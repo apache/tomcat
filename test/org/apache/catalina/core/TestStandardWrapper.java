@@ -18,6 +18,10 @@
 package org.apache.catalina.core;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.HttpConstraint;
@@ -30,6 +34,9 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.Wrapper;
+import org.apache.catalina.authenticator.BasicAuthenticator;
+import org.apache.catalina.deploy.LoginConfig;
+import org.apache.catalina.startup.TestTomcat.MapRealm;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.util.buf.ByteChunk;
@@ -37,27 +44,35 @@ import org.apache.tomcat.util.buf.ByteChunk;
 public class TestStandardWrapper extends TomcatBaseTest {
 
     public void testSecurityAnnotationsSimple() throws Exception {
-        doTest(DenyAllServlet.class.getName(), false, false);
+        doTest(DenyAllServlet.class.getName(), false, false, false);
     }
 
     public void testSecurityAnnotationsSubclass1() throws Exception {
-        doTest(SubclassDenyAllServlet.class.getName(), false, false);
+        doTest(SubclassDenyAllServlet.class.getName(), false, false, false);
     }
 
     public void testSecurityAnnotationsSubclass2() throws Exception {
-        doTest(SubclassAllowAllServlet.class.getName(), false, true);
+        doTest(SubclassAllowAllServlet.class.getName(), false, false, true);
     }
 
     public void testSecurityAnnotationsMethods1() throws Exception {
-        doTest(MethodConstraintServlet.class.getName(), false, false);
+        doTest(MethodConstraintServlet.class.getName(), false, false, false);
     }
 
     public void testSecurityAnnotationsMethods2() throws Exception {
-        doTest(MethodConstraintServlet.class.getName(), true, true);
+        doTest(MethodConstraintServlet.class.getName(), true, false, true);
+    }
+
+    public void testSecurityAnnotationsRole1() throws Exception {
+        doTest(RoleAllowServlet.class.getName(), false, true, true);
+    }
+
+    public void testSecurityAnnotationsRole2() throws Exception {
+        doTest(RoleDenyServlet.class.getName(), false, true, false);
     }
 
     private void doTest(String servletClassName, boolean usePost,
-            boolean expect200) throws Exception {
+            boolean useRole, boolean expect200) throws Exception {
 
         // Setup Tomcat instance
         Tomcat tomcat = getTomcatInstance();
@@ -70,15 +85,35 @@ public class TestStandardWrapper extends TomcatBaseTest {
         wrapper.setAsyncSupported(true);
         ctx.addServletMapping("/", "servlet");
         
+        if (useRole) {
+            MapRealm realm = new MapRealm();
+            realm.addUser("testUser", "testPwd");
+            realm.addUserRole("testUser", "testRole");
+            ctx.setRealm(realm);
+            
+            ctx.setLoginConfig(new LoginConfig("BASIC", null, null, null));
+            ctx.getPipeline().addValve(new BasicAuthenticator());
+        }
+
         tomcat.start();
         
-        // Call the servlet once
         ByteChunk bc = new ByteChunk();
+        Map<String,List<String>> reqHeaders = null;
+        if (useRole) {
+            reqHeaders = new HashMap<String,List<String>>();
+            List<String> authHeaders = new ArrayList<String>();
+            // testUser, testPwd
+            authHeaders.add("Basic dGVzdFVzZXI6dGVzdFB3ZA==");
+            reqHeaders.put("Authorization", authHeaders);
+        }
+
         int rc;
         if (usePost) {
-            rc = postUrl(null, "http://localhost:" + getPort() + "/", bc, null);
+            rc = postUrl(null, "http://localhost:" + getPort() + "/", bc,
+                    reqHeaders, null);
         } else {
-            rc = getUrl("http://localhost:" + getPort() + "/", bc, null);
+            rc = getUrl("http://localhost:" + getPort() + "/", bc, reqHeaders,
+                    null);
         }
         
         if (expect200) {
@@ -129,6 +164,16 @@ public class TestStandardWrapper extends TomcatBaseTest {
         }
     )
     public static class MethodConstraintServlet extends TestServlet {
+        private static final long serialVersionUID = 1L;
+    }
+    
+    @ServletSecurity(@HttpConstraint(rolesAllowed = "testRole"))
+    public static class RoleAllowServlet extends TestServlet {
+        private static final long serialVersionUID = 1L;
+    }
+
+    @ServletSecurity(@HttpConstraint(rolesAllowed = "otherRole"))
+    public static class RoleDenyServlet extends TestServlet {
         private static final long serialVersionUID = 1L;
     }
 }
