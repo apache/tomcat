@@ -76,6 +76,11 @@
     <pathelement location="${h2.jar}"/>
   </path>
   
+  <fileset id="license.notice" dir="${basedir}">
+    <include name="NOTICE"/>
+    <include name="LICENSE"/>
+  </fileset>
+  
   <!-- Version info filter set -->
   <tstamp>
     <format property="TODAY" pattern="MMM d yyyy" locale="en"/>
@@ -126,6 +131,7 @@
     <!-- connection pool API  file-->
     <jar jarfile="${tomcat-jdbc-api.jar}" update="true">
       <fileset dir="${tomcat.api}"/>
+      <fileset refid="license.notice"/>
     </jar>
     <delete file="${basedir}/java/org/apache/tomcat/jdbc/pool/package.html"/>
   </target>
@@ -152,6 +158,7 @@
       <fileset dir="${basedir}/java">
         <include name="org/apache/tomcat/jdbc/**/*.xml" />
       </fileset>
+      <fileset refid="license.notice"/>
     </jar>
 
     <!-- connection pool source file-->
@@ -159,6 +166,7 @@
       <fileset dir="${basedir}/java">
         <include name="org/apache/tomcat/jdbc/**" />
       </fileset>
+      <fileset refid="license.notice"/>
     </jar>
   </target>
 
@@ -184,11 +192,13 @@
       <fileset dir="${basedir}/test">
         <include name="org/apache/tomcat/jdbc/**/*.xml" />
       </fileset>
+      <fileset refid="license.notice"/>
     </jar>
     <jar jarfile="${tomcat-jdbc-test-src.jar}" update="true">
       <fileset dir="${basedir}/test">
         <include name="org/apache/tomcat/jdbc/**" />
       </fileset>
+      <fileset refid="license.notice"/>
     </jar>
   </target>
 
