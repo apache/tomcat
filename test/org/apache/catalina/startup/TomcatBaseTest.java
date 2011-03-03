@@ -238,7 +238,9 @@ public abstract class TomcatBaseTest extends TestCase {
         OutputStream os = null;
         try {
             os = connection.getOutputStream();
-            os.write(body, 0, body.length);
+            if (body != null) {
+                os.write(body, 0, body.length);
+            }
         } finally {
             if (os != null) {
                 try {
