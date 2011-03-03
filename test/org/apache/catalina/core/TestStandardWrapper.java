@@ -35,7 +35,19 @@ import org.apache.tomcat.util.buf.ByteChunk;
 
 public class TestStandardWrapper extends TomcatBaseTest {
 
-    public void testSecurityAnnotations1() throws Exception {
+    public void testSecurityAnnotationsSimple() throws Exception {
+        doDenyTest(DenyServlet.class.getName());
+    }
+
+    public void testSecurityAnnotationsSubclass1() throws Exception {
+        doDenyTest(SubclassDenyServlet.class.getName());
+    }
+
+    public void testSecurityAnnotationsSubclass2() throws Exception {
+        doAllowTest(SubclassAllowServlet.class.getName());
+    }
+
+    private void doDenyTest(String servletClassName) throws Exception {
         // Setup Tomcat instance
         Tomcat tomcat = getTomcatInstance();
         
@@ -43,8 +55,7 @@ public class TestStandardWrapper extends TomcatBaseTest {
         Context ctx =
             tomcat.addContext("", System.getProperty("java.io.tmpdir"));
         
-        Wrapper wrapper = Tomcat.addServlet(ctx, "servlet",
-                "org.apache.catalina.core.TestStandardWrapper$DenyServlet");
+        Wrapper wrapper = Tomcat.addServlet(ctx, "servlet", servletClassName);
         wrapper.setAsyncSupported(true);
         ctx.addServletMapping("/", "servlet");
         
@@ -56,6 +67,30 @@ public class TestStandardWrapper extends TomcatBaseTest {
         
         assertNull(bc.toString());
         assertEquals(403, rc);
+        
+    }
+
+    private void doAllowTest(String servletClassName) throws Exception {
+        // Setup Tomcat instance
+        Tomcat tomcat = getTomcatInstance();
+        
+        // Must have a real docBase - just use temp
+        Context ctx =
+            tomcat.addContext("", System.getProperty("java.io.tmpdir"));
+        
+        Wrapper wrapper = Tomcat.addServlet(ctx, "servlet", servletClassName);
+        wrapper.setAsyncSupported(true);
+        ctx.addServletMapping("/", "servlet");
+        
+        tomcat.start();
+        
+        // Call the servlet once
+        ByteChunk bc = new ByteChunk();
+        int rc = getUrl("http://localhost:" + getPort() + "/", bc, null);
+        
+        assertEquals("OK", bc.toString());
+        assertEquals(200, rc);
+        
     }
 
     @ServletSecurity(@HttpConstraint(EmptyRoleSemantic.DENY))
@@ -67,7 +102,16 @@ public class TestStandardWrapper extends TomcatBaseTest {
                 throws ServletException, IOException {
             
             resp.setContentType("text/plain");
-            resp.getWriter().print("FAIL");
+            resp.getWriter().print("OK");
         }
+    }
+    
+    public static class SubclassDenyServlet extends DenyServlet {
+        private static final long serialVersionUID = 1L;
+    }
+    
+    @ServletSecurity(@HttpConstraint(EmptyRoleSemantic.PERMIT))
+    public static class SubclassAllowServlet extends DenyServlet {
+        private static final long serialVersionUID = 1L;
     }
 }
