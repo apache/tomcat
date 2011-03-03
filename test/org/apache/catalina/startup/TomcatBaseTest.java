@@ -183,11 +183,30 @@ public abstract class TomcatBaseTest extends TestCase {
 
     public static int getUrl(String path, ByteChunk out,
             Map<String, List<String>> resHead) throws IOException {
+        return getUrl(path, out, null, resHead);
+    }
+
+    public static int getUrl(String path, ByteChunk out,
+            Map<String, List<String>> reqHead,
+            Map<String, List<String>> resHead) throws IOException {
 
         URL url = new URL(path);
         HttpURLConnection connection = 
             (HttpURLConnection) url.openConnection();
         connection.setReadTimeout(1000000);
+        if (reqHead != null) {
+            for (Map.Entry<String, List<String>> entry : reqHead.entrySet()) {
+                StringBuilder valueList = new StringBuilder();
+                for (String value : entry.getValue()) {
+                    if (valueList.length() > 0) {
+                        valueList.append(',');
+                    }
+                    valueList.append(value);
+                }
+                connection.setRequestProperty(entry.getKey(),
+                        valueList.toString());
+            }
+        }
         connection.connect();
         int rc = connection.getResponseCode();
         if (resHead != null) {
@@ -226,12 +245,31 @@ public abstract class TomcatBaseTest extends TestCase {
 
     public static int postUrl(byte[] body, String path, ByteChunk out,
             Map<String, List<String>> resHead) throws IOException {
+        return postUrl(body, path, out, null, resHead);
+    }
+    
+    public static int postUrl(byte[] body, String path, ByteChunk out,
+            Map<String, List<String>> reqHead,
+            Map<String, List<String>> resHead) throws IOException {
 
         URL url = new URL(path);
         HttpURLConnection connection = 
             (HttpURLConnection) url.openConnection();
         connection.setDoOutput(true);
         connection.setReadTimeout(1000000);
+        if (reqHead != null) {
+            for (Map.Entry<String, List<String>> entry : reqHead.entrySet()) {
+                StringBuilder valueList = new StringBuilder();
+                for (String value : entry.getValue()) {
+                    if (valueList.length() > 0) {
+                        valueList.append(',');
+                    }
+                    valueList.append(value);
+                }
+                connection.setRequestProperty(entry.getKey(),
+                        valueList.toString());
+            }
+        }
         connection.connect();
         
         // Write the request body
