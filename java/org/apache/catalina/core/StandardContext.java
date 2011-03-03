@@ -298,7 +298,8 @@ public class StandardContext extends ContainerBase
     /**
      * The security constraints for this web application.
      */
-    private SecurityConstraint constraints[] = new SecurityConstraint[0];
+    private volatile SecurityConstraint constraints[] =
+            new SecurityConstraint[0];
     
     private final Object constraintsLock = new Object();
 
