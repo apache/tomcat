@@ -482,9 +482,7 @@ public abstract class AuthenticatorBase extends ValveBase
         // The Servlet may specify security constraints through annotations.
         // Ensure that they have been processed before constraints are checked
         Wrapper wrapper = (Wrapper) request.getMappingData().wrapper; 
-        if (wrapper.getServlet() == null) {
-            wrapper.load();
-        }
+        wrapper.servletSecurityAnnotationScan();
 
         Realm realm = this.context.getRealm();
         // Is this request URI subject to a security constraint?
