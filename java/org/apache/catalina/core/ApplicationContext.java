@@ -520,12 +520,10 @@ public class ApplicationContext
     public URL getResource(String path)
         throws MalformedURLException {
 
-        if (path == null)
-            throw new MalformedURLException(sm.getString("applicationContext.requestDispatcher.iae", path));
-
-        if (!path.startsWith("/") && GET_RESOURCE_REQUIRE_SLASH)
-            throw new MalformedURLException(sm.getString("applicationContext.requestDispatcher.iae", path));
-
+        if (path == null ||
+                !path.startsWith("/") && GET_RESOURCE_REQUIRE_SLASH)
+            throw new MalformedURLException(sm.getString(
+                    "applicationContext.requestDispatcher.iae", path));
         
         String normPath = RequestUtil.normalize(path);
         if (normPath == null)
