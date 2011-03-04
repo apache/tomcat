@@ -39,7 +39,6 @@ import org.apache.catalina.Manager;
 import org.apache.catalina.Session;
 import org.apache.catalina.util.Enumerator;
 import org.apache.catalina.util.RequestUtil;
-import org.apache.tomcat.util.res.StringManager;
 
 
 /**
@@ -79,13 +78,6 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
       RequestDispatcher.FORWARD_SERVLET_PATH, 
       RequestDispatcher.FORWARD_PATH_INFO,
       RequestDispatcher.FORWARD_QUERY_STRING };
-
-
-    /**
-     * The string manager for this package.
-     */
-    protected static final StringManager sm =
-        StringManager.getManager(Constants.Package);
 
 
     // ----------------------------------------------------------- Constructors

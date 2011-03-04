@@ -239,7 +239,6 @@ final class ApplicationFilterChain implements FilterChain, CometFilterChain {
                     SecurityUtil.doAsPrivilege
                         ("doFilter", filter, classType, args, principal);
                     
-                    args = null;
                 } else {  
                     filter.doFilter(request, response, this);
                 }
@@ -301,7 +300,6 @@ final class ApplicationFilterChain implements FilterChain, CometFilterChain {
                                                classTypeUsedInService, 
                                                args,
                                                principal);   
-                    args = null;
                 } else {  
                     servlet.service(request, response);
                 }
@@ -426,7 +424,6 @@ final class ApplicationFilterChain implements FilterChain, CometFilterChain {
                     SecurityUtil.doAsPrivilege("doFilterEvent", filter,
                             cometClassType, args, principal);
 
-                    args = null;
                 } else {  
                     filter.doFilterEvent(event, this);
                 }
@@ -481,7 +478,6 @@ final class ApplicationFilterChain implements FilterChain, CometFilterChain {
                         classTypeUsedInEvent, 
                         args,
                         principal);
-                args = null;
             } else {  
                 ((CometProcessor) servlet).event(event);
             }
