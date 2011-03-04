@@ -17,6 +17,7 @@
 
 package org.apache.catalina.core;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -69,6 +70,26 @@ public class TestStandardWrapper extends TomcatBaseTest {
 
     public void testSecurityAnnotationsRole2() throws Exception {
         doTest(RoleDenyServlet.class.getName(), false, true, false);
+    }
+
+    public void testSecurityAnnotationsWebXmlPriority() throws Exception {
+
+        // Setup Tomcat instance
+        Tomcat tomcat = getTomcatInstance();
+        
+        File appDir = new File("test/webapp-3.0-fragments");
+        tomcat.addWebapp(null, "", appDir.getAbsolutePath());
+        
+        tomcat.start();
+        
+        ByteChunk bc = new ByteChunk();
+        int rc;
+        rc = getUrl("http://localhost:" + getPort() +
+                "/testStandardWrapper/securityAnnotationsWebXmlPriority",
+                bc, null, null);
+        
+        assertNull(bc.toString());
+        assertEquals(403, rc);
     }
 
     private void doTest(String servletClassName, boolean usePost,
