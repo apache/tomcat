@@ -59,7 +59,7 @@ public class TestRegistration extends TomcatBaseTest {
 
         // Verify there are the correct number of Tomcat MBeans
         onames = mbeanServer.queryNames(new ObjectName("Tomcat:*"), null);
-        assertEquals("Wrong number of Tomcat MBeans", 22, onames.size());
+        assertEquals("Wrong number of Tomcat MBeans", 23, onames.size());
 
         tomcat.stop();
 
