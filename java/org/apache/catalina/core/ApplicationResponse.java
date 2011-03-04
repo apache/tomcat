@@ -14,17 +14,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.catalina.core;
-
 
 import java.util.Locale;
 
 import javax.servlet.ServletResponse;
 import javax.servlet.ServletResponseWrapper;
-
-import org.apache.tomcat.util.res.StringManager;
 
 
 /**
@@ -84,13 +79,6 @@ class ApplicationResponse extends ServletResponseWrapper {
      * call?
      */
     protected boolean included = false;
-
-
-    /**
-     * The string manager for this package.
-     */
-    protected static final StringManager sm =
-        StringManager.getManager(Constants.Package);
 
 
     // ------------------------------------------------ ServletResponse Methods
