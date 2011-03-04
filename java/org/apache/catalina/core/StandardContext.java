@@ -837,6 +837,12 @@ public class StandardContext extends ContainerBase
     
     private boolean fireRequestListenersOnForwards = false;
 
+    /**
+     * Servlets created via {@link ApplicationContext#createServlet(Class)} for
+     * tracking purposes.
+     */
+    private Set<Servlet> createdServlets = new HashSet<Servlet>();
+
     // ----------------------------------------------------- Context Properties
 
 
@@ -4364,6 +4370,11 @@ public class StandardContext extends ContainerBase
      * @param wrapper   The wrapper for the Servlet that was added
      */
     public ServletRegistration.Dynamic dynamicServletAdded(Wrapper wrapper) {
+        Servlet s = wrapper.getServlet();
+        if (s != null && createdServlets.contains(s)) {
+            // Mark the wrapper to indicate annotations need to be scanned
+            wrapper.setServletSecurityAnnotationScanRequired(true);
+        }
         return new ApplicationServletRegistration(wrapper, this);
     }
 
@@ -4372,7 +4383,7 @@ public class StandardContext extends ContainerBase
      * @param servlet
      */
     public void dynamicServletCreated(Servlet servlet) {
-        // NOOP - Hook for JACC implementations
+        createdServlets.add(servlet);
     }
 
 
@@ -5530,6 +5541,8 @@ public class StandardContext extends ContainerBase
         
         initializers.clear();
         
+        createdServlets.clear();
+
         if(log.isDebugEnabled())
             log.debug("resetContext " + getObjectName());
     }
