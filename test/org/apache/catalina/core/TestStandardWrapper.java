@@ -23,8 +23,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
+import javax.servlet.Servlet;
+import javax.servlet.ServletContainerInitializer;
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
+import javax.servlet.ServletRegistration;
 import javax.servlet.annotation.HttpConstraint;
 import javax.servlet.annotation.HttpMethodConstraint;
 import javax.servlet.annotation.ServletSecurity;
@@ -110,6 +115,43 @@ public class TestStandardWrapper extends TomcatBaseTest {
         
         assertEquals("OK", bc.toString());
         assertEquals(200, rc);
+    }
+
+    public void testSecurityAnnotationsAddServlet1() throws Exception {
+        doTestSecurityAnnotationsAddServlet(false);
+    }
+    
+    public void testSecurityAnnotationsAddServlet2() throws Exception {
+        doTestSecurityAnnotationsAddServlet(true);
+    }
+    
+    private void doTestSecurityAnnotationsAddServlet(boolean useCreateServlet)
+            throws Exception {
+
+        // Setup Tomcat instance
+        Tomcat tomcat = getTomcatInstance();
+        
+        // Must have a real docBase - just use temp
+        Context ctx =
+            tomcat.addContext("", System.getProperty("java.io.tmpdir"));
+        
+        Servlet s = new DenyAllServlet();
+        ServletContainerInitializer sci = new SCI(s, useCreateServlet);
+        ctx.addServletContainerInitializer(sci, null);
+        
+        tomcat.start();
+        
+        ByteChunk bc = new ByteChunk();
+        int rc;
+        rc = getUrl("http://localhost:" + getPort() + "/", bc, null, null);
+        
+        if (useCreateServlet) {
+            assertNull(bc.toString());
+            assertEquals(403, rc);
+        } else {
+            assertEquals("OK", bc.toString());
+            assertEquals(200, rc);
+        }
     }
 
     private void doTest(String servletClassName, boolean usePost,
@@ -216,5 +258,30 @@ public class TestStandardWrapper extends TomcatBaseTest {
     @ServletSecurity(@HttpConstraint(rolesAllowed = "otherRole"))
     public static class RoleDenyServlet extends TestServlet {
         private static final long serialVersionUID = 1L;
+    }
+
+    public static class SCI implements ServletContainerInitializer {
+
+        private Servlet servlet;
+        private boolean createServlet;
+        
+        public SCI(Servlet servlet, boolean createServlet) {
+            this.servlet = servlet;
+            this.createServlet = createServlet;
+        }
+
+        @Override
+        public void onStartup(Set<Class<?>> c, ServletContext ctx)
+                throws ServletException {
+            Servlet s;
+            
+            if (createServlet) {
+                s = ctx.createServlet(servlet.getClass());
+            } else {
+                s = servlet;
+            }
+            ServletRegistration.Dynamic r = ctx.addServlet("servlet", s);
+            r.addMapping("/");
+        }
     }
 }

@@ -371,4 +371,19 @@ public interface Wrapper extends Container {
      */
     public void setEnabled(boolean enabled);
 
+    /**
+     * Set the flag that indicates
+     * {@link javax.servlet.annotation.ServletSecurity} annotations must be
+     * scanned when the Servlet is first used.
+     * 
+     * @param b The new value of the flag
+     */
+    public void setServletSecurityAnnotationScanRequired(boolean b);
+    
+    /**
+     * Scan for (if necessary) and process (if found) the
+     * {@link javax.servlet.annotation.ServletSecurity} annotations for the
+     * Servlet associated with this wrapper.
+     */
+    public void servletSecurityAnnotationScan() throws ServletException;
 }

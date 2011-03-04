@@ -273,6 +273,8 @@ public class StandardWrapper extends ContainerBase
      */
     protected boolean enabled = true;
 
+    protected volatile boolean servletSecurityAnnotationScanRequired = false;
+
     /**
      * Static class array used when the SecurityManager is turned on and 
      * <code>Servlet.init</code> is invoked.
@@ -641,6 +643,15 @@ public class StandardWrapper extends ContainerBase
     @Override
     public void setServlet(Servlet servlet) {
         instance = servlet;
+    }
+
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setServletSecurityAnnotationScanRequired(boolean b) {
+        this.servletSecurityAnnotationScanRequired = b;
     }
 
     // --------------------------------------------------------- Public Methods
@@ -1077,20 +1088,12 @@ public class StandardWrapper extends ContainerBase
                 }
             }
 
-            ServletSecurity secAnnotation =
-                servlet.getClass().getAnnotation(ServletSecurity.class);
-            Context ctxt = (Context) getParent();
-            if (secAnnotation != null) {
-                ctxt.addServletSecurity(
-                        new ApplicationServletRegistration(this, ctxt),
-                        new ServletSecurityElement(secAnnotation));
-            }
-            
+            processServletSecurityAnnotation(servlet);
 
             // Special handling for ContainerServlet instances
             if ((servlet instanceof ContainerServlet) &&
-                  (isContainerProvidedServlet(servletClass) ||
-                    ctxt.getPrivileged() )) {
+                    (isContainerProvidedServlet(servletClass) ||
+                            ((Context) getParent()).getPrivileged() )) {
                 ((ContainerServlet) servlet).setWrapper(this);
             }
 
@@ -1121,6 +1124,34 @@ public class StandardWrapper extends ContainerBase
         }
         return servlet;
 
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void servletSecurityAnnotationScan() throws ServletException {
+        if (instance == null) {
+            load();
+        } else {
+            if (servletSecurityAnnotationScanRequired) {
+                processServletSecurityAnnotation(instance);
+            }
+        }
+    }
+
+    private void processServletSecurityAnnotation(Servlet servlet) {
+        // Calling this twice isn't harmful so no syncs
+        servletSecurityAnnotationScanRequired = false;
+
+        ServletSecurity secAnnotation =
+            servlet.getClass().getAnnotation(ServletSecurity.class);
+        Context ctxt = (Context) getParent();
+        if (secAnnotation != null) {
+            ctxt.addServletSecurity(
+                    new ApplicationServletRegistration(this, ctxt),
+                    new ServletSecurityElement(secAnnotation));
+        }
     }
 
     private synchronized void initServlet(Servlet servlet)
