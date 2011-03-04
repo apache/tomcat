@@ -27,4 +27,20 @@
      Used as part of the Tomcat unit tests when a full web application is
      required.
   </description>
+  
+  <servlet>
+    <servlet-name>AllowByAnnotation</servlet-name>
+    <servlet-class>org.apache.catalina.core.TestStandardWrapper$SubclassAllowAllServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>AllowByAnnotation</servlet-name>
+    <url-pattern>/testStandardWrapper/securityAnnotationsWebXmlPriority</url-pattern>  
+  </servlet-mapping>
+  <security-constraint>
+    <auth-constraint/>
+    <web-resource-collection>
+    <url-pattern>/testStandardWrapper/securityAnnotationsWebXmlPriority</url-pattern>  
+    </web-resource-collection>
+  </security-constraint>
+
 </web-app>
