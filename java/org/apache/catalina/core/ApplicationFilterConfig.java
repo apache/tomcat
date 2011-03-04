@@ -110,7 +110,7 @@ public final class ApplicationFilterConfig implements FilterConfig, Serializable
     /**
      * The Context with which we are associated.
      */
-    private Context context = null;
+    private transient Context context = null;
 
 
     /**
