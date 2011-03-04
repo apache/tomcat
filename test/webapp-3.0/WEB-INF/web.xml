@@ -103,4 +103,14 @@
       <url-pattern>/bug49nnn/bug49726b.jsp</url-pattern>
     </jsp-property-group>
   </jsp-config>
+  
+  <servlet>
+    <servlet-name>DenyByAnnotation</servlet-name>
+    <servlet-class>org.apache.catalina.core.TestStandardWrapper$DenyAllServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>DenyByAnnotation</servlet-name>
+    <url-pattern>/testStandardWrapper/securityAnnotationsMetaDataPriority</url-pattern>  
+  </servlet-mapping>
+
 </web-app>
