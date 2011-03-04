@@ -14,10 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.catalina.core;
-
 
 import java.io.IOException;
 import java.util.Locale;
@@ -25,8 +22,6 @@ import java.util.Locale;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpServletResponseWrapper;
-
-import org.apache.tomcat.util.res.StringManager;
 
 
 /**
@@ -94,13 +89,6 @@ class ApplicationHttpResponse extends HttpServletResponseWrapper {
      */
     protected static final String info =
         "org.apache.catalina.core.ApplicationHttpResponse/1.0";
-
-
-    /**
-     * The string manager for this package.
-     */
-    protected static final StringManager sm =
-        StringManager.getManager(Constants.Package);
 
 
     // ------------------------------------------------ ServletResponse Methods

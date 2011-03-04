@@ -83,6 +83,7 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
         request.getCoyoteRequest().action(ActionCode.ASYNC_COMPLETE, null);
     }
 
+    @Override
     public void fireOnComplete() {
         List<AsyncListenerWrapper> listenersCopy =
             new ArrayList<AsyncListenerWrapper>();
@@ -383,7 +384,7 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
                 "Req: %1$8s  CReq: %2$8s  RP: %3$8s  Stage: %4$s  " +
                 "Thread: %5$20s  State: %6$20s  Method: %7$11s  URI: %8$s",
                 rHashCode, crHashCode, rpHashCode, stage,
-                Thread.currentThread().getName(), "N/A", method, uri);
+                threadName, "N/A", method, uri);
         if (log.isTraceEnabled()) {
             log.trace(msg, new DebugException());
         } else {
