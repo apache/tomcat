@@ -92,6 +92,26 @@ public class TestStandardWrapper extends TomcatBaseTest {
         assertEquals(403, rc);
     }
 
+    public void testSecurityAnnotationsMetaDataPriority() throws Exception {
+
+        // Setup Tomcat instance
+        Tomcat tomcat = getTomcatInstance();
+        
+        File appDir = new File("test/webapp-3.0");
+        tomcat.addWebapp(null, "", appDir.getAbsolutePath());
+        
+        tomcat.start();
+        
+        ByteChunk bc = new ByteChunk();
+        int rc;
+        rc = getUrl("http://localhost:" + getPort() +
+                "/testStandardWrapper/securityAnnotationsMetaDataPriority",
+                bc, null, null);
+        
+        assertEquals("OK", bc.toString());
+        assertEquals(200, rc);
+    }
+
     private void doTest(String servletClassName, boolean usePost,
             boolean useRole, boolean expect200) throws Exception {
 
