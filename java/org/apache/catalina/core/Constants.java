@@ -27,9 +27,4 @@ public class Constants {
 
     public static final String JSP_SERVLET_CLASS =
         "org.apache.jasper.servlet.JspServlet";
-    public static final String JSP_SERVLET_NAME = "jsp";
-    public static final String PRECOMPILE = 
-        System.getProperty("org.apache.jasper.Constants.PRECOMPILE",
-                "jsp_precompile");
-
 }
