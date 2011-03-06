@@ -312,6 +312,8 @@ public class JspServletWrapper {
                         boolean precompile)
             throws ServletException, IOException, FileNotFoundException {
         
+        Servlet servlet;
+
         try {
 
             if (ctxt.isRemoved()) {
@@ -351,7 +353,7 @@ public class JspServletWrapper {
             /*
              * (2) (Re)load servlet class file
              */
-            getServlet();
+            servlet = getServlet();
 
             // If a page is to be precompiled only, return.
             if (precompile) {
@@ -407,14 +409,14 @@ public class JspServletWrapper {
             /*
              * (4) Service request
              */
-            if (theServlet instanceof SingleThreadModel) {
+            if (servlet instanceof SingleThreadModel) {
                // sync on the wrapper so that the freshness
                // of the page is determined right before servicing
                synchronized (this) {
-                   theServlet.service(request, response);
+                   servlet.service(request, response);
                 }
             } else {
-                theServlet.service(request, response);
+                servlet.service(request, response);
             }
         } catch (UnavailableException ex) {
             String includeRequestUri = (String)
