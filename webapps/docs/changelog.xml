@@ -46,6 +46,10 @@
   <subsection name="Catalina">
     <changelog>
       <fix>
+        <bug>26701</bug>: Provide a mechanism for users to register their own
+        <code>URLStreamHandlerFactory</code> objects. (markt)
+      </fix>
+      <fix>
         <bug>50855</bug>: Fix NPE on HttpServletRequest.logout() when debug
         logging is enabled. (markt)
       </fix>
