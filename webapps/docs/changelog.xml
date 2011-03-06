@@ -51,6 +51,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Coyote">
+    <changelog>
+      <add>
+        <bug>48208</bug>: Allow the configuration of a custom trust manager for
+        use in CLIENT-CERT authentication. (markt)
+      </add>
+    </changelog>
+  </subsection>
   <subsection name="Jasper">
     <changelog>
       <fix>
