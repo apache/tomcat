@@ -27,16 +27,13 @@ import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.net.jsse.TesterBug50640SslImpl;
 
 /**
- * Requires test.keystore (checked in), generated with:
- *  keytool -genkey -alias tomcat -keyalg RSA
- *  pass: changeit 
- *  CN: localhost ( for hostname validation )
+ * The keys and certificates used in this file are all available in svn and were
+ * generated using a test CA the files for which are in the Tomcat PMC private
+ * repository since not all of them are AL2 licensed.
  */
 public class TestCustomSsl extends TomcatBaseTest {
 
-    public void testSimpleSsl() throws Exception {
-        // Install the all-trusting trust manager so https:// works 
-        // with unsigned certs. 
+    public void testCustomSslImplementation() throws Exception {
 
         try {
             SSLContext sc = SSLContext.getInstance("SSL");
