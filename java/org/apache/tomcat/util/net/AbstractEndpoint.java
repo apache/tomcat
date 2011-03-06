@@ -679,9 +679,13 @@ public abstract class AbstractEndpoint {
     private String truststoreFile = System.getProperty("javax.net.ssl.trustStore");
     public String getTruststoreFile() {return truststoreFile;}
     public void setTruststoreFile(String s) {
-        String file = adjustRelativePath(s,
-                System.getProperty(Constants.CATALINA_BASE_PROP));
-        this.truststoreFile = file;
+        if (s == null) {
+            this.truststoreFile = null;
+        } else {
+            String file = adjustRelativePath(s,
+                    System.getProperty(Constants.CATALINA_BASE_PROP));
+            this.truststoreFile = file;
+        }
     }
 
     private String truststorePass =
@@ -708,6 +712,12 @@ public abstract class AbstractEndpoint {
     public String getTruststoreAlgorithm() {return truststoreAlgorithm;}
     public void setTruststoreAlgorithm(String truststoreAlgorithm) {
         this.truststoreAlgorithm = truststoreAlgorithm;
+    }
+
+    private String trustManagerClassName = null;
+    public String getTrustManagerClassName() {return trustManagerClassName;}
+    public void setTrustManagerClassName(String trustManagerClassName) {
+        this.trustManagerClassName = trustManagerClassName;
     }
 
     private String crlFile = null;
