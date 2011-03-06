@@ -61,6 +61,9 @@
         Improve shut down speed by not renewing threads during shut down when
         the <code>ThreadLocalLeakPreventionListener</code> is enabled. (markt)  
       </fix>
+      <fix>
+        Don&apos;t ignore @ServletSecurity annotations. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
