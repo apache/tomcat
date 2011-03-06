@@ -72,7 +72,6 @@ public final class Matcher {
      *         or <code>false</code> otherwise.
      */
     public static boolean matchPath(Set<String[]> patternSet, String str) {
-        boolean result;
         for (String[] patternTokens: patternSet) {
             if (matchPath(patternTokens, tokenizePathAsArray(str), true)) {
                 return true;
