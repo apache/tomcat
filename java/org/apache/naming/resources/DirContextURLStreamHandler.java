@@ -31,8 +31,7 @@ import javax.naming.directory.DirContext;
  * @author <a href="mailto:remm@apache.org">Remy Maucherat</a>
  * @version $Revision$
  */
-public class DirContextURLStreamHandler 
-    extends URLStreamHandler {
+public class DirContextURLStreamHandler extends URLStreamHandler {
     
     
     // ----------------------------------------------------------- Constructors
@@ -131,21 +130,6 @@ public class DirContextURLStreamHandler
 
 
     // --------------------------------------------------------- Public Methods
-    
-    
-    /**
-     * Set the java.protocol.handler.pkgs system property.
-     */
-    public static void setProtocolHandler() {
-        String value = System.getProperty(Constants.PROTOCOL_HANDLER_VARIABLE);
-        if (value == null) {
-            value = Constants.Package;
-            System.setProperty(Constants.PROTOCOL_HANDLER_VARIABLE, value);
-        } else if (value.indexOf(Constants.Package) == -1) {
-            value += "|" + Constants.Package;
-            System.setProperty(Constants.PROTOCOL_HANDLER_VARIABLE, value);
-        }
-    }
     
     
     /**
