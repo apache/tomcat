@@ -967,6 +967,14 @@
       the default is "<code>TLS</code>".</p>
     </attribute>
 
+    <attribute name="trustManagerClassName" required="false">
+      <p>The name of a custom trust manager class to use to validate client
+      certificates. The class must have a zero argument constructor and must
+      also implement <code>javax.net.ssl.X509TrustManager</code>. If this
+      attribute is set, the trust store attributes may be ignored.
+      </p>
+    </attribute>
+    
     <attribute name="trustMaxCertLength" required="false">
       <p>The maximum number of intermediate certificates that will be allowed
       when validating client certificates. If not specified, the default value

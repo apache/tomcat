@@ -569,12 +569,12 @@ public class JSSESocketFactory implements ServerSocketFactory {
         TrustManager[] tms = null;
         
         KeyStore trustStore = getTrustStore(keystoreType, keystoreProvider);
-        if (trustStore != null) {
+        if (trustStore != null || endpoint.getTrustManagerClassName() != null) {
             if (crlf == null) {
                 TrustManagerFactory tmf =
                     TrustManagerFactory.getInstance(algorithm);
                 tmf.init(trustStore);
-                tms = tmf.getTrustManagers();
+                tms = getTrustManagers(tmf);
             } else {
                 TrustManagerFactory tmf =
                     TrustManagerFactory.getInstance(algorithm);
@@ -583,13 +583,42 @@ public class JSSESocketFactory implements ServerSocketFactory {
                 ManagerFactoryParameters mfp =
                     new CertPathTrustManagerParameters(params);
                 tmf.init(mfp);
-                tms = tmf.getTrustManagers();
+                tms = getTrustManagers(tmf);
             }
         }
         
         return tms;
     }
-    
+
+    /**
+     * Gets the TrustManagers either from Connector's
+     * <code>trustManagerClassName</code> attribute (if set) else from the
+     * {@link TrustManagerFactory}.
+     * @return The TrustManagers to use for this connector.
+     * @throws NoSuchAlgorithmException 
+     * @throws ClassNotFoundException 
+     * @throws IllegalAccessException 
+     * @throws InstantiationException 
+    */
+   protected TrustManager[] getTrustManagers(TrustManagerFactory tmf)
+           throws NoSuchAlgorithmException, ClassNotFoundException,
+           InstantiationException, IllegalAccessException {
+
+       String className = endpoint.getTrustManagerClassName();
+       if(className != null && className.length() > 0) {
+            ClassLoader classLoader = getClass().getClassLoader();
+            Class<?> clazz = classLoader.loadClass(className);
+            if(!(TrustManager.class.isAssignableFrom(clazz))){
+               throw new InstantiationException(sm.getString(
+                       "jsse.invalidTrustManagerClassName", className));
+            }
+            Object trustManagerObject = clazz.newInstance();
+            TrustManager trustManager = (TrustManager) trustManagerObject;
+            return new TrustManager[]{ trustManager };
+        }      
+       return tmf.getTrustManagers();
+   }
+
     /**
      * Return the initialization parameters for the TrustManager.
      * Currently, only the default <code>PKIX</code> is supported.
