@@ -686,9 +686,11 @@ public abstract class AuthenticatorBase extends ValveBase
                             Principal principal, String authType,
                             String username, String password) {
 
-        if (log.isDebugEnabled())
-            log.debug("Authenticated '" + principal.getName() + "' with type '"
-                + authType + "'");
+        if (log.isDebugEnabled()) {
+            String name = (principal == null) ? "none" : principal.getName(); 
+            log.debug("Authenticated '" + name + "' with type '" + authType +
+                    "'");
+        }
 
         // Cache the authentication information in our request
         request.setAuthType(authType);

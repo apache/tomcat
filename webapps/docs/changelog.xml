@@ -43,6 +43,14 @@
   Other
 -->
 <section name="Tomcat 7.0.11 (markt)">
+  <subsection name="Catalina">
+    <changelog>
+      <fix>
+        <bug>50855</bug>: Fix NPE on HttpServletRequest.logout() when debug
+        logging is enabled. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Jasper">
     <changelog>
       <fix>
