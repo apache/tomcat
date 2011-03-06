@@ -36,7 +36,7 @@ public final class Library {
         throws Exception
     {
         boolean loaded = false;
-        String err = "";
+        StringBuilder err = new StringBuilder();
         for (int i = 0; i < NAMES.length; i++) {
             try {
                 System.loadLibrary(NAMES[i]);
@@ -60,17 +60,17 @@ public final class Library {
                     }
                 }
                 if ( i > 0)
-                    err += ", ";
-                err +=  t.getMessage();
+                    err.append(", ");
+                err.append(t.getMessage());
             }
             if (loaded)
                 break;
         }
         if (!loaded) {
-            err += "(";
-            err += System.getProperty("java.library.path");
-            err += ")";
-            throw new UnsatisfiedLinkError(err);
+            err.append('(');
+            err.append(System.getProperty("java.library.path"));
+            err.append(')');
+            throw new UnsatisfiedLinkError(err.toString());
         }
     }
 
