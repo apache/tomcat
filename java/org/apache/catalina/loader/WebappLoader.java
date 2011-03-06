@@ -559,7 +559,7 @@ public class WebappLoader extends LifecycleMBeanBase
         
         // Register a stream handler factory for the JNDI protocol
         URLStreamHandlerFactory streamHandlerFactory =
-            new DirContextURLStreamHandlerFactory();
+                DirContextURLStreamHandlerFactory.getInstance();
         if (first) {
             first = false;
             try {
