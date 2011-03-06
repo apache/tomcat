@@ -42,6 +42,16 @@
   General, Catalina, Coyote, Jasper, Cluster, Web applications, Extras, Tribes,
   Other
 -->
+<section name="Tomcat 7.0.11 (markt)">
+  <subsection name="Jasper">
+    <changelog>
+      <fix>
+        Correct possible threading issue in JSP compilation when development
+        mode is used. (markt)
+      </fix>
+    </changelog>
+  </subsection>
+</section>
 <section name="Tomcat 7.0.10 (markt)">
   <subsection name="Catalina">
     <changelog>
