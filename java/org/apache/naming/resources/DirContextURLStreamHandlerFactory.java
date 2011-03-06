@@ -19,32 +19,38 @@ package org.apache.naming.resources;
 
 import java.net.URLStreamHandler;
 import java.net.URLStreamHandlerFactory;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
- * Factory for Stream handlers to a JNDI directory context.
+ * Factory for Stream handlers to a JNDI directory context that also supports
+ * users specifying additional stream handler.
  * 
  * @author <a href="mailto:remm@apache.org">Remy Maucherat</a>
  * @version $Revision$
  */
-public class DirContextURLStreamHandlerFactory 
-    implements URLStreamHandlerFactory {
+public class DirContextURLStreamHandlerFactory
+        implements URLStreamHandlerFactory {
     
-    
-    // ----------------------------------------------------------- Constructors
-    
-    
-    public DirContextURLStreamHandlerFactory() {
-        // NOOP
+    // Singleton
+    private static DirContextURLStreamHandlerFactory instance =
+        new DirContextURLStreamHandlerFactory();
+
+    public static DirContextURLStreamHandlerFactory getInstance() {
+        return instance;
     }
-    
-    
-    // ----------------------------------------------------- Instance Variables
-    
-    
-    // ------------------------------------------------------------- Properties
-    
-    
-    // ---------------------------------------- URLStreamHandlerFactory Methods
+
+    public static void addUserFactory(URLStreamHandlerFactory factory) {
+        instance.userFactories.add(factory);
+    }
+
+
+    private List<URLStreamHandlerFactory> userFactories =
+        new CopyOnWriteArrayList<URLStreamHandlerFactory>();
+
+    private DirContextURLStreamHandlerFactory() {
+        // Hide the default constructor
+    }
     
     
     /**
@@ -60,6 +66,13 @@ public class DirContextURLStreamHandlerFactory
         if (protocol.equals("jndi")) {
             return new DirContextURLStreamHandler();
         } else {
+            for (URLStreamHandlerFactory factory : userFactories) {
+                URLStreamHandler handler =
+                    factory.createURLStreamHandler(protocol);
+                if (handler != null) {
+                    return handler;
+                }
+            }
             return null;
         }
     }
