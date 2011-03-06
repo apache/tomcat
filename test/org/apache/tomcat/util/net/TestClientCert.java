@@ -16,21 +16,8 @@
  */
 package org.apache.tomcat.util.net;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.Arrays;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.apache.catalina.Context;
-import org.apache.catalina.authenticator.SSLAuthenticator;
-import org.apache.catalina.deploy.LoginConfig;
-import org.apache.catalina.deploy.SecurityCollection;
-import org.apache.catalina.deploy.SecurityConstraint;
-import org.apache.catalina.startup.TestTomcat.MapRealm;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.util.buf.ByteChunk;
@@ -41,7 +28,6 @@ import org.apache.tomcat.util.buf.ByteChunk;
  * repository since not all of them are AL2 licensed.
  */
 public class TestClientCert extends TomcatBaseTest {
-    public static final byte DATA = (byte)33;
     
     public void testClientCertGet() throws Exception {
         if (!TesterSupport.isRenegotiationSupported(getTomcatInstance())) {
@@ -83,7 +69,7 @@ public class TestClientCert extends TomcatBaseTest {
         }
 
         byte[] body = new byte[bodySize];
-        Arrays.fill(body, DATA);
+        Arrays.fill(body, TesterSupport.DATA);
 
         // Unprotected resource
         ByteChunk res = postUrl(body,
@@ -112,79 +98,11 @@ public class TestClientCert extends TomcatBaseTest {
 
         Tomcat tomcat = getTomcatInstance();
 
-        TesterSupport.initSsl(tomcat);
-        
-        // Need a web application with a protected and unprotected URL
-        // Must have a real docBase - just use temp
-        Context ctx =
-            tomcat.addContext("", System.getProperty("java.io.tmpdir"));
-
-        Tomcat.addServlet(ctx, "simple", new SimpleServlet());
-        ctx.addServletMapping("/unprotected", "simple");
-        ctx.addServletMapping("/protected", "simple");
-
-        // Security constraints
-        SecurityCollection collection = new SecurityCollection();
-        collection.addPattern("/protected");
-        SecurityConstraint sc = new SecurityConstraint();
-        sc.addAuthRole("testrole");
-        sc.addCollection(collection);
-        ctx.addConstraint(sc);
-
-        // Configure the Realm
-        MapRealm realm = new MapRealm();
-        realm.addUser("CN=user1, C=US", "not used");
-        realm.addUserRole("CN=user1, C=US", "testrole");
-        ctx.setRealm(realm);
-        
-        // Configure the authenticator
-        LoginConfig lc = new LoginConfig();
-        lc.setAuthMethod("CLIENT-CERT");
-        ctx.setLoginConfig(lc);
-        ctx.getPipeline().addValve(new SSLAuthenticator());
+        TesterSupport.configureClientCertContext(tomcat);
         
         // Start Tomcat
         tomcat.start();
         
         TesterSupport.configureClientSsl();
-    }
-
-    public static class SimpleServlet extends HttpServlet {
-
-        private static final long serialVersionUID = 1L;
-        
-        @Override
-        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-                throws ServletException, IOException {
-            resp.setContentType("text/plain");
-            resp.getWriter().print("OK");
-        }
-        
-        @Override
-        protected void doPost(HttpServletRequest req, HttpServletResponse resp)
-                throws ServletException, IOException {
-            // Swallow any request body
-            int read = 0;
-            int len = 0;
-            byte[] buffer = new byte[4096];
-            InputStream is = req.getInputStream();
-            boolean contentOK = true;
-            while (len > -1) {
-                len = is.read(buffer);
-                read = read + len;
-                for (int i=0; i<len && contentOK; i++) {
-                    contentOK = (buffer[i] == DATA);
-                }
-            }
-            // len will have been -1 on last iteration
-            read++;
-            
-            // Report the number of bytes read
-            resp.setContentType("text/plain");
-            if (contentOK) 
-                resp.getWriter().print("OK-" + read);
-            else
-                resp.getWriter().print("CONTENT-MISMATCH-" + read);
-        }
     }
 }
