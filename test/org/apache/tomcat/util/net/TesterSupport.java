@@ -24,6 +24,7 @@ import java.security.KeyManagementException;
 import java.security.KeyStore;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
+import java.security.cert.X509Certificate;
 
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.KeyManagerFactory;
@@ -31,6 +32,7 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLServerSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
+import javax.net.ssl.X509TrustManager;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -224,6 +226,26 @@ public final class TesterSupport {
                 resp.getWriter().print("OK-" + read);
             else
                 resp.getWriter().print("CONTENT-MISMATCH-" + read);
+        }
+    }
+    
+    public static class TrustAllCerts implements X509TrustManager {
+        
+        @Override
+        public X509Certificate[] getAcceptedIssuers() {
+            return new X509Certificate[0];
+        }
+        
+        @Override
+        public void checkClientTrusted(X509Certificate[] certs,
+                String authType) {
+            // NOOP - Trust everything
+        }
+        
+        @Override
+        public void checkServerTrusted(X509Certificate[] certs,
+                String authType) {
+            // NOOP - Trust everything
         }
     }
 }

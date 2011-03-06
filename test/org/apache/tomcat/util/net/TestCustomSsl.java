@@ -17,12 +17,15 @@
 package org.apache.tomcat.util.net;
 
 import java.io.File;
+import java.net.SocketException;
 
-import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLHandshakeException;
 
 import org.apache.catalina.connector.Connector;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.coyote.ProtocolHandler;
+import org.apache.coyote.http11.AbstractHttp11JsseProtocol;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.net.jsse.TesterBug50640SslImpl;
 
@@ -35,16 +38,8 @@ public class TestCustomSsl extends TomcatBaseTest {
 
     public void testCustomSslImplementation() throws Exception {
 
-        try {
-            SSLContext sc = SSLContext.getInstance("SSL");
-            sc.init(null, TesterSupport.getTrustManagers(),
-                    new java.security.SecureRandom());
-            javax.net.ssl.HttpsURLConnection.setDefaultSSLSocketFactory(
-                    sc.getSocketFactory());
-        } catch (Exception e) {
-            e.printStackTrace();
-        } 
-        
+        TesterSupport.configureClientSsl();
+
         Tomcat tomcat = getTomcatInstance();
         Connector connector = tomcat.getConnector();
         if (connector.getProtocolHandlerClassName().contains("Apr")) {
@@ -76,4 +71,70 @@ public class TestCustomSsl extends TomcatBaseTest {
         assertTrue(res.toString().indexOf("<h1>Hello World!</h1>") > 0);
     }
 
+    public void testCustomTrustManager1() throws Exception {
+        doTestCustomTrustManager(false);
+    }
+    
+    public void testCustomTrustManager2() throws Exception {
+        doTestCustomTrustManager(true);
+    }
+    
+    private void doTestCustomTrustManager(boolean serverTrustAll)
+            throws Exception {
+        
+        if (!TesterSupport.RFC_5746_SUPPORTED) {
+            // Make sure SSL renegotiation is not disabled in the JVM
+            System.setProperty("sun.security.ssl.allowUnsafeRenegotiation", "true");
+        }
+
+        Tomcat tomcat = getTomcatInstance();
+
+        if (!TesterSupport.isRenegotiationSupported(getTomcatInstance())) {
+            return;
+        }
+
+        TesterSupport.configureClientCertContext(tomcat);
+        
+        // Override the defaults
+        ProtocolHandler handler = tomcat.getConnector().getProtocolHandler();
+        if (handler instanceof AbstractHttp11JsseProtocol) {
+            ((AbstractHttp11JsseProtocol) handler).setTruststoreFile(null);
+        } else {
+            // Unexpected
+            fail("Unexpected handler type");
+        }
+        if (serverTrustAll) {
+            tomcat.getConnector().setAttribute("trustManagerClassName",
+                    "org.apache.tomcat.util.net.TesterSupport$TrustAllCerts");
+        }
+        
+        // Start Tomcat
+        tomcat.start();
+        
+        TesterSupport.configureClientSsl();
+
+        // Unprotected resource
+        ByteChunk res =
+                getUrl("https://localhost:" + getPort() + "/unprotected");
+        assertEquals("OK", res.toString());
+        
+        // Protected resource
+        res.recycle();
+        int rc = -1;
+        try {
+            rc = getUrl("https://localhost:" + getPort() + "/protected", res,
+                null, null);
+        } catch (SocketException expected1) {
+            // Ignore
+        } catch (SSLHandshakeException expected2) {
+            // Ignore
+        }
+        if (serverTrustAll) {
+            assertEquals(200, rc);
+            assertEquals("OK", res.toString());
+        } else {
+            assertTrue(rc != 200);
+            assertEquals("", res.toString());
+        }
+    }
 }
