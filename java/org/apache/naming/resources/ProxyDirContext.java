@@ -82,8 +82,8 @@ public class ProxyDirContext implements DirContext {
                     cache = (ResourceCache) 
                         Class.forName(cacheClassName).newInstance();
                 } catch (Exception e) {
-                    //FIXME
-                    e.printStackTrace();
+                    throw new IllegalArgumentException(sm.getString(
+                            "resources.invalidCache", cacheClassName), e);
                 }
                 cache.setCacheMaxSize(baseDirContext.getCacheMaxSize());
                 cacheTTL = baseDirContext.getCacheTTL();

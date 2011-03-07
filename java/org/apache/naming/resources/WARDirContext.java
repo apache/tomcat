@@ -896,7 +896,19 @@ public class WARDirContext extends BaseDirContext {
         public int compareTo(Object o) {
             if (!(o instanceof Entry))
                 return (+1);
-            return (name.compareTo(((Entry) o).getName()));
+            return name.compareTo(((Entry) o).getName());
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (!(o instanceof Entry))
+                return false;
+            return name.equals(((Entry) o).getName());
+        }
+        
+        @Override
+        public int hashCode() {
+            return name.hashCode();
         }
 
         public ZipEntry getEntry() {

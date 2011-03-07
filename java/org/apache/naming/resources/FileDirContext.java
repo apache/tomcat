@@ -270,7 +270,10 @@ public class FileDirContext extends BaseDirContext {
 
         File newFile = new File(base, newName);
 
-        file.renameTo(newFile);
+        if (!file.renameTo(newFile)) {
+            throw new NamingException(sm.getString("resources.renameFail",
+                    oldName, newName));
+        }
 
     }
 
