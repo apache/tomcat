@@ -362,7 +362,7 @@ public class ResourceCache {
 
         int i = 0;
         while (true) {
-            i = (b + a) / 2;
+            i = (b + a) >>> 1;
             int result = name.compareTo(map[i].name);
             if (result > 0) {
                 a = i;
