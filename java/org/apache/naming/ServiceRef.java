@@ -96,7 +96,8 @@ public class ServiceRef extends Reference {
                         null, null);
     }
 
-    public ServiceRef(String refname, String serviceInterface, String[] serviceQname, 
+    public ServiceRef(@SuppressWarnings("unused") String refname,
+                       String serviceInterface, String[] serviceQname, 
                        String wsdl, String jaxrpcmapping,
                        String factory, String factoryLocation) {
         super(serviceInterface, factory, factoryLocation);
