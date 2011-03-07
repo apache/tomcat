@@ -80,6 +80,7 @@ public class ServiceRefFactory
      * 
      * @param obj The reference object describing the webservice
      */
+    @Override
     public Object getObjectInstance(Object obj, Name name, Context nameCtx,
             Hashtable<?,?> environment)
     throws Exception {
@@ -193,6 +194,7 @@ public class ServiceRefFactory
                     Definition def = reader.readWSDL((new URL(wsdlRefAddr)).toExternalForm());
 
                     javax.wsdl.Service wsdlservice = def.getService(serviceQname);
+                    @SuppressWarnings("unchecked") // Can't change the API
                     Map<String,?> ports = wsdlservice.getPorts();
                     Method m = serviceInterfaceClass.getMethod("setEndpointAddress",
                             new Class[] { java.lang.String.class,
@@ -335,6 +337,7 @@ public class ServiceRefFactory
      */
     private String getSOAPLocation(Port port) {
         String endpoint = null;
+        @SuppressWarnings("unchecked") // Can't change the API
         List<ExtensibilityElement> extensions = port.getExtensibilityElements();
         for (Iterator<ExtensibilityElement> i = extensions.iterator();
                 i.hasNext();) {
@@ -351,6 +354,7 @@ public class ServiceRefFactory
     private void initHandlerChain(QName portName, HandlerRegistry handlerRegistry,
             HandlerInfo handlerInfo, ArrayList<String> soaprolesToAdd) {
         HandlerChain handlerChain = (HandlerChain) handlerRegistry.getHandlerChain(portName);
+        @SuppressWarnings("unchecked") // Can't change the API
         Iterator<Handler> iter = handlerChain.iterator();
         while (iter.hasNext()) {
             Handler handler = iter.next();
