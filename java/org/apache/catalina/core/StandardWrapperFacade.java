@@ -68,11 +68,13 @@ public final class StandardWrapperFacade
     // -------------------------------------------------- ServletConfig Methods
 
 
+    @Override
     public String getServletName() {
         return config.getServletName();
     }
 
 
+    @Override
     public ServletContext getServletContext() {
         if (context == null) {
             context = config.getServletContext();
@@ -83,11 +85,13 @@ public final class StandardWrapperFacade
     }
 
 
+    @Override
     public String getInitParameter(String name) {
         return config.getInitParameter(name);
     }
 
 
+    @Override
     public Enumeration<String> getInitParameterNames() {
         return config.getInitParameterNames();
     }

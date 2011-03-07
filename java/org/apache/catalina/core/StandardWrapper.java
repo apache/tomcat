@@ -78,6 +78,7 @@ import org.apache.tomcat.util.modeler.Registry;
  * @author Remy Maucherat
  * @version $Id$
  */
+@SuppressWarnings("deprecation") // SingleThreadModel
 public class StandardWrapper extends ContainerBase
     implements ServletConfig, Wrapper, NotificationEmitter {
 
@@ -1602,8 +1603,7 @@ public class StandardWrapper extends ContainerBase
      *
      * @param mapperClass Java class name of the default Mapper
      */
-    protected void addDefaultMapper(
-            @SuppressWarnings("unused") String mapperClass) {
+    protected void addDefaultMapper(String mapperClass) {
 
         // No need for a default Mapper on a Wrapper
 
