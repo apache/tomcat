@@ -1598,19 +1598,6 @@ public class StandardWrapper extends ContainerBase
 
 
     /**
-     * Add a default Mapper implementation if none have been configured
-     * explicitly.
-     *
-     * @param mapperClass Java class name of the default Mapper
-     */
-    protected void addDefaultMapper(String mapperClass) {
-
-        // No need for a default Mapper on a Wrapper
-
-    }
-
-
-    /**
      * Return <code>true</code> if the specified class name represents a
      * container provided servlet class that should be loaded by the
      * server class loader.
