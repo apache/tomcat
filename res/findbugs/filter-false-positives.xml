@@ -68,6 +68,11 @@
     <Bug code="MSF" />
   </Match>
   <Match>
+    <Class name="org.apache.catalina.realm.JDBCRealm" />
+    <Field name="containerLog" />
+    <Bug code="IS" />
+  </Match>
+  <Match>
     <!-- Catalina isn't used when embedding -->
     <Class name="org.apache.catalina.startup.Catalina" />
     <Method name="stopServer" />
@@ -207,6 +212,7 @@
   <Match>
     <Class name="org.apache.el.parser.ParseException" />
   </Match>
+
   <!-- Test code -->
   <Match>
     <Or>
