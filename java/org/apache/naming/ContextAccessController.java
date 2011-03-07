@@ -87,11 +87,7 @@ public class ContextAccessController {
     public static boolean checkSecurityToken
         (Object name, Object token) {
         Object refToken = securityTokens.get(name);
-        if (refToken == null)
-            return (true);
-        if ((refToken != null) && (refToken.equals(token)))
-            return (true);
-        return (false);
+        return (refToken == null || refToken.equals(token));
     }
 
 
