@@ -16,6 +16,18 @@
  */
 package org.apache.tomcat.util.net;
 
+import javax.net.ssl.KeyManager;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSessionContext;
+import javax.net.ssl.TrustManager;
+
 public interface SSLUtil {
 
+    public SSLContext createSSLContext() throws Exception; 
+
+    public KeyManager[] getKeyManagers() throws Exception;
+    
+    public TrustManager[] getTrustManagers() throws Exception;
+    
+    public void configureSessionContext(SSLSessionContext sslSessionContext);
 }
