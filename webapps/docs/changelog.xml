@@ -92,7 +92,7 @@
         the <code>ThreadLocalLeakPreventionListener</code> is enabled. (markt)  
       </fix>
       <fix>
-        Don&apos;t ignore @ServletSecurity annotations. (markt)
+        CVE-2011-1088: Don&apos;t ignore @ServletSecurity annotations. (markt)
       </fix>
     </changelog>
   </subsection>
