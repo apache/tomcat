@@ -45,19 +45,26 @@
 <section name="Tomcat 7.0.11 (markt)">
   <subsection name="Catalina">
     <changelog>
-      <fix>
+      <add>
+        <bug>25060</bug>: Close Apache Commons DBCP datasources when the
+        associated JNDI naming context is stopped (e.g. for a non-global
+        DataSource resource on web application reload) to close remaining
+        database connections immediately rather than waiting for garbage 
+        collection. (markt)
+      </add>
+      <add>
         <bug>26701</bug>: Provide a mechanism for users to register their own
         <code>URLStreamHandlerFactory</code> objects. (markt)
-      </fix>
+      </add>
       <fix>
         <bug>50855</bug>: Fix NPE on HttpServletRequest.logout() when debug
         logging is enabled. (markt)
       </fix>
-      <fix>
+      <add>
         New context attribute "swallowAbortedUploads" allows
         to make request data swallowing configurable for requests
         that are too large. (rjung)
-      </fix>
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">

@@ -22,8 +22,13 @@ package org.apache.catalina.deploy;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.io.Serializable;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Hashtable;
+
+import javax.naming.NamingException;
+import javax.sql.DataSource;
 
 import org.apache.catalina.Container;
 import org.apache.catalina.Context;
@@ -35,6 +40,7 @@ import org.apache.catalina.mbeans.MBeanUtils;
 import org.apache.catalina.util.LifecycleMBeanBase;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.naming.ContextBindings;
 import org.apache.tomcat.util.res.StringManager;
 
 
@@ -949,11 +955,84 @@ public class NamingResources extends LifecycleMBeanBase implements Serializable 
 
     @Override
     protected void stopInternal() throws LifecycleException {
+        cleanUp();
         setState(LifecycleState.STOPPING);
         fireLifecycleEvent(CONFIGURE_STOP_EVENT, null);
     }
 
+    /**
+     * Close those resources that an explicit close may help clean-up faster.
+     */
+    private void cleanUp() {
+        if (resources.size() == 0) {
+            return;
+        }
+        javax.naming.Context ctxt;
+        try {
+            if (container instanceof Server) {
+                ctxt = ((Server) container).getGlobalNamingContext();
+            } else {
+                ctxt = ContextBindings.getClassLoader();
+                ctxt = (javax.naming.Context) ctxt.lookup("comp/env");
+            }
+        } catch (NamingException e) {
+            log.warn(sm.getString("namingResources.cleanupNoContext",
+                    container), e);
+            return;
+        }
+        for (ContextResource cr: resources.values()) {
+            if (DataSource.class.getName().equals(cr.getType())) {
+                String name = cr.getName();
+                DataSource ds;
+                try {
+                     ds = (DataSource) ctxt.lookup(name);
+                } catch (NamingException e) {
+                    log.warn(sm.getString("namingResources.cleanupNoResource",
+                            cr.getName(), container), e);
+                    continue;
+                }
+                cleanUp(ds, name);
+            }
+        }
+    }
+
     
+    /**
+     * Closing a database connection pool will close it's open connections. This
+     * will happen on GC but that leaves db connections open that may cause
+     * issues.
+     * @param ds    The DataSource to close.
+     */
+    private void cleanUp(DataSource ds, String name) {
+        // Look for a zero-arg close() method
+        Method m = null;
+        try {
+            m = ds.getClass().getMethod("close", (Class<?>[]) null);
+        } catch (SecurityException e) {
+            log.debug(sm.getString("namingResources.cleanupCloseSecurity", name,
+                    container));
+            return;
+        } catch (NoSuchMethodException e) {
+            log.debug(sm.getString("namingResources.cleanupNoClose", name,
+                    container));
+            return;
+        }
+        if (m != null) {
+            try {
+                m.invoke(ds, (Object[]) null);
+            } catch (IllegalArgumentException e) {
+                log.warn(sm.getString("namingResources.cleanupCloseFailed",
+                        name, container), e);
+            } catch (IllegalAccessException e) {
+                log.warn(sm.getString("namingResources.cleanupCloseFailed",
+                        name, container), e);
+            } catch (InvocationTargetException e) {
+                log.warn(sm.getString("namingResources.cleanupCloseFailed",
+                        name, container), e);
+            }
+        }
+    }
+
     @Override
     protected void destroyInternal() throws LifecycleException {
 
