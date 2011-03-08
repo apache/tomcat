@@ -86,4 +86,6 @@ public abstract class SSLImplementation {
     public abstract SSLSupport getSSLSupport(Socket sock);
 
     public abstract SSLSupport getSSLSupport(SSLSession session);
+
+    public abstract SSLUtil getSSLUtil(AbstractEndpoint ep);
 }
