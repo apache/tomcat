@@ -800,6 +800,9 @@ public class Request
      */
     public void finishRequest() throws IOException {
         // The reader and input stream don't need to be closed
+        // TODO: Is this ever called?
+        // If so, move input swallow disabling from 
+        // Response.finishResponse() to here
     }
 
 
@@ -2450,6 +2453,16 @@ public class Request
         return (inputBuffer.available() > 0);
     }
 
+    /**
+     * Disable swallowing of remaining input if configured
+     */
+    protected void disableSwallowInput() {
+        Context context = getContext();
+        if (context != null && !context.getSwallowAbortedUploads()) {
+            coyoteRequest.action(ActionCode.DISABLE_SWALLOW_INPUT, null);
+        }
+    }
+    
     public void cometClose() {
         coyoteRequest.action(ActionCode.COMET_CLOSE,getEvent());
     }
@@ -2620,6 +2633,7 @@ public class Request
         } catch (InvalidContentTypeException e) {
             partsParseException = new ServletException(e);
         } catch (FileUploadBase.SizeException e) {
+            disableSwallowInput();
             partsParseException = new IllegalStateException(e);
         } catch (FileUploadException e) {
             partsParseException = new IOException(e);
@@ -2845,6 +2859,7 @@ public class Request
                     context.getLogger().debug(
                             sm.getString("coyoteRequest.postTooLarge"));
                 }
+                disableSwallowInput();
                 return;
             }
             byte[] formData = null;
@@ -2922,6 +2937,7 @@ public class Request
             if (connector.getMaxPostSize() > 0 &&
                     (body.getLength() + len) > connector.getMaxPostSize()) {
                 // Too much data
+                disableSwallowInput();
                 throw new IllegalArgumentException(
                         sm.getString("coyoteRequest.chunkedPostTooLarge"));
             }

@@ -53,6 +53,11 @@
         <bug>50855</bug>: Fix NPE on HttpServletRequest.logout() when debug
         logging is enabled. (markt)
       </fix>
+      <fix>
+        New context attribute "swallowAbortedUploads" allows
+        to make request data swallowing configurable for requests
+        that are too large. (rjung)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
