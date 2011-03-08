@@ -566,6 +566,19 @@ public class JSSESocketFactory implements ServerSocketFactory {
         throws Exception {
         String crlf = endpoint.getCrlFile();
         
+        String className = endpoint.getTrustManagerClassName();
+        if(className != null && className.length() > 0) {
+             ClassLoader classLoader = getClass().getClassLoader();
+             Class<?> clazz = classLoader.loadClass(className);
+             if(!(TrustManager.class.isAssignableFrom(clazz))){
+                throw new InstantiationException(sm.getString(
+                        "jsse.invalidTrustManagerClassName", className));
+             }
+             Object trustManagerObject = clazz.newInstance();
+             TrustManager trustManager = (TrustManager) trustManagerObject;
+             return new TrustManager[]{ trustManager };
+        }    
+
         TrustManager[] tms = null;
         
         KeyStore trustStore = getTrustStore(keystoreType, keystoreProvider);
@@ -574,7 +587,7 @@ public class JSSESocketFactory implements ServerSocketFactory {
                 TrustManagerFactory tmf =
                     TrustManagerFactory.getInstance(algorithm);
                 tmf.init(trustStore);
-                tms = getTrustManagers(tmf);
+                tms = tmf.getTrustManagers();
             } else {
                 TrustManagerFactory tmf =
                     TrustManagerFactory.getInstance(algorithm);
@@ -583,41 +596,12 @@ public class JSSESocketFactory implements ServerSocketFactory {
                 ManagerFactoryParameters mfp =
                     new CertPathTrustManagerParameters(params);
                 tmf.init(mfp);
-                tms = getTrustManagers(tmf);
+                tms = tmf.getTrustManagers();
             }
         }
         
         return tms;
     }
-
-    /**
-     * Gets the TrustManagers either from Connector's
-     * <code>trustManagerClassName</code> attribute (if set) else from the
-     * {@link TrustManagerFactory}.
-     * @return The TrustManagers to use for this connector.
-     * @throws NoSuchAlgorithmException 
-     * @throws ClassNotFoundException 
-     * @throws IllegalAccessException 
-     * @throws InstantiationException 
-    */
-   protected TrustManager[] getTrustManagers(TrustManagerFactory tmf)
-           throws NoSuchAlgorithmException, ClassNotFoundException,
-           InstantiationException, IllegalAccessException {
-
-       String className = endpoint.getTrustManagerClassName();
-       if(className != null && className.length() > 0) {
-            ClassLoader classLoader = getClass().getClassLoader();
-            Class<?> clazz = classLoader.loadClass(className);
-            if(!(TrustManager.class.isAssignableFrom(clazz))){
-               throw new InstantiationException(sm.getString(
-                       "jsse.invalidTrustManagerClassName", className));
-            }
-            Object trustManagerObject = clazz.newInstance();
-            TrustManager trustManager = (TrustManager) trustManagerObject;
-            return new TrustManager[]{ trustManager };
-        }      
-       return tmf.getTrustManagers();
-   }
 
     /**
      * Return the initialization parameters for the TrustManager.
