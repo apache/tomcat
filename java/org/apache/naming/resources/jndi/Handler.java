@@ -14,19 +14,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */ 
+package org.apache.naming.resources.jndi;
 
-
-package org.apache.naming.resources;
-
+import org.apache.naming.resources.DirContextURLStreamHandler;
 
 /**
- * Static constants for this package.
+ * Stream handler to a JNDI directory context. For use when
+ * embedding Tomcat and the embedding application has already set its own
+ * {@link java.net.URLStreamHandlerFactory} and the Tomcat jndi handler needs to
+ * be registered via the java.protocol.handler.pkgs system property.
  */
-
-public final class Constants {
-
-    public static final String PROTOCOL_HANDLER_VARIABLE = 
-        "java.protocol.handler.pkgs";
-
-    public static final String Package = "org.apache.naming.resources";
+public class Handler extends DirContextURLStreamHandler {
+    
+    public Handler() {
+        // NOOP
+    }
 }

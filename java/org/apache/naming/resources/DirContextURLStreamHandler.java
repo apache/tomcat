@@ -133,6 +133,23 @@ public class DirContextURLStreamHandler extends URLStreamHandler {
     
     
     /**
+     * Set the java.protocol.handler.pkgs system property. For use when
+     * embedding Tomcat and the embedding application has already set its own
+     * {@link java.net.URLStreamHandlerFactory}.
+     */
+    public static void setProtocolHandler() {
+        String value = System.getProperty(Constants.PROTOCOL_HANDLER_VARIABLE);
+        if (value == null) {
+            value = Constants.Package;
+            System.setProperty(Constants.PROTOCOL_HANDLER_VARIABLE, value);
+        } else if (value.indexOf(Constants.Package) == -1) {
+            value += "|" + Constants.Package;
+            System.setProperty(Constants.PROTOCOL_HANDLER_VARIABLE, value);
+        }
+    }
+    
+    
+    /**
      * Returns true if the thread or the context class loader of the current 
      * thread is bound.
      */
