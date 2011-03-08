@@ -444,58 +444,14 @@ public class JSSESocketFactory implements ServerSocketFactory, SSLUtil {
                 wantClientAuth = true;
             }
 
-            // SSL protocol variant (e.g., TLS, SSL v3, etc.)
-            String protocol = endpoint.getSslProtocol();
-            if (protocol == null) {
-                protocol = defaultProtocol;
-            }
-
-            // Certificate encoding algorithm (e.g., SunX509)
-            String algorithm = endpoint.getAlgorithm();
-            if (algorithm == null) {
-                algorithm = KeyManagerFactory.getDefaultAlgorithm();
-            }
-
-            String keystoreType = endpoint.getKeystoreType();
-            if (keystoreType == null) {
-                keystoreType = defaultKeystoreType;
-            }
-
-            String keystoreProvider = endpoint.getKeystoreProvider();
-
-            String trustAlgorithm = endpoint.getTruststoreAlgorithm();
-            if( trustAlgorithm == null ) {
-                trustAlgorithm = TrustManagerFactory.getDefaultAlgorithm();
-            }
-
-            // Create and init SSLContext
-            SSLContext context = SSLContext.getInstance(protocol); 
-            context.init(getKeyManagers(keystoreType, keystoreProvider,
-                    algorithm,
-                    endpoint.getKeyAlias()),
-                    getTrustManagers(keystoreType, keystoreProvider,
-                            trustAlgorithm),
-                    new SecureRandom());
+            SSLContext context = createSSLContext();
+            context.init(getKeyManagers(), getTrustManagers(), null);
 
             // Configure SSL session cache
-            int sessionCacheSize;
-            if (endpoint.getSessionCacheSize() != null) {
-                sessionCacheSize = Integer.parseInt(
-                        endpoint.getSessionCacheSize());
-            } else {
-                sessionCacheSize = defaultSessionCacheSize;
-            }
-            int sessionTimeout;
-            if (endpoint.getSessionTimeout() != null) {
-                sessionTimeout = Integer.parseInt(endpoint.getSessionTimeout());
-            } else {
-                sessionTimeout = defaultSessionTimeout;
-            }
             SSLSessionContext sessionContext =
                 context.getServerSessionContext();
             if (sessionContext != null) {
-                sessionContext.setSessionCacheSize(sessionCacheSize);
-                sessionContext.setSessionTimeout(sessionTimeout);
+                configureSessionContext(sessionContext);
             }
 
             // create proxy
@@ -517,6 +473,73 @@ public class JSSESocketFactory implements ServerSocketFactory, SSLUtil {
                 throw (IOException)e;
             throw new IOException(e.getMessage());
         }
+    }
+
+    @Override
+    public SSLContext createSSLContext() throws Exception {
+
+        // SSL protocol variant (e.g., TLS, SSL v3, etc.)
+        String protocol = endpoint.getSslProtocol();
+        if (protocol == null) {
+            protocol = defaultProtocol;
+        }
+
+        SSLContext context = SSLContext.getInstance(protocol); 
+
+        return context;
+    }
+    
+    @Override
+    public KeyManager[] getKeyManagers() throws Exception {
+        String keystoreType = endpoint.getKeystoreType();
+        if (keystoreType == null) {
+            keystoreType = defaultKeystoreType;
+        }
+
+        String algorithm = endpoint.getAlgorithm();
+        if (algorithm == null) {
+            algorithm = KeyManagerFactory.getDefaultAlgorithm();
+        }
+
+        return getKeyManagers(keystoreType, endpoint.getKeystoreProvider(),
+                algorithm, endpoint.getKeyAlias());
+    }
+
+    @Override
+    public TrustManager[] getTrustManagers() throws Exception {
+        String keystoreType = endpoint.getKeystoreType();
+        if (keystoreType == null) {
+            keystoreType = defaultKeystoreType;
+        }
+
+        String algorithm = endpoint.getAlgorithm();
+        if (algorithm == null) {
+            algorithm = KeyManagerFactory.getDefaultAlgorithm();
+        }
+
+        return getTrustManagers(keystoreType, endpoint.getKeystoreProvider(),
+                algorithm);
+    }
+
+    @Override
+    public void configureSessionContext(SSLSessionContext sslSessionContext) {
+        int sessionCacheSize;
+        if (endpoint.getSessionCacheSize() != null) {
+            sessionCacheSize = Integer.parseInt(
+                    endpoint.getSessionCacheSize());
+        } else {
+            sessionCacheSize = defaultSessionCacheSize;
+        }
+        
+        int sessionTimeout;
+        if (endpoint.getSessionTimeout() != null) {
+            sessionTimeout = Integer.parseInt(endpoint.getSessionTimeout());
+        } else {
+            sessionTimeout = defaultSessionTimeout;
+        }
+
+        sslSessionContext.setSessionCacheSize(sessionCacheSize);
+        sslSessionContext.setSessionTimeout(sessionTimeout);
     }
 
     /**
