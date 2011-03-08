@@ -5384,15 +5384,13 @@ public class StandardContext extends ContainerBase
         
         setState(LifecycleState.STOPPING);
 
-        // Currently this is effectively a NO-OP but needs to be called to
-        // ensure the NamingResources follows the correct lifecycle
+        // Binding thread
+        ClassLoader oldCCL = bindThread();
+
         if (namingResources != null) {
             namingResources.stop();
         }
         
-        // Binding thread
-        ClassLoader oldCCL = bindThread();
-
         try {
 
             // Stop our child containers, if any
