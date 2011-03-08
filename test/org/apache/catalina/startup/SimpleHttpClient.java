@@ -48,6 +48,7 @@ public abstract class SimpleHttpClient {
     public static final String OK_200 = "HTTP/1.1 200";
     public static final String REDIRECT_302 = "HTTP/1.1 302";
     public static final String FAIL_404 = "HTTP/1.1 404";
+    public static final String FAIL_413 = "HTTP/1.1 413";
     public static final String FAIL_50X = "HTTP/1.1 50";
     public static final String FAIL_500 = "HTTP/1.1 500";
     public static final String FAIL_501 = "HTTP/1.1 501";
@@ -216,6 +217,10 @@ public abstract class SimpleHttpClient {
 
     public boolean isResponse404() {
         return getResponseLine().startsWith(FAIL_404);
+    }
+
+    public boolean isResponse413() {
+        return getResponseLine().startsWith(FAIL_413);
     }
 
     public boolean isResponse50x() {
