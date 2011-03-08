@@ -31,7 +31,6 @@ import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 import java.nio.channels.WritableByteChannel;
-import java.security.KeyStore;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -42,11 +41,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
 import javax.net.ssl.KeyManager;
-import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLEngine;
 import javax.net.ssl.SSLSessionContext;
-import javax.net.ssl.TrustManagerFactory;
 import javax.net.ssl.X509KeyManager;
 
 import org.apache.juli.logging.Log;
@@ -55,7 +52,6 @@ import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.IntrospectionUtils;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
 import org.apache.tomcat.util.net.SecureNioChannel.ApplicationBufferHandler;
-import org.apache.tomcat.util.net.jsse.JSSESocketFactory;
 import org.apache.tomcat.util.net.jsse.NioX509KeyManager;
 
 /**
@@ -94,8 +90,6 @@ public class NioEndpoint extends AbstractEndpoint {
      */
     protected ServerSocketChannel serverSock = null;
     
-    protected SSLUtil sslUtil = null;
-
     /**
      * use send file
      */
@@ -479,68 +473,16 @@ public class NioEndpoint extends AbstractEndpoint {
 
         // Initialize SSL if needed
         if (isSSLEnabled()) {
-            if (sslUtil == null) {
-                sslUtil = handler.getSslImplementation().getSSLUtil(this);
-            }
-            // Initialize SSL
-            String keystorePass = getKeystorePass();
-            if (keystorePass == null) {
-                keystorePass = JSSESocketFactory.DEFAULT_KEY_PASS;
-            }
-            char[] passphrase = keystorePass.toCharArray();
+            SSLUtil sslUtil = handler.getSslImplementation().getSSLUtil(this);
 
-            char[] tpassphrase = (getTruststorePass()!=null)?getTruststorePass().toCharArray():passphrase;
-            String ttype = (getTruststoreType()!=null)?getTruststoreType():getKeystoreType();
-            
-            KeyStore ks = KeyStore.getInstance(getKeystoreType());
-            FileInputStream fisKeyStore = null;
-            try {
-                fisKeyStore = new FileInputStream(getKeystoreFile());
-                ks.load(fisKeyStore, passphrase);
-            } finally {
-                if (fisKeyStore != null) {
-                    try {
-                        fisKeyStore.close();
-                    } catch (IOException ioe) {/*Ignore*/}
-                }
-            }
-            KeyStore ts = null;
-            if (getTruststoreFile()==null) {
-                //no op, same as for BIO connector
-            }else {
-                ts = KeyStore.getInstance(ttype);
-                FileInputStream fisTrustStore = null;
-                try {
-                    fisTrustStore = new FileInputStream(getTruststoreFile());
-                    ts.load(fisTrustStore, tpassphrase);
-                } finally {
-                    if (fisTrustStore != null) {
-                        try {
-                            fisTrustStore.close();
-                        } catch (IOException ioe) {/*Ignore*/}
-                    }
-                }
-            }
+            sslContext = sslUtil.createSSLContext();
+            sslContext.init(wrap(sslUtil.getKeyManagers()),
+                    sslUtil.getTrustManagers(), null);
 
-            KeyManagerFactory kmf = KeyManagerFactory.getInstance(getAlgorithm());
-            kmf.init(ks, passphrase);
-
-            TrustManagerFactory tmf = TrustManagerFactory.getInstance(getAlgorithm());
-            tmf.init(ts);
-
-            sslContext = SSLContext.getInstance(getSslProtocol());
-            sslContext.init(wrap(kmf.getKeyManagers()), tmf.getTrustManagers(), null);
             SSLSessionContext sessionContext =
                 sslContext.getServerSessionContext();
             if (sessionContext != null) {
-                if (getSessionCacheSize() != null) {
-                    sessionContext.setSessionCacheSize(
-                            Integer.parseInt(getSessionCacheSize()));
-                }
-                if (getSessionTimeout() != null) {
-                    sessionContext.setSessionTimeout(
-                            Integer.parseInt(getSessionTimeout()));
-                }
+                sslUtil.configureSessionContext(sessionContext);
             }
         }
         
