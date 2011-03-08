@@ -146,6 +146,7 @@ public class JSSESocketFactory implements ServerSocketFactory, SSLUtil {
     public ServerSocket createSocket (int port)
         throws IOException
     {
+        init();
         ServerSocket socket = sslProxy.createServerSocket(port);
         initServerSocket(socket);
         return socket;
@@ -155,6 +156,7 @@ public class JSSESocketFactory implements ServerSocketFactory, SSLUtil {
     public ServerSocket createSocket (int port, int backlog)
         throws IOException
     {
+        init();
         ServerSocket socket = sslProxy.createServerSocket(port, backlog);
         initServerSocket(socket);
         return socket;
@@ -165,6 +167,7 @@ public class JSSESocketFactory implements ServerSocketFactory, SSLUtil {
                                       InetAddress ifAddress)
         throws IOException
     {   
+        init();
         ServerSocket socket = sslProxy.createServerSocket(port, backlog,
                                                           ifAddress);
         initServerSocket(socket);
