@@ -84,7 +84,8 @@ public class TestCustomSsl extends TomcatBaseTest {
         
         if (!TesterSupport.RFC_5746_SUPPORTED) {
             // Make sure SSL renegotiation is not disabled in the JVM
-            System.setProperty("sun.security.ssl.allowUnsafeRenegotiation", "true");
+            System.setProperty("sun.security.ssl.allowUnsafeRenegotiation",
+                    "true");
         }
 
         Tomcat tomcat = getTomcatInstance();
@@ -124,10 +125,16 @@ public class TestCustomSsl extends TomcatBaseTest {
         try {
             rc = getUrl("https://localhost:" + getPort() + "/protected", res,
                 null, null);
-        } catch (SocketException expected1) {
-            // Ignore
-        } catch (SSLHandshakeException expected2) {
-            // Ignore
+        } catch (SocketException se) {
+            if (serverTrustAll) {
+                fail(se.getMessage());
+                se.printStackTrace();
+            }
+        } catch (SSLHandshakeException he) {
+            if (serverTrustAll) {
+                fail(he.getMessage());
+                he.printStackTrace();
+            }
         }
         if (serverTrustAll) {
             assertEquals(200, rc);
