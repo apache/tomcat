@@ -46,7 +46,6 @@ import org.apache.tomcat.util.net.NioEndpoint.KeyAttachment;
 import org.apache.tomcat.util.net.SSLSupport;
 import org.apache.tomcat.util.net.SecureNioChannel;
 import org.apache.tomcat.util.net.SocketStatus;
-import org.apache.tomcat.util.net.jsse.JSSEFactory;
 
 
 /**
@@ -636,7 +635,9 @@ public class Http11NioProcessor extends AbstractHttp11Processor {
                     engine.setNeedClientAuth(true);
                     try {
                         sslChannel.rehandshake(endpoint.getSoTimeout());
-                        sslSupport = (new JSSEFactory()).getSSLSupport(engine.getSession());
+                        sslSupport =
+                            endpoint.getHandler().getSslImplementation().getSSLSupport(
+                                    engine.getSession());
                     } catch (IOException ioe) {
                         log.warn(sm.getString("http11processor.socket.sslreneg",ioe));
                     }
