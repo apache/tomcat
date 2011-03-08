@@ -30,7 +30,6 @@ import javax.naming.Context;
 import javax.sql.DataSource;
 
 import org.apache.catalina.LifecycleException;
-import org.apache.catalina.core.StandardServer;
 import org.apache.naming.ContextBindings;
 
 /**
@@ -390,8 +389,7 @@ public class DataSourceRealm
                 context = ContextBindings.getClassLoader();
                 context = (Context) context.lookup("comp/env");
             } else {
-                context =
-                    ((StandardServer)getServer()).getGlobalNamingContext();
+                context = getServer().getGlobalNamingContext();
             }
             DataSource dataSource = (DataSource)context.lookup(dataSourceName);
         return dataSource.getConnection();

@@ -76,6 +76,12 @@ public interface Server extends Lifecycle {
 
 
     /**
+     * Return the global naming resources context.
+     */
+    public javax.naming.Context getGlobalNamingContext();
+
+
+    /**
      * Return the port number we listen to for shutdown commands.
      */
     public int getPort();
