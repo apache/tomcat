@@ -25,6 +25,7 @@ import javax.net.ssl.SSLSocket;
 import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.net.SSLImplementation;
 import org.apache.tomcat.util.net.SSLSupport;
+import org.apache.tomcat.util.net.SSLUtil;
 import org.apache.tomcat.util.net.ServerSocketFactory;
 
 /* JSSEImplementation:
@@ -56,4 +57,8 @@ public class JSSEImplementation extends SSLImplementation {
         return new JSSESupport(session);
     }
 
+    @Override
+    public SSLUtil getSSLUtil(AbstractEndpoint endpoint) {
+        return new JSSESocketFactory(endpoint);
+    }
 }

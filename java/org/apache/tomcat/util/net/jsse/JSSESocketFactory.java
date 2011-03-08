@@ -62,6 +62,7 @@ import javax.net.ssl.X509KeyManager;
 
 import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.net.Constants;
+import org.apache.tomcat.util.net.SSLUtil;
 import org.apache.tomcat.util.net.ServerSocketFactory;
 import org.apache.tomcat.util.res.StringManager;
 
@@ -78,7 +79,7 @@ import org.apache.tomcat.util.res.StringManager;
  * @author Jan Luehe
  * @author Bill Barker
  */
-public class JSSESocketFactory implements ServerSocketFactory {
+public class JSSESocketFactory implements ServerSocketFactory, SSLUtil {
 
     private static final org.apache.juli.logging.Log log =
         org.apache.juli.logging.LogFactory.getLog(JSSESocketFactory.class);
