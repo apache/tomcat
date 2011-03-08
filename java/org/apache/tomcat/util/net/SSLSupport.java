@@ -19,13 +19,9 @@ package org.apache.tomcat.util.net;
 
 import java.io.IOException;
 
-/* SSLSupport
-
-   Interface for SSL-specific functions
-
-   @author EKR
-*/
-
+/**
+ * Defines an interface to interact with SSL sessions.
+ */
 public interface SSLSupport {
     /**
      * The Request attribute key for the cipher suite.
