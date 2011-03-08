@@ -200,7 +200,7 @@ public class StandardContext extends ContainerBase
      * Control whether remaining request data will be read
      * (swallowed) even if the request violates a data size constraint.
      */
-    public boolean swallowAbortedUploads = true;
+    private boolean swallowAbortedUploads = true;
 
     /**
      * The alternate deployment descriptor name.
