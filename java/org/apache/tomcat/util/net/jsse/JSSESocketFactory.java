@@ -123,7 +123,6 @@ public class JSSESocketFactory implements ServerSocketFactory, SSLUtil {
 
     private AbstractEndpoint endpoint;
 
-    protected boolean initialized;
     protected SSLServerSocketFactory sslProxy = null;
     protected String[] enabledCiphers;
     protected boolean allowUnsafeLegacyRenegotiation = false;
@@ -147,7 +146,6 @@ public class JSSESocketFactory implements ServerSocketFactory, SSLUtil {
     public ServerSocket createSocket (int port)
         throws IOException
     {
-        if (!initialized) init();
         ServerSocket socket = sslProxy.createServerSocket(port);
         initServerSocket(socket);
         return socket;
@@ -157,7 +155,6 @@ public class JSSESocketFactory implements ServerSocketFactory, SSLUtil {
     public ServerSocket createSocket (int port, int backlog)
         throws IOException
     {
-        if (!initialized) init();
         ServerSocket socket = sslProxy.createServerSocket(port, backlog);
         initServerSocket(socket);
         return socket;
@@ -168,7 +165,6 @@ public class JSSESocketFactory implements ServerSocketFactory, SSLUtil {
                                       InetAddress ifAddress)
         throws IOException
     {   
-        if (!initialized) init();
         ServerSocket socket = sslProxy.createServerSocket(port, backlog,
                                                           ifAddress);
         initServerSocket(socket);
