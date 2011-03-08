@@ -32,7 +32,6 @@ import org.apache.catalina.Role;
 import org.apache.catalina.User;
 import org.apache.catalina.UserDatabase;
 import org.apache.catalina.Wrapper;
-import org.apache.catalina.core.StandardServer;
 import org.apache.tomcat.util.ExceptionUtils;
 
 
@@ -252,8 +251,7 @@ public class UserDatabaseRealm
     protected void startInternal() throws LifecycleException {
 
         try {
-            Context context =
-                ((StandardServer)getServer()).getGlobalNamingContext();
+            Context context = getServer().getGlobalNamingContext();
             database = (UserDatabase) context.lookup(resourceName);
         } catch (Throwable e) {
             ExceptionUtils.handleThrowable(e);

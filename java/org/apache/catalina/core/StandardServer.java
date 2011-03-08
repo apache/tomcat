@@ -173,6 +173,7 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
     /**
      * Return the global naming resources context.
      */
+    @Override
     public javax.naming.Context getGlobalNamingContext() {
 
         return (this.globalNamingContext);
