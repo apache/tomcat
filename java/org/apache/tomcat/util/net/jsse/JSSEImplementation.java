@@ -20,6 +20,7 @@ package org.apache.tomcat.util.net.jsse;
 import java.net.Socket;
 
 import javax.net.ssl.SSLSession;
+import javax.net.ssl.SSLSocket;
 
 import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.net.SSLImplementation;
@@ -35,13 +36,6 @@ import org.apache.tomcat.util.net.ServerSocketFactory;
         
 public class JSSEImplementation extends SSLImplementation {
 
-    private JSSEFactory factory = null;
-
-    public JSSEImplementation() {
-        factory = new JSSEFactory();
-    }
-
-
     @Override
     public String getImplementationName(){
         return "JSSE";
@@ -49,20 +43,17 @@ public class JSSEImplementation extends SSLImplementation {
       
     @Override
     public ServerSocketFactory getServerSocketFactory(AbstractEndpoint endpoint)  {
-        ServerSocketFactory ssf = factory.getSocketFactory(endpoint);
-        return ssf;
+        return new JSSESocketFactory(endpoint);
     } 
 
     @Override
     public SSLSupport getSSLSupport(Socket s) {
-        SSLSupport ssls = factory.getSSLSupport(s);
-        return ssls;
+        return new JSSESupport((SSLSocket) s);
     }
 
     @Override
     public SSLSupport getSSLSupport(SSLSession session) {
-        SSLSupport ssls = factory.getSSLSupport(session);
-        return ssls;
+        return new JSSESupport(session);
     }
 
 }
