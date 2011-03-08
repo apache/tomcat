@@ -49,6 +49,13 @@ public enum ActionCode {
     POST_REQUEST,
 
     /**
+     * Hook called if swallowing request input should be disabled.
+     * Example: Cancel a large file upload.
+     * 
+     */
+    DISABLE_SWALLOW_INPUT,
+
+    /**
      * Callback for lazy evaluation - extract the remote host address.
      */
     REQ_HOST_ATTRIBUTE,

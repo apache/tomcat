@@ -197,6 +197,12 @@ public class StandardContext extends ContainerBase
     protected boolean allowCasualMultipartParsing = false;
      
     /**
+     * Control whether remaining request data will be read
+     * (swallowed) even if the request violates a data size constraint.
+     */
+    public boolean swallowAbortedUploads = true;
+
+    /**
      * The alternate deployment descriptor name.
      */
     private String altDDName = null;
@@ -1063,6 +1069,30 @@ public class StandardContext extends ContainerBase
     @Override
     public boolean getAllowCasualMultipartParsing() {
         return this.allowCasualMultipartParsing;
+    }
+
+    /**
+     * Set to <code>false</code> to disable request data swallowing
+     * after an upload was aborted due to size constraints.
+     *
+     * @param swallowAbortedUploads <code>false</code> to disable
+     *        swallowing, <code>true</code> otherwise (default).
+     */
+    @Override
+    public void setSwallowAbortedUploads(boolean swallowAbortedUploads) {
+        this.swallowAbortedUploads = swallowAbortedUploads;
+    }
+
+    /**
+     * Returns <code>true</code> if remaining request data will be read
+     * (swallowed) even the request violates a data size constraint.
+     *
+     * @return <code>true</code> if data will be swallowed (default),
+     *    <code>false</code> otherwise.
+     */
+    @Override
+    public boolean getSwallowAbortedUploads() {
+        return this.swallowAbortedUploads;
     }
 
     /**

@@ -111,6 +111,24 @@ public interface Context extends Container {
     public boolean getAllowCasualMultipartParsing();
 
     /**
+     * Set to <code>false</code> to disable request data swallowing
+     * after an upload was aborted due to size constraints.
+     *
+     * @param swallowAbortedUploads <code>false</code> to disable
+     *        swallowing, <code>true</code> otherwise (default).
+     */
+    public void setSwallowAbortedUploads(boolean swallowAbortedUploads);
+
+    /**
+     * Returns <code>true</code> if remaining request data will be read
+     * (swallowed) even the request violates a data size constraint.
+     *
+     * @return <code>true</code> if data will be swallowed (default),
+     *    <code>false</code> otherwise.
+     */
+    public boolean getSwallowAbortedUploads();
+
+    /**
      * Return the set of initialized application event listener objects,
      * in the order they were specified in the web application deployment
      * descriptor, for this application.
