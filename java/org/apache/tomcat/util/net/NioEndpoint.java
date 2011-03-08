@@ -94,6 +94,8 @@ public class NioEndpoint extends AbstractEndpoint {
      */
     protected ServerSocketChannel serverSock = null;
     
+    protected SSLUtil sslUtil = null;
+
     /**
      * use send file
      */
@@ -477,6 +479,9 @@ public class NioEndpoint extends AbstractEndpoint {
 
         // Initialize SSL if needed
         if (isSSLEnabled()) {
+            if (sslUtil == null) {
+                sslUtil = handler.getSslImplementation().getSSLUtil(this);
+            }
             // Initialize SSL
             String keystorePass = getKeystorePass();
             if (keystorePass == null) {
