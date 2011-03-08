@@ -767,6 +767,12 @@ public abstract class AbstractHttp11Processor implements ActionHook, Processor {
                 response.setErrorException(e);
             }
 
+        } else if (actionCode == ActionCode.DISABLE_SWALLOW_INPUT) {
+            // Do not swallow request input but
+            // make sure we are closing the connection
+            error = true;
+            getInputBuffer().setSwallowInput(false);
+
         } else if (actionCode == ActionCode.RESET) {
             // Reset response
             // Note: This must be called before the response is committed

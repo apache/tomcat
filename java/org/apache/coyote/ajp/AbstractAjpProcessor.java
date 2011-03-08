@@ -266,6 +266,11 @@ public abstract class AbstractAjpProcessor implements ActionHook, Processor {
                error = true;
            }
 
+       } else if (actionCode == ActionCode.DISABLE_SWALLOW_INPUT) {
+           // TODO: Do not swallow request input but
+           // make sure we are closing the connection
+           error = true;
+
        } else if (actionCode == ActionCode.CLOSE) {
            // Close
            // End the processing of the current request, and stop any further
