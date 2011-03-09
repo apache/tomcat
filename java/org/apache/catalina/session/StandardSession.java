@@ -1578,7 +1578,7 @@ public class StandardSession implements HttpSession, Session, Serializable {
 
         // Deserialize the attribute count and attribute values
         if (attributes == null)
-            attributes = new Hashtable<String, Object>();
+            attributes = new ConcurrentHashMap<String, Object>();
         int n = ((Integer) stream.readObject()).intValue();
         boolean isValidSave = isValid;
         isValid = true;
