@@ -35,9 +35,9 @@
 
   <section name="Introduction">
   <p>
-    A number of additional third party components may be used with Apache
-    Tomcat. These components may be built by users should they need them or they
-    can be downloaded from one of the mirrors.
+    A number of additional components may be used with Apache Tomcat. These
+    components may be built by users should they need them or they can be 
+    downloaded from one of the mirrors.
   </p>
 
   </section>
@@ -53,8 +53,9 @@
   <section name="Building">
 
     <p>
-      The additional components are built using the <code>extras.xml</code> Ant
-      script which is present in the source bundle of Tomcat.
+      The additional components are built using the <code>extras</code> target
+      of the standard Tomcat Ant script which is present in the source bundle of
+      Tomcat.
     </p>
     
     <p>The build process is the following:</p>
@@ -104,6 +105,18 @@
 
   </subsection>
 
+  <subsection name="JMX Remote Lifecycle Listener">
+
+  <p>
+    The JMX protocol requires the JMX server (Tomcat in this instance) to listen
+    on two network ports. One of these ports can be fixed via configuration but
+    the second is selected randomly. This makes it difficult to use JMX through
+    a firewall. The JMX Remote Lifecycle Listener allows both ports to be fixed,
+    simplifying the process of connecting to JMX through a firewall. See the <a
+    href="config/listeners.html">listeners</a> page for usage instructions.
+  </p>
+
+  </subsection>
   </section>
 
 </body>
