@@ -2456,7 +2456,7 @@ public class Request
     /**
      * Disable swallowing of remaining input if configured
      */
-    protected void disableSwallowInput() {
+    protected void checkSwallowInput() {
         Context context = getContext();
         if (context != null && !context.getSwallowAbortedUploads()) {
             coyoteRequest.action(ActionCode.DISABLE_SWALLOW_INPUT, null);
@@ -2633,7 +2633,7 @@ public class Request
         } catch (InvalidContentTypeException e) {
             partsParseException = new ServletException(e);
         } catch (FileUploadBase.SizeException e) {
-            disableSwallowInput();
+            checkSwallowInput();
             partsParseException = new IllegalStateException(e);
         } catch (FileUploadException e) {
             partsParseException = new IOException(e);
@@ -2859,7 +2859,7 @@ public class Request
                     context.getLogger().debug(
                             sm.getString("coyoteRequest.postTooLarge"));
                 }
-                disableSwallowInput();
+                checkSwallowInput();
                 return;
             }
             byte[] formData = null;
@@ -2937,7 +2937,7 @@ public class Request
             if (connector.getMaxPostSize() > 0 &&
                     (body.getLength() + len) > connector.getMaxPostSize()) {
                 // Too much data
-                disableSwallowInput();
+                checkSwallowInput();
                 throw new IllegalArgumentException(
                         sm.getString("coyoteRequest.chunkedPostTooLarge"));
             }
