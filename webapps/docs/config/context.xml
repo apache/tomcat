@@ -184,6 +184,17 @@
 
     <attributes>
 
+      <attribute name="allowCasualMultipartParsing" required="false">
+        <p>Set to true if Tomcat should automatically parse
+        multipart/form-data request bodies when HttpServletRequest.getPart*
+        or HttpServletRequest.getParameter* is called, even when the
+        target servlet isn't marked with the @MultipartConfig annotation
+        (See Servlet Specification 3.0, Section 3.2 for details).
+        Note that any setting other than <code>false</code> causes Tomcat
+        to behave in a way that is not technically spec-compliant.
+        The default is <code>false</code></p>
+      </attribute>
+
       <attribute name="backgroundProcessorDelay" required="false">
         <p>This value represents the delay in seconds between the 
         invocation of the backgroundProcess method on this context and 
@@ -333,6 +344,33 @@
         file.</p>
       </attribute>
       
+      <attribute name="swallowAbortedUploads" required="false">
+        <p>Set to false if Tomcat should <b>not</b> read any additional
+        request body data for aborted uploads and instead abort the client
+        connection. This setting is used in the following situations:
+        <ul>
+        <li>the size of the request body is larger than the
+        <code>maxPostSize</code> configured in the connector
+        </li>
+        <li>the size limit of a MultiPart upload is reached
+        </li>
+        <li>the servlet sets the response status to 413
+        (Request Entity Too Large)
+        </li>
+        </ul>
+        Not reading the additional data will free the request processing thread
+        more quickly. Unfortunately most HTTP clients will not read the response
+        in case they can not write the full request.</p>
+        <p>The default is <code>true</code>, so additional data is being read.</p>
+      </attribute>
+
+      <attribute name="swallowOutput" required="false">
+        <p>If the value of this flag is <code>true</code>, the bytes output to
+        System.out and System.err by the web application will be redirected to
+        the web application logger. If not specified, the default value
+        of the flag is <code>false</code>.</p>
+      </attribute>
+
       <attribute name="tldNamespaceAware" required="false">
         <p>If the value of this flag is <code>true</code>, the TLD files
         XML validation will be namespace-aware.  If you turn this flag on,
@@ -432,17 +470,6 @@
         <code>docBase</code> instead.</p>
         <p>These external locations will not be emptied if the context
         is un-deployed.</p>
-      </attribute>
-
-      <attribute name="allowCasualMultipartParsing" required="false">
-        <p>Set to true if Tomcat should automatically parse
-        multipart/form-data request bodies when HttpServletRequest.getPart*
-        or HttpServletRequest.getParameter* is called, even when the
-        target servlet isn't marked with the @MultipartConfig annotation
-        (See Servlet Specification 3.0, Section 3.2 for details).
-        Note that any setting other than <code>false</code> causes Tomcat
-        to behave in a way that is not technically spec-compliant.
-        The default is <code>false</code></p>
       </attribute>
 
       <attribute name="allowLinking" required="false">
@@ -567,33 +594,6 @@
         <code>server.xml</code> and that the <code>threadRenewalDelay</code>
         property of the <code>Executor</code> be &gt;=0. If not specified, the 
         default value of <code>true</code> will be used.</p>
-      </attribute>
-
-      <attribute name="swallowAbortedUploads" required="false">
-        <p>Set to false if Tomcat should <b>not</b> read any additional
-        request body data for aborted uploads and instead abort the client
-        connection. This setting is used in the following situations:
-        <ul>
-        <li>the size of the request body is larger than the
-        <code>maxPostSize</code> configured in the connector
-        </li>
-        <li>the size limit of a MultiPart upload is reached
-        </li>
-        <li>the servlet sets the response status to 413
-        (Request Entity Too Large)
-        </li>
-        </ul>
-        Not reading the additional data will free the request processing thread
-        more quickly. Unfortunately most HTTP clients will not read the response
-        in case they can not write the full request.</p>
-        <p>The default is <code>true</code>, so additional data is being read.</p>
-      </attribute>
-
-      <attribute name="swallowOutput" required="false">
-        <p>If the value of this flag is <code>true</code>, the bytes output to
-        System.out and System.err by the web application will be redirected to
-        the web application logger. If not specified, the default value
-        of the flag is <code>false</code>.</p>
       </attribute>
 
       <attribute name="unloadDelay" required="false">
