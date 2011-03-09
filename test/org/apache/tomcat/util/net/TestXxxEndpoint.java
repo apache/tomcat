@@ -40,7 +40,7 @@ public class TestXxxEndpoint extends TomcatBaseTest {
         tomcat.start();
         
         tomcat.getConnector().stop();
-        // This will should throw an Exception
+        // This should throw an Exception
         Exception e = null;
         ServerSocket s = null;
         try {
