@@ -78,6 +78,10 @@
         <bug>50893</bug>: Add additional information to the download README for
         the extras components. (markt)
       </fix>
+      <fix>
+        Calling <code>stop()</code> and then <code>destroy()</code> on a
+        connector in correctly triggered an exception. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
