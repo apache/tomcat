@@ -40,6 +40,7 @@ public final class SecurityClassLoad {
         loadCorePackage(loader);
         loadCoyotePackage(loader);
         loadLoaderPackage(loader);
+        loadRealmPackage(loader);
         loadSessionPackage(loader);
         loadUtilPackage(loader);
         loadJavaxPackage(loader);
@@ -105,6 +106,14 @@ public final class SecurityClassLoad {
     }
     
     
+    private static final void loadRealmPackage(ClassLoader loader)
+            throws Exception {
+        final String basePackage = "org.apache.catalina.realm.";
+        loader.loadClass
+            (basePackage + "LockOutRealm$LockRecord");
+    }
+
+
     private static final void loadSessionPackage(ClassLoader loader)
         throws Exception {
         final String basePackage = "org.apache.catalina.session.";
