@@ -759,6 +759,14 @@ public class Tomcat {
         public boolean isUnavailable() {
             return false;       
         }
+        @Override
+        public Servlet getServlet() {
+            return existing;
+        }
+        @Override
+        public String getServletClass() {
+            return existing.getClass().getName();
+        }
     }
     
     /**
