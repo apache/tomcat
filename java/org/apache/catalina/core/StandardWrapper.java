@@ -1089,7 +1089,7 @@ public class StandardWrapper extends ContainerBase
                 }
             }
 
-            processServletSecurityAnnotation(servlet);
+            processServletSecurityAnnotation(servlet.getClass());
 
             // Special handling for ContainerServlet instances
             if ((servlet instanceof ContainerServlet) &&
@@ -1129,19 +1129,26 @@ public class StandardWrapper extends ContainerBase
 
     /**
      * {@inheritDoc}
+     * @throws ClassNotFoundException 
      */
     @Override
     public void servletSecurityAnnotationScan() throws ServletException {
         if (instance == null) {
-            load();
+            Class<?> clazz = null;
+            try {
+                clazz = getParentClassLoader().loadClass(getServletClass());
+                processServletSecurityAnnotation(clazz);
+            } catch (ClassNotFoundException e) {
+                // Safe to ignore. No class means no annotations to process
+            }
         } else {
             if (servletSecurityAnnotationScanRequired) {
-                processServletSecurityAnnotation(instance);
+                processServletSecurityAnnotation(instance.getClass());
             }
         }
     }
 
-    private void processServletSecurityAnnotation(Servlet servlet) {
+    private void processServletSecurityAnnotation(Class<?> clazz) {
         // Calling this twice isn't harmful so no syncs
         servletSecurityAnnotationScanRequired = false;
 
@@ -1152,7 +1159,7 @@ public class StandardWrapper extends ContainerBase
         }
 
         ServletSecurity secAnnotation =
-            servlet.getClass().getAnnotation(ServletSecurity.class);
+            clazz.getAnnotation(ServletSecurity.class);
         if (secAnnotation != null) {
             ctxt.addServletSecurity(
                     new ApplicationServletRegistration(this, ctxt),
