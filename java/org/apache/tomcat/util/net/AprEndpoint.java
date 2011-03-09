@@ -760,7 +760,8 @@ public class AprEndpoint extends AbstractEndpoint {
             if (running) {
                 SocketWrapper<Long> wrapper =
                     new SocketWrapper<Long>(Long.valueOf(socket));
-                getExecutor().execute(new SocketWithOptionsProcessor(wrapper));
+                getExecutor().execute(
+                        new SocketWithOptionsProcessor(wrapper, null));
             }
         } catch (RejectedExecutionException x) {
             log.warn("Socket processing request was rejected for:"+socket,x);
@@ -1641,9 +1642,13 @@ public class AprEndpoint extends AbstractEndpoint {
     protected class SocketWithOptionsProcessor implements Runnable {
 
         protected SocketWrapper<Long> socket = null;
+        protected SocketStatus status = null;
 
-        public SocketWithOptionsProcessor(SocketWrapper<Long> socket) {
+
+        public SocketWithOptionsProcessor(SocketWrapper<Long> socket,
+                SocketStatus status) {
             this.socket = socket;
+            this.status = status;
         }
 
         @Override
@@ -1660,17 +1665,30 @@ public class AprEndpoint extends AbstractEndpoint {
                     }
                 } else {
                     // Process the request from this socket
-                    if (!setSocketOptions(socket.getSocket().longValue())
-                            || handler.process(socket) == Handler.SocketState.CLOSED) {
+                    if (!setSocketOptions(socket.getSocket().longValue())) {
                         // Close socket and pool
                         destroySocket(socket.getSocket().longValue());
                         socket = null;
                     }
+                    // Process the request from this socket
+                    Handler.SocketState state = (status==null)?handler.process(socket):handler.asyncDispatch(socket, status);
+                    if (state == Handler.SocketState.CLOSED) {
+                        // Close socket and pool
+                        destroySocket(socket.getSocket().longValue());
+                        socket = null;
+                    } else if (state == Handler.SocketState.LONG) {
+                        socket.access();
+                        if (socket.async) {
+                            waitingRequests.add(socket);
+                        }
+                    } else if (state == Handler.SocketState.ASYNC_END) {
+                        socket.access();
+                        SocketProcessor proc = new SocketProcessor(socket, SocketStatus.OPEN);
+                        getExecutor().execute(proc);
+                    }
                 }
             }
-
         }
-
     }
 
 

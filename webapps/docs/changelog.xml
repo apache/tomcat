@@ -90,6 +90,11 @@
         <bug>48208</bug>: Allow the configuration of a custom trust manager for
         use in CLIENT-CERT authentication. (markt)
       </add>
+      <fix>
+        Fix issues that prevented asynchronous servlets from working when used
+        with the HTTP APR connector on platforms that support TCP_DEFER_ACCEPT.
+        (martk)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
