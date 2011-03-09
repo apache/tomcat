@@ -265,16 +265,6 @@
         the same attribute explicitly for the Context.</p>
       </attribute>
 
-      <attribute name="privileged" required="false">
-        <p>Set to <code>true</code> to allow this context to use container
-        servlets, like the manager servlet. Use of the <code>privileged</code>
-        attribute will change the context's parent class loader to be the
-        <em>Server</em> class loader rather than the <em>Shared</em> class
-        loader. Note that in a default installation, the <em>Common</em> class
-        loader is used for both the <em>Server</em> and the <em>Shared</em>
-        class loaders.</p>
-      </attribute>
-
       <attribute name="path" required="false">
         <p>The <em>context path</em> of this web application, which is
         matched against the beginning of each request URI to select the
@@ -286,6 +276,16 @@
         <p>The value of this field must not be set except when statically
         defining a Context in server.xml, as it will be inferred from the
         filenames used for either the .xml context file or the docBase.</p>
+      </attribute>
+
+      <attribute name="privileged" required="false">
+        <p>Set to <code>true</code> to allow this context to use container
+        servlets, like the manager servlet. Use of the <code>privileged</code>
+        attribute will change the context's parent class loader to be the
+        <em>Server</em> class loader rather than the <em>Shared</em> class
+        loader. Note that in a default installation, the <em>Common</em> class
+        loader is used for both the <em>Server</em> and the <em>Shared</em>
+        class loaders.</p>
       </attribute>
 
       <attribute name="reloadable" required="false">
@@ -356,16 +356,16 @@
         penalty.</p>
       </attribute>
 
-      <attribute name="wrapperClass" required="false">
-        <p>Java class name of the <code>org.apache.catalina.Wrapper</code>
-        implementation class that will be used for servlets managed by this
-        Context.  If not specified, a standard default value will be used.</p>
-      </attribute>
-      
       <attribute name="useHttpOnly" required="false">
        <p>Should the HttpOnly flag be set on session cookies to prevent client
           side script from accessing the session ID? Defaults to
           <code>true</code>.</p>
+      </attribute>
+      
+      <attribute name="wrapperClass" required="false">
+        <p>Java class name of the <code>org.apache.catalina.Wrapper</code>
+        implementation class that will be used for servlets managed by this
+        Context.  If not specified, a standard default value will be used.</p>
       </attribute>
       
       <attribute name="xmlNamespaceAware" required="false">
