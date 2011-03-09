@@ -130,7 +130,7 @@ public class TestMaxConnections extends TomcatBaseTest{
         @Override
         protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
             try {
-                Thread.sleep(TestMaxConnections.soTimeout/2);
+                Thread.sleep(TestMaxConnections.soTimeout*4/5);
             }catch (InterruptedException x) {
                 
             }
