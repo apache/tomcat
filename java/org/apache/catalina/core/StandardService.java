@@ -304,7 +304,7 @@ public class StandardService extends LifecycleMBeanBase implements Service {
             }
             if (j < 0)
                 return;
-            if (getState().isAvailable()) {
+            if (connectors[j].getState().isAvailable()) {
                 try {
                     connectors[j].stop();
                 } catch (LifecycleException e) {
