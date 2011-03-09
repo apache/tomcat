@@ -133,6 +133,7 @@ public abstract class TomcatBaseTest extends TestCase {
         if (protocol.contains("Apr")) {
             StandardServer server = (StandardServer) tomcat.getServer();
             AprLifecycleListener listener = new AprLifecycleListener();
+            listener.setSSLRandomSeed("/dev/urandom");
             server.addLifecycleListener(listener);
             connector.setAttribute("pollerThreadCount", Integer.valueOf(1));
         }
