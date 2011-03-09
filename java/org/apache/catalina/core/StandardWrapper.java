@@ -1133,7 +1133,7 @@ public class StandardWrapper extends ContainerBase
      */
     @Override
     public void servletSecurityAnnotationScan() throws ServletException {
-        if (instance == null) {
+        if (getServlet() == null) {
             Class<?> clazz = null;
             try {
                 clazz = getParentClassLoader().loadClass(getServletClass());
@@ -1143,7 +1143,7 @@ public class StandardWrapper extends ContainerBase
             }
         } else {
             if (servletSecurityAnnotationScanRequired) {
-                processServletSecurityAnnotation(instance.getClass());
+                processServletSecurityAnnotation(getServlet().getClass());
             }
         }
     }
