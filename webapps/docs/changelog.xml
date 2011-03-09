@@ -30,7 +30,7 @@
     <author email="kkolinko@apache.org">Konstantin Kolinko</author>
     <author email="pero@apache.org">Peter Rossbach</author>
     <author email="kfujino@apache.org">Keiichi Fujino</author>
-    <author email="timw@apache.org">Tim Whittington</author>    
+    <author email="timw@apache.org">Tim Whittington</author>   
     <author email="mturk@apache.org">Mladen Turk</author>
     <author email="schultz@apache.org">Christopher Schultz</author>
     <author email="slaurent@apache.org">Sylvain Laurent</author>
@@ -69,6 +69,11 @@
         to make request data swallowing configurable for requests
         that are too large. (rjung)
       </add>
+      <fix>
+        <bug>50854</bug>: Add additional permissions required by the Manager
+        application when running under a security Manager and support a shared
+        Manager installation when $CATALINA_HOME != CATALINA_BASE. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
