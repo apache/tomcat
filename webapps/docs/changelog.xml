@@ -94,6 +94,10 @@
         Correct possible threading issue in JSP compilation when development
         mode is used. (markt)
       </fix>
+      <fix>
+        <bug>50895</bug>: Don&apos;t initialize classes created during the
+        compilation stage. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>

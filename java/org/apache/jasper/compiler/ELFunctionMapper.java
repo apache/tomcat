@@ -312,7 +312,7 @@ public class ELFunctionMapper {
             }
 
             try {
-                clazz = Class.forName(className, true, tccl);
+                clazz = Class.forName(className, false, tccl);
             } catch (ClassNotFoundException e) {
                 throw new JasperException(e);
             }
