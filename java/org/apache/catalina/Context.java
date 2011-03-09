@@ -90,6 +90,17 @@ public interface Context extends Container {
     // ------------------------------------------------------------- Properties
 
     /**
+     * Returns <code>true</code> if requests mapped to servlets without
+     * "multipart config" to parse multipart/form-data requests anyway.
+     *
+     * @return <code>true</code> if requests mapped to servlets without
+     *    "multipart config" to parse multipart/form-data requests,
+     *    <code>false</code> otherwise.
+     */
+    public boolean getAllowCasualMultipartParsing();
+
+
+   /**
      * Set to <code>true</code> to allow requests mapped to servlets that
      * do not explicitly declare @MultipartConfig or have
      * &lt;multipart-config&gt; specified in web.xml to parse
@@ -100,33 +111,6 @@ public interface Context extends Container {
      */
     public void setAllowCasualMultipartParsing(boolean allowCasualMultipartParsing);
 
-    /**
-     * Returns <code>true</code> if requests mapped to servlets without
-     * "multipart config" to parse multipart/form-data requests anyway.
-     *
-     * @return <code>true</code> if requests mapped to servlets without
-     *    "multipart config" to parse multipart/form-data requests,
-     *    <code>false</code> otherwise.
-     */
-    public boolean getAllowCasualMultipartParsing();
-
-    /**
-     * Set to <code>false</code> to disable request data swallowing
-     * after an upload was aborted due to size constraints.
-     *
-     * @param swallowAbortedUploads <code>false</code> to disable
-     *        swallowing, <code>true</code> otherwise (default).
-     */
-    public void setSwallowAbortedUploads(boolean swallowAbortedUploads);
-
-    /**
-     * Returns <code>true</code> if remaining request data will be read
-     * (swallowed) even the request violates a data size constraint.
-     *
-     * @return <code>true</code> if data will be swallowed (default),
-     *    <code>false</code> otherwise.
-     */
-    public boolean getSwallowAbortedUploads();
 
     /**
      * Return the set of initialized application event listener objects,
@@ -527,6 +511,25 @@ public interface Context extends Container {
      */
     public void setSessionTimeout(int timeout);
 
+
+    /**
+     * Returns <code>true</code> if remaining request data will be read
+     * (swallowed) even the request violates a data size constraint.
+     *
+     * @return <code>true</code> if data will be swallowed (default),
+     *    <code>false</code> otherwise.
+     */
+    public boolean getSwallowAbortedUploads();
+
+
+    /**
+     * Set to <code>false</code> to disable request data swallowing
+     * after an upload was aborted due to size constraints.
+     *
+     * @param swallowAbortedUploads <code>false</code> to disable
+     *        swallowing, <code>true</code> otherwise (default).
+     */
+    public void setSwallowAbortedUploads(boolean swallowAbortedUploads);
 
     /**
      * Return the value of the swallowOutput flag.
