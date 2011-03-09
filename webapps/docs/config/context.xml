@@ -333,6 +333,14 @@
         used.</p>
       </attribute>
       
+      <attribute name="sessionCookieName" required="false">
+        <p>The name to be used for all session cookies created for this
+        context. If set, this overrides any name set by the web application.
+        If not set, the value specified by the web application, if any, will be
+        used, or the name <code>JSESSIONID</code> if the web application does
+        not explicitly set one.</p>
+      </attribute>
+      
       <attribute name="sessionCookiePath" required="false">
         <p>The path to be used for all session cookies created for this
         context. If set, this overrides any path set by the web application.
