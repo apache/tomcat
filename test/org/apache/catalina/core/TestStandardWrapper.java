@@ -125,6 +125,24 @@ public class TestStandardWrapper extends TomcatBaseTest {
         doTestSecurityAnnotationsAddServlet(true);
     }
     
+    public void testSecurityAnnotationsNoWebXmlConstraints() throws Exception {
+        // Setup Tomcat instance
+        Tomcat tomcat = getTomcatInstance();
+        
+        File appDir = new File("test/webapp-3.0-servletsecurity");
+        tomcat.addWebapp(null, "", appDir.getAbsolutePath());
+        
+        tomcat.start();
+        
+        ByteChunk bc = new ByteChunk();
+        int rc;
+        rc = getUrl("http://localhost:" + getPort() + "/",
+                bc, null, null);
+        
+        assertNull(bc.toString());
+        assertEquals(403, rc);
+    }
+
     private void doTestSecurityAnnotationsAddServlet(boolean useCreateServlet)
             throws Exception {
 
