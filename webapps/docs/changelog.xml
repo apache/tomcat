@@ -74,6 +74,10 @@
         application when running under a security Manager and support a shared
         Manager installation when $CATALINA_HOME != CATALINA_BASE. (markt)
       </fix>
+      <fix>
+        <bug>50893</bug>: Add additional information to the download README for
+        the extras components. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

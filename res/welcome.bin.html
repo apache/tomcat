@@ -64,13 +64,27 @@ RELEASE-NOTES and the RUNNING.txt file in the distribution for more details.
     wrapper and the compiled APR/native library for use with 64-bit JVMs on
     Itanium 64-bit Windows platforms.</dd>
   <dt>apache-tomcat-[version]-deployer.zip or .tar.gz</dt>
-    <dd>The standalone Tomcat Web Application Deployer.</dd>
+    <dd>The standalone
+    <a href="http://tomcat.apache.org/tomcat-@VERSION_MAJOR_MINOR@-doc/deployer-howto.html">
+    Tomcat Web Application Deployer</a>.</dd>
   <dt>apache-tomcat-[version]-fulldocs.tar.gz</dt>
     <dd>The Tomcat documentation bundle, including complete javadocs.</dd>
 </dl></dd>
 <dt><b>bin/extras/</b></dt>
-<dd>Additional components. See
-  <a href="http://tomcat.apache.org/tomcat-@VERSION_MAJOR_MINOR@-doc/extras.html">documentation</a>.</dd>
+<dd><dl>
+  <dt>tomcat-juli-adapters.jar & tomcat-juli.jar</dt>
+    <dd>Full commons-logging implementation. See the <a
+    href="http://tomcat.apache.org/tomcat-@VERSION_MAJOR_MINOR@-doc/logging.html">
+    logging documentation</a> for more information.</dd>
+  <dt>catalina-ws.jar</dt>
+    <dd>Web Services support (JSR 109). See the <a
+    href="http://tomcat.apache.org/tomcat-@VERSION_MAJOR_MINOR@-doc/extras.html">
+    extras documentation</a> for more information.</dd>
+  <dt>catalina-jmx-remote.jar</dt>
+    <dd>JMX Remote Lifecycle Listener. See the <a
+    href="http://tomcat.apache.org/tomcat-@VERSION_MAJOR_MINOR@-doc/config/listeners.html">
+    listeners documentation</a> for details.</dd>
+</dl></dd>  
 <dt><b>src/</b></dt>
 <dd><dl>
   <dt>apache-tomcat-[version].zip or .tar.gz</dt>
