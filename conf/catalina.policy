@@ -187,11 +187,24 @@ grant {
 
 
 // The Manager application needs access to the following packages to support the
-// session display functionality
+// session display functionality. These settings support the following
+// configurations:
+// - default CATALINA_HOME == CATALINA_BASE
+// - CATALINA_HOME != CATALINA_BASE, per instance Manager in CATALINA_BASE
+// - CATALINA_HOME != CATALINA_BASE, shared Manager in CATALINA_HOME
 grant codeBase "file:${catalina.base}/webapps/manager/-" {
     permission java.lang.RuntimePermission "accessClassInPackage.org.apache.catalina";
+    permission java.lang.RuntimePermission "accessClassInPackage.org.apache.catalina.ha.session";
     permission java.lang.RuntimePermission "accessClassInPackage.org.apache.catalina.manager";
     permission java.lang.RuntimePermission "accessClassInPackage.org.apache.catalina.manager.util";
+    permission java.lang.RuntimePermission "accessClassInPackage.org.apache.catalina.util";
+};
+grant codeBase "file:${catalina.home}/webapps/manager/-" {
+    permission java.lang.RuntimePermission "accessClassInPackage.org.apache.catalina";
+    permission java.lang.RuntimePermission "accessClassInPackage.org.apache.catalina.ha.session";
+    permission java.lang.RuntimePermission "accessClassInPackage.org.apache.catalina.manager";
+    permission java.lang.RuntimePermission "accessClassInPackage.org.apache.catalina.manager.util";
+    permission java.lang.RuntimePermission "accessClassInPackage.org.apache.catalina.util";
 };
 
 // You can assign additional permissions to particular web applications by
