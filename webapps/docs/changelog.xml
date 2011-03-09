@@ -45,6 +45,10 @@
 <section name="Tomcat 7.0.11 (markt)">
   <subsection name="Catalina">
     <changelog>
+      <fix>
+        CVE-2011-1088: Completed fix. Don&apos;t ignore @ServletSecurity
+        annotations. (markt)
+      </fix>
       <add>
         <bug>25060</bug>: Close Apache Commons DBCP datasources when the
         associated JNDI naming context is stopped (e.g. for a non-global
@@ -88,6 +92,10 @@
   <subsection name="Catalina">
     <changelog>
       <fix>
+        CVE-2011-1088: Partial fix. Don&apos;t ignore @ServletSecurity
+        annotations. (markt)
+      </fix>
+      <fix>
         <bug>27988</bug>: Improve reporting of missing files. (markt)
       </fix>
       <fix>
@@ -102,10 +110,6 @@
       <fix>
         Improve shut down speed by not renewing threads during shut down when
         the <code>ThreadLocalLeakPreventionListener</code> is enabled. (markt)  
-      </fix>
-      <fix>
-        CVE-2011-1088: Partial fix. Don&apos;t ignore @ServletSecurity
-        annotations. (markt)
       </fix>
     </changelog>
   </subsection>
