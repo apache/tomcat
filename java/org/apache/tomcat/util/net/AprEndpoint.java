@@ -760,8 +760,7 @@ public class AprEndpoint extends AbstractEndpoint {
             if (running) {
                 SocketWrapper<Long> wrapper =
                     new SocketWrapper<Long>(Long.valueOf(socket));
-                getExecutor().execute(
-                        new SocketWithOptionsProcessor(wrapper, null));
+                getExecutor().execute(new SocketWithOptionsProcessor(wrapper));
             }
         } catch (RejectedExecutionException x) {
             log.warn("Socket processing request was rejected for:"+socket,x);
@@ -1642,13 +1641,10 @@ public class AprEndpoint extends AbstractEndpoint {
     protected class SocketWithOptionsProcessor implements Runnable {
 
         protected SocketWrapper<Long> socket = null;
-        protected SocketStatus status = null;
 
 
-        public SocketWithOptionsProcessor(SocketWrapper<Long> socket,
-                SocketStatus status) {
+        public SocketWithOptionsProcessor(SocketWrapper<Long> socket) {
             this.socket = socket;
-            this.status = status;
         }
 
         @Override
@@ -1671,7 +1667,7 @@ public class AprEndpoint extends AbstractEndpoint {
                         socket = null;
                     }
                     // Process the request from this socket
-                    Handler.SocketState state = (status==null)?handler.process(socket):handler.asyncDispatch(socket, status);
+                    Handler.SocketState state = handler.process(socket);
                     if (state == Handler.SocketState.CLOSED) {
                         // Close socket and pool
                         destroySocket(socket.getSocket().longValue());
@@ -1683,7 +1679,8 @@ public class AprEndpoint extends AbstractEndpoint {
                         }
                     } else if (state == Handler.SocketState.ASYNC_END) {
                         socket.access();
-                        SocketProcessor proc = new SocketProcessor(socket, SocketStatus.OPEN);
+                        SocketProcessor proc =
+                            new SocketProcessor(socket, SocketStatus.OPEN);
                         getExecutor().execute(proc);
                     }
                 }
