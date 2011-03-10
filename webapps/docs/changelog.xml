@@ -93,7 +93,7 @@
       <fix>
         Fix issues that prevented asynchronous servlets from working when used
         with the HTTP APR connector on platforms that support TCP_DEFER_ACCEPT.
-        (martk)
+        (markt)
       </fix>
     </changelog>
   </subsection>
