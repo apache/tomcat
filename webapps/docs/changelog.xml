@@ -50,6 +50,10 @@
         inside server.xml and log a warning that the configuration has been
         corrected. (markt)
       </add>
+      <fix>
+        Don&apos;t unpack WAR files if they are not located in the Host&apos;s
+        appBase. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
