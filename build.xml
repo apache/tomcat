@@ -1621,11 +1621,13 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
     </copy>
     <exec dir="${tomcat.dist}" executable="${nsis.exe}" osfamily="windows">
       <arg value="/DNSISDIR=${nsis.home}" />
+      <arg value="/V2" />
       <arg value="tomcat.nsi" />
     </exec>
     <exec dir="${tomcat.dist}" executable="wine" osfamily="unix">
       <arg value="${nsis.exe}" />
       <arg value="/DNSISDIR=${nsis.home}" />
+      <arg value="/V2" />
       <arg value="tomcat.nsi" />
     </exec>
 
