@@ -672,12 +672,6 @@ public class ContextConfig
         Host host = (Host) context.getParent();
         String appBase = host.getAppBase();
 
-        boolean unpackWARs = true;
-        if (host instanceof StandardHost) {
-            unpackWARs = ((StandardHost) host).isUnpackWARs() 
-                && ((StandardContext) context).getUnpackWAR();
-        }
-
         File canonicalAppBase = new File(appBase);
         if (canonicalAppBase.isAbsolute()) {
             canonicalAppBase = canonicalAppBase.getCanonicalFile();
@@ -710,6 +704,13 @@ public class ContextConfig
         ContextName cn = new ContextName(context.getPath(),
                 context.getWebappVersion());
         String pathName = cn.getBaseName();
+
+        boolean unpackWARs = true;
+        if (host instanceof StandardHost) {
+            unpackWARs = ((StandardHost) host).isUnpackWARs() &&
+                    ((StandardContext) context).getUnpackWAR() &&
+                    (docBase.startsWith(canonicalAppBase.getPath()));
+        }
 
         if (docBase.toLowerCase(Locale.ENGLISH).endsWith(".war") && !file.isDirectory() && unpackWARs) {
             URL war = new URL("jar:" + (new File(docBase)).toURI().toURL() + "!/");
