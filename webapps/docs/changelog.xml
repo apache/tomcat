@@ -55,6 +55,10 @@
       <update>
         Update optional CheckStyle library to 5.3. (markt)
       </update>
+      <fix>
+        <bug>50911</bug>: Reduce noise generated during the build of the Windows
+        installer so warnings are more obvious. Patch provided by sebb. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
