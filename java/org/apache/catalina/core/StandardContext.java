@@ -2040,10 +2040,16 @@ public class StandardContext extends ContainerBase
      */
     @Override
     public void setPath(String path) {
-        this.path = path;
-        encodedPath = urlEncoder.encode(path);
+        if (path == null || (!path.equals("") && !path.startsWith("/"))) {
+            this.path = "/" + path;
+            log.warn(sm.getString(
+                    "standardContext.pathInvalid", path, this.path));
+        } else {
+            this.path = path;
+        }
+        encodedPath = urlEncoder.encode(this.path);
         if (getName() == null) {
-            setName(path);
+            setName(this.path);
         }
     }
 
