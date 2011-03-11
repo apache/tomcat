@@ -80,7 +80,7 @@
       </fix>
       <fix>
         Calling <code>stop()</code> and then <code>destroy()</code> on a
-        connector in correctly triggered an exception. (markt)
+        connector incorrectly triggered an exception. (markt)
       </fix>
     </changelog>
   </subsection>
