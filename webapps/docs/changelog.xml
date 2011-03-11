@@ -42,6 +42,22 @@
   General, Catalina, Coyote, Jasper, Cluster, Web applications, Extras, Tribes,
   Other
 -->
+<section name="Tomcat 7.0.12 (markt)">
+  <subsection name="Other">
+    <changelog>
+      <update>
+        Update Eclipse JDT complier to 3.6.2. (markt)
+      </update>
+      <update>
+        Update WSDL4J library to 1.6.2 (used by JSR 109 support in the extras
+        package). (markt)
+      </update>
+      <update>
+        Update optional CheckStyle library to 5.3. (markt)
+      </update>
+    </changelog>
+  </subsection>
+</section>
 <section name="Tomcat 7.0.11 (markt)" rtext="released 2011-03-11">
   <subsection name="Catalina">
     <changelog>
