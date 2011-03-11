@@ -43,6 +43,15 @@
   Other
 -->
 <section name="Tomcat 7.0.12 (markt)">
+  <subsection name="Catalina">
+    <changelog>
+      <add>
+        Automatically correct invalid paths when specified for Context elements
+        inside server.xml and log a warning that the configuration has been
+        corrected. (markt)
+      </add>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <update>
