@@ -160,11 +160,6 @@ public abstract class AbstractProtocolHandler implements ProtocolHandler,
         endpoint.setKeepAliveTimeout(keepAliveTimeout);
     }
 
-
-
-    // ---------------------- Properties that are passed through to the EndPoint
-    // ------------------------------------ and are made available as attributes
-
     public InetAddress getAddress() { return endpoint.getAddress(); }
     public void setAddress(InetAddress ia) {
         endpoint.setAddress(ia);
