@@ -145,18 +145,6 @@ public abstract class AbstractHttp11Protocol extends AbstractProtocolHandler {
     }
 
 
-    // ------------------------------------------------ HTTP specific properties
-    // ------------------------------------------ passed through to the EndPoint
-    
-    public boolean isSSLEnabled() { return endpoint.isSSLEnabled();}
-    public void setSSLEnabled(boolean SSLEnabled) {
-        endpoint.setSSLEnabled(SSLEnabled);
-    }    
-
-
-    // ------------------------------------------------ HTTP specific properties
-    // --------- passed through to the EndPoint and made available as attributes
-
     /**
      * This field indicates if the protocol is treated as if it is secure. This
      * normally means https is being used but can be used to fake https e.g
@@ -168,6 +156,15 @@ public abstract class AbstractHttp11Protocol extends AbstractProtocolHandler {
         secure = b;         
     }
     
+
+    // ------------------------------------------------ HTTP specific properties
+    // ------------------------------------------ passed through to the EndPoint
+    
+    public boolean isSSLEnabled() { return endpoint.isSSLEnabled();}
+    public void setSSLEnabled(boolean SSLEnabled) {
+        endpoint.setSSLEnabled(SSLEnabled);
+    }    
+
 
     /**
      * Maximum number of requests which can be performed over a keepalive 
