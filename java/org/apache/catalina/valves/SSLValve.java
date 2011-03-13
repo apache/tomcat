@@ -19,6 +19,7 @@ package org.apache.catalina.valves;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.security.NoSuchProviderException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 
@@ -27,6 +28,8 @@ import javax.servlet.ServletException;
 import org.apache.catalina.Globals;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
 
 /**
  * When using mod_proxy_http, the client SSL information is not included in the
@@ -59,6 +62,8 @@ import org.apache.catalina.connector.Response;
  */
 public class SSLValve extends ValveBase {
     
+    private static final Log log = LogFactory.getLog(SSLValve.class);
+
     
     //------------------------------------------------------ Constructor
     public SSLValve() {
@@ -91,14 +96,24 @@ public class SSLValve extends ValveBase {
             // ByteArrayInputStream bais = new ByteArrayInputStream(strcerts.getBytes("UTF-8"));
             ByteArrayInputStream bais = new ByteArrayInputStream(strcerts.getBytes());
             X509Certificate jsseCerts[] = null;
+            String providerName = (String) request.getConnector().getProperty(
+                    "clientCertProvider");
             try {
-                CertificateFactory cf = CertificateFactory.getInstance("X.509");
+                CertificateFactory cf;
+                if (providerName == null) {
+                    cf = CertificateFactory.getInstance("X.509");    
+                } else {
+                    cf = CertificateFactory.getInstance("X.509", providerName);
+                }
                 X509Certificate cert = (X509Certificate) cf.generateCertificate(bais);
                 jsseCerts = new X509Certificate[1];
                 jsseCerts[0] = cert;
             } catch (java.security.cert.CertificateException e) {
                 System.out.println("SSLValve failed " + strcerts);
                 System.out.println("SSLValve failed " + e);
+            } catch (NoSuchProviderException e) {
+                log.error(sm.getString(
+                        "sslValve.invalidProvider", providerName), e);
             }
             request.setAttribute(Globals.CERTIFICATES_ATTR, jsseCerts);
         }

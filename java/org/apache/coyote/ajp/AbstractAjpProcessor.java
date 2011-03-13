@@ -20,6 +20,7 @@ package org.apache.coyote.ajp;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.InetAddress;
+import java.security.NoSuchProviderException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.concurrent.Executor;
@@ -205,6 +206,19 @@ public abstract class AbstractAjpProcessor implements ActionHook, Processor {
     }
 
 
+    /**
+     * When client certificate information is presented in a form other than
+     * instances of {@link java.security.cert.X509Certificate} it needs to be
+     * converted before it can be used and this property controls which JSSE
+     * provider is used to perform the conversion. For example it is used with
+     * the AJP connectors, the HTTP APR connector and with the
+     * {@link org.apache.catalina.valves.SSLValve}. If not specified, the
+     * default provider will be used. 
+     */
+    protected String clientCertProvider = null;
+    public String getClientCertProvider() { return clientCertProvider; }
+    public void setClientCertProvider(String s) { this.clientCertProvider = s; }
+
     // --------------------------------------------------------- Public Methods
 
 
@@ -294,8 +308,13 @@ public abstract class AbstractAjpProcessor implements ActionHook, Processor {
                            certData.getLength());
                // Fill the  elements.
                try {
-                   CertificateFactory cf =
-                       CertificateFactory.getInstance("X.509");
+                   CertificateFactory cf;
+                   if (clientCertProvider == null) {
+                       cf = CertificateFactory.getInstance("X.509");
+                   } else {
+                       cf = CertificateFactory.getInstance("X.509",
+                               clientCertProvider);
+                   }
                    while(bais.available() > 0) {
                        X509Certificate cert = (X509Certificate)
                            cf.generateCertificate(bais);
@@ -310,6 +329,9 @@ public abstract class AbstractAjpProcessor implements ActionHook, Processor {
                        }
                    }
                } catch (java.security.cert.CertificateException e) {
+                   getLog().error(sm.getString("ajpprocessor.certs.fail"), e);
+                   return;
+               } catch (NoSuchProviderException e) {
                    getLog().error(sm.getString("ajpprocessor.certs.fail"), e);
                    return;
                }

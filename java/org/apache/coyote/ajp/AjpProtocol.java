@@ -221,6 +221,7 @@ public class AjpProtocol extends AbstractAjpProtocol {
             processor.setTomcatAuthentication(proto.tomcatAuthentication);
             processor.setRequiredSecret(proto.requiredSecret);
             processor.setKeepAliveTimeout(proto.getKeepAliveTimeout());
+            processor.setClientCertProvider(proto.getClientCertProvider());
             register(processor);
             return processor;
         }
