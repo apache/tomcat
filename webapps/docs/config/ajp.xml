@@ -268,6 +268,17 @@
       interface.</p>
     </attribute>
 
+    <attribute name="clientCertProvider" required="false">
+      <p>When client certificate information is presented in a form other than
+      instances of <code>java.security.cert.X509Certificate</code> it needs to
+      be converted before it can be used and this property controls which JSSE
+      provider is used to perform the conversion. For example it is used with
+      the AJP connectors, the <a href="http.html">HTTP APR connector</a> and
+      with the <a href="valve.html#SSL_Authenticator_Valve">
+      org.apache.catalina.valves.SSLValve</a>.If not specified, the default
+      provider will be used.</p>
+    </attribute>
+
     <attribute name="connectionLinger" required="false">
       <p>The number of milliseconds during which the sockets used by this
       <strong>Connector</strong> will linger when they are closed.

@@ -893,6 +893,17 @@
       constraint that uses <code>CLIENT-CERT</code> authentication.</p>
     </attribute>
 
+    <attribute name="clientCertProvider" required="false">
+      <p>When client certificate information is presented in a form other than
+      instances of <code>java.security.cert.X509Certificate</code> it needs to
+      be converted before it can be used and this property controls which JSSE
+      provider is used to perform the conversion. For example it is used with
+      the <a href="ajp.html">AJP connectors</a>, the HTTP APR connector and
+      with the <a href="valve.html#SSL_Authenticator_Valve">
+      org.apache.catalina.valves.SSLValve</a>. If not specified, the default
+      provider will be used.</p>
+    </attribute>
+
     <attribute name="crlFile" required="false">
       <p>The certificate revocation list to be used to verify client
       certificates. If not defined, client certificates will not be checked
