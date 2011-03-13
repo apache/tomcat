@@ -56,6 +56,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Coyote">
+    <changelog>
+      <add>
+        <bug>50887</bug>: Add support for configuring the JSSE provider used to
+        convert client certificates. Based on a patch by pknopp. (markt)
+      </add>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <update>

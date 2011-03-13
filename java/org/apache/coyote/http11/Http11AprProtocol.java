@@ -418,6 +418,7 @@ public class Http11AprProtocol extends AbstractHttp11Protocol {
             processor.setSocketBuffer(proto.getSocketBuffer());
             processor.setMaxSavePostSize(proto.getMaxSavePostSize());
             processor.setServer(proto.getServer());
+            processor.setClientCertProvider(proto.getClientCertProvider());
             register(processor);
             return processor;
         }
