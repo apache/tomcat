@@ -54,6 +54,9 @@
         Don&apos;t unpack WAR files if they are not located in the Host&apos;s
         appBase. (markt)
       </fix>
+      <fix>
+        Don&apos;t log to standard out in SSLValve. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
