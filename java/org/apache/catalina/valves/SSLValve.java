@@ -109,8 +109,7 @@ public class SSLValve extends ValveBase {
                 jsseCerts = new X509Certificate[1];
                 jsseCerts[0] = cert;
             } catch (java.security.cert.CertificateException e) {
-                System.out.println("SSLValve failed " + strcerts);
-                System.out.println("SSLValve failed " + e);
+                log.warn(sm.getString("sslValve.certError", strcerts), e);
             } catch (NoSuchProviderException e) {
                 log.error(sm.getString(
                         "sslValve.invalidProvider", providerName), e);
