@@ -79,6 +79,13 @@
       </add>
     </changelog>
   </subsection>
+  <subsection name="Web applications">
+    <changelog>
+      <fix>
+        <bug>50924</bug>: Clean-up HTTP connector comparison table. (markt)
+      </fix>
+    </changelog>
+  </subsection>"
   <subsection name="Other">
     <changelog>
       <update>
