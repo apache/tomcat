@@ -65,6 +65,10 @@
         Update pattern used in CrawlerSessionManagerValve to that used by the
         ASF infrastructure team. (markt)
       </update>
+      <fix>
+        Remove unnecessary whitespace from MIME mapping entries in global
+        web.xml file. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

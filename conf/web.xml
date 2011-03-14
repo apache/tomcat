@@ -824,7 +824,7 @@
     </mime-mapping>
     <mime-mapping>
         <!-- OpenDocument Drawing Template -->
-        <extension>otg </extension>
+        <extension>otg</extension>
         <mime-type>application/vnd.oasis.opendocument.graphics-template</mime-type>
     </mime-mapping>
     <mime-mapping>
@@ -840,7 +840,7 @@
     <mime-mapping>
         <!-- OpenDocument Spreadsheet Template -->
         <extension>ots</extension>
-        <mime-type>application/vnd.oasis.opendocument.spreadsheet-template </mime-type>
+        <mime-type>application/vnd.oasis.opendocument.spreadsheet-template</mime-type>
     </mime-mapping>
     <mime-mapping>
         <!-- OpenDocument Text Template -->
