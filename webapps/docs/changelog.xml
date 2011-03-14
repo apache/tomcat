@@ -57,6 +57,14 @@
       <fix>
         Don&apos;t log to standard out in SSLValve. (markt)
       </fix>
+      <fix>
+        Handle the case where a web crawler provides an invalid session ID in
+        the CrawlerSessionManagerValve. (markt)
+      </fix>
+      <update>
+        Update pattern used in CrawlerSessionManagerValve to that used by the
+        ASF infrastructure team. (markt)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Coyote">
