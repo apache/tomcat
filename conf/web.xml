@@ -699,7 +699,7 @@
     </mime-mapping>
     <mime-mapping>
         <extension>mathml</extension>
-        <mime-type>application/mathml+xml</mime-type> 
+        <mime-type>application/mathml+xml</mime-type>
     </mime-mapping>
     <mime-mapping>
         <extension>me</extension>
@@ -1196,15 +1196,15 @@
   <!-- When a request URI refers to a directory, the default servlet looks  -->
   <!-- for a "welcome file" within that directory and, if present, to the   -->
   <!-- corresponding resource URI for display.                              -->
-  <!-- If none welcome file are present, the default servlet either serves  -->
-  <!-- a directory listing (see default servlet configuration on how to     -->
+  <!-- If no welcome files are present, the default servlet either serves a -->
+  <!-- directory listing (see default servlet configuration on how to       -->
   <!-- customize) or returns a 404 status, depending on the value of the    -->
   <!-- listings setting.                                                    -->
   <!--                                                                      -->
   <!-- If you define welcome files in your own application's web.xml        -->
   <!-- deployment descriptor, that list *replaces* the list configured      -->
   <!-- here, so be sure to include any of the default values that you wish  -->
-  <!-- use within your application.                                         -->
+  <!-- to use within your application.                                       -->
 
     <welcome-file-list>
         <welcome-file>index.html</welcome-file>
