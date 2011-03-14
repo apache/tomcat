@@ -232,7 +232,7 @@ public final class JspRuntimeContext {
 
     /**
      * Push a newly compiled JspServletWrapper into the queue at first
-     * execution of jsp. Destroy any JSP the has been replaced in the queue.
+     * execution of jsp. Destroy any JSP that has been replaced in the queue.
      *
      * @param jsw Servlet wrapper for jsp.
      * @return an unloadHandle that can be pushed to front of queue at later execution times.
