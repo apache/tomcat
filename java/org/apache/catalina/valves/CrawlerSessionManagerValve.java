@@ -49,7 +49,7 @@ public class CrawlerSessionManagerValve extends ValveBase {
         new ConcurrentHashMap<String, SessionInfo>();
 
     private String crawlerUserAgents =
-        ".*GoogleBot.*|.*bingbot.*|.*Yahoo! Slurp.*";
+        ".*[bB]ot.*|.*Yahoo! Slurp.*|.*Feedfetcher-Google.*";
     private Pattern uaPattern = null;
     private int sessionInactiveInterval = 60;
 
