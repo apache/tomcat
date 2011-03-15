@@ -106,6 +106,10 @@
         <bug>50911</bug>: Reduce noise generated during the build of the Windows
         installer so warnings are more obvious. Patch provided by sebb. (markt)
       </fix>
+      <fix>
+        Further work to reduce compiler and validation warnings across the code
+        base. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
