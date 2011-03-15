@@ -2309,7 +2309,23 @@ public class Request
         }
         
         if ((session == null) || !session.isValid()) {
-            return false;
+            // Check for parallel deployment contexts
+            if (getMappingData().contexts == null) {
+                return false;
+            } else {
+                for (int i = (getMappingData().contexts.length); i > 0; i--) {
+                    Context ctxt = (Context) getMappingData().contexts[i - 1];
+                    try {
+                        if (ctxt.getManager().findSession(requestedSessionId) !=
+                                null) {
+                            return true;
+                        }
+                    } catch (IOException e) {
+                        // Ignore
+                    }
+                }
+                return false;
+            }
         }
 
         return true;
