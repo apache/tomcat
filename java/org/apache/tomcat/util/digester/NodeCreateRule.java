@@ -172,7 +172,7 @@ public class NodeCreateRule extends Rule {
                     top.appendChild(doc.createTextNode(str));
                 }
             } catch (DOMException e) {
-                throw new SAXException(e.getMessage());
+                throw new SAXException(e.getMessage(), e);
             }
 
         }
@@ -202,7 +202,7 @@ public class NodeCreateRule extends Rule {
                 top = top.getParentNode();
                 depth--;
             } catch (DOMException e) {
-                throw new SAXException(e.getMessage());
+                throw new SAXException(e.getMessage(), e);
             }
 
         }
@@ -225,7 +225,7 @@ public class NodeCreateRule extends Rule {
             try {
                 top.appendChild(doc.createProcessingInstruction(target, data));
             } catch (DOMException e) {
-                throw new SAXException(e.getMessage());
+                throw new SAXException(e.getMessage(), e);
             }
 
         }
@@ -270,7 +270,7 @@ public class NodeCreateRule extends Rule {
                 previousTop.appendChild(top);
                 depth++;
             } catch (DOMException e) {
-                throw new SAXException(e.getMessage());
+                throw new SAXException(e.getMessage(), e);
             }
 
         }

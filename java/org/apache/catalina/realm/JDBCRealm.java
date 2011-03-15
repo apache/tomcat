@@ -698,7 +698,7 @@ public class JDBCRealm
                 driver = (Driver) clazz.newInstance();
             } catch (Throwable e) {
                 ExceptionUtils.handleThrowable(e);
-                throw new SQLException(e.getMessage());
+                throw new SQLException(e.getMessage(), e);
             }
         }
 

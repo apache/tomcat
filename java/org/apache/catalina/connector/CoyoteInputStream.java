@@ -101,7 +101,7 @@ public class CoyoteInputStream
                 if (e instanceof IOException){
                     throw (IOException)e;
                 } else {
-                    throw new RuntimeException(e.getMessage());
+                    throw new RuntimeException(e.getMessage(), e);
                 }
             }
         } else {
@@ -131,7 +131,7 @@ public class CoyoteInputStream
                 if (e instanceof IOException){
                     throw (IOException)e;
                 } else {
-                    throw new RuntimeException(e.getMessage());
+                    throw new RuntimeException(e.getMessage(), e);
                 }
             }
         } else {
@@ -162,7 +162,7 @@ public class CoyoteInputStream
                 if (e instanceof IOException){
                     throw (IOException)e;
                 } else {
-                    throw new RuntimeException(e.getMessage());
+                    throw new RuntimeException(e.getMessage() ,e);
                 }
             }
         } else {
@@ -195,7 +195,7 @@ public class CoyoteInputStream
                 if (e instanceof IOException){
                     throw (IOException)e;
                 } else {
-                    throw new RuntimeException(e.getMessage());
+                    throw new RuntimeException(e.getMessage(), e);
                 }
             }
         } else {
@@ -235,7 +235,7 @@ public class CoyoteInputStream
                 if (e instanceof IOException){
                     throw (IOException)e;
                 } else {
-                    throw new RuntimeException(e.getMessage());
+                    throw new RuntimeException(e.getMessage(), e);
                 }
             }
         } else {

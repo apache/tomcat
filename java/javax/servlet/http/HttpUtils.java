@@ -182,7 +182,7 @@ public class HttpUtils {
             } while ((len - offset) > 0);
 
         } catch (IOException e) {
-            throw new IllegalArgumentException(e.getMessage());
+            throw new IllegalArgumentException(e.getMessage(), e);
         }
 
         // XXX we shouldn't assume that the only kind of POST body
@@ -194,7 +194,7 @@ public class HttpUtils {
         } catch (java.io.UnsupportedEncodingException e) {
             // XXX function should accept an encoding parameter & throw this
             // exception.  Otherwise throw something expected.
-            throw new IllegalArgumentException(e.getMessage());
+            throw new IllegalArgumentException(e.getMessage(), e);
         }
     }
 
