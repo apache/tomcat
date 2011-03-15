@@ -35,13 +35,6 @@ public class UTF8Reader
     private final org.apache.juli.logging.Log log=
         org.apache.juli.logging.LogFactory.getLog( UTF8Reader.class );
     
-    //
-    // Constants
-    //
-
-    /** Default byte buffer size (2048). */
-    public static final int DEFAULT_BUFFER_SIZE = 2048;
-
     // debugging
 
     /** Debug read. */

@@ -20,11 +20,9 @@ package org.apache.jasper.util;
 
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.NoSuchElementException;
 
 
@@ -42,31 +40,6 @@ public final class Enumerator<T> implements Enumeration<T> {
 
 
     // ----------------------------------------------------------- Constructors
-
-
-    /**
-     * Return an Enumeration over the values of the specified Collection.
-     *
-     * @param collection Collection whose values should be enumerated
-     */
-    public Enumerator(Collection<T> collection) {
-
-        this(collection.iterator());
-
-    }
-
-
-    /**
-     * Return an Enumeration over the values of the specified Collection.
-     *
-     * @param collection Collection whose values should be enumerated
-     * @param clone true to clone iterator
-     */
-    public Enumerator(Collection<T> collection, boolean clone) {
-
-        this(collection.iterator(), clone);
-
-    }
 
 
     /**
@@ -102,31 +75,6 @@ public final class Enumerator<T> implements Enumeration<T> {
             }
             this.iterator = list.iterator();   
         }
-
-    }
-
-
-    /**
-     * Return an Enumeration over the values of the specified Map.
-     *
-     * @param map Map whose values should be enumerated
-     */
-    public Enumerator(Map<?,T> map) {
-
-        this(map.values().iterator());
-
-    }
-
-
-    /**
-     * Return an Enumeration over the values of the specified Map.
-     *
-     * @param map Map whose values should be enumerated
-     * @param clone true to clone iterator
-     */
-    public Enumerator(Map<?,T> map, boolean clone) {
-
-        this(map.values().iterator(), clone);
 
     }
 
