@@ -91,6 +91,10 @@
         <bug>50928</bug>: Don&apos;t ignore keyPass attribute for HTTP BIO and
         NIO connectors. Based on a patch provided by sebb. (markt)
       </fix>
+      <fix>
+        Make root cause exception available if JSSE SSL initialisation fails.
+        Patch provided by sebb. (markt) 
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
