@@ -49,6 +49,8 @@ public abstract class TomcatBaseTest extends TestCase {
     private File tempDir;
     private static int port = 8000;
 
+    public static final String TEMP_DIR = System.getProperty("java.io.tmpdir");
+
     /**
      * Make Tomcat instance accessible to sub-classes.
      */
@@ -190,11 +192,18 @@ public abstract class TomcatBaseTest extends TestCase {
     public static int getUrl(String path, ByteChunk out,
             Map<String, List<String>> reqHead,
             Map<String, List<String>> resHead) throws IOException {
+        return getUrl(path, out, 1000000, reqHead, resHead);
+    }
+    
+    public static int getUrl(String path, ByteChunk out, int readTimeout,
+            Map<String, List<String>> reqHead,
+            Map<String, List<String>> resHead) throws IOException {
 
         URL url = new URL(path);
         HttpURLConnection connection = 
             (HttpURLConnection) url.openConnection();
-        connection.setReadTimeout(1000000);
+        connection.setUseCaches(false);
+        connection.setReadTimeout(readTimeout);
         if (reqHead != null) {
             for (Map.Entry<String, List<String>> entry : reqHead.entrySet()) {
                 StringBuilder valueList = new StringBuilder();

@@ -287,6 +287,13 @@ public class AjpProcessor extends AbstractAjpProcessor {
                 error = true;
             }
 
+            if (endpoint.isPaused()) {
+                // 503 - Service unavailable
+                response.setStatus(503);
+                adapter.log(request, response, 0);
+                error = true;
+            }
+
             // Process the request in the adapter
             if (!error) {
                 try {
