@@ -40,6 +40,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.authenticator.SSLAuthenticator;
+import org.apache.catalina.connector.Connector;
 import org.apache.catalina.deploy.LoginConfig;
 import org.apache.catalina.deploy.SecurityCollection;
 import org.apache.catalina.deploy.SecurityConstraint;
@@ -73,17 +74,30 @@ public final class TesterSupport {
     }
 
     protected static void initSsl(Tomcat tomcat) {
+        initSsl(tomcat, "localhost.jks", null, null);
+    }
+    
+    protected static void initSsl(Tomcat tomcat, String keystore,
+            String keystorePass, String keyPass) {
+
         String protocol = tomcat.getConnector().getProtocolHandlerClassName();
         if (protocol.indexOf("Apr") == -1) {
-            tomcat.getConnector().setProperty("sslProtocol", "tls");
-            File keystoreFile = new File(
-                    "test/org/apache/tomcat/util/net/localhost.jks");
-            tomcat.getConnector().setAttribute("keystoreFile",
+            Connector connector = tomcat.getConnector();
+            connector.setProperty("sslProtocol", "tls");
+            File keystoreFile =
+                new File("test/org/apache/tomcat/util/net/" + keystore);
+            connector.setAttribute("keystoreFile",
                     keystoreFile.getAbsolutePath());
             File truststoreFile = new File(
                     "test/org/apache/tomcat/util/net/ca.jks");
-            tomcat.getConnector().setAttribute("truststoreFile",
+            connector.setAttribute("truststoreFile",
                     truststoreFile.getAbsolutePath());
+            if (keystorePass != null) {
+                connector.setAttribute("keystorePass", keystorePass);
+            }
+            if (keyPass != null) {
+                connector.setAttribute("keyPass", keyPass);
+            }
         } else {
             File keystoreFile = new File(
                     "test/org/apache/tomcat/util/net/localhost-cert.pem");
