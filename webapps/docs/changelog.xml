@@ -73,6 +73,10 @@
         When using parallel deployment, correctly handle the scenario when the
         client sends multiple JSESSIONID cookies. (markt)
       </fix>
+      <fix>
+        <bug>50929</bug>When wrapping an exception, include the root cause.
+        Patch provided by sebb. (markt) 
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
@@ -90,10 +94,6 @@
       <fix>
         <bug>50928</bug>: Don&apos;t ignore keyPass attribute for HTTP BIO and
         NIO connectors. Based on a patch provided by sebb. (markt)
-      </fix>
-      <fix>
-        Make root cause exception available if JSSE SSL initialisation fails.
-        Patch provided by sebb. (markt) 
       </fix>
     </changelog>
   </subsection>
