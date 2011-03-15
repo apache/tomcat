@@ -474,7 +474,7 @@ public class JSSESocketFactory implements ServerSocketFactory, SSLUtil {
         } catch(Exception e) {
             if( e instanceof IOException )
                 throw (IOException)e;
-            throw new IOException(e.getMessage());
+            throw new IOException(e.getMessage(), e);
         }
     }
 
