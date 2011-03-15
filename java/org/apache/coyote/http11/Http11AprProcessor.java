@@ -249,15 +249,24 @@ public class Http11AprProcessor extends AbstractHttp11Processor {
                     openSocket = true;
                     // Add the socket to the poller
                     endpoint.getPoller().add(socketRef);
-                    break;
+                    if (endpoint.isPaused()) {
+                        // 503 - Service unavailable
+                        response.setStatus(503);
+                        adapter.log(request, response, 0);
+                        error = true;
+                    } else {
+                        break;
+                    }
                 }
-                request.setStartTime(System.currentTimeMillis());
-                keptAlive = true;
-                if (!disableUploadTimeout) {
-                    Socket.timeoutSet(socketRef,
-                            connectionUploadTimeout * 1000);
+                if (!endpoint.isPaused()) {
+                    request.setStartTime(System.currentTimeMillis());
+                    keptAlive = true;
+                    if (!disableUploadTimeout) {
+                        Socket.timeoutSet(socketRef,
+                                connectionUploadTimeout * 1000);
+                    }
+                    inputBuffer.parseHeaders();
                 }
-                inputBuffer.parseHeaders();
             } catch (IOException e) {
                 error = true;
                 break;
