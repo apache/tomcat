@@ -87,6 +87,10 @@
         processed. Requests where processing has started will continue to
         completion. (markt) 
       </fix>
+      <fix>
+        <bug>50928</bug>: Don&apos;t ignore keyPass attribute for HTTP BIO and
+        NIO connectors. Based on a patch provided by sebb. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">

@@ -57,6 +57,24 @@ public class TestSsl extends TomcatBaseTest {
         assertTrue(res.toString().indexOf("<h1>Hello World!</h1>") > 0);
     }
 
+    public void testKeyPass() throws Exception {
+        TesterSupport.configureClientSsl();
+        
+        Tomcat tomcat = getTomcatInstance();
+
+        File appDir = new File(getBuildDirectory(), "webapps/examples");
+        tomcat.addWebapp(null, "/examples", appDir.getAbsolutePath());
+        
+        TesterSupport.initSsl(tomcat, "localhost-copy1.jks", "changeit",
+                "tomcatpass");
+
+        tomcat.start();
+        ByteChunk res = getUrl("https://localhost:" + getPort() +
+            "/examples/servlets/servlet/HelloWorldExample");
+        assertTrue(res.toString().indexOf("<h1>Hello World!</h1>") > 0);
+    }
+
+
     boolean handshakeDone = false;
     
     public void testRenegotiateFail() throws Exception {
