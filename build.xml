@@ -878,7 +878,7 @@
 
     <txt2html todir="${tomcat.build}/webapps/examples/jsp/jsptoserv">
       <fileset dir="webapps/examples/WEB-INF/classes">
-        <include name="servletToJsp.java"/>
+        <include name="ServletToJsp.java"/>
       </fileset>
     </txt2html>
 
