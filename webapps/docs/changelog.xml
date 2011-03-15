@@ -106,6 +106,10 @@
         Slightly expanded the documentation of the Host element to clarify the
         relationship between host name and DNS name. (markt)
       </add>
+      <fix>
+        <bug>50925</bug>: Update SSL how-to to take account of
+        <code>keyPass</code> connector attribute. (markt)
+      </fix>
     </changelog>
   </subsection>"
   <subsection name="Other">

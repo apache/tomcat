@@ -265,20 +265,15 @@ sure that the information provided here matches what they will expect.</p>
 
 <p>Finally, you will be prompted for the <em>key password</em>, which is the
 password specifically for this Certificate (as opposed to any other
-Certificates stored in the same keystore file).  You <strong>MUST</strong>
-use the same password here as was used for the keystore password itself.
-This is a restriction of the Tomcat implementation.
-(Currently, the <code>keytool</code> prompt will tell you that pressing the
-ENTER key does this for you automatically.)</p>
+Certificates stored in the same keystore file). The <code>keytool</code> prompt
+will tell you that pressing the ENTER key automatically uses the same password
+for the key as the keystore. You are free to use the same password or to select
+a custom one. If you select a different password to the keystore password, you
+will also need to specify the custom password in the <code>server.xml</code>
+configuration file.</p>
 
 <p>If everything was successful, you now have a keystore file with a
 Certificate that can be used by your server.</p>
-
-<p><strong>Note:</strong> your private key password and keystore password
-should be the same.  If they differ, you will get an error along the lines
-of <code>java.io.IOException: Cannot recover key</code>, as documented in 
-<a href="http://issues.apache.org/bugzilla/show_bug.cgi?id=38217">Bugzilla issue 38217</a>, 
-which contains further references for this issue.</p>
 
 </subsection>
 
