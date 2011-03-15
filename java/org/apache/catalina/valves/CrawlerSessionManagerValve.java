@@ -120,7 +120,7 @@ public class CrawlerSessionManagerValve extends ValveBase {
                     request.getRequestedSessionId());
         }
 
-        // If the incoming request has a session ID, no action is required
+        // If the incoming request has a valid session ID, no action is required
         if (request.getSession(false) == null) {
 
             // Is this a crawler - check the UA headers
