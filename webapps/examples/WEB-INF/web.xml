@@ -109,8 +109,8 @@
     <!-- Define servlets that are included in the example application -->
 
     <servlet>
-      <servlet-name>servletToJsp</servlet-name>
-      <servlet-class>servletToJsp</servlet-class>
+      <servlet-name>ServletToJsp</servlet-name>
+      <servlet-class>ServletToJsp</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>ChatServlet</servlet-name>
@@ -178,7 +178,7 @@
         <url-pattern>/servlets/servlet/SessionExample</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>servletToJsp</servlet-name>
+        <servlet-name>ServletToJsp</servlet-name>
         <url-pattern>/servletToJsp</url-pattern>
     </servlet-mapping>
 
