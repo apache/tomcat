@@ -384,7 +384,7 @@
       </fix>
     </changelog>
   </subsection>
-  <subsection name="Wep applications">
+  <subsection name="Web applications">
     <changelog>
       <fix>
         <bug>50713</bug>: Remove roles command from the Manager application.
