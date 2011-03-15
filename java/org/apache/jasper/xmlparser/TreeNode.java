@@ -45,18 +45,6 @@ public class TreeNode {
 
 
     /**
-     * Construct a new node with no parent.
-     *
-     * @param name The name of this node
-     */
-    public TreeNode(String name) {
-
-        this(name, null);
-
-    }
-
-
-    /**
      * Construct a new node with the specified parent.
      *
      * @param name The name of this node
@@ -249,32 +237,6 @@ public class TreeNode {
     public String getName() {
 
         return (this.name);
-
-    }
-
-
-    /**
-     * Remove any existing value for the specified attribute name.
-     *
-     * @param name The attribute name to remove
-     */
-    public void removeAttribute(String name) {
-
-        if (attributes != null)
-            attributes.remove(name);
-
-    }
-
-
-    /**
-     * Remove a child node from this node, if it is one.
-     *
-     * @param node The child node to remove
-     */
-    public void removeNode(TreeNode node) {
-
-        if (children != null)
-            children.remove(node);
 
     }
 
