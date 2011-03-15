@@ -69,6 +69,10 @@
         Remove unnecessary whitespace from MIME mapping entries in global
         web.xml file. (markt)
       </fix>
+      <fix>
+        When using parallel deployment, correctly handle the scenario when the
+        client sends multiple JSESSIONID cookies. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
