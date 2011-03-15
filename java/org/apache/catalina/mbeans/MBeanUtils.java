@@ -1652,7 +1652,7 @@ public class MBeanUtils {
             c = c.getParent();
         }
         
-        if (c instanceof Engine) {
+        if (c != null) {
             domain = c.getName();
         }
         
