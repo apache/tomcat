@@ -917,7 +917,7 @@
         <p>Regular expression (using <code>java.util.regex</code>) that the user
         agent HTTP request header is matched against to determine if a request
         is from a web crawler. If not set, the default of
-        <code>.*GoogleBot.*|.*bingbot.*|.*Yahoo! Slurp.*</code> is used.</p>
+        <code>.*[bB]ot.*|.*Yahoo! Slurp.*|.*Feedfetcher-Google.*</code> is used.</p>
       </attribute>
 
       <attribute name="sessionInactiveInterval" required="false">
