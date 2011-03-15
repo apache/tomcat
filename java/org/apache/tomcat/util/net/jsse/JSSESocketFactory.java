@@ -565,7 +565,11 @@ public class JSSESocketFactory implements ServerSocketFactory, SSLUtil {
         }
 
         KeyManagerFactory kmf = KeyManagerFactory.getInstance(algorithm);
-        kmf.init(ks, keystorePass.toCharArray());
+        String keyPass = endpoint.getKeyPass();
+        if (keyPass == null) {
+            keyPass = keystorePass;
+        }
+        kmf.init(ks, keyPass.toCharArray());
 
         kms = kmf.getKeyManagers();
         if (keyAlias != null) {
