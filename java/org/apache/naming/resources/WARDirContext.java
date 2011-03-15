@@ -990,7 +990,7 @@ public class WARDirContext extends BaseDirContext {
                     return is;
                 }
             } catch (ZipException e) {
-                throw new IOException(e.getMessage());
+                throw new IOException(e.getMessage(), e);
             }
             return super.streamContent();
         }
