@@ -31,15 +31,7 @@ import org.apache.jasper.compiler.Localizer;
  *
  * @version $Id$
  */
-public class ASCIIReader
-    extends Reader {
-
-    //
-    // Constants
-    //
-
-    /** Default byte buffer size (2048). */
-    public static final int DEFAULT_BUFFER_SIZE = 2048;
+public class ASCIIReader extends Reader {
 
     //
     // Data
