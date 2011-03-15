@@ -37,6 +37,7 @@ import org.apache.jasper.JasperException;
 import org.apache.jasper.JspCompilationContext;
 import org.apache.jasper.compiler.ErrorDispatcher;
 import org.apache.jasper.compiler.JspUtil;
+import org.apache.jasper.compiler.Localizer;
 
 public class XMLEncodingDetector {
     
@@ -170,7 +171,11 @@ public class XMLEncodingDetector {
                     int b2 = b4[2] & 0xFF;
                     if (b0 == 0xEF && b1 == 0xBB && b2 == 0xBF) {
                         // ignore first three bytes...
-                        stream.skip(3);
+                        long skipped = stream.skip(3);
+                        if (skipped != 3) {
+                            throw new IOException(Localizer.getMessage(
+                                    "xmlParser.skipBomFail"));
+                        }
                     }
                 }
                 reader = createReader(stream, encoding, isBigEndian);

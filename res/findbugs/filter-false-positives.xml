@@ -212,6 +212,12 @@
   <Match>
     <Class name="org.apache.el.parser.ParseException" />
   </Match>
+  <Match>
+    <!-- fCurrentEntity may be null after endEntity() call -->
+    <Class name="org.apache.jasper.xmlparser.XMLEncodingDetector" />
+    <Method name="load" />
+    <Bug code="RCN" />
+  </Match>
 
   <!-- Test code -->
   <Match>
