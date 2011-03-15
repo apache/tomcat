@@ -1068,7 +1068,6 @@ public class XMLEncodingDetector {
 
         private InputStream fInputStream;
         private byte[] fData;
-        private int fStartOffset;
         private int fEndOffset;
         private int fOffset;
         private int fLength;
@@ -1077,19 +1076,10 @@ public class XMLEncodingDetector {
         public RewindableInputStream(InputStream is) {
             fData = new byte[DEFAULT_XMLDECL_BUFFER_SIZE];
             fInputStream = is;
-            fStartOffset = 0;
             fEndOffset = -1;
             fOffset = 0;
             fLength = 0;
             fMark = 0;
-        }
-
-        public void setStartOffset(int offset) {
-            fStartOffset = offset;
-        }
-
-        public void rewind() {
-            fOffset = fStartOffset;
         }
 
         @Override
@@ -1199,12 +1189,12 @@ public class XMLEncodingDetector {
         }
 
         @Override
-        public void mark(int howMuch) {
+        public synchronized void mark(int howMuch) {
             fMark = fOffset;
         }
 
         @Override
-        public void reset() {
+        public synchronized void reset() {
             fOffset = fMark;
         }
 

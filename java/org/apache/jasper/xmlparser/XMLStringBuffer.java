@@ -76,30 +76,6 @@ public class XMLStringBuffer
         ch = new char[size];
     } // <init>(int)
 
-    /** Constructs a string buffer from a char. */
-    public XMLStringBuffer(char c) {
-        this(1);
-        append(c);
-    } // <init>(char)
-
-    /** Constructs a string buffer from a String. */
-    public XMLStringBuffer(String s) {
-        this(s.length());
-        append(s);
-    } // <init>(String)
-
-    /** Constructs a string buffer from the specified character array. */
-    public XMLStringBuffer(char[] ch, int offset, int length) {
-        this(length);
-        append(ch, offset, length);
-    } // <init>(char[],int,int)
-
-    /** Constructs a string buffer from the specified XMLString. */
-    public XMLStringBuffer(XMLString s) {
-        this(s.length);
-        append(s);
-    } // <init>(XMLString)
-
     //
     // Public methods
     //
