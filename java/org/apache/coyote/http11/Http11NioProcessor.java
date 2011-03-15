@@ -330,20 +330,29 @@ public class Http11NioProcessor extends AbstractHttp11Processor {
                         // associated with socket
                         recycle = false;
                     }
-                    break;
+                    if (endpoint.isPaused()) {
+                        // 503 - Service unavailable
+                        response.setStatus(503);
+                        adapter.log(request, response, 0);
+                        error = true;
+                    } else {
+                        break;
+                    }
                 }
-                keptAlive = true;
-                if ( !inputBuffer.parseHeaders() ) {
-                    //we've read part of the request, don't recycle it
-                    //instead associate it with the socket
-                    openSocket = true;
-                    recycle = false;
-                    break;
-                }
-                request.setStartTime(System.currentTimeMillis());
-                if (!disableUploadTimeout) { //only for body, not for request headers
-                    socket.getIOChannel().socket().setSoTimeout(
-                            connectionUploadTimeout);
+                if (!endpoint.isPaused()) {
+                    keptAlive = true;
+                    if ( !inputBuffer.parseHeaders() ) {
+                        //we've read part of the request, don't recycle it
+                        //instead associate it with the socket
+                        openSocket = true;
+                        recycle = false;
+                        break;
+                    }
+                    request.setStartTime(System.currentTimeMillis());
+                    if (!disableUploadTimeout) { //only for body, not for request headers
+                        socket.getIOChannel().socket().setSoTimeout(
+                                connectionUploadTimeout);
+                    }
                 }
             } catch (IOException e) {
                 if (log.isDebugEnabled()) {

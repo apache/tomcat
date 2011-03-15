@@ -194,14 +194,21 @@ public class Http11Processor extends AbstractHttp11Processor {
                     }
                 }
                 inputBuffer.parseRequestLine(false);
-                request.setStartTime(System.currentTimeMillis());
-                keptAlive = true;
-                if (disableUploadTimeout) {
-                    socket.getSocket().setSoTimeout(soTimeout);
+                if (endpoint.isPaused()) {
+                    // 503 - Service unavailable
+                    response.setStatus(503);
+                    adapter.log(request, response, 0);
+                    error = true;
                 } else {
-                    socket.getSocket().setSoTimeout(connectionUploadTimeout);
+                    request.setStartTime(System.currentTimeMillis());
+                    keptAlive = true;
+                    if (disableUploadTimeout) {
+                        socket.getSocket().setSoTimeout(soTimeout);
+                    } else {
+                        socket.getSocket().setSoTimeout(connectionUploadTimeout);
+                    }
+                    inputBuffer.parseHeaders();
                 }
-                inputBuffer.parseHeaders();
             } catch (IOException e) {
                 error = true;
                 break;

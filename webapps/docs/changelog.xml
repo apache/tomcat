@@ -77,6 +77,12 @@
         <bug>50887</bug>: Add support for configuring the JSSE provider used to
         convert client certificates. Based on a patch by pknopp. (markt)
       </add>
+      <fix>
+        <bug>50903</bug>: When a connector is stopped, ensure that requests that
+        are currently in a keep-alive state and waiting for client data are not
+        processed. Requests where processing has started will continue to
+        completion. (markt) 
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
