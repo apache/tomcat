@@ -92,6 +92,11 @@
         completion. (markt) 
       </fix>
       <fix>
+        <bug>50927</bug>: Improve error message when SSLCertificateFile is not
+        specified when using APR with SSL. Based on a patch provided by sebb.
+        (markt)
+      </fix>
+      <fix>
         <bug>50928</bug>: Don&apos;t ignore keyPass attribute for HTTP BIO and
         NIO connectors. Based on a patch provided by sebb. (markt)
       </fix>
