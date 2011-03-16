@@ -463,6 +463,11 @@ public class AprEndpoint extends AbstractEndpoint {
         // Initialize SSL if needed
         if (isSSLEnabled()) {
 
+            if (SSLCertificateFile == null) {
+                // This is required
+                throw new Exception(sm.getString("endpoint.apr.noSslCertFile"));
+            }
+
             // SSL protocol
             int value = SSL.SSL_PROTOCOL_ALL;
             if ("SSLv2".equalsIgnoreCase(SSLProtocol)) {
