@@ -74,7 +74,7 @@
         client sends multiple JSESSIONID cookies. (markt)
       </fix>
       <fix>
-        <bug>50929</bug>When wrapping an exception, include the root cause.
+        <bug>50929</bug>: When wrapping an exception, include the root cause.
         Patch provided by sebb. (markt) 
       </fix>
     </changelog>
@@ -115,6 +115,9 @@
         <bug>50925</bug>: Update SSL how-to to take account of
         <code>keyPass</code> connector attribute. (markt)
       </fix>
+      <update>
+        Improve Tomcat Logging documentation. (kkolinko)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Other">
