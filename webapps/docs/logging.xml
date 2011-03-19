@@ -375,10 +375,28 @@ java.util.logging.ConsoleHandler.formatter = java.util.logging.SimpleFormatter
 
   <section name="Using Log4j">
     <p>
-      This section explains how to configure Tomcat to use log4j rather than
-      java.util.logging for all Tomcat's internal logging. The following steps
-      describe configuring log4j to output Tomcat's internal logging to a file
-      named tomcat.log.
+      This section explains how to configure Tomcat to use
+      <a href="http://logging.apache.org/log4j/">log4j</a> rather than
+      java.util.logging for all Tomcat's internal logging.
+    </p>
+    <p>Note, that</p>
+    <ul>
+        <li>This exposes log4j libraries to the web applications through the
+        Common classloader. See <a href="class-loader-howto.html">class loading</a>
+        for details. The web applications using
+        <a href="http://commons.apache.org/logging">Apache Commons Logging</a>
+        library are likely to automatically choose log4j as the underlying
+        logging implementation.</li>
+        <li>The <code>java.util.logging</code> API is still available, for
+        those who use it directly. Removal of the
+        <code>${catalina.base}/conf/logging.properties</code> file, mentioned
+        as one of the steps below, causes it to fallback to the default
+        configuration configured in JRE, which is to use a ConsoleHandler and
+        do not create any files.</li>
+    </ul>
+    <p>
+      The following steps describe configuring log4j to output Tomcat's
+      internal logging.
     </p>
 
     <ol>
