@@ -23,14 +23,30 @@
          group="Valve"
          type="org.apache.catalina.authenticator.BasicAuthenticator">
     
+    <attribute name="alwaysUseSession"
+               description="Should a session always be used once a user is authenticated?"
+               type="boolean"/>
+      
     <attribute name="cache"
                description="Should we cache authenticated Principals if the request is part of an HTTP session?"
+               type="boolean"/>
+      
+    <attribute name="changeSessionIdOnAuthentication"
+               description="Controls if the session ID is changed if a session exists at the point where users are authenticated"
                type="boolean"/>
       
     <attribute name="className"
                description="Fully qualified class name of the managed object"
                type="java.lang.String"
                writeable="false"/>
+      
+    <attribute name="disableProxyCaching"
+               description="Controls the caching of pages that are protected by security constraints"
+               type="boolean"/>
+      
+    <attribute name="securePagesWithPragma"
+               description="Controls the caching of pages that are protected by security constraints"
+               type="boolean"/>
       
     <attribute name="secureRandomAlgorithm"
                description="The name of the algorithm to use for SSO session ID generation"
@@ -57,14 +73,30 @@
          group="Valve"
          type="org.apache.catalina.authenticator.DigestAuthenticator">
     
+    <attribute name="alwaysUseSession"
+               description="Should a session always be used once a user is authenticated?"
+               type="boolean"/>
+      
     <attribute name="cache"
                description="Should we cache authenticated Principals if the request is part of an HTTP session?"
                type="boolean"/>
 
+    <attribute name="changeSessionIdOnAuthentication"
+               description="Controls if the session ID is changed if a session exists at the point where users are authenticated"
+               type="boolean"/>
+      
     <attribute name="className"
                description="Fully qualified class name of the managed object"
                type="java.lang.String"
                writeable="false"/>
+      
+    <attribute name="disableProxyCaching"
+               description="Controls the caching of pages that are protected by security constraints"
+               type="boolean"/>
+      
+    <attribute name="securePagesWithPragma"
+               description="Controls the caching of pages that are protected by security constraints"
+               type="boolean"/>
       
     <attribute name="secureRandomAlgorithm"
                description="The name of the algorithm to use for SSO session ID generation"
@@ -90,15 +122,31 @@
          group="Valve"
          type="org.apache.catalina.authenticator.FormAuthenticator">
     
-    <attribute name="cache"
-               description="Should we cache authenticated Principals if the request is part of an HTTP session?"
+    <attribute name="changeSessionIdOnAuthentication"
+               description="Controls if the session ID is changed if a session exists at the point where users are authenticated"
                type="boolean"/>
+
+    <attribute name="characterEncoding"
+               description="Character encoding to use to read the username and password parameters from the request"
+               type="java.lang.String"/>
 
     <attribute name="className"
                description="Fully qualified class name of the managed object"
                type="java.lang.String"
                writeable="false"/>
 
+    <attribute name="disableProxyCaching"
+               description="Controls the caching of pages that are protected by security constraints"
+               type="boolean"/>
+      
+    <attribute name="landingPage"
+               description="Controls the behavior of the FORM authentication process if the process is misused, for example by directly requesting the login page or delaying logging in for so long that the session expires"
+               type="java.lang.String"/>
+
+    <attribute name="securePagesWithPragma"
+               description="Controls the caching of pages that are protected by security constraints"
+               type="boolean"/>
+      
     <attribute name="secureRandomAlgorithm"
                description="The name of the algorithm to use for SSO session ID generation"
                type="java.lang.String"/>
@@ -127,11 +175,23 @@
                description="Should we cache authenticated Principals if the request is part of an HTTP session?"
                type="boolean"/>
       
+    <attribute name="changeSessionIdOnAuthentication"
+               description="Controls if the session ID is changed if a session exists at the point where users are authenticated"
+               type="boolean"/>
+
     <attribute name="className"
                description="Fully qualified class name of the managed object"
                type="java.lang.String"
                writeable="false"/>
 
+    <attribute name="disableProxyCaching"
+               description="Controls the caching of pages that are protected by security constraints"
+               type="boolean"/>
+      
+    <attribute name="securePagesWithPragma"
+               description="Controls the caching of pages that are protected by security constraints"
+               type="boolean"/>
+      
     <attribute name="stateName"
                description="The name of the LifecycleState that this component is currently in"
                type="java.lang.String"
@@ -175,11 +235,23 @@
                description="Should we cache authenticated Principals if the request is part of an HTTP session?"
                type="boolean"/>
 
+    <attribute name="changeSessionIdOnAuthentication"
+               description="Controls if the session ID is changed if a session exists at the point where users are authenticated"
+               type="boolean"/>
+
     <attribute name="className"
                description="Fully qualified class name of the managed object"
                type="java.lang.String"
                writeable="false"/>
 
+    <attribute name="disableProxyCaching"
+               description="Controls the caching of pages that are protected by security constraints"
+               type="boolean"/>
+      
+    <attribute name="securePagesWithPragma"
+               description="Controls the caching of pages that are protected by security constraints"
+               type="boolean"/>
+      
     <attribute name="secureRandomAlgorithm"
                description="The name of the algorithm to use for SSO session ID generation"
                type="java.lang.String"/>
