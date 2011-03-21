@@ -18,6 +18,7 @@
 package org.apache.catalina.filters;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.security.SecureRandom;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -287,7 +288,9 @@ public class CsrfPreventionFilter extends FilterBase {
         }
     }
     
-    private static class LruCache<T> {
+    protected static class LruCache<T> implements Serializable {
+
+        private static final long serialVersionUID = 1L;
 
         // Although the internal implementation uses a Map, this cache
         // implementation is only concerned with the keys.
