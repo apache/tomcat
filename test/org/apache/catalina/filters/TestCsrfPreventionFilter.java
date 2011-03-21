@@ -17,8 +17,14 @@
 
 package org.apache.catalina.filters;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.catalina.filters.CsrfPreventionFilter.LruCache;
 import org.apache.catalina.startup.TomcatBaseTest;
 
 public class TestCsrfPreventionFilter extends TomcatBaseTest {
@@ -50,6 +56,41 @@ public class TestCsrfPreventionFilter extends TomcatBaseTest {
                 wrapper.encodeRedirectURL("/test?a=b#c"));
     }
     
+    public void testLruCacheSerializable() throws Exception {
+        LruCache<String> cache = new LruCache<String>(5);
+        cache.add("key1");
+        cache.add("key2");
+        cache.add("key3");
+        cache.add("key4");
+        cache.add("key5");
+        cache.add("key6");
+        
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        ObjectOutputStream oos = new ObjectOutputStream(baos);
+        oos.writeObject(cache);
+        
+        ByteArrayInputStream bais =
+            new ByteArrayInputStream(baos.toByteArray());
+        ObjectInputStream ois = new ObjectInputStream(bais);
+        @SuppressWarnings("unchecked")
+        LruCache<String> cache2 = (LruCache<String>) ois.readObject();
+        
+        cache2.add("key7");
+        assertFalse(cache2.contains("key1"));
+        assertFalse(cache2.contains("key2"));
+        assertTrue(cache2.contains("key3"));
+        assertTrue(cache2.contains("key4"));
+        assertTrue(cache2.contains("key5"));
+        assertTrue(cache2.contains("key6"));
+        assertTrue(cache2.contains("key7"));
+    }
+
+    public void testLruCacheSerializablePerformance() throws Exception {
+        for (int i = 0; i < 10000; i++) {
+            testLruCacheSerializable();
+        }
+    }
+
     private static class NonEncodingResponse extends TesterResponse {
 
         @Override
