@@ -417,11 +417,6 @@
 
     <attributes>
 
-      <attribute name="className" required="true">
-        <p>Java class name of the implementation to use.  This MUST be set to
-        <strong>org.apache.catalina.authenticator.BasicAuthenticator</strong>.</p>
-      </attribute>
-
       <attribute name="alwaysUseSession" required="false">
         <p>Should a session always be used once a user is authenticated? This
         may offer some performance benefits since the session can then be used
@@ -433,11 +428,22 @@
         default value of <code>false</code> will be used.</p>
       </attribute>
 
+      <attribute name="cache" required="false">
+        <p>Should we cache authenticated Principals if the request is part of an
+        HTTP session? If not specified, the default value of <code>true</code>
+        will be used.</p>
+      </attribute>
+
       <attribute name="changeSessionIdOnAuthentication" required="false">
         <p>Controls if the session ID is changed if a session exists at the
         point where users are authenticated. This is to prevent session fixation
         attacks. If not set, the default value of <code>true</code> will be
         used.</p>
+      </attribute>
+
+      <attribute name="className" required="true">
+        <p>Java class name of the implementation to use.  This MUST be set to
+        <strong>org.apache.catalina.authenticator.BasicAuthenticator</strong>.</p>
       </attribute>
 
       <attribute name="disableProxyCaching" required="false">
@@ -459,6 +465,18 @@
         If not set, the default value of <code>true</code> will be used.</p>
       </attribute>
 
+      <attribute name="secureRandomAlgorithm" required="false">
+        <p>Name of the algorithm to use to create the
+        <code>java.security.SecureRandom</code> instances that generate session
+        IDs. If an invalid algorithm and/or provider is specified, the platform
+        default provider and the default algorithm will be used. If not
+        specified, the default algorithm of SHA1PRNG will be used. If the
+        default algorithm is not supported, the platform default will be used.
+        To specify that the platform default should be used, do not set the
+        secureRandomProvider attribute and set this attribute to the empty
+        string.</p>
+      </attribute>
+
       <attribute name="secureRandomClass" required="false">
         <p>Name of the Java class that extends
         <code>java.security.SecureRandom</code> to use to generate SSO session
@@ -472,18 +490,6 @@
         session IDs. If an invalid algorithm and/or provider is specified, the
         platform default provider and the default algorithm will be used. If not
         specified, the platform default provider will be used.</p>
-      </attribute>
-
-      <attribute name="secureRandomAlgorithm" required="false">
-        <p>Name of the algorithm to use to create the
-        <code>java.security.SecureRandom</code> instances that generate session
-        IDs. If an invalid algorithm and/or provider is specified, the platform
-        default provider and the default algorithm will be used. If not
-        specified, the default algorithm of SHA1PRNG will be used. If the
-        default algorithm is not supported, the platform default will be used.
-        To specify that the platform default should be used, do not set the
-        secureRandomProvider attribute and set this attribute to the empty
-        string.</p>
       </attribute>
 
     </attributes>
@@ -514,9 +520,21 @@
 
     <attributes>
 
-      <attribute name="className" required="true">
-        <p>Java class name of the implementation to use.  This MUST be set to
-        <strong>org.apache.catalina.authenticator.DigestAuthenticator</strong>.</p>
+      <attribute name="alwaysUseSession" required="false">
+        <p>Should a session always be used once a user is authenticated? This
+        may offer some performance benefits since the session can then be used
+        to cache the authenticated Principal, hence removing the need to
+        authenticate the user via the Realm on every request. This may be of
+        help for combinations such as BASIC authentication used with the
+        JNDIRealm or DataSourceRealms. However there will also be the
+        performance cost of creating and GC'ing the session. If not set, the
+        default value of <code>false</code> will be used.</p>
+      </attribute>
+
+      <attribute name="cache" required="false">
+        <p>Should we cache authenticated Principals if the request is part of an
+        HTTP session? If not specified, the default value of <code>true</code>
+        will be used.</p>
       </attribute>
 
       <attribute name="changeSessionIdOnAuthentication" required="false">
@@ -524,6 +542,11 @@
         point where users are authenticated. This is to prevent session fixation
         attacks. If not set, the default value of <code>true</code> will be
         used.</p>
+      </attribute>
+
+      <attribute name="className" required="true">
+        <p>Java class name of the implementation to use.  This MUST be set to
+        <strong>org.apache.catalina.authenticator.DigestAuthenticator</strong>.</p>
       </attribute>
 
       <attribute name="disableProxyCaching" required="false">
@@ -545,6 +568,18 @@
         If not set, the default value of <code>true</code> will be used.</p>
       </attribute>
 
+      <attribute name="secureRandomAlgorithm" required="false">
+        <p>Name of the algorithm to use to create the
+        <code>java.security.SecureRandom</code> instances that generate session
+        IDs. If an invalid algorithm and/or provider is specified, the platform
+        default provider and the default algorithm will be used. If not
+        specified, the default algorithm of SHA1PRNG will be used. If the
+        default algorithm is not supported, the platform default will be used.
+        To specify that the platform default should be used, do not set the
+        secureRandomProvider attribute and set this attribute to the empty
+        string.</p>
+      </attribute>
+
       <attribute name="secureRandomClass" required="false">
         <p>Name of the Java class that extends
         <code>java.security.SecureRandom</code> to use to generate SSO session
@@ -558,18 +593,6 @@
         session IDs. If an invalid algorithm and/or provider is specified, the
         platform default provider and the default algorithm will be used. If not
         specified, the platform default provider will be used.</p>
-      </attribute>
-
-      <attribute name="secureRandomAlgorithm" required="false">
-        <p>Name of the algorithm to use to create the
-        <code>java.security.SecureRandom</code> instances that generate session
-        IDs. If an invalid algorithm and/or provider is specified, the platform
-        default provider and the default algorithm will be used. If not
-        specified, the default algorithm of SHA1PRNG will be used. If the
-        default algorithm is not supported, the platform default will be used.
-        To specify that the platform default should be used, do not set the
-        secureRandomProvider attribute and set this attribute to the empty
-        string.</p>
       </attribute>
 
     </attributes>
@@ -600,11 +623,6 @@
 
     <attributes>
 
-      <attribute name="className" required="true">
-        <p>Java class name of the implementation to use.  This MUST be set to
-        <strong>org.apache.catalina.authenticator.FormAuthenticator</strong>.</p>
-      </attribute>
-
       <attribute name="changeSessionIdOnAuthentication" required="false">
         <p>Controls if the session ID is changed if a session exists at the
         point where users are authenticated. This is to prevent session fixation
@@ -618,6 +636,11 @@
         used.</p>
       </attribute>
       
+      <attribute name="className" required="true">
+        <p>Java class name of the implementation to use.  This MUST be set to
+        <strong>org.apache.catalina.authenticator.FormAuthenticator</strong>.</p>
+      </attribute>
+
       <attribute name="disableProxyCaching" required="false">
         <p>Controls the caching of pages that are protected by security
         constraints. Setting this to <code>false</code> may help work around
@@ -650,6 +673,18 @@
         If not set, the default value of <code>true</code> will be used.</p>
       </attribute>
 
+      <attribute name="secureRandomAlgorithm" required="false">
+        <p>Name of the algorithm to use to create the
+        <code>java.security.SecureRandom</code> instances that generate session
+        IDs. If an invalid algorithm and/or provider is specified, the platform
+        default provider and the default algorithm will be used. If not
+        specified, the default algorithm of SHA1PRNG will be used. If the
+        default algorithm is not supported, the platform default will be used.
+        To specify that the platform default should be used, do not set the
+        secureRandomProvider attribute and set this attribute to the empty
+        string.</p>
+      </attribute>
+
       <attribute name="secureRandomClass" required="false">
         <p>Name of the Java class that extends
         <code>java.security.SecureRandom</code> to use to generate SSO session
@@ -663,18 +698,6 @@
         session IDs. If an invalid algorithm and/or provider is specified, the
         platform default provider and the default algorithm will be used. If not
         specified, the platform default provider will be used.</p>
-      </attribute>
-
-      <attribute name="secureRandomAlgorithm" required="false">
-        <p>Name of the algorithm to use to create the
-        <code>java.security.SecureRandom</code> instances that generate session
-        IDs. If an invalid algorithm and/or provider is specified, the platform
-        default provider and the default algorithm will be used. If not
-        specified, the default algorithm of SHA1PRNG will be used. If the
-        default algorithm is not supported, the platform default will be used.
-        To specify that the platform default should be used, do not set the
-        secureRandomProvider attribute and set this attribute to the empty
-        string.</p>
       </attribute>
 
     </attributes>
@@ -704,6 +727,12 @@
     configuration attributes:</p>
 
     <attributes>
+
+      <attribute name="cache" required="false">
+        <p>Should we cache authenticated Principals if the request is part of an
+        HTTP session? If not specified, the default value of <code>true</code>
+        will be used.</p>
+      </attribute>
 
       <attribute name="className" required="true">
         <p>Java class name of the implementation to use.  This MUST be set to
@@ -736,6 +765,18 @@
         If not set, the default value of <code>true</code> will be used.</p>
       </attribute>
 
+      <attribute name="secureRandomAlgorithm" required="false">
+        <p>Name of the algorithm to use to create the
+        <code>java.security.SecureRandom</code> instances that generate session
+        IDs. If an invalid algorithm and/or provider is specified, the platform
+        default provider and the default algorithm will be used. If not
+        specified, the default algorithm of SHA1PRNG will be used. If the
+        default algorithm is not supported, the platform default will be used.
+        To specify that the platform default should be used, do not set the
+        secureRandomProvider attribute and set this attribute to the empty
+        string.</p>
+      </attribute>
+
       <attribute name="secureRandomClass" required="false">
         <p>Name of the Java class that extends
         <code>java.security.SecureRandom</code> to use to generate SSO session
@@ -749,18 +790,6 @@
         session IDs. If an invalid algorithm and/or provider is specified, the
         platform default provider and the default algorithm will be used. If not
         specified, the platform default provider will be used.</p>
-      </attribute>
-
-      <attribute name="secureRandomAlgorithm" required="false">
-        <p>Name of the algorithm to use to create the
-        <code>java.security.SecureRandom</code> instances that generate session
-        IDs. If an invalid algorithm and/or provider is specified, the platform
-        default provider and the default algorithm will be used. If not
-        specified, the default algorithm of SHA1PRNG will be used. If the
-        default algorithm is not supported, the platform default will be used.
-        To specify that the platform default should be used, do not set the
-        secureRandomProvider attribute and set this attribute to the empty
-        string.</p>
       </attribute>
 
     </attributes>
