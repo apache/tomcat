@@ -23,10 +23,6 @@
          group="Valve"
          type="org.apache.catalina.authenticator.BasicAuthenticator">
     
-    <attribute name="algorithm"
-               description="The message digest algorithm to be used when generating session identifiers"
-               type="java.lang.String"/>
-      
     <attribute name="cache"
                description="Should we cache authenticated Principals if the request is part of an HTTP session?"
                type="boolean"/>
@@ -61,10 +57,6 @@
          group="Valve"
          type="org.apache.catalina.authenticator.DigestAuthenticator">
     
-    <attribute name="algorithm"
-               description="The message digest algorithm to be used when generating session identifiers"
-               type="java.lang.String"/>
-      
     <attribute name="cache"
                description="Should we cache authenticated Principals if the request is part of an HTTP session?"
                type="boolean"/>
@@ -98,10 +90,6 @@
          group="Valve"
          type="org.apache.catalina.authenticator.FormAuthenticator">
     
-    <attribute name="algorithm"
-               description="The message digest algorithm to be used when generating session identifiers"
-               type="java.lang.String"/>
-      
     <attribute name="cache"
                description="Should we cache authenticated Principals if the request is part of an HTTP session?"
                type="boolean"/>
@@ -135,10 +123,6 @@
          group="Valve"
          type="org.apache.catalina.authenticator.NonLoginAuthenticator">
     
-    <attribute name="algorithm"
-               description="The message digest algorithm to be used when generating session identifiers"
-               type="java.lang.String"/>
-      
     <attribute name="cache"
                description="Should we cache authenticated Principals if the request is part of an HTTP session?"
                type="boolean"/>
@@ -187,10 +171,6 @@
          group="Valve"
          type="org.apache.catalina.authenticator.SSLAuthenticator">
 
-    <attribute name="algorithm"
-               description="The message digest algorithm to be used when generating session identifiers"
-               type="java.lang.String"/>
-      
     <attribute name="cache"
                description="Should we cache authenticated Principals if the request is part of an HTTP session?"
                type="boolean"/>
