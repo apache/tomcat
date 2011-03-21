@@ -36,10 +36,18 @@
                type="java.lang.String"
                writeable="false"/>
       
-    <attribute name="entropy"
-               description="A String initialization parameter used to increase the  entropy of the initialization of our random number generator"
+    <attribute name="secureRandomAlgorithm"
+               description="The name of the algorithm to use for SSO session ID generation"
                type="java.lang.String"/>
-
+      
+    <attribute name="secureRandomClass"
+               description="The name of the class to use for SSO session ID generation"
+               type="java.lang.String"/>
+      
+    <attribute name="secureRandomProvider"
+               description="The name of the provider to use for SSO session ID generation"
+               type="java.lang.String"/>
+      
     <attribute name="stateName"
                description="The name of the LifecycleState that this component is currently in"
                type="java.lang.String"
@@ -66,10 +74,18 @@
                type="java.lang.String"
                writeable="false"/>
       
-    <attribute name="entropy"
-               description="A String initialization parameter used to increase the  entropy of the initialization of our random number generator"
+    <attribute name="secureRandomAlgorithm"
+               description="The name of the algorithm to use for SSO session ID generation"
                type="java.lang.String"/>
-
+      
+    <attribute name="secureRandomClass"
+               description="The name of the class to use for SSO session ID generation"
+               type="java.lang.String"/>
+      
+    <attribute name="secureRandomProvider"
+               description="The name of the provider to use for SSO session ID generation"
+               type="java.lang.String"/>
+      
     <attribute name="stateName"
                description="The name of the LifecycleState that this component is currently in"
                type="java.lang.String"
@@ -95,10 +111,18 @@
                type="java.lang.String"
                writeable="false"/>
 
-    <attribute name="entropy"
-               description="A String initialization parameter used to increase the entropy of the initialization of our random number generator"
+    <attribute name="secureRandomAlgorithm"
+               description="The name of the algorithm to use for SSO session ID generation"
                type="java.lang.String"/>
-
+      
+    <attribute name="secureRandomClass"
+               description="The name of the class to use for SSO session ID generation"
+               type="java.lang.String"/>
+      
+    <attribute name="secureRandomProvider"
+               description="The name of the provider to use for SSO session ID generation"
+               type="java.lang.String"/>
+      
     <attribute name="stateName"
                description="The name of the LifecycleState that this component is currently in"
                type="java.lang.String"
@@ -123,10 +147,6 @@
                description="Fully qualified class name of the managed object"
                type="java.lang.String"
                writeable="false"/>
-
-    <attribute name="entropy"
-               description="A String initialization parameter used to increase the entropy of the initialization of our random number generator"
-               type="java.lang.String"/>
 
     <attribute name="stateName"
                description="The name of the LifecycleState that this component is currently in"
@@ -180,10 +200,18 @@
                type="java.lang.String"
                writeable="false"/>
 
-    <attribute name="entropy"
-               description="A String initialization parameter used to increase the entropy of the initialization of our random number generator"
+    <attribute name="secureRandomAlgorithm"
+               description="The name of the algorithm to use for SSO session ID generation"
                type="java.lang.String"/>
-
+      
+    <attribute name="secureRandomClass"
+               description="The name of the class to use for SSO session ID generation"
+               type="java.lang.String"/>
+      
+    <attribute name="secureRandomProvider"
+               description="The name of the provider to use for SSO session ID generation"
+               type="java.lang.String"/>
+      
     <attribute name="stateName"
                description="The name of the LifecycleState that this component is currently in"
                type="java.lang.String"
