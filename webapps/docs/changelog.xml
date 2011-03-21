@@ -118,6 +118,10 @@
       <update>
         Improve Tomcat Logging documentation. (kkolinko)
       </update>
+      <fix>
+        Align the authenticator documentation and MBean descriptors with the
+        implementation. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
