@@ -86,13 +86,6 @@ public abstract class AuthenticatorBase extends ValveBase
 
 
     /**
-     * The default message digest algorithm to use if we cannot use
-     * the requested one.
-     */
-    protected static final String DEFAULT_ALGORITHM = "MD5";
-
-
-    /**
      * Authentication header
      */
     protected static final String AUTH_HEADER_NAME = "WWW-Authenticate";
@@ -101,14 +94,6 @@ public abstract class AuthenticatorBase extends ValveBase
      * Default authentication realm name.
      */
     protected static final String REALM_NAME = "Authentication required";
-
-    /**
-     * The message digest algorithm to be used when generating session
-     * identifiers.  This must be an algorithm supported by the
-     * <code>java.security.MessageDigest</code> class on your platform.
-     */
-    protected String algorithm = DEFAULT_ALGORITHM;
-
 
     /**
      * Should a session always be used once a user is authenticated? This may
@@ -215,28 +200,6 @@ public abstract class AuthenticatorBase extends ValveBase
 
 
     // ------------------------------------------------------------- Properties
-
-
-    /**
-     * Return the message digest algorithm for this Manager.
-     */
-    public String getAlgorithm() {
-
-        return (this.algorithm);
-
-    }
-
-
-    /**
-     * Set the message digest algorithm for this Manager.
-     *
-     * @param algorithm The new message digest algorithm
-     */
-    public void setAlgorithm(String algorithm) {
-
-        this.algorithm = algorithm;
-
-    }
 
 
     /**
