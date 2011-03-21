@@ -77,6 +77,10 @@
         <bug>50929</bug>: When wrapping an exception, include the root cause.
         Patch provided by sebb. (markt) 
       </fix>
+      <fix>
+        Make the CSRF nonce cache serializable so that it can be replicated
+        across a cluster and/or persisted across Tomcat restarts. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
