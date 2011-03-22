@@ -14,9 +14,6 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 --%>
-<%
-  response.setHeader("WWW-Authenticate", "Basic realm=\"Tomcat Manager Application\"");
-%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html>
  <head>
