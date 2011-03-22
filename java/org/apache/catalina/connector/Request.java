@@ -81,7 +81,6 @@ import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.buf.B2CConverter;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.buf.MessageBytes;
-import org.apache.tomcat.util.buf.StringCache;
 import org.apache.tomcat.util.http.Cookies;
 import org.apache.tomcat.util.http.FastHttpDateFormat;
 import org.apache.tomcat.util.http.Parameters;
@@ -111,12 +110,6 @@ public class Request
     
     // ----------------------------------------------------------- Constructors
 
-
-    static {
-        // Ensure that classes are loaded for SM
-        new StringCache.ByteEntry();
-        new StringCache.CharEntry();
-    }
 
     public Request() {
 
