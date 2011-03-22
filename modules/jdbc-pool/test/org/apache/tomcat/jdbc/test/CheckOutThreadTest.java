@@ -412,13 +412,13 @@ public class CheckOutThreadTest extends DefaultTestCase {
             }
             if (System.getProperty("print-thread-stats")!=null) {
                 System.out.println("["+getName()+"] "+
-                    "\n\tMax time to retrieve connection:"+(((float)max)/1000f/1000f)+" ms."+
-                    "\n\tTotal time to retrieve connection:"+(((float)totalmax)/1000f/1000f)+" ms."+
-                    "\n\tAverage time to retrieve connection:"+(((float)totalmax)/1000f/1000f)/(float)nroffetch+" ms."+
-                    "\n\tMax time to close connection:"+(((float)cmax)/1000f/1000f)+" ms."+
-                    "\n\tTotal time to close connection:"+(((float)totalcmax)/1000f/1000f)+" ms."+
-                    "\n\tAverage time to close connection:"+(((float)totalcmax)/1000f/1000f)/(float)nroffetch+" ms."+
-                    "\n\tRun time:"+(((float)totalruntime)/1000f/1000f)+" ms."+
+                    "\n\tMax time to retrieve connection:"+(max/1000f/1000f)+" ms."+
+                    "\n\tTotal time to retrieve connection:"+(totalmax/1000f/1000f)+" ms."+
+                    "\n\tAverage time to retrieve connection:"+(totalmax/1000f/1000f)/nroffetch+" ms."+
+                    "\n\tMax time to close connection:"+(cmax/1000f/1000f)+" ms."+
+                    "\n\tTotal time to close connection:"+(totalcmax/1000f/1000f)+" ms."+
+                    "\n\tAverage time to close connection:"+(totalcmax/1000f/1000f)/nroffetch+" ms."+
+                    "\n\tRun time:"+(totalruntime/1000f/1000f)+" ms."+
                     "\n\tNr of fetch:"+nroffetch);
             }
         }
