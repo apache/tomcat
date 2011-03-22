@@ -126,6 +126,10 @@
         Align the authenticator documentation and MBean descriptors with the
         implementation. (markt)
       </fix>
+      <fix>
+        Prevent the custom error pages for the Manager and Host Manager
+        applications from being accessed directly. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
