@@ -19,10 +19,10 @@
 // This file contains a default set of security policies to be enforced (by the
 // JVM) when Catalina is executed with the "-security" option.  In addition
 // to the permissions granted here, the following additional permissions are
-// granted specific to each web application:
+// granted to each web application:
 //
-// * Read access to its document root directory
-// * Read, write and delete access to its working directory
+// * Read access to the web application's document root directory
+// * Read, write and delete access to the web application's working directory
 //
 // $Id$
 // ============================================================================
