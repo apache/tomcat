@@ -19,7 +19,6 @@ package org.apache.catalina.filters;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Enumeration;
@@ -410,14 +409,6 @@ public class ExpiresFilter extends FilterBase {
      */
     protected static class Duration {
 
-        public static Duration minutes(int amount) {
-            return new Duration(amount, DurationUnit.MINUTE);
-        }
-
-        public static Duration seconds(int amount) {
-            return new Duration(amount, DurationUnit.SECOND);
-        }
-
         protected final int amount;
 
         protected final DurationUnit unit;
@@ -479,11 +470,6 @@ public class ExpiresFilter extends FilterBase {
          * Starting point of the elaspse to set in the response.
          */
         private StartingPoint startingPoint;
-
-        public ExpiresConfiguration(StartingPoint startingPoint,
-                Duration... durations) {
-            this(startingPoint, Arrays.asList(durations));
-        }
 
         public ExpiresConfiguration(StartingPoint startingPoint,
                 List<Duration> durations) {
