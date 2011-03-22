@@ -238,6 +238,10 @@ public final class SecurityClassLoad {
     private static final void loadTomcatPackage(ClassLoader loader)
         throws Exception {
         final String basePackage = "org.apache.tomcat.";
+        loader.loadClass(basePackage + "util.buf.StringCache");
+        loader.loadClass(basePackage + "util.buf.StringCache$ByteEntry");
+        loader.loadClass(basePackage + "util.buf.StringCache$CharEntry");
+        loader.loadClass(basePackage + "util.http.HttpMessages");
         // Make sure system property is read at this point
         Class<?> clazz = loader.loadClass(
                 basePackage + "util.http.FastHttpDateFormat");
