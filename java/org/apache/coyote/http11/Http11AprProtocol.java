@@ -367,13 +367,13 @@ public class Http11AprProtocol extends AbstractHttp11Protocol {
 
         @Override
         public SocketState asyncDispatch(SocketWrapper<Long> socket, SocketStatus status) {
-            Http11AprProcessor result = connections.get(socket.getSocket());
+            Http11AprProcessor processor = connections.get(socket.getSocket());
             
             SocketState state = SocketState.CLOSED; 
-            if (result != null) {
+            if (processor != null) {
                 // Call the appropriate event
                 try {
-                    state = result.asyncDispatch(socket, status);
+                    state = processor.asyncDispatch(socket, status);
                 // Future developers: if you discover any rare-but-nonfatal
                 // exceptions, catch them here, and log as per {@link #event()}
                 // above.
@@ -385,13 +385,13 @@ public class Http11AprProtocol extends AbstractHttp11Protocol {
                     Http11AprProtocol.log.error
                         (sm.getString("http11protocol.proto.error"), e);
                 } finally {
-                    if (state == SocketState.LONG && result.isAsync()) {
-                        state = result.asyncPostProcess();
+                    if (state == SocketState.LONG && processor.isAsync()) {
+                        state = processor.asyncPostProcess();
                     }
                     if (state != SocketState.LONG && state != SocketState.ASYNC_END) {
                         connections.remove(socket.getSocket());
                         socket.setAsync(false);
-                        recycledProcessors.offer(result);
+                        recycledProcessors.offer(processor);
                         if (state == SocketState.OPEN) {
                             ((AprEndpoint)proto.endpoint).getPoller().add(socket.getSocket().longValue());
                         }
