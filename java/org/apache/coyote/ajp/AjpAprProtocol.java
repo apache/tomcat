@@ -227,13 +227,13 @@ public class AjpAprProtocol extends AbstractAjpProtocol {
         @Override
         public SocketState asyncDispatch(SocketWrapper<Long> socket, SocketStatus status) {
 
-            AjpAprProcessor result = connections.get(socket);
+            AjpAprProcessor processor = connections.get(socket);
             
             SocketState state = SocketState.CLOSED; 
-            if (result != null) {
+            if (processor != null) {
                 // Call the appropriate event
                 try {
-                    state = result.asyncDispatch(socket, status);
+                    state = processor.asyncDispatch(socket, status);
                 }
                 // Future developers: if you discover any other
                 // rare-but-nonfatal exceptions, catch them here, and log as
@@ -246,12 +246,12 @@ public class AjpAprProtocol extends AbstractAjpProtocol {
                     AjpAprProtocol.log.error
                         (sm.getString("ajpprotocol.proto.error"), e);
                 } finally {
-                    if (state == SocketState.LONG && result.isAsync()) {
-                        state = result.asyncPostProcess();
+                    if (state == SocketState.LONG && processor.isAsync()) {
+                        state = processor.asyncPostProcess();
                     }
                     if (state != SocketState.LONG && state != SocketState.ASYNC_END) {
                         connections.remove(socket);
-                        recycledProcessors.offer(result);
+                        recycledProcessors.offer(processor);
                         if (state == SocketState.OPEN) {
                             ((AprEndpoint)proto.endpoint).getPoller().add(socket.getSocket().longValue());
                         }
