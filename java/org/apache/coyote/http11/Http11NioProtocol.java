@@ -252,10 +252,10 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol {
          */
         @Override
         public void release(NioChannel socket) {
-            Http11NioProcessor result = connections.remove(socket);
-            if ( result != null ) {
-                result.recycle();
-                recycledProcessors.offer(result);
+            Http11NioProcessor processor = connections.remove(socket);
+            if (processor != null) {
+                processor.recycle();
+                recycledProcessors.offer(processor);
             }
         }
 
