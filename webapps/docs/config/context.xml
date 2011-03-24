@@ -68,9 +68,10 @@
   web application for this virtual host, and is used to process all
   requests that do not match any other Context's context path.</p>
 
-  <p><b>You may deploy multiple versions of a web application with the same context
-  path at the same time.</b> The rules used to match requests to a context version
-  are as follows:
+  <subsection name="Parallel deployment">
+  <p><b>You may deploy multiple versions of a web application with the same
+  context path at the same time.</b> The rules used to match requests to a
+  context version are as follows:
   <ul>
   <li>If no session information is present in the request, use the latest
   version.</li>
@@ -81,11 +82,15 @@
   can be found, use the latest version.</li>
   </ul>
   </p>
+  </subsection>
   
-  <p>There is a close relationship between the <em>context name</em>,
-  <em>context path</em>, <em>context version</em> and the <em>base file
-  name</em> used for the WAR and/or directory that contains the web application.
-  When no version is specified, the rules are:
+  <subsection name="Naming">
+  <p>When autoDeploy or deployOnStartup is used then there is a close
+  relationship between the <em>context name</em>, <em>context path</em>,
+  <em>context version</em> and the <em>base file name</em> used for the WAR
+  and/or directory that contains the web application when the WAR or directory
+  is located in the Host&apos;s appBase. When no version is specified, the rules
+  are:
   <ul>
     <li>contextName = contextPath</li>
     <li>If the contextPath is a zero length string, the base name is ROOT</li>
@@ -119,7 +124,19 @@
   recommended that zero padding is used so that <code>foo##002.war</code> is
   treated as an earlier version than <code>foo##011.war</code>.
   </p>
+  
+  <p>If you want to deploy a WAR file or a directory using a context path that
+  is not related to the base file name then one of the following options must
+  be used to prevent double-deployment:
+  <ul>
+  <li>Disable autoDeploy and deployOnStartup and define all
+  <Strong>Context</Strong>s in server.xml</li>
+  <li>Locate the WAR and/or directory outside of the Host&apos;s appBase and use
+      a context.xml file with a docBase attribute to define it.</li>
+  </ul></p>
+  </subsection>
 
+  <subsection name="Defining a context">
   <p><b>It is NOT recommended to place &lt;Context&gt; elements directly in the
   server.xml file.</b> This is because it makes modifying the
   <strong>Context</strong> configuration more invasive since the main
@@ -171,7 +188,13 @@
   Automatic Application Deployment</a> and
   <a href="host.html#User Web Applications">User Web Applications</a>
   for more information.</p>
-
+  
+  <p>To define multiple <Strong>Context</Strong>s that use a single WAR file or
+  directory, use one of the options described above for creating a
+  <Strong>Context</Strong> that has a path that is not related to the base file
+  name and create multiple <Strong>Context</Strong> definitions.
+  </p>
+  </subsection>
 </section>
 
 
