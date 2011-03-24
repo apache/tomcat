@@ -64,7 +64,7 @@ changed at all during the remaining lifetime of the 7.x series:
 The public interfaces for the following classes may be added to in order to
 resolve bugs and/or add new features. No existing interface will be removed or
 changed although it may be deprecated.
-- none
+- org/apache/catalina/*
 
 Note: As Tomcat 7 matures, the above list will be added to. The list is not
       considered complete at this time.
