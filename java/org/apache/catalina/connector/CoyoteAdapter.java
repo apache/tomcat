@@ -314,6 +314,7 @@ public class CoyoteAdapter implements Adapter {
                 }
             }
             if (!request.isAsync() && !comet) {
+                request.finishRequest();
                 response.finishResponse();
                 req.action(ActionCode.POST_REQUEST , null);
             }
@@ -417,6 +418,7 @@ public class CoyoteAdapter implements Adapter {
             if (asyncConImpl != null) {
                 async = true;
             } else if (!comet) {
+                request.finishRequest();
                 response.finishResponse();
                 if (postParseSuccess) {
                     // Log only if processing was invoked.

@@ -792,10 +792,13 @@ public class Request
      * @exception IOException if an input/output error occurs
      */
     public void finishRequest() throws IOException {
-        // The reader and input stream don't need to be closed
-        // TODO: Is this ever called?
-        // If so, move input swallow disabling from 
-        // Response.finishResponse() to here
+        // Optionally disable swallowing of additional request data.
+        Context context = getContext();
+        if (context != null &&
+                response.getStatus() == HttpServletResponse.SC_REQUEST_ENTITY_TOO_LARGE &&
+                !context.getSwallowAbortedUploads()) {
+            coyoteRequest.action(ActionCode.DISABLE_SWALLOW_INPUT, null);
+        }
     }
 
 
