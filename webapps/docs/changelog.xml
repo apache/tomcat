@@ -81,6 +81,10 @@
         Make the CSRF nonce cache serializable so that it can be replicated
         across a cluster and/or persisted across Tomcat restarts. (markt)
       </fix>
+      <update>
+        Resolve some refactoring TODOs in the implementation of the new Context
+        attribute "swallowAbortedUploads". (markt) 
+      </update>
     </changelog>
   </subsection>
   <subsection name="Coyote">
