@@ -95,6 +95,7 @@ public class CometEventImpl implements CometEvent {
         }
         boolean iscomet = request.isComet();
         request.setComet(false);
+        request.finishRequest();
         response.finishResponse();
         if (iscomet) request.cometClose();
     }

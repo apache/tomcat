@@ -49,7 +49,6 @@ import org.apache.catalina.core.ApplicationSessionCookieConfig;
 import org.apache.catalina.security.SecurityUtil;
 import org.apache.catalina.util.CharsetMapper;
 import org.apache.catalina.util.DateTool;
-import org.apache.coyote.ActionCode;
 import org.apache.tomcat.util.buf.CharChunk;
 import org.apache.tomcat.util.buf.UEncoder;
 import org.apache.tomcat.util.http.FastHttpDateFormat;
@@ -498,15 +497,6 @@ public class Response
      */
     public void finishResponse() 
         throws IOException {
-        // Optionally disable swallowing of additional request data.
-        // TODO: Should be in Request.finishRequest(), but that method
-        // seems to get called never.
-        Context context = getContext();
-        if (context != null
-                && getStatus() == HttpServletResponse.SC_REQUEST_ENTITY_TOO_LARGE
-                && !context.getSwallowAbortedUploads()) {
-            coyoteResponse.action(ActionCode.DISABLE_SWALLOW_INPUT, null);
-        }
         // Writing leftover bytes
         outputBuffer.close();
     }
