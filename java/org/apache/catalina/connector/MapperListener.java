@@ -290,7 +290,9 @@ public class MapperListener extends LifecycleMBeanBase
         mapper.addHost(host.getName(), aliases, host);
         
         for (Container container : host.findChildren()) {
-            registerContext((Context) container);
+            if (container.getState().isAvailable()) {
+                registerContext((Context) container);
+            }
         }
         if(log.isDebugEnabled()) {
             log.debug(sm.getString("mapperListener.registerHost",
