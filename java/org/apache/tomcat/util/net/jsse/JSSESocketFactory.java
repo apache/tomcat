@@ -29,7 +29,6 @@ import java.net.SocketException;
 import java.security.KeyManagementException;
 import java.security.KeyStore;
 import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CRL;
 import java.security.cert.CRLException;
@@ -103,7 +102,7 @@ public class JSSESocketFactory implements ServerSocketFactory, SSLUtil {
         SSLContext context;
         try {
             context = SSLContext.getInstance("TLS");
-            context.init(null, null, new SecureRandom());
+            context.init(null, null, null);
             SSLServerSocketFactory ssf = context.getServerSocketFactory();
             String ciphers[] = ssf.getSupportedCipherSuites();
             for (String cipher : ciphers) {
