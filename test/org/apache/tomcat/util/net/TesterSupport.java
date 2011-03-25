@@ -23,7 +23,6 @@ import java.io.InputStream;
 import java.security.KeyManagementException;
 import java.security.KeyStore;
 import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
 import java.security.cert.X509Certificate;
 
 import javax.net.ssl.KeyManager;
@@ -56,7 +55,7 @@ public final class TesterSupport {
         SSLContext context;
         try {
             context = SSLContext.getInstance("TLS");
-            context.init(null, null, new SecureRandom());
+            context.init(null, null, null);
             SSLServerSocketFactory ssf = context.getServerSocketFactory();
             String ciphers[] = ssf.getSupportedCipherSuites();
             for (String cipher : ciphers) {
@@ -133,7 +132,7 @@ public final class TesterSupport {
             SSLContext sc = SSLContext.getInstance("SSL");
             sc.init(TesterSupport.getUser1KeyManagers(),
                     TesterSupport.getTrustManagers(),
-                    new java.security.SecureRandom());     
+                    null);     
             javax.net.ssl.HttpsURLConnection.setDefaultSSLSocketFactory(
                     sc.getSocketFactory());
         } catch (Exception e) {
