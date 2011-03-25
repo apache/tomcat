@@ -33,6 +33,7 @@
   <allow pkg="javax.xml"/>
   <allow pkg="org.w3c.dom"/>
   <allow pkg="org.xml.sax"/>
+  <allow pkg="org.ietf.jgss"/>
   <subpackage name="catalina">
     <allow pkg="javax.annotation"/>
     <allow pkg="javax.ejb"/>
