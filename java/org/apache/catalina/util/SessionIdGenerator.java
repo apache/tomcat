@@ -242,12 +242,13 @@ public class SessionIdGenerator {
             result = new SecureRandom();
         }
 
-        if(log.isDebugEnabled()) {
-            long t2=System.currentTimeMillis();
-            if( (t2-t1) > 100 )
-                log.debug(sm.getString("sessionIdGenerator.createRandom",
-                        Long.valueOf(t2-t1)));
-        }
+        // Force seeding to take place
+        result.nextInt();
+        
+        long t2=System.currentTimeMillis();
+        if( (t2-t1) > 100 )
+            log.info(sm.getString("sessionIdGenerator.createRandom",
+                    result.getAlgorithm(), Long.valueOf(t2-t1)));
         return result;
     }
 }
