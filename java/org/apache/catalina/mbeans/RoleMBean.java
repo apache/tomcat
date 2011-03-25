@@ -19,7 +19,6 @@ package org.apache.catalina.mbeans;
 
 
 import javax.management.MBeanException;
-import javax.management.MBeanServer;
 import javax.management.RuntimeOperationsException;
 
 import org.apache.tomcat.util.modeler.BaseModelMBean;
@@ -68,16 +67,9 @@ public class RoleMBean extends BaseModelMBean {
 
 
     /**
-     * The <code>MBeanServer</code> in which we are registered.
-     */
-    protected MBeanServer mserver = MBeanUtils.createServer();
-
-
-    /**
      * The <code>ManagedBean</code> information describing this MBean.
      */
-    protected ManagedBean managed =
-        registry.findManagedBean("Role");
+    protected ManagedBean managed = registry.findManagedBean("Role");
 
 
     // ------------------------------------------------------------- Attributes

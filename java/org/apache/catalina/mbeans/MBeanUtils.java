@@ -622,8 +622,7 @@ public class MBeanUtils {
      *
      * @exception MalformedObjectNameException if a name cannot be created
      */
-    static ObjectName createObjectName(String domain,
-            @SuppressWarnings("unused") Engine engine)
+    static ObjectName createObjectName(String domain, Engine engine)
         throws MalformedObjectNameException {
 
         ObjectName name = null;
@@ -785,8 +784,7 @@ public class MBeanUtils {
      *
      * @exception MalformedObjectNameException if a name cannot be created
      */
-    static ObjectName createObjectName(String domain,
-            @SuppressWarnings("unused") MBeanFactory factory)
+    static ObjectName createObjectName(String domain, MBeanFactory factory)
         throws MalformedObjectNameException {
 
         ObjectName name = new ObjectName(domain + ":type=MBeanFactory");
@@ -861,8 +859,7 @@ public class MBeanUtils {
      *
      * @exception MalformedObjectNameException if a name cannot be created
      */
-    static ObjectName createObjectName(String domain,
-            @SuppressWarnings("unused") Server server)
+    static ObjectName createObjectName(String domain, Server server)
         throws MalformedObjectNameException {
 
         ObjectName name = null;
@@ -1055,13 +1052,7 @@ public class MBeanUtils {
     public static synchronized MBeanServer createServer() {
 
         if (mserver == null) {
-            try {
-                mserver = Registry.getRegistry(null, null).getMBeanServer();
-            } catch (Throwable t) {
-                ExceptionUtils.handleThrowable(t);
-                t.printStackTrace(System.out);
-                System.exit(1);
-            }
+            mserver = Registry.getRegistry(null, null).getMBeanServer();
         }
         return (mserver);
 
