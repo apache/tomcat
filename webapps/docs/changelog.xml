@@ -91,6 +91,9 @@
         (greater than 100ms) at INFO level and provide a value for the message
         key so a meaningful message appears in the logs. (markt)
       </fix>
+      <fix>
+        Don&apos;t register Contexts that fail to start with the Mapper. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
