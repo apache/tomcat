@@ -116,6 +116,15 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Cluster">
+    <changelog>
+      <fix>
+        Securely seed the SecureRandom instance used for UUID generation and
+        report excessive creation time (greater than 100ms) at INFO level.
+        (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Web applications">
     <changelog>
       <fix>
