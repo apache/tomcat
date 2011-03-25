@@ -85,6 +85,12 @@
         Resolve some refactoring TODOs in the implementation of the new Context
         attribute "swallowAbortedUploads". (markt) 
       </update>
+      <fix>
+        Include the seed time when calculating the time taken to create
+        SecureRandom instances for session ID generation, report excessive times
+        (greater than 100ms) at INFO level and provide a value for the message
+        key so a meaningful message appears in the logs. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
