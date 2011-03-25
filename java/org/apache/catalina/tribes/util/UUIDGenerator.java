@@ -19,12 +19,19 @@ package org.apache.catalina.tribes.util;
 import java.security.SecureRandom;
 import java.util.Random;
 
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
+
 /**
  * simple generation of a UUID 
  * @author Filip Hanik
  * @version 1.0
  */
 public class UUIDGenerator {
+    private static final Log log = LogFactory.getLog(UUIDGenerator.class);
+    protected static final StringManager sm =
+        StringManager.getManager("org.apache.catalina.tribes.util");
+
     public static final int UUID_LENGTH = 16;
     public static final int UUID_VERSION = 4;
     public static final int BYTES_PER_INT = 4;
@@ -32,9 +39,17 @@ public class UUIDGenerator {
     
     protected static SecureRandom secrand = null;
     protected static Random rand = new Random();
+    
     static {
+        long start = System.currentTimeMillis();
         secrand = new SecureRandom();
-        secrand.setSeed(rand.nextLong());
+        // seed the generator
+        secrand.nextInt();
+        long time = System.currentTimeMillis() - start;
+        if (time > 100) {
+            log.info(sm.getString("uuidGenerator.createRandom",
+                    secrand.getAlgorithm(), Long.valueOf(time)));
+        }
     }
     
     public static byte[] randomUUID(boolean secure) {
