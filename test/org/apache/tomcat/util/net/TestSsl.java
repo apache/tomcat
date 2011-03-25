@@ -97,8 +97,7 @@ public class TestSsl extends TomcatBaseTest {
         
         tomcat.start();
         SSLContext sslCtx = SSLContext.getInstance("TLS");
-        sslCtx.init(null, TesterSupport.getTrustManagers(),
-                new java.security.SecureRandom());
+        sslCtx.init(null, TesterSupport.getTrustManagers(), null);
         SSLSocketFactory socketFactory = sslCtx.getSocketFactory();
         SSLSocket socket = (SSLSocket) socketFactory.createSocket("localhost", getPort());
 
@@ -161,8 +160,7 @@ public class TestSsl extends TomcatBaseTest {
         tomcat.start();
 
         SSLContext sslCtx = SSLContext.getInstance("TLS");
-        sslCtx.init(null, TesterSupport.getTrustManagers(),
-                new java.security.SecureRandom());
+        sslCtx.init(null, TesterSupport.getTrustManagers(), null);
         SSLSocketFactory socketFactory = sslCtx.getSocketFactory();
         SSLSocket socket = (SSLSocket) socketFactory.createSocket("localhost",
                 getPort());
