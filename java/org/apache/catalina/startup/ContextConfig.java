@@ -609,7 +609,7 @@ public class ContextConfig
             
             // Add as watched resource so that cascade reload occurs if a default
             // config file is modified/added/removed
-            if (contextXml.getProtocol() == "file") {
+            if ("file".equals(contextXml.getProtocol())) {
                 context.addWatchedResource(
                         (new File(contextXml.toURI())).getAbsolutePath());
             }
