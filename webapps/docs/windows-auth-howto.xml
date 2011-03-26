@@ -1,0 +1,118 @@
+<?xml version="1.0"?>
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one or more
+  contributor license agreements.  See the NOTICE file distributed with
+  this work for additional information regarding copyright ownership.
+  The ASF licenses this file to You under the Apache License, Version 2.0
+  (the "License"); you may not use this file except in compliance with
+  the License.  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+<!DOCTYPE document [
+  <!ENTITY project SYSTEM "project.xml">
+]>
+<document url="windows-auth-howto.html">
+
+    &project;
+
+    <properties>
+      <title>Windows Authentication How-To</title>
+    </properties>
+
+<body>
+
+<section name="Table of Contents">
+<toc/>
+</section>
+
+<section name="Overview">
+<p>Integrated Windows authentication is most frequently used within intranet
+environments since it requires that the server performing the authentication and
+the user being authentication are part of the same domain. For the user to be
+authenticated automatically, the client machine used by the user must also be
+part of the domain.</p>
+<p>There are several options for implementing integrated Windows authentication
+with Apache Tomcat. They are:
+<ul>
+<li>Built-in Tomcat support (work in progress, not yet available).</li>
+<li>Use a third party library such as Waffle.</li>
+<li>Use a reverse proxy that supports Windows authentication to perform the
+authentication step such as IIS or httpd.</li>
+</ul>
+The configuration of each of these options is discussed in the following
+sections.</p>
+</section>
+
+<section name="Built-in Tomcat support">
+<p>TBD.</p>
+</section>
+
+<section name="Third party libraries">
+
+  <subsection name="Waffle">
+  <p>Full details of this solution can be found on the
+  <a href="http://waffle.codeplex.com/">Waffle site</a>. The edited highlights
+  are:
+  <ul>
+  <li>Drop-in solution</li>
+  <li>Simple configuration (no JAAS or Kerberos keytab configuration required)
+  </li>
+  </ul>
+  </p>
+  </subsection>
+
+</section>
+
+<section name="Reverse proxies">
+
+  <subsection name="Microsoft IIS">
+  <p>There are three steps to configuring IIS to provide Windows authentication.
+  They are:
+  <ol>
+  <li>Configure IIS as a reverse proxy for Tomcat (see the
+  <a href="http://tomcat.apache.org/connectors-doc/webserver_howto/iis.html">
+  IIS Web Server How-To)</a>.</li>
+  <li>Configure IIS to use Windows authentication</li>
+  <li>Configure Tomcat to use the authentication user information from IIS by
+  setting the tomcatAuthentication attribute on the <a href="config/ajp.html">
+  AJP connector</a> to <code>false</code>.</li>
+  </ol>
+  </p>
+  </subsection>
+
+  <subsection name="Apache httpd">
+  <p>Apache httpd does not support Windows authentication out of the box but
+  there are a number of third-party modules that can be used. These include:
+  <ol>
+  <li><a href="http://sourceforge.net/projects/mod-auth-sspi/">mod_auth_sspi</a>
+  for use on Windows platforms</li>
+  <li><a href="http://modntlm.sourceforge.net/">mod_ntlm</a> for non-Windows
+  platforms (NTLM v1 only)</li>
+  <li><a href="http://adldap.sourceforge.net/wiki/doku.php?id=mod_auth_ntlm_winbind">
+  mod_auth_ntlm_winbind</a> for non-Windows platforms (NTLM v2)</li> 
+  </ol>
+  There are three steps to configuring httpd to provide Windows
+  authentication. They are:
+  <ol>
+  <li>Configure httpd as a reverse proxy for Tomcat (see the
+  <a href="http://tomcat.apache.org/connectors-doc/webserver_howto/apache.html">
+  Apache httpd Web Server How-To)</a>.</li>
+  <li>Configure httpd to use Windows authentication</li>
+  <li>Configure Tomcat to use the authentication user information from httpd by
+  setting the tomcatAuthentication attribute on the <a href="config/ajp.html">
+  AJP connector</a> to <code>false</code>.</li>
+  </ol>
+  </p>
+  </subsection>
+
+</section>
+
+</body>
+</document> 

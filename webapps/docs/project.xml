@@ -67,6 +67,9 @@
         <item name="27) Mavenized"          href="maven-jars.html"/>
         <item name="28) Security Considerations"
               href="security-howto.html"/>
+        <item name="29) Windows Service"    href="windows-service-howto.html"/>
+        <item name="30) Windows Authentication"   
+              href="windows-auth-howto.html"/>
     </menu>
 
     <menu name="Reference">
