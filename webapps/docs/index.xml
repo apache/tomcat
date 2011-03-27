@@ -129,6 +129,10 @@ Apache Tomcat 7, and using many of the Apache Tomcat features.</p>
     Obtaining Tomcat jars through Maven.</li>
 <li><a href="security-howto.html"><strong>Security Considerations</strong></a> -
     Options to consider when securing an Apache Tomcat installation.</li>
+<li><a href="windows-service-howto.html"><strong>Windows Service</strong></a> -
+    Running Tomcat as a service on Microsoft Windows.</li>
+<li><a href="windows-auth-howto.html"><strong>Windows Authentication</strong></a> -
+    Configuring Tomcat to use integrated Windows authentication.</li>
 
 </ol>
 
