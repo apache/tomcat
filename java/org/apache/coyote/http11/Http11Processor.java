@@ -326,8 +326,8 @@ public class Http11Processor extends AbstractHttp11Processor {
         } else if (isAsync()) {
             return SocketState.LONG;
         } else {
+            recycle();
             if (!keepAlive) {
-                recycle();
                 return SocketState.CLOSED;
             } else {
                 return SocketState.OPEN;
