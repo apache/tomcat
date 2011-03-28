@@ -93,14 +93,6 @@ public class InternalAprOutputBuffer extends AbstractOutputBuffer {
     }
 
 
-    /**
-     * Get the underlying socket input stream.
-     */
-    public long getSocket() {
-        return socket;
-    }
-
-
     // --------------------------------------------------------- Public Methods
 
 

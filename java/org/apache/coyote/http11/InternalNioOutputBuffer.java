@@ -91,13 +91,6 @@ public class InternalNioOutputBuffer extends AbstractOutputBuffer {
         this.socket = socket;
     }
 
-    /**
-     * Get the underlying socket input stream.
-     */
-    public NioChannel getSocket() {
-        return socket;
-    }
-
     public void setSelectorPool(NioSelectorPool pool) { 
         this.pool = pool;
     }
@@ -151,9 +144,6 @@ public class InternalNioOutputBuffer extends AbstractOutputBuffer {
         flushBuffer();
     }
 
-    public boolean isWritable() {
-        return lastWrite.get()>0;
-    }
     // ------------------------------------------------ HTTP/1.1 Output Methods
 
 
