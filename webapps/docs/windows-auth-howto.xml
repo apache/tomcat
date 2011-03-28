@@ -35,7 +35,7 @@
 <section name="Overview">
 <p>Integrated Windows authentication is most frequently used within intranet
 environments since it requires that the server performing the authentication and
-the user being authentication are part of the same domain. For the user to be
+the user being authenticated are part of the same domain. For the user to be
 authenticated automatically, the client machine used by the user must also be
 part of the domain.</p>
 <p>There are several options for implementing integrated Windows authentication
@@ -57,17 +57,28 @@ sections.</p>
 <section name="Third party libraries">
 
   <subsection name="Waffle">
-  <p>Full details of this solution can be found on the
-  <a href="http://waffle.codeplex.com/">Waffle site</a>. The edited highlights
-  are:
+  <p>Full details of this solution can be found through the
+  <a href="http://waffle.codeplex.com/">Waffle site</a>. The key features are:
   <ul>
   <li>Drop-in solution</li>
   <li>Simple configuration (no JAAS or Kerberos keytab configuration required)
   </li>
+  <li>Uses a native library</li>
   </ul>
   </p>
   </subsection>
 
+  <subsection name="Spring Security - Kerberos Extension">
+  <p>Full details of this solution can be found through the
+  <a href="http://static.springsource.org/spring-security/site/extensions/krb/index.html">
+  Kerberos extension site</a>. The key features are:
+  <ul>
+  <li>Extension to Spring Security</li>
+  <li>Requires a Kerberos keytab file to be generated</li>
+  <li>Pure Java solution</li>
+  </ul>
+  </p>
+  </subsection>
 </section>
 
 <section name="Reverse proxies">
@@ -92,11 +103,11 @@ sections.</p>
   there are a number of third-party modules that can be used. These include:
   <ol>
   <li><a href="http://sourceforge.net/projects/mod-auth-sspi/">mod_auth_sspi</a>
-  for use on Windows platforms</li>
-  <li><a href="http://modntlm.sourceforge.net/">mod_ntlm</a> for non-Windows
-  platforms (NTLM v1 only)</li>
+  for use on Windows platforms.</li>
   <li><a href="http://adldap.sourceforge.net/wiki/doku.php?id=mod_auth_ntlm_winbind">
-  mod_auth_ntlm_winbind</a> for non-Windows platforms (NTLM v2)</li> 
+  mod_auth_ntlm_winbind</a> for non-Windows platforms. Known to work with httpd
+  2.0.x on 32-bit platforms. Some users have reported stability issues with both
+  httpd 2.2.x builds and 64-bit Linux builds.</li> 
   </ol>
   There are three steps to configuring httpd to provide Windows
   authentication. They are:
