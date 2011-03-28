@@ -49,8 +49,7 @@ public class TestGzipOutputFilter extends TestCase {
     public void testFlushingWithGzip() throws Exception {
         // set up response, InternalOutputBuffer, and ByteArrayOutputStream
         Response res = new Response();
-        InternalOutputBuffer iob = new InternalOutputBuffer(res,
-                Constants.DEFAULT_HTTP_HEADER_BUFFER_SIZE);
+        InternalOutputBuffer iob = new InternalOutputBuffer(res, 8 * 1024);
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         iob.setOutputStream(bos);
         res.setOutputBuffer(iob);
