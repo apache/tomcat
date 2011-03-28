@@ -88,16 +88,6 @@ public class InternalOutputBuffer extends AbstractOutputBuffer
 
 
     /**
-     * Get the underlying socket output stream.
-     */
-    public OutputStream getOutputStream() {
-
-        return outputStream;
-
-    }
-
-
-    /**
      * Set the socket buffer size.
      */
     public void setSocketBuffer(int socketBufferSize) {
