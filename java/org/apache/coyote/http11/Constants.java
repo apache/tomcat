@@ -120,12 +120,6 @@ public final class Constants {
     public static final byte LC_OFFSET = A - a;
 
 
-    /**
-     * Default HTTP header buffer size.
-     */
-    public static final int DEFAULT_HTTP_HEADER_BUFFER_SIZE = 48 * 1024;
-
-
     /* Various constant "strings" */
     public static final String CONNECTION = "Connection";
     public static final String CLOSE = "close";
