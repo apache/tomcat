@@ -707,12 +707,6 @@ public class Http11NioProcessor extends AbstractHttp11Processor {
     }
 
 
-    // ------------------------------------------------------ Connector Methods
-
-    public SSLSupport getSslSupport() {
-        return sslSupport;
-    }
-
     // ------------------------------------------------------ Protected Methods
 
 
