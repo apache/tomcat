@@ -26,6 +26,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.apache.catalina.LifecycleException;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.ietf.jgss.GSSContext;
+import org.ietf.jgss.GSSException;
+import org.ietf.jgss.GSSName;
 
 /**
  * This class extends the CombinedRealm (hence it can wrap other Realms) to
@@ -215,6 +218,46 @@ public class LockOutRealm extends CombinedRealm {
             registerAuthSuccess(username);
         }
         return authenticatedUser;
+    }
+
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Principal authenticate(GSSContext gssContext) {
+        if (gssContext.isEstablished()) {
+            String username = null;
+            GSSName name = null;
+            try {
+                name = gssContext.getSrcName();
+            } catch (GSSException e) {
+                log.warn(sm.getString("realmBase.gssNameFail"), e);
+                return null;
+            }
+            
+            username = name.toString();
+            
+            if (isLocked(username)) {
+                // Trying to authenticate a locked user is an automatic failure
+                registerAuthFailure(username);
+                
+                log.warn(sm.getString("lockOutRealm.authLockedUser", username));
+                return null;
+            }
+
+            Principal authenticatedUser = super.authenticate(gssContext);
+            
+            if (authenticatedUser == null) {
+                registerAuthFailure(username);
+            } else {
+                registerAuthSuccess(username);
+            }
+            return authenticatedUser;
+        }
+        
+        // Fail in all other cases
+        return null;
     }
 
 
