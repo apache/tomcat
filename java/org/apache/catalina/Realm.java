@@ -26,6 +26,7 @@ import java.security.cert.X509Certificate;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
 import org.apache.catalina.deploy.SecurityConstraint;
+import org.ietf.jgss.GSSContext;
 /**
  * A <b>Realm</b> is a read-only facade for an underlying security realm
  * used to authenticate individual users, and identify the security roles
@@ -110,7 +111,16 @@ public interface Realm {
      * Return the Principal associated with the specified chain of X509
      * client certificates.  If there is none, return <code>null</code>.
      *
-     * @param certs Array of client certificates, with the first one in
+     * @param certs The gssContext processed by the {@link Authenticator}.
+     */
+    public Principal authenticate(GSSContext gssContext);
+    
+    
+    /**
+     * Return the Principal associated with the specified {@link GSSContext}.
+     * If there is none, return <code>null</code>.
+     *
+     * @param gssContext Array of client certificates, with the first one in
      *  the array being the certificate of the client itself.
      */
     public Principal authenticate(X509Certificate certs[]);

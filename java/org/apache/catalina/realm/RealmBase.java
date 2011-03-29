@@ -54,6 +54,9 @@ import org.apache.catalina.util.MD5Encoder;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.res.StringManager;
+import org.ietf.jgss.GSSContext;
+import org.ietf.jgss.GSSException;
+import org.ietf.jgss.GSSName;
 
 /**
  * Simple implementation of <b>Realm</b> that reads an XML file to configure
@@ -414,6 +417,29 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
         // Check the existence of the client Principal in our database
         return (getPrincipal(certs[0]));
 
+    }
+
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Principal authenticate(GSSContext gssContext) {
+        if (gssContext.isEstablished()) {
+            GSSName name = null;
+            try {
+                name = gssContext.getSrcName();
+            } catch (GSSException e) {
+                log.warn(sm.getString("realmBase.gssNameFail"), e);
+            }
+            
+            if (name!= null) {
+                return getPrincipal(name.toString());
+            }
+        }
+        
+        // Fail in all other cases
+        return null;
     }
 
     
