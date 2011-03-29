@@ -31,6 +31,9 @@ import org.apache.catalina.LifecycleException;
 import org.apache.catalina.Realm;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.ietf.jgss.GSSContext;
+import org.ietf.jgss.GSSException;
+import org.ietf.jgss.GSSName;
 
 /**
  * Realm implementation that contains one or more realms. Authentication is
@@ -264,6 +267,53 @@ public class CombinedRealm extends RealmBase {
         return authenticatedUser;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Principal authenticate(GSSContext gssContext) {
+        if (gssContext.isEstablished()) {
+            Principal authenticatedUser = null;
+            String username = null;
+            
+            GSSName name = null;
+            try {
+                name = gssContext.getSrcName();
+            } catch (GSSException e) {
+                log.warn(sm.getString("realmBase.gssNameFail"), e);
+                return null;
+            }
+            
+            username = name.toString();
+
+            for (Realm realm : realms) {
+                if (log.isDebugEnabled()) {
+                    log.debug(sm.getString("combinedRealm.authStart",
+                            username, realm.getInfo()));
+                }
+
+                authenticatedUser = realm.authenticate(gssContext);
+
+                if (authenticatedUser == null) {
+                    if (log.isDebugEnabled()) {
+                        log.debug(sm.getString("combinedRealm.authFail",
+                                username, realm.getInfo()));
+                    }
+                } else {
+                    if (log.isDebugEnabled()) {
+                        log.debug(sm.getString("combinedRealm.authSucess",
+                                username, realm.getInfo()));
+                    }
+                    break;
+                }
+            }
+            return authenticatedUser;
+        }
+        
+        // Fail in all other cases
+        return null;
+    }
+    
     @Override
     protected String getName() {
         return name;
