@@ -24,15 +24,22 @@ public class Constants {
     public static final String Package = "org.apache.catalina.authenticator";
 
     // Authentication methods for login configuration
+    // Servlet spec schemes
     public static final String BASIC_METHOD = "BASIC";
     public static final String CERT_METHOD = "CLIENT_CERT";
     public static final String DIGEST_METHOD = "DIGEST";
     public static final String FORM_METHOD = "FORM";
+    // Vendor specific schemes
+    public static final String SPNEGO_METHOD = "SPNEGO";
 
     // Form based authentication constants
     public static final String FORM_ACTION = "/j_security_check";
     public static final String FORM_PASSWORD = "j_password";
     public static final String FORM_USERNAME = "j_username";
+
+    // SPNEGO authentication constants
+    public static final String DEFAULT_KEYTAB = "conf/tomcat.keytab";
+    public static final String DEFAULT_SPN_CLASS = "HTTP";
 
     // Cookie name for single sign on support
     public static final String SINGLE_SIGN_ON_COOKIE =
