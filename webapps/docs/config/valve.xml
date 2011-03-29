@@ -799,6 +799,115 @@
 </section>
 
 
+<section name="SPNEGO Valve">
+
+  <subsection name="Introduction">
+
+    <p>The <strong>SPNEGO Authenticator Valve</strong> is automatically added to
+    any <a href="context.html">Context</a> that is configured to use SPNEGO
+    authentication.</p>
+
+    <p>If any non-default settings are required, the valve may be configured
+    within <a href="context.html">Context</a> element with the required
+    values.</p>
+
+  </subsection>
+
+  <subsection name="Attributes">
+
+    <p>The <strong>SPNEGO Authenticator Valve</strong> supports the following
+    configuration attributes:</p>
+
+    <attributes>
+
+      <attribute name="cache" required="false">
+        <p>Should we cache authenticated Principals if the request is part of an
+        HTTP session? If not specified, the default value of <code>true</code>
+        will be used.</p>
+      </attribute>
+
+      <attribute name="className" required="true">
+        <p>Java class name of the implementation to use.  This MUST be set to
+        <strong>org.apache.catalina.authenticator.SpnegoAuthenticator</strong>.
+        </p>
+      </attribute>
+
+      <attribute name="changeSessionIdOnAuthentication" required="false">
+        <p>Controls if the session ID is changed if a session exists at the
+        point where users are authenticated. This is to prevent session fixation
+        attacks. If not set, the default value of <code>true</code> will be
+        used.</p>
+      </attribute>
+
+      <attribute name="disableProxyCaching" required="false">
+        <p>Controls the caching of pages that are protected by security
+        constraints. Setting this to <code>false</code> may help work around
+        caching issues in some browsers but will also cause secured pages to be
+        cached by proxies which will almost certainly be a security issue.
+        <code>securePagesWithPragma</code> offers an alternative, secure,
+        workaround for browser caching issues. If not set, the default value of
+        <code>true</code> will be used.</p>
+      </attribute>
+
+      <attribute name="securePagesWithPragma" required="false">
+        <p>Controls the caching of pages that are protected by security
+        constraints. Setting this to <code>false</code> may help work around
+        caching issues in some browsers by using
+        <code>Cache-Control: private</code> rather than the default of
+        <code>Pragma: No-cache</code> and <code>Cache-control: No-cache</code>.
+        If not set, the default value of <code>true</code> will be used.</p>
+      </attribute>
+
+      <attribute name="secureRandomAlgorithm" required="false">
+        <p>Name of the algorithm to use to create the
+        <code>java.security.SecureRandom</code> instances that generate session
+        IDs. If an invalid algorithm and/or provider is specified, the platform
+        default provider and the default algorithm will be used. If not
+        specified, the default algorithm of SHA1PRNG will be used. If the
+        default algorithm is not supported, the platform default will be used.
+        To specify that the platform default should be used, do not set the
+        secureRandomProvider attribute and set this attribute to the empty
+        string.</p>
+      </attribute>
+
+      <attribute name="secureRandomClass" required="false">
+        <p>Name of the Java class that extends
+        <code>java.security.SecureRandom</code> to use to generate SSO session
+        IDs. If not specified, the default value is
+        <code>java.security.SecureRandom</code>.</p>
+      </attribute>
+
+      <attribute name="secureRandomProvider" required="false">
+        <p>Name of the provider to use to create the
+        <code>java.security.SecureRandom</code> instances that generate SSO
+        session IDs. If an invalid algorithm and/or provider is specified, the
+        platform default provider and the default algorithm will be used. If not
+        specified, the platform default provider will be used.</p>
+      </attribute>
+
+      <attribute name="serviceKeyTab" required="false">
+        <p>Name of the Kerberos keytab file that contains the private key for
+        the service principal. The name of the service principal must match the
+        spn attribute. Relative file names are relative to
+        <code>$CATALINA_BASE</code>. If not specified, the default value of
+        <code>conf/tomcat.keytab</code> is used.</p>
+      </attribute>
+
+      <attribute name="spn" required="false">
+        <p>Service Principal Name (SPN) for this server. It must match the SPN
+        associated with the key in the serviceKetTab file. If not specified, the
+        default value of <code>HTTP/&lt;hostname&gt;</code> where
+        <code>&lt;hostname&gt;</code> is obtained using
+        <code>InetAddress.getLocalHost().getCanonicalHostName()</code>.</p>
+      </attribute>
+
+    </attributes>
+
+  </subsection>
+
+</section>
+
+
 <section name="Remote IP Valve">
 
   <subsection name="Introduction">

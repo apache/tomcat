@@ -290,4 +290,85 @@ public final class  Base64
     }
 
 
+    /**
+     * Decodes Base64 data into octets
+     *
+     * @param base64DataBC Byte array containing Base64 data
+     * @param decodedDataBC The decoded data bytes
+     */
+    public static void decode( ByteChunk base64DataBC, ByteChunk decodedDataBC)
+    {
+        int start = base64DataBC.getStart();
+        int end = base64DataBC.getEnd();
+        byte[] base64Data = base64DataBC.getBuffer();
+        
+        decodedDataBC.recycle();
+        
+        // handle the edge case, so we don't have to worry about it later
+        if(end - start == 0) { return; }
+
+        int      numberQuadruple    = (end - start)/FOURBYTE;
+        byte     b1=0,b2=0,b3=0, b4=0, marker0=0, marker1=0;
+
+        // Throw away anything not in base64Data
+
+        int encodedIndex = 0;
+        int dataIndex = start;
+        byte[] decodedData = null;
+        
+        {
+            // this sizes the output array properly - rlw
+            int lastData = end - start;
+            // ignore the '=' padding
+            while (base64Data[start+lastData-1] == PAD)
+            {
+                if (--lastData == 0)
+                {
+                    return;
+                }
+            }
+            decodedDataBC.allocate(lastData - numberQuadruple, -1);
+            decodedDataBC.setEnd(lastData - numberQuadruple);
+            decodedData = decodedDataBC.getBuffer();
+        }
+
+        for (int i = 0; i < numberQuadruple; i++)
+        {
+            dataIndex = start + i * 4;
+            marker0   = base64Data[dataIndex + 2];
+            marker1   = base64Data[dataIndex + 3];
+
+            b1 = base64Alphabet[base64Data[dataIndex]];
+            b2 = base64Alphabet[base64Data[dataIndex +1]];
+
+            if (marker0 != PAD && marker1 != PAD)
+            {
+                //No PAD e.g 3cQl
+                b3 = base64Alphabet[ marker0 ];
+                b4 = base64Alphabet[ marker1 ];
+
+                decodedData[encodedIndex]   = (byte) ((  b1 <<2 | b2>>4 ) & 0xff);
+                decodedData[encodedIndex + 1] =
+                    (byte) ((((b2 & 0xf)<<4 ) |( (b3>>2) & 0xf) ) & 0xff);
+                decodedData[encodedIndex + 2] = (byte) (( b3<<6 | b4 ) & 0xff);
+            }
+            else if (marker0 == PAD)
+            {
+                //Two PAD e.g. 3c[Pad][Pad]
+                decodedData[encodedIndex]   = (byte) ((  b1 <<2 | b2>>4 ) & 0xff);
+            }
+            else if (marker1 == PAD)
+            {
+                //One PAD e.g. 3cQ[Pad]
+                b3 = base64Alphabet[ marker0 ];
+
+                decodedData[encodedIndex]   = (byte) ((  b1 <<2 | b2>>4 ) & 0xff);
+                decodedData[encodedIndex + 1] =
+                    (byte) ((((b2 & 0xf)<<4 ) |( (b3>>2) & 0xf) ) & 0xff);
+            }
+            encodedIndex += 3;
+        }
+    }
+
+
 }
