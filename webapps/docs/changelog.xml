@@ -94,6 +94,11 @@
       <fix>
         Don&apos;t register Contexts that fail to start with the Mapper. (markt)
       </fix>
+      <add>
+        Add initial support for SPNEGO/Kerberos authentication also referred to
+        as integrated Windows authentication. This is a work in progress. See
+        the documentation for details. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
