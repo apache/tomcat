@@ -51,7 +51,66 @@ sections.</p>
 </section>
 
 <section name="Built-in Tomcat support">
-<p>TBD.</p>
+<p><strong>This is a work in progress. This warning should be removed once the
+end-to-end testing is complete</strong></p>
+<p>There are four components to the configuration of the built-in Tomcat
+support for Windows authentication. The domain controller, the server hosting
+Tomcat, the web application wishing to use Windows authentication and the client
+machine. The following sections describe the configuration required for each
+component.</p>
+<p>The names of the three machines used in the configuration examples below are
+win-dc01.dev.local (the domain controller), win-tc01.dev.local (the Tomcat
+instance) and win-pc01.dev.local (client). The Tomcat server and the client are
+both members of the domain.</p>
+<p>Note: In order to use the passwords in the steps below, the domain password
+policy had to be relaxed. This is not recommended for production environments.
+</p>
+
+  <subsection name="Domain Controller">
+  <p>These steps assume that the server has already been configured to act as a
+  domain controller. Configuration of a Windows server as a domain controller is
+  outside the scope of this how-to. The steps to configure the domain controller
+  to enable Tomcat to support Windows authentication are as follows:
+  <ul>
+  <li>Create a domain user that will be mapped to the service name used by the
+  Tomcat server. In this how-to, this user is called <code>tc01</code> and has a
+  password of <code>tc01pass</code>.</li>
+  <li>Map the service principal name (SPN) to the user account. SPNs take the
+  form <code>
+  &lt;service class&gt;/&lt;host&gt;:&lt;port&gt;/&lt;service name&gt;</code>.
+  The SPN used in this how-to is <code>HTTP/win-tc01.dev.local</code>. To
+  map the user to the SPN, run the following:
+  <source>setspn -A HTTP/win-tc01.dev.local tc01</source>
+  </li>
+  <li>Generate the keytab file that the Tomcat server will use to authenticate
+  itself to the domain controller. This file contains the Tomcat private key for
+  the service provider account and should be protected accordingly. To generate
+  the file, run the following command (all on a single line):
+  <source>ktpass /out c:\tc01.keytab /mapuser tc01@DEV.LOCAL
+          /princ HTTP/win-tc01.dev.local@DEV.LOCAL
+          +andPass /kvno 0</source></li>
+  <li>Create a domain user to be used on the client. In this how-to the domain
+  user is <code>test</code> with a password of <code>testpass</code>.</li>
+  </ul>
+  </p>
+  <p>The above steps have been tested on a domain controller running Windows
+  Server 2008 R2 64-bit Standard using the Windows Server 2003 functional level
+  for both the forest and the domain.
+  </p>
+  </subsection>
+
+  <subsection name="Tomcat instance">
+  <p>TBD</p>
+  </subsection>
+
+  <subsection name="Wep application">
+  <p>TBD</p>
+  </subsection>
+
+  <subsection name="Client">
+  <p>TBD</p>
+  </subsection>
+
 </section>
 
 <section name="Third party libraries">
