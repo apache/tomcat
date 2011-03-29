@@ -876,6 +876,8 @@ public class DefaultServlet
                         || (contentType.startsWith("text"))
                         || (contentType.endsWith("xml")) ) {
                     writer = response.getWriter();
+                    // Cannot reliably serve partial content with a Writer
+                    ranges = FULL;
                 } else {
                     throw e;
                 }
@@ -896,7 +898,8 @@ public class DefaultServlet
                         contentType + "'");
                 response.setContentType(contentType);
             }
-            if ((cacheEntry.resource != null) && (contentLength >= 0)) {
+            if ((cacheEntry.resource != null) && (contentLength >= 0)
+                    && (!serveContent || ostream != null)) {
                 if (debug > 0)
                     log("DefaultServlet.serveFile:  contentLength=" +
                         contentLength);
@@ -974,7 +977,8 @@ public class DefaultServlet
                         if (!checkSendfile(request, response, cacheEntry, range.end - range.start + 1, range))
                             copy(cacheEntry, ostream, range);
                     } else {
-                        copy(cacheEntry, writer, range);
+                        // we should not get here
+                        throw new IllegalStateException();
                     }
                 }
 
@@ -993,8 +997,8 @@ public class DefaultServlet
                         copy(cacheEntry, ostream, ranges.iterator(),
                              contentType);
                     } else {
-                        copy(cacheEntry, writer, ranges.iterator(),
-                             contentType);
+                        // we should not get here
+                        throw new IllegalStateException();
                     }
                 }
 
@@ -1939,44 +1943,6 @@ public class DefaultServlet
      * (even in the face of an exception).
      *
      * @param cacheEntry The cache entry for the source resource
-     * @param writer The writer to write to
-     * @param range Range the client wanted to retrieve
-     * @exception IOException if an input/output error occurs
-     */
-    protected void copy(CacheEntry cacheEntry, PrintWriter writer,
-                      Range range)
-        throws IOException {
-
-        IOException exception = null;
-
-        InputStream resourceInputStream = cacheEntry.resource.streamContent();
-
-        Reader reader;
-        if (fileEncoding == null) {
-            reader = new InputStreamReader(resourceInputStream);
-        } else {
-            reader = new InputStreamReader(resourceInputStream,
-                                           fileEncoding);
-        }
-
-        exception = copyRange(reader, writer, range.start, range.end);
-
-        // Clean up the input stream
-        reader.close();
-
-        // Rethrow any exception that has occurred
-        if (exception != null)
-            throw exception;
-
-    }
-
-
-    /**
-     * Copy the contents of the specified input stream to the specified
-     * output stream, and ensure that both streams are closed before returning
-     * (even in the face of an exception).
-     *
-     * @param cacheEntry The cache entry for the source resource
      * @param ostream The output stream to write to
      * @param ranges Enumeration of the ranges the client wanted to retrieve
      * @param contentType Content type of the resource
@@ -2016,65 +1982,6 @@ public class DefaultServlet
 
         ostream.println();
         ostream.print("--" + mimeSeparation + "--");
-
-        // Rethrow any exception that has occurred
-        if (exception != null)
-            throw exception;
-
-    }
-
-
-    /**
-     * Copy the contents of the specified input stream to the specified
-     * output stream, and ensure that both streams are closed before returning
-     * (even in the face of an exception).
-     *
-     * @param cacheEntry The cache entry for the source resource
-     * @param writer The writer to write to
-     * @param ranges Enumeration of the ranges the client wanted to retrieve
-     * @param contentType Content type of the resource
-     * @exception IOException if an input/output error occurs
-     */
-    protected void copy(CacheEntry cacheEntry, PrintWriter writer,
-                      Iterator<Range> ranges, String contentType)
-        throws IOException {
-
-        IOException exception = null;
-
-        while ( (exception == null) && (ranges.hasNext()) ) {
-
-            InputStream resourceInputStream = cacheEntry.resource.streamContent();
-            
-            Reader reader;
-            if (fileEncoding == null) {
-                reader = new InputStreamReader(resourceInputStream);
-            } else {
-                reader = new InputStreamReader(resourceInputStream,
-                                               fileEncoding);
-            }
-
-            Range currentRange = ranges.next();
-
-            // Writing MIME header.
-            writer.println();
-            writer.println("--" + mimeSeparation);
-            if (contentType != null)
-                writer.println("Content-Type: " + contentType);
-            writer.println("Content-Range: bytes " + currentRange.start
-                           + "-" + currentRange.end + "/"
-                           + currentRange.length);
-            writer.println();
-
-            // Printing content
-            exception = copyRange(reader, writer, currentRange.start,
-                                  currentRange.end);
-
-            reader.close();
-
-        }
-
-        writer.println();
-        writer.print("--" + mimeSeparation + "--");
 
         // Rethrow any exception that has occurred
         if (exception != null)
@@ -2203,60 +2110,6 @@ public class DefaultServlet
         return exception;
 
     }
-
-
-    /**
-     * Copy the contents of the specified input stream to the specified
-     * output stream, and ensure that both streams are closed before returning
-     * (even in the face of an exception).
-     *
-     * @param reader The reader to read from
-     * @param writer The writer to write to
-     * @param start Start of the range which will be copied
-     * @param end End of the range which will be copied
-     * @return Exception which occurred during processing
-     */
-    protected IOException copyRange(Reader reader, PrintWriter writer,
-                                  long start, long end) {
-
-        long skipped = 0;
-        try {
-            skipped = reader.skip(start);
-        } catch (IOException e) {
-            return e;
-        }
-        if (skipped < start) {
-            return new IOException(sm.getString("defaultservlet.skipfail",
-                    Long.valueOf(skipped), Long.valueOf(start)));
-        }
-
-        IOException exception = null;
-        long bytesToRead = end - start + 1;
-
-        char buffer[] = new char[input];
-        int len = buffer.length;
-        while ( (bytesToRead > 0) && (len >= buffer.length)) {
-            try {
-                len = reader.read(buffer);
-                if (bytesToRead >= len) {
-                    writer.write(buffer, 0, len);
-                    bytesToRead -= len;
-                } else {
-                    writer.write(buffer, 0, (int) bytesToRead);
-                    bytesToRead = 0;
-                }
-            } catch (IOException e) {
-                exception = e;
-                len = -1;
-            }
-            if (len < buffer.length)
-                break;
-        }
-
-        return exception;
-
-    }
-
 
 
     // ------------------------------------------------------ Range Inner Class
