@@ -52,7 +52,8 @@ sections.</p>
 
 <section name="Built-in Tomcat support">
 <p><strong>This is a work in progress. This warning should be removed once the
-end-to-end testing is complete</strong></p>
+various questions and TODOs (see the Javadoc and implementation class) have been
+resolved.</strong></p>
 <p>There are four components to the configuration of the built-in Tomcat
 support for Windows authentication. The domain controller, the server hosting
 Tomcat, the web application wishing to use Windows authentication and the client
@@ -60,8 +61,8 @@ machine. The following sections describe the configuration required for each
 component.</p>
 <p>The names of the three machines used in the configuration examples below are
 win-dc01.dev.local (the domain controller), win-tc01.dev.local (the Tomcat
-instance) and win-pc01.dev.local (client). The Tomcat server and the client are
-both members of the domain.</p>
+instance) and win-pc01.dev.local (client). All are members of the DEV.LOCAL
+domain.</p>
 <p>Note: In order to use the passwords in the steps below, the domain password
 policy had to be relaxed. This is not recommended for production environments.
 </p>
@@ -86,9 +87,9 @@ policy had to be relaxed. This is not recommended for production environments.
   itself to the domain controller. This file contains the Tomcat private key for
   the service provider account and should be protected accordingly. To generate
   the file, run the following command (all on a single line):
-  <source>ktpass /out c:\tc01.keytab /mapuser tc01@DEV.LOCAL
+  <source>ktpass /out c:\tomcat.keytab /mapuser tc01@DEV.LOCAL
           /princ HTTP/win-tc01.dev.local@DEV.LOCAL
-          +andPass /kvno 0</source></li>
+          /pass tc01pass /kvno 0</source></li>
   <li>Create a domain user to be used on the client. In this how-to the domain
   user is <code>test</code> with a password of <code>testpass</code>.</li>
   </ul>
@@ -100,15 +101,69 @@ policy had to be relaxed. This is not recommended for production environments.
   </subsection>
 
   <subsection name="Tomcat instance">
-  <p>TBD</p>
+  <p>These steps assume that Tomcat and a Java 6 JDK/JRE have already been
+  installed and configured and that Tomcat is running as the tc01@DEV.LOCAL
+  user. The steps to configure the Tomcat instance for Windows authentication
+  are as follows:
+  <li>Copy the <code>tomcat.keytab</code> file created on the domain controller
+  to <code>$CATALINA_BASE/conf</code>.</li>
+  <li>Create the kerberos configuration file
+  <code>C:\Windows\krb5.ini</code>. The file used in this how-to
+  contained:<source>[libdefaults]
+default_realm = DEV.LOCAL
+default_keytab_name = FILE:c:\apache-tomcat-7.0.x\conf\tomcat.keytab
+default_tkt_enctypes = rc4-hmac,aes256-cts-hmac-sha1-96,aes128-cts-hmac-sha1-96
+default_tgs_enctypes = rc4-hmac,aes256-cts-hmac-sha1-96,aes128-cts-hmac-sha1-96
+forwardable=true
+
+[realms]
+DEV.LOCAL = {
+        kdc = win-dc01.dev.local:88
+}
+
+[domain_realm]
+dev.local= DEV.LOCAL
+.dev.local= DEV.LOCAL</source></li>
+  </p>
+  <p>The above steps have been tested on a Tomcat server running Windows Server
+  2008 R2 64-bit Standard with an Oracle 1.6.0_24 64-bit JDK.</p>
   </subsection>
 
-  <subsection name="Wep application">
-  <p>TBD</p>
+  <subsection name="Web application">
+  <p>The web application needs to be configured to the use Tomcat specific
+  authentication method of <code>SPNEGO</code> (rather than BASIC etc.) in
+  web.xml. As with the other authenticators, behaviour can be customised by
+  explicitly configuring the <a href="config/valve.html#SPNEGO_Valve">
+  authentication valve</a> and setting attributes on the Valve.</p>
   </subsection>
 
   <subsection name="Client">
-  <p>TBD</p>
+  <p>The client must be configured to use Kerberos authentication. For Internet
+  Explorer this means making sure that the Tomcat instance is in the &quot;Local
+  intranet&quot; security domain and that it is configured (Tools > Internet
+  Options > Advanced) with integrated Windows authentication enabled. Note that
+  this <strong>will not</strong> work if you use the same machine for the client
+  and the Tomcat instance as Internet Explorer will use the unsupported NTLM
+  protocol.</p>
+  </subsection>
+
+  <subsection name="References">
+  <p>Correctly configuring Kerberos authentication can be tricky. The following
+  references may prove helpful. Advice is also always available from the
+  <a href="http://tomcat.apache.org/lists.html#tomcat-users">Tomcat users
+  mailing list</a>.
+  <ol>
+  <li><a href="http://www.adopenstatic.com/cs/blogs/ken/archive/2006/10/19/512.aspx">
+      IIS and Kerberos</a></li>
+  <li><a href="http://blog.springsource.com/2009/09/28/spring-security-kerberos/">
+      Spring Security Kerberos extension</a></li>
+  <li><a href="https://cwiki.apache.org/GMOxDOC21/using-spengo-in-geronimo.html#UsingSpengoingeronimo-SettinguptheActiveDirectoryDomainController">
+      Geronimo configuration for Windows authentication</a></li>
+  <li><a href="http://blogs.msdn.com/b/openspecification/archive/2010/11/17/encryption-type-selection-in-kerberos-exchanges.aspx">
+      Encryption Selection in Kerberos Exchanges</a></li>
+  <li><a href="http://support.microsoft.com/kb/977321">Supported Kerberos Cipher
+      Suites</a></li>
+  </ol></p>
   </subsection>
 
 </section>
