@@ -99,6 +99,10 @@
         as integrated Windows authentication. This is a work in progress. See
         the documentation for details. (markt)
       </add>
+      <fix>
+        HTTP range requests cannot be reliably served when a Writer is in use so
+        prevent the DefaultServlet from attempting to do so. (kkolinko)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
