@@ -138,8 +138,8 @@ public class SpnegoAuthenticator extends AuthenticatorBase {
             try {
                 name.append(InetAddress.getLocalHost().getCanonicalHostName());
             } catch (UnknownHostException e) {
-                // TODO add a message
-                throw new LifecycleException(e);
+                throw new LifecycleException(
+                        sm.getString("spnegoAuthenticator.hostnameFail"), e);
             }
             serviceProvideName = name.toString();
         } else {
@@ -154,8 +154,8 @@ public class SpnegoAuthenticator extends AuthenticatorBase {
             lc.login();
             serviceSubject = lc.getSubject();
         } catch (LoginException e) {
-            // TODO add a message
-            throw new LifecycleException(e);
+            throw new LifecycleException(
+                    sm.getString("spnegoAuthenticator.serviceLoginFail"), e);
         }
     }
 
@@ -211,8 +211,10 @@ public class SpnegoAuthenticator extends AuthenticatorBase {
                             new KerberosAuthAction(decoded.getBytes(),
                                     response, context));
                 } catch (PrivilegedActionException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
+                    if (log.isDebugEnabled()) {
+                        log.debug(sm.getString(
+                                "spnegoAuthenticator.ticketValidateFail"));
+                    }
                 }
                 
                 if (principal != null) {
