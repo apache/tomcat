@@ -33,10 +33,10 @@ import javax.security.auth.login.LoginContext;
 import javax.security.auth.login.LoginException;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.catalina.Context;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.deploy.LoginConfig;
-import org.apache.catalina.realm.GenericPrincipal;
 import org.apache.catalina.startup.Bootstrap;
 import org.apache.catalina.util.Base64;
 import org.apache.juli.logging.Log;
@@ -47,7 +47,7 @@ import org.ietf.jgss.GSSContext;
 import org.ietf.jgss.GSSCredential;
 import org.ietf.jgss.GSSException;
 import org.ietf.jgss.GSSManager;
-import org.ietf.jgss.GSSName;
+
 
 /**
  * A SPNEGO authenticator that uses the SPENGO/Kerberos support built in to Java
@@ -208,7 +208,8 @@ public class SpnegoAuthenticator extends AuthenticatorBase {
 
                 try {
                     principal = Subject.doAs(serviceSubject,
-                            new KerberosAuthAction(decoded.getBytes(), response));
+                            new KerberosAuthAction(decoded.getBytes(),
+                                    response, context));
                 } catch (PrivilegedActionException e) {
                     // TODO Auto-generated catch block
                     e.printStackTrace();
@@ -235,10 +236,13 @@ public class SpnegoAuthenticator extends AuthenticatorBase {
 
         private byte[] inToken;
         private HttpServletResponse resp;
+        private Context context;
 
-        public KerberosAuthAction(byte[] inToken, HttpServletResponse resp) {
+        public KerberosAuthAction(byte[] inToken, HttpServletResponse resp,
+                Context context) {
             this.inToken = inToken;
             this.resp = resp;
+            this.context = context;
         }
 
         @Override
@@ -246,7 +250,7 @@ public class SpnegoAuthenticator extends AuthenticatorBase {
 
             // Assume the GSSContext is stateless
             // TODO: Confirm this assumption
-            GSSContext context =
+            GSSContext gssContext =
                 GSSManager.getInstance().createContext((GSSCredential) null);
 
             Principal principal = null;
@@ -256,26 +260,19 @@ public class SpnegoAuthenticator extends AuthenticatorBase {
             }
 
             byte[] outToken =
-                context.acceptSecContext(inToken, 0, inToken.length);
+                gssContext.acceptSecContext(inToken, 0, inToken.length);
 
             if (outToken == null) {
                 throw new GSSException(GSSException.DEFECTIVE_TOKEN);
             }
 
-            GSSName initiatorName = context.getSrcName();
-
-            if (context.isEstablished()) {
-                // TODO This (and a lot of the surrounding code) needs to move
-                // to RealmBase so authorisation will work. This is just a quick
-                // hack to get authentication working.
-                principal = new GenericPrincipal(initiatorName.toString(), null);
-            }
+            principal = context.getRealm().authenticate(gssContext);
 
             // Send response token on success and failure
             resp.setHeader("WWW-Authenticate", "Negotiate "
                     + Base64.encode(outToken));
 
-            context.dispose();
+            gssContext.dispose();
             return principal;
         }
     }
