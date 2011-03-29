@@ -30,7 +30,6 @@ import javax.net.ssl.KeyManagerFactory;
 
 import org.apache.juli.logging.Log;
 import org.apache.tomcat.util.IntrospectionUtils;
-import org.apache.tomcat.util.net.jsse.JSSESocketFactory;
 import org.apache.tomcat.util.res.StringManager;
 import org.apache.tomcat.util.threads.CounterLatch;
 import org.apache.tomcat.util.threads.ResizableExecutor;
@@ -672,7 +671,7 @@ public abstract class AbstractEndpoint {
     public String getKeyAlias() { return keyAlias;}
     public void setKeyAlias(String s ) { keyAlias = s;}
 
-    private String keyPass = JSSESocketFactory.DEFAULT_KEY_PASS;
+    private String keyPass = null;
     public String getKeyPass() { return keyPass;}
     public void setKeyPass(String s ) { this.keyPass = s;}
 
