@@ -53,7 +53,8 @@ sections.</p>
 <section name="Built-in Tomcat support">
 <p><strong>This is a work in progress. This warning should be removed once the
 various questions and TODOs (see the Javadoc and implementation class) have been
-resolved.</strong></p>
+resolved.</strong> In particular, onwards delegation is not yet supported and
+roles are not retrieved from the domain controller.</p>
 <p>There are four components to the configuration of the built-in Tomcat
 support for Windows authentication. The domain controller, the server hosting
 Tomcat, the web application wishing to use Windows authentication and the client
