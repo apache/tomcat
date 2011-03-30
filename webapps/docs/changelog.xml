@@ -128,6 +128,10 @@
         name ending in <code>.jar</code> to be treated as an expanded JAR file
         by the default JarScanner. Based on patch by Rodion Zhitomirsky. (markt)
       </fix>
+      <fix>
+        Don&apos;t append the jvmRoute to a session ID if the jvmRoute is a zero
+        length string. (markt) 
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
