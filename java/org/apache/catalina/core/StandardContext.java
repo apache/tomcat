@@ -5393,10 +5393,6 @@ public class StandardContext extends ContainerBase
         // Binding thread
         ClassLoader oldCCL = bindThread();
 
-        if (namingResources != null) {
-            namingResources.stop();
-        }
-        
         try {
 
             // Stop our child containers, if any
@@ -5443,6 +5439,13 @@ public class StandardContext extends ContainerBase
 
             fireLifecycleEvent(Lifecycle.CONFIGURE_STOP_EVENT, null);
 
+            // JNDI resources are unbound in CONFIGURE_STOP_EVENT so it is now
+            // safe to stop the resources which will trigger the close method if
+            // present
+            if (namingResources != null) {
+                namingResources.stop();
+            }
+            
             // Stop the Valves in our pipeline (including the basic), if any
             if (pipeline instanceof Lifecycle) {
                 ((Lifecycle) pipeline).stop();
