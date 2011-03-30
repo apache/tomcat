@@ -1013,6 +1013,13 @@
         application uses a <code>&lt;resource-env-ref&gt;</code> instead.</p>
       </attribute>
 
+      <attribute name="closeMethod" required="false">
+        <p>Name of zero-argument method to call on the resource when it is no
+        longer required to spped up clean-up of resources that would otherwise
+        happen as part of garbage collection. If not specificed, the default
+        value of <code>close</code> is used.</p>
+      </attribute>
+
       <attribute name="description" required="false">
         <p>Optional, human-readable description of this resource.</p>
       </attribute>

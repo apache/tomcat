@@ -115,6 +115,10 @@
         close on a JNDI resource while it was still available to the
         application. (markt)
       </fix>
+      <add>
+        Provide a configuration option that lets the close method to be used for
+        a JNDI Resource to be defined by the user. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">

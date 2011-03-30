@@ -80,6 +80,24 @@ public class ContextResource extends ResourceBase {
         this.singleton = singleton;
     }
 
+
+    /**
+     * The name of the zero argument method to be called when the resource is
+     * no longer required to clean-up resources. This method must only speed up
+     * the clean-up of resources that would otherwise happen via garbage
+     * collection.
+     */
+    private String closeMethod = "close";
+    
+    public String getCloseMethod() {
+        return closeMethod;
+    }
+
+    public void setCloseMethod(String closeMethod) {
+        this.closeMethod = closeMethod;
+    }
+
+
     // --------------------------------------------------------- Public Methods
 
 
