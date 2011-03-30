@@ -114,7 +114,7 @@
   <target name="javadoc" depends="prepare">
   
      <xslt basedir="${tomcat.pool}/doc"
-          destdir="${basedir}/java/org/apache/tomcat/jdbc/pool"
+          destdir="${basedir}/src/main/java/org/apache/tomcat/jdbc/pool"
           extension=".html"
           style="${basedir}/doc/package.xsl"
           excludes="build.xml"
@@ -122,9 +122,9 @@
       <param name="relative-path" expression="http://tomcat.apache.org/tomcat-6.0-doc"/>
       <param name="apache-logo" expression="/images/asf-logo.gif"/>
     </xslt>
-    <move tofile="${basedir}/java/org/apache/tomcat/jdbc/pool/package.html"
-          file="${basedir}/java/org/apache/tomcat/jdbc/pool/jdbc-pool.html"/>
-    <javadoc sourcepath="${basedir}/java" destdir="${tomcat.api}" verbose="false"
+    <move tofile="${basedir}/src/main/java/org/apache/tomcat/jdbc/pool/package.html"
+          file="${basedir}/src/main/java/org/apache/tomcat/jdbc/pool/jdbc-pool.html"/>
+    <javadoc sourcepath="${basedir}/src/main/java" destdir="${tomcat.api}" verbose="false"
              link="http://java.sun.com/javase/6/docs/api/">
       <classpath refid="tomcat.jdbc.classpath"/>
     </javadoc>
@@ -133,13 +133,13 @@
       <fileset dir="${tomcat.api}"/>
       <fileset refid="license.notice"/>
     </jar>
-    <delete file="${basedir}/java/org/apache/tomcat/jdbc/pool/package.html"/>
+    <delete file="${basedir}/src/main/java/org/apache/tomcat/jdbc/pool/package.html"/>
   </target>
   
   <target name="build" depends="prepare,download">
     <mkdir dir="${tomcat.pool}"/>
     <!-- compile org.apache.tomcat.jdbc-->
-    <javac srcdir="${basedir}/java" destdir="${tomcat.classes}"
+    <javac srcdir="${basedir}/src/main/java" destdir="${tomcat.classes}"
            debug="${compile.debug}"
            deprecation="${compile.deprecation}"
            source="${compile.source}"
@@ -155,7 +155,7 @@
       <fileset dir="${tomcat.classes}">
         <include name="org/apache/tomcat/jdbc/**" />
       </fileset>
-      <fileset dir="${basedir}/java">
+      <fileset dir="${basedir}/src/main/java">
         <include name="org/apache/tomcat/jdbc/**/*.xml" />
       </fileset>
       <fileset refid="license.notice"/>
@@ -163,7 +163,7 @@
 
     <!-- connection pool source file-->
     <jar jarfile="${tomcat-jdbc-src.jar}" update="true">
-      <fileset dir="${basedir}/java">
+      <fileset dir="${basedir}/src/main/java">
         <include name="org/apache/tomcat/jdbc/**" />
       </fileset>
       <fileset refid="license.notice"/>
@@ -173,7 +173,7 @@
   <target name="build-test" depends="prepare, build, download-test">
     <mkdir dir="${tomcat.pool}"/>
     <!-- compile org.apache.tomcat.jdbc-->
-    <javac srcdir="${basedir}/test" destdir="${tomcat.testclasses}"
+    <javac srcdir="${basedir}/src/test/java" destdir="${tomcat.testclasses}"
            debug="${compile.debug}"
            deprecation="${compile.deprecation}"
            source="${compile.source}"
@@ -189,13 +189,13 @@
       <fileset dir="${tomcat.testclasses}">
         <include name="org/apache/tomcat/jdbc/**" />
       </fileset>
-      <fileset dir="${basedir}/test">
+      <fileset dir="${basedir}/src/test/java">
         <include name="org/apache/tomcat/jdbc/**/*.xml" />
       </fileset>
       <fileset refid="license.notice"/>
     </jar>
     <jar jarfile="${tomcat-jdbc-test-src.jar}" update="true">
-      <fileset dir="${basedir}/test">
+      <fileset dir="${basedir}/src/test/java">
         <include name="org/apache/tomcat/jdbc/**" />
       </fileset>
       <fileset refid="license.notice"/>
@@ -439,7 +439,7 @@
       <classpath refid="tomcat.jdbc.classpath"/>
       <classpath refid="test.classpath"/>
       <batchtest fork="yes" todir="${tomcat.testclasses}">
-        <fileset dir="${basedir}/test">
+        <fileset dir="${basedir}/src/test/java">
           <include name="**/CreateTestTable*"/>
         </fileset>
       </batchtest>
@@ -453,7 +453,7 @@
       <classpath refid="tomcat.jdbc.classpath"/>
       <classpath refid="test.classpath"/>
       <batchtest fork="yes" todir="${tomcat.testclasses}">
-        <fileset dir="${basedir}/test">
+        <fileset dir="${basedir}/src/test/java">
           <include name="org/apache/tomcat/jdbc/test/*CheckOutThreadTest*.java"/>
           <include name="org/apache/tomcat/jdbc/test/FairnessTest*.java"/>
           <exclude name="**/CreateTestTable*"/>
@@ -470,7 +470,7 @@
       <classpath refid="tomcat.jdbc.classpath"/>
       <classpath refid="test.classpath"/>
       <batchtest fork="yes" todir="${tomcat.testclasses}">
-        <fileset dir="${basedir}/test">
+        <fileset dir="${basedir}/src/test/java">
           <include name="org/apache/tomcat/jdbc/test/*Test*.java"/>
           <exclude name="org/apache/tomcat/jdbc/test/*CheckOutThreadTest*.java"/>
           <exclude name="**/CreateTestTable*"/>
@@ -495,7 +495,7 @@
       <classpath refid="tomcat.jdbc.classpath"/>
       <classpath refid="test.classpath"/>
       <batchtest fork="yes" todir="${tomcat.testclasses}">
-        <fileset dir="${basedir}/test">
+        <fileset dir="${basedir}/src/test/java">
           <include name="org/apache/tomcat/jdbc/test/*${test}*.java"/>
           <exclude name="**/CreateTestTable*"/>
           <exclude name="**/DefaultTestCase*"/>

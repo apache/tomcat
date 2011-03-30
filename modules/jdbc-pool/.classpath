@@ -6,6 +6,6 @@
 	<classpathentry kind="var" path="TOMCAT_LIBS_BASE/tomcat7-deps/dbcp/tomcat-dbcp.jar" sourcepath="/TOMCAT_LIBS_BASE/tomcat6-deps/dbcp/src/java"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="includes/h2/bin/h2-1.2.129.jar"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/tomcat-trunk"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/tomcat-7.0.x"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
