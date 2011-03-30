@@ -627,7 +627,11 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
         File deployedPath = deployed;
         if (tag != null) {
             deployedPath = new File(versioned, tag);
-            deployedPath.mkdirs();
+            if (!deployedPath.isDirectory() && !deployedPath.mkdirs()) {
+                writer.println(smClient.getString("managerServlet.mkdirFail",
+                        deployedPath));
+                return;
+            }
         }
 
         // Upload the web application archive to a local WAR file
@@ -642,7 +646,7 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
                 addServiced(name);
                 try {
                     // Upload WAR
-                    uploadWar(request, localWar);
+                    uploadWar(writer, request, localWar, smClient);
                     // Copy WAR and XML to the host app base if needed
                     if (tag != null) {
                         deployedPath = deployed;
@@ -817,7 +821,11 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
                 addServiced(name);
                 try {
                     if (config != null) {
-                        configBase.mkdirs();
+                        if (!configBase.isDirectory() && !configBase.mkdirs()) {
+                            writer.println(smClient.getString(
+                                    "managerServlet.mkdirFail",configBase));
+                            return;
+                        }
                         copy(new File(config), 
                                 new File(configBase, baseName + ".xml"));
                     }
@@ -1333,12 +1341,18 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
                     File war = new File(getAppBase(), baseName + ".war");
                     File dir = new File(getAppBase(), baseName);
                     File xml = new File(configBase, baseName + ".xml");
-                    if (war.exists()) {
-                        war.delete();
-                    } else if (dir.exists()) {
-                        undeployDir(dir);
-                    } else {
-                        xml.delete();
+                    if (war.exists() && !war.delete()) {
+                        writer.println(smClient.getString(
+                                "managerServlet.deleteFail", war));
+                        return;
+                    } else if (dir.exists() && !undeployDir(dir)) {
+                        writer.println(smClient.getString(
+                                "managerServlet.deleteFail", dir));
+                        return;
+                    } else if (xml.exists() && !xml.delete()) {
+                        writer.println(smClient.getString(
+                                "managerServlet.deleteFail", xml));
+                        return;
                     }
                     // Perform new deployment
                     check(name);
@@ -1446,11 +1460,11 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
 
     /**
      * Delete the specified directory, including all of its contents and
-     * subdirectories recursively.
+     * subdirectories recursively. The code assumes that the directory exists.
      *
-     * @param dir File object representing the directory to be deleted
+     * @param dir File object representing the directory to be deleted.
      */
-    protected void undeployDir(File dir) {
+    protected boolean undeployDir(File dir) {
 
         String files[] = dir.list();
         if (files == null) {
@@ -1459,13 +1473,16 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
         for (int i = 0; i < files.length; i++) {
             File file = new File(dir, files[i]);
             if (file.isDirectory()) {
-                undeployDir(file);
+                if (!undeployDir(file)) {
+                    return false;
+                }
             } else {
-                file.delete();
+                if (!file.delete()) {
+                    return false;
+                }
             }
         }
-        dir.delete();
-
+        return dir.delete();
     }
 
 
@@ -1473,15 +1490,21 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
      * Upload the WAR file included in this request, and store it at the
      * specified file location.
      *
-     * @param request The servlet request we are processing
-     * @param war The file into which we should store the uploaded WAR
+     * @param writer    Writer to render to
+     * @param request   The servlet request we are processing
+     * @param war       The file into which we should store the uploaded WAR
+     * @param smClient  The StringManager used to construct i18n messages based
+     *                  on the Locale of the client
      *
      * @exception IOException if an I/O error occurs during processing
      */
-    protected void uploadWar(HttpServletRequest request, File war)
-        throws IOException {
+    protected void uploadWar(PrintWriter writer, HttpServletRequest request,
+            File war, StringManager smClient) throws IOException {
 
-        war.delete();
+        if (war.exists() && !war.delete()) {
+            String msg = smClient.getString("managerServlet.deleteFail", war);
+            throw new IOException(msg);
+        }
         ServletInputStream istream = null;
         BufferedOutputStream ostream = null;
         try {
@@ -1502,7 +1525,10 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
             istream.close();
             istream = null;
         } catch (IOException e) {
-            war.delete();
+            if (war.exists() && !war.delete()) {
+                writer.println(
+                        smClient.getString("managerServlet.deleteFail", war));
+            }
             throw e;
         } finally {
             if (ostream != null) {
