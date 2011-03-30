@@ -28,7 +28,6 @@ import java.util.HashMap;
 import java.util.Hashtable;
 
 import javax.naming.NamingException;
-import javax.sql.DataSource;
 
 import org.apache.catalina.Container;
 import org.apache.catalina.Context;
@@ -981,54 +980,57 @@ public class NamingResources extends LifecycleMBeanBase implements Serializable 
             return;
         }
         for (ContextResource cr: resources.values()) {
-            if (DataSource.class.getName().equals(cr.getType())) {
+            String closeMethod = cr.getCloseMethod(); 
+            if (closeMethod != null && closeMethod.length() > 0) {
                 String name = cr.getName();
-                DataSource ds;
+                Object resource;
                 try {
-                     ds = (DataSource) ctxt.lookup(name);
+                     resource = ctxt.lookup(name);
                 } catch (NamingException e) {
                     log.warn(sm.getString("namingResources.cleanupNoResource",
                             cr.getName(), container), e);
                     continue;
                 }
-                cleanUp(ds, name);
+                cleanUp(resource, name, cr.getCloseMethod());
             }
         }
     }
 
     
     /**
-     * Closing a database connection pool will close it's open connections. This
+     * Clean up a resource by calling the defined close method. For example,
+     * closing a database connection pool will close it's open connections. This
      * will happen on GC but that leaves db connections open that may cause
      * issues.
-     * @param ds    The DataSource to close.
+     * 
+     * @param resource  The resource to close.
      */
-    private void cleanUp(DataSource ds, String name) {
+    private void cleanUp(Object resource, String name, String closeMethod) {
         // Look for a zero-arg close() method
         Method m = null;
         try {
-            m = ds.getClass().getMethod("close", (Class<?>[]) null);
+            m = resource.getClass().getMethod(closeMethod, (Class<?>[]) null);
         } catch (SecurityException e) {
-            log.debug(sm.getString("namingResources.cleanupCloseSecurity", name,
-                    container));
+            log.debug(sm.getString("namingResources.cleanupCloseSecurity",
+                    closeMethod, name, container));
             return;
         } catch (NoSuchMethodException e) {
-            log.debug(sm.getString("namingResources.cleanupNoClose", name,
-                    container));
+            log.debug(sm.getString("namingResources.cleanupNoClose",
+                    name, container, closeMethod));
             return;
         }
         if (m != null) {
             try {
-                m.invoke(ds, (Object[]) null);
+                m.invoke(resource, (Object[]) null);
             } catch (IllegalArgumentException e) {
                 log.warn(sm.getString("namingResources.cleanupCloseFailed",
-                        name, container), e);
+                        closeMethod, name, container), e);
             } catch (IllegalAccessException e) {
                 log.warn(sm.getString("namingResources.cleanupCloseFailed",
-                        name, container), e);
+                        closeMethod, name, container), e);
             } catch (InvocationTargetException e) {
                 log.warn(sm.getString("namingResources.cleanupCloseFailed",
-                        name, container), e);
+                        closeMethod, name, container), e);
             }
         }
     }
