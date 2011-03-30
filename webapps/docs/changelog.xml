@@ -103,6 +103,13 @@
         HTTP range requests cannot be reliably served when a Writer is in use so
         prevent the DefaultServlet from attempting to do so. (kkolinko)
       </fix>
+      <fix>
+        Protect the DefaultServlet from Valves, Filters and Wrappers that write
+        content to the response. Prevent partial responses to partial GET
+        requests in this case since the range cannot be reliably determined.
+        Also prevent the DefaultServlet from setting a content length header
+        since this too cannot be reliably determined. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
