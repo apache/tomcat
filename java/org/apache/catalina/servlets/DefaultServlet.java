@@ -923,7 +923,7 @@ public class DefaultServlet
                         contentLength);
                 // Don't set a content length if something else has already
                 // written to the response.
-                if (contentWritten > 0) {
+                if (contentWritten == 0) {
                     if (contentLength < Integer.MAX_VALUE) {
                         response.setContentLength((int) contentLength);
                     } else {
