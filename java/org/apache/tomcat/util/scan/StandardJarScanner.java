@@ -271,6 +271,9 @@ public class StandardJarScanner implements JarScanner {
         if (end != -1) {
             int start = path.lastIndexOf('/', end);
             name = path.substring(start + 1, end + 4);
+        } else if (isScanAllDirectories()){
+            int start = path.lastIndexOf('/');
+            name = path.substring(start + 1);
         }
         
         return name;

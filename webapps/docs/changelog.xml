@@ -123,6 +123,11 @@
         Correctly track changes to context.xml files and trigger redeployment
         when copyXML is set to false. (markt) 
       </fix>
+      <fix>
+        <bug>50997</bug>: Relax the requirement that directories must have a
+        name ending in <code>.jar</code> to be treated as an expanded JAR file
+        by the default JarScanner. Based on patch by Rodion Zhitomirsky. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
