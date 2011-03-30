@@ -1,0 +1,110 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.apache.tomcat</groupId>
+  <artifactId>jdbc-pool</artifactId>
+  <version>1.2-SNAPSHOT</version>
+  <packaging>jar</packaging>
+
+  <name>jdbc-pool</name>
+  <url>http://people.apache.org/~fhanik/jdbc-pool/</url>
+  
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  </properties>
+  
+  <mailingLists>
+    <mailingList>
+      <name>Development List</name>
+      <subscribe>dev-subscribe@tomcat.apache.org</subscribe>
+      <unsubscribe>dev-unsubscribe@tomcat.apache.org</unsubscribe>
+      <post>dev@tomcat.apache.org</post>
+    </mailingList>
+    <mailingList>
+      <name>Users List</name>
+      <subscribe>users-subscribe@tomcat.apache.org</subscribe>
+      <unsubscribe>users-unsubscribe@tomcat.apache.org</unsubscribe>
+      <post>users@tomcat.apache.org</post>
+    </mailingList>
+  </mailingLists>
+  
+  <distributionManagement>
+    <snapshotRepository>
+      <id>apache.snapshots.https</id>
+      <name>Apache Development Snapshot Repository</name>
+      <url>https://repository.apache.org/content/repositories/snapshots</url>
+      <uniqueVersion>false</uniqueVersion>
+    </snapshotRepository>
+  </distributionManagement>  
+
+  <scm>
+    <connection>scm:svn:https://svn.apache.org/repos/asf/tomcat/trunk/modules/jdbc-pool</connection>
+    <developerConnection>scm:svn:https://svn.apache.org/repos/asf/tomcat/trunk/modules/jdbc-pool</developerConnection>
+    <url>http://svn.apache.org/viewvc/tomcat/trunk/modules/jdbc-pool</url>
+  </scm>  
+
+  <dependencies>
+    <dependency>
+      <groupId>org.apache.tomcat</groupId>
+      <artifactId>juli</artifactId>
+      <version>6.0.32</version>
+    </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>3.8.1</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.tomcat</groupId>
+      <artifactId>dbcp</artifactId>
+      <version>6.0.32</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.h2database</groupId>
+      <artifactId>h2</artifactId>
+      <version>1.3.152</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <source>1.6</source>
+          <target>1.6</target>
+          <optimize>true</optimize>
+          <debug>true</debug>
+          <showDeprecation>true</showDeprecation>
+          <showWarnings>true</showWarnings>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-gpg-plugin</artifactId>
+        <version>1.2</version>
+        <executions>
+          <execution>
+            <id>sign-artifacts</id>
+            <phase>verify</phase>
+            <goals>
+              <goal>sign</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-eclipse-plugin</artifactId>
+        <version>2.5.1</version>
+        <configuration>
+          <downloadSources>true</downloadSources>
+          <downloadJavadocs>false</downloadJavadocs>
+        </configuration>
+      </plugin>
+    </plugins>    
+  </build>  
+</project>
