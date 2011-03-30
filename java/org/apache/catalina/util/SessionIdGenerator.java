@@ -168,7 +168,7 @@ public class SessionIdGenerator {
             }
         }
 
-        if (jvmRoute != null) {
+        if (jvmRoute != null && jvmRoute.length() > 0) {
             buffer.append('.').append(jvmRoute);
         }
 
