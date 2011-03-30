@@ -39,6 +39,8 @@ public abstract class BaseSessionComparator<T> implements Comparator<Session> {
     /* (non-Javadoc)
      * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
      */
+    @SuppressWarnings("unchecked")
+    @Override
     public final int compare(Session s1, Session s2) {
         Comparable<T> c1 = getComparableObject(s1);
         Comparable<T> c2 = getComparableObject(s2);

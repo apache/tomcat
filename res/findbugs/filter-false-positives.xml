@@ -73,6 +73,12 @@
     <Bug code="MSF" />
   </Match>
   <Match>
+    <!-- Catching exception is simpler than handling all the individual ones -->
+    <Class name="org.apache.catalina.manager.util.SessionUtils" />
+    <Method name="guessLocaleFromSession" />
+    <Bug code="REC" />
+  </Match>
+  <Match>
     <Class name="org.apache.catalina.realm.JDBCRealm" />
     <Field name="containerLog" />
     <Bug code="IS" />

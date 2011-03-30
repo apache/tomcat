@@ -168,7 +168,7 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
     /**
      * The Context container associated with our web application.
      */
-    protected Context context = null;
+    protected transient Context context = null;
 
 
     /**
@@ -200,7 +200,7 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
     /**
      * The associated host.
      */
-    protected Host host = null;
+    protected transient Host host = null;
 
     
     /**
@@ -212,7 +212,7 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
     /**
      * MBean server.
      */
-    protected MBeanServer mBeanServer = null;
+    protected transient MBeanServer mBeanServer = null;
 
 
     /**
@@ -225,7 +225,7 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
      * The global JNDI <code>NamingContext</code> for this server,
      * if available.
      */
-    protected javax.naming.Context global = null;
+    protected transient javax.naming.Context global = null;
 
 
     /**
@@ -238,7 +238,7 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
     /**
      * The Wrapper container associated with this servlet.
      */
-    protected Wrapper wrapper = null;
+    protected transient Wrapper wrapper = null;
 
 
     // ----------------------------------------------- ContainerServlet Methods
@@ -272,11 +272,12 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
             context = (Context) wrapper.getParent();
             host = (Host) context.getParent();
             Engine engine = (Engine) host.getParent();
+            String name = engine.getName() + ":type=Deployer,host=" +
+                    host.getName();
             try {
-                oname = new ObjectName(engine.getName() 
-                        + ":type=Deployer,host=" + host.getName());
+                oname = new ObjectName(name);
             } catch (Exception e) {
-                // ?
+                log(sm.getString("managerServlet.objectNameFail", name), e);
             }
         }
 
@@ -785,6 +786,7 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
         if (!validateContextName(cn, writer, smClient)) {
             return;
         }
+        @SuppressWarnings("null") // checked in call above
         String name = cn.getName();
         String baseName = cn.getBaseName();
         String displayPath = cn.getDisplayName();
