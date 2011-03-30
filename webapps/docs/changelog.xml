@@ -119,6 +119,10 @@
         Provide a configuration option that lets the close method to be used for
         a JNDI Resource to be defined by the user. (markt)
       </add>
+      <fix>
+        Correctly track changes to context.xml files and trigger redeployment
+        when copyXML is set to false. (markt) 
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
