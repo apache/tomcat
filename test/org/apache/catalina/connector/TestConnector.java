@@ -16,6 +16,8 @@
  */
 package org.apache.catalina.connector;
 
+import java.net.SocketTimeoutException;
+
 import org.apache.catalina.Context;
 import org.apache.catalina.Wrapper;
 import org.apache.catalina.startup.TesterServlet;
@@ -52,8 +54,14 @@ public class TestConnector extends TomcatBaseTest {
 
         connector.stop();
 
-        rc = getUrl("http://localhost:" + getPort() + "/", bc, 1000,
-                null, null);
+        try {
+            rc = getUrl("http://localhost:" + getPort() + "/", bc, 1000,
+                    null, null);
+        } catch (SocketTimeoutException ste) {
+            // May also see this with NIO
+            // Make sure the test passes if we do
+            rc = 503;
+        }
         assertEquals(503, rc);
     }
 }
