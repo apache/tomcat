@@ -163,6 +163,16 @@ public class ResponseFacade
     }
 
 
+    public long getContentWritten() {
+
+        if (response == null) {
+            throw new IllegalStateException(
+                            sm.getString("responseFacade.nullResponse"));
+        }
+
+        return response.getContentWritten();
+    }
+
     // ------------------------------------------------ ServletResponse Methods
 
 
