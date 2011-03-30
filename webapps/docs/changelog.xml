@@ -110,6 +110,11 @@
         Also prevent the DefaultServlet from setting a content length header
         since this too cannot be reliably determined. (markt)
       </fix>
+      <fix>
+        <bug>50991</bug>: Fix regression in fix for <bug>25060</bug> that called
+        close on a JNDI resource while it was still available to the
+        application. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
