@@ -777,8 +777,15 @@ public class HostConfig
         JarEntry entry = null;
         InputStream istream = null;
         BufferedOutputStream ostream = null;
-        File xml = new File
-            (configBase(), file.substring(0, file.lastIndexOf(".")) + ".xml");
+        File xml;
+        if (copyXML) {
+            xml = new File(configBase(),
+                    file.substring(0, file.lastIndexOf(".")) + ".xml");
+        } else {
+            xml = new File(appBase(),
+                    file.substring(0, file.lastIndexOf(".")) +
+                    "/META-INF/context.xml");
+        }
         boolean xmlInWar = false;
         
         if (deployXML && !xml.exists()) {
@@ -931,6 +938,10 @@ public class HostConfig
                         Long.valueOf(docBase.lastModified()));
                 addWatchedResources(deployedApp, docBase.getAbsolutePath(),
                         context);
+                if (deployXML && !copyXML && xmlInWar) {
+                    deployedApp.redeployResources.put(xml.getAbsolutePath(),
+                            Long.valueOf(xml.lastModified()));
+                }
             } else {
                 addWatchedResources(deployedApp, null, context);
             }
