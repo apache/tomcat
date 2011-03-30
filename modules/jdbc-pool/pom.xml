@@ -102,7 +102,7 @@
         <version>2.5.1</version>
         <configuration>
           <downloadSources>true</downloadSources>
-          <downloadJavadocs>false</downloadJavadocs>
+          <downloadJavadocs>true</downloadJavadocs>
         </configuration>
       </plugin>
     </plugins>    
