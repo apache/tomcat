@@ -991,7 +991,7 @@ public class NamingResources extends LifecycleMBeanBase implements Serializable 
                             cr.getName(), container), e);
                     continue;
                 }
-                cleanUp(resource, name, cr.getCloseMethod());
+                cleanUp(resource, name, closeMethod);
             }
         }
     }
