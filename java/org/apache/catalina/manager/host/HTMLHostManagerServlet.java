@@ -237,7 +237,7 @@ public final class HTMLHostManagerServlet extends HostManagerServlet {
         PrintWriter writer = response.getWriter();
 
         // HTML Header Section
-        writer.print(Constants.HTML_HEADER_SECTION);
+        writer.print(org.apache.catalina.manager.Constants.HTML_HEADER_SECTION);
 
         // Body Header Section
         Object[] args = new Object[2];

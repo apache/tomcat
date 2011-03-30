@@ -39,6 +39,7 @@ public class ReverseComparator implements Comparator<Session> {
     /* (non-Javadoc)
      * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
      */
+    @Override
     public int compare(Session o1, Session o2) {
         int returnValue = comparator.compare(o1, o2);
         return (- returnValue);
