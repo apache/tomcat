@@ -181,6 +181,10 @@
         Prevent the custom error pages for the Manager and Host Manager
         applications from being accessed directly. (markt)
       </fix>
+      <fix>
+        <bug>50984</bug>: When using the Manager application ensure that
+        undeployment fails if a file cannot be deleted. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
