@@ -299,6 +299,7 @@ public class StatusManagerServlet
     // ------------------------------------------- NotificationListener Methods
 
 
+    @Override
     public void handleNotification(Notification notification,
                                    java.lang.Object handback) {
 
