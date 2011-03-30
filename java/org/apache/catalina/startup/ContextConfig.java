@@ -2347,7 +2347,7 @@ public class ContextConfig
         public void scan(File file) throws IOException {
 
             InputStream stream = null;
-            WebXml fragment = null;
+            WebXml fragment = new WebXml();
             
             try {
                 File fragmentFile = new File(file, FRAGMENT_LOCATION);
@@ -2356,7 +2356,6 @@ public class ContextConfig
                     InputSource source =
                         new InputSource(fragmentFile.toURI().toURL().toString());
                     source.setByteStream(stream);
-                    fragment = new WebXml();
                     parseWebXml(source, fragment, true);
                 }
             } finally {
@@ -2367,15 +2366,11 @@ public class ContextConfig
                         ExceptionUtils.handleThrowable(t);
                     }
                 }
-                if (fragment == null) {
-                    fragments.put(file.toURI().toURL().toString(), fragment);
-                } else {
-                    fragment.setURL(file.toURI().toURL());
-                    if (fragment.getName() == null) {
-                        fragment.setName(fragment.getURL().toString());
-                    }
-                    fragments.put(fragment.getName(), fragment);
+                fragment.setURL(file.toURI().toURL());
+                if (fragment.getName() == null) {
+                    fragment.setName(fragment.getURL().toString());
                 }
+                fragments.put(fragment.getName(), fragment);
             }
         }
         
