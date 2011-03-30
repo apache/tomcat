@@ -47,6 +47,8 @@ import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
+import javax.servlet.ServletResponse;
+import javax.servlet.ServletResponseWrapper;
 import javax.servlet.UnavailableException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -60,6 +62,7 @@ import javax.xml.transform.stream.StreamSource;
 
 import org.apache.catalina.Globals;
 import org.apache.catalina.connector.RequestFacade;
+import org.apache.catalina.connector.ResponseFacade;
 import org.apache.catalina.util.RequestUtil;
 import org.apache.catalina.util.ServerInfo;
 import org.apache.catalina.util.URLEncoder;
@@ -885,6 +888,21 @@ public class DefaultServlet
 
         }
 
+        // Check to see if a Filter, Valve of wrapper has written some content.
+        // If it has, disable range requests and setting of a content length
+        // since neither can be done reliably.
+        ServletResponse r = response;
+        long contentWritten = 0;
+        while (r instanceof ServletResponseWrapper) {
+            r = ((ServletResponseWrapper) r).getResponse();
+        }
+        if (r instanceof ResponseFacade) {
+            contentWritten = ((ResponseFacade) r).getContentWritten();
+        }
+        if (contentWritten > 0) {
+            ranges = FULL;
+        }
+        
         if ( (cacheEntry.context != null)
                 || isError
                 || ( ((ranges == null) || (ranges.isEmpty()))
@@ -903,11 +921,17 @@ public class DefaultServlet
                 if (debug > 0)
                     log("DefaultServlet.serveFile:  contentLength=" +
                         contentLength);
-                if (contentLength < Integer.MAX_VALUE) {
-                    response.setContentLength((int) contentLength);
-                } else {
-                    // Set the content-length as String to be able to use a long
-                    response.setHeader("content-length", "" + contentLength);
+                // Don't set a content length if something else has already
+                // written to the response.
+                if (contentWritten > 0) {
+                    if (contentLength < Integer.MAX_VALUE) {
+                        response.setContentLength((int) contentLength);
+                    } else {
+                        // Set the content-length as String to be able to use a
+                        // long
+                        response.setHeader("content-length",
+                                "" + contentLength);
+                    }
                 }
             }
 
