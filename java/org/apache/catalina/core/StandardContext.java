@@ -5437,15 +5437,16 @@ public class StandardContext extends ContainerBase
             if (log.isDebugEnabled())
                 log.debug("Processing standard container shutdown");
 
-            fireLifecycleEvent(Lifecycle.CONFIGURE_STOP_EVENT, null);
-
-            // JNDI resources are unbound in CONFIGURE_STOP_EVENT so it is now
-            // safe to stop the resources which will trigger the close method if
-            // present
+            // JNDI resources are unbound in CONFIGURE_STOP_EVENT so stop
+            // naming resoucres before they are unbound since NamingResoucres
+            // does a JNDI lookup to retrieve the resource. This needs to be
+            // after the application has finished with the resource 
             if (namingResources != null) {
                 namingResources.stop();
             }
             
+            fireLifecycleEvent(Lifecycle.CONFIGURE_STOP_EVENT, null);
+
             // Stop the Valves in our pipeline (including the basic), if any
             if (pipeline instanceof Lifecycle) {
                 ((Lifecycle) pipeline).stop();
