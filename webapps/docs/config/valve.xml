@@ -849,6 +849,12 @@
         <code>true</code> will be used.</p>
       </attribute>
 
+      <attribute name="loginConfigName" required="false">
+        <p>The name of the JAAS login configuration to be used to login as the
+        service. If not specified, the default of
+        <code>com.sun.security.jgss.krb5.accept</code> is used.</p>
+      </attribute>
+
       <attribute name="securePagesWithPragma" required="false">
         <p>Controls the caching of pages that are protected by security
         constraints. Setting this to <code>false</code> may help work around
@@ -883,22 +889,6 @@
         session IDs. If an invalid algorithm and/or provider is specified, the
         platform default provider and the default algorithm will be used. If not
         specified, the platform default provider will be used.</p>
-      </attribute>
-
-      <attribute name="serviceKeyTab" required="false">
-        <p>Name of the Kerberos keytab file that contains the private key for
-        the service principal. The name of the service principal must match the
-        spn attribute. Relative file names are relative to
-        <code>$CATALINA_BASE</code>. If not specified, the default value of
-        <code>conf/tomcat.keytab</code> is used.</p>
-      </attribute>
-
-      <attribute name="spn" required="false">
-        <p>Service Principal Name (SPN) for this server. It must match the SPN
-        associated with the key in the serviceKetTab file. If not specified, the
-        default value of <code>HTTP/&lt;hostname&gt;</code> where
-        <code>&lt;hostname&gt;</code> is obtained using
-        <code>InetAddress.getLocalHost().getCanonicalHostName()</code>.</p>
       </attribute>
 
     </attributes>

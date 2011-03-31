@@ -18,22 +18,12 @@ package org.apache.catalina.authenticator;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.security.Principal;
-import java.security.PrivilegedActionException;
-import java.security.PrivilegedExceptionAction;
-import java.util.HashMap;
-import java.util.Map;
 
-import javax.security.auth.Subject;
-import javax.security.auth.login.AppConfigurationEntry;
-import javax.security.auth.login.Configuration;
 import javax.security.auth.login.LoginContext;
 import javax.security.auth.login.LoginException;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.catalina.Context;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.deploy.LoginConfig;
@@ -47,6 +37,7 @@ import org.ietf.jgss.GSSContext;
 import org.ietf.jgss.GSSCredential;
 import org.ietf.jgss.GSSException;
 import org.ietf.jgss.GSSManager;
+import org.ietf.jgss.Oid;
 
 
 /**
@@ -69,8 +60,6 @@ import org.ietf.jgss.GSSManager;
  * <li>Does the SPN have to start with HTTP/...?</li>
  * <li>Can a port number be appended to the end of the host in the SPN?</li>
  * <li>Can the domain be left off the user in the ktpass command?</li>
- * <li>Can -Djava.security.krb5.conf be used to change the location of krb5.ini?
- *     </li>
  * <li>What are the limitations on the account that Tomcat can run as? SPN
  *     associated account works, domain admin works, local admin doesn't
  *     work</li>
@@ -80,12 +69,15 @@ public class SpnegoAuthenticator extends AuthenticatorBase {
 
     private static final Log log = LogFactory.getLog(SpnegoAuthenticator.class);
     
-    protected String serviceKeyTab = Constants.DEFAULT_KEYTAB;
-    protected String spn = null;
+    private String loginConfigName = Constants.DEFAULT_LOGIN_MODULE_NAME;
+    public String getLoginConfigName() {
+        return loginConfigName;
+    }
+    public void setLoginConfigName(String loginConfigName) {
+        this.loginConfigName = loginConfigName;
+    }
 
-    protected Subject serviceSubject = null;
 
-    
     @Override
     protected String getAuthMethod() {
         return Constants.SPNEGO_METHOD;
@@ -98,65 +90,32 @@ public class SpnegoAuthenticator extends AuthenticatorBase {
     }
 
 
-    public String getServiceKeyTab() {
-        return serviceKeyTab;
-    }
-
-
-    public void setServiceKeyTab(String serviceKeyTab) {
-        this.serviceKeyTab = serviceKeyTab;
-    }
-
-
-    public String getSpn() {
-        return spn;
-    }
-
-
-    public void setSpn(String spn) {
-        this.spn = spn;
-    }
-
-
     @Override
     protected void initInternal() throws LifecycleException {
         super.initInternal();
 
-        // Service keytab needs to be an absolute file name
-        File serviceKeyTabFile = new File(serviceKeyTab);
-        if (!serviceKeyTabFile.isAbsolute()) {
-            serviceKeyTabFile =
-                new File(Bootstrap.getCatalinaBase(), serviceKeyTab);
+        // Kerberos configuration file location
+        String krb5Conf = System.getProperty(Constants.KRB5_CONF_PROPERTY);
+        if (krb5Conf == null) {
+            // System property not set, use the Tomcat default
+            File krb5ConfFile = new File(Bootstrap.getCatalinaBase(),
+                    Constants.DEFAULT_KRB5_CONF);
+            System.setProperty(Constants.KRB5_CONF_PROPERTY,
+                    krb5ConfFile.getAbsolutePath());
         }
 
-        // SPN is HTTP/hostname
-        String serviceProvideName;
-        if (spn == null || spn.length() == 0) {
-            // Construct default
-            StringBuilder name = new StringBuilder(Constants.DEFAULT_SPN_CLASS);
-            name.append('/');
-            try {
-                name.append(InetAddress.getLocalHost().getCanonicalHostName());
-            } catch (UnknownHostException e) {
-                throw new LifecycleException(
-                        sm.getString("spnegoAuthenticator.hostnameFail"), e);
-            }
-            serviceProvideName = name.toString();
-        } else {
-            serviceProvideName = spn;
+        // JAAS configuration file location
+        String jaasConf = System.getProperty(Constants.JAAS_CONF_PROPERTY);
+        if (jaasConf == null) {
+            // System property not set, use the Tomcat default
+            File jaasConfFile = new File(Bootstrap.getCatalinaBase(),
+                    Constants.DEFAULT_JAAS_CONF);
+            System.setProperty(Constants.JAAS_CONF_PROPERTY,
+                    jaasConfFile.getAbsolutePath());
         }
-
-        LoginContext lc;
-        try {
-            lc = new LoginContext("", null, null,
-                    new JaasConfig(serviceKeyTabFile.getAbsolutePath(),
-                            serviceProvideName, log.isDebugEnabled()));
-            lc.login();
-            serviceSubject = lc.getSubject();
-        } catch (LoginException e) {
-            throw new LifecycleException(
-                    sm.getString("spnegoAuthenticator.serviceLoginFail"), e);
-        }
+        
+        // This property must be false for SPNEGO to work
+        System.setProperty(Constants.USE_SUBJECT_CREDS_ONLY_PROPERTY, "false");
     }
 
 
@@ -195,122 +154,118 @@ public class SpnegoAuthenticator extends AuthenticatorBase {
             request.getCoyoteRequest().getMimeHeaders()
             .getValue("authorization");
         
-        if (authorization != null) {
-            authorization.toBytes();
-            ByteChunk authorizationBC = authorization.getByteChunk();
-            if (authorizationBC.startsWithIgnoreCase("negotiate ", 0)) {
-                authorizationBC.setOffset(authorizationBC.getOffset() + 10);
-                // FIXME: Add trimming
-                // authorizationBC.trim();
-                
-                ByteChunk decoded = new ByteChunk();
-                Base64.decode(authorizationBC, decoded);
-
-                try {
-                    principal = Subject.doAs(serviceSubject,
-                            new KerberosAuthAction(decoded.getBytes(),
-                                    response, context));
-                } catch (PrivilegedActionException e) {
-                    if (log.isDebugEnabled()) {
-                        log.debug(sm.getString(
-                                "spnegoAuthenticator.ticketValidateFail"));
-                    }
-                }
-                
-                if (principal != null) {
-                    register(request, response, principal, Constants.SPNEGO_METHOD,
-                            principal.getName(), null);
-                    return true;
-                }
-            } else {
-                response.setHeader("WWW-Authenticate", "Negotiate");
+        if (authorization == null) {
+            if (log.isDebugEnabled()) {
+                log.debug(sm.getString("authenticator.noAuthHeader"));
             }
-        } else {
             response.setHeader("WWW-Authenticate", "Negotiate");
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+            return false;
         }
-        response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
-        return false;
-    }
+        
+        authorization.toBytes();
+        ByteChunk authorizationBC = authorization.getByteChunk();
 
-
-    private static class KerberosAuthAction
-            implements PrivilegedExceptionAction<Principal> {
-
-        private byte[] inToken;
-        private HttpServletResponse resp;
-        private Context context;
-
-        public KerberosAuthAction(byte[] inToken, HttpServletResponse resp,
-                Context context) {
-            this.inToken = inToken;
-            this.resp = resp;
-            this.context = context;
+        if (!authorizationBC.startsWithIgnoreCase("negotiate ", 0)) {
+            if (log.isDebugEnabled()) {
+                log.debug(sm.getString(
+                        "spnegoAuthenticator.authHeaderNotNego"));
+            }
+            response.setHeader("WWW-Authenticate", "Negotiate");
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+            return false;
         }
 
-        @Override
-        public Principal run() throws Exception {
+        authorizationBC.setOffset(authorizationBC.getOffset() + 10);
+        // FIXME: Add trimming
+        // authorizationBC.trim();
+                
+        ByteChunk decoded = new ByteChunk();
+        Base64.decode(authorizationBC, decoded);
 
+        if (decoded.getLength() == 0) {
+            if (log.isDebugEnabled()) {
+                log.debug(sm.getString(
+                        "spnegoAuthenticator.authHeaderNoToken"));
+            }
+            response.setHeader("WWW-Authenticate", "Negotiate");
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+            return false;
+        }
+
+        LoginContext lc = null;
+        GSSContext gssContext = null;
+        byte[] outToken = null;
+        try {
+            try {
+                lc = new LoginContext(loginConfigName);
+                lc.login();
+            } catch (LoginException e) {
+                log.error(sm.getString("spnegoAuthenticator.serviceLoginFail"),
+                        e);
+                response.sendError(
+                        HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                return false;
+            }
             // Assume the GSSContext is stateless
             // TODO: Confirm this assumption
-            GSSContext gssContext =
-                GSSManager.getInstance().createContext((GSSCredential) null);
+            GSSManager manager = GSSManager.getInstance();
+            gssContext = manager.createContext(manager.createCredential(null,
+                    GSSCredential.DEFAULT_LIFETIME,
+                    new Oid("1.3.6.1.5.5.2"),
+                    GSSCredential.ACCEPT_ONLY));
 
-            Principal principal = null;
-
-            if (inToken == null) {
-                throw new IllegalArgumentException("inToken cannot be null");
-            }
-
-            byte[] outToken =
-                gssContext.acceptSecContext(inToken, 0, inToken.length);
+            outToken = gssContext.acceptSecContext(decoded.getBytes(),
+                    decoded.getOffset(), decoded.getLength());
 
             if (outToken == null) {
-                throw new GSSException(GSSException.DEFECTIVE_TOKEN);
+                if (log.isDebugEnabled()) {
+                    log.debug(sm.getString(
+                            "spnegoAuthenticator.ticketValidateFail"));
+                }
+                // Start again
+                response.setHeader("WWW-Authenticate", "Negotiate");
+                response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+                return false;
             }
 
             principal = context.getRealm().authenticate(gssContext);
-
-            // Send response token on success and failure
-            resp.setHeader("WWW-Authenticate", "Negotiate "
-                    + Base64.encode(outToken));
-
-            gssContext.dispose();
-            return principal;
+        } catch (GSSException e) {
+            if (log.isDebugEnabled()) {
+                log.debug(sm.getString("spnegoAuthenticator.ticketValidateFail",
+                        e));
+            }
+            response.setHeader("WWW-Authenticate", "Negotiate");
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+            return false;
+        } finally {
+            if (gssContext != null) {
+                try {
+                    gssContext.dispose();
+                } catch (GSSException e) {
+                    // Ignore
+                }
+            }
+            if (lc != null) {
+                try {
+                    lc.logout();
+                } catch (LoginException e) {
+                    // Ignore
+                }
+            }
         }
-    }
 
+        // Send response token on success and failure
+        response.setHeader("WWW-Authenticate", "Negotiate "
+                + Base64.encode(outToken));
 
-    /**
-     * Provides the JAAS login configuration required to create
-     */
-    private static class JaasConfig extends Configuration {
-
-        private String keytab;
-        private String spn;
-        private boolean debug;
-
-        public JaasConfig(String keytab, String spn, boolean debug) {
-            this.keytab = keytab;
-            this.spn = spn;
-            this.debug = debug;
+        if (principal != null) {
+            register(request, response, principal, Constants.SPNEGO_METHOD,
+                    principal.getName(), null);
+            return true;
         }
 
-        @Override
-        public AppConfigurationEntry[] getAppConfigurationEntry(String name) {
-            Map<String, String> options = new HashMap<String, String>();
-            options.put("useKeyTab", "true");
-            options.put("keyTab", keytab);
-            options.put("principal", spn);
-            options.put("storeKey", "true");
-            options.put("doNotPrompt", "true");
-            options.put("isInitiator", "false");
-            options.put("debug", Boolean.toString(debug));
-
-            return new AppConfigurationEntry[] {
-                    new AppConfigurationEntry(
-                        "com.sun.security.auth.module.Krb5LoginModule",
-                        AppConfigurationEntry.LoginModuleControlFlag.REQUIRED,
-                        options) };
-        }
+        response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+        return false;
     }
 }
