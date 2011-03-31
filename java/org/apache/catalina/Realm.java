@@ -111,9 +111,11 @@ public interface Realm {
      * Return the Principal associated with the specified chain of X509
      * client certificates.  If there is none, return <code>null</code>.
      *
-     * @param certs The gssContext processed by the {@link Authenticator}.
+     * @param gssContext The gssContext processed by the {@link Authenticator}.
+     * @param storeCreds Should the realm attempt to store the delegated
+     *                   credentials in the returned Principal?
      */
-    public Principal authenticate(GSSContext gssContext);
+    public Principal authenticate(GSSContext gssContext, boolean storeCreds);
     
     
     /**
