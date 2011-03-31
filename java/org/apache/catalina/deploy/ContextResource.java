@@ -87,7 +87,7 @@ public class ContextResource extends ResourceBase {
      * the clean-up of resources that would otherwise happen via garbage
      * collection.
      */
-    private String closeMethod = "close";
+    private String closeMethod = null;
     
     public String getCloseMethod() {
         return closeMethod;
