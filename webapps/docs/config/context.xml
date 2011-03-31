@@ -1044,8 +1044,11 @@
         attribute is <code>true</code>, multiple JNDI lookups for this resource
         will return the same object. If this attribute is <code>false</code>,
         multiple JNDI lookups for this resource will return different objects.
-        The value of this attribute must be <code>true</code> or
-        <code>false</code>. By default, this attribute is <code>true</code>.</p>
+        This attribute must be <code>true</code> for
+        <code>javax.sql.DataSource</code> resources to enable JMX registration
+        of the DataSource. The value of this attribute must be <code>true</code>
+        or <code>false</code>. By default, this attribute is <code>true</code>.
+        </p>
       </attribute>
 
       <attribute name="type" required="true">

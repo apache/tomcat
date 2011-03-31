@@ -134,6 +134,9 @@
         Don&apos;t append the jvmRoute to a session ID if the jvmRoute is a zero
         length string. (markt) 
       </fix>
+      <fix>
+        Don&apos;t register non-singelton DataSource resources with JMX. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
