@@ -122,7 +122,12 @@ public class ProxyConnection extends JdbcInterceptor {
             return this.isWrapperFor((Class<?>)args[0]);
         }
         try {
-            return method.invoke(connection.getConnection(),args);
+            PooledConnection poolc = connection;
+            if (poolc!=null) {
+                return method.invoke(poolc.getConnection(),args);    
+            } else {
+                throw new SQLException("Connection has already been closed.");
+            }
         }catch (Throwable t) {
             if (t instanceof InvocationTargetException) {
                 InvocationTargetException it = (InvocationTargetException)t;
