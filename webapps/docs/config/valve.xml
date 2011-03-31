@@ -891,6 +891,15 @@
         specified, the platform default provider will be used.</p>
       </attribute>
 
+      <attribute name="storeDelegatedCredentials" required="false">
+        <p>Controls if the user&apos; delegated credentials will be stored in
+        the user Principal. If available, the delegated credentials will be
+        available to applications (e.g. for onward authentication to external
+        services) via the <code>org.apache.catalina.realm.GSS_CREDENTIAL</code>
+        request attribute.If not set, the default value of <code>true</code>
+        will be used.</p>
+      </attribute>
+
     </attributes>
 
   </subsection>

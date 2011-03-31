@@ -923,6 +923,13 @@ public class Request
             return asyncSupported;
         }
 
+        if (name.equals(Globals.GSS_CREDENTIAL_ATTR)) {
+            if (userPrincipal instanceof GenericPrincipal) {
+                return ((GenericPrincipal) userPrincipal).getGssCredential();
+            }
+            return null;
+        }
+
         Object attr=attributes.get(name);
 
         if(attr!=null)
