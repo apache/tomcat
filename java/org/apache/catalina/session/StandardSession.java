@@ -176,7 +176,8 @@ public class StandardSession implements HttpSession, Session, Serializable {
      * Set of attribute names which are not allowed to be persisted.
      */
     protected static final String[] excludedAttributes = {
-        Globals.SUBJECT_ATTR
+        Globals.SUBJECT_ATTR,
+        Globals.GSS_CREDENTIAL_ATTR
     };
 
 

@@ -151,6 +151,10 @@ public final class Globals {
         "javax.security.auth.subject";
 
     
+    public static final String GSS_CREDENTIAL_ATTR =
+        "org.apache.catalina.realm.GSS_CREDENTIAL";
+
+
     /**
      * The master flag which controls strict servlet specification 
      * compliance.
