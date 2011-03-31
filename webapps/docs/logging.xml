@@ -113,9 +113,7 @@
     </p>
 
     <p>
-      More details about Tomcat JULI may be found below and in Tomcat Javadoc
-      for the <a href="api/org/apache/juli/package-summary.html"><code>org.apache.juli</code></a>
-      package.
+      More details about Tomcat JULI may be found below.
     </p>
 
     </subsection>
@@ -371,6 +369,20 @@ java.util.logging.ConsoleHandler.formatter = java.util.logging.SimpleFormatter
       </source>
     </p>
 
+    <subsection name="References">
+      <p>See the following resources for additional information:</p>
+      <ul>
+        <li>Tomcat Javadoc for the
+          <a href="api/org/apache/juli/package-summary.html"><code>org.apache.juli</code></a>
+          package.
+        </li>
+        <li>Oracle Java 6 Javadoc for the
+          <a href="http://download.oracle.com/javase/6/docs/api/java/util/logging/package-summary.html"><code>java.util.logging</code></a>
+          package.
+        </li>
+      </ul>
+    </subsection>
+
   </section>
 
   <section name="Using Log4j">
@@ -459,7 +471,11 @@ log4j.logger.org.apache.catalina.core.ContainerBase.[Catalina].[localhost].[/hos
             <code>output/extras/tomcat-juli.jar</code>.</li>
 
         <li>Place <code>output/extras/tomcat-juli-adapters.jar</code> in 
-            $CATALINA_HOME/lib.</li>
+            $CATALINA_HOME/lib.<br />
+            Note, that <code>tomcat-juli.jar</code> and
+            <code>tomcat-juli-adapters.jar</code> go into different
+            directories. While the first one goes into <code>bin</code>, this
+            one goes into <code>lib</code>.</li>
 
         <li>Delete <code>$CATALINA_BASE/conf/logging.properties</code> to
             prevent java.util.logging generating zero length log files.</li>
