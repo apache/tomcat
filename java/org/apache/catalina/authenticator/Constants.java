@@ -40,6 +40,15 @@ public class Constants {
     // SPNEGO authentication constants
     public static final String DEFAULT_KEYTAB = "conf/tomcat.keytab";
     public static final String DEFAULT_SPN_CLASS = "HTTP";
+    public static final String KRB5_CONF_PROPERTY = "java.security.krb5.conf";
+    public static final String DEFAULT_KRB5_CONF = "conf/krb5.ini";
+    public static final String JAAS_CONF_PROPERTY =
+            "java.security.auth.login.config";
+    public static final String DEFAULT_JAAS_CONF = "conf/jaas.conf";
+    public static final String DEFAULT_LOGIN_MODULE_NAME =
+        "com.sun.security.jgss.krb5.accept";
+    public static final String USE_SUBJECT_CREDS_ONLY_PROPERTY =
+            "javax.security.auth.useSubjectCredsOnly";
 
     // Cookie name for single sign on support
     public static final String SINGLE_SIGN_ON_COOKIE =
