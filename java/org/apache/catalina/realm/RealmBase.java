@@ -55,6 +55,7 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.res.StringManager;
 import org.ietf.jgss.GSSContext;
+import org.ietf.jgss.GSSCredential;
 import org.ietf.jgss.GSSException;
 import org.ietf.jgss.GSSName;
 
@@ -424,7 +425,7 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
      * {@inheritDoc}
      */
     @Override
-    public Principal authenticate(GSSContext gssContext) {
+    public Principal authenticate(GSSContext gssContext, boolean storeCred) {
         if (gssContext.isEstablished()) {
             GSSName name = null;
             try {
@@ -434,7 +435,20 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
             }
             
             if (name!= null) {
-                return getPrincipal(name.toString());
+                GSSCredential gssCredential = null;
+                if (storeCred && gssContext.getCredDelegState()) {
+                    try {
+                        gssCredential = gssContext.getDelegCred();
+                    } catch (GSSException e) {
+                        e.printStackTrace();
+                        if (log.isDebugEnabled()) {
+                            log.debug(sm.getString(
+                                    "realmBase.delegatedCredentialFail", name),
+                                    e);
+                        }
+                    }
+                }
+                return getPrincipal(name.toString(), gssCredential);
             }
         }
         
@@ -785,7 +799,7 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
             if (roles.length == 0 && !constraint.getAllRoles()) {
                 if(constraint.getAuthConstraint()) {
                     if( log.isDebugEnabled() )
-                        log.debug("No roles ");
+                        log.debug("No role)s ");
                     status = false; // No listed roles means no access at all
                     denyfromall = true;
                     break;
@@ -1180,6 +1194,17 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
      */
     protected abstract Principal getPrincipal(String username);
 
+
+    protected Principal getPrincipal(String username,
+            GSSCredential gssCredential) {
+        Principal p = getPrincipal(username);
+        
+        if (p instanceof GenericPrincipal) {
+            ((GenericPrincipal) p).setGssCredential(gssCredential);
+        }
+        
+        return p;
+    }
 
     /**
      * Return the Server object that is the ultimate parent for the container

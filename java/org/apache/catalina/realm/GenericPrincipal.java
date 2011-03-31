@@ -25,6 +25,8 @@ import java.util.List;
 
 import javax.security.auth.login.LoginContext;
 
+import org.ietf.jgss.GSSCredential;
+
 
 /**
  * Generic implementation of <strong>java.security.Principal</strong> that
@@ -98,6 +100,26 @@ public class GenericPrincipal implements Principal {
      */
     public GenericPrincipal(String name, String password, List<String> roles,
             Principal userPrincipal, LoginContext loginContext) {
+        this(name, password, roles, userPrincipal, loginContext, null);
+    }
+    
+    /**
+     * Construct a new Principal, associated with the specified Realm, for the
+     * specified username and password, with the specified role names
+     * (as Strings).
+     *
+     * @param name The username of the user represented by this Principal
+     * @param password Credentials used to authenticate this user
+     * @param roles List of roles (must be Strings) possessed by this user
+     * @param userPrincipal - the principal to be returned from the request 
+     *        getUserPrincipal call if not null; if null, this will be returned
+     * @param loginContext  - If provided, this will be used to log out the user
+     *        at the appropriate time
+     * @param gssCredential - If provided, the user&apos;s delegated credentials
+     */
+    public GenericPrincipal(String name, String password, List<String> roles,
+            Principal userPrincipal, LoginContext loginContext,
+            GSSCredential gssCredential) {
         super();
         this.name = name;
         this.password = password;
@@ -109,6 +131,7 @@ public class GenericPrincipal implements Principal {
                 Arrays.sort(this.roles);
         }
         this.loginContext = loginContext;
+        this.gssCredential = gssCredential;
     }
 
 
@@ -166,6 +189,19 @@ public class GenericPrincipal implements Principal {
      * Kept so we can call logout().
      */
     protected LoginContext loginContext = null;
+
+
+    /**
+     * The user&apos;s delegated credentials.
+     */
+    protected GSSCredential gssCredential = null;
+
+    public GSSCredential getGssCredential() {
+        return this.gssCredential;
+    }
+    protected void setGssCredential(GSSCredential gssCredential) {
+        this.gssCredential = gssCredential;
+    }
 
     // --------------------------------------------------------- Public Methods
 

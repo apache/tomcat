@@ -225,7 +225,7 @@ public class LockOutRealm extends CombinedRealm {
      * {@inheritDoc}
      */
     @Override
-    public Principal authenticate(GSSContext gssContext) {
+    public Principal authenticate(GSSContext gssContext, boolean storeCreds) {
         if (gssContext.isEstablished()) {
             String username = null;
             GSSName name = null;
@@ -246,7 +246,8 @@ public class LockOutRealm extends CombinedRealm {
                 return null;
             }
 
-            Principal authenticatedUser = super.authenticate(gssContext);
+            Principal authenticatedUser =
+                    super.authenticate(gssContext, storeCreds);
             
             if (authenticatedUser == null) {
                 registerAuthFailure(username);
