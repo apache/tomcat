@@ -401,15 +401,17 @@ public class PoolProperties implements PoolConfiguration {
                 interceptors = new InterceptorDefinition[0];
             } else {
                 String[] interceptorValues = jdbcInterceptors.split(";");
-                InterceptorDefinition[] definitions = new InterceptorDefinition[interceptorValues.length];
+                InterceptorDefinition[] definitions = new InterceptorDefinition[interceptorValues.length+1];
+                //always add the trap interceptor to the mix
+                definitions[0] = new InterceptorDefinition(TrapException.class);
                 for (int i=0; i<interceptorValues.length; i++) {
                     int propIndex = interceptorValues[i].indexOf("(");
                     int endIndex = interceptorValues[i].indexOf(")");
                     if (propIndex<0 || endIndex<0 || endIndex <= propIndex) {
-                        definitions[i] = new InterceptorDefinition(interceptorValues[i].trim());
+                        definitions[i+1] = new InterceptorDefinition(interceptorValues[i].trim());
                     } else {
                         String name = interceptorValues[i].substring(0,propIndex).trim();
-                        definitions[i] = new InterceptorDefinition(name);
+                        definitions[i+1] = new InterceptorDefinition(name);
                         String propsAsString = interceptorValues[i].substring(propIndex+1, interceptorValues[i].length()-1);
                         String[] props = propsAsString.split(",");
                         for (int j=0; j<props.length; j++) {
@@ -809,6 +811,11 @@ public class PoolProperties implements PoolConfiguration {
         protected volatile Class<?> clazz = null;
         public InterceptorDefinition(String className) {
             this.className = className;
+        }
+        
+        public InterceptorDefinition(Class<?> cl) {
+            this(cl.getName());
+            clazz = cl;
         }
 
         public String getClassName() {
