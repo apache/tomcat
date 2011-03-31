@@ -980,18 +980,21 @@ public class NamingResources extends LifecycleMBeanBase implements Serializable 
             return;
         }
         for (ContextResource cr: resources.values()) {
-            String closeMethod = cr.getCloseMethod(); 
-            if (closeMethod != null && closeMethod.length() > 0) {
-                String name = cr.getName();
-                Object resource;
-                try {
-                     resource = ctxt.lookup(name);
-                } catch (NamingException e) {
-                    log.warn(sm.getString("namingResources.cleanupNoResource",
-                            cr.getName(), container), e);
-                    continue;
+            if (cr.getSingleton()) {
+                String closeMethod = cr.getCloseMethod(); 
+                if (closeMethod != null && closeMethod.length() > 0) {
+                    String name = cr.getName();
+                    Object resource;
+                    try {
+                         resource = ctxt.lookup(name);
+                    } catch (NamingException e) {
+                        log.warn(sm.getString(
+                                "namingResources.cleanupNoResource",
+                                cr.getName(), container), e);
+                        continue;
+                    }
+                    cleanUp(resource, name, closeMethod);
                 }
-                cleanUp(resource, name, closeMethod);
             }
         }
     }
