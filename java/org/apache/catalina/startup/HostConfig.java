@@ -795,7 +795,7 @@ public class HostConfig
                 if (entry != null) {
                     xmlInWar = true;
                 }
-                if (copyXML && xmlInWar) {
+                if ((copyXML || unpackWARs) && xmlInWar) {
                     istream = jar.getInputStream(entry);
                     
                     ostream =
@@ -915,7 +915,7 @@ public class HostConfig
             deployedApp.redeployResources.put
                 (war.getAbsolutePath(), Long.valueOf(war.lastModified()));
 
-            if (deployXML && xml.exists()) {
+            if (deployXML && xml.exists() && copyXML) {
                 deployedApp.redeployResources.put(xml.getAbsolutePath(),
                         Long.valueOf(xml.lastModified()));
             }
@@ -938,7 +938,7 @@ public class HostConfig
                         Long.valueOf(docBase.lastModified()));
                 addWatchedResources(deployedApp, docBase.getAbsolutePath(),
                         context);
-                if (deployXML && !copyXML && xmlInWar) {
+                if (deployXML && !copyXML && (xmlInWar || xml.exists())) {
                     deployedApp.redeployResources.put(xml.getAbsolutePath(),
                             Long.valueOf(xml.lastModified()));
                 }
