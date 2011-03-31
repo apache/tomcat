@@ -20,6 +20,23 @@ import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.LogRecord;
 /**
+ * A {@link FileHandler} implementation that uses a queue of log entries.
+ *
+ * <p>Configuration properties are inherited from the {@link FileHandler}
+ * class. This class does not add its own configuration properties for the
+ * logging configuration, but relies on the following system properties
+ * instead:</p>
+ * 
+ * <ul>
+ *   <li><code>org.apache.juli.AsyncOverflowDropType</code>
+ *    Default value: <code>1</code></li>
+ *   <li><code>org.apache.juli.AsyncMaxRecordCount</code>
+ *    Default value: <code>10000</code></li>
+ *   <li><code>org.apache.juli.AsyncLoggerPollInterval</code>
+ *    Default value: <code>1000</code></li>
+ * </ul>
+ * 
+ * <p>See the System Properties page in the configuration reference of Tomcat.</p>
  * 
  * @author Filip Hanik
  *
