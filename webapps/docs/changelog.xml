@@ -117,7 +117,9 @@
       </fix>
       <add>
         Provide a configuration option that lets the close method to be used for
-        a JNDI Resource to be defined by the user. (markt)
+        a JNDI Resource to be defined by the user. This change also disables
+        using the close method unless one is explicitly defined for the
+        resource. (markt)
       </add>
       <fix>
         Correctly track changes to context.xml files and trigger redeployment

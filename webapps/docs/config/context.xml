@@ -1016,8 +1016,8 @@
       <attribute name="closeMethod" required="false">
         <p>Name of zero-argument method to call on the resource when it is no
         longer required to speed up clean-up of resources that would otherwise
-        happen as part of garbage collection. If not specificed, the default
-        value of <code>close</code> is used.</p>
+        happen as part of garbage collection. If not specificed, no default is
+        defined and no close method will be called.</p>
       </attribute>
 
       <attribute name="description" required="false">
