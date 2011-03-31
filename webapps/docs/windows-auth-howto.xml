@@ -107,9 +107,9 @@ policy had to be relaxed. This is not recommended for production environments.
   user. The steps to configure the Tomcat instance for Windows authentication
   are as follows:
   <li>Copy the <code>tomcat.keytab</code> file created on the domain controller
-  to <code>$CATALINA_BASE/conf</code>.</li>
+  to <code>$CATALINA_BASE/conf/tomcat.keytab</code>.</li>
   <li>Create the kerberos configuration file
-  <code>C:\Windows\krb5.ini</code>. The file used in this how-to
+  <code>$CATALINA_BASE/conf/krb5.ini</code>. The file used in this how-to
   contained:<source>[libdefaults]
 default_realm = DEV.LOCAL
 default_keytab_name = FILE:c:\apache-tomcat-7.0.x\conf\tomcat.keytab
@@ -124,7 +124,37 @@ DEV.LOCAL = {
 
 [domain_realm]
 dev.local= DEV.LOCAL
-.dev.local= DEV.LOCAL</source></li>
+.dev.local= DEV.LOCAL</source>
+  The location of this file can be changed by setting the
+  <code>java.security.krb5.conf</code> systm property.</li>
+  <li>Create the JAAS login configuration file
+  <code>$CATALINA_BASE/conf/jaas.conf</code>. The file used in this how-to
+  contained:<source>com.sun.security.jgss.krb5.initiate {
+    com.sun.security.auth.module.Krb5LoginModule required
+    doNotPrompt=true
+    principal="HTTP/win-tc01.dev.local@DEV.LOCAL"
+    useKeyTab=true
+    keyTab="c:/apache-tomcat-7.0.x/conf/tomcat.keytab"
+    storeKey=true;
+};
+
+com.sun.security.jgss.krb5.accept {
+    com.sun.security.auth.module.Krb5LoginModule required
+    doNotPrompt=true
+    principal="HTTP/win-tc01.dev.local@DEV.LOCAL"
+    useKeyTab=true
+    keyTab="c:/apache-tomcat-7.0.x/conf/tomcat.keytab"
+    storeKey=true;
+};</source>
+  The location of this file can be changed by setting the
+  <code>java.security.auth.login.config</code> system property. The LoginModule
+  used is a JVM specific one so ensure that the LoginModule specified matches
+  the JVM being used. The name of the login configuration must match the
+  value used by the <a href="config/valve.html#SPNEGO_Valve">authentication
+  valve</a>.</li>
+  <li>The system property <code>javax.security.auth.useSubjectCredsOnly</code>
+  is automatically set to the required value of false if a web application is
+  configured to use the SPNEGO authentication method.</li>
   </p>
   <p>The above steps have been tested on a Tomcat server running Windows Server
   2008 R2 64-bit Standard with an Oracle 1.6.0_24 64-bit JDK.</p>
@@ -156,8 +186,10 @@ dev.local= DEV.LOCAL
   <ol>
   <li><a href="http://www.adopenstatic.com/cs/blogs/ken/archive/2006/10/19/512.aspx">
       IIS and Kerberos</a></li>
-  <li><a href="http://blog.springsource.com/2009/09/28/spring-security-kerberos/">
-      Spring Security Kerberos extension</a></li>
+  <li><a href="http://spnego.sourceforge.net/index.html">
+      SPNEGO project at SourceForge</a></li>
+  <li><a href="http://download.oracle.com/javase/1.5.0/docs/guide/security/jgss/tutorials/index.html">
+      Oracle JGSS tutorial</a></li>
   <li><a href="https://cwiki.apache.org/GMOxDOC21/using-spengo-in-geronimo.html#UsingSpengoingeronimo-SettinguptheActiveDirectoryDomainController">
       Geronimo configuration for Windows authentication</a></li>
   <li><a href="http://blogs.msdn.com/b/openspecification/archive/2010/11/17/encryption-type-selection-in-kerberos-exchanges.aspx">
@@ -190,6 +222,17 @@ dev.local= DEV.LOCAL
   <ul>
   <li>Extension to Spring Security</li>
   <li>Requires a Kerberos keytab file to be generated</li>
+  <li>Pure Java solution</li>
+  </ul>
+  </p>
+  </subsection>
+  
+  <subsection name="SPNEGO project at SourceForge">
+  <p>Full details of this solution can be found through the
+  <a href="http://spnego.sourceforge.net/index.html/">project site</a>. The key
+  features are:
+  <ul>
+  <li>Uses Kerberos</li>
   <li>Pure Java solution</li>
   </ul>
   </p>
