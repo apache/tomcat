@@ -155,7 +155,7 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
      * When processing users authenticated via the GSS-API, should any
      * &quot;@...&quot; be stripped from the end of the user name?
      */
-    protected boolean stripAtForGss = true;
+    protected boolean stripRealmForGss = true;
 
     
     // ------------------------------------------------------------- Properties
@@ -279,13 +279,13 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
     }
 
 
-    public boolean isStripAtForGss() {
-        return stripAtForGss;
+    public boolean isStripRealmForGss() {
+        return stripRealmForGss;
     }
 
 
-    public void setStripAtForGss(boolean stripAtForGss) {
-        this.stripAtForGss = stripAtForGss;
+    public void setStripRealmForGss(boolean stripRealmForGss) {
+        this.stripRealmForGss = stripRealmForGss;
     }
 
 
@@ -454,7 +454,7 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
             if (gssName!= null) {
                 String name = gssName.toString();
                 
-                if (isStripAtForGss()) {
+                if (isStripRealmForGss()) {
                     int i = name.indexOf('@');
                     if (i > 0) {
                         // Zero so we don;t leave a zero length name
