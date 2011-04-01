@@ -143,7 +143,7 @@
         a role name assigned to the corresponding user.</p>
       </attribute>
 
-      <attribute name="stripAtForGss" required="false">
+      <attribute name="stripRealmForGss" required="false">
         <p>When processing users authenticated via the GSS-API, this attribute
         controls if any &quot;@...&quot; is removed from the end of the user
         name. If not specified, the default is <code>true</code>.</p>
@@ -230,7 +230,7 @@
         a role name assigned to the corresponding user.</p>
       </attribute>
 
-      <attribute name="stripAtForGss" required="false">
+      <attribute name="stripRealmForGss" required="false">
         <p>When processing users authenticated via the GSS-API, this attribute
         controls if any &quot;@...&quot; is removed from the end of the user
         name. If not specified, the default is <code>true</code>.</p>
@@ -451,7 +451,7 @@
         <code>0</code> is used which indicates no limit.</p>
       </attribute>
 
-      <attribute name="stripAtForGss" required="false">
+      <attribute name="stripRealmForGss" required="false">
         <p>When processing users authenticated via the GSS-API, this attribute
         controls if any &quot;@...&quot; is removed from the end of the user
         name. If not specified, the default is <code>true</code>.</p>
@@ -597,7 +597,7 @@
         default value is <code>conf/tomcat-users.xml</code>.</p>
       </attribute>
 
-      <attribute name="stripAtForGss" required="false">
+      <attribute name="stripRealmForGss" required="false">
         <p>When processing users authenticated via the GSS-API, this attribute
         controls if any &quot;@...&quot; is removed from the end of the user
         name. If not specified, the default is <code>true</code>.</p>
@@ -672,7 +672,7 @@
         for your role <code>Principals</code>.</p>
       </attribute>
 
-      <attribute name="stripAtForGss" required="false">
+      <attribute name="stripRealmForGss" required="false">
         <p>When processing users authenticated via the GSS-API, this attribute
         controls if any &quot;@...&quot; is removed from the end of the user
         name. If not specified, the default is <code>true</code>.</p>
