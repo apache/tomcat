@@ -59,13 +59,13 @@ public class SpnegoAuthenticator extends AuthenticatorBase {
         this.loginConfigName = loginConfigName;
     }
 
-    private boolean storeDelegatedCredentials = true;
-    public boolean isStoreDelegatedCredentials() {
-        return storeDelegatedCredentials;
+    private boolean storeDelegatedCredential = true;
+    public boolean isStoreDelegatedCredential() {
+        return storeDelegatedCredential;
     }
-    public void setStoreDelegatedCredentials(
-            boolean storeDelegatedCredentials) {
-        this.storeDelegatedCredentials = storeDelegatedCredentials;
+    public void setStoreDelegatedCredential(
+            boolean storeDelegatedCredential) {
+        this.storeDelegatedCredential = storeDelegatedCredential;
     }
 
 
@@ -221,7 +221,7 @@ public class SpnegoAuthenticator extends AuthenticatorBase {
             }
 
             principal = context.getRealm().authenticate(gssContext,
-                    storeDelegatedCredentials);
+                    storeDelegatedCredential);
         } catch (GSSException e) {
             if (log.isDebugEnabled()) {
                 log.debug(sm.getString("spnegoAuthenticator.ticketValidateFail",
