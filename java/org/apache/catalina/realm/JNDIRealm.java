@@ -56,6 +56,7 @@ import org.apache.catalina.LifecycleException;
 import org.apache.catalina.util.Base64;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.buf.CharChunk;
+import org.ietf.jgss.GSSCredential;
 
 /**
  * <p>Implementation of <strong>Realm</strong> that works with a directory
@@ -414,6 +415,14 @@ public class JNDIRealm extends RealmBase {
      * {@link #userSearch}. Zero for no limit.
      */
     protected int timeLimit = 0;
+
+    
+    /**
+     * Should delegated credentials from the SPNEGO authenticator be used if
+     * available
+     */
+    protected boolean useDelegatedCredential = true;
+
 
     // ------------------------------------------------------------- Properties
 
@@ -949,6 +958,15 @@ public class JNDIRealm extends RealmBase {
         this.timeLimit = timeLimit;
     }
 
+
+    
+    public boolean isUseDelegatedCredential() {
+        return useDelegatedCredential;
+    }
+
+    public void setUseDelegatedCredential(boolean useDelegatedCredential) {
+        this.useDelegatedCredential = useDelegatedCredential;
+    }
 
     /**
      * Return descriptive information about this Realm implementation and
@@ -1935,6 +1953,12 @@ public class JNDIRealm extends RealmBase {
      */
     @Override
     protected Principal getPrincipal(String username) {
+        return getPrincipal(username, null);
+    }
+    
+    @Override
+    protected Principal getPrincipal(String username,
+            GSSCredential gssCredential) {
 
         DirContext context = null;
         Principal principal = null;
@@ -1949,7 +1973,7 @@ public class JNDIRealm extends RealmBase {
             try {
 
                 // Authenticate the specified username if possible
-                principal = getPrincipal(context, username);
+                principal = getPrincipal(context, username, gssCredential);
 
             } catch (CommunicationException e) {
 
@@ -1964,7 +1988,7 @@ public class JNDIRealm extends RealmBase {
                 context = open();
 
                 // Try the authentication again.
-                principal = getPrincipal(context, username);
+                principal = getPrincipal(context, username, gssCredential);
 
             } catch (ServiceUnavailableException e) {
 
@@ -1979,7 +2003,7 @@ public class JNDIRealm extends RealmBase {
                 context = open();
 
                 // Try the authentication again.
-                principal = getPrincipal(context, username);
+                principal = getPrincipal(context, username, gssCredential);
 
             }
 
@@ -2012,14 +2036,52 @@ public class JNDIRealm extends RealmBase {
      * Return the Principal associated with the given user name.
      */
     protected synchronized Principal getPrincipal(DirContext context,
-                                                  String username)
+            String username, GSSCredential gssCredential)
         throws NamingException {
 
-        User user = getUser(context, username);
+        User user = null;
+        List<String> roles = null;
+
+        try {
+            if (gssCredential != null && isUseDelegatedCredential()) {
+                // Set up context
+                context.addToEnvironment(
+                        Context.SECURITY_AUTHENTICATION, "GSSAPI");
+                context.addToEnvironment(
+                        "javax.security.sasl.server.authentication", "true");
+                context.addToEnvironment(
+                        "javax.security.sasl.qop", "auth-conf");
+                // Note: Subject already set in SPNEGO authenticator so no need
+                //       for Subject.doAs() here
+            }
+            user = getUser(context, username);
+            if (user != null) {
+                roles = getRoles(context, user);
+            }
+        } finally {
+            try {
+                context.removeFromEnvironment(
+                        Context.SECURITY_AUTHENTICATION);
+            } catch (NamingException e) {
+                // Ignore
+            }
+            try {
+                context.removeFromEnvironment(
+                        "javax.security.sasl.server.authentication");
+            } catch (NamingException e) {
+                // Ignore
+            }
+            try {
+                context.removeFromEnvironment(
+                        "javax.security.sasl.qop");
+            } catch (NamingException e) {
+                // Ignore
+            }
+        }
 
         if (user != null) {
             return new GenericPrincipal(user.getUserName(), user.getPassword(),
-                    getRoles(context, user));
+                    roles, null, null, gssCredential);
         }
         
         return null;
@@ -2303,45 +2365,45 @@ public class JNDIRealm extends RealmBase {
     }
 
 
-     // ------------------------------------------------------ Private Classes
-    
-     /**
-      * A protected class representing a User
-      */
-     protected static class User {
-         
-         private final String username;
-         private final String dn;
-         private final String password;
-         private final List<String> roles;
+    // ------------------------------------------------------ Private Classes
 
-         public User(String username, String dn, String password,
-                 List<String> roles) {
-             this.username = username;
-             this.dn = dn;
-             this.password = password;
-             if (roles == null) {
-                 this.roles = Collections.emptyList();
-             } else {
-                 this.roles = Collections.unmodifiableList(roles);
-             }
-         }
+    /**
+     * A protected class representing a User
+     */
+    protected static class User {
+         
+        private final String username;
+        private final String dn;
+        private final String password;
+        private final List<String> roles;
+
+        public User(String username, String dn, String password,
+                List<String> roles) {
+            this.username = username;
+            this.dn = dn;
+            this.password = password;
+            if (roles == null) {
+                this.roles = Collections.emptyList();
+            } else {
+                this.roles = Collections.unmodifiableList(roles);
+            }
+        }
     
-         public String getUserName() {
-             return username;
-         }
+        public String getUserName() {
+            return username;
+        }
          
-         public String getDN() {
-             return dn;
-         }
+        public String getDN() {
+            return dn;
+        }
+        
+        public String getPassword() {
+            return password;
+        }
          
-         public String getPassword() {
-             return password;
-         }
-         
-         public List<String> getRoles() {
-             return roles;
-         }
-     }
+        public List<String> getRoles() {
+            return roles;
+        }
+    }
 }
 
