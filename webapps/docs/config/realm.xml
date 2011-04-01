@@ -143,6 +143,12 @@
         a role name assigned to the corresponding user.</p>
       </attribute>
 
+      <attribute name="stripAtForGss" required="false">
+        <p>When processing users authenticated via the GSS-API, this attribute
+        controls if any &quot;@...&quot; is removed from the end of the user
+        name. If not specified, the default is <code>true</code>.</p>
+      </attribute>
+
       <attribute name="userCredCol" required="true">
         <p>Name of the column, in the "users" table, which contains
         the user's credentials (i.e. password(.  If a value for the
@@ -222,6 +228,12 @@
       <attribute name="roleNameCol" required="true">
         <p>Name of the column, in the "user roles" table, which contains
         a role name assigned to the corresponding user.</p>
+      </attribute>
+
+      <attribute name="stripAtForGss" required="false">
+        <p>When processing users authenticated via the GSS-API, this attribute
+        controls if any &quot;@...&quot; is removed from the end of the user
+        name. If not specified, the default is <code>true</code>.</p>
       </attribute>
 
       <attribute name="userCredCol" required="true">
@@ -420,7 +432,9 @@
         user currently being authenticated? If false,
         <code>connectionName</code>} and <code>connectionPassword</code> will be
         used if specified, else an anonymous. If not specified, the default
-        value of <code>false</code> is used.</p>
+        value of <code>false</code> is used. Note that when accessing the
+        directory using delegated credentials, this attribute is always ignored
+        and the search is performed using the delegated credentials.</p>
       </attribute>
 
       <attribute name="roleSubtree" required="false">
@@ -437,11 +451,25 @@
         <code>0</code> is used which indicates no limit.</p>
       </attribute>
 
+      <attribute name="stripAtForGss" required="false">
+        <p>When processing users authenticated via the GSS-API, this attribute
+        controls if any &quot;@...&quot; is removed from the end of the user
+        name. If not specified, the default is <code>true</code>.</p>
+      </attribute>
+
       <attribute name="timeLimit" required="false">
         <p>Specifies the time (in milliseconds) to wait for records to be
         returned when using the <code>userSearch</code> attribute. If not
         specified, the default of <code>0</code> is used which indicates no
         limit.</p>
+      </attribute>
+
+      <attribute name="useDelegatedCredential" required="false">
+        <p>When the JNIRealm is used with the SPNEGO authenticator, delegated
+        credentials for the user may be available. If such credentials are
+        present, this attribute controls whether are not they are used to
+        connect to the directory. If not specified, the default value of
+        <code>true</code> is used.</p>
       </attribute>
 
       <attribute name="userBase" required="false">
@@ -471,7 +499,11 @@
         actual username should be inserted. You can use this property
         instead of <code>userSearch</code>, <code>userSubtree</code>
         and <code>userBase</code> when the distinguished name contains
-        the username and is otherwise the same for all users.</p>
+        the username and is otherwise the same for all users. Note that
+        when accessing the directory using delegated credentials, this
+        attribute is always ignored and <code>userSearch</code>,
+        <code>userSubtree</code> and <code>userBase</code> are always
+        used instead.</p>
       </attribute>
 
       <attribute name="userRoleName" required="false">
@@ -565,6 +597,12 @@
         default value is <code>conf/tomcat-users.xml</code>.</p>
       </attribute>
 
+      <attribute name="stripAtForGss" required="false">
+        <p>When processing users authenticated via the GSS-API, this attribute
+        controls if any &quot;@...&quot; is removed from the end of the user
+        name. If not specified, the default is <code>true</code>.</p>
+      </attribute>
+
     </attributes>
 
     <p>The XML document referenced by the <code>pathname</code> attribute must
@@ -632,6 +670,12 @@
       <attribute name="roleClassNames" required="false">
         <p>A comma-separated list of the names of the classes that you have made 
         for your role <code>Principals</code>.</p>
+      </attribute>
+
+      <attribute name="stripAtForGss" required="false">
+        <p>When processing users authenticated via the GSS-API, this attribute
+        controls if any &quot;@...&quot; is removed from the end of the user
+        name. If not specified, the default is <code>true</code>.</p>
       </attribute>
 
       <attribute name="useContextClassLoader" required="false">
