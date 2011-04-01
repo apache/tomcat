@@ -38,8 +38,6 @@ public class Constants {
     public static final String FORM_USERNAME = "j_username";
 
     // SPNEGO authentication constants
-    public static final String DEFAULT_KEYTAB = "conf/tomcat.keytab";
-    public static final String DEFAULT_SPN_CLASS = "HTTP";
     public static final String KRB5_CONF_PROPERTY = "java.security.krb5.conf";
     public static final String DEFAULT_KRB5_CONF = "conf/krb5.ini";
     public static final String JAAS_CONF_PROPERTY =
