@@ -849,7 +849,21 @@ public class StandardContext extends ContainerBase
      */
     private Set<Servlet> createdServlets = new HashSet<Servlet>();
 
+    private boolean preemptiveAuthentication = false;
+
     // ----------------------------------------------------- Context Properties
+
+
+    @Override
+    public boolean getPreemptiveAuthentication() {
+        return preemptiveAuthentication;
+    }
+
+
+    @Override
+    public void setPreemptiveAuthentication(boolean preemptiveAuthentication) {
+        this.preemptiveAuthentication = preemptiveAuthentication;
+    }
 
 
     @Override
