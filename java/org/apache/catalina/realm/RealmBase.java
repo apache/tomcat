@@ -151,6 +151,13 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
     protected AllRolesMode allRolesMode = AllRolesMode.STRICT_MODE;
     
 
+    /**
+     * When processing users authenticated via the GSS-API, should any
+     * &quot;@...&quot; be stripped from the end of the user name?
+     */
+    protected boolean stripAtForGss = true;
+
+    
     // ------------------------------------------------------------- Properties
 
 
@@ -269,6 +276,16 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
 
         this.validate = validate;
 
+    }
+
+
+    public boolean isStripAtForGss() {
+        return stripAtForGss;
+    }
+
+
+    public void setStripAtForGss(boolean stripAtForGss) {
+        this.stripAtForGss = stripAtForGss;
     }
 
 
@@ -427,14 +444,23 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
     @Override
     public Principal authenticate(GSSContext gssContext, boolean storeCred) {
         if (gssContext.isEstablished()) {
-            GSSName name = null;
+            GSSName gssName = null;
             try {
-                name = gssContext.getSrcName();
+                gssName = gssContext.getSrcName();
             } catch (GSSException e) {
                 log.warn(sm.getString("realmBase.gssNameFail"), e);
             }
             
-            if (name!= null) {
+            if (gssName!= null) {
+                String name = gssName.toString();
+                
+                if (isStripAtForGss()) {
+                    int i = name.indexOf('@');
+                    if (i > 0) {
+                        // Zero so we don;t leave a zero length name
+                        name = name.substring(0, i);
+                    }
+                }
                 GSSCredential gssCredential = null;
                 if (storeCred && gssContext.getCredDelegState()) {
                     try {
@@ -448,7 +474,7 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
                         }
                     }
                 }
-                return getPrincipal(name.toString(), gssCredential);
+                return getPrincipal(name, gssCredential);
             }
         }
         

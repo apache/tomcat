@@ -51,10 +51,18 @@ sections.</p>
 </section>
 
 <section name="Built-in Tomcat support">
-<p><strong>This is a work in progress. This warning should be removed once the
-various questions and TODOs (see the Javadoc and implementation class) have been
-resolved.</strong> In particular, onwards delegation is not yet supported and
-roles are not retrieved from the domain controller.</p>
+<p><strong>This is a work in progress. There are a number of outstanding
+questions that require further testing.</strong> These include:
+<ul>
+<li>Does the domain name have to be in upper case?</li>
+<li>Does the SPN have to start with HTTP/...?</li>
+<li>Can a port number be appended to the end of the host in the SPN?</li>
+<li>Can the domain be left off the user in the ktpass command?</li>
+<li>What are the limitations on the account that Tomcat can run as? SPN
+    associated account works, domain admin works, local admin doesn't
+    work</li>
+</ul>
+</p>
 <p>There are four components to the configuration of the built-in Tomcat
 support for Windows authentication. The domain controller, the server hosting
 Tomcat, the web application wishing to use Windows authentication and the client
@@ -155,6 +163,10 @@ com.sun.security.jgss.krb5.accept {
   <li>The system property <code>javax.security.auth.useSubjectCredsOnly</code>
   is automatically set to the required value of false if a web application is
   configured to use the SPNEGO authentication method.</li>
+  </p>
+  <p>The SPNEGO authenticator will work with any <a href="config/realm.html">
+  Realm</a> but if used with the JNDI Realm, by default the JNDI Realm will use
+  the user&apos;s delegated credentials to connect to the Active Directory.
   </p>
   <p>The above steps have been tested on a Tomcat server running Windows Server
   2008 R2 64-bit Standard with an Oracle 1.6.0_24 64-bit JDK.</p>
