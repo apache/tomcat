@@ -147,6 +147,10 @@
       <fix>
         Don&apos;t register non-singelton DataSource resources with JMX. (markt)
       </fix>
+      <add>
+        Provide additional configuration options for the DIGEST authenticator.
+        (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
