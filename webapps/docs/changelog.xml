@@ -42,6 +42,15 @@
   General, Catalina, Coyote, Jasper, Cluster, Web applications, Extras, Tribes,
   Other
 -->
+<section name="Tomcat 7.0.13 (markt)">
+  <subsection name="Catalina">
+    <changelog>
+      <fix>
+        Correct mix-up in Realm Javadoc. (markt)
+      </fix>
+    </changelog>
+  </subsection>
+</section>
 <section name="Tomcat 7.0.12 (markt)">
   <subsection name="Catalina">
     <changelog>
