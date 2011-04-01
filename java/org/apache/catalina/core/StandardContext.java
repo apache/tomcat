@@ -5414,14 +5414,21 @@ public class StandardContext extends ContainerBase
             // we do it in a dedicated thread for memory leak protection, in
             // case some webapp code registers some ThreadLocals that they
             // forget to cleanup
-            DedicatedThreadExecutor.executeInOwnThread(
-                new Callable<Void>() {
+            // TODO Figure out why DedicatedThreadExecutor hangs randomly in the
+            //      unit tests if used here
+            RunnableWithLifecycleException stop =
+                    new RunnableWithLifecycleException() {
                 @Override
-                public Void call() throws Exception {
+                public void run() {
                     ClassLoader old = bindThread();
                     try {
                         for (int i = 0; i < children.length; i++) {
-                            children[i].stop();
+                            try {
+                                children[i].stop();
+                            } catch (LifecycleException e) {
+                                le = e;
+                                return;
+                            }
                         }
             
                         // Stop our filters
@@ -5430,19 +5437,35 @@ public class StandardContext extends ContainerBase
                         // Stop ContainerBackgroundProcessor thread
                         threadStop();
             
-                        if ((manager != null) && 
-                                (manager instanceof Lifecycle)) {
-                            ((Lifecycle) manager).stop();
+                        if (manager != null && manager instanceof Lifecycle) {
+                            try {
+                                ((Lifecycle) manager).stop();
+                            } catch (LifecycleException e) {
+                                le = e;
+                                return;
+                            }
                         }
             
                         // Stop our application listeners
                         listenerStop();
-                        return null;
                     }finally{
                         unbindThread(old);
                     }
                 }
-            });
+            };
+            
+            Thread t = new Thread(stop);
+            t.setName("stop children - " + getObjectName().toString());
+            t.run();
+            try {
+                t.join();
+            } catch (InterruptedException e) {
+                // Shouldn't happen
+                throw new LifecycleException(e);
+            }
+            if (stop.getLifecycleException() != null) {
+                throw stop.getLifecycleException();
+            }
 
             // Finalize our character set mapper
             setCharsetMapper(null);
@@ -6492,4 +6515,13 @@ public class StandardContext extends ContainerBase
         return false;
     }
 
+    private abstract static class RunnableWithLifecycleException
+            implements Runnable {
+        
+        protected LifecycleException le = null;
+        
+        public LifecycleException getLifecycleException() {
+            return le;
+        }
+    }
 }
