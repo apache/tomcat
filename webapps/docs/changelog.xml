@@ -151,6 +151,10 @@
         Provide additional configuration options for the DIGEST authenticator.
         (markt)
       </add>
+      <fix>
+        Provide a workaround for Tomcat hanging during shutdown when running the
+        unit tests. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
