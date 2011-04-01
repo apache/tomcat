@@ -519,7 +519,7 @@
       <attribute name="socket.soTrafficClass" required="false">
         <p>(byte)Value between <code>0</code> and <code>255</code> for the
         traffic class on the socket. JVM default used if not set.</p>
-        <p><strong>Note</strong>On some JDK versions, setting
+        <p><strong>Note:</strong> On some JDK versions, setting
         <strong>soTrafficClass</strong> causes a problem. A work around for this
         is to add the <code>-Djava.net.preferIPv4Stack=true</code> value to your
         JVM options.</p>
@@ -687,10 +687,10 @@
         <p>The following command line options are available for the NIO
         connector:<br/>
         <code>-Dorg.apache.tomcat.util.net.NioSelectorShared=true|false</code>
-        - default is <code>true</code>. Set this value to false if you wish to
-        use a selector for each thread. If you do set it to false, you can
+        - default is <code>true</code>. Set this value to <code>false</code> if you wish to
+        use a selector for each thread. When you set it to <code>false</code>, you can
         control the size of the pool of selectors by using the 
-        <strong>selectorPool.maxSelectors attribute</strong>.</p>
+        <strong>selectorPool.maxSelectors</strong> attribute.</p>
       </attribute>
 
       <attribute name="oomParachute" required="false">
