@@ -143,6 +143,30 @@ public class TestStandardWrapper extends TomcatBaseTest {
         assertEquals(403, rc);
     }
 
+    public void testSecurityAnnotationsNoWebXmlLoginConfig() throws Exception {
+        // Setup Tomcat instance
+        Tomcat tomcat = getTomcatInstance();
+        
+        File appDir = new File("test/webapp-3.0-servletsecurity2");
+        tomcat.addWebapp(null, "", appDir.getAbsolutePath());
+        
+        tomcat.start();
+        
+        ByteChunk bc = new ByteChunk();
+        int rc;
+        rc = getUrl("http://localhost:" + getPort() + "/protected.jsp",
+                bc, null, null);
+        
+        assertNull(bc.toString());
+        assertEquals(403, rc);
+
+        rc = getUrl("http://localhost:" + getPort() + "/unprotected.jsp",
+                bc, null, null);
+        
+        assertEquals(200, rc);
+        assertTrue(bc.toString().contains("00-OK"));
+    }
+
     private void doTestSecurityAnnotationsAddServlet(boolean useCreateServlet)
             throws Exception {
 

@@ -312,6 +312,16 @@
         filenames used for either the .xml context file or the docBase.</p>
       </attribute>
 
+      <attribute name="preemptiveAuthentication" required="false">
+        <p>When set to <code>true</code> and the user presents credentials for a
+        resource that is not protected by a security constraint, if the
+        authenticator supports preemptive authentication (the standard
+        authenticators provided with Tomcat do) then the user&apos; credentials
+        will be processed. If not specified, the default of <code>false</code>is
+        used.
+        </p>
+      </attribute>
+
       <attribute name="privileged" required="false">
         <p>Set to <code>true</code> to allow this context to use container
         servlets, like the manager servlet. Use of the <code>privileged</code>

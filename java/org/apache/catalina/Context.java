@@ -1349,5 +1349,18 @@ public interface Context extends Container {
      */
     public boolean getFireRequestListenersOnForwards();
     
+    /**
+     * Configures if a user presents authentication credentials, whether the
+     * context will process them when the request is for a non-protected
+     * resource.
+     */
+    public void setPreemptiveAuthentication(boolean enable);
+
+    /**
+     * Determines if a user presents authentication credentials, will the
+     * context will process them when the request is for a non-protected
+     * resource.
+     */
+    public boolean getPreemptiveAuthentication();
 }
 
