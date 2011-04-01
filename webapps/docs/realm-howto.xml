@@ -215,11 +215,15 @@ java org.apache.catalina.realm.RealmBase \
    not specified in web.xml, the default value of <code>Authentication
    required</code> is used.</p>
 
-<p>To use either of the above techniques, the
-<code>$CATALINA_HOME/lib/catalina.jar</code> and 
-<code>$CATALINA_HOME/bin/tomcat-juli.jar</code> files will need to be
-on your class path to make the <code>RealmBase</code> class available.
+<p>To use either of the above techniques, the following jar files will need
+to be on your class path to make the <code>RealmBase</code> class available:
 </p>
+
+<ul>
+  <li>$CATALINA_HOME/bin/tomcat-juli.jar</li>
+  <li>$CATALINA_HOME/lib/catalina.jar</li>
+  <li>$CATALINA_HOME/lib/tomcat-util.jar</li>
+</ul>
 
 <p>Non-ASCII usernames and/or passwords are supported using
 <source>java org.apache.catalina.realm.RealmBase \
