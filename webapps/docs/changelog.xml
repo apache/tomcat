@@ -101,7 +101,8 @@
         user&apos;s delegated credentials and exposing the user&apos;s delegated
         credentials via a request attribute so applications can make use of the
         to impersonate the current user when accessing third-party systems that
-        use a compatible authentication mechanism. (markt)
+        use a compatible authentication mechanism. Based on a patch provided by
+        Michael Osipov. (markt)
       </add>
       <fix>
         HTTP range requests cannot be reliably served when a Writer is in use so
