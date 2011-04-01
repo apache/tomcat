@@ -1055,10 +1055,16 @@ public class HostConfig
             host.addChild(context);
             deployedApp.redeployResources.put(dir.getAbsolutePath(),
                     Long.valueOf(dir.lastModified()));
-            if (xmlCopy != null) {
-                deployedApp.redeployResources.put(
-                        xmlCopy.getAbsolutePath(),
-                        Long.valueOf(xmlCopy.lastModified()));
+            if (deployXML && xml.exists()) {
+                if (xmlCopy == null) {
+                    deployedApp.redeployResources.put(
+                            xml.getAbsolutePath(),
+                            Long.valueOf(xml.lastModified()));
+                } else {
+                    deployedApp.redeployResources.put(
+                            xmlCopy.getAbsolutePath(),
+                            Long.valueOf(xmlCopy.lastModified()));
+                }
             }
             addWatchedResources(deployedApp, dir.getAbsolutePath(), context);
         } catch (Throwable t) {
