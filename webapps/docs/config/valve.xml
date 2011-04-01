@@ -549,6 +549,12 @@
         <strong>org.apache.catalina.authenticator.DigestAuthenticator</strong>.</p>
       </attribute>
 
+      <attribute name="cnonceCacheSize" required="false">
+        <p>To protect against replay attacks, the DIGEST authenticator tracks
+        client nonce and nonce count values. This attribute controls the size
+        of that cache. If not specified, the default value of 1000 is used.</p>
+      </attribute>
+
       <attribute name="disableProxyCaching" required="false">
         <p>Controls the caching of pages that are protected by security
         constraints. Setting this to <code>false</code> may help work around
@@ -557,6 +563,26 @@
         <code>securePagesWithPragma</code> offers an alternative, secure,
         workaround for browser caching issues. If not set, the default value of
         <code>true</code> will be used.</p>
+      </attribute>
+
+      <attribute name="key" required="false">
+        <p>The secret key used by digest authentication. If not set, a secure
+        random value is generated. This should normally only be set when it is
+        necessary to keep key values constant either across server restarts
+        and/or across a cluster.</p>
+      </attribute>
+
+      <attribute name="nonceValidity" required="false">
+        <p>The time, in milliseconds, that a server generated nonce will be
+        considered valid for use in authentication. If not specified, the
+        default value of 300000 (5 minutes) will be used.</p>
+      </attribute>
+
+      <attribute name="opaque" required="false">
+        <p>The opaque server string used by digest authentication. If not set, a
+        random value is generated. This should normally only be set when it is
+        necessary to keep opaque values constant either across server restarts
+        and/or across a cluster.</p>
       </attribute>
 
       <attribute name="securePagesWithPragma" required="false">
@@ -593,6 +619,14 @@
         session IDs. If an invalid algorithm and/or provider is specified, the
         platform default provider and the default algorithm will be used. If not
         specified, the platform default provider will be used.</p>
+      </attribute>
+
+      <attribute name="validateUri" required="false">
+        <p>Should the URI be validated as required by RFC2617? If not specified,
+        the default value of <code>true</code> will be used. This should
+        normally only be set when Tomcat is located behind a reverse proxy and
+        the proxy is modifying the URI passed to Tomcat such that DIGEST
+        authentication always fails.</p>
       </attribute>
 
     </attributes>

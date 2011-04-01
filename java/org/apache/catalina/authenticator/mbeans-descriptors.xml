@@ -90,9 +90,25 @@
                type="java.lang.String"
                writeable="false"/>
       
+    <attribute name="cnonceCacheSize"
+               description="The size of the cnonce cache used to prevent replay attacks"
+               type="int"/>
+      
     <attribute name="disableProxyCaching"
                description="Controls the caching of pages that are protected by security constraints"
                type="boolean"/>
+      
+    <attribute name="key"
+               description="The secret key used by digest authentication"
+               type="java.lang.String"/>
+      
+    <attribute name="nonceValidity"
+               description="The time, in milliseconds, for which a server issued nonce will be valid"
+               type="long"/>
+
+    <attribute name="opaque"
+               description="The opaque server string used by digest authentication"
+               type="java.lang.String"/>
       
     <attribute name="securePagesWithPragma"
                description="Controls the caching of pages that are protected by security constraints"
@@ -114,6 +130,10 @@
                description="The name of the LifecycleState that this component is currently in"
                type="java.lang.String"
                writeable="false"/>
+
+    <attribute name="validateUri"
+               description="Should the uri be validated as required by RFC2617?"
+               type="boolean"/>
   </mbean>
   
   <mbean name="FormAuthenticator"
