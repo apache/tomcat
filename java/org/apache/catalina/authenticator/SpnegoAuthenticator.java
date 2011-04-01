@@ -46,24 +46,6 @@ import org.ietf.jgss.Oid;
  * multiple components. If the configuration is invalid, the error messages are
  * often cryptic although a Google search will usually point you in the right
  * direction.
- * <p>
- * TODO:
- * <ul>
- * <li>Add support for delegating credentials? Need this if we want to
- *     authenticate to a realm as the user. This is likely to result in a fair
- *     amount of internal refactoring.</li>
- * </ul>
- * <p>
- * TBDs:
- * <ul>
- * <li>Does the domain name have to be in upper case?</li>
- * <li>Does the SPN have to start with HTTP/...?</li>
- * <li>Can a port number be appended to the end of the host in the SPN?</li>
- * <li>Can the domain be left off the user in the ktpass command?</li>
- * <li>What are the limitations on the account that Tomcat can run as? SPN
- *     associated account works, domain admin works, local admin doesn't
- *     work</li>
- * </ul>
  */
 public class SpnegoAuthenticator extends AuthenticatorBase {
 

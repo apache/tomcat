@@ -95,9 +95,13 @@
         Don&apos;t register Contexts that fail to start with the Mapper. (markt)
       </fix>
       <add>
-        Add initial support for SPNEGO/Kerberos authentication also referred to
-        as integrated Windows authentication. This is a work in progress. See
-        the documentation for details. (markt)
+        <bug>48685</bug>: Add initial support for SPNEGO/Kerberos authentication
+        also referred to as integrated Windows authentication. This includes
+        user authentication, authorisation via the directory using the
+        user&apos;s delegated credentials and exposing the user&apos;s delegated
+        credentials via a request attribute so applications can make use of the
+        to impersonate the current user when accessing third-party systems that
+        use a compatible authentication mechanism. (markt)
       </add>
       <fix>
         HTTP range requests cannot be reliably served when a Writer is in use so
