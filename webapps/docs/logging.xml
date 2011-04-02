@@ -261,7 +261,8 @@
     plain <code>java.util.logging</code>, but uses a few
     extensions to allow better flexibility in assigning loggers. The main
     differences are:
-    <ul>
+  </p>
+  <ul>
       <li>A prefix may be added to handler names, so that multiple handlers of a
       single class may be instantiated. A prefix is a String which starts with a
       digit, and ends with '.'. For example, <code>22foobar.</code> is a valid
@@ -276,18 +277,21 @@
       boolean value.</li>
       <li>The root logger can define its set of handlers using the
       <code>.handlers</code> property.</li>
-      <li>Several additional implementations of <code>java.util.logging.Handler</code>,
-      that can be used together with the ones provided by Java.
-      The notable one is <code>org.apache.juli.FileHandler</code></li>
-      <li><code>org.apache.juli.FileHandler</code> supports buffering of the
+  </ul>
+  <p>
+    There are several additional implementation classes, that can be used
+    together with the ones provided by Java. The notable one is
+    <code>org.apache.juli.FileHandler</code>.
+  </p>
+  <p>
+    <code>org.apache.juli.FileHandler</code> supports buffering of the
       logs. The buffering is not enabled by default. To configure it, use the
       <code>bufferSize</code> property of a handler. The value of <code>0</code>
       uses system default buffering (typically an 8K buffer will be used). A
       value of <code>&lt;0</code> forces a writer flush upon each log write. A
       value <code>&gt;0</code> uses a BufferedOutputStream with the defined
       value but note that the system default buffering will also be
-      applied.</li>
-    </ul>
+      applied.
   </p>
   <p>
     Example logging.properties file to be placed in $CATALINA_BASE/conf:
@@ -295,7 +299,6 @@
 handlers = 1catalina.org.apache.juli.FileHandler, \
            2localhost.org.apache.juli.FileHandler, \
            3manager.org.apache.juli.FileHandler, \
-           4admin.org.apache.juli.FileHandler, \
            java.util.logging.ConsoleHandler
 
 .handlers = 1catalina.org.apache.juli.FileHandler, java.util.logging.ConsoleHandler
@@ -316,11 +319,7 @@ handlers = 1catalina.org.apache.juli.FileHandler, \
 3manager.org.apache.juli.FileHandler.level = FINE
 3manager.org.apache.juli.FileHandler.directory = ${catalina.base}/logs
 3manager.org.apache.juli.FileHandler.prefix = manager.
-
-4admin.org.apache.juli.FileHandler.level = FINE
-4admin.org.apache.juli.FileHandler.directory = ${catalina.base}/logs
-4admin.org.apache.juli.FileHandler.prefix = admin.
-4admin.org.apache.juli.FileHandler.bufferSize = 16384
+3manager.org.apache.juli.FileHandler.bufferSize = 16384
 
 java.util.logging.ConsoleHandler.level = FINE
 java.util.logging.ConsoleHandler.formatter = java.util.logging.SimpleFormatter
@@ -339,14 +338,10 @@ org.apache.catalina.core.ContainerBase.[Catalina].[localhost].[/manager].level =
 org.apache.catalina.core.ContainerBase.[Catalina].[localhost].[/manager].handlers = \
    3manager.org.apache.juli.FileHandler
 
-org.apache.catalina.core.ContainerBase.[Catalina].[localhost].[/admin].level = INFO
-org.apache.catalina.core.ContainerBase.[Catalina].[localhost].[/admin].handlers = \
-   4admin.org.apache.juli.FileHandler
-
 # For example, set the org.apache.catalina.util.LifecycleBase logger to log
 # each component that extends LifecycleBase changing state:
 #org.apache.catalina.util.LifecycleBase.level = FINE
-    </source>
+</source>
     </p>
     
     <p>
@@ -366,7 +361,7 @@ org.apache.juli.FileHandler.prefix = servlet-examples.
 
 java.util.logging.ConsoleHandler.level = FINE
 java.util.logging.ConsoleHandler.formatter = java.util.logging.SimpleFormatter
-      </source>
+</source>
     </p>
 
     <subsection name="References">
@@ -502,7 +497,7 @@ log4j.logger.org.apache.catalina.core.ContainerBase.[Catalina].[localhost].[/hos
 log4j.logger.org.apache.catalina.core.ContainerBase.[Catalina].[localhost]=DEBUG<br />
 log4j.logger.org.apache.catalina.core=DEBUG<br />
 log4j.logger.org.apache.catalina.session=DEBUG<br />
-      </source>
+</source>
 
       Be warned a level of DEBUG will produce megabytes of logging and slow
       startup of Tomcat. This level should be used sparingly when debugging of
