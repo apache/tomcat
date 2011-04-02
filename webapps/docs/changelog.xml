@@ -50,6 +50,15 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Web applications">
+    <changelog>
+      <update>
+        Configure Security Manager How-To to include a copy of the actual
+        conf/catalina.policy file when the documentation is built, rather
+        than maintaining a copy of its content. (kkolinko)
+      </update>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 7.0.12 (markt)">
   <subsection name="Catalina">
