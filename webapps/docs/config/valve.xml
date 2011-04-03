@@ -930,7 +930,7 @@
         the user Principal. If available, the delegated credential will be
         available to applications (e.g. for onward authentication to external
         services) via the <code>org.apache.catalina.realm.GSS_CREDENTIAL</code>
-        request attribute.If not set, the default value of <code>true</code>
+        request attribute. If not set, the default value of <code>true</code>
         will be used.</p>
       </attribute>
 
