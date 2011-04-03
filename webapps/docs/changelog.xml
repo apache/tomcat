@@ -130,7 +130,7 @@
         also referred to as integrated Windows authentication. This includes
         user authentication, authorisation via the directory using the
         user&apos;s delegated credentials and exposing the user&apos;s delegated
-        credentials via a request attribute so applications can make use of the
+        credentials via a request attribute so applications can make use of them
         to impersonate the current user when accessing third-party systems that
         use a compatible authentication mechanism. Based on a patch provided by
         Michael Osipov. (markt)
