@@ -39,19 +39,19 @@ in the following subsections.</p>
 
 <subsection name="JDK">
 
-<p>Tomcat 7.0 was designed to run on J2SE 6.0.
+<p>Tomcat 7.0 was designed to run on Java SE 6.
 </p>
 
 <p>Compatible JDKs for many platforms (or links to where they can be found)
 are available at
-<a href="http://www.oracle.com/technetwork/java/javase/downloads/index.html">http://www.oracle.com/technetwork/java/javase/downloads/index.html/</a>.</p>
+<a href="http://www.oracle.com/technetwork/java/javase/downloads/index.html">http://www.oracle.com/technetwork/java/javase/downloads/index.html</a>.</p>
 
 </subsection>
 
 <subsection name="Tomcat">
 
 <p>Binary downloads of the <strong>Tomcat</strong> server are available from
-<a href="http://tomcat.apache.org/download-60.cgi">http://tomcat.apache.org/download-60.cgi</a>.
+<a href="http://tomcat.apache.org/">http://tomcat.apache.org/</a>.
 This manual assumes you are using the most recent release
 of Tomcat 7.  Detailed instructions for downloading and installing
 Tomcat are available <a href="../setup.html">here</a>.</p>
@@ -68,11 +68,11 @@ own <code>CATALINA_BASE</code> configured.</p>
 <subsection name="Ant">
 
 <p>Binary downloads of the <strong>Ant</strong> build tool are available from
-<a href="http://ant.apache.org/bindownload.cgi">http://ant.apache.org/bindownload.cgi</a>.
-This manual assumes you are using Ant 1.4 or later.  The instructions should
-also be compatible with later versions, but this has not been tested.</p>
+<a href="http://ant.apache.org/">http://ant.apache.org/</a>.
+This manual assumes you are using Ant 1.8 or later.  The instructions may
+also be compatible with other versions, but this has not been tested.</p>
 
-<p>Download and install Ant from the distribution directory mentioned above.
+<p>Download and install Ant.
 Then, add the <code>bin</code> directory of the Ant distribution to your
 <code>PATH</code> environment variable, following the standard practices for
 your operating system platform.  Once you have done this, you will be able to
@@ -93,7 +93,7 @@ tools to check out source code files, and check in modified versions.</p>
 <p>Detailed instructions for installing and using source code control
 applications is beyond the scope of this manual.  However, CVS server and
 client tools for many platforms (along with documentation) can be downloaded
-from <a href="http://www.cvshome.org">http://www.cvshome.org</a>.</p>
+from <a href="http://www.cvshome.org/">http://www.cvshome.org/</a>.</p>
 
 </subsection>
 
