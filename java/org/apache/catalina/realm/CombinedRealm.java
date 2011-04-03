@@ -117,7 +117,7 @@ public class CombinedRealm extends RealmBase {
                 }
             } else {
                 if (log.isDebugEnabled()) {
-                    log.debug(sm.getString("combinedRealm.authSucess", username, realm.getInfo()));
+                    log.debug(sm.getString("combinedRealm.authSuccess", username, realm.getInfo()));
                 }
                 break;
             }
@@ -151,7 +151,7 @@ public class CombinedRealm extends RealmBase {
                 }
             } else {
                 if (log.isDebugEnabled()) {
-                    log.debug(sm.getString("combinedRealm.authSucess", username, realm.getInfo()));
+                    log.debug(sm.getString("combinedRealm.authSuccess", username, realm.getInfo()));
                 }
                 break;
             }
@@ -259,7 +259,7 @@ public class CombinedRealm extends RealmBase {
                 }
             } else {
                 if (log.isDebugEnabled()) {
-                    log.debug(sm.getString("combinedRealm.authSucess", username, realm.getInfo()));
+                    log.debug(sm.getString("combinedRealm.authSuccess", username, realm.getInfo()));
                 }
                 break;
             }
@@ -301,7 +301,7 @@ public class CombinedRealm extends RealmBase {
                     }
                 } else {
                     if (log.isDebugEnabled()) {
-                        log.debug(sm.getString("combinedRealm.authSucess",
+                        log.debug(sm.getString("combinedRealm.authSuccess",
                                 username, realm.getInfo()));
                     }
                     break;
