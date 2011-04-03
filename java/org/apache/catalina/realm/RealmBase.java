@@ -471,7 +471,6 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
                     try {
                         gssCredential = gssContext.getDelegCred();
                     } catch (GSSException e) {
-                        e.printStackTrace();
                         if (log.isDebugEnabled()) {
                             log.debug(sm.getString(
                                     "realmBase.delegatedCredentialFail", name),
@@ -830,7 +829,7 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
             if (roles.length == 0 && !constraint.getAllRoles()) {
                 if(constraint.getAuthConstraint()) {
                     if( log.isDebugEnabled() )
-                        log.debug("No role)s ");
+                        log.debug("No roles");
                     status = false; // No listed roles means no access at all
                     denyfromall = true;
                     break;
