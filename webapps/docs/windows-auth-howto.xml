@@ -53,6 +53,7 @@ sections.</p>
 <section name="Built-in Tomcat support">
 <p><strong>This is a work in progress. There are a number of outstanding
 questions that require further testing.</strong> These include:
+</p>
 <ul>
 <li>Does the domain name have to be in upper case?</li>
 <li>Does the SPN have to start with HTTP/...?</li>
@@ -62,7 +63,6 @@ questions that require further testing.</strong> These include:
     associated account works, domain admin works, local admin doesn't
     work</li>
 </ul>
-</p>
 <p>There are four components to the configuration of the built-in Tomcat
 support for Windows authentication. The domain controller, the server hosting
 Tomcat, the web application wishing to use Windows authentication and the client
@@ -81,6 +81,7 @@ policy had to be relaxed. This is not recommended for production environments.
   domain controller. Configuration of a Windows server as a domain controller is
   outside the scope of this how-to. The steps to configure the domain controller
   to enable Tomcat to support Windows authentication are as follows:
+  </p>
   <ul>
   <li>Create a domain user that will be mapped to the service name used by the
   Tomcat server. In this how-to, this user is called <code>tc01</code> and has a
@@ -102,7 +103,6 @@ policy had to be relaxed. This is not recommended for production environments.
   <li>Create a domain user to be used on the client. In this how-to the domain
   user is <code>test</code> with a password of <code>testpass</code>.</li>
   </ul>
-  </p>
   <p>The above steps have been tested on a domain controller running Windows
   Server 2008 R2 64-bit Standard using the Windows Server 2003 functional level
   for both the forest and the domain.
@@ -114,6 +114,8 @@ policy had to be relaxed. This is not recommended for production environments.
   installed and configured and that Tomcat is running as the tc01@DEV.LOCAL
   user. The steps to configure the Tomcat instance for Windows authentication
   are as follows:
+  </p>
+  <ul>
   <li>Copy the <code>tomcat.keytab</code> file created on the domain controller
   to <code>$CATALINA_BASE/conf/tomcat.keytab</code>.</li>
   <li>Create the kerberos configuration file
@@ -163,7 +165,7 @@ com.sun.security.jgss.krb5.accept {
   <li>The system property <code>javax.security.auth.useSubjectCredsOnly</code>
   is automatically set to the required value of false if a web application is
   configured to use the SPNEGO authentication method.</li>
-  </p>
+  </ul>
   <p>The SPNEGO authenticator will work with any <a href="config/realm.html">
   Realm</a> but if used with the JNDI Realm, by default the JNDI Realm will use
   the user&apos;s delegated credentials to connect to the Active Directory.
@@ -194,7 +196,7 @@ com.sun.security.jgss.krb5.accept {
   <p>Correctly configuring Kerberos authentication can be tricky. The following
   references may prove helpful. Advice is also always available from the
   <a href="http://tomcat.apache.org/lists.html#tomcat-users">Tomcat users
-  mailing list</a>.
+  mailing list</a>.</p>
   <ol>
   <li><a href="http://www.adopenstatic.com/cs/blogs/ken/archive/2006/10/19/512.aspx">
       IIS and Kerberos</a></li>
@@ -208,7 +210,7 @@ com.sun.security.jgss.krb5.accept {
       Encryption Selection in Kerberos Exchanges</a></li>
   <li><a href="http://support.microsoft.com/kb/977321">Supported Kerberos Cipher
       Suites</a></li>
-  </ol></p>
+  </ol>
   </subsection>
 
 </section>
@@ -217,37 +219,34 @@ com.sun.security.jgss.krb5.accept {
 
   <subsection name="Waffle">
   <p>Full details of this solution can be found through the
-  <a href="http://waffle.codeplex.com/">Waffle site</a>. The key features are:
+  <a href="http://waffle.codeplex.com/">Waffle site</a>. The key features are:</p>
   <ul>
   <li>Drop-in solution</li>
   <li>Simple configuration (no JAAS or Kerberos keytab configuration required)
   </li>
   <li>Uses a native library</li>
   </ul>
-  </p>
   </subsection>
 
   <subsection name="Spring Security - Kerberos Extension">
   <p>Full details of this solution can be found through the
   <a href="http://static.springsource.org/spring-security/site/extensions/krb/index.html">
-  Kerberos extension site</a>. The key features are:
+  Kerberos extension site</a>. The key features are:</p>
   <ul>
   <li>Extension to Spring Security</li>
   <li>Requires a Kerberos keytab file to be generated</li>
   <li>Pure Java solution</li>
   </ul>
-  </p>
   </subsection>
   
   <subsection name="SPNEGO project at SourceForge">
   <p>Full details of this solution can be found through the
   <a href="http://spnego.sourceforge.net/index.html/">project site</a>. The key
-  features are:
+  features are:</p>
   <ul>
   <li>Uses Kerberos</li>
   <li>Pure Java solution</li>
   </ul>
-  </p>
   </subsection>
 </section>
 
@@ -255,7 +254,7 @@ com.sun.security.jgss.krb5.accept {
 
   <subsection name="Microsoft IIS">
   <p>There are three steps to configuring IIS to provide Windows authentication.
-  They are:
+  They are:</p>
   <ol>
   <li>Configure IIS as a reverse proxy for Tomcat (see the
   <a href="http://tomcat.apache.org/connectors-doc/webserver_howto/iis.html">
@@ -265,12 +264,11 @@ com.sun.security.jgss.krb5.accept {
   setting the tomcatAuthentication attribute on the <a href="config/ajp.html">
   AJP connector</a> to <code>false</code>.</li>
   </ol>
-  </p>
   </subsection>
 
   <subsection name="Apache httpd">
   <p>Apache httpd does not support Windows authentication out of the box but
-  there are a number of third-party modules that can be used. These include:
+  there are a number of third-party modules that can be used. These include:</p>
   <ol>
   <li><a href="http://sourceforge.net/projects/mod-auth-sspi/">mod_auth_sspi</a>
   for use on Windows platforms.</li>
@@ -279,8 +277,8 @@ com.sun.security.jgss.krb5.accept {
   2.0.x on 32-bit platforms. Some users have reported stability issues with both
   httpd 2.2.x builds and 64-bit Linux builds.</li> 
   </ol>
-  There are three steps to configuring httpd to provide Windows
-  authentication. They are:
+  <p>There are three steps to configuring httpd to provide Windows
+  authentication. They are:</p>
   <ol>
   <li>Configure httpd as a reverse proxy for Tomcat (see the
   <a href="http://tomcat.apache.org/connectors-doc/webserver_howto/apache.html">
@@ -290,7 +288,6 @@ com.sun.security.jgss.krb5.accept {
   setting the tomcatAuthentication attribute on the <a href="config/ajp.html">
   AJP connector</a> to <code>false</code>.</li>
   </ol>
-  </p>
   </subsection>
 
 </section>
