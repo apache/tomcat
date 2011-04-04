@@ -40,6 +40,9 @@ execute.test.nio=true
 execute.test.apr=true
 test.haltonfailure=false
 
+# Workaround against http://bugs.sun.com/view_bug.do?bug_id=6202721
+test.jvmarg.egd=-Djava.security.egd=file:/dev/./urandom
+
 # ----- Default Base Path for Dependent Packages -----
 # Please note this path must be absolute, not relative,
 # as it is referenced with different working directory
