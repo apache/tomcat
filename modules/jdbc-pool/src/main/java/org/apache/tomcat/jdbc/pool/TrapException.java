@@ -39,11 +39,10 @@ public class TrapException extends JdbcInterceptor {
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
         try {
             return super.invoke(proxy, method, args);
-        }catch (Throwable t) {
+        }catch (Exception t) {
             Throwable exception = t;
             if (t instanceof InvocationTargetException) {
-                InvocationTargetException it = (InvocationTargetException)t;
-                exception = it.getCause()!=null?it.getCause():it;
+                exception = t.getCause()!=null?t.getCause():t;
             } 
             Class<?> exceptionClass = exception.getClass();
             if (!isDeclaredException(method, exceptionClass)) {
@@ -64,7 +63,7 @@ public class TrapException extends JdbcInterceptor {
     
     public boolean isDeclaredException(Method m, Class<?> clazz) {
         for (Class<?> cl : m.getExceptionTypes()) {
-            if (cl.equals(clazz)) return true;
+            if (cl.equals(clazz) || cl.isAssignableFrom(clazz)) return true;
         }
         return false;
     }
