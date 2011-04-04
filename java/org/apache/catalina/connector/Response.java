@@ -913,7 +913,7 @@ public class Response
 
 
     /**
-     * Return an Iterable of all the header values associated with the
+     * Return a Collection of all the header values associated with the
      * specified header name.
      *
      * @param name Header name to look up
