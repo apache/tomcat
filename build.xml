@@ -1062,6 +1062,7 @@
     <sequential>
       <junit printsummary="yes" fork="yes" dir="." showoutput="yes">
 
+        <jvmarg value="${test.jvmarg.egd}"/>
         <jvmarg value="-Djava.library.path=${test.apr.loc}"/>
         <jvmarg value="${test.formatter}"/>
 
