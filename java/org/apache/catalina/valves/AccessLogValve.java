@@ -1290,18 +1290,17 @@ public class AccessLogValve extends ValveBase implements AccessLog {
         @Override
         public void addElement(StringBuilder buf, Date date, Request request,
                 Response response, long time) {
-           if (null != response) {
+            if (null != response) {
                 Iterator<String> iter = response.getHeaders(header).iterator();
-                boolean first = true;
-                while (iter.hasNext()) {
-                    if (!first) {
-                        buf.append(",");
-                    }
+                if (iter.hasNext()) {
                     buf.append(iter.next());
+                    while (iter.hasNext()) {
+                        buf.append(',').append(iter.next());
+                    }
+                    return;
                 }
-                return ;
             }
-            buf.append("-");
+            buf.append('-');
         }
     }
     
