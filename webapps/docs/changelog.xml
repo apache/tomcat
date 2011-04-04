@@ -51,6 +51,11 @@
       <fix>
         Fix display of response headers in AccessLogValve. (kkolinko)
       </fix>
+      <update>
+        Implement display of multiple request headers in AccessLogValve:
+        print not just the value of the first header, but of the all of them,
+        separated by commas. (kkolinko)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Web applications">
