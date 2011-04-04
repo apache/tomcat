@@ -48,6 +48,9 @@
       <fix>
         Correct mix-up in Realm Javadoc. (markt)
       </fix>
+      <fix>
+        Fix display of response headers in AccessLogValve. (kkolinko)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
