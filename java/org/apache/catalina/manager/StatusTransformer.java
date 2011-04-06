@@ -64,17 +64,18 @@ public class StatusTransformer {
      * Write an HTML or XML header.
      *
      * @param writer the PrintWriter to use
+     * @param args Path prefix for URLs
      * @param mode - 0 = HTML header, 1 = XML declaration
      *
      */
-    public static void writeHeader(PrintWriter writer, int mode) {
+    public static void writeHeader(PrintWriter writer, Object[] args, int mode) {
         if (mode == 0){
             // HTML Header Section
             writer.print(Constants.HTML_HEADER_SECTION);
         } else if (mode == 1){
             writer.write(Constants.XML_DECLARATION);
-            writer.write
-                (Constants.XML_STYLE);
+            writer.print(MessageFormat.format
+                     (Constants.XML_STYLE, args));
             writer.write("<status>");
         }
     }

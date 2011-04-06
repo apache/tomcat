@@ -210,7 +210,7 @@ public class Constants {
         "<?xml version=\"1.0\" encoding=\""+CHARSET+"\"?>";
 
     public static final String XML_STYLE =
-        "<?xml-stylesheet type=\"text/xsl\" href=\"xform.xsl\" ?>";
+        "<?xml-stylesheet type=\"text/xsl\" href=\"{0}/xform.xsl\" ?>\n";
 
 }
 
