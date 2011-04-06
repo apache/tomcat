@@ -35,8 +35,7 @@ import java.util.List;
 /**
  * Simple client for unit testing. It isn't robust, it isn't secure and
  * should not be used as the basis for production code. Its only purpose
- * is to do the bare minimum for the unit tests. It does not support keep-alive
- * connections - make sure you send a Connection: close header with the request.
+ * is to do the bare minimum for the unit tests.
  */
 public abstract class SimpleHttpClient {
     public static final String TEMP_DIR =
@@ -130,7 +129,15 @@ public abstract class SimpleHttpClient {
     public void processRequest() throws IOException, InterruptedException {
         processRequest(true);
     }
+
     public void processRequest(boolean readBody) throws IOException, InterruptedException {
+        sendRequest();
+
+        readResponse(readBody);
+
+    }
+
+    public void sendRequest() throws InterruptedException, IOException {
         // Send the request
         boolean first = true;
         for (String requestPart : request) {
@@ -142,6 +149,13 @@ public abstract class SimpleHttpClient {
             writer.write(requestPart);
             writer.flush();
         }
+    }
+
+    public void readResponse(boolean readBody) throws IOException {
+        // Reset fields use to hold response
+        responseLine = null;
+        responseHeaders.clear();
+        responseBody = null;
 
         // Read the response
         responseLine = readLine();
@@ -175,7 +189,6 @@ public abstract class SimpleHttpClient {
             }
         }
         responseBody = builder.toString();
-
     }
 
     public String readLine() throws IOException {
