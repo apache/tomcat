@@ -1485,7 +1485,7 @@
   <subsection name="Catalina">
     <changelog>
       <fix>
-        <bug>49428</bug>: Re-implement the fix for bug <bug>49428</bug> &#150;
+        <bug>49428</bug>: Re-implement the fix for bug <bug>49428</bug> &#x2013;
         namespace issues for some Microsoft WebDAV clients. (kkolinko)
       </fix>
       <fix>
