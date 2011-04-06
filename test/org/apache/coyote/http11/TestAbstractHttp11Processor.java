@@ -14,12 +14,14 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package org.apache.coyote.http11;
 
 import java.io.File;
+import java.io.IOException;
 
+import org.apache.catalina.Context;
 import org.apache.catalina.startup.SimpleHttpClient;
+import org.apache.catalina.startup.TesterServlet;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 
@@ -171,6 +173,66 @@ public class TestAbstractHttp11Processor extends TomcatBaseTest {
     }
 
 
+    public void testPipelining() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+        
+        // Must have a real docBase - just use temp
+        Context ctxt = tomcat.addContext("",
+                System.getProperty("java.io.tmpdir"));
+        
+        // Add protected servlet
+        Tomcat.addServlet(ctxt, "TesterServlet", new TesterServlet());
+        ctxt.addServletMapping("/foo", "TesterServlet");
+        
+        tomcat.start();
+
+        String requestPart1 =
+            "GET /foo HTTP/1.1" + SimpleHttpClient.CRLF;
+        String requestPart2 =
+            "Host: any" + SimpleHttpClient.CRLF +
+            SimpleHttpClient.CRLF;
+
+        final Client client = new Client();
+        client.setPort(getPort());
+        client.setRequest(new String[] {requestPart1, requestPart2});
+        client.setRequestPause(1000);
+        client.setUseContentLength(true);
+        client.connect();
+
+        Runnable send = new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    client.sendRequest();
+                    client.sendRequest();
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        };
+        Thread t = new Thread(send);
+        t.start();
+        
+        // Sleep for 1500 ms which should mean the all of request 1 has been
+        // sent and half of request 2
+        Thread.sleep(1500);
+        
+        // Now read the first response
+        client.readResponse(true);
+        assertFalse(client.isResponse50x());
+        assertTrue(client.isResponse200());
+        assertEquals("OK", client.getResponseBody());
+        
+        // Read the second response. No need to sleep, read will block until
+        // there is data to process
+        client.readResponse(true);
+        assertFalse(client.isResponse50x());
+        assertTrue(client.isResponse200());
+        assertEquals("OK", client.getResponseBody());
+    }
+    
     private static final class Client extends SimpleHttpClient {
         @Override
         public boolean isResponseBodyOK() {
