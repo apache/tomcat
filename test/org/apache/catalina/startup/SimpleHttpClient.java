@@ -67,6 +67,7 @@ public abstract class SimpleHttpClient {
     private String responseLine;
     private List<String> responseHeaders = new ArrayList<String>();
     private String responseBody;
+    private boolean useContentLength;
 
     public void setPort(int thePort) {
         port = thePort;
@@ -98,6 +99,10 @@ public abstract class SimpleHttpClient {
 
     public String getResponseBody() {
         return responseBody;
+    }
+
+    public void setUseContentLength(boolean b) {
+        useContentLength = b;
     }
 
     public String getSessionId() {
@@ -174,18 +179,28 @@ public abstract class SimpleHttpClient {
         
         // Put the headers into the map
         String line = readLine();
+        int cl = -1;
         while (line!=null && line.length() > 0) {
             responseHeaders.add(line);
             line = readLine();
+            if (line != null && line.startsWith("Content-Length: ")) {
+                cl = Integer.parseInt(line.substring(16));
+            }
         }
         
         // Read the body, if any
         StringBuilder builder = new StringBuilder();
         if (readBody) {
-            line = readLine();
-            while (line != null) {
-                builder.append(line);
+            if (cl > -1 && useContentLength) {
+                char[] body = new char[cl];
+                reader.read(body);
+                builder.append(body);
+            } else {
                 line = readLine();
+                while (line != null) {
+                    builder.append(line);
+                    line = readLine();
+                }
             }
         }
         responseBody = builder.toString();
