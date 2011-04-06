@@ -58,6 +58,14 @@
       </update>
     </changelog>
   </subsection>
+  <subsection name="Coyote">
+    <changelog>
+      <fix>
+        <bug>50957</bug>: Fix regression in HTTP BIO connector that triggered
+        errors when processing pipe-lined requests. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Web applications">
     <changelog>
       <update>
