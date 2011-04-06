@@ -73,6 +73,9 @@
         conf/catalina.policy file when the documentation is built, rather
         than maintaining a copy of its content. (kkolinko)
       </update>
+      <fix>
+        Fix broken stylesheet URL in XML based manager status output. (rjung)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
