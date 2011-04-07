@@ -555,23 +555,8 @@ public abstract class Compiler {
      * Remove generated files
      */
     public void removeGeneratedFiles() {
-        try {
-            String classFileName = ctxt.getClassFileName();
-            if (classFileName != null) {
-                File classFile = new File(classFileName);
-                if (log.isDebugEnabled())
-                    log.debug("Deleting " + classFile);
-                if (classFile.exists()) {
-                    if (!classFile.delete()) {
-                        log.warn(Localizer.getMessage(
-                                "jsp.warning.compiler.classfile.delete.fail",
-                                classFile.getAbsolutePath()));
-                    }
-                }
-            }
-        } catch (Exception e) {
-            // Remove as much as possible, ignore possible exceptions
-        }
+        removeGeneratedClassFiles();
+
         try {
             String javaFileName = ctxt.getServletJavaFileName();
             if (javaFileName != null) {
@@ -587,7 +572,9 @@ public abstract class Compiler {
                 }
             }
         } catch (Exception e) {
-            // Remove as much as possible, ignore possible exceptions
+            // Remove as much as possible, log possible exceptions
+            log.warn(Localizer.getMessage("jsp.warning.compiler.classfile.delete.fail.unknown"),
+                     e);
         }
     }
 
@@ -607,7 +594,9 @@ public abstract class Compiler {
                 }
             }
         } catch (Exception e) {
-            // Remove as much as possible, ignore possible exceptions
+            // Remove as much as possible, log possible exceptions
+            log.warn(Localizer.getMessage("jsp.warning.compiler.classfile.delete.fail.unknown"),
+                     e);
         }
     }
 }
