@@ -1106,7 +1106,46 @@
 
 </section>
 
+<section name="Stuck Thread Detection Valve">
 
+  <subsection name="Introduction">
+  
+    <p>This valve allows to detect requests that take a long time to process, which might 
+    indicate that the thread that is processing it is stuck.</p>
+    <p>When such a request is detected, the current stack trace of its thread is written 
+    to tomcat log with a WARN level.</p>
+    <p>The IDs of the stuck threads are available through JMX in the 
+    <code>stuckThreadIds</code> attribute. The JVM Thread MBean can then be used to 
+    retrieve other information about each stuck thread (name, stack trace...).</p>
+
+  </subsection>
+
+  <subsection name="Attributes">
+
+    <p>The <strong>Stuck Thread Detection Valve</strong> supports the
+    following configuration attributes:</p>
+
+    <attributes>
+
+      <attribute name="className" required="true">
+        <p>Java class name of the implementation to use.  This MUST be set to
+        <strong>org.apache.catalina.valves.StuckThreadDetectionValve</strong>.
+        </p>
+      </attribute>
+
+      <attribute name="threshold" required="false">
+        <p>Minimum duration in seconds after which a thread is considered stuck. 
+        Default is 600 seconds. If set to 0, the detection is disabled.</p>
+        <p>Note: since the detection is done in the background thread of the Container
+        (Engine, Host or Context) declaring this Valve, the threshold should be higher 
+        than the <code>backgroundProcessorDelay</code> of this Container.</p>
+      </attribute>
+
+    </attributes>
+
+  </subsection>
+
+</section>
 </body>
 
 

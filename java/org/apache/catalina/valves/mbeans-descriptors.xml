@@ -390,4 +390,41 @@
                writeable="false" />
                
   </mbean>
+
+  <mbean name="StuckThreadDetectionValve"
+         description="Detect long requests for which their thread might be stuck"
+         domain="Catalina"
+         group="Valve"
+         type="org.apache.catalina.valves.StuckThreadDetectionValve">
+
+    <attribute name="asyncSupported"
+               description="Does this valve support async reporting."
+               is="true"
+               type="boolean"/>
+
+    <attribute name="className"
+               description="Fully qualified class name of the managed object"
+               type="java.lang.String"
+               writeable="false"/>
+
+    <attribute name="info"
+               description="Information about this implementation"
+               type="java.lang.String"
+               writeable="false"/>
+
+    <attribute name="stateName"
+               description="The name of the LifecycleState that this component is currently in"
+               type="java.lang.String"
+               writeable="false"/>
+
+    <attribute name="stuckThreadIds"
+               description="IDs of the thread currently considered stuck. Each ID can then be used with the ThreadMXBean to retrieve data about it."
+               type="long[]"
+               writeable="false"/>
+
+    <attribute name="threshold"
+               description="Duration in seconds after which a request is considered as stuck"
+               type="int"/>
+
+  </mbean>
 </mbeans-descriptors>
