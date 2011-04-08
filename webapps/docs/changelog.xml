@@ -56,6 +56,11 @@
         print not just the value of the first header, but of the all of them,
         separated by commas. (kkolinko)
       </update>
+      <add>
+        <bug>50306</bug>: New StuckThreadDetectionValve to detect requests that take a 
+        long time to process, which might indicate that their processing threads are 
+        stuck. (slaurent)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
