@@ -117,14 +117,15 @@ public abstract class SimpleHttpClient {
     }
 
     public void connect(int connectTimeout, int soTimeout) throws UnknownHostException, IOException {
+        final String encoding = "ISO-8859-1";
         SocketAddress addr = new InetSocketAddress("localhost", port);
         socket = new Socket();
         socket.setSoTimeout(soTimeout);
         socket.connect(addr,connectTimeout);
         OutputStream os = socket.getOutputStream();
-        writer = new OutputStreamWriter(os);
+        writer = new OutputStreamWriter(os, encoding);
         InputStream is = socket.getInputStream();
-        Reader r = new InputStreamReader(is);
+        Reader r = new InputStreamReader(is, encoding);
         reader = new BufferedReader(r);
     }
     public void connect() throws UnknownHostException, IOException {
