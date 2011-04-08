@@ -59,7 +59,7 @@
       <add>
         <bug>50306</bug>: New StuckThreadDetectionValve to detect requests that take a 
         long time to process, which might indicate that their processing threads are 
-        stuck. (slaurent)
+        stuck. (slaurent, based on a patch provided by TomLu)
       </add>
     </changelog>
   </subsection>
