@@ -858,6 +858,31 @@ public class JspUtil {
         return false;
     }
 
+    public static boolean isJavaIdentifier(String key) {
+        // Should not be the case but check to be sure
+        if (key == null || key.length() == 0) {
+            return false;
+        }
+        
+        if (isJavaKeyword(key)) {
+            return false;
+        }
+
+        // Check the start character that has more restrictions
+        if (!Character.isJavaIdentifierStart(key.charAt(0))) {
+            return false;
+        }
+
+        // Check each remaining character used is permitted
+        for (int idx = 1; idx < key.length(); idx++) {
+            if (!Character.isJavaIdentifierPart(key.charAt(idx))) {
+                return false;
+            }
+        }
+        
+        return true;
+    }
+
     static InputStreamReader getReader(String fname, String encoding,
             JarFile jarFile, JspCompilationContext ctxt, ErrorDispatcher err)
             throws JasperException, IOException {
