@@ -57,9 +57,9 @@
         separated by commas. (kkolinko)
       </update>
       <add>
-        <bug>50306</bug>: New StuckThreadDetectionValve to detect requests that take a 
-        long time to process, which might indicate that their processing threads are 
-        stuck. Based on a patch provided by TomLu. (slaurent)
+        <bug>50306</bug>: New StuckThreadDetectionValve to detect requests that
+        take a long time to process, which might indicate that their processing
+        threads are stuck. Based on a patch provided by TomLu. (slaurent)
       </add>
     </changelog>
   </subsection>
@@ -69,6 +69,14 @@
         <bug>50957</bug>: Fix regression in HTTP BIO connector that triggered
         errors when processing pipe-lined requests. (markt)
       </fix>
+    </changelog>
+  </subsection>
+  <subsection name="Jasper">
+    <changelog>
+      <add>
+        Label JSP/tag file line and column numbers when reporting errors since
+        it may not be immediately obvious what the numbers represent. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Web applications">

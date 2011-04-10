@@ -38,8 +38,8 @@ class DefaultErrorHandler implements ErrorHandler {
     @Override
     public void jspError(String fname, int line, int column, String errMsg,
             Exception ex) throws JasperException {
-        throw new JasperException(fname + "(" + line + "," + column + ")"
-                + " " + errMsg, ex);
+        throw new JasperException(fname + "(line: " + line + ", column: " +
+                column + ")" + " " + errMsg, ex);
     }
     
     /*
