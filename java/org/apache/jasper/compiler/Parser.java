@@ -593,6 +593,18 @@ class Parser implements TagConstants {
      */
     private void parseAttributeDirective(Node parent) throws JasperException {
         Attributes attrs = parseAttributes();
+        // JSP.8.3 says the variable created for each attribute must have the
+        // same name as the attribute. Therefore, the names must be valid Java
+        // identifiers
+        if (attrs != null && attrs.getLength() > 0) {
+            for (int i = 0; i < attrs.getLength(); i++) {
+                if ("name".equals(attrs.getLocalName(i)) &&
+                        !JspUtil.isJavaIdentifier(attrs.getValue(i))) {
+                    err.jspError(start, "jsp.error.identifier",
+                            attrs.getValue(i));
+                }
+            }
+        }
         new Node.AttributeDirective(attrs, start, parent);
     }
 
