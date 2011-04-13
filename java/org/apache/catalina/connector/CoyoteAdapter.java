@@ -271,7 +271,7 @@ public class CoyoteAdapter implements Adapter {
             if (!request.isAsync() && !comet) {
                 // Error or timeout - need to tell listeners the request is over
                 // Have to test this first since state may change while in this
-                // method and this is only required if entering this methos in
+                // method and this is only required if entering this method in
                 // this state 
                 Context ctxt = (Context) request.getMappingData().context;
                 if (ctxt != null) {
