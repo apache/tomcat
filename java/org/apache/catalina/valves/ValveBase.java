@@ -64,7 +64,7 @@ public abstract class ValveBase extends LifecycleMBeanBase
 
     //------------------------------------------------------ Instance Variables
     /**
-     * Does this valve support async reporting
+     * Does this valve support Servlet 3+ async requests?
      */
     protected boolean asyncSupported;
     
