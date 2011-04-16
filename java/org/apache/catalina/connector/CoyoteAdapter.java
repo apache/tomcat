@@ -317,6 +317,10 @@ public class CoyoteAdapter implements Adapter {
                 request.finishRequest();
                 response.finishResponse();
                 req.action(ActionCode.POST_REQUEST , null);
+                ((Context) request.getMappingData().context).logAccess(
+                        request, response,
+                        System.currentTimeMillis() - req.getStartTime(),
+                        false);
             }
 
         } catch (IOException e) {
