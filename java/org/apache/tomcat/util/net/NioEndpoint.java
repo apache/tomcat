@@ -1344,13 +1344,16 @@ public class NioEndpoint extends AbstractEndpoint {
                             nextExpiration = (nextTime < nextExpiration)?nextTime:nextExpiration;
                         }
                     } else if (ka.isAsync() || ka.getComet()) {
-                        long delta = now - ka.getLastAccess();
-                        long timeout = (ka.getTimeout()==-1)?((long) socketProperties.getSoTimeout()):(ka.getTimeout());
-                        boolean isTimedout = delta > timeout;
-                        if (isTimedout) {
-                            // Prevent subsequent timeouts if the timeout event takes a while to process
-                            ka.access(Long.MAX_VALUE);
-                            processSocket(ka.getChannel(), SocketStatus.TIMEOUT, true);
+                        // Async requests with a timeout of 0 or less never timeout
+                        if (!ka.isAsync() || ka.getTimeout() > 0) {
+                            long delta = now - ka.getLastAccess();
+                            long timeout = (ka.getTimeout()==-1)?((long) socketProperties.getSoTimeout()):(ka.getTimeout());
+                            boolean isTimedout = delta > timeout;
+                            if (isTimedout) {
+                                // Prevent subsequent timeouts if the timeout event takes a while to process
+                                ka.access(Long.MAX_VALUE);
+                                processSocket(ka.getChannel(), SocketStatus.TIMEOUT, true);
+                            }
                         }
                     }//end if
                 }catch ( CancelledKeyException ckx ) {
