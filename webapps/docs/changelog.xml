@@ -69,6 +69,11 @@
         <bug>51042</bug>: Don&apos;t trigger session creation listeners when a
         session ID is changed as part of the authentication process. (markt)
       </fix>
+      <fix>
+        <bug>51050</bug>: Add additional common but non-standard file extension
+        to MIME type mappings for MPEG 4 files. Based on a patch by Cédrik Lime.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
