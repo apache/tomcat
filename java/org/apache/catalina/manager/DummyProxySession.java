@@ -169,6 +169,12 @@ public class DummyProxySession implements Session {
     }
 
     @Override
+    public void setId(String id, boolean notify) {
+        this.sessionId = id;
+        // Ignore notify
+    }
+
+    @Override
     public void setManager(Manager manager) {
         // NOOP
     }

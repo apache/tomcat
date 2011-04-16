@@ -65,6 +65,10 @@
         <bug>51038</bug>: Ensure that asynchronous requests are included in
         access logs. (markt)
       </fix>
+      <fix>
+        <bug>51042</bug>: Don&apos;t trigger session creation listeners when a
+        session ID is changed as part of the authentication process. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

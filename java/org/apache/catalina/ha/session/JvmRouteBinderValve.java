@@ -359,8 +359,7 @@ public class JvmRouteBinderValve extends ValveBase implements ClusterValve {
     protected void changeSessionID(Request request, String sessionId,
             String newSessionID, Session catalinaSession) {
         fireLifecycleEvent("Before session migration", catalinaSession);
-        // FIXME: setId trigger session Listener, but only chance to register manager with correct id!
-        catalinaSession.setId(newSessionID);
+        catalinaSession.setId(newSessionID, false);
         // FIXME: Why we remove change data from other running request?
         // setId also trigger resetDeltaRequest!!
         if (catalinaSession instanceof DeltaSession)

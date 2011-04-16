@@ -374,6 +374,15 @@ public class StandardSession implements HttpSession, Session, Serializable {
      */
     @Override
     public void setId(String id) {
+        setId(id, true);
+    }
+
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setId(String id, boolean notify) {
 
         if ((this.id != null) && (manager != null))
             manager.remove(this);
@@ -382,7 +391,10 @@ public class StandardSession implements HttpSession, Session, Serializable {
 
         if (manager != null)
             manager.add(this);
-        tellNew();
+        
+        if (notify) {
+            tellNew();
+        }
     }
 
 
