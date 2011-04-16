@@ -851,7 +851,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         wrapper.setAsyncSupported(true);
         ctx.addServletMapping("/stage1", "dispatch");
 
-        ErrorServlet error = new ErrorServlet();
+        ErrorServlet error = new ErrorServlet(true);
         Tomcat.addServlet(ctx, "error", error);
         ctx.addServletMapping("/stage2", "error");
 
@@ -897,11 +897,19 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
 
         private static final long serialVersionUID = 1L;
 
+        private boolean flush = false;
+
+        public ErrorServlet(boolean flush) {
+            this.flush = flush;
+        }
+        
         @Override
         protected void doGet(HttpServletRequest req, HttpServletResponse resp)
                 throws ServletException, IOException {
             resp.getWriter().write("ErrorServletGet-");
-            resp.flushBuffer();
+            if (flush) {
+                resp.flushBuffer();
+            }
             throw new ServletException("Opps.");
         }
     }
@@ -1043,5 +1051,46 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
                 } 
             }); 
         }
+    }
+
+    public void testErrorHandling() throws Exception {
+        // Setup Tomcat instance
+        Tomcat tomcat = getTomcatInstance();
+        
+        // Must have a real docBase - just use temp
+        File docBase = new File(System.getProperty("java.io.tmpdir"));
+        
+        Context ctx = tomcat.addContext("", docBase.getAbsolutePath());
+
+        ErrorServlet error = new ErrorServlet(false);
+        Tomcat.addServlet(ctx, "error", error);
+        ctx.addServletMapping("/error", "error");
+
+        TesterAccessLogValve alv = new TesterAccessLogValve();
+        ctx.getPipeline().addValve(alv);
+        
+        tomcat.start();
+        
+        StringBuilder url = new StringBuilder(48);
+        url.append("http://localhost:");
+        url.append(getPort());
+        url.append("/error");
+        
+        int rc = getUrl(url.toString(), new ByteChunk(), null);
+        
+        assertEquals(500, rc);
+        
+        // Without this test may complete before access log has a chance to log
+        // the request
+        Thread.sleep(REQUEST_TIME);
+        
+        // Check the access log
+        List<Entry> entries = alv.getEntries();
+        assertEquals(1, entries.size());
+        Entry entry = entries.get(0);
+        assertEquals(500, entry.getStatus());
+        assertTrue(entry.toString(), entry.getTime() > 0);
+        assertTrue(entry.toString(), entry.getTime() < REQUEST_TIME);
+
     }
 }
