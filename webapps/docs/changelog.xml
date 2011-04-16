@@ -82,6 +82,11 @@
         <bug>50957</bug>: Fix regression in HTTP BIO connector that triggered
         errors when processing pipe-lined requests. (markt)
       </fix>
+      <fix>
+        <bug>50158</bug>: Ensure the asynchronous requests never timeout if the
+        timeout is set to zero or less. Based on a patch provided by Chris.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
