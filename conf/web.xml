@@ -690,6 +690,22 @@
         <mime-type>audio/x-mpegurl</mime-type>
     </mime-mapping>
     <mime-mapping>
+        <extension>m4a</extension>
+        <mime-type>audio/mp4</mime-type>
+    </mime-mapping>
+    <mime-mapping>
+        <extension>m4b</extension>
+        <mime-type>audio/mp4</mime-type>
+    </mime-mapping>
+    <mime-mapping>
+        <extension>m4r</extension>
+        <mime-type>audio/mp4</mime-type>
+    </mime-mapping>
+    <mime-mapping>
+        <extension>m4v</extension>
+        <mime-type>video/mp4</mime-type>
+    </mime-mapping>
+    <mime-mapping>
         <extension>mac</extension>
         <mime-type>image/x-macpaint</mime-type>
     </mime-mapping>
