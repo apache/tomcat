@@ -1024,7 +1024,8 @@ public class AprEndpoint extends AbstractEndpoint {
                     SocketWrapper<Long> socket = sockets.next();
                     if (socket.async) {
                         long access = socket.getLastAccess();
-                        if ((now-access)>socket.getTimeout()) {
+                        if (socket.getTimeout() > 0 &&
+                                (now-access)>socket.getTimeout()) {
                             processSocketAsync(socket,SocketStatus.TIMEOUT);
                         }
                     }

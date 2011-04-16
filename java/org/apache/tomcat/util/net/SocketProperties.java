@@ -173,8 +173,8 @@ public class SocketProperties {
     protected Integer performanceBandwidth = null;
     
     /**
-     * The minimum frequency of the timeout interval to avoid the 
-     * poller going boinkers during high traffic
+     * The minimum frequency of the timeout interval to avoid excess load from
+     * the poller during high traffic
      */
     protected long timeoutInterval = 1000;
     
