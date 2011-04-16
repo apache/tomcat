@@ -244,16 +244,16 @@ public class DeltaSession extends StandardSession implements Externalizable,Clus
         this.isPrimarySession = primarySession;
     }
 
+
     /**
-     * Set the session identifier for this session without notify listeners.
-     *
-     * @param id
-     *            The new session identifier
+     * {@inheritDoc}
      */
-    public void setIdInternal(String id) {
-        this.id = id;
+    @Override
+    public void setId(String id, boolean notify) {
+        super.setId(id, notify);
         resetDeltaRequest();
     }
+
 
     /**
      * Set the session identifier for this session.
