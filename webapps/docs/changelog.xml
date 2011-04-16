@@ -61,6 +61,10 @@
         take a long time to process, which might indicate that their processing
         threads are stuck. Based on a patch provided by TomLu. (slaurent)
       </add>
+      <fix>
+        <bug>51038</bug>: Ensure that asynchronous requests are included in
+        access logs. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

@@ -39,9 +39,16 @@ import org.apache.catalina.Wrapper;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.catalina.valves.TesterAccessLogValve;
+import org.apache.catalina.valves.TesterAccessLogValve.Entry;
 import org.apache.tomcat.util.buf.ByteChunk;
 
 public class TestAsyncContextImpl extends TomcatBaseTest {
+
+    // Time for a request to process (need to allow for threads to start etc.)
+    private static final long REQUEST_TIME = 500;
+    // Timeout thread (where used) checks for timeout every second
+    private static final long TIMEOUT_MARGIN = 1000;
 
     public void testBug49528() throws Exception {
         // Setup Tomcat instance
@@ -57,6 +64,9 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         wrapper.setAsyncSupported(true);
         ctx.addServletMapping("/", "servlet");
         
+        TesterAccessLogValve alv = new TesterAccessLogValve();
+        ctx.getPipeline().addValve(alv);
+        
         tomcat.start();
         
         // Call the servlet once
@@ -71,6 +81,16 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         }
 
         assertEquals("1false2true3true4true5false", servlet.getResult());
+
+        // Check the access log
+        List<Entry> entries = alv.getEntries();
+        assertEquals(1, entries.size());
+        Entry entry = entries.get(0);
+        assertEquals(200, entry.getStatus());
+        assertTrue(entry.toString(), entry.getTime() >
+                Bug49528Servlet.THREAD_SLEEP_TIME);
+        assertTrue(entry.toString(), entry.getTime() <
+                Bug49528Servlet.THREAD_SLEEP_TIME + REQUEST_TIME);
     }
     
     public void testBug49567() throws Exception {
@@ -87,6 +107,9 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         wrapper.setAsyncSupported(true);
         ctx.addServletMapping("/", "servlet");
         
+        TesterAccessLogValve alv = new TesterAccessLogValve();
+        ctx.getPipeline().addValve(alv);
+        
         tomcat.start();
         
         // Call the servlet once
@@ -101,6 +124,16 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         }
 
         assertEquals("1false2true3true4true5false", servlet.getResult());
+
+        // Check the access log
+        List<Entry> entries = alv.getEntries();
+        assertEquals(1, entries.size());
+        Entry entry = entries.get(0);
+        assertEquals(200, entry.getStatus());
+        assertTrue(entry.toString(), entry.getTime() >
+        Bug49567Servlet.THREAD_SLEEP_TIME);
+        assertTrue(entry.toString(), entry.getTime() <
+                Bug49567Servlet.THREAD_SLEEP_TIME + REQUEST_TIME);
     }
     
     public void testAsyncStartNoComplete() throws Exception {
@@ -122,6 +155,9 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         wrapper.setAsyncSupported(true);
         ctx.addServletMapping("/", "servlet");
         
+        TesterAccessLogValve alv = new TesterAccessLogValve();
+        ctx.getPipeline().addValve(alv);
+        
         tomcat.start();
         
         // Call the servlet the first time
@@ -133,6 +169,18 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         ByteChunk bc2 = getUrl("http://localhost:" + getPort() +
                 "/?echo=run2");
         assertEquals("OK-run2", bc2.toString());
+        
+        // Check the access log
+        List<Entry> entries = alv.getEntries();
+        assertEquals(2, entries.size());
+        for (Entry entry : entries) {
+            assertEquals(200, entry.getStatus());
+            assertTrue(entry.toString(), entry.getTime() >
+                    AsyncStartNoCompleteServlet.ASYNC_TIMEOUT);
+            assertTrue(entry.toString(), entry.getTime() <
+                    AsyncStartNoCompleteServlet.ASYNC_TIMEOUT + TIMEOUT_MARGIN +
+                            REQUEST_TIME);
+        }
     }
     
     public void testAsyncStartWithComplete() throws Exception {
@@ -150,11 +198,21 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         wrapper.setAsyncSupported(true);
         ctx.addServletMapping("/", "servlet");
         
+        TesterAccessLogValve alv = new TesterAccessLogValve();
+        ctx.getPipeline().addValve(alv);
+        
         tomcat.start();
         
         // Call the servlet once
         ByteChunk bc = getUrl("http://localhost:" + getPort() + "/");
         assertEquals("OK", bc.toString());
+
+        // Check the access log
+        List<Entry> entries = alv.getEntries();
+        assertEquals(1, entries.size());
+        Entry entry = entries.get(0);
+        assertEquals(200, entry.getStatus());
+        assertTrue(entry.toString(), entry.getTime() < REQUEST_TIME);
     }
     
     /*
@@ -168,6 +226,8 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         
         private StringBuilder result;
         
+        public static final long THREAD_SLEEP_TIME = 1000;
+
         public String getResult() {
             return result.toString();
         }
@@ -194,7 +254,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
                     try {
                         result.append('3');
                         result.append(req.isAsyncStarted());
-                        Thread.sleep(1000);
+                        Thread.sleep(THREAD_SLEEP_TIME);
                         result.append('4');
                         result.append(req.isAsyncStarted());
                         resp.setContentType("text/plain");
@@ -227,6 +287,8 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         
         private StringBuilder result;
         
+        public static final long THREAD_SLEEP_TIME = 1000;
+
         public String getResult() {
             return result.toString();
         }
@@ -256,7 +318,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
                             try {
                                 result.append('3');
                                 result.append(req.isAsyncStarted());
-                                Thread.sleep(1000);
+                                Thread.sleep(THREAD_SLEEP_TIME);
                                 result.append('4');
                                 result.append(req.isAsyncStarted());
                                 resp.setContentType("text/plain");
@@ -283,6 +345,8 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
     
     private static class AsyncStartNoCompleteServlet extends HttpServlet {
 
+        public static final long ASYNC_TIMEOUT = 1000;
+        
         private static final long serialVersionUID = 1L;
         
         @Override
@@ -298,7 +362,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
                 resp.getWriter().print("-" + echo);
             }
             // Speed up the test by reducing the timeout
-            actxt.setTimeout(1000);
+            actxt.setTimeout(ASYNC_TIMEOUT);
         }
     }
 
@@ -363,6 +427,9 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
 
         ctx.addApplicationListener(TrackingRequestListener.class.getName());
 
+        TesterAccessLogValve alv = new TesterAccessLogValve();
+        ctx.getPipeline().addValve(alv);
+        
         tomcat.start();
         ByteChunk res = getUrl("http://localhost:" + getPort() + "/async");
         StringBuilder expected = new StringBuilder("requestInitialized-");
@@ -377,6 +444,16 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         }
         expected.append("requestDestroyed");
         assertEquals(expected.toString(), res.toString());
+
+        // Check the access log
+        List<Entry> entries = alv.getEntries();
+        assertEquals(1, entries.size());
+        Entry entry = entries.get(0);
+        assertEquals(200, entry.getStatus());
+        assertTrue(entry.toString(), entry.getTime() >
+                TimeoutServlet.ASYNC_TIMEOUT);
+        assertTrue(entry.toString(), entry.getTime() <
+                TimeoutServlet.ASYNC_TIMEOUT + TIMEOUT_MARGIN + REQUEST_TIME);
     }
     
     private static class TimeoutServlet extends HttpServlet {
@@ -384,6 +461,8 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
 
         private boolean completeOnTimeout;
         private String dispatchUrl;
+
+        public static final long ASYNC_TIMEOUT = 3000;
 
         public TimeoutServlet(boolean completeOnTimeout, String dispatchUrl) {
             this.completeOnTimeout = completeOnTimeout;
@@ -396,7 +475,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
             if (req.isAsyncSupported()) {
                 resp.getWriter().print("TimeoutServletGet-");
                 final AsyncContext ac = req.startAsync();
-                ac.setTimeout(3000);
+                ac.setTimeout(ASYNC_TIMEOUT);
                 
                 ac.addListener(new TrackingListener(
                         false, completeOnTimeout, dispatchUrl));
@@ -450,6 +529,9 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
 
         ctx.addApplicationListener(TrackingRequestListener.class.getName());
 
+        TesterAccessLogValve alv = new TesterAccessLogValve();
+        ctx.getPipeline().addValve(alv);
+        
         tomcat.start();
         
         StringBuilder url = new StringBuilder(48);
@@ -471,6 +553,14 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         expected.append("NonAsyncServletGet-");
         expected.append("requestDestroyed");
         assertEquals(expected.toString(), res.toString());
+        
+        // Check the access log
+        List<Entry> entries = alv.getEntries();
+        assertEquals(1, entries.size());
+        Entry entry = entries.get(0);
+        assertEquals(200, entry.getStatus());
+        assertTrue(entry.toString(), entry.getTime() > 0);
+        assertTrue(entry.toString(), entry.getTime() < REQUEST_TIME);
     }
     
     private static class DispatchingServlet extends HttpServlet {
@@ -547,6 +637,9 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         wrapper2.setAsyncSupported(true);
         ctx.addServletMapping("/stage2", "timeout");
 
+        TesterAccessLogValve alv = new TesterAccessLogValve();
+        ctx.getPipeline().addValve(alv);
+        
         tomcat.start();
         
         StringBuilder url = new StringBuilder(48);
@@ -560,6 +653,16 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
                 "DispatchingServletGet-DispatchingServletGet-onStartAsync-" +
                 "TimeoutServletGet-onStartAsync-onTimeout-onComplete-",
                 res.toString());
+
+        // Check the access log
+        List<Entry> entries = alv.getEntries();
+        assertEquals(1, entries.size());
+        Entry entry = entries.get(0);
+        assertEquals(200, entry.getStatus());
+        assertTrue(entry.toString(), entry.getTime() >
+                TimeoutServlet.ASYNC_TIMEOUT);
+        assertTrue(entry.toString(), entry.getTime() <
+                TimeoutServlet.ASYNC_TIMEOUT + TIMEOUT_MARGIN + REQUEST_TIME);
     }
 
     private static class TrackingServlet extends HttpServlet {
@@ -754,6 +857,9 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
 
         ctx.addApplicationListener(TrackingRequestListener.class.getName());
 
+        TesterAccessLogValve alv = new TesterAccessLogValve();
+        ctx.getPipeline().addValve(alv);
+        
         tomcat.start();
         
         StringBuilder url = new StringBuilder(48);
@@ -777,6 +883,14 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         }
         expected.append("ErrorServletGet-onError-onComplete-requestDestroyed");
         assertEquals(expected.toString(), res.toString());
+        
+        // Check the access log
+        List<Entry> entries = alv.getEntries();
+        assertEquals(1, entries.size());
+        Entry entry = entries.get(0);
+        assertEquals(200, entry.getStatus());
+        assertTrue(entry.toString(), entry.getTime() > 0);
+        assertTrue(entry.toString(), entry.getTime() < REQUEST_TIME);
     }
     
     private static class ErrorServlet extends HttpServlet {
@@ -806,20 +920,31 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         wrapper.setAsyncSupported(true);
         ctx.addServletMapping("/", "servlet");
 
-        ErrorServlet error = new ErrorServlet();
-        Tomcat.addServlet(ctx, "error", error);
-        ctx.addServletMapping("/stage2", "error");
-
+        TesterAccessLogValve alv = new TesterAccessLogValve();
+        ctx.getPipeline().addValve(alv);
+        
         tomcat.start();
         
         ByteChunk res = getUrl("http://localhost:" + getPort() + "/");
         
         assertEquals("Runnable-onComplete-", res.toString());
+
+        // Check the access log
+        List<Entry> entries = alv.getEntries();
+        assertEquals(1, entries.size());
+        Entry entry = entries.get(0);
+        assertEquals(200, entry.getStatus());
+        assertTrue(entry.toString(), entry.getTime() >
+        AsyncStartRunnable.THREAD_SLEEP_TIME);
+        assertTrue(entry.toString(), entry.getTime() <
+                AsyncStartRunnable.THREAD_SLEEP_TIME + REQUEST_TIME);
     }
     
     private static final class AsyncStartRunnable extends HttpServlet {
         
         private static final long serialVersionUID = 1L;
+
+        public static final long THREAD_SLEEP_TIME = 3000;
 
         @Override
         protected void doGet(HttpServletRequest request,
@@ -836,7 +961,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
                 @Override
                 public void run() {
                     try {
-                        Thread.sleep(3 * 1000);
+                        Thread.sleep(THREAD_SLEEP_TIME);
                         asyncContext.getResponse().getWriter().write(
                                 "Runnable-");
                         asyncContext.complete();
@@ -862,6 +987,9 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         wrapper.setAsyncSupported(true);
         ctx.addServletMapping("/", "servlet");
         
+        TesterAccessLogValve alv = new TesterAccessLogValve();
+        ctx.getPipeline().addValve(alv);
+        
         tomcat.start();
         
         // Call the servlet once
@@ -875,11 +1003,24 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         assertNotNull(testHeader);
         assertEquals(1, testHeader.size());
         assertEquals("xyz",testHeader.get(0));
+        
+        // Check the access log
+        List<Entry> entries = alv.getEntries();
+        assertEquals(1, entries.size());
+        Entry entry = entries.get(0);
+        assertEquals(200, entry.getStatus());
+        assertTrue(entry.toString(), entry.getTime() >
+        Bug50753Servlet.THREAD_SLEEP_TIME);
+        assertTrue(entry.toString(), entry.getTime() <
+                Bug50753Servlet.THREAD_SLEEP_TIME + REQUEST_TIME);
+
     }
 
     private static class Bug50753Servlet extends HttpServlet {
 
         private static final long serialVersionUID = 1L;
+
+        public static final long THREAD_SLEEP_TIME = 5000;
 
         @Override
         protected void doGet(HttpServletRequest req,
@@ -890,7 +1031,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
                 @Override
                 public void run() { 
                     try { 
-                        Thread.sleep(5000); 
+                        Thread.sleep(THREAD_SLEEP_TIME); 
                         resp.setHeader("A", "xyz"); 
                         resp.setContentType("text/plain"); 
                         resp.setContentLength("OK".getBytes().length); 
