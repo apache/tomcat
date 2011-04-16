@@ -768,7 +768,7 @@ public abstract class ManagerBase extends LifecycleMBeanBase
      */
     @Override
     public void changeSessionId(Session session) {
-        session.setId(generateSessionId());
+        session.setId(generateSessionId(), false);
     }
     
     

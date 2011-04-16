@@ -118,11 +118,23 @@ public interface Session {
 
 
     /**
-     * Set the session identifier for this session.
+     * Set the session identifier for this session and notifies any associated
+     * listeners that a new session has been created.
      *
      * @param id The new session identifier
      */
     public void setId(String id);
+
+
+    /**
+     * Set the session identifier for this session and optionally notifies any
+     * associated listeners that a new session has been created.
+     *
+     * @param id        The new session identifier
+     * @param notify    Should any associated listeners be notified that a new
+     *                      session has been created? 
+     */
+    public void setId(String id, boolean notify);
 
 
     /**
