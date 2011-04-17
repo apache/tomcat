@@ -83,13 +83,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         assertEquals("1false2true3true4true5false", servlet.getResult());
 
         // Check the access log
-        List<Entry> entries = alv.getEntries();
-        assertEquals(1, entries.size());
-        Entry entry = entries.get(0);
-        assertEquals(200, entry.getStatus());
-        assertTrue(entry.toString(), entry.getTime() >
-                Bug49528Servlet.THREAD_SLEEP_TIME);
-        assertTrue(entry.toString(), entry.getTime() <
+        validateAccessLog(alv, 1, 200, Bug49528Servlet.THREAD_SLEEP_TIME,
                 Bug49528Servlet.THREAD_SLEEP_TIME + REQUEST_TIME);
     }
     
@@ -126,13 +120,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         assertEquals("1false2true3true4true5false", servlet.getResult());
 
         // Check the access log
-        List<Entry> entries = alv.getEntries();
-        assertEquals(1, entries.size());
-        Entry entry = entries.get(0);
-        assertEquals(200, entry.getStatus());
-        assertTrue(entry.toString(), entry.getTime() >
-        Bug49567Servlet.THREAD_SLEEP_TIME);
-        assertTrue(entry.toString(), entry.getTime() <
+        validateAccessLog(alv, 1, 200, Bug49567Servlet.THREAD_SLEEP_TIME,
                 Bug49567Servlet.THREAD_SLEEP_TIME + REQUEST_TIME);
     }
     
@@ -171,16 +159,10 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         assertEquals("OK-run2", bc2.toString());
         
         // Check the access log
-        List<Entry> entries = alv.getEntries();
-        assertEquals(2, entries.size());
-        for (Entry entry : entries) {
-            assertEquals(200, entry.getStatus());
-            assertTrue(entry.toString(), entry.getTime() >
-                    AsyncStartNoCompleteServlet.ASYNC_TIMEOUT);
-            assertTrue(entry.toString(), entry.getTime() <
-                    AsyncStartNoCompleteServlet.ASYNC_TIMEOUT + TIMEOUT_MARGIN +
-                            REQUEST_TIME);
-        }
+        validateAccessLog(alv, 2, 200,
+                AsyncStartNoCompleteServlet.ASYNC_TIMEOUT,
+                AsyncStartNoCompleteServlet.ASYNC_TIMEOUT + TIMEOUT_MARGIN +
+                        REQUEST_TIME);
     }
     
     public void testAsyncStartWithComplete() throws Exception {
@@ -208,11 +190,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         assertEquals("OK", bc.toString());
 
         // Check the access log
-        List<Entry> entries = alv.getEntries();
-        assertEquals(1, entries.size());
-        Entry entry = entries.get(0);
-        assertEquals(200, entry.getStatus());
-        assertTrue(entry.toString(), entry.getTime() < REQUEST_TIME);
+        validateAccessLog(alv, 1, 200, 0, REQUEST_TIME);
     }
     
     /*
@@ -375,6 +353,15 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
                 final HttpServletResponse resp)
                 throws ServletException, IOException {
             
+            // Ensure the request takes more than 0 ms to process
+            // 0ms processing time in access log usually indicates an error
+            try {
+                Thread.sleep(1);
+            } catch (InterruptedException ie) {
+                // Should never happen
+                throw new IOException(ie);
+            }
+
             AsyncContext actxt = req.startAsync();
             actxt.setTimeout(3000);
             resp.setContentType("text/plain");
@@ -446,13 +433,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         assertEquals(expected.toString(), res.toString());
 
         // Check the access log
-        List<Entry> entries = alv.getEntries();
-        assertEquals(1, entries.size());
-        Entry entry = entries.get(0);
-        assertEquals(200, entry.getStatus());
-        assertTrue(entry.toString(), entry.getTime() >
-                TimeoutServlet.ASYNC_TIMEOUT);
-        assertTrue(entry.toString(), entry.getTime() <
+        validateAccessLog(alv, 1, 200, TimeoutServlet.ASYNC_TIMEOUT,
                 TimeoutServlet.ASYNC_TIMEOUT + TIMEOUT_MARGIN + REQUEST_TIME);
     }
     
@@ -555,12 +536,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         assertEquals(expected.toString(), res.toString());
         
         // Check the access log
-        List<Entry> entries = alv.getEntries();
-        assertEquals(1, entries.size());
-        Entry entry = entries.get(0);
-        assertEquals(200, entry.getStatus());
-        assertTrue(entry.toString(), entry.getTime() > 0);
-        assertTrue(entry.toString(), entry.getTime() < REQUEST_TIME);
+        validateAccessLog(alv, 1, 200, 0, REQUEST_TIME);
     }
     
     private static class DispatchingServlet extends HttpServlet {
@@ -579,6 +555,16 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         @Override
         protected void doGet(HttpServletRequest req, HttpServletResponse resp)
                 throws ServletException, IOException {
+
+            // Ensure the request takes more than 0 ms to process
+            // 0ms processing time in access log usually indicates an error
+            try {
+                Thread.sleep(1);
+            } catch (InterruptedException ie) {
+                // Should never happen
+                throw new IOException(ie);
+            }
+
             resp.getWriter().write("DispatchingServletGet-");
             resp.flushBuffer();
             final int iter = Integer.parseInt(req.getParameter(ITER_PARAM)) - 1;
@@ -655,13 +641,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
                 res.toString());
 
         // Check the access log
-        List<Entry> entries = alv.getEntries();
-        assertEquals(1, entries.size());
-        Entry entry = entries.get(0);
-        assertEquals(200, entry.getStatus());
-        assertTrue(entry.toString(), entry.getTime() >
-                TimeoutServlet.ASYNC_TIMEOUT);
-        assertTrue(entry.toString(), entry.getTime() <
+        validateAccessLog(alv, 1, 200, TimeoutServlet.ASYNC_TIMEOUT,
                 TimeoutServlet.ASYNC_TIMEOUT + TIMEOUT_MARGIN + REQUEST_TIME);
     }
 
@@ -885,12 +865,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         assertEquals(expected.toString(), res.toString());
         
         // Check the access log
-        List<Entry> entries = alv.getEntries();
-        assertEquals(1, entries.size());
-        Entry entry = entries.get(0);
-        assertEquals(200, entry.getStatus());
-        assertTrue(entry.toString(), entry.getTime() > 0);
-        assertTrue(entry.toString(), entry.getTime() < REQUEST_TIME);
+        validateAccessLog(alv, 1, 200, 0, REQUEST_TIME);
     }
     
     private static class ErrorServlet extends HttpServlet {
@@ -938,13 +913,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         assertEquals("Runnable-onComplete-", res.toString());
 
         // Check the access log
-        List<Entry> entries = alv.getEntries();
-        assertEquals(1, entries.size());
-        Entry entry = entries.get(0);
-        assertEquals(200, entry.getStatus());
-        assertTrue(entry.toString(), entry.getTime() >
-        AsyncStartRunnable.THREAD_SLEEP_TIME);
-        assertTrue(entry.toString(), entry.getTime() <
+        validateAccessLog(alv, 1, 200, AsyncStartRunnable.THREAD_SLEEP_TIME,
                 AsyncStartRunnable.THREAD_SLEEP_TIME + REQUEST_TIME);
     }
     
@@ -1013,15 +982,8 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         assertEquals("xyz",testHeader.get(0));
         
         // Check the access log
-        List<Entry> entries = alv.getEntries();
-        assertEquals(1, entries.size());
-        Entry entry = entries.get(0);
-        assertEquals(200, entry.getStatus());
-        assertTrue(entry.toString(), entry.getTime() >
-        Bug50753Servlet.THREAD_SLEEP_TIME);
-        assertTrue(entry.toString(), entry.getTime() <
+        validateAccessLog(alv, 1, 200, Bug50753Servlet.THREAD_SLEEP_TIME,
                 Bug50753Servlet.THREAD_SLEEP_TIME + REQUEST_TIME);
-
     }
 
     private static class Bug50753Servlet extends HttpServlet {
@@ -1085,12 +1047,31 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         Thread.sleep(REQUEST_TIME);
         
         // Check the access log
-        List<Entry> entries = alv.getEntries();
-        assertEquals(1, entries.size());
-        Entry entry = entries.get(0);
-        assertEquals(500, entry.getStatus());
-        assertTrue(entry.toString(), entry.getTime() > 0);
-        assertTrue(entry.toString(), entry.getTime() < REQUEST_TIME);
+        validateAccessLog(alv, 1, 500, 0, REQUEST_TIME);
+    }
 
+    private void validateAccessLog(TesterAccessLogValve alv, int count,
+            int status, long minTime, long maxTime) throws Exception {
+        List<Entry> entries = alv.getEntries();
+        
+        // Assume one entry - wait until it appears (access log entry will be
+        // made after response has been returned to user)
+        for (int i = 0; i < 10 && entries.size() == 0; i++) {
+            Thread.sleep(100);
+        }
+        
+        assertEquals(count, entries.size());
+        for (int j = 0; j < count; j++) {
+            Entry entry = entries.get(j);
+            assertEquals(status, entry.getStatus());
+            // A 0ms entry in the access log normally indicates a processing
+            // error and we don't expect any of those for 200 responses
+            if (minTime == 0 && status == 200) {
+                assertTrue(entry.toString(), entry.getTime() > minTime);
+            } else {
+                assertTrue(entry.toString(), entry.getTime() >= minTime);
+            }
+            assertTrue(entry.toString(), entry.getTime() < maxTime);
+        }
     }
 }
