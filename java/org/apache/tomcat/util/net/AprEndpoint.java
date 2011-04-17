@@ -478,7 +478,17 @@ public class AprEndpoint extends AbstractEndpoint {
                 value = SSL.SSL_PROTOCOL_TLSV1;
             } else if ("SSLv2+SSLv3".equalsIgnoreCase(SSLProtocol)) {
                 value = SSL.SSL_PROTOCOL_SSLV2 | SSL.SSL_PROTOCOL_SSLV3;
+            } else if ("all".equalsIgnoreCase(SSLProtocol) ||
+                    SSLProtocol == null || SSLProtocol.length() == 0) {
+                // NOOP, use the default defined above
+            } else {
+                // Protocol not recognized, fail to start as it is safer than
+                // continuing with the default which might enable more than the
+                // is required
+                throw new Exception(sm.getString(
+                        "endpoint.apr.invalidSslProtocol", SSLProtocol));
             }
+
             // Create SSL Context
             sslContext = SSLContext.make(rootPool, value, SSL.SSL_MODE_SERVER);
             if (SSLInsecureRenegotiation) {
