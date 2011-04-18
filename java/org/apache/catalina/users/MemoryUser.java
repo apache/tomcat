@@ -116,6 +116,7 @@ public class MemoryUser extends AbstractUser {
     /**
      * Return the {@link UserDatabase} within which this User is defined.
      */
+    @Override
     public UserDatabase getUserDatabase() {
 
         return (this.database);
