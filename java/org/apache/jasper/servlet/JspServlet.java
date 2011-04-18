@@ -125,7 +125,6 @@ public class JspServlet extends HttpServlet implements PeriodicEventListener {
                 throw new ServletException("Can not locate jsp file", e);
             }
             try {
-                serviceJspFile(null, null, jspFile, null, true);
                 if (SecurityUtil.isPackageProtectionEnabled()){
                    AccessController.doPrivileged(new PrivilegedExceptionAction<Object>(){
                         @Override
