@@ -100,6 +100,10 @@
         Label JSP/tag file line and column numbers when reporting errors since
         it may not be immediately obvious what the numbers represent. (markt)
       </add>
+      <fix>
+        Correct a regression in the fix for <bug>49916</bug> that resulted in
+        JSPs being compiled twice rather than just once. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
