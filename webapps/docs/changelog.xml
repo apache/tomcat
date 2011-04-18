@@ -92,6 +92,13 @@
         if it is configured for SSL and an invalid value is provided for
         SSLProtocol. (markt)
       </fix>
+      <fix>
+        Align all the connector implementations with the documented default
+        setting for processorCache of 200. This changes the default from -1
+        (unlimited) for the AJP-BIO, AJP-APR and HTTP-APR connectors. Additional
+        information was also added to the documentation on how to select an
+        appropriate value. 
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">

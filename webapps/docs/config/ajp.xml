@@ -333,8 +333,11 @@
     <attribute name="processorCache" required="false">
       <p>The protocol handler caches Processor objects to speed up performance.
       This setting dictates how many of these objects get cached.
-      <code>-1</code> means unlimited, default is <code>200</code>. Set this
-      value somewhere close to your maxThreads value.</p>
+      <code>-1</code> means unlimited, default is <code>200</code>. If not using
+      Servlet 3.0 asynchronous processing, a good default is to use the same as
+      the maxThreads setting. If using Servlet 3.0 asynchronous processing, a
+      good default is to use the larger of maxThreads and the maximum number of
+      expected concurrent requests (synchronous and asynchronous).</p>
     </attribute>
       
     <attribute name="requiredSecret" required="false">

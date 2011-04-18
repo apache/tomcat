@@ -76,7 +76,6 @@ public class Http11AprProtocol extends AbstractHttp11Protocol {
         setSoLinger(Constants.DEFAULT_CONNECTION_LINGER);
         setSoTimeout(Constants.DEFAULT_CONNECTION_TIMEOUT);
         setTcpNoDelay(Constants.DEFAULT_TCP_NO_DELAY);
-        setProcessorCache(-1);
     }
 
     private final Http11ConnectionHandler cHandler;

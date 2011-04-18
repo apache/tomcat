@@ -98,11 +98,12 @@ public abstract class AbstractProtocolHandler implements ProtocolHandler,
 
     /**
      * The maximum number of idle processors that will be retained in the cache
-     * and re-used with a subsequent request. The default is -1, unlimited,
-     * although in that case there will never be more Processor objects than
-     * there are threads in the associated thread pool.
+     * and re-used with a subsequent request. The default is 200. A value of -1
+     * means unlimited. In the unlimited case, the theoretical maximum number of
+     * cached Processor objects is {@link #getMaxConnections()} although it will
+     * usually be closer to {@link #getMaxThreads()}.
      */
-    protected int processorCache = -1;
+    protected int processorCache = 200;
     public int getProcessorCache() { return this.processorCache; }
     public void setProcessorCache(int processorCache) {
         this.processorCache = processorCache;
