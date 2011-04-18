@@ -529,9 +529,14 @@
       <attribute name="antiJARLocking" required="false">
         <p>If true, the Tomcat classloader will take extra measures to avoid
         JAR file locking when resources are accessed inside JARs through URLs.
-        This will impact startup time of applications, but could prove to be useful
-        on platforms or configurations where file locking can occur.
+        This will impact startup time of applications, but could prove to be
+        useful on platforms or configurations where file locking can occur.
         If not specified, the default value is <code>false</code>.</p>
+
+        <p><code>antiJARLocking</code> is a subset of
+        <code>antiResourceLocking</code> and therefore, to prevent duplicate
+        work and possible issues, only one of these attributes should be set
+        to <code>true</code> at any one time.</p>
       </attribute>
 
       <attribute name="antiResourceLocking" required="false">
@@ -541,19 +546,22 @@
         or configurations where file locking can occur.
         If not specified, the default value is <code>false</code>.</p>
    
-        <p>Please note that setting this to <code>true</code> has some side effects,
-        including the disabling of JSP reloading in a running server: see
-        <a href="http://issues.apache.org/bugzilla/show_bug.cgi?id=37668">Bugzilla 37668</a>.
-        </p>
+        <p><code>antiJARLocking</code> is a subset of
+        <code>antiResourceLocking</code> and therefore, to prevent duplicate
+        work and possible issues, only one of these attributes should be set
+        to <code>true</code> at any one time.</p>
 
-        <p>
-        Please note that setting this flag to true in applications that are
+        <p>Please note that setting this to <code>true</code> has some side
+        effects, including the disabling of JSP reloading in a running server:
+        see <a href="http://issues.apache.org/bugzilla/show_bug.cgi?id=37668">
+        Bugzilla 37668</a>.</p>
+
+        <p>Please note that setting this flag to true in applications that are
         outside the appBase for the Host (the <code>webapps</code> directory
-        by default) will cause the application to be
-        <strong>deleted</strong> on Tomcat shutdown.  You probably don't want to
-        do this, so think twice before setting antiResourceLocking=true on a webapp
-        that's outside the appBase for its Host.
-        </p>
+        by default) will cause the application to be <strong>deleted</strong> on
+        Tomcat shutdown.  You probably don't want to do this, so think twice
+        before setting antiResourceLocking=true on a webapp that's outside the
+        appBase for its Host.</p>
       </attribute>
 
       <attribute name="cacheMaxSize" required="false">
