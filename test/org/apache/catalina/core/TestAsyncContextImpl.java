@@ -353,15 +353,6 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
                 final HttpServletResponse resp)
                 throws ServletException, IOException {
             
-            // Ensure the request takes more than 0 ms to process
-            // 0ms processing time in access log usually indicates an error
-            try {
-                Thread.sleep(1);
-            } catch (InterruptedException ie) {
-                // Should never happen
-                throw new IOException(ie);
-            }
-
             AsyncContext actxt = req.startAsync();
             actxt.setTimeout(3000);
             resp.setContentType("text/plain");
@@ -555,15 +546,6 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         @Override
         protected void doGet(HttpServletRequest req, HttpServletResponse resp)
                 throws ServletException, IOException {
-
-            // Ensure the request takes more than 0 ms to process
-            // 0ms processing time in access log usually indicates an error
-            try {
-                Thread.sleep(1);
-            } catch (InterruptedException ie) {
-                // Should never happen
-                throw new IOException(ie);
-            }
 
             resp.getWriter().write("DispatchingServletGet-");
             resp.flushBuffer();
@@ -1054,9 +1036,9 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
             int status, long minTime, long maxTime) throws Exception {
         List<Entry> entries = alv.getEntries();
         
-        // Assume one entry - wait until it appears (access log entry will be
-        // made after response has been returned to user)
-        for (int i = 0; i < 10 && entries.size() == 0; i++) {
+        // Wait (but not too long) until all expected entries appear (access log
+        // entry will be made after response has been returned to user)
+        for (int i = 0; i < 10 && entries.size() < count; i++) {
             Thread.sleep(100);
         }
         
@@ -1064,13 +1046,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         for (int j = 0; j < count; j++) {
             Entry entry = entries.get(j);
             assertEquals(status, entry.getStatus());
-            // A 0ms entry in the access log normally indicates a processing
-            // error and we don't expect any of those for 200 responses
-            if (minTime == 0 && status == 200) {
-                assertTrue(entry.toString(), entry.getTime() > minTime);
-            } else {
-                assertTrue(entry.toString(), entry.getTime() >= minTime);
-            }
+            assertTrue(entry.toString(), entry.getTime() >= minTime);
             assertTrue(entry.toString(), entry.getTime() < maxTime);
         }
     }
