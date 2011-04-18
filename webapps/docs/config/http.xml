@@ -651,21 +651,21 @@
         <p>(int)Tomcat will cache SocketProcessor objects to reduce garbage
         collection. The integer value specifies how many objects to keep in the
         cache at most. The default is <code>500</code>. Other values are
-        <code>-1</code> for unlimited cache and <code>0</code>for no cache.</p>
+        <code>-1</code> for unlimited cache and <code>0</code> for no cache.</p>
       </attribute>
 
       <attribute name="socket.keyCache" required="false">
         <p>(int)Tomcat will cache KeyAttachment objects to reduce garbage
         collection. The integer value specifies how many objects to keep in the
         cache at most. The default is <code>500</code>. Other values are
-        <code>-1</code> for unlimited cache and <code>0</code>for no cache.</p>
+        <code>-1</code> for unlimited cache and <code>0</code> for no cache.</p>
       </attribute>
 
       <attribute name="socket.eventCache" required="false">
         <p>(int)Tomcat will cache PollerEvent objects to reduce garbage
         collection. The integer value specifies how many objects to keep in the
         cache at most. The default is <code>500</code>. Other values are
-        <code>-1</code> for unlimited cache and <code>0</code>for no cache.</p>
+        <code>-1</code> for unlimited cache and <code>0</code> for no cache.</p>
       </attribute>
 
       <attribute name="selectorPool.maxSelectors" required="false">
