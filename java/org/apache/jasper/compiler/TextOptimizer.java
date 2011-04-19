@@ -28,12 +28,13 @@ public class TextOptimizer {
      */
     static class TextCatVisitor extends Node.Visitor {
 
+        private static final String EMPTY_TEXT = "";
+
         private Options options;
         private PageInfo pageInfo;
         private int textNodeCount = 0;
         private Node.TemplateText firstTextNode = null;
         private StringBuilder textBuffer;
-        private final String emptyText = "";
 
         public TextCatVisitor(Compiler compiler) {
             options = compiler.getCompilationContext().getOptions();
@@ -82,7 +83,7 @@ public class TextOptimizer {
         public void visit(Node.TemplateText n) throws JasperException {
             if ((options.getTrimSpaces() || pageInfo.isTrimDirectiveWhitespaces()) 
                     && n.isAllSpace()) {
-                n.setText(emptyText);
+                n.setText(EMPTY_TEXT);
                 return;
             }
 
@@ -92,7 +93,7 @@ public class TextOptimizer {
             } else {
                 // Append text to text buffer
                 textBuffer.append(n.getText());
-                n.setText(emptyText);
+                n.setText(EMPTY_TEXT);
             }
         }
 
