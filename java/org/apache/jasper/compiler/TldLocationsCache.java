@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.jasper.compiler;
 
 import java.io.File;
@@ -41,6 +40,7 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.JarScanner;
 import org.apache.tomcat.JarScannerCallback;
+
 
 /**
  * A container for all tag libraries that are defined "globally"
@@ -77,7 +77,9 @@ import org.apache.tomcat.JarScannerCallback;
 
 public class TldLocationsCache {
 
-    private final Log log = LogFactory.getLog(TldLocationsCache.class);
+    private static final Log log = LogFactory.getLog(TldLocationsCache.class);
+
+    private static final String KEY = TldLocationsCache.class.getName();
 
     /**
      * The types of URI one may specify for a tag library
@@ -103,7 +105,7 @@ public class TldLocationsCache {
      */
     private Hashtable<String, TldLocation> mappings;
 
-    private boolean initialized;
+    private volatile boolean initialized;
     private ServletContext ctxt;
 
     /** Constructor. 
@@ -137,6 +139,24 @@ public class TldLocationsCache {
                 noTldJars.add(tokenizer.nextToken());
             }
         }
+    }
+
+
+    /**
+     * Obtains the TLD location cache for the given {@link ServletContext} and
+     * creates one if one does not currently exist.
+     */
+    public static synchronized TldLocationsCache getInstance(
+            ServletContext ctxt) {
+        if (ctxt == null) {
+            throw new IllegalArgumentException("ServletContext was null");
+        }
+        TldLocationsCache cache = (TldLocationsCache) ctxt.getAttribute(KEY);
+        if (cache == null) {
+            cache = new TldLocationsCache(ctxt);
+            ctxt.setAttribute(KEY, cache);
+        }
+        return cache;
     }
 
     /**
@@ -189,7 +209,7 @@ public class TldLocationsCache {
      * wonderful arrangements present when Tomcat gets embedded.
      *
      */
-    private void init() throws JasperException {
+    private synchronized void init() throws JasperException {
         if (initialized) return;
         try {
             tldScanWebXml();
