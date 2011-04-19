@@ -74,6 +74,11 @@
         to MIME type mappings for MPEG 4 files. Based on a patch by Cédrik Lime.
         (markt)
       </fix>
+      <add>
+        Add some additional common JARs that do not contain TLDs or web
+        fragments to the list of JARs to skip when scanning for TLDs and web
+        fragments. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
