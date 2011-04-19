@@ -145,6 +145,9 @@
         Clarify error messages in *.sh files to mention that if a script is
         not found it might be because execute permission is needed. (kkolinko)
       </update>
+      <update>
+        Update commons pool to 1.5.6. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
