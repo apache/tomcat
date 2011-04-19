@@ -121,6 +121,10 @@
         can easily identify JARs that can be added to the list of JARs to skip.
         (markt)
       </add>
+      <update>
+        Use a single TLD location cache for a web application rather than one
+        per JSP compilation to speed up JSP compilation. (markt)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Web applications">

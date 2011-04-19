@@ -1436,7 +1436,7 @@ public class JspC implements Options {
             context =new JspCServletContext
                 (new PrintWriter(System.out),
                  new URL("file:" + uriRoot.replace('\\','/') + '/'));
-            tldLocationsCache = new TldLocationsCache(context);
+            tldLocationsCache = TldLocationsCache.getInstance(context);
         } catch (MalformedURLException me) {
             System.out.println("**" + me);
         }
