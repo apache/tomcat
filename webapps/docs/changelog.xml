@@ -111,6 +111,11 @@
         Correct a regression in the fix for <bug>49916</bug> that resulted in
         JSPs being compiled twice rather than just once. (markt)
       </fix>
+      <add>
+        Log JARs that are scanned for TLDs where no TLD is found so that users
+        can easily identify JARs that can be added to the list of JARs to skip.
+        (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Web applications">

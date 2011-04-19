@@ -37,6 +37,8 @@ import org.apache.jasper.JasperException;
 import org.apache.jasper.util.ExceptionUtils;
 import org.apache.jasper.xmlparser.ParserUtils;
 import org.apache.jasper.xmlparser.TreeNode;
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.JarScanner;
 import org.apache.tomcat.JarScannerCallback;
 
@@ -74,6 +76,8 @@ import org.apache.tomcat.JarScannerCallback;
  */
 
 public class TldLocationsCache {
+
+    private final Log log = LogFactory.getLog(TldLocationsCache.class);
 
     /**
      * The types of URI one may specify for a tag library
@@ -376,6 +380,7 @@ public class TldLocationsCache {
 
         JarFile jarFile = null;
         String resourcePath = conn.getJarFileURL().toString();
+        boolean foundTld = false;
         try {
             conn.setUseCaches(false);
             jarFile = conn.getJarFile();
@@ -385,6 +390,7 @@ public class TldLocationsCache {
                 String name = entry.getName();
                 if (!name.startsWith("META-INF/")) continue;
                 if (!name.endsWith(".tld")) continue;
+                foundTld = true;
                 InputStream stream = jarFile.getInputStream(entry);
                 tldScanStream(resourcePath, name, stream);
             }
@@ -396,6 +402,10 @@ public class TldLocationsCache {
                     ExceptionUtils.handleThrowable(t);
                 }
             }
+        }
+        if (!foundTld) {
+            log.info(Localizer.getMessage("jsp.tldCache.noTldInJar",
+                    resourcePath));
         }
     }
 
