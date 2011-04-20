@@ -106,6 +106,31 @@ public abstract class TomcatBaseTest extends TestCase {
         }
         
         System.setProperty("catalina.base", tempDir.getAbsolutePath());
+        System.setProperty("tomcat.util.scan.DefaultJarScanner.jarsToSkip",
+                "bootstrap.jar,commons-daemon.jar,tomcat-juli.jar," +
+                "annotations-api.jar,el-api.jar,jsp-api.jar,servlet-api.jar," +
+                "catalina.jar,catalina-ant.jar,catalina-ha.jar," +
+                "catalina-tribes.jar," +
+                "jasper.jar,jasper-el.jar,ecj-*.jar," +
+                "tomcat-api.jar,tomcat-util.jar,tomcat-coyote.jar," +
+                "tomcat-dbcp.jar," +
+                "tomcat-i18n-en.jar,tomcat-i18n-es.jar,tomcat-i18n-fr.jar," +
+                "tomcat-i18n-ja.jar," +
+                "commons-beanutils*.jar,commons-collections*.jar," +
+                "commons-dbcp*.jar,commons-digester*.jar," +
+                "commons-fileupload*.jar,commons-io*.jar," +
+                "commons-logging*.jar,commons-math*.jar,commons-pool*.jar," +
+                "junit.jar,jstl.jar," +
+                "geronimo-spec-jaxrpc*.jar,wsdl4j*.jar," +
+                "ant.jar,jmx.jar,hibernate*.jar,jmx-tools.jar,jta*.jar," +
+                "log4j*.jar,slf4j*.jar" +
+                "xercesImpl.jar,xmlParserAPIs.jar,xml-apis.jar," +
+                "dnsns.jar,ldapsec.jar,localedata.jar,sunjce_provider.jar," +
+                "sunpkcs11.jar,tools.jar," +
+                "apple_provider.jar,AppleScriptEngine.jar,CoreAudio.jar," +
+                "dns_sd.jar,j3daudio.jar,j3dcore.jar,j3dutils.jar," +
+                "jai_core.jar,jai_codec.jar," +
+                "mlibwrapper_jai.jar,MRJToolkit.jar,vecmath.jar");
         
         File appBase = new File(tempDir, "webapps");
         if (!appBase.exists() && !appBase.mkdir()) {
