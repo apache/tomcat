@@ -44,8 +44,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.jar.JarEntry;
-import java.util.jar.JarFile;
-import java.util.zip.ZipEntry;
+import java.util.jar.JarInputStream;
 
 import javax.servlet.ServletContainerInitializer;
 import javax.servlet.ServletContext;
@@ -1376,17 +1375,28 @@ public class ContextConfig
         
         for (WebXml fragment : fragments) {
             URL url = fragment.getURL();
-            JarFile jarFile = null;
+            JarInputStream jarInputStream = null;
             InputStream is = null;
             ServletContainerInitializer sci = null;
             try {
                 if ("jar".equals(url.getProtocol())) {
-                    JarURLConnection conn =
+                    JarURLConnection jarConn =
                         (JarURLConnection) url.openConnection();
-                    jarFile = conn.getJarFile();
-                    ZipEntry entry = jarFile.getEntry(SCI_LOCATION);
+                    URL resourceURL = jarConn.getJarFileURL();
+                    URLConnection resourceConn = resourceURL.openConnection();
+                    resourceConn.setUseCaches(false);
+                    
+                    jarInputStream =
+                        new JarInputStream(resourceConn.getInputStream());
+                    JarEntry entry = jarInputStream.getNextJarEntry();
+                    while (entry != null) {
+                        if (SCI_LOCATION.equals(entry.getName())) {
+                            break;
+                        }
+                        entry = jarInputStream.getNextJarEntry();
+                    }
                     if (entry != null) {
-                        is = jarFile.getInputStream(entry);
+                        is = jarInputStream;
                     }
                 } else if ("file".equals(url.getProtocol())) {
                     String path = url.getPath();
@@ -1412,9 +1422,9 @@ public class ContextConfig
                         // Ignore
                     }
                 }
-                if (jarFile != null) {
+                if (jarInputStream != null) {
                     try {
-                        jarFile.close();
+                        jarInputStream.close();
                     } catch (IOException e) {
                         // Ignore
                     }
@@ -1504,14 +1514,24 @@ public class ContextConfig
     protected void processResourceJARs(Set<WebXml> fragments) {
         for (WebXml fragment : fragments) {
             URL url = fragment.getURL();
-            JarFile jarFile = null;
+            JarInputStream jarInputStream = null;
             try {
                 // Note: Ignore file URLs for now since only jar URLs will be accepted
                 if ("jar".equals(url.getProtocol())) {
-                    JarURLConnection conn =
+                    JarURLConnection jarConn =
                         (JarURLConnection) url.openConnection();
-                    jarFile = conn.getJarFile();   
-                    ZipEntry entry = jarFile.getEntry("META-INF/resources/");
+                    URL resourceURL = jarConn.getJarFileURL();
+                    URLConnection resourceConn = resourceURL.openConnection();
+                    resourceConn.setUseCaches(false);
+                    jarInputStream =
+                        new JarInputStream(resourceConn.getInputStream());
+                    JarEntry entry = jarInputStream.getNextJarEntry();
+                    while (entry != null) {
+                        if ("META-INF/resources/".equals(entry.getName())) {
+                            break;
+                        }
+                        entry = jarInputStream.getNextJarEntry();
+                    }
                     if (entry != null) {
                         context.addResourceJarUrl(url);
                     }
@@ -1520,9 +1540,9 @@ public class ContextConfig
                 log.error(sm.getString("contextConfig.resourceJarFail", url,
                         context.getName()));
             } finally {
-                if (jarFile != null) {
+                if (jarInputStream != null) {
                     try {
-                        jarFile.close();
+                        jarInputStream.close();
                     } catch (IOException e) {
                         // Ignore
                     }
@@ -1780,50 +1800,42 @@ public class ContextConfig
 
 
     protected void processAnnotationsJar(URL url, WebXml fragment) {
-        JarFile jarFile = null;
+        JarInputStream jarInputStream = null;
         
         try {
             URLConnection urlConn = url.openConnection();
-            JarURLConnection jarUrlConn;
+            JarURLConnection jarConn;
             if (!(urlConn instanceof JarURLConnection)) {
                 // This should never happen
                 sm.getString("contextConfig.jarUrl", url);
                 return;
             }
             
-            jarUrlConn = (JarURLConnection) urlConn;
-            jarUrlConn.setUseCaches(false);
-            jarFile = jarUrlConn.getJarFile();
-            
-            Enumeration<JarEntry> jarEntries = jarFile.entries();
-            while (jarEntries.hasMoreElements()) {
-                JarEntry jarEntry = jarEntries.nextElement();
-                String entryName = jarEntry.getName();
+            jarConn = (JarURLConnection) urlConn;
+            jarConn.setUseCaches(false);
+            URL resourceURL = jarConn.getJarFileURL();
+            URLConnection resourceConn = resourceURL.openConnection();
+
+            jarInputStream = new JarInputStream(resourceConn.getInputStream());
+
+            JarEntry entry = jarInputStream.getNextJarEntry();
+            while (entry != null) {
+                String entryName = entry.getName();
                 if (entryName.endsWith(".class")) {
-                    InputStream is = null;
                     try {
-                        is = jarFile.getInputStream(jarEntry);
-                        processAnnotationsStream(is, fragment);
+                        processAnnotationsStream(jarInputStream, fragment);
                     } catch (IOException e) {
                         log.error(sm.getString("contextConfig.inputStreamJar",
                                 entryName, url),e);
-                    } finally {
-                        if (is != null) {
-                            try {
-                                is.close();
-                            } catch (Throwable t) {
-                                ExceptionUtils.handleThrowable(t);
-                            }
-                        }
                     }
                 }
             }
         } catch (IOException e) {
             log.error(sm.getString("contextConfig.jarFile", url), e);
         } finally {
-            if (jarFile != null) {
+            if (jarInputStream != null) {
                 try {
-                    jarFile.close();
+                    jarInputStream.close();
                 } catch (Throwable t) {
                     ExceptionUtils.handleThrowable(t);
                 }
@@ -2302,45 +2314,48 @@ public class ContextConfig
         private Map<String,WebXml> fragments = new HashMap<String,WebXml>();
         
         @Override
-        public void scan(JarURLConnection urlConn) throws IOException {
+        public void scan(JarURLConnection jarConn) throws IOException {
             
-            JarFile jarFile = null;
-            InputStream stream = null;
+            // JarURLConnection#getJarFile() creates temporary copies of the JAR
+            // if the underlying resource is not a file URL. That can be slow so
+            // the InputStream for the resource is used
+            URL resourceURL = jarConn.getJarFileURL();
+
+            JarInputStream jarInputStream = null;
             WebXml fragment = new WebXml();
 
             try {
-                urlConn.setUseCaches(false);
-                jarFile = urlConn.getJarFile();
-                JarEntry fragmentEntry =
-                    jarFile.getJarEntry(FRAGMENT_LOCATION);
-                if (fragmentEntry == null) {
+                URLConnection resourceConn = resourceURL.openConnection();
+                resourceConn.setUseCaches(false);
+                jarInputStream =
+                    new JarInputStream(resourceConn.getInputStream());
+                JarEntry entry = jarInputStream.getNextJarEntry();
+                while (entry != null) {
+                    if (FRAGMENT_LOCATION.equals(entry.getName())) {
+                        break;
+                    }
+                    entry = jarInputStream.getNextJarEntry();
+                }
+
+                if (entry == null) {
                     // If there is no web.xml, normal JAR no impact on
                     // distributable
                     fragment.setDistributable(true);
                 } else {
-                    stream = jarFile.getInputStream(fragmentEntry);
                     InputSource source = new InputSource(
-                            urlConn.getJarFileURL().toString() +
-                            "!/" + FRAGMENT_LOCATION);
-                    source.setByteStream(stream);
+                            resourceURL.toString() + "!/" + FRAGMENT_LOCATION);
+                    source.setByteStream(jarInputStream);
                     parseWebXml(source, fragment, true);
                 }
             } finally {
-                if (jarFile != null) {
+                if (jarInputStream != null) {
                     try {
-                        jarFile.close();
+                        jarInputStream.close();
                     } catch (Throwable t) {
                         ExceptionUtils.handleThrowable(t);
                     }
                 }
-                if (stream != null) {
-                    try {
-                        stream.close();
-                    } catch (Throwable t) {
-                        ExceptionUtils.handleThrowable(t);
-                    }
-                }
-                fragment.setURL(urlConn.getURL());
+                fragment.setURL(jarConn.getURL());
                 if (fragment.getName() == null) {
                     fragment.setName(fragment.getURL().toString());
                 }

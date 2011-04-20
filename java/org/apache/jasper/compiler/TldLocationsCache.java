@@ -21,14 +21,14 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.JarURLConnection;
-import java.util.Enumeration;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.jar.JarEntry;
-import java.util.jar.JarFile;
 
 import javax.servlet.ServletContext;
 
@@ -40,6 +40,7 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.JarScanner;
 import org.apache.tomcat.JarScannerCallback;
+import org.apache.tomcat.util.scan.NonClosingJarInputStream;
 
 
 /**
@@ -392,32 +393,39 @@ public class TldLocationsCache {
      * (or a subdirectory of it), adding an implicit map entry to the taglib
      * map for any TLD that has a <uri> element.
      *
-     * @param conn The JarURLConnection to the JAR file to scan
+     * @param jarConn The JarURLConnection to the JAR file to scan
      * 
      * Keep in sync with o.a.c.startup.TldConfig
      */
-    private void tldScanJar(JarURLConnection conn) throws IOException {
+    private void tldScanJar(JarURLConnection jarConn) throws IOException {
 
-        JarFile jarFile = null;
-        String resourcePath = conn.getJarFileURL().toString();
+        // JarURLConnection#getJarFile() creates temporary copies of the JAR if
+        // the underlying resource is not a file URL. That can be slow so the
+        // InputStream for the resource is used
+        URL resourceURL = jarConn.getJarFileURL();
+        String resourcePath = resourceURL.toString();
+        
+        NonClosingJarInputStream jarInputStream = null;
+        
         boolean foundTld = false;
         try {
-            conn.setUseCaches(false);
-            jarFile = conn.getJarFile();
-            Enumeration<JarEntry> entries = jarFile.entries();
-            while (entries.hasMoreElements()) {
-                JarEntry entry = entries.nextElement();
+            URLConnection resourceConn = resourceURL.openConnection();
+            resourceConn.setUseCaches(false);
+            jarInputStream =
+                new NonClosingJarInputStream(resourceConn.getInputStream());
+            JarEntry entry = jarInputStream.getNextJarEntry();
+            while (entry != null) {
                 String name = entry.getName();
-                if (!name.startsWith("META-INF/")) continue;
-                if (!name.endsWith(".tld")) continue;
-                foundTld = true;
-                InputStream stream = jarFile.getInputStream(entry);
-                tldScanStream(resourcePath, name, stream);
+                if (name.startsWith("META-INF/") && name.endsWith(".tld")) {
+                    foundTld = true;
+                    tldScanStream(resourcePath, name, jarInputStream);
+                }
+                entry = jarInputStream.getNextJarEntry();
             }
         } finally {
-            if (jarFile != null) {
+            if (jarInputStream != null) {
                 try {
-                    jarFile.close();
+                    jarInputStream.reallyClose();
                 } catch (Throwable t) {
                     ExceptionUtils.handleThrowable(t);
                 }
@@ -468,14 +476,6 @@ public class TldLocationsCache {
         } catch (JasperException e) {
             // Hack - makes exception handling simpler
             throw new IOException(e);
-        } finally {
-            if (stream != null) {
-                try {
-                    stream.close();
-                } catch (Throwable t) {
-                    ExceptionUtils.handleThrowable(t);
-                }
-            }
         }
     }
 
