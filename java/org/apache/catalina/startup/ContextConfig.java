@@ -1829,6 +1829,7 @@ public class ContextConfig
                                 entryName, url),e);
                     }
                 }
+                entry = jarInputStream.getNextJarEntry();
             }
         } catch (IOException e) {
             log.error(sm.getString("contextConfig.jarFile", url), e);
