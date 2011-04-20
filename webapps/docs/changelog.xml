@@ -79,6 +79,13 @@
         fragments to the list of JARs to skip when scanning for TLDs and web
         fragments. (markt)
       </add>
+      <fix>
+        While scanning JARs for TLDs and fragments, avoid using JarFile and use
+        JarInputStream as in most circumstances where JARs are scanned, JarFile
+        will create a temporary copy of the JAR rather than using the resource
+        directly. This change significantly improves startup performance for
+        applications with lots of JARs to be scanned. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
