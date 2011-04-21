@@ -36,8 +36,8 @@ import org.apache.catalina.UserDatabase;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.ExceptionUtils;
+import org.apache.tomcat.util.digester.AbstractObjectCreationFactory;
 import org.apache.tomcat.util.digester.Digester;
-import org.apache.tomcat.util.digester.ObjectCreationFactory;
 import org.apache.tomcat.util.res.StringManager;
 import org.xml.sax.Attributes;
 
@@ -683,7 +683,7 @@ public class MemoryUserDatabase implements UserDatabase {
 /**
  * Digester object creation factory for group instances.
  */
-class MemoryGroupCreationFactory implements ObjectCreationFactory {
+class MemoryGroupCreationFactory extends AbstractObjectCreationFactory {
 
     public MemoryGroupCreationFactory(MemoryUserDatabase database) {
         this.database = database;
@@ -722,26 +722,13 @@ class MemoryGroupCreationFactory implements ObjectCreationFactory {
     }
 
     private MemoryUserDatabase database = null;
-
-    private Digester digester = null;
-
-    @Override
-    public Digester getDigester() {
-        return (this.digester);
-    }
-
-    @Override
-    public void setDigester(Digester digester) {
-        this.digester = digester;
-    }
-
 }
 
 
 /**
  * Digester object creation factory for role instances.
  */
-class MemoryRoleCreationFactory implements ObjectCreationFactory {
+class MemoryRoleCreationFactory extends AbstractObjectCreationFactory {
 
     public MemoryRoleCreationFactory(MemoryUserDatabase database) {
         this.database = database;
@@ -759,26 +746,13 @@ class MemoryRoleCreationFactory implements ObjectCreationFactory {
     }
 
     private MemoryUserDatabase database = null;
-
-    private Digester digester = null;
-
-    @Override
-    public Digester getDigester() {
-        return (this.digester);
-    }
-
-    @Override
-    public void setDigester(Digester digester) {
-        this.digester = digester;
-    }
-
 }
 
 
 /**
  * Digester object creation factory for user instances.
  */
-class MemoryUserCreationFactory implements ObjectCreationFactory {
+class MemoryUserCreationFactory extends AbstractObjectCreationFactory {
 
     public MemoryUserCreationFactory(MemoryUserDatabase database) {
         this.database = database;
@@ -842,17 +816,4 @@ class MemoryUserCreationFactory implements ObjectCreationFactory {
     }
 
     private MemoryUserDatabase database = null;
-
-    private Digester digester = null;
-
-    @Override
-    public Digester getDigester() {
-        return (this.digester);
-    }
-
-    @Override
-    public void setDigester(Digester digester) {
-        this.digester = digester;
-    }
-
 }
