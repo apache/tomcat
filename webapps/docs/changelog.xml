@@ -111,6 +111,11 @@
         information was also added to the documentation on how to select an
         appropriate value. 
       </fix>
+      <fix>
+        Take account of time spent waiting for a processing thread when
+        calculating connection and keep-alive timeouts for the HTTP BIO
+        connector. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
