@@ -1172,7 +1172,7 @@
     Write HTTP Response       Blocking                   Sim Blocking                    Blocking
     SSL Support               Java SSL                     Java SSL                      OpenSSL
     SSL Handshake             Blocking                   Non blocking                    Blocking
-    Max Connections          maxThreads                See polling size              See polling size
+    Max Connections        maxConnections              See polling size              See polling size
     
     
     </source>
