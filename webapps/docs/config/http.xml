@@ -373,15 +373,6 @@
       execute tasks using the executor rather than an internal thread pool.</p>
     </attribute>
 
-    <attribute name="maxConnections" required="false">
-      <p>The maximum number of connections that the server will accept and process
-      at any given time. When this number has been reached, the server will not accept any more
-      connections until the number of connections reach below this value. The operating system may still accept connections based 
-      on the <code>acceptCount</code> setting.
-      This setting is currently only applicable to the blocking Java connectors (AJP/HTTP).
-      Default value is <code>10000</code>.</p>
-    </attribute>
-
     <attribute name="maxTrailerSize" required="false">
       <p>Limits the total length of trailing headers in the last chunk of
       a chunked HTTP request. If the value is <code>-1</code>, no limit will be
@@ -554,8 +545,21 @@
   
   <subsection name="BIO specific configuration">
     
-    <p>There are no BIO specific configuration settings.</p>
+    <p>The following attributes are specific to the BIO connector.</p>
     
+    <attributes>
+
+      <attribute name="maxConnections" required="false">
+        <p>The maximum number of connections that the server will accept and
+        process at any given time. When this number has been reached, the server
+        will not accept any more connections until the number of connections
+        falls below this value. The operating system may still accept
+        connections based on the <code>acceptCount</code> setting. Default value
+        is <code>10000</code>.</p>
+      </attribute>
+
+    </attributes>
+
   </subsection>
   
   <subsection name="NIO specific configuration">
