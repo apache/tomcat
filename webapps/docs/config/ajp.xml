@@ -379,10 +379,18 @@
 
   <subsection name="BIO specific configuration">
     
-    <p>The BIO implementation supports the following Java TCP socket attributes
-    in addition to the common Connector and AJP attributes listed above.</p>
+    <p>The BIO implementation supports the following attributes in addition to
+    the common Connector and AJP attributes listed above.</p>
   
     <attributes>
+      <attribute name="maxConnections" required="false">
+        <p>The maximum number of connections that the server will accept and
+        process at any given time. When this number has been reached, the server
+        will not accept any more connections until the number of connections
+        falls below this value. The operating system may still accept
+        connections based on the <code>acceptCount</code> setting. Default value
+        is <code>10000</code>.</p>
+      </attribute>
       <attribute name="socket.rxBufSize" required="false">
         <p>(int)The socket receive buffer (SO_RCVBUF) size in bytes. JVM default
         used if not set.</p>
