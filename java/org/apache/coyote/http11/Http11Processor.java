@@ -17,6 +17,7 @@
 
 package org.apache.coyote.http11;
 
+import java.io.EOFException;
 import java.io.IOException;
 import java.io.InterruptedIOException;
 import java.net.InetAddress;
@@ -184,15 +185,48 @@ public class Http11Processor extends AbstractHttp11Processor {
 
             // Parsing the request header
             try {
-                //TODO - calculate timeout based on length in queue (System.currentTimeMills() - wrapper.getLastAccess() is the time in queue)
+                int standardTimeout = 0;
                 if (keptAlive) {
                     if (keepAliveTimeout > 0) {
-                        socket.getSocket().setSoTimeout(keepAliveTimeout);
-                    }
-                    else if (soTimeout > 0) {
-                        socket.getSocket().setSoTimeout(soTimeout);
+                        standardTimeout = keepAliveTimeout;
+                    } else if (soTimeout > 0) {
+                        standardTimeout = soTimeout;
                     }
                 }
+                /*
+                 * When there is no data in the buffer and this is not the first
+                 * request on this connection and timeouts are being used the
+                 * first read for this request may need a different timeout to
+                 * take account of time spent waiting for a processing thread.
+                 * 
+                 * This is a little hacky but better than exposing the socket
+                 * and the timeout info to the InputBuffer
+                 */
+                if (inputBuffer.lastValid == 0 &&
+                        socketWrapper.getLastAccess() > -1 &&
+                        standardTimeout > 0) {
+
+                    long queueTime = System.currentTimeMillis() -
+                            socketWrapper.getLastAccess();
+                    int firstReadTimeout;
+                    if (queueTime >= standardTimeout) {
+                        // Queued for longer than timeout but there might be
+                        // data so use shortest possible timeout
+                        firstReadTimeout = 1;
+                    } else {
+                        // Cast is safe since queueTime must be less than
+                        // standardTimeout which is an int
+                        firstReadTimeout = standardTimeout - (int) queueTime;
+                    }
+                    socket.getSocket().setSoTimeout(firstReadTimeout);
+                    if (!inputBuffer.fill()) {
+                        throw new EOFException(sm.getString("iib.eof.error"));
+                    }
+                }
+                if (standardTimeout > 0) {
+                    socket.getSocket().setSoTimeout(standardTimeout);
+                }
+
                 inputBuffer.parseRequestLine(false);
                 if (endpoint.isPaused()) {
                     // 503 - Service unavailable
