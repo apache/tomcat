@@ -1050,4 +1050,66 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
             assertTrue(entry.toString(), entry.getTime() < maxTime);
         }
     }
+    
+    public void testCommitOnComplete() throws Exception {
+        // Setup Tomcat instance
+        Tomcat tomcat = getTomcatInstance();
+        
+        // Must have a real docBase - just use temp
+        File docBase = new File(System.getProperty("java.io.tmpdir"));
+        
+        Context ctx = tomcat.addContext("", docBase.getAbsolutePath());
+
+        AsyncStatusServlet asyncStatusServlet =
+            new AsyncStatusServlet(HttpServletResponse.SC_BAD_REQUEST);
+        Wrapper wrapper =
+            Tomcat.addServlet(ctx, "asyncStatusServlet", asyncStatusServlet);
+        wrapper.setAsyncSupported(true);
+        ctx.addServletMapping("/asyncStatusServlet", "asyncStatusServlet");
+
+        TesterAccessLogValve alv = new TesterAccessLogValve();
+        ctx.getPipeline().addValve(alv);
+        
+        tomcat.start();
+        
+        StringBuilder url = new StringBuilder(48);
+        url.append("http://localhost:");
+        url.append(getPort());
+        url.append("/asyncStatusServlet");
+        
+        int rc = getUrl(url.toString(), new ByteChunk(), null);
+        
+        assertEquals(HttpServletResponse.SC_BAD_REQUEST, rc);
+        
+        // Without this test may complete before access log has a chance to log
+        // the request
+        Thread.sleep(REQUEST_TIME);
+        
+        // Check the access log
+        validateAccessLog(alv, 1, HttpServletResponse.SC_BAD_REQUEST, 0,
+                REQUEST_TIME);
+
+    }
+
+    private static class AsyncStatusServlet extends HttpServlet {
+
+        private static final long serialVersionUID = 1L;
+
+        private int status = 200;
+
+        public AsyncStatusServlet(int status) {
+            this.status = status;
+        }
+        
+        @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+                throws ServletException, IOException {
+            
+            AsyncContext actxt = req.startAsync();
+            resp.setStatus(status);
+            actxt.complete();
+        }
+    }
+    
+
 }
