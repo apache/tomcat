@@ -870,7 +870,7 @@
     </p>
 <source>
 &lt;env-entry&gt;
-  &lt;env-entry-name&gt;maxExemptions&lt;/param-name&gt;
+  &lt;env-entry-name&gt;maxExemptions&lt;/env-entry-name&gt;
   &lt;env-entry-value&gt;10&lt;/env-entry-value&gt;
   &lt;env-entry-type&gt;java.lang.Integer&lt;/env-entry-type&gt;
 &lt;/env-entry&gt;
