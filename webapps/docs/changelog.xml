@@ -86,6 +86,10 @@
         directly. This change significantly improves startup performance for
         applications with lots of JARs to be scanned. (markt)
       </fix>
+      <fix>
+        Ensure response is committed when <code>AsyncContext#complete()</code>
+        is called. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
