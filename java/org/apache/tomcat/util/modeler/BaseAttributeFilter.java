@@ -122,6 +122,7 @@ public class BaseAttributeFilter implements NotificationFilter {
      *     includes the name of the attribute in this notification</li>
      * </ul>
      */
+    @Override
     public boolean isNotificationEnabled(Notification notification) {
 
         if (notification == null)

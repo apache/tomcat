@@ -95,30 +95,35 @@ public class ChannelData implements ChannelMessage {
     /**
      * @return Returns the message byte buffer
      */
+    @Override
     public XByteBuffer getMessage() {
         return message;
     }
     /**
      * @param message The message to send.
      */
+    @Override
     public void setMessage(XByteBuffer message) {
         this.message = message;
     }
     /**
      * @return Returns the timestamp.
      */
+    @Override
     public long getTimestamp() {
         return timestamp;
     }
     /**
      * @param timestamp The timestamp to send
      */
+    @Override
     public void setTimestamp(long timestamp) {
         this.timestamp = timestamp;
     }
     /**
      * @return Returns the uniqueId.
      */
+    @Override
     public byte[] getUniqueId() {
         return uniqueId;
     }
@@ -133,6 +138,7 @@ public class ChannelData implements ChannelMessage {
      * see org.apache.catalina.tribes.Channel#sendMessage(org.apache.catalina.tribes.Member[], java.io.Serializable, int)
      *                                                 
      */
+    @Override
     public int getOptions() {
         return options;
     }
@@ -141,6 +147,7 @@ public class ChannelData implements ChannelMessage {
      * 
      * @param options the message options
      */
+    @Override
     public void setOptions(int options) {
         this.options = options;
     }
@@ -149,6 +156,7 @@ public class ChannelData implements ChannelMessage {
      * Returns the source or reply-to address
      * @return Member
      */
+    @Override
     public Member getAddress() {
         return address;
     }
@@ -157,6 +165,7 @@ public class ChannelData implements ChannelMessage {
      * Sets the source or reply-to address
      * @param address Member
      */
+    @Override
     public void setAddress(Member address) {
         this.address = address;
     }
@@ -312,6 +321,7 @@ public class ChannelData implements ChannelMessage {
      * Complete clone
      * @return ClusterData
      */
+    @Override
     public Object deepclone() {
         byte[] d = this.getDataPackage();
         return ChannelData.getDataFromPackage(d);

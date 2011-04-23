@@ -136,33 +136,4 @@ public class ArrayStack<E> extends ArrayList<E> {
         add(item);
         return item;
     }
-
-
-    /**
-     * Returns the one-based position of the distance from the top that the
-     * specified object exists on this stack, where the top-most element is
-     * considered to be at distance <code>1</code>.  If the object is not
-     * present on the stack, return <code>-1</code> instead.  The
-     * <code>equals()</code> method is used to compare to the items
-     * in this stack.
-     *
-     * @param object  the object to be searched for
-     * @return the 1-based depth into the stack of the object, or -1 if not found
-     */
-    public int search(E object) {
-        int i = size() - 1;        // Current index
-        int n = 1;                 // Current distance
-        while (i >= 0) {
-            Object current = get(i);
-            if ((object == null && current == null) ||
-                (object != null && object.equals(current))) {
-                return n;
-            }
-            i--;
-            n++;
-        }
-        return -1;
-    }
-
-
 }
