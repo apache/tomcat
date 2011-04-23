@@ -120,6 +120,11 @@
         calculating connection and keep-alive timeouts for the HTTP BIO
         connector. (markt)
       </fix>
+      <fix>
+        <bug>51095</bug>: Don&apos;t trigger a NullPointerException when the SSL
+        handshake fails with the HTTP-APR connector. Patch provided by Mike
+        Glazer. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
