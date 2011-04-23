@@ -101,6 +101,7 @@ public abstract class AbstractSender implements DataSender {
      * @throws IOException
      * TODO Implement this org.apache.catalina.tribes.transport.DataSender method
      */
+    @Override
     public abstract void connect() throws IOException;
 
     /**
@@ -108,6 +109,7 @@ public abstract class AbstractSender implements DataSender {
      *
      * TODO Implement this org.apache.catalina.tribes.transport.DataSender method
      */
+    @Override
     public abstract void disconnect();
 
     /**
@@ -116,6 +118,7 @@ public abstract class AbstractSender implements DataSender {
      * @return boolean
      * TODO Implement this org.apache.catalina.tribes.transport.DataSender method
      */
+    @Override
     public boolean keepalive() {
         boolean disconnect = false;
         if (isUdpBased()) disconnect = true; //always disconnect UDP, TODO optimize the keepalive handling
@@ -129,10 +132,12 @@ public abstract class AbstractSender implements DataSender {
         this.connected = connected;
     }
 
+    @Override
     public boolean isConnected() {
         return connected;
     }
 
+    @Override
     public long getConnectTime() {
         return connectTime;
     }
@@ -150,6 +155,7 @@ public abstract class AbstractSender implements DataSender {
         return keepAliveTime;
     }
 
+    @Override
     public int getRequestCount() {
         return requestCount;
     }
@@ -230,10 +236,12 @@ public abstract class AbstractSender implements DataSender {
         return throwOnFailedAck;
     }
 
+    @Override
     public void setKeepAliveCount(int keepAliveCount) {
         this.keepAliveCount = keepAliveCount;
     }
 
+    @Override
     public void setKeepAliveTime(long keepAliveTime) {
         this.keepAliveTime = keepAliveTime;
     }
@@ -242,14 +250,17 @@ public abstract class AbstractSender implements DataSender {
         this.requestCount = requestCount;
     }
 
+    @Override
     public void setRxBufSize(int rxBufSize) {
         this.rxBufSize = rxBufSize;
     }
 
+    @Override
     public void setTimeout(long timeout) {
         this.timeout = timeout;
     }
 
+    @Override
     public void setTxBufSize(int txBufSize) {
         this.txBufSize = txBufSize;
     }

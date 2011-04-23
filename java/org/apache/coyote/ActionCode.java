@@ -40,7 +40,6 @@ public enum ActionCode {
 
     CUSTOM,
     RESET,
-    WEBAPP,
 
     /**
      * Hook called after request, but before recycling. Can be used for logging,
@@ -70,12 +69,6 @@ public enum ActionCode {
      * Callback for lazy evaluation - extract the SSL-related attributes.
      */
     REQ_SSL_ATTRIBUTE,
-
-    /**
-     * Chain for request creation. Called each time a new request is created
-     * (requests are recycled).
-     */
-    NEW_REQUEST,
 
     /**
      * Callback for lazy evaluation - extract the SSL-certificate (including
