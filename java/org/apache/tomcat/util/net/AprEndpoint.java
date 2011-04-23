@@ -1681,6 +1681,7 @@ public class AprEndpoint extends AbstractEndpoint {
                         // Close socket and pool
                         destroySocket(socket.getSocket().longValue());
                         socket = null;
+                        return;
                     }
                     // Process the request from this socket
                     Handler.SocketState state = handler.process(socket);
