@@ -80,34 +80,6 @@ public final class  Base64
         lookUpBase64Alphabet[63] = (byte) '/';
     }
 
-    public static boolean isBase64( String isValidString )
-    {
-        return isArrayByteBase64(isValidString.getBytes());
-    }
-
-    public static boolean isBase64( byte octect )
-    {
-        //shall we ignore white space? JEFF??
-        return (octect == PAD || base64Alphabet[octect] != -1);
-    }
-
-    public static boolean isArrayByteBase64( byte[] arrayOctect )
-    {
-        int length = arrayOctect.length;
-        if (length == 0)
-        {
-            // shouldn't a 0 length array be valid base64 data?
-            // return false;
-            return true;
-        }
-        for (int i=0; i < length; i++)
-        {
-            if ( !Base64.isBase64(arrayOctect[i]) )
-                return false;
-        }
-        return true;
-    }
-
     /**
      * Encodes hex octets into Base64.
      *

@@ -108,6 +108,7 @@ public interface ChannelInterceptor extends MembershipListener, Heartbeat {
      * to allow interceptors to clean up resources, time out object and 
      * perform actions that are unrelated to sending/receiving data.
      */
+    @Override
     public void heartbeat();
     
     /**

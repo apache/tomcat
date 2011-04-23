@@ -163,6 +163,7 @@ public class BaseModelMBean implements DynamicMBean, MBeanRegistration, ModelMBe
      * @exception ReflectionException if a Java reflection exception
      *  occurs when invoking the getter
      */
+    @Override
     public Object getAttribute(String name)
         throws AttributeNotFoundException, MBeanException,
             ReflectionException {
@@ -217,6 +218,7 @@ public class BaseModelMBean implements DynamicMBean, MBeanRegistration, ModelMBe
      *
      * @param names Names of the requested attributes
      */
+    @Override
     public AttributeList getAttributes(String names[]) {
 
         // Validate the input parameters
@@ -246,6 +248,7 @@ public class BaseModelMBean implements DynamicMBean, MBeanRegistration, ModelMBe
     /**
      * Return the <code>MBeanInfo</code> object for this MBean.
      */
+    @Override
     public MBeanInfo getMBeanInfo() {
         return managedBean.getMBeanInfo();
     }
@@ -270,6 +273,7 @@ public class BaseModelMBean implements DynamicMBean, MBeanRegistration, ModelMBe
      * @exception ReflectioNException if a Java reflection exception
      *  occurs when invoking a method
      */
+    @Override
     public Object invoke(String name, Object params[], String signature[])
         throws MBeanException, ReflectionException 
     {
@@ -370,6 +374,7 @@ public class BaseModelMBean implements DynamicMBean, MBeanRegistration, ModelMBe
      * @exception ReflectionException if a Java reflection exception
      *  occurs when invoking the getter
      */
+    @Override
     public void setAttribute(Attribute attribute)
         throws AttributeNotFoundException, MBeanException,
         ReflectionException
@@ -458,6 +463,7 @@ public class BaseModelMBean implements DynamicMBean, MBeanRegistration, ModelMBe
      *
      * @return The list of attributes that were set and their new values
      */
+    @Override
     public AttributeList setAttributes(AttributeList attributes) {
         AttributeList response = new AttributeList();
 
@@ -581,6 +587,7 @@ public class BaseModelMBean implements DynamicMBean, MBeanRegistration, ModelMBe
      *
      * @exception IllegalArgumentException if the listener parameter is null
      */
+    @Override
     public void addAttributeChangeNotificationListener
         (NotificationListener listener, String name, Object handback)
         throws IllegalArgumentException {
@@ -611,6 +618,7 @@ public class BaseModelMBean implements DynamicMBean, MBeanRegistration, ModelMBe
      * @exception ListenerNotFoundException if this listener is not
      *  registered in the MBean
      */
+    @Override
     public void removeAttributeChangeNotificationListener
         (NotificationListener listener, String name)
         throws ListenerNotFoundException {
@@ -660,6 +668,7 @@ public class BaseModelMBean implements DynamicMBean, MBeanRegistration, ModelMBe
      * @exception RuntimeOperationsException wraps IllegalArgumentException
      *  when the specified notification is <code>null</code> or invalid
      */
+    @Override
     public void sendAttributeChangeNotification
         (AttributeChangeNotification notification)
         throws MBeanException, RuntimeOperationsException {
@@ -689,6 +698,7 @@ public class BaseModelMBean implements DynamicMBean, MBeanRegistration, ModelMBe
      * @exception RuntimeOperationsException wraps IllegalArgumentException
      *  when the specified notification is <code>null</code> or invalid
      */
+    @Override
     public void sendAttributeChangeNotification
         (Attribute oldValue, Attribute newValue)
         throws MBeanException, RuntimeOperationsException {
@@ -724,6 +734,7 @@ public class BaseModelMBean implements DynamicMBean, MBeanRegistration, ModelMBe
      * @exception RuntimeOperationsException wraps IllegalArgumentException
      *  when the specified notification is <code>null</code> or invalid
      */
+    @Override
     public void sendNotification(Notification notification)
         throws MBeanException, RuntimeOperationsException {
 
@@ -749,6 +760,7 @@ public class BaseModelMBean implements DynamicMBean, MBeanRegistration, ModelMBe
      * @exception RuntimeOperationsException wraps IllegalArgumentException
      *  when the specified notification is <code>null</code> or invalid
      */
+    @Override
     public void sendNotification(String message)
         throws MBeanException, RuntimeOperationsException {
 
@@ -777,6 +789,7 @@ public class BaseModelMBean implements DynamicMBean, MBeanRegistration, ModelMBe
      *
      * @exception IllegalArgumentException if the listener parameter is null
      */
+    @Override
     public void addNotificationListener(NotificationListener listener,
                                         NotificationFilter filter,
                                         Object handback)
@@ -811,6 +824,7 @@ public class BaseModelMBean implements DynamicMBean, MBeanRegistration, ModelMBe
      * Return an <code>MBeanNotificationInfo</code> object describing the
      * notifications sent by this MBean.
      */
+    @Override
     public MBeanNotificationInfo[] getNotificationInfo() {
 
         // Acquire the set of application notifications
@@ -863,6 +877,7 @@ public class BaseModelMBean implements DynamicMBean, MBeanRegistration, ModelMBe
      * @exception ListenerNotFoundException if this listener is not
      *  registered in the MBean
      */
+    @Override
     public void removeNotificationListener(NotificationListener listener)
         throws ListenerNotFoundException {
 
@@ -1103,6 +1118,7 @@ public class BaseModelMBean implements DynamicMBean, MBeanRegistration, ModelMBe
     // XXX We can add some method patterns here- like setName() and
     // setDomain() for code that doesn't implement the Registration
 
+    @Override
     public ObjectName preRegister(MBeanServer server,
                                   ObjectName name)
             throws Exception
@@ -1116,18 +1132,21 @@ public class BaseModelMBean implements DynamicMBean, MBeanRegistration, ModelMBe
         return oname;
     }
 
+    @Override
     public void postRegister(Boolean registrationDone) {
         if( resource instanceof MBeanRegistration ) {
             ((MBeanRegistration)resource).postRegister(registrationDone);
         }
     }
 
+    @Override
     public void preDeregister() throws Exception {
         if( resource instanceof MBeanRegistration ) {
             ((MBeanRegistration)resource).preDeregister();
         }
     }
 
+    @Override
     public void postDeregister() {
         if( resource instanceof MBeanRegistration ) {
             ((MBeanRegistration)resource).postDeregister();

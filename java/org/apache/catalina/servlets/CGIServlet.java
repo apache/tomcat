@@ -354,8 +354,7 @@ public final class CGIServlet extends HttpServlet {
      *
      */
     protected void printServletEnvironment(ServletOutputStream out,
-        HttpServletRequest req,
-        @SuppressWarnings("unused") HttpServletResponse res)
+        HttpServletRequest req, HttpServletResponse res)
     throws IOException {
 
         // Document the properties from ServletRequest
