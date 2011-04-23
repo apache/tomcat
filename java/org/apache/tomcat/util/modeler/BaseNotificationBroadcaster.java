@@ -71,6 +71,7 @@ public class BaseNotificationBroadcaster implements NotificationBroadcaster {
      *
      * @exception IllegalArgumentException if the listener parameter is null
      */
+    @Override
     public void addNotificationListener(NotificationListener listener,
                                         NotificationFilter filter,
                                         Object handback)
@@ -118,6 +119,7 @@ public class BaseNotificationBroadcaster implements NotificationBroadcaster {
      * Return an <code>MBeanNotificationInfo</code> object describing the
      * notifications sent by this MBean.
      */
+    @Override
     public MBeanNotificationInfo[] getNotificationInfo() {
 
         return (new MBeanNotificationInfo[0]);
@@ -134,6 +136,7 @@ public class BaseNotificationBroadcaster implements NotificationBroadcaster {
      * @exception ListenerNotFoundException if this listener is not
      *  registered in the MBean
      */
+    @Override
     public void removeNotificationListener(NotificationListener listener)
         throws ListenerNotFoundException {
 
