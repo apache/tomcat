@@ -638,4 +638,13 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
         //noop
     }
 
+    /** 
+     * {@inheritDoc}
+     */
+    public void setValidator(Validator validator) {
+        //noop
+    }
+    
+    
+
 }
