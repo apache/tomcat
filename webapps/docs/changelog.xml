@@ -90,6 +90,10 @@
         Ensure response is committed when <code>AsyncContext#complete()</code>
         is called. (markt)
       </fix>
+      <add>
+        Add a container event that is fired when a session&apos;s ID is changed,
+        e.g. on authentication. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">

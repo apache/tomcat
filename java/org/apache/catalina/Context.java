@@ -87,6 +87,11 @@ public interface Context extends Container {
      */
     public static final String  CLEAR_WELCOME_FILES_EVENT = "clearWelcomeFiles";
 
+    /**
+     * Container event for changing the ID of a session.
+     */
+    public static final String CHANGE_SESSION_ID_EVENT = "changeSessionId";
+
     // ------------------------------------------------------------- Properties
 
     /**
