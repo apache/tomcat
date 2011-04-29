@@ -358,6 +358,19 @@ public class PoolProperties implements PoolConfiguration {
     public Validator getValidator() {
         return validator;
     }
+    
+    /** 
+     * {@inheritDoc}
+     */
+    public void setValidator(Validator validator) {
+        this.validator = validator;
+        if (validator!=null) {
+            this.validatorClassName = validator.getClass().getName();
+        } else {
+            this.validatorClassName = null;
+        }
+    }
+
 
     /** 
      * {@inheritDoc}

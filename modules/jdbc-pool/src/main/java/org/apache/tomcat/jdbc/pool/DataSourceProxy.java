@@ -844,6 +844,14 @@ public class DataSourceProxy implements PoolConfiguration {
     public Validator getValidator() {
         return getPoolProperties().getValidator();
     }
+    
+    /** 
+     * {@inheritDoc}
+     */
+    public void setValidator(Validator validator) {
+        getPoolProperties().setValidator(validator);
+    }
+
 
     /** 
      * {@inheritDoc}

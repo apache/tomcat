@@ -542,6 +542,13 @@ public interface PoolConfiguration {
      * @return the optional validator object - may be null
      */
     public Validator getValidator();
+    
+    /**
+     * Sets the validator object
+     * If this is a non null object, it will be used as a validator instead of the validationQuery
+     * If this is null, remove the usage of the validator.
+     */
+    public void setValidator(Validator validator);
 
     /**
      * avoid excess validation, only run validation at most at this frequency - time in milliseconds. 
