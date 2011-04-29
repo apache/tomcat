@@ -768,7 +768,11 @@ public abstract class ManagerBase extends LifecycleMBeanBase
      */
     @Override
     public void changeSessionId(Session session) {
+        String oldId = session.getIdInternal();
         session.setId(generateSessionId(), false);
+        String newId = session.getIdInternal();
+        container.fireContainerEvent(Context.CHANGE_SESSION_ID_EVENT,
+                new String[] {oldId, newId});
     }
     
     
