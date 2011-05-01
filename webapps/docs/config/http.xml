@@ -743,10 +743,10 @@
       </attribute>
 
       <attribute name="pollTime" required="false">
-        <p>Duration of a poll call in microseconds. Lowering this value will slightly
-        decrease latency of connections being kept alive in some cases, but will use
-        more CPU as more poll calls are being made. The default value is 2000 (2ms).
-        </p>
+        <p>Duration of a poll call in microseconds. Lowering this value will
+        slightly decrease latency of connections being kept alive in some cases,
+        but will use more CPU as more poll calls are being made. The default
+        value is 2000 (2ms).</p>
       </attribute>
 
       <attribute name="sendfileSize" required="false">
