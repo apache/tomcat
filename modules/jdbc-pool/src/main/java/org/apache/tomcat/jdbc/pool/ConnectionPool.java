@@ -440,7 +440,9 @@ public class ConnectionPool {
                 if (log.isDebugEnabled()) {
                     log.debug("Creating interceptor instance of class:"+proxies[i].getInterceptorClass());
                 }
-                proxies[i].getInterceptorClass().newInstance().poolStarted(this);
+                JdbcInterceptor interceptor = proxies[i].getInterceptorClass().newInstance();
+                interceptor.setProperties(proxies[i].getProperties());
+                interceptor.poolStarted(this);
             }catch (Exception x) {
                 log.error("Unable to inform interceptor of pool start.",x);
                 if (jmxPool!=null) jmxPool.notify(org.apache.tomcat.jdbc.pool.jmx.ConnectionPool.NOTIFY_INIT, getStackTrace(x));
