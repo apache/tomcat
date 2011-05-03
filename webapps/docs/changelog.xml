@@ -94,6 +94,14 @@
         Add a container event that is fired when a session&apos;s ID is changed,
         e.g. on authentication. (markt)
       </add>
+      <fix>
+        <bug>51137</bug>: Add additional Microsoft Office MIME type mappings.
+        (rjung)
+      </fix>
+      <add>
+        Partial sync of MIME type mapping with mime.types from the Apache web
+        server. About 600 MIME types added, some changed. (rjung)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
