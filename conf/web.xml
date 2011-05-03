@@ -863,8 +863,8 @@
         <extension>ott</extension>
         <mime-type>application/vnd.oasis.opendocument.text-template</mime-type>
     </mime-mapping>
-    <!-- xiph mime types -->
     <mime-mapping>
+        <!-- xiph mime types -->
         <extension>ogx</extension>
         <mime-type>application/ogg</mime-type>
     </mime-mapping>
