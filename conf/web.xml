@@ -547,7 +547,7 @@
     </mime-mapping>
     <mime-mapping>
         <extension>cer</extension>
-        <mime-type>application/x-x509-ca-cert</mime-type>
+        <mime-type>application/pkix-cert</mime-type>
     </mime-mapping>
     <mime-mapping>
         <extension>class</extension>
@@ -643,7 +643,7 @@
     </mime-mapping>
     <mime-mapping>
         <extension>java</extension>
-        <mime-type>text/plain</mime-type>
+        <mime-type>text/x-java-source</mime-type>
     </mime-mapping>
     <mime-mapping>
         <extension>jnlp</extension>
@@ -663,7 +663,7 @@
     </mime-mapping>
     <mime-mapping>
         <extension>js</extension>
-        <mime-type>text/javascript</mime-type>
+        <mime-type>application/javascript</mime-type>
     </mime-mapping>
     <mime-mapping>
         <extension>jsf</extension>
@@ -675,7 +675,7 @@
     </mime-mapping>
     <mime-mapping>
         <extension>kar</extension>
-        <mime-type>audio/x-midi</mime-type>
+        <mime-type>audio/midi</mime-type>
     </mime-mapping>
     <mime-mapping>
         <extension>latex</extension>
@@ -707,7 +707,7 @@
     </mime-mapping>
     <mime-mapping>
         <extension>man</extension>
-        <mime-type>application/x-troff-man</mime-type>
+        <mime-type>text/troff</mime-type>
     </mime-mapping>
     <mime-mapping>
         <extension>mathml</extension>
@@ -715,15 +715,15 @@
     </mime-mapping>
     <mime-mapping>
         <extension>me</extension>
-        <mime-type>application/x-troff-me</mime-type>
+        <mime-type>text/troff</mime-type>
     </mime-mapping>
     <mime-mapping>
         <extension>mid</extension>
-        <mime-type>audio/x-midi</mime-type>
+        <mime-type>audio/midi</mime-type>
     </mime-mapping>
     <mime-mapping>
         <extension>midi</extension>
-        <mime-type>audio/x-midi</mime-type>
+        <mime-type>audio/midi</mime-type>
     </mime-mapping>
     <mime-mapping>
         <extension>mif</extension>
@@ -739,15 +739,15 @@
     </mime-mapping>
     <mime-mapping>
         <extension>mp1</extension>
-        <mime-type>audio/x-mpeg</mime-type>
+        <mime-type>audio/mpeg</mime-type>
     </mime-mapping>
     <mime-mapping>
         <extension>mp2</extension>
-        <mime-type>audio/x-mpeg</mime-type>
+        <mime-type>audio/mpeg</mime-type>
     </mime-mapping>
     <mime-mapping>
         <extension>mp3</extension>
-        <mime-type>audio/x-mpeg</mime-type>
+        <mime-type>audio/mpeg</mime-type>
     </mime-mapping>
     <mime-mapping>
         <extension>mp4</extension>
@@ -755,7 +755,7 @@
     </mime-mapping>
     <mime-mapping>
         <extension>mpa</extension>
-        <mime-type>audio/x-mpeg</mime-type>
+        <mime-type>audio/mpeg</mime-type>
     </mime-mapping>
     <mime-mapping>
         <extension>mpe</extension>
@@ -779,7 +779,7 @@
     </mime-mapping>
     <mime-mapping>
         <extension>ms</extension>
-        <mime-type>application/x-wais-source</mime-type>
+        <mime-type>text/troff</mime-type>
     </mime-mapping>
     <mime-mapping>
         <extension>nc</extension>
@@ -958,7 +958,7 @@
     </mime-mapping>
     <mime-mapping>
         <extension>psd</extension>
-        <mime-type>image/x-photoshop</mime-type>
+        <mime-type>image/vnd.adobe.photoshop</mime-type>
     </mime-mapping>
     <mime-mapping>
         <extension>qt</extension>
@@ -990,7 +990,7 @@
     </mime-mapping>
     <mime-mapping>
         <extension>roff</extension>
-        <mime-type>application/x-troff</mime-type>
+        <mime-type>text/troff</mime-type>
     </mime-mapping>
     <mime-mapping>
         <extension>rtf</extension>
@@ -1016,7 +1016,7 @@
 -->
     <mime-mapping>
         <extension>smf</extension>
-        <mime-type>audio/x-midi</mime-type>
+        <mime-type>application/vnd.stardivision.math</mime-type>
     </mime-mapping>
     <mime-mapping>
         <extension>sit</extension>
@@ -1052,7 +1052,7 @@
     </mime-mapping>
     <mime-mapping>
         <extension>t</extension>
-        <mime-type>application/x-troff</mime-type>
+        <mime-type>text/troff</mime-type>
     </mime-mapping>
     <mime-mapping>
         <extension>tar</extension>
@@ -1084,7 +1084,7 @@
     </mime-mapping>
     <mime-mapping>
         <extension>tr</extension>
-        <mime-type>application/x-troff</mime-type>
+        <mime-type>text/troff</mime-type>
     </mime-mapping>
     <mime-mapping>
         <extension>tsv</extension>
@@ -1148,7 +1148,7 @@
     </mime-mapping>
     <mime-mapping>
         <extension>vsd</extension>
-        <mime-type>application/x-visio</mime-type>
+        <mime-type>application/vnd.visio</mime-type>
     </mime-mapping>
     <mime-mapping>
         <extension>wav</extension>
@@ -1185,7 +1185,7 @@
     </mime-mapping>
     <mime-mapping>
         <extension>wrl</extension>
-        <mime-type>x-world/x-vrml</mime-type>
+        <mime-type>model/vrml</mime-type>
     </mime-mapping>
     <mime-mapping>
         <extension>wspolicy</extension>
