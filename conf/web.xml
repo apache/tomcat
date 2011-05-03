@@ -502,6 +502,10 @@
         <mime-type>application/x-aim</mime-type>
     </mime-mapping>
     <mime-mapping>
+        <extension>anx</extension>
+        <mime-type>application/annodex</mime-type>
+    </mime-mapping>
+    <mime-mapping>
         <extension>art</extension>
         <mime-type>image/x-jg</mime-type>
     </mime-mapping>
@@ -524,6 +528,14 @@
     <mime-mapping>
         <extension>avx</extension>
         <mime-type>video/x-rad-screenplay</mime-type>
+    </mime-mapping>
+    <mime-mapping>
+        <extension>axa</extension>
+        <mime-type>audio/annodex</mime-type>
+    </mime-mapping>
+    <mime-mapping>
+        <extension>axv</extension>
+        <mime-type>video/annodex</mime-type>
     </mime-mapping>
     <mime-mapping>
         <extension>bcpio</extension>
@@ -596,6 +608,10 @@
     <mime-mapping>
         <extension>exe</extension>
         <mime-type>application/octet-stream</mime-type>
+    </mime-mapping>
+    <mime-mapping>
+        <extension>flac</extension>
+        <mime-type>audio/flac</mime-type>
     </mime-mapping>
     <mime-mapping>
         <extension>gif</extension>
@@ -835,6 +851,23 @@
         <mime-type>application/vnd.oasis.opendocument.text</mime-type>
     </mime-mapping>
     <mime-mapping>
+        <extension>oga</extension>
+        <mime-type>audio/ogg</mime-type>
+    </mime-mapping>
+    <mime-mapping>
+        <extension>ogg</extension>
+        <mime-type>audio/ogg</mime-type>
+    </mime-mapping>
+    <mime-mapping>
+        <extension>ogv</extension>
+        <mime-type>video/ogg</mime-type>
+    </mime-mapping>
+    <mime-mapping>
+        <!-- xiph mime types -->
+        <extension>ogx</extension>
+        <mime-type>application/ogg</mime-type>
+    </mime-mapping>
+    <mime-mapping>
         <!-- OpenDocument Drawing Template -->
         <extension>otg</extension>
         <mime-type>application/vnd.oasis.opendocument.graphics-template</mime-type>
@@ -858,47 +891,6 @@
         <!-- OpenDocument Text Template -->
         <extension>ott</extension>
         <mime-type>application/vnd.oasis.opendocument.text-template</mime-type>
-    </mime-mapping>
-    <mime-mapping>
-        <!-- xiph mime types -->
-        <extension>ogx</extension>
-        <mime-type>application/ogg</mime-type>
-    </mime-mapping>
-    <mime-mapping>
-        <extension>ogv</extension>
-        <mime-type>video/ogg</mime-type>
-    </mime-mapping>
-    <mime-mapping>
-        <extension>oga</extension>
-        <mime-type>audio/ogg</mime-type>
-    </mime-mapping>
-    <mime-mapping>
-        <extension>ogg</extension>
-        <mime-type>audio/ogg</mime-type>
-    </mime-mapping>
-    <mime-mapping>
-        <extension>spx</extension>
-        <mime-type>audio/ogg</mime-type>
-    </mime-mapping>
-    <mime-mapping>
-        <extension>flac</extension>
-        <mime-type>audio/flac</mime-type>
-    </mime-mapping>
-    <mime-mapping>
-        <extension>anx</extension>
-        <mime-type>application/annodex</mime-type>
-    </mime-mapping>
-    <mime-mapping>
-        <extension>axa</extension>
-        <mime-type>audio/annodex</mime-type>
-    </mime-mapping>
-    <mime-mapping>
-        <extension>axv</extension>
-        <mime-type>video/annodex</mime-type>
-    </mime-mapping>
-    <mime-mapping>
-        <extension>xspf</extension>
-        <mime-type>application/xspf+xml</mime-type>
     </mime-mapping>
     <mime-mapping>
         <extension>pbm</extension>
@@ -945,11 +937,11 @@
         <mime-type>image/x-portable-pixmap</mime-type>
     </mime-mapping>
     <mime-mapping>
-        <extension>ppt</extension>
+        <extension>pps</extension>
         <mime-type>application/vnd.ms-powerpoint</mime-type>
     </mime-mapping>
     <mime-mapping>
-        <extension>pps</extension>
+        <extension>ppt</extension>
         <mime-type>application/vnd.ms-powerpoint</mime-type>
     </mime-mapping>
     <mime-mapping>
@@ -1015,16 +1007,20 @@
     </mime-mapping>
 -->
     <mime-mapping>
-        <extension>smf</extension>
-        <mime-type>application/vnd.stardivision.math</mime-type>
-    </mime-mapping>
-    <mime-mapping>
         <extension>sit</extension>
         <mime-type>application/x-stuffit</mime-type>
     </mime-mapping>
     <mime-mapping>
+        <extension>smf</extension>
+        <mime-type>application/vnd.stardivision.math</mime-type>
+    </mime-mapping>
+    <mime-mapping>
         <extension>snd</extension>
         <mime-type>audio/basic</mime-type>
+    </mime-mapping>
+    <mime-mapping>
+        <extension>spx</extension>
+        <mime-type>audio/ogg</mime-type>
     </mime-mapping>
     <mime-mapping>
         <extension>src</extension>
@@ -1103,52 +1099,12 @@
         <mime-type>application/x-ustar</mime-type>
     </mime-mapping>
     <mime-mapping>
-        <extension>vxml</extension>
-        <mime-type>application/voicexml+xml</mime-type>
-    </mime-mapping>
-    <mime-mapping>
-        <extension>xbm</extension>
-        <mime-type>image/x-xbitmap</mime-type>
-    </mime-mapping>
-    <mime-mapping>
-        <extension>xht</extension>
-        <mime-type>application/xhtml+xml</mime-type>
-    </mime-mapping>
-    <mime-mapping>
-        <extension>xhtml</extension>
-        <mime-type>application/xhtml+xml</mime-type>
-    </mime-mapping>
-    <mime-mapping>
-        <extension>xls</extension>
-        <mime-type>application/vnd.ms-excel</mime-type>
-    </mime-mapping>
-    <mime-mapping>
-        <extension>xml</extension>
-        <mime-type>application/xml</mime-type>
-    </mime-mapping>
-    <mime-mapping>
-        <extension>xpm</extension>
-        <mime-type>image/x-xpixmap</mime-type>
-    </mime-mapping>
-    <mime-mapping>
-        <extension>xsl</extension>
-        <mime-type>application/xml</mime-type>
-    </mime-mapping>
-    <mime-mapping>
-        <extension>xslt</extension>
-        <mime-type>application/xslt+xml</mime-type>
-    </mime-mapping>
-    <mime-mapping>
-        <extension>xul</extension>
-        <mime-type>application/vnd.mozilla.xul+xml</mime-type>
-    </mime-mapping>
-    <mime-mapping>
-        <extension>xwd</extension>
-        <mime-type>image/x-xwindowdump</mime-type>
-    </mime-mapping>
-    <mime-mapping>
         <extension>vsd</extension>
         <mime-type>application/vnd.visio</mime-type>
+    </mime-mapping>
+    <mime-mapping>
+        <extension>vxml</extension>
+        <mime-type>application/voicexml+xml</mime-type>
     </mime-mapping>
     <mime-mapping>
         <extension>wav</extension>
@@ -1192,11 +1148,55 @@
         <mime-type>application/wspolicy+xml</mime-type>
     </mime-mapping>
     <mime-mapping>
-        <extension>Z</extension>
-        <mime-type>application/x-compress</mime-type>
+        <extension>xbm</extension>
+        <mime-type>image/x-xbitmap</mime-type>
+    </mime-mapping>
+    <mime-mapping>
+        <extension>xht</extension>
+        <mime-type>application/xhtml+xml</mime-type>
+    </mime-mapping>
+    <mime-mapping>
+        <extension>xhtml</extension>
+        <mime-type>application/xhtml+xml</mime-type>
+    </mime-mapping>
+    <mime-mapping>
+        <extension>xls</extension>
+        <mime-type>application/vnd.ms-excel</mime-type>
+    </mime-mapping>
+    <mime-mapping>
+        <extension>xml</extension>
+        <mime-type>application/xml</mime-type>
+    </mime-mapping>
+    <mime-mapping>
+        <extension>xpm</extension>
+        <mime-type>image/x-xpixmap</mime-type>
+    </mime-mapping>
+    <mime-mapping>
+        <extension>xsl</extension>
+        <mime-type>application/xml</mime-type>
+    </mime-mapping>
+    <mime-mapping>
+        <extension>xslt</extension>
+        <mime-type>application/xslt+xml</mime-type>
+    </mime-mapping>
+    <mime-mapping>
+        <extension>xspf</extension>
+        <mime-type>application/xspf+xml</mime-type>
+    </mime-mapping>
+    <mime-mapping>
+        <extension>xul</extension>
+        <mime-type>application/vnd.mozilla.xul+xml</mime-type>
+    </mime-mapping>
+    <mime-mapping>
+        <extension>xwd</extension>
+        <mime-type>image/x-xwindowdump</mime-type>
     </mime-mapping>
     <mime-mapping>
         <extension>z</extension>
+        <mime-type>application/x-compress</mime-type>
+    </mime-mapping>
+    <mime-mapping>
+        <extension>Z</extension>
         <mime-type>application/x-compress</mime-type>
     </mime-mapping>
     <mime-mapping>
