@@ -1176,7 +1176,7 @@
     </mime-mapping>
     <mime-mapping>
         <!-- Compiled WML Script -->
-        <extension>wmlscriptc</extension>
+        <extension>wmlsc</extension>
         <mime-type>application/vnd.wap.wmlscriptc</mime-type>
     </mime-mapping>
     <mime-mapping>
