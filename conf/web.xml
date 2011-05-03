@@ -630,10 +630,6 @@
         <mime-type>text/html</mime-type>
     </mime-mapping>
     <mime-mapping>
-        <extension>hqx</extension>
-        <mime-type>application/mac-binhex40</mime-type>
-    </mime-mapping>
-    <mime-mapping>
         <extension>ief</extension>
         <mime-type>image/ief</mime-type>
     </mime-mapping>
