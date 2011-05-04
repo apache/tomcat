@@ -69,6 +69,7 @@ public class JmxRemoteLifecycleListener implements LifecycleListener {
     protected boolean clientAuth = true;
     protected boolean authenticate = true;
     protected String passwordFile = null;
+    protected String loginModuleName = null;
     protected String accessFile = null;
     protected boolean useLocalPorts = false;
 
@@ -164,6 +165,9 @@ public class JmxRemoteLifecycleListener implements LifecycleListener {
         accessFile = System.getProperty(
                 "com.sun.management.jmxremote.access.file",
                 "jmxremote.access");
+        
+        loginModuleName = System.getProperty(
+                "com.sun.management.jmxremote.login.config");
     }
     
 
@@ -209,6 +213,7 @@ public class JmxRemoteLifecycleListener implements LifecycleListener {
             if (authenticate) {
                 env.put("jmx.remote.x.password.file", passwordFile);
                 env.put("jmx.remote.x.access.file", accessFile);
+                env.put("jmx.remote.x.login.config", loginModuleName);
             }
 
 
