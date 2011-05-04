@@ -56,8 +56,8 @@ public class BodyContentImpl extends BodyContent {
      */
     public BodyContentImpl(JspWriter enclosingWriter) {
         super(enclosingWriter);
-        bufferSize = Constants.DEFAULT_TAG_BUFFER_SIZE;
-        cb = new char[bufferSize];
+        cb = new char[Constants.DEFAULT_TAG_BUFFER_SIZE];
+        bufferSize = cb.length;
         nextChar = 0;
         closed = false;
     }
@@ -495,8 +495,8 @@ public class BodyContentImpl extends BodyContent {
         } else {
             nextChar = 0;
             if (LIMIT_BUFFER && (cb.length > Constants.DEFAULT_TAG_BUFFER_SIZE)) {
-                bufferSize = Constants.DEFAULT_TAG_BUFFER_SIZE;
-                cb = new char[bufferSize];
+                cb = new char[Constants.DEFAULT_TAG_BUFFER_SIZE];
+                bufferSize = cb.length;
             }
         }
     }
@@ -644,13 +644,10 @@ public class BodyContentImpl extends BodyContent {
             len = cb.length;
         }
         
-        bufferSize = cb.length + len;
-        char[] tmp = new char[bufferSize];
-        
+        char[] tmp = new char[cb.length + len];
         System.arraycopy(cb, 0, tmp, 0, cb.length);
         cb = tmp;
-        tmp = null;
-        
+        bufferSize = cb.length;
     }
     
     

@@ -172,6 +172,10 @@
         Use a single TLD location cache for a web application rather than one
         per JSP compilation to speed up JSP compilation. (markt)
       </update>
+      <add>
+        <bug>51124</bug>: Refactor BodyContentImpl to assist in determining the
+        root cause of this bug. Based on a patch by Ramiro. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Web applications">
