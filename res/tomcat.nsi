@@ -635,22 +635,35 @@ Function findJavaHome
 
   ClearErrors
 
-  ; Use the 64-bit registry on 64-bit machines
+  ; Use the 64-bit registry first on 64-bit machines
   ExpandEnvStrings $0 "%PROGRAMW6432%"
   ${If} $0 != "%PROGRAMW6432%"
     SetRegView 64
+    ReadRegStr $2 HKLM "SOFTWARE\JavaSoft\Java Runtime Environment" "CurrentVersion"
+    ReadRegStr $1 HKLM "SOFTWARE\JavaSoft\Java Runtime Environment\$2" "JavaHome"
+    ReadRegStr $3 HKLM "SOFTWARE\JavaSoft\Java Runtime Environment\$2" "RuntimeLib"
+
+    IfErrors 0 +2
+    StrCpy $1 ""
+    ClearErrors
   ${EndIf}
 
-  ReadRegStr $2 HKLM "SOFTWARE\JavaSoft\Java Runtime Environment" "CurrentVersion"
-  ReadRegStr $1 HKLM "SOFTWARE\JavaSoft\Java Runtime Environment\$2" "JavaHome"
-  ReadRegStr $3 HKLM "SOFTWARE\JavaSoft\Java Runtime Environment\$2" "RuntimeLib"
+  ; If no 64-bit Java was found, look for 32-bit Java
+  ${If} $1 == ""
+    SetRegView 32
+    ReadRegStr $2 HKLM "SOFTWARE\JavaSoft\Java Runtime Environment" "CurrentVersion"
+    ReadRegStr $1 HKLM "SOFTWARE\JavaSoft\Java Runtime Environment\$2" "JavaHome"
+    ReadRegStr $3 HKLM "SOFTWARE\JavaSoft\Java Runtime Environment\$2" "RuntimeLib"
 
-  IfErrors 0 NoErrors
-  StrCpy $1 ""
-
-NoErrors:
-
-  ClearErrors
+    IfErrors 0 +2
+    StrCpy $1 ""
+    ClearErrors
+    
+    ; If using 64-bit, go back to using 64-bit registry
+    ${If} $0 != "%PROGRAMW6432%"
+      SetRegView 64
+    ${EndIf}
+  ${EndIf}
 
   ; Put the result in the stack
   Push $1

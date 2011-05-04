@@ -186,6 +186,10 @@
       <update>
         Update commons pool to 1.5.6. (markt)
       </update>
+      <fix>
+        <bug>51135</bug>: Fix auto-detection of JAVA_HOME for 64-bit Windows
+        platforms that only have a 32-bit JVM installed. (markt) 
+      </fix>
     </changelog>
   </subsection>
 </section>
