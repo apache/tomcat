@@ -459,9 +459,15 @@ public class Tomcat {
     }
 
     public Context addContext(Host host, String contextPath, String dir) {
+        return addContext(host, contextPath, contextPath, dir);
+    }
+
+    public Context addContext(Host host, String contextPath, String contextName,
+            String dir) {
         silence(contextPath);
         Context ctx = new StandardContext();
-        ctx.setPath( contextPath );
+        ctx.setName(contextName);
+        ctx.setPath(contextPath);
         ctx.setDocBase(dir);
         ctx.addLifecycleListener(new FixContextListener());
         
@@ -474,10 +480,15 @@ public class Tomcat {
     }
     
     public Context addWebapp(Host host, String url, String path) {
+        return addWebapp(host, url, url, path);
+    }
+
+    public Context addWebapp(Host host, String url, String name, String path) {
         silence(url);
 
         Context ctx = new StandardContext();
-        ctx.setPath( url );
+        ctx.setName(name);
+        ctx.setPath(url);
         ctx.setDocBase(path);
         if (defaultRealm == null) {
             initSimpleAuth();
