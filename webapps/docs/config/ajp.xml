@@ -334,7 +334,8 @@
       directive configured for mod_jk. Normally it is not necessary to change
       the maximum packet size. Problems with the default value have been
       reported when sending certificates or certificate chains. The default
-      value is 8192.</p>
+      value is 8192. If set to less than 8192 then the setting will ignored and
+      the default value of 8192 used.</p>
     </attribute>
 
     <attribute name="processorCache" required="false">
