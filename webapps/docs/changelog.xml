@@ -147,6 +147,10 @@
         handshake fails with the HTTP-APR connector. Patch provided by Mike
         Glazer. (markt)
       </fix>
+      <fix>
+        Improve handling in AJP connectors of the case where too large a AJP
+        packet is received. (markt) 
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">

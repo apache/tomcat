@@ -263,17 +263,19 @@ public class AjpAprProcessor extends AbstractAjpProcessor {
                 error = true;
             }
 
-            // Setting up filters, and parse some request headers
-            rp.setStage(org.apache.coyote.Constants.STAGE_PREPARE);
-            try {
-                prepareRequest();
-            } catch (Throwable t) {
-                ExceptionUtils.handleThrowable(t);
-                log.debug(sm.getString("ajpprocessor.request.prepare"), t);
-                // 400 - Internal Server Error
-                response.setStatus(400);
-                adapter.log(request, response, 0);
-                error = true;
+            if (!error) {
+                // Setting up filters, and parse some request headers
+                rp.setStage(org.apache.coyote.Constants.STAGE_PREPARE);
+                try {
+                    prepareRequest();
+                } catch (Throwable t) {
+                    ExceptionUtils.handleThrowable(t);
+                    log.debug(sm.getString("ajpprocessor.request.prepare"), t);
+                    // 400 - Internal Server Error
+                    response.setStatus(400);
+                    adapter.log(request, response, 0);
+                    error = true;
+                }
             }
 
             // Process the request in the adapter
@@ -621,6 +623,14 @@ public class AjpAprProcessor extends AbstractAjpProcessor {
             return true;
         }
         else {
+            if (messageLength > message.getBuffer().length) {
+                // Message too long for the buffer
+                // Need to trigger a 400 response
+                throw new IllegalArgumentException(sm.getString(
+                        "ajpprocessor.header.tooLong",
+                        Integer.valueOf(messageLength),
+                        Integer.valueOf(message.getBuffer().length)));
+            }
             read(messageLength);
             inputBuffer.get(message.getBuffer(), headerLength, messageLength);
             return true;
