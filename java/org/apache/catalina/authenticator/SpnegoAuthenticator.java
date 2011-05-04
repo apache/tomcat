@@ -19,7 +19,10 @@ package org.apache.catalina.authenticator;
 import java.io.File;
 import java.io.IOException;
 import java.security.Principal;
+import java.security.PrivilegedActionException;
+import java.security.PrivilegedExceptionAction;
 
+import javax.security.auth.Subject;
 import javax.security.auth.login.LoginContext;
 import javax.security.auth.login.LoginException;
 import javax.servlet.http.HttpServletResponse;
@@ -189,7 +192,7 @@ public class SpnegoAuthenticator extends AuthenticatorBase {
         byte[] outToken = null;
         try {
             try {
-                lc = new LoginContext(loginConfigName);
+                lc = new LoginContext(getLoginConfigName());
                 lc.login();
             } catch (LoginException e) {
                 log.error(sm.getString("spnegoAuthenticator.serviceLoginFail"),
@@ -200,11 +203,18 @@ public class SpnegoAuthenticator extends AuthenticatorBase {
             }
             // Assume the GSSContext is stateless
             // TODO: Confirm this assumption
-            GSSManager manager = GSSManager.getInstance();
-            gssContext = manager.createContext(manager.createCredential(null,
-                    GSSCredential.DEFAULT_LIFETIME,
-                    new Oid("1.3.6.1.5.5.2"),
-                    GSSCredential.ACCEPT_ONLY));
+            final GSSManager manager = GSSManager.getInstance();
+            final PrivilegedExceptionAction<GSSCredential> action =
+                new PrivilegedExceptionAction<GSSCredential>() {
+                    @Override
+                    public GSSCredential run() throws GSSException {
+                        return manager.createCredential(null,
+                                GSSCredential.DEFAULT_LIFETIME,
+                                new Oid("1.3.6.1.5.5.2"),
+                                GSSCredential.ACCEPT_ONLY);
+                    }
+                };
+            gssContext = manager.createContext(Subject.doAs(lc.getSubject(), action));
 
             outToken = gssContext.acceptSecContext(decoded.getBytes(),
                     decoded.getOffset(), decoded.getLength());
@@ -221,12 +231,17 @@ public class SpnegoAuthenticator extends AuthenticatorBase {
             }
 
             principal = context.getRealm().authenticate(gssContext,
-                    storeDelegatedCredential);
+                    isStoreDelegatedCredential());
         } catch (GSSException e) {
             if (log.isDebugEnabled()) {
                 log.debug(sm.getString("spnegoAuthenticator.ticketValidateFail",
                         e));
             }
+            response.setHeader("WWW-Authenticate", "Negotiate");
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+            return false;
+        } catch (PrivilegedActionException e) {
+            log.error(sm.getString("spnegoAuthenticator.serviceLoginFail", e));
             response.setHeader("WWW-Authenticate", "Negotiate");
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
             return false;
