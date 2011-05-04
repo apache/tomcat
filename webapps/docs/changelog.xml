@@ -95,6 +95,10 @@
         e.g. on authentication. (markt)
       </add>
       <add>
+        <bug>51119</bug>: Add JAAS authentication support to the
+        JMXRemoteLifecycleListener. Patch provided by Neil Laurance. (markt) 
+      </add>
+      <add>
         <bug>51136</bug>: Provide methods that enable the name of a Context on
         Context creation when using Tomcat in an embedded scenario. Based on a
         patch provided by David Calavera. (markt)
