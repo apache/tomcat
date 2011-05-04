@@ -634,6 +634,7 @@ FunctionEnd
 Function findJavaHome
 
   ClearErrors
+  StrCpy $1 ""
 
   ; Use the 64-bit registry first on 64-bit machines
   ExpandEnvStrings $0 "%PROGRAMW6432%"
