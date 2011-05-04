@@ -107,6 +107,11 @@
         Partial sync of MIME type mapping with mime.types from the Apache web
         server. About 600 MIME types added, some changed. (rjung)
       </add>
+      <fix>
+        Make access logging more robust when logging requests that generate 400
+        responses since the request object is unlikely to be fully/correctly
+        populated in that case. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

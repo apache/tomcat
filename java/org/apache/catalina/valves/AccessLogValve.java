@@ -926,16 +926,20 @@ public class AccessLogValve extends ValveBase implements AccessLog {
         @Override
         public void addElement(StringBuilder buf, Date date, Request request,
                 Response response, long time) {
+            String value = null;
             if (requestAttributesEnabled) {
                 Object host = request.getAttribute(REMOTE_HOST_ATTRIBUTE);
-                if (host == null) {
-                    buf.append(request.getRemoteHost());
-                } else {
-                    buf.append(host);
+                if (host != null) {
+                    value = host.toString();
                 }
-            } else {
-                buf.append(request.getRemoteHost());
             }
+            if (value == null || value.length() == 0) {
+                value = request.getRemoteHost();
+            }
+            if (value == null || value.length() == 0) {
+                value = "-";
+            }
+            buf.append(value);
         }
     }
     
@@ -1027,17 +1031,23 @@ public class AccessLogValve extends ValveBase implements AccessLog {
         public void addElement(StringBuilder buf, Date date, Request request,
                 Response response, long time) {
             if (request != null) {
-                buf.append(request.getMethod());
-                buf.append(' ');
-                buf.append(request.getRequestURI());
-                if (request.getQueryString() != null) {
-                    buf.append('?');
-                    buf.append(request.getQueryString());
+                String method = request.getMethod();
+                if (method == null) {
+                    // No method means no request line
+                    buf.append('-');
+                } else {
+                    buf.append(request.getMethod());
+                    buf.append(' ');
+                    buf.append(request.getRequestURI());
+                    if (request.getQueryString() != null) {
+                        buf.append('?');
+                        buf.append(request.getQueryString());
+                    }
+                    buf.append(' ');
+                    buf.append(request.getProtocol());
                 }
-                buf.append(' ');
-                buf.append(request.getProtocol());
             } else {
-                buf.append("- - ");
+                buf.append('-');
             }
         }
     }
