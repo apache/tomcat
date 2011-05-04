@@ -94,6 +94,11 @@
         Add a container event that is fired when a session&apos;s ID is changed,
         e.g. on authentication. (markt)
       </add>
+      <fix>
+        <bug>51099</bug>: Correctly implement non-default login configurations
+        (configured via the loginConfigName attribute) for the the SPNEGO
+        authenticator. (fhanik/markt)
+      </fix>
       <add>
         <bug>51119</bug>: Add JAAS authentication support to the
         JMXRemoteLifecycleListener. Patch provided by Neil Laurance. (markt) 
