@@ -94,6 +94,11 @@
         Add a container event that is fired when a session&apos;s ID is changed,
         e.g. on authentication. (markt)
       </add>
+      <add>
+        <bug>51136</bug>: Provide methods that enable the name of a Context on
+        Context creation when using Tomcat in an embedded scenario. Based on a
+        patch provided by David Calavera. (markt)
+      </add>
       <fix>
         <bug>51137</bug>: Add additional Microsoft Office MIME type mappings.
         (rjung)
