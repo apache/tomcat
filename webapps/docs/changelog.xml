@@ -164,6 +164,10 @@
   </subsection>
   <subsection name="Jasper">
     <changelog>
+      <fix>
+        <bug><47371/bug>: Correctly coerce the empty string to zero when used as
+        an operand in EL arithmetic. Patch provided by gbt. (markt)
+      </fix>
       <add>
         Label JSP/tag file line and column numbers when reporting errors since
         it may not be immediately obvious what the numbers represent. (markt)
