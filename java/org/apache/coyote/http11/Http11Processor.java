@@ -368,6 +368,9 @@ public class Http11Processor extends AbstractHttp11Processor {
             if (isAsync() || error || inputBuffer.lastValid == 0) {
                 break;
             }
+            
+            keepAliveLeft =
+                maxKeepAliveRequests>0?socketWrapper.decrementKeepAlive():-1;
         }
 
         rp.setStage(org.apache.coyote.Constants.STAGE_ENDED);
