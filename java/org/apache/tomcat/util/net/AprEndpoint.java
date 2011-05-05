@@ -99,6 +99,14 @@ public class AprEndpoint extends AbstractEndpoint {
     protected ConcurrentLinkedQueue<SocketWrapper<Long>> waitingRequests =
         new ConcurrentLinkedQueue<SocketWrapper<Long>>();
 
+    // ------------------------------------------------------------ Constructor
+
+    public AprEndpoint() {
+        // Need to override the default for maxConnections to align it with what
+        // was pollerSize (before the two were merged)
+        setMaxConnections(8 * 1024);
+    }
+
     // ------------------------------------------------------------- Properties
 
 
@@ -109,14 +117,6 @@ public class AprEndpoint extends AbstractEndpoint {
     public void setDeferAccept(boolean deferAccept) { this.deferAccept = deferAccept; }
     @Override
     public boolean getDeferAccept() { return deferAccept; }
-
-
-    /**
-     * Size of the socket poller.
-     */
-    protected int pollerSize = 8 * 1024;
-    public void setPollerSize(int pollerSize) { this.pollerSize = pollerSize; }
-    public int getPollerSize() { return pollerSize; }
 
 
     /**
@@ -428,11 +428,12 @@ public class AprEndpoint extends AbstractEndpoint {
             acceptorThreadCount = 1;
         }
         if (pollerThreadCount == 0) {
-            if ((OS.IS_WIN32 || OS.IS_WIN64) && (pollerSize > 1024)) {
+            if ((OS.IS_WIN32 || OS.IS_WIN64) && (getMaxConnections() > 1024)) {
                 // The maximum per poller to get reasonable performance is 1024
-                pollerThreadCount = pollerSize / 1024;
+                pollerThreadCount = getMaxConnections() / 1024;
                 // Adjust poller size so that it won't reach the limit
-                pollerSize = pollerSize - (pollerSize % 1024);
+                setMaxConnections(
+                        getMaxConnections() - (getMaxConnections() % 1024));
             } else {
                 // No explicit poller size limitation
                 pollerThreadCount = 1;
@@ -1083,7 +1084,7 @@ public class AprEndpoint extends AbstractEndpoint {
          */
         protected void init() {
             pool = Pool.create(serverSockPool);
-            int size = pollerSize / pollerThreadCount;
+            int size = getMaxConnections() / pollerThreadCount;
             int timeout = getKeepAliveTimeout();
             if (timeout <= 0) {
                 timeout = socketProperties.getSoTimeout();
