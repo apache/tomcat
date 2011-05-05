@@ -625,7 +625,9 @@ public class DeltaSession extends StandardSession implements Externalizable,Clus
         try {
             lock();
             super.setAttribute(name,value, notify);
-            if (addDeltaRequest && (deltaRequest != null)) deltaRequest.setAttribute(name, value);
+            if (addDeltaRequest && deltaRequest != null && !exclude(name)) {
+                deltaRequest.setAttribute(name, value);
+            }
         } finally {
             unlock();
         }
@@ -804,7 +806,9 @@ public class DeltaSession extends StandardSession implements Externalizable,Clus
             if (value == null) return;
 
             super.removeAttributeInternal(name,notify);
-            if (addDeltaRequest && (deltaRequest != null)) deltaRequest.removeAttribute(name);
+            if (addDeltaRequest && deltaRequest != null && !exclude(name)) {
+                deltaRequest.removeAttribute(name);
+            }
 
         }finally {
             unlock();
