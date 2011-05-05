@@ -165,7 +165,7 @@
   <subsection name="Jasper">
     <changelog>
       <fix>
-        <bug><47371/bug>: Correctly coerce the empty string to zero when used as
+        <bug>47371</bug>: Correctly coerce the empty string to zero when used as
         an operand in EL arithmetic. Patch provided by gbt. (markt)
       </fix>
       <add>
