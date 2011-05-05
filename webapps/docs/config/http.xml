@@ -356,8 +356,9 @@
       will not accept any more connections until the number of connections
       falls below this value. The operating system may still accept
       connections based on the <code>acceptCount</code> setting. Default value
-      varies by connector type. For BIO and NIO the default is
-      <code>10000</code>. For APR/native, the default is <code>8192</code>.</p>
+      varies by connector type. For BIO the default is the value of
+      <strong>maxThreads</strong>. For NIO the default is <code>10000</code>.
+      For APR/native, the default is <code>8192</code>.</p>
       <p>Note that for APR/native on Windows, the configured value will be
       reduced to the highest multiple of 1024 that is less than or equal to
       maxConnections. This is done for performance reasons.</p>
@@ -1173,18 +1174,18 @@
 
     <p>Below is a small chart that shows how the connectors differentiate.</p>
     <source>
-                       Java Blocking Connector    Java Nio Blocking Connector      APR/native Connector
-                                 BIO                          NIO                          APR
-    Classname              Http11Protocol              Http11NioProtocol            Http11AprProtocol
-    Tomcat Version           3.x onwards                  6.x onwards                 5.5.x onwards
-    Support Polling              NO                           YES                          YES
-    Polling Size                 N/A             Unlimited - Restricted by mem   Unlimited - Configurable
-    Read HTTP Request         Blocking                   Non Blocking                    Blocking
-    Read HTTP Body            Blocking                   Sim Blocking                    Blocking
-    Write HTTP Response       Blocking                   Sim Blocking                    Blocking
-    SSL Support               Java SSL                     Java SSL                      OpenSSL
-    SSL Handshake             Blocking                   Non blocking                    Blocking
-    Max Connections        maxConnections              See polling size              See polling size
+                       Java Blocking Connector   Java Nio Blocking Connector   APR/native Connector
+                                 BIO                         NIO                       APR
+    Classname              Http11Protocol             Http11NioProtocol         Http11AprProtocol
+    Tomcat Version           3.x onwards                 6.x onwards              5.5.x onwards
+    Support Polling              NO                          YES                       YES
+    Polling Size                 N/A                   maxConnections             maxConnections
+    Read HTTP Request         Blocking                  Non Blocking                 Blocking
+    Read HTTP Body            Blocking                  Sim Blocking                 Blocking
+    Write HTTP Response       Blocking                  Sim Blocking                 Blocking
+    SSL Support               Java SSL                    Java SSL                   OpenSSL
+    SSL Handshake             Blocking                  Non blocking                 Blocking
+    Max Connections        maxConnections              maxConnections             maxConnections
     
     
     </source>
