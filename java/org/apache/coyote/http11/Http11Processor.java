@@ -118,6 +118,12 @@ public class Http11Processor extends AbstractHttp11Processor {
     protected JIoEndpoint endpoint;
 
 
+    /**
+     * The percentage of threads that have to be in use before keep-alive is
+     * disabled to aid scalability.
+     */
+    private int disableKeepAlivePercentage = 75;
+
     // --------------------------------------------------------- Public Methods
 
 
@@ -134,6 +140,16 @@ public class Http11Processor extends AbstractHttp11Processor {
      */
     public void setSSLSupport(SSLSupport sslSupport) {
         this.sslSupport = sslSupport;
+    }
+
+
+    public int getDisableKeepAlivePercentage() {
+        return disableKeepAlivePercentage;
+    }
+
+
+    public void setDisableKeepAlivePercentage(int disableKeepAlivePercentage) {
+        this.disableKeepAlivePercentage = disableKeepAlivePercentage;
     }
 
 
@@ -181,8 +197,8 @@ public class Http11Processor extends AbstractHttp11Processor {
                     / endpoint.getMaxThreads();     
         }   
         // Disable keep-alive if we are running low on threads      
-        if (threadRatio > 75) {     
-            keepAliveLeft = 1;      
+        if (threadRatio > getDisableKeepAlivePercentage()) {     
+            keepAliveLeft = 1;
         }
 
         try {

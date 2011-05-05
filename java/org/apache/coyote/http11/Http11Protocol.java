@@ -82,6 +82,23 @@ public class Http11Protocol extends AbstractHttp11JsseProtocol {
     protected Http11ConnectionHandler cHandler;
 
 
+    // ------------------------------------------------ HTTP specific properties
+    // ------------------------------------------ managed in the ProtocolHandler
+
+    private int disableKeepAlivePercentage = 75;
+    public int getDisableKeepAlivePercentage() {
+        return disableKeepAlivePercentage;
+    }
+    public void setDisableKeepAlivePercentage(int disableKeepAlivePercentage) {
+        if (disableKeepAlivePercentage < 0) {
+            this.disableKeepAlivePercentage = 0;
+        } else if (disableKeepAlivePercentage > 100) {
+            this.disableKeepAlivePercentage = 100;
+        } else {
+            this.disableKeepAlivePercentage = disableKeepAlivePercentage;
+        }
+    }
+    
     // ----------------------------------------------------- JMX related methods
 
     @Override
@@ -239,6 +256,8 @@ public class Http11Protocol extends AbstractHttp11JsseProtocol {
             processor.setSocketBuffer(proto.getSocketBuffer());
             processor.setMaxSavePostSize(proto.getMaxSavePostSize());
             processor.setServer(proto.getServer());
+            processor.setDisableKeepAlivePercentage(
+                    proto.getDisableKeepAlivePercentage());
             register(processor);
             return processor;
         }
