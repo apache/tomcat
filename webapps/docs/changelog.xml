@@ -165,6 +165,10 @@
         connector once 75% of the processing threads are in use and make the
         threshold configurable. (markt)
       </fix>
+      <fix>
+        Make pollerSize and maxConnections synonyms for the APR connectors since
+        they perform the same function. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
