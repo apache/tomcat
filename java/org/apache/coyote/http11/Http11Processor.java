@@ -183,7 +183,9 @@ public class Http11Processor extends AbstractHttp11Processor {
         error = false;
         keepAlive = true;
 
-        int keepAliveLeft = maxKeepAliveRequests>0?socketWrapper.decrementKeepAlive():-1;
+        if (maxKeepAliveRequests > 0) {
+            socketWrapper.decrementKeepAlive();
+        }
         
         int soTimeout = endpoint.getSoTimeout();
 
@@ -198,7 +200,7 @@ public class Http11Processor extends AbstractHttp11Processor {
         }   
         // Disable keep-alive if we are running low on threads      
         if (threadRatio > getDisableKeepAlivePercentage()) {     
-            keepAliveLeft = 1;
+            socketWrapper.setKeepAliveLeft(0);
         }
 
         try {
@@ -304,8 +306,9 @@ public class Http11Processor extends AbstractHttp11Processor {
                 }
             }
 
-            if (maxKeepAliveRequests > 0 && keepAliveLeft == 0)
+            if (socketWrapper.getKeepAliveLeft() == 0) {
                 keepAlive = false;
+            }
 
             // Process the request in the adapter
             if (!error) {
@@ -385,8 +388,9 @@ public class Http11Processor extends AbstractHttp11Processor {
                 break;
             }
             
-            keepAliveLeft =
-                maxKeepAliveRequests>0?socketWrapper.decrementKeepAlive():-1;
+            if (maxKeepAliveRequests > 0) {
+                socketWrapper.decrementKeepAlive();
+            }
         }
 
         rp.setStage(org.apache.coyote.Constants.STAGE_ENDED);
