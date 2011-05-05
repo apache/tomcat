@@ -350,6 +350,19 @@
       <strong>connectionTimeout</strong> attribute.</p>
     </attribute>
 
+    <attribute name="maxConnections" required="false">
+      <p>The maximum number of connections that the server will accept and
+      process at any given time. When this number has been reached, the server
+      will not accept any more connections until the number of connections
+      falls below this value. The operating system may still accept
+      connections based on the <code>acceptCount</code> setting. Default value
+      varies by connector type. For BIO and NIO the default is
+      <code>10000</code>. For APR/native, the default is <code>8192</code>.</p>
+      <p>Note that for APR/native on Windows, the configured value will be
+      reduced to the highest multiple of 1024 that is less than or equal to
+      maxConnections. This is done for performance reasons.</p>
+    </attribute>
+
     <attribute name="maxHttpHeaderSize" required="false">
       <p>The maximum size of the request and response HTTP header, specified
       in bytes. If not specified, this attribute is set to 8192 (8 KB).</p>
@@ -557,15 +570,6 @@
         the default value is <code>75</code>.</p>
       </attribute>
 
-      <attribute name="maxConnections" required="false">
-        <p>The maximum number of connections that the server will accept and
-        process at any given time. When this number has been reached, the server
-        will not accept any more connections until the number of connections
-        falls below this value. The operating system may still accept
-        connections based on the <code>acceptCount</code> setting. Default value
-        is <code>10000</code>.</p>
-      </attribute>
-
     </attributes>
 
   </subsection>
@@ -740,7 +744,7 @@
         <p>Amount of sockets that the poller responsible for polling kept alive
         connections can hold at a given time. Extra connections will be closed
         right away. The default value is 8192, corresponding to 8192 keep-alive
-        connections.</p>
+        connections. This is a synonym for maxConnections.</p>
       </attribute>
 
       <attribute name="pollerThreadCount" required="false">

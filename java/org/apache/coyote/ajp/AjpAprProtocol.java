@@ -94,8 +94,9 @@ public class AjpAprProtocol extends AbstractAjpProtocol {
     public int getPollTime() { return ((AprEndpoint)endpoint).getPollTime(); }
     public void setPollTime(int pollTime) { ((AprEndpoint)endpoint).setPollTime(pollTime); }
 
-    public void setPollerSize(int pollerSize) { ((AprEndpoint)endpoint).setPollerSize(pollerSize); }
-    public int getPollerSize() { return ((AprEndpoint)endpoint).getPollerSize(); }
+    // pollerSize is now a synonym for maxConnections
+    public void setPollerSize(int pollerSize) { endpoint.setMaxConnections(pollerSize); }
+    public int getPollerSize() { return endpoint.getMaxConnections(); }
 
 
     // ----------------------------------------------------- JMX related methods
