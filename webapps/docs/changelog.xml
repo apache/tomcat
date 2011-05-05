@@ -160,6 +160,11 @@
         Improve handling in AJP connectors of the case where too large a AJP
         packet is received. (markt) 
       </fix>
+      <fix>
+        Restore the automatic disabling of HTTP keep-alive with the BIO
+        connector once 75% of the processing threads are in use and make the
+        threshold configurable. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
