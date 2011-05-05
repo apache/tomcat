@@ -49,4 +49,9 @@ public class TestELArithmetic extends TestCase {
         assertEquals("1.1",
                 String.valueOf(ELArithmetic.mod(a, b)));
     }
+
+    public void testBug47371() throws Exception {
+        assertEquals("1",
+                String.valueOf(ELArithmetic.add("", Integer.valueOf(1))));
+    }
 }
