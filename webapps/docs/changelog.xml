@@ -169,6 +169,10 @@
         Make pollerSize and maxConnections synonyms for the APR connectors since
         they perform the same function. (markt)
       </fix>
+      <fix>
+        Use maxThreads rather than 10000 as the default maxConnections for the
+        BIO connectors. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
