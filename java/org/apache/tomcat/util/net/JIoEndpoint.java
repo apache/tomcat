@@ -65,6 +65,14 @@ public class JIoEndpoint extends AbstractEndpoint {
     protected ServerSocket serverSocket = null;
     
 
+    // ------------------------------------------------------------ Constructor
+
+    public JIoEndpoint() {
+        // Set maxConnections to zero so we can tell if the user has specified
+        // their own value on the connector when we reach bind()
+        setMaxConnections(0);
+    }
+
     // ------------------------------------------------------------- Properties
 
     /**
@@ -351,6 +359,12 @@ public class JIoEndpoint extends AbstractEndpoint {
         if (acceptorThreadCount == 0) {
             acceptorThreadCount = 1;
         }
+        // Initialize maxConnections
+        if (getMaxConnections() == 0) {
+            // User hasn't set a value - use the default
+            setMaxConnections(getMaxThreads());
+        }
+
         if (serverSocketFactory == null) {
             if (isSSLEnabled()) {
                 serverSocketFactory =
