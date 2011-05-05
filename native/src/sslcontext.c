@@ -109,7 +109,9 @@ TCN_IMPLEMENT_CALL(jlong, SSLContext, make)(TCN_STDARGS, jlong pool,
         break;
     }
     if (!ctx) {
-        tcn_ThrowException(e, "Invalid Server SSL Protocol");
+        char err[256];
+        ERR_error_string(ERR_get_error(), err);
+        tcn_Throw(e, "Invalid Server SSL Protocol (%s)", err);
         goto init_failed;
     }
     if ((c = apr_pcalloc(p, sizeof(tcn_ssl_ctxt_t))) == NULL) {
