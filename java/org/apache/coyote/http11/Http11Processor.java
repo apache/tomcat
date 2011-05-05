@@ -171,6 +171,20 @@ public class Http11Processor extends AbstractHttp11Processor {
         
         int soTimeout = endpoint.getSoTimeout();
 
+        int threadRatio = -1;   
+        // These may return zero or negative values     
+        // Only calculate a thread ratio when both are >0 to ensure we get a    
+        // sensible result      
+        if (endpoint.getCurrentThreadsBusy() >0 &&      
+                endpoint.getMaxThreads() >0) {      
+            threadRatio = (endpoint.getCurrentThreadsBusy() * 100)      
+                    / endpoint.getMaxThreads();     
+        }   
+        // Disable keep-alive if we are running low on threads      
+        if (threadRatio > 75) {     
+            keepAliveLeft = 1;      
+        }
+
         try {
             socket.getSocket().setSoTimeout(soTimeout);
         } catch (Throwable t) {
