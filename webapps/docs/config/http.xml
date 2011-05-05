@@ -549,6 +549,14 @@
     
     <attributes>
 
+      <attribute name="disableKeepAlivePercentage" required="false">
+        <p>The percentage of processing threads that have to be in use before
+        HTTP keep-alives are disabled to improve scalability. Values less than
+        <code>0</code> will be changed to <code>0</code> and values greater than
+        <code>100</code> will be changed to <code>100</code>. If not specified,
+        the default value is <code>75</code>.</p>
+      </attribute>
+
       <attribute name="maxConnections" required="false">
         <p>The maximum number of connections that the server will accept and
         process at any given time. When this number has been reached, the server
