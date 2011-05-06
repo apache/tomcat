@@ -24,7 +24,7 @@ package javax.servlet.jsp.el;
  * information to resolve the map. </p>
  *
  * @since 2.0
- * @deprecated
+ * @deprecated As of JSP 2.1, replaced by javax.el.FunctionMapper
  */
 @SuppressWarnings("dep-ann") // TCK signature test fails with annotation
 public interface FunctionMapper {
