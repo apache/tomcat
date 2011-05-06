@@ -222,6 +222,11 @@
       <fix>
         Fix broken stylesheet URL in XML based manager status output. (rjung)
       </fix>
+      <fix>
+        <bug>51156</bug>: Ensure session expiration option is available in
+        Manager application was running web applications that were defined in
+        server.xml. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
