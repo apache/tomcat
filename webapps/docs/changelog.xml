@@ -237,6 +237,10 @@
         <bug>51135</bug>: Fix auto-detection of JAVA_HOME for 64-bit Windows
         platforms that only have a 32-bit JVM installed. (markt) 
       </fix>
+      <fix>
+        <bug>51154</bug>: Remove duplicate @deprecated tags in ServletContext
+        Javadoc. Patch provided by sebb. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
