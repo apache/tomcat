@@ -241,6 +241,10 @@
         <bug>51154</bug>: Remove duplicate @deprecated tags in ServletContext
         Javadoc. Patch provided by sebb. (markt)
       </fix>
+      <fix>
+        <bug>51155</bug>: Add comments to @deprecated tags that have none. Patch
+        provided by sebb. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
