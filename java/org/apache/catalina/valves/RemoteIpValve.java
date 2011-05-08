@@ -442,6 +442,17 @@ public class RemoteIpValve extends ValveBase {
      */
     private Pattern trustedProxies = null;
     
+
+    /**
+     * Default constructor that ensures {@link ValveBase#ValveBase(boolean)} is
+     * called with <code>true</code>.
+     */
+    public RemoteIpValve() {
+        // Async requests are supported with this valve
+        super(true);
+    }
+
+    
     public int getHttpsServerPort() {
         return httpsServerPort;
     }
