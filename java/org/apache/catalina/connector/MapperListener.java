@@ -140,7 +140,7 @@ public class MapperListener extends LifecycleMBeanBase
     @Override
     public void containerEvent(ContainerEvent event) {
 
-        if (event.getType().equals(Container.ADD_CHILD_EVENT)) {
+        if (Container.ADD_CHILD_EVENT.equals(event.getType())) {
             Container child = (Container) event.getData();
             addListeners(child);
             // If child is started then it is too late for life-cycle listener
@@ -154,19 +154,19 @@ public class MapperListener extends LifecycleMBeanBase
                     registerWrapper((Wrapper) child);
                 }
             }
-        } else if (event.getType().equals(Container.REMOVE_CHILD_EVENT)) {
+        } else if (Container.REMOVE_CHILD_EVENT.equals(event.getType())) {
             Container child = (Container) event.getData();
             removeListeners(child);
             // No need to unregister - life-cycle listener will handle this when
             // the child stops
-        } else if (event.getType().equals(Host.ADD_ALIAS_EVENT)) {
+        } else if (Host.ADD_ALIAS_EVENT.equals(event.getType())) {
             // Handle dynamically adding host aliases
             mapper.addHostAlias(((Host) event.getSource()).getName(),
                     event.getData().toString());
-        } else if (event.getType().equals(Host.REMOVE_ALIAS_EVENT)) {
+        } else if (Host.REMOVE_ALIAS_EVENT.equals(event.getType())) {
             // Handle dynamically removing host aliases
             mapper.removeHostAlias(event.getData().toString());
-        } else if (event.getType().equals(Wrapper.ADD_MAPPING_EVENT)) {
+        } else if (Wrapper.ADD_MAPPING_EVENT.equals(event.getType())) {
             // Handle dynamically adding wrappers
             Wrapper wrapper = (Wrapper) event.getSource();
             Context context = (Context) wrapper.getParent();
@@ -182,7 +182,7 @@ public class MapperListener extends LifecycleMBeanBase
                     && mapping.endsWith("/*"));
             mapper.addWrapper(hostName, contextPath, version, mapping, wrapper,
                     jspWildCard, context.isResourceOnlyServlet(wrapperName));
-        } else if (event.getType().equals(Wrapper.REMOVE_MAPPING_EVENT)) {
+        } else if (Wrapper.REMOVE_MAPPING_EVENT.equals(event.getType())) {
             // Handle dynamically removing wrappers
             Wrapper wrapper = (Wrapper) event.getSource();
 
@@ -196,7 +196,7 @@ public class MapperListener extends LifecycleMBeanBase
             String mapping = (String) event.getData();
             
             mapper.removeWrapper(hostName, contextPath, version, mapping);
-        } else if (event.getType().equals(Context.ADD_WELCOME_FILE_EVENT)) {
+        } else if (Context.ADD_WELCOME_FILE_EVENT.equals(event.getType())) {
             // Handle dynamically adding welcome files
             Context context = (Context) event.getSource();
             
@@ -211,7 +211,7 @@ public class MapperListener extends LifecycleMBeanBase
             
             mapper.addWelcomeFile(hostName, contextPath,
                     context.getWebappVersion(), welcomeFile);
-        } else if (event.getType().equals(Context.REMOVE_WELCOME_FILE_EVENT)) {
+        } else if (Context.REMOVE_WELCOME_FILE_EVENT.equals(event.getType())) {
             // Handle dynamically removing welcome files
             Context context = (Context) event.getSource();
             
@@ -226,7 +226,7 @@ public class MapperListener extends LifecycleMBeanBase
             
             mapper.removeWelcomeFile(hostName, contextPath,
                     context.getWebappVersion(), welcomeFile);
-        } else if (event.getType().equals(Context.CLEAR_WELCOME_FILES_EVENT)) {
+        } else if (Context.CLEAR_WELCOME_FILES_EVENT.equals(event.getType())) {
             // Handle dynamically clearing welcome files
             Context context = (Context) event.getSource();
             
