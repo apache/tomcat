@@ -61,6 +61,10 @@
         Use safe equality test when determining event type in the
         MapperListener. (markt)
       </fix>
+      <fix>
+        Use correct class loader when loading Servlet classes in
+        StandardWrapper. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
