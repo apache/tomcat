@@ -60,7 +60,7 @@ use Getopt::Std;
 ################### BEGIN VARIABLES WHICH MUST BE MAINTAINED #####################
 
 # Script version, printed via getopts with "--version"
-$main::VERSION = '1.0';
+our $VERSION = '1.1';
 
 # Locale used via LC_COLLATE when sorting extensions
 my $LOCALE  = 'en.UTF-8';
@@ -137,13 +137,19 @@ my $tomcat_pre; my $tomcat_post;
 # Helper variables
 my $i;
 my $line;
-my @cols;
+my $mimetype;
+my @extensions;
 my $extension;
 my $type;
 my $comment;
 my $commented;
-my $check;
 my $msg;
+my $previous;
+my $current;
+# File handles
+my $mimetypes_fh;
+my $webxml_fh;
+my $output_fh;
 
 
 # Usage/Help
@@ -163,7 +169,7 @@ sub HELP_MESSAGE {
 # -o: output web.xml file (gets generated and overwritten)
 
 $Getopt::Std::STANDARD_HELP_VERSION = 1;
-our($opt_m, $opt_i, $opt_o);
+our ($opt_m, $opt_i, $opt_o);
 getopts('m:i:o:');
 
 
@@ -178,33 +184,33 @@ if ($opt_m eq '' || $opt_i eq '' || $opt_o eq '') {
 setlocale(LC_COLLATE, $LOCALE);
 
 # Read and parse httpd mime.types, build up hash extension->mime-type
-open(MIMETYPES, "<$opt_m") or die "Could not open file '$opt_m' for read - Aborting!";
-while (<MIMETYPES>) {
+open($mimetypes_fh, '<', $opt_m) or die "Could not open file '$opt_m' for read - Aborting!";
+while (<$mimetypes_fh>) {
     chomp($_);
     $line = $_;
     $line =~ s/#.*//;
     $line =~ s/^\s+//;
     if ($line ne '') {
-        @cols = split(/\s+/, $line);
-        if ($#cols > 0) {
-            for ($i=1; $i <= $#cols; $i++) {
-                $httpd{$cols[$i]} = $cols[0];
+        ($mimetype, @extensions) = split(/\s+/, $line);
+        if (@extensions > 0) {
+            for $extension (@extensions) {
+                $httpd{$extension} = $mimetype;
             }
         } else {
             print STDERR "WARN mime.types line ignored: $_\n";
         }
     }
 }
-close(MIMETYPES);
+close($mimetypes_fh);
 
 # Read and parse web.xml, build up hash extension->mime-type
 # and store the file parts form before and after mime mappings.
-open(WEBXML, "<$opt_i") or die "Could not open file '$opt_i' for read - Aborting!";
+open($webxml_fh, '<', $opt_i) or die "Could not open file '$opt_i' for read - Aborting!";
 
 # Skip and record all lines before the first mime type definition.
 # Because of comment handling we need to read one line ahead.
 $line = '';
-while (<WEBXML>) {
+while (<$webxml_fh>) {
     if ($_ !~ /<mime-mapping>/) {
         $tomcat_pre .= $line;
     } else {
@@ -231,12 +237,12 @@ if ($line =~ /^\s*<!--[^>]*$/) {
 # are allowed. The whole block is also allowed to be commented out.
 
 while ($_ =~ /^\s*<mime-mapping>\s*$/) {
-    $_ = <WEBXML>;
+    $_ = <$webxml_fh>;
     chomp($_);
     $comment = '';
     if ($_ =~ /^\s*<!--([^>]*)-->\s*$/) {
         $comment = $1;
-        $_ = <WEBXML>;
+        $_ = <$webxml_fh>;
         chomp($_);
     }
     if ($_ =~ /^\s*<extension>([^<]*)<\/extension>\s*$/ ) {
@@ -246,10 +252,10 @@ while ($_ =~ /^\s*<mime-mapping>\s*$/) {
     } else {
         print STDERR "ERROR Parse error in Tomcat mime-mapping line $.\n";
         print STDERR "ERROR Expected <extension>...</extension>', got '$_' - Aborting!\n";
-        close(WEBXML);
+        close($webxml_fh);
         exit 2;
     }
-    $_ = <WEBXML>;
+    $_ = <$webxml_fh>;
     chomp($_);
     if ($_ =~ /^\s*<mime-type>([^<]*)<\/mime-type>\s*$/ ) {
         $type = $1;
@@ -272,28 +278,28 @@ while ($_ =~ /^\s*<mime-mapping>\s*$/) {
     } else {
         print STDERR "ERROR Parse error in Tomcat mime-mapping line $.\n";
         print STDERR "ERROR Expected <mime-type>...</mime-type>', got '$_' - Aborting!\n";
-        close(WEBXML);
+        close($webxml_fh);
         exit 3;
     }
-    $_ = <WEBXML>;
+    $_ = <$webxml_fh>;
     chomp($_);
     if ($_ !~ /^\s*<\/mime-mapping>\s*$/) {
         print STDERR "ERROR Parse error in Tomcat mime-mapping line $.\n";
         print STDERR "ERROR Expected '</mime-mapping>', got '$_' - Aborting!\n";
-        close(WEBXML);
+        close($webxml_fh);
         exit 4;
     }
-    $_ = <WEBXML>;
+    $_ = <$webxml_fh>;
     # Check for comment closure
     if ($commented && $_ =~ /^[^<]*-->\s*$/) {
         $commented = 0;
-        $_ = <WEBXML>;
+        $_ = <$webxml_fh>;
     }
     # Check for comment opening
     if ($_ =~ /^\s*<!--[^>]*$/) {
         $commented = 1;
         $line = $_;
-        $_ = <WEBXML>;
+        $_ = <$webxml_fh>;
     }
 }
 
@@ -304,17 +310,17 @@ if ($commented) {
 
 # Read and record the remaining lines
 $tomcat_post .= $_;
-while (<WEBXML>) {
+while (<$webxml_fh>) {
     if ($_ =~ /<mime-mapping>/) {
         print STDERR "ERROR mime-mapping blocks are not consecutive\n";
         print STDERR "ERROR See line $. in $opt_i - Aborting!\n";
-        close(WEBXML);
+        close($webxml_fh);
         exit 5;
     }
     $tomcat_post .= $_;
 }
 
-close(WEBXML);
+close($webxml_fh);
 
 
 # Look for extensions existing for Tomcat but not for httpd.
@@ -351,15 +357,16 @@ for $extension (@tomcat_extensions) {
 
 
 # Log if extensions in web.xml are not sorted alphabetically.
-$check = 0;
 $msg = '';
-for ($i=1; $i <= $#tomcat_extensions; $i++) {
-    if ($tomcat_extensions[$i - 1] ge $tomcat_extensions[$i]) {
-        $check = 1;
-        $msg .= "WARN Extension '" . $tomcat_extensions[$i - 1] . "' defined before '" . $tomcat_extensions[$i] . "'\n";
+$previous = '';
+for $current (@tomcat_extensions) {
+    if ($previous ge $current) {
+      $msg .= "WARN Extension '$previous' defined before '$current'\n";
     }
+    $previous = $current;
 }
-if ($check) {
+
+if ($msg ne '') {
     print STDERR "WARN MIME type definitions in web.xml were not sorted alphabetically by extension\n";
     print STDERR $msg;
     print STDERR "WARN This will be fixed in the new generated web.xml file '$opt_o'.\n";
@@ -381,30 +388,30 @@ for $extension (sort keys %httpd) {
 #   - Add TOMCAT_ONLY
 #   - Fix TOMCAT_KEEP
 #   - output tomcat_pre, sorted mime-mappings, tomcat_post.
-for $extension (keys %TOMCAT_ONLY) {
-    $httpd{$extension} = $TOMCAT_ONLY{$extension};
+while (($extension, $mimetype) = each %TOMCAT_ONLY) {
+    $httpd{$extension} = $mimetype;
 }
-for $extension (keys %TOMCAT_KEEP) {
-    $httpd{$extension} = $TOMCAT_KEEP{$extension};
+while (($extension, $mimetype) = each %TOMCAT_KEEP) {
+    $httpd{$extension} = $mimetype;
 }
-open (NEW, ">$opt_o") or die "Could not open file '$opt_o' for write - Aborting!";
-print NEW $tomcat_pre;
+open ($output_fh, '>', $opt_o) or die "Could not open file '$opt_o' for write - Aborting!";
+print $output_fh $tomcat_pre;
 for $extension (sort keys %httpd) {
     if (exists($tomcat_commented{$extension})) {
-        print NEW "    <!--\n";
+        print $output_fh "    <!--\n";
     }
-    print NEW "    <mime-mapping>\n";
+    print $output_fh "    <mime-mapping>\n";
     if (exists($tomcat_comments{$extension})) {
-        print NEW "        <!--$tomcat_comments{$extension}-->\n";
+        print $output_fh "        <!--$tomcat_comments{$extension}-->\n";
     }
-    print NEW "        <extension>$extension</extension>\n";
-    print NEW "        <mime-type>$httpd{$extension}</mime-type>\n";
-    print NEW "    </mime-mapping>\n";
+    print $output_fh "        <extension>$extension</extension>\n";
+    print $output_fh "        <mime-type>$httpd{$extension}</mime-type>\n";
+    print $output_fh "    </mime-mapping>\n";
     if (exists($tomcat_commented{$extension})) {
-        print NEW "    -->\n";
+        print $output_fh "    -->\n";
     }
 }
-print NEW $tomcat_post;
-close(NEW);
+print $output_fh $tomcat_post;
+close($output_fh);
 print "New file '$opt_o' has been written.\n";
 
