@@ -57,6 +57,10 @@
         Ensure that the RemoteIpValve works correctly with Servlet 3.0
         asynchronous requests. (markt)
       </fix>
+      <fix>
+        Use safe equality test when determining event type in the
+        MapperListener. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
