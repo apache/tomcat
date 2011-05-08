@@ -49,6 +49,10 @@
         Stylistic improvements to MIME type sync script.
         Based on a patch provided by Felix Schumacher. (rjung)
       </update>
+      <fix>
+        Ensure that the SSLValve provides the SSL key size as an Integer rather
+        than a String. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>

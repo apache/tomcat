@@ -126,7 +126,8 @@ public class SSLValve extends ValveBase {
         }
         strcert0 = mygetHeader(request, "ssl_cipher_usekeysize");
         if (strcert0 != null) {
-            request.setAttribute(Globals.KEY_SIZE_ATTR, strcert0);
+            request.setAttribute(Globals.KEY_SIZE_ATTR,
+                    Integer.valueOf(strcert0));
         }
         getNext().invoke(request, response);
     }
