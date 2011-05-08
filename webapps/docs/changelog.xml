@@ -53,6 +53,10 @@
         Ensure that the SSLValve provides the SSL key size as an Integer rather
         than a String. (markt)
       </fix>
+      <fix>
+        Ensure that the RemoteIpValve works correctly with Servlet 3.0
+        asynchronous requests. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
