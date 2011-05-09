@@ -33,12 +33,12 @@ maven.snapshot.repo.repositoryId=apache.snapshots
 #Maven release properties for Tomcat staging
 maven.release.repo.url=scp://people.apache.org/www/tomcat.apache.org/dev/dist/m2-repository
 maven.release.repo.repositoryId=tomcat-staging
-maven.release.deploy.version=7.0.14
+maven.release.deploy.version=7.0.15
 
 #Maven release properties for the main ASF repo
 maven.asf.release.repo.url=scp://people.apache.org/www/people.apache.org/repo/m2-ibiblio-rsync-repository
 maven.asf.release.repo.repositoryId=apache.releases
-maven.asf.release.deploy.version=7.0.14
+maven.asf.release.deploy.version=7.0.15
 
 
 #Where do we load the libraries from
