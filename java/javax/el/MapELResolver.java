@@ -64,8 +64,7 @@ public class MapELResolver extends ELResolver {
 
         if (base instanceof Map<?,?>) {
             context.setPropertyResolved(true);
-            Object obj = ((Map<?,?>) base).get(property);
-            return (obj != null) ? obj.getClass() : null;
+            return Object.class;
         }
         
         return null;
