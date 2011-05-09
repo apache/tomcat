@@ -1,0 +1,40 @@
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one or more
+  contributor license agreements.  See the NOTICE file distributed with
+  this work for additional information regarding copyright ownership.
+  The ASF licenses this file to You under the Apache License, Version 2.0
+  (the "License"); you may not use this file except in compliance with
+  the License.  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+<jsp:root
+  xmlns:bug45451="urn:jsptagdir:/WEB-INF/tags/bug45451"
+  xmlns:jsp="http://java.sun.com/JSP/Page" version="2.2"
+  xmlns:tags="urn:jsptagdir:/WEB-INF/tags" >
+  <jsp:directive.page isELIgnored="false" />
+<html>
+  <body>
+    <p>00-${1+1}</p>
+    <p>01-\${1+1}</p>
+    <p>02-\\${1+1}</p>
+    <p>03-\\\${1+1}</p>
+    <tags:echo echo="04-${1+1}" />
+    <tags:echo echo="05-\${1+1}" />
+    <tags:echo echo="06-\\${1+1}" />
+    <tags:echo echo="07-\\\${1+1}" />
+    <tags:echo echo="08-\\\\${1+1}" />
+    <tags:echo-deferred echo="09-#{1+1}" />
+    <tags:echo-deferred echo="10-\#{1+1}" />
+    <tags:echo-deferred echo="11-\\#{1+1}" />
+    <tags:echo-deferred echo="12-\\\#{1+1}" />
+    <tags:echo-deferred echo="13-\\\\#{1+1}" />
+  </body>
+</html>
+</jsp:root>

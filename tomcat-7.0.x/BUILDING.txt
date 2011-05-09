@@ -1,0 +1,143 @@
+================================================================================
+  Licensed to the Apache Software Foundation (ASF) under one or more
+  contributor license agreements.  See the NOTICE file distributed with
+  this work for additional information regarding copyright ownership.
+  The ASF licenses this file to You under the Apache License, Version 2.0
+  (the "License"); you may not use this file except in compliance with
+  the License.  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+================================================================================
+
+$Id$
+
+            ====================================================
+            Building The Apache Tomcat @VERSION_MAJOR_MINOR@ Servlet/JSP Container
+            ====================================================
+
+This subproject contains the source code for Tomcat @VERSION_MAJOR_MINOR@, a container that
+implements the Servlet 3.0 and JSP 2.1 specifications from the Java
+Community Process <http://www.jcp.org/>.  In order to build a binary
+distribution version of the container from a source distribution, 
+do the following:
+
+
+(0) Download and Install a Java Development Kit
+
+* If the JDK is already installed, skip to (1).
+
+* Download a Java Development Kit (JDK) release (version 1.6.x or later) from:
+
+    http://www.oracle.com/technetwork/java/javase/downloads/index.html
+
+* Install the JDK according to the instructions included with the release.
+
+* Set an environment variable JAVA_HOME to the pathname of the directory
+  into which you installed the JDK release.
+
+
+(1) Install Apache Ant 1.8.x on your computer
+
+* If Apache Ant 1.8.x is already installed on your computer, skip to (2).
+
+* Download a binary distribution of Ant 1.8.x from:
+
+    http://ant.apache.org/bindownload.cgi
+
+* Unpack the binary distribution into a convenient location so that the
+  Ant release resides in its own directory (conventionally named
+  "apache-ant-[version]").  For the purposes of the remainder of this document,
+  the symbolic name "${ant.home}" is used to refer to the full pathname of
+  the release directory.
+
+* Create an ANT_HOME environment variable to point the directory
+  ${ant.home}.
+
+* Modify the PATH environment variable to include the directory
+  ${ant.home}/bin in its list.  This makes the "ant" command line script
+  available, which will be used to actually perform the build.
+
+
+(2) Building Tomcat @VERSION_MAJOR_MINOR@
+
+(2.1) Checkout or obtain the source code for Tomcat @VERSION_MAJOR_MINOR@
+
+* Tomcat SVN repository URL:
+  http://svn.apache.org/repos/asf/tomcat/tc@VERSION_MAJOR_MINOR@.x/
+
+* Download a source package from:
+  http://tomcat.apache.org/download-70.cgi
+
+* Checkout the source using SVN, selecting the desired version or
+  branch (current development source is at 
+  http://svn.apache.org/repos/asf/tomcat/tc@VERSION_MAJOR_MINOR@.x/trunk/), or 
+  unpack the source package. The location where the source has been
+  placed will be referred as ${tomcat.source}.
+
+(2.2) Building
+
+* Go to that directory, and do:
+
+    cd ${tomcat.source}
+    ant
+
+* NOTE: Users accessing the Internet through a proxy must use a properties
+  file to indicate to Ant the proxy configuration. Read below.
+
+* WARNING: Running this command will download binaries to the /usr/share/java 
+  directory. Make sure this is appropriate to do on your computer. On Windows, 
+  this usually corresponds to the "C:\usr\share\java" directory, unless Cygwin 
+  is used. Read below to customize the directory used to download the binaries.
+
+* The build can be controlled by creating a ${tomcat.source}/build.properties
+  file, and adding the following content to it:
+
+    # ----- Proxy setup -----
+    # Uncomment if using a proxy server
+    #proxy.host=proxy.domain
+    #proxy.port=8080
+    #proxy.use=on
+
+    # ----- Default Base Path for Dependent Packages -----
+    # Replace this path with the directory path where dependencies binaries
+    # should be downloaded
+    base.path=/usr/share/java
+
+
+(3) Updating sources
+
+It is recommended that you regularly update the downloaded Tomcat 7 sources
+using your SVN client.
+
+(4) Rebuilds
+
+For a quick rebuild of only modified code you can use:
+
+    cd ${tomcat.source}
+    ant
+
+(5) Building the servlet and jsp API documentation
+
+The documentation can be easly built:
+
+    cd ${tomcat.source}
+    ant javadoc
+
+(6) Building the extras (commons-logging, webservices etc.).
+    cd ${tomcat.source}
+    ant extras
+
+(7) Building the embedded packages.
+    cd ${tomcat.source}
+    ant embed
+
+(8) Building a full release (as provided via the ASF download pages):
+
+    cd ${tomcat.source}
+    ant release

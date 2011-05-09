@@ -1,0 +1,245 @@
+<?xml version="1.0"?>
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one or more
+  contributor license agreements.  See the NOTICE file distributed with
+  this work for additional information regarding copyright ownership.
+  The ASF licenses this file to You under the Apache License, Version 2.0
+  (the "License"); you may not use this file except in compliance with
+  the License.  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+<!DOCTYPE document [
+  <!ENTITY project SYSTEM "project.xml">
+]>
+<document>
+
+    &project;
+
+    <properties>
+      <author>Remy Maucherat, Tim Whittington</author>
+      <title>Building Tomcat</title>
+    </properties>
+
+<body>
+
+<section name="Table of Contents">
+<toc/>
+</section>
+
+<section name="Introduction">
+
+<p>
+Building Apache Tomcat from source is very easy, and is the first step to contributing to
+Tomcat. The following is a step by step guide.
+</p>
+
+</section>
+
+<section name="Download a Java Development Kit (JDK) 1.6 or later">
+
+<p>
+Tomcat requires a JDK (version 1.6 or later) to be installed.
+<br/>The Sun JDK can be downloaded
+<a href="http://www.oracle.com/technetwork/java/javase/downloads/index.html">here</a>.
+</p>
+
+<p>
+<b>IMPORTANT</b>: Set an environment variable JAVA_HOME to the pathname of the 
+directory into which you installed the JDK release.
+</p>
+
+</section>
+
+<section name="Install Apache Ant 1.8.1 or later">
+
+<p>
+Download a binary distribution of Ant 1.8.1 or later from 
+<a href="http://ant.apache.org/bindownload.cgi">here</a>.
+</p>
+
+<p>
+Unpack the binary distribution into a convenient location so that the
+Ant release resides in its own directory (conventionally named
+<code>apache-ant-1.8.x</code>).  For the remainder of this guide,
+the symbolic name <code>${ant.home}</code> is used to refer to the full pathname of
+ the Ant installation directory directory.
+</p>
+
+<p>
+<b>IMPORTANT</b>: Create an ANT_HOME environment variable to point the directory <code>${ant.home}</code>, 
+and modify the PATH environment variable to include directory
+<code>${ant.home}/bin</code> in its list.  This makes the <code>ant</code> command line script
+available, which will be used to actually perform the build.
+</p>
+
+</section>
+
+<section name="Checkout or obtain the source code for Tomcat 7.0">
+
+  <p>
+  Tomcat SVN repository URL: 
+  <a href="http://svn.apache.org/repos/asf/tomcat/trunk/">http://svn.apache.org/repos/asf/tomcat/trunk/</a>
+  </p>
+  <p>
+  Tomcat source packages: 
+  <a href="http://tomcat.apache.org/download-70.cgi">http://tomcat.apache.org/download-70.cgi</a>.
+  </p>
+
+  <p>
+  Checkout the source using SVN, or download and unpack a source package. 
+  For the remainder of this guide, the symbolic name <code>${tomcat.source}</code> is used to refer to the 
+  location where the source has been placed.
+  </p>
+ 
+</section>
+
+<section name="Building Tomcat">
+
+<p>
+Use the following commands to build Tomcat:
+<br/>
+<code><br/>
+    cd ${tomcat.source}<br/>
+    ant<br/>
+</code>
+</p>
+
+<p>
+<b>NOTE:</b> Users accessing the Internet through a proxy must use a properties
+  file to indicate to Ant the proxy configuration. Read below for details.
+</p>
+
+<p>
+<b>WARNING:</b> Running this command will download binary binaries to the 
+  <code>/usr/share/java</code> directory by default. 
+  Make sure this is appropriate to do so on your computer. On Windows, 
+  this usually corresponds to the <code>C:\usr\share\java</code> directory, 
+  unless Cygwin is used. Read below to customize the directory used 
+  to download the binaries.
+</p>
+
+<p>
+  The build can be controlled by creating a <code>${tomcat.source}/build.properties</code>
+  file and adding the following content to it:
+<br/>
+<code><br/>
+    # ----- Proxy setup -----<br/>
+    # Uncomment if using a proxy server.<br/>
+    #proxy.host=proxy.domain<br/>
+    #proxy.port=8080<br/>
+    #proxy.use=on<br/>
+<br/>
+    # ----- Default Base Path for Dependent Packages -----<br/>
+    # Replace this path with the directory path where<br/>
+    # dependencies binaries should be downloaded.<br/>
+    base.path=/usr/share/java<br/>
+</code>
+</p>
+
+<p>
+Once the build has completed successfully, a usable Tomcat installation will have been
+produced in the <code>${tomcat.source}/output/build</code> directory, and can be started
+and stopped with the usual scripts.
+</p>
+</section>
+
+<section name="Building with Eclipse">
+
+<p>
+<b>IMPORTANT:</b> This is not a supported means of building Tomcat; this information is
+provided without warranty :-).
+The only supported means of building Tomcat is with the Ant build described above.
+However, some developers like to work on Java code with a Java IDE,
+and the following steps have been used by some developers.
+</p>
+
+<p>
+<b>NOTE:</b> This will not let you build everything under Eclipse;
+the build process requires use of Ant for the many stages that aren't
+simple Java compilations.
+However, it will allow you to view and edit the Java code,
+get warnings, reformat code, perform refactorings, run Tomcat
+under the IDE, and so on.
+</p>
+<p>
+Sample Eclipse project files and launch targets are provided in the 
+<code>res/ide-support/eclipse</code> directory of the source tree.
+The instructions below will automatically copy these into the required locations.
+</p>
+<p>
+An Ant target is provided as a convenience to download all binary dependencies, and to create
+the Eclipse project and classpath files in the root of the source tree.
+<br/>
+<code><br/>
+    cd ${tomcat.source}<br/>
+    ant ide-eclipse<br/>
+</code>
+</p>
+
+<p>
+Start Eclipse and create a new Workspace.
+</p>
+
+<p>
+Open the <em>Preferences</em> dialog and then select <em>Java-&gt;Build Path-&gt;Classpath
+Variables</em> to add two new <em>Classpath Variables</em>:
+</p>
+
+<p>
+<table border="1">
+ <tr><td>TOMCAT_LIBS_BASE</td><td>The same location as the <code>base.path</code>
+  setting in <code>build.properties</code>, where the binary dependencies have been downloaded</td></tr>
+ <tr><td>ANT_HOME</td><td>the base path of Ant 1.8.1 or later</td></tr>
+</table>
+</p>
+
+<p>
+Use <em>File-&gt;Import</em> and choose <em>Existing Projects into Workspace</em>.
+From there choose the root directory of the Tomcat source tree (<code>${tomcat.source}</code>)
+and import the Tomcat project located there.
+</p>
+
+<p>
+<code>start-tomcat</code> and <code>stop-tomcat</code> launch configurations are provided in
+<code>res/ide-support/eclipse</code> and will be available in the <em>Run-&gt;Run Configurations</em>
+dialog. Use these to start and stop Tomcat from Eclipse.
+<br/>If you want to configure these yourself (or are using a different IDE) 
+then use <code>org.apache.catalina.startup.Bootstrap</code> as the main class,
+<code>start</code>/<code>stop</code> etc. as program arguments, and specify <code>-Dcatalina.home=...</code> 
+(with the name of your build directory) as VM arguments.
+</p>
+
+<p>
+Tweaking a few formatting preferences will make it much easier to keep consistent with Tomcat 
+coding conventions (and have your contributions accepted):
+</p>
+<p>
+<table border="1">
+  <tr><td>Java -&gt; Code Style -> Formatter -&gt; Edit...</td>
+  <td>Tab policy: Spaces only<br/>Tab and Indentation size: 4</td></tr>
+  <tr><td>General -&gt; Editors -> Text Editors</td>
+  <td>Displayed tab width: 2<br/>Insert spaces for tabs<br/>Show whitespace characters (optional)</td></tr>
+  <tr><td>XML -&gt; XML Files -> Editor</td><td>Indent using spaces<br/>Indentation size: 2</td></tr>
+  <tr><td>Ant -&gt; Editor -> Formatter</td><td>Tab size: 2<br/>Use tab character instead of spaces: unchecked</td></tr>
+</table>
+</p>
+
+</section>
+
+<section name="Building with other IDEs">
+<p>
+The same general approach should work for most IDEs; it has been reported
+to work in IntelliJ IDEA, for example.
+</p>
+
+</section>
+
+</body>
+</document>
