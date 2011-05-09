@@ -75,7 +75,16 @@
         Ensure session cookie paths end in <code>/</code> so that session
         cookies created for a context with a path of <code>/foo</code> do not
         get returned with requests mapped to a context with a path of
-        <code>/foobar</code>. (markt)  
+        <code>/foobar</code>. (markt)
+      </fix>
+    </changelog>
+  </subsection>
+  <subsection name="Jasper">
+    <changelog>
+      <fix>
+        <bug>51177</bug>: Ensure Tomcat&apos;s MapElResolver always returns
+        <code>Object.class</code> for <code>getType()</code> as required by the
+        EL specification. (markt)
       </fix>
     </changelog>
   </subsection>
