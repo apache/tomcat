@@ -71,6 +71,12 @@
         ServletRequest#getServerPort() and ServletRequest#getLocalPort() when
         Tomcat is behind a reverse proxy. (markt)
       </add>
+      <fix>
+        Ensure session cookie paths end in <code>/</code> so that session
+        cookies created for a context with a path of <code>/foo</code> do not
+        get returned with requests mapped to a context with a path of
+        <code>/foobar</code>. (markt)  
+      </fix>
     </changelog>
   </subsection>
 </section>
