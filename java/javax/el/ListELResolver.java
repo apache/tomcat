@@ -74,8 +74,7 @@ public class ListELResolver extends ELResolver {
                 throw new PropertyNotFoundException(
                         new ArrayIndexOutOfBoundsException(idx).getMessage());
             }
-            Object obj = list.get(idx);
-            return (obj != null) ? obj.getClass() : null;
+            return Object.class;
         }
 
         return null;
