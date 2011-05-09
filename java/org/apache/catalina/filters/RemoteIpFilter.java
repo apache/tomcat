@@ -454,6 +454,8 @@ public class RemoteIpFilter implements Filter {
         
         protected Map<String, List<String>> headers;
         
+        protected int localPort;
+
         protected String remoteAddr;
         
         protected String remoteHost;
@@ -463,9 +465,10 @@ public class RemoteIpFilter implements Filter {
         protected boolean secure;
         
         protected int serverPort;
-        
+
         public XForwardedRequest(HttpServletRequest request) {
             super(request);
+            this.localPort = request.getLocalPort();
             this.remoteAddr = request.getRemoteAddr();
             this.remoteHost = request.getRemoteHost();
             this.scheme = request.getScheme();
@@ -543,6 +546,11 @@ public class RemoteIpFilter implements Filter {
         }
         
         @Override
+        public int getLocalPort() {
+            return localPort;
+        }
+        
+        @Override
         public String getRemoteAddr() {
             return this.remoteAddr;
         }
@@ -585,6 +593,10 @@ public class RemoteIpFilter implements Filter {
             
         }
         
+        public void setLocalPort(int localPort) {
+            this.localPort = localPort;
+        }
+
         public void setRemoteAddr(String remoteAddr) {
             this.remoteAddr = remoteAddr;
         }
@@ -626,6 +638,10 @@ public class RemoteIpFilter implements Filter {
     
     protected static final String PROTOCOL_HEADER_HTTPS_VALUE_PARAMETER = "protocolHeaderHttpsValue";
     
+    protected static final String PORT_HEADER_PARAMETER = "portHeader";
+
+    protected static final String CHANGE_LOCAL_PORT_PARAMETER = "changeLocalPort";
+
     protected static final String PROXIES_HEADER_PARAMETER = "proxiesHeader";
     
     protected static final String REMOTE_IP_HEADER_PARAMETER = "remoteIpHeader";
@@ -688,6 +704,10 @@ public class RemoteIpFilter implements Filter {
     
     private String protocolHeaderHttpsValue = "https";
     
+    private String portHeader = null;
+    
+    private boolean changeLocalPort = false;
+
     /**
      * @see #setProxiesHeader(String)
      */
@@ -780,11 +800,11 @@ public class RemoteIpFilter implements Filter {
                 } else if (protocolHeaderHttpsValue.equalsIgnoreCase(protocolHeaderValue)) {
                     xRequest.setSecure(true);
                     xRequest.setScheme("https");
-                    xRequest.setServerPort(httpsServerPort);
+                    setPorts(xRequest, httpsServerPort);
                 } else {
                     xRequest.setSecure(false);
                     xRequest.setScheme("http");
-                    xRequest.setServerPort(httpServerPort);
+                    setPorts(xRequest, httpServerPort);
                 }
             }
             
@@ -819,6 +839,25 @@ public class RemoteIpFilter implements Filter {
         
     }
     
+    private void setPorts(XForwardedRequest xrequest, int defaultPort) {
+        int port = defaultPort;
+        if (getPortHeader() != null) {
+            String portHeaderValue = xrequest.getHeader(getPortHeader());
+            if (portHeaderValue != null) {
+                try {
+                    port = Integer.parseInt(portHeaderValue);
+                } catch (NumberFormatException nfe) {
+                    log.debug("Invalid port value [" + portHeaderValue +
+                            "] provided in header [" + getPortHeader() + "]");
+                }
+            }
+        }
+        xrequest.setServerPort(port);
+        if (isChangeLocalPort()) {
+            xrequest.setLocalPort(port);
+        }
+    }
+
     /**
      * Wrap the incoming <code>request</code> in a {@link XForwardedRequest} if the http header <code>x-forwareded-for</code> is not empty.
      */
@@ -831,6 +870,10 @@ public class RemoteIpFilter implements Filter {
         }
     }
     
+    public boolean isChangeLocalPort() {
+        return changeLocalPort;
+    }
+    
     public int getHttpsServerPort() {
         return httpsServerPort;
     }
@@ -841,6 +884,10 @@ public class RemoteIpFilter implements Filter {
     
     public String getProtocolHeader() {
         return protocolHeader;
+    }
+    
+    public String getPortHeader() {
+        return portHeader;
     }
     
     public String getProtocolHeaderHttpsValue() {
@@ -882,6 +929,14 @@ public class RemoteIpFilter implements Filter {
             setProtocolHeaderHttpsValue(filterConfig.getInitParameter(PROTOCOL_HEADER_HTTPS_VALUE_PARAMETER));
         }
         
+        if (filterConfig.getInitParameter(PORT_HEADER_PARAMETER) != null) {
+            setPortHeader(filterConfig.getInitParameter(PORT_HEADER_PARAMETER));
+        }
+        
+        if (filterConfig.getInitParameter(CHANGE_LOCAL_PORT_PARAMETER) != null) {
+            setChangeLocalPort(Boolean.parseBoolean(filterConfig.getInitParameter(CHANGE_LOCAL_PORT_PARAMETER)));
+        }
+        
         if (filterConfig.getInitParameter(PROXIES_HEADER_PARAMETER) != null) {
             setProxiesHeader(filterConfig.getInitParameter(PROXIES_HEADER_PARAMETER));
         }
@@ -909,6 +964,21 @@ public class RemoteIpFilter implements Filter {
                 throw new NumberFormatException("Illegal " + HTTPS_SERVER_PORT_PARAMETER + " : " + e.getMessage());
             }
         }
+    }
+    
+    /**
+     * <p>
+     * If <code>true</code>, the return values for both {@link
+     * ServletRequest#getLocalPort()} and {@link ServletRequest#getServerPort()}
+     * wil be modified by this Filter rather than just
+     * {@link ServletRequest#getServerPort()}.
+     * </p>
+     * <p>
+     * Default value : <code>false</code>
+     * </p>
+     */
+    public void setChangeLocalPort(boolean changeLocalPort) {
+        this.changeLocalPort = changeLocalPort;
     }
     
     /**
@@ -950,6 +1020,20 @@ public class RemoteIpFilter implements Filter {
         } else {
             this.internalProxies = Pattern.compile(internalProxies);
         }
+    }
+    
+    /**
+     * <p>
+     * Header that holds the incoming port, usally named
+     * <code>X-Forwarded-Port</code>. If <code>null</code>,
+     * {@link #httpServerPort} or {@link #httpsServerPort} will be used.
+     * </p>
+     * <p>
+     * Default value : <code>null</code>
+     * </p>
+     */
+    public void setPortHeader(String portHeader) {
+        this.portHeader = portHeader;
     }
     
     /**

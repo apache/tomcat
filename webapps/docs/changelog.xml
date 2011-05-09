@@ -66,10 +66,10 @@
         StandardWrapper. (markt)
       </fix>
       <add>
-        Provide additional configuration options for the RemoteIpValve to allow
-        greater control over the values returned by
+        Provide additional configuration options for the RemoteIpValve and
+        RemoteIpFilter to allow greater control over the values returned by
         ServletRequest#getServerPort() and ServletRequest#getLocalPort() when
-        using this valve. (markt)
+        Tomcat is behind a reverse proxy. (markt)
       </add>
     </changelog>
   </subsection>
