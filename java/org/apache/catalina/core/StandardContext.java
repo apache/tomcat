@@ -771,6 +771,14 @@ public class StandardContext extends ContainerBase
     
     
     /**
+     * Is a / added to the end of the session cookie path to ensure browsers,
+     * particularly IE, don't send a session cookie for context /foo with
+     * requests intended for context /foobar.
+     */
+    private boolean sessionCookiePathUsesTrailingSlash = true;
+
+
+    /**
      * The Jar scanner to use to search for Jars that might contain
      * configuration information such as TLDs or web-fragment.xml files. 
      */
@@ -1637,6 +1645,20 @@ public class StandardContext extends ContainerBase
                 oldSessionCookiePath, sessionCookiePath);
     }
     
+
+    @Override
+    public boolean getSessionCookiePathUsesTrailingSlash() {
+        return sessionCookiePathUsesTrailingSlash;
+    }
+
+
+    @Override
+    public void setSessionCookiePathUsesTrailingSlash(
+            boolean sessionCookiePathUsesTrailingSlash) {
+        this.sessionCookiePathUsesTrailingSlash =
+            sessionCookiePathUsesTrailingSlash;
+    }
+
 
     /**
      * Return the "allow crossing servlet contexts" flag.
