@@ -834,6 +834,15 @@ public class Request
 
 
     /**
+     * Set the port number of the server to process this request.
+     *
+     * @param port The server port
+     */
+    public void setLocalPort(int port) {
+        localPort = port;
+    }
+
+    /**
      * Bind an object to a specified name in the internal notes associated
      * with this request, replacing any existing binding for this name.
      *
