@@ -990,6 +990,12 @@ FINE: Request "/docs/config/manager.html" with response status "200" content-typ
         default of <code>null</code> is used.</p>
       </attribute>
 
+      <attribute name="portHeader" required="false">
+        <p>Name of the HTTP Header read by this valve that holds the port
+        used by the client to connect to the proxy. If not specified, the
+        default of <code>null</code> is used.</p>
+      </attribute>
+
       <attribute name="protocolHeaderHttpsValue" required="false">
         <p>Value of the <strong>protocolHeader</strong> to indicate that it is
         an HTTPS request. If not specified, the default of <code>https</code> is
@@ -997,17 +1003,24 @@ FINE: Request "/docs/config/manager.html" with response status "200" content-typ
       </attribute>
 
       <attribute name="httpServerPort" required="false">
-         <p>Value returned by <code>ServletRequest.getServerPort()</code> 
-         when the <strong>protocolHeader</strong> indicates <code>http</code> 
-         protocol. If not specified, the default of <code>80</code> is
-        used.</p>
+        <p>Value returned by <code>ServletRequest.getServerPort()</code> 
+        when the <strong>protocolHeader</strong> indicates <code>http</code> 
+        protocol and no <strong>portHeader</strong> is present. If not
+        specified, the default of <code>80</code> is used.</p>
       </attribute>
 
       <attribute name="httpsServerPort" required="false">
-         <p>Value returned by <code>ServletRequest.getServerPort()</code> 
-         when the <strong>protocolHeader</strong> indicates <code>https</code> 
-         protocol. If not specified, the default of <code>443</code> is
-        used.</p>
+        <p>Value returned by <code>ServletRequest.getServerPort()</code> 
+        when the <strong>protocolHeader</strong> indicates <code>https</code> 
+        protocol and no <strong>portHeader</strong> is present. If not
+        specified, the default of <code>443</code> is used.</p>
+      </attribute>
+
+      <attribute name="changeLocalPort" required="false">
+        <p>If <code>true</code>, the value returned by
+        <code>ServletRequest.getLocalPort()</code> and
+        <code>ServletRequest.getServerPort()</code> is modified by the this
+        filter. If not specified, the default of <code>false</code> is used.</p>
       </attribute>
 
     </attributes>
