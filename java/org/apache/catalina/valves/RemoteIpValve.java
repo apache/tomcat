@@ -708,7 +708,7 @@ public class RemoteIpValve extends ValveBase {
         }
         request.setServerPort(port);
         if (changeLocalPort) {
-            request.getCoyoteRequest().setLocalPort(port);
+            request.setLocalPort(port);
         }
     }
     
