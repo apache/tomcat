@@ -299,6 +299,30 @@ public interface Context extends Container {
 
     
     /**
+     * Is a / added to the end of the session cookie path to ensure browsers,
+     * particularly IE, don't send a session cookie for context /foo with
+     * requests intended for context /foobar.
+     * 
+     * @return <code>true</code> if the slash is added, otherwise
+     *         <code>false</code>  
+     */
+    public boolean getSessionCookiePathUsesTrailingSlash();
+    
+    
+    /**
+     * Configures if a / is added to the end of the session cookie path to
+     * ensure browsers, particularly IE, don't send a session cookie for context
+     * /foo with requests intended for context /foobar.
+     * 
+     * @param sessionCookiePathUsesTrailingSlash   <code>true</code> if the
+     *                                             slash is should be added,
+     *                                             otherwise <code>false</code>  
+     */
+    public void setSessionCookiePathUsesTrailingSlash(
+            boolean sessionCookiePathUsesTrailingSlash);
+
+    
+    /**
      * Return the "allow crossing servlet contexts" flag.
      */
     public boolean getCrossContext();
