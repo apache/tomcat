@@ -156,12 +156,20 @@ public class ApplicationSessionCookieConfig implements SessionCookieConfig {
         if (contextPath == null || contextPath.length() == 0) {
             contextPath = context.getEncodedPath();
         }
-        // Handle special case of ROOT context where cookies require a path of
-        // '/' but the servlet spec uses an empty string
-        // Also ensure the cookies for a context with a path of /foo don't get
-        // sent for requests with a path of /foobar
-        if (!contextPath.endsWith("/")) {
-            contextPath = contextPath + "/";
+        if (context.getSessionCookiePathUsesTrailingSlash()) {
+            // Handle special case of ROOT context where cookies require a path of
+            // '/' but the servlet spec uses an empty string
+            // Also ensure the cookies for a context with a path of /foo don't get
+            // sent for requests with a path of /foobar
+            if (!contextPath.endsWith("/")) {
+                contextPath = contextPath + "/";
+            }
+        } else {
+            // Only handle special case of ROOT context where cookies require a
+            // path of '/' but the servlet spec uses an empty string
+            if (contextPath.length() == 0) {
+                contextPath = "/";
+            }
         }
         cookie.setPath(contextPath);
 

@@ -385,6 +385,18 @@
         file.</p>
       </attribute>
       
+      <attribute name="sessionCookiePathUsesTrailingSlash" required="false">
+        <p>Some browsers, such as IE, will send a session cookie for a context
+        with a path of /foo with a request to /foobar. To prevent this, Tomcat
+        will add a trailing slash to the path associated with the session cookie
+        so, in the above example, the cookie path becomes /foo/. However, with a
+        cookie path of /foo/, IE will no longer send the cookie with a request
+        to /foo. This should not be a problem unless there is a servlet mapped
+        to /*. In this case this feature will need to be disabled. The default
+        value for this attribute is <code>true.</code> To disable this feature,
+        set the attribute to <code>false</code>.</p>
+      </attribute>
+
       <attribute name="swallowAbortedUploads" required="false">
         <p>Set to false if Tomcat should <b>not</b> read any additional request
         body data for aborted uploads and instead abort the client connection.
