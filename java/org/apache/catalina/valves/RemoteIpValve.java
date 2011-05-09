@@ -700,9 +700,11 @@ public class RemoteIpValve extends ValveBase {
                 try {
                     port = Integer.parseInt(portHeaderValue);
                 } catch (NumberFormatException nfe) {
-                    log.debug(sm.getString(
-                            "remoteIpValve.invalidPortHeader",
-                            portHeaderValue, portHeader), nfe);
+                    if (log.isDebugEnabled()) {
+                        log.debug(sm.getString(
+                                "remoteIpValve.invalidPortHeader",
+                                portHeaderValue, portHeader), nfe);
+                    }
                 }
             }
         }
