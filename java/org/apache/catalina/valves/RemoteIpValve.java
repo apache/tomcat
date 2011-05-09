@@ -403,6 +403,8 @@ public class RemoteIpValve extends ValveBase {
      */
     private int httpsServerPort = 443;
     
+    private boolean changeLocalPort = false;
+
     /**
      * @see #setInternalProxies(String)
      */
@@ -422,6 +424,8 @@ public class RemoteIpValve extends ValveBase {
      */
     private String protocolHeaderHttpsValue = "https";
     
+    private String portHeader = null;
+
     /**
      * @see #setProxiesHeader(String)
      */
@@ -461,6 +465,36 @@ public class RemoteIpValve extends ValveBase {
         return httpServerPort;
     }
     
+    public boolean isChangeLocalPort() {
+        return changeLocalPort;
+    }
+
+    public void setChangeLocalPort(boolean changeLocalPort) {
+        this.changeLocalPort = changeLocalPort;
+    }
+
+    /**
+     * Obtain the name of the HTTP header used to override the value returned
+     * by {@link Request#getServerPort()} and (optionally depending on {link
+     * {@link #isChangeLocalPort()} {@link Request#getLocalPort()}.
+     * 
+     * @return  The HTTP header name
+     */
+    public String getPortHeader() {
+        return portHeader;
+    }
+
+    /**
+     * Set the name of the HTTP header used to override the value returned
+     * by {@link Request#getServerPort()} and (optionally depending on {link
+     * {@link #isChangeLocalPort()} {@link Request#getLocalPort()}.
+     * 
+     * @param   portHeader  The HTTP header name
+     */
+    public void setPortHeader(String portHeader) {
+        this.portHeader = portHeader;
+    }
+
     /**
      * Return descriptive information about this Valve implementation.
      */
@@ -611,13 +645,13 @@ public class RemoteIpValve extends ValveBase {
                     // use request.coyoteRequest.scheme instead of request.setScheme() because request.setScheme() is no-op in Tomcat 6.0
                     request.getCoyoteRequest().scheme().setString("https");
                     
-                    request.setServerPort(httpsServerPort);
+                    setPorts(request, httpsServerPort);
                 } else {
                     request.setSecure(false);
                     // use request.coyoteRequest.scheme instead of request.setScheme() because request.setScheme() is no-op in Tomcat 6.0
                     request.getCoyoteRequest().scheme().setString("http");
                     
-                    request.setServerPort(httpServerPort);
+                    setPorts(request, httpServerPort);
                 }
             }
             
@@ -655,6 +689,26 @@ public class RemoteIpValve extends ValveBase {
             request.getCoyoteRequest().scheme().setString(originalScheme);
             
             request.setServerPort(originalServerPort);
+        }
+    }
+
+    private void setPorts(Request request, int defaultPort) {
+        int port = defaultPort;
+        if (portHeader != null) {
+            String portHeaderValue = request.getHeader(portHeader);
+            if (portHeaderValue != null) {
+                try {
+                    port = Integer.parseInt(portHeaderValue);
+                } catch (NumberFormatException nfe) {
+                    log.debug(sm.getString(
+                            "remoteIpValve.invalidPortHeader",
+                            portHeaderValue, portHeader), nfe);
+                }
+            }
+        }
+        request.setServerPort(port);
+        if (changeLocalPort) {
+            request.getCoyoteRequest().setLocalPort(port);
         }
     }
     
