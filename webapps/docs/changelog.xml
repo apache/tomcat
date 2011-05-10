@@ -42,6 +42,16 @@
   General, Catalina, Coyote, Jasper, Cluster, Web applications, Extras, Tribes,
   Other
 -->
+<section name="Tomcat 7.0.15 (markt)">
+  <subsection name="Other">
+    <changelog>
+      <fix>
+        <bug>46451</bug>: Configure svn:bugtraq properties for Tomcat trunk.
+        Based on a patch provided by Marc Guillemot. (markt)
+      </fix>
+    </changelog>
+  </subsection>
+</section>
 <section name="Tomcat 7.0.14 (markt)">
   <subsection name="Catalina">
     <changelog>
