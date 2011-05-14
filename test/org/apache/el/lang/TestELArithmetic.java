@@ -16,6 +16,7 @@
  */
 package org.apache.el.lang;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
 
 import junit.framework.TestCase;
@@ -50,8 +51,34 @@ public class TestELArithmetic extends TestCase {
                 String.valueOf(ELArithmetic.mod(a, b)));
     }
 
-    public void testBug47371() throws Exception {
-        assertEquals("1",
-                String.valueOf(ELArithmetic.add("", Integer.valueOf(1))));
+    public void testBug47371bigDecimal() throws Exception {
+        assertEquals(BigDecimal.valueOf(1),
+                ELArithmetic.add("", BigDecimal.valueOf(1)));
     }
+
+    public void testBug47371double() throws Exception {
+        assertEquals(Double.valueOf(7), ELArithmetic.add("", Double.valueOf(7)));
+    }
+
+    public void testBug47371doubleString() throws Exception {
+        assertEquals(Double.valueOf(2), ELArithmetic.add("", "2."));
+    }
+
+    public void testBug47371bigInteger() throws Exception {
+        assertEquals(BigInteger.valueOf(0),
+                ELArithmetic.multiply("", BigInteger.valueOf(1)));
+    }
+
+    public void testBug47371long() throws Exception {
+        assertEquals(Long.valueOf(1), ELArithmetic.add("", Integer.valueOf(1)));
+    }
+
+    public void testBug47371long2() throws Exception {
+        assertEquals(Long.valueOf(-3), ELArithmetic.subtract("1", "4"));
+    }
+
+    public void testBug47371doubleString2() throws Exception {
+        assertEquals(Double.valueOf(2), ELArithmetic.add("1.", "1"));
+    }
+
 }
