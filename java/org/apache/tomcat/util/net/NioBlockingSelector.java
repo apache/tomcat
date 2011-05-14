@@ -92,7 +92,7 @@ public class NioBlockingSelector {
             while ( (!timedout) && buf.hasRemaining()) {
                 if (keycount > 0) { //only write if we were registered for a write
                     int cnt = socket.write(buf); //write the data
-                    lastWrite.set(cnt);
+                    if (lastWrite != null) lastWrite.set(cnt);
                     if (cnt == -1)
                         throw new EOFException();
                     written += cnt;
