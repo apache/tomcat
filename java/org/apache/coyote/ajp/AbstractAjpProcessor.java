@@ -188,6 +188,16 @@ public abstract class AbstractAjpProcessor implements ActionHook, Processor {
 
 
     /**
+     * The number of milliseconds Tomcat will wait for a subsequent request
+     * before closing the connection. The default is the same as for
+     * Apache HTTP Server (15 000 milliseconds).
+     */
+    protected int keepAliveTimeout = -1;
+    public int getKeepAliveTimeout() { return keepAliveTimeout; }
+    public void setKeepAliveTimeout(int timeout) { keepAliveTimeout = timeout; }
+
+
+    /**
      * Use Tomcat authentication ?
      */
     protected boolean tomcatAuthentication = true;
