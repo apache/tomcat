@@ -216,6 +216,8 @@ public class AjpNioProcessor extends AbstractAjpProcessor {
         // Error flag
         error = false;
 
+        boolean keptAlive = false;
+
         while (!error && !endpoint.isPaused()) {
 
             // Parsing the request header
@@ -225,8 +227,9 @@ public class AjpNioProcessor extends AbstractAjpProcessor {
                     ka.setTimeout(keepAliveTimeout);
                 }
                 // Get first message of the request
-                if (!readMessage(requestHeaderMessage)) {
-                    // This means a connection timeout
+                int bytesRead = readMessage(requestHeaderMessage, !keptAlive);
+                if (!keptAlive && bytesRead == 0) {
+                    // No bytes on a blocking read - connection timeout
                     rp.setStage(org.apache.coyote.Constants.STAGE_ENDED);
                     break;
                 }
@@ -243,6 +246,8 @@ public class AjpNioProcessor extends AbstractAjpProcessor {
                     } catch (IOException e) {
                         error = true;
                     }
+                    // Should be unnecessary but just in case...
+                    keptAlive = true;
                     recycle();
                     continue;
                 } else if(type != Constants.JK_AJP13_FORWARD_REQUEST) {
@@ -250,6 +255,8 @@ public class AjpNioProcessor extends AbstractAjpProcessor {
                     if(log.isDebugEnabled()) {
                         log.debug("Unexpected message: "+type);
                     }
+                    // Should be unnecessary but just in case...
+                    keptAlive = true;
                     recycle();
                     continue;
                 }
@@ -328,13 +335,18 @@ public class AjpNioProcessor extends AbstractAjpProcessor {
             request.updateCounters();
 
             rp.setStage(org.apache.coyote.Constants.STAGE_KEEPALIVE);
+            keptAlive = true;
             recycle();
         }
         
         rp.setStage(org.apache.coyote.Constants.STAGE_ENDED);
 
-        if (isAsync() && !error && !endpoint.isPaused()) {
-            return SocketState.LONG;
+        if (!error && !endpoint.isPaused()) {
+            if (isAsync()) {
+                return SocketState.LONG;
+            } else {
+                return SocketState.OPEN;
+            }
         } else {
             readBuffer = null;
             writeBuffer = null;
@@ -494,13 +506,13 @@ public class AjpNioProcessor extends AbstractAjpProcessor {
      * Read at least the specified amount of bytes, and place them
      * in the input buffer.
      */
-    protected void read(byte[] buf, int pos, int n)
+    protected int read(byte[] buf, int pos, int n, boolean block)
         throws IOException {
 
         int read = readBufferEnd - pos;
         int res = 0;
         while (read < n) {
-            res = readSocket(buf, read + pos, true);
+            res = readSocket(buf, read + pos, block);
             if (res > 0) {
                 read += res;
             } else {
@@ -508,6 +520,7 @@ public class AjpNioProcessor extends AbstractAjpProcessor {
             }
         }
         readBufferEnd += read;
+        return read;
     }
 
     private int readSocket(byte[] buf, int pos, boolean block) throws IOException {
@@ -555,10 +568,9 @@ public class AjpNioProcessor extends AbstractAjpProcessor {
 
         first = false;
         bodyMessage.reset();
-        if (!readMessage(bodyMessage)) {
-            // Invalid message
-            return false;
-        }
+        
+        readMessage(bodyMessage, true);
+
         // No data received.
         if (bodyMessage.getLen() == 0) {
             // just the header
@@ -607,27 +619,26 @@ public class AjpNioProcessor extends AbstractAjpProcessor {
     /**
      * Read an AJP message.
      *
-     * @return true if the message has been read, false if the short read
-     *         didn't return anything
+     * @return The number of bytes read
      * @throws IOException any other failure, including incomplete reads
      */
-    protected boolean readMessage(AjpMessage message)
+    protected int readMessage(AjpMessage message, boolean block)
         throws IOException {
 
         byte[] buf = message.getBuffer();
         int headerLength = message.getHeaderLength();
 
-        read(buf, 0, headerLength);
+        int bytesRead = read(buf, 0, headerLength, block);
 
         int messageLength = message.processHeader();
         if (messageLength < 0) {
             // Invalid AJP header signature
-            // TODO: Throw some exception and close the connection to frontend.
-            return false;
+            throw new IOException(sm.getString("ajpmessage.invalidLength",
+                    Integer.valueOf(messageLength)));
         }
         else if (messageLength == 0) {
             // Zero length message.
-            return true;
+            return bytesRead;
         }
         else {
             if (messageLength > buf.length) {
@@ -638,8 +649,8 @@ public class AjpNioProcessor extends AbstractAjpProcessor {
                         Integer.valueOf(messageLength),
                         Integer.valueOf(buf.length)));
             }
-            read(buf, headerLength, messageLength);
-            return true;
+            bytesRead += read(buf, headerLength, messageLength, true);
+            return bytesRead;
         }
     }
 
