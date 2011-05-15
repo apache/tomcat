@@ -1183,6 +1183,7 @@
     Read HTTP Request         Blocking                  Non Blocking                 Blocking
     Read HTTP Body            Blocking                  Sim Blocking                 Blocking
     Write HTTP Response       Blocking                  Sim Blocking                 Blocking
+    Wait for next Request     Blocking                  Non Blocking               Non Blocking
     SSL Support               Java SSL                    Java SSL                   OpenSSL
     SSL Handshake             Blocking                  Non blocking                 Blocking
     Max Connections        maxConnections              maxConnections             maxConnections
