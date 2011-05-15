@@ -109,21 +109,19 @@ public class AjpNioProcessor extends AbstractAjpProcessor {
     protected NioChannel socket;
 
     
+    /**
+     * Selector pool for the associated endpoint.
+     */
     protected NioSelectorPool pool;
 
 
     /**
-     * Input buffer.
+     * NIO socket read may return more than just the current message. Need to
+     * buffer the response to ensure data isn't lost.
      */
-    protected ByteBuffer readBuffer;
-    protected int readBufferEnd = 0;
-    
-    /**
-     * Output buffer.
-     */
-    protected ByteBuffer writeBuffer;
+    protected byte[] inputBuffer;
+    protected int inputBufferEnd;
 
-    
     /**
      * Direct buffer used for sending right away a get body message.
      */
@@ -204,8 +202,6 @@ public class AjpNioProcessor extends AbstractAjpProcessor {
 
         // Setting up the socket
         this.socket = socket;
-        readBuffer = socket.getBufHandler().getReadBuffer();
-        writeBuffer = socket.getBufHandler().getWriteBuffer();
         
         int soTimeout = -1;
         final KeyAttachment ka = (KeyAttachment)socket.getAttachment(false);
@@ -348,23 +344,12 @@ public class AjpNioProcessor extends AbstractAjpProcessor {
                 return SocketState.OPEN;
             }
         } else {
-            readBuffer = null;
-            writeBuffer = null;
             return SocketState.CLOSED;
         }
         
     }
 
     
-    @Override
-    public void recycle() {
-        if (readBuffer != null) {
-            readBuffer.clear();
-        }
-        readBufferEnd = 0;
-        super.recycle();
-    }
-
     public SocketState asyncDispatch(SocketStatus status) {
 
         RequestInfo rp = request.getRequestProcessor();
@@ -388,8 +373,6 @@ public class AjpNioProcessor extends AbstractAjpProcessor {
             if (error) {
                 response.setStatus(500);
                 request.updateCounters();
-                readBuffer = null;
-                writeBuffer = null;
                 return SocketState.CLOSED;
             } else {
                 return SocketState.LONG;
@@ -399,8 +382,6 @@ public class AjpNioProcessor extends AbstractAjpProcessor {
                 response.setStatus(500);
             }
             request.updateCounters();
-            readBuffer = null;
-            writeBuffer = null;
             return SocketState.CLOSED;
         }
 
@@ -503,29 +484,29 @@ public class AjpNioProcessor extends AbstractAjpProcessor {
 
 
     /**
-     * Read at least the specified amount of bytes, and place them
-     * in the input buffer.
+     * Read the specified amount of bytes, and place them in the input buffer.
      */
     protected int read(byte[] buf, int pos, int n, boolean block)
         throws IOException {
 
-        int read = readBufferEnd - pos;
+        int read = 0;
         int res = 0;
         while (read < n) {
-            res = readSocket(buf, read + pos, block);
+            res = readSocket(buf, read + pos, n, block);
             if (res > 0) {
                 read += res;
             } else {
                 throw new IOException(sm.getString("ajpprotocol.failedread"));
             }
         }
-        readBufferEnd += read;
         return read;
     }
 
-    private int readSocket(byte[] buf, int pos, boolean block) throws IOException {
+    private int readSocket(byte[] buf, int pos, int n, boolean block)
+            throws IOException {
         int nRead = 0;
         socket.getBufHandler().getReadBuffer().clear();
+        socket.getBufHandler().getReadBuffer().limit(n);
         if ( block ) {
             Selector selector = null;
             try {
