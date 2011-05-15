@@ -43,6 +43,14 @@
   Other
 -->
 <section name="Tomcat 7.0.15 (markt)">
+  <subsection name="Coyote">
+    <changelog>
+      <add>
+        <bug>51145</bug>: Add an experimental (not all TCK tests pass at the
+        moment) AJP-NIO connector. (markt/rjung)
+      </add>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <fix>
