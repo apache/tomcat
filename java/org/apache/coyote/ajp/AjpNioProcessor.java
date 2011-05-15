@@ -116,7 +116,7 @@ public class AjpNioProcessor extends AbstractAjpProcessor {
      * Input buffer.
      */
     protected ByteBuffer readBuffer;
-    protected int readBufferEnd;
+    protected int readBufferEnd = 0;
     
     /**
      * Output buffer.
@@ -205,10 +205,7 @@ public class AjpNioProcessor extends AbstractAjpProcessor {
         // Setting up the socket
         this.socket = socket;
         readBuffer = socket.getBufHandler().getReadBuffer();
-        readBufferEnd = 0;
-        readBuffer.clear();
         writeBuffer = socket.getBufHandler().getWriteBuffer();
-        writeBuffer.clear();
         
         int soTimeout = -1;
         final KeyAttachment ka = (KeyAttachment)socket.getAttachment(false);
@@ -246,12 +243,14 @@ public class AjpNioProcessor extends AbstractAjpProcessor {
                     } catch (IOException e) {
                         error = true;
                     }
+                    recycle();
                     continue;
                 } else if(type != Constants.JK_AJP13_FORWARD_REQUEST) {
                     // Usually the servlet didn't read the previous request body
                     if(log.isDebugEnabled()) {
                         log.debug("Unexpected message: "+type);
                     }
+                    recycle();
                     continue;
                 }
 
