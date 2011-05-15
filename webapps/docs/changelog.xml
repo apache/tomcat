@@ -59,6 +59,13 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Web applications">
+    <changelog>
+      <add>
+        Add docs for experimental AJP-NIO connector. (markt/rjung)
+      </add>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 7.0.14 (markt)" rtext="released 2011-05-12">
   <subsection name="Catalina">
