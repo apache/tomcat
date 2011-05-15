@@ -17,6 +17,7 @@
 
 package org.apache.coyote.ajp;
 
+import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
 import java.util.Iterator;
 import java.util.concurrent.ConcurrentHashMap;
@@ -215,7 +216,51 @@ public class AjpNioProtocol extends AbstractAjpProtocol {
         // FIXME: Support for this could be added in AJP as well
         @Override
         public SocketState event(NioChannel socket, SocketStatus status) {
-            return SocketState.CLOSED;
+            AjpNioProcessor processor = connections.get(socket);
+            NioEndpoint.KeyAttachment att = (NioEndpoint.KeyAttachment)socket.getAttachment(false);
+            att.setAsync(false); //no longer check for timeout
+            SocketState state = SocketState.CLOSED; 
+            if (processor != null) {
+                try {
+                    state = processor.asyncDispatch(status);
+                }
+                // Future developers: if you discover any other
+                // rare-but-nonfatal exceptions, catch them here, and log as
+                // above.
+                catch (Throwable e) {
+                    ExceptionUtils.handleThrowable(e);
+                    // any other exception or error is odd. Here we log it
+                    // with "ERROR" level, so it will show up even on
+                    // less-than-verbose logs.
+                    AjpNioProtocol.log.error
+                        (sm.getString("http11protocol.proto.error"), e);
+                } finally {
+                    if (processor.isAsync()) {
+                        state = processor.asyncPostProcess();
+                    }
+                    if (state == SocketState.OPEN || state == SocketState.CLOSED) {
+                        release(socket, processor);
+                        if (state == SocketState.OPEN) {
+                            socket.getPoller().add(socket);
+                        }
+                    } else if (state == SocketState.LONG) {
+                        if (processor.isAsync()) {
+                            att.setAsync(true); // Re-enable timeouts
+                        } else {
+                            // Comet
+                            if (log.isDebugEnabled()) log.debug("Keeping processor["+processor);
+                            // May receive more data from client
+                            SelectionKey key = socket.getIOChannel().keyFor(socket.getPoller().getSelector());
+                            key.interestOps(SelectionKey.OP_READ);
+                            att.interestOps(SelectionKey.OP_READ);
+                        }
+                    } else {
+                        // state == SocketState.ASYNC_END
+                        // No further work required
+                    }
+                }
+            }
+            return state;
         }
         
         @Override
