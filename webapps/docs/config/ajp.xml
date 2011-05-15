@@ -330,8 +330,8 @@
       falls below this value. The operating system may still accept
       connections based on the <code>acceptCount</code> setting. Default value
       varies by connector type. For BIO the default is the value of
-      <strong>maxThreads</strong>. For APR/native, the default is
-      <code>8192</code>.</p>
+      <strong>maxThreads</strong>. For NIO the default is <code>10000</code>.
+      For APR/native, the default is <code>8192</code>.</p>
       <p>Note that for APR/native on Windows, the configured value will be
       reduced to the highest multiple of 1024 that is less than or equal to
       maxConnections. This is done for performance reasons.</p>
@@ -550,7 +550,7 @@
     Tomcat Version           3.x onwards                 7.x onwards              5.5.x onwards
     Support Polling              NO                          YES                       YES
     Polling Size                 N/A                   maxConnections             maxConnections
-    Read Request Headers      Blocking                  Non Blocking                   Blocking
+    Read Request Headers      Blocking                  Sim Blocking                   Blocking
     Read Request Body         Blocking                  Sim Blocking                   Blocking
     Write Response            Blocking                  Sim Blocking                   Blocking
     Wait for next Request     Blocking                  Non Blocking               Non Blocking
