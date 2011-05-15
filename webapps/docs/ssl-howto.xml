@@ -543,9 +543,9 @@ information, at
     <ul>
       <li>Tomcat must have a connector with the attribute
           <strong>isSecure</strong> set to <code>true</code>.</li>
-      <li>If SSL conections are managed by a proxy or a hardware accelerator
+      <li>If SSL connections are managed by a proxy or a hardware accelerator
           they must populate the SSL request headers (see the SSLValve) so that
-          the SSL session ID is visibale to Tomcat.</li>
+          the SSL session ID is visible to Tomcat.</li>
       <li>If Tomcat terminates the SSL connection, it will not be possible to use
           session replication as the SSL session IDs will be different on each
           node.</li>
@@ -585,7 +585,7 @@ public class SessionTrackingModeListener implements ServletContextListener {
 }
     </source>
   </p>
-  <p>Note: SSL session tracking is implemented for the BIO and NIO connetcors.
+  <p>Note: SSL session tracking is implemented for the BIO and NIO connectors.
      It is not yet implemented for the APR connector.</p>
      
 </section>
@@ -613,13 +613,13 @@ org.apache.tomcat.util.net.SSLSessionManager mgr =
     request.getAttribute("javax.servlet.request.ssl_session_mgr");
 mgr.invalidateSession();
 
-// Close the conection since the SSL session will be active until the connection
+// Close the connection since the SSL session will be active until the connection
 // is closed
 response.setHeader("Connection", "close");
     </source>
     Note that this code is Tomcat specific due to the use of the
     SSLSessionManager class. This is currently only available for the BIO and
-    NIO conenctors, not the APR/native connector.
+    NIO connectors, not the APR/native connector.
   </p>
 </section>
 
