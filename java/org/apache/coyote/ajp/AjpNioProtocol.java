@@ -17,7 +17,6 @@
 
 package org.apache.coyote.ajp;
 
-import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
 import java.util.Iterator;
 import java.util.concurrent.ConcurrentHashMap;
@@ -113,7 +112,7 @@ public class AjpNioProtocol extends AbstractAjpProtocol {
             new ConcurrentHashMap<NioChannel, AjpNioProcessor>();
 
         protected ConcurrentLinkedQueue<AjpNioProcessor> recycledProcessors = 
-            new ConcurrentLinkedQueue<AjpNioProcessor>() {
+                new ConcurrentLinkedQueue<AjpNioProcessor>() {
             private static final long serialVersionUID = 1L;
             protected AtomicInteger size = new AtomicInteger(0);
             @Override
@@ -213,7 +212,7 @@ public class AjpNioProtocol extends AbstractAjpProtocol {
             recycledProcessors.offer(processor);
         }
 
-        // FIXME: Support for this could be added in AJP as well
+        // FIXME: Support for Comet could be added in AJP as well
         @Override
         public SocketState event(NioChannel socket, SocketStatus status) {
             AjpNioProcessor processor = connections.get(socket);
@@ -244,16 +243,7 @@ public class AjpNioProtocol extends AbstractAjpProtocol {
                             socket.getPoller().add(socket);
                         }
                     } else if (state == SocketState.LONG) {
-                        if (processor.isAsync()) {
-                            att.setAsync(true); // Re-enable timeouts
-                        } else {
-                            // Comet
-                            if (log.isDebugEnabled()) log.debug("Keeping processor["+processor);
-                            // May receive more data from client
-                            SelectionKey key = socket.getIOChannel().keyFor(socket.getPoller().getSelector());
-                            key.interestOps(SelectionKey.OP_READ);
-                            att.interestOps(SelectionKey.OP_READ);
-                        }
+                        att.setAsync(true); // Re-enable timeouts
                     } else {
                         // state == SocketState.ASYNC_END
                         // No further work required
@@ -265,27 +255,37 @@ public class AjpNioProtocol extends AbstractAjpProtocol {
         
         @Override
         public SocketState process(NioChannel socket) {
-            AjpNioProcessor processor = recycledProcessors.poll();
+            AjpNioProcessor processor = connections.remove(socket);
             try {
+                if (processor == null) {
+                    processor = recycledProcessors.poll();
+                }
                 if (processor == null) {
                     processor = createProcessor();
                 }
 
                 SocketState state = processor.process(socket);
                 if (state == SocketState.LONG) {
-                    // Check if the post processing is going to change the state
+                    // In the middle of processing a request/response. Keep the
+                    // socket associated with the processor.
+                    connections.put(socket, processor);
+                    
+                    NioEndpoint.KeyAttachment att = (NioEndpoint.KeyAttachment)socket.getAttachment(false);
+                    att.setAsync(true);
+                    // longPoll may change socket state (e.g. to trigger a
+                    // complete or dispatch)
                     state = processor.asyncPostProcess();
                 }
                 if (state == SocketState.LONG || state == SocketState.ASYNC_END) {
-                    // Need to make socket available for next processing cycle
-                    // but no need for the poller
-                    connections.put(socket, processor);
-                    NioEndpoint.KeyAttachment att =
-                            (NioEndpoint.KeyAttachment)socket.getAttachment(false);
-                    att.setAsync(true);
+                    // Already done all we need to do.
+                } else if (state == SocketState.OPEN){
+                    // In keep-alive but between requests. OK to recycle
+                    // processor. Continue to poll for the next request.
+                    release(socket, processor);
+                    socket.getPoller().add(socket);
                 } else {
-                    processor.recycle();
-                    recycledProcessors.offer(processor);
+                    // Connection closed. OK to recycle the processor.
+                    release(socket, processor);
                 }
                 return state;
 
@@ -308,8 +308,7 @@ public class AjpNioProtocol extends AbstractAjpProtocol {
                 // less-than-verbose logs.
                 log.error(sm.getString("ajpprotocol.proto.error"), e);
             }
-            processor.recycle();
-            recycledProcessors.offer(processor);
+            release(socket, processor);
             return SocketState.CLOSED;
         }
 
