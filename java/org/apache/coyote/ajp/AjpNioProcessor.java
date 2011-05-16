@@ -196,29 +196,20 @@ public class AjpNioProcessor extends AbstractAjpProcessor {
         // Setting up the socket
         this.socket = socket;
         
-        int soTimeout = -1;
-        final KeyAttachment ka = (KeyAttachment)socket.getAttachment(false);
-        if (keepAliveTimeout > 0) {
-            ka.setTimeout(soTimeout);
-        }
+        long soTimeout = endpoint.getSoTimeout();
+        int keepAliveTimeout = endpoint.getKeepAliveTimeout();
 
         // Error flag
         error = false;
 
-        boolean keptAlive = false;
-
+        final KeyAttachment ka = (KeyAttachment)socket.getAttachment(false);
+        
         while (!error && !endpoint.isPaused()) {
-
             // Parsing the request header
             try {
-                // Set keep alive timeout if enabled
-                if (keepAliveTimeout > 0) {
-                    ka.setTimeout(keepAliveTimeout);
-                }
                 // Get first message of the request
-                int bytesRead = readMessage(requestHeaderMessage, !keptAlive);
-                if (!keptAlive && bytesRead == 0) {
-                    // No bytes on a blocking read - connection timeout
+                int bytesRead = readMessage(requestHeaderMessage, false);
+                if (bytesRead == 0) {
                     rp.setStage(org.apache.coyote.Constants.STAGE_ENDED);
                     break;
                 }
@@ -235,8 +226,6 @@ public class AjpNioProcessor extends AbstractAjpProcessor {
                     } catch (IOException e) {
                         error = true;
                     }
-                    // Should be unnecessary but just in case...
-                    keptAlive = true;
                     recycle();
                     continue;
                 } else if(type != Constants.JK_AJP13_FORWARD_REQUEST) {
@@ -244,12 +233,9 @@ public class AjpNioProcessor extends AbstractAjpProcessor {
                     if(log.isDebugEnabled()) {
                         log.debug("Unexpected message: "+type);
                     }
-                    // Should be unnecessary but just in case...
-                    keptAlive = true;
                     recycle();
                     continue;
                 }
-
                 request.setStartTime(System.currentTimeMillis());
             } catch (IOException e) {
                 error = true;
@@ -324,7 +310,11 @@ public class AjpNioProcessor extends AbstractAjpProcessor {
             request.updateCounters();
 
             rp.setStage(org.apache.coyote.Constants.STAGE_KEEPALIVE);
-            keptAlive = true;
+            // Set keep alive timeout if enabled
+            if (keepAliveTimeout > 0) {
+                ka.setTimeout(keepAliveTimeout);
+            }
+
             recycle();
         }
         
@@ -479,18 +469,23 @@ public class AjpNioProcessor extends AbstractAjpProcessor {
     /**
      * Read the specified amount of bytes, and place them in the input buffer.
      */
-    protected int read(byte[] buf, int pos, int n, boolean block)
+    protected int read(byte[] buf, int pos, int n, boolean blockFirstRead)
         throws IOException {
 
         int read = 0;
         int res = 0;
+        boolean block = blockFirstRead;
+        
         while (read < n) {
             res = readSocket(buf, read + pos, n, block);
             if (res > 0) {
                 read += res;
+            } else if (res == 0 && !block) {
+                break;
             } else {
                 throw new IOException(sm.getString("ajpprotocol.failedread"));
             }
+            block = true;
         }
         return read;
     }
@@ -596,14 +591,18 @@ public class AjpNioProcessor extends AbstractAjpProcessor {
      * @return The number of bytes read
      * @throws IOException any other failure, including incomplete reads
      */
-    protected int readMessage(AjpMessage message, boolean block)
+    protected int readMessage(AjpMessage message, boolean blockFirstRead)
         throws IOException {
 
         byte[] buf = message.getBuffer();
         int headerLength = message.getHeaderLength();
 
-        int bytesRead = read(buf, 0, headerLength, block);
+        int bytesRead = read(buf, 0, headerLength, blockFirstRead);
 
+        if (bytesRead == 0) {
+            return 0;
+        }
+        
         int messageLength = message.processHeader();
         if (messageLength < 0) {
             // Invalid AJP header signature
