@@ -178,7 +178,7 @@ public class NioBlockingSelector {
                     keycount = 1;
                     att.resetReadLatch();
                 }
-                if (readTimeout > 0 && (keycount == 0))
+                if (readTimeout >= 0 && (keycount == 0))
                     timedout = (System.currentTimeMillis() - time) >= readTimeout;
             } //while
             if (timedout)
