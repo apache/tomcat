@@ -166,7 +166,11 @@ public class NioBlockingSelector {
                 try {
                     if ( att.getReadLatch()==null || att.getReadLatch().getCount()==0) att.startReadLatch(1);
                     poller.add(att,SelectionKey.OP_READ, reference);
-                    att.awaitReadLatch(readTimeout,TimeUnit.MILLISECONDS);
+                    if (readTimeout < 0) {
+                        att.awaitReadLatch(Long.MAX_VALUE, TimeUnit.MILLISECONDS);
+                    } else {
+                        att.awaitReadLatch(readTimeout, TimeUnit.MILLISECONDS);
+                    }
                 }catch (InterruptedException ignore) {
                     Thread.interrupted();
                 }
