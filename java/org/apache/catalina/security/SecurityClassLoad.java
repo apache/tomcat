@@ -248,6 +248,12 @@ public final class SecurityClassLoad {
         clazz.newInstance();
         loader.loadClass(basePackage + "util.http.HttpMessages");
         loader.loadClass(basePackage + "util.net.Constants");
+        loader.loadClass(basePackage +
+                "util.net.NioBlockingSelector$BlockPoller$1");
+        loader.loadClass(basePackage +
+                "util.net.NioBlockingSelector$BlockPoller$2");
+        loader.loadClass(basePackage +
+                "util.net.NioBlockingSelector$BlockPoller$3");
         loader.loadClass(basePackage + "util.net.SSLSupport$CipherData");
         loader.loadClass
             (basePackage + "util.net.JIoEndpoint$PrivilegedSetTccl");
