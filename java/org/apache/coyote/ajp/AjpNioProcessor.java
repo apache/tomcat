@@ -116,13 +116,6 @@ public class AjpNioProcessor extends AbstractAjpProcessor {
 
 
     /**
-     * NIO socket read may return more than just the current message. Need to
-     * buffer the response to ensure data isn't lost.
-     */
-    protected byte[] inputBuffer;
-    protected int inputBufferEnd;
-
-    /**
      * Direct buffer used for sending right away a get body message.
      */
     protected final byte[] getBodyMessageArray;
