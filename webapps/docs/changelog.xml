@@ -46,8 +46,7 @@
   <subsection name="Coyote">
     <changelog>
       <add>
-        <bug>51145</bug>: Add an experimental (not all TCK tests pass at the
-        moment) AJP-NIO connector. (markt/rjung)
+        <bug>51145</bug>: Add an AJP-NIO connector. (markt/rjung)
       </add>
     </changelog>
   </subsection>
