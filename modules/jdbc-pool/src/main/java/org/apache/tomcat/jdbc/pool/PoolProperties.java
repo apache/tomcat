@@ -431,7 +431,7 @@ public class PoolProperties implements PoolConfiguration {
                             int pidx = props[j].indexOf("=");
                             String propName = props[j].substring(0,pidx).trim();
                             String propValue = props[j].substring(pidx+1).trim();
-                            definitions[i].addProperty(new InterceptorProperty(propName,propValue));
+                            definitions[i+1].addProperty(new InterceptorProperty(propName,propValue));
                         }
                     }
                 }
