@@ -339,7 +339,10 @@ class ApplicationHttpResponse extends HttpServletResponseWrapper {
      *
      * @param sc The new status code
      * @param msg The new message
-     * @deprecated
+     * @deprecated As of version 2.1, due to ambiguous meaning of the message
+     *             parameter. To set a status code use
+     *             <code>setStatus(int)</code>, to send an error with a
+     *             description use <code>sendError(int, String)</code>.
      */
     @Deprecated
     @Override
