@@ -173,7 +173,7 @@ In order to grant security permissions to JARs located inside the
 web application repository, use URLs of of the following format
 in your policy file:
 
-file:${catalina.home}/webapps/examples/WEB-INF/lib/driver.jar
+file:${catalina.base}/webapps/examples/WEB-INF/lib/driver.jar
 
 
 ============================
