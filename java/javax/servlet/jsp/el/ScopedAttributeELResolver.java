@@ -30,6 +30,10 @@ import javax.el.PropertyNotWritableException;
 import javax.servlet.jsp.JspContext;
 import javax.servlet.jsp.PageContext;
 
+/**
+*
+* @since 2.1
+*/
 public class ScopedAttributeELResolver extends ELResolver {
 
     public ScopedAttributeELResolver() {
