@@ -105,7 +105,7 @@ public class AjpProtocol extends AbstractAjpProtocol {
             new ConcurrentHashMap<SocketWrapper<Socket>, AjpProcessor>();
 
         protected ConcurrentLinkedQueue<AjpProcessor> recycledProcessors = 
-            new ConcurrentLinkedQueue<AjpProcessor>() {
+                new ConcurrentLinkedQueue<AjpProcessor>() {
             private static final long serialVersionUID = 1L;
             protected AtomicInteger size = new AtomicInteger(0);
             @Override

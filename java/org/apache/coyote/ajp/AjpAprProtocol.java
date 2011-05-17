@@ -70,7 +70,8 @@ public class AjpAprProtocol extends AbstractAjpProtocol {
         setSoLinger(Constants.DEFAULT_CONNECTION_LINGER);
         setSoTimeout(Constants.DEFAULT_CONNECTION_TIMEOUT);
         setTcpNoDelay(Constants.DEFAULT_TCP_NO_DELAY);
-        setUseSendfile(Constants.DEFAULT_USE_SENDFILE);
+        // AJP does not use Send File
+        ((AprEndpoint) endpoint).setUseSendfile(false);
     }
 
     
@@ -85,11 +86,6 @@ public class AjpAprProtocol extends AbstractAjpProtocol {
 
     // --------------------------------------------------------- Public Methods
 
-
-    public boolean getUseSendfile() { return endpoint.getUseSendfile(); }
-    public void setUseSendfile(@SuppressWarnings("unused") boolean useSendfile) {
-        /* No sendfile for AJP */
-    }
 
     public int getPollTime() { return ((AprEndpoint)endpoint).getPollTime(); }
     public void setPollTime(int pollTime) { ((AprEndpoint)endpoint).setPollTime(pollTime); }
@@ -120,7 +116,7 @@ public class AjpAprProtocol extends AbstractAjpProtocol {
             new ConcurrentHashMap<SocketWrapper<Long>, AjpAprProcessor>();
 
         protected ConcurrentLinkedQueue<AjpAprProcessor> recycledProcessors = 
-            new ConcurrentLinkedQueue<AjpAprProcessor>() {
+                new ConcurrentLinkedQueue<AjpAprProcessor>() {
             private static final long serialVersionUID = 1L;
             protected AtomicInteger size = new AtomicInteger(0);
             @Override
