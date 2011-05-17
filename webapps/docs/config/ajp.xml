@@ -161,10 +161,6 @@
         Take a look at our <a href="#Connector Comparison">Connector
         Comparison</a> chart.
       </p>
-      <p>
-        <strong><font color="red">WARNING</font></strong>: The NIO connector for AJP
-        is experimentaland not yet fully functional.
-      </p>
     </attribute>
 
     <attribute name="proxyName" required="false">
@@ -485,6 +481,111 @@
     </attributes>
   </subsection>
 
+  <subsection name="NIO specific configuration">
+
+    <p>The following attributes are specific to the NIO connector.</p>
+
+    <attributes>
+
+      <attribute name="socket.directBuffer" required="false">
+        <p>(bool)Boolean value, whether to use direct ByteBuffers or java mapped
+        ByteBuffers. Default is <code>false</code>.<br/>
+        When you are using direct buffers, make sure you allocate the
+        appropriate amount of memory for the direct memory space. On Sun's JDK
+        that would be something like <code>-XX:MaxDirectMemorySize=256m</code>.
+        </p>
+      </attribute>
+      
+      <attribute name="socket.appReadBufSize" required="false">
+        <p>(int)Each connection that is opened up in Tomcat get associated with
+        a read ByteBuffer. This attribute controls the size of this buffer. By
+        default this read buffer is sized at <code>8192</code> bytes. For lower
+        concurrency, you can increase this to buffer more data. For an extreme
+        amount of keep alive connections, decrease this number or increase your
+        heap size.</p>
+      </attribute>
+
+      <attribute name="socket.appWriteBufSize" required="false">
+        <p>(int)Each connection that is opened up in Tomcat get associated with
+        a write ByteBuffer. This attribute controls the size of this buffer. By
+        default this write buffer is sized at <code>8192</code> bytes. For low
+        concurrency you can increase this to buffer more response data. For an
+        extreme amount of keep alive connections, decrease this number or
+        increase your heap size.<br/>
+        The default value here is pretty low, you should up it if you are not
+        dealing with tens of thousands concurrent connections.</p>
+      </attribute>
+
+      <attribute name="socket.bufferPool" required="false">
+        <p>(int)The NIO connector uses a class called NioChannel that holds
+        elements linked to a socket. To reduce garbage collection, the NIO
+        connector caches these channel objects. This value specifies the size of
+        this cache. The default value is <code>500</code>, and represents that
+        the cache will hold 500 NioChannel objects. Other values are
+        <code>-1</code> for unlimited cache and <code>0</code> for no cache.</p>
+      </attribute>
+
+      <attribute name="socket.bufferPoolSize" required="false">
+        <p>(int)The NioChannel pool can also be size based, not used object
+        based. The size is calculated as follows:<br/>
+        NioChannel
+        <code>buffer size = read buffer size + write buffer size</code><br/>
+        SecureNioChannel <code>buffer size = application read buffer size +
+        application write buffer size + network read buffer size +
+        network write buffer size</code><br/>
+        The value is in bytes, the default value is <code>1024*1024*100</code>
+        (100MB).</p>
+      </attribute>
+
+      <attribute name="socket.processorCache" required="false">
+        <p>(int)Tomcat will cache SocketProcessor objects to reduce garbage
+        collection. The integer value specifies how many objects to keep in the
+        cache at most. The default is <code>500</code>. Other values are
+        <code>-1</code> for unlimited cache and <code>0</code> for no cache.</p>
+      </attribute>
+
+      <attribute name="socket.keyCache" required="false">
+        <p>(int)Tomcat will cache KeyAttachment objects to reduce garbage
+        collection. The integer value specifies how many objects to keep in the
+        cache at most. The default is <code>500</code>. Other values are
+        <code>-1</code> for unlimited cache and <code>0</code> for no cache.</p>
+      </attribute>
+
+      <attribute name="socket.eventCache" required="false">
+        <p>(int)Tomcat will cache PollerEvent objects to reduce garbage
+        collection. The integer value specifies how many objects to keep in the
+        cache at most. The default is <code>500</code>. Other values are
+        <code>-1</code> for unlimited cache and <code>0</code> for no cache.</p>
+      </attribute>
+
+      <attribute name="selectorPool.maxSelectors" required="false">
+        <p>(int)The max selectors to be used in the pool, to reduce selector
+        contention. Use this option when the command line
+        <code>org.apache.tomcat.util.net.NioSelectorShared</code> value is set
+        to false. Default value is <code>200</code>.</p>
+      </attribute>
+
+      <attribute name="selectorPool.maxSpareSelectors" required="false">
+        <p>(int)The max spare selectors to be used in the pool, to reduce
+        selector contention. When a selector is returned to the pool, the system
+        can decide to keep it or let it be GC'd. Use this option when the
+        command line <code>org.apache.tomcat.util.net.NioSelectorShared</code>
+        value is set to false. Default value is <code>-1</code> (unlimited).</p>
+      </attribute>
+
+      <attribute name="command-line-options" required="false">
+        <p>The following command line options are available for the NIO
+        connector:<br/>
+        <code>-Dorg.apache.tomcat.util.net.NioSelectorShared=true|false</code>
+        - default is <code>true</code>. Set this value to <code>false</code> if you wish to
+        use a selector for each thread. When you set it to <code>false</code>, you can
+        control the size of the pool of selectors by using the 
+        <strong>selectorPool.maxSelectors</strong> attribute.</p>
+      </attribute>
+
+    </attributes>
+  </subsection>
+
   <subsection name="APR/native specific configuration">
   
     <p>The APR/native implementation supports the following attributes in
@@ -540,8 +641,6 @@
 
   <subsection name="Connector Comparison">
 
-    <p><strong><font color="red">WARNING</font></strong>: The NIO connector for AJP
-    is experimentaland not yet fully functional.</p>
     <p>Below is a small chart that shows how the connectors differentiate.</p>
     <source>
                        Java Blocking Connector   Java Nio Blocking Connector   APR/native Connector
