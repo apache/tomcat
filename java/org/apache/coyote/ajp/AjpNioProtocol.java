@@ -84,13 +84,6 @@ public class AjpNioProtocol extends AbstractAjpProtocol {
     private AjpConnectionHandler cHandler;
 
 
-    // --------------------------------------------------------- Public Methods
-
-
-    // AJP does not use Send File.
-    public boolean getUseSendfile() { return false; }
-
-
     // ----------------------------------------------------- JMX related methods
 
     @Override
@@ -194,7 +187,7 @@ public class AjpNioProtocol extends AbstractAjpProtocol {
         
         /**
          * Use this only if the processor is not available, otherwise use
-         * {@link #release(NioChannel, Http11NioProcessor).
+         * {@link #release(NioChannel, AjpNioProcessor).
          */
         @Override
         public void release(NioChannel socket) {
@@ -232,7 +225,7 @@ public class AjpNioProtocol extends AbstractAjpProtocol {
                     // with "ERROR" level, so it will show up even on
                     // less-than-verbose logs.
                     AjpNioProtocol.log.error
-                        (sm.getString("http11protocol.proto.error"), e);
+                        (sm.getString("ajpprotocol.proto.error"), e);
                 } finally {
                     if (processor.isAsync()) {
                         state = processor.asyncPostProcess();
