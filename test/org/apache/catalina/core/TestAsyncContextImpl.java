@@ -49,6 +49,8 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
     private static final long REQUEST_TIME = 500;
     // Timeout thread (where used) checks for timeout every second
     private static final long TIMEOUT_MARGIN = 1000;
+    // Default timeout for these tests
+    private static final long TIMEOUT = 3000;
 
     public void testBug49528() throws Exception {
         // Setup Tomcat instance
@@ -1111,5 +1113,75 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         }
     }
     
+
+    public void testBug51197() throws Exception {
+        // Setup Tomcat instance
+        Tomcat tomcat = getTomcatInstance();
+        
+        // Must have a real docBase - just use temp
+        File docBase = new File(System.getProperty("java.io.tmpdir"));
+        
+        Context ctx = tomcat.addContext("", docBase.getAbsolutePath());
+
+        AsyncErrorServlet asyncErrorServlet =
+            new AsyncErrorServlet(HttpServletResponse.SC_BAD_REQUEST);
+        Wrapper wrapper =
+            Tomcat.addServlet(ctx, "asyncErrorServlet", asyncErrorServlet);
+        wrapper.setAsyncSupported(true);
+        ctx.addServletMapping("/asyncErrorServlet", "asyncErrorServlet");
+
+        TesterAccessLogValve alv = new TesterAccessLogValve();
+        ctx.getPipeline().addValve(alv);
+        
+        tomcat.start();
+        
+        StringBuilder url = new StringBuilder(48);
+        url.append("http://localhost:");
+        url.append(getPort());
+        url.append("/asyncErrorServlet");
+        
+        int rc = getUrl(url.toString(), new ByteChunk(), null);
+        
+        assertEquals(HttpServletResponse.SC_BAD_REQUEST, rc);
+        
+        // Without this test may complete before access log has a chance to log
+        // the request
+        Thread.sleep(REQUEST_TIME);
+        
+        // Check the access log
+        validateAccessLog(alv, 1, HttpServletResponse.SC_BAD_REQUEST, TIMEOUT,
+                TIMEOUT + TIMEOUT_MARGIN + REQUEST_TIME);
+
+    }
+
+    private static class AsyncErrorServlet extends HttpServlet {
+
+        private static final long serialVersionUID = 1L;
+
+        private int status = 200;
+
+        public AsyncErrorServlet(int status) {
+            this.status = status;
+        }
+        
+        @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+                throws ServletException, IOException {
+            
+            final AsyncContext actxt = req.startAsync();
+            actxt.setTimeout(TIMEOUT);
+            actxt.start(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        ((HttpServletResponse) actxt.getResponse()).sendError(
+                                status);
+                    } catch (IOException e) {
+                        // Ignore
+                    }
+                }
+            });
+        }
+    }
 
 }
