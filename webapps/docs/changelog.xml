@@ -101,6 +101,10 @@
         get returned with requests mapped to a context with a path of
         <code>/foobar</code>. (markt)
       </fix>
+      <fix>
+        <bug>51197</bug>: Fix possible dropped connection when sendError or
+        sendRedirst are used during async processing. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">

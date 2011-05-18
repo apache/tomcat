@@ -277,6 +277,9 @@ public class CoyoteAdapter implements Adapter {
                 if (ctxt != null) {
                     ctxt.fireRequestDestroyEvent(request);
                 }
+                // Lift any suspension (e.g. if sendError() was used by an async
+                // request
+                response.setSuspended(false);
             }
 
             if (status==SocketStatus.TIMEOUT) {
