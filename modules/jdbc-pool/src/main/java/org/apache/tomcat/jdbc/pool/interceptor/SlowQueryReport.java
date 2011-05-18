@@ -255,15 +255,15 @@ public class SlowQueryReport extends AbstractQueryReport  {
         };
 
         private final String query;
-        private int nrOfInvocations;
-        private long maxInvocationTime = Long.MIN_VALUE;
-        private long maxInvocationDate;
-        private long minInvocationTime = Long.MAX_VALUE;
-        private long minInvocationDate;
-        private long totalInvocationTime;
-        private long failures;
-        private int prepareCount;
-        private long prepareTime;
+        private volatile int nrOfInvocations;
+        private volatile long maxInvocationTime = Long.MIN_VALUE;
+        private volatile long maxInvocationDate;
+        private volatile long minInvocationTime = Long.MAX_VALUE;
+        private volatile long minInvocationDate;
+        private volatile long totalInvocationTime;
+        private volatile long failures;
+        private volatile int prepareCount;
+        private volatile long prepareTime;
         private volatile long lastInvocation = 0;
         
         public static String[] getFieldNames() {
