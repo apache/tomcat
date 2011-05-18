@@ -401,7 +401,8 @@ public class Http11NioProcessor extends AbstractHttp11Processor {
                     // committed, so we can't try and set headers.
                     if(keepAlive && !error) { // Avoid checking twice.
                         error = response.getErrorException() != null ||
-                                statusDropsConnection(response.getStatus());
+                                (!isAsync() &&
+                                statusDropsConnection(response.getStatus()));
                     }
                     // Comet support
                     SelectionKey key = socket.getIOChannel().keyFor(socket.getPoller().getSelector());
