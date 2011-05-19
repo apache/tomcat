@@ -63,6 +63,10 @@
       <add>
         Add documentation for AJP-NIO connector. (markt/rjung)
       </add>
+      <fix>
+        <bug>51229</bug>: Fix bugs in the Servlet 3.0 asynchronous examples.
+        Patch provided by Eiji Takahashi. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
