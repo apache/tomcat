@@ -78,7 +78,7 @@ class Generator {
     private static final String VAR_INSTANCEMANAGER =
         System.getProperty("org.apache.jasper.compiler.Generator.VAR_INSTANCEMANAGER", "_jsp_instancemanager");
     private static final boolean POOL_TAGS_WITH_EXTENDS =
-        Boolean.getBoolean("org.apache.jasper.compiler.Generator.VAR_EXPRESSIONFACTORY");
+        Boolean.getBoolean("org.apache.jasper.compiler.Generator.POOL_TAGS_WITH_EXTENDS");
 
     /* System property that controls if the requirement to have the object
      * used in jsp:getProperty action to be previously "introduced"
