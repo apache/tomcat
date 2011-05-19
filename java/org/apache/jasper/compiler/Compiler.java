@@ -429,8 +429,6 @@ public abstract class Compiler {
      */
     public boolean isOutDated(boolean checkClass) {
 
-        String jsp = ctxt.getJspFile();
-
         if (jsw != null
                 && (ctxt.getOptions().getModificationTestInterval() > 0)) {
 
@@ -442,24 +440,9 @@ public abstract class Compiler {
             jsw.setLastModificationTest(System.currentTimeMillis());
         }
 
-        long jspRealLastModified = 0;
-        try {
-            URL jspUrl = ctxt.getResource(jsp);
-            if (jspUrl == null) {
-                ctxt.incrementRemoved();
-                return true;
-            }
-            URLConnection uc = jspUrl.openConnection();
-            if (uc instanceof JarURLConnection) {
-                jspRealLastModified =
-                    ((JarURLConnection) uc).getJarEntry().getTime();
-            } else {
-                jspRealLastModified = uc.getLastModified();
-            }
-            uc.getInputStream().close();
-        } catch (Exception e) {
-            if (log.isDebugEnabled())
-                log.debug("Problem accessing resource. Treat as outdated.", e);
+        long jspRealLastModified = ctxt.getJspLastModified();
+        if (jspRealLastModified < 0) {
+            // Something went wrong - assume modification
             return true;
         }
 
