@@ -44,10 +44,12 @@
 -->
 <section name="Tomcat 7.0.15 (markt)">
   <subsection name="Catalina">
+    <changelog>
       <fix>
         <bug>51197</bug>: Fix possible dropped connection when sendError or
         sendRedirst are used during async processing. (markt)
       </fix>
+    </changelog>
   </subsection>
   <subsection name="Coyote">
     <changelog>
