@@ -63,7 +63,6 @@ public class JspCompilationContext {
 
     protected String className;
     protected String jspUri;
-    protected boolean isErrPage;
     protected String basePackageName;
     protected String derivedPackageName;
     protected String servletJavaFileName;
@@ -95,14 +94,12 @@ public class JspCompilationContext {
 
     // jspURI _must_ be relative to the context
     public JspCompilationContext(String jspUri,
-                                 boolean isErrPage,
                                  Options options,
                                  ServletContext context,
                                  JspServletWrapper jsw,
                                  JspRuntimeContext rctxt) {
 
         this.jspUri = canonicalURI(jspUri);
-        this.isErrPage = isErrPage;
         this.options = options;
         this.jsw = jsw;
         this.context = context;
@@ -132,7 +129,7 @@ public class JspCompilationContext {
                                  JspServletWrapper jsw,
                                  JspRuntimeContext rctxt,
                                  JarResource tagJarResource) {
-        this(tagfile, false, options, context, jsw, rctxt);
+        this(tagfile, options, context, jsw, rctxt);
         this.isTagFile = true;
         this.tagInfo = tagInfo;
         this.tagJarResource = tagJarResource;
@@ -383,18 +380,6 @@ public class JspCompilationContext {
      */
     public String getJspFile() {
         return jspUri;
-    }
-
-    /**
-     * Are we processing something that has been declared as an
-     * errorpage? 
-     */
-    public boolean isErrorPage() {
-        return isErrPage;
-    }
-
-    public void setErrorPage(boolean isErrPage) {
-        this.isErrPage = isErrPage;
     }
 
     public boolean isTagFile() {
