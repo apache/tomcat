@@ -101,10 +101,12 @@
     <attribute
       name="asyncSupported"
       description="Does this valve support async reporting?"
+      is="true"
       type="boolean"/>
     <attribute
       name="doProcessingStats"
-      is="true"
+      getMethod="doStatistics"
+      setMethod="setStatistics"
       description="active statistics counting"
       type="boolean"/>
     <attribute

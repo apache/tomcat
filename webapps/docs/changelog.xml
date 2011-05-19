@@ -50,19 +50,27 @@
       </add>
     </changelog>
   </subsection>
-  <subsection name="Other">
+  <subsection name="Cluster">
     <changelog>
       <fix>
-        <bug>46451</bug>: Configure svn:bugtraq properties for Tomcat trunk.
-        Based on a patch provided by Marc Guillemot. (markt)
+        <bug>51230</bug>: Add missing attributes to JMX for ReplicationValve and
+        JvmRouteBinderValve. Patch provided by Eiji Takahashi. (markt)
       </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
     <changelog>
       <add>
-        Add docs for experimental AJP-NIO connector. (markt/rjung)
+        Add documentation for AJP-NIO connector. (markt/rjung)
       </add>
+    </changelog>
+  </subsection>
+  <subsection name="Other">
+    <changelog>
+      <fix>
+        <bug>46451</bug>: Configure svn:bugtraq properties for Tomcat trunk.
+        Based on a patch provided by Marc Guillemot. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
