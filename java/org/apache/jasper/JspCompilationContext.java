@@ -60,7 +60,6 @@ public class JspCompilationContext {
     private final Log log = LogFactory.getLog(JspCompilationContext.class); // must not be static
 
     protected Map<String, JarResource> tagFileJarUrls;
-    protected boolean isPackagedTagFile;
 
     protected String className;
     protected String jspUri;
@@ -138,9 +137,6 @@ public class JspCompilationContext {
         this.isTagFile = true;
         this.tagInfo = tagInfo;
         this.tagJarResource = tagJarResource;
-        if (tagJarResource != null) {
-            isPackagedTagFile = true;
-        }
     }
 
     /* ==================== Methods to override ==================== */
