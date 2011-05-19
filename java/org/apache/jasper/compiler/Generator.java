@@ -77,6 +77,8 @@ class Generator {
         System.getProperty("org.apache.jasper.compiler.Generator.VAR_EXPRESSIONFACTORY", "_el_expressionfactory");
     private static final String VAR_INSTANCEMANAGER =
         System.getProperty("org.apache.jasper.compiler.Generator.VAR_INSTANCEMANAGER", "_jsp_instancemanager");
+    private static final boolean POOL_TAGS_WITH_EXTENDS =
+        Boolean.getBoolean("org.apache.jasper.compiler.Generator.VAR_EXPRESSIONFACTORY");
 
     /* System property that controls if the requirement to have the object
      * used in jsp:getProperty action to be previously "introduced"
@@ -3423,7 +3425,7 @@ class Generator {
          * clarify whether containers can override init() and destroy(). For
          * now, we just disable tag pooling for pages that use "extends".
          */
-        if (pageInfo.getExtends(false) == null) {
+        if (pageInfo.getExtends(false) == null || POOL_TAGS_WITH_EXTENDS) {
             isPoolingEnabled = ctxt.getOptions().isPoolingEnabled();
         } else {
             isPoolingEnabled = false;
