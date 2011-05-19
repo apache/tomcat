@@ -129,12 +129,12 @@ public class JspServlet extends HttpServlet implements PeriodicEventListener {
                    AccessController.doPrivileged(new PrivilegedExceptionAction<Object>(){
                         @Override
                         public Object run() throws IOException, ServletException {
-                            serviceJspFile(null, null, jspFile, null, true);
+                            serviceJspFile(null, null, jspFile, true);
                             return null;
                         }
                     });
                 } else {
-                    serviceJspFile(null, null, jspFile, null, true);
+                    serviceJspFile(null, null, jspFile, true);
                 }
             } catch (IOException e) {
                 throw new ServletException("Could not precompile jsp: " + jspFile, e);
@@ -330,7 +330,7 @@ public class JspServlet extends HttpServlet implements PeriodicEventListener {
 
         try {
             boolean precompile = preCompile(request);
-            serviceJspFile(request, response, jspUri, null, precompile);
+            serviceJspFile(request, response, jspUri, precompile);
         } catch (RuntimeException e) {
             throw e;
         } catch (ServletException e) {
@@ -364,7 +364,7 @@ public class JspServlet extends HttpServlet implements PeriodicEventListener {
 
     private void serviceJspFile(HttpServletRequest request,
                                 HttpServletResponse response, String jspUri,
-                                Throwable exception, boolean precompile)
+                                boolean precompile)
         throws ServletException, IOException {
 
         JspServletWrapper wrapper = rctxt.getWrapper(jspUri);
@@ -378,9 +378,8 @@ public class JspServlet extends HttpServlet implements PeriodicEventListener {
                         handleMissingResource(request, response, jspUri);
                         return;
                     }
-                    boolean isErrorPage = exception != null;
                     wrapper = new JspServletWrapper(config, options, jspUri,
-                                                    isErrorPage, rctxt);
+                                                    rctxt);
                     rctxt.addWrapper(jspUri,wrapper);
                 }
             }
