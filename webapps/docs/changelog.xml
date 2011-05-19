@@ -76,6 +76,10 @@
         Add documentation for AJP-NIO connector. (markt/rjung)
       </add>
       <fix>
+        <bug>51182</bug>: Document JAAS supported added in <bug>51119</bug>.
+        Patch provided by Neil Laurance. (markt)
+      </fix>
+      <fix>
         <bug>51225</bug>: Fix broken documentation links for non-English locales
         in the HTML Manager application. Patch provided by Eiji Takahashi.
         (markt)
