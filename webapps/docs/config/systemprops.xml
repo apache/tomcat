@@ -98,6 +98,15 @@
 <section name="Jasper">
   <properties>
 
+    <property name="org.apache.jasper.compiler. Generator.STRICT_GET_PROPERTY">
+      <p>If <code>true</code>, the requirement to have the object referenced in
+      <code>jsp:getProperty</code> action to be previously "introduced"
+      to the JSP processor, as specified in the chapter JSP.5.3 of JSP 2.0 and
+      later specifications, is enforced.</p>
+      <p>If not specified, the specification compliant default of
+      <code>true</code> will be used.</p>
+    </property>
+
     <property name="org.apache.jasper.compiler. Generator.VAR_EXPRESSIONFACTORY">
       <p>The name of the variable to use for the expression language expression
       factory.</p>
@@ -109,15 +118,6 @@
       <p>The name of the variable to use for the instance manager factory.</p>
       <p>If not specified, the default value of <code>_jsp_instancemanager</code>
       will be used.</p>
-    </property>
-
-    <property name="org.apache.jasper.compiler. Generator.STRICT_GET_PROPERTY">
-      <p>If <code>true</code>, the requirement to have the object referenced in
-      <code>jsp:getProperty</code> action to be previously "introduced"
-      to the JSP processor, as specified in the chapter JSP.5.3 of JSP 2.0 and
-      later specifications, is enforced.</p>
-      <p>If not specified, the specification compliant default of
-      <code>true</code> will be used.</p>
     </property>
 
     <property name="org.apache.jasper.compiler. Parser.STRICT_QUOTE_ESCAPING">
