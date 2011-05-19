@@ -98,6 +98,20 @@
 <section name="Jasper">
   <properties>
 
+    <property name="org.apache.jasper.compiler. Generator.POOL_TAGS_WITH_EXTENDS">
+      <p>By default, JSPs that use their own base class via the extends
+      attribute of the page directive, will have Tag pooling disabled since
+      Jasper cannot guarantee that the necessary initialisation will have taken
+      place. This can have a negative impact on performance. Providing the
+      alternative base class calls _jspInit() from Servlet.init(), setting  this
+      property to <code>true</code> will enable pooling with an alternative base
+      class. If the alternative base class does not call _jspInit() and this
+      property is <code>true</code>, NPEs will occur when attempting to use
+      tags.</p>
+      <p>If not specified, the default value of <code>false</code> will be used.
+      </p>
+    </property>
+
     <property name="org.apache.jasper.compiler. Generator.STRICT_GET_PROPERTY">
       <p>If <code>true</code>, the requirement to have the object referenced in
       <code>jsp:getProperty</code> action to be previously "introduced"
