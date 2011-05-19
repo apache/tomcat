@@ -43,6 +43,12 @@
   Other
 -->
 <section name="Tomcat 7.0.15 (markt)">
+  <subsection name="Catalina">
+      <fix>
+        <bug>51197</bug>: Fix possible dropped connection when sendError or
+        sendRedirst are used during async processing. (markt)
+      </fix>
+  </subsection>
   <subsection name="Coyote">
     <changelog>
       <add>
@@ -117,10 +123,6 @@
         cookies created for a context with a path of <code>/foo</code> do not
         get returned with requests mapped to a context with a path of
         <code>/foobar</code>. (markt)
-      </fix>
-      <fix>
-        <bug>51197</bug>: Fix possible dropped connection when sendError or
-        sendRedirst are used during async processing. (markt)
       </fix>
     </changelog>
   </subsection>
