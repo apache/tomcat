@@ -64,6 +64,11 @@
         Add documentation for AJP-NIO connector. (markt/rjung)
       </add>
       <fix>
+        <bug>51225</bug>: Fix broken documentation links for non-English locales
+        in the HTML Manager application. Patch provided by Eiji Takahashi.
+        (markt)
+      </fix>
+      <fix>
         <bug>51229</bug>: Fix bugs in the Servlet 3.0 asynchronous examples.
         Patch provided by Eiji Takahashi. (markt)
       </fix>
