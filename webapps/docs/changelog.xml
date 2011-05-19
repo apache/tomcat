@@ -68,6 +68,10 @@
         <bug>51220</bug>: Add a system property to enable tag pooling with JSPs
         that use a custom base class. Based on a patch by Dan Mikusa. (markt)
       </add>
+      <add>
+        Include a comment header in generated java files that indicates when the
+        file was generated and which version of Tomcat generated it. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Cluster">
