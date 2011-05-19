@@ -62,6 +62,14 @@
       </add>
     </changelog>
   </subsection>
+  <subsection name="Jasper">
+    <changelog>
+      <add>
+        <bug>51220</bug>: Add a system property to enable tag pooling with JSPs
+        that use a custom base class. Based on a patch by Dan Mikusa. (markt)
+      </add>
+    </changelog>
+  </subsection>
   <subsection name="Cluster">
     <changelog>
       <fix>
