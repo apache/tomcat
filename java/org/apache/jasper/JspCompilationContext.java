@@ -69,7 +69,6 @@ public class JspCompilationContext {
     protected String servletJavaFileName;
     protected String javaPath;
     protected String classFileName;
-    protected String contentType;
     protected ServletWriter writer;
     protected Options options;
     protected JspServletWrapper jsw;
@@ -512,19 +511,6 @@ public class JspCompilationContext {
             classFileName = getOutputDir() + getServletClassName() + ".class";
         }
         return classFileName;
-    }
-
-    /**
-     * Get the content type of this JSP.
-     *
-     * Content type includes content type and encoding.
-     */
-    public String getContentType() {
-        return contentType;
-    }
-
-    public void setContentType(String contentType) {
-        this.contentType = contentType;
     }
 
     /**
