@@ -1160,7 +1160,7 @@ public class JspC implements Options {
 
             String jspUri=file.replace('\\','/');
             JspCompilationContext clctxt = new JspCompilationContext
-                ( jspUri, false,  this, context, null, rctxt );
+                ( jspUri, this, context, null, rctxt );
 
             /* Override the defaults */
             if ((targetClassName != null) && (targetClassName.length() > 0)) {
