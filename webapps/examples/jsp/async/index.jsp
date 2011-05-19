@@ -65,5 +65,5 @@ Use cases:
  
  
 7. Stock ticker
-   <a href="<%=response.encodeURL("/examples/async/stock")%>"> StockTicker </a>
+   <a href="<%=response.encodeURL("/examples/async/stockticker")%>"> StockTicker </a>
 </pre>
