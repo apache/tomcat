@@ -49,6 +49,10 @@
         <bug>51197</bug>: Fix possible dropped connection when sendError or
         sendRedirst are used during async processing. (markt)
       </fix>
+      <fix>
+        <bug>51221</bug>: Correct Spanish translation of text used in a 302
+        response. Patch provided by Paco Soberón. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
