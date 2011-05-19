@@ -19,9 +19,12 @@ package org.apache.jasper;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.net.JarURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.net.URLConnection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -380,6 +383,43 @@ public class JspCompilationContext {
      */
     public String getJspFile() {
         return jspUri;
+    }
+
+    public long getJspLastModified() {
+        long result = -1;
+        URLConnection uc = null;
+        try {
+            URL jspUrl = getResource(getJspFile());
+            if (jspUrl == null) {
+                incrementRemoved();
+                return result;
+            }
+            uc = jspUrl.openConnection();
+            if (uc instanceof JarURLConnection) {
+                result = ((JarURLConnection) uc).getJarEntry().getTime();
+            } else {
+                result = uc.getLastModified();
+            }
+        } catch (IOException e) {
+            if (log.isDebugEnabled()) {
+                log.debug(Localizer.getMessage(
+                        "jsp.error.lastModified", getJspFile()), e);
+            }
+            result = -1;
+        } finally {
+            if (uc != null) {
+                try {
+                    uc.getInputStream().close();
+                } catch (IOException e) {
+                    if (log.isDebugEnabled()) {
+                        log.debug(Localizer.getMessage(
+                                "jsp.error.lastModified", getJspFile()), e);
+                    }
+                    result = -1;
+                }
+            }
+        }
+        return result;
     }
 
     public boolean isTagFile() {
