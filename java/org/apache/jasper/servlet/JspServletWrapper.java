@@ -97,8 +97,8 @@ public class JspServletWrapper {
     /*
      * JspServletWrapper for JSP pages.
      */
-    public JspServletWrapper(ServletConfig config, Options options, String jspUri,
-                      boolean isErrorPage, JspRuntimeContext rctxt) {
+    public JspServletWrapper(ServletConfig config, Options options,
+            String jspUri, JspRuntimeContext rctxt) {
 
         this.isTagFile = false;
         this.config = config;
@@ -107,7 +107,7 @@ public class JspServletWrapper {
         unloadByCount = options.getMaxLoadedJsps() > 0 ? true : false;
         unloadByIdle = options.getJspIdleTimeout() > 0 ? true : false;
         unloadAllowed = unloadByCount || unloadByIdle ? true : false;
-        ctxt = new JspCompilationContext(jspUri, isErrorPage, options,
+        ctxt = new JspCompilationContext(jspUri, options,
                                          config.getServletContext(),
                                          this, rctxt);
     }
