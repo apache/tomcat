@@ -46,6 +46,10 @@
   <subsection name="Catalina">
     <changelog>
       <fix>
+        <bug>35054</bug>: Check that a file is not specified for a Host&apos;s
+        appBase and log an error if it is. (markt)
+      </fix>
+      <fix>
         <bug>51197</bug>: Fix possible dropped connection when sendError or
         sendRedirst are used during async processing. (markt)
       </fix>
