@@ -92,7 +92,20 @@ public class DataSourceProxy implements PoolConfiguration {
      * @return Driver
      * @throws SQLException
      */
-    public synchronized ConnectionPool createPool() throws SQLException {
+    public ConnectionPool createPool() throws SQLException {
+        if (pool != null) {
+            return pool;
+        } else {
+            return pCreatePool();
+        }
+    }
+    
+    /**
+     * Sets up the connection pool, by creating a pooling driver.
+     * @return Driver
+     * @throws SQLException
+     */
+    private synchronized ConnectionPool pCreatePool() throws SQLException {
         if (pool != null) {
             return pool;
         } else {
