@@ -462,7 +462,7 @@
         caching issues in some browsers by using
         <code>Cache-Control: private</code> rather than the default of
         <code>Pragma: No-cache</code> and <code>Cache-control: No-cache</code>.
-        If not set, the default value of <code>true</code> will be used.</p>
+        If not set, the default value of <code>false</code> will be used.</p>
       </attribute>
 
       <attribute name="secureRandomAlgorithm" required="false">
@@ -591,7 +591,7 @@
         caching issues in some browsers by using
         <code>Cache-Control: private</code> rather than the default of
         <code>Pragma: No-cache</code> and <code>Cache-control: No-cache</code>.
-        If not set, the default value of <code>true</code> will be used.</p>
+        If not set, the default value of <code>false</code> will be used.</p>
       </attribute>
 
       <attribute name="secureRandomAlgorithm" required="false">
@@ -704,7 +704,7 @@
         caching issues in some browsers by using
         <code>Cache-Control: private</code> rather than the default of
         <code>Pragma: No-cache</code> and <code>Cache-control: No-cache</code>.
-        If not set, the default value of <code>true</code> will be used.</p>
+        If not set, the default value of <code>false</code> will be used.</p>
       </attribute>
 
       <attribute name="secureRandomAlgorithm" required="false">
@@ -796,7 +796,7 @@
         caching issues in some browsers by using
         <code>Cache-Control: private</code> rather than the default of
         <code>Pragma: No-cache</code> and <code>Cache-control: No-cache</code>.
-        If not set, the default value of <code>true</code> will be used.</p>
+        If not set, the default value of <code>false</code> will be used.</p>
       </attribute>
 
       <attribute name="secureRandomAlgorithm" required="false">
@@ -895,7 +895,7 @@
         caching issues in some browsers by using
         <code>Cache-Control: private</code> rather than the default of
         <code>Pragma: No-cache</code> and <code>Cache-control: No-cache</code>.
-        If not set, the default value of <code>true</code> will be used.</p>
+        If not set, the default value of <code>false</code> will be used.</p>
       </attribute>
 
       <attribute name="secureRandomAlgorithm" required="false">

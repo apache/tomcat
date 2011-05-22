@@ -46,6 +46,12 @@
   <subsection name="Catalina">
     <changelog>
       <fix>
+        <bug>27122</bug>: Remove a workaround for a very old and since fixed
+        Mozilla bug and change the default value of the securePagesWithPragma
+        attribute of the Authenticator Valves to false. These changes should
+        reduce the likelihood of issues when downloading files with IE. (markt) 
+      </fix>
+      <fix>
         <bug>35054</bug>: Check that a file is not specified for a Host&apos;s
         appBase and log an error if it is. (markt)
       </fix>

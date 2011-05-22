@@ -143,9 +143,9 @@ public abstract class AuthenticatorBase extends ValveBase
 
     /**
      * Flag to determine if we disable proxy caching with headers incompatible
-     * with IE 
+     * with IE.
      */
-    protected boolean securePagesWithPragma = true;
+    protected boolean securePagesWithPragma = false;
     
     /**
      * The Java class name of the secure random number generator class to be
@@ -466,14 +466,10 @@ public abstract class AuthenticatorBase extends ValveBase
         // Make sure that constrained resources are not cached by web proxies
         // or browsers as caching can provide a security hole
         if (constraints != null && disableProxyCaching && 
-            // FIXME: Disabled for Mozilla FORM support over SSL 
-            // (improper caching issue)
-            //!request.isSecure() &&
+            !request.isSecure() &&
             !"POST".equalsIgnoreCase(request.getMethod())) {
             if (securePagesWithPragma) {
-                // FIXME: These cause problems with downloading office docs
-                // from IE under SSL and may not be needed for newer Mozilla
-                // clients.
+                // Note: These can cause problems with downloading files with IE
                 response.setHeader("Pragma", "No-cache");
                 response.setHeader("Cache-Control", "no-cache");
             } else {
