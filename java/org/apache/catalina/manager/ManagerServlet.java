@@ -335,6 +335,11 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
             && (request.getParameter("update").equals("true"))) {
             update = true;
         }
+        
+        boolean statusLine = false;
+        if ("true".equals(request.getParameter("statusLine"))) {
+            statusLine = true;
+        }
 
         // Prepare our output writer to generate the response message
         response.setContentType("text/plain; charset=" + Constants.CHARSET);
@@ -370,7 +375,7 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
         } else if (command.equals("/undeploy")) {
             undeploy(writer, cn, smClient);
         } else if (command.equals("/findleaks")) {
-            findleaks(writer, smClient);
+            findleaks(statusLine, writer, smClient);
         } else {
             writer.println(smClient.getString("managerServlet.unknownCommand",
                     command));
@@ -512,7 +517,8 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
     /**
      * Find potential memory leaks caused by web application reload.
      */
-    protected void findleaks(PrintWriter writer, StringManager smClient) {
+    protected void findleaks(boolean statusLine, PrintWriter writer,
+            StringManager smClient) {
         
         if (!(host instanceof StandardHost)) {
             writer.println(smClient.getString("managerServlet.findleaksFail"));
@@ -522,11 +528,19 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
         String[] results =
             ((StandardHost) host).findReloadedContextMemoryLeaks();
         
-        for (String result : results) {
-            if ("".equals(result)) {
-                result = "/";
+        if (results.length > 0) {
+            if (statusLine) {
+                writer.println(
+                        smClient.getString("managerServlet.findleaksList"));
             }
-            writer.println(result);
+            for (String result : results) {
+                if ("".equals(result)) {
+                    result = "/";
+                }
+                writer.println(result);
+            }
+        } else if (statusLine) {
+            writer.println(smClient.getString("managerServlet.findleaksNone"));
         }
     }
     
