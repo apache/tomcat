@@ -772,11 +772,16 @@ public final class HTMLManagerServlet extends ManagerServlet {
         StringWriter stringWriter = new StringWriter();
         PrintWriter printWriter = new PrintWriter(stringWriter);
 
-        super.findleaks(printWriter, smClient);
+        super.findleaks(false, printWriter, smClient);
 
-        if (stringWriter.getBuffer().length() > 0) {
-            msg.append(smClient.getString("htmlManagerServlet.findleaksList"));
-            msg.append(stringWriter.toString());
+        String writerText = stringWriter.toString();
+
+        if (writerText.length() > 0) {
+            if (!writerText.startsWith("FAIL -")) {
+                msg.append(smClient.getString(
+                        "htmlManagerServlet.findleaksList"));
+            }
+            msg.append(writerText);
         } else {
             msg.append(smClient.getString("htmlManagerServlet.findleaksNone"));
         }
