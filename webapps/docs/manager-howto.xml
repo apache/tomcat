@@ -809,7 +809,7 @@ error message.  Possible causes for problems include:</p>
 <subsection name="Finding memory leaks">
 
 <source>
-http://localhost:8080/manager/text/findleaks
+http://localhost:8080/manager/text/findleaks[?statusLine=[true|false]]
 </source>
 
 <p><strong>The find leaks diagnostic triggers a full garbage collection. It
@@ -825,13 +825,17 @@ does not extend StandardHost.</p>
 <p>Explicitly triggering a full garbage collection from Java code is documented
 to be unreliable. Furthermore, depending on the JVM used, there are options to
 disable explicit GC triggering, like <code>-XX:+DisableExplicitGC</code>.
-If you want to make sure, that the diagnostics were successfully running a full GC,
-you will need to check using tools like GC logging, JConsole or similar.</p>
+If you want to make sure, that the diagnostics were successfully running a full
+GC, you will need to check using tools like GC logging, JConsole or similar.</p>
 
 <p>If this command succeeds, you will see a response like this:</p>
 <source>
 /leaking-webapp
 </source>
+
+<p>If you wish to see a status line included in the response then include the
+<code>statusLine</code> query parameter in the request with a value of
+<code>true</code>.</p>
 
 <p>Each context path for a web application that was stopped, reloaded or
 undeployed, but which classes from the previous runs are still loaded in memory,
@@ -935,6 +939,7 @@ file might look something like this:</p>
   &lt;taskdef name="deploy"    classname="org.apache.catalina.ant.DeployTask"/&gt;
   &lt;taskdef name="list"      classname="org.apache.catalina.ant.ListTask"/&gt;
   &lt;taskdef name="reload"    classname="org.apache.catalina.ant.ReloadTask"/&gt;
+  &lt;taskdef name="findleaks" classname="org.apache.catalina.ant.FindLeaksTask"/&gt;
   &lt;taskdef name="resources" classname="org.apache.catalina.ant.ResourcesTask"/&gt;
   &lt;taskdef name="start"     classname="org.apache.catalina.ant.StartTask"/&gt;
   &lt;taskdef name="stop"      classname="org.apache.catalina.ant.StopTask"/&gt;
