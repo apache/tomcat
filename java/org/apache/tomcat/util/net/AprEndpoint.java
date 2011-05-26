@@ -949,7 +949,7 @@ public class AprEndpoint extends AbstractEndpoint {
                 }
                 try {
                     //if we have reached max connections, wait
-                    awaitConnection();
+                    countUpOrAwaitConnection();
                     
                     long socket = 0;
                     try {
@@ -965,8 +965,6 @@ public class AprEndpoint extends AbstractEndpoint {
                     // Successful accept, reset the error delay
                     errorDelay = 0;
 
-                    //increment socket count
-                    countUpConnection();
                     /*
                      * In the case of a deferred accept unlockAccept needs to
                      * send data. This data will be rubbish, so destroy the

@@ -31,7 +31,7 @@ import javax.net.ssl.KeyManagerFactory;
 import org.apache.juli.logging.Log;
 import org.apache.tomcat.util.IntrospectionUtils;
 import org.apache.tomcat.util.res.StringManager;
-import org.apache.tomcat.util.threads.CounterLatch;
+import org.apache.tomcat.util.threads.LimitLatch;
 import org.apache.tomcat.util.threads.ResizableExecutor;
 import org.apache.tomcat.util.threads.TaskQueue;
 import org.apache.tomcat.util.threads.TaskThreadFactory;
@@ -97,7 +97,7 @@ public abstract class AbstractEndpoint {
     /**
      * counter for nr of connections handled by an endpoint
      */
-    private volatile CounterLatch connectionCounterLatch = null;
+    private volatile LimitLatch connectionLimitLatch = null;
 
     /**
      * Socket properties
@@ -111,7 +111,13 @@ public abstract class AbstractEndpoint {
     // ----------------------------------------------------------------- Properties
 
     private int maxConnections = 10000;
-    public void setMaxConnections(int maxCon) { this.maxConnections = maxCon; }
+    public void setMaxConnections(int maxCon) {
+        this.maxConnections = maxCon;
+        LimitLatch latch = this.connectionLimitLatch;
+        // Update the latch that enforces this
+        latch.setLimit(maxCon);
+    }
+
     public int  getMaxConnections() { return this.maxConnections; }
     /**
      * External Executor based thread pool.
@@ -550,32 +556,26 @@ public abstract class AbstractEndpoint {
     protected abstract Log getLog();
     public abstract boolean getUseSendfile();
     
-    protected CounterLatch initializeConnectionLatch() {
-        if (connectionCounterLatch==null) {
-            connectionCounterLatch = new CounterLatch(0,getMaxConnections());
+    protected LimitLatch initializeConnectionLatch() {
+        if (connectionLimitLatch==null) {
+            connectionLimitLatch = new LimitLatch(getMaxConnections());
         }
-        return connectionCounterLatch;
+        return connectionLimitLatch;
     }
     
     protected void releaseConnectionLatch() {
-        CounterLatch latch = connectionCounterLatch;
+        LimitLatch latch = connectionLimitLatch;
         if (latch!=null) latch.releaseAll();
-        connectionCounterLatch = null;
+        connectionLimitLatch = null;
     }
     
-    protected void awaitConnection() throws InterruptedException {
-        CounterLatch latch = connectionCounterLatch;
-        if (latch!=null) latch.await();
-    }
-    
-    protected long countUpConnection() {
-        CounterLatch latch = connectionCounterLatch;
-        if (latch!=null) return latch.countUp();
-        else return -1;
+    protected void countUpOrAwaitConnection() throws InterruptedException {
+        LimitLatch latch = connectionLimitLatch;
+        if (latch!=null) latch.countUpOrAwait();
     }
     
     protected long countDownConnection() {
-        CounterLatch latch = connectionCounterLatch;
+        LimitLatch latch = connectionLimitLatch;
         if (latch!=null) {
             long result = latch.countDown();
             if (result<0) {
