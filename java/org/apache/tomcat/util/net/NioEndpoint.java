@@ -761,7 +761,7 @@ public class NioEndpoint extends AbstractEndpoint {
                 }
                 try {
                     //if we have reached max connections, wait
-                    awaitConnection();
+                    countUpOrAwaitConnection();
                     
                     SocketChannel socket = null;
                     try {
@@ -791,8 +791,6 @@ public class NioEndpoint extends AbstractEndpoint {
                                 if (log.isDebugEnabled())
                                     log.debug("", ix);
                             }
-                        } else {
-                            countUpConnection();
                         }
                     }
                 } catch (SocketTimeoutException sx) {

@@ -211,8 +211,8 @@ public class JIoEndpoint extends AbstractEndpoint {
                 }
                 try {
                     //if we have reached max connections, wait
-                    awaitConnection();
-
+                    countUpOrAwaitConnection();
+                    
                     Socket socket = null;
                     try {
                         // Accept the next incoming connection from the server
@@ -237,8 +237,6 @@ public class JIoEndpoint extends AbstractEndpoint {
                             } catch (IOException e) {
                                 // Ignore
                             }
-                        } else {
-                            countUpConnection();
                         }
                     } else {
                         // Close socket right away
