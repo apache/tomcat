@@ -114,8 +114,10 @@ public abstract class AbstractEndpoint {
     public void setMaxConnections(int maxCon) {
         this.maxConnections = maxCon;
         LimitLatch latch = this.connectionLimitLatch;
-        // Update the latch that enforces this
-        latch.setLimit(maxCon);
+        if (latch != null) {
+            // Update the latch that enforces this
+            latch.setLimit(maxCon);
+        }
     }
 
     public int  getMaxConnections() { return this.maxConnections; }
