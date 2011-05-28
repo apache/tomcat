@@ -63,6 +63,10 @@
         <bug>51221</bug>: Correct Spanish translation of text used in a 302
         response. Patch provided by Paco Soberón. (markt)
       </fix>
+      <fix>
+        <bug>51274</bug>: Add missing i18n strings in PersistentManagerBase.
+        Patch provided by Eiji Takahashi. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
