@@ -67,6 +67,10 @@
         <bug>51274</bug>: Add missing i18n strings in PersistentManagerBase.
         Patch provided by Eiji Takahashi. (markt)
       </fix>
+      <fix>
+        <bug>51277</bug>: Improve error message if an application is deployed
+        with an incomplete FORM authentication configuration. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

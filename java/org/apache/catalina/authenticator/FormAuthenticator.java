@@ -365,9 +365,19 @@ public class FormAuthenticator
     protected void forwardToLoginPage(Request request,
             HttpServletResponse response, LoginConfig config)
             throws IOException {
+        
+        String loginPage = config.getLoginPage();
+        if (loginPage == null || loginPage.length() == 0) {
+            String msg = sm.getString("formAuthenticator.noLoginPage",
+                    context.getName());
+            log.warn(msg);
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+                    msg);
+            return;
+        }
+        
         RequestDispatcher disp =
-            context.getServletContext().getRequestDispatcher
-            (config.getLoginPage());
+            context.getServletContext().getRequestDispatcher(loginPage);
         try {
             if (context.fireRequestInitEvent(request)) {
                 disp.forward(request.getRequest(), response);
@@ -398,6 +408,17 @@ public class FormAuthenticator
     protected void forwardToErrorPage(Request request,
             HttpServletResponse response, LoginConfig config)
             throws IOException {
+        
+        String errorPage = config.getErrorPage();
+        if (errorPage == null || errorPage.length() == 0) {
+            String msg = sm.getString("formAuthenticator.noErrorPage",
+                    context.getName());
+            log.warn(msg);
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+                    msg);
+            return;
+        }
+
         RequestDispatcher disp =
             context.getServletContext().getRequestDispatcher
             (config.getErrorPage());
