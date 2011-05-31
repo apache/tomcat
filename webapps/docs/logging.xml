@@ -419,6 +419,7 @@ log4j.appender.CATALINA.file=${catalina.base}/logs/catalina.<br />
 log4j.appender.CATALINA.encoding=UTF-8<br />
 # Roll-over the log once per day<br />
 log4j.appender.CATALINA.DatePattern='.'yyyy-MM-dd'.log'<br />
+log4j.appender.CATALINA.layout = org.apache.log4j.PatternLayout
 log4j.appender.CATALINA.conversionPattern = %d [%t] %-5p %c- %m%n<br />
 log4j.appender.CATALINA.append=true<br />
 <br />
@@ -426,6 +427,7 @@ log4j.appender.LOCALHOST=org.apache.log4j.DailyRollingFileAppender<br />
 log4j.appender.LOCALHOST.file=${catalina.base}/logs/localhost.<br />
 log4j.appender.LOCALHOST.encoding=UTF-8<br />
 log4j.appender.LOCALHOST.DatePattern='.'yyyy-MM-dd'.log'<br />
+log4j.appender.LOCALHOST.layout = org.apache.log4j.PatternLayout
 log4j.appender.LOCALHOST.conversionPattern = %d [%t] %-5p %c- %m%n<br />
 log4j.appender.LOCALHOST.append=true<br />
 
@@ -433,6 +435,7 @@ log4j.appender.MANAGER=org.apache.log4j.DailyRollingFileAppender<br />
 log4j.appender.MANAGER.file=${catalina.base}/logs/manager.<br />
 log4j.appender.MANAGER.encoding=UTF-8<br />
 log4j.appender.MANAGER.DatePattern='.'yyyy-MM-dd'.log'<br />
+log4j.appender.MANAGER.layout = org.apache.log4j.PatternLayout
 log4j.appender.MANAGER.conversionPattern = %d [%t] %-5p %c- %m%n<br />
 log4j.appender.MANAGER.append=true<br />
 
@@ -440,11 +443,13 @@ log4j.appender.HOST-MANAGER=org.apache.log4j.DailyRollingFileAppender<br />
 log4j.appender.HOST-MANAGER.file=${catalina.base}/logs/host-manager.<br />
 log4j.appender.HOST-MANAGER.encoding=UTF-8<br />
 log4j.appender.HOST-MANAGER.DatePattern='.'yyyy-MM-dd'.log'<br />
+log4j.appender.HOST-MANAGER.layout = org.apache.log4j.PatternLayout
 log4j.appender.HOST-MANAGER.conversionPattern = %d [%t] %-5p %c- %m%n<br />
 log4j.appender.HOST-MANAGER.append=true<br />
 
 log4j.appender.CONSOLE=org.apache.log4j.ConsoleAppender<br />
 log4j.appender.CONSOLE.encoding=UTF-8<br />
+log4j.appender.CONSOLE.layout = org.apache.log4j.PatternLayout
 log4j.appender.CONSOLE.conversionPattern = %d [%t] %-5p %c- %m%n<br />
 <br />
 # Configure which loggers log to which appenders<br />
