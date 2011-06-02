@@ -691,6 +691,7 @@ public class Catalina {
                 // Nothing to do. stop() was already called
             } else {
                 s.stop();
+                s.destroy();
             }
         } catch (LifecycleException e) {
             log.error("Catalina.stop", e);

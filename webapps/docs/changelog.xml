@@ -77,6 +77,10 @@
         <bug>51277</bug>: Improve error message if an application is deployed
         with an incomplete FORM authentication configuration. (markt)
       </fix>
+      <fix>
+        <bug>51310</bug>: When stopping the Server object on shutdown call
+        destroy() after calling stop(). (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
