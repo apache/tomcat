@@ -21,15 +21,12 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.JarURLConnection;
-import java.net.URL;
-import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.StringTokenizer;
-import java.util.jar.JarEntry;
 
 import javax.servlet.ServletContext;
 import javax.servlet.descriptor.TaglibDescriptor;
@@ -44,7 +41,8 @@ import org.apache.tomcat.JarScannerCallback;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.digester.Digester;
 import org.apache.tomcat.util.res.StringManager;
-import org.apache.tomcat.util.scan.NonClosingJarInputStream;
+import org.apache.tomcat.util.scan.Jar;
+import org.apache.tomcat.util.scan.JarFactory;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
@@ -510,38 +508,40 @@ public final class TldConfig  implements LifecycleListener {
      */
     private void tldScanJar(JarURLConnection jarConn) {
 
-        // JarURLConnection#getJarFile() creates temporary copies of the JAR if
-        // the underlying resource is not a file URL. That can be slow so the
-        // InputStream for the resource is used
-        URL resourceURL = jarConn.getJarFileURL();
-        NonClosingJarInputStream jarInputStream = null;
-        String name = null;
-
+        Jar jar = null;
+        InputStream is;
+        
         try {
-            URLConnection resourceConn = resourceURL.openConnection();
-            resourceConn.setUseCaches(false);
-            jarInputStream =
-                new NonClosingJarInputStream(resourceConn.getInputStream());
-
-            JarEntry entry = jarInputStream.getNextJarEntry();
-            while (entry != null) {
-                name = entry.getName();
-                if (name.startsWith("META-INF/") && name.endsWith(".tld")) {
-                    XmlErrorHandler handler = tldScanStream(jarInputStream);
-                    handler.logFindings(log, jarConn.getURL() + name);
+            jar = JarFactory.newInstance(jarConn.getURL());
+            
+            jar.nextEntry();
+            String entryName = jar.getEntryName();
+            while (entryName != null) {
+                if (entryName.startsWith("META-INF/") &&
+                        entryName.endsWith(".tld")) {
+                    is = null;
+                    try {
+                        is = jar.getEntryInputStream();
+                        XmlErrorHandler handler = tldScanStream(is);
+                        handler.logFindings(log, jarConn.getURL() + entryName);
+                    } finally {
+                        if (is != null) {
+                            try {
+                                is.close();
+                            } catch (IOException ioe) {
+                                // Ignore
+                            }
+                        }
+                    }
                 }
-                entry = jarInputStream.getNextJarEntry();
+                jar.nextEntry();
+                entryName = jar.getEntryName();
             }
         } catch (IOException ioe) {
-            log.warn(sm.getString("tldConfig.jarFail", jarConn.getURL() + name),
-                    ioe);
+            log.warn(sm.getString("tldConfig.jarFail", jarConn.getURL()), ioe);
         } finally {
-            if (jarInputStream != null) {
-                try {
-                    jarInputStream.reallyClose();
-                } catch (Throwable t) {
-                    ExceptionUtils.handleThrowable(t);
-                }
+            if (jar != null) {
+                jar.close();
             }
         }
     }
