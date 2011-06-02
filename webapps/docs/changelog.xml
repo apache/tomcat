@@ -68,6 +68,12 @@
         Patch provided by Eiji Takahashi. (markt)
       </fix>
       <fix>
+        <bug>51276</bug>: Provide an abstraction for accessing content in JARs
+        so the most efficient method can be selected depending on the type of
+        URL used to identify the JAR. This improves startup time when JARs are
+        located in $CATALINA_BASE/lib. (mark)
+      </fix>
+      <fix>
         <bug>51277</bug>: Improve error message if an application is deployed
         with an incomplete FORM authentication configuration. (markt)
       </fix>
