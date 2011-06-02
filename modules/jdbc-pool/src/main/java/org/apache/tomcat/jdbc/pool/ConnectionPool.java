@@ -627,7 +627,7 @@ public class ConnectionPool {
                 if ((System.currentTimeMillis() - now) >= maxWait) {
                     throw new SQLException("[" + Thread.currentThread().getName()+"] " +
                         "Timeout: Pool empty. Unable to fetch a connection in " + (maxWait / 1000) +
-                        " seconds, none available["+busy.size()+" in use].");
+                        " seconds, none available[size:"+size.get() +"; busy:"+busy.size()+"; idle:"+idle.size()+"; lastwait:"+timetowait+"].");
                 } else {
                     //no timeout, lets try again
                     continue;
