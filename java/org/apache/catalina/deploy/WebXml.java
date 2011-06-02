@@ -61,7 +61,18 @@ public class WebXml {
 
     private static final org.apache.juli.logging.Log log=
         org.apache.juli.logging.LogFactory.getLog(WebXml.class);
-    
+
+    // Global defaults are overridable but Servlets and Servlet mappings need to
+    // be unique. Duplicates normally trigger an error. This flag indicates if
+    // newly added Servlet elements are marked as overridable.
+    private boolean overridable = false;
+    public boolean isOverridable() {
+        return overridable;
+    }
+    public void setOverridable(boolean overridable) {
+        this.overridable = overridable;
+    }
+
     // web.xml only elements
     // Absolute Ordering
     private Set<String> absoluteOrdering = null;
@@ -305,6 +316,9 @@ public class WebXml {
     private Map<String,ServletDef> servlets = new HashMap<String,ServletDef>();
     public void addServlet(ServletDef servletDef) {
         servlets.put(servletDef.getServletName(), servletDef);
+        if (overridable) {
+            servletDef.setOverridable(overridable);
+        }
     }
     public Map<String,ServletDef> getServlets() { return servlets; }
     
@@ -1268,6 +1282,7 @@ public class WebXml {
                 wrapper.setAsyncSupported(
                         servlet.getAsyncSupported().booleanValue());
             }
+            wrapper.setOverridable(servlet.isOverridable());
             context.addChild(wrapper);
         }
         for (Entry<String, String> entry : servletMappings.entrySet()) {

@@ -264,4 +264,19 @@ public class ServletDef implements Serializable {
     public void setEnabled(String enabled) {
         this.enabled = Boolean.valueOf(enabled);
     }
+
+    
+    /**
+     * Can this ServletDef be overridden by an SCI?
+     */
+    private boolean overridable = false;
+    
+    public boolean isOverridable() {
+        return overridable;
+    }
+
+    public void setOverridable(boolean overridable) {
+        this.overridable = overridable;
+    }
+
 }

@@ -78,6 +78,10 @@
         with an incomplete FORM authentication configuration. (markt)
       </fix>
       <fix>
+        <bug>51278</bug>: Allow ServletContainerInitializers to override
+        settings in the global default web.xml and the host web.xml. (markt)
+      </fix>
+      <fix>
         <bug>51310</bug>: When stopping the Server object on shutdown call
         destroy() after calling stop(). (markt)
       </fix>
