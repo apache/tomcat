@@ -36,7 +36,7 @@ import org.apache.juli.logging.LogFactory;
  * @author Filip Hanik
  * @version 1.0
  */
-public class DataSource extends DataSourceProxy implements javax.sql.DataSource,MBeanRegistration, org.apache.tomcat.jdbc.pool.jmx.ConnectionPoolMBean {
+public class DataSource extends DataSourceProxy implements javax.sql.DataSource,MBeanRegistration, org.apache.tomcat.jdbc.pool.jmx.ConnectionPoolMBean, javax.sql.ConnectionPoolDataSource {
     private static final Log log = LogFactory.getLog(DataSource.class);
 
     /**
@@ -53,6 +53,10 @@ public class DataSource extends DataSourceProxy implements javax.sql.DataSource,
     public DataSource(PoolConfiguration poolProperties) {
         super(poolProperties);
     }
+    
+    
+    
+    
 
 //===============================================================================
 //  JMX Operations - Register the actual pool itself under the tomcat.jdbc domain
