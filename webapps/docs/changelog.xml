@@ -64,6 +64,11 @@
         response. Patch provided by Paco Soberón. (markt)
       </fix>
       <fix>
+        <bug>51249</bug>: Correct ClassLoaderLogManager system property
+        replacement code so properties of the form ${...}${...} can be used
+        without error. (markt) 
+      </fix>
+      <fix>
         <bug>51274</bug>: Add missing i18n strings in PersistentManagerBase.
         Patch provided by Eiji Takahashi. (markt)
       </fix>
