@@ -386,4 +386,14 @@ public interface Wrapper extends Container {
      * Servlet associated with this wrapper.
      */
     public void servletSecurityAnnotationScan() throws ServletException;
+    
+    /**
+     * Is the Servlet overridable by a ServletContainerInitializer?
+     */
+    public boolean isOverridable();
+
+    /**
+     * Sets the overridable attribute for this Servlet.
+     */
+    public void setOverridable(boolean overridable);
 }

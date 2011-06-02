@@ -1186,6 +1186,15 @@ public class ContextConfig
      */
     protected void webConfig() {
         WebXml webXml = createWebXml();
+        /* Anything and everything can override the global and host defaults.
+         * This is implemented in two parts
+         * - Handle as a web fragment that gets added after everything else so
+         *   everything else takes priority
+         * - Mark Servlets as overridable so SCI configuration can replace
+         *   configuration from the defaults
+         */ 
+        WebXml webXmlDefaultFragment = createWebXml();
+        webXmlDefaultFragment.setOverridable(true);
 
         // Parse global web.xml if present
         InputSource globalWebXml = getGlobalWebXmlSource();
@@ -1193,17 +1202,19 @@ public class ContextConfig
             // This is unusual enough to log
             log.info(sm.getString("contextConfig.defaultMissing"));
         } else {
-            parseWebXml(globalWebXml, webXml, false);
+            parseWebXml(globalWebXml, webXmlDefaultFragment, false);
         }
 
         // Parse host level web.xml if present
         // Additive apart from welcome pages
         webXml.setReplaceWelcomeFiles(true);
         InputSource hostWebXml = getHostWebXmlSource();
-        parseWebXml(hostWebXml, webXml, false);
+        parseWebXml(hostWebXml, webXmlDefaultFragment, false);
+        
+        Set<WebXml> defaults = new HashSet<WebXml>();
+        defaults.add(webXmlDefaultFragment);
         
         // Parse context level web.xml
-        webXml.setReplaceWelcomeFiles(true);
         InputSource contextWebXml = getContextWebXmlSource();
         parseWebXml(contextWebXml, webXml, false);
         
@@ -1260,16 +1271,19 @@ public class ContextConfig
                     ok = webXml.merge(orderedFragments);
                 }
     
-                // Step 6.5 Convert explicitly mentioned jsps to servlets
+                // Step 7. Convert explicitly mentioned jsps to servlets
                 if (!false) {
                     convertJsps(webXml);
                 }
-    
-                // Step 7. Apply merged web.xml to Context
+
+                // Step 8. Apply global defaults
+                webXml.merge(defaults);
+                
+                // Step 9. Apply merged web.xml to Context
                 if (ok) {
                     webXml.configureContext(context);
     
-                    // Step 7a. Make the merged web.xml available to other
+                    // Step 9a. Make the merged web.xml available to other
                     // components, specifically Jasper, to save those components
                     // from having to re-generate it.
                     // TODO Use a ServletContainerInitializer for Jasper
@@ -1282,11 +1296,12 @@ public class ContextConfig
                     }
                 }
             } else {
+                webXml.merge(defaults);
                 webXml.configureContext(context);
             }
             
             // Always need to look for static resources
-            // Step 8. Look for static resources packaged in JARs
+            // Step 10. Look for static resources packaged in JARs
             if (ok) {
                 // Spec does not define an order.
                 // Use ordered JARs followed by remaining JARs
@@ -1309,7 +1324,7 @@ public class ContextConfig
             // Only look for ServletContainerInitializer if metadata is not
             // complete
             if (!webXml.isMetadataComplete()) {
-                // Step 9. Apply the ServletContainerInitializer config to the
+                // Step 11. Apply the ServletContainerInitializer config to the
                 // context
                 if (ok) {
                     for (Map.Entry<ServletContainerInitializer,
@@ -1328,6 +1343,7 @@ public class ContextConfig
         } else {
             // Apply unmerged web.xml to Context
             convertJsps(webXml);
+            webXml.merge(defaults);
             webXml.configureContext(context);
         }
     }

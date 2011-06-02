@@ -171,8 +171,16 @@ public class ApplicationServletRegistration
         Set<String> conflicts = new HashSet<String>();
         
         for (String urlPattern : urlPatterns) {
-            if (context.findServletMapping(urlPattern) != null) {
-                conflicts.add(urlPattern);
+            String wrapperName = context.findServletMapping(urlPattern);
+            if (wrapperName != null) {
+                Wrapper wrapper = (Wrapper) context.findChild(wrapperName);
+                if (wrapper.isOverridable()) {
+                    // Some Wrappers (from global and host web.xml) may be
+                    // overridden rather than generating a conflict
+                    context.removeServletMapping(urlPattern);
+                } else {
+                    conflicts.add(urlPattern);
+                }
             }
         }
 

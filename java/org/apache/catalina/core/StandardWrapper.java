@@ -276,6 +276,8 @@ public class StandardWrapper extends ContainerBase
 
     protected volatile boolean servletSecurityAnnotationScanRequired = false;
 
+    private boolean overridable = false;
+    
     /**
      * Static class array used when the SecurityManager is turned on and 
      * <code>Servlet.init</code> is invoked.
@@ -294,6 +296,15 @@ public class StandardWrapper extends ContainerBase
 
     // ------------------------------------------------------------- Properties
 
+    @Override
+    public boolean isOverridable() {
+        return overridable;
+    }
+
+    @Override
+    public void setOverridable(boolean overridable) {
+        this.overridable = overridable;
+    }
 
     /**
      * Return the available date/time for this servlet, in milliseconds since
