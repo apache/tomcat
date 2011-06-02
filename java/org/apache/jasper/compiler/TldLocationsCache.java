@@ -22,13 +22,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.JarURLConnection;
 import java.net.URL;
-import java.net.URLConnection;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.StringTokenizer;
-import java.util.jar.JarEntry;
 
 import javax.servlet.ServletContext;
 
@@ -40,7 +38,8 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.JarScanner;
 import org.apache.tomcat.JarScannerCallback;
-import org.apache.tomcat.util.scan.NonClosingJarInputStream;
+import org.apache.tomcat.util.scan.Jar;
+import org.apache.tomcat.util.scan.JarFactory;
 
 
 /**
@@ -399,38 +398,45 @@ public class TldLocationsCache {
      */
     private void tldScanJar(JarURLConnection jarConn) throws IOException {
 
-        // JarURLConnection#getJarFile() creates temporary copies of the JAR if
-        // the underlying resource is not a file URL. That can be slow so the
-        // InputStream for the resource is used
+        Jar jar = null;
+        InputStream is;
+        boolean foundTld = false;
+        
         URL resourceURL = jarConn.getJarFileURL();
         String resourcePath = resourceURL.toString();
         
-        NonClosingJarInputStream jarInputStream = null;
-        
-        boolean foundTld = false;
         try {
-            URLConnection resourceConn = resourceURL.openConnection();
-            resourceConn.setUseCaches(false);
-            jarInputStream =
-                new NonClosingJarInputStream(resourceConn.getInputStream());
-            JarEntry entry = jarInputStream.getNextJarEntry();
-            while (entry != null) {
-                String name = entry.getName();
-                if (name.startsWith("META-INF/") && name.endsWith(".tld")) {
-                    foundTld = true;
-                    tldScanStream(resourcePath, name, jarInputStream);
+            jar = JarFactory.newInstance(jarConn.getURL());
+            
+            jar.nextEntry();
+            String entryName = jar.getEntryName();
+            while (entryName != null) {
+                if (entryName.startsWith("META-INF/") &&
+                        entryName.endsWith(".tld")) {
+                    is = null;
+                    try {
+                        is = jar.getEntryInputStream();
+                        foundTld = true;
+                        tldScanStream(resourcePath, entryName, is);
+                    } finally {
+                        if (is != null) {
+                            try {
+                                is.close();
+                            } catch (IOException ioe) {
+                                // Ignore
+                            }
+                        }
+                    }
                 }
-                entry = jarInputStream.getNextJarEntry();
+                jar.nextEntry();
+                entryName = jar.getEntryName();
             }
         } finally {
-            if (jarInputStream != null) {
-                try {
-                    jarInputStream.reallyClose();
-                } catch (Throwable t) {
-                    ExceptionUtils.handleThrowable(t);
-                }
+            if (jar != null) {
+                jar.close();
             }
         }
+
         if (!foundTld) {
             log.info(Localizer.getMessage("jsp.tldCache.noTldInJar",
                     resourcePath));
