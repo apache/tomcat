@@ -1271,13 +1271,15 @@ public class ContextConfig
                     ok = webXml.merge(orderedFragments);
                 }
     
-                // Step 7. Convert explicitly mentioned jsps to servlets
+                // Step 7. Apply global defaults
+                // Have to merge defaults before JSP conversion since defaults
+                // provide JSP servlet definition.
+                webXml.merge(defaults);
+
+                // Step 8. Convert explicitly mentioned jsps to servlets
                 if (!false) {
                     convertJsps(webXml);
                 }
-
-                // Step 8. Apply global defaults
-                webXml.merge(defaults);
                 
                 // Step 9. Apply merged web.xml to Context
                 if (ok) {
@@ -1342,8 +1344,8 @@ public class ContextConfig
             }
         } else {
             // Apply unmerged web.xml to Context
-            convertJsps(webXml);
             webXml.merge(defaults);
+            convertJsps(webXml);
             webXml.configureContext(context);
         }
     }
