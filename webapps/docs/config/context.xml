@@ -665,9 +665,14 @@
       </attribute>
 
       <attribute name="unpackWAR" required="false">
-        <p>If true, Tomcat will unpack all compressed web applications before
-        running them.
-        If not specified, the default value is <code>true</code>.</p>
+        <p>If <code>false</code>, the <strong>unpackWARs</strong> attribute of
+        the owning <a href="host.html">Host</a> will be overridden and the WAR
+        file will not be unpacked. If <code>true</code>, the value of the owning
+        <a href="host.html">Host</a>&apos;s <strong>unpackWARs</strong>
+        attribute will determine if the WAR is unpacked. If not specified, the
+        default value is <code>true</code>. Note that WAR files located outside
+        of a <a href="host.html">Host</a>&apos;s <strong>appBase</strong> are
+        never unpacked.</p>
       </attribute>
 
       <attribute name="useNaming" required="false">
