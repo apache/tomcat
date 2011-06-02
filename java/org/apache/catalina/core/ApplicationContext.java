@@ -1102,7 +1102,7 @@ public class ApplicationContext
 
         Wrapper wrapper = (Wrapper) context.findChild(servletName);
         
-        // Assume a 'complete' FilterRegistration is one that has a class and
+        // Assume a 'complete' ServletRegistration is one that has a class and
         // a name
         if (wrapper == null) {
             wrapper = context.createWrapper();
@@ -1111,7 +1111,11 @@ public class ApplicationContext
         } else {
             if (wrapper.getName() != null &&
                     wrapper.getServletClass() != null) {
-                return null;
+                if (wrapper.isOverridable()) {
+                    wrapper.setOverridable(false);
+                } else {
+                    return null;
+                }
             }
         }
 
