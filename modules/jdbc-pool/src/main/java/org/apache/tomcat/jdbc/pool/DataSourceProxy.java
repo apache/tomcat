@@ -165,16 +165,16 @@ public class DataSourceProxy implements PoolConfiguration {
     /**
      * {@link javax.sql.DataSource#getConnection()}
      */
-    public PooledConnection getPooledConnection() throws SQLException {
-        return (PooledConnection) getConnection();
+    public javax.sql.PooledConnection getPooledConnection() throws SQLException {
+        return (javax.sql.PooledConnection) getConnection();
     }
 
     /**
      * {@link javax.sql.DataSource#getConnection()}
      */
-    public PooledConnection getPooledConnection(String username,
+    public javax.sql.PooledConnection getPooledConnection(String username,
                                                 String password) throws SQLException {
-        return (PooledConnection) getConnection();
+        return (javax.sql.PooledConnection) getConnection();
     }
     
     public ConnectionPool getPool() {
