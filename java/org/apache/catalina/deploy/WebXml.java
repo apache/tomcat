@@ -1429,9 +1429,9 @@ public class WebXml {
         }
         errorPages.putAll(temp.getErrorPages());
 
-        // As per 'clarification' from the Servlet EG, filter mappings in the
+        // As per 'clarification' from the Servlet EG, filter definitions in the
         // main web.xml override those in fragments and those in fragments
-        // override mappings in annotations
+        // override those in annotations
         for (WebXml fragment : fragments) {
             Iterator<FilterMap> iterFilterMaps =
                 fragment.getFilterMappings().iterator();
@@ -1585,19 +1585,25 @@ public class WebXml {
         serviceRefs.putAll(temp.getServiceRefs());
         mergeInjectionFlags.clear();
 
-        // As per 'clarification' from the Servlet EG, servlet mappings in the
-        // main web.xml override those in fragments and those in fragments
-        // override mappings in annotations
+        // As per 'clarification' from the Servlet EG, servlet definitions and
+        // mappings in the main web.xml override those in fragments and those in
+        // fragments override those in annotations
+        // Remove servlet definitions and mappings from fragments that are
+        // defined in web.xml
         for (WebXml fragment : fragments) {
-            Iterator<Map.Entry<String,String>> iterServletMaps =
+            Iterator<Map.Entry<String,String>> iterFragmentServletMaps =
                 fragment.getServletMappings().entrySet().iterator();
-            while (iterServletMaps.hasNext()) {
-                Map.Entry<String,String> servletMap = iterServletMaps.next();
-                if (servletMappingNames.contains(servletMap.getValue())) {
-                    iterServletMaps.remove();
+            while (iterFragmentServletMaps.hasNext()) {
+                Map.Entry<String,String> servletMap =
+                    iterFragmentServletMaps.next();
+                if (servletMappingNames.contains(servletMap.getValue()) ||
+                        servletMappings.containsKey(servletMap.getKey())) {
+                    iterFragmentServletMaps.remove();
                 }
             }
         }
+        
+        // Add fragment mappings
         for (WebXml fragment : fragments) {
             for (Map.Entry<String,String> mapping :
                     fragment.getServletMappings().entrySet()) {
