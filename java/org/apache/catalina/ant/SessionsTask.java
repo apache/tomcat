@@ -19,9 +19,6 @@
 package org.apache.catalina.ant;
 
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-
 import org.apache.tools.ant.BuildException;
 
 
@@ -32,25 +29,29 @@ import org.apache.tools.ant.BuildException;
  * @author Vivek Chopra
  * @version $Revision$
  */
-public class SessionsTask extends AbstractCatalinaTask {
+public class SessionsTask extends AbstractCatalinaCommandTask {
 
-    // Properties
 
-    /**
-     * The context path of the web application we are managing.
-     */
-    protected String path = null;
-
-    public String getPath() {
-        return (this.path);
+    protected String idle = null;
+    
+    public String getIdle() {
+        return this.idle;
     }
-
-    public void setPath(String path) {
-        this.path = path;
+    
+    public void setIdle(String idle) {
+        this.idle = idle;
     }
-
-    // Public Methods
-
+    
+    @Override
+    public StringBuilder createQueryString(String command) {
+        StringBuilder buffer = super.createQueryString(command);
+        if (path != null && idle != null) {
+            buffer.append("&idle=");
+            buffer.append(this.idle);
+        }
+        return buffer;
+    }
+    
     /**
      * Execute the requested operation.
      *
@@ -60,17 +61,7 @@ public class SessionsTask extends AbstractCatalinaTask {
     public void execute() throws BuildException {
 
         super.execute();
-        if (path == null) {
-            throw new BuildException
-                ("Must specify 'path' attribute");
-        }
-        
-        try {
-            execute("/sessions?path=" + URLEncoder.encode(this.path, getCharset()));
-        } catch (UnsupportedEncodingException e) {
-            throw new BuildException
-                ("Invalid 'charset' attribute: " + getCharset());
-        }
+        execute(createQueryString("/sessions").toString());
         
     }
 

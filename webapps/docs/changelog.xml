@@ -147,6 +147,10 @@
         Patch provided by Eiji Takahashi. (markt)
       </fix>
       <fix>
+        <bug>51251</bug>: Add web application version support to the Ant tasks.
+        Based on a patch provided by Eiji Takahashi. (markt) 
+      </fix>
+      <fix>
         <bug>51294</bug>: Clarify behaviour of unpackWAR attribute of
         StandardContext components. (markt)
       </fix>
