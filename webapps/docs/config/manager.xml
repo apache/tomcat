@@ -356,6 +356,13 @@
       session table.</p>
     </attribute>
 
+    <attribute name="dataSourceName" required="false">
+      <p>Name of the JNDI resource for a JDBC DataSource-factory. If this option
+      is given and a valid JDBC resource can be found, it will be used and any
+      direct configuration of a JDBC connection via <code>connectionURL</code>
+      and <code>driverName</code> will be ignored.</p>
+    </attribute>
+
     <attribute name="driverName" required="true">
       <p>Java class name of the JDBC driver to be used.</p>
     </attribute>
