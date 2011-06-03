@@ -19,9 +19,6 @@
 package org.apache.catalina.ant;
 
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-
 import org.apache.tools.ant.BuildException;
 
 
@@ -33,28 +30,7 @@ import org.apache.tools.ant.BuildException;
  * @version $Id$
  * @since 4.1
  */
-public class StopTask extends AbstractCatalinaTask {
-
-
-    // ------------------------------------------------------------- Properties
-
-
-    /**
-     * The context path of the web application we are managing.
-     */
-    protected String path = null;
-
-    public String getPath() {
-        return (this.path);
-    }
-
-    public void setPath(String path) {
-        this.path = path;
-    }
-
-
-    // --------------------------------------------------------- Public Methods
-
+public class StopTask extends AbstractCatalinaCommandTask {
 
     /**
      * Execute the requested operation.
@@ -65,18 +41,9 @@ public class StopTask extends AbstractCatalinaTask {
     public void execute() throws BuildException {
 
         super.execute();
-        if (path == null) {
-            throw new BuildException
-                ("Must specify 'path' attribute");
-        }
-        try {
-            execute("/stop?path=" + URLEncoder.encode(this.path, getCharset()));
-        } catch (UnsupportedEncodingException e) {
-            throw new BuildException
-                ("Invalid 'charset' attribute: " + getCharset());
-        }
+        execute(createQueryString("/stop").toString());
 
     }
 
-
+    
 }
