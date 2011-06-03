@@ -33,6 +33,11 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Properties;
 
+import javax.naming.Context;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
+import javax.sql.DataSource;
+
 import org.apache.catalina.Container;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.Loader;
@@ -102,6 +107,16 @@ public class JDBCStore extends StoreBase {
      */
     protected String driverName = null;
 
+    /**
+     * name of the JNDI resource
+     */
+    protected String dataSourceName = null;
+
+    /**
+     * DataSource to use
+     */
+    protected DataSource dataSource = null;
+    
     // ------------------------------------------------------------- Table & cols
 
     /**
@@ -434,6 +449,27 @@ public class JDBCStore extends StoreBase {
      */
     public String getSessionLastAccessedCol() {
         return (this.sessionLastAccessedCol);
+    }
+
+    /**
+     * Set the JNDI name of a DataSource-factory to use for db access
+     *
+     * @param dataSourceName The JNDI name of the DataSource-factory
+     */
+    public void setDataSourceName(String dataSourceName) {
+        if (dataSourceName == null || "".equals(dataSourceName.trim())) {
+            manager.getContainer().getLogger().warn(
+                    sm.getString(getStoreName() + ".missingDataSourceName"));
+            return;
+        }
+        this.dataSourceName = dataSourceName;
+    }
+
+    /**
+     * Return the name of the JNDI DataSource-factory
+     */
+    public String getDataSourceName() {
+        return this.dataSourceName;
     }
 
     // --------------------------------------------------------- Public Methods
@@ -865,6 +901,24 @@ public class JDBCStore extends StoreBase {
         // Do nothing if there is a database connection already open
         if (dbConnection != null)
             return (dbConnection);
+
+        if (dataSourceName != null && dataSource == null) {
+            Context initCtx;
+            try {
+                initCtx = new InitialContext();
+                Context envCtx = (Context) initCtx.lookup("java:comp/env");
+                this.dataSource = (DataSource) envCtx.lookup(this.dataSourceName);
+            } catch (NamingException e) {
+                manager.getContainer().getLogger().error(
+                        sm.getString(getStoreName() + ".wrongDataSource",
+                                this.dataSourceName), e);
+           }
+        }
+        
+        if (dataSource != null) {
+            dbConnection = dataSource.getConnection();
+            return dbConnection;
+        }
 
         // Instantiate our database driver if necessary
         if (driver == null) {
