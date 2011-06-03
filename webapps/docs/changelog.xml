@@ -69,6 +69,11 @@
         without error. (markt) 
       </fix>
       <fix>
+        <bug>51264</bug>: Allow the JDBC persistent session store to use a
+        JNDI datasource to define the database in which sessions are persisted.
+        Patch provided by Felix Schumacher. (markt)
+      </fix>
+      <fix>
         <bug>51274</bug>: Add missing i18n strings in PersistentManagerBase.
         Patch provided by Eiji Takahashi. (markt)
       </fix>
