@@ -759,7 +759,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
     /**
      * Find potential memory leaks caused by web application reload.
      *
-     * @see ManagerServlet#findleaks(PrintWriter, StringManager) 
+     * @see ManagerServlet#findleaks(boolean, PrintWriter, StringManager) 
      * 
      * @param smClient  StringManager for the client's locale
      *
