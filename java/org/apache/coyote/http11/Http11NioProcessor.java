@@ -38,7 +38,6 @@ import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.buf.HexUtils;
 import org.apache.tomcat.util.buf.MessageBytes;
 import org.apache.tomcat.util.http.MimeHeaders;
-import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
 import org.apache.tomcat.util.net.NioChannel;
 import org.apache.tomcat.util.net.NioEndpoint;
@@ -136,23 +135,6 @@ public class Http11NioProcessor extends AbstractHttp11Processor {
      * Socket associated with the current connection.
      */
     protected NioChannel socket = null;
-
-
-    /**
-     * Associated endpoint.
-     */
-    protected NioEndpoint endpoint;
-
-    
-    // ------------------------------------------------------------- Properties
-
-    /**
-     * Expose the endpoint.
-     */
-    @Override
-    protected AbstractEndpoint getEndpoint() {
-        return endpoint;
-    }
 
 
     // --------------------------------------------------------- Public Methods
@@ -288,8 +270,8 @@ public class Http11NioProcessor extends AbstractHttp11Processor {
         this.socket = socket;
         inputBuffer.setSocket(socket);
         outputBuffer.setSocket(socket);
-        inputBuffer.setSelectorPool(endpoint.getSelectorPool());
-        outputBuffer.setSelectorPool(endpoint.getSelectorPool());
+        inputBuffer.setSelectorPool(((NioEndpoint)endpoint).getSelectorPool());
+        outputBuffer.setSelectorPool(((NioEndpoint)endpoint).getSelectorPool());
 
         // Error flag
         error = false;
@@ -636,9 +618,9 @@ public class Http11NioProcessor extends AbstractHttp11Processor {
                     engine.setNeedClientAuth(true);
                     try {
                         sslChannel.rehandshake(endpoint.getSoTimeout());
-                        sslSupport =
-                            endpoint.getHandler().getSslImplementation().getSSLSupport(
-                                    engine.getSession());
+                        sslSupport = ((NioEndpoint)endpoint).getHandler()
+                                .getSslImplementation().getSSLSupport(
+                                        engine.getSession());
                     } catch (IOException ioe) {
                         log.warn(sm.getString("http11processor.socket.sslreneg",ioe));
                     }
@@ -682,7 +664,8 @@ public class Http11NioProcessor extends AbstractHttp11Processor {
                 attach.setTimeout(timeout);
         } else if (actionCode == ActionCode.ASYNC_COMPLETE) {
             if (asyncStateMachine.asyncComplete()) {
-                endpoint.processSocket(this.socket, SocketStatus.OPEN, true);
+                ((NioEndpoint)endpoint).processSocket(this.socket,
+                        SocketStatus.OPEN, true);
             }
         } else if (actionCode == ActionCode.ASYNC_SETTIMEOUT) {
             if (param==null) return;
@@ -693,7 +676,8 @@ public class Http11NioProcessor extends AbstractHttp11Processor {
             attach.setTimeout(timeout);
         } else if (actionCode == ActionCode.ASYNC_DISPATCH) {
             if (asyncStateMachine.asyncDispatch()) {
-                endpoint.processSocket(this.socket, SocketStatus.OPEN, true);
+                ((NioEndpoint)endpoint).processSocket(this.socket,
+                        SocketStatus.OPEN, true);
             }
         }
     }
