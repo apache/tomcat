@@ -22,7 +22,6 @@ import java.io.InputStream;
 import java.io.InterruptedIOException;
 import java.io.OutputStream;
 import java.net.Socket;
-import java.util.concurrent.Executor;
 
 import org.apache.coyote.ActionCode;
 import org.apache.coyote.OutputBuffer;
@@ -382,12 +381,6 @@ public class AjpProcessor extends AbstractAjpProcessor {
 
     }
 
-    
-    @Override
-    public Executor getExecutor() {
-        return endpoint.getExecutor();
-    }
-    
     
     // ----------------------------------------------------- ActionHook Methods
 
