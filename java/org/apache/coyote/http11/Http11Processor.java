@@ -37,7 +37,6 @@ import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.buf.HexUtils;
 import org.apache.tomcat.util.buf.MessageBytes;
 import org.apache.tomcat.util.http.MimeHeaders;
-import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
 import org.apache.tomcat.util.net.JIoEndpoint;
 import org.apache.tomcat.util.net.SSLSupport;
@@ -113,12 +112,6 @@ public class Http11Processor extends AbstractHttp11Processor {
 
 
     /**
-     * Associated endpoint.
-     */
-    protected JIoEndpoint endpoint;
-
-
-    /**
      * The percentage of threads that have to be in use before keep-alive is
      * disabled to aid scalability.
      */
@@ -126,14 +119,6 @@ public class Http11Processor extends AbstractHttp11Processor {
 
     // --------------------------------------------------------- Public Methods
 
-
-    /**
-     * Expose the endpoint.
-     */
-    @Override
-    protected AbstractEndpoint getEndpoint() {
-        return this.endpoint;
-    }
 
     /**
      * Set the SSL information for this HTTP connection.
@@ -584,7 +569,8 @@ public class Http11Processor extends AbstractHttp11Processor {
             }
         } else if (actionCode == ActionCode.ASYNC_COMPLETE) {
             if (asyncStateMachine.asyncComplete()) {
-                endpoint.processSocketAsync(this.socket, SocketStatus.OPEN);
+                ((JIoEndpoint) endpoint).processSocketAsync(this.socket,
+                        SocketStatus.OPEN);
             }
         } else if (actionCode == ActionCode.ASYNC_SETTIMEOUT) {
             if (param == null) return;
@@ -593,7 +579,8 @@ public class Http11Processor extends AbstractHttp11Processor {
             socket.setTimeout(timeout);
         } else if (actionCode == ActionCode.ASYNC_DISPATCH) {
             if (asyncStateMachine.asyncDispatch()) {
-                endpoint.processSocketAsync(this.socket, SocketStatus.OPEN);
+                ((JIoEndpoint) endpoint).processSocketAsync(this.socket,
+                        SocketStatus.OPEN);
             }
         }
     }
