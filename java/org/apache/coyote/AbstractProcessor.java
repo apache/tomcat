@@ -16,6 +16,8 @@
  */
 package org.apache.coyote;
 
+import java.util.concurrent.Executor;
+
 import org.apache.tomcat.util.net.AbstractEndpoint;
 
 public abstract class AbstractProcessor implements ActionHook, Processor {
@@ -24,5 +26,10 @@ public abstract class AbstractProcessor implements ActionHook, Processor {
     
     protected AbstractEndpoint getEndpoint() {
         return endpoint;
+    }
+    
+    @Override
+    public Executor getExecutor() {
+        return endpoint.getExecutor();
     }
 }

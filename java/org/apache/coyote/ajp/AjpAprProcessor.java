@@ -20,7 +20,6 @@ package org.apache.coyote.ajp;
 import java.io.IOException;
 import java.io.InterruptedIOException;
 import java.nio.ByteBuffer;
-import java.util.concurrent.Executor;
 
 import org.apache.coyote.ActionCode;
 import org.apache.coyote.OutputBuffer;
@@ -383,12 +382,6 @@ public class AjpAprProcessor extends AbstractAjpProcessor {
         
     }
 
-    
-    @Override
-    public Executor getExecutor() {
-        return endpoint.getExecutor();
-    }
-    
     
     // ----------------------------------------------------- ActionHook Methods
 

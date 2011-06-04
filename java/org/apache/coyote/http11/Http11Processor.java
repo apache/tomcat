@@ -23,7 +23,6 @@ import java.io.InterruptedIOException;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.util.Locale;
-import java.util.concurrent.Executor;
 
 import org.apache.coyote.ActionCode;
 import org.apache.coyote.Request;
@@ -880,10 +879,5 @@ public class Http11Processor extends AbstractHttp11Processor {
     public void setSocketBuffer(int socketBuffer) {
         super.setSocketBuffer(socketBuffer);
         outputBuffer.setSocketBuffer(socketBuffer);
-    }
-
-    @Override
-    public Executor getExecutor() {
-        return endpoint.getExecutor();
     }
 }
