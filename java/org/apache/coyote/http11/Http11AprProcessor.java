@@ -42,7 +42,6 @@ import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.buf.HexUtils;
 import org.apache.tomcat.util.buf.MessageBytes;
 import org.apache.tomcat.util.http.MimeHeaders;
-import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
 import org.apache.tomcat.util.net.AprEndpoint;
 import org.apache.tomcat.util.net.SSLSupport;
@@ -128,16 +127,6 @@ public class Http11AprProcessor extends AbstractHttp11Processor {
      * Socket associated with the current connection.
      */
     protected SocketWrapper<Long> socket = null;
-
-
-    /**
-     * Associated endpoint.
-     */
-    protected AprEndpoint endpoint;
-    @Override
-    protected AbstractEndpoint getEndpoint() {
-        return endpoint;
-    }
 
 
     /**
@@ -246,7 +235,7 @@ public class Http11AprProcessor extends AbstractHttp11Processor {
                     // and the method should return true
                     openSocket = true;
                     // Add the socket to the poller
-                    endpoint.getPoller().add(socketRef);
+                    ((AprEndpoint)endpoint).getPoller().add(socketRef);
                     if (endpoint.isPaused()) {
                         // 503 - Service unavailable
                         response.setStatus(503);
@@ -353,7 +342,7 @@ public class Http11AprProcessor extends AbstractHttp11Processor {
             if (sendfileData != null && !error) {
                 sendfileData.socket = socketRef;
                 sendfileData.keepAlive = keepAlive;
-                if (!endpoint.getSendfile().add(sendfileData)) {
+                if (!((AprEndpoint)endpoint).getSendfile().add(sendfileData)) {
                     openSocket = true;
                     break;
                 }
@@ -594,7 +583,7 @@ public class Http11AprProcessor extends AbstractHttp11Processor {
                 try {
                     // Configure connection to require a certificate
                     SSLSocket.setVerify(socketRef, SSL.SSL_CVERIFY_REQUIRE,
-                            endpoint.getSSLVerifyDepth());
+                            ((AprEndpoint)endpoint).getSSLVerifyDepth());
                     // Renegotiate certificates
                     if (SSLSocket.renegotiate(socketRef) == 0) {
                         // Don't look for certs unless we know renegotiation worked.
@@ -628,12 +617,14 @@ public class Http11AprProcessor extends AbstractHttp11Processor {
         } else if (actionCode == ActionCode.COMET_END) {
             comet = false;
         } else if (actionCode == ActionCode.COMET_CLOSE) {
-            endpoint.processSocketAsync(this.socket, SocketStatus.OPEN);
+            ((AprEndpoint)endpoint).processSocketAsync(this.socket,
+                    SocketStatus.OPEN);
         } else if (actionCode == ActionCode.COMET_SETTIMEOUT) {
             //no op
         } else if (actionCode == ActionCode.ASYNC_COMPLETE) {
             if (asyncStateMachine.asyncComplete()) {
-                endpoint.processSocketAsync(this.socket, SocketStatus.OPEN);
+                ((AprEndpoint)endpoint).processSocketAsync(this.socket,
+                        SocketStatus.OPEN);
             }
         } else if (actionCode == ActionCode.ASYNC_SETTIMEOUT) {
             if (param==null) return;
@@ -641,7 +632,8 @@ public class Http11AprProcessor extends AbstractHttp11Processor {
             socket.setTimeout(timeout);
         } else if (actionCode == ActionCode.ASYNC_DISPATCH) {
             if (asyncStateMachine.asyncDispatch()) {
-                endpoint.processSocketAsync(this.socket, SocketStatus.OPEN);
+                ((AprEndpoint)endpoint).processSocketAsync(this.socket,
+                        SocketStatus.OPEN);
             }
         }
         

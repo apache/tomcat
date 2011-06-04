@@ -26,13 +26,12 @@ import java.security.cert.X509Certificate;
 import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import org.apache.coyote.AbstractProcessor;
 import org.apache.coyote.ActionCode;
-import org.apache.coyote.ActionHook;
 import org.apache.coyote.Adapter;
 import org.apache.coyote.AsyncContextCallback;
 import org.apache.coyote.AsyncStateMachine;
 import org.apache.coyote.InputBuffer;
-import org.apache.coyote.Processor;
 import org.apache.coyote.Request;
 import org.apache.coyote.Response;
 import org.apache.juli.logging.Log;
@@ -41,7 +40,6 @@ import org.apache.tomcat.util.buf.HexUtils;
 import org.apache.tomcat.util.buf.MessageBytes;
 import org.apache.tomcat.util.http.HttpMessages;
 import org.apache.tomcat.util.http.MimeHeaders;
-import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
 import org.apache.tomcat.util.net.SSLSupport;
 import org.apache.tomcat.util.res.StringManager;
@@ -49,7 +47,7 @@ import org.apache.tomcat.util.res.StringManager;
 /**
  * Base class for AJP Processor implementations.
  */
-public abstract class AbstractAjpProcessor implements ActionHook, Processor {
+public abstract class AbstractAjpProcessor extends AbstractProcessor {
 
     protected abstract Log getLog();
 
@@ -66,12 +64,6 @@ public abstract class AbstractAjpProcessor implements ActionHook, Processor {
      * Associated adapter.
      */
     protected Adapter adapter = null;
-
-
-    /**
-     * Associated endpoint.
-     */
-    protected AbstractEndpoint endpoint;
 
 
     /**
