@@ -18,7 +18,6 @@ package org.apache.coyote.http11;
 
 import java.io.IOException;
 import java.util.StringTokenizer;
-import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Pattern;
 
@@ -1004,9 +1003,6 @@ public abstract class AbstractHttp11Processor extends AbstractProcessor {
     
     protected abstract void recycleInternal();
 
-    @Override
-    public abstract Executor getExecutor();
-    
     protected boolean isAsync() {
         return asyncStateMachine.isAsync();
     }
