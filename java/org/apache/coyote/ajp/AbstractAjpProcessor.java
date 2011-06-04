@@ -23,7 +23,6 @@ import java.net.InetAddress;
 import java.security.NoSuchProviderException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
-import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.coyote.AbstractProcessor;
@@ -397,10 +396,6 @@ public abstract class AbstractAjpProcessor extends AbstractProcessor {
    protected abstract void flush(boolean tbd) throws IOException;
    protected abstract void finish() throws IOException;
    
-   
-   @Override
-   public abstract Executor getExecutor();
-
    
    public void recycle() {
        asyncStateMachine.recycle();

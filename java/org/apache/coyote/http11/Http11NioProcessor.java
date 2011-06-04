@@ -21,7 +21,6 @@ import java.io.InterruptedIOException;
 import java.net.InetAddress;
 import java.nio.channels.SelectionKey;
 import java.util.Locale;
-import java.util.concurrent.Executor;
 
 import javax.net.ssl.SSLEngine;
 
@@ -1001,10 +1000,5 @@ public class Http11NioProcessor extends AbstractHttp11Processor {
      */
     public void setSslSupport(SSLSupport sslSupport) {
         this.sslSupport = sslSupport;
-    }
-
-    @Override
-    public Executor getExecutor() {
-        return endpoint.getExecutor();
     }
 }

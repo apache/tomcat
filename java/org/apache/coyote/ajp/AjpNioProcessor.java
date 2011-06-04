@@ -22,7 +22,6 @@ import java.io.IOException;
 import java.io.InterruptedIOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.Selector;
-import java.util.concurrent.Executor;
 
 import org.apache.coyote.ActionCode;
 import org.apache.coyote.OutputBuffer;
@@ -371,12 +370,6 @@ public class AjpNioProcessor extends AbstractAjpProcessor {
 
     }
 
-    
-    @Override
-    public Executor getExecutor() {
-        return endpoint.getExecutor();
-    }
-    
     
     // ----------------------------------------------------- ActionHook Methods
 
