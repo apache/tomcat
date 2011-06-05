@@ -157,7 +157,7 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol {
 
     // --------------------  Connection handler --------------------
 
-    static class Http11ConnectionHandler implements Handler {
+    protected static class Http11ConnectionHandler implements Handler {
 
         protected Http11NioProtocol proto;
         protected static int count = 0;

@@ -190,7 +190,7 @@ public class Http11AprProtocol extends AbstractHttp11Protocol {
 
     // --------------------  Connection handler --------------------
 
-    static class Http11ConnectionHandler implements Handler {
+    protected static class Http11ConnectionHandler implements Handler {
         
         protected Http11AprProtocol proto;
         protected AtomicLong registerCount = new AtomicLong(0);
