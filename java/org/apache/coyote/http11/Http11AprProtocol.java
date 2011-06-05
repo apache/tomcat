@@ -18,8 +18,6 @@
 package org.apache.coyote.http11;
 
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.coyote.AbstractProtocol;
 import org.apache.juli.logging.Log;
@@ -191,46 +189,8 @@ public class Http11AprProtocol extends AbstractHttp11Protocol {
         protected ConcurrentHashMap<Long, Http11AprProcessor> connections =
             new ConcurrentHashMap<Long, Http11AprProcessor>();
 
-        protected ConcurrentLinkedQueue<Http11AprProcessor> recycledProcessors = 
-            new ConcurrentLinkedQueue<Http11AprProcessor>() {
-            private static final long serialVersionUID = 1L;
-            protected AtomicInteger size = new AtomicInteger(0);
-            @Override
-            public boolean offer(Http11AprProcessor processor) {
-                boolean offer = proto.getProcessorCache() == -1 ? true : size.get() < proto.getProcessorCache();
-                //avoid over growing our cache or add after we have stopped
-                boolean result = false;
-                if ( offer ) {
-                    result = super.offer(processor);
-                    if ( result ) {
-                        size.incrementAndGet();
-                    }
-                }
-                if (!result) unregister(processor);
-                return result;
-            }
-            
-            @Override
-            public Http11AprProcessor poll() {
-                Http11AprProcessor result = super.poll();
-                if ( result != null ) {
-                    size.decrementAndGet();
-                }
-                return result;
-            }
-            
-            @Override
-            public void clear() {
-                Http11AprProcessor next = poll();
-                while ( next != null ) {
-                    unregister(next);
-                    next = poll();
-                }
-                super.clear();
-                size.set(0);
-            }
-        };
-
+        protected RecycledProcessors<Http11AprProcessor> recycledProcessors =
+            new RecycledProcessors<Http11AprProcessor>(this);
 
         Http11ConnectionHandler(Http11AprProtocol proto) {
             this.proto = proto;
