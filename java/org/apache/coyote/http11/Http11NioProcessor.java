@@ -84,8 +84,6 @@ public class Http11NioProcessor extends AbstractHttp11Processor {
         response.setOutputBuffer(outputBuffer);
         request.setResponse(response);
 
-        ssl = endpoint.isSSLEnabled();
-
         initializeFilters(maxTrailerSize);
 
         // Cause loading of HexUtils
@@ -124,12 +122,6 @@ public class Http11NioProcessor extends AbstractHttp11Processor {
      */
     protected boolean cometClose = false;
     
-    /**
-     * SSL enabled ?
-     */
-    protected boolean ssl = false;
-
-
     /**
      * Socket associated with the current connection.
      */
@@ -695,7 +687,7 @@ public class Http11NioProcessor extends AbstractHttp11Processor {
         contentDelimitation = false;
         expectation = false;
         sendfileData = null;
-        if (ssl) {
+        if (endpoint.isSSLEnabled()) {
             request.scheme().setString("https");
         }
         MessageBytes protocolMB = request.protocol();
@@ -908,7 +900,7 @@ public class Http11NioProcessor extends AbstractHttp11Processor {
         }
 
         if (colonPos < 0) {
-            if (!ssl) {
+            if (!endpoint.isSSLEnabled()) {
                 // 80 - Default HTTP port
                 request.setServerPort(80);
             } else {
