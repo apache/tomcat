@@ -863,15 +863,18 @@ public class Http11NioProcessor extends AbstractHttp11Processor {
 
     @Override
     protected boolean prepareSendfile(OutputFilter[] outputFilters) {
-        String fileName = (String) request.getAttribute("org.apache.tomcat.sendfile.filename");
+        String fileName = (String) request.getAttribute(
+                "org.apache.tomcat.sendfile.filename");
         if (fileName != null) {
             // No entity body sent here
             outputBuffer.addActiveFilter(outputFilters[Constants.VOID_FILTER]);
             contentDelimitation = true;
             sendfileData = new NioEndpoint.SendfileData();
             sendfileData.fileName = fileName;
-            sendfileData.pos = ((Long) request.getAttribute("org.apache.tomcat.sendfile.start")).longValue();
-            sendfileData.length = ((Long) request.getAttribute("org.apache.tomcat.sendfile.end")).longValue() - sendfileData.pos;
+            sendfileData.pos = ((Long) request.getAttribute(
+                    "org.apache.tomcat.sendfile.start")).longValue();
+            sendfileData.length = ((Long) request.getAttribute(
+                    "org.apache.tomcat.sendfile.end")).longValue() - sendfileData.pos;
             return true;
         }
         return false;
