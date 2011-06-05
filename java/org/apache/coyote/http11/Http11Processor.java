@@ -796,7 +796,7 @@ public class Http11Processor extends AbstractHttp11Processor {
             // HTTP/1.0
             // Default is what the socket tells us. Overridden if a host is
             // found/parsed
-            request.setServerPort(socket.getSocket().getLocalPort());
+            request.setServerPort(endpoint.getPort());
             InetAddress localAddress = socket.getSocket().getLocalAddress();
             // Setting the socket-related fields. The adapter doesn't know
             // about socket.
