@@ -18,20 +18,13 @@
 package org.apache.coyote.http11;
 
 import java.net.Socket;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicLong;
 
-import javax.management.ObjectName;
-
-import org.apache.coyote.RequestGroupInfo;
-import org.apache.coyote.RequestInfo;
+import org.apache.coyote.AbstractProtocol;
 import org.apache.juli.logging.Log;
 import org.apache.tomcat.util.ExceptionUtils;
-import org.apache.tomcat.util.modeler.Registry;
 import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.net.JIoEndpoint;
 import org.apache.tomcat.util.net.JIoEndpoint.Handler;
@@ -109,11 +102,10 @@ public class Http11Protocol extends AbstractHttp11JsseProtocol {
 
     // -----------------------------------  Http11ConnectionHandler Inner Class
 
-    protected static class Http11ConnectionHandler implements Handler {
+    protected static class Http11ConnectionHandler
+            extends AbstractConnectionHandler implements Handler {
 
         protected Http11Protocol proto;
-        protected AtomicLong registerCount = new AtomicLong(0);
-        protected RequestGroupInfo global = new RequestGroupInfo();
             
         protected ConcurrentHashMap<SocketWrapper<Socket>, Http11Processor> connections =
             new ConcurrentHashMap<SocketWrapper<Socket>, Http11Processor>();
@@ -163,10 +155,15 @@ public class Http11Protocol extends AbstractHttp11JsseProtocol {
         }
 
         @Override
-        public Object getGlobal() {
-            return global;
+        protected AbstractProtocol getProtocol() {
+            return proto;
         }
 
+        @Override
+        protected Log getLog() {
+            return log;
+        }
+        
         @Override
         public SSLImplementation getSslImplementation() {
             return proto.sslImplementation;
@@ -260,61 +257,6 @@ public class Http11Protocol extends AbstractHttp11JsseProtocol {
                     proto.getDisableKeepAlivePercentage());
             register(processor);
             return processor;
-        }
-        
-        protected void register(Http11Processor processor) {
-            if (proto.getDomain() != null) {
-                synchronized (this) {
-                    try {
-                        long count = registerCount.incrementAndGet();
-                        final RequestInfo rp = processor.getRequest().getRequestProcessor();
-                        rp.setGlobalProcessor(global);
-                        final ObjectName rpName = new ObjectName
-                            (proto.getDomain() + ":type=RequestProcessor,worker="
-                                + proto.getName() + ",name=HttpRequest" + count);
-                        if (log.isDebugEnabled()) {
-                            log.debug("Register " + rpName);
-                        }
-                        if (Constants.IS_SECURITY_ENABLED) {
-                            AccessController.doPrivileged(new PrivilegedAction<Void>() {
-                                @Override
-                                public Void run() {
-                                    try {
-                                        Registry.getRegistry(null, null).registerComponent(rp, rpName, null);
-                                    } catch (Exception e) {
-                                        log.warn("Error registering request");
-                                    }
-                                    return null;
-                                }
-                            });
-                        } else {
-                            Registry.getRegistry(null, null).registerComponent(rp, rpName, null);
-                        }
-                        rp.setRpName(rpName);
-                    } catch (Exception e) {
-                        log.warn("Error registering request");
-                    }
-                }
-            }
-        }
-
-        protected void unregister(Http11Processor processor) {
-            if (proto.getDomain() != null) {
-                synchronized (this) {
-                    try {
-                        RequestInfo rp = processor.getRequest().getRequestProcessor();
-                        rp.setGlobalProcessor(null);
-                        ObjectName rpName = rp.getRpName();
-                        if (log.isDebugEnabled()) {
-                            log.debug("Unregister " + rpName);
-                        }
-                        Registry.getRegistry(null, null).unregisterComponent(rpName);
-                        rp.setRpName(null);
-                    } catch (Exception e) {
-                        log.warn("Error unregistering request", e);
-                    }
-                }
-            }
         }
     }
 }

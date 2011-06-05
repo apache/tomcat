@@ -28,6 +28,12 @@ public abstract class AbstractHttp11Protocol extends AbstractProtocol {
         StringManager.getManager(Constants.Package);
 
 
+    @Override
+    protected String getProtocolName() {
+        return "Http";
+    }
+
+
     // ------------------------------------------------ HTTP specific properties
     // ------------------------------------------ managed in the ProtocolHandler
 

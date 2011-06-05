@@ -19,22 +19,15 @@ package org.apache.coyote.http11;
 
 import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
 import java.util.Iterator;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicLong;
 
-import javax.management.ObjectName;
-
-import org.apache.coyote.RequestGroupInfo;
-import org.apache.coyote.RequestInfo;
+import org.apache.coyote.AbstractProtocol;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.ExceptionUtils;
-import org.apache.tomcat.util.modeler.Registry;
 import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.net.NioChannel;
 import org.apache.tomcat.util.net.NioEndpoint;
@@ -158,11 +151,10 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol {
 
     // --------------------  Connection handler --------------------
 
-    protected static class Http11ConnectionHandler implements Handler {
+    protected static class Http11ConnectionHandler
+            extends AbstractConnectionHandler implements Handler {
 
         protected Http11NioProtocol proto;
-        protected AtomicLong registerCount = new AtomicLong(0);
-        protected RequestGroupInfo global = new RequestGroupInfo();
 
         protected ConcurrentHashMap<NioChannel, Http11NioProcessor> connections =
             new ConcurrentHashMap<NioChannel, Http11NioProcessor>();
@@ -182,7 +174,7 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol {
                         size.incrementAndGet();
                     }
                 }
-                if (!result) deregister(processor);
+                if (!result) unregister(processor);
                 return result;
             }
             
@@ -199,7 +191,7 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol {
             public void clear() {
                 Http11NioProcessor next = poll();
                 while ( next != null ) {
-                    deregister(next);
+                    unregister(next);
                     next = poll();
                 }
                 super.clear();
@@ -212,10 +204,16 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol {
         }
         
         @Override
-        public Object getGlobal() {
-            return global;
+        protected AbstractProtocol getProtocol() {
+            return proto;
         }
 
+        @Override
+        protected Log getLog() {
+            return log;
+        }
+        
+        
         @Override
         public SSLImplementation getSslImplementation() {
             return proto.sslImplementation;
@@ -238,7 +236,7 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol {
                     it.remove();
                     Http11NioProcessor result = entry.getValue();
                     result.recycle();
-                    deregister(result);
+                    unregister(result);
                     released = true;
                     break;
                 }
@@ -435,61 +433,6 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol {
             processor.setServer(proto.getServer());
             register(processor);
             return processor;
-        }
-
-        protected void register(Http11NioProcessor processor) {
-            if (proto.getDomain() != null) {
-                synchronized (this) {
-                    try {
-                        long count = registerCount.incrementAndGet();
-                        final RequestInfo rp = processor.getRequest().getRequestProcessor();
-                        rp.setGlobalProcessor(global);
-                        final ObjectName rpName = new ObjectName
-                            (proto.getDomain() + ":type=RequestProcessor,worker="
-                             + proto.getName() + ",name=HttpRequest" + count);
-                        if (log.isDebugEnabled()) {
-                            log.debug("Register " + rpName);
-                        }
-                        if (Constants.IS_SECURITY_ENABLED) {
-                            AccessController.doPrivileged(new PrivilegedAction<Void>() {
-                                @Override
-                                public Void run() {
-                                    try {
-                                        Registry.getRegistry(null, null).registerComponent(rp, rpName, null);
-                                    } catch (Exception e) {
-                                        log.warn("Error registering request");
-                                    }
-                                    return null;
-                                }
-                            });
-                        } else {
-                            Registry.getRegistry(null, null).registerComponent(rp, rpName, null);
-                        }
-                        rp.setRpName(rpName);
-                    } catch (Exception e) {
-                        log.warn("Error registering request");
-                    }
-                }
-            }
-        }
-    
-        protected void deregister(Http11NioProcessor processor) {
-            if (proto.getDomain() != null) {
-                synchronized (this) {
-                    try {
-                        RequestInfo rp = processor.getRequest().getRequestProcessor();
-                        rp.setGlobalProcessor(null);
-                        ObjectName rpName = rp.getRpName();
-                        if (log.isDebugEnabled()) {
-                            log.debug("Unregister " + rpName);
-                        }
-                        Registry.getRegistry(null, null).unregisterComponent(rpName);
-                        rp.setRpName(null);
-                    } catch (Exception e) {
-                        log.warn("Error unregistering request", e);
-                    }
-                }
-            }
         }
     }
 }

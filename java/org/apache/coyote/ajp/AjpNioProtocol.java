@@ -22,16 +22,11 @@ import java.util.Iterator;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicLong;
 
-import javax.management.ObjectName;
-
-import org.apache.coyote.RequestGroupInfo;
-import org.apache.coyote.RequestInfo;
+import org.apache.coyote.AbstractProtocol;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.ExceptionUtils;
-import org.apache.tomcat.util.modeler.Registry;
 import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.net.NioChannel;
 import org.apache.tomcat.util.net.NioEndpoint;
@@ -95,11 +90,10 @@ public class AjpNioProtocol extends AbstractAjpProtocol {
     // --------------------------------------  AjpConnectionHandler Inner Class
 
 
-    protected static class AjpConnectionHandler implements Handler {
+    protected static class AjpConnectionHandler
+            extends AbstractConnectionHandler implements Handler {
 
         protected AjpNioProtocol proto;
-        protected AtomicLong registerCount = new AtomicLong(0);
-        protected RequestGroupInfo global = new RequestGroupInfo();
 
         protected ConcurrentHashMap<NioChannel, AjpNioProcessor> connections =
             new ConcurrentHashMap<NioChannel, AjpNioProcessor>();
@@ -149,8 +143,13 @@ public class AjpNioProtocol extends AbstractAjpProtocol {
         }
 
         @Override
-        public Object getGlobal() {
-            return global;
+        protected AbstractProtocol getProtocol() {
+            return proto;
+        }
+
+        @Override
+        protected Log getLog() {
+            return log;
         }
 
         @Override
@@ -314,48 +313,5 @@ public class AjpNioProtocol extends AbstractAjpProtocol {
             register(processor);
             return processor;
         }
-        
-        protected void register(AjpNioProcessor processor) {
-            if (proto.getDomain() != null) {
-                synchronized (this) {
-                    try {
-                        long count = registerCount.incrementAndGet();
-                        RequestInfo rp = processor.getRequest().getRequestProcessor();
-                        rp.setGlobalProcessor(global);
-                        ObjectName rpName = new ObjectName
-                            (proto.getDomain() + ":type=RequestProcessor,worker="
-                                + proto.getName() + ",name=AjpRequest" + count);
-                        if (log.isDebugEnabled()) {
-                            log.debug("Register " + rpName);
-                        }
-                        Registry.getRegistry(null, null).registerComponent(rp, rpName, null);
-                        rp.setRpName(rpName);
-                    } catch (Exception e) {
-                        log.warn("Error registering request");
-                    }
-                }
-            }
-        }
-
-        protected void unregister(AjpNioProcessor processor) {
-            if (proto.getDomain() != null) {
-                synchronized (this) {
-                    try {
-                        RequestInfo rp = processor.getRequest().getRequestProcessor();
-                        rp.setGlobalProcessor(null);
-                        ObjectName rpName = rp.getRpName();
-                        if (log.isDebugEnabled()) {
-                            log.debug("Unregister " + rpName);
-                        }
-                        Registry.getRegistry(null, null).unregisterComponent(rpName);
-                        rp.setRpName(null);
-                    } catch (Exception e) {
-                        log.warn("Error unregistering request", e);
-                    }
-                }
-            }
-        }
-
     }
-
 }
