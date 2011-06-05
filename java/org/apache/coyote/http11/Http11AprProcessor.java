@@ -820,18 +820,18 @@ public class Http11AprProcessor extends AbstractHttp11Processor {
 
     @Override
     protected boolean prepareSendfile(OutputFilter[] outputFilters) {
-        String fileName = (String) request.getAttribute("org.apache.tomcat.sendfile.filename");
+        String fileName = (String) request.getAttribute(
+                "org.apache.tomcat.sendfile.filename");
         if (fileName != null) {
             // No entity body sent here
-            outputBuffer.addActiveFilter
-                (outputFilters[Constants.VOID_FILTER]);
+            outputBuffer.addActiveFilter(outputFilters[Constants.VOID_FILTER]);
             contentDelimitation = true;
             sendfileData = new AprEndpoint.SendfileData();
             sendfileData.fileName = fileName;
-            sendfileData.start = 
-                ((Long) request.getAttribute("org.apache.tomcat.sendfile.start")).longValue();
-            sendfileData.end = 
-                ((Long) request.getAttribute("org.apache.tomcat.sendfile.end")).longValue();
+            sendfileData.start = ((Long) request.getAttribute(
+                    "org.apache.tomcat.sendfile.start")).longValue();
+            sendfileData.end = ((Long) request.getAttribute(
+                    "org.apache.tomcat.sendfile.end")).longValue();
             return true;
         }
         return false;
