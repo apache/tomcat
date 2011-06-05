@@ -119,12 +119,12 @@ public class Http11Protocol extends AbstractHttp11JsseProtocol {
             new ConcurrentHashMap<SocketWrapper<Socket>, Http11Processor>();
 
         protected ConcurrentLinkedQueue<Http11Processor> recycledProcessors = 
-            new ConcurrentLinkedQueue<Http11Processor>() {
+                new ConcurrentLinkedQueue<Http11Processor>() {
             private static final long serialVersionUID = 1L;
             protected AtomicInteger size = new AtomicInteger(0);
             @Override
             public boolean offer(Http11Processor processor) {
-                boolean offer = (proto.getProcessorCache() == -1) ? true : (size.get() < proto.getProcessorCache());
+                boolean offer = proto.getProcessorCache() == -1 ? true : size.get() < proto.getProcessorCache();
                 //avoid over growing our cache or add after we have stopped
                 boolean result = false;
                 if ( offer ) {
@@ -316,8 +316,5 @@ public class Http11Protocol extends AbstractHttp11JsseProtocol {
                 }
             }
         }
-
     }
-
-
 }

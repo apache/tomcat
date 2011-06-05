@@ -25,6 +25,7 @@ import java.util.Iterator;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 import javax.management.ObjectName;
 
@@ -160,18 +161,19 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol {
     protected static class Http11ConnectionHandler implements Handler {
 
         protected Http11NioProtocol proto;
-        protected static int count = 0;
+        protected AtomicLong registerCount = new AtomicLong(0);
         protected RequestGroupInfo global = new RequestGroupInfo();
 
         protected ConcurrentHashMap<NioChannel, Http11NioProcessor> connections =
             new ConcurrentHashMap<NioChannel, Http11NioProcessor>();
 
-        protected ConcurrentLinkedQueue<Http11NioProcessor> recycledProcessors = new ConcurrentLinkedQueue<Http11NioProcessor>() {
+        protected ConcurrentLinkedQueue<Http11NioProcessor> recycledProcessors =
+                new ConcurrentLinkedQueue<Http11NioProcessor>() {
             private static final long serialVersionUID = 1L;
             protected AtomicInteger size = new AtomicInteger(0);
             @Override
             public boolean offer(Http11NioProcessor processor) {
-                boolean offer = proto.getProcessorCache()==-1?true:size.get() < proto.getProcessorCache();
+                boolean offer = proto.getProcessorCache() == -1 ? true : size.get() < proto.getProcessorCache();
                 //avoid over growing our cache or add after we have stopped
                 boolean result = false;
                 if ( offer ) {
@@ -215,15 +217,15 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol {
         }
 
         @Override
-        public void recycle() {
-            recycledProcessors.clear();
-        }
-        
-        @Override
         public SSLImplementation getSslImplementation() {
             return proto.sslImplementation;
         }
 
+        @Override
+        public void recycle() {
+            recycledProcessors.clear();
+        }
+        
         @Override
         public void release(SocketChannel socket) {
             if (log.isDebugEnabled()) 
@@ -434,18 +436,20 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol {
             register(processor);
             return processor;
         }
-        AtomicInteger registerCount = new AtomicInteger(0);
-        public void register(Http11NioProcessor processor) {
+
+        protected void register(Http11NioProcessor processor) {
             if (proto.getDomain() != null) {
                 synchronized (this) {
                     try {
-                        registerCount.addAndGet(1);
-                        if (log.isDebugEnabled()) log.debug("Register ["+processor+"] count="+registerCount.get());
+                        long count = registerCount.incrementAndGet();
                         final RequestInfo rp = processor.getRequest().getRequestProcessor();
                         rp.setGlobalProcessor(global);
                         final ObjectName rpName = new ObjectName
                             (proto.getDomain() + ":type=RequestProcessor,worker="
-                             + proto.getName() + ",name=HttpRequest" + count++);
+                             + proto.getName() + ",name=HttpRequest" + count);
+                        if (log.isDebugEnabled()) {
+                            log.debug("Register " + rpName);
+                        }
                         if (Constants.IS_SECURITY_ENABLED) {
                             AccessController.doPrivileged(new PrivilegedAction<Void>() {
                                 @Override
@@ -469,15 +473,16 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol {
             }
         }
     
-        public void deregister(Http11NioProcessor processor) {
+        protected void deregister(Http11NioProcessor processor) {
             if (proto.getDomain() != null) {
                 synchronized (this) {
                     try {
-                        registerCount.addAndGet(-1);
-                        if (log.isDebugEnabled()) log.debug("Deregister ["+processor+"] count="+registerCount.get());
                         RequestInfo rp = processor.getRequest().getRequestProcessor();
                         rp.setGlobalProcessor(null);
                         ObjectName rpName = rp.getRpName();
+                        if (log.isDebugEnabled()) {
+                            log.debug("Unregister " + rpName);
+                        }
                         Registry.getRegistry(null, null).unregisterComponent(rpName);
                         rp.setRpName(null);
                     } catch (Exception e) {
@@ -486,8 +491,5 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol {
                 }
             }
         }
-
     }
-
-
 }
