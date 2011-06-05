@@ -79,8 +79,6 @@ public class Http11AprProcessor extends AbstractHttp11Processor {
         outputBuffer = new InternalAprOutputBuffer(response, headerBufferSize);
         response.setOutputBuffer(outputBuffer);
         request.setResponse(response);
-        
-        ssl = endpoint.isSSLEnabled();
 
         initializeFilters(maxTrailerSize);
 
@@ -115,12 +113,6 @@ public class Http11AprProcessor extends AbstractHttp11Processor {
      */
     protected boolean comet = false;
 
-
-    /**
-     * SSL enabled ?
-     */
-    protected boolean ssl = false;
-    
 
     /**
      * Socket associated with the current connection.
@@ -524,7 +516,7 @@ public class Http11AprProcessor extends AbstractHttp11Processor {
 
         } else if (actionCode == ActionCode.REQ_SSL_ATTRIBUTE ) {
 
-            if (ssl && (socketRef != 0)) {
+            if (endpoint.isSSLEnabled() && (socketRef != 0)) {
                 try {
                     // Cipher suite
                     Object sslO = SSLSocket.getInfoS(socketRef, SSL.SSL_INFO_CIPHER);
@@ -573,7 +565,7 @@ public class Http11AprProcessor extends AbstractHttp11Processor {
 
         } else if (actionCode == ActionCode.REQ_SSL_CERTIFICATE) {
 
-            if (ssl && (socketRef != 0)) {
+            if (endpoint.isSSLEnabled() && (socketRef != 0)) {
                 // Consume and buffer the request body, so that it does not
                 // interfere with the client's handshake messages
                 InputFilter[] inputFilters = inputBuffer.getFilters();
@@ -653,7 +645,7 @@ public class Http11AprProcessor extends AbstractHttp11Processor {
         contentDelimitation = false;
         expectation = false;
         sendfileData = null;
-        if (ssl) {
+        if (endpoint.isSSLEnabled()) {
             request.scheme().setString("https");
         }
         MessageBytes protocolMB = request.protocol();
@@ -865,7 +857,7 @@ public class Http11AprProcessor extends AbstractHttp11Processor {
         }
 
         if (colonPos < 0) {
-            if (!ssl) {
+            if (!endpoint.isSSLEnabled()) {
                 // 80 - Default HTTP port
                 request.setServerPort(80);
             } else {
