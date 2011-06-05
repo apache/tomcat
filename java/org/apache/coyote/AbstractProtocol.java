@@ -30,7 +30,7 @@ import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler;
 import org.apache.tomcat.util.res.StringManager;
 
-public abstract class AbstractProtocolHandler implements ProtocolHandler,
+public abstract class AbstractProtocol implements ProtocolHandler,
         MBeanRegistration {
 
     /**
