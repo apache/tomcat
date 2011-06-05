@@ -205,7 +205,7 @@ public class Http11AprProtocol extends AbstractHttp11Protocol {
             protected AtomicInteger size = new AtomicInteger(0);
             @Override
             public boolean offer(Http11AprProcessor processor) {
-                boolean offer = (proto.getProcessorCache() == -1) ? true : (size.get() < proto.getProcessorCache());
+                boolean offer = proto.getProcessorCache() == -1 ? true : size.get() < proto.getProcessorCache();
                 //avoid over growing our cache or add after we have stopped
                 boolean result = false;
                 if ( offer ) {
