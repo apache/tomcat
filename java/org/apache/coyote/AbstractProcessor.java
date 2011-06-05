@@ -20,14 +20,43 @@ import java.util.concurrent.Executor;
 
 import org.apache.tomcat.util.net.AbstractEndpoint;
 
+/**
+ * Provides attributes common to all support protocols (currently HTTP and AJP).
+ * TODO: There are more attributes that can be pulled up
+ */
 public abstract class AbstractProcessor implements ActionHook, Processor {
 
+    /**
+     * The endpoint receiving connections that are handled by this processor.
+     */
     protected AbstractEndpoint endpoint;
-    
     protected AbstractEndpoint getEndpoint() {
         return endpoint;
     }
-    
+
+
+    /**
+     * The request associated with this processor.
+     */
+    protected Request request = null;
+    public Request getRequest() {
+        return request;
+    }
+
+
+    /**
+     * The response associated with this processor.
+     */
+    protected Response response = null;
+
+
+    /*
+     * Expose selected endpoint attributes through the processor
+     */
+
+    /**
+     * Obtain the Executor used by the underlying endpoint.
+     */
     @Override
     public Executor getExecutor() {
         return endpoint.getExecutor();
