@@ -42,6 +42,16 @@
   General, Catalina, Coyote, Jasper, Cluster, Web applications, Extras, Tribes,
   Other
 -->
+<section name="Tomcat 7.0.16 (markt)">
+  <subsection name="Coyote">
+    <changelog>
+      <fix>
+        Correctly handle range requests when using sendfile and the APR/native
+        HTTP connector. (markt)
+      </fix>
+    </changelog>
+  </subsection>
+</section>
 <section name="Tomcat 7.0.15 (markt)">
   <subsection name="Catalina">
     <changelog>
