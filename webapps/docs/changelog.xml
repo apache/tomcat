@@ -49,6 +49,10 @@
         Correctly handle range requests when using sendfile and the APR/native
         HTTP connector. (markt)
       </fix>
+      <fix>
+        When parsing the port in the HTTP host header, treat the port as a base
+        10 integer rather than a hexadecimal one. (rjung/markt) 
+      </fix>
     </changelog>
   </subsection>
 </section>
