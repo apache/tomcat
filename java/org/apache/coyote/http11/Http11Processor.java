@@ -826,7 +826,7 @@ public class Http11Processor extends AbstractHttp11Processor {
         }
 
         if (colonPos < 0) {
-            if (sslSupport == null) {
+            if (!endpoint.isSSLEnabled()) {
                 // 80 - Default HTTP port
                 request.setServerPort(80);
             } else {
