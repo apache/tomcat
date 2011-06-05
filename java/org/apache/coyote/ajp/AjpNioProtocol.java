@@ -20,8 +20,6 @@ package org.apache.coyote.ajp;
 import java.nio.channels.SocketChannel;
 import java.util.Iterator;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.coyote.AbstractProtocol;
 import org.apache.juli.logging.Log;
@@ -98,45 +96,8 @@ public class AjpNioProtocol extends AbstractAjpProtocol {
         protected ConcurrentHashMap<NioChannel, AjpNioProcessor> connections =
             new ConcurrentHashMap<NioChannel, AjpNioProcessor>();
 
-        protected ConcurrentLinkedQueue<AjpNioProcessor> recycledProcessors = 
-                new ConcurrentLinkedQueue<AjpNioProcessor>() {
-            private static final long serialVersionUID = 1L;
-            protected AtomicInteger size = new AtomicInteger(0);
-            @Override
-            public boolean offer(AjpNioProcessor processor) {
-                boolean offer = (proto.processorCache == -1) ? true : (size.get() < proto.processorCache);
-                //avoid over growing our cache or add after we have stopped
-                boolean result = false;
-                if ( offer ) {
-                    result = super.offer(processor);
-                    if ( result ) {
-                        size.incrementAndGet();
-                    }
-                }
-                if (!result) unregister(processor);
-                return result;
-            }
-            
-            @Override
-            public AjpNioProcessor poll() {
-                AjpNioProcessor result = super.poll();
-                if ( result != null ) {
-                    size.decrementAndGet();
-                }
-                return result;
-            }
-            
-            @Override
-            public void clear() {
-                AjpNioProcessor next = poll();
-                while ( next != null ) {
-                    unregister(next);
-                    next = poll();
-                }
-                super.clear();
-                size.set(0);
-            }
-        };
+        protected RecycledProcessors<AjpNioProcessor> recycledProcessors =
+            new RecycledProcessors<AjpNioProcessor>(this);
 
         public AjpConnectionHandler(AjpNioProtocol proto) {
             this.proto = proto;
