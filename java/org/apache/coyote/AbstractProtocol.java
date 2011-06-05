@@ -17,7 +17,9 @@
 package org.apache.coyote;
 
 import java.net.InetAddress;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Executor;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
 import javax.management.MBeanRegistration;
@@ -515,6 +517,54 @@ public abstract class AbstractProtocol implements ProtocolHandler,
                     }
                 }
             }
+        }
+    }
+    
+    protected static class RecycledProcessors<P extends AbstractProcessor>
+            extends ConcurrentLinkedQueue<P> {
+
+        private static final long serialVersionUID = 1L;
+        private AbstractConnectionHandler handler;
+        protected AtomicInteger size = new AtomicInteger(0);
+
+        public RecycledProcessors(AbstractConnectionHandler handler) {
+            this.handler = handler;
+        }
+
+        @Override
+        public boolean offer(P processor) {
+            int cacheSize = handler.getProtocol().getProcessorCache();
+            boolean offer = cacheSize == -1 ? true : size.get() < cacheSize;
+            //avoid over growing our cache or add after we have stopped
+            boolean result = false;
+            if (offer) {
+                result = super.offer(processor);
+                if (result) {
+                    size.incrementAndGet();
+                }
+            }
+            if (!result) handler.unregister(processor);
+            return result;
+        }
+    
+        @Override
+        public P poll() {
+            P result = super.poll();
+            if (result != null) {
+                size.decrementAndGet();
+            }
+            return result;
+        }
+    
+        @Override
+        public void clear() {
+            P next = poll();
+            while (next != null) {
+                handler.unregister(next);
+                next = poll();
+            }
+            super.clear();
+            size.set(0);
         }
     }
 }
