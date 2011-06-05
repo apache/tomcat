@@ -16,10 +16,10 @@
  */
 package org.apache.coyote.http11;
 
-import org.apache.coyote.AbstractProtocolHandler;
+import org.apache.coyote.AbstractProtocol;
 import org.apache.tomcat.util.res.StringManager;
 
-public abstract class AbstractHttp11Protocol extends AbstractProtocolHandler {
+public abstract class AbstractHttp11Protocol extends AbstractProtocol {
 
     /**
      * The string manager for this package.
