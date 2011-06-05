@@ -872,7 +872,7 @@ public class Http11NioProcessor extends AbstractHttp11Processor {
     /**
      * Parse host.
      */
-    public void parseHost(MessageBytes valueMB) {
+    protected void parseHost(MessageBytes valueMB) {
 
         if (valueMB == null || valueMB.isNull()) {
             // HTTP/1.0
