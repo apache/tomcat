@@ -21,8 +21,6 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
 import java.util.Iterator;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.coyote.AbstractProtocol;
 import org.apache.juli.logging.Log;
@@ -159,45 +157,8 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol {
         protected ConcurrentHashMap<NioChannel, Http11NioProcessor> connections =
             new ConcurrentHashMap<NioChannel, Http11NioProcessor>();
 
-        protected ConcurrentLinkedQueue<Http11NioProcessor> recycledProcessors =
-                new ConcurrentLinkedQueue<Http11NioProcessor>() {
-            private static final long serialVersionUID = 1L;
-            protected AtomicInteger size = new AtomicInteger(0);
-            @Override
-            public boolean offer(Http11NioProcessor processor) {
-                boolean offer = proto.getProcessorCache() == -1 ? true : size.get() < proto.getProcessorCache();
-                //avoid over growing our cache or add after we have stopped
-                boolean result = false;
-                if ( offer ) {
-                    result = super.offer(processor);
-                    if ( result ) {
-                        size.incrementAndGet();
-                    }
-                }
-                if (!result) unregister(processor);
-                return result;
-            }
-            
-            @Override
-            public Http11NioProcessor poll() {
-                Http11NioProcessor result = super.poll();
-                if ( result != null ) {
-                    size.decrementAndGet();
-                }
-                return result;
-            }
-            
-            @Override
-            public void clear() {
-                Http11NioProcessor next = poll();
-                while ( next != null ) {
-                    unregister(next);
-                    next = poll();
-                }
-                super.clear();
-                size.set(0);
-            }
-        };
+        protected RecycledProcessors<Http11NioProcessor> recycledProcessors =
+            new RecycledProcessors<Http11NioProcessor>(this);
 
         Http11ConnectionHandler(Http11NioProtocol proto) {
             this.proto = proto;

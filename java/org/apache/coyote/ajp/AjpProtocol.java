@@ -19,8 +19,6 @@ package org.apache.coyote.ajp;
 
 import java.net.Socket;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.coyote.AbstractProtocol;
 import org.apache.juli.logging.Log;
@@ -98,47 +96,9 @@ public class AjpProtocol extends AbstractAjpProtocol {
         protected ConcurrentHashMap<SocketWrapper<Socket>, AjpProcessor> connections =
             new ConcurrentHashMap<SocketWrapper<Socket>, AjpProcessor>();
 
-        protected ConcurrentLinkedQueue<AjpProcessor> recycledProcessors = 
-                new ConcurrentLinkedQueue<AjpProcessor>() {
-            private static final long serialVersionUID = 1L;
-            protected AtomicInteger size = new AtomicInteger(0);
-            @Override
-            public boolean offer(AjpProcessor processor) {
-                boolean offer = (proto.processorCache == -1) ? true : (size.get() < proto.processorCache);
-                //avoid over growing our cache or add after we have stopped
-                boolean result = false;
-                if ( offer ) {
-                    result = super.offer(processor);
-                    if ( result ) {
-                        size.incrementAndGet();
-                    }
-                }
-                if (!result) unregister(processor);
-                return result;
-            }
-            
-            @Override
-            public AjpProcessor poll() {
-                AjpProcessor result = super.poll();
-                if ( result != null ) {
-                    size.decrementAndGet();
-                }
-                return result;
-            }
-            
-            @Override
-            public void clear() {
-                AjpProcessor next = poll();
-                while ( next != null ) {
-                    unregister(next);
-                    next = poll();
-                }
-                super.clear();
-                size.set(0);
-            }
-        };
+        protected RecycledProcessors<AjpProcessor> recycledProcessors =
+            new RecycledProcessors<AjpProcessor>(this);
 
-        
         public AjpConnectionHandler(AjpProtocol proto) {
             this.proto = proto;
         }
