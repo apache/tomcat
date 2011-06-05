@@ -794,13 +794,10 @@ public class Http11Processor extends AbstractHttp11Processor {
 
         if (valueMB == null || valueMB.isNull()) {
             // HTTP/1.0
-            // Default is what the socket tells us. Overridden if a host is
-            // found/parsed
+            // If no host header, use the port info from the endpoint
+            // The host will be obtained lazily from the socket if required
+            // using ActionCode#REQ_LOCAL_NAME_ATTRIBUTE
             request.setServerPort(endpoint.getPort());
-            InetAddress localAddress = socket.getSocket().getLocalAddress();
-            // Setting the socket-related fields. The adapter doesn't know
-            // about socket.
-            request.serverName().setString(localAddress.getHostName());
             return;
         }
 
