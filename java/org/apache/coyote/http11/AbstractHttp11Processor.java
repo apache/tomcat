@@ -26,8 +26,6 @@ import org.apache.coyote.ActionCode;
 import org.apache.coyote.Adapter;
 import org.apache.coyote.AsyncContextCallback;
 import org.apache.coyote.AsyncStateMachine;
-import org.apache.coyote.Request;
-import org.apache.coyote.Response;
 import org.apache.coyote.http11.filters.BufferedInputFilter;
 import org.apache.coyote.http11.filters.ChunkedInputFilter;
 import org.apache.coyote.http11.filters.ChunkedOutputFilter;
@@ -68,18 +66,6 @@ public abstract class AbstractHttp11Processor extends AbstractProcessor {
      * Associated adapter.
      */
     protected Adapter adapter = null;
-
-
-    /**
-     * Request object.
-     */
-    protected Request request = null;
-
-
-    /**
-     * Response object.
-     */
-    protected Response response = null;
 
 
     /**
@@ -504,15 +490,6 @@ public abstract class AbstractHttp11Processor extends AbstractProcessor {
      */
     public String getServer() {
         return server;
-    }
-
-
-    /** Get the request associated with this processor.
-     *
-     * @return The request
-     */
-    public Request getRequest() {
-        return request;
     }
 
 
