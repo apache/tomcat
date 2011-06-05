@@ -32,7 +32,6 @@ import org.apache.coyote.AsyncContextCallback;
 import org.apache.coyote.AsyncStateMachine;
 import org.apache.coyote.InputBuffer;
 import org.apache.coyote.Request;
-import org.apache.coyote.Response;
 import org.apache.juli.logging.Log;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.buf.HexUtils;
@@ -63,18 +62,6 @@ public abstract class AbstractAjpProcessor extends AbstractProcessor {
      * Associated adapter.
      */
     protected Adapter adapter = null;
-
-
-    /**
-     * Request object.
-     */
-    protected Request request = null;
-
-
-    /**
-     * Response object.
-     */
-    protected Response response = null;
 
 
     /**
@@ -223,15 +210,6 @@ public abstract class AbstractAjpProcessor extends AbstractProcessor {
     // --------------------------------------------------------- Public Methods
 
 
-    /** Get the request associated with this processor.
-    *
-    * @return The request
-    */
-   public Request getRequest() {
-       return request;
-   }
-   
-   
    /**
     * Send an action to the connector.
     *
