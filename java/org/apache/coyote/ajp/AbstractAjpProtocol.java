@@ -28,6 +28,13 @@ public abstract class AbstractAjpProtocol extends AbstractProtocol {
         StringManager.getManager(Constants.Package);
 
 
+    @Override
+    protected String getProtocolName() {
+        return "Ajp";
+    }
+
+
+
     // ------------------------------------------------- AJP specific properties
     // ------------------------------------------ managed in the ProtocolHandler
     

@@ -18,6 +18,7 @@ package org.apache.coyote;
 
 import java.net.InetAddress;
 import java.util.concurrent.Executor;
+import java.util.concurrent.atomic.AtomicLong;
 
 import javax.management.MBeanRegistration;
 import javax.management.MBeanServer;
@@ -247,6 +248,12 @@ public abstract class AbstractProtocol implements ProtocolHandler,
 
 
     /**
+     * Obtain the name of the protocol, (Http, Ajp, etc.). Used with JMX.
+     */
+    protected abstract String getProtocolName();
+
+
+    /**
      * Obtain the handler associated with the underlying Endpoint
      */
     protected abstract Handler getHandler();
@@ -441,5 +448,73 @@ public abstract class AbstractProtocol implements ProtocolHandler,
             Registry.getRegistry(null, null).unregisterComponent(tpOname);
         if (rgOname != null)
             Registry.getRegistry(null, null).unregisterComponent(rgOname);
+    }
+    
+    
+    // ------------------------------------------- Connection handler base class
+    
+    protected abstract static class AbstractConnectionHandler
+            implements AbstractEndpoint.Handler {
+
+        protected RequestGroupInfo global = new RequestGroupInfo();
+        protected AtomicLong registerCount = new AtomicLong(0);
+
+        protected abstract AbstractProtocol getProtocol();
+        protected abstract Log getLog();
+
+
+        @Override
+        public Object getGlobal() {
+            return global;
+        }
+
+
+        protected void register(AbstractProcessor processor) {
+            if (getProtocol().getDomain() != null) {
+                synchronized (this) {
+                    try {
+                        long count = registerCount.incrementAndGet();
+                        RequestInfo rp =
+                            processor.getRequest().getRequestProcessor();
+                        rp.setGlobalProcessor(global);
+                        ObjectName rpName = new ObjectName(
+                                getProtocol().getDomain() +
+                                ":type=RequestProcessor,worker="
+                                + getProtocol().getName() +
+                                ",name=" + getProtocol().getProtocolName() +
+                                "Request" + count);
+                        if (getLog().isDebugEnabled()) {
+                            getLog().debug("Register " + rpName);
+                        }
+                        Registry.getRegistry(null, null).registerComponent(rp,
+                                rpName, null);
+                        rp.setRpName(rpName);
+                    } catch (Exception e) {
+                        getLog().warn("Error registering request");
+                    }
+                }
+            }
+        }
+
+        protected void unregister(AbstractProcessor processor) {
+            if (getProtocol().getDomain() != null) {
+                synchronized (this) {
+                    try {
+                        RequestInfo rp =
+                            processor.getRequest().getRequestProcessor();
+                        rp.setGlobalProcessor(null);
+                        ObjectName rpName = rp.getRpName();
+                        if (getLog().isDebugEnabled()) {
+                            getLog().debug("Unregister " + rpName);
+                        }
+                        Registry.getRegistry(null, null).unregisterComponent(
+                                rpName);
+                        rp.setRpName(null);
+                    } catch (Exception e) {
+                        getLog().warn("Error unregistering request", e);
+                    }
+                }
+            }
+        }
     }
 }
