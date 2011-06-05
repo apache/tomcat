@@ -21,12 +21,12 @@ import java.io.InputStream;
 
 /**
  * Provides an abstraction for use by the various classes that need to scan
- * JARs. The classes provided by the JRE for accessing JARs ({@link JarFile} and
- * {@link JarInputStream}) have significantly different performance
+ * JARs. The classes provided by the JRE for accessing JARs ({@link java.util.jar.JarFile} and
+ * {@link java.util.jar.JarInputStream}) have significantly different performance
  * characteristics depending on the form of the URL used to access the JAR.
- * For file based JAR {@link URL}s, {@link JarFile} is faster but for non-file
- * based {@link URL}s, {@link JarFile} creates a copy of the JAR in the
- * temporary directory so {@link JarInputStream} is faster.
+ * For file based JAR {@link java.net.URL}s, {@link java.util.jar.JarFile} is faster but for non-file
+ * based {@link java.net.URL}s, {@link java.util.jar.JarFile} creates a copy of the JAR in the
+ * temporary directory so {@link java.util.jar.JarInputStream} is faster.
  */
 public interface Jar {
 
