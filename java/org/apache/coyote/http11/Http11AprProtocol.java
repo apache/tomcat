@@ -37,7 +37,6 @@ import org.apache.tomcat.util.net.AprEndpoint;
 import org.apache.tomcat.util.net.AprEndpoint.Handler;
 import org.apache.tomcat.util.net.SocketStatus;
 import org.apache.tomcat.util.net.SocketWrapper;
-import org.apache.tomcat.util.res.StringManager;
 
 
 /**
@@ -62,12 +61,6 @@ public class Http11AprProtocol extends AbstractHttp11Protocol {
         return cHandler;
     }
 
-
-    /**
-     * The string manager for this package.
-     */
-    protected static final StringManager sm =
-        StringManager.getManager(Constants.Package);
 
     public Http11AprProtocol() {
         endpoint = new AprEndpoint();
