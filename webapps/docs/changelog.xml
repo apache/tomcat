@@ -51,7 +51,7 @@
       </fix>
       <fix>
         When parsing the port in the HTTP host header, treat the port as a base
-        10 integer rather than a hexadecimal one. (rjung/markt) 
+        10 integer rather than a hexadecimal one. (rjung/markt/kkolinko) 
       </fix>
     </changelog>
   </subsection>
