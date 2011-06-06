@@ -55,6 +55,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Web applications">
+    <changelog>
+      <fix>
+        Correct the log4j configuration settings when defining conversion
+        patterns in the documentation web application. (markt)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 7.0.15 (markt)">
   <subsection name="Catalina">
