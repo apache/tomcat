@@ -39,6 +39,7 @@ import org.apache.juli.logging.Log;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.buf.Ascii;
 import org.apache.tomcat.util.buf.ByteChunk;
+import org.apache.tomcat.util.buf.HexUtils;
 import org.apache.tomcat.util.buf.MessageBytes;
 import org.apache.tomcat.util.http.FastHttpDateFormat;
 import org.apache.tomcat.util.http.MimeHeaders;
@@ -993,8 +994,23 @@ public abstract class AbstractHttp11Processor extends AbstractProcessor {
             request.serverName().setChars(hostNameC, 0, valueL);
         } else {
             request.serverName().setChars(hostNameC, 0, colonPos);
-            request.setServerPort(Ascii.parseInt(
-                    valueB, valueS + colonPos + 1, valueL - colonPos - 1));
+            
+            int port = 0;
+            int mult = 1;
+            for (int i = valueL - 1; i > colonPos; i--) {
+                int charValue = HexUtils.getDec(valueB[i + valueS]);
+                if (charValue == -1 || charValue > 9) {
+                    // Invalid character
+                    error = true;
+                    // 400 - Bad request
+                    response.setStatus(400);
+                    adapter.log(request, response, 0);
+                    break;
+                }
+                port = port + (charValue * mult);
+                mult = 10 * mult;
+            }
+            request.setServerPort(port);
         }
 
     }
