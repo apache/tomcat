@@ -60,6 +60,16 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Jasper">
+    <changelog>
+      <update>
+        Change JAR scanning log messages where no TLDs are found to DEBUG level
+        and replace the multiple messages with a single INFO level message that
+        indicates that at least one JAR was scanned needlessly and how to obtain
+        more info. (markt)
+      </update>
+    </changelog>
+  </subsection>
   <subsection name="Web applications">
     <changelog>
       <fix>
