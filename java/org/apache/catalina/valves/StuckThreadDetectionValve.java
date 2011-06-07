@@ -103,6 +103,15 @@ public class StuckThreadDetectionValve extends ValveBase {
         return threshold;
     }
 
+    
+    /**
+     * Required to enable async support.
+     */
+    public StuckThreadDetectionValve() {
+        super(true);
+    }
+
+
     @Override
     protected void initInternal() throws LifecycleException {
         super.initInternal();
