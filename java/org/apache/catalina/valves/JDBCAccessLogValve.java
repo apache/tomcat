@@ -140,7 +140,7 @@ public final class JDBCAccessLogValve extends ValveBase implements AccessLog {
      * </pre>
      */
     public JDBCAccessLogValve() {
-        super(false);
+        super(true);
         driverName = null;
         connectionURL = null;
         tableName = "access";
