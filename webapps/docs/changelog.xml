@@ -58,6 +58,10 @@
         When parsing the port in the HTTP host header, treat the port as a base
         10 integer rather than a hexadecimal one. (rjung/markt/kkolinko) 
       </fix>
+      <update>
+        Various refactorings to reduce code duplication and unnecessary code in
+        the connectors. (markt)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Jasper">
