@@ -121,7 +121,7 @@ public class ReplicationValve
     // ------------------------------------------------------------- Properties
 
     public ReplicationValve() {
-        super(false);
+        super(true);
     }
     
     /**
@@ -556,11 +556,13 @@ public class ReplicationValve
     }
 
     /**
-     * protocol cluster replications stats
+     * Protocol cluster replications stats
      * @param requestTime
      * @param clusterTime
      */
     protected  void updateStats(long requestTime, long clusterTime) {
+        // TODO: Async requests may trigger multiple replication requests. How,
+        //       if at all, should the stats handle this?
         synchronized(this) {
             lastSendTime=System.currentTimeMillis();
             totalSendTime+=lastSendTime - clusterTime;
