@@ -415,42 +415,42 @@ log4j.rootLogger=INFO, CATALINA
 
 # Define all the appenders
 log4j.appender.CATALINA=org.apache.log4j.DailyRollingFileAppender<br />
-log4j.appender.CATALINA.file=${catalina.base}/logs/catalina.<br />
-log4j.appender.CATALINA.encoding=UTF-8<br />
+log4j.appender.CATALINA.File=${catalina.base}/logs/catalina.<br />
+log4j.appender.CATALINA.Append=true<br />
+log4j.appender.CATALINA.Encoding=UTF-8<br />
 # Roll-over the log once per day<br />
 log4j.appender.CATALINA.DatePattern='.'yyyy-MM-dd'.log'<br />
 log4j.appender.CATALINA.layout = org.apache.log4j.PatternLayout
-log4j.appender.CATALINA.layout.conversionPattern = %d [%t] %-5p %c- %m%n<br />
-log4j.appender.CATALINA.append=true<br />
+log4j.appender.CATALINA.layout.ConversionPattern = %d [%t] %-5p %c- %m%n<br />
 <br />
 log4j.appender.LOCALHOST=org.apache.log4j.DailyRollingFileAppender<br />
-log4j.appender.LOCALHOST.file=${catalina.base}/logs/localhost.<br />
-log4j.appender.LOCALHOST.encoding=UTF-8<br />
+log4j.appender.LOCALHOST.File=${catalina.base}/logs/localhost.<br />
+log4j.appender.LOCALHOST.Append=true<br />
+log4j.appender.LOCALHOST.Encoding=UTF-8<br />
 log4j.appender.LOCALHOST.DatePattern='.'yyyy-MM-dd'.log'<br />
 log4j.appender.LOCALHOST.layout = org.apache.log4j.PatternLayout
-log4j.appender.LOCALHOST.layout.conversionPattern = %d [%t] %-5p %c- %m%n<br />
-log4j.appender.LOCALHOST.append=true<br />
+log4j.appender.LOCALHOST.layout.ConversionPattern = %d [%t] %-5p %c- %m%n<br />
 
 log4j.appender.MANAGER=org.apache.log4j.DailyRollingFileAppender<br />
-log4j.appender.MANAGER.file=${catalina.base}/logs/manager.<br />
-log4j.appender.MANAGER.encoding=UTF-8<br />
+log4j.appender.MANAGER.File=${catalina.base}/logs/manager.<br />
+log4j.appender.MANAGER.Append=true<br />
+log4j.appender.MANAGER.Encoding=UTF-8<br />
 log4j.appender.MANAGER.DatePattern='.'yyyy-MM-dd'.log'<br />
 log4j.appender.MANAGER.layout = org.apache.log4j.PatternLayout
-log4j.appender.MANAGER.layout.conversionPattern = %d [%t] %-5p %c- %m%n<br />
-log4j.appender.MANAGER.append=true<br />
+log4j.appender.MANAGER.layout.ConversionPattern = %d [%t] %-5p %c- %m%n<br />
 
 log4j.appender.HOST-MANAGER=org.apache.log4j.DailyRollingFileAppender<br />
-log4j.appender.HOST-MANAGER.file=${catalina.base}/logs/host-manager.<br />
-log4j.appender.HOST-MANAGER.encoding=UTF-8<br />
+log4j.appender.HOST-MANAGER.File=${catalina.base}/logs/host-manager.<br />
+log4j.appender.HOST-MANAGER.Append=true<br />
+log4j.appender.HOST-MANAGER.Encoding=UTF-8<br />
 log4j.appender.HOST-MANAGER.DatePattern='.'yyyy-MM-dd'.log'<br />
 log4j.appender.HOST-MANAGER.layout = org.apache.log4j.PatternLayout
-log4j.appender.HOST-MANAGER.layout.conversionPattern = %d [%t] %-5p %c- %m%n<br />
-log4j.appender.HOST-MANAGER.append=true<br />
+log4j.appender.HOST-MANAGER.layout.ConversionPattern = %d [%t] %-5p %c- %m%n<br />
 
 log4j.appender.CONSOLE=org.apache.log4j.ConsoleAppender<br />
-log4j.appender.CONSOLE.encoding=UTF-8<br />
+log4j.appender.CONSOLE.Encoding=UTF-8<br />
 log4j.appender.CONSOLE.layout = org.apache.log4j.PatternLayout
-log4j.appender.CONSOLE.layout.conversionPattern = %d [%t] %-5p %c- %m%n<br />
+log4j.appender.CONSOLE.layout.ConversionPattern = %d [%t] %-5p %c- %m%n<br />
 <br />
 # Configure which loggers log to which appenders<br />
 log4j.logger.org.apache.catalina.core.ContainerBase.[Catalina].[localhost]=INFO, LOCALHOST<br />
