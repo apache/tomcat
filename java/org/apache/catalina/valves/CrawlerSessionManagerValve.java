@@ -55,6 +55,14 @@ public class CrawlerSessionManagerValve extends ValveBase {
 
 
     /**
+     * Specifies a default constructor so async support can be configured.
+     */
+    public CrawlerSessionManagerValve() {
+        super(true);
+    }
+
+
+    /**
      * Specify the regular expression (using {@link Pattern}) that will be used
      * to identify crawlers based in the User-Agent header provided. The default
      * is ".*GoogleBot.*|.*bingbot.*|.*Yahoo! Slurp.*"
