@@ -59,6 +59,10 @@
         Correct a regression in the fix for <bug>51278</bug> that prevented any
         web application from being marked as distributable. (kfujino/mark)
       </fix>
+      <fix>
+        Enable remaining valves for Servlet 3 asynchronous processing support.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
@@ -81,6 +85,14 @@
         indicates that at least one JAR was scanned needlessly and how to obtain
         more info. (markt)
       </update>
+    </changelog>
+  </subsection>
+  <subsection name="Cluster">
+    <changelog>
+      <fix>
+        Enable Servlet 3 asynchronous processing support when using clustering.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
