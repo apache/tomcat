@@ -55,6 +55,10 @@
         response buffer to ensure that the doFlush flag does not get stuck in
         the enabled state. Patch provided by Jeremy Norris. (markt)
       </fix>
+      <fix>
+        Correct a regression in the fix for <bug>51278</bug> that prevented any
+        web application from being marked as distributable. (kfujino/mark)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
