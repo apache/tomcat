@@ -96,6 +96,10 @@ public class TldLocationsCache {
     // Names of JARs that are known not to contain any TLDs
     private static Set<String> noTldJars = null;
 
+    // Flag that indicates that an INFO level message has been provided that
+    // there are JARs that could be skipped
+    private static volatile boolean showTldScanWarning = true;
+
     /**
      * The mapping of the 'global' tag library URI to the location (resource
      * path) of the TLD associated with that tag library. The location is
@@ -438,8 +442,15 @@ public class TldLocationsCache {
         }
 
         if (!foundTld) {
-            log.info(Localizer.getMessage("jsp.tldCache.noTldInJar",
-                    resourcePath));
+            if (log.isDebugEnabled()) {
+                log.debug(Localizer.getMessage("jsp.tldCache.noTldInJar",
+                        resourcePath));
+            } else if (showTldScanWarning) {
+                // Not entirely thread-safe but a few duplicate log messages are
+                // not a huge issue
+                showTldScanWarning = true;
+                log.info(Localizer.getMessage("jsp.tldCache.noTldSummary"));
+            }
         }
     }
 
