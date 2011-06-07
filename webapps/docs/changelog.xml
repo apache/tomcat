@@ -43,6 +43,15 @@
   Other
 -->
 <section name="Tomcat 7.0.16 (markt)">
+  <subsection name="Catalina">
+    <changelog>
+      <fix>
+        <bug>51324</bug>: Improve handling of exceptions when flushing the
+        response buffer to ensure that the doFlush flag does not get stuck in
+        the enabled state. Patch provided by Jeremy Norris. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Coyote">
     <changelog>
       <fix>
