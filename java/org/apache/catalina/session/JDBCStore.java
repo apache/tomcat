@@ -711,16 +711,7 @@ public class JDBCStore extends StoreBase {
                 }
 
                 try {
-                    if (preparedRemoveSql == null) {
-                        String removeSql = "DELETE FROM " + sessionTable
-                                + " WHERE " + sessionIdCol + " = ?  AND "
-                                + sessionAppCol + " = ?";
-                        preparedRemoveSql = _conn.prepareStatement(removeSql);
-                    }
-
-                    preparedRemoveSql.setString(1, id);
-                    preparedRemoveSql.setString(2, getName());
-                    preparedRemoveSql.execute();
+                    remove(id, _conn);
                     // Break out after the finally block
                     numberOfTries = 0;
                 } catch (SQLException e) {
@@ -737,6 +728,28 @@ public class JDBCStore extends StoreBase {
         if (manager.getContainer().getLogger().isDebugEnabled()) {
             manager.getContainer().getLogger().debug(sm.getString(getStoreName() + ".removing", id, sessionTable));
         }
+    }
+
+    /**
+     * Remove the Session with the specified session identifier from
+     * this Store, if present.  If no such Session is present, this method
+     * takes no action.
+     * 
+     * @param id Session identifier of the Session to be removed
+     * @param _conn open connection to be used
+     * @throws SQLException if an error occurs while talking to the database
+     */
+    private void remove(String id, Connection _conn) throws SQLException {
+        if (preparedRemoveSql == null) {
+            String removeSql = "DELETE FROM " + sessionTable
+                    + " WHERE " + sessionIdCol + " = ?  AND "
+                    + sessionAppCol + " = ?";
+            preparedRemoveSql = _conn.prepareStatement(removeSql);
+        }
+
+        preparedRemoveSql.setString(1, id);
+        preparedRemoveSql.setString(2, getName());
+        preparedRemoveSql.execute();
     }
 
     /**
@@ -799,12 +812,12 @@ public class JDBCStore extends StoreBase {
                     return;
                 }
 
-                // If sessions already exist in DB, remove and insert again.
-                // TODO:
-                // * Check if ID exists in database and if so use UPDATE.
-                remove(session.getIdInternal());
-
                 try {
+                    // If sessions already exist in DB, remove and insert again.
+                    // TODO:
+                    // * Check if ID exists in database and if so use UPDATE.
+                    remove(session.getIdInternal(), _conn);
+                    
                     bos = new ByteArrayOutputStream();
                     oos = new ObjectOutputStream(new BufferedOutputStream(bos));
 
@@ -874,11 +887,13 @@ public class JDBCStore extends StoreBase {
      * @return <code>Connection</code> if the connection succeeded
      */
     protected Connection getConnection() {
+        Connection conn = null;
         try {
-            if (dbConnection == null || dbConnection.isClosed()) {
+            conn = open();
+            if (conn == null || conn.isClosed()) {
                 manager.getContainer().getLogger().info(sm.getString(getStoreName() + ".checkConnectionDBClosed"));
-                open();
-                if (dbConnection == null || dbConnection.isClosed()) {
+                conn = open();
+                if (conn == null || conn.isClosed()) {
                     manager.getContainer().getLogger().info(sm.getString(getStoreName() + ".checkConnectionDBReOpenFail"));
                 }
             }
@@ -887,7 +902,7 @@ public class JDBCStore extends StoreBase {
                     ex.toString()));
         }
 
-        return dbConnection;
+        return conn;
     }
 
     /**
@@ -916,8 +931,7 @@ public class JDBCStore extends StoreBase {
         }
         
         if (dataSource != null) {
-            dbConnection = dataSource.getConnection();
-            return dbConnection;
+            return dataSource.getConnection();
         }
 
         // Instantiate our database driver if necessary
@@ -1014,13 +1028,15 @@ public class JDBCStore extends StoreBase {
     }
 
     /**
-     * Release the connection, not needed here since the
-     * connection is not associated with a connection pool.
+     * Release the connection, if it
+     * is associated with a connection pool.
      *
      * @param conn The connection to be released
      */
     protected void release(Connection conn) {
-        // NOOP
+        if (dataSource != null) {
+            close(conn); 
+        }
     }
 
     /**
@@ -1033,8 +1049,10 @@ public class JDBCStore extends StoreBase {
     @Override
     protected synchronized void startInternal() throws LifecycleException {
 
-        // Open connection to the database
-        this.dbConnection = getConnection();
+        if (dataSource == null) {
+            // If not using a connection pool, open a connection to the database
+            this.dbConnection = getConnection();
+        }
         
         super.startInternal();
     }

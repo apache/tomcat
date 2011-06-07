@@ -360,7 +360,10 @@
       <p>Name of the JNDI resource for a JDBC DataSource-factory. If this option
       is given and a valid JDBC resource can be found, it will be used and any
       direct configuration of a JDBC connection via <code>connectionURL</code>
-      and <code>driverName</code> will be ignored.</p>
+      and <code>driverName</code> will be ignored. Since this code uses prepared
+      statements, you might want to configure pooled prepared statements as
+      shown in <a href="../jndi-resources-howto.html">the JNDI resources
+      HOW-TO</a>.</p>
     </attribute>
 
     <attribute name="driverName" required="true">

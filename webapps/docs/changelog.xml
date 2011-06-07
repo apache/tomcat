@@ -46,6 +46,11 @@
   <subsection name="Catalina">
     <changelog>
       <fix>
+        <bug>51264</bug>: Improve the previous fix for this issue by returning
+        the connection to the pool when not in use so it does not appear to be
+        an abandoned connection. Patch provided by Felix Schumacher. (markt)
+      </fix>
+      <fix>
         <bug>51324</bug>: Improve handling of exceptions when flushing the
         response buffer to ensure that the doFlush flag does not get stuck in
         the enabled state. Patch provided by Jeremy Norris. (markt)
