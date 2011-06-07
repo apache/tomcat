@@ -31,7 +31,9 @@ import org.apache.catalina.connector.Response;
  * <p>Implementation of a Valve that limits concurrency.</p>
  *
  * <p>This Valve may be attached to any Container, depending on the granularity
- * of the concurrency control you wish to perform.</p>
+ * of the concurrency control you wish to perform. Note that internally, some
+ * async requests may require multiple serial requests to complete what - to the
+ * user - appears as a single request.</p>
  *
  * @author Remy Maucherat
  * @version $Id$
@@ -41,7 +43,7 @@ public class SemaphoreValve extends ValveBase {
 
     //------------------------------------------------------ Constructor
     public SemaphoreValve() {
-        super(false); //TODO - is this async aware
+        super(true);
     }
 
     // ----------------------------------------------------- Instance Variables
