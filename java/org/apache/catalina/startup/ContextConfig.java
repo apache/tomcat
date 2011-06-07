@@ -1195,6 +1195,10 @@ public class ContextConfig
          */ 
         WebXml webXmlDefaultFragment = createWebXml();
         webXmlDefaultFragment.setOverridable(true);
+        // Set to distributable else every app will be prevented from being
+        // distributable when the default fragment is merged with the main
+        // web.xml
+        webXmlDefaultFragment.setDistributable(true);
 
         // Parse global web.xml if present
         InputSource globalWebXml = getGlobalWebXmlSource();
