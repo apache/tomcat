@@ -448,7 +448,7 @@ public class TldLocationsCache {
             } else if (showTldScanWarning) {
                 // Not entirely thread-safe but a few duplicate log messages are
                 // not a huge issue
-                showTldScanWarning = true;
+                showTldScanWarning = false;
                 log.info(Localizer.getMessage("jsp.tldCache.noTldSummary"));
             }
         }
