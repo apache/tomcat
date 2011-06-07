@@ -831,7 +831,7 @@ public class Http11AprProcessor extends AbstractHttp11Processor {
             sendfileData.start = ((Long) request.getAttribute(
                     "org.apache.tomcat.sendfile.start")).longValue();
             sendfileData.end = ((Long) request.getAttribute(
-                    "org.apache.tomcat.sendfile.end")).longValue() - sendfileData.pos;
+                    "org.apache.tomcat.sendfile.end")).longValue();
             return true;
         }
         return false;
