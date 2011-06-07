@@ -1222,13 +1222,7 @@ public class ContextConfig
         InputSource contextWebXml = getContextWebXmlSource();
         parseWebXml(contextWebXml, webXml, false);
         
-        // Assuming 0 is safe for what is required in this case
-        double webXmlVersion = 0;
-        if (webXml.getVersion() != null) {
-            webXmlVersion = Double.parseDouble(webXml.getVersion());
-        }
-        
-        if (webXmlVersion >= 3) {
+        if (webXml.getMajorVersion() >= 3) {
             // Ordering is important here
 
             // Step 1. Identify all the JARs packaged with the application
