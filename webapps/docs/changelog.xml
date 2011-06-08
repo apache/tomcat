@@ -67,6 +67,10 @@
         Enable remaining valves for Servlet 3 asynchronous processing support.
         (markt)
       </fix>
+      <fix>
+        Avoid possible NPE when logging requests received during embedded Tomcat
+        shutdown. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
