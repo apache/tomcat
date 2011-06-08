@@ -1676,13 +1676,18 @@ public class ContextConfig
         // thread safe. Whilst there should only be one thread at a time
         // processing a config, play safe and sync.
         Digester digester;
+        WebRuleSet ruleSet;
         if (fragment) {
             digester = webFragmentDigester;
+            ruleSet = webFragmentRuleSet;
         } else {
             digester = webDigester;
+            ruleSet = webRuleSet;
         }
         
-        synchronized(digester) {
+        // Sync on the ruleSet since the same ruleSet is shared across all four
+        // digesters
+        synchronized(ruleSet) {
             
             digester.push(dest);
             digester.setErrorHandler(handler);
@@ -1713,11 +1718,7 @@ public class ContextConfig
                 ok = false;
             } finally {
                 digester.reset();
-                if (fragment) {
-                    webFragmentRuleSet.recycle();
-                } else {
-                    webRuleSet.recycle();
-                }
+                ruleSet.recycle();
             }
         }
     }
