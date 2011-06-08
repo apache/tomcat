@@ -1049,7 +1049,7 @@ public class JDBCStore extends StoreBase {
     @Override
     protected synchronized void startInternal() throws LifecycleException {
 
-        if (dataSource == null) {
+        if (dataSourceName == null) {
             // If not using a connection pool, open a connection to the database
             this.dbConnection = getConnection();
         }
