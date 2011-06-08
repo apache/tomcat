@@ -71,6 +71,11 @@
         Avoid possible NPE when logging requests received during embedded Tomcat
         shutdown. (markt)
       </fix>
+      <fix>
+        <bug>51340</bug>: Fix thread-safety issue when parsing multiple web.xml
+        files in parallel. Apache Tomcat does not do this but products that
+        embed it may. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
