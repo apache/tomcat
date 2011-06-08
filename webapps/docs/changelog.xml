@@ -60,6 +60,10 @@
         web application from being marked as distributable. (kfujino/mark)
       </fix>
       <fix>
+        Correct a regression in the fix for <bug>51278</bug> that prevented a
+        web application from overriding the default welcome files. (mark)
+      </fix>
+      <fix>
         Enable remaining valves for Servlet 3 asynchronous processing support.
         (markt)
       </fix>
