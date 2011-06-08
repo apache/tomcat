@@ -1199,6 +1199,9 @@ public class ContextConfig
         // distributable when the default fragment is merged with the main
         // web.xml
         webXmlDefaultFragment.setDistributable(true);
+        // When merging, the default welcome files are only used if the app has
+        // not defined any welcomes files.
+        webXmlDefaultFragment.setAlwaysAddWelcomeFiles(false);
 
         // Parse global web.xml if present
         InputSource globalWebXml = getGlobalWebXmlSource();
@@ -1211,7 +1214,7 @@ public class ContextConfig
 
         // Parse host level web.xml if present
         // Additive apart from welcome pages
-        webXml.setReplaceWelcomeFiles(true);
+        webXmlDefaultFragment.setReplaceWelcomeFiles(true);
         InputSource hostWebXml = getHostWebXmlSource();
         parseWebXml(hostWebXml, webXmlDefaultFragment, false);
         
