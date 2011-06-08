@@ -346,13 +346,25 @@ public class WebXml {
     }
     public Map<String,String> getMimeMappings() { return mimeMappings; }
     
-    // welcome-file-list
-    // When merging web.xml files it may be necessary for any new welcome files
-    // to completely replace the current set
+    // welcome-file-list merge control
     private boolean replaceWelcomeFiles = false;
+    private boolean alwaysAddWelcomeFiles = true;
+    /**
+     * When merging/parsing web.xml files into this web.xml should the current
+     * set be completely replaced?
+     */
     public void setReplaceWelcomeFiles(boolean replaceWelcomeFiles) {
         this.replaceWelcomeFiles = replaceWelcomeFiles;
     }
+    /**
+     * When merging from this web.xml, should the welcome files be added to the
+     * target web.xml even if it already contains welcome file definitions.
+     */
+    public void setAlwaysAddWelcomeFiles(boolean alwaysAddWelcomeFiles) {
+        this.alwaysAddWelcomeFiles = alwaysAddWelcomeFiles;
+    }
+
+    // welcome-file-list
     private Set<String> welcomeFiles = new LinkedHashSet<String>();
     public void addWelcomeFile(String welcomeFile) {
         if (replaceWelcomeFiles) {
@@ -1322,7 +1334,16 @@ public class WebXml {
         // Context doesn't use version directly
         
         for (String welcomeFile : welcomeFiles) {
-            context.addWelcomeFile(welcomeFile);
+            /*
+             * The following will result in a welcome file of "" so don't add
+             * that to the context 
+             * <welcome-file-list>
+             *   <welcome-file/>
+             * </welcome-file-list>
+             */
+            if (welcomeFile != null && welcomeFile.length() > 0) {
+                context.addWelcomeFile(welcomeFile);
+            }
         }
 
         // Do this last as it depends on servlets
@@ -1848,9 +1869,10 @@ public class WebXml {
         taglibs.putAll(temp.getTaglibs());
 
         for (WebXml fragment : fragments) {
-            for (String welcomeFile : fragment.getWelcomeFiles()) {
-                // Always additive
-                addWelcomeFile(welcomeFile);
+            if (fragment.alwaysAddWelcomeFiles || welcomeFiles.size() == 0) {
+                for (String welcomeFile : fragment.getWelcomeFiles()) {
+                    addWelcomeFile(welcomeFile);
+                }
             }
         }
 
