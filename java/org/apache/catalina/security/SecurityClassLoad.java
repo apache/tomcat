@@ -140,6 +140,7 @@ public final class SecurityClassLoad {
             throws Exception {
         final String basePackage = "org.apache.coyote.";
         loader.loadClass(basePackage + "http11.AbstractOutputBuffer$1");
+        loader.loadClass(basePackage + "http11.Constants");
         // Make sure system property is read at this point
         Class<?> clazz = loader.loadClass(basePackage + "Constants");
         clazz.newInstance();
