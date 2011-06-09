@@ -85,6 +85,9 @@
         <bug>51344</bug>: Fix problem with Lifecycle re-factoring for deprecated
         embedded class that prevented events being triggered. (markt) 
       </fix>
+      <fix>
+        Prevent possible NPE when processing WebDAV locks. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
