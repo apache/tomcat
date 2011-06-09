@@ -76,6 +76,11 @@
         files in parallel. Apache Tomcat does not do this but products that
         embed it may. (markt)
       </fix>
+      <fix>
+        <bug>51249</bug>: Further improve system property replacement code
+        in ClassLoaderLogManager of Tomcat JULI to cover some corner cases.
+        (kkolinko)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
@@ -140,7 +145,7 @@
       </fix>
       <fix>
         <bug>51249</bug>: Correct ClassLoaderLogManager system property
-        replacement code so properties of the form ${...}${...} can be used
+        replacement code so properties of the form "}${...}" can be used
         without error. (markt) 
       </fix>
       <fix>
