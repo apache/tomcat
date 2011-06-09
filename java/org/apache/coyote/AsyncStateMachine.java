@@ -24,8 +24,8 @@ import org.apache.tomcat.util.res.StringManager;
 
 /**
  * Manages the state transitions for async requests.
- * TODO: State transition diagram
  * 
+ * <pre>
  * The internal states that are used are:
  * DISPATCHED    - Standard request. Not in Async mode.
  * STARTING      - ServletRequest.startAsync() has been called but the
@@ -48,6 +48,41 @@ import org.apache.tomcat.util.res.StringManager;
  *                 request finishes, the dispatch() will be processed.
  * DISPATCHING   - The dispatch is being processed.
  * ERROR         - Something went wrong.
+ *
+ * |----------------->---------------|                                         
+ * |                                \|/                                        
+ * |   |----------<----------------ERROR                                    
+ * |   |    complete()            /|\  |                                       
+ * |   |                    error()|   |postProcess()                          
+ * |   |                           |   |                                       
+ * |   |           postProcess()   |  \|/         auto                         
+ * |   |         |--------------->DISPATCHED<------------------COMPLETING<----| 
+ * |   |         |               /|\  |                          | /|\        | 
+ * |   |         |    |--->-------|   |                          |--|         | 
+ * |   |         ^    |               |startAsync()            timeout()      |
+ * |   |         |    |               |                                       | 
+ * |  \|/        |    |  complete()  \|/        postProcess()                 | 
+ * | MUST_COMPLETE-<- | ----<------STARTING-->----------------|               ^     
+ * |      /|\         |               |                       |               |         
+ * |       |          |               |                       |               |         
+ * |       |          ^               |dispatch()             |               |         
+ * |       |          |               |                       |               |         
+ * |       |          |              \|/                     \|/   complete() |         
+ * |       |          |         MUST_DISPATCH              STARTED---->-------|   
+ * |       |          |           |                         |   |                        
+ * |       |          |           |postProcess()            |   |                        
+ * ^       ^          |           |              dispatch() |   |auto                        
+ * |       |          |           |    |--------------------|   |                        
+ * |       |          | auto     \|/  \|/                      \|/                         
+ * |       |          |---<----DISPATCHING<-----------------TIMING_OUT                              
+ * |       |                                  dispatch()      |   |             
+ * |       |                                                  |   |            
+ * |       |-------<-------------------------------------<----|   |            
+ * |                              complete()                      |            
+ * |                                                              |            
+ * |----<------------------------<-----------------------------<--|            
+ *                                 error()
+ * </pre>                               
  */
 public class AsyncStateMachine {
 
