@@ -1337,13 +1337,15 @@ public class WebdavServlet
             LockInfo toRenew = resourceLocks.get(path);
             Enumeration<String> tokenList = null;
 
-            // At least one of the tokens of the locks must have been given
-            tokenList = toRenew.tokens.elements();
-            while (tokenList.hasMoreElements()) {
-                String token = tokenList.nextElement();
-                if (ifHeader.indexOf(token) != -1) {
-                    toRenew.expiresAt = lock.expiresAt;
-                    lock = toRenew;
+            if (toRenew != null) {
+                // At least one of the tokens of the locks must have been given
+                tokenList = toRenew.tokens.elements();
+                while (tokenList.hasMoreElements()) {
+                    String token = tokenList.nextElement();
+                    if (ifHeader.indexOf(token) != -1) {
+                        toRenew.expiresAt = lock.expiresAt;
+                        lock = toRenew;
+                    }
                 }
             }
 
