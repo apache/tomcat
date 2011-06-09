@@ -46,6 +46,11 @@
   <subsection name="Catalina">
     <changelog>
       <fix>
+        <bug>51249</bug>: Further improve system property replacement code
+        in ClassLoaderLogManager of Tomcat JULI to cover some corner cases.
+        (kkolinko)
+      </fix>
+      <fix>
         <bug>51264</bug>: Improve the previous fix for this issue by returning
         the connection to the pool when not in use so it does not appear to be
         an abandoned connection. Patch provided by Felix Schumacher. (markt)
@@ -77,9 +82,8 @@
         embed it may. (markt)
       </fix>
       <fix>
-        <bug>51249</bug>: Further improve system property replacement code
-        in ClassLoaderLogManager of Tomcat JULI to cover some corner cases.
-        (kkolinko)
+        <bug>51344</bug>: Fix problem with Lifecycle re-factoring for deprecated
+        embedded class that prevented events being triggered. (markt) 
       </fix>
     </changelog>
   </subsection>
