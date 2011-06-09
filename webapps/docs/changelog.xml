@@ -57,11 +57,11 @@
       </fix>
       <fix>
         Correct a regression in the fix for <bug>51278</bug> that prevented any
-        web application from being marked as distributable. (kfujino/mark)
+        web application from being marked as distributable. (kfujino/markt)
       </fix>
       <fix>
         Correct a regression in the fix for <bug>51278</bug> that prevented a
-        web application from overriding the default welcome files. (mark)
+        web application from overriding the default welcome files. (markt)
       </fix>
       <fix>
         Enable remaining valves for Servlet 3 asynchronous processing support.
@@ -156,7 +156,7 @@
         <bug>51276</bug>: Provide an abstraction for accessing content in JARs
         so the most efficient method can be selected depending on the type of
         URL used to identify the JAR. This improves startup time when JARs are
-        located in $CATALINA_BASE/lib. (mark)
+        located in $CATALINA_BASE/lib. (markt)
       </fix>
       <fix>
         <bug>51277</bug>: Improve error message if an application is deployed
@@ -784,7 +784,7 @@
       <fix>
         <bug>28852</bug>: Add URL encoding where missing to parameters in URLs
         presented by Ant tasks to the Manager application. Based on a patch by
-        Stephane Bailliez. (mark) 
+        Stephane Bailliez. (markt) 
       </fix>
       <fix>
         Improve handling of SSL renegotiation by failing earlier when the
