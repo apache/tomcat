@@ -28,8 +28,8 @@ public class TestClassLoaderLogManager extends TestCase {
         ClassLoaderLogManager logManager = new ClassLoaderLogManager();
         assertEquals("", logManager.replace(""));
         assertEquals("${", logManager.replace("${"));
-        assertEquals("${undefinedsystemproperty}",
-                logManager.replace("${undefinedsystemproperty}"));
+        assertEquals("${undefinedproperty}",
+                logManager.replace("${undefinedproperty}"));
         assertEquals(
                 System.getProperty("line.separator")
                         + System.getProperty("path.separator")
@@ -46,6 +46,13 @@ public class TestClassLoaderLogManager extends TestCase {
         assertEquals(
                 "%{file.separator}" + System.getProperty("file.separator"),
                 logManager.replace("%{file.separator}${file.separator}"));
+        assertEquals(
+                System.getProperty("file.separator") + "${undefinedproperty}"
+                        + System.getProperty("file.separator"),
+                logManager
+                        .replace("${file.separator}${undefinedproperty}${file.separator}"));
+        assertEquals("${}" + System.getProperty("path.separator"),
+                logManager.replace("${}${path.separator}"));
     }
 
 }
