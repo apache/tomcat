@@ -86,7 +86,8 @@
         embedded class that prevented events being triggered. (markt) 
       </fix>
       <fix>
-        Prevent possible NPE when processing WebDAV locks. (markt)
+        <bug>51348</bug>: Prevent possible NPE when processing WebDAV locks.
+        (markt)
       </fix>
     </changelog>
   </subsection>
