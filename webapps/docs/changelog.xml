@@ -50,8 +50,16 @@
   <subsection name="Coyote">
     <changelog>
       <fix>
-        Fix unit test for bindOnInit which was failing for APR on some platforms.
-        (rjung)
+        Fix unit test for bindOnInit which was failing for APR on some
+        platforms. (rjung)
+      </fix>
+    </changelog>
+  </subsection>
+  <subsection>
+    <changelog name="Web applications">
+      <fix>
+        Update Maven repository information in the documentation to reflect
+        current usage. (markt)
       </fix>
     </changelog>
   </subsection>

@@ -37,17 +37,15 @@
     <subsection name="Tomcat Snapshots">
       Tomcat snapshots are located in the 
       <a href="http://people.apache.org/repo/m2-snapshot-repository/org/apache/tomcat/">Apache Snapshot Repository</a>.
-      The official URL is <source>http://people.apache.org/repo/m2-snapshot-repository/org/apache/tomcat/</source><br/>
+      The official URL is <source>http://people.apache.org/repo/m2-snapshot-repository/org/apache/tomcat/</source>
       Snapshots are done periodically, not on a regular basis, but when changes happen and the Tomcat team deems a new snapshot might 
       useful.
     </subsection>
     <subsection name="Tomcat Releases">
-      At every release, be it alpha, beta or stable, we will publish the JARs to 
-      <a href="http://tomcat.apache.org/dev/dist/m2-repository/org/apache/tomcat/">Tomcat's Staging Repository</a>.
-      The URL for this is <source>http://tomcat.apache.org/dev/dist/m2-repository/org/apache/tomcat/</source>.<br/>
-      At some point, this URL will change over to ASF's main repository that synchronizes with IBiblio.<br/>
-      When that happens, all releases will be moved over, and this repository will stick around for a while, but no
-      new releases will be published to the staging repository.
+      Stable releases are published to the
+      <a href="http://repo2.maven.org/maven2/org/apache/tomcat/">Central
+      Maven Repositories</a>. The URL for this is
+      <source>http://repo2.maven.org/maven2/org/apache/tomcat/</source>
     </subsection>
 
 </section>
