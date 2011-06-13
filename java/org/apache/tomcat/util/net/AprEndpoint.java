@@ -1646,7 +1646,7 @@ public class AprEndpoint extends AbstractEndpoint {
     }
 
 
-    // ---------------------------------------------- SocketProcessor Inner Class
+    // --------------------------------- SocketWithOptionsProcessor Inner Class
 
     /**
      * This class is the equivalent of the Worker, but will simply use in an
@@ -1705,7 +1705,7 @@ public class AprEndpoint extends AbstractEndpoint {
     }
 
 
-    // ---------------------------------------------- SocketProcessor Inner Class
+    // -------------------------------------------- SocketProcessor Inner Class
 
 
     /**
