@@ -55,6 +55,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Cluster">
+    <changelog>
+      <fix>
+        <bug>51306</bug>: Avoid NPE when handleSESSION_EXPIRED is processed 
+        while handleSESSION_CREATED is being processed. (kfujino)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection>
     <changelog name="Web applications">
       <fix>

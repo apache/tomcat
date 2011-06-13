@@ -1385,7 +1385,7 @@ public CatalinaCluster getCluster() {
         session.setPrimarySession(false);
         session.setCreationTime(msg.getTimestamp());
         // use container maxInactiveInterval so that session will expire correctly in case of primary transfer
-        session.setMaxInactiveInterval(getMaxInactiveInterval());
+        session.setMaxInactiveInterval(getMaxInactiveInterval(), false);
         session.access();
         session.setId(msg.getSessionID(), notifySessionListenersOnReplication);
         session.resetDeltaRequest();

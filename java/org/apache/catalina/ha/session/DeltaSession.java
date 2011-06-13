@@ -429,7 +429,7 @@ public class DeltaSession extends StandardSession implements Externalizable,Clus
             return;
         String expiredId = getIdInternal();
 
-        if(expiredId != null && manager != null &&
+        if(notifyCluster && expiredId != null && manager != null &&
            manager instanceof DeltaManager) {
             DeltaManager dmanager = (DeltaManager)manager;
             CatalinaCluster cluster = dmanager.getCluster();
