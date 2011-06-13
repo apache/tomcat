@@ -229,7 +229,8 @@ public abstract class AbstractProtocol implements ProtocolHandler,
             name.append('-');
         }
         name.append(endpoint.getPort());
-        return ObjectName.quote(name.toString());
+        String quotedName = ObjectName.quote(name.toString());
+        return quotedName.substring(1, quotedName.length()-1);
     }
 
     

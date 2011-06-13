@@ -53,6 +53,10 @@
         Fix unit test for bindOnInit which was failing for APR on some
         platforms. (rjung)
       </fix>
+      <fix>
+        Remove superfluous quotes from thread names for connection pools.
+        (rjung)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">
