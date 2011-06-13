@@ -319,13 +319,6 @@ public class AjpAprProcessor extends AbstractAjpProcessor {
             recycle();
         }
 
-        // Add the socket to the poller
-        if (!error && !endpoint.isPaused()) {
-            if (!isAsync()) {
-                ((AprEndpoint)endpoint).getPoller().add(socketRef);
-            }
-        }
-
         rp.setStage(org.apache.coyote.Constants.STAGE_ENDED);
         
         if (error || endpoint.isPaused()) {
@@ -333,6 +326,8 @@ public class AjpAprProcessor extends AbstractAjpProcessor {
         } else if (isAsync()) {
             return SocketState.LONG;
         } else {
+            // Add the socket to the poller
+            ((AprEndpoint)endpoint).getPoller().add(socketRef);
             return SocketState.OPEN;
         }
     }
