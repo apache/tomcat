@@ -57,6 +57,11 @@
         Remove superfluous quotes from thread names for connection pools.
         (rjung)
       </fix>
+      <fix>
+        Fix crash observed during pausing the connector when using APR.
+        Only add socket to poller if we are sure we don't close it later.
+        (rjung)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">
