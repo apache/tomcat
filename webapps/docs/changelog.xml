@@ -63,8 +63,8 @@
       </fix>
     </changelog>
   </subsection>
-  <subsection>
-    <changelog name="Web applications">
+  <subsection name="Web applications">
+    <changelog>
       <fix>
         Update Maven repository information in the documentation to reflect
         current usage. (markt)
