@@ -19,6 +19,7 @@ package org.apache.coyote.ajp;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InterruptedIOException;
 import java.net.InetAddress;
 import java.security.NoSuchProviderException;
 import java.security.cert.CertificateFactory;
@@ -32,7 +33,9 @@ import org.apache.coyote.AsyncContextCallback;
 import org.apache.coyote.AsyncStateMachine;
 import org.apache.coyote.InputBuffer;
 import org.apache.coyote.Request;
+import org.apache.coyote.RequestInfo;
 import org.apache.juli.logging.Log;
+import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.buf.HexUtils;
 import org.apache.tomcat.util.buf.MessageBytes;
@@ -40,6 +43,7 @@ import org.apache.tomcat.util.http.HttpMessages;
 import org.apache.tomcat.util.http.MimeHeaders;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
 import org.apache.tomcat.util.net.SSLSupport;
+import org.apache.tomcat.util.net.SocketStatus;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
@@ -374,6 +378,46 @@ public abstract class AbstractAjpProcessor extends AbstractProcessor {
    protected abstract void flush(boolean tbd) throws IOException;
    protected abstract void finish() throws IOException;
    
+   
+   public SocketState asyncDispatch(SocketStatus status) {
+
+       RequestInfo rp = request.getRequestProcessor();
+       try {
+           rp.setStage(org.apache.coyote.Constants.STAGE_SERVICE);
+           error = !adapter.asyncDispatch(request, response, status);
+       } catch (InterruptedIOException e) {
+           error = true;
+       } catch (Throwable t) {
+           ExceptionUtils.handleThrowable(t);
+           getLog().error(sm.getString("http11processor.request.process"), t);
+           // 500 - Internal Server Error
+           response.setStatus(500);
+           adapter.log(request, response, 0);
+           error = true;
+       }
+
+       rp.setStage(org.apache.coyote.Constants.STAGE_ENDED);
+
+       if (error) {
+           response.setStatus(500);
+       }
+       if (isAsync()) {
+           if (error) {
+               request.updateCounters();
+               return SocketState.CLOSED;
+           } else {
+               return SocketState.LONG;
+           }
+       } else {
+           request.updateCounters();
+           if (error) {
+               return SocketState.CLOSED;
+           } else {
+               return SocketState.OPEN;
+           }
+       }
+   }
+
    
    public void recycle() {
        asyncStateMachine.recycle();
