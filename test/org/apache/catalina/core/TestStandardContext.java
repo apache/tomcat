@@ -321,7 +321,16 @@ public class TestStandardContext extends TomcatBaseTest {
         
     }
 
-    public void testBug51376() throws Exception {
+    public void testBug51376a() throws Exception {
+        doTestBug51376(false);
+    }
+
+    public void testBug51376b() throws Exception {
+        doTestBug51376(true);
+    }
+
+    private void doTestBug51376(boolean loadOnStartUp) throws Exception {
+
         // Set up a container
         Tomcat tomcat = getTomcatInstance();
 
@@ -330,7 +339,7 @@ public class TestStandardContext extends TomcatBaseTest {
         Context ctx = tomcat.addContext("", docBase.getAbsolutePath());
 
         // Add ServletContainerInitializer
-        Bug51376SCI sci = new Bug51376SCI();
+        Bug51376SCI sci = new Bug51376SCI(loadOnStartUp);
         ctx.addServletContainerInitializer(sci, null);
         
         // Start the context
@@ -347,6 +356,11 @@ public class TestStandardContext extends TomcatBaseTest {
             implements ServletContainerInitializer {
 
         private Bug51376Servlet s = null;
+        private boolean loadOnStartUp;
+
+        public Bug51376SCI(boolean loadOnStartUp) {
+            this.loadOnStartUp = loadOnStartUp;
+        }
 
         private Bug51376Servlet getServlet() {
             return s;
@@ -359,7 +373,9 @@ public class TestStandardContext extends TomcatBaseTest {
             s = new Bug51376Servlet();
             ServletRegistration.Dynamic sr = ctx.addServlet("bug51376", s);
             sr.addMapping("/bug51376");
-            sr.setLoadOnStartup(1);
+            if (loadOnStartUp) {
+                sr.setLoadOnStartup(1);
+            }
         }
     }
     
@@ -398,6 +414,8 @@ public class TestStandardContext extends TomcatBaseTest {
         protected boolean isOk() {
             if (initOk != null && initOk.booleanValue() && destoryOk != null &&
                     destoryOk.booleanValue()) {
+                return true;
+            } else if (initOk == null && destoryOk == null) {
                 return true;
             } else {
                 return false;
