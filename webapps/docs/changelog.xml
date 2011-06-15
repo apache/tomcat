@@ -45,6 +45,11 @@
 <section name="Tomcat 7.0.17 (markt)">
   <subsection name="Catalina">
     <changelog>
+      <add>
+        <bug>50677</bug>: Allow system property variables to be used in the
+        values of "common.loader" and other "*.loader" properties in the
+        <code>catalina.properties</code> file. (kkolinko)
+      </add>
       <fix>
         <bug>51376</bug>: When adding a Servlet via
         ServletContext#addServlet(String, Servlet), the Servlet was not
