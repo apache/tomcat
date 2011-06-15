@@ -1375,53 +1375,55 @@ public class StandardWrapper extends ContainerBase
             }
         }
 
-        PrintStream out = System.out;
-        if (swallowOutput) {
-            SystemLogHandler.startCapture();
-        }
-
-        // Call the servlet destroy() method
-        try {
-            instanceSupport.fireInstanceEvent
-              (InstanceEvent.BEFORE_DESTROY_EVENT, instance);
-
-            if( Globals.IS_SECURITY_ENABLED) {
-                SecurityUtil.doAsPrivilege("destroy",
-                                           instance);
-                SecurityUtil.remove(instance);                           
-            } else {
-                instance.destroy();
-            }
-            
-            instanceSupport.fireInstanceEvent
-              (InstanceEvent.AFTER_DESTROY_EVENT, instance);
-
-            // Annotation processing
-            if (!((Context) getParent()).getIgnoreAnnotations()) {
-               ((StandardContext)getParent()).getInstanceManager().destroyInstance(instance);
-            }
-
-        } catch (Throwable t) {
-            ExceptionUtils.handleThrowable(t);
-            instanceSupport.fireInstanceEvent
-              (InstanceEvent.AFTER_DESTROY_EVENT, instance, t);
-            instance = null;
-            instancePool = null;
-            nInstances = 0;
-            fireContainerEvent("unload", this);
-            unloading = false;
-            throw new ServletException
-                (sm.getString("standardWrapper.destroyException", getName()),
-                 t);
-        } finally {
-            // Write captured output
+        if (instanceInitialized) {
+            PrintStream out = System.out;
             if (swallowOutput) {
-                String log = SystemLogHandler.stopCapture();
-                if (log != null && log.length() > 0) {
-                    if (getServletContext() != null) {
-                        getServletContext().log(log);
-                    } else {
-                        out.println(log);
+                SystemLogHandler.startCapture();
+            }
+    
+            // Call the servlet destroy() method
+            try {
+                instanceSupport.fireInstanceEvent
+                  (InstanceEvent.BEFORE_DESTROY_EVENT, instance);
+    
+                if( Globals.IS_SECURITY_ENABLED) {
+                    SecurityUtil.doAsPrivilege("destroy",
+                                               instance);
+                    SecurityUtil.remove(instance);                           
+                } else {
+                    instance.destroy();
+                }
+                
+                instanceSupport.fireInstanceEvent
+                  (InstanceEvent.AFTER_DESTROY_EVENT, instance);
+    
+                // Annotation processing
+                if (!((Context) getParent()).getIgnoreAnnotations()) {
+                   ((StandardContext)getParent()).getInstanceManager().destroyInstance(instance);
+                }
+    
+            } catch (Throwable t) {
+                ExceptionUtils.handleThrowable(t);
+                instanceSupport.fireInstanceEvent
+                  (InstanceEvent.AFTER_DESTROY_EVENT, instance, t);
+                instance = null;
+                instancePool = null;
+                nInstances = 0;
+                fireContainerEvent("unload", this);
+                unloading = false;
+                throw new ServletException
+                    (sm.getString("standardWrapper.destroyException", getName()),
+                     t);
+            } finally {
+                // Write captured output
+                if (swallowOutput) {
+                    String log = SystemLogHandler.stopCapture();
+                    if (log != null && log.length() > 0) {
+                        if (getServletContext() != null) {
+                            getServletContext().log(log);
+                        } else {
+                            out.println(log);
+                        }
                     }
                 }
             }
