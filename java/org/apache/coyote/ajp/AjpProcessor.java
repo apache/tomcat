@@ -364,23 +364,24 @@ public class AjpProcessor extends AbstractAjpProcessor {
         if (isAsync()) {
             if (error) {
                 request.updateCounters();
-                input = null;
-                output = null;
                 return SocketState.CLOSED;
             } else {
                 return SocketState.LONG;
             }
         } else {
             request.updateCounters();
-            input = null;
-            output = null;
             return SocketState.CLOSED;
         }
-
-
     }
 
     
+    @Override
+    public void recycle() {
+        super.recycle();
+        input = null;
+        output = null;
+    }
+
     // ----------------------------------------------------- ActionHook Methods
 
 
