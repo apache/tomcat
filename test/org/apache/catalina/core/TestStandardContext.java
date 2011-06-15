@@ -321,6 +321,90 @@ public class TestStandardContext extends TomcatBaseTest {
         
     }
 
+    public void testBug51376() throws Exception {
+        // Set up a container
+        Tomcat tomcat = getTomcatInstance();
+
+        // Must have a real docBase - just use temp
+        File docBase = new File(System.getProperty("java.io.tmpdir"));
+        Context ctx = tomcat.addContext("", docBase.getAbsolutePath());
+
+        // Add ServletContainerInitializer
+        Bug51376SCI sci = new Bug51376SCI();
+        ctx.addServletContainerInitializer(sci, null);
+        
+        // Start the context
+        tomcat.start();
+        
+        // Stop the context
+        ctx.stop();
+        
+        // Make sure that init() and destroy() were called correctly
+        assertTrue(sci.getServlet().isOk());
+    }
+    
+    public static final class Bug51376SCI
+            implements ServletContainerInitializer {
+
+        private Bug51376Servlet s = null;
+
+        private Bug51376Servlet getServlet() {
+            return s;
+        }
+
+        @Override
+        public void onStartup(Set<Class<?>> c, ServletContext ctx)
+                throws ServletException {
+            // Register and map servlet
+            s = new Bug51376Servlet();
+            ServletRegistration.Dynamic sr = ctx.addServlet("bug51376", s);
+            sr.addMapping("/bug51376");
+            sr.setLoadOnStartup(1);
+        }
+    }
+    
+    public static final class Bug51376Servlet extends HttpServlet {
+
+        private static final long serialVersionUID = 1L;
+
+        private Boolean initOk = null;
+        private Boolean destoryOk = null;
+        
+        @Override
+        public void init() {
+            if (initOk == null && destoryOk == null) {
+                initOk = Boolean.TRUE;
+            } else {
+                initOk = Boolean.FALSE;
+            }
+        }
+
+        @Override
+        public void destroy() {
+            if (initOk.booleanValue() && destoryOk == null) {
+                destoryOk = Boolean.TRUE;
+            } else {
+                destoryOk = Boolean.FALSE;
+            }
+        }
+
+        @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+                throws ServletException, IOException {
+            resp.setContentType("text/plain");
+            resp.getWriter().write("OK");
+        }
+        
+        protected boolean isOk() {
+            if (initOk != null && initOk.booleanValue() && destoryOk != null &&
+                    destoryOk.booleanValue()) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+    }
+
     /**
      * Test case for bug 49711: HttpServletRequest.getParts does not work
      * in a filter.
