@@ -192,7 +192,7 @@ public class AjpAprProtocol extends AbstractAjpProtocol {
             if (processor != null) {
                 // Call the appropriate event
                 try {
-                    state = processor.asyncDispatch(socket, status);
+                    state = processor.asyncDispatch(status);
                 }
                 // Future developers: if you discover any other
                 // rare-but-nonfatal exceptions, catch them here, and log as

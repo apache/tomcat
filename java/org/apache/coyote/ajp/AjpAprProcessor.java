@@ -333,11 +333,7 @@ public class AjpAprProcessor extends AbstractAjpProcessor {
     }
 
 
-    public SocketState asyncDispatch(SocketWrapper<Long> socket,
-            SocketStatus status) {
-
-        // Setting up the socket
-        this.socket = socket;
+    public SocketState asyncDispatch(SocketStatus status) {
 
         RequestInfo rp = request.getRequestProcessor();
         try {
