@@ -363,7 +363,11 @@ public class AjpNioProcessor extends AbstractAjpProcessor {
             }
         } else {
             request.updateCounters();
-            return SocketState.CLOSED;
+            if (error) {
+                return SocketState.CLOSED;
+            } else {
+                return SocketState.OPEN;
+            }
         }
 
 
