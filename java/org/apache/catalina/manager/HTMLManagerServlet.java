@@ -22,6 +22,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -630,7 +632,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
         writer.print(MessageFormat.format(DIAGNOSTICS_SECTION, args));
 
         // Server Header Section
-        args = new Object[7];
+        args = new Object[9];
         args[0] = smClient.getString("htmlManagerServlet.serverTitle");
         args[1] = smClient.getString("htmlManagerServlet.serverVersion");
         args[2] = smClient.getString("htmlManagerServlet.serverJVMVersion");
@@ -638,17 +640,27 @@ public final class HTMLManagerServlet extends ManagerServlet {
         args[4] = smClient.getString("htmlManagerServlet.serverOSName");
         args[5] = smClient.getString("htmlManagerServlet.serverOSVersion");
         args[6] = smClient.getString("htmlManagerServlet.serverOSArch");
+        args[7] = sm.getString("htmlManagerServlet.serverHostname");
+        args[8] = sm.getString("htmlManagerServlet.serverIPAddress");
         writer.print(MessageFormat.format
                      (Constants.SERVER_HEADER_SECTION, args));
 
         // Server Row Section
-        args = new Object[6];
+        args = new Object[8];
         args[0] = ServerInfo.getServerInfo();
         args[1] = System.getProperty("java.runtime.version");
         args[2] = System.getProperty("java.vm.vendor");
         args[3] = System.getProperty("os.name");
         args[4] = System.getProperty("os.version");
         args[5] = System.getProperty("os.arch");
+        try {
+            InetAddress address = InetAddress.getLocalHost();
+            args[6] = address.getHostName();
+            args[7] = address.getHostAddress();
+        } catch (UnknownHostException e) {
+            args[6] = "-";
+            args[7] = "-";
+        }
         writer.print(MessageFormat.format(Constants.SERVER_ROW_SECTION, args));
 
         // HTML Tail Section
