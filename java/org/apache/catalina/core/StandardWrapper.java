@@ -1020,6 +1020,10 @@ public class StandardWrapper extends ContainerBase
     public synchronized void load() throws ServletException {
         instance = loadServlet();
         
+        if (!instanceInitialized) {
+            initServlet(instance);
+        }
+
         if (isJspServlet) {
             StringBuilder oname =
                 new StringBuilder(MBeanUtils.getDomain(getParent()));
