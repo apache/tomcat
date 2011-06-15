@@ -46,6 +46,9 @@
   <subsection name="Catalina">
     <changelog>
       <add>
+        <bug>48956</bug>: Add regular expression support for SSI. (markt)
+      </add>
+      <add>
         <bug>50677</bug>: Allow system property variables to be used in the
         values of "common.loader" and other "*.loader" properties in the
         <code>catalina.properties</code> file. (kkolinko)
