@@ -75,6 +75,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Jasper">
+    <changelog>
+      <update>
+        Improve the message printed by TldLocationsCache and add configuration
+        example to the <code>logging.properties</code> file. (kkolinko)
+      </update>
+    </changelog>
+  </subsection>
   <subsection name="Cluster">
     <changelog>
       <fix>
