@@ -339,46 +339,6 @@ public class AjpProcessor extends AbstractAjpProcessor {
         
     }
 
-    public SocketState asyncDispatch(SocketStatus status) {
-
-        RequestInfo rp = request.getRequestProcessor();
-        try {
-            rp.setStage(org.apache.coyote.Constants.STAGE_SERVICE);
-            error = !adapter.asyncDispatch(request, response, status);
-        } catch (InterruptedIOException e) {
-            error = true;
-        } catch (Throwable t) {
-            ExceptionUtils.handleThrowable(t);
-            log.error(sm.getString("http11processor.request.process"), t);
-            // 500 - Internal Server Error
-            response.setStatus(500);
-            adapter.log(request, response, 0);
-            error = true;
-        }
-
-        rp.setStage(org.apache.coyote.Constants.STAGE_ENDED);
-
-        if (error) {
-            response.setStatus(500);
-        }
-        if (isAsync()) {
-            if (error) {
-                request.updateCounters();
-                return SocketState.CLOSED;
-            } else {
-                return SocketState.LONG;
-            }
-        } else {
-            request.updateCounters();
-            if (error) {
-                return SocketState.CLOSED;
-            } else {
-                return SocketState.OPEN;
-            }
-        }
-    }
-
-    
     @Override
     public void recycle() {
         super.recycle();
