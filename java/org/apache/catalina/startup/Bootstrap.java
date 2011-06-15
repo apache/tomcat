@@ -59,12 +59,6 @@ public final class Bootstrap {
 
     private static final Log log = LogFactory.getLog(Bootstrap.class);
 
-    // -------------------------------------------------------------- Constants
-
-
-    protected static final String CATALINA_HOME_TOKEN = "${" + Globals.CATALINA_HOME_PROP + "}";
-    protected static final String CATALINA_BASE_TOKEN = "${" + Globals.CATALINA_BASE_PROP + "}";
-
 
     // ------------------------------------------------------- Static Variables
 
@@ -116,38 +110,16 @@ public final class Bootstrap {
         if ((value == null) || (value.equals("")))
             return parent;
 
+        value = replace(value);
+
         List<Repository> repositories = new ArrayList<Repository>();
-        int i;
 
         StringTokenizer tokenizer = new StringTokenizer(value, ",");
         while (tokenizer.hasMoreElements()) {
-            String repository = tokenizer.nextToken();
-
-            // Local repository
-            boolean replace = false;
-            String before = repository;
-            while ((i=repository.indexOf(CATALINA_HOME_TOKEN))>=0) {
-                replace=true;
-                if (i>0) {
-                repository = repository.substring(0,i) + getCatalinaHome()
-                    + repository.substring(i+CATALINA_HOME_TOKEN.length());
-                } else {
-                    repository = getCatalinaHome()
-                        + repository.substring(CATALINA_HOME_TOKEN.length());
-                }
+            String repository = tokenizer.nextToken().trim();
+            if (repository.length() == 0) {
+                continue;
             }
-            while ((i=repository.indexOf(CATALINA_BASE_TOKEN))>=0) {
-                replace=true;
-                if (i>0) {
-                repository = repository.substring(0,i) + getCatalinaBase()
-                    + repository.substring(i+CATALINA_BASE_TOKEN.length());
-                } else {
-                    repository = getCatalinaBase()
-                        + repository.substring(CATALINA_BASE_TOKEN.length());
-                }
-            }
-            if (replace && log.isDebugEnabled())
-                log.debug("Expanded " + before + " to " + repository);
 
             // Check for a JAR URL repository
             try {
@@ -159,6 +131,7 @@ public final class Bootstrap {
                 // Ignore
             }
 
+            // Local repository
             if (repository.endsWith("*.jar")) {
                 repository = repository.substring
                     (0, repository.length() - "*.jar".length());
@@ -191,6 +164,51 @@ public final class Bootstrap {
 
         return classLoader;
 
+    }
+
+    /**
+     * System property replacement in the given string.
+     * 
+     * @param str The original string
+     * @return the modified string
+     */
+    protected String replace(String str) {
+        // Implementation is copied from ClassLoaderLogManager.replace(),
+        // but added special processing for catalina.home and catalina.base.
+        String result = str;
+        int pos_start = str.indexOf("${");
+        if (pos_start >= 0) {
+            StringBuilder builder = new StringBuilder();
+            int pos_end = -1;
+            while (pos_start >= 0) {
+                builder.append(str, pos_end + 1, pos_start);
+                pos_end = str.indexOf('}', pos_start + 2);
+                if (pos_end < 0) {
+                    pos_end = pos_start - 1;
+                    break;
+                }
+                String propName = str.substring(pos_start + 2, pos_end);
+                String replacement;
+                if (propName.length() == 0) {
+                    replacement = null;
+                } else if (Globals.CATALINA_HOME_PROP.equals(propName)) {
+                    replacement = getCatalinaHome();
+                } else if (Globals.CATALINA_BASE_PROP.equals(propName)) {
+                    replacement = getCatalinaBase();
+                } else {
+                    replacement = System.getProperty(propName);
+                }
+                if (replacement != null) {
+                    builder.append(replacement);
+                } else {
+                    builder.append(str, pos_start, pos_end + 1);
+                }
+                pos_start = str.indexOf("${", pos_end + 1);
+            }
+            builder.append(str, pos_end + 1, str.length());
+            result = builder.toString();
+        }
+        return result;
     }
 
 
