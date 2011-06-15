@@ -358,9 +358,11 @@ public class AjpProcessor extends AbstractAjpProcessor {
 
         rp.setStage(org.apache.coyote.Constants.STAGE_ENDED);
 
+        if (error) {
+            response.setStatus(500);
+        }
         if (isAsync()) {
             if (error) {
-                response.setStatus(500);
                 request.updateCounters();
                 input = null;
                 output = null;
@@ -369,9 +371,6 @@ public class AjpProcessor extends AbstractAjpProcessor {
                 return SocketState.LONG;
             }
         } else {
-            if (error) {
-                response.setStatus(500);
-            }
             request.updateCounters();
             input = null;
             output = null;
