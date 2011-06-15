@@ -97,6 +97,10 @@
         Update Maven repository information in the documentation to reflect
         current usage. (markt)
       </fix>
+      <add>
+        <bug>43538</bug>: Add host name and IP address to the HTML Manager
+        application. Patch by Dennis Lundberg. (markt)
+      </add>
     </changelog>
   </subsection>
 </section>

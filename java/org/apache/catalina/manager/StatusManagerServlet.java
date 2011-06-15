@@ -21,6 +21,8 @@ package org.apache.catalina.manager;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.Set;
@@ -240,7 +242,7 @@ public class StatusManagerServlet
         StatusTransformer.writeManager(writer,args,mode);
 
         // Server Header Section
-        args = new Object[7];
+        args = new Object[9];
         args[0] = sm.getString("htmlManagerServlet.serverTitle");
         args[1] = sm.getString("htmlManagerServlet.serverVersion");
         args[2] = sm.getString("htmlManagerServlet.serverJVMVersion");
@@ -248,17 +250,27 @@ public class StatusManagerServlet
         args[4] = sm.getString("htmlManagerServlet.serverOSName");
         args[5] = sm.getString("htmlManagerServlet.serverOSVersion");
         args[6] = sm.getString("htmlManagerServlet.serverOSArch");
+        args[7] = sm.getString("htmlManagerServlet.serverHostname");
+        args[8] = sm.getString("htmlManagerServlet.serverIPAddress");
         // use StatusTransformer to output status
         StatusTransformer.writePageHeading(writer,args,mode);
 
         // Server Row Section
-        args = new Object[6];
+        args = new Object[8];
         args[0] = ServerInfo.getServerInfo();
         args[1] = System.getProperty("java.runtime.version");
         args[2] = System.getProperty("java.vm.vendor");
         args[3] = System.getProperty("os.name");
         args[4] = System.getProperty("os.version");
         args[5] = System.getProperty("os.arch");
+        try {
+            InetAddress address = InetAddress.getLocalHost();
+            args[6] = address.getHostName();
+            args[7] = address.getHostAddress();
+         } catch (UnknownHostException e) {
+            args[6] = "-";
+            args[7] = "-";
+        }
         // use StatusTransformer to output status
         StatusTransformer.writeServerInfo(writer, args, mode);
 
