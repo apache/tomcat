@@ -170,7 +170,7 @@ public class Constants {
         SERVER_HEADER_SECTION =
             "<table border=\"1\" cellspacing=\"0\" cellpadding=\"3\">\n" +
             "<tr>\n" +
-            " <td colspan=\"6\" class=\"title\">{0}</td>\n" +
+            " <td colspan=\"8\" class=\"title\">{0}</td>\n" +
             "</tr>\n" +
             "<tr>\n" +
             " <td class=\"header-center\"><small>{1}</small></td>\n" +
@@ -179,6 +179,8 @@ public class Constants {
             " <td class=\"header-center\"><small>{4}</small></td>\n" +
             " <td class=\"header-center\"><small>{5}</small></td>\n" +
             " <td class=\"header-center\"><small>{6}</small></td>\n" +
+            " <td class=\"header-center\"><small>{7}</small></td>\n" +
+            " <td class=\"header-center\"><small>{8}</small></td>\n" +
             "</tr>\n";
     
         SERVER_ROW_SECTION =
@@ -189,6 +191,8 @@ public class Constants {
             " <td class=\"row-center\"><small>{3}</small></td>\n" +
             " <td class=\"row-center\"><small>{4}</small></td>\n" +
             " <td class=\"row-center\"><small>{5}</small></td>\n" +
+            " <td class=\"row-center\"><small>{6}</small></td>\n" +
+            " <td class=\"row-center\"><small>{7}</small></td>\n" +
             "</tr>\n" +
             "</table>\n" +
             "<br>\n" +
