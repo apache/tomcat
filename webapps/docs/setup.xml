@@ -107,7 +107,7 @@
 
 <source>
     cd $CATALINA_HOME/bin
-    tar xvfz commons-deamon-native.tar.gz
+    tar xvfz commons-daemon-native.tar.gz
     cd commons-daemon-1.0.x-native-src/unix
     ./configure
     make
