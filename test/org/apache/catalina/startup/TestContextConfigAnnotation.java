@@ -16,14 +16,23 @@
  */
 package org.apache.catalina.startup;
 
+import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.net.URL;
+import java.util.HashSet;
 import java.util.Set;
 
 import javax.servlet.DispatcherType;
+import javax.servlet.Servlet;
+import javax.servlet.ServletContainerInitializer;
+import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
 
 import junit.framework.TestCase;
 
+import org.apache.catalina.Container;
+import org.apache.catalina.Loader;
+import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.deploy.FilterDef;
 import org.apache.catalina.deploy.FilterMap;
 import org.apache.catalina.deploy.ServletDef;
@@ -239,6 +248,93 @@ public class TestContextConfigAnnotation extends TestCase {
         }
         FilterDef filterDef = webxml.getFilters().get("paramD");
         assertNull(filterDef);
+    }
+
+    public void testCheckHandleTypes() throws Exception {
+        ContextConfig config = new ContextConfig();
+        
+        // Need a Context, Loader and ClassLoader for checkHandleTypes
+        StandardContext context = new StandardContext();
+        context.setLoader(new TesterLoader());
+        config.context = context;
+
+        // Add an SCI that has no interest in any type
+        SCI sciNone = new SCI();
+        config.initializerClassMap.put(sciNone, new HashSet<Class<?>>());
+        
+        // Add an SCI with an interest in Servlets
+        SCI sciServlet = new SCI();
+        config.initializerClassMap.put(sciServlet, new HashSet<Class<?>>());
+        config.typeInitializerMap.put(Servlet.class,
+                new HashSet<ServletContainerInitializer>());
+        config.typeInitializerMap.get(Servlet.class).add(sciServlet);
+        
+        // Add an SCI with an interest in Objects - i.e. everything
+        SCI sciObject = new SCI();
+        config.initializerClassMap.put(sciObject, new HashSet<Class<?>>());
+        config.typeInitializerMap.put(Object.class,
+                new HashSet<ServletContainerInitializer>());
+        config.typeInitializerMap.get(Object.class).add(sciObject);
+
+        // Scan Servlet, Filter, Servlet, Listener
+        WebXml ignore = new WebXml();
+        File file = paramClassResource(
+                "org/apache/catalina/startup/ParamServlet");
+        config.processAnnotationsFile(file, ignore);
+        file = paramClassResource("org/apache/catalina/startup/ParamFilter");
+        config.processAnnotationsFile(file, ignore);
+        file = paramClassResource("org/apache/catalina/startup/TesterServlet");
+        config.processAnnotationsFile(file, ignore);
+        file = paramClassResource("org/apache/catalina/startup/TestListener");
+        config.processAnnotationsFile(file, ignore);
+        
+        // Check right number of classes were noted to be handled
+        assertEquals(0, config.initializerClassMap.get(sciNone).size());
+        assertEquals(2, config.initializerClassMap.get(sciServlet).size());
+        assertEquals(4, config.initializerClassMap.get(sciObject).size());
+    }
+
+    private static final class SCI implements ServletContainerInitializer {
+        @Override
+        public void onStartup(Set<Class<?>> c, ServletContext ctx)
+                throws ServletException {
+            // NO-OP. Just need a class that implements SCI.
+        }
+    }
+    
+    private static final class TesterLoader implements Loader {
+
+        @Override
+        public void backgroundProcess() {}
+        @Override
+        public ClassLoader getClassLoader() {
+            return this.getClass().getClassLoader();
+        }
+        @Override
+        public Container getContainer() { return null; }
+        @Override
+        public void setContainer(Container container) {}
+        @Override
+        public boolean getDelegate() { return false; }
+        @Override
+        public void setDelegate(boolean delegate) {}
+        @Override
+        public String getInfo() { return null; }
+        @Override
+        public boolean getReloadable() { return false; }
+        @Override
+        public void setReloadable(boolean reloadable) {}
+        @Override
+        public void addPropertyChangeListener(PropertyChangeListener l) {
+        }
+        @Override
+        public void addRepository(String repository) {}
+        @Override
+        public String[] findRepositories() { return null; }
+        @Override
+        public boolean modified() { return false; }
+        @Override
+        public void removePropertyChangeListener(PropertyChangeListener l) {}
     }
 
     /**

@@ -59,6 +59,11 @@
         initialized when the web application started and a load on startup value
         was set. (markt)
       </fix>
+      <fix>
+        <bug>51386</bug>: Correct code for processing @HandlesTypes annotations
+        so only types of interest are reported to a ServletContainerInitializer.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
