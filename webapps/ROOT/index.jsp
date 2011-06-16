@@ -15,6 +15,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 --%>
 <!DOCTYPE html>
+<%@ page session="false" %>
 <%
 java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy");
 request.setAttribute("year", sdf.format(new java.util.Date()));

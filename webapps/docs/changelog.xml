@@ -104,6 +104,10 @@
         <bug>43538</bug>: Add host name and IP address to the HTML Manager
         application. Patch by Dennis Lundberg. (markt)
       </add>
+      <fix>
+        Add <code>session="false"</code> directive to the index page of the
+        ROOT web application. (kkolinko)
+      </fix>
     </changelog>
   </subsection>
 </section>
