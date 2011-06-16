@@ -1985,6 +1985,7 @@ public class ContextConfig
                 for (ServletContainerInitializer sci : entry.getValue()) {
                     initializerClassMap.get(sci).add(clazz);
                 }
+                match = false;
             }
         }
     }
