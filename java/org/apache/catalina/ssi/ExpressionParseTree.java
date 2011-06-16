@@ -21,6 +21,7 @@ import java.text.ParseException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 /**
  * Represents a parsed expression.
  * 
@@ -357,13 +358,18 @@ public class ExpressionParseTree {
                     val2.charAt(val2Len - 1) == '/') {
                 // Treat as a regular expression
                 String expr = val2.substring(1, val2Len - 1);
-                Pattern pattern = Pattern.compile(expr);
-                // Regular expressions will only ever be used with EqualNode
-                // so return zero for equal and non-zero for not equal
-                if (pattern.matcher(val1).find()) {
+                try {
+                    Pattern pattern = Pattern.compile(expr);
+                    // Regular expressions will only ever be used with EqualNode
+                    // so return zero for equal and non-zero for not equal
+                    if (pattern.matcher(val1).find()) {
+                        return 0;
+                    } else {
+                        return -1;
+                    }
+                } catch (PatternSyntaxException pse) {
+                    ssiMediator.log("Invalid expression: " + expr, pse);
                     return 0;
-                } else {
-                    return -1;
                 }
             }
             return val1.compareTo(val2);
