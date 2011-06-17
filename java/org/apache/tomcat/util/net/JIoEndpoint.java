@@ -322,8 +322,7 @@ public class JIoEndpoint extends AbstractEndpoint {
                         } catch (IOException e) {
                             // Ignore
                         }
-                    } else if (state == SocketState.ASYNC_END ||
-                            state == SocketState.OPEN){
+                    } else if (state == SocketState.OPEN){
                         socket.setKeptAlive(true);
                         socket.access();
                         launch = true;
