@@ -293,7 +293,7 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol {
         }
 
         @Override
-        public SocketState process(NioChannel socket) {
+        public SocketState process(NioChannel socket, SocketStatus status) {
             Http11NioProcessor processor = connections.remove(socket);
             try {
                 if (processor == null) {

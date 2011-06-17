@@ -1482,7 +1482,7 @@ public class NioEndpoint extends AbstractEndpoint {
      * thread local fields.
      */
     public interface Handler extends AbstractEndpoint.Handler {
-        public SocketState process(NioChannel socket);
+        public SocketState process(NioChannel socket, SocketStatus status);
         public SocketState event(NioChannel socket, SocketStatus status);
         public void release(NioChannel socket);
         public void release(SocketChannel socket);
@@ -1529,7 +1529,11 @@ public class NioEndpoint extends AbstractEndpoint {
                     if ( handshake == 0 ) {
                         SocketState state = SocketState.OPEN;
                         // Process the request from this socket
-                        state = (status==null)?handler.process(socket):handler.event(socket,status);
+                        if (status == null) {
+                            state = handler.process(socket, SocketStatus.OPEN);
+                        } else {
+                            state = handler.event(socket, status);
+                        }
     
                         if (state == SocketState.CLOSED) {
                             // Close socket and pool
