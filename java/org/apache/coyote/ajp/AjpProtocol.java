@@ -137,7 +137,7 @@ public class AjpProtocol extends AbstractAjpProtocol {
 
                 SocketState state = SocketState.CLOSED;
                 do {
-                    if (socket.isAsync() || state == SocketState.ASYNC_END) {
+                    if (processor.isAsync() || state == SocketState.ASYNC_END) {
                         state = processor.asyncDispatch(status);
                     } else {
                         state = processor.process(socket);
@@ -152,9 +152,7 @@ public class AjpProtocol extends AbstractAjpProtocol {
 
                 if (state == SocketState.LONG) {
                     connections.put(socket, processor);
-                    socket.setAsync(true);
                 } else {
-                    socket.setAsync(false);
                     processor.recycle();
                     recycledProcessors.offer(processor);
                 }
