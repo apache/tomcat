@@ -154,7 +154,13 @@ public class Http11Protocol extends AbstractHttp11JsseProtocol {
                     processor.setSSLSupport(null);
                 }
                 
-                SocketState state = socket.isAsync()?processor.asyncDispatch(status):processor.process(socket);
+                SocketState state;
+                if (socket.isAsync()) {
+                    state = processor.asyncDispatch(status);
+                } else {
+                    state = processor.process(socket);
+                }
+
                 if (state == SocketState.LONG) {
                     connections.put(socket, processor);
                     socket.setAsync(true);
