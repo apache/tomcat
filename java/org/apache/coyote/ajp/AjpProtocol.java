@@ -125,11 +125,6 @@ public class AjpProtocol extends AbstractAjpProtocol {
         }
         
         @Override
-        public SocketState process(SocketWrapper<Socket> socket) {
-            return process(socket,SocketStatus.OPEN);
-        }
-
-        @Override
         public SocketState process(SocketWrapper<Socket> socket, SocketStatus status) {
             AjpProcessor processor = connections.remove(socket);
             try {

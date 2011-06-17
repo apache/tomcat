@@ -136,11 +136,6 @@ public class Http11Protocol extends AbstractHttp11JsseProtocol {
         }
 
         @Override
-        public SocketState process(SocketWrapper<Socket> socket) {
-            return process(socket,SocketStatus.OPEN);
-        }
-
-        @Override
         public SocketState process(SocketWrapper<Socket> socket, SocketStatus status) {
             Http11Processor processor = connections.remove(socket);
             try {

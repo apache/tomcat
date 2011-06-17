@@ -127,7 +127,6 @@ public class JIoEndpoint extends AbstractEndpoint {
      * thread local fields.
      */
     public interface Handler extends AbstractEndpoint.Handler {
-        public SocketState process(SocketWrapper<Socket> socket);
         public SocketState process(SocketWrapper<Socket> socket,
                 SocketStatus status);
         public SSLImplementation getSslImplementation(); 
@@ -305,8 +304,12 @@ public class JIoEndpoint extends AbstractEndpoint {
                         state = SocketState.CLOSED;
                     }
                         
-                    if ( (state != SocketState.CLOSED) ) {
-                        state = (status==null)?handler.process(socket):handler.process(socket,status);
+                    if ((state != SocketState.CLOSED)) {
+                        if (status == null) {
+                            state = handler.process(socket, SocketStatus.OPEN);
+                        } else {
+                            state = handler.process(socket,status);
+                        }
                     }
                     if (state == SocketState.CLOSED) {
                         // Close socket
