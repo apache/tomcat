@@ -165,50 +165,13 @@ public class AjpNioProtocol extends AbstractAjpProtocol {
             recycledProcessors.offer(processor);
         }
 
-        // FIXME: Support for Comet could be added in AJP as well
-        @Override
-        public SocketState event(NioChannel socket, SocketStatus status) {
-            AjpNioProcessor processor = connections.get(socket);
-            NioEndpoint.KeyAttachment att = (NioEndpoint.KeyAttachment)socket.getAttachment(false);
-            att.setAsync(false); //no longer check for timeout
-            SocketState state = SocketState.CLOSED; 
-            if (processor != null) {
-                try {
-                    state = processor.asyncDispatch(status);
-                }
-                // Future developers: if you discover any other
-                // rare-but-nonfatal exceptions, catch them here, and log as
-                // above.
-                catch (Throwable e) {
-                    ExceptionUtils.handleThrowable(e);
-                    // any other exception or error is odd. Here we log it
-                    // with "ERROR" level, so it will show up even on
-                    // less-than-verbose logs.
-                    AjpNioProtocol.log.error
-                        (sm.getString("ajpprotocol.proto.error"), e);
-                } finally {
-                    if (processor.isAsync()) {
-                        state = processor.asyncPostProcess();
-                    }
-                    if (state == SocketState.OPEN || state == SocketState.CLOSED) {
-                        release(socket, processor);
-                        if (state == SocketState.OPEN) {
-                            socket.getPoller().add(socket);
-                        }
-                    } else if (state == SocketState.LONG) {
-                        att.setAsync(true); // Re-enable timeouts
-                    } else {
-                        // state == SocketState.ASYNC_END
-                        // No further work required
-                    }
-                }
-            }
-            return state;
-        }
-        
         @Override
         public SocketState process(NioChannel socket, SocketStatus status) {
             AjpNioProcessor processor = connections.remove(socket);
+
+            NioEndpoint.KeyAttachment att = (NioEndpoint.KeyAttachment)socket.getAttachment(false);
+            att.setAsync(false); //no longer check for timeout
+
             try {
                 if (processor == null) {
                     processor = recycledProcessors.poll();
@@ -217,20 +180,25 @@ public class AjpNioProtocol extends AbstractAjpProtocol {
                     processor = createProcessor();
                 }
 
-                SocketState state = processor.process(socket);
+                SocketState state = SocketState.CLOSED;
+                do {
+                    if (processor.isAsync() || state == SocketState.ASYNC_END) {
+                        state = processor.asyncDispatch(status);
+                    } else {
+                        state = processor.process(socket);
+                    }
+
+                    if (processor.isAsync()) {
+                        state = processor.asyncPostProcess();
+                    }
+                } while (state == SocketState.ASYNC_END);
+
                 if (state == SocketState.LONG) {
                     // In the middle of processing a request/response. Keep the
                     // socket associated with the processor.
                     connections.put(socket, processor);
                     
-                    NioEndpoint.KeyAttachment att = (NioEndpoint.KeyAttachment)socket.getAttachment(false);
                     att.setAsync(true);
-                    // longPoll may change socket state (e.g. to trigger a
-                    // complete or dispatch)
-                    state = processor.asyncPostProcess();
-                }
-                if (state == SocketState.LONG || state == SocketState.ASYNC_END) {
-                    // Already done all we need to do.
                 } else if (state == SocketState.OPEN){
                     // In keep-alive but between requests. OK to recycle
                     // processor. Continue to poll for the next request.
