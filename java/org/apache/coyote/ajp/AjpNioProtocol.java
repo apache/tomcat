@@ -207,7 +207,7 @@ public class AjpNioProtocol extends AbstractAjpProtocol {
         }
         
         @Override
-        public SocketState process(NioChannel socket) {
+        public SocketState process(NioChannel socket, SocketStatus status) {
             AjpNioProcessor processor = connections.remove(socket);
             try {
                 if (processor == null) {
