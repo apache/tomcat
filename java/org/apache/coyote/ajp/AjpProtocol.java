@@ -135,13 +135,24 @@ public class AjpProtocol extends AbstractAjpProtocol {
                     processor = createProcessor();
                 }
 
-                SocketState state = socket.isAsync()?processor.asyncDispatch(status):processor.process(socket);
+                SocketState state = SocketState.CLOSED;
+                do {
+                    if (socket.isAsync() || state == SocketState.ASYNC_END) {
+                        state = processor.asyncDispatch(status);
+                    } else {
+                        state = processor.process(socket);
+                    }
+    
+                    if (processor.isAsync()) {
+                        state = processor.asyncPostProcess();
+                    }
+                } while (state == SocketState.ASYNC_END);
+                // TODO Better to add a new state to the AsyncStateMachine and
+                //      remove ASYNC_END entirely
+
                 if (state == SocketState.LONG) {
                     connections.put(socket, processor);
                     socket.setAsync(true);
-                    // longPoll may change socket state (e.g. to trigger a
-                    // complete or dispatch)
-                    return processor.asyncPostProcess();
                 } else {
                     socket.setAsync(false);
                     processor.recycle();
