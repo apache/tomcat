@@ -49,14 +49,14 @@ import org.apache.tomcat.util.res.StringManager;
  * DISPATCHING   - The dispatch is being processed.
  * ERROR         - Something went wrong.
  *
- * |----------------->---------------|                                         
- * |                                \|/                                        
- * |   |----------<----------------ERROR                                    
- * |   |    complete()            /|\  |                                       
- * |   |                    error()|   |postProcess()                          
- * |   |                           |   |                                       
- * |   |           postProcess()   |  \|/         auto                         
- * |   |         |--------------->DISPATCHED<------------------COMPLETING<----| 
+ * |----------------->--------------|                                         
+ * |                               \|/                                        
+ * |   |----------<---------------ERROR                                    
+ * |   |    complete()           /|\ |postProcess()
+ * |   |                   error()|  |
+ * |   |                          |  |  |--|timeout()
+ * |   |           postProcess()  | \|/ | \|/            auto
+ * |   |         |--------------->DISPATCHED<------------------COMPLETING<----|
  * |   |         |               /|\  |                          | /|\        | 
  * |   |         |    |--->-------|   |                          |--|         | 
  * |   |         ^    |               |startAsync()            timeout()      |
