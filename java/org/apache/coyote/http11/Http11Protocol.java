@@ -161,12 +161,14 @@ public class Http11Protocol extends AbstractHttp11JsseProtocol {
                     state = processor.process(socket);
                 }
 
-                if (state == SocketState.LONG) {
+                if (processor.isAsync()) {
+                    state = processor.asyncPostProcess();
+                }
+
+                if (state == SocketState.LONG ||
+                        state == SocketState.ASYNC_END) {
                     connections.put(socket, processor);
                     socket.setAsync(true);
-                    // longPoll may change socket state (e.g. to trigger a
-                    // complete or dispatch)
-                    return processor.asyncPostProcess();
                 } else {
                     socket.setAsync(false);
                     processor.recycle();
