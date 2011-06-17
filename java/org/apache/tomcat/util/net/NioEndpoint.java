@@ -1483,7 +1483,6 @@ public class NioEndpoint extends AbstractEndpoint {
      */
     public interface Handler extends AbstractEndpoint.Handler {
         public SocketState process(NioChannel socket, SocketStatus status);
-        public SocketState event(NioChannel socket, SocketStatus status);
         public void release(NioChannel socket);
         public void release(SocketChannel socket);
         public SSLImplementation getSslImplementation();
@@ -1532,7 +1531,7 @@ public class NioEndpoint extends AbstractEndpoint {
                         if (status == null) {
                             state = handler.process(socket, SocketStatus.OPEN);
                         } else {
-                            state = handler.event(socket, status);
+                            state = handler.process(socket, status);
                         }
     
                         if (state == SocketState.CLOSED) {
@@ -1551,8 +1550,6 @@ public class NioEndpoint extends AbstractEndpoint {
                             }catch ( Exception x ) {
                                 log.error("",x);
                             }
-                        } else if (state == SocketState.ASYNC_END) {
-                            launch = true;
                         }
                     } else if (handshake == -1 ) {
                         KeyAttachment ka = null;

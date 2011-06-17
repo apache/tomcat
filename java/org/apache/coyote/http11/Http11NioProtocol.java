@@ -228,73 +228,12 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol {
 
 
         @Override
-        public SocketState event(NioChannel socket, SocketStatus status) {
-            Http11NioProcessor processor = connections.get(socket);
-            NioEndpoint.KeyAttachment att = (NioEndpoint.KeyAttachment)socket.getAttachment(false);
-            att.setAsync(false); //no longer check for timeout
-            SocketState state = SocketState.CLOSED; 
-            if (processor != null) {
-                if (log.isDebugEnabled()) log.debug("Http11NioProcessor.error="+processor.error);
-                // Call the appropriate event
-                try {
-                    if (processor.comet) {
-                        state = processor.event(status);
-                    } else {
-                        state = processor.asyncDispatch(status);
-                    }
-                } catch (java.net.SocketException e) {
-                    // SocketExceptions are normal
-                    Http11NioProtocol.log.debug
-                        (sm.getString
-                            ("http11protocol.proto.socketexception.debug"), e);
-                } catch (java.io.IOException e) {
-                    // IOExceptions are normal
-                    Http11NioProtocol.log.debug
-                        (sm.getString
-                            ("http11protocol.proto.ioexception.debug"), e);
-                }
-                // Future developers: if you discover any other
-                // rare-but-nonfatal exceptions, catch them here, and log as
-                // above.
-                catch (Throwable e) {
-                    ExceptionUtils.handleThrowable(e);
-                    // any other exception or error is odd. Here we log it
-                    // with "ERROR" level, so it will show up even on
-                    // less-than-verbose logs.
-                    Http11NioProtocol.log.error
-                        (sm.getString("http11protocol.proto.error"), e);
-                } finally {
-                    if (processor.isAsync()) {
-                        state = processor.asyncPostProcess();
-                    }
-                    if (state == SocketState.OPEN || state == SocketState.CLOSED) {
-                        release(socket, processor);
-                        if (state == SocketState.OPEN) {
-                            socket.getPoller().add(socket);
-                        }
-                    } else if (state == SocketState.LONG) {
-                        if (processor.isAsync()) {
-                            att.setAsync(true); // Re-enable timeouts
-                        } else {
-                            // Comet
-                            if (log.isDebugEnabled()) log.debug("Keeping processor["+processor);
-                            // May receive more data from client
-                            SelectionKey key = socket.getIOChannel().keyFor(socket.getPoller().getSelector());
-                            key.interestOps(SelectionKey.OP_READ);
-                            att.interestOps(SelectionKey.OP_READ);
-                        }
-                    } else {
-                        // state == SocketState.ASYNC_END
-                        // No further work required
-                    }
-                }
-            }
-            return state;
-        }
-
-        @Override
         public SocketState process(NioChannel socket, SocketStatus status) {
             Http11NioProcessor processor = connections.remove(socket);
+
+            NioEndpoint.KeyAttachment att = (NioEndpoint.KeyAttachment)socket.getAttachment(false);
+            att.setAsync(false); //no longer check for timeout
+
             try {
                 if (processor == null) {
                     processor = recycledProcessors.poll();
@@ -314,18 +253,28 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol {
                     processor.setSslSupport(null);
                 }
 
-                SocketState state = processor.process(socket);
+                SocketState state = SocketState.CLOSED;
+                do {
+                    if (processor.isAsync() || state == SocketState.ASYNC_END) {
+                        state = processor.asyncDispatch(status);
+                    } else if (processor.comet) {
+                        state = processor.event(status);
+                    } else {
+                        state = processor.process(socket);
+                    }
+
+                    if (processor.isAsync()) {
+                        state = processor.asyncPostProcess();
+                    }
+                } while (state == SocketState.ASYNC_END);
+
                 if (state == SocketState.LONG) {
                     // In the middle of processing a request/response. Keep the
                     // socket associated with the processor.
                     connections.put(socket, processor);
                     
                     if (processor.isAsync()) {
-                        NioEndpoint.KeyAttachment att = (NioEndpoint.KeyAttachment)socket.getAttachment(false);
                         att.setAsync(true);
-                        // longPoll may change socket state (e.g. to trigger a
-                        // complete or dispatch)
-                        state = processor.asyncPostProcess();
                     } else {
                         // Either:
                         //  - this is comet request
@@ -333,14 +282,9 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol {
                         //    read
                         SelectionKey key = socket.getIOChannel().keyFor(
                                 socket.getPoller().getSelector());
-                        NioEndpoint.KeyAttachment att =
-                            (NioEndpoint.KeyAttachment)socket.getAttachment(false);
                         key.interestOps(SelectionKey.OP_READ);
                         att.interestOps(SelectionKey.OP_READ);
                     }
-                }
-                if (state == SocketState.LONG || state == SocketState.ASYNC_END) {
-                    // Already done all we need to do.
                 } else if (state == SocketState.OPEN){
                     // In keep-alive but between requests. OK to recycle
                     // processor. Continue to poll for the next request.
