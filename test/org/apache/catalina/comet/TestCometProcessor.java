@@ -69,7 +69,7 @@ public class TestCometProcessor extends TomcatBaseTest {
                         os.write("4\r\n".getBytes());
                         os.write("PING\r\n".getBytes());
                         os.flush();
-                        Thread.sleep(2000);
+                        Thread.sleep(1000);
                     }
                     os.write("0\r\n".getBytes());
                     os.write("\r\n".getBytes());
