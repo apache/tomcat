@@ -129,31 +129,46 @@ public class AjpAprProtocol extends AbstractAjpProtocol {
             recycledProcessors.clear();
         }
         
-        // FIXME: Support for this could be added in AJP as well
-        @Override
-        public SocketState event(SocketWrapper<Long> socket, SocketStatus status) {
-            return SocketState.CLOSED;
-        }
-        
         @Override
         public SocketState process(SocketWrapper<Long> socket,
                 SocketStatus status) {
-            AjpAprProcessor processor = recycledProcessors.poll();
+            AjpAprProcessor processor = connections.remove(socket);
+
+            socket.setAsync(false);
+
             try {
+                if (processor == null) {
+                    processor = recycledProcessors.poll();
+                }
                 if (processor == null) {
                     processor = createProcessor();
                 }
 
-                SocketState state = processor.process(socket);
+                SocketState state = SocketState.CLOSED;
+                do {
+                    if (processor.isAsync() || state == SocketState.ASYNC_END) {
+                        state = processor.asyncDispatch(status);
+                    } else {
+                        state = processor.process(socket);
+                    }
+
+                    if (processor.isAsync()) {
+                        state = processor.asyncPostProcess();
+                    }
+                } while (state == SocketState.ASYNC_END);
+                
                 if (state == SocketState.LONG) {
-                    // Check if the post processing is going to change the state
-                    state = processor.asyncPostProcess();
-                }
-                if (state == SocketState.LONG || state == SocketState.ASYNC_END) {
                     // Need to make socket available for next processing cycle
                     // but no need for the poller
                     connections.put(socket, processor);
                     socket.setAsync(true);
+                } else if (state == SocketState.OPEN){
+                    // In keep-alive but between requests. OK to recycle
+                    // processor. Continue to poll for the next request.
+                    processor.recycle();
+                    recycledProcessors.offer(processor);
+                    ((AprEndpoint)proto.endpoint).getPoller().add(
+                            socket.getSocket().longValue());
                 } else {
                     processor.recycle();
                     recycledProcessors.offer(processor);
@@ -184,44 +199,6 @@ public class AjpAprProtocol extends AbstractAjpProtocol {
             return SocketState.CLOSED;
         }
 
-        @Override
-        public SocketState asyncDispatch(SocketWrapper<Long> socket, SocketStatus status) {
-
-            AjpAprProcessor processor = connections.get(socket);
-            
-            SocketState state = SocketState.CLOSED; 
-            if (processor != null) {
-                // Call the appropriate event
-                try {
-                    state = processor.asyncDispatch(status);
-                }
-                // Future developers: if you discover any other
-                // rare-but-nonfatal exceptions, catch them here, and log as
-                // debug.
-                catch (Throwable e) {
-                    ExceptionUtils.handleThrowable(e);
-                    // any other exception or error is odd. Here we log it
-                    // with "ERROR" level, so it will show up even on
-                    // less-than-verbose logs.
-                    AjpAprProtocol.log.error
-                        (sm.getString("ajpprotocol.proto.error"), e);
-                } finally {
-                    if (state == SocketState.LONG && processor.isAsync()) {
-                        state = processor.asyncPostProcess();
-                    }
-                    if (state != SocketState.LONG && state != SocketState.ASYNC_END) {
-                        connections.remove(socket);
-                        processor.recycle();
-                        recycledProcessors.offer(processor);
-                        if (state == SocketState.OPEN) {
-                            ((AprEndpoint)proto.endpoint).getPoller().add(socket.getSocket().longValue());
-                        }
-                    }
-                }
-            }
-            return state;
-        }
-        
         protected AjpAprProcessor createProcessor() {
             AjpAprProcessor processor = new AjpAprProcessor(proto.packetSize, (AprEndpoint)proto.endpoint);
             processor.setAdapter(proto.adapter);
