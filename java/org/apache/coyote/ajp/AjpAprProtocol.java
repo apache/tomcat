@@ -136,7 +136,8 @@ public class AjpAprProtocol extends AbstractAjpProtocol {
         }
         
         @Override
-        public SocketState process(SocketWrapper<Long> socket) {
+        public SocketState process(SocketWrapper<Long> socket,
+                SocketStatus status) {
             AjpAprProcessor processor = recycledProcessors.poll();
             try {
                 if (processor == null) {

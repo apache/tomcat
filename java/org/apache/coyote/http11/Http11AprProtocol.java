@@ -262,7 +262,8 @@ public class Http11AprProtocol extends AbstractHttp11Protocol {
         }
         
         @Override
-        public SocketState process(SocketWrapper<Long> socket) {
+        public SocketState process(SocketWrapper<Long> socket,
+                SocketStatus status) {
             Http11AprProcessor processor = recycledProcessors.poll();
             try {
                 if (processor == null) {
