@@ -1641,10 +1641,6 @@ public class AprEndpoint extends AbstractEndpoint {
     public interface Handler extends AbstractEndpoint.Handler {
         public SocketState process(SocketWrapper<Long> socket,
                 SocketStatus status);
-        public SocketState event(SocketWrapper<Long> socket,
-                SocketStatus status);
-        public SocketState asyncDispatch(SocketWrapper<Long> socket,
-                SocketStatus status);
     }
 
 
@@ -1696,11 +1692,6 @@ public class AprEndpoint extends AbstractEndpoint {
                         if (socket.async) {
                             waitingRequests.add(socket);
                         }
-                    } else if (state == Handler.SocketState.ASYNC_END) {
-                        socket.access();
-                        SocketProcessor proc =
-                            new SocketProcessor(socket, SocketStatus.OPEN);
-                        getExecutor().execute(proc);
                     }
                 }
             }
@@ -1734,7 +1725,7 @@ public class AprEndpoint extends AbstractEndpoint {
                 if (status == null) {
                     state = handler.process(socket,SocketStatus.OPEN);
                 } else {
-                    state = handler.asyncDispatch(socket, status);
+                    state = handler.process(socket, status);
                 }
                 if (state == Handler.SocketState.CLOSED) {
                     // Close socket and pool
@@ -1777,7 +1768,7 @@ public class AprEndpoint extends AbstractEndpoint {
         public void run() {
             synchronized (socket) {
                 // Process the request from this socket
-                Handler.SocketState state = handler.event(socket, status);
+                Handler.SocketState state = handler.process(socket, status);
                 if (state == Handler.SocketState.CLOSED) {
                     // Close socket and pool
                     destroySocket(socket.getSocket().longValue());
