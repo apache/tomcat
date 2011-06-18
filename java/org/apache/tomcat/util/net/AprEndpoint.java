@@ -40,6 +40,7 @@ import org.apache.tomcat.jni.SSLSocket;
 import org.apache.tomcat.jni.Socket;
 import org.apache.tomcat.jni.Status;
 import org.apache.tomcat.util.ExceptionUtils;
+import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
 
 
 /**
@@ -1638,7 +1639,8 @@ public class AprEndpoint extends AbstractEndpoint {
      * thread local fields.
      */
     public interface Handler extends AbstractEndpoint.Handler {
-        public SocketState process(SocketWrapper<Long> socket);
+        public SocketState process(SocketWrapper<Long> socket,
+                SocketStatus status);
         public SocketState event(SocketWrapper<Long> socket,
                 SocketStatus status);
         public SocketState asyncDispatch(SocketWrapper<Long> socket,
@@ -1683,7 +1685,8 @@ public class AprEndpoint extends AbstractEndpoint {
                         return;
                     }
                     // Process the request from this socket
-                    Handler.SocketState state = handler.process(socket);
+                    Handler.SocketState state = handler.process(socket,
+                            SocketStatus.OPEN);
                     if (state == Handler.SocketState.CLOSED) {
                         // Close socket and pool
                         destroySocket(socket.getSocket().longValue());
@@ -1727,7 +1730,12 @@ public class AprEndpoint extends AbstractEndpoint {
         public void run() {
             synchronized (socket) {
                 // Process the request from this socket
-                Handler.SocketState state = (status==null)?handler.process(socket):handler.asyncDispatch(socket, status);
+                SocketState state = SocketState.OPEN;
+                if (status == null) {
+                    state = handler.process(socket,SocketStatus.OPEN);
+                } else {
+                    state = handler.asyncDispatch(socket, status);
+                }
                 if (state == Handler.SocketState.CLOSED) {
                     // Close socket and pool
                     destroySocket(socket.getSocket().longValue());
