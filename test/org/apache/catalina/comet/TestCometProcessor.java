@@ -93,8 +93,6 @@ public class TestCometProcessor extends TomcatBaseTest {
         
         // Validate response
         String[] response = buffer.toString().split("\r\n");
-        // Expect 26 lines
-        assertEquals(26, response.length);
         assertEquals("HTTP/1.1 200 OK", response[0]);
         assertEquals("Server: Apache-Coyote/1.1", response[1]);
         assertTrue(response[2].startsWith("Set-Cookie: JSESSIONID="));
@@ -121,6 +119,8 @@ public class TestCometProcessor extends TomcatBaseTest {
         assertEquals("Client: END", response[23]);
         assertEquals("", response[24]);
         assertEquals("0", response[25]);
+        // Expect 26 lines
+        assertEquals(26, response.length);
     }
     
     private boolean isCometSupported() {
