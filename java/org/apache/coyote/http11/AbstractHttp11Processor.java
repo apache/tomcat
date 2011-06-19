@@ -43,6 +43,7 @@ import org.apache.tomcat.util.buf.HexUtils;
 import org.apache.tomcat.util.buf.MessageBytes;
 import org.apache.tomcat.util.http.FastHttpDateFormat;
 import org.apache.tomcat.util.http.MimeHeaders;
+import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
 import org.apache.tomcat.util.res.StringManager;
 
@@ -222,6 +223,11 @@ public abstract class AbstractHttp11Processor extends AbstractProcessor {
      * Track changes in state for async requests.
      */
     protected AsyncStateMachine asyncStateMachine = new AsyncStateMachine(this);
+
+
+    public AbstractHttp11Processor(AbstractEndpoint endpoint) {
+        super(endpoint);
+    }
 
 
     /**
