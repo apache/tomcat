@@ -53,12 +53,65 @@ public abstract class AbstractAjpProcessor extends AbstractProcessor {
 
     protected abstract Log getLog();
 
+
     /**
      * The string manager for this package.
      */
     protected static final StringManager sm =
         StringManager.getManager(Constants.Package);
 
+
+    /**
+     * End message array.
+     */
+    protected static final byte[] endMessageArray;
+
+
+    /**
+     * Flush message array.
+     */
+    protected static final byte[] flushMessageArray;
+    
+
+    /**
+     * Pong message array.
+     */
+    protected static final byte[] pongMessageArray;
+
+
+    static {
+        // Allocate the end message array
+        AjpMessage endMessage = new AjpMessage(16);
+        endMessage.reset();
+        endMessage.appendByte(Constants.JK_AJP13_END_RESPONSE);
+        endMessage.appendByte(1);
+        endMessage.end();
+        endMessageArray = new byte[endMessage.getLen()];
+        System.arraycopy(endMessage.getBuffer(), 0, endMessageArray, 0,
+                endMessage.getLen());
+        
+        // Allocate the flush message array
+        AjpMessage flushMessage = new AjpMessage(16);
+        flushMessage.reset();
+        flushMessage.appendByte(Constants.JK_AJP13_SEND_BODY_CHUNK);
+        flushMessage.appendInt(0);
+        flushMessage.appendByte(0);
+        flushMessage.end();
+        flushMessageArray = new byte[flushMessage.getLen()];
+        System.arraycopy(flushMessage.getBuffer(), 0, flushMessageArray, 0,
+                flushMessage.getLen());
+        
+        // Allocate the pong message array
+        AjpMessage pongMessage = new AjpMessage(16);
+        pongMessage.reset();
+        pongMessage.appendByte(Constants.JK_AJP13_CPONG_REPLY);
+        pongMessage.end();
+        pongMessageArray = new byte[pongMessage.getLen()];
+        System.arraycopy(pongMessage.getBuffer(), 0, pongMessageArray, 
+                0, pongMessage.getLen());
+    }
+
+    
     // ----------------------------------------------------- Instance Variables
 
 
