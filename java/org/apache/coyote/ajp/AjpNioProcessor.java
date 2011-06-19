@@ -63,7 +63,6 @@ public class AjpNioProcessor extends AbstractAjpProcessor {
 
         super(packetSize, endpoint);
 
-        response.setHook(this);
         response.setOutputBuffer(new SocketOutputBuffer());
 
         pool = endpoint.getSelectorPool();
