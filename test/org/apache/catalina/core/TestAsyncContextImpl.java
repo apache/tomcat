@@ -49,6 +49,8 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
     private static final long REQUEST_TIME = 500;
     // Timeout thread (where used) checks for timeout every second
     private static final long TIMEOUT_MARGIN = 1000;
+    // Timing tests need a small error margin to prevent failures
+    private static final long ERROR_MARGIN = 10;
     // Default timeout for these tests
     private static final long TIMEOUT = 3000;
 
@@ -1048,8 +1050,10 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         for (int j = 0; j < count; j++) {
             Entry entry = entries.get(j);
             assertEquals(status, entry.getStatus());
-            assertTrue(entry.toString(), entry.getTime() >= minTime);
-            assertTrue(entry.toString(), entry.getTime() < maxTime);
+            assertTrue(entry.toString(),
+                    entry.getTime() >= minTime - ERROR_MARGIN);
+            assertTrue(entry.toString(),
+                    entry.getTime() < maxTime + ERROR_MARGIN);
         }
     }
     
