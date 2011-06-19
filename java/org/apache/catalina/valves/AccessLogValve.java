@@ -29,6 +29,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.TimeZone;
@@ -76,6 +77,7 @@ import org.apache.tomcat.util.ExceptionUtils;
  * <li><b>%s</b> - HTTP status code of the response
  * <li><b>%S</b> - User session ID
  * <li><b>%t</b> - Date and time, in Common Log Format format
+ * <li><b>%t{format}</b> - Date and time, in any format supported by SimpleDateFormat
  * <li><b>%u</b> - Remote user that was authenticated
  * <li><b>%U</b> - Requested URL path
  * <li><b>%v</b> - Local server name
@@ -149,7 +151,7 @@ public class AccessLogValve extends ValveBase implements AccessLog {
      * The descriptive information about this implementation.
      */
     protected static final String info =
-        "org.apache.catalina.valves.AccessLogValve/2.1";
+        "org.apache.catalina.valves.AccessLogValve/2.2";
 
 
     /**
@@ -227,39 +229,239 @@ public class AccessLogValve extends ValveBase implements AccessLog {
      */
     private static final String timeZoneDST;
     
+    /**
+     * The size of our global date format cache
+     */
+    private static final int globalCacheSize = 300;
+
+    /**
+     * The size of our thread local date format cache
+     */
+    private static final int localCacheSize = 60;
+
     
     /**
      * The current log file we are writing to. Helpful when checkExists
      * is true.
      */
     protected File currentLogFile = null;
-    private static class AccessDateStruct {
-        private Date currentDate = new Date();
-        private String currentDateString = null;
-        private SimpleDateFormat dayFormatter = new SimpleDateFormat("dd");
-        private SimpleDateFormat monthFormatter = new SimpleDateFormat("MM");
-        private SimpleDateFormat yearFormatter = new SimpleDateFormat("yyyy");
-        private SimpleDateFormat timeFormatter = new SimpleDateFormat("HH:mm:ss");
-        public AccessDateStruct() {
-            TimeZone tz = TimeZone.getDefault();
-            dayFormatter.setTimeZone(tz);
-            monthFormatter.setTimeZone(tz);
-            yearFormatter.setTimeZone(tz);
-            timeFormatter.setTimeZone(tz);
+
+    /**
+     * <p>Cache structure for formatted timestamps based on seconds.</p>
+     *
+     * <p>The cache consists of entries for a consecutive range of
+     * seconds. The length of the range is configurable. It is
+     * implemented based on a cyclic buffer. New entries shift the range.</p>
+     *
+     * <p>There is one cache for the CLF format (the access log standard
+     * format) and a HashMap of caches for additional formats used by
+     * SimpleDateFormat.</p>
+     *
+     * <p>The cache is not threadsafe. It can be used without synchronization
+     * via thread local instances, or with synchronization as a global cache.</p>
+     *
+     * <p>This class uses a small thread local first level cache and a bigger
+     * synchronized global second level cache.</p>
+     */
+    private static class DateFormatCache {
+
+        private class Cache {
+
+            /* CLF log format */
+            private static final String cLFFormat = "dd/MMM/yyy:HH:mm:ss";
+
+            /* Second used to retrieve CLF format in most recent invocation */
+            private long previousSeconds = 0L;
+            /* Value of CLF format retrieved in most recent invocation */
+            private String previousFormat = "";
+
+            /* First second contained in cache */
+            private long first = 0L;
+            /* Last second contained in cache */
+            private long last = 0L;
+            /* Index of "first" in the cyclic cache */
+            private int offset = 0;
+            /* Helper object to be able to call SimpleDateFormat.format(). */
+            private final Date currentDate = new Date();
+
+            private String cache[];
+            private SimpleDateFormat formatter;
+            private boolean isCLF = false;
+
+            private Cache parent = null;
+
+            private Cache(String format, Cache parent) {
+                cache = new String[cacheSize];
+                for (int i = 0; i < cacheSize; i++) {
+                    cache[i] = null;
+                }
+                if (format == null) {
+                    isCLF = true;
+                    format = cLFFormat;
+                }
+                formatter = new SimpleDateFormat(format);
+                formatter.setTimeZone(TimeZone.getDefault());
+                this.parent = parent;
+            }
+
+            private String getFormat(long time) {
+
+                long seconds = time / 1000;
+
+                /* First step: if we have seen this timestamp
+                   during the previous call, and we need CLF, return the previous value. */
+                if (seconds == previousSeconds) {
+                    return previousFormat;
+                }
+
+                /* Second step: Try to locate in cache */
+                previousSeconds = seconds;
+                int index = (offset + (int)(seconds - first)) % cacheSize;
+                if (index < 0) {
+                    index += cacheSize;
+                }
+                if (seconds >= first && seconds <= last) {
+                    if (cache[index] != null) {
+                        /* Found, so remember for next call and return.*/
+                        previousFormat = cache[index];
+                        return previousFormat;
+                    }
+
+                /* Third step: not found in cache, adjust cache and add item */
+                } else if (seconds >= last + cacheSize || seconds <= first - cacheSize) {
+                    first = seconds;
+                    last = first + cacheSize - 1;
+                    index = 0;
+                    offset = 0;
+                    for (int i = 1; i < cacheSize; i++) {
+                        cache[i] = null;
+                    }
+                } else if (seconds > last) {
+                    for (int i = 1; i < seconds - last; i++) {
+                        cache[(index + cacheSize - i) % cacheSize] = null;
+                    }
+                    first = seconds - cacheSize;
+                    last = seconds;
+                } else if (seconds < first) {
+                    for (int i = 1; i < first - seconds; i++) {
+                        cache[(index + i) % cacheSize] = null;
+                    }
+                    first = seconds;
+                    last = seconds + cacheSize;
+                }
+
+                /* Last step: format new timestamp either using
+                 * parent cache or locally. */
+                if (parent != null) {
+                    synchronized(parent) {
+                        previousFormat = parent.getFormat(time);
+                    }
+                } else {
+                    currentDate.setTime(time);
+                    previousFormat = formatter.format(currentDate);
+                    if (isCLF) {
+                        StringBuilder current = new StringBuilder(32);
+                        current.append('[');
+                        current.append(previousFormat);
+                        current.append(' ');
+                        current.append(getTimeZone(currentDate));
+                        current.append(']');
+                        previousFormat = current.toString();
+                    }
+                }
+                cache[index] = previousFormat;
+                return previousFormat;
+            }
+        }
+
+        private String type;
+
+        /* Number of cached entries */
+        private int cacheSize = 0;
+
+        private DateFormatCache parent;
+        private Cache cLFCache;
+        private HashMap<String, Cache> formatCache = new HashMap<String, Cache>();
+
+        private DateFormatCache(int size, DateFormatCache parent) {
+            if (parent == null) {
+                type = "main";
+            } else {
+                type = "child";
+            }
+            cacheSize = size;
+            this.parent = parent;
+            Cache parentCache = null;
+            if (parent != null) {
+                synchronized(parent) {
+                    parentCache = parent.getCache(null);
+                }
+            }
+            cLFCache = new Cache(null, parentCache);
+        }
+
+        private Cache getCache(String format) {
+            Cache cache;
+            if (format == null) {
+                cache = cLFCache;
+            } else {
+                cache = formatCache.get(format);
+                if (cache == null) {
+                    Cache parentCache = null;
+                    if (parent != null) {
+                        synchronized(parent) {
+                            parentCache = parent.getCache(format);
+                        }
+                    }
+                    cache = new Cache(format, parentCache);
+                    formatCache.put(format, cache);
+                }
+            }
+            return cache;
+        }
+
+        public String getFormat(String format, long time) {
+
+            return getCache(format).getFormat(time);
         }
     }
-    
+
+    /**
+     * Global date format cache.
+     */
+    private static final DateFormatCache globalDateCache =
+            new DateFormatCache(globalCacheSize, null);
+
+    /**
+     * Thread local date format cache.
+     */
+    private static final ThreadLocal<DateFormatCache> localDateCache =
+            new ThreadLocal<DateFormatCache>() {
+        protected DateFormatCache initialValue() {
+            return new DateFormatCache(localCacheSize, globalDateCache);
+        }
+    };
+
+
     /**
      * The system time when we last updated the Date that this valve
      * uses for log lines.
      */
-    private static final ThreadLocal<AccessDateStruct> currentDateStruct =
-            new ThreadLocal<AccessDateStruct>() {
+    private static final ThreadLocal<Date> localDate =
+            new ThreadLocal<Date>() {
         @Override
-        protected AccessDateStruct initialValue() {
-            return new AccessDateStruct();
+        protected Date initialValue() {
+            return new Date();
         }
     };
+
+    /**
+     * The list of our format types.
+     */
+    private static enum formatType {
+        CLF, SEC, MSEC, MSEC_FRAC, SDF
+    }
+
     /**
      * Resolve hosts.
      */
@@ -572,7 +774,15 @@ public class AccessLogValve extends ValveBase implements AccessLog {
             return;
         }
 
-        Date date = getDate();
+        /**
+         * XXX This is a bit silly, but we want to have start and stop time and
+         * duration consistent. It would be better to keep start and stop
+         * simply in the request and/or response object and remove time
+         * (duration) from the interface.
+         */
+        long start = request.getCoyoteRequest().getStartTime();
+        Date date = getDate(start + time);
+
         StringBuilder result = new StringBuilder(128);
 
         for (int i = 0; i < logElements.length; i++) {
@@ -759,15 +969,10 @@ public class AccessLogValve extends ValveBase implements AccessLog {
      * 
      * @return Date
      */
-    private Date getDate() {
-        // Only create a new Date once per second, max.
-        long systime = System.currentTimeMillis();
-        AccessDateStruct struct = currentDateStruct.get(); 
-        if ((systime - struct.currentDate.getTime()) > 1000) {
-            struct.currentDate.setTime(systime);
-            struct.currentDateString = null;
-        }
-        return struct.currentDate;
+    private static Date getDate(long systime) {
+        Date date = localDate.get();
+        date.setTime(systime);
+        return date;
     }
 
 
@@ -830,7 +1035,7 @@ public class AccessLogValve extends ValveBase implements AccessLog {
         }
         fileDateFormatter = new SimpleDateFormat(format);
         fileDateFormatter.setTimeZone(timezone);
-        dateStamp = fileDateFormatter.format(currentDateStruct.get().currentDate);
+        dateStamp = fileDateFormatter.format(new Date(System.currentTimeMillis()));
         open();
         
         setState(LifecycleState.STARTING);
@@ -997,31 +1202,154 @@ public class AccessLogValve extends ValveBase implements AccessLog {
     }
 
     /**
-     * write date and time, in Common Log Format - %t
+     * write date and time, in configurable format (default CLF) - %t or %t{format}
      */
     protected class DateAndTimeElement implements AccessLogElement {
 
+        /**
+         * Format prefix specifying request start time
+         */
+        private static final String requestStartPrefix = "begin";
+
+        /**
+         * Format prefix specifying response end time
+         */
+        private static final String responseEndPrefix = "end";
+
+        /**
+         * Separator between optional prefix and rest of format
+         */
+        private static final String prefixSeparator = ":";
+
+        /**
+         * Special format for seconds since epoch
+         */
+        private static final String secFormat = "sec";
+
+        /**
+         * Special format for milliseconds since epoch
+         */
+        private static final String msecFormat = "msec";
+
+        /**
+         * Special format for millisecond part of timestamp
+         */
+        private static final String msecFractionFormat = "msec_frac";
+
+        /**
+         * The pattern we use to replace "S" millisecond formatting
+         * of SimpleDateFormat by our own handling
+         */
+        private static final String msecPattern = "####";
+
+        /* Our format description string, null if CLF */
+        private String format = null;
+        /* Whether to use begin of request or end of response as the timestamp */
+        private boolean usesBegin = false;
+        /* The format type */
+        private formatType type = formatType.CLF;
+        /* Whether we need to postprocess by adding milliseconds */
+        private boolean usesMsecs = false;
+
+        protected DateAndTimeElement() {
+            this(null);
+        }
+
+        /**
+         * Replace the millisecond formatting character 'S' by
+         * some dummy characters in order to make the resulting
+         * formatted time stamps cacheable. We replace the dummy
+         * chars later with the actual milliseconds because that's
+         * relatively cheap.
+         */
+        private void tidyFormat() {
+            boolean escape = false;
+            StringBuilder result = new StringBuilder();
+            int len = format.length();
+            char x;
+            for (int i = 0; i < len; i++) {
+                x = format.charAt(i);
+                if (escape || x != 'S') {
+                    result.append(x);
+                } else {
+                    result.append(msecPattern);
+                    usesMsecs = true;
+                }
+                if (x == '\'') {
+                    escape = !escape;
+                }
+            }
+            format = result.toString();
+        }
+
+        protected DateAndTimeElement(String header) {
+            format = header;
+            if (format != null) {
+                if (format.equals(requestStartPrefix)) {
+                    usesBegin = true;
+                    format = "";
+                } else if (format.startsWith(requestStartPrefix + prefixSeparator)) {
+                    usesBegin = true;
+                    format = format.substring(6);
+                } else if (format.equals(responseEndPrefix)) {
+                    usesBegin = false;
+                    format = "";
+                } else if (format.startsWith(responseEndPrefix + prefixSeparator)) {
+                    usesBegin = false;
+                    format = format.substring(4);
+                }
+                if (format.length() == 0) {
+                    type = formatType.CLF;
+                } else if (format.equals(secFormat)) {
+                    type = formatType.SEC;
+                } else if (format.equals(msecFormat)) {
+                    type = formatType.MSEC;
+                } else if (format.equals(msecFractionFormat)) {
+                    type = formatType.MSEC_FRAC;
+                } else {
+                    type = formatType.SDF;
+                    tidyFormat();
+                }
+            }
+        }
 
         @Override
         public void addElement(StringBuilder buf, Date date, Request request,
                 Response response, long time) {
-            AccessDateStruct struct = currentDateStruct.get();
-            if (struct.currentDateString == null) {
-                StringBuilder current = new StringBuilder(32);
-                current.append('[');
-                current.append(struct.dayFormatter.format(date));
-                current.append('/');
-                current.append(lookup(struct.monthFormatter.format(date)));
-                current.append('/');
-                current.append(struct.yearFormatter.format(date));
-                current.append(':');
-                current.append(struct.timeFormatter.format(date));
-                current.append(' ');
-                current.append(getTimeZone(date));
-                current.append(']');
-                struct.currentDateString = current.toString();
+            long timestamp = date.getTime();
+            if (usesBegin) {
+                timestamp -= time;
             }
-            buf.append(struct.currentDateString);
+            switch (type) {
+            case CLF:
+                buf.append(localDateCache.get().getFormat(null, timestamp));
+                break;
+            case SEC:
+                buf.append(timestamp / 1000);
+                break;
+            case MSEC:
+                buf.append(timestamp);
+                break;
+            case MSEC_FRAC:
+                long frac = timestamp % 1000;
+                if (frac < 100) {
+                    if (frac < 10) {
+                        buf.append("00");
+                    } else {
+                        buf.append("0");
+                    }
+                }
+                buf.append(frac);
+                break;
+            case SDF:
+                String temp = localDateCache.get().getFormat(format, timestamp);
+                if (usesMsecs) {
+                    String msec = Long.toString(timestamp % 1000);
+                    temp = temp.replace(msecPattern, msec);
+                }
+                buf.append(temp);
+                break;
+            }
         }
     }
 
@@ -1449,6 +1777,8 @@ public class AccessLogValve extends ValveBase implements AccessLog {
             return new RequestAttributeElement(header);
         case 's':
             return new SessionAttributeElement(header);            
+        case 't':
+            return new DateAndTimeElement(header);
         default:
             return new StringElement("???");
         }
