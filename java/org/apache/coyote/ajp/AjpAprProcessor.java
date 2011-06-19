@@ -137,63 +137,6 @@ public class AjpAprProcessor extends AbstractAjpProcessor {
     protected final ByteBuffer getBodyMessageBuffer;
 
 
-    /**
-     * Direct buffer used for sending right away a pong message.
-     */
-    protected static final ByteBuffer pongMessageBuffer;
-
-
-    /**
-     * End message array.
-     */
-    protected static final byte[] endMessageArray;
-
-
-    /**
-     * Direct buffer used for sending explicit flush message.
-     */
-    protected static final ByteBuffer flushMessageBuffer;
-
-
-    // ----------------------------------------------------- Static Initializer
-
-
-    static {
-
-        // Set the read body message buffer
-        AjpMessage pongMessage = new AjpMessage(16);
-        pongMessage.reset();
-        pongMessage.appendByte(Constants.JK_AJP13_CPONG_REPLY);
-        pongMessage.end();
-        pongMessageBuffer = ByteBuffer.allocateDirect(pongMessage.getLen());
-        pongMessageBuffer.put(pongMessage.getBuffer(), 0,
-                pongMessage.getLen());
-
-        // Allocate the end message array
-        AjpMessage endMessage = new AjpMessage(16);
-        endMessage.reset();
-        endMessage.appendByte(Constants.JK_AJP13_END_RESPONSE);
-        endMessage.appendByte(1);
-        endMessage.end();
-        endMessageArray = new byte[endMessage.getLen()];
-        System.arraycopy(endMessage.getBuffer(), 0, endMessageArray, 0,
-                endMessage.getLen());
-
-        // Set the flush message buffer
-        AjpMessage flushMessage = new AjpMessage(16);
-        flushMessage.reset();
-        flushMessage.appendByte(Constants.JK_AJP13_SEND_BODY_CHUNK);
-        flushMessage.appendInt(0);
-        flushMessage.appendByte(0);
-        flushMessage.end();
-        flushMessageBuffer =
-            ByteBuffer.allocateDirect(flushMessage.getLen());
-        flushMessageBuffer.put(flushMessage.getBuffer(), 0,
-                flushMessage.getLen());
-
-    }
-
-
     // --------------------------------------------------------- Public Methods
 
 
@@ -235,8 +178,8 @@ public class AjpAprProcessor extends AbstractAjpProcessor {
                 // not regular request processing
                 int type = requestHeaderMessage.getByte();
                 if (type == Constants.JK_AJP13_CPING_REQUEST) {
-                    if (Socket.sendb(socketRef, pongMessageBuffer, 0,
-                            pongMessageBuffer.position()) < 0) {
+                    if (Socket.send(socketRef, pongMessageArray, 0,
+                            pongMessageArray.length) < 0) {
                         error = true;
                     }
                     continue;
@@ -612,8 +555,8 @@ public class AjpAprProcessor extends AbstractAjpProcessor {
         }
         // Send explicit flush message
         if (explicit && !finished) {
-            if (Socket.sendb(socketRef, flushMessageBuffer, 0,
-                    flushMessageBuffer.position()) < 0) {
+            if (Socket.send(socketRef, flushMessageArray, 0,
+                    flushMessageArray.length) < 0) {
                 throw new IOException(sm.getString("ajpprocessor.failedflush"));
             }
         }
