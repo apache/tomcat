@@ -209,8 +209,9 @@
     </ul>
 
     <p>
-    There is also support to write information from the cookie, incoming
-    header, the Session or something else in the ServletRequest.
+    There is also support to write information incoming or outgoing
+    headers, cookies, session or request attributes and special
+    timestamp formats.
     It is modeled after the apache syntax:
     <ul>
     <li><b><code>%{xxx}i</code></b> for incoming headers</li>
@@ -218,17 +219,38 @@
     <li><b><code>%{xxx}c</code></b> for a specific cookie</li>
     <li><b><code>%{xxx}r</code></b> xxx is an attribute in the ServletRequest</li>
     <li><b><code>%{xxx}s</code></b> xxx is an attribute in the HttpSession</li>
+    <li><b><code>%{xxx}t</code></b> xxx is an enhanced SimpleDateFormat pattern</li>
     </ul>
     </p>
 
+    <p>All formats supported by SimpleDateFormat are allowed in <code>%{xxx}t</code>.
+    In addition the following extensions have been added:
+    <ul>
+    <li><b><code>sec</code></b> - number of seconds since the epoch</li>
+    <li><b><code>msec</code></b> - number of milliseconds since the epoch</li>
+    <li><b><code>msec_frac</code></b> - millisecond fraction</li>
+    </ul>
+    These formats can not be mixed with SimpleDateFormat formats in the same format
+    token.</p>
 
-    <p>The shorthand pattern name <code>common</code> (which is also the
-    default) corresponds to <strong>'%h %l %u %t "%r" %s %b'</strong>.</p>
+    <p>Furthermore one can define whether to log the timestamp for the request start
+    time or the response finish time:
+    <ul>
+    <li><b><code>begin</code></b> or prefix <b><code>begin:</code></b> chooses
+    the request start time</li>
+    <li><b><code>end</code></b> or prefix <b><code>end:</code></b> chooses
+    the response finish time</li>
+    </ul>
+    By adding multiple <code>%{xxx}t</code> tokens to the pattern, one can
+    also log both timestamps.</p>
 
-    <p>The shorthand pattern name <code>combined</code> appends the
-    values of the <code>Referer</code> and <code>User-Agent</code> headers,
-    each in double quotes, to the <code>common</code> pattern
-    described in the previous paragraph.</p>
+    <p>The shorthand pattern <code>pattern=&quot;common&quot;</code>
+    corresponds to the Common Log Format defined by
+    <strong>'%h %l %u %t &quot;%r&quot; %s %b'</strong>.</p>
+
+    <p>The shorthand pattern <code>pattern=&quot;combined&quot;</code>
+    appends the values of the <code>Referer</code> and <code>User-Agent</code>
+    headers, each in double quotes, to the <code>common</code> pattern.</p>
 
   </subsection>
 
