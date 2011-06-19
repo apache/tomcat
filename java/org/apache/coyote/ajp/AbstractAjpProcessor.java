@@ -115,6 +115,13 @@ public abstract class AbstractAjpProcessor extends AbstractProcessor {
 
 
     /**
+     * GetBody message array. Not static like the other message arrays since the
+     * message varies with packetSize and that can vary per connector.
+     */
+    protected final byte[] getBodyMessageArray;
+
+
+    /**
      * AJP packet size.
      */
     protected int packetSize;
@@ -219,6 +226,18 @@ public abstract class AbstractAjpProcessor extends AbstractProcessor {
         requestHeaderMessage = new AjpMessage(packetSize);
         responseHeaderMessage = new AjpMessage(packetSize);
         bodyMessage = new AjpMessage(packetSize);
+        
+        // Set the getBody message buffer
+        AjpMessage getBodyMessage = new AjpMessage(16);
+        getBodyMessage.reset();
+        getBodyMessage.appendByte(Constants.JK_AJP13_GET_BODY_CHUNK);
+        // Adjust read size if packetSize != default (Constants.MAX_PACKET_SIZE)
+        getBodyMessage.appendInt(Constants.MAX_READ_SIZE + packetSize -
+                Constants.MAX_PACKET_SIZE);
+        getBodyMessage.end();
+        getBodyMessageArray = new byte[getBodyMessage.getLen()];
+        System.arraycopy(getBodyMessage.getBuffer(), 0, getBodyMessageArray, 
+                         0, getBodyMessage.getLen());
     }
 
     
