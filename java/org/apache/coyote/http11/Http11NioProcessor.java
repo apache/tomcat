@@ -29,8 +29,6 @@ import org.apache.coyote.http11.filters.BufferedInputFilter;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.ExceptionUtils;
-import org.apache.tomcat.util.buf.Ascii;
-import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.buf.HexUtils;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
 import org.apache.tomcat.util.net.NioChannel;
@@ -686,35 +684,6 @@ public class Http11NioProcessor extends AbstractHttp11Processor {
             return true;
         }
         return false;
-    }
-
-    /**
-     * Specialized utility method: find a sequence of lower case bytes inside
-     * a ByteChunk.
-     */
-    @Override
-    protected int findBytes(ByteChunk bc, byte[] b) {
-
-        byte first = b[0];
-        byte[] buff = bc.getBuffer();
-        int start = bc.getStart();
-        int end = bc.getEnd();
-
-        // Look for first char
-        int srcEnd = b.length;
-    
-        for (int i = start; i <= (end - srcEnd); i++) {
-            if (Ascii.toLower(buff[i]) != first) continue;
-            // found first char, now look for a match
-                int myPos = i+1;
-            for (int srcPos = 1; srcPos < srcEnd;) {
-                    if (Ascii.toLower(buff[myPos++]) != b[srcPos++])
-                break;
-                    if (srcPos == srcEnd) return i - start; // found it
-            }
-        }
-        return -1;
-
     }
 
     @Override
