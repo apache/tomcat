@@ -25,7 +25,6 @@ import java.net.Socket;
 
 import org.apache.coyote.ActionCode;
 import org.apache.coyote.OutputBuffer;
-import org.apache.coyote.Request;
 import org.apache.coyote.RequestInfo;
 import org.apache.coyote.Response;
 import org.apache.juli.logging.Log;
@@ -68,20 +67,10 @@ public class AjpProcessor extends AbstractAjpProcessor {
 
     public AjpProcessor(int packetSize, JIoEndpoint endpoint) {
 
-        this.endpoint = endpoint;
+        super(packetSize, endpoint);
 
-        request = new Request();
-        request.setInputBuffer(new SocketInputBuffer());
-
-        response = new Response();
         response.setHook(this);
         response.setOutputBuffer(new SocketOutputBuffer());
-        request.setResponse(response);
-
-        this.packetSize = packetSize;
-        requestHeaderMessage = new AjpMessage(packetSize);
-        responseHeaderMessage = new AjpMessage(packetSize);
-        bodyMessage = new AjpMessage(packetSize);
 
         // Set the get body message buffer
         AjpMessage getBodyMessage = new AjpMessage(16);

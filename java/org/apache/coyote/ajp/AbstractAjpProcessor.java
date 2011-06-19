@@ -34,6 +34,7 @@ import org.apache.coyote.AsyncStateMachine;
 import org.apache.coyote.InputBuffer;
 import org.apache.coyote.Request;
 import org.apache.coyote.RequestInfo;
+import org.apache.coyote.Response;
 import org.apache.juli.logging.Log;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.buf.ByteChunk;
@@ -41,6 +42,7 @@ import org.apache.tomcat.util.buf.HexUtils;
 import org.apache.tomcat.util.buf.MessageBytes;
 import org.apache.tomcat.util.http.HttpMessages;
 import org.apache.tomcat.util.http.MimeHeaders;
+import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
 import org.apache.tomcat.util.net.SSLSupport;
 import org.apache.tomcat.util.net.SocketStatus;
@@ -218,6 +220,24 @@ public abstract class AbstractAjpProcessor extends AbstractProcessor {
      */
     protected long byteCount = 0;
     
+    
+    // ------------------------------------------------------------ Constructor
+    
+    public AbstractAjpProcessor(int packetSize, AbstractEndpoint endpoint) {
+        this.packetSize = packetSize;
+        this.endpoint = endpoint;
+
+        request = new Request();
+        request.setInputBuffer(new SocketInputBuffer());
+        
+        response = new Response();
+        request.setResponse(response);
+
+        requestHeaderMessage = new AjpMessage(packetSize);
+        responseHeaderMessage = new AjpMessage(packetSize);
+        bodyMessage = new AjpMessage(packetSize);
+    }
+
     
     // ------------------------------------------------------------- Properties
 
