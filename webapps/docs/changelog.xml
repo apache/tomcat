@@ -64,6 +64,10 @@
         so only types of interest are reported to a ServletContainerInitializer.
         (markt)
       </fix>
+      <fix>
+        <bug>49165</bug>: Allow any time stamp formats supported by SimpleDateFormat
+        in AccessLogValve. Support logging begin and/or end of request. (rjung)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
