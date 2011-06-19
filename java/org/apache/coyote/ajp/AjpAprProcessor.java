@@ -72,18 +72,6 @@ public class AjpAprProcessor extends AbstractAjpProcessor {
 
         response.setOutputBuffer(new SocketOutputBuffer());
 
-        // Set the get body message buffer
-        AjpMessage getBodyMessage = new AjpMessage(16);
-        getBodyMessage.reset();
-        getBodyMessage.appendByte(Constants.JK_AJP13_GET_BODY_CHUNK);
-        // Adjust allowed size if packetSize != default (Constants.MAX_PACKET_SIZE)
-        getBodyMessage.appendInt(Constants.MAX_READ_SIZE + packetSize - Constants.MAX_PACKET_SIZE);
-        getBodyMessage.end();
-        getBodyMessageBuffer =
-            ByteBuffer.allocateDirect(getBodyMessage.getLen());
-        getBodyMessageBuffer.put(getBodyMessage.getBuffer(), 0,
-                                 getBodyMessage.getLen());
-
         // Allocate input and output buffers
         inputBuffer = ByteBuffer.allocateDirect(packetSize * 2);
         inputBuffer.limit(0);
@@ -117,12 +105,6 @@ public class AjpAprProcessor extends AbstractAjpProcessor {
      * Direct buffer used for output.
      */
     protected ByteBuffer outputBuffer = null;
-
-
-    /**
-     * Direct buffer used for sending right away a get body message.
-     */
-    protected final ByteBuffer getBodyMessageBuffer;
 
 
     // --------------------------------------------------------- Public Methods
@@ -452,8 +434,8 @@ public class AjpAprProcessor extends AbstractAjpProcessor {
         }
 
         // Request more data immediately
-        Socket.sendb(socket.getSocket().longValue(), getBodyMessageBuffer, 0,
-                getBodyMessageBuffer.position());
+        Socket.send(socket.getSocket().longValue(), getBodyMessageArray, 0,
+                getBodyMessageArray.length);
 
         boolean moreData = receive();
         if( !moreData ) {
