@@ -150,7 +150,7 @@ public class TestCometProcessor extends TomcatBaseTest {
 
             if (event.getEventType() == EventType.BEGIN) {
                 response.setContentType("text/plain");
-                response.getWriter().println("BEGIN");
+                response.getWriter().print("BEGIN" + "\r\n");
             } else if (event.getEventType() == EventType.READ) {
                 InputStream is = request.getInputStream();
                 int count = 0;
@@ -159,13 +159,13 @@ public class TestCometProcessor extends TomcatBaseTest {
                     count ++;
                 }
                 String msg = "READ: " + count + " bytes";
-                response.getWriter().println("Client: " + msg);
+                response.getWriter().print("Client: " + msg + "\r\n");
             } else if (event.getEventType() == EventType.END) {
                 String msg = "END";
-                response.getWriter().println("Client: " + msg);
+                response.getWriter().print("Client: " + msg + "\r\n");
                 event.close();
             } else {
-                response.getWriter().println(event.getEventSubType());
+                response.getWriter().print(event.getEventSubType() + "\r\n");
                 event.close();
             }
             response.getWriter().flush();
