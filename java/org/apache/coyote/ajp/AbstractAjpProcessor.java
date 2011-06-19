@@ -224,8 +224,10 @@ public abstract class AbstractAjpProcessor extends AbstractProcessor {
     // ------------------------------------------------------------ Constructor
     
     public AbstractAjpProcessor(int packetSize, AbstractEndpoint endpoint) {
+        
+        super(endpoint);
+
         this.packetSize = packetSize;
-        this.endpoint = endpoint;
 
         request = new Request();
         request.setInputBuffer(new SocketInputBuffer());

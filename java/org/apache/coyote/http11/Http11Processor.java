@@ -63,7 +63,7 @@ public class Http11Processor extends AbstractHttp11Processor {
     public Http11Processor(int headerBufferSize, JIoEndpoint endpoint,
             int maxTrailerSize) {
 
-        this.endpoint = endpoint;
+        super(endpoint);
         
         request = new Request();
         inputBuffer = new InternalInputBuffer(request, headerBufferSize);
