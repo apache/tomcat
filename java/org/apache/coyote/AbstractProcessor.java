@@ -19,6 +19,7 @@ package org.apache.coyote;
 import java.util.concurrent.Executor;
 
 import org.apache.tomcat.util.net.AbstractEndpoint;
+import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
 
 /**
  * Provides functionality and attributes common to all supported protocols
@@ -82,16 +83,21 @@ public abstract class AbstractProcessor implements ActionHook, Processor {
     }
 
 
-
-    /*
-     * Expose selected endpoint attributes through the processor
-     */
-
     /**
      * Obtain the Executor used by the underlying endpoint.
      */
     @Override
     public Executor getExecutor() {
         return endpoint.getExecutor();
+    }
+    
+    
+    public boolean isAsync() {
+        return asyncStateMachine.isAsync();
+    }
+
+
+    public SocketState asyncPostProcess() {
+        return asyncStateMachine.asyncPostProcess();
     }
 }
