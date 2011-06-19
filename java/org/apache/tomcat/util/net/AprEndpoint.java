@@ -66,9 +66,6 @@ public class AprEndpoint extends AbstractEndpoint {
 
     private static final Log log = LogFactory.getLog(AprEndpoint.class);
 
-    private static final boolean IS_SECURITY_ENABLED =
-        (System.getSecurityManager() != null);
-
     // ----------------------------------------------------------------- Fields
     /**
      * Root APR memory pool.
@@ -828,7 +825,7 @@ public class AprEndpoint extends AbstractEndpoint {
                     new SocketEventProcessor(wrapper, status);
                 ClassLoader loader = Thread.currentThread().getContextClassLoader();
                 try {
-                    if (IS_SECURITY_ENABLED) {
+                    if (Constants.IS_SECURITY_ENABLED) {
                         PrivilegedAction<Void> pa = new PrivilegedSetTccl(
                                 getClass().getClassLoader());
                         AccessController.doPrivileged(pa);
@@ -838,7 +835,7 @@ public class AprEndpoint extends AbstractEndpoint {
                     }
                     getExecutor().execute(proc);
                 } finally {
-                    if (IS_SECURITY_ENABLED) {
+                    if (Constants.IS_SECURITY_ENABLED) {
                         PrivilegedAction<Void> pa = new PrivilegedSetTccl(loader);
                         AccessController.doPrivileged(pa);
                     } else {
@@ -866,7 +863,8 @@ public class AprEndpoint extends AbstractEndpoint {
                     SocketProcessor proc = new SocketProcessor(socket, status);
                     ClassLoader loader = Thread.currentThread().getContextClassLoader();
                     try {
-                        if (IS_SECURITY_ENABLED) {
+                        //threads should not be created by the webapp classloader
+                        if (Constants.IS_SECURITY_ENABLED) {
                             PrivilegedAction<Void> pa = new PrivilegedSetTccl(
                                     getClass().getClassLoader());
                             AccessController.doPrivileged(pa);
@@ -874,9 +872,13 @@ public class AprEndpoint extends AbstractEndpoint {
                             Thread.currentThread().setContextClassLoader(
                                     getClass().getClassLoader());
                         }
+                        // During shutdown, executor may be null - avoid NPE
+                        if (!running) {
+                            return false;
+                        }
                         getExecutor().execute(proc);
                     } finally {
-                        if (IS_SECURITY_ENABLED) {
+                        if (Constants.IS_SECURITY_ENABLED) {
                             PrivilegedAction<Void> pa = new PrivilegedSetTccl(loader);
                             AccessController.doPrivileged(pa);
                         } else {
@@ -886,7 +888,7 @@ public class AprEndpoint extends AbstractEndpoint {
                 }
             }
         } catch (RejectedExecutionException x) {
-            log.warn("Socket processing request was rejected for:"+socket,x);
+            log.warn("Socket processing request was rejected for: "+socket, x);
             return false;
         } catch (Throwable t) {
             ExceptionUtils.handleThrowable(t);
