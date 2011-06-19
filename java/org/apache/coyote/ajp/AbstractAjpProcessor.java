@@ -871,14 +871,6 @@ public abstract class AbstractAjpProcessor extends AbstractProcessor {
            throws IOException;
    
    
-   protected boolean isAsync() {
-       return asyncStateMachine.isAsync();
-   }
-   
-   protected SocketState asyncPostProcess() {
-       return asyncStateMachine.asyncPostProcess();
-   }
-
    // ------------------------------------- InputStreamInputBuffer Inner Class
 
 
