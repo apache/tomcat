@@ -97,26 +97,17 @@ public class JIoEndpoint extends AbstractEndpoint {
     public ServerSocketFactory getServerSocketFactory() { return serverSocketFactory; }
 
 
-    /**
-     * Is sendfile available
+    /*
+     * Optional feature support.
      */
     @Override
-    public boolean getUseSendfile() {
-        // Not supported
-        return false;
-    }
-
-
-    /**
-     * Is deferAccept supported?
-     */
+    public boolean getUseSendfile() { return false; } // Not supported
     @Override
-    public boolean getDeferAccept() {
-        // Not supported
-        return false;
-    }
-    
-    
+    public boolean getUseComet() { return false; } // Not supported
+    @Override
+    public boolean getUseCometTimeout() { return false; } // Not supported
+    @Override
+    public boolean getDeferAccept() { return false; } // Not supported
 
 
     // ------------------------------------------------ Handler Inner Interface
