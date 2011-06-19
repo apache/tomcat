@@ -556,7 +556,10 @@ public abstract class AbstractEndpoint {
     }
 
     protected abstract Log getLog();
+    // Flags to indicate optional feature support
     public abstract boolean getUseSendfile();
+    public abstract boolean getUseComet();
+    public abstract boolean getUseCometTimeout();
     
     protected LimitLatch initializeConnectionLatch() {
         if (connectionLimitLatch==null) {

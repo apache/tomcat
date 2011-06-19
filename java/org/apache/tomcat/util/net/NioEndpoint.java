@@ -328,7 +328,10 @@ public class NioEndpoint extends AbstractEndpoint {
      */
     protected boolean useComet = true;
     public void setUseComet(boolean useComet) { this.useComet = useComet; }
+    @Override
     public boolean getUseComet() { return useComet; }
+    @Override
+    public boolean getUseCometTimeout() { return getUseComet(); }
 
 
     /**
