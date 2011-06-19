@@ -23,9 +23,7 @@ import java.util.regex.Pattern;
 
 import org.apache.coyote.AbstractProcessor;
 import org.apache.coyote.ActionCode;
-import org.apache.coyote.Adapter;
 import org.apache.coyote.AsyncContextCallback;
-import org.apache.coyote.AsyncStateMachine;
 import org.apache.coyote.http11.filters.BufferedInputFilter;
 import org.apache.coyote.http11.filters.ChunkedInputFilter;
 import org.apache.coyote.http11.filters.ChunkedOutputFilter;
@@ -62,11 +60,6 @@ public abstract class AbstractHttp11Processor extends AbstractProcessor {
      * are skipped when looking for pluggable filters. 
      */
     private int pluggableFilterIndex = Integer.MAX_VALUE;
-    
-    /**
-     * Associated adapter.
-     */
-    protected Adapter adapter = null;
 
 
     /**
@@ -219,12 +212,6 @@ public abstract class AbstractHttp11Processor extends AbstractProcessor {
     protected String server = null;
 
     
-    /**
-     * Track changes in state for async requests.
-     */
-    protected AsyncStateMachine asyncStateMachine = new AsyncStateMachine(this);
-
-
     public AbstractHttp11Processor(AbstractEndpoint endpoint) {
         super(endpoint);
     }
@@ -496,26 +483,6 @@ public abstract class AbstractHttp11Processor extends AbstractProcessor {
      */
     public String getServer() {
         return server;
-    }
-
-
-    /**
-     * Set the associated adapter.
-     *
-     * @param adapter the new adapter
-     */
-    public void setAdapter(Adapter adapter) {
-        this.adapter = adapter;
-    }
-
-
-    /**
-     * Get the associated adapter.
-     *
-     * @return the associated adapter
-     */
-    public Adapter getAdapter() {
-        return adapter;
     }
 
 
