@@ -211,21 +211,21 @@ public class AccessLogValve extends ValveBase implements AccessLog {
     /**
      * The system timezone.
      */
-    private volatile TimeZone timezone = null;
+    private static final TimeZone timezone;
 
     
     /**
      * The time zone offset relative to GMT in text form when daylight saving
      * is not in operation.
      */
-    private volatile String timeZoneNoDST = null;
+    private static final String timeZoneNoDST;
 
 
     /**
      * The time zone offset relative to GMT in text form when daylight saving
      * is in operation.
      */
-    private volatile String timeZoneDST = null;
+    private static final String timeZoneDST;
     
     
     /**
@@ -703,7 +703,7 @@ public class AccessLogValve extends ValveBase implements AccessLog {
      *
      * @param month Month number ("01" .. "12").
      */
-    private String lookup(String month) {
+    private static String lookup(String month) {
         int index;
         try {
             index = Integer.parseInt(month) - 1;
@@ -771,7 +771,7 @@ public class AccessLogValve extends ValveBase implements AccessLog {
     }
 
 
-    private String getTimeZone(Date date) {
+    private static String getTimeZone(Date date) {
         if (timezone.inDaylightTime(date)) {
             return timeZoneDST;
         } else {
@@ -780,7 +780,7 @@ public class AccessLogValve extends ValveBase implements AccessLog {
     }
     
     
-    private String calculateTimeZoneOffset(long offset) {
+    private static String calculateTimeZoneOffset(long offset) {
         StringBuilder tz = new StringBuilder();
         if ((offset < 0)) {
             tz.append("-");
@@ -803,6 +803,14 @@ public class AccessLogValve extends ValveBase implements AccessLog {
         return tz.toString();
     }
 
+    static {
+        // Initialize the timeZone
+        timezone = TimeZone.getDefault();
+        timeZoneNoDST = calculateTimeZoneOffset(timezone.getRawOffset());
+        int offset = timezone.getDSTSavings();
+        timeZoneDST = calculateTimeZoneOffset(timezone.getRawOffset() + offset);
+    }
+
 
     /**
      * Start this component and implement the requirements
@@ -814,20 +822,14 @@ public class AccessLogValve extends ValveBase implements AccessLog {
     @Override
     protected synchronized void startInternal() throws LifecycleException {
 
-        // Initialize the timeZone, Date formatters, and currentDate
-        TimeZone tz = TimeZone.getDefault();
-        timezone = tz;
-        timeZoneNoDST = calculateTimeZoneOffset(tz.getRawOffset());
-        int offset = tz.getDSTSavings();
-        timeZoneDST = calculateTimeZoneOffset(tz.getRawOffset() + offset);
-
+        // Initialize the Date formatters
         String format = getFileDateFormat();
         if (format == null || format.length() == 0) {
             format = "yyyy-MM-dd";
             setFileDateFormat(format);
         }
         fileDateFormatter = new SimpleDateFormat(format);
-        fileDateFormatter.setTimeZone(tz);
+        fileDateFormatter.setTimeZone(timezone);
         dateStamp = fileDateFormatter.format(currentDateStruct.get().currentDate);
         open();
         
