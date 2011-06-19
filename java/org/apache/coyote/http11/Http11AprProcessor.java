@@ -25,9 +25,7 @@ import java.security.cert.X509Certificate;
 import java.util.Locale;
 
 import org.apache.coyote.ActionCode;
-import org.apache.coyote.Request;
 import org.apache.coyote.RequestInfo;
-import org.apache.coyote.Response;
 import org.apache.coyote.http11.filters.BufferedInputFilter;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -70,15 +68,11 @@ public class Http11AprProcessor extends AbstractHttp11Processor {
 
         super(endpoint);
         
-        request = new Request();
         inputBuffer = new InternalAprInputBuffer(request, headerBufferSize);
         request.setInputBuffer(inputBuffer);
 
-        response = new Response();
-        response.setHook(this);
         outputBuffer = new InternalAprOutputBuffer(response, headerBufferSize);
         response.setOutputBuffer(outputBuffer);
-        request.setResponse(response);
 
         initializeFilters(maxTrailerSize);
 

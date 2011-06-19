@@ -25,9 +25,7 @@ import java.net.Socket;
 import java.util.Locale;
 
 import org.apache.coyote.ActionCode;
-import org.apache.coyote.Request;
 import org.apache.coyote.RequestInfo;
-import org.apache.coyote.Response;
 import org.apache.coyote.http11.filters.BufferedInputFilter;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -65,15 +63,11 @@ public class Http11Processor extends AbstractHttp11Processor {
 
         super(endpoint);
         
-        request = new Request();
         inputBuffer = new InternalInputBuffer(request, headerBufferSize);
         request.setInputBuffer(inputBuffer);
 
-        response = new Response();
-        response.setHook(this);
         outputBuffer = new InternalOutputBuffer(response, headerBufferSize);
         response.setOutputBuffer(outputBuffer);
-        request.setResponse(response);
 
         initializeFilters(maxTrailerSize);
 

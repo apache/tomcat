@@ -70,7 +70,6 @@ public class AjpAprProcessor extends AbstractAjpProcessor {
 
         super(packetSize, endpoint);
 
-        response.setHook(this);
         response.setOutputBuffer(new SocketOutputBuffer());
 
         // Set the get body message buffer

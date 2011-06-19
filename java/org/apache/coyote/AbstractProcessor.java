@@ -26,14 +26,25 @@ import org.apache.tomcat.util.net.AbstractEndpoint;
  */
 public abstract class AbstractProcessor implements ActionHook, Processor {
 
-    protected AbstractEndpoint endpoint;
-    protected Request request = null;
-    protected Response response = null;
+    protected Adapter adapter;
+    protected final AsyncStateMachine asyncStateMachine;
+    protected final AbstractEndpoint endpoint;
+    protected final Request request;
+    protected final Response response;
 
     
     public AbstractProcessor(AbstractEndpoint endpoint) {
         this.endpoint = endpoint;
+        asyncStateMachine = new AsyncStateMachine(this);
+        
+        request = new Request();
+
+        response = new Response();
+        response.setHook(this);
+        request.setResponse(response);
+
     }
+
 
     /**
      * The endpoint receiving connections that are handled by this processor.
@@ -49,6 +60,27 @@ public abstract class AbstractProcessor implements ActionHook, Processor {
     public Request getRequest() {
         return request;
     }
+
+
+    /**
+     * Set the associated adapter.
+     *
+     * @param adapter the new adapter
+     */
+    public void setAdapter(Adapter adapter) {
+        this.adapter = adapter;
+    }
+
+
+    /**
+     * Get the associated adapter.
+     *
+     * @return the associated adapter
+     */
+    public Adapter getAdapter() {
+        return adapter;
+    }
+
 
 
     /*

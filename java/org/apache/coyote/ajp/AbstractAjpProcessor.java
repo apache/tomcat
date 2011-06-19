@@ -28,13 +28,10 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.coyote.AbstractProcessor;
 import org.apache.coyote.ActionCode;
-import org.apache.coyote.Adapter;
 import org.apache.coyote.AsyncContextCallback;
-import org.apache.coyote.AsyncStateMachine;
 import org.apache.coyote.InputBuffer;
 import org.apache.coyote.Request;
 import org.apache.coyote.RequestInfo;
-import org.apache.coyote.Response;
 import org.apache.juli.logging.Log;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.buf.ByteChunk;
@@ -115,12 +112,6 @@ public abstract class AbstractAjpProcessor extends AbstractProcessor {
 
     
     // ----------------------------------------------------- Instance Variables
-
-
-    /**
-     * Associated adapter.
-     */
-    protected Adapter adapter = null;
 
 
     /**
@@ -210,12 +201,6 @@ public abstract class AbstractAjpProcessor extends AbstractProcessor {
     
     
     /**
-     * Track changes in state for async requests.
-     */
-    protected AsyncStateMachine asyncStateMachine = new AsyncStateMachine(this);
-
-
-    /**
      * Bytes written to client for the current request
      */
     protected long byteCount = 0;
@@ -229,12 +214,8 @@ public abstract class AbstractAjpProcessor extends AbstractProcessor {
 
         this.packetSize = packetSize;
 
-        request = new Request();
         request.setInputBuffer(new SocketInputBuffer());
         
-        response = new Response();
-        request.setResponse(response);
-
         requestHeaderMessage = new AjpMessage(packetSize);
         responseHeaderMessage = new AjpMessage(packetSize);
         bodyMessage = new AjpMessage(packetSize);
@@ -508,29 +489,6 @@ public abstract class AbstractAjpProcessor extends AbstractProcessor {
        certificates.recycle();
        byteCount = 0;
    }
-   
-   // ------------------------------------------------------ Connector Methods
-
-
-   /**
-    * Set the associated adapter.
-    *
-    * @param adapter the new adapter
-    */
-   public void setAdapter(Adapter adapter) {
-       this.adapter = adapter;
-   }
-
-
-   /**
-    * Get the associated adapter.
-    *
-    * @return the associated adapter
-    */
-   public Adapter getAdapter() {
-       return adapter;
-   }
-   
    
    // ------------------------------------------------------ Protected Methods
 
