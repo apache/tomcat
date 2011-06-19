@@ -447,15 +447,16 @@ public class Http11NioProcessor extends AbstractHttp11Processor {
 
     @Override
     public void recycleInternal() {
-        this.socket = null;
-        this.cometClose = false;
-        this.comet = false;
+        socket = null;
+        cometClose = false;
+        comet = false;
         remoteAddr = null;
         remoteHost = null;
         localAddr = null;
         localName = null;
         remotePort = -1;
         localPort = -1;
+        sendfileData = null;
     }
 
 
@@ -680,7 +681,6 @@ public class Http11NioProcessor extends AbstractHttp11Processor {
         http09 = false;
         contentDelimitation = false;
         expectation = false;
-        sendfileData = null;
         if (endpoint.isSSLEnabled()) {
             request.scheme().setString("https");
         }
