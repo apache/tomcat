@@ -71,17 +71,6 @@ public class AjpProcessor extends AbstractAjpProcessor {
 
         response.setOutputBuffer(new SocketOutputBuffer());
 
-        // Set the get body message buffer
-        AjpMessage getBodyMessage = new AjpMessage(16);
-        getBodyMessage.reset();
-        getBodyMessage.appendByte(Constants.JK_AJP13_GET_BODY_CHUNK);
-        // Adjust allowed size if packetSize != default (Constants.MAX_PACKET_SIZE)
-        getBodyMessage.appendInt(Constants.MAX_READ_SIZE + packetSize - Constants.MAX_PACKET_SIZE);
-        getBodyMessage.end();
-        getBodyMessageArray = new byte[getBodyMessage.getLen()];
-        System.arraycopy(getBodyMessage.getBuffer(), 0, getBodyMessageArray, 
-                         0, getBodyMessage.getLen());
-
         // Cause loading of HexUtils
         HexUtils.load();
 
@@ -111,15 +100,6 @@ public class AjpProcessor extends AbstractAjpProcessor {
      */
     protected OutputStream output;
     
-
-    /**
-     * Direct buffer used for sending right away a get body message.
-     */
-    protected final byte[] getBodyMessageArray;
-
-
-    // ------------------------------------------------------------- Properties
-
 
     // --------------------------------------------------------- Public Methods
 
