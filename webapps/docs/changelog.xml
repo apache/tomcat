@@ -81,6 +81,10 @@
         Only add socket to poller if we are sure we don't close it later.
         (rjung)
       </fix>
+      <update>
+        Various refactorings to reduce code duplication and unnecessary code in
+        the connectors. (markt)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Jasper">
