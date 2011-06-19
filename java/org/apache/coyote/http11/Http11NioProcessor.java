@@ -72,7 +72,7 @@ public class Http11NioProcessor extends AbstractHttp11Processor {
     public Http11NioProcessor(int maxHttpHeaderSize, NioEndpoint endpoint,
             int maxTrailerSize) {
 
-        this.endpoint = endpoint;
+        super(endpoint);
 
         request = new Request();
         inputBuffer = new InternalNioInputBuffer(request, maxHttpHeaderSize);

@@ -68,7 +68,7 @@ public class Http11AprProcessor extends AbstractHttp11Processor {
     public Http11AprProcessor(int headerBufferSize, AprEndpoint endpoint,
             int maxTrailerSize) {
 
-        this.endpoint = endpoint;
+        super(endpoint);
         
         request = new Request();
         inputBuffer = new InternalAprInputBuffer(request, headerBufferSize);
