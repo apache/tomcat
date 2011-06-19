@@ -212,7 +212,6 @@ public class Http11AprProcessor extends AbstractHttp11Processor {
         
         boolean keptAlive = false;
         boolean openSocket = false;
-        boolean addToPoller = false;
 
         while (!error && keepAlive && !comet && !isAsync() && !endpoint.isPaused()) {
 
@@ -232,7 +231,6 @@ public class Http11AprProcessor extends AbstractHttp11Processor {
                         adapter.log(request, response, 0);
                         error = true;
                     } else {
-                        addToPoller = true;
                         break;
                     }
                 }
@@ -350,10 +348,6 @@ public class Http11AprProcessor extends AbstractHttp11Processor {
         } else if (comet  || isAsync()) {
             return SocketState.LONG;
         } else {
-            // Add the socket to the poller
-            if (addToPoller) {
-                ((AprEndpoint)endpoint).getPoller().add(socketRef);
-            }
             return (openSocket) ? SocketState.OPEN : SocketState.CLOSED;
         }
         
