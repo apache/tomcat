@@ -702,6 +702,10 @@ public class Http11NioProcessor extends AbstractHttp11Processor {
             http11 = false;
             error = true;
             // Send 505; Unsupported HTTP version
+            if (log.isDebugEnabled()) {
+                log.debug(sm.getString("http11processor.request.prepare")+
+                          " Unsupported HTTP version \""+protocolMB+"\"");
+            }
             response.setStatus(505);
             adapter.log(request, response, 0);
         }
@@ -810,6 +814,10 @@ public class Http11NioProcessor extends AbstractHttp11Processor {
                 // Unsupported transfer encoding
                 error = true;
                 // 501 - Unimplemented
+                if (log.isDebugEnabled()) {
+                    log.debug(sm.getString("http11processor.request.prepare")+
+                              " Unsupported transfer encoding \""+encodingName+"\"");
+                }
                 response.setStatus(501);
                 adapter.log(request, response, 0);
             }
@@ -829,6 +837,10 @@ public class Http11NioProcessor extends AbstractHttp11Processor {
         if (http11 && (valueMB == null)) {
             error = true;
             // 400 - Bad request
+            if (log.isDebugEnabled()) {
+                log.debug(sm.getString("http11processor.request.prepare")+
+                          " host header missing");
+            }
             response.setStatus(400);
             adapter.log(request, response, 0);
         }
@@ -845,13 +857,21 @@ public class Http11NioProcessor extends AbstractHttp11Processor {
         }
 
         // Advertise sendfile support through a request attribute
-        if (endpoint.getUseSendfile()) 
-            request.setAttribute("org.apache.tomcat.sendfile.support", Boolean.TRUE);
+        if (endpoint.getUseSendfile()) {
+            request.setAttribute("org.apache.tomcat.sendfile.support",
+                    Boolean.TRUE);
+        }
+        
         // Advertise comet support through a request attribute
-        request.setAttribute("org.apache.tomcat.comet.support", Boolean.TRUE);
+        if (endpoint.getUseComet()) {
+            request.setAttribute("org.apache.tomcat.comet.support",
+                    Boolean.TRUE);
+        }
         // Advertise comet timeout support
-        request.setAttribute("org.apache.tomcat.comet.timeout.support", Boolean.TRUE);
-
+        if (endpoint.getUseCometTimeout()) {
+            request.setAttribute("org.apache.tomcat.comet.timeout.support",
+                    Boolean.TRUE);
+        }
     }
 
 
