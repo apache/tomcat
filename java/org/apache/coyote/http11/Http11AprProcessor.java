@@ -390,7 +390,8 @@ public class Http11AprProcessor extends AbstractHttp11Processor {
 
     @Override
     public void recycleInternal() {
-        this.socket = null;
+        socket = null;
+        sendfileData = null;
     }
     
 
@@ -636,7 +637,6 @@ public class Http11AprProcessor extends AbstractHttp11Processor {
         http09 = false;
         contentDelimitation = false;
         expectation = false;
-        sendfileData = null;
         if (endpoint.isSSLEnabled()) {
             request.scheme().setString("https");
         }
