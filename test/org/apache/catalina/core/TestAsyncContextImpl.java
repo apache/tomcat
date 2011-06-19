@@ -46,7 +46,7 @@ import org.apache.tomcat.util.buf.ByteChunk;
 public class TestAsyncContextImpl extends TomcatBaseTest {
 
     // Time for a request to process (need to allow for threads to start etc.)
-    private static final long REQUEST_TIME = 500;
+    private static final long REQUEST_TIME = 1000;
     // Timeout thread (where used) checks for timeout every second
     private static final long TIMEOUT_MARGIN = 1000;
     // Timing tests need a small error margin to prevent failures
