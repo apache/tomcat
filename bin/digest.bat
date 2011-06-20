@@ -22,10 +22,13 @@ rem $Id$
 rem ---------------------------------------------------------------------------
 
 rem Guess CATALINA_HOME if not defined
+set "CURRENT_DIR=%cd%"
 if not "%CATALINA_HOME%" == "" goto gotHome
-set CATALINA_HOME=.
+set "CATALINA_HOME=%CURRENT_DIR%"
 if exist "%CATALINA_HOME%\bin\tool-wrapper.bat" goto okHome
-set CATALINA_HOME=..
+cd ..
+set "CATALINA_HOME=%cd%"
+cd "%CURRENT_DIR%"
 :gotHome
 if exist "%CATALINA_HOME%\bin\tool-wrapper.bat" goto okHome
 echo The CATALINA_HOME environment variable is not defined correctly
