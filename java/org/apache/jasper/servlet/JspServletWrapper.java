@@ -19,6 +19,8 @@ package org.apache.jasper.servlet;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.Servlet;
@@ -68,6 +70,14 @@ import org.apache.tomcat.InstanceManager;
 
 @SuppressWarnings("deprecation") // Have to support SingleThreadModel
 public class JspServletWrapper {
+
+    private static final Map<String,Long> ALWAYS_OUTDATED_DEPENDENCIES =
+        new HashMap<String,Long>();
+
+    static {
+        // If this is missing, 
+        ALWAYS_OUTDATED_DEPENDENCIES.put("/WEB-INF/web.xml", Long.valueOf(-1));
+    }
 
     // Logger
     private final Log log = LogFactory.getLog(JspServletWrapper.class);
@@ -266,7 +276,7 @@ public class JspServletWrapper {
     /**
      * Get a list of files that the current page has source dependency on.
      */
-    public java.util.List<String> getDependants() {
+    public java.util.Map<String,Long> getDependants() {
         try {
             Object target;
             if (isTagFile) {
@@ -281,6 +291,10 @@ public class JspServletWrapper {
             if (target != null && target instanceof JspSourceDependent) {
                 return ((JspSourceDependent) target).getDependants();
             }
+        } catch (AbstractMethodError ame) {
+            // Almost certainly a pre Tomcat 7.0.17 compiled JSP using the old
+            // version of the interface. Force a re-compile.
+            return ALWAYS_OUTDATED_DEPENDENCIES;
         } catch (Throwable ex) {
             ExceptionUtils.handleThrowable(ex);
         }

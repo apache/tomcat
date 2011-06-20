@@ -34,6 +34,8 @@ import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.Vector;
@@ -525,20 +527,23 @@ class Generator {
         out.println();
 
         // Static data for getDependants()
-        out.printil("private static java.util.List<java.lang.String> _jspx_dependants;");
+        out.printil("private static java.util.Map<java.lang.String,java.lang.Long> _jspx_dependants;");
         out.println();
-        List<String> dependants = pageInfo.getDependants();
-        Iterator<String> iter = dependants.iterator();
+        Map<String,Long> dependants = pageInfo.getDependants();
+        Iterator<Entry<String,Long>> iter = dependants.entrySet().iterator();
         if (!dependants.isEmpty()) {
             out.printil("static {");
             out.pushIndent();
-            out.printin("_jspx_dependants = new java.util.ArrayList<java.lang.String>(");
+            out.printin("_jspx_dependants = new java.util.HashMap<java.lang.String,java.lang.Long>(");
             out.print("" + dependants.size());
             out.println(");");
             while (iter.hasNext()) {
-                out.printin("_jspx_dependants.add(\"");
-                out.print(iter.next());
-                out.println("\");");
+                Entry<String,Long> entry = iter.next();
+                out.printin("_jspx_dependants.put(\"");
+                out.print(entry.getKey());
+                out.print("\", Long.valueOf(");
+                out.print(entry.getValue().toString());
+                out.println("L));");
             }
             out.popIndent();
             out.printil("}");
@@ -576,7 +581,7 @@ class Generator {
      */
     private void genPreambleMethods() {
         // Method used to get compile time file dependencies
-        out.printil("public java.util.List<java.lang.String> getDependants() {");
+        out.printil("public java.util.Map<java.lang.String,java.lang.Long> getDependants() {");
         out.pushIndent();
         out.printil("return _jspx_dependants;");
         out.popIndent();
@@ -3494,6 +3499,9 @@ class Generator {
         out.println(" * Version: " + ctxt.getServletContext().getServerInfo());
         out.println(" * Generated at: " + timestampFormat.format(new Date()) +
                 " UTC");
+        out.println(" * Note: The last modified time of this file was set to");
+        out.println(" *       the last modified time of the source file after");
+        out.println(" *       generation to assist with modification tracking.");
         out.println(" */");
     }
 

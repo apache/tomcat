@@ -170,7 +170,8 @@ class TagLibraryInfoImpl extends TagLibraryInfo implements TagConstants {
                 // Add TLD to dependency list
                 PageInfo pageInfo = ctxt.createCompiler().getPageInfo();
                 if (pageInfo != null) {
-                    pageInfo.addDependant(tldName);
+                    pageInfo.addDependant(tldName,
+                            ctxt.getLastModified(tldName));
                 }
             } else {
                 // Tag library is packaged in JAR file

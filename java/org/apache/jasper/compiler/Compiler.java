@@ -27,7 +27,8 @@ import java.net.JarURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.Iterator;
-import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import org.apache.jasper.JasperException;
 import org.apache.jasper.JspCompilationContext;
@@ -370,6 +371,9 @@ public abstract class Compiler {
 
         try {
             String[] smap = generateJava();
+            File javaFile = new File(ctxt.getServletJavaFileName());
+            Long jspLastModified = ctxt.getLastModified(ctxt.getJspFile());
+            javaFile.setLastModified(jspLastModified.longValue());
             if (compileClass) {
                 generateClass(smap);
                 // Fix for bugzilla 41606
@@ -377,8 +381,12 @@ public abstract class Compiler {
                 String targetFileName = ctxt.getClassFileName();
                 if (targetFileName != null) {
                     File targetFile = new File(targetFileName);
-                    if (targetFile.exists() && jsw != null) {
-                        jsw.setServletClassLastModifiedTime(targetFile.lastModified());
+                    if (targetFile.exists()) {
+                        targetFile.setLastModified(jspLastModified.longValue());
+                        if (jsw != null) {
+                            jsw.setServletClassLastModifiedTime(
+                                    jspLastModified.longValue());
+                        }
                     }
                 }
             }
@@ -440,8 +448,8 @@ public abstract class Compiler {
             jsw.setLastModificationTest(System.currentTimeMillis());
         }
 
-        long jspRealLastModified = ctxt.getJspLastModified();
-        if (jspRealLastModified < 0) {
+        Long jspRealLastModified = ctxt.getLastModified(ctxt.getJspFile());
+        if (jspRealLastModified.longValue() < 0) {
             // Something went wrong - assume modification
             return true;
         }
@@ -463,7 +471,7 @@ public abstract class Compiler {
         if (checkClass && jsw != null) {
             jsw.setServletClassLastModifiedTime(targetLastModified);
         }
-        if (targetLastModified < jspRealLastModified) {
+        if (targetLastModified != jspRealLastModified.longValue()) {
             if (log.isDebugEnabled()) {
                 log.debug("Compiler: outdated: " + targetFile + " "
                         + targetLastModified);
@@ -477,16 +485,16 @@ public abstract class Compiler {
             return false;
         }
 
-        List<String> depends = jsw.getDependants();
+        Map<String,Long> depends = jsw.getDependants();
         if (depends == null) {
             return false;
         }
 
-        Iterator<String> it = depends.iterator();
+        Iterator<Entry<String,Long>> it = depends.entrySet().iterator();
         while (it.hasNext()) {
-            String include = it.next();
+            Entry<String,Long> include = it.next();
             try {
-                URL includeUrl = ctxt.getResource(include);
+                URL includeUrl = ctxt.getResource(include.getKey());
                 if (includeUrl == null) {
                     return true;
                 }
@@ -501,7 +509,7 @@ public abstract class Compiler {
                 }
                 iuc.getInputStream().close();
 
-                if (includeLastModified > targetLastModified) {
+                if (includeLastModified != include.getValue().longValue()) {
                     return true;
                 }
             } catch (Exception e) {
