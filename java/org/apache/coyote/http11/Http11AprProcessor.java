@@ -343,15 +343,8 @@ public class Http11AprProcessor extends AbstractHttp11Processor {
         
     }
 
-    /* Copied from the AjpProcessor.java */
-    public SocketState asyncDispatch(SocketWrapper<Long> socket,
-            SocketStatus status) {
 
-        // Setting up the socket
-        this.socket = socket;
-        long socketRef = socket.getSocket().longValue();
-        inputBuffer.setSocket(socketRef);
-        outputBuffer.setSocket(socketRef);
+    public SocketState asyncDispatch(SocketStatus status) {
 
         RequestInfo rp = request.getRequestProcessor();
         try {
