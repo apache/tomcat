@@ -192,10 +192,13 @@ class ParserController implements TagConstants {
         if (parent != null) {
             // Included resource, add to dependent list
             if (jarFile == null) {
-                compiler.getPageInfo().addDependant(absFileName);
+                compiler.getPageInfo().addDependant(absFileName,
+                        ctxt.getLastModified(absFileName));
             } else {
+                String entry = absFileName.substring(1);
                 compiler.getPageInfo().addDependant(
-                        jarResource.getEntry(absFileName.substring(1)).toString());
+                        jarResource.getEntry(entry).toString(),
+                        Long.valueOf(jarFile.getEntry(entry).getTime()));
                         
             }
         }

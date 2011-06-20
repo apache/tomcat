@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
 
@@ -39,7 +40,7 @@ import org.apache.jasper.JasperException;
 class PageInfo {
 
     private Vector<String> imports;
-    private Vector<String> dependants;
+    private Map<String,Long> dependants;
 
     private BeanRepository beanRepository;
     private Set<String> varInfoNames;
@@ -108,7 +109,7 @@ class PageInfo {
         this.xmlPrefixMapper = new HashMap<String, LinkedList<String>>();
         this.nonCustomTagPrefixMap = new HashMap<String, Mark>();
         this.imports = new Vector<String>();
-        this.dependants = new Vector<String>();
+        this.dependants = new HashMap<String,Long>();
         this.includePrelude = new Vector<String>();
         this.includeCoda = new Vector<String>();
         this.pluginDcls = new Vector<String>();
@@ -146,12 +147,12 @@ class PageInfo {
         return jspFile;
     }
 
-    public void addDependant(String d) {
-        if (!dependants.contains(d) && !jspFile.equals(d))
-                dependants.add(d);
+    public void addDependant(String d, Long lastModified) {
+        if (!dependants.containsKey(d) && !jspFile.equals(d))
+                dependants.put(d, lastModified);
     }
 
-    public List<String> getDependants() {
+    public Map<String,Long> getDependants() {
         return dependants;
     }
 
