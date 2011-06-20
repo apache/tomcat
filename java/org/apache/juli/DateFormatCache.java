@@ -24,7 +24,11 @@ import java.util.Date;
 import java.util.TimeZone;
 
 /**
- * <p>Cache structure for formatted timestamps based on seconds.</p>
+ * <p>Cache structure for SimpleDateFormat formatted timestamps based on
+ * seconds.</p>
+ *
+ * <p>Millisecond formatting using S is not supported. You should add the
+ * millisecond information after getting back the second formatting.</p>
  *
  * <p>The cache consists of entries for a consecutive range of
  * seconds. The length of the range is configurable. It is
@@ -38,6 +42,8 @@ import java.util.TimeZone;
 
 public class DateFormatCache {
 
+    private static final String msecPattern = "#";
+
     /* Timestamp format */
     private final String format;
 
@@ -50,6 +56,32 @@ public class DateFormatCache {
     /* Cache type, "parent" or "child" */
     private String type;
 
+    /**
+     * Replace the millisecond formatting character 'S' by
+     * some dummy characters in order to make the resulting
+     * formatted time stamps cacheable. Our consumer might
+     * choose to replace the dummies with the actual milliseconds
+     * because that's relatively cheap.
+     */
+    private String tidyFormat(String format) {
+        boolean escape = false;
+        StringBuilder result = new StringBuilder();
+        int len = format.length();
+        char x;
+        for (int i = 0; i < len; i++) {
+            x = format.charAt(i);
+            if (escape || x != 'S') {
+                result.append(x);
+            } else {
+                result.append(msecPattern);
+            }
+            if (x == '\'') {
+                escape = !escape;
+            }
+        }
+        return result.toString();
+    }
+
     public DateFormatCache(int size, String format, DateFormatCache parent) {
         if (parent == null) {
             type = "main";
@@ -57,7 +89,7 @@ public class DateFormatCache {
             type = "child";
         }
         cacheSize = size;
-        this.format = format;
+        this.format = tidyFormat(format);
         this.parent = parent;
         Cache parentCache = null;
         if (parent != null) {
