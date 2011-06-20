@@ -81,9 +81,9 @@
       <fix>
         Correct issues with JULI&apos;s OneLineFormatter including: correctly
         re-using formatted timestamps when possible; thread-safety issues in
-        tiomstamp formatting; correcting the output of any milliseconds to
+        timestamp formatting; correcting the output of any milliseconds to
         include leading zeros and formatting any parameters present.
-        (kolinko/markt)
+        (kolinko/markt/rjung)
       </fix>
       <fix>
         <bug>51395</bug>: Fix memory leak triggered when an application that
