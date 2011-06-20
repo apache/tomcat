@@ -1307,7 +1307,7 @@ public class ContextConfig
                 webXml.merge(defaults);
 
                 // Step 8. Convert explicitly mentioned jsps to servlets
-                if (!false) {
+                if (ok) {
                     convertJsps(webXml);
                 }
                 
