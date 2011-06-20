@@ -85,6 +85,11 @@
         include leading zeros and formatting any parameters present.
         (kolinko/markt)
       </fix>
+      <fix>
+        <bug>51395</bug>: Fix memory leak triggered when an application that
+        includes a SAXParserFactory is the first web application to be loaded.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
