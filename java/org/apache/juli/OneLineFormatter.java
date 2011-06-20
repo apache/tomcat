@@ -19,8 +19,6 @@ package org.apache.juli;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.logging.Formatter;
 import java.util.logging.LogRecord;
 
@@ -34,45 +32,59 @@ import java.util.logging.LogRecord;
  */
 public class OneLineFormatter extends Formatter {
 
-    /**
-     * The set of month abbreviations for log messages.
-     */
-    private static final String months[] = {"Jan", "Feb", "Mar", "Apr", "May",
-        "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
-
     private static final String LINE_SEP = System.getProperty("line.separator");
     private static final String ST_SEP = LINE_SEP + " ";
 
-    private final SimpleDateFormat dayFormatter = new SimpleDateFormat("dd");
-    private final SimpleDateFormat monthFormatter = new SimpleDateFormat("MM");
-    private final SimpleDateFormat yearFormatter = new SimpleDateFormat("yyyy");
-    private final SimpleDateFormat timeFormatter =
-        new SimpleDateFormat("HH:mm:ss.SSS");
-    
-    private volatile Date currentDate;
-    private volatile String currentDateString;
+    /* Timestamp format */
+    private static final String timeFormat = "dd-MMM-yyyy HH:mm:ss";
+
+    /**
+     * The size of our global date format cache
+     */
+    private static final int globalCacheSize = 30;
+
+    /**
+     * The size of our thread local date format cache
+     */
+    private static final int localCacheSize = 5;
+
+    /**
+     * Global date format cache.
+     */
+    private static final DateFormatCache globalDateCache =
+            new DateFormatCache(globalCacheSize, timeFormat, null);
+
+    /**
+     * Thread local date format cache.
+     */
+    private static final ThreadLocal<DateFormatCache> localDateCache =
+            new ThreadLocal<DateFormatCache>() {
+        protected DateFormatCache initialValue() {
+            return new DateFormatCache(localCacheSize, timeFormat, globalDateCache);
+        }
+    };
 
     @Override
     public String format(LogRecord record) {
         StringBuilder sb = new StringBuilder();
-        
+
         // Timestamp
-        addTimestamp(sb, new Date(record.getMillis()));
-        
+        addTimestamp(sb, record.getMillis());
+
         // Severity
         sb.append(' ');
         sb.append(record.getLevel());
-        
+
         // Source
         sb.append(' ');
         sb.append(record.getSourceClassName());
         sb.append('.');
         sb.append(record.getSourceMethodName());
-        
+
         // Message
         sb.append(' ');
         sb.append(formatMessage(record));
-        
+
         // Stack trace
         if (record.getThrown() != null) {
             sb.append(ST_SEP);
@@ -89,39 +101,17 @@ public class OneLineFormatter extends Formatter {
         return sb.toString();
     }
 
-    protected void addTimestamp(StringBuilder buf, Date date) {
-        if (currentDate.getTime() != date.getTime()) {
-            synchronized (this) {
-                if (currentDate.getTime() != date.getTime()) {
-                    StringBuilder current = new StringBuilder(32);
-                    current.append(dayFormatter.format(date)); // Day
-                    current.append('-');
-                    current.append(lookup(monthFormatter.format(date))); // Month
-                    current.append('-');
-                    current.append(yearFormatter.format(date)); // Year
-                    current.append(' ');
-                    current.append(timeFormatter.format(date)); // Time
-                    currentDateString = current.toString();
-                    currentDate = date;
-                }
+    protected void addTimestamp(StringBuilder buf, long timestamp) {
+        buf.append(localDateCache.get().getFormat(timestamp));
+        long frac = timestamp % 1000;
+        buf.append(".");
+        if (frac < 100) {
+            if (frac < 10) {
+                buf.append("00");
+            } else {
+                buf.append("0");
             }
         }
-        buf.append(currentDateString);
-    }
-
-    /**
-     * Return the month abbreviation for the specified month, which must
-     * be a two-digit String.
-     *
-     * @param month Month number ("01" .. "12").
-     */
-    private String lookup(String month) {
-        int index;
-        try {
-            index = Integer.parseInt(month) - 1;
-        } catch (Exception e) {
-            index = 0;  // Can not happen, in theory
-        }
-        return (months[index]);
+        buf.append(frac);
     }
 }
