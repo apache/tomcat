@@ -64,14 +64,14 @@
         so only types of interest are reported to a ServletContainerInitializer.
         (markt)
       </fix>
-      <fix>
+      <add>
         <bug>49165</bug>: Allow any time stamp formats supported by SimpleDateFormat
         in AccessLogValve. Support logging begin and/or end of request. (rjung)
-      </fix>
-      <add>
+      </add>
+      <update>
         Add the Tomcat extras JARs to the list of JARs to skip when scanning
         for TLDs and web fragments. (rjung)
-      </add>
+      </update>
     </changelog>
   </subsection>
   <subsection name="Coyote">
@@ -125,6 +125,13 @@
         Add <code>session="false"</code> directive to the index page of the
         ROOT web application. (kkolinko)
       </fix>
+    </changelog>
+  </subsection>
+  <subsection name="Other">
+    <changelog>
+      <update>
+        Clean up shell and batch scripts for consistency. (rjung)
+      </update>
     </changelog>
   </subsection>
 </section>
