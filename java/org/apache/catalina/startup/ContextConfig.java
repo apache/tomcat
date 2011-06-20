@@ -58,6 +58,8 @@ import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleEvent;
 import org.apache.catalina.LifecycleListener;
 import org.apache.catalina.Pipeline;
+import org.apache.catalina.Server;
+import org.apache.catalina.Service;
 import org.apache.catalina.Valve;
 import org.apache.catalina.Wrapper;
 import org.apache.catalina.core.ContainerBase;
@@ -1090,6 +1092,12 @@ public class ContextConfig
         if (log.isDebugEnabled())
             log.debug(sm.getString("contextConfig.destroy"));
 
+        // Skip clearing the work directory if Tomcat is being shutdown
+        Server s = getServer();
+        if (s != null && !s.getState().isAvailable()) {
+            return;
+        }
+        
         // Changed to getWorkPath per Bugzilla 35819.
         String workDir = ((StandardContext) context).getWorkPath();
         if (workDir != null)
@@ -1097,6 +1105,25 @@ public class ContextConfig
     }
     
     
+    private Server getServer() {
+        Container c = context;
+        while (c != null && !(c instanceof Engine)) {
+            c = c.getParent();
+        }
+        
+        if (c == null) {
+            return null;
+        }
+        
+        Service s = ((Engine)c).getService();
+        
+        if (s == null) {
+            return null;
+        }
+        
+        return s.getServer();
+    }
+
     /**
      * Validate the usage of security role names in the web application
      * deployment descriptor.  If any problems are found, issue warning

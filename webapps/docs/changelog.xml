@@ -72,6 +72,12 @@
         Add the Tomcat extras JARs to the list of JARs to skip when scanning
         for TLDs and web fragments. (rjung)
       </update>
+      <fix>
+        The fix for bug <bug>51310</bug> caused a regression that re-introduced
+        bug <bug>49957</bug> and deleted the contents of the work directory
+        when Tomcat was shutdown. This fix ensures that that work directory for
+        an application is not deleted when Tomcat is shutdown. (mark)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
