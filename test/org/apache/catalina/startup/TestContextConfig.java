@@ -69,6 +69,23 @@ public class TestContextConfig extends TomcatBaseTest {
         assertEquals("OK - Custom default Servlet", res.toString());
     }
 
+    public void testBug51396() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+
+        File appDir =  new File("test/webapp-3.0-fragments");
+        // app dir is relative to server home
+        tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());
+        
+        tomcat.start();
+
+        ByteChunk bc = new ByteChunk();
+        int rc = getUrl("http://localhost:" + getPort() +
+                "/test/bug51396.jsp", bc, null);
+        
+        assertEquals(HttpServletResponse.SC_OK, rc);
+        assertTrue(bc.toString().contains("<p>OK</p>"));
+    }
+
     private static class CustomDefaultServletSCI
             implements ServletContainerInitializer {
 

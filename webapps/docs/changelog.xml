@@ -91,6 +91,10 @@
         includes a SAXParserFactory is the first web application to be loaded.
         (markt)
       </fix>
+      <fix>
+        <bug>51396</bug>: Correctly handle jsp-file entries in web.xml when the
+        JSP servlet has been configured via code when embedding Tomcat. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
