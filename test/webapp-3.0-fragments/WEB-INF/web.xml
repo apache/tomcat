@@ -43,4 +43,10 @@
     </web-resource-collection>
   </security-constraint>
 
+  <!-- Bug 51396 -->
+  <servlet>
+    <servlet-name>bug51396</servlet-name>
+    <jsp-file>/bug51396.jsp</jsp-file>
+  </servlet>
+
 </web-app>
