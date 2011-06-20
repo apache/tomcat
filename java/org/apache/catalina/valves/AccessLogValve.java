@@ -155,14 +155,6 @@ public class AccessLogValve extends ValveBase implements AccessLog {
 
 
     /**
-     * The set of month abbreviations for log messages.
-     */
-    protected static final String months[] =
-    { "Jan", "Feb", "Mar", "Apr", "May", "Jun",
-      "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
-
-
-    /**
      * enabled this component
      */
     protected boolean enabled = true;
@@ -904,24 +896,6 @@ public class AccessLogValve extends ValveBase implements AccessLog {
             }
         }
 
-    }
-
-
-    /**
-     * Return the month abbreviation for the specified month, which must
-     * be a two-digit String.
-     *
-     * @param month Month number ("01" .. "12").
-     */
-    private static String lookup(String month) {
-        int index;
-        try {
-            index = Integer.parseInt(month) - 1;
-        } catch (Throwable t) {
-            ExceptionUtils.handleThrowable(t);
-            index = 0;  // Can not happen, in theory
-        }
-        return (months[index]);
     }
 
 
