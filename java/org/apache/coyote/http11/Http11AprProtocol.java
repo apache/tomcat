@@ -230,7 +230,7 @@ public class Http11AprProtocol extends AbstractHttp11Protocol {
                 SocketState state = SocketState.CLOSED;
                 do {
                     if (processor.isAsync() || state == SocketState.ASYNC_END) {
-                        state = processor.asyncDispatch(socket, status);
+                        state = processor.asyncDispatch(status);
                     } else if (processor.comet) {
                         state = processor.event(status);
                     } else {
