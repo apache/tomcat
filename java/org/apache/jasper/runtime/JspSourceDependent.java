@@ -17,7 +17,7 @@
 
 package org.apache.jasper.runtime;
 
-import java.util.List;
+import java.util.Map;
 
 /**
  * Interface for tracking the source files dependencies, for the purpose
@@ -31,9 +31,9 @@ import java.util.List;
 public interface JspSourceDependent {
 
    /**
-    * Returns a list of files names that the current page has a source
-    * dependency on.
+    * Returns a map of file names and last modified time where the current page
+    * has a source dependency on the file.
     */
-    public List<String> getDependants();
+    public Map<String,Long> getDependants();
 
 }

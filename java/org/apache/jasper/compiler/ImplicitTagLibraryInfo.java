@@ -121,7 +121,7 @@ class ImplicitTagLibraryInfo extends TagLibraryInfo {
                             
                             // Add implicit TLD to dependency list
                             if (pi != null) {
-                                pi.addDependant(path);
+                                pi.addDependant(path, ctxt.getLastModified(path));
                             }
                             
                             ParserUtils pu = new ParserUtils();
