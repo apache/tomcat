@@ -37,7 +37,8 @@ rem   JAVA_HOME       Must point at your Java Development Kit installation.
 rem                   Required to run the with the "debug" argument.
 rem
 rem   JRE_HOME        Must point at your Java Runtime installation.
-rem                   Defaults to JAVA_HOME if empty.
+rem                   Defaults to JAVA_HOME if empty. If JRE_HOME and JAVA_HOME
+rem                   are both set, JRE_HOME is used.
 rem
 rem   JAVA_OPTS       (Optional) Java runtime options used when the "start",
 rem                   "stop", or "run" command is executed.
