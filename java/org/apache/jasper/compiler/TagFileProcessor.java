@@ -21,6 +21,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map.Entry;
 import java.util.Vector;
 
 import javax.el.MethodExpression;
@@ -586,10 +587,12 @@ class TagFileProcessor {
             try {
                 Object tagIns = tagClazz.newInstance();
                 if (tagIns instanceof JspSourceDependent) {
-                    Iterator<String> iter = ((JspSourceDependent) tagIns)
-                            .getDependants().iterator();
+                    Iterator<Entry<String,Long>> iter = ((JspSourceDependent)
+                            tagIns).getDependants().entrySet().iterator();
                     while (iter.hasNext()) {
-                        parentPageInfo.addDependant(iter.next());
+                        Entry<String,Long> entry = iter.next();
+                        parentPageInfo.addDependant(entry.getKey(),
+                                entry.getValue());
                     }
                 }
             } catch (Exception e) {
@@ -628,16 +631,26 @@ class TagFileProcessor {
                             tagFileInfo.getTagInfo().getTagLibrary().getURI());
                     JarResource jarResource = location.getJarResource();
                     if (jarResource != null) {
-                        // Add TLD
-                        pageInfo.addDependant(jarResource.getEntry(location.getName()).toString());
-                        // Add Tag
-                        pageInfo.addDependant(jarResource.getEntry(tagFilePath.substring(1)).toString());
+                        try {
+                            // Add TLD
+                            pageInfo.addDependant(jarResource.getEntry(location.getName()).toString(),
+                                    Long.valueOf(jarResource.getJarFile().getEntry(location.getName()).getTime()));
+                            // Add Tag
+                            pageInfo.addDependant(jarResource.getEntry(tagFilePath.substring(1)).toString(),
+                                    Long.valueOf(jarResource.getJarFile().getEntry(tagFilePath.substring(1)).getTime()));
+                        } catch (IOException ioe) {
+                            throw new JasperException(ioe);
+                        }
                     }
                     else {
-                        pageInfo.addDependant(tagFilePath);
+                        pageInfo.addDependant(tagFilePath,
+                                compiler.getCompilationContext().getLastModified(
+                                        tagFilePath));
                     }
                 } else {
-                    pageInfo.addDependant(tagFilePath);
+                    pageInfo.addDependant(tagFilePath,
+                            compiler.getCompilationContext().getLastModified(
+                                    tagFilePath));
                 }
                 Class<?> c = loadTagFile(compiler, tagFilePath, n.getTagInfo(),
                         pageInfo);

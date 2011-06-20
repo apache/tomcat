@@ -3025,6 +3025,8 @@ public class WebappClassLoader
                                                 }
                                                 os.write(buf, 0, n);
                                             }
+                                            resourceFile.setLastModified(
+                                                    jarEntry2.getTime());
                                         } catch (IOException e) {
                                             // Ignore
                                         } finally {

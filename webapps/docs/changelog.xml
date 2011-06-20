@@ -107,6 +107,15 @@
         Improve the message printed by TldLocationsCache and add configuration
         example to the <code>logging.properties</code> file. (kkolinko)
       </update>
+      <fix>
+        <bug>33453</bug>: Recompile JSPs if last modified time of the source or
+        any of its dependencies changes either forwards or backwards. Note that
+        this introduces an incompatible change to the code generated for JSPs.
+        Tomcat will automatically re-compile any JSPs and tag files found in the
+        work directory when upgrading from 7.0.16 or earlier to 7.0.17 or later.
+        If you later downgrade from 7.0.17 or later to 7.0.16 or earlier, you
+        must empty the work directory as part of the downgrade process. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">
