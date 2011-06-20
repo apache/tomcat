@@ -215,6 +215,7 @@ if ""%1"" == ""debug"" goto doDebug
 if ""%1"" == ""run"" goto doRun
 if ""%1"" == ""start"" goto doStart
 if ""%1"" == ""stop"" goto doStop
+if ""%1"" == ""configtest"" goto doConfigTest
 if ""%1"" == ""version"" goto doVersion
 
 echo Usage:  catalina ( commands ... )
@@ -227,6 +228,7 @@ echo   run -security     Start in the current window with security manager
 echo   start             Start Catalina in a separate window
 echo   start -security   Start in a separate window with security manager
 echo   stop              Stop Catalina
+echo   configtest        Run a basic syntax check on server.xml
 echo   version           What version of tomcat are you running?
 goto end
 
@@ -266,6 +268,12 @@ goto execCmd
 :doStop
 shift
 set ACTION=stop
+set CATALINA_OPTS=
+goto execCmd
+
+:doConfigTest
+shift
+set ACTION=configtest
 set CATALINA_OPTS=
 goto execCmd
 
