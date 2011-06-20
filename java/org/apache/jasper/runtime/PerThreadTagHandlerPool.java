@@ -31,7 +31,11 @@ import org.apache.jasper.Constants;
  *
  * @author Jan Luehe
  * @author Costin Manolache
+ * 
+ * @deprecated Use of ThreadLocals is likely to trigger memory leaks. Use
+ *             TagHandlerPool. Will be removed in Tomcat 8.0.x.
  */
+@Deprecated
 public class PerThreadTagHandlerPool extends TagHandlerPool {
 
     private int maxSize;
