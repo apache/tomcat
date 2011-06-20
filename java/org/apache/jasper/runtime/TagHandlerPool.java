@@ -28,53 +28,54 @@ import org.apache.tomcat.InstanceManager;
 
 /**
  * Pool of tag handlers that can be reused.
- *
+ * 
  * @author Jan Luehe
  */
 public class TagHandlerPool {
 
     private Tag[] handlers;
 
-    public static final String OPTION_TAGPOOL="tagpoolClassName";
-    public static final String OPTION_MAXSIZE="tagpoolMaxSize";
+    public static final String OPTION_TAGPOOL = "tagpoolClassName";
+    public static final String OPTION_MAXSIZE = "tagpoolMaxSize";
 
     private final Log log = LogFactory.getLog(TagHandlerPool.class);
-    
+
     // index of next available tag handler
     private int current;
     protected InstanceManager instanceManager = null;
 
-    public static TagHandlerPool getTagHandlerPool( ServletConfig config) {
-        TagHandlerPool result=null;
+    public static TagHandlerPool getTagHandlerPool(ServletConfig config) {
+        TagHandlerPool result = null;
 
-        String tpClassName=getOption( config, OPTION_TAGPOOL, null);
-        if( tpClassName != null ) {
+        String tpClassName = getOption(config, OPTION_TAGPOOL, null);
+        if (tpClassName != null) {
             try {
-                Class<?> c=Class.forName( tpClassName );
-                result=(TagHandlerPool)c.newInstance();
+                Class<?> c = Class.forName(tpClassName);
+                result = (TagHandlerPool) c.newInstance();
             } catch (Exception e) {
                 e.printStackTrace();
-                result=null;
+                result = null;
             }
         }
-        if( result==null ) result=new TagHandlerPool();
+        if (result == null)
+            result = new TagHandlerPool();
         result.init(config);
 
         return result;
     }
 
-    protected void init( ServletConfig config ) {
-        int maxSize=-1;
-        String maxSizeS=getOption(config, OPTION_MAXSIZE, null);
-        if( maxSizeS != null ) {
+    protected void init(ServletConfig config) {
+        int maxSize = -1;
+        String maxSizeS = getOption(config, OPTION_MAXSIZE, null);
+        if (maxSizeS != null) {
             try {
-                maxSize=Integer.parseInt(maxSizeS);
-            } catch( Exception ex) {
-                maxSize=-1;
+                maxSize = Integer.parseInt(maxSizeS);
+            } catch (Exception ex) {
+                maxSize = -1;
             }
         }
-        if( maxSize <0  ) {
-            maxSize=Constants.MAX_POOL_SIZE;
+        if (maxSize < 0) {
+            maxSize = Constants.MAX_POOL_SIZE;
         }
         this.handlers = new Tag[maxSize];
         this.current = -1;
@@ -92,16 +93,16 @@ public class TagHandlerPool {
     /**
      * Gets the next available tag handler from this tag handler pool,
      * instantiating one if this tag handler pool is empty.
-     *
-     * @param handlerClass Tag handler class
-     *
+     * 
+     * @param handlerClass
+     *            Tag handler class
      * @return Reused or newly instantiated tag handler
-     *
-     * @throws JspException if a tag handler cannot be instantiated
+     * @throws JspException
+     *             if a tag handler cannot be instantiated
      */
     public Tag get(Class<? extends Tag> handlerClass) throws JspException {
         Tag handler;
-        synchronized( this ) {
+        synchronized (this) {
             if (current >= 0) {
                 handler = handlers[current--];
                 return handler;
@@ -112,7 +113,8 @@ public class TagHandlerPool {
         // wait for us to construct a tag for this thread.
         try {
             if (Constants.USE_INSTANCE_MANAGER_FOR_TAGS) {
-                return (Tag) instanceManager.newInstance(handlerClass.getName(), handlerClass.getClassLoader());
+                return (Tag) instanceManager.newInstance(
+                        handlerClass.getName(), handlerClass.getClassLoader());
             } else {
                 Tag instance = handlerClass.newInstance();
                 instanceManager.newInstance(instance);
@@ -127,11 +129,12 @@ public class TagHandlerPool {
      * Adds the given tag handler to this tag handler pool, unless this tag
      * handler pool has already reached its capacity, in which case the tag
      * handler's release() method is called.
-     *
-     * @param handler Tag handler to add to this tag handler pool
+     * 
+     * @param handler
+     *            Tag handler to add to this tag handler pool
      */
     public void reuse(Tag handler) {
-        synchronized( this ) {
+        synchronized (this) {
             if (current < (handlers.length - 1)) {
                 handlers[++current] = handler;
                 return;
@@ -142,8 +145,8 @@ public class TagHandlerPool {
         try {
             instanceManager.destroyInstance(handler);
         } catch (Exception e) {
-            log.warn("Error processing preDestroy on tag instance of "
-                    + handler.getClass().getName(), e);
+            log.warn("Error processing preDestroy on tag instance of " +
+                    handler.getClass().getName(), e);
         }
     }
 
@@ -157,23 +160,26 @@ public class TagHandlerPool {
             try {
                 instanceManager.destroyInstance(handlers[i]);
             } catch (Exception e) {
-                log.warn("Error processing preDestroy on tag instance of "
-                        + handlers[i].getClass().getName(), e);
+                log.warn("Error processing preDestroy on tag instance of " +
+                        handlers[i].getClass().getName(), e);
             }
         }
     }
 
-    protected static String getOption( ServletConfig config, String name, String defaultV) {
-        if( config == null ) return defaultV;
-
-        String value=config.getInitParameter(name);
-        if( value != null ) return value;
-        if( config.getServletContext() ==null )
+    protected static String getOption(ServletConfig config, String name,
+            String defaultV) {
+        if (config == null)
             return defaultV;
-        value=config.getServletContext().getInitParameter(name);
-        if( value!=null ) return value;
+
+        String value = config.getInitParameter(name);
+        if (value != null)
+            return value;
+        if (config.getServletContext() == null)
+            return defaultV;
+        value = config.getServletContext().getInitParameter(name);
+        if (value != null)
+            return value;
         return defaultV;
     }
 
 }
-
