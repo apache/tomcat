@@ -116,17 +116,18 @@ public abstract class TomcatBaseTest extends TestCase {
                 "tomcat-dbcp.jar," +
                 "tomcat-i18n-en.jar,tomcat-i18n-es.jar,tomcat-i18n-fr.jar," +
                 "tomcat-i18n-ja.jar," +
+                "tomcat-juli-adapters.jar,catalina-jmx-remote.jar,catalina-ws.jar," +
                 "commons-beanutils*.jar,commons-collections*.jar," +
                 "commons-dbcp*.jar,commons-digester*.jar," +
                 "commons-fileupload*.jar,commons-io*.jar," +
                 "commons-logging*.jar,commons-math*.jar,commons-pool*.jar," +
                 "jstl.jar," +
                 "geronimo-spec-jaxrpc*.jar,wsdl4j*.jar," +
-                "ant.jar,jmx.jar,hibernate*.jar,jmx-tools.jar,jta*.jar," +
+                "ant.jar,ant-junit*.jar,jmx.jar,hibernate*.jar,jmx-tools.jar,jta*.jar," +
                 "log4j*.jar,slf4j*.jar" +
                 "xercesImpl.jar,xmlParserAPIs.jar,xml-apis.jar," +
                 "dnsns.jar,ldapsec.jar,localedata.jar,sunjce_provider.jar," +
-                "sunpkcs11.jar,tools.jar," +
+                "sunpkcs11.jar,jhall.jar,tools.jar," +
                 "apple_provider.jar,AppleScriptEngine.jar,CoreAudio.jar," +
                 "dns_sd.jar,j3daudio.jar,j3dcore.jar,j3dutils.jar," +
                 "jai_core.jar,jai_codec.jar," +
