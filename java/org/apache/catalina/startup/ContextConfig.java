@@ -1381,15 +1381,29 @@ public class ContextConfig
     }
 
     private void convertJsps(WebXml webXml) {
+        Map<String,String> jspInitParams;
         ServletDef jspServlet = webXml.getServlets().get("jsp");
+        if (jspServlet == null) {
+            jspInitParams = new HashMap<String,String>();
+            Wrapper w = (Wrapper) context.findChild("jsp");
+            if (w != null) {
+                String[] params = w.findInitParameters();
+                for (String param : params) {
+                    jspInitParams.put(param, w.findInitParameter(param));
+                }
+            }
+        } else {
+            jspInitParams = jspServlet.getParameterMap();
+        }
         for (ServletDef servletDef: webXml.getServlets().values()) {
             if (servletDef.getJspFile() != null) {
-                convertJsp(servletDef, jspServlet);
+                convertJsp(servletDef, jspInitParams);
             }
         }
     }
 
-    private void convertJsp(ServletDef servletDef, ServletDef jspServletDef) {
+    private void convertJsp(ServletDef servletDef,
+            Map<String,String> jspInitParams) {
         servletDef.setServletClass(org.apache.catalina.core.Constants.JSP_SERVLET_CLASS);
         String jspFile = servletDef.getJspFile();
         if ((jspFile != null) && !jspFile.startsWith("/")) {
@@ -1405,7 +1419,7 @@ public class ContextConfig
         }
         servletDef.getParameterMap().put("jspFile", jspFile);
         servletDef.setJspFile(null);
-        for (Map.Entry<String, String> initParam: jspServletDef.getParameterMap().entrySet()) {
+        for (Map.Entry<String, String> initParam: jspInitParams.entrySet()) {
             servletDef.addInitParameter(initParam.getKey(), initParam.getValue());
         }
     }
