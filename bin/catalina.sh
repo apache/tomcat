@@ -482,13 +482,17 @@ elif [ "$1" = "stop" ] ; then
 
 elif [ "$1" = "configtest" ] ; then
 
-    eval \"$_RUNJAVA\" $JAVA_OPTS $CATALINA_OPTS \
+    eval \"$_RUNJAVA\" $JAVA_OPTS \
       -Djava.endorsed.dirs=\"$JAVA_ENDORSED_DIRS\" -classpath \"$CLASSPATH\" \
       -Dcatalina.base=\"$CATALINA_BASE\" \
       -Dcatalina.home=\"$CATALINA_HOME\" \
       -Djava.io.tmpdir=\"$CATALINA_TMPDIR\" \
       org.apache.catalina.startup.Bootstrap configtest 
-    exit $?
+    result=$?
+    if [ $result -ne 0 ]; then
+        echo "Configuration error detected!"
+    fi
+    exit $result
 
 elif [ "$1" = "version" ] ; then
 
@@ -516,6 +520,7 @@ else
   echo "  stop n            Stop Catalina, waiting up to n seconds for the process to end"
   echo "  stop -force       Stop Catalina, wait up to 5 seconds and then use kill -KILL if still running"
   echo "  stop n -force     Stop Catalina, wait up to n seconds and then use kill -KILL if still running"
+  echo "  configtest        Run a basic syntax check on server.xml - check exit code for result"
   echo "  version           What version of tomcat are you running?"
   echo "Note: Waiting for the process to end and use of the -force option require that \$CATALINA_PID is defined"
   exit 1
