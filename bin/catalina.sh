@@ -16,7 +16,7 @@
 # limitations under the License.
 
 # -----------------------------------------------------------------------------
-# Start/Stop Script for the CATALINA Server
+# Control Script for the CATALINA Server
 #
 # Environment Variable Prerequisites
 #
@@ -40,8 +40,9 @@
 #   JAVA_HOME       Must point at your Java Development Kit installation.
 #                   Required to run the with the "debug" argument.
 #
-#   JRE_HOME        Must point at your Java Development Kit installation.
-#                   Defaults to JAVA_HOME if empty.
+#   JRE_HOME        Must point at your Java Runtime installation.
+#                   Defaults to JAVA_HOME if empty. If JRE_HOME and JAVA_HOME
+#                   are both set, JRE_HOME is used.
 #
 #   JAVA_OPTS       (Optional) Java runtime options used when the "start",
 #                   "stop", or "run" command is executed.
@@ -87,12 +88,12 @@
 
 # OS specific support.  $var _must_ be set to either true or false.
 cygwin=false
-os400=false
 darwin=false
+os400=false
 case "`uname`" in
 CYGWIN*) cygwin=true;;
-OS400*) os400=true;;
 Darwin*) darwin=true;;
+OS400*) os400=true;;
 esac
 
 # resolve links - $0 may be a softlink
