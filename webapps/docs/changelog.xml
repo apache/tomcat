@@ -68,6 +68,10 @@
         <bug>49165</bug>: Allow any time stamp formats supported by SimpleDateFormat
         in AccessLogValve. Support logging begin and/or end of request. (rjung)
       </fix>
+      <add>
+        Add the Tomcat extras JARs to the list of JARs to skip when scanning
+        for TLDs and web fragments. (rjung)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
