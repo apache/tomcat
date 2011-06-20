@@ -69,8 +69,8 @@
         in AccessLogValve. Support logging begin and/or end of request. (rjung)
       </add>
       <update>
-        Add the Tomcat extras JARs to the list of JARs to skip when scanning
-        for TLDs and web fragments. (rjung)
+        Add the Tomcat extras, ant-junit and Java Help Jars to the list of JARs
+        to skip when scanning for TLDs and web fragments. (rjung)
       </update>
       <fix>
         The fix for bug <bug>51310</bug> caused a regression that re-introduced
