@@ -109,11 +109,17 @@ cd ..
 set "CATALINA_HOME=%cd%"
 cd "%CURRENT_DIR%"
 :gotHome
+
 if exist "%CATALINA_HOME%\bin\catalina.bat" goto okHome
 echo The CATALINA_HOME environment variable is not defined correctly
 echo This environment variable is needed to run this program
 goto end
 :okHome
+
+rem Copy CATALINA_BASE from CATALINA_HOME if not defined
+if not "%CATALINA_BASE%" == "" goto gotBase
+set "CATALINA_BASE=%CATALINA_HOME%"
+:gotBase
 
 rem Ensure that any user defined CLASSPATH variables are not used on startup,
 rem but allow them to be specified in setenv.bat, in rare case when it is needed.
@@ -144,10 +150,6 @@ if "%CLASSPATH%" == "" goto emptyClasspath
 set "CLASSPATH=%CLASSPATH%;"
 :emptyClasspath
 set "CLASSPATH=%CLASSPATH%%CATALINA_HOME%\bin\bootstrap.jar"
-
-if not "%CATALINA_BASE%" == "" goto gotBase
-set "CATALINA_BASE=%CATALINA_HOME%"
-:gotBase
 
 if not "%CATALINA_TMPDIR%" == "" goto gotTmpdir
 set "CATALINA_TMPDIR=%CATALINA_BASE%\temp"
