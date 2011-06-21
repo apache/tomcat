@@ -20,6 +20,7 @@ package org.apache.catalina.authenticator;
 
 
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.Principal;
@@ -378,7 +379,8 @@ public class DigestAuthenticator extends AuthenticatorBase {
 
         byte[] buffer;
         synchronized (md5Helper) {
-            buffer = md5Helper.digest(ipTimeKey.getBytes());
+            buffer = md5Helper.digest(
+                    ipTimeKey.getBytes(Charset.defaultCharset()));
         }
 
         return currentTime + ":" + md5Encoder.encode(buffer);
@@ -617,7 +619,8 @@ public class DigestAuthenticator extends AuthenticatorBase {
                 request.getRemoteAddr() + ":" + nOnceTime + ":" + key;
             byte[] buffer = null;
             synchronized (md5Helper) {
-                buffer = md5Helper.digest(serverIpTimeKey.getBytes());
+                buffer = md5Helper.digest(
+                        serverIpTimeKey.getBytes(Charset.defaultCharset()));
             }
             String md5ServerIpTimeKey = md5Encoder.encode(buffer);
             if (!md5ServerIpTimeKey.equals(md5clientIpTimeKey)) {
@@ -679,7 +682,7 @@ public class DigestAuthenticator extends AuthenticatorBase {
 
             byte[] buffer;
             synchronized (md5Helper) {
-                buffer = md5Helper.digest(a2.getBytes());
+                buffer = md5Helper.digest(a2.getBytes(Charset.defaultCharset()));
             }
             String md5a2 = md5Encoder.encode(buffer);
 

@@ -18,7 +18,7 @@ package org.apache.tomcat.util.http.fileupload;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -60,6 +60,8 @@ public abstract class FileUploadBase {
 
     // ---------------------------------------------------------- Class methods
 
+    private static final Charset CHARSET_ISO_8859_1 =
+        Charset.forName("ISO-8859-1");
 
     /**
      * <p>Utility method that determines whether the request contains multipart
@@ -372,11 +374,7 @@ public abstract class FileUploadBase {
             return null;
         }
         byte[] boundary;
-        try {
-            boundary = boundaryStr.getBytes("ISO-8859-1");
-        } catch (UnsupportedEncodingException e) {
-            boundary = boundaryStr.getBytes();
-        }
+        boundary = boundaryStr.getBytes(CHARSET_ISO_8859_1);
         return boundary;
     }
 

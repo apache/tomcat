@@ -16,7 +16,7 @@
  */
 package org.apache.catalina.tribes.util;
 
-import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
@@ -27,15 +27,14 @@ import org.apache.catalina.tribes.UniqueId;
 import org.apache.catalina.tribes.group.AbsoluteOrder;
 import org.apache.catalina.tribes.membership.MemberImpl;
 import org.apache.catalina.tribes.membership.Membership;
-import org.apache.juli.logging.Log;
-import org.apache.juli.logging.LogFactory;
 
 /**
  * @author Filip Hanik
  * @version 1.0
  */
 public class Arrays {
-    private static final Log log = LogFactory.getLog(Arrays.class);
+    private static final Charset CHARSET_ISO_8859_1 =
+        Charset.forName("ISO-8859-1");
     
     public static boolean contains(byte[] source, int srcoffset, byte[] key, int keyoffset, int length) {
         if ( srcoffset < 0 || srcoffset >= source.length) throw new ArrayIndexOutOfBoundsException("srcoffset is out of bounds.");
@@ -218,13 +217,6 @@ public class Arrays {
 
 
     public static byte[] convert(String s) {
-        try {
-            return s.getBytes("ISO-8859-1");
-        }catch (UnsupportedEncodingException ux ) {
-            log.error("Unable to convert ["+s+"] into a byte[] using ISO-8859-1 encoding, falling back to default encoding.");
-            return s.getBytes();
-        }
+        return s.getBytes(CHARSET_ISO_8859_1);
     }
-
-
 }

@@ -33,6 +33,7 @@ import java.lang.reflect.Modifier;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.nio.charset.Charset;
 import java.security.AccessControlException;
 import java.security.AccessController;
 import java.security.CodeSource;
@@ -125,6 +126,7 @@ public class WebappClassLoader
     private static final org.apache.juli.logging.Log log=
         org.apache.juli.logging.LogFactory.getLog( WebappClassLoader.class );
 
+    private static final Charset CHARSET_UTF8 = Charset.forName("UTF-8");
     /**
      * List of ThreadGroup names to ignore when scanning for web application
      * started threads that need to be shut down.
@@ -3086,7 +3088,7 @@ public class WebappClassLoader
                         // http://svn.apache.org/viewvc?view=revision&revision=303915
                         String str = new String(binaryContent,0,pos);
                         try {
-                            binaryContent = str.getBytes("UTF-8");
+                            binaryContent = str.getBytes(CHARSET_UTF8);
                         } catch (Exception e) {
                             return null;
                         }
