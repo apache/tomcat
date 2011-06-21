@@ -84,6 +84,12 @@
     <Bug code="IS" />
   </Match>
   <Match>
+    <!-- Use of null is deliberate -->
+    <Class name="org.apache.catalina.ssi.ExpressionParseTree" />
+    <Method name="pushOpp" />
+    <Bug code="NP" />
+  </Match>
+  <Match>
     <!-- Catalina isn't used when embedding -->
     <Class name="org.apache.catalina.startup.Catalina" />
     <Method name="stopServer" />
