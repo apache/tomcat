@@ -191,6 +191,8 @@ public class SemaphoreValve extends ValveBase {
     
     /**
      * Subclass friendly method to add conditions.
+     * @param request 
+     * @param response 
      */
     public boolean controlConcurrency(Request request, Response response) {
         return true;
@@ -200,6 +202,8 @@ public class SemaphoreValve extends ValveBase {
     /**
      * Subclass friendly method to add error handling when a permit isn't
      * granted.
+     * @param request 
+     * @param response 
      * @throws IOException
      * @throws ServletException
      */

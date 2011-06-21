@@ -136,9 +136,10 @@ public class StuckThreadDetectionValve extends ValveBase {
         if (log.isWarnEnabled()) {
             String msg = sm.getString(
                 "stuckThreadDetectionValve.notifyStuckThreadDetected",
-                monitoredThread.getThread().getName(), activeTime,
-                monitoredThread.getStartTime(), numStuckThreads,
-                monitoredThread.getRequestUri(), threshold);
+                monitoredThread.getThread().getName(), Long.valueOf(activeTime),
+                monitoredThread.getStartTime(),
+                Integer.valueOf(numStuckThreads),
+                monitoredThread.getRequestUri(), Integer.valueOf(threshold));
             // msg += "\n" + getStackTraceAsString(trace);
             Throwable th = new Throwable();
             th.setStackTrace(monitoredThread.getThread().getStackTrace());
@@ -151,7 +152,8 @@ public class StuckThreadDetectionValve extends ValveBase {
         if (log.isWarnEnabled()) {
             String msg = sm.getString(
                 "stuckThreadDetectionValve.notifyStuckThreadCompleted",
-                threadName, activeTime, numStuckThreads);
+                threadName, Long.valueOf(activeTime),
+                Integer.valueOf(numStuckThreads));
             // Since the "stuck thread notification" is warn, this should also
             // be warn
             log.warn(msg);
@@ -227,13 +229,13 @@ public class StuckThreadDetectionValve extends ValveBase {
         List<Long> idList = new ArrayList<Long>();
         for (MonitoredThread monitoredThread : activeThreads.values()) {
             if (monitoredThread.isMarkedAsStuck()) {
-                idList.add(monitoredThread.getThread().getId());
+                idList.add(Long.valueOf(monitoredThread.getThread().getId()));
             }
         }
 
         long[] result = new long[idList.size()];
         for (int i = 0; i < result.length; i++) {
-            result[i] = idList.get(i);
+            result[i] = idList.get(i).longValue();
         }
         return result;
     }
