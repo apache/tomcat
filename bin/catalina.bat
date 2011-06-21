@@ -30,7 +30,7 @@ rem                   of a Catalina installation.  If not present, resolves to
 rem                   the same directory that CATALINA_HOME points to.
 rem
 rem   CATALINA_OPTS   (Optional) Java runtime options used when the "start",
-rem                   or "run" command is executed.
+rem                   "run" or "debug" command is executed.
 rem                   Include here and not in JAVA_OPTS all options, that should
 rem                   only be used by Tomcat itself, not by the stop process,
 rem                   the version command etc.
@@ -47,9 +47,9 @@ rem   JRE_HOME        Must point at your Java Runtime installation.
 rem                   Defaults to JAVA_HOME if empty. If JRE_HOME and JAVA_HOME
 rem                   are both set, JRE_HOME is used.
 rem
-rem   JAVA_OPTS       (Optional) Java runtime options used when the "start",
-rem                   "stop", or "run" command is executed.
-rem                   Include here and not in CATALINA_OPTS all options, thatr
+rem   JAVA_OPTS       (Optional) Java runtime options used when any command
+rem                   is executed.
+rem                   Include here and not in CATALINA_OPTS all options, that
 rem                   should be used by Tomcat and also by the stop process,
 rem                   the version command etc.
 rem                   Most options should go into CATALINA_OPTS.
