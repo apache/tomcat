@@ -20,6 +20,9 @@ rem Start/Stop Script for the CATALINA Server
 rem
 rem Environment Variable Prerequisites
 rem
+rem   Do not set the variables in this script. Instead put them into a script
+rem   setenv.bat in CATALINA_BASE/bin to keep your customizations separate.
+rem
 rem   CATALINA_HOME   May point at your Catalina "build" directory.
 rem
 rem   CATALINA_BASE   (Optional) Base directory for resolving dynamic portions
