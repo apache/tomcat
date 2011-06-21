@@ -366,8 +366,6 @@ public class AccessLogValve extends ValveBase implements AccessLog {
             }
         }
 
-        private String type;
-
         /* Number of cached entries */
         private int cacheSize = 0;
 
@@ -376,11 +374,6 @@ public class AccessLogValve extends ValveBase implements AccessLog {
         private HashMap<String, Cache> formatCache = new HashMap<String, Cache>();
 
         private DateFormatCache(int size, DateFormatCache parent) {
-            if (parent == null) {
-                type = "main";
-            } else {
-                type = "child";
-            }
             cacheSize = size;
             this.parent = parent;
             Cache parentCache = null;
@@ -429,6 +422,7 @@ public class AccessLogValve extends ValveBase implements AccessLog {
      */
     private static final ThreadLocal<DateFormatCache> localDateCache =
             new ThreadLocal<DateFormatCache>() {
+        @Override
         protected DateFormatCache initialValue() {
             return new DateFormatCache(localCacheSize, globalDateCache);
         }
