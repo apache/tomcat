@@ -19,12 +19,14 @@
 package org.apache.catalina.util;
 
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
 import java.util.Map;
 import java.util.TimeZone;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.buf.B2CConverter;
 import org.apache.tomcat.util.res.StringManager;
 
 
@@ -199,9 +201,9 @@ public final class RequestUtil {
             byte[] bytes = null;
             try {
                 if (encoding == null) {
-                    bytes = data.getBytes();
+                    bytes = data.getBytes(Charset.defaultCharset());
                 } else {
-                    bytes = data.getBytes(encoding);
+                    bytes = data.getBytes(B2CConverter.getCharset(encoding));
                 }
                 parseParameters(map, bytes, encoding);
             } catch (UnsupportedEncodingException uee) {
@@ -264,9 +266,9 @@ public final class RequestUtil {
         byte[] bytes = null;
         try {
             if (enc == null) {
-                bytes = str.getBytes();
+                bytes = str.getBytes(Charset.defaultCharset());
             } else {
-                bytes = str.getBytes(enc);
+                bytes = str.getBytes(B2CConverter.getCharset(enc));
             }
         } catch (UnsupportedEncodingException uee) {
             log.debug(sm.getString("requestUtil.urlDecode.uee", enc), uee);
@@ -337,7 +339,7 @@ public final class RequestUtil {
         }
         if (enc != null) {
             try {
-                return new String(bytes, 0, ox, enc);
+                return new String(bytes, 0, ox, B2CConverter.getCharset(enc));
             } catch (UnsupportedEncodingException uee) {
                 log.debug(sm.getString("requestUtil.urlDecode.uee", enc), uee);
                 return null;
@@ -411,6 +413,8 @@ public final class RequestUtil {
     public static void parseParameters(Map<String,String[]> map, byte[] data,
             String encoding) throws UnsupportedEncodingException {
 
+        Charset charset = B2CConverter.getCharset(encoding);
+        
         if (data != null && data.length > 0) {
             int    ix = 0;
             int    ox = 0;
@@ -420,7 +424,7 @@ public final class RequestUtil {
                 byte c = data[ix++];
                 switch ((char) c) {
                 case '&':
-                    value = new String(data, 0, ox, encoding);
+                    value = new String(data, 0, ox, charset);
                     if (key != null) {
                         putMapEntry(map, key, value);
                         key = null;
@@ -429,7 +433,7 @@ public final class RequestUtil {
                     break;
                 case '=':
                     if (key == null) {
-                        key = new String(data, 0, ox, encoding);
+                        key = new String(data, 0, ox, charset);
                         ox = 0;
                     } else {
                         data[ox++] = c;
@@ -448,7 +452,7 @@ public final class RequestUtil {
             }
             //The last value does not end in '&'.  So save it now.
             if (key != null) {
-                value = new String(data, 0, ox, encoding);
+                value = new String(data, 0, ox, charset);
                 putMapEntry(map, key, value);
             }
         }

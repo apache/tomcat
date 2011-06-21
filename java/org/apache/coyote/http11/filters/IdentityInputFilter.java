@@ -18,6 +18,7 @@
 package org.apache.coyote.http11.filters;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
 
 import org.apache.coyote.InputBuffer;
 import org.apache.coyote.Request;
@@ -43,7 +44,8 @@ public class IdentityInputFilter implements InputFilter {
 
 
     static {
-        ENCODING.setBytes(ENCODING_NAME.getBytes(), 0, ENCODING_NAME.length());
+        ENCODING.setBytes(ENCODING_NAME.getBytes(Charset.defaultCharset()), 0,
+                ENCODING_NAME.length());
     }
 
 

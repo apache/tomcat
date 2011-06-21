@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -159,7 +160,8 @@ public class SmapUtil {
 
         for (int i = 0; i < smap.length; i += 2) {
             File outServlet = new File(smap[i]);
-            SDEInstaller.install(outServlet, smap[i+1].getBytes());
+            SDEInstaller.install(outServlet,
+                    smap[i+1].getBytes(Charset.defaultCharset()));
         }
     }
 

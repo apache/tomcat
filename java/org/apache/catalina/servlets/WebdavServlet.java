@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.nio.charset.Charset;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
@@ -1151,8 +1152,8 @@ public class WebdavServlet
                 + lock.depth + "-" + lock.owner + "-" + lock.tokens + "-"
                 + lock.expiresAt + "-" + System.currentTimeMillis() + "-"
                 + secret;
-            String lockToken =
-                md5Encoder.encode(md5Helper.digest(lockTokenStr.getBytes()));
+            String lockToken = md5Encoder.encode(md5Helper.digest(
+                    lockTokenStr.getBytes(Charset.defaultCharset())));
 
             if ( (exists) && (object instanceof DirContext) &&
                  (lock.depth == maxDepth) ) {

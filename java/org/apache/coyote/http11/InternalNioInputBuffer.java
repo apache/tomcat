@@ -21,6 +21,7 @@ package org.apache.coyote.http11;
 import java.io.EOFException;
 import java.io.IOException;
 import java.nio.channels.Selector;
+import java.nio.charset.Charset;
 
 import org.apache.coyote.InputBuffer;
 import org.apache.coyote.Request;
@@ -44,6 +45,9 @@ public class InternalNioInputBuffer extends AbstractInputBuffer {
      */
     private static final org.apache.juli.logging.Log log =
         org.apache.juli.logging.LogFactory.getLog(InternalNioInputBuffer.class);
+
+    private static final Charset DEFAULT_CHARSET =
+        Charset.forName("ISO-8859-1");
 
     // -------------------------------------------------------------- Constants
 
@@ -256,7 +260,7 @@ public class InternalNioInputBuffer extends AbstractInputBuffer {
             parsingRequestLinePhase = 2;
             if (log.isDebugEnabled()) {
                 log.debug("Received ["
-                        + new String(buf, pos, lastValid - pos, "ISO-8859-1")
+                        + new String(buf, pos, lastValid - pos, DEFAULT_CHARSET)
                         + "]");
             }
         }
