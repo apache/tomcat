@@ -35,6 +35,7 @@ public class SSIEcho implements SSICommand {
     /**
      * @see SSICommand
      */
+    @Override
     public long process(SSIMediator ssiMediator, String commandName,
             String[] paramNames, String[] paramValues, PrintWriter writer) {
         String encoding = DEFAULT_ENCODING;
