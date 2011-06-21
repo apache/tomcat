@@ -106,6 +106,12 @@
         <bug>51396</bug>: Correctly handle jsp-file entries in web.xml when the
         JSP servlet has been configured via code when embedding Tomcat. (markt)
       </fix>
+      <fix>
+        <bug>51401</bug>: Correctly initialise shared WebRuleSet instance used
+        by the digesters that parse web.xml and prevent incorrect warnings about
+        multiple occurrences of elements that are only allowed to appear once in
+        web.xml and web-fragment.xml. (kfujino)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
