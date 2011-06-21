@@ -39,8 +39,19 @@
 
 <body>
 <!--
+  Subsection ordering:
   General, Catalina, Coyote, Jasper, Cluster, Web applications, Extras, Tribes,
   Other
+
+  Item Ordering:
+
+  Fixes having an issue number are sorted by their number, ascending.
+
+  There is no ordering by add/update/fix.
+
+  Other fixed issues are added to the end of the list, chronologically.
+  They eventually become mixed with the numbered issues. (I.e., numbered
+  issues to not "pop up" wrt. others).
 -->
 <section name="Tomcat 7.0.17 (markt)">
   <subsection name="Catalina">
@@ -162,8 +173,12 @@
   <subsection name="Other">
     <changelog>
       <update>
-        Clean up shell and batch scripts for consistency. (rjung)
+        Clean up shell and batch scripts (improve consistency,
+        clarify comments, add configtest for Windows). (rjung)
       </update>
+      <fix>
+        <bug>51206</bug>: Make CATALINA_BASE visible for setenv.sh. (rjung)
+      </fix>
     </changelog>
   </subsection>
 </section>
