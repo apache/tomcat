@@ -59,6 +59,7 @@ public class OneLineFormatter extends Formatter {
      */
     private static final ThreadLocal<DateFormatCache> localDateCache =
             new ThreadLocal<DateFormatCache>() {
+        @Override
         protected DateFormatCache initialValue() {
             return new DateFormatCache(localCacheSize, timeFormat, globalDateCache);
         }
@@ -104,12 +105,12 @@ public class OneLineFormatter extends Formatter {
     protected void addTimestamp(StringBuilder buf, long timestamp) {
         buf.append(localDateCache.get().getFormat(timestamp));
         long frac = timestamp % 1000;
-        buf.append(".");
+        buf.append('.');
         if (frac < 100) {
             if (frac < 10) {
                 buf.append("00");
             } else {
-                buf.append("0");
+                buf.append('0');
             }
         }
         buf.append(frac);
