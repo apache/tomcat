@@ -18,11 +18,11 @@
 
 package org.apache.catalina.ha.backend;
 
-import java.io.UnsupportedEncodingException;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.MulticastSocket;
+import java.nio.charset.Charset;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -34,6 +34,7 @@ public class MultiCastSender
     implements Sender {
 
     private static final Log log = LogFactory.getLog(HeartbeatListener.class);
+    private static final Charset US_ASCII = Charset.forName("US-ASCII");
 
     HeartbeatListener config = null;
 
@@ -68,11 +69,7 @@ public class MultiCastSender
         }
 
         byte[] buf;
-        try {
-            buf = mess.getBytes("US-ASCII");
-        } catch (UnsupportedEncodingException ex) {
-            buf = mess.getBytes();
-        }
+        buf = mess.getBytes(US_ASCII);
         DatagramPacket data = new DatagramPacket(buf, buf.length, group, config.getMultiport());
         try {
             s.send(data);

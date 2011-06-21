@@ -107,6 +107,11 @@
         JSP servlet has been configured via code when embedding Tomcat. (markt)
       </fix>
       <fix>
+        <bug>51400</bug>: Avoid known bottleneck in JVM when converting between
+        Strings and bytes by always providing a Charset rather than an encoding
+        name. Based on a patch by Dave Engberg. (markt)
+      </fix>
+      <fix>
         <bug>51401</bug>: Correctly initialise shared WebRuleSet instance used
         by the digesters that parse web.xml and prevent incorrect warnings about
         multiple occurrences of elements that are only allowed to appear once in

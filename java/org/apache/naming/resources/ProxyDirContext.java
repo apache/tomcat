@@ -21,6 +21,7 @@ package org.apache.naming.resources;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.Charset;
 import java.util.Hashtable;
 
 import javax.naming.Binding;
@@ -309,7 +310,7 @@ public class ProxyDirContext implements DirContext {
             return object;
         } else {
             return new Resource(new ByteArrayInputStream
-                (object.toString().getBytes()));
+                (object.toString().getBytes(Charset.defaultCharset())));
         }
     }
 
@@ -1466,7 +1467,7 @@ public class ProxyDirContext implements DirContext {
                     entry.resource = (Resource) object;
                 } else {
                     entry.resource = new Resource(new ByteArrayInputStream
-                        (object.toString().getBytes()));
+                        (object.toString().getBytes(Charset.defaultCharset())));
                 }
                 Attributes attributes = dirContext.getAttributes(parseName(name));
                 if (!(attributes instanceof ResourceAttributes)) {
@@ -1629,7 +1630,7 @@ public class ProxyDirContext implements DirContext {
                     entry.resource = (Resource) object;
                 } else {
                     entry.resource = new Resource(new ByteArrayInputStream
-                        (object.toString().getBytes()));
+                        (object.toString().getBytes(Charset.defaultCharset())));
                 }
             } catch (NamingException e) {
                 exists = false;

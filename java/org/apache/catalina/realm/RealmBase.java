@@ -23,6 +23,7 @@ import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.Principal;
@@ -52,6 +53,7 @@ import org.apache.catalina.util.LifecycleMBeanBase;
 import org.apache.catalina.util.MD5Encoder;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.buf.B2CConverter;
 import org.apache.tomcat.util.buf.HexUtils;
 import org.apache.tomcat.util.res.StringManager;
 import org.ietf.jgss.GSSContext;
@@ -244,6 +246,14 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
         digestEncoding = charset;
     }
 
+    protected Charset getDigestCharset() throws UnsupportedEncodingException {
+        if (digestEncoding == null) {
+            return Charset.defaultCharset();
+        } else {
+            return B2CConverter.getCharset(getDigestEncoding());
+        }
+    }
+
     /**
      * Return descriptive information about this Realm implementation and
      * the corresponding version number, in the format
@@ -373,15 +383,11 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
         }
 
         byte[] valueBytes = null;
-        if(getDigestEncoding() == null) {
-            valueBytes = serverDigestValue.getBytes();
-        } else {
-            try {
-                valueBytes = serverDigestValue.getBytes(getDigestEncoding());
-            } catch (UnsupportedEncodingException uee) {
-                log.error("Illegal digestEncoding: " + getDigestEncoding(), uee);
-                throw new IllegalArgumentException(uee.getMessage());
-            }
+        try {
+            valueBytes = serverDigestValue.getBytes(getDigestCharset());
+        } catch (UnsupportedEncodingException uee) {
+            log.error("Illegal digestEncoding: " + getDigestEncoding(), uee);
+            throw new IllegalArgumentException(uee.getMessage());
         }
 
         String serverDigest = null;
@@ -1130,15 +1136,11 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
                 md.reset();
     
                 byte[] bytes = null;
-                if(getDigestEncoding() == null) {
-                    bytes = credentials.getBytes();
-                } else {
-                    try {
-                        bytes = credentials.getBytes(getDigestEncoding());
-                    } catch (UnsupportedEncodingException uee) {
-                        log.error("Illegal digestEncoding: " + getDigestEncoding(), uee);
-                        throw new IllegalArgumentException(uee.getMessage());
-                    }
+                try {
+                    bytes = credentials.getBytes(getDigestCharset());
+                } catch (UnsupportedEncodingException uee) {
+                    log.error("Illegal digestEncoding: " + getDigestEncoding(), uee);
+                    throw new IllegalArgumentException(uee.getMessage());
                 }
                 md.update(bytes);
 
@@ -1177,15 +1179,11 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
             + getPassword(username);
 
         byte[] valueBytes = null;
-        if(getDigestEncoding() == null) {
-            valueBytes = digestValue.getBytes();
-        } else {
-            try {
-                valueBytes = digestValue.getBytes(getDigestEncoding());
-            } catch (UnsupportedEncodingException uee) {
-                log.error("Illegal digestEncoding: " + getDigestEncoding(), uee);
-                throw new IllegalArgumentException(uee.getMessage());
-            }
+        try {
+            valueBytes = digestValue.getBytes(getDigestCharset());
+        } catch (UnsupportedEncodingException uee) {
+            log.error("Illegal digestEncoding: " + getDigestEncoding(), uee);
+            throw new IllegalArgumentException(uee.getMessage());
         }
 
         byte[] digest = null;

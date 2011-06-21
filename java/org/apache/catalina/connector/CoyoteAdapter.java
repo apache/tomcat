@@ -20,6 +20,7 @@ package org.apache.catalina.connector;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
 import java.util.EnumSet;
 
 import javax.servlet.RequestDispatcher;
@@ -784,6 +785,13 @@ public class CoyoteAdapter implements Adapter {
         if (enc == null) {
             enc = "ISO-8859-1";
         }
+        Charset charset = null;
+        try {
+            charset = B2CConverter.getCharset(enc);
+        } catch (UnsupportedEncodingException e1) {
+            log.warn(sm.getString("coyoteAdapter.parsePathParam",
+                    enc));
+        }
 
         if (log.isDebugEnabled()) {
             log.debug(sm.getString("coyoteAdapter.debug", "uriBC",
@@ -808,15 +816,9 @@ public class CoyoteAdapter implements Adapter {
             String pv = null;
 
             if (pathParamEnd >= 0) {
-                try {
-                    pv = (new String(uriBC.getBuffer(), start + pathParamStart,
-                                pathParamEnd - pathParamStart, enc));
-                } catch (UnsupportedEncodingException e) {
-                    if (!warnedEncoding) {
-                        log.warn(sm.getString("coyoteAdapter.parsePathParam",
-                                enc));
-                        warnedEncoding = true;
-                    }
+                if (charset != null) {
+                    pv = new String(uriBC.getBuffer(), start + pathParamStart,
+                                pathParamEnd - pathParamStart, charset);
                 }
                 // Extract path param from decoded request URI
                 byte[] buf = uriBC.getBuffer();
@@ -827,15 +829,9 @@ public class CoyoteAdapter implements Adapter {
                 uriBC.setBytes(buf, start,
                         end - start - pathParamEnd + semicolon);
             } else {
-                try {
-                    pv = (new String(uriBC.getBuffer(), start + pathParamStart, 
-                                (end - start) - pathParamStart, enc));
-                } catch (UnsupportedEncodingException e) {
-                    if (!warnedEncoding) {
-                        log.warn(sm.getString("coyoteAdapter.parsePathParam",
-                                enc));
-                        warnedEncoding = true;
-                    }
+                if (charset != null) {
+                    pv = new String(uriBC.getBuffer(), start + pathParamStart, 
+                                (end - start) - pathParamStart, charset);
                 }
                 uriBC.setEnd(start + semicolon);
             }
