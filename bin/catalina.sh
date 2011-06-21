@@ -32,6 +32,10 @@
 #
 #   CATALINA_OPTS   (Optional) Java runtime options used when the "start",
 #                   or "run" command is executed.
+#                   Include here and not in JAVA_OPTS all options, that should
+#                   only be used by Tomcat itself, not by the stop process,
+#                   the version command etc.
+#                   Examples are heap size, GC logging, JMX ports etc.
 #
 #   CATALINA_TMPDIR (Optional) Directory path location of temporary directory
 #                   the JVM should use (java.io.tmpdir).  Defaults to
@@ -46,6 +50,10 @@
 #
 #   JAVA_OPTS       (Optional) Java runtime options used when the "start",
 #                   "stop", or "run" command is executed.
+#                   Include here and not in CATALINA_OPTS all options, thatr
+#                   should be used by Tomcat and also by the stop process,
+#                   the version command etc.
+#                   Most options should go into CATALINA_OPTS.
 #
 #   JAVA_ENDORSED_DIRS (Optional) Lists of of colon separated directories
 #                   containing some jars in order to allow replacement of APIs
