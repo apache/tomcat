@@ -801,8 +801,6 @@ public class CoyoteAdapter implements Adapter {
             log.debug(sm.getString("coyoteAdapter.debug", "enc", enc));
         }
 
-        boolean warnedEncoding = false;
-
         while (semicolon > -1) {
             // Parse path param, and extract it from the decoded request URI
             int start = uriBC.getStart();
