@@ -28,6 +28,10 @@ rem                   the same directory that CATALINA_HOME points to.
 rem
 rem   CATALINA_OPTS   (Optional) Java runtime options used when the "start",
 rem                   or "run" command is executed.
+rem                   Include here and not in JAVA_OPTS all options, that should
+rem                   only be used by Tomcat itself, not by the stop process,
+rem                   the version command etc.
+rem                   Examples are heap size, GC logging, JMX ports etc.
 rem
 rem   CATALINA_TMPDIR (Optional) Directory path location of temporary directory
 rem                   the JVM should use (java.io.tmpdir).  Defaults to
@@ -42,6 +46,10 @@ rem                   are both set, JRE_HOME is used.
 rem
 rem   JAVA_OPTS       (Optional) Java runtime options used when the "start",
 rem                   "stop", or "run" command is executed.
+rem                   Include here and not in CATALINA_OPTS all options, thatr
+rem                   should be used by Tomcat and also by the stop process,
+rem                   the version command etc.
+rem                   Most options should go into CATALINA_OPTS.
 rem
 rem   JAVA_ENDORSED_DIRS (Optional) Lists of of semi-colon separated directories
 rem                   containing some jars in order to allow replacement of APIs 
