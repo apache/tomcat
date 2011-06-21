@@ -14,14 +14,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.catalina.tribes.membership;
 
-import java.nio.charset.Charset;
-
 import org.apache.catalina.tribes.util.Arrays;
-
 
 /**
  * Manifest constants for the <code>org.apache.catalina.tribes.membership</code>
@@ -31,14 +26,11 @@ import org.apache.catalina.tribes.util.Arrays;
  * @version $Id$
  * @author Filip Hanik
  */
-
 public class Constants {
 
     public static final String Package = "org.apache.catalina.tribes.membership";
     public static void main(String[] args) throws Exception {
-        System.out.println(Arrays.toString(
-                "TRIBES-B".getBytes(Charset.defaultCharset())));
-        System.out.println(Arrays.toString(
-                "TRIBES-E".getBytes(Charset.defaultCharset())));
+        System.out.println(Arrays.toString("TRIBES-B".getBytes()));
+        System.out.println(Arrays.toString("TRIBES-E".getBytes()));
     }
 }
