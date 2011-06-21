@@ -88,14 +88,14 @@
         The fix for bug <bug>51310</bug> caused a regression that re-introduced
         bug <bug>49957</bug> and deleted the contents of the work directory
         when Tomcat was shutdown. This fix ensures that that work directory for
-        an application is not deleted when Tomcat is shutdown. (mark)
+        an application is not deleted when Tomcat is shutdown. (markt)
       </fix>
       <fix>
         Correct issues with JULI&apos;s OneLineFormatter including: correctly
         re-using formatted timestamps when possible; thread-safety issues in
         timestamp formatting; correcting the output of any milliseconds to
         include leading zeros and formatting any parameters present.
-        (kolinko/markt/rjung)
+        (kkolinko/markt/rjung)
       </fix>
       <fix>
         <bug>51395</bug>: Fix memory leak triggered when an application that
@@ -174,7 +174,8 @@
     <changelog>
       <update>
         Clean up shell and batch scripts (improve consistency,
-        clarify comments, add configtest for Windows). (rjung)
+        clarify comments, add <code>configtest</code> command support for
+        Windows). (rjung)
       </update>
       <fix>
         <bug>51206</bug>: Make CATALINA_BASE visible for setenv.sh. (rjung)
