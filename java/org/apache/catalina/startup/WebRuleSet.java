@@ -77,19 +77,19 @@ public class WebRuleSet extends RuleSetBase {
     /**
      * The <code>SetSessionConfig</code> rule used to parse the web.xml
      */
-    protected SetSessionConfig sessionConfig;
+    protected SetSessionConfig sessionConfig = new SetSessionConfig();
     
     
     /**
      * The <code>SetLoginConfig</code> rule used to parse the web.xml
      */
-    protected SetLoginConfig loginConfig;
+    protected SetLoginConfig loginConfig = new SetLoginConfig();
 
     
     /**
      * The <code>SetJspConfig</code> rule used to parse the web.xml
      */    
-    protected SetJspConfig jspConfig;
+    protected SetJspConfig jspConfig = new SetJspConfig();
 
 
     // ------------------------------------------------------------ Constructor
@@ -153,10 +153,6 @@ public class WebRuleSet extends RuleSetBase {
      */
     @Override
     public void addRuleInstances(Digester digester) {
-        sessionConfig = new SetSessionConfig();
-        jspConfig = new SetJspConfig();
-        loginConfig = new SetLoginConfig();
-        
         digester.addRule(fullPrefix,
                          new SetPublicIdRule("setPublicId"));
         digester.addRule(fullPrefix,
