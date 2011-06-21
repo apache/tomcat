@@ -20,6 +20,9 @@
 #
 # Environment Variable Prerequisites
 #
+#   Do not set the variables in this script. Instead put them into a script
+#   setenv.sh in CATALINA_BASE/bin to keep your customizations separate.
+#
 #   CATALINA_HOME   May point at your Catalina "build" directory.
 #
 #   CATALINA_BASE   (Optional) Base directory for resolving dynamic portions
