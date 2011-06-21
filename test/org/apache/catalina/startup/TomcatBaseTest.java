@@ -126,7 +126,7 @@ public abstract class TomcatBaseTest extends TestCase {
                 "geronimo-spec-jaxrpc*.jar,wsdl4j*.jar," +
                 "ant.jar,ant-junit*.jar,jmx.jar,h2*.jar,hibernate*.jar," +
                 "httpclient*.jar," +
-                "jmx-tools.jar,jta*.jar,log4j*.jar,mail*.jar,slf4j*.jar" +
+                "jmx-tools.jar,jta*.jar,log4j*.jar,mail*.jar,slf4j*.jar," +
                 "xercesImpl.jar,xmlParserAPIs.jar,xml-apis.jar," +
                 "dnsns.jar,ldapsec.jar,localedata.jar,sunjce_provider.jar," +
                 "sunmscapi.jar," +
