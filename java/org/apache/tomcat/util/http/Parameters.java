@@ -18,7 +18,7 @@
 package org.apache.tomcat.util.http;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
 import java.util.Enumeration;
 import java.util.Hashtable;
 
@@ -191,6 +191,9 @@ public final class Parameters {
     private ByteChunk origValue=new ByteChunk();
     CharChunk tmpNameC=new CharChunk(1024);
     public static final String DEFAULT_ENCODING = "ISO-8859-1";
+    public static final Charset DEFAULT_CHARSET =
+        Charset.forName(DEFAULT_ENCODING);
+    
     
     public void processParameters( byte bytes[], int start, int len ) {
         processParameters(bytes, start, len, encoding);
@@ -202,13 +205,8 @@ public final class Parameters {
         int pos=start;
         
         if(log.isDebugEnabled()) {
-            try {
-                log.debug("Bytes: " +
-                        new String(bytes, start, len, DEFAULT_ENCODING));
-            } catch (UnsupportedEncodingException e) {
-                // Should never happen...
-                log.error("Unable to convert bytes", e);
-            }
+            log.debug("Bytes: " +
+                    new String(bytes, start, len, DEFAULT_CHARSET));
         }
 
         do {
@@ -227,14 +225,9 @@ public final class Parameters {
                 valStart=nameEnd;
                 valEnd=nameEnd;
                 if(log.isDebugEnabled()) {
-                    try {
-                        log.debug("no equal " + nameStart + " " + nameEnd + " " +
-                                new String(bytes, nameStart, nameEnd-nameStart,
-                                        DEFAULT_ENCODING) );
-                    } catch (UnsupportedEncodingException e) {
-                        // Should never happen...
-                        log.error("Unable to convert bytes", e);
-                    }
+                    log.debug("no equal " + nameStart + " " + nameEnd + " " +
+                        new String(bytes, nameStart, nameEnd-nameStart,
+                                        DEFAULT_CHARSET));
                 }
             }
             if( nameEnd== -1 ) 
@@ -254,13 +247,8 @@ public final class Parameters {
                     // No name eg ...&=xx&... will trigger this
                     if (valEnd >= nameStart) {
                         msg.append('\'');
-                        try {
-                            msg.append(new String(bytes, nameStart,
-                                    valEnd - nameStart, DEFAULT_ENCODING));
-                        } catch (UnsupportedEncodingException e) {
-                            // Should never happen...
-                            log.error("Unable to convert bytes", e);
-                        }
+                        msg.append(new String(bytes, nameStart,
+                                valEnd - nameStart, DEFAULT_CHARSET));
                         msg.append("' ");
                     }
                     msg.append("ignored.");

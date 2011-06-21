@@ -19,7 +19,7 @@ package org.apache.jasper.compiler;
 import java.io.ByteArrayInputStream;
 import java.io.CharArrayWriter;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
 import java.util.ListIterator;
 
 import javax.servlet.jsp.tagext.PageData;
@@ -53,6 +53,7 @@ class PageDataImpl extends PageData implements TagConstants {
     private static final String JSP_VERSION = "2.0";
     private static final String CDATA_START_SECTION = "<![CDATA[\n";
     private static final String CDATA_END_SECTION = "]]>\n";
+    private static final Charset CHARSET_UTF8 = Charset.forName("UTF-8");
 
     // string buffer used to build XML view
     private StringBuilder buf;
@@ -85,13 +86,7 @@ class PageDataImpl extends PageData implements TagConstants {
      */
     @Override
     public InputStream getInputStream() {
-        // Turn StringBuilder into InputStream
-        try {
-            return new ByteArrayInputStream(buf.toString().getBytes("UTF-8"));
-        } catch (UnsupportedEncodingException uee) {
-            // should never happen
-            throw new RuntimeException(uee.toString());
-        }
+        return new ByteArrayInputStream(buf.toString().getBytes(CHARSET_UTF8));
     }
 
     /*
