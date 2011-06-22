@@ -33,6 +33,7 @@ import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleEvent;
 import org.apache.catalina.LifecycleListener;
 import org.apache.catalina.deploy.WebXml;
+import org.apache.catalina.startup.Constants;
 import org.apache.catalina.startup.ContextConfig;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
@@ -124,7 +125,7 @@ public class TestStandardContextResources extends TomcatBaseTest {
             }
         };
         // prevent it from looking ( if it finds one - it'll have dup error )
-        config.setDefaultWebXml("org/apache/catalin/startup/NO_DEFAULT_XML");
+        config.setDefaultWebXml(Constants.NoDefaultWebXml);
         listener[1] = config;
         Tomcat.addServlet(ctx, "getresource", new GetResourceServlet());
         ctx.addServletMapping("/getresource", "getresource");
@@ -149,7 +150,7 @@ public class TestStandardContextResources extends TomcatBaseTest {
             }
         };
         // prevent it from looking ( if it finds one - it'll have dup error )
-        config1.setDefaultWebXml("org/apache/catalin/startup/NO_DEFAULT_XML");
+        config1.setDefaultWebXml(Constants.NoDefaultWebXml);
         listener1[1] = config1;
         // Need to init since context won't call init
         config1.lifecycleEvent(
