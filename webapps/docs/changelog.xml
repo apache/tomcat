@@ -121,6 +121,11 @@
         <bug>51403</bug>: Avoid NPE in JULI FileHandler if formatter is
         misconfigured. (kkolinko)
       </add>
+      <fix>
+        Previous improvements in JAR scanning performance introduced a start-up
+        performance penalty for some use cases. This fix addresses those
+        performance penalties while retaining the original improvements. (markt) 
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
