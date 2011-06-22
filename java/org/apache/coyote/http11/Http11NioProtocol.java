@@ -233,7 +233,6 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol {
         @Override
         public SocketState process(SocketWrapper<NioChannel> socketWrapper,
                 SocketStatus status) {
-            NioChannel socket = socketWrapper.getSocket();
             Http11NioProcessor processor = connections.remove(socketWrapper);
 
             socketWrapper.setAsync(false); //no longer check for timeout
@@ -248,8 +247,8 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol {
 
                 if (proto.isSSLEnabled() &&
                         (proto.sslImplementation != null)
-                        && (socket instanceof SecureNioChannel)) {
-                    SecureNioChannel ch = (SecureNioChannel)socket;
+                        && (socketWrapper.getSocket() instanceof SecureNioChannel)) {
+                    SecureNioChannel ch = (SecureNioChannel)socketWrapper.getSocket();
                     processor.setSslSupport(
                             proto.sslImplementation.getSSLSupport(
                                     ch.getSslEngine().getSession()));
@@ -264,7 +263,7 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol {
                     } else if (processor.comet) {
                         state = processor.event(status);
                     } else {
-                        state = processor.process(socket);
+                        state = processor.process(socketWrapper.getSocket());
                     }
 
                     if (processor.isAsync()) {
@@ -284,8 +283,8 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol {
                         //  - this is comet request
                         //  - the request line/headers have not been completely
                         //    read
-                        SelectionKey key = socket.getIOChannel().keyFor(
-                                socket.getPoller().getSelector());
+                        SelectionKey key = socketWrapper.getSocket().getIOChannel().keyFor(
+                                socketWrapper.getSocket().getPoller().getSelector());
                         key.interestOps(SelectionKey.OP_READ);
                         ((KeyAttachment) socketWrapper).interestOps(
                                 SelectionKey.OP_READ);
@@ -294,7 +293,7 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol {
                     // In keep-alive but between requests. OK to recycle
                     // processor. Continue to poll for the next request.
                     release(socketWrapper, processor);
-                    socket.getPoller().add(socket);
+                    socketWrapper.getSocket().getPoller().add(socketWrapper.getSocket());
                 } else {
                     // Connection closed. OK to recycle the processor.
                     release(socketWrapper, processor);

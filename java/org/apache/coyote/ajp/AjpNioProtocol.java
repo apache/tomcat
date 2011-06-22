@@ -170,7 +170,6 @@ public class AjpNioProtocol extends AbstractAjpProtocol {
         @Override
         public SocketState process(SocketWrapper<NioChannel> socketWrapper,
                 SocketStatus status) {
-            NioChannel socket = socketWrapper.getSocket();
             AjpNioProcessor processor = connections.remove(socketWrapper);
 
             socketWrapper.setAsync(false); //no longer check for timeout
@@ -188,7 +187,7 @@ public class AjpNioProtocol extends AbstractAjpProtocol {
                     if (processor.isAsync() || state == SocketState.ASYNC_END) {
                         state = processor.asyncDispatch(status);
                     } else {
-                        state = processor.process(socket);
+                        state = processor.process(socketWrapper.getSocket());
                     }
 
                     if (processor.isAsync()) {
@@ -206,7 +205,7 @@ public class AjpNioProtocol extends AbstractAjpProtocol {
                     // In keep-alive but between requests. OK to recycle
                     // processor. Continue to poll for the next request.
                     release(socketWrapper, processor);
-                    socket.getPoller().add(socket);
+                    socketWrapper.getSocket().getPoller().add(socketWrapper.getSocket());
                 } else {
                     // Connection closed. OK to recycle the processor.
                     release(socketWrapper, processor);
