@@ -83,6 +83,35 @@ import org.apache.catalina.session.StandardManager;
  * use if you have a webapp with a web.xml file, but it is 
  * optional - you can use your own servlets.
  * 
+ * There are a variety of 'add' methods to configure servlets and webapps. These
+ * methods, by default, create a simple in-memory security realm and apply it.
+ * If you need more complex security processing, you can define a subclass of
+ * this class.
+ * 
+ * This class provides a set of convenience methods for configuring webapp
+ * contexts, all overloads of the method <pre>addWebapp</pre>. These methods
+ * create a webapp context, configure it, and then add it to a {@link Host}.
+ * They do not use a global default web.xml; rather, they add a lifecycle
+ * listener that adds the standard DefaultServlet, JSP processing, and welcome
+ * files.
+ * 
+ * In complex cases, you may prefer to use the ordinary Tomcat API to create
+ * webapp contexts; for example, you might need to install a custom Loader
+ * before the call to {@link Host#addChild(Container)}. To replicate the basic
+ * behavior of the <pre>addWebapp</pre> methods, you may want to call three
+ * methods of this class: {@link #getDefaultRealm()}, 
+ * {@link #noDefaultWebXmlPath()}, and {@link #getDefaultWebXmlListener()}. 
+ * 
+ * {@link #getDefaultRealm()} returns the simple security realm.
+ * 
+ * {@link #getDefaultWebXmlListener()} returns a {@link LifecycleListener} that
+ * adds the standard DefaultServlet, JSP processing, and welcome files. If you
+ * add this listener, you must prevent Tomcat from applying any standard global
+ * web.xml with ...
+ * 
+ * {@link #noDefaultWebXmlPath()} returns a dummy pathname to configure to
+ * prevent {@link ContextConfig} from trying to apply a global web.xml file. 
+ * 
  * This class provides a main() and few simple CLI arguments,
  * see setters for doc. It can be used for simple tests and
  * demo.
@@ -116,9 +145,10 @@ public class Tomcat {
     // the context.
     protected Realm defaultRealm;
     private Map<String, String> userPass = new HashMap<String, String>();
-    private Map<String, List<String>> userRoles = 
-            new HashMap<String, List<String>>();
-    private Map<String, Principal> userPrincipals = new HashMap<String, Principal>();
+    private Map<String, List<String>> userRoles =
+        new HashMap<String, List<String>>();
+    private Map<String, Principal> userPrincipals =
+        new HashMap<String, Principal>();
     
     public Tomcat() {
         // NOOP
@@ -510,6 +540,39 @@ public class Tomcat {
         }
 
         return ctx;
+    }
+    
+    /**
+     * Return a listener that provides the required configuration items for JSP
+     * processing. From the standard Tomcat global web.xml. Pass this to
+     * {@link Context#addLifecycleListener(LifecycleListener)} and then pass the
+     * result of {@link #noDefaultWebXmlPath()} to 
+     * {@link ContextConfig#setDefaultWebXml(String)}. 
+     * @return a listener object that configures default JSP processing.
+     */
+    public LifecycleListener getDefaultWebXmlListener() {
+        return new DefaultWebXmlListener();
+    }
+    
+    /**
+     * @return a pathname to pass to
+     * {@link ContextConfig#setDefaultWebXml(String)} when using
+     * {@link #getDefaultWebXmlListener()}.
+     */
+    public String noDefaultWebXmlPath() {
+        return "org/apache/catalin/startup/NO_DEFAULT_XML";
+    }
+    
+    /**
+     * For complex configurations, this accessor allows callers of this class
+     * to obtain the simple realm created by default.
+     * @return the simple in-memory realm created by default.
+     */
+    public Realm getDefaultRealm() {
+        if (defaultRealm == null) {
+            initSimpleAuth();
+        }
+        return defaultRealm;
     }
 
 
