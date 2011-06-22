@@ -126,6 +126,10 @@
         performance penalty for some use cases. This fix addresses those
         performance penalties while retaining the original improvements. (markt) 
       </fix>
+      <add>
+        <bug>51418</bug>: Provide more control over Context creation when
+        embedding Tomcat. Based on a patch by Benson Margulies. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
