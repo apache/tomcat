@@ -128,7 +128,7 @@
       </fix>
       <add>
         <bug>51418</bug>: Provide more control over Context creation when
-        embedding Tomcat. Based on a patch by Benson Margulies. (markt)
+        embedding Tomcat. Based on a patch by Benson Margulies. (markt/kkolinko)
       </add>
     </changelog>
   </subsection>

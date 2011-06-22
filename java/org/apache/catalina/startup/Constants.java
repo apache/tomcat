@@ -38,6 +38,18 @@ public final class Constants {
     public static final String HostContextXml = "context.xml.default";
     public static final String HostWebXml = "web.xml.default";
 
+    /**
+     * A dummy value used to suppress loading the default web.xml file.
+     *
+     * <p>
+     * It is useful when embedding Tomcat, when the default configuration is
+     * done programmatically, e.g. by calling
+     * <code>Tomcat.initWebappDefaults(context)</code>.
+     *
+     * @see Tomcat
+     */
+    public static final String NoDefaultWebXml = "org/apache/catalina/startup/NO_DEFAULT_XML";
+
     // J2EE
     public static final String J2eeSchemaPublicId_14 =
         "j2ee_1_4.xsd";
