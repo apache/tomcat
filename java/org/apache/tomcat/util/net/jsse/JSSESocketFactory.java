@@ -283,13 +283,12 @@ public class JSSESocketFactory implements ServerSocketFactory, SSLUtil {
      * Gets the SSL server's keystore password.
      */
     protected String getKeystorePassword() {
-        String keyPass = endpoint.getKeyPass();
-        if (keyPass == null) {
-            keyPass = DEFAULT_KEY_PASS;
-        }
         String keystorePass = endpoint.getKeystorePass();
         if (keystorePass == null) {
-            keystorePass = keyPass;
+            keystorePass = endpoint.getKeyPass();
+        }
+        if (keystorePass == null) {
+            keystorePass = DEFAULT_KEY_PASS;
         }
         return keystorePass;
     }
