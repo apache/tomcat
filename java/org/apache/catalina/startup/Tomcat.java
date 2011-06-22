@@ -531,8 +531,8 @@ public class Tomcat {
         ctx.addLifecycleListener(ctxCfg);
         
         // prevent it from looking ( if it finds one - it'll have dup error )
-        ctxCfg.setDefaultWebXml("org/apache/catalin/startup/NO_DEFAULT_XML");
-        
+        ctxCfg.setDefaultWebXml(noDefaultWebXmlPath());
+
         if (host == null) {
             getHost().addChild(ctx);
         } else {
@@ -560,7 +560,7 @@ public class Tomcat {
      * {@link #getDefaultWebXmlListener()}.
      */
     public String noDefaultWebXmlPath() {
-        return "org/apache/catalin/startup/NO_DEFAULT_XML";
+        return Constants.NoDefaultWebXml;
     }
     
     /**
