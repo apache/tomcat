@@ -155,7 +155,14 @@ public class StandardJarScanner implements JarScanner {
                     }
                     URL url = null;
                     try {
-                        url = context.getResource(path);
+                        // File URLs are always faster to work with so use them
+                        // if available.
+                        String realPath = context.getRealPath(path);
+                        if (realPath == null) {
+                            url = context.getResource(path);
+                        } else {
+                            url = (new File(realPath)).toURI().toURL();
+                        }
                         process(callback, url);
                     } catch (IOException e) {
                         log.warn(sm.getString("jarScan.webinflibFail", url), e);
