@@ -39,6 +39,7 @@ import org.apache.tomcat.util.net.NioEndpoint;
 import org.apache.tomcat.util.net.NioEndpoint.KeyAttachment;
 import org.apache.tomcat.util.net.NioSelectorPool;
 import org.apache.tomcat.util.net.SocketStatus;
+import org.apache.tomcat.util.net.SocketWrapper;
 
 
 /**
@@ -100,13 +101,13 @@ public class AjpNioProcessor extends AbstractAjpProcessor {
      *
      * @throws IOException error during an I/O operation
      */
-    public SocketState process(NioChannel socket)
+    public SocketState process(SocketWrapper<NioChannel> socket)
         throws IOException {
         RequestInfo rp = request.getRequestProcessor();
         rp.setStage(org.apache.coyote.Constants.STAGE_PARSE);
 
         // Setting up the socket
-        this.socket = socket;
+        this.socket = socket.getSocket();
         
         long soTimeout = endpoint.getSoTimeout();
         int keepAliveTimeout = endpoint.getKeepAliveTimeout();
@@ -114,8 +115,6 @@ public class AjpNioProcessor extends AbstractAjpProcessor {
         // Error flag
         error = false;
 
-        final KeyAttachment ka = (KeyAttachment)socket.getAttachment(false);
-        
         while (!error && !endpoint.isPaused()) {
             // Parsing the request header
             try {
@@ -127,7 +126,7 @@ public class AjpNioProcessor extends AbstractAjpProcessor {
                 }
                 // Set back timeout if keep alive timeout is enabled
                 if (keepAliveTimeout > 0) {
-                    ka.setTimeout(soTimeout);
+                    socket.setTimeout(soTimeout);
                 }
                 // Check message type, process right away and break if
                 // not regular request processing
@@ -224,7 +223,7 @@ public class AjpNioProcessor extends AbstractAjpProcessor {
             rp.setStage(org.apache.coyote.Constants.STAGE_KEEPALIVE);
             // Set keep alive timeout if enabled
             if (keepAliveTimeout > 0) {
-                ka.setTimeout(keepAliveTimeout);
+                socket.setTimeout(keepAliveTimeout);
             }
 
             recycle();
