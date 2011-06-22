@@ -147,6 +147,10 @@
         Various refactorings to reduce code duplication and unnecessary code in
         the connectors. (markt)
       </update>
+      <fix>
+        Correct a regression introduced in Apache Tomcat 7.0.11 that broke
+        certificate revokation list handling. (markt) 
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
