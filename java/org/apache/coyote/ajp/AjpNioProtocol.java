@@ -31,6 +31,7 @@ import org.apache.tomcat.util.net.NioEndpoint;
 import org.apache.tomcat.util.net.NioEndpoint.Handler;
 import org.apache.tomcat.util.net.SSLImplementation;
 import org.apache.tomcat.util.net.SocketStatus;
+import org.apache.tomcat.util.net.SocketWrapper;
 
 
 /**
@@ -166,7 +167,9 @@ public class AjpNioProtocol extends AbstractAjpProtocol {
         }
 
         @Override
-        public SocketState process(NioChannel socket, SocketStatus status) {
+        public SocketState process(SocketWrapper<NioChannel> socketWrapper,
+                SocketStatus status) {
+            NioChannel socket = socketWrapper.getSocket();
             AjpNioProcessor processor = connections.remove(socket);
 
             NioEndpoint.KeyAttachment att = (NioEndpoint.KeyAttachment)socket.getAttachment(false);

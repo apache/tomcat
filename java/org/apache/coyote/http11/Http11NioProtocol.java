@@ -33,6 +33,7 @@ import org.apache.tomcat.util.net.NioEndpoint.Handler;
 import org.apache.tomcat.util.net.SSLImplementation;
 import org.apache.tomcat.util.net.SecureNioChannel;
 import org.apache.tomcat.util.net.SocketStatus;
+import org.apache.tomcat.util.net.SocketWrapper;
 
 
 /**
@@ -228,7 +229,9 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol {
 
 
         @Override
-        public SocketState process(NioChannel socket, SocketStatus status) {
+        public SocketState process(SocketWrapper<NioChannel> socketWrapper,
+                SocketStatus status) {
+            NioChannel socket = socketWrapper.getSocket();
             Http11NioProcessor processor = connections.remove(socket);
 
             NioEndpoint.KeyAttachment att = (NioEndpoint.KeyAttachment)socket.getAttachment(false);
