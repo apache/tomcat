@@ -1589,6 +1589,10 @@ public class ContextConfig
         // Set the default if we don't have any overrides
         if (defaultWebXml == null) getDefaultWebXml();
 
+        // Is it explicitly suppressed, e.g. in embedded environment?
+        if (Constants.NoDefaultWebXml.equals(defaultWebXml)) {
+            return null;
+        }
         return getWebXmlSource(defaultWebXml, getBaseDir());
     }
     
