@@ -1485,7 +1485,8 @@ public class NioEndpoint extends AbstractEndpoint {
      * thread local fields.
      */
     public interface Handler extends AbstractEndpoint.Handler {
-        public SocketState process(NioChannel socket, SocketStatus status);
+        public SocketState process(SocketWrapper<NioChannel> socket,
+                SocketStatus status);
         public void release(NioChannel socket);
         public void release(SocketChannel socket);
         public SSLImplementation getSslImplementation();
@@ -1532,9 +1533,13 @@ public class NioEndpoint extends AbstractEndpoint {
                         SocketState state = SocketState.OPEN;
                         // Process the request from this socket
                         if (status == null) {
-                            state = handler.process(socket, SocketStatus.OPEN);
+                            state = handler.process(
+                                    (KeyAttachment) key.attachment(),
+                                    SocketStatus.OPEN);
                         } else {
-                            state = handler.process(socket, status);
+                            state = handler.process(
+                                    (KeyAttachment) key.attachment(),
+                                    status);
                         }
     
                         if (state == SocketState.CLOSED) {
