@@ -30,6 +30,7 @@ import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.net.NioChannel;
 import org.apache.tomcat.util.net.NioEndpoint;
 import org.apache.tomcat.util.net.NioEndpoint.Handler;
+import org.apache.tomcat.util.net.NioEndpoint.KeyAttachment;
 import org.apache.tomcat.util.net.SSLImplementation;
 import org.apache.tomcat.util.net.SecureNioChannel;
 import org.apache.tomcat.util.net.SocketStatus;
@@ -234,8 +235,7 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol {
             NioChannel socket = socketWrapper.getSocket();
             Http11NioProcessor processor = connections.remove(socket);
 
-            NioEndpoint.KeyAttachment att = (NioEndpoint.KeyAttachment)socket.getAttachment(false);
-            att.setAsync(false); //no longer check for timeout
+            socketWrapper.setAsync(false); //no longer check for timeout
 
             try {
                 if (processor == null) {
@@ -277,7 +277,7 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol {
                     connections.put(socket, processor);
                     
                     if (processor.isAsync()) {
-                        att.setAsync(true);
+                        socketWrapper.setAsync(true);
                     } else {
                         // Either:
                         //  - this is comet request
@@ -286,7 +286,8 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol {
                         SelectionKey key = socket.getIOChannel().keyFor(
                                 socket.getPoller().getSelector());
                         key.interestOps(SelectionKey.OP_READ);
-                        att.interestOps(SelectionKey.OP_READ);
+                        ((KeyAttachment) socketWrapper).interestOps(
+                                SelectionKey.OP_READ);
                     }
                 } else if (state == SocketState.OPEN){
                     // In keep-alive but between requests. OK to recycle
