@@ -94,8 +94,8 @@ public class AjpNioProtocol extends AbstractAjpProtocol {
 
         protected AjpNioProtocol proto;
 
-        protected ConcurrentHashMap<NioChannel, AjpNioProcessor> connections =
-            new ConcurrentHashMap<NioChannel, AjpNioProcessor>();
+        protected ConcurrentHashMap<SocketWrapper<NioChannel>, AjpNioProcessor> connections =
+            new ConcurrentHashMap<SocketWrapper<NioChannel>, AjpNioProcessor>();
 
         protected RecycledProcessors<AjpNioProcessor> recycledProcessors =
             new RecycledProcessors<AjpNioProcessor>(this);
@@ -130,10 +130,10 @@ public class AjpNioProtocol extends AbstractAjpProtocol {
             if (log.isDebugEnabled()) 
                 log.debug("Iterating through our connections to release a socket channel:"+socket);
             boolean released = false;
-            Iterator<java.util.Map.Entry<NioChannel, AjpNioProcessor>> it = connections.entrySet().iterator();
+            Iterator<java.util.Map.Entry<SocketWrapper<NioChannel>, AjpNioProcessor>> it = connections.entrySet().iterator();
             while (it.hasNext()) {
-                java.util.Map.Entry<NioChannel, AjpNioProcessor> entry = it.next();
-                if (entry.getKey().getIOChannel()==socket) {
+                java.util.Map.Entry<SocketWrapper<NioChannel>, AjpNioProcessor> entry = it.next();
+                if (entry.getKey().getSocket().getIOChannel()==socket) {
                     it.remove();
                     AjpNioProcessor result = entry.getValue();
                     result.recycle();
@@ -151,7 +151,7 @@ public class AjpNioProtocol extends AbstractAjpProtocol {
          * {@link #release(NioChannel, AjpNioProcessor)}.
          */
         @Override
-        public void release(NioChannel socket) {
+        public void release(SocketWrapper<NioChannel> socket) {
             AjpNioProcessor processor = connections.remove(socket);
             if (processor != null) {
                 processor.recycle();
@@ -160,7 +160,8 @@ public class AjpNioProtocol extends AbstractAjpProtocol {
         }
 
 
-        public void release(NioChannel socket, AjpNioProcessor processor) {
+        public void release(SocketWrapper<NioChannel> socket,
+                AjpNioProcessor processor) {
             connections.remove(socket);
             processor.recycle();
             recycledProcessors.offer(processor);
@@ -170,7 +171,7 @@ public class AjpNioProtocol extends AbstractAjpProtocol {
         public SocketState process(SocketWrapper<NioChannel> socketWrapper,
                 SocketStatus status) {
             NioChannel socket = socketWrapper.getSocket();
-            AjpNioProcessor processor = connections.remove(socket);
+            AjpNioProcessor processor = connections.remove(socketWrapper);
 
             socketWrapper.setAsync(false); //no longer check for timeout
 
@@ -198,17 +199,17 @@ public class AjpNioProtocol extends AbstractAjpProtocol {
                 if (state == SocketState.LONG) {
                     // In the middle of processing a request/response. Keep the
                     // socket associated with the processor.
-                    connections.put(socket, processor);
+                    connections.put(socketWrapper, processor);
                     
                     socketWrapper.setAsync(true);
                 } else if (state == SocketState.OPEN){
                     // In keep-alive but between requests. OK to recycle
                     // processor. Continue to poll for the next request.
-                    release(socket, processor);
+                    release(socketWrapper, processor);
                     socket.getPoller().add(socket);
                 } else {
                     // Connection closed. OK to recycle the processor.
-                    release(socket, processor);
+                    release(socketWrapper, processor);
                 }
                 return state;
 
@@ -231,7 +232,7 @@ public class AjpNioProtocol extends AbstractAjpProtocol {
                 // less-than-verbose logs.
                 log.error(sm.getString("ajpprotocol.proto.error"), e);
             }
-            release(socket, processor);
+            release(socketWrapper, processor);
             return SocketState.CLOSED;
         }
 

@@ -1019,7 +1019,7 @@ public class NioEndpoint extends AbstractEndpoint {
                     }                    
                 }
                 key.attach(null);
-                if (ka!=null) handler.release(ka.getChannel());
+                if (ka!=null) handler.release(ka);
                 else handler.release((SocketChannel)key.channel());
                 if (key.isValid()) key.cancel();
                 if (key.channel().isOpen()) {
@@ -1487,7 +1487,7 @@ public class NioEndpoint extends AbstractEndpoint {
     public interface Handler extends AbstractEndpoint.Handler {
         public SocketState process(SocketWrapper<NioChannel> socket,
                 SocketStatus status);
-        public void release(NioChannel socket);
+        public void release(SocketWrapper<NioChannel> socket);
         public void release(SocketChannel socket);
         public SSLImplementation getSslImplementation();
     }
