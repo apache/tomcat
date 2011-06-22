@@ -156,8 +156,8 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol {
 
         protected Http11NioProtocol proto;
 
-        protected ConcurrentHashMap<NioChannel, Http11NioProcessor> connections =
-            new ConcurrentHashMap<NioChannel, Http11NioProcessor>();
+        protected ConcurrentHashMap<SocketWrapper<NioChannel>, Http11NioProcessor> connections =
+            new ConcurrentHashMap<SocketWrapper<NioChannel>, Http11NioProcessor>();
 
         protected RecycledProcessors<Http11NioProcessor> recycledProcessors =
             new RecycledProcessors<Http11NioProcessor>(this);
@@ -192,10 +192,10 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol {
             if (log.isDebugEnabled()) 
                 log.debug("Iterating through our connections to release a socket channel:"+socket);
             boolean released = false;
-            Iterator<java.util.Map.Entry<NioChannel, Http11NioProcessor>> it = connections.entrySet().iterator();
+            Iterator<java.util.Map.Entry<SocketWrapper<NioChannel>, Http11NioProcessor>> it = connections.entrySet().iterator();
             while (it.hasNext()) {
-                java.util.Map.Entry<NioChannel, Http11NioProcessor> entry = it.next();
-                if (entry.getKey().getIOChannel()==socket) {
+                java.util.Map.Entry<SocketWrapper<NioChannel>, Http11NioProcessor> entry = it.next();
+                if (entry.getKey().getSocket().getIOChannel()==socket) {
                     it.remove();
                     Http11NioProcessor result = entry.getValue();
                     result.recycle();
@@ -213,7 +213,7 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol {
          * {@link #release(NioChannel, Http11NioProcessor)}.
          */
         @Override
-        public void release(NioChannel socket) {
+        public void release(SocketWrapper<NioChannel> socket) {
             Http11NioProcessor processor = connections.remove(socket);
             if (processor != null) {
                 processor.recycle();
@@ -222,7 +222,8 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol {
         }
 
 
-        public void release(NioChannel socket, Http11NioProcessor processor) {
+        public void release(SocketWrapper<NioChannel> socket,
+                Http11NioProcessor processor) {
             connections.remove(socket);
             processor.recycle();
             recycledProcessors.offer(processor);
@@ -233,7 +234,7 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol {
         public SocketState process(SocketWrapper<NioChannel> socketWrapper,
                 SocketStatus status) {
             NioChannel socket = socketWrapper.getSocket();
-            Http11NioProcessor processor = connections.remove(socket);
+            Http11NioProcessor processor = connections.remove(socketWrapper);
 
             socketWrapper.setAsync(false); //no longer check for timeout
 
@@ -274,7 +275,7 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol {
                 if (state == SocketState.LONG) {
                     // In the middle of processing a request/response. Keep the
                     // socket associated with the processor.
-                    connections.put(socket, processor);
+                    connections.put(socketWrapper, processor);
                     
                     if (processor.isAsync()) {
                         socketWrapper.setAsync(true);
@@ -292,11 +293,11 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol {
                 } else if (state == SocketState.OPEN){
                     // In keep-alive but between requests. OK to recycle
                     // processor. Continue to poll for the next request.
-                    release(socket, processor);
+                    release(socketWrapper, processor);
                     socket.getPoller().add(socket);
                 } else {
                     // Connection closed. OK to recycle the processor.
-                    release(socket, processor);
+                    release(socketWrapper, processor);
                 }
                 return state;
 
@@ -319,7 +320,7 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol {
                 // less-than-verbose logs.
                 log.error(sm.getString("http11protocol.proto.error"), e);
             }
-            release(socket, processor);
+            release(socketWrapper, processor);
             return SocketState.CLOSED;
         }
 
