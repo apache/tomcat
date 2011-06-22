@@ -263,7 +263,7 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol {
                     } else if (processor.comet) {
                         state = processor.event(status);
                     } else {
-                        state = processor.process(socket.getSocket());
+                        state = processor.process(socket);
                     }
 
                     if (processor.isAsync()) {
