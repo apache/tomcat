@@ -231,11 +231,11 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol {
 
 
         @Override
-        public SocketState process(SocketWrapper<NioChannel> socketWrapper,
+        public SocketState process(SocketWrapper<NioChannel> socket,
                 SocketStatus status) {
-            Http11NioProcessor processor = connections.remove(socketWrapper);
+            Http11NioProcessor processor = connections.remove(socket);
 
-            socketWrapper.setAsync(false); //no longer check for timeout
+            socket.setAsync(false); //no longer check for timeout
 
             try {
                 if (processor == null) {
@@ -247,8 +247,8 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol {
 
                 if (proto.isSSLEnabled() &&
                         (proto.sslImplementation != null)
-                        && (socketWrapper.getSocket() instanceof SecureNioChannel)) {
-                    SecureNioChannel ch = (SecureNioChannel)socketWrapper.getSocket();
+                        && (socket.getSocket() instanceof SecureNioChannel)) {
+                    SecureNioChannel ch = (SecureNioChannel)socket.getSocket();
                     processor.setSslSupport(
                             proto.sslImplementation.getSSLSupport(
                                     ch.getSslEngine().getSession()));
@@ -263,7 +263,7 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol {
                     } else if (processor.comet) {
                         state = processor.event(status);
                     } else {
-                        state = processor.process(socketWrapper.getSocket());
+                        state = processor.process(socket.getSocket());
                     }
 
                     if (processor.isAsync()) {
@@ -274,29 +274,29 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol {
                 if (state == SocketState.LONG) {
                     // In the middle of processing a request/response. Keep the
                     // socket associated with the processor.
-                    connections.put(socketWrapper, processor);
+                    connections.put(socket, processor);
                     
                     if (processor.isAsync()) {
-                        socketWrapper.setAsync(true);
+                        socket.setAsync(true);
                     } else {
                         // Either:
                         //  - this is comet request
                         //  - the request line/headers have not been completely
                         //    read
-                        SelectionKey key = socketWrapper.getSocket().getIOChannel().keyFor(
-                                socketWrapper.getSocket().getPoller().getSelector());
+                        SelectionKey key = socket.getSocket().getIOChannel().keyFor(
+                                socket.getSocket().getPoller().getSelector());
                         key.interestOps(SelectionKey.OP_READ);
-                        ((KeyAttachment) socketWrapper).interestOps(
+                        ((KeyAttachment) socket).interestOps(
                                 SelectionKey.OP_READ);
                     }
                 } else if (state == SocketState.OPEN){
                     // In keep-alive but between requests. OK to recycle
                     // processor. Continue to poll for the next request.
-                    release(socketWrapper, processor);
-                    socketWrapper.getSocket().getPoller().add(socketWrapper.getSocket());
+                    release(socket, processor);
+                    socket.getSocket().getPoller().add(socket.getSocket());
                 } else {
                     // Connection closed. OK to recycle the processor.
-                    release(socketWrapper, processor);
+                    release(socket, processor);
                 }
                 return state;
 
@@ -319,7 +319,7 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol {
                 // less-than-verbose logs.
                 log.error(sm.getString("http11protocol.proto.error"), e);
             }
-            release(socketWrapper, processor);
+            release(socket, processor);
             return SocketState.CLOSED;
         }
 
