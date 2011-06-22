@@ -172,8 +172,7 @@ public class AjpNioProtocol extends AbstractAjpProtocol {
             NioChannel socket = socketWrapper.getSocket();
             AjpNioProcessor processor = connections.remove(socket);
 
-            NioEndpoint.KeyAttachment att = (NioEndpoint.KeyAttachment)socket.getAttachment(false);
-            att.setAsync(false); //no longer check for timeout
+            socketWrapper.setAsync(false); //no longer check for timeout
 
             try {
                 if (processor == null) {
@@ -201,7 +200,7 @@ public class AjpNioProtocol extends AbstractAjpProtocol {
                     // socket associated with the processor.
                     connections.put(socket, processor);
                     
-                    att.setAsync(true);
+                    socketWrapper.setAsync(true);
                 } else if (state == SocketState.OPEN){
                     // In keep-alive but between requests. OK to recycle
                     // processor. Continue to poll for the next request.
