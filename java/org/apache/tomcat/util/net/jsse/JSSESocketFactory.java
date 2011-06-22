@@ -508,17 +508,23 @@ public class JSSESocketFactory implements ServerSocketFactory, SSLUtil {
 
     @Override
     public TrustManager[] getTrustManagers() throws Exception {
-        String keystoreType = endpoint.getKeystoreType();
-        if (keystoreType == null) {
-            keystoreType = defaultKeystoreType;
+        String truststoreType = endpoint.getTruststoreType();
+        if (truststoreType == null) {
+            truststoreType = System.getProperty("javax.net.ssl.trustStoreType");
         }
-
-        String algorithm = endpoint.getAlgorithm();
+        if (truststoreType == null) {
+            truststoreType = endpoint.getKeystoreType();
+        }
+        if (truststoreType == null) {
+            truststoreType = defaultKeystoreType;
+        }
+        
+        String algorithm = endpoint.getTruststoreAlgorithm();
         if (algorithm == null) {
-            algorithm = KeyManagerFactory.getDefaultAlgorithm();
+            algorithm = TrustManagerFactory.getDefaultAlgorithm();
         }
 
-        return getTrustManagers(keystoreType, endpoint.getKeystoreProvider(),
+        return getTrustManagers(truststoreType, endpoint.getKeystoreProvider(),
                 algorithm);
     }
 
