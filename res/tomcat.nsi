@@ -230,7 +230,7 @@ Section "Service Startup" SecTomcatService
   DetailPrint "Configuring Tomcat@VERSION_MAJOR@ service"
   nsExec::ExecToLog '"$INSTDIR\bin\tomcat@VERSION_MAJOR@.exe" //US//Tomcat@VERSION_MAJOR@ --Startup auto'
   ; Behave like Apache Httpd (put the icon in tray on login)
-  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Run" "ApacheTomcatMonitor@VERSION_MAJOR_MINOR@" '"$INSTDIR\bin\tomcat@VERSION_MAJOR@w.exe" //MS//Tomcat@VERSION_MAJOR@'
+  WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Run" "ApacheTomcatMonitor@VERSION_MAJOR_MINOR@" '"$INSTDIR\bin\tomcat@VERSION_MAJOR@w.exe" //MS//Tomcat@VERSION_MAJOR@'
 
   ClearErrors
 
@@ -917,7 +917,7 @@ Section Uninstall
 
   DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Apache Tomcat @VERSION_MAJOR_MINOR@"
   DeleteRegKey HKLM "SOFTWARE\Apache Software Foundation\Tomcat\@VERSION_MAJOR_MINOR@"
-  DeleteRegValue HKLM "Software\Microsoft\Windows\CurrentVersion\Run" "ApacheTomcatMonitor@VERSION_MAJOR_MINOR@"
+  DeleteRegValue HKCU "Software\Microsoft\Windows\CurrentVersion\Run" "ApacheTomcatMonitor@VERSION_MAJOR_MINOR@"
   RMDir /r "$SMPROGRAMS\Apache Tomcat @VERSION_MAJOR_MINOR@"
   Delete "$INSTDIR\tomcat.ico"
   Delete "$INSTDIR\LICENSE"

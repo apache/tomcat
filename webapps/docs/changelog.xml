@@ -217,6 +217,10 @@
   </subsection>
   <subsection name="Other">
     <changelog>
+      <fix>
+        <bug>33262</bug>: Install monitor to auto-start for current user only
+        rather than all users to be consistent with menu item creation. (markt)
+      </fix>
       <update>
         Clean up shell and batch scripts (improve consistency,
         clarify comments, add <code>configtest</code> command support for
