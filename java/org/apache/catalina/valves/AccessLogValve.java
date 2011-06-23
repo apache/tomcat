@@ -1302,9 +1302,10 @@ public class AccessLogValve extends ValveBase implements AccessLog {
                 long frac = timestamp % 1000;
                 if (frac < 100) {
                     if (frac < 10) {
-                        buf.append("00");
+                        buf.append('0');
+                        buf.append('0');
                     } else {
-                        buf.append("0");
+                        buf.append('0');
                     }
                 }
                 buf.append(frac);
