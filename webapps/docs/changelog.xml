@@ -220,6 +220,10 @@
       <update>
         Remove unnecessary variable BASEDIR from scripts. (rjung)
       </update>
+      <fix>
+        <bug>51425</bug>: Update Spanish translations. Based on a patch provided
+        by Jesus Marin. (markt) 
+      </fix>
     </changelog>
   </subsection>
 </section>
