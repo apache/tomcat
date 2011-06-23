@@ -139,6 +139,9 @@
         Use system properties loaded from catalina.properties via the class
         path in unit tests. (rjung)
       </fix>
+      <update>
+        Improve JMX unit test. (rjung)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Coyote">

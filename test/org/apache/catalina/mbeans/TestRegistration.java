@@ -17,6 +17,9 @@
 package org.apache.catalina.mbeans;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Set;
 
 import javax.management.MBeanServer;
@@ -34,6 +37,56 @@ import org.apache.tomcat.util.modeler.Registry;
  */
 public class TestRegistration extends TomcatBaseTest {
 
+    private static final String contextName = "/foo";
+
+    private static String[] basicMBeanNames() {
+        return new String[] {
+            "Tomcat:type=Engine",
+            "Tomcat:type=MBeanFactory",
+            "Tomcat:type=NamingResources",
+            "Tomcat:type=Server",
+            "Tomcat:type=Service",
+            "Tomcat:type=StringCache",
+            "Tomcat:type=Valve,name=StandardEngineValve",
+        };
+    }
+
+    private static String[] hostMBeanNames(String host) {
+        return new String[] {
+            "Tomcat:type=Host,host=" + host,
+            "Tomcat:type=Valve,host=" + host + ",name=ErrorReportValve",
+            "Tomcat:type=Valve,host=" + host + ",name=StandardHostValve",
+        };
+    }
+
+    private static String[] contextMBeanNames(String host, String context) {
+        return new String[] {
+            "Tomcat:j2eeType=WebModule,name=//" + host + context +
+                ",J2EEApplication=none,J2EEServer=none",
+            "Tomcat:type=Cache,host=" + host + ",context=" + context,
+            "Tomcat:type=Loader,context=" + context + ",host=" + host,
+            "Tomcat:type=Manager,context=" + context + ",host=" + host,
+            "Tomcat:type=NamingResources,context=" + context +
+                ",host=" + host,
+            "Tomcat:type=Valve,context=" + context +
+                ",host=" + host + ",name=NonLoginAuthenticator",
+            "Tomcat:type=Valve,context=" + context +
+                ",host=" + host + ",name=StandardContextValve",
+            "Tomcat:type=WebappClassLoader,context=" + context +
+                ",host=" + host,
+        };
+    }
+
+    private static String[] connectorMBeanNames(String port, String type) {
+        return new String[] {
+        "Tomcat:type=Connector,port=" + port,
+        "Tomcat:type=GlobalRequestProcessor,name=http-" + type + "-" + port,
+        "Tomcat:type=Mapper,port=" + port,
+        "Tomcat:type=ProtocolHandler,port=" + port,
+        "Tomcat:type=ThreadPool,name=http-" + type + "-" + port,
+        };
+    }
+
     /**
      * Test verifying that Tomcat correctly de-registers the MBeans it has
      * registered.
@@ -50,16 +103,44 @@ public class TestRegistration extends TomcatBaseTest {
             if (!contextDir.mkdir())
                 fail("Failed to create: [" + contextDir.toString() + "]");
         }
-        tomcat.addContext("/foo", contextDir.getAbsolutePath());
+        tomcat.addContext(contextName, contextDir.getAbsolutePath());
         tomcat.start();
         
         // Verify there are no Catalina MBeans
         onames = mbeanServer.queryNames(new ObjectName("Catalina:*"), null);
         assertEquals("Found: " + onames, 0, onames.size());
 
-        // Verify there are the correct number of Tomcat MBeans
+        // Verify there are the correct Tomcat MBeans
         onames = mbeanServer.queryNames(new ObjectName("Tomcat:*"), null);
-        assertEquals("Wrong number of Tomcat MBeans", 23, onames.size());
+        ArrayList<String> found = new ArrayList<String>(onames.size());
+        for (ObjectName on: onames) {
+            found.add(on.toString());
+        }
+
+        // Create the list of expected MBean names
+        String protocol=
+            getTomcatInstance().getConnector().getProtocolHandlerClassName();
+        if (protocol.indexOf("Nio") > 0) {
+            protocol = "nio";
+        } else if (protocol.indexOf("Apr") > 0) {
+            protocol = "apr";
+        } else {
+            protocol = "bio";
+        }
+        ArrayList<String> expected = new ArrayList<String>(Arrays.asList(basicMBeanNames()));
+        expected.addAll(Arrays.asList(hostMBeanNames("localhost")));
+        expected.addAll(Arrays.asList(contextMBeanNames("localhost", contextName)));
+        expected.addAll(Arrays.asList(connectorMBeanNames(Integer.toString(getPort()), protocol)));
+
+        // Did we find all expected MBeans?
+        ArrayList<String> missing = new ArrayList<String>(expected);
+        missing.removeAll(found);
+        assertTrue("Missing Tomcat MBeans: " + missing, missing.isEmpty());
+
+        // Did we find any unexpected MBeans?
+        List additional = found;
+        additional.removeAll(expected);
+        assertTrue("Unexpected Tomcat MBeans: " + additional, additional.isEmpty());
 
         tomcat.stop();
 
@@ -77,7 +158,7 @@ public class TestRegistration extends TomcatBaseTest {
             if (!contextDir2.mkdir())
                 fail("Failed to create: [" + contextDir2.toString() + "]");
         }
-        tomcat.addContext(host, "/foo2", contextDir2.getAbsolutePath());
+        tomcat.addContext(host, contextName + "2", contextDir2.getAbsolutePath());
         
         tomcat.start();
         tomcat.stop();
