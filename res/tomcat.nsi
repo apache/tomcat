@@ -46,6 +46,8 @@ Var JvmDll
 Var Arch
 Var ResetInstDir
 Var TomcatPort
+Var TomcatMenuEntriesEnable
+Var TomcatShortcutAllUsers
 Var TomcatAdminEnable
 Var TomcatAdminUsername
 Var TomcatAdminPassword
@@ -54,6 +56,7 @@ Var TomcatAdminRoles
 ; Variables that store handles of dialog controls
 Var CtlJavaHome
 Var CtlTomcatPort
+Var CtlTomcatShortcutAllUsers
 Var CtlTomcatAdminUsername
 Var CtlTomcatAdminPassword
 Var CtlTomcatAdminRoles
@@ -93,6 +96,7 @@ Var ServiceInstallLog
 
   LangString TEXT_JVM_LABEL1 ${LANG_ENGLISH} "Please select the path of a Java SE 6.0 or later JRE installed on your system."
   LangString TEXT_CONF_LABEL_PORT ${LANG_ENGLISH} "HTTP/1.1 Connector Port"
+  LangString TEXT_CONF_LABEL_SHORTCUT_ALL_USERS ${LANG_ENGLISH} "Create shortcuts for all users"
   LangString TEXT_CONF_LABEL_ADMIN ${LANG_ENGLISH} "Tomcat Administrator Login (optional)"
   LangString TEXT_CONF_LABEL_ADMINUSERNAME ${LANG_ENGLISH} "User Name"
   LangString TEXT_CONF_LABEL_ADMINPASSWORD ${LANG_ENGLISH} "Password"
@@ -229,8 +233,6 @@ Section "Service Startup" SecTomcatService
   ${EndIf}
   DetailPrint "Configuring Tomcat@VERSION_MAJOR@ service"
   nsExec::ExecToLog '"$INSTDIR\bin\tomcat@VERSION_MAJOR@.exe" //US//Tomcat@VERSION_MAJOR@ --Startup auto'
-  ; Behave like Apache Httpd (put the icon in tray on login)
-  WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Run" "ApacheTomcatMonitor@VERSION_MAJOR_MINOR@" '"$INSTDIR\bin\tomcat@VERSION_MAJOR@w.exe" //MS//Tomcat@VERSION_MAJOR@'
 
   ClearErrors
 
@@ -260,7 +262,6 @@ Section "Start Menu Items" SecMenu
 
   SectionIn 1 2 3
 
-  Call createShortcuts
 SectionEnd
 
 Section "Documentation" SecDocs
@@ -317,6 +318,16 @@ Section -post
   nsExec::ExecToLog '"$INSTDIR\bin\tomcat@VERSION_MAJOR@.exe" //US//Tomcat@VERSION_MAJOR@ --JvmOptions "-Dcatalina.home=$INSTDIR#-Dcatalina.base=$INSTDIR#-Djava.endorsed.dirs=$INSTDIR\endorsed#-Djava.io.tmpdir=$INSTDIR\temp#-Djava.util.logging.manager=org.apache.juli.ClassLoaderLogManager#-Djava.util.logging.config.file=$INSTDIR\conf\logging.properties"'
   nsExec::ExecToLog '"$INSTDIR\bin\tomcat@VERSION_MAJOR@.exe" //US//Tomcat@VERSION_MAJOR@ --StdOutput auto --StdError auto'
 
+  ${If} $TomcatShortcutAllUsers == "1"
+    WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Run" "ApacheTomcatMonitor@VERSION_MAJOR_MINOR@" '"$INSTDIR\bin\tomcat@VERSION_MAJOR@w.exe" //MS//Tomcat@VERSION_MAJOR@'
+  ${Else}
+    WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Run" "ApacheTomcatMonitor@VERSION_MAJOR_MINOR@" '"$INSTDIR\bin\tomcat@VERSION_MAJOR@w.exe" //MS//Tomcat@VERSION_MAJOR@'
+  ${EndIf}
+  
+  ${If} $TomcatMenuEntriesEnable == "1"
+    Call createShortcuts
+  ${EndIf}
+
   WriteUninstaller "$INSTDIR\Uninstall.exe"
 
   WriteRegStr HKLM "SOFTWARE\Apache Software Foundation\Tomcat\@VERSION_MAJOR_MINOR@" "InstallPath" $INSTDIR
@@ -346,6 +357,8 @@ Function .onInit
   ;Initialize default values
   StrCpy $JavaHome ""
   StrCpy $TomcatPort "8080"
+  StrCpy $TomcatMenuEntriesEnable "0"
+  StrCpy $TomcatShortcutAllUsers "0"
   StrCpy $TomcatAdminEnable "0"
   StrCpy $TomcatAdminUsername ""
   StrCpy $TomcatAdminPassword ""
@@ -403,6 +416,7 @@ FunctionEnd
 Function pageComponentsLeave
   StrCpy $TomcatAdminEnable "0"
   StrCpy $TomcatAdminRoles ""
+  StrCpy $TomcatMenuEntriesEnable "0"
 
   SectionGetFlags ${SecManager} $0
   IntOp $0 $0 & ${SF_SELECTED}
@@ -421,6 +435,12 @@ Function pageComponentsLeave
       StrCpy $TomcatAdminRoles "admin-gui"
     ${EndIf}
   ${EndIf}
+  
+  SectionGetFlags ${SecMenu} $0
+  IntOp $0 $0 & ${SF_SELECTED}
+  ${If} $0 <> 0
+    StrCpy $TomcatMenuEntriesEnable "1"
+  ${EndIf}
 FunctionEnd
 
 Function pageConfiguration
@@ -436,20 +456,27 @@ Function pageConfiguration
   Pop $CtlTomcatPort
   ${NSD_SetTextLimit} $CtlTomcatPort 5
 
+  ${If} $TomcatMenuEntriesEnable == "1"
+    ${NSD_CreateLabel} 0 30u 140u 15u "$(TEXT_CONF_LABEL_SHORTCUT_ALL_USERS)"
+    Pop $R0
+    ${NSD_CreateCheckBox} 150u 30u 10u 10u "$TomcatShortcutAllUsers"
+    Pop $CtlTomcatShortcutAllUsers
+  ${EndIf}
+
   ${If} $TomcatAdminEnable == "1"
-    ${NSD_CreateLabel} 0 30u 100% 15u "$(TEXT_CONF_LABEL_ADMIN)"
+    ${NSD_CreateLabel} 0 55u 100% 15u "$(TEXT_CONF_LABEL_ADMIN)"
     Pop $R0
-    ${NSD_CreateLabel} 10u 50u 140u 15u "$(TEXT_CONF_LABEL_ADMINUSERNAME)"
+    ${NSD_CreateLabel} 10u 75u 140u 15u "$(TEXT_CONF_LABEL_ADMINUSERNAME)"
     Pop $R0
-    ${NSD_CreateText} 150u 50u 110u 13u "$TomcatAdminUsername"
+    ${NSD_CreateText} 150u 75u 110u 13u "$TomcatAdminUsername"
     Pop $CtlTomcatAdminUsername
-    ${NSD_CreateLabel} 10u 70u 140u 15u "$(TEXT_CONF_LABEL_ADMINPASSWORD)"
+    ${NSD_CreateLabel} 10u 95u 140u 15u "$(TEXT_CONF_LABEL_ADMINPASSWORD)"
     Pop $R0
-    ${NSD_CreatePassword} 150u 70u 110u 13u "$TomcatAdminPassword"
+    ${NSD_CreatePassword} 150u 95u 110u 13u "$TomcatAdminPassword"
     Pop $CtlTomcatAdminPassword
-    ${NSD_CreateLabel} 10u 90u 140u 15u "$(TEXT_CONF_LABEL_ADMINROLES)"
+    ${NSD_CreateLabel} 10u 115u 140u 15u "$(TEXT_CONF_LABEL_ADMINROLES)"
     Pop $R0
-    ${NSD_CreateText} 150u 90u 110u 13u "$TomcatAdminRoles"
+    ${NSD_CreateText} 150u 115u 110u 13u "$TomcatAdminRoles"
     Pop $CtlTomcatAdminRoles
   ${EndIf}
 
@@ -459,6 +486,9 @@ FunctionEnd
 
 Function pageConfigurationLeave
   ${NSD_GetText} $CtlTomcatPort $TomcatPort
+  ${If} $TomcatMenuEntriesEnable == "1"
+    ${NSD_GetState} $CtlTomcatShortcutAllUsers $TomcatShortcutAllUsers
+  ${EndIf}
   ${If} $TomcatAdminEnable == "1"
     ${NSD_GetText} $CtlTomcatAdminUsername $TomcatAdminUsername
     ${NSD_GetText} $CtlTomcatAdminPassword $TomcatAdminPassword
@@ -859,6 +889,10 @@ FunctionEnd
 ;
 Function createShortcuts
 
+  ${If} $TomcatShortcutAllUsers == ${BST_CHECKED}
+    SetShellVarContext all
+  ${EndIf}
+  
   SetOutPath "$SMPROGRAMS\Apache Tomcat @VERSION_MAJOR_MINOR@"
 
   CreateShortCut "$SMPROGRAMS\Apache Tomcat @VERSION_MAJOR_MINOR@\Tomcat Home Page.lnk" \
@@ -898,6 +932,10 @@ Function createShortcuts
                  '//ES//Tomcat@VERSION_MAJOR@' \
                  "$INSTDIR\tomcat.ico" 0 SW_SHOWNORMAL
 
+  ${If} $TomcatShortcutAllUsers == ${BST_CHECKED}
+    SetShellVarContext current
+  ${EndIf}
+
 FunctionEnd
 
 ;--------------------------------
@@ -915,10 +953,24 @@ Section Uninstall
   nsExec::ExecToLog '"$INSTDIR\bin\tomcat@VERSION_MAJOR@.exe" //DS//Tomcat@VERSION_MAJOR@'
   ClearErrors
 
-  DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Apache Tomcat @VERSION_MAJOR_MINOR@"
+  ; Don't know if 32-bit or 64-bit registry was used so, for now, remove both
+  SetRegView 32
+  DeleteRegKey HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Apache Tomcat @VERSION_MAJOR_MINOR@"
   DeleteRegKey HKLM "SOFTWARE\Apache Software Foundation\Tomcat\@VERSION_MAJOR_MINOR@"
+  DeleteRegValue HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Run" "ApacheTomcatMonitor@VERSION_MAJOR_MINOR@"
+  SetRegView 64
+  DeleteRegKey HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Apache Tomcat @VERSION_MAJOR_MINOR@"
+  DeleteRegKey HKLM "SOFTWARE\Apache Software Foundation\Tomcat\@VERSION_MAJOR_MINOR@"
+  DeleteRegValue HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Run" "ApacheTomcatMonitor@VERSION_MAJOR_MINOR@"
+
   DeleteRegValue HKCU "Software\Microsoft\Windows\CurrentVersion\Run" "ApacheTomcatMonitor@VERSION_MAJOR_MINOR@"
+
+  ; Don't know if short-cuts were created for all users, one user or not at all so, for now, remove both
+  SetShellVarContext all
   RMDir /r "$SMPROGRAMS\Apache Tomcat @VERSION_MAJOR_MINOR@"
+  SetShellVarContext current
+  RMDir /r "$SMPROGRAMS\Apache Tomcat @VERSION_MAJOR_MINOR@"
+
   Delete "$INSTDIR\tomcat.ico"
   Delete "$INSTDIR\LICENSE"
   Delete "$INSTDIR\NOTICE"
