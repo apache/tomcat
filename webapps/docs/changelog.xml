@@ -263,8 +263,9 @@
   <subsection name="Coyote">
     <changelog>
       <fix>
-        When parsing the port in the HTTP host header, treat the port as a base
-        10 integer rather than a hexadecimal one. (rjung/markt/kkolinko) 
+        When parsing the port in the HTTP host header, restrict the value to be
+        base 10 integer digits rather than hexadecimal ones.
+        (rjung/markt/kkolinko) 
       </fix>
       <update>
         Various refactorings to reduce code duplication and unnecessary code in
