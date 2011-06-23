@@ -74,6 +74,7 @@ Var ServiceInstallLog
   !define MUI_WELCOMEFINISHPAGE_BITMAP side_left.bmp
   !define MUI_FINISHPAGE_SHOWREADME "$INSTDIR\webapps\ROOT\RELEASE-NOTES.txt"
   !define MUI_FINISHPAGE_RUN $INSTDIR\bin\tomcat@VERSION_MAJOR@w.exe
+  !define MUI_FINISHPAGE_RUN_FUNCTION "StartService" $INSTDIR\bin\tomcat@VERSION_MAJOR@w.exe
   !define MUI_FINISHPAGE_RUN_PARAMETERS //MR//Tomcat@VERSION_MAJOR@
   !define MUI_FINISHPAGE_NOREBOOTSUPPORT
 
@@ -881,12 +882,6 @@ FunctionEnd
 ; =================
 ; createShortcuts Function
 ; =================
-;
-; This is called by the SecMenu section.
-;
-; The code is moved here, because ${SecManager} etc. are not visible
-; in SecMenu, because they are defined lower than it.
-;
 Function createShortcuts
 
   ${If} $TomcatShortcutAllUsers == ${BST_CHECKED}
