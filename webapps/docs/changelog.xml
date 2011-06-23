@@ -217,6 +217,9 @@
       <fix>
         <bug>51206</bug>: Make CATALINA_BASE visible for setenv.sh. (rjung)
       </fix>
+      <update>
+        Remove unnecessary variable BASEDIR from scripts. (rjung)
+      </update>
     </changelog>
   </subsection>
 </section>

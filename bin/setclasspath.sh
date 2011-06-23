@@ -75,29 +75,11 @@ if [ "$1" = "debug" ] ; then
     fi
   fi
 fi
-if [ -z "$BASEDIR" ]; then
-  echo "The BASEDIR environment variable is not defined"
-  echo "This environment variable is needed to run this program"
-  exit 1
-fi
-if [ ! -x "$BASEDIR"/bin/setclasspath.sh ]; then
-  if $os400; then
-    # -x will Only work on the os400 if the files are:
-    # 1. owned by the user
-    # 2. owned by the PRIMARY group of the user
-    # this will not work if the user belongs in secondary groups
-    eval
-  else
-    echo "The BASEDIR environment variable is not defined correctly"
-    echo "This environment variable is needed to run this program"
-    exit 1
-  fi
-fi
 
 # Don't override the endorsed dir if the user has set it previously
 if [ -z "$JAVA_ENDORSED_DIRS" ]; then
   # Set the default -Djava.endorsed.dirs argument
-  JAVA_ENDORSED_DIRS="$BASEDIR"/endorsed
+  JAVA_ENDORSED_DIRS="$CATALINA_HOME"/endorsed
 fi
 
 # Set standard commands for invoking Java.

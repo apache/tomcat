@@ -67,21 +67,10 @@ echo This environment variable is needed to run this program
 goto exit
 
 :okJava
-if not "%BASEDIR%" == "" goto gotBasedir
-echo The BASEDIR environment variable is not defined
-echo This environment variable is needed to run this program
-goto exit
-:gotBasedir
-if exist "%BASEDIR%\bin\setclasspath.bat" goto okBasedir
-echo The BASEDIR environment variable is not defined correctly
-echo This environment variable is needed to run this program
-goto exit
-:okBasedir
-
 rem Don't override the endorsed dir if the user has set it previously
 if not "%JAVA_ENDORSED_DIRS%" == "" goto gotEndorseddir
 rem Set the default -Djava.endorsed.dirs argument
-set "JAVA_ENDORSED_DIRS=%BASEDIR%\endorsed"
+set "JAVA_ENDORSED_DIRS=%CATALINA_HOME%\endorsed"
 :gotEndorseddir
 
 rem Set standard command for invoking Java.

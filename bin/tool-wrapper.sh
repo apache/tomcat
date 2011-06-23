@@ -105,11 +105,9 @@ if $os400; then
   # 1. owned by the user
   # 2. owned by the PRIMARY group of the user
   # this will not work if the user belongs in secondary groups
-  BASEDIR="$CATALINA_HOME"
   . "$CATALINA_HOME"/bin/setclasspath.sh
 else
   if [ -r "$CATALINA_HOME"/bin/setclasspath.sh ]; then
-    BASEDIR="$CATALINA_HOME"
     . "$CATALINA_HOME"/bin/setclasspath.sh
   else
     echo "Cannot find $CATALINA_HOME/bin/setclasspath.sh"
