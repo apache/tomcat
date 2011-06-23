@@ -134,8 +134,6 @@ public final class TldConfig  implements LifecycleListener {
     private Digester tldDigester = null;
 
 
-    private boolean rescan=true;
-
     /**
      * Set of URIs discovered for the associated context. Used to enforce the
      * correct processing priority. Only the TLD associated with the first
@@ -190,14 +188,6 @@ public final class TldConfig  implements LifecycleListener {
                 noTldJars.add(tokenizer.nextToken());
             }
         }
-    }
-
-    public boolean isRescan() {
-        return rescan;
-    }
-
-    public void setRescan(boolean rescan) {
-        this.rescan = rescan;
     }
 
     public Context getContext() {
