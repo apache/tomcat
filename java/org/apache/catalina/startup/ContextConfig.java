@@ -114,14 +114,23 @@ public class ContextConfig
     private static final String SCI_LOCATION =
         "META-INF/services/javax.servlet.ServletContainerInitializer";
 
-    // ----------------------------------------------------- Instance Variables
-
 
     /**
-     * Custom mappings of login methods to authenticators
+     * The string resources for this package.
      */
-    protected Map<String,Authenticator> customAuthenticators;
+    protected static final StringManager sm =
+        StringManager.getManager(Constants.Package);
 
+
+    protected static final LoginConfig DUMMY_LOGIN_CONFIG =
+        new LoginConfig("NONE", null, null, null);
+
+    /**
+     * The <code>Digester</code> we will use to process web application
+     * context files.
+     */
+    protected static Digester contextDigester = null;
+    
 
     /**
      * The set of Authenticators that we know how to configure.  The key is
@@ -129,6 +138,45 @@ public class ContextConfig
      * the fully qualified Java class name of the corresponding Valve.
      */
     protected static Properties authenticators = null;
+
+
+    /**
+     * The <code>Digester</code>s available to process web deployment descriptor
+     * files.
+     */
+    protected static Digester[] webDigesters = new Digester[4];
+
+
+    /**
+     * The <code>Digester</code>s available to process web fragment deployment
+     * descriptor files.
+     */
+    protected static Digester[] webFragmentDigesters = new Digester[4];
+
+
+    /**
+     * The <code>Rule</code>s used to parse the web.xml
+     */
+    protected static WebRuleSet webRuleSet = new WebRuleSet(false);
+
+
+    /**
+     * The <code>Rule</code>s used to parse the web-fragment.xml
+     */
+    protected static WebRuleSet webFragmentRuleSet = new WebRuleSet(true);
+
+
+    /**
+     * Deployment count.
+     */
+    protected static long deploymentCount = 0L;
+
+
+    // ----------------------------------------------------- Instance Variables
+    /**
+     * Custom mappings of login methods to authenticators
+     */
+    protected Map<String,Authenticator> customAuthenticators;
 
 
     /**
@@ -175,20 +223,6 @@ public class ContextConfig
         new HashMap<Class<?>, Set<ServletContainerInitializer>>();
 
     /**
-     * The string resources for this package.
-     */
-    protected static final StringManager sm =
-        StringManager.getManager(Constants.Package);
-
-
-    /**
-     * The <code>Digester</code> we will use to process web application
-     * context files.
-     */
-    protected static Digester contextDigester = null;
-    
-    
-    /**
      * The <code>Digester</code> we will use to process web application
      * deployment descriptor files.
      */
@@ -201,37 +235,7 @@ public class ContextConfig
     protected Digester webFragmentDigester = null;
 
     
-    protected static Digester[] webDigesters = new Digester[4];
-
-    /**
-     * The <code>Digester</code>s available to process web fragment
-     * deployment descriptor files.
-     */
-    protected static Digester[] webFragmentDigesters = new Digester[4];
-    
-    /**
-     * The <code>Rule</code>s used to parse the web.xml
-     */
-    protected static WebRuleSet webRuleSet = new WebRuleSet(false);
-
-    /**
-     * The <code>Rule</code>s used to parse the web-fragment.xml
-     */
-    protected static WebRuleSet webFragmentRuleSet = new WebRuleSet(true);
-
-    /**
-     * Deployment count.
-     */
-    protected static long deploymentCount = 0L;
-    
-    
-    protected static final LoginConfig DUMMY_LOGIN_CONFIG =
-                                new LoginConfig("NONE", null, null, null);
-
-
     // ------------------------------------------------------------- Properties
-
-
     /**
      * Return the location of the default deployment descriptor
      */
