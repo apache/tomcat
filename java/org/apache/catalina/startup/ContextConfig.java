@@ -229,32 +229,6 @@ public class ContextConfig
                                 new LoginConfig("NONE", null, null, null);
 
 
-    static {
-        webDigesters[0] = DigesterFactory.newDigester(false, false, webRuleSet);
-        webDigesters[0].getParser();
-        webFragmentDigesters[0] = DigesterFactory.newDigester(false, false,
-                webFragmentRuleSet);
-        webFragmentDigesters[0].getParser();
-
-        webDigesters[1] = DigesterFactory.newDigester(true, false, webRuleSet);
-        webDigesters[1].getParser();
-        webFragmentDigesters[1] = DigesterFactory.newDigester(true, false,
-                webFragmentRuleSet);
-        webFragmentDigesters[1].getParser();
-
-        webDigesters[2] = DigesterFactory.newDigester(false, true, webRuleSet);
-        webDigesters[2].getParser();
-        webFragmentDigesters[2] = DigesterFactory.newDigester(false, true,
-                webFragmentRuleSet);
-        webFragmentDigesters[2].getParser();
-
-        webDigesters[3] = DigesterFactory.newDigester(true, true, webRuleSet);
-        webDigesters[3].getParser();
-        webFragmentDigesters[3] = DigesterFactory.newDigester(true, true,
-                webFragmentRuleSet);
-        webFragmentDigesters[3].getParser();
-    }
-
     // ------------------------------------------------------------- Properties
 
 
@@ -501,22 +475,46 @@ public class ContextConfig
      * Create (if necessary) and return a Digester configured to process the
      * web application deployment descriptor (web.xml).
      */
-    protected void createWebXmlDigester(boolean namespaceAware,
+    public void createWebXmlDigester(boolean namespaceAware,
             boolean validation) {
         
         if (!namespaceAware && !validation) {
+            if (webDigesters[0] == null) {
+                webDigesters[0] = DigesterFactory.newDigester(validation,
+                        namespaceAware, webRuleSet);
+                webFragmentDigesters[0] = DigesterFactory.newDigester(validation,
+                        namespaceAware, webFragmentRuleSet);
+            }
             webDigester = webDigesters[0];
             webFragmentDigester = webFragmentDigesters[0];
             
         } else if (!namespaceAware && validation) {
+            if (webDigesters[1] == null) {
+                webDigesters[1] = DigesterFactory.newDigester(validation,
+                        namespaceAware, webRuleSet);
+                webFragmentDigesters[1] = DigesterFactory.newDigester(validation,
+                        namespaceAware, webFragmentRuleSet);
+            }
             webDigester = webDigesters[1];
             webFragmentDigester = webFragmentDigesters[1];
             
         } else if (namespaceAware && !validation) {
+            if (webDigesters[2] == null) {
+                webDigesters[2] = DigesterFactory.newDigester(validation,
+                        namespaceAware, webRuleSet);
+                webFragmentDigesters[2] = DigesterFactory.newDigester(validation,
+                        namespaceAware, webFragmentRuleSet);
+            }
             webDigester = webDigesters[2];
             webFragmentDigester = webFragmentDigesters[2];
             
         } else {
+            if (webDigesters[3] == null) {
+                webDigesters[3] = DigesterFactory.newDigester(validation,
+                        namespaceAware, webRuleSet);
+                webFragmentDigesters[3] = DigesterFactory.newDigester(validation,
+                        namespaceAware, webFragmentRuleSet);
+            }
             webDigester = webDigesters[3];
             webFragmentDigester = webFragmentDigesters[3];
         }
