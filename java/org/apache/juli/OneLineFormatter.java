@@ -108,7 +108,8 @@ public class OneLineFormatter extends Formatter {
         buf.append('.');
         if (frac < 100) {
             if (frac < 10) {
-                buf.append("00");
+                buf.append('0');
+                buf.append('0');
             } else {
                 buf.append('0');
             }
