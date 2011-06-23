@@ -134,17 +134,6 @@ public final class TldConfig  implements LifecycleListener {
     private Digester tldDigester = null;
 
 
-    /**
-     * Attribute value used to turn on/off TLD validation
-     */
-    private boolean tldValidation = false;
-
-
-    /**
-     * Attribute value used to turn on/off TLD  namespace awareness.
-     */
-    private boolean tldNamespaceAware = false;
-
     private boolean rescan=true;
 
     /**
@@ -202,44 +191,6 @@ public final class TldConfig  implements LifecycleListener {
             }
         }
     }
-
-    /**
-     * Set the validation feature of the XML parser used when
-     * parsing xml instances.
-     * @param tldValidation true to enable xml instance validation
-     */
-    public void setTldValidation(boolean tldValidation){
-        this.tldValidation = tldValidation;
-    }
-
-    /**
-     * Get the server.xml &lt;host&gt; attribute's xmlValidation.
-     * @return true if validation is enabled.
-     *
-     */
-    public boolean getTldValidation(){
-        return this.tldValidation;
-    }
-
-    /**
-     * Get the server.xml &lt;host&gt; attribute's xmlNamespaceAware.
-     * @return true if namespace awareness is enabled.
-     *
-     */
-    public boolean getTldNamespaceAware(){
-        return this.tldNamespaceAware;
-    }
-
-
-    /**
-     * Set the namespace aware feature of the XML parser used when
-     * parsing xml instances.
-     * @param tldNamespaceAware true to enable namespace awareness
-     */
-    public void setTldNamespaceAware(boolean tldNamespaceAware){
-        this.tldNamespaceAware = tldNamespaceAware;
-    }    
-
 
     public boolean isRescan() {
         return rescan;
@@ -610,9 +561,8 @@ public final class TldConfig  implements LifecycleListener {
     
     private void init() {
         if (tldDigester == null){
-            setTldValidation(context.getTldValidation());
-            setTldNamespaceAware(context.getTldNamespaceAware());
-            tldDigester = createTldDigester(tldNamespaceAware, tldValidation);
+            tldDigester = createTldDigester(context.getTldNamespaceAware(),
+                    context.getTldValidation());
         }
     }
 
