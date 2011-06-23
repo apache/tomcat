@@ -467,6 +467,11 @@
 
   <target name="compile" depends="build-prepare,download-compile,validate">
 
+    <!-- Add the builtin catalina.properties -->
+    <copy todir="java/org/apache/catalina/startup"
+          file="conf/catalina.properties" encoding="ISO-8859-1">
+      <filterset refid="version.filters"/>
+    </copy>
     <!-- Compile internal server components -->
     <javac srcdir="java" destdir="${tomcat.classes}"
            debug="${compile.debug}"
@@ -2097,6 +2102,8 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
   <target name="clean"
           description="Delete the default output folders">
     <delete dir="${tomcat.output}" />
+    <!-- Remove the copied catalina.properties -->
+    <delete file="java/org/apache/catalina/startup/catalina.properties" />
   </target>
 
     

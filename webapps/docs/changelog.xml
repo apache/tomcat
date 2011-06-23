@@ -130,6 +130,11 @@
         <bug>51418</bug>: Provide more control over Context creation when
         embedding Tomcat. Based on a patch by Benson Margulies. (markt/kkolinko)
       </add>
+      <fix>
+        Remove redundant copy of catalina.properties from o.a.c.startup.
+        Generate this copy for inclusion in bin and src jars during the
+        ant "compile" task. (rjung)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
