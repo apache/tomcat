@@ -73,9 +73,8 @@ Var ServiceInstallLog
   !define MUI_HEADERIMAGE_BITMAP header.bmp
   !define MUI_WELCOMEFINISHPAGE_BITMAP side_left.bmp
   !define MUI_FINISHPAGE_SHOWREADME "$INSTDIR\webapps\ROOT\RELEASE-NOTES.txt"
-  !define MUI_FINISHPAGE_RUN $INSTDIR\bin\tomcat@VERSION_MAJOR@w.exe
-  !define MUI_FINISHPAGE_RUN_FUNCTION "StartService" $INSTDIR\bin\tomcat@VERSION_MAJOR@w.exe
-  !define MUI_FINISHPAGE_RUN_PARAMETERS //MR//Tomcat@VERSION_MAJOR@
+  !define MUI_FINISHPAGE_RUN
+  !define MUI_FINISHPAGE_RUN_FUNCTION "startService"
   !define MUI_FINISHPAGE_NOREBOOTSUPPORT
 
   !define MUI_ABORTWARNING
@@ -932,6 +931,16 @@ Function createShortcuts
   ${EndIf}
 
 FunctionEnd
+
+; =================
+; startService Function
+;
+; Using a function allows the service name to be varied
+; =================
+Function startService
+  ExecShell "" "$INSTDIR\bin\tomcat@VERSION_MAJOR@w.exe" "//MR//Tomcat@VERSION_MAJOR@"
+FunctionEnd
+
 
 ;--------------------------------
 ;Uninstaller Section
