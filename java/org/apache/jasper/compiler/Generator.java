@@ -3675,13 +3675,16 @@ class Generator {
                 out.print(JspUtil.toJavaSourceType(attrInfos[i].getTypeName()));
                 out.print(" ");
             }
-            out.print(attrInfos[i].getName());
+            out.print(JspUtil.makeJavaIdentifier(attrInfos[i].getName()));
             out.println(";");
         }
         out.println();
 
         // Define attribute getter and setter methods
         for (int i = 0; i < attrInfos.length; i++) {
+            String javaName =
+                JspUtil.makeJavaIdentifier(attrInfos[i].getName());
+
             // getter method
             out.printin("public ");
             if (attrInfos[i].isFragment()) {
@@ -3694,7 +3697,7 @@ class Generator {
             out.println(" {");
             out.pushIndent();
             out.printin("return this.");
-            out.print(attrInfos[i].getName());
+            out.print(javaName);
             out.println(";");
             out.popIndent();
             out.printil("}");
@@ -3710,20 +3713,20 @@ class Generator {
                 out.print(JspUtil.toJavaSourceType(attrInfos[i].getTypeName()));
                 out.print(" ");
             }
-            out.print(attrInfos[i].getName());
+            out.print(javaName);
             out.println(") {");
             out.pushIndent();
             out.printin("this.");
-            out.print(attrInfos[i].getName());
+            out.print(javaName);
             out.print(" = ");
-            out.print(attrInfos[i].getName());
+            out.print(javaName);
             out.println(";");
             if (ctxt.isTagFile()) {
                 // Tag files should also set jspContext attributes
                 out.printin("jspContext.setAttribute(\"");
                 out.print(attrInfos[i].getName());
                 out.print("\", ");
-                out.print(attrInfos[i].getName());
+                out.print(javaName);
                 out.println(");");
             }
             out.popIndent();
