@@ -135,6 +135,10 @@
         Generate this copy for inclusion in bin and src jars during the
         ant "compile" task. (rjung)
       </fix>
+      <fix>
+        Use system properties loaded from catalina.properties via the class
+        path in unit tests. (rjung)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
