@@ -184,6 +184,10 @@
         If you later downgrade from 7.0.17 or later to 7.0.16 or earlier, you
         must empty the work directory as part of the downgrade process. (markt)
       </fix>
+      <fix>
+        <bug>36362</bug>: Handle the case where tag file attributes (which can
+        use any valid XML name) have a name which is a Java identifier. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">
