@@ -142,6 +142,12 @@
       <update>
         Improve JMX unit test. (rjung)
       </update>
+      <fix>
+        Fix IllegalStateException for JavaScript files when switching from
+        Writer to OutputStream. The special handling of this case in the
+        DefaultServlet was broken due to a MIME type change for JavaScript.
+        (funkman)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
