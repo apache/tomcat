@@ -227,11 +227,17 @@
         <bug>33262</bug>: Install monitor to auto-start for current user only
         rather than all users to be consistent with menu item creation. (markt)
       </fix>
-      <fix>
+      <add>
         <bug>40510</bug>: Provide an option to install shortcuts for the current
         user or all users. Also ensure registry is correctly cleaned on
         uninstall for 64-bit platforms. (markt)
-      </fix>
+      </add>
+      <add>
+        <bug>50949</bug>: Provide the ability to specify the AJP port and
+        service name when installing Tomcat using the Windows installer. This
+        permits multiple instances of the same Tomcat version to be installed
+        side-by-side. (markt)
+      </add>
       <update>
         Clean up shell and batch scripts (improve consistency,
         clarify comments, add <code>configtest</code> command support for
