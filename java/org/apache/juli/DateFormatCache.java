@@ -37,6 +37,9 @@ import java.util.TimeZone;
  * <p>The cache is not threadsafe. It can be used without synchronization
  * via thread local instances, or with synchronization as a global cache.</p>
  *
+ * <p>The cache can be created with a parent cache to build a cache hierarchy.
+ * Access to the parent cache is threadsafe.</p>
+ *
  * @version $Id$
  */
 
@@ -52,9 +55,6 @@ public class DateFormatCache {
 
     private DateFormatCache parent;
     private Cache cache;
-
-    /* Cache type, "parent" or "child" */
-    private String type;
 
     /**
      * Replace the millisecond formatting character 'S' by
@@ -83,11 +83,6 @@ public class DateFormatCache {
     }
 
     public DateFormatCache(int size, String format, DateFormatCache parent) {
-        if (parent == null) {
-            type = "main";
-        } else {
-            type = "child";
-        }
         cacheSize = size;
         this.format = tidyFormat(format);
         this.parent = parent;
