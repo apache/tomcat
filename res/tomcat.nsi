@@ -506,13 +506,9 @@ Function pageConfigurationLeave
   ${EndIf}
 FunctionEnd
 
-; Not used
-;Function Void
-;FunctionEnd
 
 ;--------------------------------
 ;Descriptions
-
 !insertmacro MUI_FUNCTION_DESCRIPTION_BEGIN
   !insertmacro MUI_DESCRIPTION_TEXT ${SecTomcat} $(DESC_SecTomcat)
   !insertmacro MUI_DESCRIPTION_TEXT ${SecTomcatCore} $(DESC_SecTomcatCore)
