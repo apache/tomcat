@@ -252,6 +252,9 @@ public class AccessLogValve extends ValveBase implements AccessLog {
      * <p>The cache is not threadsafe. It can be used without synchronization
      * via thread local instances, or with synchronization as a global cache.</p>
      *
+     * <p>The cache can be created with a parent cache to build a cache hierarchy.
+     * Access to the parent cache is threadsafe.</p>
+     *
      * <p>This class uses a small thread local first level cache and a bigger
      * synchronized global second level cache.</p>
      */
@@ -1205,10 +1208,12 @@ public class AccessLogValve extends ValveBase implements AccessLog {
         private static final String msecFractionFormat = "msec_frac";
 
         /**
-         * The pattern we use to replace "S" millisecond formatting
-         * of SimpleDateFormat by our own handling
+         * The patterns we use to replace "S" and "SSS" millisecond
+         * formatting of SimpleDateFormat by our own handling
          */
-        private static final String msecPattern = "####";
+        private static final String msecPattern = "{#}";
+        private static final String trippleMsecPattern =
+            msecPattern + msecPattern + msecPattern;
 
         /* Our format description string, null if CLF */
         private String format = null;
@@ -1285,6 +1290,7 @@ public class AccessLogValve extends ValveBase implements AccessLog {
         public void addElement(StringBuilder buf, Date date, Request request,
                 Response response, long time) {
             long timestamp = date.getTime();
+            long frac;
             if (usesBegin) {
                 timestamp -= time;
             }
@@ -1299,7 +1305,7 @@ public class AccessLogValve extends ValveBase implements AccessLog {
                 buf.append(timestamp);
                 break;
             case MSEC_FRAC:
-                long frac = timestamp % 1000;
+                frac = timestamp % 1000;
                 if (frac < 100) {
                     if (frac < 10) {
                         buf.append('0');
@@ -1313,8 +1319,19 @@ public class AccessLogValve extends ValveBase implements AccessLog {
             case SDF:
                 String temp = localDateCache.get().getFormat(format, timestamp);
                 if (usesMsecs) {
-                    String msec = Long.toString(timestamp % 1000);
-                    temp = temp.replace(msecPattern, msec);
+                    frac = timestamp % 1000;
+                    StringBuilder trippleMsec = new StringBuilder(4);
+                    if (frac < 100) {
+                        if (frac < 10) {
+                            trippleMsec.append('0');
+                            trippleMsec.append('0');
+                        } else {
+                            trippleMsec.append('0');
+                        }
+                    }
+                    trippleMsec.append(frac);
+                    temp = temp.replace(trippleMsecPattern, trippleMsec);
+                    temp = temp.replace(msecPattern, Long.toString(frac));
                 }
                 buf.append(temp);
                 break;
