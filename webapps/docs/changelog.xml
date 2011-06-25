@@ -219,6 +219,11 @@
         Add <code>session="false"</code> directive to the index page of the
         ROOT web application. (kkolinko)
       </fix>
+      <add>
+        Add an upgrade page to the documentation that can be used to determine
+        the changes in any of the configuration files between two given
+        versions. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Other">
