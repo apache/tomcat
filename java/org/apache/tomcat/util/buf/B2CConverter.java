@@ -55,8 +55,11 @@ public class B2CConverter {
     static {
         for (Entry<String,Charset> entry :
                 Charset.availableCharsets().entrySet()) {
-            encodingToCharsetCache.put(entry.getKey().toLowerCase(),
-                    entry.getValue());
+            Charset charset = entry.getValue(); 
+            encodingToCharsetCache.put(entry.getKey().toLowerCase(), charset);
+            for (String alias : charset.aliases()) {
+                encodingToCharsetCache.put(alias, charset);
+            }
         }
     }
 
