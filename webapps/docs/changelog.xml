@@ -148,6 +148,11 @@
         DefaultServlet was broken due to a MIME type change for JavaScript.
         (funkman)
       </fix>
+      <fix>
+        Fix CVE-2011-2204. Prevent user passwords appearing in log files if a
+        runtime exception (e.g. OOME) occurs while creating a new user for a
+        MemoryUserDatabase via JMX. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
