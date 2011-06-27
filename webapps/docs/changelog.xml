@@ -176,7 +176,7 @@
       </update>
       <fix>
         Correct a regression introduced in Apache Tomcat 7.0.11 that broke
-        certificate revokation list handling. (markt) 
+        certificate revocation list handling. (markt) 
       </fix>
     </changelog>
   </subsection>
