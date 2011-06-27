@@ -103,6 +103,44 @@
  
   </mbean>
 
+  <mbean name="CrawlerSessionManagerValve"
+         description="Valve that ensures web crawlers always use sessions even if no session ID is presented by the client"
+         domain="Catalina"
+         group="Valve"
+         type="org.apache.catalina.valves.CrawlerSessionManagerValve">
+         
+    <attribute name="asyncSupported"
+               description="Does this valve support async reporting."
+               is="true"
+               type="boolean"/>
+
+    <attribute name="className"
+               description="Fully qualified class name of the managed object"
+               type="java.lang.String"
+               writeable="false"/>
+
+    <attribute name="clientIpSessionId"
+               description="Current Map of client IP address to session ID managed by this Valve"
+               type="java.util.Map"
+               writeable="false"/>
+
+    <attribute name="crawlerUserAgents"
+               description="Specify the regular expression used to identify crawlers based in the User-Agent header provided."
+               type="java.lang.String"
+               writeable="true"/>
+
+    <attribute name="sessionInactiveInterval"
+               description="Specify the session timeout (in seconds) for a crawler's session."
+               type="int"
+               writeable="true"/>
+
+    <attribute name="stateName"
+               description="The name of the LifecycleState that this component is currently in"
+               type="java.lang.String"
+               writeable="false"/>
+ 
+  </mbean>
+
   <mbean name="ErrorReportValve"
          description="Implementation of a Valve that outputs HTML error pages"
          domain="Catalina"
