@@ -70,7 +70,6 @@
         <item name="29) Windows Service"    href="windows-service-howto.html"/>
         <item name="30) Windows Authentication"   
               href="windows-auth-howto.html"/>
-        <item name="31) Upgrading"          href="upgrading.html"/>
     </menu>
 
     <menu name="Reference">
