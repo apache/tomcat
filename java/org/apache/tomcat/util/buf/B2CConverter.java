@@ -23,10 +23,11 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
-import java.nio.charset.IllegalCharsetNameException;
-import java.nio.charset.UnsupportedCharsetException;
 import java.util.Locale;
+import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
+
+import org.apache.tomcat.util.res.StringManager;
 
 /** Efficient conversion of bytes  to character .
  *  
@@ -45,8 +46,19 @@ public class B2CConverter {
     private static final org.apache.juli.logging.Log log=
         org.apache.juli.logging.LogFactory.getLog( B2CConverter.class );
     
+    private static final StringManager sm =
+        StringManager.getManager(Constants.Package);
+
     private static final ConcurrentHashMap<String, Charset> encodingToCharsetCache =
         new ConcurrentHashMap<String, Charset>();
+
+    static {
+        for (Entry<String,Charset> entry :
+                Charset.availableCharsets().entrySet()) {
+            encodingToCharsetCache.put(entry.getKey().toLowerCase(),
+                    entry.getValue());
+        }
+    }
 
     public static Charset getCharset(String enc)
             throws UnsupportedEncodingException{
@@ -55,21 +67,11 @@ public class B2CConverter {
         String lowerCaseEnc = enc.toLowerCase(Locale.US);
 
         Charset charset = encodingToCharsetCache.get(lowerCaseEnc);
+        
         if (charset == null) {
-            try {
-                charset = Charset.forName(enc);
-            } catch (IllegalCharsetNameException icne) {
-                UnsupportedEncodingException uee =
-                    new UnsupportedEncodingException();
-                uee.initCause(icne);
-                throw uee;
-            } catch (UnsupportedCharsetException uce) {
-                UnsupportedEncodingException uee =
-                    new UnsupportedEncodingException();
-                uee.initCause(uce);
-                throw uee;
-            }
-            encodingToCharsetCache.put(enc, charset);
+            // Pre-population of the cache means this must be invalid
+            throw new UnsupportedEncodingException(
+                    sm.getString("b2cConvertor.unknownEncoding", enc));
         }
         return charset;
     }
