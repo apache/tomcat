@@ -25,6 +25,7 @@ import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import java.nio.charset.IllegalCharsetNameException;
 import java.nio.charset.UnsupportedCharsetException;
+import java.util.Locale;
 import java.util.concurrent.ConcurrentHashMap;
 
 /** Efficient conversion of bytes  to character .
@@ -50,7 +51,10 @@ public class B2CConverter {
     public static Charset getCharset(String enc)
             throws UnsupportedEncodingException{
 
-        Charset charset = encodingToCharsetCache.get(enc);
+        // Encoding names should all be ASCII
+        String lowerCaseEnc = enc.toLowerCase(Locale.US);
+
+        Charset charset = encodingToCharsetCache.get(lowerCaseEnc);
         if (charset == null) {
             try {
                 charset = Charset.forName(enc);
