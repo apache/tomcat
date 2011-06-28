@@ -48,6 +48,7 @@ import org.apache.coyote.RequestInfo;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.InstanceManager;
+import org.apache.tomcat.util.res.StringManager;
 /**
  * 
  * @author fhanik
@@ -57,6 +58,9 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
     
     private static final Log log = LogFactory.getLog(AsyncContextImpl.class);
     
+    protected static final StringManager sm =
+        StringManager.getManager(Constants.Package);
+
     private ServletRequest servletRequest = null;
     private ServletResponse servletResponse = null;
     private List<AsyncListenerWrapper> listeners = new ArrayList<AsyncListenerWrapper>();
@@ -80,6 +84,7 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
         if (log.isDebugEnabled()) {
             logDebug("complete   ");
         }
+        check();
         request.getCoyoteRequest().action(ActionCode.COMMIT, null);
         request.getCoyoteRequest().action(ActionCode.ASYNC_COMPLETE, null);
     }
@@ -126,6 +131,7 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
 
     @Override
     public void dispatch() {
+        check();
         HttpServletRequest sr = (HttpServletRequest)getRequest();
         String path = sr.getRequestURI();
         String cpath = sr.getContextPath();
@@ -135,6 +141,7 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
 
     @Override
     public void dispatch(String path) {
+        check();
         dispatch(request.getServletContext(),path);
     }
 
@@ -143,6 +150,7 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
         if (log.isDebugEnabled()) {
             logDebug("dispatch   ");
         }
+        check();
         if (request.getAttribute(ASYNC_REQUEST_URI)==null) {
             request.setAttribute(ASYNC_REQUEST_URI, request.getRequestURI()+"?"+request.getQueryString());
             request.setAttribute(ASYNC_CONTEXT_PATH, request.getContextPath());
@@ -178,11 +186,13 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
 
     @Override
     public ServletRequest getRequest() {
+        check();
         return servletRequest;
     }
 
     @Override
     public ServletResponse getResponse() {
+        check();
         return servletResponse;
     }
 
@@ -191,13 +201,14 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
         if (log.isDebugEnabled()) {
             logDebug("start      ");
         }
-
+        check();
         Runnable wrapper = new RunnableWrapper(run, context);
         this.request.getCoyoteRequest().action(ActionCode.ASYNC_RUN, wrapper);
     }
     
     @Override
     public void addListener(AsyncListener listener) {
+        check();
         AsyncListenerWrapper wrapper = new AsyncListenerWrapper();
         wrapper.setListener(listener);
         listeners.add(wrapper);
@@ -206,6 +217,7 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
     @Override
     public void addListener(AsyncListener listener, ServletRequest servletRequest,
             ServletResponse servletResponse) {
+        check();
         AsyncListenerWrapper wrapper = new AsyncListenerWrapper();
         wrapper.setListener(listener);
         listeners.add(wrapper);
@@ -215,6 +227,7 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
     @Override
     public <T extends AsyncListener> T createListener(Class<T> clazz)
             throws ServletException {
+        check();
         T listener = null;
         try {
              listener = (T) getInstanceManager().newInstance(clazz.getName(),
@@ -242,12 +255,16 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
         if (log.isDebugEnabled()) {
             logDebug("recycle    ");
         }
+        context = null;
+        dispatch = null;
+        event = null;
+        hasOriginalRequestAndResponse = true;
+        instanceManager = null;
+        listeners.clear();
+        request = null;
         servletRequest = null;
         servletResponse = null;
-        hasOriginalRequestAndResponse = true;
-        context = null;
         timeout = -1;
-        event = null;
     }
 
     public boolean isStarted() {
@@ -285,6 +302,7 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
 
     @Override
     public boolean hasOriginalRequestAndResponse() {
+        check();
         return hasOriginalRequestAndResponse;
     }
 
@@ -309,12 +327,14 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
     
     @Override
     public long getTimeout() {
+        check();
         return timeout;
     }
 
 
     @Override
     public void setTimeout(long timeout) {
+        check();
         this.timeout = timeout;
         request.getCoyoteRequest().action(ActionCode.ASYNC_SETTIMEOUT,
                 Long.valueOf(timeout));
@@ -407,6 +427,13 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
         return instanceManager;
     }
 
+    private void check() {
+        if (request == null) {
+            // AsyncContext has been recycled and should not be being used
+            throw new IllegalStateException(sm.getString(
+                    "asyncContextImpl.requestEnded"));
+        }
+    }
     private static class DebugException extends Exception {
         private static final long serialVersionUID = 1L;
     }
