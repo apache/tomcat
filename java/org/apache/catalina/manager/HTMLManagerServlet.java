@@ -923,27 +923,18 @@ public final class HTMLManagerServlet extends ManagerServlet {
         }
         return sessions;
     }
+
     protected Session getSessionForNameAndId(ContextName cn, String id,
-            StringManager smClient) throws IOException {
-        if ((cn == null) || !(cn.getPath().startsWith("/") ||
-                cn.getPath().equals(""))) {
-            String path = null;
-            if (cn != null) {
-                path = cn.getPath();
+            StringManager smClient) {
+
+        List<Session> sessions = getSessionsForName(cn, smClient);
+        if (sessions == null || sessions.isEmpty()) return null;
+        for(Session session : sessions) {
+            if (session.getId().equals(id)) {
+                return session;
             }
-            throw new IllegalArgumentException(smClient.getString(
-                    "managerServlet.invalidPath",
-                    RequestUtil.filter(path)));
         }
-        
-        Context ctxt = (Context) host.findChild(cn.getName());
-        if (null == ctxt) {
-            throw new IllegalArgumentException(smClient.getString(
-                    "managerServlet.noContext",
-                    RequestUtil.filter(cn.getDisplayName())));
-        }
-        Session session = ctxt.getManager().findSession(id);
-        return session;
+        return null;
     }
 
     /**
