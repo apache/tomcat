@@ -137,6 +137,7 @@ public class AprLifecycleListener
         aprAvailable = false;
         aprInitialized = false;
         sslInitialized = false; // Well we cleaned the pool in terminate.
+        sslAvailable = false; // Well we cleaned the pool in terminate.
     }
 
     private static void init()
