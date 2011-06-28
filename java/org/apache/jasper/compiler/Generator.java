@@ -3675,7 +3675,8 @@ class Generator {
                 out.print(JspUtil.toJavaSourceType(attrInfos[i].getTypeName()));
                 out.print(" ");
             }
-            out.print(JspUtil.makeJavaIdentifier(attrInfos[i].getName()));
+            out.print(JspUtil.makeJavaIdentifier(
+                    attrInfos[i].getName(), false));
             out.println(";");
         }
         out.println();
@@ -3683,7 +3684,7 @@ class Generator {
         // Define attribute getter and setter methods
         for (int i = 0; i < attrInfos.length; i++) {
             String javaName =
-                JspUtil.makeJavaIdentifier(attrInfos[i].getName());
+                JspUtil.makeJavaIdentifier(attrInfos[i].getName(), false);
 
             // getter method
             out.printin("public ");
