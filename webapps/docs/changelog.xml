@@ -157,6 +157,11 @@
         Fix an issue with the CrawlerSessionManagerValve that meant sessions
         were not always correctly tracked. (markt)
       </fix>
+      <fix>
+        <bug>51436</bug>: Send 100 (Continue) response earlier to enable
+        ServletRequestListener implementations to read the request body. Based
+        on a patch by Simon Olofsson. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

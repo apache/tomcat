@@ -171,22 +171,6 @@ final class StandardWrapperValve
             request.setComet(true);
         }
         
-        // Acknowledge the request
-        try {
-            response.sendAcknowledgement();
-        } catch (IOException e) {
-            container.getLogger().warn(sm.getString("standardWrapper.acknowledgeException",
-                             wrapper.getName()), e);
-            throwable = e;
-            exception(request, response, e);
-        } catch (Throwable e) {
-            ExceptionUtils.handleThrowable(e);
-            container.getLogger().error(sm.getString("standardWrapper.acknowledgeException",
-                             wrapper.getName()), e);
-            throwable = e;
-            exception(request, response, e);
-            servlet = null;
-        }
         MessageBytes requestPathMB = request.getRequestPathMB();
         DispatcherType dispatcherType = DispatcherType.REQUEST;
         if (request.getDispatcherType()==DispatcherType.ASYNC) dispatcherType = DispatcherType.ASYNC; 
