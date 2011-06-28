@@ -213,7 +213,7 @@ public class TestSwallowAbortedUploads extends TomcatBaseTest {
         private static final String URI = "/uploadAborted";
         private static final String servletName = "uploadAborted";
         private static final int limitSize = 100;
-        private static final int hugeSize = 200000;
+        private static final int hugeSize = 400000;
 
         private boolean init;
         private Context context;
