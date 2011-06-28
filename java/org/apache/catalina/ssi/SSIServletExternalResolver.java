@@ -36,6 +36,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.util.RequestUtil;
 import org.apache.coyote.Constants;
+import org.apache.tomcat.util.buf.B2CConverter;
 
 /**
  * An implementation of SSIExternalResolver that is used with servlets.
@@ -542,7 +543,8 @@ public class SSIServletExternalResolver implements SSIExternalResolver {
             if (inputEncoding == null) {
                 retVal = new String( bytes );
             } else {
-                retVal = new String (bytes, inputEncoding);
+                retVal = new String (bytes,
+                        B2CConverter.getCharset(inputEncoding));
             }
 
             //make an assumption that an empty response is a failure. This is
