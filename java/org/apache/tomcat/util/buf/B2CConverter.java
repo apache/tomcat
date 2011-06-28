@@ -23,8 +23,9 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
+import java.util.HashMap;
 import java.util.Locale;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.Map;
 
 import org.apache.tomcat.util.res.StringManager;
 
@@ -48,8 +49,8 @@ public class B2CConverter {
     private static final StringManager sm =
         StringManager.getManager(Constants.Package);
 
-    private static final ConcurrentHashMap<String, Charset> encodingToCharsetCache =
-        new ConcurrentHashMap<String, Charset>();
+    private static final Map<String, Charset> encodingToCharsetCache =
+        new HashMap<String, Charset>();
 
     static {
         for (Charset charset: Charset.availableCharsets().values()) {
