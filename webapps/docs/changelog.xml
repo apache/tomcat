@@ -239,6 +239,10 @@
         ROOT web application. (kkolinko)
       </fix>
       <fix>
+        <bug>51443</bug>: Document the notifySessionListenersOnReplication
+        attribute for the DeltaManager. (markt)
+      </fix>
+      <fix>
         <bug>51447</bug>: Viewing a back up session in the HTML Manager web
         application no longer changes the session to a primary session. Based on
         a patch provided by Eiji Takahashi. (markt)
