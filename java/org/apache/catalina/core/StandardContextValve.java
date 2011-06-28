@@ -115,7 +115,7 @@ final class StandardContextValve
             || (requestPathMB.equalsIgnoreCase("/META-INF"))
             || (requestPathMB.startsWithIgnoreCase("/WEB-INF/", 0))
             || (requestPathMB.equalsIgnoreCase("/WEB-INF"))) {
-            notFound(response);
+            error(response, HttpServletResponse.SC_NOT_FOUND);
             return;
         }
 
@@ -142,17 +142,28 @@ final class StandardContextValve
         // Select the Wrapper to be used for this Request
         Wrapper wrapper = request.getWrapper();
         if (wrapper == null) {
-            notFound(response);
+            error(response, HttpServletResponse.SC_NOT_FOUND);
             return;
         } else if (wrapper.isUnavailable()) {
             // May be as a result of a reload, try and find the new wrapper
             wrapper = (Wrapper) container.findChild(wrapper.getName());
             if (wrapper == null) {
-                notFound(response);
+                error(response, HttpServletResponse.SC_NOT_FOUND);
                 return;
             }
         }
 
+        // Acknowledge the request
+        try {
+            response.sendAcknowledgement();
+        } catch (IOException ioe) {
+            container.getLogger().error(sm.getString(
+                    "standardContextValve.acknowledgeException"), ioe);
+            request.setAttribute(RequestDispatcher.ERROR_EXCEPTION, ioe);
+            error(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            return;
+        }
+        
         // Don't fire listeners during async processing
         // If a request init listener throws an exception, the request is
         // aborted
@@ -209,17 +220,17 @@ final class StandardContextValve
 
 
     /**
-     * Report a "not found" error for the specified resource.  FIXME:  We
+     * Report an error for the specified resource.  FIXME:  We
      * should really be using the error reporting settings for this web
      * application, but currently that code runs at the wrapper level rather
      * than the context level.
      *
      * @param response The response we are creating
      */
-    private void notFound(HttpServletResponse response) {
+    private void error(HttpServletResponse response, int status) {
 
         try {
-            response.sendError(HttpServletResponse.SC_NOT_FOUND);
+            response.sendError(status);
         } catch (IllegalStateException e) {
             // Ignore
         } catch (IOException e) {
