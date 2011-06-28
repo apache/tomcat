@@ -81,7 +81,11 @@ public class RxTaskPool
                     worker = creator.createRxTask();
                     configureTask(worker);
                 } else {
-                    try { mutex.wait(); } catch ( java.lang.InterruptedException x ) {Thread.interrupted();}
+                    try {
+                        mutex.wait();
+                    } catch (java.lang.InterruptedException x) {
+                        Thread.currentThread().interrupt();
+                    }
                 }
             }//while
             if ( worker != null ) used.add(worker);
