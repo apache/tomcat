@@ -26,6 +26,7 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.servlet.Servlet;
+import javax.servlet.ServletConfig;
 import javax.servlet.ServletContainerInitializer;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -324,6 +325,51 @@ public class TestStandardWrapper extends TomcatBaseTest {
             }
             ServletRegistration.Dynamic r = ctx.addServlet("servlet", s);
             r.addMapping("/");
+        }
+    }
+
+
+    public void testBug51445() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+
+        // Must have a real docBase - just use temp
+        StandardContext ctx = (StandardContext) 
+            tomcat.addContext("", System.getProperty("java.io.tmpdir"));
+        
+        Tomcat.addServlet(ctx, "Bug51445", new Bug51445Servlet());
+        ctx.addServletMapping("/", "Bug51445");
+        
+        tomcat.start();
+
+        ByteChunk res = getUrl("http://localhost:" + getPort() + "/");
+
+        assertEquals("10", res.toString());
+    }
+
+
+    /**
+     * SingleThreadModel servlet that sets a value in the init() method.
+     */
+    @SuppressWarnings("deprecation")
+    private static class Bug51445Servlet extends HttpServlet
+            implements javax.servlet.SingleThreadModel {
+
+        private static final long serialVersionUID = 1L;
+
+        private int data = 0;
+
+        @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+                throws ServletException, IOException {
+            
+            resp.setContentType("text/plain");
+            resp.getWriter().print(data);
+        }
+
+        @Override
+        public void init(ServletConfig config) throws ServletException {
+            super.init(config);
+            data = 10;
         }
     }
 }
