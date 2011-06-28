@@ -228,6 +228,11 @@
         Add <code>session="false"</code> directive to the index page of the
         ROOT web application. (kkolinko)
       </fix>
+      <fix>
+        <bug>51447</bug>: Viewing a back up session in the HTML Manager web
+        application no longer changes the session to a primary session. Based on
+        a patch provided by Eiji Takahashi. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
