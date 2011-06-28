@@ -20,7 +20,7 @@ package org.apache.tomcat.util.buf;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
 
 /** Efficient conversion of character to bytes.
  *  
@@ -44,7 +44,7 @@ public final class C2BConverter {
     public C2BConverter(ByteChunk output, String encoding) throws IOException {
         this.bb=output;
         ios=new IntermediateOutputStream( output );
-        conv=new WriteConvertor( ios, encoding );
+        conv=new WriteConvertor( ios, B2CConverter.getCharset(encoding));
         this.enc=encoding;
     }
 
@@ -168,10 +168,8 @@ public final class C2BConverter {
     
     /** Create a converter.
      */
-    public WriteConvertor( IntermediateOutputStream out, String enc )
-        throws UnsupportedEncodingException
-    {
-        super( out, enc );
+    public WriteConvertor(IntermediateOutputStream out, Charset charset) {
+        super(out, charset);
         ios=out;
     }
     
