@@ -1463,7 +1463,7 @@ public CatalinaCluster getCluster() {
         if (session != null) {
             String newSessionID = deserializeSessionId(msg.getSession());
             session.setPrimarySession(false);
-            session.setId(newSessionID, notifyListenersOnReplication);
+            session.setId(newSessionID, notifySessionListenersOnReplication);
         }
     }
 
