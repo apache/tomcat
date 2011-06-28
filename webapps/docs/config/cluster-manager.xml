@@ -100,6 +100,11 @@
         sessions are counted as active sessions irrespective if whether or not
         the current node is the primary node for the session.
       </attribute>
+      <attribute name="notifySessionListenersOnReplication" required="false">
+        Set to <code>true</code> if you wish to have session listeners notified
+        when sessions are created and expired across Tomcat nodes in the
+        cluster.
+      </attribute>
       <attribute name="stateTransferTimeout" required="false">
         The time in seconds to wait for a session state transfer to complete
         from another node when a node is starting up.
