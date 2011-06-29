@@ -465,10 +465,13 @@ public abstract class AbstractAjpProcessor extends AbstractProcessor {
        } catch (Throwable t) {
            ExceptionUtils.handleThrowable(t);
            getLog().error(sm.getString("http11processor.request.process"), t);
-           // 500 - Internal Server Error
-           response.setStatus(500);
-           adapter.log(request, response, 0);
            error = true;
+       } finally {
+           if (error) {
+               // 500 - Internal Server Error
+               response.setStatus(500);
+               adapter.log(request, response, 0);
+           }
        }
 
        rp.setStage(org.apache.coyote.Constants.STAGE_ENDED);
