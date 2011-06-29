@@ -227,7 +227,11 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, R
                     throw x;
                 }
                 portstart++;
-                try {Thread.sleep(25);}catch( InterruptedException ti){Thread.interrupted();}
+                try {
+                    Thread.sleep(25);
+                } catch (InterruptedException ti) {
+                    Thread.currentThread().interrupt();
+                }
                 retries = bind(socket,portstart,retries);
             }
         }
@@ -258,7 +262,11 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, R
                     throw x;
                 }
                 portstart++;
-                try {Thread.sleep(25);}catch( InterruptedException ti){Thread.interrupted();}
+                try {
+                    Thread.sleep(25);
+                } catch (InterruptedException ti) {
+                    Thread.currentThread().interrupt();
+                }
                 retries = bindUdp(socket,portstart,retries);
             }
         }
