@@ -167,6 +167,11 @@
         asynchronous request processing and the socket is immediately closed.
         (markt)
       </fix>
+      <fix>
+        Ensure that if asyncDispatch() is called during an onTimeout event and
+        the target Servlet does not call startAsync() or complete() that Tomcat
+        calls complete() once the target Servlet exits. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
