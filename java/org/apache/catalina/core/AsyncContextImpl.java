@@ -312,6 +312,9 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
         }
         try {
             dispatch.run();
+            if (!request.isAsync()) {
+                fireOnComplete();
+            }
         } catch (RuntimeException x) {
             // doInternalComplete(true);
             if (x.getCause() instanceof ServletException) {
