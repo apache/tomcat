@@ -219,6 +219,12 @@
         use any valid XML name) have a name which is not a Java identifier.
         (markt)
       </fix>
+      <add>
+        Broaden the exception handling in the EL Parser so that more failures to
+        parse an expression include the failed expression in the exception
+        message. Hopefully, this will help track down the cause of
+        <bug>51088</bug>. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Cluster">
