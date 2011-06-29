@@ -152,7 +152,7 @@ public class AjpAprProtocol extends AbstractAjpProtocol {
                         state = processor.process(socket);
                     }
 
-                    if (processor.isAsync()) {
+                    if (state == SocketState.CLOSED && processor.isAsync()) {
                         state = processor.asyncPostProcess();
                     }
                 } while (state == SocketState.ASYNC_END);
