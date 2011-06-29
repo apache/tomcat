@@ -184,7 +184,7 @@ public class SingleRemoveSynchronizedAddLock {
                 try {
                     wait(addWaitTimeout);
                 } catch ( InterruptedException e ) {
-                    Thread.interrupted();
+                    Thread.currentThread().interrupt();
                 }
             } while ( addLocked || removeLocked );
         }
@@ -206,7 +206,7 @@ public class SingleRemoveSynchronizedAddLock {
                 try {
                     wait(removeWaitTimeout);
                 } catch ( InterruptedException e ) {
-                    Thread.interrupted();
+                    Thread.currentThread().interrupt();
                 }
             } while ( ( addLocked || ! dataAvailable ) && removeEnabled );
             remover=null;
