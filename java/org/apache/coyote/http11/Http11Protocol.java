@@ -162,7 +162,7 @@ public class Http11Protocol extends AbstractHttp11JsseProtocol {
                         state = processor.process(socket);
                     }
     
-                    if (processor.isAsync()) {
+                    if (state != SocketState.CLOSED && processor.isAsync()) {
                         state = processor.asyncPostProcess();
                     }
                 } while (state == SocketState.ASYNC_END);
