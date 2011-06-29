@@ -237,7 +237,7 @@ public class Http11AprProtocol extends AbstractHttp11Protocol {
                         state = processor.process(socket);
                     }
 
-                    if (processor.isAsync()) {
+                    if (state != SocketState.CLOSED && processor.isAsync()) {
                         state = processor.asyncPostProcess();
                     }
                 } while (state == SocketState.ASYNC_END);
