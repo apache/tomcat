@@ -190,7 +190,7 @@ public class AjpNioProtocol extends AbstractAjpProtocol {
                         state = processor.process(socket);
                     }
 
-                    if (state == SocketState.CLOSED && processor.isAsync()) {
+                    if (state != SocketState.CLOSED && processor.isAsync()) {
                         state = processor.asyncPostProcess();
                     }
                 } while (state == SocketState.ASYNC_END);
