@@ -41,7 +41,6 @@ import org.apache.el.parser.AstValue;
 import org.apache.el.parser.ELParser;
 import org.apache.el.parser.Node;
 import org.apache.el.parser.NodeVisitor;
-import org.apache.el.parser.ParseException;
 import org.apache.el.util.ConcurrentCache;
 import org.apache.el.util.MessageFactory;
 
@@ -143,8 +142,9 @@ public final class ExpressionBuilder implements NodeVisitor {
                     n = n.jjtGetChild(0);
                 }
                 cache.put(expr, n);
-            } catch (ParseException pe) {
-                throw new ELException("Error Parsing: " + expr, pe);
+            } catch (Exception e) {
+                throw new ELException(
+                        MessageFactory.get("error.parseFail", expr), e);
             }
         }
         return n;
