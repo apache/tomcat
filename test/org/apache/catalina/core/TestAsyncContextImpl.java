@@ -365,18 +365,26 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         }
     }
 
-    public void testTimeoutListenerComplete() throws Exception {
+    public void testTimeoutListenerCompleteNoDispatch() throws Exception {
+        // Should work
         doTestTimeout(true, null);
     }
     
-    public void testTimeoutListenerNoComplete() throws Exception {
+    public void testTimeoutListenerNoCompleteNoDispatch() throws Exception {
+        // Should trigger an error - must do one or other
         doTestTimeout(false, null);
     }
 
-    public void testTimeoutListenerDispatch() throws Exception {
+    public void testTimeoutListenerCompleteDispatch() throws Exception {
+        // Should trigger an error - can't do both
         doTestTimeout(true, "/nonasync");
     }
-    
+
+    public void testTimeoutListenerNoCompleteDispatch() throws Exception {
+        // Should work
+        doTestTimeout(false, "/nonasync");
+    }
+
 
     private void doTestTimeout(boolean completeOnTimeout, String dispatchUrl)
     throws Exception {
@@ -413,23 +421,44 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         ctx.getPipeline().addValve(alv);
         
         tomcat.start();
-        ByteChunk res = getUrl("http://localhost:" + getPort() + "/async");
+        ByteChunk res = new ByteChunk();
+        try {
+            getUrl("http://localhost:" + getPort() + "/async", res, null);
+        } catch (IOException ioe) {
+            // Ignore - expected for some error conditions
+        }
         StringBuilder expected = new StringBuilder("requestInitialized-");
         expected.append("TimeoutServletGet-onTimeout-");
-        if (!completeOnTimeout) {
-            expected.append("onError-");
-        }
-        if (dispatchUrl == null) {
-            expected.append("onComplete-");
+        if (completeOnTimeout) {
+            if (dispatchUrl == null) {
+                expected.append("onComplete-");
+                expected.append("requestDestroyed");
+            } else {
+                // Error - no further output
+                // There is no onComplete- since the complete event would be
+                // fired during post processing but since there is an error that
+                // never happens.
+            }
         } else {
-            expected.append("NonAsyncServletGet-");
+            if (dispatchUrl == null) {
+                expected.append("onError-");
+            } else {
+                expected.append("NonAsyncServletGet-");
+            }
+            expected.append("onComplete-");
+            expected.append("requestDestroyed");
         }
-        expected.append("requestDestroyed");
         assertEquals(expected.toString(), res.toString());
 
         // Check the access log
-        validateAccessLog(alv, 1, 200, TimeoutServlet.ASYNC_TIMEOUT,
-                TimeoutServlet.ASYNC_TIMEOUT + TIMEOUT_MARGIN + REQUEST_TIME);
+        if (completeOnTimeout && dispatchUrl != null) {
+            validateAccessLog(alv, 1, 500, 0, TimeoutServlet.ASYNC_TIMEOUT +
+                    TIMEOUT_MARGIN + REQUEST_TIME);
+        } else {
+            validateAccessLog(alv, 1, 200, TimeoutServlet.ASYNC_TIMEOUT,
+                    TimeoutServlet.ASYNC_TIMEOUT + TIMEOUT_MARGIN +
+                    REQUEST_TIME);
+        }
     }
     
     private static class TimeoutServlet extends HttpServlet {
@@ -695,11 +724,10 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
             resp.getWriter().write("onTimeout-");
             resp.flushBuffer();
             if (completeOnTimeout){
-                if (dispatchUrl == null) {
-                    event.getAsyncContext().complete();
-                } else {
-                    event.getAsyncContext().dispatch(dispatchUrl);
-                }
+                event.getAsyncContext().complete();
+            }
+            if (dispatchUrl != null) {
+                event.getAsyncContext().dispatch(dispatchUrl);
             }
         }
 
