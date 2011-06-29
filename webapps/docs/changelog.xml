@@ -162,6 +162,11 @@
         ServletRequestListener implementations to read the request body. Based
         on a patch by Simon Olofsson. (markt)
       </fix>
+      <fix>
+        Ensure an access log entry is made if an error occurs during
+        asynchronous request processing and the socket is immediately closed.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
