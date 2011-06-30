@@ -333,7 +333,7 @@ public class TestStandardWrapper extends TomcatBaseTest {
 
     public static final int BUG51445_THREAD_COUNT = 5;
 
-    public void testBug51445() throws Exception {
+    public void testBug51445AddServlet() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
         // Must have a real docBase - just use temp
@@ -341,6 +341,46 @@ public class TestStandardWrapper extends TomcatBaseTest {
             tomcat.addContext("", System.getProperty("java.io.tmpdir"));
         
         Tomcat.addServlet(ctx, "Bug51445", new Bug51445Servlet());
+        ctx.addServletMapping("/", "Bug51445");
+        
+        tomcat.start();
+
+        // Start the threads
+        Bug51445Thread[] threads = new Bug51445Thread[5];
+        for (int i = 0; i < BUG51445_THREAD_COUNT; i ++) {
+            threads[i] = new Bug51445Thread(getPort());
+            threads[i].start();
+        }
+
+        // Wait for threads to finish
+        for (int i = 0; i < BUG51445_THREAD_COUNT; i ++) {
+            threads[i].join();
+        }
+
+        Set<String> servlets = new HashSet<String>();
+        // Check the result
+        for (int i = 0; i < BUG51445_THREAD_COUNT; i ++) {
+            String[] results = threads[i].getResult().split(",");
+            assertEquals(2, results.length);
+            assertEquals("10", results[0]);
+            System.out.println(results[1]);
+            assertFalse(servlets.contains(results[1]));
+            servlets.add(results[1]);
+        }
+
+    }
+
+    public void testBug51445AddChild() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+
+        // Must have a real docBase - just use temp
+        StandardContext ctx = (StandardContext) 
+            tomcat.addContext("", System.getProperty("java.io.tmpdir"));
+        
+        StandardWrapper wrapper = new StandardWrapper();
+        wrapper.setServletName("Bug51445");
+        wrapper.setServletClass(Bug51445Servlet.class.getName());
+        ctx.addChild(wrapper);
         ctx.addServletMapping("/", "Bug51445");
         
         tomcat.start();
