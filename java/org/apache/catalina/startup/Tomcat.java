@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Stack;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -812,18 +813,35 @@ public class Tomcat {
     public static class ExistingStandardWrapper extends StandardWrapper {
         private Servlet existing;
         boolean init = false;
-        
+
+        @SuppressWarnings("deprecation")
         public ExistingStandardWrapper( Servlet existing ) {
             this.existing = existing;
+            if (existing instanceof javax.servlet.SingleThreadModel) {
+                singleThreadModel = true;
+                instancePool = new Stack<Servlet>();
+            }
         }
         @Override
         public synchronized Servlet loadServlet() throws ServletException {
-            if (!init) {
-                existing.init(facade);
-                init = true;
+            if (singleThreadModel) {
+                Servlet instance;
+                try {
+                    instance = existing.getClass().newInstance();
+                } catch (InstantiationException e) {
+                    throw new ServletException(e);
+                } catch (IllegalAccessException e) {
+                    throw new ServletException(e);
+                }
+                instance.init(facade);
+                return instance;
+            } else {
+                if (!init) {
+                    existing.init(facade);
+                    init = true;
+                }
+                return existing;
             }
-            return existing;
-
         }
         @Override
         public long getAvailable() {
