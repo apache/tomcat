@@ -249,6 +249,11 @@
       description="Send session start/stop events on backup nodes"
       type="boolean"/>
     <attribute
+      name="notifyContainerListenersOnReplication"
+      is="true"
+      description="Send container events on backup nodes"
+      type="boolean"/>
+    <attribute
       name="processExpiresFrequency"
       description="The frequency of the manager checks (expiration and passivation)"
       type="int"/>
