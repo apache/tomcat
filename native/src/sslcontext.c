@@ -447,7 +447,6 @@ static EVP_PKEY *load_pem_key(tcn_ssl_ctxt_t *c, const char *file)
     BIO *bio = NULL;
     EVP_PKEY *key = NULL;
     tcn_pass_cb_t *cb_data = c->cb_data;
-    int i;
 
     if ((bio = BIO_new(BIO_s_file())) == NULL) {
         return NULL;
@@ -458,14 +457,14 @@ static EVP_PKEY *load_pem_key(tcn_ssl_ctxt_t *c, const char *file)
     }
     if (!cb_data)
         cb_data = &tcn_password_callback;
-    for (i = 0; i < 3; i++) {
-        key = PEM_read_bio_PrivateKey(bio, NULL,
-                    (pem_password_cb *)SSL_password_callback,
-                    (void *)cb_data);
-        if (key)
-            break;
-        cb_data->password[0] = '\0';
+    cert = PEM_read_bio_X509_AUX(bio, NULL,
+                (pem_password_cb *)SSL_password_callback,
+                (void *)cb_data);
+    if (cert == NULL &&
+       (ERR_GET_REASON(ERR_peek_last_error()) == PEM_R_NO_START_LINE)) {
+        ERR_clear_error();
         BIO_ctrl(bio, BIO_CTRL_RESET, 0, NULL);
+        cert = d2i_X509_bio(bio, NULL);
     }
     BIO_free(bio);
     return key;
