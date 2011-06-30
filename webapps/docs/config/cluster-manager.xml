@@ -105,6 +105,10 @@
         when sessions are created and expired across Tomcat nodes in the
         cluster.
       </attribute>
+      <attribute name="notifyContainerListenersOnReplication" required="false">
+        Set to <code>true</code> if you wish to have container listeners notified
+        across Tomcat nodes in the cluster.
+      </attribute>
       <attribute name="stateTransferTimeout" required="false">
         The time in seconds to wait for a session state transfer to complete
         from another node when a node is starting up.
