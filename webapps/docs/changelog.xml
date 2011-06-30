@@ -238,6 +238,12 @@
         should be controlled by notifySessionListenersOnReplication rather than
         notifyListenersOnReplication. (markt)
       </fix>
+      <fix>
+        The change in session ID is notified to the container event listener on 
+        the backup node in cluster. 
+        This notification is controlled by 
+        notifyContainerListenersOnReplication.(kfujino)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
