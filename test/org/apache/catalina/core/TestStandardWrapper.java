@@ -21,9 +21,11 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.CountDownLatch;
 
 import javax.servlet.Servlet;
 import javax.servlet.ServletConfig;
@@ -329,6 +331,8 @@ public class TestStandardWrapper extends TomcatBaseTest {
     }
 
 
+    public static final int BUG51445_THREAD_COUNT = 5;
+
     public void testBug51445() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
@@ -341,29 +345,85 @@ public class TestStandardWrapper extends TomcatBaseTest {
         
         tomcat.start();
 
-        ByteChunk res = getUrl("http://localhost:" + getPort() + "/");
+        // Start the threads
+        Bug51445Thread[] threads = new Bug51445Thread[5];
+        for (int i = 0; i < BUG51445_THREAD_COUNT; i ++) {
+            threads[i] = new Bug51445Thread(getPort());
+            threads[i].start();
+        }
 
-        assertEquals("10", res.toString());
+        // Wait for threads to finish
+        for (int i = 0; i < BUG51445_THREAD_COUNT; i ++) {
+            threads[i].join();
+        }
+
+        Set<String> servlets = new HashSet<String>();
+        // Check the result
+        for (int i = 0; i < BUG51445_THREAD_COUNT; i ++) {
+            String[] results = threads[i].getResult().split(",");
+            assertEquals(2, results.length);
+            assertEquals("10", results[0]);
+            System.out.println(results[1]);
+            assertFalse(servlets.contains(results[1]));
+            servlets.add(results[1]);
+        }
+
     }
 
+    private static class Bug51445Thread extends Thread {
+
+        private int port;
+        private String result;
+
+        public Bug51445Thread(int port) {
+            this.port = port;
+        }
+
+        @Override
+        public void run() {
+            try {
+                ByteChunk res = getUrl("http://localhost:" + port + "/");
+                result = res.toString();
+            } catch (IOException ioe) {
+                result = ioe.getMessage();
+            }
+        }
+
+        public String getResult() {
+            return result;
+        }
+    }
 
     /**
      * SingleThreadModel servlet that sets a value in the init() method.
      */
     @SuppressWarnings("deprecation")
-    private static class Bug51445Servlet extends HttpServlet
+    public static class Bug51445Servlet extends HttpServlet
             implements javax.servlet.SingleThreadModel {
 
         private static final long serialVersionUID = 1L;
+
+        private static final CountDownLatch latch =
+            new CountDownLatch(BUG51445_THREAD_COUNT);
 
         private int data = 0;
 
         @Override
         protected void doGet(HttpServletRequest req, HttpServletResponse resp)
                 throws ServletException, IOException {
-            
+
+            // Ensure all threads have their own instance of the servlet
+            latch.countDown();
+            try {
+                latch.await();
+            } catch (InterruptedException e) {
+                // Ignore
+            }
+
             resp.setContentType("text/plain");
             resp.getWriter().print(data);
+            resp.getWriter().print(",");
+            resp.getWriter().print(hashCode());
         }
 
         @Override
