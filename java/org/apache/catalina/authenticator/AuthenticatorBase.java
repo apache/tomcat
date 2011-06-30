@@ -516,13 +516,13 @@ public abstract class AuthenticatorBase extends ValveBase
             }
         }
 
-        if (!authRequired) {
+        if (!authRequired && context.getPreemptiveAuthentication()) {
             authRequired =
                 request.getCoyoteRequest().getMimeHeaders().getValue(
                         "authorization") != null;
         }
 
-        if (!authRequired) {
+        if (!authRequired && context.getPreemptiveAuthentication()) {
             X509Certificate[] certs = (X509Certificate[]) request.getAttribute(
                     Globals.CERTIFICATES_ATTR);
             authRequired = certs != null && certs.length > 0;
