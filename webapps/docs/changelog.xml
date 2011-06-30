@@ -181,6 +181,11 @@
         implement SingleThreadModel. Based on a patch by Felix Schumacher.
         (markt)
       </fix>
+      <fix>
+        <bug>51453</bug>: Fix a regression in the preemptive authentication
+        support (enhancement <bug>12428</bug>) that could trigger authentication
+        even if preemptive authentication was disabled. (markt) 
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
