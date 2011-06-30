@@ -1115,14 +1115,14 @@ public class StandardWrapper extends ContainerBase
 
             classLoadTime=(int) (System.currentTimeMillis() -t1);
 
-            initServlet(servlet);
-
-            // Register our newly initialized instance
             singleThreadModel = servlet instanceof SingleThreadModel;
             if (singleThreadModel) {
                 if (instancePool == null)
                     instancePool = new Stack<Servlet>();
             }
+
+            initServlet(servlet);
+
             fireContainerEvent("load", this);
 
             loadTime=System.currentTimeMillis() -t1;
@@ -1186,7 +1186,7 @@ public class StandardWrapper extends ContainerBase
     private synchronized void initServlet(Servlet servlet)
             throws ServletException {
         
-        if (instanceInitialized) return;
+        if (instanceInitialized && !singleThreadModel) return;
 
         // Call the initialization method of this servlet
         try {

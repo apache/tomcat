@@ -176,6 +176,11 @@
         Improve the handling for Servlets that implement the deprecated
         SingleThreadModel when embedding Tomcat. (markt)
       </fix>
+      <fix>
+        <bug>51445</bug>: Correctly initialise all instances of Servlets that
+        implement SingleThreadModel. Based on a patch by Felix Schumacher.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
