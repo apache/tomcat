@@ -172,6 +172,10 @@
         the target Servlet does not call startAsync() or complete() that Tomcat
         calls complete() once the target Servlet exits. (markt)
       </fix>
+      <fix>
+        Improve the handling for Servlets that implement the deprecated
+        SingleThreadModel when embedding Tomcat. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
