@@ -194,6 +194,11 @@
         In launcher for embedded Tomcat: do not change <code>catalina.home</code>
         system property if it had a value. (kkolinko)
       </fix>
+      <fix>
+        When using Servlets that implement the SingleThreadModel interface, add
+        the single instance created to the pool when it is determined that a
+        pool of servlets is required rather than throwing it away. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
