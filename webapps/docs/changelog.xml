@@ -186,6 +186,10 @@
         support (enhancement <bug>12428</bug>) that could trigger authentication
         even if preemptive authentication was disabled. (markt) 
       </fix>
+      <fix>
+        Prevent possible NPE when serving Servlets that implement the
+        SingleThreadModel interface. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

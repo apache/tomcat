@@ -1115,10 +1115,11 @@ public class StandardWrapper extends ContainerBase
 
             classLoadTime=(int) (System.currentTimeMillis() -t1);
 
-            singleThreadModel = servlet instanceof SingleThreadModel;
-            if (singleThreadModel) {
-                if (instancePool == null)
+            if (servlet instanceof SingleThreadModel) {
+                if (instancePool == null) {
                     instancePool = new Stack<Servlet>();
+                }
+                singleThreadModel = true;
             }
 
             initServlet(servlet);
