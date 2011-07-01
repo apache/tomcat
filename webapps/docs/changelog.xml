@@ -190,6 +190,10 @@
         Prevent possible NPE when serving Servlets that implement the
         SingleThreadModel interface. (markt)
       </fix>
+      <fix>
+        In launcher for embedded Tomcat: do not change <code>catalina.home</code>
+        system property if it had a value. (kkolinko)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
@@ -235,7 +239,7 @@
       <fix>
         <bug>36362</bug>: Handle the case where tag file attributes (which can
         use any valid XML name) have a name which is not a Java identifier.
-        (markt)
+        (markt/kkolinko)
       </fix>
       <add>
         Broaden the exception handling in the EL Parser so that more failures to
