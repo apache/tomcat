@@ -126,7 +126,7 @@ public abstract class TomcatBaseTest extends TestCase {
 
         Connector connector = new Connector(protocol);
         // If each test is running on same port - they
-        // may interfere with each other (on unix at least)
+        // may interfere with each other
         connector.setPort(getNextPort());
         // Mainly set to reduce timeouts during async tests
         connector.setAttribute("connectionTimeout", "3000");
