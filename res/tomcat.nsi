@@ -527,6 +527,7 @@ FunctionEnd
 
 Function pageConfigurationLeave
   ${NSD_GetText} $CtlTomcatPortHttp $TomcatPortHttp
+  ${NSD_GetText} $CtlTomcatPortAjp $TomcatPortAjp
   ${NSD_GetText} $CtlTomcatServiceName $TomcatServiceName
   ${If} $TomcatMenuEntriesEnable == "1"
     ${NSD_GetState} $CtlTomcatShortcutAllUsers $TomcatShortcutAllUsers
