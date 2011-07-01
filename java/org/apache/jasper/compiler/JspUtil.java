@@ -806,7 +806,20 @@ public class JspUtil {
     public static final String makeJavaIdentifier(String identifier) {
         return makeJavaIdentifier(identifier, true);
     }
-    
+
+    /**
+     * Converts the given identifier to a legal Java identifier
+     * to be used for JSP Tag file attribute names. 
+     * 
+     * @param identifier
+     *            Identifier to convert
+     * 
+     * @return Legal Java identifier corresponding to the given identifier
+     */
+    public static final String makeJavaIdentifierForAttribute(String identifier) {
+        return makeJavaIdentifier(identifier, false);
+    }
+
     /**
      * Converts the given identifier to a legal Java identifier.
      * 
@@ -815,7 +828,7 @@ public class JspUtil {
      * 
      * @return Legal Java identifier corresponding to the given identifier
      */
-    public static final String makeJavaIdentifier(String identifier,
+    private static final String makeJavaIdentifier(String identifier,
             boolean periodToUnderscore) {
         StringBuilder modifiedIdentifier = new StringBuilder(identifier.length());
         if (!Character.isJavaIdentifierStart(identifier.charAt(0))) {
