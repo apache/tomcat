@@ -332,8 +332,13 @@ public class TestStandardWrapper extends TomcatBaseTest {
 
 
     public static final int BUG51445_THREAD_COUNT = 5;
+    
+    public static CountDownLatch latch = null;
 
     public void testBug51445AddServlet() throws Exception {
+
+        latch = new CountDownLatch(BUG51445_THREAD_COUNT);
+
         Tomcat tomcat = getTomcatInstance();
 
         // Must have a real docBase - just use temp
@@ -358,19 +363,25 @@ public class TestStandardWrapper extends TomcatBaseTest {
         }
 
         Set<String> servlets = new HashSet<String>();
+        // Output the result
+        for (int i = 0; i < BUG51445_THREAD_COUNT; i ++) {
+            System.out.println(threads[i].getResult());
+        }
+        
         // Check the result
         for (int i = 0; i < BUG51445_THREAD_COUNT; i ++) {
             String[] results = threads[i].getResult().split(",");
             assertEquals(2, results.length);
             assertEquals("10", results[0]);
-            System.out.println(results[1]);
             assertFalse(servlets.contains(results[1]));
             servlets.add(results[1]);
         }
-
     }
 
     public void testBug51445AddChild() throws Exception {
+        
+        latch = new CountDownLatch(BUG51445_THREAD_COUNT);
+
         Tomcat tomcat = getTomcatInstance();
 
         // Must have a real docBase - just use temp
@@ -398,16 +409,18 @@ public class TestStandardWrapper extends TomcatBaseTest {
         }
 
         Set<String> servlets = new HashSet<String>();
+        // Output the result
+        for (int i = 0; i < BUG51445_THREAD_COUNT; i ++) {
+            System.out.println(threads[i].getResult());
+        }
         // Check the result
         for (int i = 0; i < BUG51445_THREAD_COUNT; i ++) {
             String[] results = threads[i].getResult().split(",");
             assertEquals(2, results.length);
             assertEquals("10", results[0]);
-            System.out.println(results[1]);
             assertFalse(servlets.contains(results[1]));
             servlets.add(results[1]);
         }
-
     }
 
     private static class Bug51445Thread extends Thread {
@@ -442,9 +455,6 @@ public class TestStandardWrapper extends TomcatBaseTest {
             implements javax.servlet.SingleThreadModel {
 
         private static final long serialVersionUID = 1L;
-
-        private static final CountDownLatch latch =
-            new CountDownLatch(BUG51445_THREAD_COUNT);
 
         private int data = 0;
 
