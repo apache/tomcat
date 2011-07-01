@@ -27,6 +27,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.servlet.Servlet;
 import javax.servlet.ServletConfig;
@@ -335,6 +336,7 @@ public class TestStandardWrapper extends TomcatBaseTest {
     public static final int BUG51445_THREAD_COUNT = 5;
     
     public static CountDownLatch latch = null;
+    public static AtomicInteger counter = new AtomicInteger(0);
 
     public void testBug51445AddServlet() throws Exception {
 
@@ -459,6 +461,14 @@ public class TestStandardWrapper extends TomcatBaseTest {
         private static final long LATCH_TIMEOUT = 60;
 
         private int data = 0;
+        private int counter;
+        
+        public Bug51445Servlet() {
+            // Use this rather than hashCode since in some environments,
+            // multiple instances of this object were created with the same
+            // hashCode
+            counter = TestStandardWrapper.counter.incrementAndGet();
+        }
 
         @Override
         protected void doGet(HttpServletRequest req, HttpServletResponse resp)
@@ -481,7 +491,7 @@ public class TestStandardWrapper extends TomcatBaseTest {
                 resp.getWriter().print("Latch await failed");
             }
             resp.getWriter().print(",");
-            resp.getWriter().print(hashCode());
+            resp.getWriter().print(counter);
         }
 
         @Override
