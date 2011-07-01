@@ -204,7 +204,7 @@ public class StandardWrapper extends ContainerBase
     /**
      * Does this servlet implement the SingleThreadModel interface?
      */
-    protected boolean singleThreadModel = false;
+    protected volatile boolean singleThreadModel = false;
 
 
     /**
