@@ -822,9 +822,16 @@ public class StandardWrapper extends ContainerBase
                                 log.debug("Allocating non-STM instance");
 
                             instance = loadServlet();
-                            // For non-STM, increment here to prevent a race
-                            // condition with unload. Bug 43683, test case #3
-                            if (!singleThreadModel) {
+                            if (singleThreadModel) {
+                                // No need to lock pool since until an instance
+                                // is created, no threads will get past this
+                                // point
+                                instancePool.push(instance);
+                                nInstances++;
+                            } else {
+                                // For non-STM, increment here to prevent a race
+                                // condition with unload. Bug 43683, test case
+                                // #3
                                 newInstance = true;
                                 countAllocated.incrementAndGet();
                             }
