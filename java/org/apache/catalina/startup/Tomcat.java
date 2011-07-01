@@ -613,11 +613,12 @@ public class Tomcat {
     }
     
     protected void initBaseDir() {
+        String catalinaHome = System.getProperty(Globals.CATALINA_HOME_PROP);
         if (basedir == null) {
             basedir = System.getProperty(Globals.CATALINA_BASE_PROP);
         }
         if (basedir == null) {
-            basedir = System.getProperty(Globals.CATALINA_HOME_PROP);
+            basedir = catalinaHome;
         }
         if (basedir == null) {
             // Create a temp dir.
@@ -633,7 +634,9 @@ public class Tomcat {
                 }
             }
         }
-        System.setProperty(Globals.CATALINA_HOME_PROP, basedir);
+        if (catalinaHome == null) {
+            System.setProperty(Globals.CATALINA_HOME_PROP, basedir);
+        }
         System.setProperty(Globals.CATALINA_BASE_PROP, basedir);
     }
 
