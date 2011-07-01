@@ -824,6 +824,7 @@ Function configure
   ${EndIf}
 
   DetailPrint 'HTTP/1.1 Connector configured on port "$TomcatPortHttp"'
+  DetailPrint 'AJP/1.3 Connector configured on port "$TomcatPortAjp"'
 
   ; Extract these fragments to $PLUGINSDIR. That is a temporary directory,
   ; that is automatically deleted when the installer exits.
