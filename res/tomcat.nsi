@@ -45,6 +45,7 @@ Var JavaExe
 Var JvmDll
 Var Arch
 Var ResetInstDir
+Var TomcatPortShutdown
 Var TomcatPortHttp
 Var TomcatPortAjp
 Var TomcatMenuEntriesEnable
@@ -59,6 +60,7 @@ Var TomcatAdminRoles
 
 ; Variables that store handles of dialog controls
 Var CtlJavaHome
+Var CtlTomcatPortShutdown
 Var CtlTomcatPortHttp
 Var CtlTomcatPortAjp
 Var CtlTomcatServiceName
@@ -102,6 +104,7 @@ Var ServiceInstallLog
   LangString TEXT_CONF_PAGETITLE ${LANG_ENGLISH} ": Configuration Options"
 
   LangString TEXT_JVM_LABEL1 ${LANG_ENGLISH} "Please select the path of a Java SE 6.0 or later JRE installed on your system."
+  LangString TEXT_CONF_LABEL_PORT_SHUTDOWN ${LANG_ENGLISH} "Server Shutdown Port"
   LangString TEXT_CONF_LABEL_PORT_HTTP ${LANG_ENGLISH} "HTTP/1.1 Connector Port"
   LangString TEXT_CONF_LABEL_PORT_AJP ${LANG_ENGLISH} "AJP/1.3 Connector Port"
   LangString TEXT_CONF_LABEL_SERVICE_NAME ${LANG_ENGLISH} "Windows Service Name"
@@ -365,6 +368,7 @@ Function .onInit
 
   ;Initialize default values
   StrCpy $JavaHome ""
+  StrCpy $TomcatPortShutdown "8005"
   StrCpy $TomcatPortHttp "8080"
   StrCpy $TomcatPortAjp "8009"
   StrCpy $TomcatMenuEntriesEnable "0"
@@ -474,55 +478,63 @@ Function pageConfiguration
   nsDialogs::Create 1018
   Pop $R0
 
-  ${NSD_CreateLabel} 0 2 100u 14u "$(TEXT_CONF_LABEL_PORT_HTTP)"
+  ${NSD_CreateLabel} 0 2u 100u 14u "$(TEXT_CONF_LABEL_PORT_SHUTDOWN)"
   Pop $R0
 
-  ${NSD_CreateText} 150u 0 50u 12u "$TomcatPortHttp"
+  ${NSD_CreateText} 150u 0 50u 12u "$TomcatPortShutdown"
+  Pop $CtlTomcatPortShutdown
+  ${NSD_SetTextLimit} $CtlTomcatPortShutdown 5
+
+  ${NSD_CreateLabel} 0 19u 100u 14u "$(TEXT_CONF_LABEL_PORT_HTTP)"
+  Pop $R0
+
+  ${NSD_CreateText} 150u 17u 50u 12u "$TomcatPortHttp"
   Pop $CtlTomcatPortHttp
   ${NSD_SetTextLimit} $CtlTomcatPortHttp 5
 
-  ${NSD_CreateLabel} 0 20u 100u 14u "$(TEXT_CONF_LABEL_PORT_AJP)"
+  ${NSD_CreateLabel} 0 36u 100u 14u "$(TEXT_CONF_LABEL_PORT_AJP)"
   Pop $R0
 
-  ${NSD_CreateText} 150u 18u 50u 12u "$TomcatPortAjp"
+  ${NSD_CreateText} 150u 34u 50u 12u "$TomcatPortAjp"
   Pop $CtlTomcatPortAjp
   ${NSD_SetTextLimit} $CtlTomcatPortAjp 5
 
-  ${NSD_CreateLabel} 0 41u 140u 14u "$(TEXT_CONF_LABEL_SERVICE_NAME)"
+  ${NSD_CreateLabel} 0 57u 140u 14u "$(TEXT_CONF_LABEL_SERVICE_NAME)"
   Pop $R0
 
-  ${NSD_CreateText} 150u 39u 140u 12u "$TomcatServiceName"
+  ${NSD_CreateText} 150u 55u 140u 12u "$TomcatServiceName"
   Pop $CtlTomcatServiceName
 
   ${If} $TomcatMenuEntriesEnable == "1"
-    ${NSD_CreateLabel} 0 59u 100u 14u "$(TEXT_CONF_LABEL_SHORTCUT_ALL_USERS)"
+    ${NSD_CreateLabel} 0 75u 100u 14u "$(TEXT_CONF_LABEL_SHORTCUT_ALL_USERS)"
     Pop $R0
-    ${NSD_CreateCheckBox} 150u 58u 10u 10u "$TomcatShortcutAllUsers"
+    ${NSD_CreateCheckBox} 150u 74u 10u 10u "$TomcatShortcutAllUsers"
     Pop $CtlTomcatShortcutAllUsers
   ${EndIf}
 
   ${If} $TomcatAdminEnable == "1"
-    ${NSD_CreateLabel} 0 77u 140u 14u "$(TEXT_CONF_LABEL_ADMIN)"
+    ${NSD_CreateLabel} 0 93u 90u 28u "$(TEXT_CONF_LABEL_ADMIN)"
     Pop $R0
-    ${NSD_CreateLabel} 10u 92u 140u 14u "$(TEXT_CONF_LABEL_ADMINUSERNAME)"
+    ${NSD_CreateLabel} 100u 93u 40u 14u "$(TEXT_CONF_LABEL_ADMINUSERNAME)"
     Pop $R0
-    ${NSD_CreateText} 150u 90u 110u 12u "$TomcatAdminUsername"
+    ${NSD_CreateText} 150u 91u 110u 12u "$TomcatAdminUsername"
     Pop $CtlTomcatAdminUsername
-    ${NSD_CreateLabel} 10u 110u 140u 12u "$(TEXT_CONF_LABEL_ADMINPASSWORD)"
+    ${NSD_CreateLabel} 100u 110u 40u 12u "$(TEXT_CONF_LABEL_ADMINPASSWORD)"
     Pop $R0
     ${NSD_CreatePassword} 150u 108u 110u 12u "$TomcatAdminPassword"
     Pop $CtlTomcatAdminPassword
-    ${NSD_CreateLabel} 10u 128u 140u 14u "$(TEXT_CONF_LABEL_ADMINROLES)"
+    ${NSD_CreateLabel} 100u 127u 40u 14u "$(TEXT_CONF_LABEL_ADMINROLES)"
     Pop $R0
-    ${NSD_CreateText} 150u 126u 110u 12u "$TomcatAdminRoles"
+    ${NSD_CreateText} 150u 125u 110u 12u "$TomcatAdminRoles"
     Pop $CtlTomcatAdminRoles
   ${EndIf}
 
-  ${NSD_SetFocus} $CtlTomcatPortHttp
+  ${NSD_SetFocus} $CtlTomcatPortShutdown
   nsDialogs::Show
 FunctionEnd
 
 Function pageConfigurationLeave
+  ${NSD_GetText} $CtlTomcatPortShutdown $TomcatPortShutdown
   ${NSD_GetText} $CtlTomcatPortHttp $TomcatPortHttp
   ${NSD_GetText} $CtlTomcatPortAjp $TomcatPortAjp
   ${NSD_GetText} $CtlTomcatServiceName $TomcatServiceName
@@ -808,9 +820,10 @@ Function configure
   SERVER_XML_LOOP:
     FileRead $R1 $R3
     IfErrors SERVER_XML_LEAVELOOP
-    ${StrRep} $R4 $R3 "8080" "$TomcatPortHttp"
-    ${StrRep} $R3 $R4 "8009" "$TomcatPortAjp"
-    FileWrite $R2 $R3
+    ${StrRep} $R4 $R3 "8005" "$TomcatPortShutdown"
+    ${StrRep} $R3 $R4 "8080" "$TomcatPortHttp"
+    ${StrRep} $R4 $R3 "8009" "$TomcatPortAjp"
+    FileWrite $R2 $R4
   Goto SERVER_XML_LOOP
   SERVER_XML_LEAVELOOP:
 
@@ -825,6 +838,7 @@ Function configure
   FileClose $R9
   Delete "$INSTDIR\conf\server.xml.new"
   
+  DetailPrint 'Server shutdown listener configured on port "$TomcatPortShutdown"'
   DetailPrint 'HTTP/1.1 Connector configured on port "$TomcatPortHttp"'
   DetailPrint 'AJP/1.3 Connector configured on port "$TomcatPortAjp"'
   DetailPrint "server.xml written"
