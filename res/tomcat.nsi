@@ -154,9 +154,6 @@ Var ServiceInstallLog
 
   ReserveFile "${NSISDIR}\Plugins\System.dll"
   ReserveFile "${NSISDIR}\Plugins\nsDialogs.dll"
-  ReserveFile confinstall\server_1.xml
-  ReserveFile confinstall\server_2.xml
-  ReserveFile confinstall\server_3.xml
   ReserveFile confinstall\tomcat-users_1.xml
   ReserveFile confinstall\tomcat-users_2.xml
 
@@ -802,8 +799,36 @@ FunctionEnd
 ; Writes server.xml and tomcat-users.xml
 ;
 Function configure
-  StrCpy $R4 'port="$TomcatPortHttp"'
-  StrCpy $R6 'port="$TomcatPortAjp"'
+  ; Build final server.xml
+  DetailPrint "Creating server.xml.new"
+
+  FileOpen $R1 "$INSTDIR\conf\server.xml" r
+  FileOpen $R2 "$INSTDIR\conf\server.xml.new" w
+
+  SERVER_XML_LOOP:
+    FileRead $R1 $R3
+    IfErrors SERVER_XML_LEAVELOOP
+    ${StrRep} $R4 $R3 "8080" "$TomcatPortHttp"
+    ${StrRep} $R3 $R4 "8009" "$TomcatPortAjp"
+    FileWrite $R2 $R3
+  Goto SERVER_XML_LOOP
+  SERVER_XML_LEAVELOOP:
+
+  FileClose $R1
+  FileClose $R2
+
+  ; Replace server.xml with server.xml.new
+  Delete "$INSTDIR\conf\server.xml"
+  FileOpen $R9 "$INSTDIR\conf\server.xml" w
+  Push "$INSTDIR\conf\server.xml.new"
+  Call copyFile
+  FileClose $R9
+  Delete "$INSTDIR\conf\server.xml.new"
+  
+  DetailPrint 'HTTP/1.1 Connector configured on port "$TomcatPortHttp"'
+  DetailPrint 'AJP/1.3 Connector configured on port "$TomcatPortAjp"'
+  DetailPrint "server.xml written"
+
   StrCpy $R5 ''
 
   ${If} $TomcatAdminEnable == "1"
@@ -824,35 +849,13 @@ Function configure
     DetailPrint 'Admin user added: "$TomcatAdminUsername"'
   ${EndIf}
 
-  DetailPrint 'HTTP/1.1 Connector configured on port "$TomcatPortHttp"'
-  DetailPrint 'AJP/1.3 Connector configured on port "$TomcatPortAjp"'
 
   ; Extract these fragments to $PLUGINSDIR. That is a temporary directory,
   ; that is automatically deleted when the installer exits.
   InitPluginsDir
   SetOutPath $PLUGINSDIR
-  File confinstall\server_1.xml
-  File confinstall\server_2.xml
-  File confinstall\server_3.xml
   File confinstall\tomcat-users_1.xml
   File confinstall\tomcat-users_2.xml
-
-  ; Build final server.xml
-  Delete "$INSTDIR\conf\server.xml"
-  DetailPrint "Writing server.xml"
-  FileOpen $R9 "$INSTDIR\conf\server.xml" w
-
-  Push "$PLUGINSDIR\server_1.xml"
-  Call copyFile
-  FileWrite $R9 $R4
-  Push "$PLUGINSDIR\server_2.xml"
-  Call copyFile
-  FileWrite $R9 $R6
-  Push "$PLUGINSDIR\server_3.xml"
-  Call copyFile
-
-  FileClose $R9
-  DetailPrint "server.xml written"
 
   ; Build final tomcat-users.xml
   Delete "$INSTDIR\conf\tomcat-users.xml"
@@ -875,9 +878,6 @@ Function configure
   FileClose $R9
   DetailPrint "tomcat-users.xml written"
 
-  Delete "$PLUGINSDIR\server_1.xml"
-  Delete "$PLUGINSDIR\server_2.xml"
-  Delete "$PLUGINSDIR\server_3.xml"
   Delete "$PLUGINSDIR\tomcat-users_1.xml"
   Delete "$PLUGINSDIR\tomcat-users_2.xml"
 FunctionEnd

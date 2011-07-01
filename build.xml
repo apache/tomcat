@@ -438,7 +438,6 @@
         <exclude name="modules/**"/>
         <exclude name="**/*.mdl"/>
         <exclude name="**/*_2.xml"/>
-        <exclude name="**/*_3.xml"/>
         <exclude name="res/checkstyle/header-al2.txt"/>
         <!-- Exclude auto-generated files -->
         <exclude name="java/org/apache/el/parser/ELParser*.java" />
