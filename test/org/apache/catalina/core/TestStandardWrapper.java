@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import javax.servlet.Servlet;
 import javax.servlet.ServletConfig;
@@ -455,6 +456,7 @@ public class TestStandardWrapper extends TomcatBaseTest {
             implements javax.servlet.SingleThreadModel {
 
         private static final long serialVersionUID = 1L;
+        private static final long LATCH_TIMEOUT = 60;
 
         private int data = 0;
 
@@ -462,16 +464,22 @@ public class TestStandardWrapper extends TomcatBaseTest {
         protected void doGet(HttpServletRequest req, HttpServletResponse resp)
                 throws ServletException, IOException {
 
+            boolean latchAwaitResult = false;
+            
             // Ensure all threads have their own instance of the servlet
             latch.countDown();
             try {
-                latch.await();
+                latchAwaitResult = latch.await(LATCH_TIMEOUT, TimeUnit.SECONDS);
             } catch (InterruptedException e) {
                 // Ignore
             }
 
             resp.setContentType("text/plain");
-            resp.getWriter().print(data);
+            if (latchAwaitResult) {
+                resp.getWriter().print(data);
+            } else {
+                resp.getWriter().print("Latch await failed");
+            }
             resp.getWriter().print(",");
             resp.getWriter().print(hashCode());
         }
