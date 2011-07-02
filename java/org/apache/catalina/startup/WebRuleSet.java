@@ -863,6 +863,7 @@ final class CallParamMultiRule extends CallParamRule {
         if (bodyTextStack != null && !bodyTextStack.empty()) {
             // what we do now is push one parameter onto the top set of parameters
             Object parameters[] = (Object[]) digester.peekParams();
+            @SuppressWarnings("unchecked")
             ArrayList<String> params = (ArrayList<String>) parameters[paramIndex];
             if (params == null) {
                 params = new ArrayList<String>();
