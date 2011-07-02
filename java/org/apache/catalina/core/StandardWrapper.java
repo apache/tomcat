@@ -845,11 +845,13 @@ public class StandardWrapper extends ContainerBase
             }
 
             if (singleThreadModel) {
-                // Have to do this outside of the sync above to prevent a
-                // possible deadlock
-                synchronized (instancePool) {
-                    instancePool.push(instance);
-                    nInstances++;
+                if (newInstance) {
+                    // Have to do this outside of the sync above to prevent a
+                    // possible deadlock
+                    synchronized (instancePool) {
+                        instancePool.push(instance);
+                        nInstances++;
+                    }
                 }
             } else {
                 if (log.isTraceEnabled())
