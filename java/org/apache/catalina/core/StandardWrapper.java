@@ -822,13 +822,7 @@ public class StandardWrapper extends ContainerBase
                                 log.debug("Allocating non-STM instance");
 
                             instance = loadServlet();
-                            if (singleThreadModel) {
-                                // No need to lock pool since until an instance
-                                // is created, no threads will get past this
-                                // point
-                                instancePool.push(instance);
-                                nInstances++;
-                            } else {
+                            if (!singleThreadModel) {
                                 // For non-STM, increment here to prevent a race
                                 // condition with unload. Bug 43683, test case
                                 // #3
@@ -850,7 +844,14 @@ public class StandardWrapper extends ContainerBase
                 initServlet(instance);
             }
 
-            if (!singleThreadModel) {
+            if (singleThreadModel) {
+                // Have to do this outside of the sync above to prevent a
+                // possible deadlock
+                synchronized (instancePool) {
+                    instancePool.push(instance);
+                    nInstances++;
+                }
+            } else {
                 if (log.isTraceEnabled())
                     log.trace("  Returning non-STM instance");
                 // For new instances, count will have been incremented at the
