@@ -148,7 +148,7 @@ public class AjpNioProtocol extends AbstractAjpProtocol {
         
         /**
          * Use this only if the processor is not available, otherwise use
-         * {@link #release(NioChannel, AjpNioProcessor)}.
+         * {@link #release(SocketWrapper<NioChannel>, AjpNioProcessor)}.
          */
         @Override
         public void release(SocketWrapper<NioChannel> socket) {
