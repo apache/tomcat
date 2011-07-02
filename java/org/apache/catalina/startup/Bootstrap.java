@@ -123,7 +123,8 @@ public final class Bootstrap {
 
             // Check for a JAR URL repository
             try {
-                new URL(repository);
+                @SuppressWarnings("unused")
+                URL url = new URL(repository);
                 repositories.add(
                         new Repository(repository, RepositoryType.URL));
                 continue;

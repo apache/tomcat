@@ -118,6 +118,7 @@ public final class Tool {
      *
      * @param args Command line arguments to be processed
      */
+    @SuppressWarnings("null")
     public static void main(String args[]) {
 
         // Verify that "catalina.home" was passed.
@@ -204,7 +205,6 @@ public final class Tool {
             System.exit(1);
         }
 
-        // Locate the static main() method of the application class
         Method method = null;
         String params[] = new String[args.length - index];
         System.arraycopy(args, index, params, 0, params.length);
