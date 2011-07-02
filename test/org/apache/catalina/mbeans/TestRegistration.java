@@ -138,7 +138,7 @@ public class TestRegistration extends TomcatBaseTest {
         assertTrue("Missing Tomcat MBeans: " + missing, missing.isEmpty());
 
         // Did we find any unexpected MBeans?
-        List additional = found;
+        List<String> additional = found;
         additional.removeAll(expected);
         assertTrue("Unexpected Tomcat MBeans: " + additional, additional.isEmpty());
 
