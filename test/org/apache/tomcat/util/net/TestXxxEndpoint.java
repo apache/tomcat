@@ -64,12 +64,8 @@ public class TestXxxEndpoint extends TomcatBaseTest {
         // Create the APR address that will be bound
         int family = Socket.APR_INET;
         if (Library.APR_HAVE_IPV6) {
-            if (address == null) {
-                if (!OS.IS_BSD && !OS.IS_WIN32 && !OS.IS_WIN64)
-                    family = Socket.APR_UNSPEC;
-            } else if (address.indexOf(':') >= 0) {
+            if (!OS.IS_BSD && !OS.IS_WIN32 && !OS.IS_WIN64)
                 family = Socket.APR_UNSPEC;
-            }
          }
 
         long inetAddress = 0;
