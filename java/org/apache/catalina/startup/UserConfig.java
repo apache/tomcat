@@ -215,6 +215,7 @@ public final class UserConfig
      *
      * @param event The lifecycle event that has occurred
      */
+    @Override
     public void lifecycleEvent(LifecycleEvent event) {
 
         // Identify the host we are associated with
