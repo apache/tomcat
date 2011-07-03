@@ -54,6 +54,15 @@
   issues to not "pop up" wrt. others).
 -->
 <section name="Tomcat 7.0.18 (markt)">
+  <subsection name="Catalina">
+    <changelog>
+      <fix>
+        Correct regression introduced in 7.0.17 that triggered an NPE if a
+        CrawlerSessionManagerValve was used without setting crawlerUserAgents.
+        (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <fix>
