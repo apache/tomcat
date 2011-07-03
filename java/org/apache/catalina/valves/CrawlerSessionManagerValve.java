@@ -27,6 +27,7 @@ import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpSessionBindingEvent;
 import javax.servlet.http.HttpSessionBindingListener;
 
+import org.apache.catalina.LifecycleException;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
 import org.apache.juli.logging.Log;
@@ -110,6 +111,14 @@ public class CrawlerSessionManagerValve extends ValveBase
 
     public Map<String,String> getClientIpSessionId() {
         return clientIpSessionId;
+    }
+
+
+    @Override
+    protected void initInternal() throws LifecycleException {
+        super.initInternal();
+        
+        uaPattern = Pattern.compile(crawlerUserAgents);
     }
 
 
