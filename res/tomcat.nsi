@@ -546,8 +546,52 @@ Function pageConfigurationLeave
     ${NSD_GetText} $CtlTomcatAdminPassword $TomcatAdminPassword
     ${NSD_GetText} $CtlTomcatAdminRoles $TomcatAdminRoles
   ${EndIf}
+  
+  Push $TomcatServiceName
+  Call validateServiceName
+  Pop $0
+  
+  IntCmp $0 1 exit
+  MessageBox MB_ICONEXCLAMATION|MB_OK 'The Service Name may not contain a space or any of the following characters: <>:"/\:|?*'
+  Abort "Config not right"
+  exit:
 FunctionEnd
 
+; Validates that a service name does not use any of the invalid
+; characters: <>:"/\:|?*
+; Note that space is also not permitted although it will be once
+; Tomcat is using Daemon 1.0.6 or later
+;
+; Put the proposed service name on the stack
+; If the name is valid, a 1 will be left on the stack
+; If the name is invalid, a 0 will be left on the stack
+Function validateServiceName
+  Pop $0
+  StrLen $1 $0
+  StrCpy $3 '<>:"/\:|?* '
+  StrLen $4 $3
+  
+  loopInput:
+    IntOp $1 $1 - 1
+    IntCmp $1 -1 valid
+    loopTestChars:
+      IntOp $4 $4 - 1
+      IntCmp $4 -1 loopTestCharsDone
+      StrCpy $2 $0 1 $1
+      StrCpy $5 $3 1 $4
+      StrCmp $2 $5 invalid loopTestChars
+    loopTestCharsDone:
+    StrLen $4 $3
+    Goto loopInput
+
+  invalid:
+  Push 0
+  Goto exit
+  
+  valid:
+  Push 1
+  exit:
+FunctionEnd
 
 ;--------------------------------
 ;Descriptions
