@@ -73,6 +73,7 @@ public class ReplicationTransmitter implements ChannelSender {
      * Send data to one member
      * @see org.apache.catalina.tribes.ChannelSender#sendMessage(org.apache.catalina.tribes.ChannelMessage, org.apache.catalina.tribes.Member[])
      */
+    @Override
     public void sendMessage(ChannelMessage message, Member[] destination) throws ChannelException {
         MultiPointSender sender = getTransport();
         sender.sendMessage(destination,message);
@@ -84,6 +85,7 @@ public class ReplicationTransmitter implements ChannelSender {
      * 
      * @see org.apache.catalina.tribes.ChannelSender#start()
      */
+    @Override
     public void start() throws java.io.IOException {
         getTransport().connect();
     }
@@ -93,6 +95,7 @@ public class ReplicationTransmitter implements ChannelSender {
      * 
      * @see org.apache.catalina.tribes.ChannelSender#stop()
      */
+    @Override
     public synchronized void stop() {
         getTransport().disconnect();
     }
@@ -113,6 +116,7 @@ public class ReplicationTransmitter implements ChannelSender {
      * 
      * @see org.apache.catalina.tribes.ChannelSender#add(org.apache.catalina.tribes.Member)
      */
+    @Override
     public synchronized void add(Member member) {
         getTransport().add(member);
     }
@@ -122,6 +126,7 @@ public class ReplicationTransmitter implements ChannelSender {
      * 
      * @see org.apache.catalina.tribes.ChannelSender#remove(org.apache.catalina.tribes.Member)
      */
+    @Override
     public synchronized void remove(Member member) {
         getTransport().remove(member);
     }

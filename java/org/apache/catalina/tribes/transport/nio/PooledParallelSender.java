@@ -40,7 +40,8 @@ public class PooledParallelSender extends PooledSender {
     public PooledParallelSender() {
         super();
     }
-    
+
+    @Override
     public void sendMessage(Member[] destination, ChannelMessage message) throws ChannelException {
         if ( !connected ) throw new ChannelException("Sender not connected.");
         ParallelNioSender sender = (ParallelNioSender)getSender();
