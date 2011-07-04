@@ -76,6 +76,7 @@ public class GlobalResourcesLifecycleListener
      *
      * @param event The event that has occurred
      */
+    @Override
     public void lifecycleEvent(LifecycleEvent event) {
 
         if (Lifecycle.START_EVENT.equals(event.getType())) {
