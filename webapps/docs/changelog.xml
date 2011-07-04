@@ -65,6 +65,11 @@
         <bug>51466</bug>: Correct comment typos in HostManagerServlet. Patch
         provided by Felix Schumacher. (markt)
       </fix>
+      <fix>
+        <bug>51467</bug>: Invoke Thread.start() rather than Thread.run() so that
+        listeners and filters are stopped in a separate thread rather than the
+        current thread. Patch provided by Felix Schumacher. (markt)  
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
