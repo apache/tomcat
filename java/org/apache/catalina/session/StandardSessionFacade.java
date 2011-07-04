@@ -23,7 +23,6 @@ import java.util.Enumeration;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpSession;
-import javax.servlet.http.HttpSessionContext;
 
 
 /**
@@ -113,7 +112,7 @@ public class StandardSessionFacade
      */
     @Override
     @Deprecated
-    public HttpSessionContext getSessionContext() {
+    public javax.servlet.http.HttpSessionContext getSessionContext() {
         return session.getSessionContext();
     }
 
