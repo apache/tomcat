@@ -92,6 +92,7 @@ public class SchemaResolver implements EntityResolver {
      * @exception SAXException if a parsing exception occurs
      *
      */
+    @Override
     public InputSource resolveEntity(String publicId, String systemId)
         throws SAXException {
 
