@@ -142,12 +142,15 @@ public class MemberImpl implements Member, java.io.Externalizable {
         setPayload(payload);
     }
 
+    @Override
     public boolean isReady() {
         return SenderState.getSenderState(this).isReady();
     }
+    @Override
     public boolean isSuspect() {
         return SenderState.getSenderState(this).isSuspect();
     }
+    @Override
     public boolean isFailing() {
         return SenderState.getSenderState(this).isFailing();
     }
@@ -423,6 +426,7 @@ public class MemberImpl implements Member, java.io.Externalizable {
      * Return the name of this object
      * @return a unique name to the cluster
      */
+    @Override
     public String getName() {
         return "tcp://"+getHostname()+":"+getPort();
     }
@@ -431,6 +435,7 @@ public class MemberImpl implements Member, java.io.Externalizable {
      * Return the listen port of this member
      * @return - tcp listen port
      */
+    @Override
     public int getPort()  {
         return this.port;
     }
@@ -439,6 +444,7 @@ public class MemberImpl implements Member, java.io.Externalizable {
      * Return the TCP listen host for this member
      * @return IP address or host name
      */
+    @Override
     public byte[] getHost()  {
         return host;
     }
@@ -464,6 +470,7 @@ public class MemberImpl implements Member, java.io.Externalizable {
      * broadcasting its membership to the cluster.
      * @return nr of milliseconds since this member started.
      */
+    @Override
     public long getMemberAliveTime() {
        return memberAliveTime;
     }
@@ -472,26 +479,32 @@ public class MemberImpl implements Member, java.io.Externalizable {
         return serviceStartTime;
     }
 
+    @Override
     public byte[] getUniqueId() {
         return uniqueId;
     }
 
+    @Override
     public byte[] getPayload() {
         return payload;
     }
 
+    @Override
     public byte[] getCommand() {
         return command;
     }
 
+    @Override
     public byte[] getDomain() {
         return domain;
     }
 
+    @Override
     public int getSecurePort() {
         return securePort;
     }
 
+    @Override
     public int getUdpPort() {
         return udpPort;
     }
@@ -619,6 +632,7 @@ public class MemberImpl implements Member, java.io.Externalizable {
         this.dataPkg = null;
     }
 
+    @Override
     public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
         int length = in.readInt();
         byte[] message = new byte[length];
@@ -627,6 +641,7 @@ public class MemberImpl implements Member, java.io.Externalizable {
 
     }
 
+    @Override
     public void writeExternal(ObjectOutput out) throws IOException {
         byte[] data = this.getData();
         out.writeInt(data.length);
