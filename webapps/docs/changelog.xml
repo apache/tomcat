@@ -76,7 +76,7 @@
     <changelog>
       <fix>
         More code clean-up to remove unused code and reduce IDE warnings.
-        (markt)
+        (markt/kkolinko)
       </fix>
     </changelog>
   </subsection>
