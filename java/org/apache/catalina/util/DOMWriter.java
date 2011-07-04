@@ -250,8 +250,11 @@ public class DOMWriter {
 
    /** Returns a sorted list of attributes. */
    protected Attr[] sortAttributes(NamedNodeMap attrs) {
+      if (attrs == null) {
+         return new Attr[0];
+      }
 
-      int len = (attrs != null) ? attrs.getLength() : 0;
+      int len = attrs.getLength();
       Attr array[] = new Attr[len];
       for ( int i = 0; i < len; i++ ) {
          array[i] = (Attr)attrs.item(i);
