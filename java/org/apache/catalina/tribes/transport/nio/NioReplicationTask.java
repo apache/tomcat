@@ -67,6 +67,7 @@ public class NioReplicationTask extends AbstractRxTask {
     }
 
     // loop forever waiting for work to do
+    @Override
     public synchronized void run() {
         if ( buffer == null ) {
             int size = getRxBufSize();
@@ -246,6 +247,7 @@ public class NioReplicationTask extends AbstractRxTask {
         reader.finish();
         //register our OP_READ interest
         Runnable r = new Runnable() {
+            @Override
             public void run() {
                 try {
                     if (key.isValid()) {
@@ -280,6 +282,7 @@ public class NioReplicationTask extends AbstractRxTask {
             reader.finish();
         }
         Runnable cx = new Runnable() {
+            @Override
             public void run() {
                 if ( log.isTraceEnabled() )
                     log.trace("Cancelling key:"+key);

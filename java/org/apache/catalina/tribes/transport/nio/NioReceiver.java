@@ -115,6 +115,7 @@ public class NioReceiver extends ReceiverBase implements Runnable {
         }
     }
 
+    @Override
     public AbstractRxTask createRxTask() {
         NioReplicationTask thread = new NioReplicationTask(this,this);
         thread.setUseBufferPool(this.getUseBufferPool());
@@ -402,6 +403,7 @@ public class NioReceiver extends ReceiverBase implements Runnable {
     /**
      * Start thread and listen
      */
+    @Override
     public void run() {
         try {
             listen();
