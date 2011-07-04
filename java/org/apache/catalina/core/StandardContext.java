@@ -5478,7 +5478,7 @@ public class StandardContext extends ContainerBase
             
             Thread t = new Thread(stop);
             t.setName("stop children - " + getObjectName().toString());
-            t.run();
+            t.start();
             try {
                 t.join();
             } catch (InterruptedException e) {
