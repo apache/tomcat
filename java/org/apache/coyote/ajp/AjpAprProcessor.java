@@ -239,8 +239,6 @@ public class AjpAprProcessor extends AbstractAjpProcessor {
         } else if (isAsync()) {
             return SocketState.LONG;
         } else {
-            // Add the socket to the poller
-            ((AprEndpoint)endpoint).getPoller().add(socketRef);
             return SocketState.OPEN;
         }
     }
