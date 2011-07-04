@@ -172,9 +172,12 @@ public class ReplicatedContext extends StandardContext implements MapOwner {
                 return super.getAttribute(name);
         }
         
+        @SuppressWarnings("unchecked")
         @Override
         public Enumeration<String> getAttributeNames() {
-            return new MultiEnumeration<String>(new Enumeration[] {super.getAttributeNames(),new Enumerator<String>(tomcatAttributes.keySet(), true)});
+            return new MultiEnumeration<String>(new Enumeration[] {
+                    super.getAttributeNames(),
+                    new Enumerator<String>(tomcatAttributes.keySet(), true)});
         }
         
     }
