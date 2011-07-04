@@ -121,6 +121,7 @@ public class McastService implements MembershipService,MembershipListener,Messag
      * 8. tcpListenHost - the bind address of this member<BR>
      * @exception java.lang.IllegalArgumentException if a property is missing.
      */
+    @Override
     public void setProperties(Properties properties) {
         hasProperty(properties,"mcastPort");
         hasProperty(properties,"mcastAddress");
@@ -134,6 +135,7 @@ public class McastService implements MembershipService,MembershipListener,Messag
     /**
      * Return the properties, see setProperties
      */
+    @Override
     public Properties getProperties() {
         return properties;
     }
@@ -148,6 +150,7 @@ public class McastService implements MembershipService,MembershipListener,Messag
     /**
      * Return the local member
      */
+    @Override
     public Member getLocalMember(boolean alive) {
         if ( alive && localMember != null && impl != null) localMember.setMemberAliveTime(System.currentTimeMillis()-impl.getServiceStartTime());
         return localMember;
@@ -156,6 +159,7 @@ public class McastService implements MembershipService,MembershipListener,Messag
     /**
      * Sets the local member properties for broadcasting
      */
+    @Override
     public void setLocalMemberProperties(String listenHost, int listenPort, int securePort, int udpPort) {
         properties.setProperty("tcpListenHost",listenHost);
         properties.setProperty("tcpListenPort",String.valueOf(listenPort));
@@ -360,11 +364,13 @@ public class McastService implements MembershipService,MembershipListener,Messag
      * Start broadcasting and listening to membership pings
      * @throws java.lang.Exception if a IO error occurs
      */
+    @Override
     public void start() throws java.lang.Exception {
         start(MembershipService.MBR_RX);
         start(MembershipService.MBR_TX);
     }
 
+    @Override
     public void start(int level) throws java.lang.Exception {
         hasProperty(properties,"mcastPort");
         hasProperty(properties,"mcastAddress");
@@ -447,6 +453,7 @@ public class McastService implements MembershipService,MembershipListener,Messag
     /**
      * Stop broadcasting and listening to membership pings
      */
+    @Override
     public void stop(int svc) {
         try  {
             if ( impl != null && impl.stop(svc) ) impl = null;
@@ -459,6 +466,7 @@ public class McastService implements MembershipService,MembershipListener,Messag
     /**
      * Return all the members by name
      */
+    @Override
     public String[] getMembersByName() {
         Member[] currentMembers = getMembers();
         String [] membernames ;
@@ -475,6 +483,7 @@ public class McastService implements MembershipService,MembershipListener,Messag
     /**
      * Return the member by name
      */
+    @Override
     public Member findMemberByName(String name) {
         Member[] currentMembers = getMembers();
         for (int i = 0; i < currentMembers.length; i++) {
@@ -487,11 +496,13 @@ public class McastService implements MembershipService,MembershipListener,Messag
     /**
      * has members?
      */
+    @Override
     public boolean hasMembers() {
        if ( impl == null || impl.membership == null ) return false;
        return impl.membership.hasMembers();
     }
 
+    @Override
     public Member getMember(Member mbr) {
         if ( impl == null || impl.membership == null ) return null;
         return impl.membership.getMember(mbr);
@@ -501,6 +512,7 @@ public class McastService implements MembershipService,MembershipListener,Messag
      * Return all the members
      */
     protected static final Member[]EMPTY_MEMBERS = new Member[0];
+    @Override
     public Member[] getMembers() {
         if ( impl == null || impl.membership == null ) return EMPTY_MEMBERS;
         return impl.membership.getMembers();
@@ -510,6 +522,7 @@ public class McastService implements MembershipService,MembershipListener,Messag
      * so calling this method twice will result in only the second listener being active.
      * @param listener The listener
      */
+    @Override
     public void setMembershipListener(MembershipListener listener) {
         this.listener = listener;
     }
@@ -524,10 +537,12 @@ public class McastService implements MembershipService,MembershipListener,Messag
     /**
      * Remove the membership listener
      */
+    @Override
     public void removeMembershipListener(){
         listener = null;
     }
 
+    @Override
     public void memberAdded(Member member) {
         if ( listener!=null ) listener.memberAdded(member);
     }
@@ -536,18 +551,22 @@ public class McastService implements MembershipService,MembershipListener,Messag
      * Callback from the impl when a new member has been received
      * @param member The member
      */
+    @Override
     public void memberDisappeared(Member member)
     {
         if ( listener!=null ) listener.memberDisappeared(member);
     }
     
+    @Override
     public void messageReceived(ChannelMessage msg) {
         if (msglistener!=null && msglistener.accept(msg)) msglistener.messageReceived(msg); 
     }
     
+    @Override
     public boolean accept(ChannelMessage msg) {
         return true;
     }
+    @Override
     public void broadcast(ChannelMessage message) throws ChannelException {
         if (impl==null || (impl.startLevel & Channel.MBR_TX_SEQ)!=Channel.MBR_TX_SEQ )
             throw new ChannelException("Multicast send is not started or enabled.");
@@ -626,6 +645,7 @@ public class McastService implements MembershipService,MembershipListener,Messag
         properties.setProperty("mcastTTL", String.valueOf(mcastTTL));
     }
 
+    @Override
     public void setPayload(byte[] payload) {
         this.payload = payload;
         if ( localMember != null ) {
@@ -639,6 +659,7 @@ public class McastService implements MembershipService,MembershipListener,Messag
         }
     }
 
+    @Override
     public void setDomain(byte[] domain) {
         this.domain = domain;
         if ( localMember != null ) {
