@@ -290,9 +290,13 @@ public class DOMWriter {
 
    /** Normalizes the given string. */
    protected String normalize(String s) {
+      if (s == null) {
+         return "";
+      }
+
       StringBuilder str = new StringBuilder();
 
-      int len = (s != null) ? s.length() : 0;
+      int len = s.length();
       for ( int i = 0; i < len; i++ ) {
          char ch = s.charAt(i);
          switch ( ch ) {
@@ -322,6 +326,7 @@ public class DOMWriter {
                   }
                   // else, default append char
                }
+            //$FALL-THROUGH$
             default: {
                   str.append(ch);
                }
