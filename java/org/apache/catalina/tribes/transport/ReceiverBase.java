@@ -89,6 +89,7 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, R
     public ReceiverBase() {
     }
 
+    @Override
     public void start() throws IOException {
         if ( executor == null ) {
             //executor = new ThreadPoolExecutor(minThreads,maxThreads,60,TimeUnit.SECONDS,new LinkedBlockingQueue<Runnable>());
@@ -97,6 +98,7 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, R
         }
     }
 
+    @Override
     public void stop() {
         if ( executor != null ) executor.shutdownNow();//ignore left overs
         executor = null;
@@ -108,6 +110,7 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, R
      * @return MessageListener
      * TODO Implement this org.apache.catalina.tribes.ChannelReceiver method
      */
+    @Override
     public MessageListener getMessageListener() {
         return listener;
     }
@@ -117,6 +120,7 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, R
      * @return The port
      * TODO Implement this org.apache.catalina.tribes.ChannelReceiver method
      */
+    @Override
     public int getPort() {
         return port;
     }
@@ -144,6 +148,7 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, R
      * @param listener MessageListener
      * TODO Implement this org.apache.catalina.tribes.ChannelReceiver method
      */
+    @Override
     public void setMessageListener(MessageListener listener) {
         this.listener = listener;
     }
@@ -274,6 +279,7 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, R
     }
 
 
+    @Override
     public void messageDataReceived(ChannelMessage data) {
         if ( this.listener != null ) {
             if ( listener.accept(data) ) listener.messageReceived(data);
@@ -320,6 +326,7 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, R
         return this.host;
     }
 
+    @Override
     public String getHost() {
         return getAddress();
     }
@@ -406,6 +413,7 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, R
         return useBufferPool;
     }
 
+    @Override
     public int getSecurePort() {
         return securePort;
     }
@@ -529,10 +537,12 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, R
         this.executor = executor;
     }
 
+    @Override
     public void heartbeat() {
         //empty operation
     }
 
+    @Override
     public int getUdpPort() {
         return udpPort;
     }
@@ -569,6 +579,7 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, R
             this.namePrefix = namePrefix;
         }
 
+        @Override
         public Thread newThread(Runnable r) {
             Thread t = new Thread(group, r, namePrefix + threadNumber.getAndIncrement());
             t.setDaemon(daemon);
