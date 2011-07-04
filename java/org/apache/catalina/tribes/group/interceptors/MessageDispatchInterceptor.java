@@ -167,7 +167,8 @@ public class MessageDispatchInterceptor extends ChannelInterceptorBase implement
 
         super.stop(svc);
     }
-    
+
+    @Override
     public void run() {
         while ( run ) {
             LinkObject link = removeFromQueue();

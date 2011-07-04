@@ -804,11 +804,13 @@ public class NonBlockingCoordinator extends ChannelInterceptorBase {
             this.view = ((NonBlockingCoordinator)interceptor).view;
             this.suggestedView = ((NonBlockingCoordinator)interceptor).suggestedView;
         }
-        
+
+        @Override
         public int getEventType() {
             return type;
         }
-        
+
+        @Override
         public String getEventTypeDesc() {
             switch (type) {
                 case  EVT_START: return "EVT_START:"+info;
@@ -828,6 +830,7 @@ public class NonBlockingCoordinator extends ChannelInterceptorBase {
             }
         }
         
+        @Override
         public ChannelInterceptor getInterceptor() {
             return interceptor;
         }
