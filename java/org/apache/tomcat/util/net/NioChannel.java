@@ -86,6 +86,7 @@ public class NioChannel implements ByteChannel{
      * @throws IOException If an I/O error occurs
      * TODO Implement this java.nio.channels.Channel method
      */
+    @Override
     public void close() throws IOException {
         getIOChannel().socket().close();
         getIOChannel().close();
@@ -100,6 +101,7 @@ public class NioChannel implements ByteChannel{
      * @return <tt>true</tt> if, and only if, this channel is open
      * TODO Implement this java.nio.channels.Channel method
      */
+    @Override
     public boolean isOpen() {
         return sc.isOpen();
     }
@@ -112,6 +114,7 @@ public class NioChannel implements ByteChannel{
      * @throws IOException If some other I/O error occurs
      * TODO Implement this java.nio.channels.WritableByteChannel method
      */
+    @Override
     public int write(ByteBuffer src) throws IOException {
         return sc.write(src);
     }
@@ -124,6 +127,7 @@ public class NioChannel implements ByteChannel{
      * @throws IOException If some other I/O error occurs
      * TODO Implement this java.nio.channels.ReadableByteChannel method
      */
+    @Override
     public int read(ByteBuffer dst) throws IOException {
         return sc.read(dst);
     }
