@@ -203,6 +203,7 @@ public class DomUtil {
     }
 
     public static class NullResolver implements EntityResolver {
+        @Override
         public InputSource resolveEntity (String publicId,
                                                    String systemId)
             throws SAXException, IOException
