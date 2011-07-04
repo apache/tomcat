@@ -600,7 +600,7 @@ public class HostManagerServlet
             return;
         }
 
-        // Don't start host of already started
+        // Don't start host if already started
         if (host.getState().isAvailable()) {
             writer.println(smClient.getString(
                     "hostManagerServlet.alreadyStarted", name));
@@ -626,7 +626,7 @@ public class HostManagerServlet
 
 
     /**
-     * Start the host with the specified name.
+     * Stop the host with the specified name.
      *
      * @param writer Writer to render to
      * @param name Host name
@@ -654,14 +654,14 @@ public class HostManagerServlet
             return;
         }
 
-        // Prevent starting our own host
+        // Prevent stopping our own host
         if (host == installedHost) {
             writer.println(smClient.getString(
                     "hostManagerServlet.cannotStopOwnHost", name));
             return;
         }
 
-        // Don't stop host of already stopped
+        // Don't stop host if already stopped
         if (!host.getState().isAvailable()) {
             writer.println(smClient.getString(
                     "hostManagerServlet.alreadyStopped", name));
