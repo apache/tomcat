@@ -696,11 +696,13 @@ public final class CharChunk implements Cloneable, Serializable, CharSequence {
     }
 
     // Char sequence impl
-    
+
+    @Override
     public char charAt(int index) {
         return buff[index + start];
     }
-    
+
+    @Override
     public CharSequence subSequence(int start, int end) {
         try {
             CharChunk result = (CharChunk) this.clone();
@@ -712,7 +714,8 @@ public final class CharChunk implements Cloneable, Serializable, CharSequence {
             return null;
         }
     }
-    
+
+    @Override
     public int length() {
         return end - start;
     }
