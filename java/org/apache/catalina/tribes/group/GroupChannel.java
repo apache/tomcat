@@ -126,6 +126,7 @@ public class GroupChannel extends ChannelInterceptorBase implements ManagedChann
      * <code>Channel -> A -> C -> B -> ChannelCoordinator</code><br>
      * @param interceptor ChannelInterceptorBase
      */
+    @Override
     public void addInterceptor(ChannelInterceptor interceptor) {
         if ( interceptors == null ) {
             interceptors = interceptor;
@@ -176,6 +177,7 @@ public class GroupChannel extends ChannelInterceptorBase implements ManagedChann
      * @throws ChannelException - if an error occurs processing the message
      * @see org.apache.catalina.tribes.Channel
      */
+    @Override
     public UniqueId send(Member[] destination, Serializable msg, int options) throws ChannelException {
         return send(destination,msg,options,null);
     }
@@ -192,6 +194,7 @@ public class GroupChannel extends ChannelInterceptorBase implements ManagedChann
      * @throws ChannelException - if an error occurs processing the message
      * @see org.apache.catalina.tribes.Channel
      */
+    @Override
     public UniqueId send(Member[] destination, Serializable msg, int options, ErrorHandler handler) throws ChannelException {
         if ( msg == null ) throw new ChannelException("Cant send a NULL message");
         XByteBuffer buffer = null;
@@ -448,6 +451,7 @@ public class GroupChannel extends ChannelInterceptorBase implements ManagedChann
      * Returns the channel receiver component
      * @return ChannelReceiver
      */
+    @Override
     public ChannelReceiver getChannelReceiver() {
         return coordinator.getClusterReceiver();
     }
@@ -456,6 +460,7 @@ public class GroupChannel extends ChannelInterceptorBase implements ManagedChann
      * Returns the channel sender component
      * @return ChannelSender
      */
+    @Override
     public ChannelSender getChannelSender() {
         return coordinator.getClusterSender();
     }
@@ -464,6 +469,7 @@ public class GroupChannel extends ChannelInterceptorBase implements ManagedChann
      * Returns the membership service component
      * @return MembershipService
      */
+    @Override
     public MembershipService getMembershipService() {
         return coordinator.getMembershipService();
     }
@@ -472,6 +478,7 @@ public class GroupChannel extends ChannelInterceptorBase implements ManagedChann
      * Sets the channel receiver component
      * @param clusterReceiver ChannelReceiver
      */
+    @Override
     public void setChannelReceiver(ChannelReceiver clusterReceiver) {
         coordinator.setClusterReceiver(clusterReceiver);
     }
@@ -480,6 +487,7 @@ public class GroupChannel extends ChannelInterceptorBase implements ManagedChann
      * Sets the channel sender component
      * @param clusterSender ChannelSender
      */
+    @Override
     public void setChannelSender(ChannelSender clusterSender) {
         coordinator.setClusterSender(clusterSender);
     }
@@ -488,6 +496,7 @@ public class GroupChannel extends ChannelInterceptorBase implements ManagedChann
      * Sets the membership component
      * @param membershipService MembershipService
      */
+    @Override
     public void setMembershipService(MembershipService membershipService) {
         coordinator.setMembershipService(membershipService);
     }
@@ -497,6 +506,7 @@ public class GroupChannel extends ChannelInterceptorBase implements ManagedChann
      * Membership listeners are uniquely identified using the equals(Object) method
      * @param membershipListener MembershipListener
      */
+    @Override
     public void addMembershipListener(MembershipListener membershipListener) {
         if (!this.membershipListeners.contains(membershipListener) )
             this.membershipListeners.add(membershipListener);
@@ -508,6 +518,7 @@ public class GroupChannel extends ChannelInterceptorBase implements ManagedChann
      * @param membershipListener MembershipListener
      */
 
+    @Override
     public void removeMembershipListener(MembershipListener membershipListener) {
         membershipListeners.remove(membershipListener);
     }
@@ -517,6 +528,7 @@ public class GroupChannel extends ChannelInterceptorBase implements ManagedChann
      * Channel listeners are uniquely identified using the equals(Object) method
      * @param channelListener ChannelListener
      */
+    @Override
     public void addChannelListener(ChannelListener channelListener) {
         if (!this.channelListeners.contains(channelListener) ) {
             this.channelListeners.add(channelListener);
@@ -531,6 +543,7 @@ public class GroupChannel extends ChannelInterceptorBase implements ManagedChann
      * Channel listeners are uniquely identified using the equals(Object) method
      * @param channelListener ChannelListener
      */
+    @Override
     public void removeChannelListener(ChannelListener channelListener) {
         channelListeners.remove(channelListener);
     }
@@ -539,6 +552,7 @@ public class GroupChannel extends ChannelInterceptorBase implements ManagedChann
      * Returns an iterator of all the interceptors in this stack
      * @return Iterator
      */
+    @Override
     public Iterator<ChannelInterceptor> getInterceptors() {
         return new InterceptorIterator(this.getNext(),this.coordinator);
     }
@@ -569,6 +583,7 @@ public class GroupChannel extends ChannelInterceptorBase implements ManagedChann
      * thread to invoke <code>Channel.heartbeat()</code> every <code>getHeartbeatSleeptime</code> milliseconds
      * @param heartbeat boolean
      */
+    @Override
     public void setHeartbeat(boolean heartbeat) {
         this.heartbeat = heartbeat;
     }
@@ -614,10 +629,12 @@ public class GroupChannel extends ChannelInterceptorBase implements ManagedChann
             this.start = start;
         }
 
+        @Override
         public boolean hasNext() {
             return start!=null && start != end;
         }
 
+        @Override
         public ChannelInterceptor next() {
             ChannelInterceptor result = null;
             if ( hasNext() ) {
@@ -627,6 +644,7 @@ public class GroupChannel extends ChannelInterceptorBase implements ManagedChann
             return result;
         }
 
+        @Override
         public void remove() {
             //empty operation
         }
