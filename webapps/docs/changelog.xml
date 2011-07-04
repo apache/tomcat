@@ -61,6 +61,10 @@
         CrawlerSessionManagerValve was used without setting crawlerUserAgents.
         (markt)
       </fix>
+      <fix>
+        <bug>51466</bug>: Correct comment typos in HostManagerServlet. Patch
+        provided by Felix Schumacher. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
