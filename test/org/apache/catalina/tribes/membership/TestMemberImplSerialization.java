@@ -107,10 +107,4 @@ public class TestMemberImplSerialization extends TestCase {
         result = result && impl1.getPort() == impl2.getPort();
         return result;
     }
-
-    @Override
-    protected void tearDown() throws Exception {
-        super.tearDown();
-    }
-
 }
