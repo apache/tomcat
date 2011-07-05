@@ -20,7 +20,6 @@ package org.apache.catalina.tribes.group.interceptors;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
@@ -33,10 +32,7 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
 
-
 /**
- *
- *
  * @author Filip Hanik
  * @version 1.0
  */
@@ -95,14 +91,4 @@ public class GzipInterceptor extends ChannelInterceptorBase {
         System.arraycopy(tmp,0,result,0,length);
         return result;
     }
-    
-    public static void main(String[] arg) throws Exception {
-        byte[] data = new byte[1024];
-        Arrays.fill(data,(byte)1);
-        byte[] compress = compress(data);
-        decompress(compress);
-        System.out.println("Debug test");
-        
-    }
-    
 }
