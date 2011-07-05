@@ -1093,7 +1093,7 @@
             <!-- Exclude helper classes -->
             <exclude name="**/Tester*.java" />
             <!-- Exclude the tests known to fail -->
-            <exclude name="org/apache/catalina/tribes/**" />
+            <exclude name="org/apache/catalina/tribes/test/**" />
           </fileset>
         </batchtest>
       </junit>
