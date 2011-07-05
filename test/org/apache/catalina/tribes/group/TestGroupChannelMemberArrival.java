@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.catalina.tribes.test.membership;
+package org.apache.catalina.tribes.group;
 
 import java.util.ArrayList;
 
@@ -24,11 +24,8 @@ import org.apache.catalina.tribes.Channel;
 import org.apache.catalina.tribes.ManagedChannel;
 import org.apache.catalina.tribes.Member;
 import org.apache.catalina.tribes.MembershipListener;
-import org.apache.catalina.tribes.group.GroupChannel;
-import org.apache.catalina.tribes.group.interceptors.DomainFilterInterceptor;
-import org.apache.catalina.tribes.util.UUIDGenerator;
 
-public class TestDomainFilter
+public class TestGroupChannelMemberArrival
     extends TestCase {
     private static int count = 10;
     private ManagedChannel[] channels = new ManagedChannel[count];
@@ -42,9 +39,7 @@ public class TestDomainFilter
             channels[i].getMembershipService().setPayload( ("Channel-" + (i + 1)).getBytes("ASCII"));
             listeners[i] = new TestMbrListener( ("Listener-" + (i + 1)));
             channels[i].addMembershipListener(listeners[i]);
-            DomainFilterInterceptor filter = new DomainFilterInterceptor();
-            filter.setDomain(UUIDGenerator.randomUUID(false));
-            channels[i].addInterceptor(filter);
+
         }
     }
 
@@ -74,8 +69,9 @@ public class TestDomainFilter
         }
         for (int i=0; i<threads.length; i++ ) threads[i].start();
         for (int i=0; i<threads.length; i++ ) threads[i].join();
+        Thread.sleep(2000);
         System.out.println("All channels started.");
-        for (int i=listeners.length-1; i>=0; i-- ) assertEquals("Checking member arrival length",0,listeners[i].members.size());
+        for (int i=listeners.length-1; i>=0; i-- ) assertEquals("Checking member arrival length",channels.length-1,listeners[i].members.size());
     }
 
     @Override

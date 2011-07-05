@@ -14,13 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.catalina.tribes.test.membership;
+package org.apache.catalina.tribes.membership;
 
 import java.util.Arrays;
 
 import junit.framework.TestCase;
-
-import org.apache.catalina.tribes.membership.MemberImpl;
 
 /**
  * <p>Title: </p>
@@ -32,7 +30,7 @@ import org.apache.catalina.tribes.membership.MemberImpl;
  * @author not attributable
  * @version 1.0
  */
-public class TestMemberSerialization extends TestCase {
+public class TestMemberImplSerialization extends TestCase {
     MemberImpl m1, m2, p1,p2;
     byte[] payload = null;
     int udpPort = 3445;
