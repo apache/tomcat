@@ -82,11 +82,12 @@ public class GzipInterceptor extends ChannelInterceptorBase {
      * @throws IOException
      */
     public static byte[] decompress(byte[] data) throws IOException {
-        ByteArrayOutputStream bout = new ByteArrayOutputStream();
+        ByteArrayOutputStream bout =
+            new ByteArrayOutputStream(DEFAULT_BUFFER_SIZE);
         ByteArrayInputStream bin = new ByteArrayInputStream(data);
         GZIPInputStream gin = new GZIPInputStream(bin);
         byte[] tmp = new byte[DEFAULT_BUFFER_SIZE];
-        int length = 0;
+        int length = gin.read(tmp);
         while (length > -1) {
             bout.write(tmp, 0, length);
             length = gin.read(tmp);
