@@ -88,6 +88,15 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Tribes">
+    <changelog>
+      <update>
+        Re-factor tests to align packages for tests with the classes under test.
+        Start to convert non-JUnit tests to JUnit. Remove unnecessary code.
+        (markt) 
+      </update>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <fix>
