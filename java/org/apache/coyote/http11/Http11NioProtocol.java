@@ -210,7 +210,7 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol {
         
         /**
          * Use this only if the processor is not available, otherwise use
-         * {@link #release(SocketWrapper<NioChannel>, Http11NioProcessor)}.
+         * {@link #release(SocketWrapper, Http11NioProcessor)}.
          */
         @Override
         public void release(SocketWrapper<NioChannel> socket) {
