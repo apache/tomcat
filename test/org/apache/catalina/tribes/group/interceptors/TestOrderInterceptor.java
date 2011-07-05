@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.catalina.tribes.test.interceptors;
+package org.apache.catalina.tribes.group.interceptors;
 
 import java.io.Serializable;
 import java.util.Queue;
@@ -33,7 +33,6 @@ import org.apache.catalina.tribes.Member;
 import org.apache.catalina.tribes.group.ChannelInterceptorBase;
 import org.apache.catalina.tribes.group.GroupChannel;
 import org.apache.catalina.tribes.group.InterceptorPayload;
-import org.apache.catalina.tribes.group.interceptors.OrderInterceptor;
 
 public class TestOrderInterceptor extends TestCase {
 
