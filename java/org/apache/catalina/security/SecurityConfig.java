@@ -39,6 +39,8 @@ public final class SecurityConfig{
                                                 + ",org.apache.coyote."
                                                 + ",org.apache.tomcat.";
     
+    // FIX ME package "javax." was removed to prevent HotSpot
+    // fatal internal errors
     private static final String PACKAGE_DEFINITION= "java.,sun."
                                                 + ",org.apache.catalina." 
                                                 + ",org.apache.coyote."
@@ -117,13 +119,14 @@ public final class SecurityConfig{
         if (System.getSecurityManager() != null){
             String definition = Security.getProperty(properties);
             if( definition != null && definition.length() > 0 ){
-                definition += ",";
+                if (packageList.length() > 0) {
+                    definition = definition + ',' + packageList;
+                }
+            } else {
+                definition = packageList;
             }
 
-            Security.setProperty(properties,
-                // FIX ME package "javax." was removed to prevent HotSpot
-                // fatal internal errors
-                definition + packageList);      
+            Security.setProperty(properties, definition);
         }
     }
     

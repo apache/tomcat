@@ -70,6 +70,10 @@
         listeners and filters are stopped in a separate thread rather than the
         current thread. Patch provided by Felix Schumacher. (markt)  
       </fix>
+      <fix>
+        <bug>51473</bug>: Fix concatenation of values in
+        <code>SecurityConfig.setSecurityProperty()</code>. (kkolinko)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
@@ -89,7 +93,7 @@
     </changelog>
   </subsection>
 </section>
-<section name="Tomcat 7.0.17 (markt)" rtext="released TBD">
+<section name="Tomcat 7.0.17 (markt)" rtext="not released">
   <subsection name="Catalina">
     <changelog>
       <add>
