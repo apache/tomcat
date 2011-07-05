@@ -67,11 +67,7 @@ public class TestGroupChannelMemberArrival
             };
             threads[i] = t;
         }
-        for (int i=0; i<threads.length; i++ ) {
-            threads[i].start();
-            // Delay prevents binding errors on linux for BIO & APR
-            Thread.sleep(10);
-        }
+        for (int i=0; i<threads.length; i++ ) threads[i].start();
         for (int i=0; i<threads.length; i++ ) threads[i].join();
         Thread.sleep(2000);
         System.out.println("All channels started.");
