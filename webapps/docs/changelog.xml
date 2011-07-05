@@ -88,14 +88,6 @@
       </fix>
     </changelog>
   </subsection>
-  <subsection name="Jasper">
-    <changelog>
-      <fix>
-        <bug>51472</bug>: Correctly test modifiers when resolving bean methods
-        with the BeanELResolver. Patch provided by Friedhelm Kuehn. (markt)
-      </fix>
-    </changelog>
-  </subsection>
   <subsection name="Other">
     <changelog>
       <fix>
