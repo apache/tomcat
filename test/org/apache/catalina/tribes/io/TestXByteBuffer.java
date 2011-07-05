@@ -21,7 +21,8 @@ import junit.framework.TestCase;
 public class TestXByteBuffer extends TestCase {
 
     public void testEmptyArray() throws Exception {
-        // TODO
+        Object obj = XByteBuffer.deserialize(new byte[0]);
+        assertNull(obj);
     }
 
     public void testSerializationString() throws Exception {
