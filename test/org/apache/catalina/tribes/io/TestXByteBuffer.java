@@ -31,10 +31,4 @@ public class TestXByteBuffer extends TestCase {
         assertTrue(obj instanceof String);
         assertEquals(test, obj);
     }
-
-    public static void main(String[] args) throws Exception {
-        //XByteBuffer.deserialize(new byte[0]);
-        XByteBuffer.deserialize(new byte[] {-84, -19, 0, 5, 115, 114, 0, 17, 106});
-    }
-
 }
