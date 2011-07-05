@@ -19,20 +19,19 @@ package org.apache.catalina.tribes.io;
 import junit.framework.TestCase;
 
 public class TestXByteBuffer extends TestCase {
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
-    }
-    
+
     public void testEmptyArray() throws Exception {
         // TODO
     }
 
-    @Override
-    protected void tearDown() throws Exception {
-        super.tearDown();
+    public void testSerializationString() throws Exception {
+        String test = "This is as test.";
+        byte[] msg = XByteBuffer.serialize(test);
+        Object obj = XByteBuffer.deserialize(msg);
+        assertTrue(obj instanceof String);
+        assertEquals(test, obj);
     }
-    
+
     public static void main(String[] args) throws Exception {
         //XByteBuffer.deserialize(new byte[0]);
         XByteBuffer.deserialize(new byte[] {-84, -19, 0, 5, 115, 114, 0, 17, 106});
