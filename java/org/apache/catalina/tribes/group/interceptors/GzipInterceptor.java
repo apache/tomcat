@@ -77,18 +77,20 @@ public class GzipInterceptor extends ChannelInterceptorBase {
     }
     
     /**
-     * TODO Fix to create an automatically growing buffer.
-     * @param data byte[]
-     * @return byte[]
+     * @param data  Data to decompress
+     * @return      Decompressed data
      * @throws IOException
      */
     public static byte[] decompress(byte[] data) throws IOException {
+        ByteArrayOutputStream bout = new ByteArrayOutputStream();
         ByteArrayInputStream bin = new ByteArrayInputStream(data);
         GZIPInputStream gin = new GZIPInputStream(bin);
         byte[] tmp = new byte[DEFAULT_BUFFER_SIZE];
-        int length = gin.read(tmp);
-        byte[] result = new byte[length];
-        System.arraycopy(tmp,0,result,0,length);
-        return result;
+        int length = 0;
+        while (length > -1) {
+            bout.write(tmp, 0, length);
+            length = gin.read(tmp);
+        }
+        return bout.toByteArray();
     }
 }
