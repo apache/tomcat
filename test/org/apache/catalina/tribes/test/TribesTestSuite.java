@@ -20,20 +20,20 @@ import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-import org.apache.catalina.tribes.test.channel.TestChannelOptionFlag;
-import org.apache.catalina.tribes.test.channel.TestChannelStartStop;
+import org.apache.catalina.tribes.group.TestGroupChannelMemberArrival;
+import org.apache.catalina.tribes.group.TestGroupChannelOptionFlag;
+import org.apache.catalina.tribes.group.TestGroupChannelSenderConnections;
+import org.apache.catalina.tribes.group.TestGroupChannelStartStop;
+import org.apache.catalina.tribes.group.interceptors.TestDomainFilterInterceptor;
+import org.apache.catalina.tribes.group.interceptors.TestNonBlockingCoordinator;
+import org.apache.catalina.tribes.group.interceptors.TestOrderInterceptor;
+import org.apache.catalina.tribes.group.interceptors.TestTcpFailureDetector;
+import org.apache.catalina.tribes.io.TestXByteBuffer;
+import org.apache.catalina.tribes.membership.TestMemberImplSerialization;
 import org.apache.catalina.tribes.test.channel.TestDataIntegrity;
 import org.apache.catalina.tribes.test.channel.TestMulticastPackages;
 import org.apache.catalina.tribes.test.channel.TestRemoteProcessException;
 import org.apache.catalina.tribes.test.channel.TestUdpPackages;
-import org.apache.catalina.tribes.test.interceptors.TestNonBlockingCoordinator;
-import org.apache.catalina.tribes.test.interceptors.TestOrderInterceptor;
-import org.apache.catalina.tribes.test.io.TestSenderConnections;
-import org.apache.catalina.tribes.test.io.TestSerialization;
-import org.apache.catalina.tribes.test.membership.TestDomainFilter;
-import org.apache.catalina.tribes.test.membership.TestMemberArrival;
-import org.apache.catalina.tribes.test.membership.TestMemberSerialization;
-import org.apache.catalina.tribes.test.membership.TestTcpFailureDetector;
 
 public class TribesTestSuite
     extends TestCase {
@@ -45,8 +45,8 @@ public class TribesTestSuite
     public static Test suite() {
         TestSuite suite = new TestSuite();
         // o.a.catalina.tribes.test.channel
-        suite.addTestSuite(TestChannelStartStop.class);
-        suite.addTestSuite(TestChannelOptionFlag.class);
+        suite.addTestSuite(TestGroupChannelStartStop.class);
+        suite.addTestSuite(TestGroupChannelOptionFlag.class);
         suite.addTestSuite(TestDataIntegrity.class);
         suite.addTestSuite(TestMulticastPackages.class);
         suite.addTestSuite(TestRemoteProcessException.class);
@@ -55,12 +55,12 @@ public class TribesTestSuite
         suite.addTestSuite(TestNonBlockingCoordinator.class);
         suite.addTestSuite(TestOrderInterceptor.class);
         // o.a.catalina.tribes.test.io
-        suite.addTestSuite(TestSenderConnections.class);
-        suite.addTestSuite(TestSerialization.class);
+        suite.addTestSuite(TestGroupChannelSenderConnections.class);
+        suite.addTestSuite(TestXByteBuffer.class);
         // o.a.catalina.tribes.test.membership
-        suite.addTestSuite(TestMemberSerialization.class);
-        suite.addTestSuite(TestDomainFilter.class);
-        suite.addTestSuite(TestMemberArrival.class);
+        suite.addTestSuite(TestMemberImplSerialization.class);
+        suite.addTestSuite(TestDomainFilterInterceptor.class);
+        suite.addTestSuite(TestGroupChannelMemberArrival.class);
         suite.addTestSuite(TestTcpFailureDetector.class);
         return suite;
     }
