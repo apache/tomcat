@@ -22,9 +22,37 @@ import junit.framework.TestCase;
 
 public class TestGzipInterceptor extends TestCase {
 
-    public void testBasic() throws Exception {
-        byte[] data = new byte[1024];
-        Arrays.fill(data,(byte)1);
+    public void testSmallerThanBufferSize() throws Exception {
+        doCompressDecompress(GzipInterceptor.DEFAULT_BUFFER_SIZE / 2);
+    }
+
+    public void testJustSmallerThanBufferSize() throws Exception {
+        doCompressDecompress(GzipInterceptor.DEFAULT_BUFFER_SIZE -1);
+    }
+
+    public void testExactBufferSize() throws Exception {
+        doCompressDecompress(GzipInterceptor.DEFAULT_BUFFER_SIZE);
+    }
+
+    public void testJustLargerThanBufferSize() throws Exception {
+        doCompressDecompress(GzipInterceptor.DEFAULT_BUFFER_SIZE + 1);
+    }
+
+    public void testFactor2BufferSize() throws Exception {
+        doCompressDecompress(GzipInterceptor.DEFAULT_BUFFER_SIZE * 2);
+    }
+
+    public void testFactor4BufferSize() throws Exception {
+        doCompressDecompress(GzipInterceptor.DEFAULT_BUFFER_SIZE * 4);
+    }
+
+    public void testMuchLargerThanBufferSize() throws Exception {
+        doCompressDecompress(GzipInterceptor.DEFAULT_BUFFER_SIZE * 10 + 1000);
+    }
+
+    private void doCompressDecompress(int size) throws Exception {
+        byte[] data = new byte[size];
+        Arrays.fill(data, (byte)1);
         byte[] compress = GzipInterceptor.compress(data);
         byte[] result = GzipInterceptor.decompress(compress);
         assertTrue(Arrays.equals(data, result));
