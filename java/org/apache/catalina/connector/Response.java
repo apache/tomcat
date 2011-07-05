@@ -1198,8 +1198,10 @@ public class Response
         String absolute = toAbsolute(url);
         if (isEncodeable(absolute)) {
             // W3c spec clearly said 
-            if (url.equalsIgnoreCase("")){
+            if (url.equalsIgnoreCase("")) {
                 url = absolute;
+            } else if (url.equals(absolute) && !hasPath(url)) {
+                url += '/';
             }
             return (toEncoded(url, request.getSessionInternal().getIdInternal()));
         } else {
@@ -1646,6 +1648,21 @@ public class Response
 
     }
 
+
+    /**
+     * Determine if an absolute URL has a path component
+     */
+    private boolean hasPath(String uri) {
+        int pos = uri.indexOf("://");
+        if (pos < 0) {
+            return false;
+        }
+        pos = uri.indexOf('/', pos + 3);
+        if (pos < 0) {
+            return false;
+        }
+        return true;
+    }
 
     /**
      * Determine if a URI string has a <code>scheme</code> component.

@@ -74,6 +74,10 @@
         <bug>51473</bug>: Fix concatenation of values in
         <code>SecurityConfig.setSecurityProperty()</code>. (kkolinko)
       </fix>
+      <fix>
+        Fix response.encodeURL() for the special case of an absolute URL
+        with no path segment (http://name). (rjung)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
