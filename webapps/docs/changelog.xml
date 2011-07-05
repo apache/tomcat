@@ -90,6 +90,9 @@
         More code clean-up to remove unused code and reduce IDE warnings.
         (markt/kkolinko)
       </fix>
+      <update>
+        Further improvements to the Windows installer. (markt/kkolinko)
+      </update>
     </changelog>
   </subsection>
 </section>
