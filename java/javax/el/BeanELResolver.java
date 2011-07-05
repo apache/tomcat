@@ -312,7 +312,7 @@ public class BeanELResolver extends ELResolver {
     }
 
     private static final Method getMethod(Class<?> type, Method m) {
-        if (m == null || Modifier.isPublic(m.getModifiers())) {
+        if (m == null || Modifier.isPublic(type.getModifiers())) {
             return m;
         }
         Class<?>[] inf = type.getInterfaces();
