@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.catalina.tribes.test.interceptors;
+package org.apache.catalina.tribes.group.interceptors;
 
 import junit.framework.TestCase;
 import junit.framework.TestResult;
@@ -23,8 +23,6 @@ import junit.framework.TestSuite;
 import org.apache.catalina.tribes.Channel;
 import org.apache.catalina.tribes.Member;
 import org.apache.catalina.tribes.group.GroupChannel;
-import org.apache.catalina.tribes.group.interceptors.NonBlockingCoordinator;
-import org.apache.catalina.tribes.group.interceptors.TcpFailureDetector;
 
 public class TestNonBlockingCoordinator extends TestCase {
 

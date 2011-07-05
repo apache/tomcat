@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.catalina.tribes.test.membership;
+package org.apache.catalina.tribes.group.interceptors;
 
 import java.util.ArrayList;
 
@@ -27,7 +27,6 @@ import org.apache.catalina.tribes.ManagedChannel;
 import org.apache.catalina.tribes.Member;
 import org.apache.catalina.tribes.MembershipListener;
 import org.apache.catalina.tribes.group.GroupChannel;
-import org.apache.catalina.tribes.group.interceptors.TcpFailureDetector;
 
 /**
  * <p>Title: </p> 

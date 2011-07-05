@@ -14,19 +14,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.catalina.tribes.test.channel;
+package org.apache.catalina.tribes.group;
 
 import junit.framework.TestCase;
 
 import org.apache.catalina.tribes.Channel;
-import org.apache.catalina.tribes.group.GroupChannel;
 import org.apache.catalina.tribes.transport.ReceiverBase;
 
 /**
  * @author Filip Hanik
  * @version 1.0
  */
-public class TestChannelStartStop extends TestCase {
+public class TestGroupChannelStartStop extends TestCase {
     GroupChannel channel = null;
     int udpPort = 45543;
     @Override

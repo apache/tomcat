@@ -14,15 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.catalina.tribes.test.channel;
+package org.apache.catalina.tribes.group;
 
 import junit.framework.TestCase;
 
 import org.apache.catalina.tribes.Channel;
 import org.apache.catalina.tribes.ChannelException;
 import org.apache.catalina.tribes.ChannelInterceptor;
-import org.apache.catalina.tribes.group.ChannelInterceptorBase;
-import org.apache.catalina.tribes.group.GroupChannel;
 
 /**
  * <p>Title: </p> 
@@ -34,7 +32,7 @@ import org.apache.catalina.tribes.group.GroupChannel;
  * @author not attributable
  * @version 1.0
  */
-public class TestChannelOptionFlag extends TestCase {
+public class TestGroupChannelOptionFlag extends TestCase {
     GroupChannel channel = null;
     @Override
     protected void setUp() throws Exception {
