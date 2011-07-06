@@ -97,7 +97,7 @@
       </update>
       <fix>
         Add synchronization to receiver socket binding to prevent test failures
-        on Linuz. (markt) 
+        on Linux. (markt) 
       </fix>
     </changelog>
   </subsection>
