@@ -113,8 +113,6 @@ public class TestLimitLatch extends TestCase {
                 latch.countUpOrAwait();
                 Thread.sleep(holdTime);
                 latch.countDown();
-            } catch (NullPointerException npe) {
-                npe.printStackTrace();
             } catch (InterruptedException x) {
                 x.printStackTrace();
             }
