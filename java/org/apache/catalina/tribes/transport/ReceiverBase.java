@@ -209,38 +209,36 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, R
     }
 
     /**
-     * recursive bind to find the next available port
-     * @param socket ServerSocket
-     * @param portstart int
-     * @param retries int
-     * @return int
+     * Attempts to bind using the provided port and if that fails attempts to
+     * bind to each of the ports from portstart to (portstart + retries -1)
+     * until either there are no more ports or the bind is successful. The
+     * address to bind to is obtained via a call to {link {@link #getBind()}.
+     * @param socket        The socket to bind
+     * @param portstart     Starting port for bind attempts
+     * @param retries       Number of times to attempt to bind (port incremented
+     *                      between attempts)
      * @throws IOException
      */
-    protected int bind(ServerSocket socket, int portstart, int retries) throws IOException {
+    protected void bind(ServerSocket socket, int portstart, int retries) throws IOException {
         InetSocketAddress addr = null;
-        while ( retries > 0 ) {
+        int port = portstart;
+        while (retries > 0) {
             try {
-                addr = new InetSocketAddress(getBind(), portstart);
+                addr = new InetSocketAddress(getBind(), port);
                 socket.bind(addr);
-                setPort(portstart);
+                setPort(port);
                 log.info("Receiver Server Socket bound to:"+addr);
-                return 0;
-            }catch ( IOException x) {
+                retries = 0;
+            } catch ( IOException x) {
                 retries--;
                 if ( retries <= 0 ) {
-                    log.info("Unable to bind server socket to:"+addr+" throwing error.");
+                    log.info("Unable to bind server socket to:" + addr +
+                            " throwing error.");
                     throw x;
                 }
-                portstart++;
-                try {
-                    Thread.sleep(25);
-                } catch (InterruptedException ti) {
-                    Thread.currentThread().interrupt();
-                }
-                retries = bind(socket,portstart,retries);
+                port++;
             }
         }
-        return retries;
     }
 
     /**
