@@ -95,6 +95,10 @@
         Start to convert non-JUnit tests to JUnit. Remove unnecessary code.
         (markt) 
       </update>
+      <fix>
+        Add synchronization to receiver socket binding to prevent test failures
+        on Linuz. (markt) 
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
