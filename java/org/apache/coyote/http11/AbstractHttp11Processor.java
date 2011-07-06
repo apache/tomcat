@@ -776,6 +776,9 @@ public abstract class AbstractHttp11Processor extends AbstractProcessor {
         http09 = false;
         contentDelimitation = false;
         expectation = false;
+        
+        prepareRequestInternal();
+
         if (endpoint.isSSLEnabled()) {
             request.scheme().setString("https");
         }
@@ -970,6 +973,12 @@ public abstract class AbstractHttp11Processor extends AbstractProcessor {
     }
 
 
+    /**
+     * Connector implementation specific request preparation. Ideally, this will
+     * go away in the future.
+     */
+    protected abstract void prepareRequestInternal();
+    
     /**
      * When committing the response, we have to validate the set of headers, as
      * well as setup the response filters.
