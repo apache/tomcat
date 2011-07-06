@@ -50,6 +50,8 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, R
 
     private static final Log log = LogFactory.getLog(ReceiverBase.class);
 
+    private static final Object bindLock = new Object();
+
     private MessageListener listener;
     private String host = "auto";
     private InetAddress bind;
@@ -220,23 +222,25 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, R
      * @throws IOException
      */
     protected void bind(ServerSocket socket, int portstart, int retries) throws IOException {
-        InetSocketAddress addr = null;
-        int port = portstart;
-        while (retries > 0) {
-            try {
-                addr = new InetSocketAddress(getBind(), port);
-                socket.bind(addr);
-                setPort(port);
-                log.info("Receiver Server Socket bound to:"+addr);
-                retries = 0;
-            } catch ( IOException x) {
-                retries--;
-                if ( retries <= 0 ) {
-                    log.info("Unable to bind server socket to:" + addr +
-                            " throwing error.");
-                    throw x;
+        synchronized (bindLock) {
+            InetSocketAddress addr = null;
+            int port = portstart;
+            while (retries > 0) {
+                try {
+                    addr = new InetSocketAddress(getBind(), port);
+                    socket.bind(addr);
+                    setPort(port);
+                    log.info("Receiver Server Socket bound to:"+addr);
+                    retries = 0;
+                } catch ( IOException x) {
+                    retries--;
+                    if ( retries <= 0 ) {
+                        log.info("Unable to bind server socket to:" + addr +
+                                " throwing error.");
+                        throw x;
+                    }
+                    port++;
                 }
-                port++;
             }
         }
     }
