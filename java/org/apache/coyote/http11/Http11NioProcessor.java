@@ -676,6 +676,11 @@ public class Http11NioProcessor extends AbstractHttp11Processor {
 
 
     @Override
+    protected void prepareRequestInternal() {
+        sendfileData = null;
+    }
+
+    @Override
     protected boolean prepareSendfile(OutputFilter[] outputFilters) {
         String fileName = (String) request.getAttribute(
                 "org.apache.tomcat.sendfile.filename");

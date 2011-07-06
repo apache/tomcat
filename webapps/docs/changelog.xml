@@ -86,6 +86,10 @@
         Correct regression caused by connector re-factoring that made AJP
         APR/native connector very unstable on Windows platforms. (markt)
       </fix>
+      <fix>
+        Correct regression caused by connector re-factoring that meant that
+        sendfile data was not reset between pipe-lined HTTP requests. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Tribes">

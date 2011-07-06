@@ -582,6 +582,11 @@ public class Http11Processor extends AbstractHttp11Processor {
 
 
     @Override
+    protected void prepareRequestInternal() {
+        // NOOP for BIO
+    }
+
+    @Override
     protected boolean prepareSendfile(OutputFilter[] outputFilters) {
         // Should never, ever call this code
         Exception e = new Exception();
