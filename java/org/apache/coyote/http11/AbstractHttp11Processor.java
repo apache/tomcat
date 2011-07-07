@@ -1281,6 +1281,12 @@ public abstract class AbstractHttp11Processor extends AbstractProcessor {
         getInputBuffer().recycle();
         getOutputBuffer().recycle();
         asyncStateMachine.recycle();
+        remoteAddr = null;
+        remoteHost = null;
+        localAddr = null;
+        localName = null;
+        remotePort = -1;
+        localPort = -1;
         recycleInternal();
     }
     

@@ -134,14 +134,6 @@ public class Http11Processor extends AbstractHttp11Processor {
         RequestInfo rp = request.getRequestProcessor();
         rp.setStage(org.apache.coyote.Constants.STAGE_PARSE);
 
-        // Set the remote address
-        remoteAddr = null;
-        remoteHost = null;
-        localAddr = null;
-        localName = null;
-        remotePort = -1;
-        localPort = -1;
-
         // Setting up the I/O
         this.socket = socketWrapper;
         inputBuffer.setInputStream(socket.getSocket().getInputStream());
