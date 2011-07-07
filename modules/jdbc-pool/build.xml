@@ -483,9 +483,9 @@
 
   </target>
 
-  <target name="simplebuild" depends="build">
-  </target>
-
+  <target name="simplebuild" depends="build"/>
+  <target name="clean-and-build" depends="clean,build"/>
+  
   <target name="onetest" depends="build,build-test">
     
     <echo>Testing:${test}</echo>

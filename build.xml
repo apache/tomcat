@@ -69,6 +69,8 @@
   <property name="test.classes"          value="${tomcat.output}/testclasses"/>
   <property name="test.temp"             value="${tomcat.output}/test-tmp"/>
   <property name="test.apr.loc"          value="${tomcat.build}/bin/native"/>
+  <!-- base directory for jdbc-pool --> 
+  <property name="tomcat.jdbc.dir"       value="${basedir}/modules/jdbc-pool"/>
 
   <!-- Servlet 3.0 spec requires 1.6+ -->
   <property name="compile.source" value="1.6"/>
@@ -128,7 +130,7 @@
   <property name="tomcat-embed-juli-sources.jar" value="${tomcat.embed.sources}/tomcat-embed-logging-juli-src.jar"/>
   <property name="tomcat-embed-dbcp-sources.jar" value="${tomcat.embed.sources}/tomcat-dbcp-src.jar"/>
 
-  <!-- Extras JARs & source JRAs -->
+  <!-- Extras JARs & source JARs -->
   <property name="tomcat-juli-extras.jar" value="${tomcat.extras}/tomcat-juli.jar"/>
   <property name="tomcat-juli-adapters.jar" value="${tomcat.extras}/tomcat-juli-adapters.jar"/>
   <property name="catalina-ws.jar" value="${tomcat.extras}/catalina-ws.jar"/>
@@ -141,6 +143,11 @@
   <property name="catalina-jmx-remote-src.jar" value="${tomcat.extras.sources}/catalina-jmx-remote-src.jar"/>
   <property name="tomcat-embed-log4j-src.jar" value="${tomcat.embed.sources}/tomcat-embed-logging-log4j-src.jar"/>
 
+  <!-- jdbc-pool JARs & source JARs -->
+  <property name="tomcat-jdbc.jar" value="${tomcat.jdbc.dir}/output/tomcat-jdbc.jar"/>
+  <property name="tomcat-jdbc-src.jar" value="${tomcat.jdbc.dir}/output/tomcat-jdbc-src.jar"/>
+  
+  
   <!-- Tests To Run -->
   <property name="test.name" value="**/Test*.java"/>
   <property name="test.formatter" value="-Dorg.apache.juli.formatter=java.util.logging.SimpleFormatter"/>
@@ -501,6 +508,8 @@
     </copy>
 
   </target>
+  
+  
 
   <target name="build-manifests" unless="manifests.uptodate"
           depends="build-prepare">
@@ -680,6 +689,12 @@
     <mkdir dir="${tomcat.build}/webapps/docs/funcspecs" />
 
     <!-- XSL processing -->
+    <copy tofile="webapps/docs/jdbc-pool.xml" file="${tomcat.jdbc.dir}/doc/jdbc-pool.xml" overwrite="true">
+      <!-- jdbc-pool documentation -->
+      <filterset>
+        <filter token="TOMCAT_PROJECT_DEST" value="project.xml"/>
+      </filterset>
+    </copy>
     <xslt basedir="webapps/docs"
            destdir="${tomcat.build}/webapps/docs"
          extension=".html"
@@ -691,6 +706,8 @@
       <param name="build-date" expression="${today}"/>
       <param name="year" expression="${year}"/>
     </xslt>
+    <!-- remove jdbc-pool documentation -->
+    <delete file="webapps/docs/jdbc-pool.xml"/>
     <xslt basedir="webapps/docs/appdev"
            destdir="${tomcat.build}/webapps/docs/appdev"
          extension=".html"
@@ -840,8 +857,16 @@
       failonerror="false"/>
     <copy file="${jdt.jar}" todir="${tomcat.build}/lib" />
 
-  </target>
+    <!-- build the jdbc-pool jar and source jar-->
+    <echo message="Building Tomcat JDBC pool libraries"/>
+    <ant antfile="${tomcat.jdbc.dir}/build.xml" dir="${tomcat.jdbc.dir}" inheritall="false" target="clean-and-build">
+      <property name="tomcat.juli.jar" value="${tomcat-juli.jar}"></property>
+      <property name="skip.download" value="set"/>
+    </ant>
+    <copy file="${tomcat-jdbc.jar}" todir="${tomcat.build}/lib" overwrite="true"/>
 
+  </target>
+  
   <target name="examples-sources" description="Create examples sources"
           unless="examples.sources.skip" >
     <taskdef name="txt2html"
@@ -1517,7 +1542,6 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       </classpath>
     </javadoc>
     <javadoc packagenames="org.apache.*"
-      sourcepath="${tomcat.dist}/src/java"
       destdir="${tomcat.dist}/webapps/docs/api"
       version="true"
       windowtitle="Apache Tomcat ${version} API Documentation"
@@ -1538,6 +1562,11 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       <link href="http://download.oracle.com/javase/6/docs/api/"/>
       <link href="http://commons.apache.org/io/api-release/"/>
       <link href="http://download-llnw.oracle.com/javaee/6/api/"/>
+      <sourcepath>
+        <path location="${tomcat.dist}/src/java"/>
+        <!--jdbc-pool src files for javadoc-->
+        <path location="${tomcat.dist}/src/modules/jdbc-pool/src/main/java"/>
+      </sourcepath>
     </javadoc>
   </target>
 
@@ -1605,7 +1634,18 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
         <exclude name="build.properties"/>
       </fileset>
     </copy>
-
+    <!--jdbc-pool sources --> 
+    <copy todir="${tomcat.dist}/src">
+      <fileset dir="${basedir}" defaultexcludes="true">
+        <include name="modules/jdbc-pool/LICENSE"/>
+        <include name="modules/jdbc-pool/NOTICE"/>
+        <include name="modules/jdbc-pool/src/**"/>
+        <include name="modules/jdbc-pool/build.*"/>
+        <include name="modules/jdbc-pool/doc/**"/>
+        <include name="modules/jdbc-pool/resources/**"/>
+        <include name="modules/jdbc-pool/pom.xml"/>
+      </fileset>
+    </copy>
   </target>
 
   <target name="installer" description="Create Windows installer"
@@ -2089,7 +2129,8 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
 
     <!-- Repackaged DBCP -->
     <copy file="${tomcat-dbcp-src.jar}" todir="${tomcat.src.jars}" />
-
+    <!-- jdbc-pool JAR File -->
+    <copy file="${tomcat-jdbc-src.jar}" todir="${tomcat.src.jars}" />
   </target>
 
   <!-- ========================= Cleaning Targets ========================== -->
