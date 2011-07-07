@@ -173,14 +173,6 @@ public class Http11AprProcessor extends AbstractHttp11Processor {
         RequestInfo rp = request.getRequestProcessor();
         rp.setStage(org.apache.coyote.Constants.STAGE_PARSE);
 
-        // Set the remote address
-        remoteAddr = null;
-        remoteHost = null;
-        localAddr = null;
-        localName = null;
-        remotePort = -1;
-        localPort = -1;
-
         // Setting up the socket
         this.socket = socket;
         long socketRef = socket.getSocket().longValue();
