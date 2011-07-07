@@ -215,7 +215,7 @@ public class Http11NioProcessor extends AbstractHttp11Processor {
 
         if (error) {
             return SocketState.CLOSED;
-        } else if (!comet && !isAsync()) {
+        } else if (!isAsync()) {
             return (keepAlive)?SocketState.OPEN:SocketState.CLOSED;
         } else {
             return SocketState.LONG;
