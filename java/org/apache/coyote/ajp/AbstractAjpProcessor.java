@@ -476,9 +476,6 @@ public abstract class AbstractAjpProcessor extends AbstractProcessor {
 
        rp.setStage(org.apache.coyote.Constants.STAGE_ENDED);
 
-       if (error) {
-           response.setStatus(500);
-       }
        if (isAsync()) {
            if (error) {
                request.updateCounters();
