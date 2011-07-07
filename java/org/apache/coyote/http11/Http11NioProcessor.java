@@ -193,21 +193,14 @@ public class Http11NioProcessor extends AbstractHttp11Processor {
             error = !adapter.asyncDispatch(request, response, status);
             if ( !error ) {
                 if (attach != null) {
-                    attach.setComet(comet);
-                    if (comet) {
-                        Integer comettimeout = (Integer) request.getAttribute("org.apache.tomcat.comet.timeout");
-                        if (comettimeout != null) attach.setTimeout(comettimeout.longValue());
-                    } else {
-                        if (asyncStateMachine.isAsyncDispatching()) {
-                            //reset the timeout
-                            if (keepAlive && keepAliveTimeout>0) {
-                                attach.setTimeout(keepAliveTimeout);
-                            } else {
-                                attach.setTimeout(soTimeout);
-                            }
+                    if (asyncStateMachine.isAsyncDispatching()) {
+                        //reset the timeout
+                        if (keepAlive && keepAliveTimeout>0) {
+                            attach.setTimeout(keepAliveTimeout);
+                        } else {
+                            attach.setTimeout(soTimeout);
                         }
                     }
-
                 }
             }
         } catch (InterruptedIOException e) {
