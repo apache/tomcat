@@ -30,7 +30,6 @@ import org.apache.tomcat.jni.Socket;
 import org.apache.tomcat.jni.Status;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.buf.ByteChunk;
-import org.apache.tomcat.util.http.HttpMessages;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
 import org.apache.tomcat.util.net.AprEndpoint;
 import org.apache.tomcat.util.net.SocketStatus;
@@ -74,9 +73,6 @@ public class AjpAprProcessor extends AbstractAjpProcessor {
         inputBuffer = ByteBuffer.allocateDirect(packetSize * 2);
         inputBuffer.limit(0);
         outputBuffer = ByteBuffer.allocateDirect(packetSize * 2);
-
-        // Cause loading of HttpMessages
-        HttpMessages.getMessage(200);
     }
 
 
