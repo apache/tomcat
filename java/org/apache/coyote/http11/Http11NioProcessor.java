@@ -406,12 +406,6 @@ public class Http11NioProcessor extends AbstractHttp11Processor {
         socket = null;
         cometClose = false;
         comet = false;
-        remoteAddr = null;
-        remoteHost = null;
-        localAddr = null;
-        localName = null;
-        remotePort = -1;
-        localPort = -1;
         sendfileData = null;
     }
 
