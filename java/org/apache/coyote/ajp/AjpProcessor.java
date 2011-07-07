@@ -30,7 +30,6 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.buf.ByteChunk;
-import org.apache.tomcat.util.http.HttpMessages;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
 import org.apache.tomcat.util.net.JIoEndpoint;
 import org.apache.tomcat.util.net.SocketStatus;
@@ -68,9 +67,6 @@ public class AjpProcessor extends AbstractAjpProcessor {
         super(packetSize, endpoint);
 
         response.setOutputBuffer(new SocketOutputBuffer());
-
-        // Cause loading of HttpMessages
-        HttpMessages.getMessage(200);
     }
 
 
