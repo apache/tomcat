@@ -14,7 +14,6 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package org.apache.coyote.ajp;
 
 import java.io.EOFException;
@@ -31,7 +30,6 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.buf.ByteChunk;
-import org.apache.tomcat.util.buf.HexUtils;
 import org.apache.tomcat.util.http.HttpMessages;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
 import org.apache.tomcat.util.net.NioChannel;
@@ -68,12 +66,8 @@ public class AjpNioProcessor extends AbstractAjpProcessor {
 
         pool = endpoint.getSelectorPool();
 
-        // Cause loading of HexUtils
-        HexUtils.load();
-
         // Cause loading of HttpMessages
         HttpMessages.getMessage(200);
-
     }
 
 
