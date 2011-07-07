@@ -191,16 +191,13 @@ public class Http11NioProcessor extends AbstractHttp11Processor {
         try {
             rp.setStage(org.apache.coyote.Constants.STAGE_SERVICE);
             error = !adapter.asyncDispatch(request, response, status);
-            if ( !error ) {
-                if (attach != null) {
-                    if (asyncStateMachine.isAsyncDispatching()) {
-                        //reset the timeout
-                        if (keepAlive && keepAliveTimeout>0) {
-                            attach.setTimeout(keepAliveTimeout);
-                        } else {
-                            attach.setTimeout(soTimeout);
-                        }
-                    }
+            if (!error && attach != null &&
+                    asyncStateMachine.isAsyncDispatching()) {
+                //reset the timeout
+                if (keepAlive && keepAliveTimeout>0) {
+                    attach.setTimeout(keepAliveTimeout);
+                } else {
+                    attach.setTimeout(soTimeout);
                 }
             }
         } catch (InterruptedIOException e) {
