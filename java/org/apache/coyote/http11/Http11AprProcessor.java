@@ -339,39 +339,9 @@ public class Http11AprProcessor extends AbstractHttp11Processor {
     }
 
 
-    public SocketState asyncDispatch(SocketStatus status) {
-
-        RequestInfo rp = request.getRequestProcessor();
-        try {
-            rp.setStage(org.apache.coyote.Constants.STAGE_SERVICE);
-            error = !adapter.asyncDispatch(request, response, status);
-        } catch (InterruptedIOException e) {
-            error = true;
-        } catch (Throwable t) {
-            ExceptionUtils.handleThrowable(t);
-            log.error(sm.getString("http11processor.request.process"), t);
-            error = true;
-        } finally {
-            if (error) {
-                // 500 - Internal Server Error
-                response.setStatus(500);
-                adapter.log(request, response, 0);
-            }
-        }
-
-        rp.setStage(org.apache.coyote.Constants.STAGE_ENDED);
-
-        if (error) {
-            return SocketState.CLOSED;
-        } else if (isAsync()) {
-            return SocketState.LONG;
-        } else {
-            if (!keepAlive) {
-                return SocketState.CLOSED;
-            } else {
-                return SocketState.OPEN;
-            }
-        }
+    @Override
+    protected void resetTimeouts() {
+        // NOOP for APR
     }
 
 

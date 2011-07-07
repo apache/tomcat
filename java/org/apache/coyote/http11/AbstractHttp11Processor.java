@@ -17,6 +17,7 @@
 package org.apache.coyote.http11;
 
 import java.io.IOException;
+import java.io.InterruptedIOException;
 import java.util.Locale;
 import java.util.StringTokenizer;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -25,6 +26,7 @@ import java.util.regex.Pattern;
 import org.apache.coyote.AbstractProcessor;
 import org.apache.coyote.ActionCode;
 import org.apache.coyote.AsyncContextCallback;
+import org.apache.coyote.RequestInfo;
 import org.apache.coyote.http11.filters.BufferedInputFilter;
 import org.apache.coyote.http11.filters.ChunkedInputFilter;
 import org.apache.coyote.http11.filters.ChunkedOutputFilter;
@@ -43,6 +45,8 @@ import org.apache.tomcat.util.buf.MessageBytes;
 import org.apache.tomcat.util.http.FastHttpDateFormat;
 import org.apache.tomcat.util.http.MimeHeaders;
 import org.apache.tomcat.util.net.AbstractEndpoint;
+import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
+import org.apache.tomcat.util.net.SocketStatus;
 import org.apache.tomcat.util.res.StringManager;
 
 public abstract class AbstractHttp11Processor extends AbstractProcessor {
@@ -1199,6 +1203,52 @@ public abstract class AbstractHttp11Processor extends AbstractProcessor {
         }
 
     }
+
+    
+    public SocketState asyncDispatch(SocketStatus status) {
+
+        RequestInfo rp = request.getRequestProcessor();
+        try {
+            rp.setStage(org.apache.coyote.Constants.STAGE_SERVICE);
+            error = !adapter.asyncDispatch(request, response, status);
+            resetTimeouts();
+        } catch (InterruptedIOException e) {
+            error = true;
+        } catch (Throwable t) {
+            ExceptionUtils.handleThrowable(t);
+            getLog().error(sm.getString("http11processor.request.process"), t);
+            error = true;
+        } finally {
+            if (error) {
+                // 500 - Internal Server Error
+                response.setStatus(500);
+                adapter.log(request, response, 0);
+            }
+        }
+
+        rp.setStage(org.apache.coyote.Constants.STAGE_ENDED);
+
+        if (error) {
+            return SocketState.CLOSED;
+        } else if (isAsync()) {
+            return SocketState.LONG;
+        } else {
+            if (!keepAlive) {
+                return SocketState.CLOSED;
+            } else {
+                return SocketState.OPEN;
+            }
+        }
+    }
+
+
+    /**
+     * Provides a mechanism for those connector implementations (currently only
+     * NIO) that need to reset timeouts from Async timeouts to standard HTTP
+     * timeouts once async processing completes.
+     */
+    protected abstract void resetTimeouts();
+
 
     public void endRequest() {
 
