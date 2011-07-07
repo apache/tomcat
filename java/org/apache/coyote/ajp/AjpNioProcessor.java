@@ -30,7 +30,6 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.buf.ByteChunk;
-import org.apache.tomcat.util.http.HttpMessages;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
 import org.apache.tomcat.util.net.NioChannel;
 import org.apache.tomcat.util.net.NioEndpoint;
@@ -65,9 +64,6 @@ public class AjpNioProcessor extends AbstractAjpProcessor {
         response.setOutputBuffer(new SocketOutputBuffer());
 
         pool = endpoint.getSelectorPool();
-
-        // Cause loading of HttpMessages
-        HttpMessages.getMessage(200);
     }
 
 
