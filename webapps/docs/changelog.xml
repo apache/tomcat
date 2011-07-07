@@ -53,7 +53,17 @@
   They eventually become mixed with the numbered issues. (I.e., numbered
   issues to not "pop up" wrt. others).
 -->
-<section name="Tomcat 7.0.18 (markt)">
+<section name="Tomcat 7.0.19 (markt)">
+  <subsection name="Coyote">
+    <changelog>
+      <update>
+        Various refactorings to reduce code duplication and unnecessary code in
+        the connectors. (markt)
+      </update>
+    </changelog>
+  </subsection>
+</section>
+<section name="Tomcat 7.0.18 (markt)" rtext="TBD">
   <subsection name="Catalina">
     <changelog>
       <fix>
