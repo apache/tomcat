@@ -14,8 +14,8 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package org.apache.coyote.http11;
+
 import java.io.IOException;
 import java.io.InterruptedIOException;
 import java.net.InetAddress;
@@ -29,7 +29,6 @@ import org.apache.coyote.http11.filters.BufferedInputFilter;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.ExceptionUtils;
-import org.apache.tomcat.util.buf.HexUtils;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
 import org.apache.tomcat.util.net.NioChannel;
 import org.apache.tomcat.util.net.NioEndpoint;
@@ -75,9 +74,6 @@ public class Http11NioProcessor extends AbstractHttp11Processor {
         response.setOutputBuffer(outputBuffer);
 
         initializeFilters(maxTrailerSize);
-
-        // Cause loading of HexUtils
-        HexUtils.load();
     }
 
 

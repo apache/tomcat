@@ -14,7 +14,6 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package org.apache.coyote.http11;
 
 import java.io.ByteArrayInputStream;
@@ -34,7 +33,6 @@ import org.apache.tomcat.jni.SSLSocket;
 import org.apache.tomcat.jni.Sockaddr;
 import org.apache.tomcat.jni.Socket;
 import org.apache.tomcat.util.ExceptionUtils;
-import org.apache.tomcat.util.buf.HexUtils;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
 import org.apache.tomcat.util.net.AprEndpoint;
 import org.apache.tomcat.util.net.SSLSupport;
@@ -71,9 +69,6 @@ public class Http11AprProcessor extends AbstractHttp11Processor {
         response.setOutputBuffer(outputBuffer);
 
         initializeFilters(maxTrailerSize);
-
-        // Cause loading of HexUtils
-        HexUtils.load();
     }
 
 

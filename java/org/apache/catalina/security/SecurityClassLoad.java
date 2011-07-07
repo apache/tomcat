@@ -239,6 +239,7 @@ public final class SecurityClassLoad {
     private static final void loadTomcatPackage(ClassLoader loader)
         throws Exception {
         final String basePackage = "org.apache.tomcat.";
+        loader.loadClass(basePackage + "util.buf.HexUtils");
         loader.loadClass(basePackage + "util.buf.StringCache");
         loader.loadClass(basePackage + "util.buf.StringCache$ByteEntry");
         loader.loadClass(basePackage + "util.buf.StringCache$CharEntry");
