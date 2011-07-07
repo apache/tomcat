@@ -173,58 +173,24 @@ public class Http11NioProcessor extends AbstractHttp11Processor {
         }
     }
     
-    
-    /**
-     * Process pipelined HTTP requests using the specified input and output
-     * streams.
-     */
-    public SocketState asyncDispatch(SocketStatus status) {
 
-        RequestInfo rp = request.getRequestProcessor();
+    @Override
+    protected void resetTimeouts() {
         final NioEndpoint.KeyAttachment attach = (NioEndpoint.KeyAttachment)socket.getAttachment(false);
-        try {
-            rp.setStage(org.apache.coyote.Constants.STAGE_SERVICE);
-            error = !adapter.asyncDispatch(request, response, status);
-            if (!error && attach != null &&
-                    asyncStateMachine.isAsyncDispatching()) {
-                long soTimeout = endpoint.getSoTimeout();
-                int keepAliveTimeout = endpoint.getKeepAliveTimeout();
+        if (!error && attach != null &&
+                asyncStateMachine.isAsyncDispatching()) {
+            long soTimeout = endpoint.getSoTimeout();
+            int keepAliveTimeout = endpoint.getKeepAliveTimeout();
 
-                //reset the timeout
-                if (keepAlive && keepAliveTimeout>0) {
-                    attach.setTimeout(keepAliveTimeout);
-                } else {
-                    attach.setTimeout(soTimeout);
-                }
-            }
-        } catch (InterruptedIOException e) {
-            error = true;
-        } catch (Throwable t) {
-            ExceptionUtils.handleThrowable(t);
-            log.error(sm.getString("http11processor.request.process"), t);
-            error = true;
-        } finally {
-            if (error) {
-                // 500 - Internal Server Error
-                response.setStatus(500);
-                adapter.log(request, response, 0);
-            }
-        }
-
-        rp.setStage(org.apache.coyote.Constants.STAGE_ENDED);
-
-        if (error) {
-            return SocketState.CLOSED;
-        } else if (isAsync()) {
-            return SocketState.LONG;
-        } else {
-            if (!keepAlive) {
-                return SocketState.CLOSED;
+            //reset the timeout
+            if (keepAlive && keepAliveTimeout>0) {
+                attach.setTimeout(keepAliveTimeout);
             } else {
-                return SocketState.OPEN;
+                attach.setTimeout(soTimeout);
             }
         }
     }
+
 
     /**
      * Process pipelined HTTP requests using the specified input and output
