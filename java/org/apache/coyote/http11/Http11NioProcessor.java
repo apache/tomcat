@@ -177,14 +177,8 @@ public class Http11NioProcessor extends AbstractHttp11Processor {
     /**
      * Process pipelined HTTP requests using the specified input and output
      * streams.
-     *
-     * @throws IOException error during an I/O operation
      */
-    public SocketState asyncDispatch(SocketStatus status)
-        throws IOException {
-
-        long soTimeout = endpoint.getSoTimeout();
-        int keepAliveTimeout = endpoint.getKeepAliveTimeout();
+    public SocketState asyncDispatch(SocketStatus status) {
 
         RequestInfo rp = request.getRequestProcessor();
         final NioEndpoint.KeyAttachment attach = (NioEndpoint.KeyAttachment)socket.getAttachment(false);
@@ -193,6 +187,9 @@ public class Http11NioProcessor extends AbstractHttp11Processor {
             error = !adapter.asyncDispatch(request, response, status);
             if (!error && attach != null &&
                     asyncStateMachine.isAsyncDispatching()) {
+                long soTimeout = endpoint.getSoTimeout();
+                int keepAliveTimeout = endpoint.getKeepAliveTimeout();
+
                 //reset the timeout
                 if (keepAlive && keepAliveTimeout>0) {
                     attach.setTimeout(keepAliveTimeout);
