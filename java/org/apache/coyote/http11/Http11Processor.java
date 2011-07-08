@@ -41,7 +41,7 @@ import org.apache.tomcat.util.net.SocketWrapper;
  * @author Remy Maucherat
  * @author fhanik
  */
-public class Http11Processor extends AbstractHttp11Processor {
+public class Http11Processor extends AbstractHttp11Processor<Socket> {
 
     private static final Log log = LogFactory.getLog(Http11Processor.class);
     @Override
@@ -129,6 +129,7 @@ public class Http11Processor extends AbstractHttp11Processor {
      *  
      * @throws IOException error during an I/O operation
      */
+    @Override
     public SocketState process(SocketWrapper<Socket> socketWrapper)
         throws IOException {
         RequestInfo rp = request.getRequestProcessor();
