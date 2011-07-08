@@ -210,7 +210,27 @@ public class Http11AprProtocol extends AbstractHttp11Protocol {
         public void recycle() {
             recycledProcessors.clear();
         }
-        
+
+        /**
+         * Expected to be used by the handler once the processor is no longer
+         * required.
+         * 
+         * @param socket
+         * @param processor
+         * @param isSocketClosing   Not used in HTTP
+         * @param addToPoller
+         */
+        public void release(SocketWrapper<Long> socket,
+                Http11AprProcessor processor, boolean isSocketClosing,
+                boolean addToPoller) {
+            processor.recycle();
+            recycledProcessors.offer(processor);
+            if (addToPoller) {
+                ((AprEndpoint)proto.endpoint).getPoller().add(
+                        socket.getSocket().longValue());
+            }
+        }
+
         @Override
         public SocketState process(SocketWrapper<Long> socket,
                 SocketStatus status) {
@@ -257,14 +277,10 @@ public class Http11AprProtocol extends AbstractHttp11Protocol {
                 } else if (state == SocketState.OPEN){
                     // In keep-alive but between requests. OK to recycle
                     // processor. Continue to poll for the next request.
-                    processor.recycle();
-                    recycledProcessors.offer(processor);
-                    ((AprEndpoint)proto.endpoint).getPoller().add(
-                            socket.getSocket().longValue());
+                    release(socket, processor, false, true);
                 } else {
                     // Connection closed. OK to recycle the processor.
-                    processor.recycle();
-                    recycledProcessors.offer(processor);
+                    release(socket, processor, true, false);
                 }
                 return state;
             } catch (java.net.SocketException e) {
@@ -287,11 +303,11 @@ public class Http11AprProtocol extends AbstractHttp11Protocol {
                 Http11AprProtocol.log.error(
                         sm.getString("http11protocol.proto.error"), e);
             }
-            processor.recycle();
-            recycledProcessors.offer(processor);
+            release(socket, processor, true, false);
             return SocketState.CLOSED;
         }
 
+        @SuppressWarnings("unused")
         private void initSsl(SocketWrapper<Long> socket,
                 Http11AprProcessor processor) {
             // NOOP for APR
