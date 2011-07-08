@@ -96,11 +96,6 @@ public class Http11NioProcessor extends AbstractHttp11Processor {
     protected NioEndpoint.SendfileData sendfileData = null;
 
     /**
-     * Comet used.
-     */
-    protected boolean comet = false;
-    
-    /**
      * Closed flag, a Comet async thread can 
      * signal for this Nio processor to be closed and recycled instead
      * of waiting for a timeout.
@@ -123,6 +118,7 @@ public class Http11NioProcessor extends AbstractHttp11Processor {
      *
      * @throws IOException error during an I/O operation
      */
+    @Override
     public SocketState event(SocketStatus status)
         throws IOException {
 
