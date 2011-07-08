@@ -104,10 +104,14 @@ public abstract class AbstractAjpProtocol extends AbstractProtocol {
                     processor = createProcessor();
                 }
 
+                initSsl(socket, processor);
+
                 SocketState state = SocketState.CLOSED;
                 do {
                     if (processor.isAsync() || state == SocketState.ASYNC_END) {
                         state = processor.asyncDispatch(status);
+                    } else if (processor.comet) {
+                        state = processor.event(status);
                     } else {
                         state = processor.process(socket);
                     }
@@ -119,9 +123,9 @@ public abstract class AbstractAjpProtocol extends AbstractProtocol {
 
                 if (state == SocketState.LONG) {
                     // In the middle of processing a request/response. Keep the
-                    // socket associated with the processor.
-                    connections.put(socket, processor);
-                    socket.setAsync(true);
+                    // socket associated with the processor. Exact requirements
+                    // depend on type of long poll
+                    longPoll(socket, processor);
                 } else if (state == SocketState.OPEN){
                     // In keep-alive but between requests. OK to recycle
                     // processor. Continue to poll for the next request.
@@ -155,6 +159,16 @@ public abstract class AbstractAjpProtocol extends AbstractProtocol {
         }
         
         protected abstract P createProcessor();
+        @SuppressWarnings("unused")
+        protected void initSsl(SocketWrapper<S> socket, P processor) {
+            // NOOP for AJP
+        }
+        protected void longPoll(SocketWrapper<S> socket, P processor) {
+            // Same requirements for all AJP connectors
+            connections.put(socket, processor);
+            socket.setAsync(true);
+            
+        }
         protected abstract void release(SocketWrapper<S> socket, P processor,
                 boolean socketClosing, boolean addToPoller);
     }
