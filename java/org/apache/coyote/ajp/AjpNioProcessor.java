@@ -127,14 +127,14 @@ public class AjpNioProcessor extends AbstractAjpProcessor {
                     } catch (IOException e) {
                         error = true;
                     }
-                    recycle();
+                    recycle(true);
                     continue;
                 } else if(type != Constants.JK_AJP13_FORWARD_REQUEST) {
                     // Usually the servlet didn't read the previous request body
                     if(log.isDebugEnabled()) {
                         log.debug("Unexpected message: "+type);
                     }
-                    recycle();
+                    recycle(false);
                     continue;
                 }
                 request.setStartTime(System.currentTimeMillis());
@@ -216,7 +216,7 @@ public class AjpNioProcessor extends AbstractAjpProcessor {
                 socket.setTimeout(keepAliveTimeout);
             }
 
-            recycle();
+            recycle(true);
         }
         
         rp.setStage(org.apache.coyote.Constants.STAGE_ENDED);

@@ -494,7 +494,15 @@ public abstract class AbstractAjpProcessor extends AbstractProcessor {
     }
 
 
-    public void recycle() {
+    /**
+     * Recycle the processor, ready for the next request which may be on the
+     * same connection or a different connection.
+     * 
+     * @param socketClosing Indicates if the socket is about to be closed
+     *                      allowing the processor to perform any additional
+     *                      clean-up that may be required
+     */
+    public void recycle(boolean socketClosing) {
         asyncStateMachine.recycle();
 
         // Recycle Request object
