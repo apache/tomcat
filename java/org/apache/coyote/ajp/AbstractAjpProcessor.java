@@ -14,7 +14,6 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package org.apache.coyote.ajp;
 
 import java.io.ByteArrayInputStream;
@@ -43,12 +42,13 @@ import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
 import org.apache.tomcat.util.net.SSLSupport;
 import org.apache.tomcat.util.net.SocketStatus;
+import org.apache.tomcat.util.net.SocketWrapper;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
  * Base class for AJP Processor implementations.
  */
-public abstract class AbstractAjpProcessor extends AbstractProcessor {
+public abstract class AbstractAjpProcessor<S> extends AbstractProcessor {
 
     protected abstract Log getLog();
 
@@ -453,6 +453,9 @@ public abstract class AbstractAjpProcessor extends AbstractProcessor {
     protected abstract void flush(boolean tbd) throws IOException;
     protected abstract void finish() throws IOException;
 
+
+    public abstract SocketState process(SocketWrapper<S> socket)
+            throws IOException;
 
     public SocketState asyncDispatch(SocketStatus status) {
 
