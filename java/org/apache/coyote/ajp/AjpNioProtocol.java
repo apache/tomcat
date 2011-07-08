@@ -14,23 +14,19 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package org.apache.coyote.ajp;
 
 import java.nio.channels.SocketChannel;
 import java.util.Iterator;
-import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.coyote.AbstractProtocol;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
-import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.net.NioChannel;
 import org.apache.tomcat.util.net.NioEndpoint;
 import org.apache.tomcat.util.net.NioEndpoint.Handler;
 import org.apache.tomcat.util.net.SSLImplementation;
-import org.apache.tomcat.util.net.SocketStatus;
 import org.apache.tomcat.util.net.SocketWrapper;
 
 
@@ -90,15 +86,10 @@ public class AjpNioProtocol extends AbstractAjpProtocol {
 
 
     protected static class AjpConnectionHandler
-            extends AbstractConnectionHandler implements Handler {
+            extends AbstractAjpConnectionHandler<NioChannel, AjpNioProcessor>
+            implements Handler {
 
         protected AjpNioProtocol proto;
-
-        protected ConcurrentHashMap<SocketWrapper<NioChannel>, AjpNioProcessor> connections =
-            new ConcurrentHashMap<SocketWrapper<NioChannel>, AjpNioProcessor>();
-
-        protected RecycledProcessors<AjpNioProcessor> recycledProcessors =
-            new RecycledProcessors<AjpNioProcessor>(this);
 
         public AjpConnectionHandler(AjpNioProtocol proto) {
             this.proto = proto;
@@ -114,11 +105,6 @@ public class AjpNioProtocol extends AbstractAjpProtocol {
             return log;
         }
 
-        @Override
-        public void recycle() {
-            recycledProcessors.clear();
-        }
-        
         @Override
         public SSLImplementation getSslImplementation() {
             // AJP does not support SSL
@@ -167,6 +153,7 @@ public class AjpNioProtocol extends AbstractAjpProtocol {
          * Expected to be used by the handler once the processor is no longer
          * required.
          */
+        @Override
         public void release(SocketWrapper<NioChannel> socket,
                 AjpNioProcessor processor, boolean isSocketClosing,
                 boolean addToPoller) {
@@ -179,70 +166,6 @@ public class AjpNioProtocol extends AbstractAjpProtocol {
 
 
         @Override
-        public SocketState process(SocketWrapper<NioChannel> socket,
-                SocketStatus status) {
-            AjpNioProcessor processor = connections.remove(socket);
-
-            socket.setAsync(false); //no longer check for timeout
-
-            try {
-                if (processor == null) {
-                    processor = recycledProcessors.poll();
-                }
-                if (processor == null) {
-                    processor = createProcessor();
-                }
-
-                SocketState state = SocketState.CLOSED;
-                do {
-                    if (processor.isAsync() || state == SocketState.ASYNC_END) {
-                        state = processor.asyncDispatch(status);
-                    } else {
-                        state = processor.process(socket);
-                    }
-
-                    if (state != SocketState.CLOSED && processor.isAsync()) {
-                        state = processor.asyncPostProcess();
-                    }
-                } while (state == SocketState.ASYNC_END);
-
-                if (state == SocketState.LONG) {
-                    // In the middle of processing a request/response. Keep the
-                    // socket associated with the processor.
-                    connections.put(socket, processor);
-                    socket.setAsync(true);
-                } else if (state == SocketState.OPEN){
-                    // In keep-alive but between requests. OK to recycle
-                    // processor. Continue to poll for the next request.
-                    release(socket, processor, false, true);
-                } else {
-                    // Connection closed. OK to recycle the processor.
-                    release(socket, processor, true, false);
-                }
-                return state;
-            } catch(java.net.SocketException e) {
-                // SocketExceptions are normal
-                log.debug(sm.getString(
-                        "ajpprotocol.proto.socketexception.debug"), e);
-            } catch (java.io.IOException e) {
-                // IOExceptions are normal
-                log.debug(sm.getString(
-                        "ajpprotocol.proto.ioexception.debug"), e);
-            }
-            // Future developers: if you discover any other
-            // rare-but-nonfatal exceptions, catch them here, and log as
-            // above.
-            catch (Throwable e) {
-                ExceptionUtils.handleThrowable(e);
-                // any other exception or error is odd. Here we log it
-                // with "ERROR" level, so it will show up even on
-                // less-than-verbose logs.
-                log.error(sm.getString("ajpprotocol.proto.error"), e);
-            }
-            release(socket, processor, true, false);
-            return SocketState.CLOSED;
-        }
-
         protected AjpNioProcessor createProcessor() {
             AjpNioProcessor processor = new AjpNioProcessor(proto.packetSize, (NioEndpoint)proto.endpoint);
             processor.setAdapter(proto.adapter);
