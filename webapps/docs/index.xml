@@ -133,6 +133,8 @@ Apache Tomcat 7, and using many of the Apache Tomcat features.</p>
     Running Tomcat as a service on Microsoft Windows.</li>
 <li><a href="windows-auth-howto.html"><strong>Windows Authentication</strong></a> -
     Configuring Tomcat to use integrated Windows authentication.</li>
+<li><a href="jdbc-pool.html"><strong>High Concurrency JDBC Pool</strong></a> -
+    Configuring Tomcat to use an alternative JDBC pool.</li>
 
 </ol>
 
