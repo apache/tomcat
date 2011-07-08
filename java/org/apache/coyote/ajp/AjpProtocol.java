@@ -127,9 +127,15 @@ public class AjpProtocol extends AbstractAjpProtocol {
         /**
          * Expected to be used by the handler once the processor is no longer
          * required.
+         * 
+         * @param socket            Ignored for BIO
+         * @param processor
+         * @param isSocketClosing
+         * @param addToPoller       Ignored for BIO
          */
         public void release(SocketWrapper<Socket> socket,
-                AjpProcessor processor, boolean isSocketClosing) {
+                AjpProcessor processor, boolean isSocketClosing,
+                boolean addToPoller) {
             processor.recycle(isSocketClosing);
             recycledProcessors.offer(processor);
         }
@@ -171,10 +177,10 @@ public class AjpProtocol extends AbstractAjpProtocol {
                 } else if (state == SocketState.OPEN){
                     // In keep-alive but between requests. OK to recycle
                     // processor. Continue to poll for the next request.
-                    release(socket, processor, false);
+                    release(socket, processor, false, true);
                 } else {
                     // Connection closed. OK to recycle the processor.
-                    release(socket, processor, true);
+                    release(socket, processor, true, false);
                 }
                 return state;
             } catch(java.net.SocketException e) {
@@ -196,7 +202,7 @@ public class AjpProtocol extends AbstractAjpProtocol {
                 // less-than-verbose logs.
                 log.error(sm.getString("ajpprotocol.proto.error"), e);
             }
-            release(socket, processor, true);
+            release(socket, processor, true, false);
             return SocketState.CLOSED;
         }
 
