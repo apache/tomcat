@@ -94,12 +94,6 @@ public class Http11AprProcessor extends AbstractHttp11Processor {
 
 
     /**
-     * Comet used.
-     */
-    protected boolean comet = false;
-
-
-    /**
      * Socket associated with the current connection.
      */
     protected SocketWrapper<Long> socket = null;
@@ -128,6 +122,7 @@ public class Http11AprProcessor extends AbstractHttp11Processor {
      *
      * @throws IOException error during an I/O operation
      */
+    @Override
     public SocketState event(SocketStatus status)
         throws IOException {
         

@@ -104,6 +104,12 @@ public abstract class AbstractHttp11Processor extends AbstractProcessor {
 
 
     /**
+     * Comet used.
+     */
+    protected boolean comet = false;
+
+
+    /**
      * Regular expression that defines the restricted user agents.
      */
     protected Pattern restrictedUserAgents = null;
@@ -1240,6 +1246,9 @@ public abstract class AbstractHttp11Processor extends AbstractProcessor {
             }
         }
     }
+
+
+    public abstract SocketState event(SocketStatus status) throws IOException;
 
 
     /**
