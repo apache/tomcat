@@ -125,8 +125,12 @@ public class AjpProtocol extends AbstractAjpProtocol {
         }
         
         @Override
-        public SocketState process(SocketWrapper<Socket> socket, SocketStatus status) {
+        public SocketState process(SocketWrapper<Socket> socket,
+                SocketStatus status) {
             AjpProcessor processor = connections.remove(socket);
+
+            socket.setAsync(false);
+
             try {
                 if (processor == null) {
                     processor = recycledProcessors.poll();
@@ -147,12 +151,15 @@ public class AjpProtocol extends AbstractAjpProtocol {
                         state = processor.asyncPostProcess();
                     }
                 } while (state == SocketState.ASYNC_END);
-                // TODO Better to add a new state to the AsyncStateMachine and
-                //      remove ASYNC_END entirely
 
                 if (state == SocketState.LONG) {
+                    // In the middle of processing a request/response. Keep the
+                    // socket associated with the processor.
                     connections.put(socket, processor);
+                    socket.setAsync(true);
                 } else if (state == SocketState.OPEN){
+                    // In keep-alive but between requests. OK to recycle
+                    // processor. Continue to poll for the next request.
                     processor.recycle(false);
                     recycledProcessors.offer(processor);
                 } else {
