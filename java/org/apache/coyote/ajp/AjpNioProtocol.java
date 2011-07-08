@@ -125,6 +125,10 @@ public class AjpNioProtocol extends AbstractAjpProtocol {
             return null;
         }
 
+        /**
+         * Expected to be used by the Poller to release resources on socket
+         * close, errors etc.
+         */
         @Override
         public void release(SocketChannel socket) {
             if (log.isDebugEnabled()) 
@@ -147,8 +151,8 @@ public class AjpNioProtocol extends AbstractAjpProtocol {
         }
         
         /**
-         * Use this only if the processor is not available, otherwise use
-         * {@link #release(SocketWrapper, AjpNioProcessor, boolean)}.
+         * Expected to be used by the Poller to release resources on socket
+         * close, errors etc.
          */
         @Override
         public void release(SocketWrapper<NioChannel> socket) {
@@ -160,6 +164,10 @@ public class AjpNioProtocol extends AbstractAjpProtocol {
         }
 
 
+        /**
+         * Expected to be used by the handler once the processor is no longer
+         * required.
+         */
         public void release(SocketWrapper<NioChannel> socket,
                 AjpNioProcessor processor, boolean isSocketClosing) {
             connections.remove(socket);
