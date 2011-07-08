@@ -174,7 +174,6 @@ public class AjpAprProtocol extends AbstractAjpProtocol {
                     recycledProcessors.offer(processor);
                 }
                 return state;
-
             } catch(java.net.SocketException e) {
                 // SocketExceptions are normal
                 log.debug(sm.getString(

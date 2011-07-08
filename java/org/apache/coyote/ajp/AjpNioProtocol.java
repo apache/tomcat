@@ -206,7 +206,6 @@ public class AjpNioProtocol extends AbstractAjpProtocol {
                     // In the middle of processing a request/response. Keep the
                     // socket associated with the processor.
                     connections.put(socket, processor);
-                    
                     socket.setAsync(true);
                 } else if (state == SocketState.OPEN){
                     // In keep-alive but between requests. OK to recycle
@@ -218,7 +217,6 @@ public class AjpNioProtocol extends AbstractAjpProtocol {
                     release(socket, processor, true);
                 }
                 return state;
-
             } catch(java.net.SocketException e) {
                 // SocketExceptions are normal
                 log.debug(sm.getString(
