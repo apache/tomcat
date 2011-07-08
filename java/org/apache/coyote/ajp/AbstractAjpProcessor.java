@@ -42,13 +42,12 @@ import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
 import org.apache.tomcat.util.net.SSLSupport;
 import org.apache.tomcat.util.net.SocketStatus;
-import org.apache.tomcat.util.net.SocketWrapper;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
  * Base class for AJP Processor implementations.
  */
-public abstract class AbstractAjpProcessor<S> extends AbstractProcessor {
+public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
 
     protected abstract Log getLog();
 
@@ -212,11 +211,6 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor {
      */
     protected long byteCount = 0;
 
-
-    /**
-     * AJP does not support comet
-     */
-    protected final boolean comet = false;
 
     // ------------------------------------------------------------ Constructor
 
@@ -459,9 +453,7 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor {
     protected abstract void finish() throws IOException;
 
 
-    public abstract SocketState process(SocketWrapper<S> socket)
-            throws IOException;
-
+    @Override
     public SocketState asyncDispatch(SocketStatus status) {
 
         RequestInfo rp = request.getRequestProcessor();
@@ -502,7 +494,13 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor {
     }
 
 
-    @SuppressWarnings("unused")
+    @Override
+    protected final boolean isComet() {
+        // AJP does not support Comet
+        return false;
+    }
+
+    @Override
     public SocketState event(SocketStatus status) throws IOException {
         // Should never reach this code but in case we do...
         throw new IOException(

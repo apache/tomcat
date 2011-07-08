@@ -97,7 +97,7 @@ public class Http11Protocol extends AbstractHttp11JsseProtocol {
     // -----------------------------------  Http11ConnectionHandler Inner Class
 
     protected static class Http11ConnectionHandler
-            extends AbstractHttp11ConnectionHandler<Socket, Http11Processor> implements Handler {
+            extends AbstractConnectionHandler<Socket, Http11Processor> implements Handler {
 
         protected Http11Protocol proto;
             
