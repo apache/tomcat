@@ -47,10 +47,9 @@ import org.apache.tomcat.util.http.MimeHeaders;
 import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
 import org.apache.tomcat.util.net.SocketStatus;
-import org.apache.tomcat.util.net.SocketWrapper;
 import org.apache.tomcat.util.res.StringManager;
 
-public abstract class AbstractHttp11Processor<S> extends AbstractProcessor {
+public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
 
     protected abstract Log getLog();
 
@@ -1212,9 +1211,7 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor {
     }
 
     
-    public abstract SocketState process(SocketWrapper<S> socket)
-            throws IOException;
-    
+    @Override
     public SocketState asyncDispatch(SocketStatus status) {
 
         RequestInfo rp = request.getRequestProcessor();
@@ -1252,7 +1249,10 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor {
     }
 
 
-    public abstract SocketState event(SocketStatus status) throws IOException;
+    @Override
+    public boolean isComet() {
+        return comet;
+    }
 
 
     /**
