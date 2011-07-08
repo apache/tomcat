@@ -47,7 +47,7 @@ import org.apache.tomcat.util.net.SocketWrapper;
  * @author Costin Manolache
  * @author Bill Barker
  */
-public class AjpProcessor extends AbstractAjpProcessor {
+public class AjpProcessor extends AbstractAjpProcessor<Socket> {
 
 
     /**
@@ -100,6 +100,7 @@ public class AjpProcessor extends AbstractAjpProcessor {
      *
      * @throws IOException error during an I/O operation
      */
+    @Override
     public SocketState process(SocketWrapper<Socket> socket)
         throws IOException {
         RequestInfo rp = request.getRequestProcessor();
