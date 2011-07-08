@@ -170,7 +170,6 @@ public class AjpNioProtocol extends AbstractAjpProtocol {
          */
         public void release(SocketWrapper<NioChannel> socket,
                 AjpNioProcessor processor, boolean isSocketClosing) {
-            connections.remove(socket);
             processor.recycle(isSocketClosing);
             recycledProcessors.offer(processor);
         }
