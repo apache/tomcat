@@ -165,12 +165,12 @@ public class AjpAprProtocol extends AbstractAjpProtocol {
                 } else if (state == SocketState.OPEN){
                     // In keep-alive but between requests. OK to recycle
                     // processor. Continue to poll for the next request.
-                    processor.recycle();
+                    processor.recycle(false);
                     recycledProcessors.offer(processor);
                     ((AprEndpoint)proto.endpoint).getPoller().add(
                             socket.getSocket().longValue());
                 } else {
-                    processor.recycle();
+                    processor.recycle(true);
                     recycledProcessors.offer(processor);
                 }
                 return state;
@@ -194,7 +194,7 @@ public class AjpAprProtocol extends AbstractAjpProtocol {
                 // less-than-verbose logs.
                 log.error(sm.getString("ajpprotocol.proto.error"), e);
             }
-            processor.recycle();
+            processor.recycle(true);
             recycledProcessors.offer(processor);
             return SocketState.CLOSED;
         }

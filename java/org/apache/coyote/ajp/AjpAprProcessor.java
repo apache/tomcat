@@ -219,7 +219,7 @@ public class AjpAprProcessor extends AbstractAjpProcessor {
             request.updateCounters();
 
             rp.setStage(org.apache.coyote.Constants.STAGE_KEEPALIVE);
-            recycle();
+            recycle(false);
         }
 
         rp.setStage(org.apache.coyote.Constants.STAGE_ENDED);
@@ -487,8 +487,8 @@ public class AjpAprProcessor extends AbstractAjpProcessor {
      * Recycle the processor.
      */
     @Override
-    public void recycle() {
-        super.recycle();
+    public void recycle(boolean socketClosing) {
+        super.recycle(socketClosing);
 
         inputBuffer.clear();
         inputBuffer.limit(0);

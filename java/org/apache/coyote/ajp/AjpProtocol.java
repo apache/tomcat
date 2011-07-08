@@ -152,8 +152,11 @@ public class AjpProtocol extends AbstractAjpProtocol {
 
                 if (state == SocketState.LONG) {
                     connections.put(socket, processor);
+                } else if (state == SocketState.OPEN){
+                    processor.recycle(false);
+                    recycledProcessors.offer(processor);
                 } else {
-                    processor.recycle();
+                    processor.recycle(true);
                     recycledProcessors.offer(processor);
                 }
                 return state;
@@ -176,7 +179,7 @@ public class AjpProtocol extends AbstractAjpProtocol {
                 // less-than-verbose logs.
                 log.error(sm.getString("ajpprotocol.proto.error"), e);
             }
-            processor.recycle();
+            processor.recycle(true);
             recycledProcessors.offer(processor);
             return SocketState.CLOSED;
         }
