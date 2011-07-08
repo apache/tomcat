@@ -214,8 +214,7 @@ public class Http11AprProtocol extends AbstractHttp11Protocol {
         @Override
         public SocketState process(SocketWrapper<Long> socket,
                 SocketStatus status) {
-            Http11AprProcessor processor =
-                connections.remove(socket.getSocket());
+            Http11AprProcessor processor = connections.remove(socket.getSocket());
             
             socket.setAsync(false);
 
@@ -226,6 +225,8 @@ public class Http11AprProtocol extends AbstractHttp11Protocol {
                 if (processor == null) {
                     processor = createProcessor();
                 }
+
+                initSsl(socket, processor);
 
                 SocketState state = SocketState.CLOSED;
                 do {
@@ -266,7 +267,6 @@ public class Http11AprProtocol extends AbstractHttp11Protocol {
                     recycledProcessors.offer(processor);
                 }
                 return state;
-
             } catch (java.net.SocketException e) {
                 // SocketExceptions are normal
                 log.debug(sm.getString(
@@ -290,6 +290,11 @@ public class Http11AprProtocol extends AbstractHttp11Protocol {
             processor.recycle();
             recycledProcessors.offer(processor);
             return SocketState.CLOSED;
+        }
+
+        private void initSsl(SocketWrapper<Long> socket,
+                Http11AprProcessor processor) {
+            // NOOP for APR
         }
 
         protected Http11AprProcessor createProcessor() {
