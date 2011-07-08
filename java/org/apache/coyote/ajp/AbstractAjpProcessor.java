@@ -213,6 +213,11 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor {
     protected long byteCount = 0;
 
 
+    /**
+     * AJP does not support comet
+     */
+    protected final boolean comet = false;
+
     // ------------------------------------------------------------ Constructor
 
     public AbstractAjpProcessor(int packetSize, AbstractEndpoint endpoint) {
@@ -496,6 +501,13 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor {
         }
     }
 
+
+    @SuppressWarnings("unused")
+    public SocketState event(SocketStatus status) throws IOException {
+        // Should never reach this code but in case we do...
+        throw new IOException(
+                sm.getString("ajpprocessor.comet.notsupported"));
+    }
 
     /**
      * Recycle the processor, ready for the next request which may be on the
