@@ -135,6 +135,22 @@ public class Http11Protocol extends AbstractHttp11JsseProtocol {
             recycledProcessors.clear();
         }
 
+        /**
+         * Expected to be used by the handler once the processor is no longer
+         * required.
+         * 
+         * @param socket            Not used in BIO
+         * @param processor
+         * @param isSocketClosing   Not used in HTTP
+         * @param addToPoller       Not used in BIO
+         */
+        public void release(SocketWrapper<Socket> socket,
+                Http11Processor processor, boolean isSocketClosing,
+                boolean addToPoller) {
+            processor.recycle();
+            recycledProcessors.offer(processor);
+        }
+
         @Override
         public SocketState process(SocketWrapper<Socket> socket,
                 SocketStatus status) {
@@ -174,12 +190,10 @@ public class Http11Protocol extends AbstractHttp11JsseProtocol {
                 } else if (state == SocketState.OPEN){
                     // In keep-alive but between requests. OK to recycle
                     // processor. Continue to poll for the next request.
-                    processor.recycle();
-                    recycledProcessors.offer(processor);
+                    release(socket, processor, false, true);
                 } else {
                     // Connection closed. OK to recycle the processor.
-                    processor.recycle();
-                    recycledProcessors.offer(processor);
+                    release(socket, processor, true, false);
                 }
                 return state;
             } catch(java.net.SocketException e) {
@@ -201,8 +215,7 @@ public class Http11Protocol extends AbstractHttp11JsseProtocol {
                 // less-than-verbose logs.
                 log.error(sm.getString("http11protocol.proto.error"), e);
             }
-            processor.recycle();
-            recycledProcessors.offer(processor);
+            release(socket, processor, true, false);
             return SocketState.CLOSED;
         }
         
