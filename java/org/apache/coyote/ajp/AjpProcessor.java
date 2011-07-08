@@ -227,7 +227,7 @@ public class AjpProcessor extends AbstractAjpProcessor {
             request.updateCounters();
 
             rp.setStage(org.apache.coyote.Constants.STAGE_KEEPALIVE);
-            recycle();
+            recycle(false);
         }
         
         rp.setStage(org.apache.coyote.Constants.STAGE_ENDED);
@@ -243,10 +243,12 @@ public class AjpProcessor extends AbstractAjpProcessor {
     }
 
     @Override
-    public void recycle() {
-        super.recycle();
-        input = null;
-        output = null;
+    public void recycle(boolean socketClosing) {
+        super.recycle(socketClosing);
+        if (socketClosing) {
+            input = null;
+            output = null;
+        }
     }
 
     // ----------------------------------------------------- ActionHook Methods

@@ -136,7 +136,7 @@ public class AjpNioProtocol extends AbstractAjpProtocol {
                 if (entry.getKey().getSocket().getIOChannel()==socket) {
                     it.remove();
                     AjpNioProcessor result = entry.getValue();
-                    result.recycle();
+                    result.recycle(true);
                     unregister(result);
                     released = true;
                     break;
@@ -148,22 +148,22 @@ public class AjpNioProtocol extends AbstractAjpProtocol {
         
         /**
          * Use this only if the processor is not available, otherwise use
-         * {@link #release(SocketWrapper, AjpNioProcessor)}.
+         * {@link #release(SocketWrapper, AjpNioProcessor, boolean)}.
          */
         @Override
         public void release(SocketWrapper<NioChannel> socket) {
             AjpNioProcessor processor = connections.remove(socket);
             if (processor != null) {
-                processor.recycle();
+                processor.recycle(true);
                 recycledProcessors.offer(processor);
             }
         }
 
 
         public void release(SocketWrapper<NioChannel> socket,
-                AjpNioProcessor processor) {
+                AjpNioProcessor processor, boolean isSocketClosing) {
             connections.remove(socket);
-            processor.recycle();
+            processor.recycle(isSocketClosing);
             recycledProcessors.offer(processor);
         }
 
@@ -204,11 +204,11 @@ public class AjpNioProtocol extends AbstractAjpProtocol {
                 } else if (state == SocketState.OPEN){
                     // In keep-alive but between requests. OK to recycle
                     // processor. Continue to poll for the next request.
-                    release(socket, processor);
+                    release(socket, processor, false);
                     socket.getSocket().getPoller().add(socket.getSocket());
                 } else {
                     // Connection closed. OK to recycle the processor.
-                    release(socket, processor);
+                    release(socket, processor, true);
                 }
                 return state;
 
@@ -231,7 +231,7 @@ public class AjpNioProtocol extends AbstractAjpProtocol {
                 // less-than-verbose logs.
                 log.error(sm.getString("ajpprotocol.proto.error"), e);
             }
-            release(socket, processor);
+            release(socket, processor, true);
             return SocketState.CLOSED;
         }
 
