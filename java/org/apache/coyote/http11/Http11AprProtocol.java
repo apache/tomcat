@@ -265,15 +265,9 @@ public class Http11AprProtocol extends AbstractHttp11Protocol {
 
                 if (state == SocketState.LONG) {
                     // In the middle of processing a request/response. Keep the
-                    // socket associated with the processor.
-                    connections.put(socket.getSocket(), processor);
-
-                    if (processor.isAsync()) {
-                        socket.setAsync(true);
-                    } else if (processor.comet) {
-                        ((AprEndpoint) proto.endpoint).getCometPoller().add(
-                                socket.getSocket().longValue());
-                    }
+                    // socket associated with the processor. Exact requirements
+                    // depend on type of long poll
+                    longPoll(socket, processor);
                 } else if (state == SocketState.OPEN){
                     // In keep-alive but between requests. OK to recycle
                     // processor. Continue to poll for the next request.
@@ -300,8 +294,7 @@ public class Http11AprProtocol extends AbstractHttp11Protocol {
                 // any other exception or error is odd. Here we log it
                 // with "ERROR" level, so it will show up even on
                 // less-than-verbose logs.
-                Http11AprProtocol.log.error(
-                        sm.getString("http11protocol.proto.error"), e);
+                log.error(sm.getString("http11protocol.proto.error"), e);
             }
             release(socket, processor, true, false);
             return SocketState.CLOSED;
@@ -311,6 +304,18 @@ public class Http11AprProtocol extends AbstractHttp11Protocol {
         private void initSsl(SocketWrapper<Long> socket,
                 Http11AprProcessor processor) {
             // NOOP for APR
+        }
+
+        private void longPoll(SocketWrapper<Long> socket,
+                Http11AprProcessor processor) {
+            connections.put(socket.getSocket(), processor);
+
+            if (processor.isAsync()) {
+                socket.setAsync(true);
+            } else if (processor.comet) {
+                ((AprEndpoint) proto.endpoint).getCometPoller().add(
+                        socket.getSocket().longValue());
+            }
         }
 
         protected Http11AprProcessor createProcessor() {
