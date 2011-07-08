@@ -14,19 +14,14 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package org.apache.coyote.http11;
-
-import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.coyote.AbstractProtocol;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
-import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.net.AprEndpoint;
 import org.apache.tomcat.util.net.AprEndpoint.Handler;
-import org.apache.tomcat.util.net.SocketStatus;
 import org.apache.tomcat.util.net.SocketWrapper;
 
 
@@ -182,16 +177,10 @@ public class Http11AprProtocol extends AbstractHttp11Protocol {
     // --------------------  Connection handler --------------------
 
     protected static class Http11ConnectionHandler
-            extends AbstractConnectionHandler implements Handler {
+            extends AbstractHttp11ConnectionHandler<Long,Http11AprProcessor> implements Handler {
         
         protected Http11AprProtocol proto;
         
-        protected ConcurrentHashMap<Long, Http11AprProcessor> connections =
-            new ConcurrentHashMap<Long, Http11AprProcessor>();
-
-        protected RecycledProcessors<Http11AprProcessor> recycledProcessors =
-            new RecycledProcessors<Http11AprProcessor>(this);
-
         Http11ConnectionHandler(Http11AprProtocol proto) {
             this.proto = proto;
         }
@@ -220,6 +209,7 @@ public class Http11AprProtocol extends AbstractHttp11Protocol {
          * @param isSocketClosing   Not used in HTTP
          * @param addToPoller
          */
+        @Override
         public void release(SocketWrapper<Long> socket,
                 Http11AprProcessor processor, boolean isSocketClosing,
                 boolean addToPoller) {
@@ -232,83 +222,15 @@ public class Http11AprProtocol extends AbstractHttp11Protocol {
         }
 
         @Override
-        public SocketState process(SocketWrapper<Long> socket,
-                SocketStatus status) {
-            Http11AprProcessor processor = connections.remove(socket.getSocket());
-            
-            socket.setAsync(false);
-
-            try {
-                if (processor == null) {
-                    processor = recycledProcessors.poll();
-                }
-                if (processor == null) {
-                    processor = createProcessor();
-                }
-
-                initSsl(socket, processor);
-
-                SocketState state = SocketState.CLOSED;
-                do {
-                    if (processor.isAsync() || state == SocketState.ASYNC_END) {
-                        state = processor.asyncDispatch(status);
-                    } else if (processor.comet) {
-                        state = processor.event(status);
-                    } else {
-                        state = processor.process(socket);
-                    }
-
-                    if (state != SocketState.CLOSED && processor.isAsync()) {
-                        state = processor.asyncPostProcess();
-                    }
-                } while (state == SocketState.ASYNC_END);
-
-                if (state == SocketState.LONG) {
-                    // In the middle of processing a request/response. Keep the
-                    // socket associated with the processor. Exact requirements
-                    // depend on type of long poll
-                    longPoll(socket, processor);
-                } else if (state == SocketState.OPEN){
-                    // In keep-alive but between requests. OK to recycle
-                    // processor. Continue to poll for the next request.
-                    release(socket, processor, false, true);
-                } else {
-                    // Connection closed. OK to recycle the processor.
-                    release(socket, processor, true, false);
-                }
-                return state;
-            } catch (java.net.SocketException e) {
-                // SocketExceptions are normal
-                log.debug(sm.getString(
-                        "http11protocol.proto.socketexception.debug"), e);
-            } catch (java.io.IOException e) {
-                // IOExceptions are normal
-                log.debug(sm.getString(
-                        "http11protocol.proto.ioexception.debug"), e);
-            }
-            // Future developers: if you discover any other
-            // rare-but-nonfatal exceptions, catch them here, and log as
-            // above.
-            catch (Throwable e) {
-                ExceptionUtils.handleThrowable(e);
-                // any other exception or error is odd. Here we log it
-                // with "ERROR" level, so it will show up even on
-                // less-than-verbose logs.
-                log.error(sm.getString("http11protocol.proto.error"), e);
-            }
-            release(socket, processor, true, false);
-            return SocketState.CLOSED;
-        }
-
-        @SuppressWarnings("unused")
-        private void initSsl(SocketWrapper<Long> socket,
+        protected void initSsl(SocketWrapper<Long> socket,
                 Http11AprProcessor processor) {
             // NOOP for APR
         }
 
-        private void longPoll(SocketWrapper<Long> socket,
+        @Override
+        protected void longPoll(SocketWrapper<Long> socket,
                 Http11AprProcessor processor) {
-            connections.put(socket.getSocket(), processor);
+            connections.put(socket, processor);
 
             if (processor.isAsync()) {
                 socket.setAsync(true);
@@ -318,6 +240,7 @@ public class Http11AprProtocol extends AbstractHttp11Protocol {
             }
         }
 
+        @Override
         protected Http11AprProcessor createProcessor() {
             Http11AprProcessor processor = new Http11AprProcessor(
                     proto.getMaxHttpHeaderSize(), (AprEndpoint)proto.endpoint,
