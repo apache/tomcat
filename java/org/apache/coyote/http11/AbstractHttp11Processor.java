@@ -47,9 +47,10 @@ import org.apache.tomcat.util.http.MimeHeaders;
 import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
 import org.apache.tomcat.util.net.SocketStatus;
+import org.apache.tomcat.util.net.SocketWrapper;
 import org.apache.tomcat.util.res.StringManager;
 
-public abstract class AbstractHttp11Processor extends AbstractProcessor {
+public abstract class AbstractHttp11Processor<S> extends AbstractProcessor {
 
     protected abstract Log getLog();
 
@@ -1210,6 +1211,9 @@ public abstract class AbstractHttp11Processor extends AbstractProcessor {
 
     }
 
+    
+    public abstract SocketState process(SocketWrapper<S> socket)
+            throws IOException;
     
     public SocketState asyncDispatch(SocketStatus status) {
 

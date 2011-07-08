@@ -16,7 +16,12 @@
  */
 package org.apache.coyote.http11;
 
+import java.util.concurrent.ConcurrentHashMap;
+
 import org.apache.coyote.AbstractProtocol;
+import org.apache.tomcat.util.ExceptionUtils;
+import org.apache.tomcat.util.net.SocketStatus;
+import org.apache.tomcat.util.net.SocketWrapper;
 import org.apache.tomcat.util.res.StringManager;
 
 public abstract class AbstractHttp11Protocol extends AbstractProtocol {
@@ -181,5 +186,95 @@ public abstract class AbstractHttp11Protocol extends AbstractProtocol {
     }
     public void setMaxKeepAliveRequests(int mkar) {
         endpoint.setMaxKeepAliveRequests(mkar);
+    }
+
+
+    protected abstract static class AbstractHttp11ConnectionHandler<S,P extends AbstractHttp11Processor<S>>
+            extends AbstractConnectionHandler {
+        
+        protected ConcurrentHashMap<SocketWrapper<S>,P> connections =
+            new ConcurrentHashMap<SocketWrapper<S>,P>();
+
+        protected RecycledProcessors<P> recycledProcessors =
+            new RecycledProcessors<P>(this);
+        
+        @Override
+        public void recycle() {
+            recycledProcessors.clear();
+        }
+        
+        public SocketState process(SocketWrapper<S> socket,
+                SocketStatus status) {
+            P processor = connections.remove(socket);
+
+            socket.setAsync(false); //no longer check for timeout
+
+            try {
+                if (processor == null) {
+                    processor = recycledProcessors.poll();
+                }
+                if (processor == null) {
+                    processor = createProcessor();
+                }
+
+                initSsl(socket, processor);
+                
+                SocketState state = SocketState.CLOSED;
+                do {
+                    if (processor.isAsync() || state == SocketState.ASYNC_END) {
+                        state = processor.asyncDispatch(status);
+                    } else if (processor.comet) {
+                        state = processor.event(status);
+                    } else {
+                        state = processor.process(socket);
+                    }
+    
+                    if (state != SocketState.CLOSED && processor.isAsync()) {
+                        state = processor.asyncPostProcess();
+                    }
+                } while (state == SocketState.ASYNC_END);
+
+                if (state == SocketState.LONG) {
+                    // In the middle of processing a request/response. Keep the
+                    // socket associated with the processor. Exact requirements
+                    // depend on type of long poll
+                    longPoll(socket, processor);
+                } else if (state == SocketState.OPEN){
+                    // In keep-alive but between requests. OK to recycle
+                    // processor. Continue to poll for the next request.
+                    release(socket, processor, false, true);
+                } else {
+                    // Connection closed. OK to recycle the processor.
+                    release(socket, processor, true, false);
+                }
+                return state;
+            } catch(java.net.SocketException e) {
+                // SocketExceptions are normal
+                getLog().debug(sm.getString(
+                        "http11protocol.proto.socketexception.debug"), e);
+            } catch (java.io.IOException e) {
+                // IOExceptions are normal
+                getLog().debug(sm.getString(
+                        "http11protocol.proto.ioexception.debug"), e);
+            }
+            // Future developers: if you discover any other
+            // rare-but-nonfatal exceptions, catch them here, and log as
+            // above.
+            catch (Throwable e) {
+                ExceptionUtils.handleThrowable(e);
+                // any other exception or error is odd. Here we log it
+                // with "ERROR" level, so it will show up even on
+                // less-than-verbose logs.
+                getLog().error(sm.getString("http11protocol.proto.error"), e);
+            }
+            release(socket, processor, true, false);
+            return SocketState.CLOSED;
+        }
+        
+        protected abstract P createProcessor();
+        protected abstract void initSsl(SocketWrapper<S> socket, P processor);
+        protected abstract void longPoll(SocketWrapper<S> socket, P processor);
+        protected abstract void release(SocketWrapper<S> socket, P processor,
+                boolean socketClosing, boolean addToPoller);        
     }
 }
