@@ -177,7 +177,7 @@ public class Http11AprProtocol extends AbstractHttp11Protocol {
     // --------------------  Connection handler --------------------
 
     protected static class Http11ConnectionHandler
-            extends AbstractHttp11ConnectionHandler<Long,Http11AprProcessor> implements Handler {
+            extends AbstractConnectionHandler<Long,Http11AprProcessor> implements Handler {
         
         protected Http11AprProtocol proto;
         

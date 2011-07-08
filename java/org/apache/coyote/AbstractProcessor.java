@@ -16,16 +16,19 @@
  */
 package org.apache.coyote;
 
+import java.io.IOException;
 import java.util.concurrent.Executor;
 
 import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
+import org.apache.tomcat.util.net.SocketStatus;
+import org.apache.tomcat.util.net.SocketWrapper;
 
 /**
  * Provides functionality and attributes common to all supported protocols
  * (currently HTTP and AJP).
  */
-public abstract class AbstractProcessor implements ActionHook, Processor {
+public abstract class AbstractProcessor<S> implements ActionHook, Processor {
 
     protected Adapter adapter;
     protected final AsyncStateMachine asyncStateMachine;
@@ -100,4 +103,25 @@ public abstract class AbstractProcessor implements ActionHook, Processor {
     public SocketState asyncPostProcess() {
         return asyncStateMachine.asyncPostProcess();
     }
+
+    protected abstract boolean isComet();
+
+    /**
+     * Process HTTP requests. All requests are treated as HTTP requests to start
+     * with although they may change type during processing.
+     */
+    public abstract SocketState process(SocketWrapper<S> socket)
+        throws IOException;
+
+
+    /**
+     * Process in-progress Comet requests. These will start as HTTP requests.
+     */
+    public abstract SocketState event(SocketStatus status) throws IOException;
+
+    /**
+     * Process in-progress Servlet 3.0 Async requests. These will start as HTTP
+     * requests.
+     */
+    public abstract SocketState asyncDispatch(SocketStatus status);
 }
