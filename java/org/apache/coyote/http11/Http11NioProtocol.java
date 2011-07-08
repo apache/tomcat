@@ -187,6 +187,10 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol {
             recycledProcessors.clear();
         }
         
+        /**
+         * Expected to be used by the Poller to release resources on socket
+         * close, errors etc.
+         */
         @Override
         public void release(SocketChannel socket) {
             if (log.isDebugEnabled()) 
@@ -209,8 +213,8 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol {
         }
         
         /**
-         * Use this only if the processor is not available, otherwise use
-         * {@link #release(SocketWrapper, Http11NioProcessor)}.
+         * Expected to be used by the Poller to release resources on socket
+         * close, errors etc.
          */
         @Override
         public void release(SocketWrapper<NioChannel> socket) {
@@ -222,11 +226,23 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol {
         }
 
 
+        /**
+         * Expected to be used by the handler once the processor is no longer
+         * required.
+         * 
+         * @param socket
+         * @param processor
+         * @param isSocketClosing   Not used in HTTP
+         * @param addToPoller
+         */
         public void release(SocketWrapper<NioChannel> socket,
-                Http11NioProcessor processor) {
-            connections.remove(socket);
+                Http11NioProcessor processor, boolean isSocketClosing,
+                boolean addToPoller) {
             processor.recycle();
             recycledProcessors.offer(processor);
+            if (addToPoller) {
+                socket.getSocket().getPoller().add(socket.getSocket());
+            }
         }
 
 
@@ -283,11 +299,10 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol {
                 } else if (state == SocketState.OPEN){
                     // In keep-alive but between requests. OK to recycle
                     // processor. Continue to poll for the next request.
-                    release(socket, processor);
-                    socket.getSocket().getPoller().add(socket.getSocket());
+                    release(socket, processor, false, true);
                 } else {
                     // Connection closed. OK to recycle the processor.
-                    release(socket, processor);
+                    release(socket, processor, true, false);
                 }
                 return state;
             } catch (java.net.SocketException e) {
@@ -309,7 +324,7 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol {
                 // less-than-verbose logs.
                 log.error(sm.getString("http11protocol.proto.error"), e);
             }
-            release(socket, processor);
+            release(socket, processor, true, false);
             return SocketState.CLOSED;
         }
 
