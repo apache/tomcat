@@ -386,6 +386,13 @@ public class Http11Processor extends AbstractHttp11Processor {
     }
 
 
+    @Override
+    public SocketState event(SocketStatus status) throws IOException {
+        // Should never reach this code but in case we do...
+        throw new IOException(
+                sm.getString("http11processor.comet.notsupported"));
+    }
+
     // ----------------------------------------------------- ActionHook Methods
 
 

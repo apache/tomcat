@@ -245,16 +245,7 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol {
                     processor = createProcessor();
                 }
 
-                if (proto.isSSLEnabled() &&
-                        (proto.sslImplementation != null)
-                        && (socket.getSocket() instanceof SecureNioChannel)) {
-                    SecureNioChannel ch = (SecureNioChannel)socket.getSocket();
-                    processor.setSslSupport(
-                            proto.sslImplementation.getSSLSupport(
-                                    ch.getSslEngine().getSession()));
-                } else {
-                    processor.setSslSupport(null);
-                }
+                initSsl(socket, processor);
 
                 SocketState state = SocketState.CLOSED;
                 do {
@@ -299,7 +290,6 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol {
                     release(socket, processor);
                 }
                 return state;
-
             } catch (java.net.SocketException e) {
                 // SocketExceptions are normal
                 log.debug(sm.getString(
@@ -321,6 +311,21 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol {
             }
             release(socket, processor);
             return SocketState.CLOSED;
+        }
+
+        private void initSsl(SocketWrapper<NioChannel> socket,
+                Http11NioProcessor processor) {
+            if (proto.isSSLEnabled() &&
+                    (proto.sslImplementation != null)
+                    && (socket.getSocket() instanceof SecureNioChannel)) {
+                SecureNioChannel ch = (SecureNioChannel)socket.getSocket();
+                processor.setSslSupport(
+                        proto.sslImplementation.getSSLSupport(
+                                ch.getSslEngine().getSession()));
+            } else {
+                processor.setSslSupport(null);
+            }
+
         }
 
         public Http11NioProcessor createProcessor() {

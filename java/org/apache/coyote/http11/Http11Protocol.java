@@ -136,8 +136,12 @@ public class Http11Protocol extends AbstractHttp11JsseProtocol {
         }
 
         @Override
-        public SocketState process(SocketWrapper<Socket> socket, SocketStatus status) {
+        public SocketState process(SocketWrapper<Socket> socket,
+                SocketStatus status) {
             Http11Processor processor = connections.remove(socket);
+
+            socket.setAsync(false); //no longer check for timeout
+
             try {
                 if (processor == null) {
                     processor = recycledProcessors.poll();
@@ -146,18 +150,14 @@ public class Http11Protocol extends AbstractHttp11JsseProtocol {
                     processor = createProcessor();
                 }
 
-                if (proto.isSSLEnabled() && (proto.sslImplementation != null)) {
-                    processor.setSSLSupport(
-                            proto.sslImplementation.getSSLSupport(
-                                    socket.getSocket()));
-                } else {
-                    processor.setSSLSupport(null);
-                }
+                initSsl(socket,processor);
                 
                 SocketState state = SocketState.CLOSED;
                 do {
                     if (processor.isAsync() || state == SocketState.ASYNC_END) {
                         state = processor.asyncDispatch(status);
+                    } else if (processor.comet) {
+                        state = processor.event(status);
                     } else {
                         state = processor.process(socket);
                     }
@@ -166,12 +166,18 @@ public class Http11Protocol extends AbstractHttp11JsseProtocol {
                         state = processor.asyncPostProcess();
                     }
                 } while (state == SocketState.ASYNC_END);
-                // TODO Better to add a new state to the AsyncStateMachine and
-                //      remove ASYNC_END entirely
 
                 if (state == SocketState.LONG) {
+                    // In the middle of processing a request/response. Keep the
+                    // socket associated with the processor.
                     connections.put(socket, processor);
+                } else if (state == SocketState.OPEN){
+                    // In keep-alive but between requests. OK to recycle
+                    // processor. Continue to poll for the next request.
+                    processor.recycle();
+                    recycledProcessors.offer(processor);
                 } else {
+                    // Connection closed. OK to recycle the processor.
                     processor.recycle();
                     recycledProcessors.offer(processor);
                 }
@@ -200,6 +206,18 @@ public class Http11Protocol extends AbstractHttp11JsseProtocol {
             return SocketState.CLOSED;
         }
         
+        private void initSsl(SocketWrapper<Socket> socket,
+                Http11Processor processor) {
+            if (proto.isSSLEnabled() && (proto.sslImplementation != null)) {
+                processor.setSSLSupport(
+                        proto.sslImplementation.getSSLSupport(
+                                socket.getSocket()));
+            } else {
+                processor.setSSLSupport(null);
+            }
+
+        }
+
         protected Http11Processor createProcessor() {
             Http11Processor processor = new Http11Processor(
                     proto.getMaxHttpHeaderSize(), (JIoEndpoint)proto.endpoint,
