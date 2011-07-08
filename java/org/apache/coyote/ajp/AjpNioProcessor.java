@@ -42,7 +42,7 @@ import org.apache.tomcat.util.net.SocketWrapper;
 /**
  * Processes AJP requests using NIO.
  */
-public class AjpNioProcessor extends AbstractAjpProcessor {
+public class AjpNioProcessor extends AbstractAjpProcessor<NioChannel> {
 
 
     /**
@@ -91,6 +91,7 @@ public class AjpNioProcessor extends AbstractAjpProcessor {
      *
      * @throws IOException error during an I/O operation
      */
+    @Override
     public SocketState process(SocketWrapper<NioChannel> socket)
         throws IOException {
         RequestInfo rp = request.getRequestProcessor();
