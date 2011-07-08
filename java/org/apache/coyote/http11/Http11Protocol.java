@@ -166,7 +166,7 @@ public class Http11Protocol extends AbstractHttp11JsseProtocol {
                     processor = createProcessor();
                 }
 
-                initSsl(socket,processor);
+                initSsl(socket, processor);
                 
                 SocketState state = SocketState.CLOSED;
                 do {
@@ -185,8 +185,9 @@ public class Http11Protocol extends AbstractHttp11JsseProtocol {
 
                 if (state == SocketState.LONG) {
                     // In the middle of processing a request/response. Keep the
-                    // socket associated with the processor.
-                    connections.put(socket, processor);
+                    // socket associated with the processor. Exact requirements
+                    // depend on type of long poll
+                    longPoll(socket, processor);
                 } else if (state == SocketState.OPEN){
                     // In keep-alive but between requests. OK to recycle
                     // processor. Continue to poll for the next request.
@@ -229,6 +230,11 @@ public class Http11Protocol extends AbstractHttp11JsseProtocol {
                 processor.setSSLSupport(null);
             }
 
+        }
+
+        private void longPoll(SocketWrapper<Socket> socket,
+                Http11Processor processor) {
+            connections.put(socket, processor);
         }
 
         protected Http11Processor createProcessor() {

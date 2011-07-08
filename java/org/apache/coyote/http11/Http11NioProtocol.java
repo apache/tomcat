@@ -280,22 +280,9 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol {
 
                 if (state == SocketState.LONG) {
                     // In the middle of processing a request/response. Keep the
-                    // socket associated with the processor.
-                    connections.put(socket, processor);
-                    
-                    if (processor.isAsync()) {
-                        socket.setAsync(true);
-                    } else {
-                        // Either:
-                        //  - this is comet request
-                        //  - the request line/headers have not been completely
-                        //    read
-                        SelectionKey key = socket.getSocket().getIOChannel().keyFor(
-                                socket.getSocket().getPoller().getSelector());
-                        key.interestOps(SelectionKey.OP_READ);
-                        ((KeyAttachment) socket).interestOps(
-                                SelectionKey.OP_READ);
-                    }
+                    // socket associated with the processor. Exact requirements
+                    // depend on type of long poll
+                    longPoll(socket, processor);
                 } else if (state == SocketState.OPEN){
                     // In keep-alive but between requests. OK to recycle
                     // processor. Continue to poll for the next request.
@@ -341,6 +328,25 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol {
                 processor.setSslSupport(null);
             }
 
+        }
+
+        private void longPoll(SocketWrapper<NioChannel> socket,
+                Http11NioProcessor processor) {
+            connections.put(socket, processor);
+            
+            if (processor.isAsync()) {
+                socket.setAsync(true);
+            } else {
+                // Either:
+                //  - this is comet request
+                //  - the request line/headers have not been completely
+                //    read
+                SelectionKey key = socket.getSocket().getIOChannel().keyFor(
+                        socket.getSocket().getPoller().getSelector());
+                key.interestOps(SelectionKey.OP_READ);
+                ((KeyAttachment) socket).interestOps(
+                        SelectionKey.OP_READ);
+            }
         }
 
         public Http11NioProcessor createProcessor() {
