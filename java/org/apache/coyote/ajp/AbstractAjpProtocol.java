@@ -83,7 +83,7 @@ public abstract class AbstractAjpProtocol extends AbstractProtocol {
         @Override
         protected void longPoll(SocketWrapper<S> socket, P processor) {
             // Same requirements for all AJP connectors
-            connections.put(socket, processor);
+            connections.put(socket.getSocket(), processor);
             socket.setAsync(true);
         }
     }
