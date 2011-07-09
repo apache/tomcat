@@ -79,6 +79,9 @@
       <update>
         Update to Commons Daemon 1.0.6. (markt)
       </update>
+      <update>
+        Update to Eclipse JDT Compiler 3.7. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
