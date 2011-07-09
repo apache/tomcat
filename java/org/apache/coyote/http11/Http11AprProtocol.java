@@ -230,7 +230,7 @@ public class Http11AprProtocol extends AbstractHttp11Protocol {
         @Override
         protected void longPoll(SocketWrapper<Long> socket,
                 Http11AprProcessor processor) {
-            connections.put(socket, processor);
+            connections.put(socket.getSocket(), processor);
 
             if (processor.isAsync()) {
                 socket.setAsync(true);

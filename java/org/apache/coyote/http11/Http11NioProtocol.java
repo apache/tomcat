@@ -182,10 +182,10 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol {
             if (log.isDebugEnabled()) 
                 log.debug("Iterating through our connections to release a socket channel:"+socket);
             boolean released = false;
-            Iterator<java.util.Map.Entry<SocketWrapper<NioChannel>, Http11NioProcessor>> it = connections.entrySet().iterator();
+            Iterator<java.util.Map.Entry<NioChannel, Http11NioProcessor>> it = connections.entrySet().iterator();
             while (it.hasNext()) {
-                java.util.Map.Entry<SocketWrapper<NioChannel>, Http11NioProcessor> entry = it.next();
-                if (entry.getKey().getSocket().getIOChannel()==socket) {
+                java.util.Map.Entry<NioChannel, Http11NioProcessor> entry = it.next();
+                if (entry.getKey().getIOChannel()==socket) {
                     it.remove();
                     Http11NioProcessor result = entry.getValue();
                     result.recycle();
@@ -252,7 +252,7 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol {
         @Override
         protected void longPoll(SocketWrapper<NioChannel> socket,
                 Http11NioProcessor processor) {
-            connections.put(socket, processor);
+            connections.put(socket.getSocket(), processor);
             
             if (processor.isAsync()) {
                 socket.setAsync(true);
