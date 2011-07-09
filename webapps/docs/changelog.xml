@@ -60,6 +60,10 @@
         Various refactorings to reduce code duplication and unnecessary code in
         the connectors. (markt)
       </update>
+      <fix>
+        Correct regression introduced in 7.0.17 that triggered 400 entries in
+        the AccessLog when using the AJP/BIO connector. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
