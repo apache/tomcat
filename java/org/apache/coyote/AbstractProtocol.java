@@ -468,8 +468,8 @@ public abstract class AbstractProtocol implements ProtocolHandler,
         protected RequestGroupInfo global = new RequestGroupInfo();
         protected AtomicLong registerCount = new AtomicLong(0);
 
-        protected ConcurrentHashMap<SocketWrapper<S>,P> connections =
-            new ConcurrentHashMap<SocketWrapper<S>,P>();
+        protected ConcurrentHashMap<S,P> connections =
+            new ConcurrentHashMap<S,P>();
 
         protected RecycledProcessors<P,S> recycledProcessors =
             new RecycledProcessors<P,S>(this);
@@ -491,7 +491,7 @@ public abstract class AbstractProtocol implements ProtocolHandler,
 
         public SocketState process(SocketWrapper<S> socket,
                 SocketStatus status) {
-            P processor = connections.remove(socket);
+            P processor = connections.remove(socket.getSocket());
 
             socket.setAsync(false);
 
