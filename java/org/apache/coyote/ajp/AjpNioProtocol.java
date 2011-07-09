@@ -120,10 +120,10 @@ public class AjpNioProtocol extends AbstractAjpProtocol {
             if (log.isDebugEnabled()) 
                 log.debug("Iterating through our connections to release a socket channel:"+socket);
             boolean released = false;
-            Iterator<java.util.Map.Entry<SocketWrapper<NioChannel>, AjpNioProcessor>> it = connections.entrySet().iterator();
+            Iterator<java.util.Map.Entry<NioChannel, AjpNioProcessor>> it = connections.entrySet().iterator();
             while (it.hasNext()) {
-                java.util.Map.Entry<SocketWrapper<NioChannel>, AjpNioProcessor> entry = it.next();
-                if (entry.getKey().getSocket().getIOChannel()==socket) {
+                java.util.Map.Entry<NioChannel, AjpNioProcessor> entry = it.next();
+                if (entry.getKey().getIOChannel()==socket) {
                     it.remove();
                     AjpNioProcessor result = entry.getValue();
                     result.recycle(true);
