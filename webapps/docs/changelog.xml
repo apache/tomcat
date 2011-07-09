@@ -66,6 +66,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Cluster">
+    <changelog>
+      <update>
+        Remove unnecessary serverl.xml parsing code for old cluster
+        implementation that does not ship as part of Tomcat 7. (markt)
+      </update>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 7.0.18 (markt)" rtext="TBD">
   <subsection name="Catalina">
