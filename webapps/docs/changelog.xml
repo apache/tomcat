@@ -74,6 +74,13 @@
       </update>
     </changelog>
   </subsection>
+  <subsection name="Other">
+    <changelog>
+      <update>
+        Update to Commons Daemon 1.0.6. (markt)
+      </update>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 7.0.18 (markt)" rtext="TBD">
   <subsection name="Catalina">
