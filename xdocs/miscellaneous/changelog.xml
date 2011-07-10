@@ -39,6 +39,9 @@
 <section name="Changes between 1.1.20 and 1.1.21">
   <changelog>
     <fix>
+      Support arbitrary protocol combinations of SSLv2, SSLv3 and TLSv1. (rjung)
+    </fix>
+    <fix>
       <bug>51437</bug>: Try loading certificate in DER format if PEM was invalid. (mturk)
     </fix>
     <fix>
