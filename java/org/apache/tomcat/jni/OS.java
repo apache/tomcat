@@ -58,7 +58,7 @@ public class OS {
     public static final boolean IS_MACOSX  = is(MACOSX);
 
     /**
-     * Get the name of the system default characer set.
+     * Get the name of the system default character set.
      * @param pool the pool to allocate the name from, if needed
      */
     public static native String defaultEncoding(long pool);
@@ -66,7 +66,7 @@ public class OS {
     /**
      * Get the name of the current locale character set.
      * Defers to apr_os_default_encoding if the current locale's
-     * data can't be retreved on this system.
+     * data can't be retrieved on this system.
      * @param pool the pool to allocate the name from, if needed
      */
     public static native String localeEncoding(long pool);

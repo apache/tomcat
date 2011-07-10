@@ -419,7 +419,7 @@ public class File {
     public static native int writeFullb(long thefile, ByteBuffer buf, int offset, int nbytes);
 
     /**
-     * Write data from aray of byte arrays to the specified file.
+     * Write data from array of byte arrays to the specified file.
      *
      * It is possible for both bytes to be written and an error to
      * be returned.  APR_EINTR is never returned.
@@ -433,7 +433,7 @@ public class File {
     public static native int writev(long thefile, byte[][] vec);
 
     /**
-     * Write data from aray of byte arrays to the specified file,
+     * Write data from array of byte arrays to the specified file,
      * ensuring that all of the data is written before returning.
      *
      * writevFull is available even if the underlying
@@ -543,7 +543,7 @@ public class File {
     /**
      * Read a character from the specified file.
      * @param thefile The file descriptor to read from
-     * @return The readed character
+     * @return The read character
      */
     public static native int getc(long thefile)
         throws Error;
@@ -576,7 +576,7 @@ public class File {
 
     /**
      * Set attributes of the specified file.
-     * This function should be used in preference to explict manipulation
+     * This function should be used in preference to explicit manipulation
      *      of the file permissions, because the operations to provide these
      *      attributes are platform specific and may involve more than simply
      *      setting permission bits.
@@ -624,7 +624,7 @@ public class File {
     /**
      * Retrieve the flags that were passed into apr_file_open()
      * when the file was opened.
-     * @param file The file to retrive flags.
+     * @param file The file to retrieve flags.
      * @return the flags
      */
     public static native int flagsGet(long file);

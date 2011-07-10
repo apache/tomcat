@@ -65,7 +65,7 @@ public class Proc {
     public static final int APR_OC_REASON_DEATH      = 0;
     /** write_fd is unwritable */
     public static final int APR_OC_REASON_UNWRITABLE = 1;
-    /** a restart is occuring, perform any necessary cleanup (including
+    /** a restart is occurring, perform any necessary cleanup (including
      * sending a special signal to child)
      */
     public static final int APR_OC_REASON_RESTART    = 2;
@@ -75,7 +75,7 @@ public class Proc {
     public static final int APR_OC_REASON_UNREGISTER = 3;
     /** somehow the child exited without us knowing ... buggy os? */
     public static final int APR_OC_REASON_LOST       = 4;
-    /** a health check is occuring, for most maintainence functions
+    /** a health check is occurring, for most maintenance functions
      * this is a no-op.
      */
     public static final int APR_OC_REASON_RUNNING    = 5;
@@ -101,7 +101,7 @@ public class Proc {
     public static final int MAX_ENV_SIZE           = 1024;
 
     /**
-     * Allocate apr_proc_t stucture from pool
+     * Allocate apr_proc_t structure from pool
      * This is not an apr function.
      * @param cont The pool to use.
      */
