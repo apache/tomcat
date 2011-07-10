@@ -109,6 +109,9 @@
       <update>
         Update to Eclipse JDT Compiler 3.7. (markt)
       </update>
+      <add>
+        Include jdbc-pool into tomcat release. (fhanik)
+      </add>
     </changelog>
   </subsection>
 </section>
