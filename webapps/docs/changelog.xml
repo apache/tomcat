@@ -71,6 +71,9 @@
       <add>
         Add option to activate AccessLog for unit tests. (rjung)
       </add>
+      <fix>
+        Fix regression in year number formatting for AccessLogValve. (rjung)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">
