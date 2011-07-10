@@ -233,8 +233,7 @@ public abstract class AbstractProtocol implements ProtocolHandler,
             name.append('-');
         }
         name.append(endpoint.getPort());
-        String quotedName = ObjectName.quote(name.toString());
-        return quotedName.substring(1, quotedName.length()-1);
+        return ObjectName.quote(name.toString());
     }
 
     
@@ -363,7 +362,8 @@ public abstract class AbstractProtocol implements ProtocolHandler,
                     getHandler().getGlobal(), rgOname, null );
         }
 
-        endpoint.setName(getName());
+        String endpointName = getName();
+        endpoint.setName(endpointName.substring(1, endpointName.length()-1));
 
         try {
             endpoint.init();

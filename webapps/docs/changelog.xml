@@ -64,6 +64,10 @@
         Correct regression introduced in 7.0.17 that triggered 400 entries in
         the AccessLog when using the AJP/BIO connector. (markt)
       </fix>
+      <fix>
+        Fix regression producing invalid MBean names when using IPV6
+        addresses for connectors. (rjung)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">
