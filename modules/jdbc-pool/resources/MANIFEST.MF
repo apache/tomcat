@@ -1,15 +1,15 @@
 Manifest-Version: 1.0
 Export-Package: 
-  org.apache.tomcat.jdbc.pool;version="@@VERSION@@";
+  org.apache.tomcat.jdbc.pool;version="@VERSION@";
   uses:="javax.management,javax.naming,javax.naming.spi,javax.sql,
   org.apache.tomcat.jdbc.pool.jmx",
-  org.apache.tomcat.jdbc.pool.interceptor;version="@@VERSION@@";
+  org.apache.tomcat.jdbc.pool.interceptor;version="@VERSION@";
   uses:="javax.management.openmbean,org.apache.tomcat.jdbc.pool",
-  org.apache.tomcat.jdbc.pool.jmx;version="@@VERSION@@";
+  org.apache.tomcat.jdbc.pool.jmx;version="@VERSION@";
   uses:="javax.management,org.apache.tomcat.jdbc.pool"
 Ant-Version: Apache Ant 1.7.0
 Bundle-Vendor: Apache Software Foundation
-Bundle-Version: @@VERSION@@
+Bundle-Version: @VERSION@
 Bundle-Name: Apache Tomcat JDBC Connection Pool
 Bundle-ManifestVersion: 2
 Created-By: 11.0-b16 (Sun Microsystems Inc.)
