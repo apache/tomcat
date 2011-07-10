@@ -74,6 +74,10 @@
       <fix>
         Fix regression in year number formatting for AccessLogValve. (rjung)
       </fix>
+      <fix>
+        Add missing thread name in RequestProcessor when Servlet 3 Async
+        is used. Fixes null thread name in access log and JMX MBean. (rjung)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">
