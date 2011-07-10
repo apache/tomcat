@@ -125,14 +125,7 @@ public abstract class TomcatBaseTest extends TestCase {
         
         tomcat = new Tomcat();
 
-        // Has a protocol been specified
-        String protocol = System.getProperty("tomcat.test.protocol");
-        
-        // Use BIO by default
-        if (protocol == null) {
-            protocol = "org.apache.coyote.http11.Http11Protocol";
-        }
-
+        String protocol = getProtocol();
         Connector connector = new Connector(protocol);
         // If each test is running on same port - they
         // may interfere with each other
@@ -164,6 +157,18 @@ public abstract class TomcatBaseTest extends TestCase {
         }
     }
     
+    protected String getProtocol() {
+        // Has a protocol been specified
+        String protocol = System.getProperty("tomcat.test.protocol");
+        
+        // Use BIO by default
+        if (protocol == null) {
+            protocol = "org.apache.coyote.http11.Http11Protocol";
+        }
+
+        return protocol;
+    }
+
     @Override
     public void tearDown() throws Exception {
         // Some tests may call tomcat.destroy(), some tests may just call
