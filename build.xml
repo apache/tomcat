@@ -1102,6 +1102,7 @@
         <sysproperty key="tomcat.test.temp" value="${test.temp}" />
         <sysproperty key="tomcat.test.tomcatbuild" value="${tomcat.build}" />
         <sysproperty key="tomcat.test.protocol" value="@{protocol}" />
+        <sysproperty key="tomcat.test.accesslog" value="${test.accesslog}" />
 
         <formatter type="plain" usefile="true" extension="@{extension}"/>
 
