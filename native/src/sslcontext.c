@@ -476,7 +476,6 @@ static X509 *load_pem_cert(tcn_ssl_ctxt_t *c, const char *file)
     BIO *bio = NULL;
     X509 *cert = NULL;
     tcn_pass_cb_t *cb_data = c->cb_data;
-    int i;
 
     if ((bio = BIO_new(BIO_s_file())) == NULL) {
         return NULL;
@@ -485,14 +484,14 @@ static X509 *load_pem_cert(tcn_ssl_ctxt_t *c, const char *file)
         BIO_free(bio);
         return NULL;
     }
-    for (i = 0; i < 3; i++) {
-        cert = PEM_read_bio_X509_AUX(bio, NULL,
-                    (pem_password_cb *)SSL_password_callback,
-                    (void *)cb_data);
-        if (cert)
-            break;
-        cb_data->password[0] = '\0';
+    cert = PEM_read_bio_X509_AUX(bio, NULL,
+                (pem_password_cb *)SSL_password_callback,
+                (void *)cb_data);
+    if (cert == NULL &&
+       (ERR_GET_REASON(ERR_peek_last_error()) == PEM_R_NO_START_LINE)) {
+        ERR_clear_error();
         BIO_ctrl(bio, BIO_CTRL_RESET, 0, NULL);
+        cert = d2i_X509_bio(bio, NULL);
     }
     BIO_free(bio);
     return cert;
