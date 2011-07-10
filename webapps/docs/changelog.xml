@@ -68,6 +68,9 @@
         Fix regression producing invalid MBean names when using IPV6
         addresses for connectors. (rjung)
       </fix>
+      <add>
+        Add option to activate AccessLog for unit tests. (rjung)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Cluster">

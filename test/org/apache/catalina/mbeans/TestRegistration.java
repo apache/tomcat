@@ -59,6 +59,16 @@ public class TestRegistration extends TomcatBaseTest {
         };
     }
 
+    private String[] optionalMBeanNames(String host, String context) {
+        if (isAccessLogEnabled()) {
+            return new String[] {
+                "Tomcat:type=Valve,host=" + host + ",name=AccessLogValve",
+            };
+        } else {
+            return new String[] { };
+        }
+    }
+
     private static String[] contextMBeanNames(String host, String context) {
         return new String[] {
             "Tomcat:j2eeType=WebModule,name=//" + host + context +
@@ -131,6 +141,7 @@ public class TestRegistration extends TomcatBaseTest {
         expected.addAll(Arrays.asList(hostMBeanNames("localhost")));
         expected.addAll(Arrays.asList(contextMBeanNames("localhost", contextName)));
         expected.addAll(Arrays.asList(connectorMBeanNames(Integer.toString(getPort()), protocol)));
+        expected.addAll(Arrays.asList(optionalMBeanNames("localhost", contextName)));
 
         // Did we find all expected MBeans?
         ArrayList<String> missing = new ArrayList<String>(expected);
