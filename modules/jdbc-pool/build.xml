@@ -145,7 +145,8 @@
            source="${compile.source}"
            target="${compile.target}"
            optimize="${compile.optimize}"
-           encoding="ISO-8859-1">
+           encoding="ISO-8859-1"
+           includeantruntime="false">
       <classpath refid="tomcat.jdbc.classpath"/>
       <include name="org/apache/tomcat/jdbc/**" />
     </javac>
@@ -179,7 +180,8 @@
            source="${compile.source}"
            target="${compile.target}"
            optimize="${compile.optimize}"
-           encoding="ISO-8859-1">
+           encoding="ISO-8859-1"
+           includeantruntime="false">
       <classpath refid="tomcat.jdbc.classpath"/>
       <classpath refid="test.classpath"/>
       <include name="org/apache/tomcat/jdbc/**" />
