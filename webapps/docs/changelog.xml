@@ -81,6 +81,15 @@
       </update>
     </changelog>
   </subsection>
+  <subsection name="Web applications">
+    <changelog>
+      <add>
+        Add additional information to the documentation web application on the
+        benefits and remaining risks when running under a security manager.
+        (markt)
+      </add>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <update>
