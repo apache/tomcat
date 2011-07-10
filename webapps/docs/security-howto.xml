@@ -83,7 +83,20 @@
     sandbox, significantly limiting a web application's ability to perform
     malicious actions such as calling System.exit(), establishing network
     connections or accessing the file system outside of the web application's
-    root and temporary directories.</p>
+    root and temporary directories. However, it should be noted that there are
+    some malicious actions, such as triggering high CPU consumption via an
+    infinite loop, that the security manager cannot prevent.</p>
+
+    <p>Enabling the security manager is usually done to limit the potential
+    impact, should an attacker find a way to compromise a trusted web
+    application . A security manager may also be used to reduce the risks of
+    running untrusted web applications (e.g. in hosting environments) but it
+    should be noted that the security manager only reduces the risks of
+    running untrusted web applications, it does not eliminate them. If running
+    multiple untrusted web applications, it is recommended that each web
+    application is deployed to a separate Tomcat instance (and ideally separate
+    hosts) to reduce the ability of a malicious web application impacting the
+    availability of other applications.</p>
     
     <p>Tomcat is tested with the security manager enabled; but the majority of
     Tomcat users do not run with a security manager, so Tomcat is not as well
