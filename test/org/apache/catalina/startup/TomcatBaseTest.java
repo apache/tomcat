@@ -38,6 +38,7 @@ import org.apache.catalina.LifecycleState;
 import org.apache.catalina.connector.Connector;
 import org.apache.catalina.core.AprLifecycleListener;
 import org.apache.catalina.core.StandardServer;
+import org.apache.catalina.valves.AccessLogValve;
 import org.apache.tomcat.util.buf.ByteChunk;
 
 /**
@@ -47,6 +48,7 @@ import org.apache.tomcat.util.buf.ByteChunk;
 public abstract class TomcatBaseTest extends TestCase {
     private Tomcat tomcat;
     private File tempDir;
+    private boolean accessLogEnabled = false;
     private static int port = 8000;
 
     public static final String TEMP_DIR = System.getProperty("java.io.tmpdir");
@@ -90,6 +92,13 @@ public abstract class TomcatBaseTest extends TestCase {
     public File getBuildDirectory() {
         return new File(System.getProperty("tomcat.test.tomcatbuild",
                 "output/build"));
+    }
+
+    /**
+     * Sub-classes may want to check, whether an AccessLogValve is active
+     */
+    public boolean isAccessLogEnabled() {
+        return accessLogEnabled;
     }
 
     @Override
@@ -144,6 +153,15 @@ public abstract class TomcatBaseTest extends TestCase {
         
         tomcat.setBaseDir(tempDir.getAbsolutePath());
         tomcat.getHost().setAppBase(appBase.getAbsolutePath());
+
+        accessLogEnabled = Boolean.parseBoolean(
+            System.getProperty("tomcat.test.accesslog", "false"));
+        if (accessLogEnabled) {
+            AccessLogValve alv = new AccessLogValve();
+            alv.setDirectory(getBuildDirectory() + "/logs");
+            alv.setPattern("%h %l %u %t \"%r\" %s %b %I %D");
+            tomcat.getHost().getPipeline().addValve(alv);
+        }
     }
     
     @Override
