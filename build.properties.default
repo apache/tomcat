@@ -38,7 +38,10 @@ execute.test.bio=true
 execute.test.nio=true
 # Still requires APR/native library to be present
 execute.test.apr=true
+# Stop testing if a failure occurs
 test.haltonfailure=false
+# Activate AccessLog during testing
+test.accesslog=false
 
 # Workaround against http://bugs.sun.com/view_bug.do?bug_id=6202721
 test.jvmarg.egd=-Djava.security.egd=file:/dev/./urandom
