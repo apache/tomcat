@@ -54,6 +54,16 @@
   issues to not "pop up" wrt. others).
 -->
 <section name="Tomcat 7.0.19 (markt)">
+  <subsection name="Catalina">
+    <changelog>
+      <add>
+        Add option to activate AccessLog for unit tests. (rjung)
+      </add>
+      <fix>
+        Fix regression in year number formatting for AccessLogValve. (rjung)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Coyote">
     <changelog>
       <update>
@@ -67,12 +77,6 @@
       <fix>
         Fix regression producing invalid MBean names when using IPV6
         addresses for connectors. (rjung)
-      </fix>
-      <add>
-        Add option to activate AccessLog for unit tests. (rjung)
-      </add>
-      <fix>
-        Fix regression in year number formatting for AccessLogValve. (rjung)
       </fix>
       <fix>
         Add missing thread name in RequestProcessor when Servlet 3 Async
