@@ -367,8 +367,12 @@ public class FileHandler
         // Open the current log file
         writerLock.writeLock().lock();
         try {
-            String pathname = dir.getAbsolutePath() + File.separator +
-                prefix + (rotatable ? date : "") + suffix;
+            File pathname = new File(dir.getAbsoluteFile(), prefix
+                    + (rotatable ? date : "") + suffix);
+            File parent = pathname.getParentFile();
+            if (!parent.exists()) {
+                parent.mkdirs();
+            }
             String encoding = getEncoding();
             FileOutputStream fos = new FileOutputStream(pathname, true);
             OutputStream os = bufferSize>0?new BufferedOutputStream(fos,bufferSize):fos;
