@@ -142,6 +142,9 @@
         improve the &lt;c:if&gt; example to make failures more obvious. Based on
         suggestions by Charles. (markt)
       </fix>
+      <add>
+        Document ExtendedAccessLogValve. (rjung)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Other">
