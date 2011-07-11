@@ -102,8 +102,6 @@ public final class Library {
     public static int TCN_PATCH_VERSION  = 0;
     /* TCN_IS_DEV_VERSION */
     public static int TCN_IS_DEV_VERSION = 0;
-    /* TCN_FULL_VERSION */
-    public static int TCN_FULL_VERSION   = 0;
     /* APR_MAJOR_VERSION */
     public static int APR_MAJOR_VERSION  = 0;
     /* APR_MINOR_VERSION */
@@ -180,9 +178,6 @@ public final class Library {
             TCN_MINOR_VERSION  = version(0x02);
             TCN_PATCH_VERSION  = version(0x03);
             TCN_IS_DEV_VERSION = version(0x04);
-            TCN_FULL_VERSION   = TCN_MAJOR_VERSION * 1000 +
-                                 TCN_MINOR_VERSION * 100 +
-                                 TCN_PATCH_VERSION;
             APR_MAJOR_VERSION  = version(0x11);
             APR_MINOR_VERSION  = version(0x12);
             APR_PATCH_VERSION  = version(0x13);

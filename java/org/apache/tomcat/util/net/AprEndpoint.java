@@ -473,7 +473,10 @@ public class AprEndpoint extends AbstractEndpoint {
             // SSL protocol
             int value;
             // This branch can be removed, once the required version is at least 1.1.21.
-            if (Library.TCN_FULL_VERSION <= 1120) {
+            int tcnFullVersion = Library.TCN_MAJOR_VERSION * 1000
+                    + Library.TCN_MINOR_VERSION * 100
+                    + Library.TCN_PATCH_VERSION;
+            if (tcnFullVersion <= 1120) {
                 value = SSL.SSL_PROTOCOL_ALL;
                 if ("SSLv2".equalsIgnoreCase(SSLProtocol)) {
                     value = SSL.SSL_PROTOCOL_SSLV2;
