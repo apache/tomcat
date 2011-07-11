@@ -89,8 +89,11 @@
         Log a failure if access log file cannot be opened. (kkolinko)
       </fix>
       <fix>
-        Always use en_US as locale for timestamps in ExtendedAccessLogValve.
+        Use en_US as locale for timestamps in ExtendedAccessLogValve.
         (rjung)
+      </fix>
+      <fix>
+        Use en_US as locale for creationdate in WebdavServlet. (rjung)
       </fix>
     </changelog>
   </subsection>
