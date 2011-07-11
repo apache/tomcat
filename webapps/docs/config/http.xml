@@ -90,7 +90,7 @@
       order to return the actual host name of the remote client.  Set
       to <code>false</code> to skip the DNS lookup and return the IP
       address in String form instead (thereby improving performance).
-      By default, DNS lookups are enabled.</p>
+      By default, DNS lookups are disabled.</p>
     </attribute>
 
     <attribute name="maxPostSize" required="false">
