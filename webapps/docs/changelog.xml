@@ -62,6 +62,10 @@
       <fix>
         Fix regression in year number formatting for AccessLogValve. (rjung)
       </fix>
+      <add>
+        <bug>46252</bug>: Allow to specify character set to be used to write
+        the access log in AccessLogValve. (kkolinko)
+      </add>
       <fix>
         <bug>51494</bug>: Prevent an NPE when a long running request completes
         if the associated web application was destroyed while the request was
