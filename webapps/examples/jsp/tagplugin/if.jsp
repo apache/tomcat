@@ -21,16 +21,15 @@
   <body>
     <h1>Tag Plugin Examples - &lt;c:if></h1>
 
-    <hr>
-    </br>
-    <a href="notes.html">Plugin Introductory Notes<font <font color="#0000FF"></a>
+    <hr/>
     <br/>
-    <a href="howto.html">Brief Instructions for Writing Plugins<font color="#0000FF"></a>
+    <a href="notes.html">Plugin Introductory Notes</a>
+    <br/>
+    <a href="howto.html">Brief Instructions for Writing Plugins</a>
     <br/> <br/>
-    <hr>
+    <hr/>
 
-    <font color="#000000"/>
-    </br>
+    <br/>
     <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 
     <h3>Set the test result to a variable</h3>
