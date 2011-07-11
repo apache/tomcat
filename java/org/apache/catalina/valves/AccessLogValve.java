@@ -1008,36 +1008,44 @@ public class AccessLogValve extends ValveBase implements AccessLog {
         }
 
         // Open the current log file
+        File pathname;
+        // If no rotate - no need for dateStamp in fileName
+        if (rotatable) {
+            pathname = new File(dir.getAbsoluteFile(), prefix + dateStamp
+                    + suffix);
+        } else {
+            pathname = new File(dir.getAbsoluteFile(), prefix + suffix);
+        }
+        File parent = pathname.getParentFile();
+        if (!parent.exists()) {
+            if (!parent.mkdirs()) {
+                log.error(sm.getString("accessLogValve.openDirFail", parent));
+            }
+        }
+
+        Charset charset = null;
+        if (encoding != null) {
+            try {
+                charset = B2CConverter.getCharset(encoding);
+            } catch (UnsupportedEncodingException ex) {
+                log.error(sm.getString(
+                        "accessLogValve.unsupportedEncoding", encoding), ex);
+            }
+        }
+        if (charset == null) {
+            charset = Charset.defaultCharset();
+        }
+
         try {
-            String pathname;
-            // If no rotate - no need for dateStamp in fileName
-            if (rotatable) {
-                pathname = dir.getAbsolutePath() + File.separator + prefix
-                        + dateStamp + suffix;
-            } else {
-                pathname = dir.getAbsolutePath() + File.separator + prefix
-                        + suffix;
-            }
-            Charset charset = null;
-            if (encoding != null) {
-                try {
-                    charset = B2CConverter.getCharset(encoding);
-                } catch (UnsupportedEncodingException ex) {
-                    log.error(sm.getString(
-                            "accessLogValve.unsupportedEncoding", encoding), ex);
-                }
-            }
-            if (charset == null) {
-                charset = Charset.defaultCharset();
-            }
             writer = new PrintWriter(new BufferedWriter(new OutputStreamWriter(
                     new FileOutputStream(pathname, true), charset), 128000),
                     false);
 
-            currentLogFile = new File(pathname);
+            currentLogFile = pathname;
         } catch (IOException e) {
             writer = null;
             currentLogFile = null;
+            log.error(sm.getString("accessLogValve.openFail", pathname), e);
         }
     }
  
