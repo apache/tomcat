@@ -493,8 +493,24 @@ public class CoyoteAdapter implements Adapter {
         }
         
         try {
-            connector.getService().getContainer().logAccess(
-                    request, response, time, true);
+            // Log at the lowest level available. logAccess() will be
+            // automatically called on parent containers.
+            boolean logged = false;
+            if (request.mappingData != null) {
+                if (request.mappingData.context != null) {
+                    logged = true;
+                    ((Context) request.mappingData.context).logAccess(
+                            request, response, time, true);
+                } else if (request.mappingData.host != null) {
+                    logged = true;
+                    ((Context) request.mappingData.context).logAccess(
+                            request, response, time, true);
+                }
+            }
+            if (!logged) {
+                connector.getService().getContainer().logAccess(
+                        request, response, time, true);
+            }
         } catch (Throwable t) {
             ExceptionUtils.handleThrowable(t);
             log.warn(sm.getString("coyoteAdapter.accesslogFail"), t);
