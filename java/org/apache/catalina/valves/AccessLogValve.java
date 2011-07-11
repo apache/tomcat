@@ -32,6 +32,7 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.TimeZone;
 
 import javax.servlet.ServletException;
@@ -249,6 +250,12 @@ public class AccessLogValve extends ValveBase implements AccessLog {
      * format) and a HashMap of caches for additional formats used by
      * SimpleDateFormat.</p>
      *
+     * <p>Although the cache supports specifying a locale when retrieving a
+     * formatted timestamp, each format will always use the locale given
+     * when the format was first used. New locales can only be used for new formats.
+     * The CLF format will always be formatted using the locale
+     * <code>en_US</code>.</p>
+     *
      * <p>The cache is not threadsafe. It can be used without synchronization
      * via thread local instances, or with synchronization as a global cache.</p>
      *
@@ -285,21 +292,34 @@ public class AccessLogValve extends ValveBase implements AccessLog {
 
             private Cache parent = null;
 
+            private Cache(Cache parent) {
+                this(null, parent);
+            }
+
             private Cache(String format, Cache parent) {
+                this(format, null, parent);
+            }
+
+            private Cache(String format, Locale loc, Cache parent) {
                 cache = new String[cacheSize];
                 for (int i = 0; i < cacheSize; i++) {
                     cache[i] = null;
                 }
+                if (loc == null) {
+                    loc = cacheDefaultLocale;
+                }
                 if (format == null) {
                     isCLF = true;
                     format = cLFFormat;
+                    formatter = new SimpleDateFormat(format, Locale.US);
+                } else {
+                    formatter = new SimpleDateFormat(format, loc);
                 }
-                formatter = new SimpleDateFormat(format);
                 formatter.setTimeZone(TimeZone.getDefault());
                 this.parent = parent;
             }
 
-            private String getFormat(long time) {
+            private String getFormatInternal(long time) {
 
                 long seconds = time / 1000;
 
@@ -349,7 +369,7 @@ public class AccessLogValve extends ValveBase implements AccessLog {
                  * parent cache or locally. */
                 if (parent != null) {
                     synchronized(parent) {
-                        previousFormat = parent.getFormat(time);
+                        previousFormat = parent.getFormatInternal(time);
                     }
                 } else {
                     currentDate.setTime(time);
@@ -372,23 +392,25 @@ public class AccessLogValve extends ValveBase implements AccessLog {
         /* Number of cached entries */
         private int cacheSize = 0;
 
+        private Locale cacheDefaultLocale;
         private DateFormatCache parent;
         private Cache cLFCache;
         private HashMap<String, Cache> formatCache = new HashMap<String, Cache>();
 
-        private DateFormatCache(int size, DateFormatCache parent) {
+        private DateFormatCache(int size, Locale loc, DateFormatCache parent) {
             cacheSize = size;
+            cacheDefaultLocale = loc;
             this.parent = parent;
             Cache parentCache = null;
             if (parent != null) {
                 synchronized(parent) {
-                    parentCache = parent.getCache(null);
+                    parentCache = parent.getCache(null, null);
                 }
             }
-            cLFCache = new Cache(null, parentCache);
+            cLFCache = new Cache(parentCache);
         }
 
-        private Cache getCache(String format) {
+        private Cache getCache(String format, Locale loc) {
             Cache cache;
             if (format == null) {
                 cache = cLFCache;
@@ -398,19 +420,22 @@ public class AccessLogValve extends ValveBase implements AccessLog {
                     Cache parentCache = null;
                     if (parent != null) {
                         synchronized(parent) {
-                            parentCache = parent.getCache(format);
+                            parentCache = parent.getCache(format, loc);
                         }
                     }
-                    cache = new Cache(format, parentCache);
+                    cache = new Cache(format, loc, parentCache);
                     formatCache.put(format, cache);
                 }
             }
             return cache;
         }
 
-        public String getFormat(String format, long time) {
+        public String getFormat(long time) {
+            return cLFCache.getFormatInternal(time);
+        }
 
-            return getCache(format).getFormat(time);
+        public String getFormat(String format, Locale loc, long time) {
+            return getCache(format, loc).getFormatInternal(time);
         }
     }
 
@@ -418,7 +443,7 @@ public class AccessLogValve extends ValveBase implements AccessLog {
      * Global date format cache.
      */
     private static final DateFormatCache globalDateCache =
-            new DateFormatCache(globalCacheSize, null);
+            new DateFormatCache(globalCacheSize, Locale.getDefault(), null);
 
     /**
      * Thread local date format cache.
@@ -427,7 +452,7 @@ public class AccessLogValve extends ValveBase implements AccessLog {
             new ThreadLocal<DateFormatCache>() {
         @Override
         protected DateFormatCache initialValue() {
-            return new DateFormatCache(localCacheSize, globalDateCache);
+            return new DateFormatCache(localCacheSize, Locale.getDefault(), globalDateCache);
         }
     };
 
@@ -479,6 +504,20 @@ public class AccessLogValve extends ValveBase implements AccessLog {
      * Date format to place in log file name. Use at your own risk!
      */
     protected String fileDateFormat = null;
+
+
+    /**
+     * Name of locale used to format timestamps in log entries and in
+     * log file name suffix.
+     */
+    protected String localeName = Locale.getDefault().toString();
+
+
+    /**
+     * Locale used to format timestamps in log entries and in
+     * log file name suffix.
+     */
+    protected Locale locale = Locale.getDefault();
     
     /**
      * Array of AccessLogElement, they will be used to make log message.
@@ -708,6 +747,7 @@ public class AccessLogValve extends ValveBase implements AccessLog {
         this.condition = condition;
     }
 
+
     /**
      *  Return the date format date based log rotation.
      */
@@ -721,6 +761,29 @@ public class AccessLogValve extends ValveBase implements AccessLog {
      */
     public void setFileDateFormat(String fileDateFormat) {
         this.fileDateFormat =  fileDateFormat;
+    }
+
+
+    /**
+     * Return the locale used to format timestamps in log entries and in
+     * log file name suffix.
+     */
+    public String getLocale() {
+        return localeName;
+    }
+
+
+    /**
+     * Set the locale used to format timestamps in log entries and in
+     * log file name suffix. Changing the locale is only supported
+     * as long as the AccessLogValve has not logged anything. Changing
+     * the locale later can lead to inconsistent formatting.
+     *
+     * @param locale The locale to use.
+     */
+    public void setLocale(String localeName) {
+        this.localeName = localeName;
+        locale = findLocale(localeName, locale);
     }
 
     // --------------------------------------------------------- Public Methods
@@ -979,6 +1042,23 @@ public class AccessLogValve extends ValveBase implements AccessLog {
         return tz.toString();
     }
 
+    /**
+     * Find a locale by name
+     */
+    protected static Locale findLocale(String name, Locale fallback) {
+        if (name == null || name.isEmpty()) {
+            return Locale.getDefault();
+        } else {
+            for (Locale l: Locale.getAvailableLocales()) {
+                if (name.equals(l.toString())) {
+                    return(l);
+                }
+            }
+        }
+        log.error(sm.getString("accessLogValve.invalidLocale", name));
+        return fallback;
+    }
+
     static {
         // Initialize the timeZone
         timezone = TimeZone.getDefault();
@@ -1004,7 +1084,7 @@ public class AccessLogValve extends ValveBase implements AccessLog {
             format = "yyyy-MM-dd";
             setFileDateFormat(format);
         }
-        fileDateFormatter = new SimpleDateFormat(format);
+        fileDateFormatter = new SimpleDateFormat(format, Locale.US);
         fileDateFormatter.setTimeZone(timezone);
         dateStamp = fileDateFormatter.format(new Date(System.currentTimeMillis()));
         open();
@@ -1252,7 +1332,6 @@ public class AccessLogValve extends ValveBase implements AccessLog {
                     escape = !escape;
                 }
             }
-            format = result.toString();
         }
 
         protected DateAndTimeElement(String header) {
@@ -1296,7 +1375,7 @@ public class AccessLogValve extends ValveBase implements AccessLog {
             }
             switch (type) {
             case CLF:
-                buf.append(localDateCache.get().getFormat(null, timestamp));
+                buf.append(localDateCache.get().getFormat(timestamp));
                 break;
             case SEC:
                 buf.append(timestamp / 1000);
@@ -1317,7 +1396,7 @@ public class AccessLogValve extends ValveBase implements AccessLog {
                 buf.append(frac);
                 break;
             case SDF:
-                String temp = localDateCache.get().getFormat(format, timestamp);
+                String temp = localDateCache.get().getFormat(format, locale, timestamp);
                 if (usesMsecs) {
                     frac = timestamp % 1000;
                     StringBuilder trippleMsec = new StringBuilder(4);
