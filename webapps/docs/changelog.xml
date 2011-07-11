@@ -79,6 +79,15 @@
         When generating access logs for errors, log at the Context/Host level if
         a Context or Host can be identified for the failed request. (markt)
       </fix>
+      <update>
+        In JULI FileHandler and in AccessLogValve create a directory
+        automatically when it is specified as a part of the file name, e.g. in
+        the <code>prefix</code> attribute. Earlier this happened only if it was
+        specified with the <code>directory</code> attribute. (kkolinko)
+      </update>
+      <fix>
+        Log a failure if access log file cannot be opened. (kkolinko)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
@@ -109,7 +118,7 @@
   <subsection name="Cluster">
     <changelog>
       <update>
-        Remove unnecessary serverl.xml parsing code for old cluster
+        Remove unnecessary server.xml parsing code for old cluster
         implementation that does not ship as part of Tomcat 7. (markt)
       </update>
     </changelog>
