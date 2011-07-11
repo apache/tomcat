@@ -46,26 +46,34 @@
     <attribute name="condition"
                description="The value to look for conditional logging."
                type="java.lang.String"/>
-               
+
     <attribute name="directory"
                description="The directory in which log files are created"
                type="java.lang.String"/>
-               
+
     <attribute name="enabled"
                description="Enable Access Logging"
                is="false"
                type="boolean"/>
 
-    <attribute name="fileDateFormat"
-               description="The format for the date date based log rotation."
+    <attribute name="encoding"
+               description="Character set used to write the log file"
                type="java.lang.String"/>
-               
+
+    <attribute name="fileDateFormat"
+               description="The format for the date for date based log rotation"
+               type="java.lang.String"/>
+
     <attribute name="info"
                description="Information about this implementation"
                type="java.lang.String"
                writeable="false"/>
 
-    <attribute   name="pattern"
+    <attribute name="locale"
+               description="The locale used to format timestamps in the access log lines"
+               type="java.lang.String"/>
+
+    <attribute name="pattern"
                description="The pattern used to format our access log lines"
                type="java.lang.String"/>
 
@@ -198,24 +206,32 @@
     <attribute name="condition"
                description="The value to look for conditional logging."
                type="java.lang.String"/>
-               
+
     <attribute name="directory"
                description="The directory in which log files are created"
                type="java.lang.String"/>
-               
-     <attribute name="enabled"
+
+    <attribute name="enabled"
                description="Enable Access Logging"
                is="false"
                type="boolean"/>
 
+    <attribute name="encoding"
+               description="Character set used to write the log file"
+               type="java.lang.String"/>
+
     <attribute name="fileDateFormat"
                description="The format for the date date based log rotation."
                type="java.lang.String"/>
-               
+
     <attribute name="info"
                description="Information about this implementation"
                type="java.lang.String"
                writeable="false"/>
+
+    <attribute name="locale"
+               description="The locale used to format timestamps in the access log lines"
+               type="java.lang.String"/>
 
     <attribute   name="pattern"
                description="The pattern used to format our access log lines"
