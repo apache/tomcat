@@ -99,6 +99,11 @@
         benefits and remaining risks when running under a security manager.
         (markt)
       </add>
+      <fix>
+        <bug>51490</bug>: Correct broken HTML in JSP tag plugin examples and
+        improve the &lt;c:if&gt; example to make failures more obvious. Based on
+        suggestions by Charles. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
