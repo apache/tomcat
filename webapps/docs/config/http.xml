@@ -141,9 +141,9 @@
         either a blocking Java based connector or an APR/native based connector.
         If the <code>PATH</code> (Windows) or <code>LD_LIBRARY_PATH</code> (on
         most unix systems) environment variables contain the Tomcat native
-        library, the native/APR connector will be used. If the native library
+        library, the APR/native connector will be used. If the native library
         cannot be found, the blocking Java based connector will be used. Note
-        that the native/APR connector has different settings for HTTPS than the
+        that the APR/native connector has different settings for HTTPS than the
         Java connectors.<br/>
         To use an explicit protocol rather than rely on the auto-switching
         mechanism described above, the following values may be used:<br/>
@@ -1149,8 +1149,12 @@
 
     <attribute name="SSLProtocol" required="false">
       <p>Protocol which may be used for communicating with clients. The default
-      is "all", with other acceptable values being "SSLv2", "SSLv3", "TLSv1"
-      and "SSLv2+SSLv3".</p>
+      value is <code>all</code>, with other acceptable values being <code>SSLv2</code>,
+      <code>SSLv3</code>, <code>TLSv1</code> and <code>SSLv2+SSLv3</code>.
+      Starting with version 1.1.21 of the Tomcat native
+      library any combination of the three protocols concatenated with a
+      plus sign will be supported. Note that the protocol <code>SSLv2</code>
+      is inherently unsafe.</p>
     </attribute>
 
     <attribute name="SSLVerifyClient" required="false">
