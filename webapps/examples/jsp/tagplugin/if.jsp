@@ -33,7 +33,7 @@
     <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 
     <h3>Set the test result to a variable</h3>
-    <c:if test="${1==1}" var="theTruth" scope="session"/>
+    <c:if test="${1==1}" var="theTruth" scope="page"/>
     The result of testing for (1==1) is: ${theTruth}
 
     <h3>Conditionally execute the body</h3>
