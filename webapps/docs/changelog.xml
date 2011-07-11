@@ -120,6 +120,10 @@
         Add missing thread name in RequestProcessor when Servlet 3 Async
         is used. Fixes null thread name in access log and JMX MBean. (rjung)
       </fix>
+      <fix>
+        Protect against infinite loops in the HTTP NIO connector if sendfile is
+        configured to send more data than is available in the file. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">
