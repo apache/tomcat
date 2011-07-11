@@ -75,6 +75,10 @@
         Allow choosing a locale for timestamp formatting in AccessLogValve.
         (rjung)
       </update>
+      <fix>
+        When generating access logs for errors, log at the Context/Host level if
+        a Context or Host can be identified for the failed request. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
