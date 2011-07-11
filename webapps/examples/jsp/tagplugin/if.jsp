@@ -38,7 +38,10 @@
 
     <h3>Conditionally execute the body</h3>
     <c:if test="${2>0}">
-        It's true that (2>0)!
+        <p>It's true that (2>0)! Working.</p>
+    </c:if>
+    <c:if test="${0>2}">
+        <p>It's not true that (0>2)! Failed.</p>
     </c:if>
   </body>
 </html> 
