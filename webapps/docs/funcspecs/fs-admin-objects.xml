@@ -118,7 +118,7 @@ Operations</a> that can be performed when the administrative application is
   <li><code>debug</code> - Debugging detail level.  [0]</li>
   <li><code>enableLookups</code> - Should we perform DNS lookups on remote
       IP addresses when <code>request.getRemoteHost()</code> is called?
-      [true]</li>
+      [false]</li>
   <li><code>maxProcessors</code> - The maximum number of processor threads
       supported by this connector.  [20]</li>
   <li><code>minProcessors</code> - The minimum number of processor threads
