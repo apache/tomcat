@@ -779,7 +779,7 @@ public class AccessLogValve extends ValveBase implements AccessLog {
      * as long as the AccessLogValve has not logged anything. Changing
      * the locale later can lead to inconsistent formatting.
      *
-     * @param locale The locale to use.
+     * @param localeName The locale to use.
      */
     public void setLocale(String localeName) {
         this.localeName = localeName;
