@@ -200,7 +200,7 @@ public class WebdavServlet
      * Simple date format for the creation date ISO representation (partial).
      */
     protected static final SimpleDateFormat creationDateFormat =
-        new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+        new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.US);
 
 
      /**
