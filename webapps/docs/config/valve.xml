@@ -128,9 +128,7 @@
         from the request and response to be logged, or the word
         <code>common</code> or <code>combined</code> to select a
         standard format.  See below for more information on configuring
-        this attribute. Note that the optimized access does only support
-        <code>common</code> and <code>combined</code> as the value for this
-        attribute.</p>
+        this attribute.</p>
       </attribute>
 
       <attribute name="prefix" required="false">
@@ -273,6 +271,185 @@
     <p>The shorthand pattern <code>pattern=&quot;combined&quot;</code>
     appends the values of the <code>Referer</code> and <code>User-Agent</code>
     headers, each in double quotes, to the <code>common</code> pattern.</p>
+
+  </subsection>
+
+</section>
+
+
+<section name="Extended Access Log Valve">
+
+  <subsection name="Introduction">
+
+    <p>The <strong>Extended Access Log Valve</strong> is a variant of
+    the Access Log Valve. It is not a real extension of the standard
+    Access Log valve, instead it supports the so-called
+    <a href="http://www.w3.org/TR/WD-logfile.html">Extended Log File Format</a>
+    defined by the W3C. The main difference to the standard
+    <code>AccessLogValve</code> are the supported pattern values.</p>
+
+  </subsection>
+
+  <subsection name="Attributes">
+
+    <p>The <strong>Extended Access Log Valve</strong> supports the following
+    configuration attributes:</p>
+
+    <attributes>
+
+      <attribute name="className" required="true">
+        <p>Java class name of the implementation to use.  This MUST be set to
+        <strong>org.apache.catalina.valves.ExtendedAccessLogValve</strong> to
+        use the extended access log valve.</p>
+      </attribute>
+
+      <attribute name="directory" required="false">
+        <p>Absolute or relative pathname of a directory in which log files
+        created by this valve will be placed.  If a relative path is
+        specified, it is interpreted as relative to $CATALINA_BASE.  If
+        no directory attribute is specified, the default value is "logs"
+        (relative to $CATALINA_BASE).</p>
+      </attribute>
+
+      <attribute name="encoding" required="false">
+        <p>Character set used to write the log file. An empty string means
+        to use the system default character set. Default value: use the
+        system default character set.
+        </p>
+      </attribute>
+
+      <attribute name="pattern" required="false">
+        <p>A formatting layout identifying the various information fields
+        from the request and response to be logged.
+        See below for more information on configuring this attribute.</p>
+      </attribute>
+
+      <attribute name="prefix" required="false">
+        <p>The prefix added to the start of each log file's name.  If not
+        specified, the default value is "access_log.".  To specify no prefix,
+        use a zero-length string.</p>
+      </attribute>
+
+      <attribute name="requestAttributesEnabled" required="false">
+        <p>Set to <code>true</code> to check for the existance of request
+        attributes (typically set by the RemoteIpValve and similar) that should
+        be used to override the values returned by the request for remote
+        address, remote host, server port and protocol. If the attributes are
+        not set, or this attribute is set to <code>false</code> then the values 
+        from the request will be used. If not set, the default value of
+        <code>false</code> will be used.</p>
+      </attribute>
+
+      <attribute name="resolveHosts" required="false">
+        <p>Set to <code>true</code> to convert the IP address of the remote
+        host into the corresponding host name via a DNS lookup.  Set to
+        <code>false</code> to skip this lookup, and report the remote IP
+        address instead.</p>
+      </attribute>
+
+      <attribute name="suffix" required="false">
+        <p>The suffix added to the end of each log file's name.  If not
+        specified, the default value is "".  To specify no suffix,
+        use a zero-length string.</p>
+      </attribute>
+
+      <attribute name="rotatable" required="false">
+        <p>Flag to determine if log rotation should occur.
+           If set to <code>false</code>, then this file is never rotated and
+           <code>fileDateFormat</code> is ignored. Use with caution!
+           Default value: <code>true</code>
+        </p>
+      </attribute>
+
+      <attribute name="condition" required="false">
+        <p>Turns on conditional logging. If set, requests will be
+           logged only if <code>ServletRequest.getAttribute()</code> is
+           null. For example, if this value is set to
+           <code>junk</code>, then a particular request will only be logged
+           if <code>ServletRequest.getAttribute("junk") == null</code>.
+           The use of Filters is an easy way to set/unset the attribute
+           in the ServletRequest on many different requests.
+        </p>
+      </attribute>
+
+      <attribute name="fileDateFormat" required="false">
+        <p>Allows a customized date format in the access log file name.
+           The date format also decides how often the file is rotated.
+           If you wish to rotate every hour, then set this value
+           to: <code>yyyy-MM-dd.HH</code>. The default value is
+           <code>yyyy-MM-dd</code>. The date format will always be localized
+           using the locale <code>en_US</code>.
+        </p>
+      </attribute>
+
+      <attribute name="buffered" required="false">
+        <p>Flag to determine if logging will be buffered.
+           If set to <code>false</code>, then access logging will be written after each 
+           request. Default value: <code>true</code>
+        </p>
+      </attribute>
+
+    </attributes>
+
+    <p>Values for the <code>pattern</code> attribute are made up of
+    format tokens. Some of the tokens need an additional prefix. Possible
+    prefixes are <code>c</code> for "client", <code>s</code> for "server",
+    <code>cs</code> for "client to server", <code>sc</code> for
+    "server to client" or <code>x</code> for "application specific".
+    Furthermore some tokens are completed by an additional selector.
+    See the <a href="http://www.w3.org/TR/WD-logfile.html">W3C specification</a>
+    for more information about the format.</p>
+
+    <p>The following format tokens are supported:</p>
+    <ul>
+    <li><b>bytes</b> - Bytes sent, excluding HTTP headers, or '-' if zero</li>
+    <li><b>c-dns</b> - Remote host name</li>
+    <li><b>c-ip</b> - Remote IP address</li>
+    <li><b>cs-method</b> - Request method (GET, POST, etc.)</li>
+    <li><b>cs-uri</b> - Request URI</li>
+    <li><b>cs-uri-query</b> - Query string (prepended with a '?' if it exists)</li>
+    <li><b>cs-uri-stem</b> - Requested URL path</li>
+    <li><b>date</b> - The date in yyyy-mm-dd format for GMT</li>
+    <li><b>s-dns</b> - Local host name</li>
+    <li><b>s-ip</b> - Local IP address</li>
+    <li><b>sc-status</b> - HTTP status code of the response</li>
+    <li><b>time</b> - Time the request was served in HH:mm:ss format for GMT</li>
+    <li><b>time-taken</b> - Time (in seconds as floating point) taken to serve the request</li>
+    </ul>
+
+    <p>For any of the <code>x-H(XXX)</code> the following method will be called from the
+    HttpServletRequestObject:</p>
+    <ul>
+    <li><b><code>x-H(authType)</code></b>: getAuthType </li>
+    <li><b><code>x-H(characterEncoding)</code></b>: getCharacterEncoding </li>
+    <li><b><code>x-H(contentLength)</code></b>: getContentLength </li>
+    <li><b><code>x-H(locale)</code></b>:  getLocale</li>
+    <li><b><code>x-H(protocol)</code></b>: getProtocol </li>
+    <li><b><code>x-H(remoteUser)</code></b>:  getRemoteUser</li>
+    <li><b><code>x-H(requestedSessionId)</code></b>: getGequestedSessionId</li>
+    <li><b><code>x-H(requestedSessionIdFromCookie)</code></b>:
+                     isRequestedSessionIdFromCookie </li>
+    <li><b><code>x-H(requestedSessionIdValid)</code></b>:
+                     isRequestedSessionIdValid</li>
+    <li><b><code>x-H(scheme)</code></b>:  getScheme</li>
+    <li><b><code>x-H(secure)</code></b>:  isSecure</li>
+    </ul>
+
+    <p>
+    There is also support to write information about headers
+    cookies, context, request or session attributes and request
+    parameters.
+    </p>
+    <ul>
+    <li><b><code>cs(XXX)</code></b> for incoming request headers with name XXX</li>
+    <li><b><code>sc(XXX)</code></b> for outgoing response headers with name XXX</li>
+    <li><b><code>x-A(XXX)</code></b> for the servlet context attribute with name XXX</li>
+    <li><b><code>x-C(XXX)</code></b> for the first cookie with name XXX</li>
+    <li><b><code>x-O(XXX)</code></b> for a concatenation of all outgoing response headers with name XXX</li>
+    <li><b><code>x-P(XXX)</code></b> for the URL encoded request parameter with name XXX</li>
+    <li><b><code>x-R(XXX)</code></b> for the request attribute with name XXX</li>
+    <li><b><code>x-S(XXX)</code></b> for the session attribute with name XXX</li>
+    </ul>
 
   </subsection>
 
