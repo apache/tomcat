@@ -144,18 +144,18 @@
 
       <attribute name="rotatable" required="false">
         <p>Flag to determine if log rotation should occur.
-           If set to <tt>false</tt>, then this file is never rotated and
-           <tt>fileDateFormat</tt> is ignored. Use with caution!
-           Default value: <tt>true</tt>
+           If set to <code>false</code>, then this file is never rotated and
+           <code>fileDateFormat</code> is ignored. Use with caution!
+           Default value: <code>true</code>
         </p>
       </attribute>
 
       <attribute name="condition" required="false">
         <p>Turns on conditional logging. If set, requests will be
-           logged only if <tt>ServletRequest.getAttribute()</tt> is
+           logged only if <code>ServletRequest.getAttribute()</code> is
            null. For example, if this value is set to
-           <tt>junk</tt>, then a particular request will only be logged
-           if <tt>ServletRequest.getAttribute("junk") == null</tt>.
+           <code>junk</code>, then a particular request will only be logged
+           if <code>ServletRequest.getAttribute("junk") == null</code>.
            The use of Filters is an easy way to set/unset the attribute
            in the ServletRequest on many different requests.
         </p>
@@ -165,14 +165,14 @@
         <p>Allows a customized date format in the access log file name.
            The date format also decides how often the file is rotated.
            If you wish to rotate every hour, then set this value
-           to: <tt>yyyy-MM-dd.HH</tt>
+           to: <code>yyyy-MM-dd.HH</code>
         </p>
       </attribute>
 
       <attribute name="buffered" required="false">
         <p>Flag to determine if logging will be buffered.
-           If set to <tt>false</tt>, then access logging will be written after each 
-           request. Default value: <tt>true</tt>
+           If set to <code>false</code>, then access logging will be written after each 
+           request. Default value: <code>true</code>
         </p>
       </attribute>
 

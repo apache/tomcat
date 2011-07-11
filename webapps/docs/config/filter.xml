@@ -167,8 +167,8 @@
     ExpiresFilter is a Java Servlet API port of <a
     href="http://httpd.apache.org/docs/2.2/mod/mod_expires.html">Apache
     mod_expires</a>.
-    This filter controls the setting of the <tt>Expires</tt> HTTP header and the
-    <tt>max-age</tt> directive of the <tt>Cache-Control</tt> HTTP header in
+    This filter controls the setting of the <code>Expires</code> HTTP header and the
+    <code>max-age</code> directive of the <code>Cache-Control</code> HTTP header in
     server responses. The expiration date can set to be relative to either the
     time the source file was last modified, or to the time of the client access.
     </p>
@@ -181,7 +181,7 @@
     be obtained from the source.
     </p>
     <p>
-    To modify <tt>Cache-Control</tt> directives other than <tt>max-age</tt> (see
+    To modify <code>Cache-Control</code> directives other than <code>max-age</code> (see
     <a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.9" >RFC
     2616 section 14.9</a>), you can use other servlet filters or <a
     href="http://httpd.apache.org/docs/2.2/mod/mod_headers.html" >Apache Httpd
@@ -192,7 +192,7 @@
 
   <subsection name="Basic configuration sample">
     <p>
-    Basic configuration to add '<tt>Expires</tt>' and '<tt>Cache-Control: max-age=</tt>' 
+    Basic configuration to add '<code>Expires</code>' and '<code>Cache-Control: max-age=</code>' 
     headers to images, css and javascript.
     </p>
 
@@ -226,7 +226,7 @@
   
   <subsection name="Alternate Syntax">
     <p>
-    The <tt>ExpiresDefault</tt> and <tt>ExpiresByType</tt> directives can also be
+    The <code>ExpiresDefault</code> and <code>ExpiresByType</code> directives can also be
     defined in a more readable syntax of the form:
     </p>
     
@@ -247,25 +247,25 @@
 &lt;/init-param&gt;
     </source>
     <p>
-    where <tt>&lt;base&gt;</tt> is one of:
+    where <code>&lt;base&gt;</code> is one of:
     <ul>
-    <li><tt>access</tt></li>
-    <li><tt>now</tt> (equivalent to &#x27;<tt>access</tt>&#x27;)</li>
-    <li><tt>modification</tt></li>
+    <li><code>access</code></li>
+    <li><code>now</code> (equivalent to &#x27;<code>access</code>&#x27;)</li>
+    <li><code>modification</code></li>
     </ul>
     </p>
     <p>
-    The <tt>plus</tt> keyword is optional. <tt>&lt;num&gt;</tt> should be an
-    integer value (acceptable to <tt>Integer.parseInt()</tt>), and
-    <tt>&lt;type&gt;</tt> is one of:
+    The <code>plus</code> keyword is optional. <code>&lt;num&gt;</code> should be an
+    integer value (acceptable to <code>Integer.parseInt()</code>), and
+    <code>&lt;type&gt;</code> is one of:
     <ul>
-    <li><tt>years</tt></li>
-    <li><tt>months</tt></li>
-    <li><tt>weeks</tt></li>
-    <li><tt>days</tt></li>
-    <li><tt>hours</tt></li>
-    <li><tt>minutes</tt></li>
-    <li><tt>seconds</tt></li>
+    <li><code>years</code></li>
+    <li><code>months</code></li>
+    <li><code>weeks</code></li>
+    <li><code>days</code></li>
+    <li><code>hours</code></li>
+    <li><code>minutes</code></li>
+    <li><code>seconds</code></li>
     </ul>
     For example, any of the following directives can be used to make documents
     expire 1 month after being accessed, by default:
@@ -289,7 +289,7 @@
 </source>
 <p>
 The expiry time can be fine-tuned by adding several &#x27;
-<tt>&lt;num&gt; &lt;type&gt;</tt>&#x27; clauses:
+<code>&lt;num&gt; &lt;type&gt;</code>&#x27; clauses:
 </p>
 
 <source>
@@ -304,7 +304,7 @@ The expiry time can be fine-tuned by adding several &#x27;
 &lt;/init-param&gt;
     </source>
     <p>
-    Note that if you use a modification date based setting, the <tt>Expires</tt>
+    Note that if you use a modification date based setting, the <code>Expires</code>
     header will <strong>not</strong> be added to content that does not come from
     a file on disk. This is due to the fact that there is no modification time
     for such content.
@@ -313,21 +313,21 @@ The expiry time can be fine-tuned by adding several &#x27;
   
   <subsection name="Expiration headers generation eligibility">
     <p>
-    A response is eligible to be enriched by <tt>ExpiresFilter</tt> if :
+    A response is eligible to be enriched by <code>ExpiresFilter</code> if :
     <ol>
-    <li>no expiration header is defined (<tt>Expires</tt> header or the
-    <tt>max-age</tt> directive of the <tt>Cache-Control</tt> header),</li>
+    <li>no expiration header is defined (<code>Expires</code> header or the
+    <code>max-age</code> directive of the <code>Cache-Control</code> header),</li>
     <li>the response status code is not excluded by the directive
-    <tt>ExpiresExcludedResponseStatusCodes</tt>,</li>
-    <li>the <tt>Content-Type</tt> of the response matches one of the types
-    defined the in <tt>ExpiresByType</tt> directives or the
-    <tt>ExpiresDefault</tt> directive is defined.</li>
+    <code>ExpiresExcludedResponseStatusCodes</code>,</li>
+    <li>the <code>Content-Type</code> of the response matches one of the types
+    defined the in <code>ExpiresByType</code> directives or the
+    <code>ExpiresDefault</code> directive is defined.</li>
     </ol>
     </p>
     <p>
-    Note : If <tt>Cache-Control</tt> header contains other directives than
-    <tt>max-age</tt>, they are concatenated with the <tt>max-age</tt> directive
-    that is added by the <tt>ExpiresFilter</tt>.
+    Note : If <code>Cache-Control</code> header contains other directives than
+    <code>max-age</code>, they are concatenated with the <code>max-age</code> directive
+    that is added by the <code>ExpiresFilter</code>.
     </p>
 
   </subsection>
@@ -336,17 +336,17 @@ The expiry time can be fine-tuned by adding several &#x27;
     <p>
     The expiration configuration if elected according to the following algorithm:
     <ol>
-    <li><tt>ExpiresByType</tt> matching the exact content-type returned by
-    <tt>HttpServletResponse.getContentType()</tt> possibly including the charset
-    (e.g. &#x27;<tt>text/xml;charset=UTF-8</tt>&#x27;),</li>
-    <li><tt>ExpiresByType</tt> matching the content-type without the charset if
-    <tt>HttpServletResponse.getContentType()</tt> contains a charset (e.g. &#x27;
-    <tt>text/xml;charset=UTF-8</tt>&#x27; -&gt; &#x27;<tt>text/xml</tt>&#x27;),</li>
-    <li><tt>ExpiresByType</tt> matching the major type (e.g. substring before
-    &#x27;<tt>/</tt>&#x27;) of <tt>HttpServletResponse.getContentType()</tt>
-    (e.g. &#x27;<tt>text/xml;charset=UTF-8</tt>&#x27; -&gt; &#x27;<tt>text</tt>
+    <li><code>ExpiresByType</code> matching the exact content-type returned by
+    <code>HttpServletResponse.getContentType()</code> possibly including the charset
+    (e.g. &#x27;<code>text/xml;charset=UTF-8</code>&#x27;),</li>
+    <li><code>ExpiresByType</code> matching the content-type without the charset if
+    <code>HttpServletResponse.getContentType()</code> contains a charset (e.g. &#x27;
+    <code>text/xml;charset=UTF-8</code>&#x27; -&gt; &#x27;<code>text/xml</code>&#x27;),</li>
+    <li><code>ExpiresByType</code> matching the major type (e.g. substring before
+    &#x27;<code>/</code>&#x27;) of <code>HttpServletResponse.getContentType()</code>
+    (e.g. &#x27;<code>text/xml;charset=UTF-8</code>&#x27; -&gt; &#x27;<code>text</code>
     &#x27;),</li>
-    <li><tt>ExpiresDefault</tt></li>
+    <li><code>ExpiresDefault</code></li>
     </ol>
     </p>
   </subsection>
@@ -369,15 +369,15 @@ The expiry time can be fine-tuned by adding several &#x27;
       <attribute name="ExpiresExcludedResponseStatusCodes" required="false">
          <p>
          This directive defines the http response status codes for which the
-         <tt>ExpiresFilter</tt> will not generate expiration headers. By default, the
-         <tt>304</tt> status code (&quot;<tt>Not modified</tt>&quot;) is skipped. The
+         <code>ExpiresFilter</code> will not generate expiration headers. By default, the
+         <code>304</code> status code (&quot;<code>Not modified</code>&quot;) is skipped. The
          value is a comma separated list of http status codes.
          </p>
          <p>
-         This directive is useful to ease usage of <tt>ExpiresDefault</tt> directive.
-         Indeed, the behavior of <tt>304 Not modified</tt> (which does specify a
-         <tt>Content-Type</tt> header) combined with <tt>Expires</tt> and
-         <tt>Cache-Control:max-age=</tt> headers can be unnecessarily tricky to
+         This directive is useful to ease usage of <code>ExpiresDefault</code> directive.
+         Indeed, the behavior of <code>304 Not modified</code> (which does specify a
+         <code>Content-Type</code> header) combined with <code>Expires</code> and
+         <code>Cache-Control:max-age=</code> headers can be unnecessarily tricky to
          understand.
          </p>
          <p>
@@ -394,29 +394,29 @@ The expiry time can be fine-tuned by adding several &#x27;
 
       <attribute name="ExpiresByType &lt;content-type&gt;" required="false">
          <p>
-         This directive defines the value of the <tt>Expires</tt> header and the
-         <tt>max-age</tt> directive of the <tt>Cache-Control</tt> header generated for
-         documents of the specified type (<i>e.g.</i>, <tt>text/html</tt>). The second
+         This directive defines the value of the <code>Expires</code> header and the
+         <code>max-age</code> directive of the <code>Cache-Control</code> header generated for
+         documents of the specified type (<i>e.g.</i>, <code>text/html</code>). The second
          argument sets the number of seconds that will be added to a base time to
-         construct the expiration date. The <tt>Cache-Control: max-age</tt> is
+         construct the expiration date. The <code>Cache-Control: max-age</code> is
          calculated by subtracting the request time from the expiration date and
          expressing the result in seconds.
          </p>
          <p>
          The base time is either the last modification time of the file, or the time
          of the client&#x27;s access to the document. Which should be used is
-         specified by the <tt>&lt;code&gt;</tt> field; <tt>M</tt> means that the
+         specified by the <code>&lt;code&gt;</code> field; <code>M</code> means that the
          file&#x27;s last modification time should be used as the base time, and
-         <tt>A</tt> means the client&#x27;s access time should be used. The duration
-         is expressed in seconds. <tt>A2592000</tt> stands for
-         <tt>access plus 30 days</tt> in alternate syntax.
+         <code>A</code> means the client&#x27;s access time should be used. The duration
+         is expressed in seconds. <code>A2592000</code> stands for
+         <code>access plus 30 days</code> in alternate syntax.
          </p>
          <p>
-         The difference in effect is subtle. If <tt>M</tt> (<tt>modification</tt> in
+         The difference in effect is subtle. If <code>M</code> (<code>modification</code> in
          alternate syntax) is used, all current copies of the document in all caches
          will expire at the same time, which can be good for something like a weekly
-         notice that&#x27;s always found at the same URL. If <tt>A</tt> (
-         <tt>access</tt> or <tt>now</tt> in alternate syntax) is used, the date of
+         notice that&#x27;s always found at the same URL. If <code>A</code> (
+         <code>access</code> or <code>now</code> in alternate syntax) is used, the date of
          expiration is different for each client; this can be good for image files
          that don&#x27;t change very often, particularly for a set of related
          documents that all refer to the same images (<i>i.e.</i>, the images will be
@@ -424,8 +424,8 @@ The expiry time can be fine-tuned by adding several &#x27;
          </p>
          <p>
          <strong>Note:</strong> When the content type includes a charset (e.g. 
-         <tt>'ExpiresByType text/xml;charset=utf-8'</tt>), Tomcat removes blank chars 
-         between the '<tt>;</tt>' and the '<tt>charset</tt>' keyword. Due to this, 
+         <code>'ExpiresByType text/xml;charset=utf-8'</code>), Tomcat removes blank chars 
+         between the '<code>;</code>' and the '<code>charset</code>' keyword. Due to this, 
          configuration of an expiration with a charset must <strong>not</strong> include 
          such a space character. 
          </p>
@@ -447,7 +447,7 @@ The expiry time can be fine-tuned by adding several &#x27;
          </source>
          <p>
          It overrides, for the specified MIME type <i>only</i>, any
-         expiration date set by the <tt>ExpiresDefault</tt> directive.
+         expiration date set by the <code>ExpiresDefault</code> directive.
          </p>
          <p>
          You can also specify the expiration time calculation using an alternate
@@ -459,7 +459,7 @@ The expiry time can be fine-tuned by adding several &#x27;
          <p>
          This directive sets the default algorithm for calculating the
          expiration time for all documents in the affected realm. It can be
-         overridden on a type-by-type basis by the <tt>ExpiresByType</tt> directive. See the
+         overridden on a type-by-type basis by the <code>ExpiresByType</code> directive. See the
          description of that directive for details about the syntax of the
          argument, and the "alternate syntax"
          description as well.
@@ -472,7 +472,7 @@ The expiry time can be fine-tuned by adding several &#x27;
   <subsection name="Troubleshooting">
     <p>
     To troubleshoot, enable logging on the
-    <tt>org.apache.catalina.filters.ExpiresFilter</tt>.
+    <code>org.apache.catalina.filters.ExpiresFilter</code>.
     </p>
     <p>
     Extract of logging.properties
@@ -496,7 +496,7 @@ FINE: Filter initialized with configuration ExpiresFilter[
     text/javascript=ExpiresConfiguration[startingPoint=ACCESS_TIME, duration=[10 MINUTE]]}]
     </source>
     <p>
-    Sample of per-request log message where <tt>ExpiresFilter</tt> adds an
+    Sample of per-request log message where <code>ExpiresFilter</code> adds an
     expiration date:
     </p>
     
@@ -505,7 +505,7 @@ Mar 26, 2010 2:09:47 PM org.apache.catalina.filters.ExpiresFilter onBeforeWriteR
 FINE: Request "/tomcat.gif" with response status "200" content-type "image/gif", set expiration date 3/26/10 2:19 PM
     </source>
     <p>
-    Sample of per-request log message where <tt>ExpiresFilter</tt> does not add
+    Sample of per-request log message where <code>ExpiresFilter</code> does not add
     an expiration date:
     </p>
     
@@ -658,7 +658,7 @@ FINE: Request "/docs/config/manager.html" with response status "200" content-typ
 
   <subsection name="Basic configuration to handle &#x27;x-forwarded-for&#x27;">
     <p>
-    The filter will process the <tt>x-forwarded-for</tt> http header.
+    The filter will process the <code>x-forwarded-for</code> http header.
     </p>
     <source>
       &lt;filter&gt;
@@ -677,10 +677,10 @@ FINE: Request "/docs/config/manager.html" with response status "200" content-typ
   <subsection name="Basic configuration to handle &#x27;x-forwarded-for&#x27; and &#x27;x-forwarded-proto&#x27;">
   
     <p>
-    The filter will process <tt>x-forwarded-for</tt> and 
-    <tt>x-forwarded-proto</tt> http headers. Expected value for the
-    <tt>x-forwarded-proto</tt> header in case of SSL connections is 
-    <tt>https</tt> (case insensitive). </p>
+    The filter will process <code>x-forwarded-for</code> and 
+    <code>x-forwarded-proto</code> http headers. Expected value for the
+    <code>x-forwarded-proto</code> header in case of SSL connections is 
+    <code>https</code> (case insensitive). </p>
     <source>
       &lt;filter&gt;
         &lt;filter-name&gt;RemoteIpFilter&lt;/filter-name&gt;
@@ -736,17 +736,17 @@ FINE: Request "/docs/config/manager.html" with response status "200" content-typ
         <td> 140.211.11.130 </td>
       </tr> 
       <tr>
-        <td> request.header<tt>[</tt>&#x27;x-forwarded-for&#x27;<tt>]</tt> </td>
+        <td> request.header<code>[</code>&#x27;x-forwarded-for&#x27;<code>]</code> </td>
         <td> 140.211.11.130, 192.168.0.10 </td>
         <td> null </td>
       </tr> 
       <tr>
-        <td> request.header<tt>[</tt>&#x27;x-forwarded-by&#x27;<tt>]</tt> </td>
+        <td> request.header<code>[</code>&#x27;x-forwarded-by&#x27;<code>]</code> </td>
         <td> null </td>
         <td> null </td>
       </tr> 
       <tr>
-        <td> request.header<tt>[</tt>&#x27;x-forwarded-proto&#x27;<tt>]</tt> </td>
+        <td> request.header<code>[</code>&#x27;x-forwarded-proto&#x27;<code>]</code> </td>
         <td> https </td>
         <td> https </td>
       </tr> 
@@ -768,9 +768,9 @@ FINE: Request "/docs/config/manager.html" with response status "200" content-typ
     </table>
     </p>
     <p>
-    Note : <tt>x-forwarded-by</tt> header is <tt>null</tt> because only 
+    Note : <code>x-forwarded-by</code> header is <code>null</code> because only 
     internal proxies has been traversed by the request. 
-    <tt>x-forwarded-for</tt> is <tt>null</tt> because all the proxies are 
+    <code>x-forwarded-for</code> is <code>null</code> because all the proxies are 
     trusted or internal. 
     </p>
   </subsection>
@@ -812,21 +812,21 @@ FINE: Request "/docs/config/manager.html" with response status "200" content-typ
         <td> 140.211.11.130 </td>
       </tr> 
       <tr>
-        <td> request.header<tt>[</tt>&#x27;x-forwarded-for&#x27;<tt>]</tt> </td>
+        <td> request.header<code>[</code>&#x27;x-forwarded-for&#x27;<code>]</code> </td>
         <td> 140.211.11.130, proxy1, proxy2 </td>
         <td> null </td>
       </tr> 
       <tr>
-        <td> request.header<tt>[</tt>&#x27;x-forwarded-by&#x27;<tt>]</tt> </td>
+        <td> request.header<code>[</code>&#x27;x-forwarded-by&#x27;<code>]</code> </td>
         <td> null </td>
         <td> proxy1, proxy2 </td>
       </tr> 
     </table>
     </p>
     <p>
-    Note : <tt>proxy1</tt> and <tt>proxy2</tt> are both trusted proxies that 
-    come in <tt>x-forwarded-for</tt> header, they both are migrated in 
-    <tt>x-forwarded-by</tt> header. <tt>x-forwarded-for</tt> is <tt>null</tt> 
+    Note : <code>proxy1</code> and <code>proxy2</code> are both trusted proxies that 
+    come in <code>x-forwarded-for</code> header, they both are migrated in 
+    <code>x-forwarded-by</code> header. <code>x-forwarded-for</code> is <code>null</code> 
     because all the proxies are trusted or internal.
     </p>
   </subsection>
@@ -867,23 +867,23 @@ FINE: Request "/docs/config/manager.html" with response status "200" content-typ
         <td> 140.211.11.130 </td>
       </tr> 
       <tr>
-        <td> request.header<tt>[</tt>&#x27;x-forwarded-for&#x27;<tt>]</tt> </td>
+        <td> request.header<code>[</code>&#x27;x-forwarded-for&#x27;<code>]</code> </td>
         <td> 140.211.11.130, proxy1, proxy2, 192.168.0.10 </td>
         <td> null </td>
       </tr> 
       <tr>
-        <td> request.header<tt>[</tt>&#x27;x-forwarded-by&#x27;<tt>]</tt> </td>
+        <td> request.header<code>[</code>&#x27;x-forwarded-by&#x27;<code>]</code> </td>
         <td> null </td>
         <td> proxy1, proxy2 </td>
       </tr> 
     </table>
     </p>
     <p>
-    Note : <tt>proxy1</tt> and <tt>proxy2</tt> are both trusted proxies that 
-    come in <tt>x-forwarded-for</tt> header, they both are migrated in 
-    <tt>x-forwarded-by</tt> header. As <tt>192.168.0.10</tt> is an internal 
-    proxy, it does not appear in <tt>x-forwarded-by</tt>. 
-    <tt>x-forwarded-for</tt> is <tt>null</tt> because all the proxies are 
+    Note : <code>proxy1</code> and <code>proxy2</code> are both trusted proxies that 
+    come in <code>x-forwarded-for</code> header, they both are migrated in 
+    <code>x-forwarded-by</code> header. As <code>192.168.0.10</code> is an internal 
+    proxy, it does not appear in <code>x-forwarded-by</code>. 
+    <code>x-forwarded-for</code> is <code>null</code> because all the proxies are 
     trusted or internal.
     </p>
   </subsection>
@@ -925,24 +925,24 @@ FINE: Request "/docs/config/manager.html" with response status "200" content-typ
         <td> untrusted-proxy </td>
       </tr> 
       <tr>
-        <td> request.header<tt>[</tt>&#x27;x-forwarded-for&#x27;<tt>]</tt> </td>
+        <td> request.header<code>[</code>&#x27;x-forwarded-for&#x27;<code>]</code> </td>
         <td> 140.211.11.130, untrusted-proxy, proxy1 </td>
         <td> 140.211.11.130 </td>
       </tr> 
       <tr>
-        <td> request.header<tt>[</tt>&#x27;x-forwarded-by&#x27;<tt>]</tt> </td>
+        <td> request.header<code>[</code>&#x27;x-forwarded-by&#x27;<code>]</code> </td>
         <td> null </td>
         <td> proxy1 </td>
       </tr> 
     </table>
     </p>
     <p>
-    Note : <tt>x-forwarded-by</tt> holds the trusted proxy <tt>proxy1</tt>. 
-    <tt>x-forwarded-by</tt> holds <tt>140.211.11.130</tt> because 
-    <tt>untrusted-proxy</tt> is not trusted and thus, we can not trust that 
-    <tt>untrusted-proxy</tt> is the actual remote ip. 
-    <tt>request.remoteAddr</tt> is <tt>untrusted-proxy</tt> that is an IP 
-    verified by <tt>proxy1</tt>. 
+    Note : <code>x-forwarded-by</code> holds the trusted proxy <code>proxy1</code>. 
+    <code>x-forwarded-by</code> holds <code>140.211.11.130</code> because 
+    <code>untrusted-proxy</code> is not trusted and thus, we can not trust that 
+    <code>untrusted-proxy</code> is the actual remote ip. 
+    <code>request.remoteAddr</code> is <code>untrusted-proxy</code> that is an IP 
+    verified by <code>proxy1</code>. 
     </p>
   </subsection>
 
