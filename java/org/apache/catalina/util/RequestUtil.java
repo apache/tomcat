@@ -20,7 +20,6 @@ package org.apache.catalina.util;
 
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
-import java.text.SimpleDateFormat;
 import java.util.Map;
 import java.util.TimeZone;
 
@@ -48,16 +47,6 @@ public final class RequestUtil {
      */
     private static final StringManager sm =
         StringManager.getManager("org.apache.catalina.util");
-    
-    /**
-     * The DateFormat to use for generating readable dates in cookies.
-     */
-    private static SimpleDateFormat format =
-        new SimpleDateFormat(" EEEE, dd-MMM-yy kk:mm:ss zz");
-
-    static {
-        format.setTimeZone(TimeZone.getTimeZone("GMT"));
-    }
 
 
     /**
@@ -207,8 +196,10 @@ public final class RequestUtil {
                 }
                 parseParameters(map, bytes, encoding);
             } catch (UnsupportedEncodingException uee) {
-                log.debug(sm.getString("requestUtil.parseParameters.uee",
-                        encoding), uee);
+                if (log.isDebugEnabled()) {
+                    log.debug(sm.getString("requestUtil.parseParameters.uee",
+                            encoding), uee);
+                }
             }
 
         }
@@ -271,7 +262,9 @@ public final class RequestUtil {
                 bytes = str.getBytes(B2CConverter.getCharset(enc));
             }
         } catch (UnsupportedEncodingException uee) {
-            log.debug(sm.getString("requestUtil.urlDecode.uee", enc), uee);
+            if (log.isDebugEnabled()) {
+                log.debug(sm.getString("requestUtil.urlDecode.uee", enc), uee);
+            }
         }
 
         return URLDecode(bytes, enc, isQuery);
@@ -341,7 +334,9 @@ public final class RequestUtil {
             try {
                 return new String(bytes, 0, ox, B2CConverter.getCharset(enc));
             } catch (UnsupportedEncodingException uee) {
-                log.debug(sm.getString("requestUtil.urlDecode.uee", enc), uee);
+                if (log.isDebugEnabled()) {
+                    log.debug(sm.getString("requestUtil.urlDecode.uee", enc), uee);
+                }
                 return null;
             }
         }
@@ -458,7 +453,4 @@ public final class RequestUtil {
         }
 
     }
-
-
-
 }
