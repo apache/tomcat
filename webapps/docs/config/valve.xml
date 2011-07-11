@@ -148,10 +148,8 @@
       </attribute>
 
       <attribute name="resolveHosts" required="false">
-        <p>Set to <code>true</code> to convert the IP address of the remote
-        host into the corresponding host name via a DNS lookup.  Set to
-        <code>false</code> to skip this lookup, and report the remote IP
-        address instead.</p>
+        <p>This attribute is no longer supported. Use the connector
+        attribute <code>enableLookups</code> instead.</p>
       </attribute>
 
       <attribute name="suffix" required="false">
@@ -209,7 +207,7 @@
     <li><b>%b</b> - Bytes sent, excluding HTTP headers, or '-' if zero</li>
     <li><b>%B</b> - Bytes sent, excluding HTTP headers</li>
     <li><b>%h</b> - Remote host name (or IP address if
-        <code>resolveHosts</code> is false)</li>
+        <code>enableLookups</code> for the connector is false)</li>
     <li><b>%H</b> - Request protocol</li>
     <li><b>%l</b> - Remote logical username from identd (always returns
         '-')</li>
@@ -341,10 +339,8 @@
       </attribute>
 
       <attribute name="resolveHosts" required="false">
-        <p>Set to <code>true</code> to convert the IP address of the remote
-        host into the corresponding host name via a DNS lookup.  Set to
-        <code>false</code> to skip this lookup, and report the remote IP
-        address instead.</p>
+        <p>This attribute is no longer supported. Use the connector
+        attribute <code>enableLookups</code> instead.</p>
       </attribute>
 
       <attribute name="suffix" required="false">
