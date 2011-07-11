@@ -57,7 +57,7 @@
   <subsection name="Catalina">
     <changelog>
       <add>
-        Add option to activate AccessLog for unit tests. (rjung)
+        Add option to activate access log for unit tests. (rjung)
       </add>
       <fix>
         Fix regression in year number formatting for AccessLogValve. (rjung)
@@ -67,6 +67,10 @@
         if the associated web application was destroyed while the request was
         processing. (markt)
       </fix>
+      <update>
+        Allow choosing a locale for timestamp formatting in AccessLogValve.
+        (rjung)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Coyote">

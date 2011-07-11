@@ -103,6 +103,19 @@
         (relative to $CATALINA_BASE).</p>
       </attribute>
 
+      <attribute name="locale" required="false">
+        <p>The locale used to format timestamps in the access log
+           lines. Any timestamps configured using an
+           explicit SimpleDateFormat pattern (<code>%{xxx}t</code>)
+           are formatted in this locale. By default the
+           default locale of the Java process is used. Switching the
+           locale after the AccessLogValve is initialized is not supported.
+           Any timestamps using the common log format
+           (<code>CLF</code>) are always formatted in the locale
+           <code>en_US</code>.
+        </p>
+      </attribute>
+
       <attribute name="pattern" required="false">
         <p>A formatting layout identifying the various information fields
         from the request and response to be logged, or the word
@@ -165,7 +178,9 @@
         <p>Allows a customized date format in the access log file name.
            The date format also decides how often the file is rotated.
            If you wish to rotate every hour, then set this value
-           to: <code>yyyy-MM-dd.HH</code>
+           to: <code>yyyy-MM-dd.HH</code>. The default value is
+           <code>yyyy-MM-dd</code>. The date format will always be localized
+           using the locale <code>en_US</code>.
         </p>
       </attribute>
 
