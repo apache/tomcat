@@ -180,7 +180,12 @@ final class StandardContextValve
             // place
             if (!(request.isAsync() || (asyncAtStart && request.getAttribute(
                         RequestDispatcher.ERROR_EXCEPTION) != null))) {
-                context.fireRequestDestroyEvent(request);
+                // Protect against NPEs if context was destroyed during a long
+                // running request.
+                StandardContext c = context;
+                if (c != null && c.getState().isAvailable()) {
+                    context.fireRequestDestroyEvent(request);
+                }
             }
         }
     }
