@@ -452,10 +452,10 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
 
         // Check the access log
         if (completeOnTimeout && dispatchUrl != null) {
-            //if (!isAccessLogEnabled()) {
+            if (!isAccessLogEnabled()) {
                 validateAccessLog(alv, 1, 500, 0, TimeoutServlet.ASYNC_TIMEOUT +
                         TIMEOUT_MARGIN + REQUEST_TIME);
-            //}
+            }
         } else {
             validateAccessLog(alv, 1, 200, TimeoutServlet.ASYNC_TIMEOUT,
                     TimeoutServlet.ASYNC_TIMEOUT + TIMEOUT_MARGIN +
