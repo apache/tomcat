@@ -103,6 +103,13 @@
         (relative to $CATALINA_BASE).</p>
       </attribute>
 
+      <attribute name="encoding" required="false">
+        <p>Character set used to write the log file. An empty string means
+        to use the system default character set. Default value: use the
+        system default character set.
+        </p>
+      </attribute>
+
       <attribute name="locale" required="false">
         <p>The locale used to format timestamps in the access log
            lines. Any timestamps configured using an

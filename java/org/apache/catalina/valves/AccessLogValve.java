@@ -21,10 +21,13 @@ package org.apache.catalina.valves;
 
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 import java.net.InetAddress;
+import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -49,6 +52,7 @@ import org.apache.coyote.RequestInfo;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.ExceptionUtils;
+import org.apache.tomcat.util.buf.B2CConverter;
 
 
 /**
@@ -518,7 +522,14 @@ public class AccessLogValve extends ValveBase implements AccessLog {
      * log file name suffix.
      */
     protected Locale locale = Locale.getDefault();
-    
+
+    /**
+     * Character set used by the log file. If it is <code>null</code>, the
+     * system default character set will be used. An empty string will be
+     * treated as <code>null</code> when this property is assigned.
+     */
+    protected String encoding = null;
+
     /**
      * Array of AccessLogElement, they will be used to make log message.
      */
@@ -786,6 +797,29 @@ public class AccessLogValve extends ValveBase implements AccessLog {
         locale = findLocale(localeName, locale);
     }
 
+    /**
+     * Return the character set name that is used to write the log file.
+     *
+     * @return Character set name, or <code>null</code> if the system default
+     *  character set is used.
+     */
+    public String getEncoding() {
+        return encoding;
+    }
+
+    /**
+     * Set the character set that is used to write the log file.
+     * 
+     * @param encoding The name of the character set.
+     */
+    public void setEncoding(String encoding) {
+        if (encoding != null && encoding.length() > 0) {
+            this.encoding = encoding;
+        } else {
+            this.encoding = null;
+        }
+    }
+
     // --------------------------------------------------------- Public Methods
 
     /**
@@ -984,9 +1018,22 @@ public class AccessLogValve extends ValveBase implements AccessLog {
                 pathname = dir.getAbsolutePath() + File.separator + prefix
                         + suffix;
             }
-            writer = new PrintWriter(new BufferedWriter(new FileWriter(
-                    pathname, true), 128000), false);
-            
+            Charset charset = null;
+            if (encoding != null) {
+                try {
+                    charset = B2CConverter.getCharset(encoding);
+                } catch (UnsupportedEncodingException ex) {
+                    log.error(sm.getString(
+                            "accessLogValve.unsupportedEncoding", encoding), ex);
+                }
+            }
+            if (charset == null) {
+                charset = Charset.defaultCharset();
+            }
+            writer = new PrintWriter(new BufferedWriter(new OutputStreamWriter(
+                    new FileOutputStream(pathname, true), charset), 128000),
+                    false);
+
             currentLogFile = new File(pathname);
         } catch (IOException e) {
             writer = null;
