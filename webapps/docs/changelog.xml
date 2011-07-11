@@ -149,6 +149,11 @@
       <add>
         Document ExtendedAccessLogValve. (rjung)
       </add>
+      <fix>
+        Correct default value of <code>enableLookups</code> for connectors
+        and mention, that <code>resolveHosts</code> for the AccessLogValve
+        is replaced by <code>enableLookups</code>. (rjung)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
