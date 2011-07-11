@@ -88,6 +88,10 @@
       <fix>
         Log a failure if access log file cannot be opened. (kkolinko)
       </fix>
+      <fix>
+        Always use en_US as locale for timestamps in ExtendedAccessLogValve.
+        (rjung)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

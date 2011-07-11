@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.TimeZone;
 
 import javax.servlet.http.Cookie;
@@ -875,7 +876,7 @@ public class ExtendedAccessLogValve extends AccessLogValve {
         private String currentTimestampString;
         
         ElementTimestampStruct(String format) {
-            currentTimestampFormat = new SimpleDateFormat(format);
+            currentTimestampFormat = new SimpleDateFormat(format, Locale.US);
             currentTimestampFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
         }
     }
