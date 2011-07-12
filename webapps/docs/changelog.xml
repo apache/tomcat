@@ -124,6 +124,10 @@
         Protect against infinite loops in the HTTP NIO connector if sendfile is
         configured to send more data than is available in the file. (markt)
       </fix>
+      <fix>
+        Prevent NPEs when a socket is closed in non-error conditions after
+        sendfile processing when using the HTTP NIO connector. (markt) 
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">
