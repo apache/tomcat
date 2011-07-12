@@ -100,9 +100,9 @@
   <subsection name="Coyote">
     <changelog>
       <update>
-        <bug>51477</bug>Support all SSL protocol combinations in the APR/native
-        connector. This only works when using the native library version 1.1.21
-        or later, which is not yet released. (rjung)
+        <bug>51477</bug>: Support all SSL protocol combinations in the
+        APR/native connector. This only works when using the native library
+        version 1.1.21 or later, which is not yet released. (rjung)
       </update>
       <update>
         Various refactorings to reduce code duplication and unnecessary code in
