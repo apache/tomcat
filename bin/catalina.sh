@@ -133,9 +133,8 @@ PRGDIR=`dirname "$PRG"`
 # but allow them to be specified in setenv.sh, in rare case when it is needed.
 CLASSPATH=
 
-SETENVPATH="${CATALINA_BASE:-$CATALINA_HOME}"
-if [ -r "$SETENVPATH/bin/setenv.sh" ]; then
-  . "$SETENVPATH/bin/setenv.sh"
+if [ -r "$CATALINA_BASE/bin/setenv.sh" ]; then
+  . "$CATALINA_BASE/bin/setenv.sh"
 elif [ -r "$CATALINA_HOME/bin/setenv.sh" ]; then
   . "$CATALINA_HOME/bin/setenv.sh"
 fi
