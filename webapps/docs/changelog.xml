@@ -121,9 +121,9 @@
         is used. Fixes null thread name in access log and JMX MBean. (rjung)
       </fix>
       <fix>
-        Protect against infinite loops (HTTP NIO) and crashes (HTTP APR) if
-        sendfile is configured to send more data than is available in the file.
-        (markt)
+        Fix CVE-2011-2526. Protect against infinite loops (HTTP NIO) and crashes
+        (HTTP APR) if sendfile is configured to send more data than is available
+        in the file. (markt)
       </fix>
       <fix>
         Prevent NPEs when a socket is closed in non-error conditions after
