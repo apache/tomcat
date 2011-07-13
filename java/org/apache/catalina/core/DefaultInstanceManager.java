@@ -429,7 +429,7 @@ public class DefaultInstanceManager implements InstanceManager {
     private void checkAccess(Class<?> clazz, Properties restricted) {
         while (clazz != null) {
             if ("restricted".equals(restricted.getProperty(clazz.getName()))) {
-                throw new SecurityException("Restricted class" + clazz);
+                throw new SecurityException("Restricted " + clazz);
             }
             clazz = clazz.getSuperclass();
         }
