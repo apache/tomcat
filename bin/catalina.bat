@@ -137,12 +137,12 @@ rem but allow them to be specified in setenv.bat, in rare case when it is needed
 set CLASSPATH=
 
 rem Get standard environment variables
-if "%CATALINA_BASE%" == "" goto gotSetenvHome
-if exist "%CATALINA_BASE%\bin\setenv.bat" call "%CATALINA_BASE%\bin\setenv.bat"
-goto gotSetenvBase
-:gotSetenvHome
+if not exist "%CATALINA_BASE%\bin\setenv.bat" goto checkSetenvHome
+call "%CATALINA_BASE%\bin\setenv.bat"
+goto setenvDone
+:checkSetenvHome
 if exist "%CATALINA_HOME%\bin\setenv.bat" call "%CATALINA_HOME%\bin\setenv.bat"
-:gotSetenvBase
+:setenvDone
 
 rem Get standard Java environment variables
 if exist "%CATALINA_HOME%\bin\setclasspath.bat" goto okSetclasspath
