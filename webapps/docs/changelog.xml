@@ -53,6 +53,18 @@
   They eventually become mixed with the numbered issues. (I.e., numbered
   issues to not "pop up" wrt. others).
 -->
+<section name="Tomcat 7.0.20 (markt)">
+  <subsection name="Catalina">
+    <changelog>
+      <fix>
+        Corrected missing comma in the value of <code>jarsToSkip</code>
+        property in <code>conf/catalina.properties</code> file, which
+        caused tomcat-jdbc.jar and commons-beanutils*.jar to be not
+        ignored when scanning jars for tag libraries. (kkolinko)
+      </fix>
+    </changelog>
+  </subsection>
+</section>
 <section name="Tomcat 7.0.19 (markt)">
   <subsection name="Catalina">
     <changelog>
