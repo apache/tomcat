@@ -72,7 +72,13 @@ public interface AsyncContext {
     <T extends AsyncListener> T createListener(Class<T> clazz)
     throws ServletException;
     
+    /**
+     * Get timeout in milliseconds
+     */
     long getTimeout();
     
+    /**
+     * Set timeout in milliseconds
+     */
     void setTimeout(long timeout);
 }
