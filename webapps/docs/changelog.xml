@@ -64,6 +64,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Coyote">
+    <changelog>
+      <fix>
+        Correctly handle a connectionTimeout value of -1 (no timeout) for the
+        HTTP NIO and AJP NIO connectors. (markt)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 7.0.19 (markt)">
   <subsection name="Catalina">
