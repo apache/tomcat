@@ -46,6 +46,7 @@ public class TestAbstractAjpProcessor extends TomcatBaseTest {
     
     public void testKeepAlive() throws Exception {
         Tomcat tomcat = getTomcatInstance();
+        tomcat.getConnector().setProperty("connectionTimeout", "-1");
         tomcat.start();
 
         // Must have a real docBase - just use temp
@@ -72,6 +73,9 @@ public class TestAbstractAjpProcessor extends TomcatBaseTest {
             TesterAjpMessage responseBody = ajpClient.readMessage();
             validateResponseBody(responseBody, HelloWorldServlet.RESPONSE_TEXT);
             validateResponseEnd(ajpClient.readMessage(), true);
+            
+            // Give connections plenty of time to time out
+            Thread.sleep(2000);
             
             // Double check the connection is still open
             validateCpong(ajpClient.cping());
