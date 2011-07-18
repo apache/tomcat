@@ -70,6 +70,19 @@
         Correctly handle a connectionTimeout value of -1 (no timeout) for the
         HTTP NIO and AJP NIO connectors. (markt)
       </fix>
+      <fix>
+        <bug>51503</bug>: Add additional validation that prevents a connector
+        from starting if it does not have a port > 0. (markt)
+      </fix>
+    </changelog>
+  </subsection>
+  <subsection>
+    <changelog>
+      <fix>
+        <bug>51503</bug>: Add additional validation to Windows installer that
+        ensure that the shutdown port, HTTP port and AJP port are all specified
+        during the install process. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
