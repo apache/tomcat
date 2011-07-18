@@ -927,6 +927,12 @@ public class Connector extends LifecycleMBeanBase  {
     @Override
     protected void startInternal() throws LifecycleException {
 
+        // Validate settings before starting
+        if (getPort() < 1) {
+            throw new LifecycleException(sm.getString(
+                    "coyoteConnector.invalidPort", Integer.valueOf(getPort())));
+        }
+
         setState(LifecycleState.STARTING);
 
         try {
