@@ -549,6 +549,24 @@ Function pageConfigurationLeave
     ${NSD_GetText} $CtlTomcatAdminRoles $TomcatAdminRoles
   ${EndIf}
 
+  ${If} $TomcatPortShutdown == ""
+    MessageBox MB_ICONEXCLAMATION|MB_OK 'The shutdown port may not be empty'
+    Abort "Config not right"
+    Goto exit
+  ${EndIf}
+
+  ${If} $TomcatPortHttp == ""
+    MessageBox MB_ICONEXCLAMATION|MB_OK 'The HTTP port may not be empty'
+    Abort "Config not right"
+    Goto exit
+  ${EndIf}
+
+  ${If} $TomcatPortAjp == ""
+    MessageBox MB_ICONEXCLAMATION|MB_OK 'The AJP port may not be empty'
+    Abort "Config not right"
+    Goto exit
+  ${EndIf}
+
   ${If} $TomcatServiceName == ""
     MessageBox MB_ICONEXCLAMATION|MB_OK 'The Service Name may not be empty'
     Abort "Config not right"
