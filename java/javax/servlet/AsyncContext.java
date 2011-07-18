@@ -73,12 +73,12 @@ public interface AsyncContext {
     throws ServletException;
     
     /**
-     * Get timeout in milliseconds
+     * Get timeout in milliseconds. 0 or less indicates no timeout.
      */
     long getTimeout();
     
     /**
-     * Set timeout in milliseconds
+     * Set timeout in milliseconds. 0 or less indicates no timeout.
      */
     void setTimeout(long timeout);
 }
