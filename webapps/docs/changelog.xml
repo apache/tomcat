@@ -100,6 +100,10 @@
         ensure that the shutdown port, HTTP port and AJP port are all specified
         during the install process. (markt)
       </fix>
+      <fix>
+        <bug>51531</bug>: Update sample Eclipse classpath file to reflect
+        updated ECJ jar. Patch provided by Ian Brandt. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
