@@ -76,7 +76,7 @@
       </fix>
     </changelog>
   </subsection>
-  <subsection>
+  <subsection name="Other">
     <changelog>
       <fix>
         <bug>51503</bug>: Add additional validation to Windows installer that
