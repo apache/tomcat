@@ -62,6 +62,10 @@
         caused tomcat-jdbc.jar and commons-beanutils*.jar to be not
         ignored when scanning jars for tag libraries. (kkolinko)
       </fix>
+      <fix>
+        <bug>51518</bug>: Correct error in web.xml parsing rules for the
+        &lt;others/&gt; tag when using absolute ordering. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
