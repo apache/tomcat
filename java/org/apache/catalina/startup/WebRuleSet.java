@@ -180,7 +180,7 @@ public class WebRuleSet extends RuleSetBase {
                     new RelativeOrderingRule());
             digester.addCallMethod(fullPrefix + "/absolute-ordering/name",
                                    "addAbsoluteOrdering", 0);
-            digester.addCallMethod(fullPrefix + "/absolute-ordering/name/others",
+            digester.addCallMethod(fullPrefix + "/absolute-ordering/others",
                                    "addAbsoluteOrderingOthers");
         }
 
