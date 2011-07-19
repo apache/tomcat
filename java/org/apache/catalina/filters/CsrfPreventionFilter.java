@@ -310,11 +310,15 @@ public class CsrfPreventionFilter extends FilterBase {
         }
         
         public void add(T key) {
-            cache.put(key, null);
+            synchronized (cache) {
+                cache.put(key, null);
+            }
         }
-        
+
         public boolean contains(T key) {
-            return cache.containsKey(key);
+            synchronized (cache) {
+                return cache.containsKey(key);
+            }
         }
     }
 }
