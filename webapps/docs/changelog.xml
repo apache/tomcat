@@ -63,6 +63,10 @@
         ignored when scanning jars for tag libraries. (kkolinko)
       </fix>
       <fix>
+        <bug>51509</bug>: Fix potential concurrency issue in CSRF prevention
+        filter that may lead to some requests failing that should not. (markt)
+      </fix>
+      <fix>
         <bug>51518</bug>: Correct error in web.xml parsing rules for the
         &lt;others/&gt; tag when using absolute ordering. (markt)
       </fix>
