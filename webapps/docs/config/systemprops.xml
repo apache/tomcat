@@ -406,7 +406,8 @@
 
   <properties>
 
-    <property name="org.apache.catalina.SSO_SESSION_COOKIE_NAME">
+    <property name="org.apache.catalina.authenticator. 
+                    Constants.SSO_SESSION_COOKIE_NAME">
       <p>An alternative name for the single sign on session cookie. Defaults to
       <code>JSESSIONIDSSO</code>.</p>
     </property>
