@@ -71,6 +71,14 @@
   <subsection name="Coyote">
     <changelog>
       <fix>
+        <bug>50394</bug>: Return -1 instead throwing exception when
+        EOF (jfclere)
+      </fix>
+      <fix>
+        <bug>49595</bug>: Prevent JVM crash with native when flushing
+        a closed socket (jfclere)
+      </fix>
+      <fix>
         Correctly handle a connectionTimeout value of -1 (no timeout) for the
         HTTP NIO and AJP NIO connectors. (markt)
       </fix>
