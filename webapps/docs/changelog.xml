@@ -93,6 +93,15 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Web applications">
+    <changelog>
+      <fix>
+        <bug>51516</bug>: Correct documentation web application to show correct
+        system property name for changing the name of the SSO session cookie.
+        (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <fix>
