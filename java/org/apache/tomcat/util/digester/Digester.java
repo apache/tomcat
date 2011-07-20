@@ -340,12 +340,6 @@ public class Digester extends DefaultHandler {
         LogFactory.getLog("org.apache.commons.digester.Digester.sax");
     
         
-    /**
-     * The schema language supported. By default, we use this one.
-     */
-    protected static final String W3C_XML_SCHEMA =
-        "http://www.w3.org/2001/XMLSchema";
-    
     /** Stacks used for interrule communication, indexed by name String */
     private HashMap<String,ArrayStack<Object>> stacksByName =
         new HashMap<String,ArrayStack<Object>>();
