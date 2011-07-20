@@ -587,11 +587,9 @@ public class InternalAprInputBuffer extends AbstractInputBuffer {
                 bbuf.get(buf, pos, nRead);
                 lastValid = pos + nRead;
             } else {
-                if ((-nRead) == Status.APR_EOF)
-                    return false;
                 if ((-nRead) == Status.ETIMEDOUT || (-nRead) == Status.TIMEUP) {
                     throw new SocketTimeoutException(sm.getString("iib.failedread"));
-                } else {
+                } else if (nRead != 0) {
                     throw new IOException(sm.getString("iib.failedread"));
                 }
             }
