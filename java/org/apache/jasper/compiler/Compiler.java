@@ -494,7 +494,13 @@ public abstract class Compiler {
         while (it.hasNext()) {
             Entry<String,Long> include = it.next();
             try {
-                URL includeUrl = ctxt.getResource(include.getKey());
+                String key = include.getKey();
+                URL includeUrl;
+                if (key.startsWith("jar:")) {
+                    includeUrl = new URL(key);
+                } else {
+                    includeUrl = ctxt.getResource(include.getKey());
+                }
                 if (includeUrl == null) {
                     return true;
                 }
