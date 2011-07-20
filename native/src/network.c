@@ -929,6 +929,8 @@ TCN_IMPLEMENT_CALL(jint, Socket, recvbb)(TCN_STDARGS, jlong sock,
 #endif
     if (ss == APR_SUCCESS)
         return (jint)nbytes;
+    else if (APR_STATUS_IS_EOF(ss))
+        return 0;
     else {
         TCN_ERROR_WRAP(ss);
         return -(jint)ss;
