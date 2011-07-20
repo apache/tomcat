@@ -93,6 +93,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Jasper">
+    <changelog>
+      <fix>
+        <bug>51532</bug>: JSP files with dependencies in JARs were recompiled on
+        every access leading to poor performance. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Web applications">
     <changelog>
       <fix>
