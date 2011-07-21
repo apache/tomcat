@@ -113,6 +113,13 @@
         system property name for changing the name of the SSO session cookie.
         (markt)
       </fix>
+      <update>
+        Configure the Manager and Host Manager web applications with the Set
+        Character Encoding Filter to make the default request character encoding
+        UTF-8 to improve i18n support. Note that best results will be obtained
+        if the connector is also configured with
+        <code>URIEncoding=&quot;UTF-8&quot;</code>.(markt)  
+      </update>
     </changelog>
   </subsection>
   <subsection name="Other">
