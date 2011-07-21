@@ -70,6 +70,11 @@
         <bug>51518</bug>: Correct error in web.xml parsing rules for the
         &lt;others/&gt; tag when using absolute ordering. (markt)
       </fix>
+      <add>
+        Move the SetCharacaterEncoding filter from the examples web application
+        to the <code>org.apache.catalina.filters</code> package so it is
+        available for all web applications. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">

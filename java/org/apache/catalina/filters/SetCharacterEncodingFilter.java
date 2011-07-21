@@ -14,18 +14,17 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-
-package filters;
-
+package org.apache.catalina.filters;
 
 import java.io.IOException;
 
-import javax.servlet.Filter;
 import javax.servlet.FilterChain;
-import javax.servlet.FilterConfig;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
+
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
 
 
 /**
@@ -43,7 +42,7 @@ import javax.servlet.ServletResponse;
  *     <code>selectEncoding()</code> method is set.  If set to "false,
  *     <code>selectEncoding()</code> is called <strong>only</strong> if the
  *     client has not already specified an encoding.  By default, this
- *     parameter is set to "true".</li>
+ *     parameter is set to "false".</li>
  * </ul>
  *
  * <p>Although this filter can be used unchanged, it is also easy to
@@ -52,50 +51,34 @@ import javax.servlet.ServletResponse;
  * the incoming request (such as the values of the <code>Accept-Language</code>
  * and <code>User-Agent</code> headers, or a value stashed in the current
  * user's session.</p>
- *
- * @author Craig McClanahan
- * @version $Id$
  */
 
-public class SetCharacterEncodingFilter implements Filter {
+public class SetCharacterEncodingFilter extends FilterBase {
+
+    private static final Log log =
+        LogFactory.getLog(SetCharacterEncodingFilter.class);
 
 
     // ----------------------------------------------------- Instance Variables
-
 
     /**
      * The default character encoding to set for requests that pass through
      * this filter.
      */
-    protected String encoding = null;
-
-
-    /**
-     * The filter configuration object we are associated with.  If this value
-     * is null, this filter instance is not currently configured.
-     */
-    protected FilterConfig filterConfig = null;
+    private String encoding = null;
+    public void setEncoding(String encoding) { this.encoding = encoding; }
+    public String getEncoding() { return encoding; }
 
 
     /**
      * Should a character encoding specified by the client be ignored?
      */
-    protected boolean ignore = true;
+    private boolean ignore = false;
+    public void setIgnore(boolean ignore) { this.ignore = ignore; }
+    public boolean isIgnore() { return ignore; }
 
 
     // --------------------------------------------------------- Public Methods
-
-
-    /**
-     * Take this filter out of service.
-     */
-    @Override
-    public void destroy() {
-
-        this.encoding = null;
-        this.filterConfig = null;
-
-    }
 
 
     /**
@@ -123,34 +106,15 @@ public class SetCharacterEncodingFilter implements Filter {
 
         // Pass control on to the next filter
         chain.doFilter(request, response);
-
-    }
-
-
-    /**
-     * Place this filter into service.
-     *
-     * @param fConfig The filter configuration object
-     */
-    @Override
-    public void init(FilterConfig fConfig) throws ServletException {
-
-        this.filterConfig = fConfig;
-        this.encoding = fConfig.getInitParameter("encoding");
-        String value = fConfig.getInitParameter("ignore");
-        if (value == null)
-            this.ignore = true;
-        else if (value.equalsIgnoreCase("true"))
-            this.ignore = true;
-        else if (value.equalsIgnoreCase("yes"))
-            this.ignore = true;
-        else
-            this.ignore = false;
-
     }
 
 
     // ------------------------------------------------------ Protected Methods
+
+    @Override
+    protected Log getLogger() {
+        return log;
+    }
 
 
     /**
@@ -166,10 +130,6 @@ public class SetCharacterEncodingFilter implements Filter {
      * @param request The servlet request we are processing
      */
     protected String selectEncoding(ServletRequest request) {
-
-        return (this.encoding);
-
+        return this.encoding;
     }
-
-
 }

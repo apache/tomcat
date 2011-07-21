@@ -1100,6 +1100,51 @@ org.apache.catalina.filters.RequestDumperFilter.handlers = 1request-dumper.org.a
 </section>
 
 
+<section name="Set Character Encoding Filter">
+
+  <subsection name="Introduction">
+
+    <p>User agents don&apos;t always include character encoding information in
+    requests. Depending on the how the request is processed, a default of either
+    ISO-8859-1 or the platform default encoding may be used. This is not always
+    desirable. This filter provides options for setting that encoding or forcing
+    it to a particular value.</p>
+        
+  </subsection>
+
+  <subsection name="Filter Class Name">
+
+    <p>The filter class name for the Set Character Encoding Filter is
+    <strong><code>org.apache.catalina.filters.SetCharacterEncodingFilter</code>
+    </strong>.</p>
+
+  </subsection>
+
+  <subsection name="Initialisation parameters">
+
+    <p>The Set Character Encoding Filter supports the following initialization
+    parameters:</p>
+
+    <attributes>
+
+      <attribute name="encoding" required="false">
+        <p>Name of the character encoding which should be set.</p>
+      </attribute>
+
+      <attribute name="ignore" required="false">
+        <p>Determines if any character encoding specified by the user agent is
+        ignored. If this attribute is <code>true</code>, any value provided by
+        the user agent is ignored. If <code>false</code>, the encoding is only
+        set if the user agent did not specify an encoding.</p>
+      </attribute>
+
+    </attributes>
+
+  </subsection>
+
+</section>
+
+
 <section name="WebDAV Fix Filter">
 
   <subsection name="Introduction">
