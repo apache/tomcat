@@ -151,10 +151,11 @@
         a Context or Host can be identified for the failed request. (markt)
       </fix>
       <update>
-        In JULI FileHandler and in AccessLogValve create a directory
-        automatically when it is specified as a part of the file name, e.g. in
-        the <code>prefix</code> attribute. Earlier this happened only if it was
-        specified with the <code>directory</code> attribute. (kkolinko)
+        Create a directory for access log or error log (in AccessLogValve and
+        in JULI FileHandler) automatically when it is specified as a part of
+        the file name, e.g. in the <code>prefix</code> attribute. Earlier this
+        happened only if it was specified with the <code>directory</code>
+        attribute. (kkolinko)
       </update>
       <fix>
         Log a failure if access log file cannot be opened. (kkolinko)
