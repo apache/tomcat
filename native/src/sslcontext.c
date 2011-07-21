@@ -91,13 +91,6 @@ TCN_IMPLEMENT_CALL(jlong, SSLContext, make)(TCN_STDARGS, jlong pool,
         case SSL_PROTOCOL_SSLV2 | SSL_PROTOCOL_SSLV3:
         case SSL_PROTOCOL_SSLV2 | SSL_PROTOCOL_TLSV1:
         case SSL_PROTOCOL_ALL:
-            if (mode == SSL_MODE_CLIENT)
-                ctx = SSL_CTX_new(SSLv23_client_method());
-            else if (mode == SSL_MODE_SERVER)
-                ctx = SSL_CTX_new(SSLv23_server_method());
-            else
-                ctx = SSL_CTX_new(SSLv23_method());
-        break;
         case SSL_PROTOCOL_SSLV3 | SSL_PROTOCOL_TLSV1:
             if (mode == SSL_MODE_CLIENT)
                 ctx = SSL_CTX_new(SSLv23_client_method());
@@ -105,8 +98,6 @@ TCN_IMPLEMENT_CALL(jlong, SSLContext, make)(TCN_STDARGS, jlong pool,
                 ctx = SSL_CTX_new(SSLv23_server_method());
             else
                 ctx = SSL_CTX_new(SSLv23_method());
-            if (ctx != NULL)
-                SSL_CTX_set_options(ctx, SSL_OP_NO_SSLv2);
         break;
         case SSL_PROTOCOL_TLSV1:
             if (mode == SSL_MODE_CLIENT)
