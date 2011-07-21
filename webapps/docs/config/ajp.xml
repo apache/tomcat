@@ -244,8 +244,8 @@
   following attributes in addition to the common Connector attributes listed
   above.</p>
   
-  <p><strong><font color="red">WARNING</font></strong>: The NIO connector for AJP
-  is experimentaland not yet fully functional.</p>
+  <p><strong><font color="red">WARNING</font></strong>: The NIO connector for
+  AJP is experimental.</p>
   
   <attributes>
 
