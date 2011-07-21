@@ -133,12 +133,11 @@
 
       <attribute name="prefix" required="false">
         <p>The prefix added to the start of each log file's name.  If not
-        specified, the default value is "access_log.".  To specify no prefix,
-        use a zero-length string.</p>
+        specified, the default value is "access_log.".</p>
       </attribute>
 
       <attribute name="requestAttributesEnabled" required="false">
-        <p>Set to <code>true</code> to check for the existance of request
+        <p>Set to <code>true</code> to check for the existence of request
         attributes (typically set by the RemoteIpValve and similar) that should
         be used to override the values returned by the request for remote
         address, remote host, server port and protocol. If the attributes are
@@ -154,8 +153,8 @@
 
       <attribute name="suffix" required="false">
         <p>The suffix added to the end of each log file's name.  If not
-        specified, the default value is "".  To specify no suffix,
-        use a zero-length string.</p>
+        specified, the default value is "" (a zero-length string),
+        meaning that no suffix will be added.</p>
       </attribute>
 
       <attribute name="rotatable" required="false">
@@ -230,7 +229,9 @@
     There is also support to write information incoming or outgoing
     headers, cookies, session or request attributes and special
     timestamp formats.
-    It is modeled after the apache syntax:
+    It is modeled after the
+    <a href="http://httpd.apache.org/">Apache HTTP Server</a> log configuration
+    syntax:
     <ul>
     <li><b><code>%{xxx}i</code></b> for incoming headers</li>
     <li><b><code>%{xxx}o</code></b> for outgoing response headers</li>
@@ -324,12 +325,11 @@
 
       <attribute name="prefix" required="false">
         <p>The prefix added to the start of each log file's name.  If not
-        specified, the default value is "access_log.".  To specify no prefix,
-        use a zero-length string.</p>
+        specified, the default value is "access_log.".</p>
       </attribute>
 
       <attribute name="requestAttributesEnabled" required="false">
-        <p>Set to <code>true</code> to check for the existance of request
+        <p>Set to <code>true</code> to check for the existence of request
         attributes (typically set by the RemoteIpValve and similar) that should
         be used to override the values returned by the request for remote
         address, remote host, server port and protocol. If the attributes are
@@ -345,8 +345,8 @@
 
       <attribute name="suffix" required="false">
         <p>The suffix added to the end of each log file's name.  If not
-        specified, the default value is "".  To specify no suffix,
-        use a zero-length string.</p>
+        specified, the default value is "" (a zero-length string),
+        meaning that no suffix will be added.</p>
       </attribute>
 
       <attribute name="rotatable" required="false">
@@ -414,7 +414,7 @@
     </ul>
 
     <p>For any of the <code>x-H(XXX)</code> the following method will be called from the
-    HttpServletRequestObject:</p>
+    HttpServletRequest object:</p>
     <ul>
     <li><b><code>x-H(authType)</code></b>: getAuthType </li>
     <li><b><code>x-H(characterEncoding)</code></b>: getCharacterEncoding </li>
@@ -422,7 +422,7 @@
     <li><b><code>x-H(locale)</code></b>:  getLocale</li>
     <li><b><code>x-H(protocol)</code></b>: getProtocol </li>
     <li><b><code>x-H(remoteUser)</code></b>:  getRemoteUser</li>
-    <li><b><code>x-H(requestedSessionId)</code></b>: getGequestedSessionId</li>
+    <li><b><code>x-H(requestedSessionId)</code></b>: getRequestedSessionId</li>
     <li><b><code>x-H(requestedSessionIdFromCookie)</code></b>:
                      isRequestedSessionIdFromCookie </li>
     <li><b><code>x-H(requestedSessionIdValid)</code></b>:
