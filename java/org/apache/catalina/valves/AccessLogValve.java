@@ -59,7 +59,8 @@ import org.apache.tomcat.util.buf.B2CConverter;
  * <p>Implementation of the <b>Valve</b> interface that generates a web server
  * access log with the detailed line contents matching a configurable pattern.
  * The syntax of the available patterns is similar to that supported by the
- * Apache <code>mod_log_config</code> module.  As an additional feature,
+ * <a href="http://httpd.apache.org/">Apache HTTP Server</a>
+ * <code>mod_log_config</code> module.  As an additional feature,
  * automatic rollover of log files when the date changes is also supported.</p>
  *
  * <p>Patterns for the logged message may include constant text or any of the
@@ -101,7 +102,9 @@ import org.apache.tomcat.util.buf.B2CConverter;
  * <p>
  * There is also support to write information from the cookie, incoming
  * header, the Session or something else in the ServletRequest.<br>
- * It is modeled after the apache syntax:
+ * It is modeled after the
+ * <a href="http://httpd.apache.org/">Apache HTTP Server</a> log configuration
+ * syntax:
  * <ul>
  * <li><code>%{xxx}i</code> for incoming headers
  * <li><code>%{xxx}o</code> for outgoing response headers
@@ -112,10 +115,34 @@ import org.apache.tomcat.util.buf.B2CConverter;
  * </p>
  *
  * <p>
+ * Log rotation can be on or off. This is dictated by the rotatable
+ * property.
+ * </p>
+ *
+ * <p>
+ * For UvNIX users, another field called <code>checkExists</code> is also
+ * available. If set to true, the log file's existence will be checked before
+ * each logging. This way an external log rotator can move the file
+ * somewhere and tomcat will start with a new file.
+ * </p>
+ *
+ * <p>
+ * For JMX junkies, a public method called </code>rotate</code> has
+ * been made available to allow you to tell this instance to move
+ * the existing log file to somewhere else and start writing a new log file.
+ * </p>
+ * 
+ * <p>
  * Conditional logging is also supported. This can be done with the
  * <code>condition</code> property.
  * If the value returned from ServletRequest.getAttribute(condition)
- * yields a non-null value. The logging will be skipped.
+ * yields a non-null value, the logging will be skipped.
+ * </p>
+ * 
+ * <p>
+ * For extended attributes coming from a getAttribute() call,
+ * it is you responsibility to ensure there are no newline or
+ * control characters.
  * </p>
  *
  * @author Craig R. McClanahan
