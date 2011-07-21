@@ -500,9 +500,6 @@ TCN_IMPLEMENT_CALL(jint, SSL, initialize)(TCN_STDARGS, jstring engine)
     ERR_load_crypto_strings();
     SSL_load_error_strings();
     SSL_library_init();
-    OpenSSL_add_all_algorithms();
-    OpenSSL_add_all_ciphers();
-    OpenSSL_add_all_digests(); 
 #if HAVE_ENGINE_LOAD_BUILTIN_ENGINES
     ENGINE_load_builtin_engines();
 #endif
