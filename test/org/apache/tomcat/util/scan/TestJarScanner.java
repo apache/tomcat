@@ -32,9 +32,9 @@ public class TestJarScanner extends TomcatBaseTest {
         String token;
         while (tokenizer.hasMoreElements()) {
             token = tokenizer.nextToken();
-            assertTrue("token '" + token + "' does not end with \".jar\"",
+            assertTrue("Token \"" + token + "\" does not end with \".jar\"",
                        token.endsWith(".jar"));
-            assertEquals("token '" + token + "' contains sub string \".jar\"" +
+            assertEquals("Token \"" + token + "\" contains sub string \".jar\"" +
                          " or separator \",\" is missing",
                          token.length() - ".jar".length(),
                          token.indexOf(".jar"));
