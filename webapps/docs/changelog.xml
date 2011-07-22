@@ -109,6 +109,10 @@
   <subsection name="Web applications">
     <changelog>
       <fix>
+        <bug>41498</bug>: Add the allRolesMode attribute to the Realm
+        configuration page in the documentation web application. (markt)
+      </fix>
+      <fix>
         <bug>51516</bug>: Correct documentation web application to show correct
         system property name for changing the name of the SSO session cookie.
         (markt)
