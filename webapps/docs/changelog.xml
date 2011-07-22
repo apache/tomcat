@@ -63,6 +63,11 @@
         ignored when scanning jars for tag libraries. (kkolinko)
       </fix>
       <fix>
+        <bug>41709</bug>: Provide exception messages where no message is
+        provided currently for IllegalStateExcpetions triggered by calling
+        HttpServletResponse methods when the reponse is committed. (markt)
+      </fix>
+      <fix>
         <bug>51509</bug>: Fix potential concurrency issue in CSRF prevention
         filter that may lead to some requests failing that should not. (markt)
       </fix>

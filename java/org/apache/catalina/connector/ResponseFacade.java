@@ -250,7 +250,7 @@ public class ResponseFacade
 
         if (isCommitted())
             throw new IllegalStateException
-                (/*sm.getString("responseBase.reset.ise")*/);
+                (sm.getString("coyoteResponse.setBufferSize.ise"));
 
         response.setBufferSize(size);
 
@@ -311,7 +311,7 @@ public class ResponseFacade
 
         if (isCommitted())
             throw new IllegalStateException
-                (/*sm.getString("responseBase.reset.ise")*/);
+                (sm.getString("coyoteResponse.resetBuffer.ise"));
 
         response.resetBuffer();
 
@@ -335,7 +335,7 @@ public class ResponseFacade
 
         if (isCommitted())
             throw new IllegalStateException
-                (/*sm.getString("responseBase.reset.ise")*/);
+                (sm.getString("coyoteResponse.reset.ise"));
 
         response.reset();
 
@@ -441,7 +441,7 @@ public class ResponseFacade
 
         if (isCommitted())
             throw new IllegalStateException
-                (/*sm.getString("responseBase.reset.ise")*/);
+                (sm.getString("coyoteResponse.sendError.ise"));
 
         response.setAppCommitted(true);
 
@@ -456,7 +456,7 @@ public class ResponseFacade
 
         if (isCommitted())
             throw new IllegalStateException
-                (/*sm.getString("responseBase.reset.ise")*/);
+                (sm.getString("coyoteResponse.sendError.ise"));
 
         response.setAppCommitted(true);
 
@@ -471,7 +471,7 @@ public class ResponseFacade
 
         if (isCommitted())
             throw new IllegalStateException
-                (/*sm.getString("responseBase.reset.ise")*/);
+                (sm.getString("coyoteResponse.sendRedirect.ise"));
 
         response.setAppCommitted(true);
 
