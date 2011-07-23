@@ -307,9 +307,15 @@
         If you specify a context path of an empty string (""), you are
         defining the <em>default</em> web application for this Host, which
         will process all requests not assigned to other Contexts.</p>
-        <p>The value of this field must not be set except when statically
-        defining a Context in server.xml, as it will be inferred from the
-        filenames used for either the .xml context file or the docBase.</p>
+        <p>This attribute must only be used when statically defining a Context
+        in server.xml. In all other circumstances, the path will be inferred
+        from the filenames used for either the .xml context file or the docBase.
+        </p>
+        <p>Even when statically defining a Context in server.xml, this attribute
+        must not be set unless either the docBase is not located under the
+        <a href="host.html">Host</a>&apos;s <code>appBase</code> or both
+        <code>deployOnStartup</code> and <code>autoDeploy</code> are false. If
+        this rule is not followed, double deployment is likely to result.</p>
       </attribute>
 
       <attribute name="preemptiveAuthentication" required="false">

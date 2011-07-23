@@ -129,6 +129,11 @@
         if the connector is also configured with
         <code>URIEncoding=&quot;UTF-8&quot;</code>.(markt)  
       </update>
+      <update>
+        Update the documentation web application to be even more explicit about
+        the implications of setting the path attribute on a Context element in
+        server.xml. (markt)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Other">
