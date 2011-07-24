@@ -325,6 +325,22 @@ public class TestELInJsp extends TomcatBaseTest {
         assertEcho(result, "00-" + TesterFunctions.Inner$Class.RETVAL);
     }
 
+    public void testBug51544() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+
+        File appDir = new File("test/webapp-3.0");
+        // app dir is relative to server home
+        tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());
+        
+        tomcat.start();
+
+        ByteChunk res = getUrl("http://localhost:" + getPort() +
+                "/test/bug51544.jsp");
+        
+        String result = res.toString();
+        assertEcho(result, "Empty list: true");
+    }
+
     public void testELMisc() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
