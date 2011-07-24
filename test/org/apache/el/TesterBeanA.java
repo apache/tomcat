@@ -17,10 +17,13 @@
 
 package org.apache.el;
 
+import java.util.List;
+
 public class TesterBeanA {
     private TesterBeanB bean;
     private String name;
     private long valLong;
+    private List<?> valList;
 
     public TesterBeanB getBean() {
         return bean;
@@ -44,5 +47,13 @@ public class TesterBeanA {
     
     public void setValLong(long valLong) {
         this.valLong = valLong;
+    }
+
+    public List<?> getValList() {
+        return valList;
+    }
+
+    public void setValList(List<?> valList) {
+        this.valList = valList;
     }
 }
