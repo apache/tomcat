@@ -18,6 +18,7 @@
 package org.apache.el;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -115,7 +116,7 @@ public class TestValueExpressionImpl extends TestCase {
         ELContext context = new ELContextImpl();
         
         Object o1 = "String value";
-        Object o2 = new Integer(32);
+        Object o2 = Integer.valueOf(32);
 
         Map<Object,Object> map = new HashMap<Object,Object>();
         map.put("key1", o1);
@@ -141,7 +142,7 @@ public class TestValueExpressionImpl extends TestCase {
         ELContext context = new ELContextImpl();
         
         Object o1 = "String value";
-        Object o2 = new Integer(32);
+        Object o2 = Integer.valueOf(32);
 
         List<Object> list = new ArrayList<Object>();
         list.add(0, o1);
@@ -162,4 +163,46 @@ public class TestValueExpressionImpl extends TestCase {
         assertEquals(o1, ve2.getValue(context));
     }
 
+
+    /**
+     * Test returning an empty list as a bean property.
+     */
+    public void testBug51544Bean() throws Exception {
+        ExpressionFactory factory = ExpressionFactory.newInstance();
+        ELContext context = new ELContextImpl();
+        
+        TesterBeanA beanA = new TesterBeanA();
+        beanA.setValList(Collections.emptyList());
+        
+        ValueExpression var =
+            factory.createValueExpression(beanA, TesterBeanA.class);
+        context.getVariableMapper().setVariable("beanA", var);
+
+        ValueExpression ve = factory.createValueExpression(
+                context, "${beanA.valList.isEmpty()}", String.class);
+
+        String result = (String) ve.getValue(context);
+        assertEquals("true", result);
+    }
+
+
+    /**
+     * Test using list directly as variable.
+     */
+    public void testBug51544Direct() throws Exception {
+        ExpressionFactory factory = ExpressionFactory.newInstance();
+        ELContext context = new ELContextImpl();
+        
+        List<?> list = Collections.emptyList();
+        
+        ValueExpression var =
+            factory.createValueExpression(list, List.class);
+        context.getVariableMapper().setVariable("list", var);
+
+        ValueExpression ve = factory.createValueExpression(
+                context, "${list.isEmpty()}", Boolean.class);
+
+        Boolean result = (Boolean) ve.getValue(context);
+        assertEquals(Boolean.TRUE, result);
+    }
 }
