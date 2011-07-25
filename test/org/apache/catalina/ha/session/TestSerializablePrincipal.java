@@ -27,16 +27,22 @@ import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import junit.framework.TestCase;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.fail;
+
+import org.junit.Test;
 
 import org.apache.catalina.realm.GenericPrincipal;
 
-public class TestSerializablePrincipal extends TestCase {
+
+public class TestSerializablePrincipal  {
 
     /**
      * Simple serialization / de-serialization test for bug 43840.
      */
     @SuppressWarnings("null")
+    @Test
     public void testWriteReadPrincipal() {
         // Get a temporary file to use for the serialization test
         File file = null;
