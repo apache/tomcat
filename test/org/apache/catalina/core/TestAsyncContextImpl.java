@@ -34,16 +34,23 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+import org.junit.Test;
+
 import org.apache.catalina.Context;
 import org.apache.catalina.Wrapper;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.startup.Tomcat;
-import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.catalina.startup.TomcatBaseTestJUnit4;
 import org.apache.catalina.valves.TesterAccessLogValve;
 import org.apache.catalina.valves.TesterAccessLogValve.Entry;
 import org.apache.tomcat.util.buf.ByteChunk;
 
-public class TestAsyncContextImpl extends TomcatBaseTest {
+public class TestAsyncContextImpl extends TomcatBaseTestJUnit4 {
 
     // Time for a request to process (need to allow for threads to start etc.)
     private static final long REQUEST_TIME = 1000;
@@ -54,6 +61,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
     // Default timeout for these tests
     private static final long TIMEOUT = 3000;
 
+    @Test
     public void testBug49528() throws Exception {
         // Setup Tomcat instance
         Tomcat tomcat = getTomcatInstance();
@@ -90,7 +98,8 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         validateAccessLog(alv, 1, 200, Bug49528Servlet.THREAD_SLEEP_TIME,
                 Bug49528Servlet.THREAD_SLEEP_TIME + REQUEST_TIME);
     }
-    
+
+    @Test
     public void testBug49567() throws Exception {
         // Setup Tomcat instance
         Tomcat tomcat = getTomcatInstance();
@@ -127,7 +136,8 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         validateAccessLog(alv, 1, 200, Bug49567Servlet.THREAD_SLEEP_TIME,
                 Bug49567Servlet.THREAD_SLEEP_TIME + REQUEST_TIME);
     }
-    
+
+    @Test
     public void testAsyncStartNoComplete() throws Exception {
         // Setup Tomcat instance
         Tomcat tomcat = getTomcatInstance();
@@ -168,7 +178,8 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
                 AsyncStartNoCompleteServlet.ASYNC_TIMEOUT + TIMEOUT_MARGIN +
                         REQUEST_TIME);
     }
-    
+
+    @Test
     public void testAsyncStartWithComplete() throws Exception {
         // Setup Tomcat instance
         Tomcat tomcat = getTomcatInstance();
@@ -365,21 +376,25 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         }
     }
 
+    @Test
     public void testTimeoutListenerCompleteNoDispatch() throws Exception {
         // Should work
         doTestTimeout(true, null);
     }
-    
+
+    @Test
     public void testTimeoutListenerNoCompleteNoDispatch() throws Exception {
         // Should trigger an error - must do one or other
         doTestTimeout(false, null);
     }
 
+    @Test
     public void testTimeoutListenerCompleteDispatch() throws Exception {
         // Should trigger an error - can't do both
         doTestTimeout(true, "/nonasync");
     }
 
+    @Test
     public void testTimeoutListenerNoCompleteDispatch() throws Exception {
         // Should work
         doTestTimeout(false, "/nonasync");
@@ -491,26 +506,32 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         }
     }
 
+    @Test
     public void testDispatchSingle() throws Exception {
         doTestDispatch(1, false);
     }
-    
+
+    @Test
     public void testDispatchDouble() throws Exception {
         doTestDispatch(2, false);
     }
-    
+
+    @Test
     public void testDispatchMultiple() throws Exception {
         doTestDispatch(5, false);
     }
-    
+
+    @Test
     public void testDispatchWithThreadSingle() throws Exception {
         doTestDispatch(1, true);
     }
-    
+
+    @Test
     public void testDispatchWithThreadDouble() throws Exception {
         doTestDispatch(2, true);
     }
-    
+
+    @Test
     public void testDispatchWithThreadMultiple() throws Exception {
         doTestDispatch(5, true);
     }
@@ -620,7 +641,8 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
             resp.flushBuffer();
         }
     }
-    
+
+    @Test
     public void testListeners() throws Exception {
         // Setup Tomcat instance
         Tomcat tomcat = getTomcatInstance();
@@ -779,52 +801,64 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         }
     }
 
+    @Test
     public void testDispatchErrorSingle() throws Exception {
         doTestDispatchError(1, false, false);
     }
-    
+
+    @Test
     public void testDispatchErrorDouble() throws Exception {
         doTestDispatchError(2, false, false);
     }
-    
+
+    @Test
     public void testDispatchErrorMultiple() throws Exception {
         doTestDispatchError(5, false, false);
     }
-    
+
+    @Test
     public void testDispatchErrorWithThreadSingle() throws Exception {
         doTestDispatchError(1, true, false);
     }
-    
+
+    @Test
     public void testDispatchErrorWithThreadDouble() throws Exception {
         doTestDispatchError(2, true, false);
     }
-    
+
+    @Test
     public void testDispatchErrorWithThreadMultiple() throws Exception {
         doTestDispatchError(5, true, false);
     }
-    
+
+    @Test
     public void testDispatchErrorSingleThenComplete() throws Exception {
         doTestDispatchError(1, false, true);
     }
-    
+
+    @Test
     public void testDispatchErrorDoubleThenComplete() throws Exception {
         doTestDispatchError(2, false, true);
     }
-    
+
+    @Test
     public void testDispatchErrorMultipleThenComplete() throws Exception {
         doTestDispatchError(5, false, true);
     }
-    
+
+    @Test
     public void testDispatchErrorWithThreadSingleThenComplete()
             throws Exception {
         doTestDispatchError(1, true, true);
     }
-    
+
+    @Test
     public void testDispatchErrorWithThreadDoubleThenComplete()
             throws Exception {
         doTestDispatchError(2, true, true);
     }
-    
+
+    @Test
     public void testDispatchErrorWithThreadMultipleThenComplete()
             throws Exception {
         doTestDispatchError(5, true, true);
@@ -904,7 +938,8 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
             throw new ServletException("Opps.");
         }
     }
-    
+
+    @Test
     public void testBug50352() throws Exception {
         // Setup Tomcat instance
         Tomcat tomcat = getTomcatInstance();
@@ -965,7 +1000,8 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
             });
         }
     }
-    
+
+    @Test
     public void testBug50753() throws Exception {
         // Setup Tomcat instance
         Tomcat tomcat = getTomcatInstance();
@@ -1031,6 +1067,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         }
     }
 
+    @Test
     public void testErrorHandling() throws Exception {
         // Setup Tomcat instance
         Tomcat tomcat = getTomcatInstance();
@@ -1086,7 +1123,8 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
                     entry.getTime() < maxTime + ERROR_MARGIN);
         }
     }
-    
+
+    @Test
     public void testCommitOnComplete() throws Exception {
         // Setup Tomcat instance
         Tomcat tomcat = getTomcatInstance();
@@ -1146,8 +1184,8 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
             actxt.complete();
         }
     }
-    
 
+    @Test
     public void testBug51197() throws Exception {
         // Setup Tomcat instance
         Tomcat tomcat = getTomcatInstance();
