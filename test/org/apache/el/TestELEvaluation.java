@@ -25,7 +25,12 @@ import javax.el.ELException;
 import javax.el.FunctionMapper;
 import javax.el.ValueExpression;
 
-import junit.framework.TestCase;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+import org.junit.Test;
 
 import org.apache.el.lang.ELSupport;
 import org.apache.jasper.el.ELContextImpl;
@@ -35,12 +40,13 @@ import org.apache.jasper.el.ELContextImpl;
  * {@link org.apache.jasper.compiler.TestAttributeParser} and
  * {@link TestELInJsp}.
  */
-public class TestELEvaluation extends TestCase {
+public class TestELEvaluation {
 
     /**
      * Test use of spaces in ternary expressions. This was primarily an EL
      * parser bug.
      */
+    @Test
     public void testBug42565() {
         assertEquals("false", evaluateExpression("${false?true:false}"));
         assertEquals("false", evaluateExpression("${false?true: false}"));
@@ -64,6 +70,7 @@ public class TestELEvaluation extends TestCase {
     /**
      * Test use nested ternary expressions. This was primarily an EL parser bug. 
      */
+    @Test
     public void testBug44994() {
         assertEquals("none", evaluateExpression(
                 "${0 lt 0 ? 1 lt 0 ? 'many': 'one': 'none'}"));
@@ -72,8 +79,8 @@ public class TestELEvaluation extends TestCase {
         assertEquals("many", evaluateExpression(
                 "${0 lt 2 ? 1 lt 2 ? 'many': 'one': 'none'}"));
     }
-    
-    
+
+    @Test
     public void testParserBug45511() {
         // Test cases provided by OP
         assertEquals("true", evaluateExpression("${empty ('')}"));
@@ -82,11 +89,13 @@ public class TestELEvaluation extends TestCase {
         assertEquals("false", evaluateExpression("${(true)and(false)}"));
     }
 
+    @Test
     public void testBug48112() {
         // bug 48112
         assertEquals("{world}", evaluateExpression("${fn:trim('{world}')}"));
     }
 
+    @Test
     public void testParserLiteralExpression() {
         // Inspired by work on bug 45451, comments from kkolinko on the dev
         // list and looking at the spec to find some edge cases
@@ -111,6 +120,7 @@ public class TestELEvaluation extends TestCase {
         assertEquals("\\#{", evaluateExpression("\\\\#{"));
     }
 
+    @Test
     public void testParserStringLiteral() {
         // Inspired by work on bug 45451, comments from kkolinko on the dev
         // list and looking at the spec to find some edge cases
@@ -154,6 +164,7 @@ public class TestELEvaluation extends TestCase {
         assertEquals(msg,expected, -i2);
     }
 
+    @Test
     public void testElSupportCompare(){
         compareBoth("Nulls should compare equal", 0, null, null);
         compareBoth("Null should compare equal to \"\"", 0, "", null);
@@ -172,6 +183,7 @@ public class TestELEvaluation extends TestCase {
     /**
      * Test mixing ${...} and #{...} in the same expression.
      */
+    @Test
     public void testMixedTypes() {
         // Mixing types should throw an error
         Exception e = null;
