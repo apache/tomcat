@@ -17,13 +17,14 @@
 
 package org.apache.catalina.util;
 
-import junit.framework.TestCase;
+import org.junit.Test;
 
-public class TestServerInfo extends TestCase {
+public class TestServerInfo {
 
     /**
      * Test that prints the server version info. 
      */
+    @Test
     public void testServerInfo() {
         ServerInfo.main(new String[0]);
     }

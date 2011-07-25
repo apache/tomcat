@@ -22,19 +22,19 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.security.SecureRandom;
 
-import junit.framework.TestCase;
+import static org.junit.Assert.fail;
+
+import org.junit.Test;
 
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.Session;
-
 import org.apache.catalina.core.StandardContext;
-
 
 /**
  * Named Benchmarks so it is not automatically executed as part of the unit
  * tests.
  */
-public class Benchmarks extends TestCase {
+public class Benchmarks {
 
     /*
      * Results on markt's 4-core Windows dev box
@@ -49,6 +49,7 @@ public class Benchmarks extends TestCase {
      *  4 threads -   ~3,500ms
      * 16 threads -  ~14,465ms
      */
+    @Test
     public void testManagerBaseGenerateSessionId() throws Exception {
         doTestManagerBaseGenerateSessionId(1, 1000000);
         doTestManagerBaseGenerateSessionId(1, 1000000);
@@ -146,6 +147,7 @@ public class Benchmarks extends TestCase {
      *  4 threads - ~11,700ms
      * 16 threads - ~45,600ms
      */
+    @Test
     public void testManagerBaseCreateSession() throws LifecycleException {
         doTestManagerBaseCreateSession(1, 1000000);
         doTestManagerBaseCreateSession(2, 1000000);
@@ -240,6 +242,7 @@ public class Benchmarks extends TestCase {
      *  2 threads -     ~725ms      ~5,200ms
      *  4 threads -   ~1,265ms     ~10,500ms
      */
+    @Test
     public void testSecureRandomVsDevURandom() throws Exception {
         doTestSecureRandomVsDevURandom(1, 1000000);
         doTestSecureRandomVsDevURandom(2, 1000000);
