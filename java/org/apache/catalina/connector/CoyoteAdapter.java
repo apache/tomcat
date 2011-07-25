@@ -443,9 +443,6 @@ public class CoyoteAdapter implements Adapter {
 
         } catch (IOException e) {
             // Ignore
-        } catch (Throwable t) {
-            ExceptionUtils.handleThrowable(t);
-            log.error(sm.getString("coyoteAdapter.service"), t);
         } finally {
             req.getRequestProcessor().setWorkerThreadName(null);
             // Recycle the wrapper request and response

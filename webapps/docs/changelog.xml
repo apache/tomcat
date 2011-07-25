@@ -80,6 +80,12 @@
         to the <code>org.apache.catalina.filters</code> package so it is
         available for all web applications. (markt)
       </add>
+      <fix>
+        <bug>51550</bug>: Internal errors in Tomcat components that process
+        requests before they are passed to a web application, such as
+        Authenticators, now return a 500 response rather than a 200 response.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
