@@ -39,6 +39,9 @@
 <section name="Changes between 1.1.20 and 1.1.21">
   <changelog>
     <fix>
+      <bug>50394</bug>: InternalAprInputBuffer.fill() doesn't deal correctly with EOF. (jfclere)
+    </fix>
+    <fix>
       Support arbitrary protocol combinations of SSLv2, SSLv3 and TLSv1. (rjung)
     </fix>
     <fix>
