@@ -23,6 +23,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+
+import org.junit.Test;
+
 import org.apache.catalina.Context;
 import org.apache.catalina.deploy.LoginConfig;
 import org.apache.catalina.deploy.SecurityCollection;
@@ -30,11 +35,11 @@ import org.apache.catalina.deploy.SecurityConstraint;
 import org.apache.catalina.startup.TestTomcat.MapRealm;
 import org.apache.catalina.startup.TesterServlet;
 import org.apache.catalina.startup.Tomcat;
-import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.catalina.startup.TomcatBaseTestJUnit4;
 import org.apache.catalina.util.MD5Encoder;
 import org.apache.tomcat.util.buf.ByteChunk;
 
-public class TestDigestAuthenticator extends TomcatBaseTest {
+public class TestDigestAuthenticator extends TomcatBaseTestJUnit4 {
 
     private static String USER = "user";
     private static String PWD = "pwd";
@@ -49,86 +54,103 @@ public class TestDigestAuthenticator extends TomcatBaseTest {
     private static String NC2 = "00000002";
     private static String QOP = "auth";
 
+    @Test
     public void testAllValid() throws Exception {
         doTest(USER, PWD, CONTEXT_PATH + URI, false, true, REALM, true, true,
                 NC1, NC2, CNONCE, QOP, true, true);
     }
 
+    @Test
     public void testValidNoQop() throws Exception {
         doTest(USER, PWD, CONTEXT_PATH + URI, false, true, REALM, true, true,
                 null, null, null, null, true, true);
     }
 
+    @Test
     public void testValidQuery() throws Exception {
         doTest(USER, PWD, CONTEXT_PATH + URI + QUERY, false, true, REALM, true,
                 true, NC1, NC2, CNONCE, QOP, true, true);
     }
 
+    @Test
     public void testInvalidUriFail() throws Exception {
         doTest(USER, PWD, CONTEXT_PATH + URI, true, true, REALM, true, true,
                 NC1, NC2, CNONCE, QOP, false, false);
     }
 
+    @Test
     public void testInvalidUriPass() throws Exception {
         doTest(USER, PWD, CONTEXT_PATH + URI, true, false, REALM, true, true,
                 NC1, NC2, CNONCE, QOP, true, true);
     }
 
+    @Test
     public void testInvalidRealm() throws Exception {
         doTest(USER, PWD, CONTEXT_PATH + URI, false, true, "null", true, true,
                 NC1, NC2, CNONCE, QOP, false, false);
     }
 
+    @Test
     public void testInvalidNonce() throws Exception {
         doTest(USER, PWD, CONTEXT_PATH + URI, false, true, REALM, false, true,
                 NC1, NC2, CNONCE, QOP, false, true);
     }
 
+    @Test
     public void testInvalidOpaque() throws Exception {
         doTest(USER, PWD, CONTEXT_PATH + URI, false, true, REALM, true, false,
                 NC1, NC2, CNONCE, QOP, false, true);
     }
 
+    @Test
     public void testInvalidNc1() throws Exception {
         doTest(USER, PWD, CONTEXT_PATH + URI, false, true, REALM, true, true,
                 "null", null, CNONCE, QOP, false, false);
     }
 
+    @Test
     public void testInvalidQop() throws Exception {
         doTest(USER, PWD, CONTEXT_PATH + URI, false, true, REALM, true, true,
                 NC1, NC2, CNONCE, "null", false, false);
     }
 
+    @Test
     public void testInvalidQopCombo1() throws Exception {
         doTest(USER, PWD, CONTEXT_PATH + URI, false, true, REALM, true, true,
                 NC1, NC2, CNONCE, null, false, false);
     }
 
+    @Test
     public void testInvalidQopCombo2() throws Exception {
         doTest(USER, PWD, CONTEXT_PATH + URI, false, true, REALM, true, true,
                 NC1, NC2, null, QOP, false, false);
     }
 
+    @Test
     public void testInvalidQopCombo3() throws Exception {
         doTest(USER, PWD, CONTEXT_PATH + URI, false, true, REALM, true, true,
                 NC1, NC2, null, null, false, false);
     }
 
+    @Test
     public void testInvalidQopCombo4() throws Exception {
         doTest(USER, PWD, CONTEXT_PATH + URI, false, true, REALM, true, true,
                 null, null, CNONCE, QOP, false, false);
     }
 
+    @Test
     public void testInvalidQopCombo5() throws Exception {
         doTest(USER, PWD, CONTEXT_PATH + URI, false, true, REALM, true, true,
                 null, null, CNONCE, null, false, false);
     }
 
+    @Test
     public void testInvalidQopCombo6() throws Exception {
         doTest(USER, PWD, CONTEXT_PATH + URI, false, true, REALM, true, true,
                 null, null, null, QOP, false, false);
     }
 
+    @Test
     public void testReplay() throws Exception {
         doTest(USER, PWD, CONTEXT_PATH + URI, false, true, REALM, true, true,
                 NC1, NC1, CNONCE, QOP, true, false);

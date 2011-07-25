@@ -18,32 +18,41 @@ package org.apache.catalina.authenticator;
 
 import java.io.File;
 
+import static org.junit.Assert.assertTrue;
+
+import org.junit.Test;
+
 import org.apache.catalina.Context;
 import org.apache.catalina.startup.SimpleHttpClient;
 import org.apache.catalina.startup.TestTomcat.MapRealm;
 import org.apache.catalina.startup.Tomcat;
-import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.catalina.startup.TomcatBaseTestJUnit4;
 
-public class TestFormAuthenticator extends TomcatBaseTest {
+public class TestFormAuthenticator extends TomcatBaseTestJUnit4 {
 
+    @Test
     public void testGet() throws Exception {
         doTest("GET", "GET", false);
     }
 
+    @Test
     public void testPostNoContinue() throws Exception {
         doTest("POST", "GET", false);
     }
 
+    @Test
     public void testPostWithContinue() throws Exception {
         doTest("POST", "GET", true);
     }
 
     // Bug 49779
+    @Test
     public void testPostNoContinuePostRedirect() throws Exception {
         doTest("POST", "POST", false);
     }
 
     // Bug 49779
+    @Test
     public void testPostWithContinuePostRedirect() throws Exception {
         doTest("POST", "POST", true);
     }
