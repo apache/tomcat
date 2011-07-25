@@ -20,7 +20,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 
-import junit.framework.TestCase;
+import static org.junit.Assert.fail;
+
+import org.junit.Test;
 
 /**
  * The design of the session manager depends on the thread-safety - or not - of
@@ -31,18 +33,21 @@ import junit.framework.TestCase;
  * Named Threading so it is not automatically executed as part of the unit
  * tests.
  */
-public class Threading extends TestCase {
+public class Threading {
 
     /**
      * {@link FileInputStream#read(byte[])} and related methods are all native
      * methods so it isn't immediately obvious if they are thread-safe or not.
      * 
+     * <pre>
      * Windows JDK 1.6.0_22_x64 - Thread safe
      * OSX     JDK 1.6.0_22_x64 - Not thread safe
+     * </pre>
      * 
      * Therefore, have to assume that {@link FileInputStream#read(byte[])} is
      * not thread safe.
      */
+    @Test
     public void testFileInputStream() throws Exception {
         doTestFileInputStream(1);
         doTestFileInputStream(2);
@@ -55,7 +60,7 @@ public class Threading extends TestCase {
         // Assumes "ant release" has been run
         // Will need to be updated as new releases are made
         File file = new File(
-                "./output/release/v7.0.6-dev/bin/apache-tomcat-7.0.6-dev.zip");
+                "./output/release/v7.0.20-dev/bin/apache-tomcat-7.0.20-dev.zip");
         
         FileInputStream fis = new FileInputStream(file);
         

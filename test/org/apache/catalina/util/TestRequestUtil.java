@@ -17,10 +17,14 @@
 
 package org.apache.catalina.util;
 
-import junit.framework.TestCase;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
-public class TestRequestUtil extends TestCase {
+import org.junit.Test;
 
+public class TestRequestUtil {
+
+    @Test
     public void testNormalizeString() {
         assertEquals("/something",RequestUtil.normalize("//something"));
         assertEquals("/some/thing",RequestUtil.normalize("some//thing"));
@@ -28,6 +32,7 @@ public class TestRequestUtil extends TestCase {
         assertEquals("/",RequestUtil.normalize("//"));
     }
 
+    @Test
     public void testURLDecodeStringInvalid() {
         // %n rather than %nn should throw an IAE according to the Javadoc
         Exception exception = null;
@@ -48,35 +53,41 @@ public class TestRequestUtil extends TestCase {
         assertTrue(exception instanceof IllegalArgumentException);
     }
     
+    @Test
     public void testURLDecodeStringValidIso88591Start() {
 
         String result = RequestUtil.URLDecode("%41xxxx", "ISO-8859-1");
         assertEquals("Axxxx", result);
     }
 
+    @Test
     public void testURLDecodeStringValidIso88591Middle() {
 
         String result = RequestUtil.URLDecode("xx%41xx", "ISO-8859-1");
         assertEquals("xxAxx", result);
     }
 
+    @Test
     public void testURLDecodeStringValidIso88591End() {
 
         String result = RequestUtil.URLDecode("xxxx%41", "ISO-8859-1");
         assertEquals("xxxxA", result);
     }
 
+    @Test
     public void testURLDecodeStringValidUtf8Start() {
         String result = RequestUtil.URLDecode("%c3%aaxxxx", "UTF-8");
         assertEquals("\u00eaxxxx", result);
     }
 
+    @Test
     public void testURLDecodeStringValidUtf8Middle() {
 
         String result = RequestUtil.URLDecode("xx%c3%aaxx", "UTF-8");
         assertEquals("xx\u00eaxx", result);
     }
 
+    @Test
     public void testURLDecodeStringValidUtf8End() {
 
         String result = RequestUtil.URLDecode("xxxx%c3%aa", "UTF-8");

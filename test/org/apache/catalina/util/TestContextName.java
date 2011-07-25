@@ -16,9 +16,13 @@
  */
 package org.apache.catalina.util;
 
-import junit.framework.TestCase;
+import static org.junit.Assert.assertEquals;
 
-public class TestContextName extends TestCase {
+import org.junit.Before;
+import org.junit.Test;
+
+
+public class TestContextName {
 
     private ContextName cn1;
     private ContextName cn2;
@@ -37,9 +41,8 @@ public class TestContextName extends TestCase {
     private ContextName cn15;
     private ContextName cn16;
     
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
+    @Before
+    public void setUp() throws Exception {
         cn1 = new ContextName(null, null);
         cn2 = new ContextName("", null);
         cn3 = new ContextName("/", null);
@@ -58,6 +61,7 @@ public class TestContextName extends TestCase {
         cn16 = new ContextName("foo#bar##E");
     }
 
+    @Test
     public void testGetBaseName() {
         assertEquals("ROOT", cn1.getBaseName());
         assertEquals("ROOT", cn2.getBaseName());
@@ -77,6 +81,7 @@ public class TestContextName extends TestCase {
         assertEquals("foo#bar##E", cn16.getBaseName());
     }
 
+    @Test
     public void testGetPath() {
         assertEquals("", cn1.getPath());
         assertEquals("", cn2.getPath());
@@ -96,6 +101,7 @@ public class TestContextName extends TestCase {
         assertEquals("/foo/bar", cn16.getPath());
     }
 
+    @Test
     public void testGetVersion() {
         assertEquals("", cn1.getVersion());
         assertEquals("", cn2.getVersion());
@@ -115,6 +121,7 @@ public class TestContextName extends TestCase {
         assertEquals("E", cn16.getVersion());
     }
 
+    @Test
     public void testGetName() {
         assertEquals("", cn1.getName());
         assertEquals("", cn2.getName());
@@ -134,6 +141,7 @@ public class TestContextName extends TestCase {
         assertEquals("/foo/bar##E", cn16.getName());
     }
 
+    @Test
     public void testGetDisplayName() {
         assertEquals("/", cn1.getDisplayName());
         assertEquals("/", cn2.getDisplayName());
@@ -153,6 +161,7 @@ public class TestContextName extends TestCase {
         assertEquals("/foo/bar##E", cn16.getDisplayName());
     }
 
+    @Test
     public void testConstructorString() {
         doTestConstructorString(cn1);
         doTestConstructorString(cn2);
