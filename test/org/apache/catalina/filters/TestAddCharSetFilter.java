@@ -28,43 +28,55 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import static org.junit.Assert.assertEquals;
+
+import org.junit.Test;
+
 import org.apache.catalina.Context;
 import org.apache.catalina.deploy.FilterDef;
 import org.apache.catalina.deploy.FilterMap;
 import org.apache.catalina.startup.Tomcat;
-import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.catalina.startup.TomcatBaseTestJUnit4;
 import org.apache.tomcat.util.buf.ByteChunk;
 
-public class TestAddCharSetFilter extends TomcatBaseTest {
+public class TestAddCharSetFilter extends TomcatBaseTestJUnit4 {
 
+    @Test
     public void testNoneSpecifiedMode1() throws Exception {
         doTest(null, "ISO-8859-1");
     }
 
+    @Test
     public void testNoneSpecifiedMode2() throws Exception {
         doTest(null, "ISO-8859-2", 2);
     }
 
+    @Test
     public void testNoneSpecifiedMode3() throws Exception {
         doTest(null, "ISO-8859-3", 3);
     }
 
+    @Test
     public void testDefault() throws Exception {
         doTest("default", "ISO-8859-1");
     }
 
+    @Test
     public void testDefaultMixedCase() throws Exception {
         doTest("dEfAuLt", "ISO-8859-1");
     }
 
+    @Test
     public void testSystem() throws Exception {
         doTest("system", Charset.defaultCharset().name());
     }
 
+    @Test
     public void testSystemMixedCase() throws Exception {
         doTest("SyStEm", Charset.defaultCharset().name());
     }
 
+    @Test
     public void testUTF8() throws Exception {
         doTest("utf-8", "utf-8");
     }

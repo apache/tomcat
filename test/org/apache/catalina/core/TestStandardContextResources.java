@@ -29,6 +29,11 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+import org.junit.Test;
+
 import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleEvent;
 import org.apache.catalina.LifecycleListener;
@@ -36,10 +41,10 @@ import org.apache.catalina.deploy.WebXml;
 import org.apache.catalina.startup.Constants;
 import org.apache.catalina.startup.ContextConfig;
 import org.apache.catalina.startup.Tomcat;
-import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.catalina.startup.TomcatBaseTestJUnit4;
 import org.apache.tomcat.util.buf.ByteChunk;
 
-public class TestStandardContextResources extends TomcatBaseTest {
+public class TestStandardContextResources extends TomcatBaseTestJUnit4 {
 
     @Override
     public void setUp() throws Exception {
@@ -55,6 +60,7 @@ public class TestStandardContextResources extends TomcatBaseTest {
                 new JreMemoryLeakPreventionListener());
     }
 
+    @Test
     public void testResources() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
@@ -78,6 +84,7 @@ public class TestStandardContextResources extends TomcatBaseTest {
                 "<p>resourceG.jsp in WEB-INF/classes</p>", 404);
     }
 
+    @Test
     public void testResourcesWebInfClasses() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
@@ -105,6 +112,7 @@ public class TestStandardContextResources extends TomcatBaseTest {
                 "<p>resourceG.jsp in WEB-INF/classes</p>");
     }
 
+    @Test
     public void testResourcesAbsoluteOrdering() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
@@ -166,7 +174,8 @@ public class TestStandardContextResources extends TomcatBaseTest {
         "<p>resourceB.jsp in resources2.jar</p>");
  
     }
-    
+
+    @Test
     public void testResources2() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 

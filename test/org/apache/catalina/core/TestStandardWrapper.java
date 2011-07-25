@@ -43,45 +43,60 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
+import org.junit.Test;
+
 import org.apache.catalina.Context;
 import org.apache.catalina.Wrapper;
 import org.apache.catalina.authenticator.BasicAuthenticator;
 import org.apache.catalina.deploy.LoginConfig;
 import org.apache.catalina.startup.TestTomcat.MapRealm;
 import org.apache.catalina.startup.Tomcat;
-import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.catalina.startup.TomcatBaseTestJUnit4;
 import org.apache.tomcat.util.buf.ByteChunk;
 
-public class TestStandardWrapper extends TomcatBaseTest {
+public class TestStandardWrapper extends TomcatBaseTestJUnit4 {
 
+    @Test
     public void testSecurityAnnotationsSimple() throws Exception {
         doTest(DenyAllServlet.class.getName(), false, false, false);
     }
 
+    @Test
     public void testSecurityAnnotationsSubclass1() throws Exception {
         doTest(SubclassDenyAllServlet.class.getName(), false, false, false);
     }
 
+    @Test
     public void testSecurityAnnotationsSubclass2() throws Exception {
         doTest(SubclassAllowAllServlet.class.getName(), false, false, true);
     }
 
+    @Test
     public void testSecurityAnnotationsMethods1() throws Exception {
         doTest(MethodConstraintServlet.class.getName(), false, false, false);
     }
 
+    @Test
     public void testSecurityAnnotationsMethods2() throws Exception {
         doTest(MethodConstraintServlet.class.getName(), true, false, true);
     }
 
+    @Test
     public void testSecurityAnnotationsRole1() throws Exception {
         doTest(RoleAllowServlet.class.getName(), false, true, true);
     }
 
+    @Test
     public void testSecurityAnnotationsRole2() throws Exception {
         doTest(RoleDenyServlet.class.getName(), false, true, false);
     }
 
+    @Test
     public void testSecurityAnnotationsWebXmlPriority() throws Exception {
 
         // Setup Tomcat instance
@@ -102,6 +117,7 @@ public class TestStandardWrapper extends TomcatBaseTest {
         assertEquals(403, rc);
     }
 
+    @Test
     public void testSecurityAnnotationsMetaDataPriority() throws Exception {
 
         // Setup Tomcat instance
@@ -122,14 +138,17 @@ public class TestStandardWrapper extends TomcatBaseTest {
         assertEquals(200, rc);
     }
 
+    @Test
     public void testSecurityAnnotationsAddServlet1() throws Exception {
         doTestSecurityAnnotationsAddServlet(false);
     }
-    
+
+    @Test
     public void testSecurityAnnotationsAddServlet2() throws Exception {
         doTestSecurityAnnotationsAddServlet(true);
     }
-    
+
+    @Test
     public void testSecurityAnnotationsNoWebXmlConstraints() throws Exception {
         // Setup Tomcat instance
         Tomcat tomcat = getTomcatInstance();
@@ -148,6 +167,7 @@ public class TestStandardWrapper extends TomcatBaseTest {
         assertEquals(403, rc);
     }
 
+    @Test
     public void testSecurityAnnotationsNoWebXmlLoginConfig() throws Exception {
         // Setup Tomcat instance
         Tomcat tomcat = getTomcatInstance();
@@ -338,6 +358,7 @@ public class TestStandardWrapper extends TomcatBaseTest {
     public static CountDownLatch latch = null;
     public static AtomicInteger counter = new AtomicInteger(0);
 
+    @Test
     public void testBug51445AddServlet() throws Exception {
 
         latch = new CountDownLatch(BUG51445_THREAD_COUNT);
@@ -381,6 +402,7 @@ public class TestStandardWrapper extends TomcatBaseTest {
         }
     }
 
+    @Test
     public void testBug51445AddChild() throws Exception {
         
         latch = new CountDownLatch(BUG51445_THREAD_COUNT);

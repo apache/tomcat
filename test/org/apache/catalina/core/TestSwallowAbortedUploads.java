@@ -29,15 +29,20 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.Part;
 
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
+import org.junit.Test;
+
 import org.apache.catalina.Context;
 import org.apache.catalina.Wrapper;
 import org.apache.catalina.startup.SimpleHttpClient;
 import org.apache.catalina.startup.Tomcat;
-import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.catalina.startup.TomcatBaseTestJUnit4;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
-public class TestSwallowAbortedUploads extends TomcatBaseTest {
+public class TestSwallowAbortedUploads extends TomcatBaseTestJUnit4 {
 
     private static Log log = LogFactory.getLog(TestSwallowAbortedUploads.class);
 
@@ -79,6 +84,7 @@ public class TestSwallowAbortedUploads extends TomcatBaseTest {
         return ex;
     }
 
+    @Test
     public void testAbortedUploadUnlimitedSwallow() {
         log.info("Unlimited, swallow enabled");
         AbortedUploadClient client = new AbortedUploadClient();
@@ -90,6 +96,7 @@ public class TestSwallowAbortedUploads extends TomcatBaseTest {
         client.reset();
     }
 
+    @Test
     public void testAbortedUploadUnlimitedNoSwallow() {
         log.info("Unlimited, swallow disabled");
         AbortedUploadClient client = new AbortedUploadClient();
@@ -101,6 +108,7 @@ public class TestSwallowAbortedUploads extends TomcatBaseTest {
         client.reset();
     }
 
+    @Test
     public void testAbortedUploadLimitedSwallow() {
         log.info("Limited, swallow enabled");
         AbortedUploadClient client = new AbortedUploadClient();
@@ -112,6 +120,7 @@ public class TestSwallowAbortedUploads extends TomcatBaseTest {
         client.reset();
     }
 
+    @Test
     public void testAbortedUploadLimitedNoSwallow() {
         log.info("Limited, swallow disabled");
         AbortedUploadClient client = new AbortedUploadClient();
@@ -121,6 +130,7 @@ public class TestSwallowAbortedUploads extends TomcatBaseTest {
         client.reset();
     }
 
+    @Test
     public void testAbortedPOSTOKSwallow() {
         log.info("Aborted (OK), swallow enabled");
         AbortedPOSTClient client = new AbortedPOSTClient();
@@ -132,6 +142,7 @@ public class TestSwallowAbortedUploads extends TomcatBaseTest {
         client.reset();
     }
 
+    @Test
     public void testAbortedPOSTOKNoSwallow() {
         log.info("Aborted (OK), swallow disabled");
         AbortedPOSTClient client = new AbortedPOSTClient();
@@ -143,6 +154,7 @@ public class TestSwallowAbortedUploads extends TomcatBaseTest {
         client.reset();
     }
 
+    @Test
     public void testAbortedPOST413Swallow() {
         log.info("Aborted (413), swallow enabled");
         AbortedPOSTClient client = new AbortedPOSTClient();
@@ -154,6 +166,7 @@ public class TestSwallowAbortedUploads extends TomcatBaseTest {
         client.reset();
     }
 
+    @Test
     public void testAbortedPOST413NoSwallow() {
         log.info("Aborted (413), swallow disabled");
         AbortedPOSTClient client = new AbortedPOSTClient();

@@ -33,6 +33,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import junit.framework.Assert;
 
+import org.junit.Test;
+
 import org.apache.catalina.Context;
 import org.apache.catalina.deploy.FilterDef;
 import org.apache.catalina.deploy.FilterMap;
@@ -41,11 +43,12 @@ import org.apache.catalina.filters.ExpiresFilter.DurationUnit;
 import org.apache.catalina.filters.ExpiresFilter.ExpiresConfiguration;
 import org.apache.catalina.filters.ExpiresFilter.StartingPoint;
 import org.apache.catalina.startup.Tomcat;
-import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.catalina.startup.TomcatBaseTestJUnit4;
 
-public class TestExpiresFilter extends TomcatBaseTest {
+public class TestExpiresFilter extends TomcatBaseTestJUnit4 {
     public static final String TEMP_DIR = System.getProperty("java.io.tmpdir");
 
+    @Test
     public void testConfiguration() throws Exception {
 
         Tomcat tomcat = getTomcatInstance();
@@ -181,7 +184,7 @@ public class TestExpiresFilter extends TomcatBaseTest {
     /**
      * Test that a resource with empty content is also processed
      */
-
+    @Test
     public void testEmptyContent() throws Exception {
         HttpServlet servlet = new HttpServlet() {
             private static final long serialVersionUID = 1L;
@@ -198,6 +201,7 @@ public class TestExpiresFilter extends TomcatBaseTest {
         validate(servlet, Integer.valueOf(7 * 60));
     }
 
+    @Test
     public void testParseExpiresConfigurationCombinedDuration() {
         ExpiresFilter expiresFilter = new ExpiresFilter();
         ExpiresConfiguration actualConfiguration = expiresFilter.parseExpiresConfiguration("access plus 1 month 15 days 2 hours");
@@ -209,6 +213,7 @@ public class TestExpiresFilter extends TomcatBaseTest {
 
     }
 
+    @Test
     public void testParseExpiresConfigurationMonoDuration() {
         ExpiresFilter expiresFilter = new ExpiresFilter();
         ExpiresConfiguration actualConfiguration = expiresFilter.parseExpiresConfiguration("access plus 2 hours");
@@ -224,6 +229,7 @@ public class TestExpiresFilter extends TomcatBaseTest {
 
     }
 
+    @Test
     public void testSkipBecauseCacheControlMaxAgeIsDefined() throws Exception {
         HttpServlet servlet = new HttpServlet() {
             private static final long serialVersionUID = 1L;
@@ -241,6 +247,7 @@ public class TestExpiresFilter extends TomcatBaseTest {
         validate(servlet, Integer.valueOf(232));
     }
 
+    @Test
     public void testExcludedResponseStatusCode() throws Exception {
         HttpServlet servlet = new HttpServlet() {
             private static final long serialVersionUID = 1L;
@@ -258,6 +265,7 @@ public class TestExpiresFilter extends TomcatBaseTest {
         validate(servlet, null, HttpServletResponse.SC_NOT_MODIFIED);
     }
 
+    @Test
     public void testNullContentType() throws Exception {
         HttpServlet servlet = new HttpServlet() {
             private static final long serialVersionUID = 1L;
@@ -273,6 +281,7 @@ public class TestExpiresFilter extends TomcatBaseTest {
         validate(servlet, Integer.valueOf(1 * 60));
     }
 
+    @Test
     public void testSkipBecauseExpiresIsDefined() throws Exception {
         HttpServlet servlet = new HttpServlet() {
             private static final long serialVersionUID = 1L;
@@ -290,6 +299,7 @@ public class TestExpiresFilter extends TomcatBaseTest {
         validate(servlet, null);
     }
 
+    @Test
     public void testUseContentTypeExpiresConfiguration() throws Exception {
         HttpServlet servlet = new HttpServlet() {
             private static final long serialVersionUID = 1L;
@@ -306,6 +316,7 @@ public class TestExpiresFilter extends TomcatBaseTest {
         validate(servlet, Integer.valueOf(3 * 60));
     }
 
+    @Test
     public void testUseContentTypeWithoutCharsetExpiresConfiguration()
             throws Exception {
         HttpServlet servlet = new HttpServlet() {
@@ -323,6 +334,7 @@ public class TestExpiresFilter extends TomcatBaseTest {
         validate(servlet, Integer.valueOf(5 * 60));
     }
 
+    @Test
     public void testUseDefaultConfiguration1() throws Exception {
         HttpServlet servlet = new HttpServlet() {
             private static final long serialVersionUID = 1L;
@@ -339,6 +351,7 @@ public class TestExpiresFilter extends TomcatBaseTest {
         validate(servlet, Integer.valueOf(1 * 60));
     }
 
+    @Test
     public void testUseDefaultConfiguration2() throws Exception {
         HttpServlet servlet = new HttpServlet() {
             private static final long serialVersionUID = 1L;
@@ -357,6 +370,7 @@ public class TestExpiresFilter extends TomcatBaseTest {
         validate(servlet, Integer.valueOf(1 * 60));
     }
 
+    @Test
     public void testUseMajorTypeExpiresConfiguration() throws Exception {
         HttpServlet servlet = new HttpServlet() {
             private static final long serialVersionUID = 1L;
@@ -482,6 +496,7 @@ public class TestExpiresFilter extends TomcatBaseTest {
         }
     }
 
+    @Test
     public void testIntsToCommaDelimitedString() {
         String actual = ExpiresFilter.intsToCommaDelimitedString(new int[] {
                 500, 503 });

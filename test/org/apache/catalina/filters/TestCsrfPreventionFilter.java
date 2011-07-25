@@ -24,10 +24,16 @@ import java.io.ObjectOutputStream;
 
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.catalina.filters.CsrfPreventionFilter.LruCache;
-import org.apache.catalina.startup.TomcatBaseTest;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
-public class TestCsrfPreventionFilter extends TomcatBaseTest {
+import org.junit.Test;
+
+import org.apache.catalina.filters.CsrfPreventionFilter.LruCache;
+import org.apache.catalina.startup.TomcatBaseTestJUnit4;
+
+public class TestCsrfPreventionFilter extends TomcatBaseTestJUnit4 {
 
     private static final String RESULT_NONCE =
         Constants.CSRF_NONCE_SESSION_ATTR_NAME + "=TESTNONCE";
@@ -36,26 +42,31 @@ public class TestCsrfPreventionFilter extends TomcatBaseTest {
         new CsrfPreventionFilter.CsrfResponseWrapper(
                 new NonEncodingResponse(), "TESTNONCE");
 
+    @Test
     public void testAddNonceNoQueryNoAnchor() throws Exception {
         assertEquals("/test?" + RESULT_NONCE ,
                 wrapper.encodeRedirectURL("/test"));
     }
-    
+
+    @Test
     public void testAddNonceQueryNoAnchor() throws Exception {
         assertEquals("/test?a=b&" + RESULT_NONCE ,
                 wrapper.encodeRedirectURL("/test?a=b"));
     }
-    
+
+    @Test
     public void testAddNonceNoQueryAnchor() throws Exception {
         assertEquals("/test?" + RESULT_NONCE + "#c",
                 wrapper.encodeRedirectURL("/test#c"));
     }
-    
+
+    @Test
     public void testAddNonceQueryAnchor() throws Exception {
         assertEquals("/test?a=b&" + RESULT_NONCE + "#c",
                 wrapper.encodeRedirectURL("/test?a=b#c"));
     }
-    
+
+    @Test
     public void testLruCacheSerializable() throws Exception {
         LruCache<String> cache = new LruCache<String>(5);
         cache.add("key1");
@@ -85,6 +96,7 @@ public class TestCsrfPreventionFilter extends TomcatBaseTest {
         assertTrue(cache2.contains("key7"));
     }
 
+    @Test
     public void testLruCacheSerializablePerformance() throws Exception {
         for (int i = 0; i < 10000; i++) {
             testLruCacheSerializable();

@@ -39,6 +39,12 @@ import javax.servlet.http.HttpServletResponse;
 
 import junit.framework.Assert;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+
+import org.junit.Test;
+
 import org.apache.catalina.Context;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.connector.Connector;
@@ -47,9 +53,9 @@ import org.apache.catalina.connector.Response;
 import org.apache.catalina.deploy.FilterDef;
 import org.apache.catalina.deploy.FilterMap;
 import org.apache.catalina.startup.Tomcat;
-import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.catalina.startup.TomcatBaseTestJUnit4;
 
-public class TestRemoteIpFilter extends TomcatBaseTest {
+public class TestRemoteIpFilter extends TomcatBaseTestJUnit4 {
 
     /**
      * Mock {@link FilterChain} to keep a handle on the passed
@@ -127,23 +133,27 @@ public class TestRemoteIpFilter extends TomcatBaseTest {
 
     public static final String TEMP_DIR = System.getProperty("java.io.tmpdir");
 
+    @Test
     public void testCommaDelimitedListToStringArray() {
         List<String> elements = Arrays.asList("element1", "element2", "element3");
         String actual = RemoteIpFilter.listToCommaDelimitedString(elements);
         assertEquals("element1, element2, element3", actual);
     }
 
+    @Test
     public void testCommaDelimitedListToStringArrayEmptyList() {
         List<String> elements = new ArrayList<String>();
         String actual = RemoteIpFilter.listToCommaDelimitedString(elements);
         assertEquals("", actual);
     }
 
+    @Test
     public void testCommaDelimitedListToStringArrayNullList() {
         String actual = RemoteIpFilter.listToCommaDelimitedString(null);
         assertEquals("", actual);
     }
 
+    @Test
     public void testHeaderNamesCaseInsensitivity() {
         RemoteIpFilter.XForwardedRequest request = new RemoteIpFilter.XForwardedRequest(new MockHttpServletRequest());
         request.setHeader("myheader", "lower Case");
@@ -153,6 +163,7 @@ public class TestRemoteIpFilter extends TomcatBaseTest {
         assertEquals("Camel Case", request.getHeader("myheader"));
     }
 
+    @Test
     public void testIncomingRequestIsSecuredButProtocolHeaderSaysItIsNotWithCustomValues() throws Exception {
         // PREPARE
         FilterDef filterDef = new FilterDef();
@@ -172,7 +183,7 @@ public class TestRemoteIpFilter extends TomcatBaseTest {
 
         // VERIFY
         boolean actualSecure = actualRequest.isSecure();
-        assertEquals("request must be unsecured as header x-forwarded-proto said it is http", false, actualSecure);
+        assertFalse("request must be unsecured as header x-forwarded-proto said it is http", actualSecure);
 
         String actualScheme = actualRequest.getScheme();
         assertEquals("scheme must be http as header x-forwarded-proto said it is http", "http", actualScheme);
@@ -187,6 +198,7 @@ public class TestRemoteIpFilter extends TomcatBaseTest {
         assertEquals("remoteHost", "140.211.11.130", actualRemoteHost);
     }
 
+    @Test
     public void testIncomingRequestIsSecuredButProtocolHeaderSaysItIsNotWithDefaultValues() throws Exception {
         // PREPARE
         FilterDef filterDef = new FilterDef();
@@ -204,7 +216,7 @@ public class TestRemoteIpFilter extends TomcatBaseTest {
 
         // VERIFY
         boolean actualSecure = actualRequest.isSecure();
-        assertEquals("request must be unsecured as header x-forwarded-proto said it is http", false, actualSecure);
+        assertFalse("request must be unsecured as header x-forwarded-proto said it is http", actualSecure);
 
         String actualScheme = actualRequest.getScheme();
         assertEquals("scheme must be http as header x-forwarded-proto said it is http", "http", actualScheme);
@@ -217,6 +229,7 @@ public class TestRemoteIpFilter extends TomcatBaseTest {
 
     }
 
+    @Test
     public void testInvokeAllowedRemoteAddrWithNullRemoteIpHeader() throws Exception {
         // PREPARE
         FilterDef filterDef = new FilterDef();
@@ -247,6 +260,7 @@ public class TestRemoteIpFilter extends TomcatBaseTest {
 
     }
 
+    @Test
     public void testInvokeAllProxiesAreInternal() throws Exception {
 
         // PREPARE
@@ -278,6 +292,7 @@ public class TestRemoteIpFilter extends TomcatBaseTest {
         assertEquals("remoteHost", "140.211.11.130", actualRemoteHost);
     }
 
+    @Test
     public void testInvokeAllProxiesAreTrusted() throws Exception {
 
         // PREPARE
@@ -312,6 +327,7 @@ public class TestRemoteIpFilter extends TomcatBaseTest {
         assertEquals("remoteHost", "140.211.11.130", actualRemoteHost);
     }
 
+    @Test
     public void testInvokeAllProxiesAreTrustedAndRemoteAddrMatchRegexp() throws Exception {
 
         // PREPARE
@@ -345,6 +361,7 @@ public class TestRemoteIpFilter extends TomcatBaseTest {
         assertEquals("remoteHost", "140.211.11.130", actualRemoteHost);
     }
 
+    @Test
     public void testInvokeAllProxiesAreTrustedOrInternal() throws Exception {
 
         // PREPARE
@@ -377,6 +394,7 @@ public class TestRemoteIpFilter extends TomcatBaseTest {
         assertEquals("remoteHost", "140.211.11.130", actualRemoteHost);
     }
 
+    @Test
     public void testInvokeNotAllowedRemoteAddr() throws Exception {
         // PREPARE
         FilterDef filterDef = new FilterDef();
@@ -408,6 +426,7 @@ public class TestRemoteIpFilter extends TomcatBaseTest {
         assertEquals("remoteHost", "not-allowed-internal-proxy-host", actualRemoteHost);
     }
 
+    @Test
     public void testInvokeUntrustedProxyInTheChain() throws Exception {
         // PREPARE
         FilterDef filterDef = new FilterDef();
@@ -439,6 +458,7 @@ public class TestRemoteIpFilter extends TomcatBaseTest {
         assertEquals("remoteHost", "untrusted-proxy", actualRemoteHost);
     }
 
+    @Test
     public void testListToCommaDelimitedString() {
         String[] actual = RemoteIpFilter.commaDelimitedListToStringArray("element1, element2, element3");
         String[] expected = new String[] { "element1", "element2", "element3" };
@@ -448,6 +468,7 @@ public class TestRemoteIpFilter extends TomcatBaseTest {
         }
     }
 
+    @Test
     public void testListToCommaDelimitedStringMixedSpaceChars() {
         String[] actual = RemoteIpFilter.commaDelimitedListToStringArray("element1  , element2,\t element3");
         String[] expected = new String[] { "element1", "element2", "element3" };
@@ -485,6 +506,7 @@ public class TestRemoteIpFilter extends TomcatBaseTest {
     /**
      * Test {@link RemoteIpFilter} in Tomcat standalone server
      */
+    @Test
     public void testWithTomcatServer() throws Exception {
 
         // mostly default configuration : enable "x-forwarded-proto"
