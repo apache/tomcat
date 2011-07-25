@@ -24,12 +24,18 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.tagext.TagSupport;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+import org.junit.Test;
+
 import org.apache.catalina.startup.Tomcat;
-import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.catalina.startup.TomcatBaseTestJUnit4;
 import org.apache.tomcat.util.buf.ByteChunk;
 
-public class TestValidator extends TomcatBaseTest {
-    
+public class TestValidator extends TomcatBaseTestJUnit4 {
+
+    @Test
     public void testBug47331() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
@@ -45,8 +51,8 @@ public class TestValidator extends TomcatBaseTest {
         
         assertEquals(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, rc);
     }
-    
 
+    @Test
     public void testTldVersions23() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
@@ -71,7 +77,7 @@ public class TestValidator extends TomcatBaseTest {
         assertTrue(result.indexOf("<p>${'06-hello world'}</p>") > 0);
     }
 
-    
+    @Test
     public void testTldVersions24() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
@@ -96,7 +102,7 @@ public class TestValidator extends TomcatBaseTest {
         assertTrue(result.indexOf("<p>06-hello world</p>") > 0);
     }
 
-    
+    @Test
     public void testTldVersions25() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
@@ -121,7 +127,7 @@ public class TestValidator extends TomcatBaseTest {
         assertTrue(result.indexOf("<p>06-hello world</p>") > 0);
     }
 
-    
+    @Test
     public void testTldVersions30() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
