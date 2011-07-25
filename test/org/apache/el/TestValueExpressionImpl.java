@@ -28,12 +28,16 @@ import javax.el.ExpressionFactory;
 import javax.el.ValueExpression;
 import javax.el.ValueReference;
 
-import junit.framework.TestCase;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
+import org.junit.Test;
 
 import org.apache.jasper.el.ELContextImpl;
 
-public class TestValueExpressionImpl extends TestCase {
+public class TestValueExpressionImpl {
 
+    @Test
     public void testGetValueReference() {
         ExpressionFactory factory = ExpressionFactory.newInstance();
         ELContext context = new ELContextImpl();
@@ -59,7 +63,7 @@ public class TestValueExpressionImpl extends TestCase {
         assertEquals("name", vr.getProperty());
     }
 
- 
+    @Test
     public void testBug49345() {
         ExpressionFactory factory = ExpressionFactory.newInstance();
         ELContext context = new ELContextImpl();
@@ -88,7 +92,7 @@ public class TestValueExpressionImpl extends TestCase {
         assertEquals("name", vr.getProperty());
     }
 
-
+    @Test
     public void testBug50105() {
         ExpressionFactory factory = ExpressionFactory.newInstance();
         ELContext context = new ELContextImpl();
@@ -111,6 +115,7 @@ public class TestValueExpressionImpl extends TestCase {
         assertEquals("fooAPPLEbar", result2);
     }
 
+    @Test
     public void testBug51177ObjectMap() {
         ExpressionFactory factory = ExpressionFactory.newInstance();
         ELContext context = new ELContextImpl();
@@ -136,7 +141,8 @@ public class TestValueExpressionImpl extends TestCase {
         ve2.setValue(context, o1);
         assertEquals(o1, ve2.getValue(context));
     }
-    
+
+    @Test
     public void testBug51177ObjectList() {
         ExpressionFactory factory = ExpressionFactory.newInstance();
         ELContext context = new ELContextImpl();
@@ -167,6 +173,7 @@ public class TestValueExpressionImpl extends TestCase {
     /**
      * Test returning an empty list as a bean property.
      */
+    @Test
     public void testBug51544Bean() throws Exception {
         ExpressionFactory factory = ExpressionFactory.newInstance();
         ELContext context = new ELContextImpl();
@@ -189,6 +196,7 @@ public class TestValueExpressionImpl extends TestCase {
     /**
      * Test using list directly as variable.
      */
+    @Test
     public void testBug51544Direct() throws Exception {
         ExpressionFactory factory = ExpressionFactory.newInstance();
         ELContext context = new ELContextImpl();
