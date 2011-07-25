@@ -19,8 +19,12 @@ package org.apache.el;
 
 import java.io.File;
 
+import static org.junit.Assert.assertTrue;
+
+import org.junit.Test;
+
 import org.apache.catalina.startup.Tomcat;
-import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.catalina.startup.TomcatBaseTestJUnit4;
 import org.apache.tomcat.util.buf.ByteChunk;
 
 /**
@@ -28,8 +32,9 @@ import org.apache.tomcat.util.buf.ByteChunk;
  * tests may be found in {@link TestELEvaluation} and
  * {@link org.apache.jasper.compiler.TestAttributeParser}.
  */
-public class TestELInJsp extends TomcatBaseTest {
-    
+public class TestELInJsp extends TomcatBaseTestJUnit4 {
+
+    @Test
     public void testBug36923() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
@@ -46,6 +51,7 @@ public class TestELInJsp extends TomcatBaseTest {
         assertEcho(result, "00-${hello world}");
     }
 
+    @Test
     public void testBug42565() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
@@ -77,6 +83,7 @@ public class TestELInJsp extends TomcatBaseTest {
         assertEcho(result, "15-false");
     }
 
+    @Test
     public void testBug44994() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
@@ -96,6 +103,7 @@ public class TestELInJsp extends TomcatBaseTest {
         assertEcho(result, "02-many");
     }
 
+    @Test
     public void testBug45427() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
@@ -131,6 +139,7 @@ public class TestELInJsp extends TomcatBaseTest {
         assertEcho(result, "17-hello \"world");
     }
 
+    @Test
     public void testBug45451() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
@@ -231,6 +240,7 @@ public class TestELInJsp extends TomcatBaseTest {
         assertEcho(result, "13-\\\\#{1+1}");
     }
 
+    @Test
     public void testBug45511() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
@@ -249,6 +259,7 @@ public class TestELInJsp extends TomcatBaseTest {
         assertEcho(result, "01-false");
     }
 
+    @Test
     public void testBug46596() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
@@ -264,7 +275,8 @@ public class TestELInJsp extends TomcatBaseTest {
         String result = res.toString();
         assertEcho(result, "{OK}");
     }
-    
+
+    @Test
     public void testBug47413() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
@@ -293,6 +305,7 @@ public class TestELInJsp extends TomcatBaseTest {
         assertEcho(result, "11-0");
     }
 
+    @Test
     public void testBug48112() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
@@ -308,7 +321,8 @@ public class TestELInJsp extends TomcatBaseTest {
         String result = res.toString();
         assertEcho(result, "{OK}");
     }
-    
+
+    @Test
     public void testBug49555() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
@@ -325,6 +339,7 @@ public class TestELInJsp extends TomcatBaseTest {
         assertEcho(result, "00-" + TesterFunctions.Inner$Class.RETVAL);
     }
 
+    @Test
     public void testBug51544() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
@@ -341,6 +356,7 @@ public class TestELInJsp extends TomcatBaseTest {
         assertEcho(result, "Empty list: true");
     }
 
+    @Test
     public void testELMisc() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
@@ -374,6 +390,7 @@ public class TestELInJsp extends TomcatBaseTest {
         assertEcho(result, "17-foo\\bar\\baz");
     }
 
+    @Test
     public void testScriptingExpression() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
@@ -401,6 +418,7 @@ public class TestELInJsp extends TomcatBaseTest {
         assertEcho(result, "11-hello %> world");
     }
 
+    @Test
     public void testELMethod() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
