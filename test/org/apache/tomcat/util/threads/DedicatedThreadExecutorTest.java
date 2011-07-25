@@ -18,11 +18,17 @@ package org.apache.tomcat.util.threads;
 
 import java.util.concurrent.Callable;
 
-import junit.framework.TestCase;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertSame;
 
-public class DedicatedThreadExecutorTest extends TestCase {
+import org.junit.Test;
+
+public class DedicatedThreadExecutorTest {
     private Thread dedicatedThread;
 
+    @Test
     public void testExecute() {
         final Thread testingThread = Thread.currentThread();
         DedicatedThreadExecutor executor = new DedicatedThreadExecutor();
@@ -30,8 +36,7 @@ public class DedicatedThreadExecutorTest extends TestCase {
             @Override
             public Long call() throws Exception {
                 dedicatedThread = Thread.currentThread();
-                DedicatedThreadExecutorTest.assertNotSame(testingThread,
-                    dedicatedThread);
+                assertNotSame(testingThread, dedicatedThread);
                 return Long.valueOf(123);
             }
         });
@@ -41,8 +46,7 @@ public class DedicatedThreadExecutorTest extends TestCase {
         executor.execute(new Callable<Void>() {
             @Override
             public Void call() throws Exception {
-                DedicatedThreadExecutorTest.assertSame(dedicatedThread,
-                    Thread.currentThread());
+                assertSame(dedicatedThread, Thread.currentThread());
                 return null;
             }
         });
@@ -51,6 +55,7 @@ public class DedicatedThreadExecutorTest extends TestCase {
         assertFalse(dedicatedThread.isAlive());
     }
 
+    @Test
     public void testExecuteInOwnThread() {
         final Thread testingThread = Thread.currentThread();
         Long result =
@@ -58,8 +63,7 @@ public class DedicatedThreadExecutorTest extends TestCase {
                 @Override
                 public Long call() throws Exception {
                     dedicatedThread = Thread.currentThread();
-                    DedicatedThreadExecutorTest.assertNotSame(testingThread,
-                        dedicatedThread);
+                    assertNotSame(testingThread, dedicatedThread);
                     return Long.valueOf(456);
                 }
             });

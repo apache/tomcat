@@ -21,10 +21,14 @@ import java.net.URL;
 import java.net.URLStreamHandler;
 import java.net.URLStreamHandlerFactory;
 
-import junit.framework.TestCase;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
-public class TestDirContextURLStreamHandlerFactory extends TestCase {
+import org.junit.Test;
 
+public class TestDirContextURLStreamHandlerFactory {
+
+    @Test
     public void testUserSuppliedFactory() throws Exception {
         
         URL url = null;
