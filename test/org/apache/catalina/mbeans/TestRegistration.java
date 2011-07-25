@@ -25,9 +25,15 @@ import java.util.Set;
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+import org.junit.Test;
+
 import org.apache.catalina.core.StandardHost;
 import org.apache.catalina.startup.Tomcat;
-import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.catalina.startup.TomcatBaseTestJUnit4;
 import org.apache.tomcat.util.modeler.Registry;
 
 /**
@@ -35,7 +41,7 @@ import org.apache.tomcat.util.modeler.Registry;
  * don't necessarily apply to one specific Tomcat class.
  *
  */
-public class TestRegistration extends TomcatBaseTest {
+public class TestRegistration extends TomcatBaseTestJUnit4 {
 
     private static final String contextName = "/foo";
 
@@ -102,6 +108,7 @@ public class TestRegistration extends TomcatBaseTest {
      * registered.
      * @author Marc Guillemot
      */
+    @Test
     public void testMBeanDeregistration() throws Exception {
         final MBeanServer mbeanServer = Registry.getRegistry(null, null).getMBeanServer();
         Set<ObjectName> onames = mbeanServer.queryNames(new ObjectName("Catalina:*"), null);

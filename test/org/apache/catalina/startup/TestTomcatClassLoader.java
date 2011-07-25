@@ -26,12 +26,17 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import static org.junit.Assert.assertEquals;
+
+import org.junit.Test;
+
 import org.apache.catalina.Context;
 import org.apache.catalina.loader.WebappClassLoader;
 import org.apache.tomcat.util.buf.ByteChunk;
 
-public class TestTomcatClassLoader extends TomcatBaseTest {
+public class TestTomcatClassLoader extends TomcatBaseTestJUnit4 {
 
+    @Test
     public void testDefaultClassLoader() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
@@ -47,7 +52,8 @@ public class TestTomcatClassLoader extends TomcatBaseTest {
         ByteChunk res = getUrl("http://localhost:" + getPort() + "/");
         assertEquals("WEBAPP,SYSTEM,OTHER,", res.toString());
     }
-    
+
+    @Test
     public void testNonDefaultClassLoader() throws Exception {
         
         ClassLoader cl = new URLClassLoader(new URL[0],

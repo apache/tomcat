@@ -24,15 +24,21 @@ import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.ServletException;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
+import org.junit.Test;
+
 import org.apache.catalina.Context;
 
-public class TestListener extends TomcatBaseTest {
+public class TestListener extends TomcatBaseTestJUnit4 {
 
     /**
      * Check that a ServletContainerInitializer can install a
      * {@link ServletContextListener} and that it gets initialized.
      * @throws Exception
      */
+    @Test
     public void testServletContainerInitializer() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
@@ -49,6 +55,7 @@ public class TestListener extends TomcatBaseTest {
      * {@link ServletContextInitializer}.
      * @throws Exception
      */
+    @Test
     public void testServletContextListener() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
