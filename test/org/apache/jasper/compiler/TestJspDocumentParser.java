@@ -22,12 +22,18 @@ import java.io.IOException;
 
 import javax.servlet.http.HttpServletResponse;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+
+import org.junit.Test;
+
 import org.apache.catalina.startup.Tomcat;
-import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.catalina.startup.TomcatBaseTestJUnit4;
 import org.apache.tomcat.util.buf.ByteChunk;
 
-public class TestJspDocumentParser extends TomcatBaseTest {
-    
+public class TestJspDocumentParser extends TomcatBaseTestJUnit4 {
+
+    @Test
     public void testBug47977() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
@@ -43,7 +49,8 @@ public class TestJspDocumentParser extends TomcatBaseTest {
         
         assertEquals(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, rc);
     }
-    
+
+    @Test
     public void testBug48827() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 

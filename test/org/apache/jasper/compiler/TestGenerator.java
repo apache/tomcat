@@ -30,13 +30,19 @@ import javax.servlet.jsp.tagext.TagExtraInfo;
 import javax.servlet.jsp.tagext.TagSupport;
 import javax.servlet.jsp.tagext.VariableInfo;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+import org.junit.Test;
+
 import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.startup.Tomcat;
-import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.catalina.startup.TomcatBaseTestJUnit4;
 import org.apache.tomcat.util.buf.ByteChunk;
 
-public class TestGenerator extends TomcatBaseTest {
-    
+public class TestGenerator extends TomcatBaseTestJUnit4 {
+
+    @Test
     public void testBug45015a() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
@@ -65,6 +71,7 @@ public class TestGenerator extends TomcatBaseTest {
         assertEcho(result, "09-hello world\"");
     }
 
+    @Test
     public void testBug45015b() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
@@ -81,6 +88,7 @@ public class TestGenerator extends TomcatBaseTest {
         assertEquals(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, rc);
     }
 
+    @Test
     public void testBug45015c() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
@@ -97,6 +105,7 @@ public class TestGenerator extends TomcatBaseTest {
         assertEquals(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, rc);
     }
 
+    @Test
     public void testBug48701Fail() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
@@ -118,18 +127,22 @@ public class TestGenerator extends TomcatBaseTest {
         assertEquals(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, rc);
     }
 
+    @Test
     public void testBug48701UseBean() throws Exception {
         testBug48701("bug48nnn/bug48701-UseBean.jsp");
     }
-    
+
+    @Test
     public void testBug48701VariableInfo() throws Exception {
         testBug48701("bug48nnn/bug48701-VI.jsp");
     }
-    
+
+    @Test
     public void testBug48701TagVariableInfoNameGiven() throws Exception {
         testBug48701("bug48nnn/bug48701-TVI-NG.jsp");
     }
-    
+
+    @Test
     public void testBug48701TagVariableInfoNameFromAttribute() throws Exception {
         testBug48701("bug48nnn/bug48701-TVI-NFA.jsp");
     }
@@ -200,6 +213,7 @@ public class TestGenerator extends TomcatBaseTest {
         }
     }
 
+    @Test
     public void testBug49799() throws Exception {
 
         String[] expected = { "<p style=\"color:red\">00-Red</p>",

@@ -25,11 +25,16 @@ import javax.servlet.jsp.tagext.TagExtraInfo;
 import javax.servlet.jsp.tagext.TagSupport;
 import javax.servlet.jsp.tagext.VariableInfo;
 
-import org.apache.catalina.startup.Tomcat;
-import org.apache.catalina.startup.TomcatBaseTest;
+import static org.junit.Assert.assertNull;
 
-public class TestScriptingVariabler extends TomcatBaseTest {
-    
+import org.junit.Test;
+
+import org.apache.catalina.startup.Tomcat;
+import org.apache.catalina.startup.TomcatBaseTestJUnit4;
+
+public class TestScriptingVariabler extends TomcatBaseTestJUnit4 {
+
+    @Test
     public void testBug42390() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
@@ -71,7 +76,8 @@ public class TestScriptingVariabler extends TomcatBaseTest {
             };
         }
     }
-    
+
+    @Test
     public void testBug48616() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
@@ -93,6 +99,7 @@ public class TestScriptingVariabler extends TomcatBaseTest {
         assertNull(e);
     }
 
+    @Test
     public void testBug48616b() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
