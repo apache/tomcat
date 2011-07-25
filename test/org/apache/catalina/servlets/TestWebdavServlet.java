@@ -23,15 +23,21 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletResponse;
 
+import static org.junit.Assert.assertEquals;
+
+import org.junit.Test;
+
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.catalina.startup.TomcatBaseTestJUnit4;
 import org.apache.tomcat.util.buf.ByteChunk;
 
-public class TestWebdavServlet extends TomcatBaseTest {
+public class TestWebdavServlet extends TomcatBaseTestJUnit4 {
 
     /**
      * Test attempting to access special paths (WEB-INF/META-INF) using WebdavServlet 
      */
+    @Test
     public void testGetSpecials() throws Exception {
         Tomcat tomcat = getTomcatInstance();
         
@@ -75,6 +81,7 @@ public class TestWebdavServlet extends TomcatBaseTest {
      * Test https://issues.apache.org/bugzilla/show_bug.cgi?id=50026
      * Verify protection of special paths with re-mount of web app resource root.
      */
+    @Test
     public void testGetWithSubpathmount() throws Exception {
         Tomcat tomcat = getTomcatInstance();
         
