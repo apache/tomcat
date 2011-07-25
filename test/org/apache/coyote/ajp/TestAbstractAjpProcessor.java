@@ -16,10 +16,15 @@
  */
 package org.apache.coyote.ajp;
 
-import org.apache.catalina.startup.Tomcat;
-import org.apache.catalina.startup.TomcatBaseTest;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
-public class TestAbstractAjpProcessor extends TomcatBaseTest {
+import org.junit.Test;
+
+import org.apache.catalina.startup.Tomcat;
+import org.apache.catalina.startup.TomcatBaseTestJUnit4;
+
+public class TestAbstractAjpProcessor extends TomcatBaseTestJUnit4 {
 
     @Override
     protected String getProtocol() {
@@ -43,7 +48,8 @@ public class TestAbstractAjpProcessor extends TomcatBaseTest {
         
         return protocol;
     }
-    
+
+    @Test
     public void testKeepAlive() throws Exception {
         Tomcat tomcat = getTomcatInstance();
         tomcat.getConnector().setProperty("connectionTimeout", "-1");
@@ -159,8 +165,8 @@ public class TestAbstractAjpProcessor extends TomcatBaseTest {
         if (message.readByte() > 0) {
             reuse = true;
         }
-        
-        assertEquals(expectedReuse, reuse);
+
+        assertEquals(Boolean.valueOf(expectedReuse), Boolean.valueOf(reuse));
     }
 
     private void validateCpong(TesterAjpMessage message) throws Exception {
