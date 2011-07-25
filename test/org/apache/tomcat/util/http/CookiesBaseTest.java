@@ -26,7 +26,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.startup.Tomcat;
-import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.catalina.startup.TomcatBaseTestJUnit4;
 
 /**
  * Base Test case for {@link Cookies}. <b>Note</b> because of the use of
@@ -34,7 +34,7 @@ import org.apache.catalina.startup.TomcatBaseTest;
  * must be executed in a new JVM instance. The tests have been place in separate
  * classes to facilitate this when running the unit tests via Ant.
  */
-public abstract class CookiesBaseTest extends TomcatBaseTest {
+public abstract class CookiesBaseTest extends TomcatBaseTestJUnit4 {
 
     /**
      * Servlet for cookie naming test.
@@ -89,7 +89,7 @@ public abstract class CookiesBaseTest extends TomcatBaseTest {
         ctx.addServletMapping("/switch", "switch");
 
     }
-    
+
     public abstract void testCookiesInstance() throws Exception;
     
 }
