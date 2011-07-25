@@ -16,16 +16,20 @@
  */
 package org.apache.tomcat.util.http.mapper;
 
-import junit.framework.TestCase;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+import org.junit.Before;
+import org.junit.Test;
 
 import org.apache.tomcat.util.buf.MessageBytes;
 
-public class TestMapper extends TestCase {
+public class TestMapper {
 
     private Mapper mapper;
 
-    @Override
-    protected void setUp() throws Exception {
+    @Before
+    public void setUp() throws Exception {
         mapper = new Mapper();
 
         mapper.addHost("sjbjdvwsbvhrb", new String[0], "blah1");
@@ -77,8 +81,8 @@ public class TestMapper extends TestCase {
         mapper.addWrapper("iowejoiejfoiew", "/foo/bar/bla", "0", "/bobou/*",
                 "wrapper7", false, false);
     }
-    
 
+    @Test
     public void testAddHost() throws Exception {
         // Check we have the right number (add 16 but one is a duplicate)
         assertEquals(15, mapper.hosts.length);
@@ -95,8 +99,8 @@ public class TestMapper extends TestCase {
             assertTrue(previous.compareTo(current) < 0);
         }
     }
-    
-    
+
+    @Test
     public void testMap() throws Exception {
         MappingData mappingData = new MappingData();
         MessageBytes host = MessageBytes.newInstance();
@@ -129,8 +133,8 @@ public class TestMapper extends TestCase {
         assertEquals("/foo", mappingData.pathInfo.toString());
         assertTrue(mappingData.redirectPath.isNull());
     }
-    
-    
+
+    @Test
     public void testPerformance() throws Exception {
         MappingData mappingData = new MappingData();
         MessageBytes host = MessageBytes.newInstance();

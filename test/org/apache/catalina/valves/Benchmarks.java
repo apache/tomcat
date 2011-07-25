@@ -20,7 +20,7 @@ package org.apache.catalina.valves;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import junit.framework.TestCase;
+import org.junit.Test;
 
 /**
  * Some simple micro-benchmarks to help determine best approach for thread
@@ -28,7 +28,8 @@ import junit.framework.TestCase;
  * JUnit tests to make the simple to execute but does not used Test* as the
  * class name to avoid being included in the automated unit tests.
  */
-public class Benchmarks extends TestCase {
+public class Benchmarks {
+    @Test
     public void testAccessLogGetDate() throws Exception {
         // Is it better to use a sync or a thread local here?
         BenchmarkTest benchmark = new BenchmarkTest();
@@ -171,6 +172,7 @@ public class Benchmarks extends TestCase {
         }
     }
 
+    @Test
     public void testAccessLogTimeDateElement() throws Exception {
         // Is it better to use a sync or a thread local here?
         BenchmarkTest benchmark = new BenchmarkTest();

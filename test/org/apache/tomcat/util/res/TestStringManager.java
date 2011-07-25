@@ -17,13 +17,16 @@
 
 package org.apache.tomcat.util.res;
 
-import junit.framework.TestCase;
+import static org.junit.Assert.assertTrue;
 
-public class TestStringManager extends TestCase {
+import org.junit.Test;
+
+public class TestStringManager {
 
     private static final StringManager sm =
         StringManager.getManager("org.apache.naming");
 
+    @Test
     public void testNullKey() {
         boolean iaeThrown = false;
         
@@ -32,9 +35,10 @@ public class TestStringManager extends TestCase {
         } catch (IllegalArgumentException iae) {
             iaeThrown = true;
         }
-        assertEquals("IAE not thrown on null key", true, iaeThrown);
+        assertTrue("IAE not thrown on null key", iaeThrown);
     }
-    
+
+    @Test
     public void testBug46933() {
         // Check null args are OK
         sm.getString("namingContext.nameNotBound");
