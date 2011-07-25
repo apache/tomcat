@@ -402,7 +402,8 @@ public class BeanELResolver extends ELResolver {
         Class<?> clazz = base.getClass();
         if (paramTypes != null) {
             try {
-                matchingMethod = clazz.getMethod(methodName, paramTypes);
+                matchingMethod =
+                    getMethod(clazz, clazz.getMethod(methodName, paramTypes));
             } catch (NoSuchMethodException e) {
                 throw new MethodNotFoundException(e);
             }
@@ -416,11 +417,11 @@ public class BeanELResolver extends ELResolver {
                 if (methodName.equals(m.getName()) && 
                         m.getParameterTypes().length == paramCount) {
                     // Same number of parameters - use the first match
-                    matchingMethod = m;
+                    matchingMethod = getMethod(clazz, m);
                     break;
                 }
                 if (m.isVarArgs()) {
-                    matchingMethod = m;
+                    matchingMethod = getMethod(clazz, m);
                 }
             }
             if (matchingMethod == null) {

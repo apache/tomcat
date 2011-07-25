@@ -186,10 +186,10 @@ public class TestValueExpressionImpl {
         context.getVariableMapper().setVariable("beanA", var);
 
         ValueExpression ve = factory.createValueExpression(
-                context, "${beanA.valList.isEmpty()}", String.class);
+                context, "${beanA.valList.size()}", Integer.class);
 
-        String result = (String) ve.getValue(context);
-        assertEquals("true", result);
+        Integer result = (Integer) ve.getValue(context);
+        assertEquals(Integer.valueOf(0), result);
     }
 
 
@@ -208,9 +208,9 @@ public class TestValueExpressionImpl {
         context.getVariableMapper().setVariable("list", var);
 
         ValueExpression ve = factory.createValueExpression(
-                context, "${list.isEmpty()}", Boolean.class);
+                context, "${list.size()}", Integer.class);
 
-        Boolean result = (Boolean) ve.getValue(context);
-        assertEquals(Boolean.TRUE, result);
+        Integer result = (Integer) ve.getValue(context);
+        assertEquals(Integer.valueOf(0), result);
     }
 }
