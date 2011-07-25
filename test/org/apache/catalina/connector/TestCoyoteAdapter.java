@@ -32,10 +32,10 @@ import org.junit.Test;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.startup.Tomcat;
-import org.apache.catalina.startup.TomcatBaseTestJUnit4;
+import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.util.buf.ByteChunk;
 
-public class TestCoyoteAdapter extends TomcatBaseTestJUnit4 {
+public class TestCoyoteAdapter extends TomcatBaseTest {
 
     @Test
     public void testPathParmsRootNone() throws Exception {

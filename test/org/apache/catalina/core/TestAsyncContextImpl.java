@@ -45,12 +45,12 @@ import org.apache.catalina.Context;
 import org.apache.catalina.Wrapper;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.startup.Tomcat;
-import org.apache.catalina.startup.TomcatBaseTestJUnit4;
+import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.catalina.valves.TesterAccessLogValve;
 import org.apache.catalina.valves.TesterAccessLogValve.Entry;
 import org.apache.tomcat.util.buf.ByteChunk;
 
-public class TestAsyncContextImpl extends TomcatBaseTestJUnit4 {
+public class TestAsyncContextImpl extends TomcatBaseTest {
 
     // Time for a request to process (need to allow for threads to start etc.)
     private static final long REQUEST_TIME = 1000;

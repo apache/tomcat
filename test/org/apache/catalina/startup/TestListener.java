@@ -31,7 +31,7 @@ import org.junit.Test;
 
 import org.apache.catalina.Context;
 
-public class TestListener extends TomcatBaseTestJUnit4 {
+public class TestListener extends TomcatBaseTest {
 
     /**
      * Check that a ServletContainerInitializer can install a

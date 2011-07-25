@@ -29,7 +29,7 @@ import org.junit.Test;
 
 import org.apache.catalina.connector.Connector;
 import org.apache.catalina.startup.Tomcat;
-import org.apache.catalina.startup.TomcatBaseTestJUnit4;
+import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.coyote.ProtocolHandler;
 import org.apache.coyote.http11.AbstractHttp11JsseProtocol;
 import org.apache.tomcat.util.buf.ByteChunk;
@@ -40,7 +40,7 @@ import org.apache.tomcat.util.net.jsse.TesterBug50640SslImpl;
  * generated using a test CA the files for which are in the Tomcat PMC private
  * repository since not all of them are AL2 licensed.
  */
-public class TestCustomSsl extends TomcatBaseTestJUnit4 {
+public class TestCustomSsl extends TomcatBaseTest {
 
     @Test
     public void testCustomSslImplementation() throws Exception {

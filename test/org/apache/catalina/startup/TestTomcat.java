@@ -48,7 +48,7 @@ import org.apache.catalina.realm.GenericPrincipal;
 import org.apache.catalina.realm.RealmBase;
 import org.apache.tomcat.util.buf.ByteChunk;
 
-public class TestTomcat extends TomcatBaseTestJUnit4 {
+public class TestTomcat extends TomcatBaseTest {
 
     /**
      * Simple servlet to test in-line registration 

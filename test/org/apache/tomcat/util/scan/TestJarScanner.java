@@ -26,9 +26,9 @@ import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
-import org.apache.catalina.startup.TomcatBaseTestJUnit4;
+import org.apache.catalina.startup.TomcatBaseTest;
 
-public class TestJarScanner extends TomcatBaseTestJUnit4 {
+public class TestJarScanner extends TomcatBaseTest {
 
     @Test
     public void testJarsToSkipFormat() {

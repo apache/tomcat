@@ -31,9 +31,9 @@ import org.junit.Test;
 import org.apache.catalina.Context;
 import org.apache.catalina.startup.SimpleHttpClient;
 import org.apache.catalina.startup.Tomcat;
-import org.apache.catalina.startup.TomcatBaseTestJUnit4;
+import org.apache.catalina.startup.TomcatBaseTest;
 
-public class TestCookiesAllowEquals extends TomcatBaseTestJUnit4 {
+public class TestCookiesAllowEquals extends TomcatBaseTest {
 
     private static final String COOKIE_WITH_EQUALS_1 = "name=equals=middle";
     private static final String COOKIE_WITH_EQUALS_2 = "name==equalsstart";

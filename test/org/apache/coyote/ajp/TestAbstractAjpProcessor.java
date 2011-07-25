@@ -22,9 +22,9 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 
 import org.apache.catalina.startup.Tomcat;
-import org.apache.catalina.startup.TomcatBaseTestJUnit4;
+import org.apache.catalina.startup.TomcatBaseTest;
 
-public class TestAbstractAjpProcessor extends TomcatBaseTestJUnit4 {
+public class TestAbstractAjpProcessor extends TomcatBaseTest {
 
     @Override
     protected String getProtocol() {

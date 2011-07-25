@@ -26,9 +26,9 @@ import org.apache.catalina.Context;
 import org.apache.catalina.startup.SimpleHttpClient;
 import org.apache.catalina.startup.TestTomcat.MapRealm;
 import org.apache.catalina.startup.Tomcat;
-import org.apache.catalina.startup.TomcatBaseTestJUnit4;
+import org.apache.catalina.startup.TomcatBaseTest;
 
-public class TestFormAuthenticator extends TomcatBaseTestJUnit4 {
+public class TestFormAuthenticator extends TomcatBaseTest {
 
     @Test
     public void testGet() throws Exception {

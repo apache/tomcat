@@ -53,9 +53,9 @@ import org.apache.catalina.connector.Response;
 import org.apache.catalina.deploy.FilterDef;
 import org.apache.catalina.deploy.FilterMap;
 import org.apache.catalina.startup.Tomcat;
-import org.apache.catalina.startup.TomcatBaseTestJUnit4;
+import org.apache.catalina.startup.TomcatBaseTest;
 
-public class TestRemoteIpFilter extends TomcatBaseTestJUnit4 {
+public class TestRemoteIpFilter extends TomcatBaseTest {
 
     /**
      * Mock {@link FilterChain} to keep a handle on the passed

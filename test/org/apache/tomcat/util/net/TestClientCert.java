@@ -23,7 +23,7 @@ import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 
 import org.apache.catalina.startup.Tomcat;
-import org.apache.catalina.startup.TomcatBaseTestJUnit4;
+import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.util.buf.ByteChunk;
 
 /**
@@ -31,7 +31,7 @@ import org.apache.tomcat.util.buf.ByteChunk;
  * generated using a test CA the files for which are in the Tomcat PMC private
  * repository since not all of them are AL2 licensed.
  */
-public class TestClientCert extends TomcatBaseTestJUnit4 {
+public class TestClientCert extends TomcatBaseTest {
 
     @Test
     public void testClientCertGet() throws Exception {
