@@ -23,19 +23,23 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import static org.junit.Assert.assertTrue;
+
+import org.junit.Test;
+
 import org.apache.catalina.Context;
 import org.apache.catalina.startup.SimpleHttpClient;
 import org.apache.catalina.startup.Tomcat;
-import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.catalina.startup.TomcatBaseTestJUnit4;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
-public class TestMaxConnections extends TomcatBaseTest{
+public class TestMaxConnections extends TomcatBaseTestJUnit4 {
     private static Log log = LogFactory.getLog(TestMaxConnections.class);
     static int soTimeout = 3000;
     static int connectTimeout = 1000;
-    
-    
+
+    @Test
     public void testConnector() throws Exception {
         init();
         ConnectThread[] t = new ConnectThread[10];

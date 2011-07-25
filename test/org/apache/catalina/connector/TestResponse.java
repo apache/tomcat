@@ -29,16 +29,22 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
+import org.junit.Test;
+
 import org.apache.catalina.Context;
 import org.apache.catalina.startup.Tomcat;
-import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.catalina.startup.TomcatBaseTestJUnit4;
 import org.apache.tomcat.util.buf.ByteChunk;
 
 /**
  * Test case for {@link Request}. 
  */
-public class TestResponse extends TomcatBaseTest {
+public class TestResponse extends TomcatBaseTestJUnit4 {
 
+    @Test
     public void testBug49598() throws Exception {
         // Setup Tomcat instance
         Tomcat tomcat = getTomcatInstance();

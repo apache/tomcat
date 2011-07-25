@@ -30,19 +30,25 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+import org.junit.Test;
+
 import org.apache.catalina.Context;
 import org.apache.catalina.authenticator.BasicAuthenticator;
 import org.apache.catalina.deploy.LoginConfig;
 import org.apache.catalina.startup.SimpleHttpClient;
 import org.apache.catalina.startup.TestTomcat.MapRealm;
 import org.apache.catalina.startup.Tomcat;
-import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.catalina.startup.TomcatBaseTestJUnit4;
 import org.apache.tomcat.util.buf.ByteChunk;
 
 /**
  * Test case for {@link Request}. 
  */
-public class TestRequest extends TomcatBaseTest {
+public class TestRequest extends TomcatBaseTestJUnit4 {
 
     /**
      * Test case for https://issues.apache.org/bugzilla/show_bug.cgi?id=37794
@@ -50,6 +56,7 @@ public class TestRequest extends TomcatBaseTest {
      * any of the {@link HttpServletRequest} getParameterXXX() methods if the
      * request is chunked.
      */
+    @Test
     public void testBug37794() {
         Bug37794Client client = new Bug37794Client();
         client.setPort(getPort());
@@ -206,6 +213,7 @@ public class TestRequest extends TomcatBaseTest {
      * <a href="https://issues.apache.org/bugzilla/show_bug.cgi?id=38113">bug
      * 38118</a>.
      */
+    @Test
     public void testBug38113() throws Exception {
         // Setup Tomcat instance
         Tomcat tomcat = getTomcatInstance();
@@ -250,6 +258,7 @@ public class TestRequest extends TomcatBaseTest {
      * Test case for {@link Request#login(String, String)} and
      * {@link Request#logout()}.
      */
+    @Test
     public void testLoginLogout() throws Exception{
         // Setup Tomcat instance
         Tomcat tomcat = getTomcatInstance();
@@ -304,7 +313,8 @@ public class TestRequest extends TomcatBaseTest {
         }
         
     }
-    
+
+    @Test
     public void testBug49424NoChunking() throws Exception {
         Tomcat tomcat = getTomcatInstance();
         Context root = tomcat.addContext("",
@@ -318,6 +328,7 @@ public class TestRequest extends TomcatBaseTest {
         assertNotNull(is);
     }
 
+    @Test
     public void testBug49424WithChunking() throws Exception {
         Tomcat tomcat = getTomcatInstance();
         Context root = tomcat.addContext("",
@@ -338,6 +349,7 @@ public class TestRequest extends TomcatBaseTest {
      * the request body (when properly configured using the new parseBodyMethod
      * setting).
      */
+    @Test
     public void testBug48692() {
         Bug48692Client client = new Bug48692Client();
         client.setPort(getPort());
