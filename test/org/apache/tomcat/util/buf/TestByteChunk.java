@@ -20,13 +20,17 @@ package org.apache.tomcat.util.buf;
 import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
 
-import junit.framework.TestCase;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+import org.junit.Test;
 
 /**
  * Test cases for {@link ByteChunk}.
  */
-public class TestByteChunk extends TestCase {
+public class TestByteChunk {
 
+    @Test
     public void testConvertToBytes() throws UnsupportedEncodingException {
         String string = "HTTP/1.1 100 Continue\r\n";
         byte[] bytes = ByteChunk.convertToBytes(string);
@@ -43,6 +47,7 @@ public class TestByteChunk extends TestCase {
      * any chars outside of the range. {@code ByteChunk.findByte()} works for
      * any ISO-8859-1 chars.
      */
+    @Test
     public void testFindByte() throws UnsupportedEncodingException {
         // 0xa0 = 160 = &nbsp; character
         byte[] bytes = "Hello\u00a0world".getBytes("ISO-8859-1");
@@ -68,6 +73,7 @@ public class TestByteChunk extends TestCase {
         assertEquals(-1, ByteChunk.indexOf(bytes, 5, 5, 'w'));
     }
 
+    @Test
     public void testIndexOf_Char() throws UnsupportedEncodingException {
         byte[] bytes = "Hello\u00a0world".getBytes("ISO-8859-1");
         final int len = bytes.length;
@@ -89,6 +95,7 @@ public class TestByteChunk extends TestCase {
         assertEquals(-1, bc.indexOf('d', 0));
     }
 
+    @Test
     public void testIndexOf_String() throws UnsupportedEncodingException {
         byte[] bytes = "Hello\u00a0world".getBytes("ISO-8859-1");
         final int len = bytes.length;
@@ -113,6 +120,7 @@ public class TestByteChunk extends TestCase {
         assertEquals(-1, bc.indexOf("d", 0, 1, 0));
     }
 
+    @Test
     public void testFindBytes() throws UnsupportedEncodingException {
         byte[] bytes = "Hello\u00a0world".getBytes("ISO-8859-1");
         final int len = bytes.length;
@@ -129,6 +137,7 @@ public class TestByteChunk extends TestCase {
         assertEquals(-1, ByteChunk.findBytes(bytes, 2, 5, new byte[] { 'w' }));
     }
 
+    @Test
     public void testFindNotBytes() throws UnsupportedEncodingException {
         byte[] bytes = "Hello\u00a0world".getBytes("ISO-8859-1");
         final int len = bytes.length;

@@ -20,7 +20,9 @@ package org.apache.coyote.http11;
 import java.io.ByteArrayOutputStream;
 import java.util.zip.GZIPOutputStream;
 
-import junit.framework.TestCase;
+import static org.junit.Assert.assertTrue;
+
+import org.junit.Test;
 
 import org.apache.coyote.Response;
 import org.apache.coyote.http11.filters.GzipOutputFilter;
@@ -30,7 +32,7 @@ import org.apache.tomcat.util.buf.ByteChunk;
  * Test case to demonstrate the interaction between gzip and flushing in the
  * output filter.
  */
-public class TestGzipOutputFilter extends TestCase {
+public class TestGzipOutputFilter {
 
     /**
      * Test the interaction betwen gzip and flushing. The idea is to: 1. create
@@ -46,6 +48,7 @@ public class TestGzipOutputFilter extends TestCase {
      * 
      * @throws Exception
      */
+    @Test
     public void testFlushingWithGzip() throws Exception {
         // set up response, InternalOutputBuffer, and ByteArrayOutputStream
         Response res = new Response();

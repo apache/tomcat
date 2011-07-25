@@ -17,13 +17,16 @@
 
 package org.apache.juli;
 
-import junit.framework.TestCase;
+import static org.junit.Assert.assertEquals;
+
+import org.junit.Test;
 
 /**
  * Test cases for {@link ClassLoaderLogManager}.
  */
-public class TestClassLoaderLogManager extends TestCase {
+public class TestClassLoaderLogManager {
 
+    @Test
     public void testReplace() {
         ClassLoaderLogManager logManager = new ClassLoaderLogManager();
         assertEquals("", logManager.replace(""));

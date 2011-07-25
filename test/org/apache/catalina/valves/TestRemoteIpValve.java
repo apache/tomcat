@@ -24,7 +24,13 @@ import java.util.List;
 
 import javax.servlet.ServletException;
 
-import junit.framework.TestCase;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
+import org.junit.Test;
 
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
@@ -32,7 +38,7 @@ import org.apache.catalina.connector.Response;
 /**
  * {@link RemoteIpValve} Tests
  */
-public class TestRemoteIpValve extends TestCase {
+public class TestRemoteIpValve {
     
     static class RemoteAddrAndHostTrackerValve extends ValveBase {
         private String remoteAddr;
@@ -78,23 +84,27 @@ public class TestRemoteIpValve extends TestCase {
         }
     }
 
+    @Test
     public void testListToCommaDelimitedString() {
         List<String> elements = Arrays.asList("element1", "element2", "element3");
         String actual = RemoteIpValve.listToCommaDelimitedString(elements);
         assertEquals("element1, element2, element3", actual);
     }
     
+    @Test
     public void testListToCommaDelimitedStringEmptyList() {
         List<String> elements = new ArrayList<String>();
         String actual = RemoteIpValve.listToCommaDelimitedString(elements);
         assertEquals("", actual);
     }
     
+    @Test
     public void testCommaDelimitedListToStringArrayNullList() {
         String actual = RemoteIpValve.listToCommaDelimitedString(null);
         assertEquals("", actual);
     }
     
+    @Test
     public void testInvokeAllowedRemoteAddrWithNullRemoteIpHeader() throws Exception {
         // PREPARE
         RemoteIpValve remoteIpValve = new RemoteIpValve();
@@ -134,6 +144,7 @@ public class TestRemoteIpValve extends TestCase {
         
     }
     
+    @Test
     public void testInvokeAllProxiesAreTrusted() throws Exception {
         
         // PREPARE
@@ -174,6 +185,7 @@ public class TestRemoteIpValve extends TestCase {
         assertEquals("postInvoke remoteAddr", "remote-host-original-value", actualPostInvokeRemoteHost);
     }
     
+    @Test
     public void testInvokeAllProxiesAreTrustedOrInternal() throws Exception {
         
         // PREPARE
@@ -215,6 +227,7 @@ public class TestRemoteIpValve extends TestCase {
         assertEquals("postInvoke remoteAddr", "remote-host-original-value", actualPostInvokeRemoteHost);
     }
     
+    @Test
     public void testInvokeAllProxiesAreInternal() throws Exception {
         
         // PREPARE
@@ -255,6 +268,7 @@ public class TestRemoteIpValve extends TestCase {
         assertEquals("postInvoke remoteAddr", "remote-host-original-value", actualPostInvokeRemoteHost);
     }
     
+    @Test
     public void testInvokeAllProxiesAreTrustedAndRemoteAddrMatchRegexp() throws Exception {
         
         // PREPARE
@@ -297,6 +311,7 @@ public class TestRemoteIpValve extends TestCase {
         assertEquals("postInvoke remoteAddr", "remote-host-original-value", actualPostInvokeRemoteHost);
     }
     
+    @Test
     public void testInvokeXforwardedProtoSaysHttpsForIncomingHttpRequest() throws Exception {
         
         // PREPARE
@@ -349,10 +364,10 @@ public class TestRemoteIpValve extends TestCase {
         assertEquals("x-forwarded-proto says https", 443, actualServerPort);
         
         boolean actualSecure = remoteAddrAndHostTrackerValve.isSecure();
-        assertEquals("x-forwarded-proto says https", true, actualSecure);
+        assertTrue("x-forwarded-proto says https", actualSecure);
 
         boolean actualPostInvokeSecure = request.isSecure();
-        assertEquals("postInvoke secure", false, actualPostInvokeSecure);
+        assertFalse("postInvoke secure", actualPostInvokeSecure);
 
         int actualPostInvokeServerPort = request.getServerPort();
         assertEquals("postInvoke serverPort", 8080, actualPostInvokeServerPort);
@@ -361,6 +376,7 @@ public class TestRemoteIpValve extends TestCase {
         assertEquals("postInvoke scheme", "http", actualPostInvokeScheme);
     }
     
+    @Test
     public void testInvokeXforwardedProtoIsNullForIncomingHttpRequest() throws Exception {
         
         // PREPARE
@@ -413,10 +429,10 @@ public class TestRemoteIpValve extends TestCase {
         assertEquals("x-forwarded-proto is null", 8080, actualServerPort);
         
         boolean actualSecure = remoteAddrAndHostTrackerValve.isSecure();
-        assertEquals("x-forwarded-proto is null", false, actualSecure);
+        assertFalse("x-forwarded-proto is null", actualSecure);
 
         boolean actualPostInvokeSecure = request.isSecure();
-        assertEquals("postInvoke secure", false, actualPostInvokeSecure);
+        assertFalse("postInvoke secure", actualPostInvokeSecure);
 
         int actualPostInvokeServerPort = request.getServerPort();
         assertEquals("postInvoke serverPort", 8080, actualPostInvokeServerPort);
@@ -425,6 +441,7 @@ public class TestRemoteIpValve extends TestCase {
         assertEquals("postInvoke scheme", "http", actualPostInvokeScheme);
     }
     
+    @Test
     public void testInvokeXforwardedProtoSaysHttpForIncomingHttpsRequest() throws Exception {
         
         // PREPARE
@@ -477,10 +494,10 @@ public class TestRemoteIpValve extends TestCase {
         assertEquals("x-forwarded-proto says http", 80, actualServerPort);
         
         boolean actualSecure = remoteAddrAndHostTrackerValve.isSecure();
-        assertEquals("x-forwarded-proto says http", false, actualSecure);
+        assertFalse("x-forwarded-proto says http", actualSecure);
 
         boolean actualPostInvokeSecure = request.isSecure();
-        assertEquals("postInvoke secure", true, actualPostInvokeSecure);
+        assertTrue("postInvoke secure", actualPostInvokeSecure);
 
         int actualPostInvokeServerPort = request.getServerPort();
         assertEquals("postInvoke serverPort", 8443, actualPostInvokeServerPort);
@@ -489,6 +506,7 @@ public class TestRemoteIpValve extends TestCase {
         assertEquals("postInvoke scheme", "https", actualPostInvokeScheme);
     }
     
+    @Test
     public void testInvokeXforwardedProtoIsNullForIncomingHttpsRequest() throws Exception {
         
         // PREPARE
@@ -541,10 +559,10 @@ public class TestRemoteIpValve extends TestCase {
         assertEquals("x-forwarded-proto is null", 8443, actualServerPort);
         
         boolean actualSecure = remoteAddrAndHostTrackerValve.isSecure();
-        assertEquals("x-forwarded-proto is null", true, actualSecure);
+        assertTrue("x-forwarded-proto is null", actualSecure);
 
         boolean actualPostInvokeSecure = request.isSecure();
-        assertEquals("postInvoke secure", true, actualPostInvokeSecure);
+        assertTrue("postInvoke secure", actualPostInvokeSecure);
 
         int actualPostInvokeServerPort = request.getServerPort();
         assertEquals("postInvoke serverPort", 8443, actualPostInvokeServerPort);
@@ -553,6 +571,7 @@ public class TestRemoteIpValve extends TestCase {
         assertEquals("postInvoke scheme", "https", actualPostInvokeScheme);
     }
     
+    @Test
     public void testInvokeNotAllowedRemoteAddr() throws Exception {
         // PREPARE
         RemoteIpValve remoteIpValve = new RemoteIpValve();
@@ -592,6 +611,7 @@ public class TestRemoteIpValve extends TestCase {
         assertEquals("postInvoke remoteAddr", "not-allowed-internal-proxy-host", actualPostInvokeRemoteHost);
     }
     
+    @Test
     public void testInvokeUntrustedProxyInTheChain() throws Exception {
         // PREPARE
         RemoteIpValve remoteIpValve = new RemoteIpValve();
@@ -632,6 +652,7 @@ public class TestRemoteIpValve extends TestCase {
         assertEquals("postInvoke remoteAddr", "remote-host-original-value", actualPostInvokeRemoteHost);
     }
     
+    @Test
     public void testCommaDelimitedListToStringArray() {
         String[] actual = RemoteIpValve.commaDelimitedListToStringArray("element1, element2, element3");
         String[] expected = new String[] {
@@ -640,6 +661,7 @@ public class TestRemoteIpValve extends TestCase {
         assertArrayEquals(expected, actual);
     }
     
+    @Test
     public void testCommaDelimitedListToStringArrayMixedSpaceChars() {
         String[] actual = RemoteIpValve.commaDelimitedListToStringArray("element1  , element2,\t element3");
         String[] expected = new String[] {

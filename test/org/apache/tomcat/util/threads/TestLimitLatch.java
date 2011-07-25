@@ -16,20 +16,23 @@
  */
 package org.apache.tomcat.util.threads;
 
-import junit.framework.TestCase;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 
-public class TestLimitLatch extends TestCase {
+import org.junit.Test;
 
+public class TestLimitLatch {
+
+    @Test
     public void testNoThreads() throws Exception {
         LimitLatch latch = new LimitLatch(0);
-        assertEquals("No threads should be waiting", false,
-                latch.hasQueuedThreads());
+        assertFalse("No threads should be waiting", latch.hasQueuedThreads());
     }
 
+    @Test
     public void testOneThreadNoWait() throws Exception {
         LimitLatch latch = new LimitLatch(1);
-        assertEquals("No threads should be waiting", false,
-                latch.hasQueuedThreads());
+        assertFalse("No threads should be waiting", latch.hasQueuedThreads());
         Thread testThread = new TestThread(latch);
         testThread.start();
         Thread.sleep(50);
@@ -37,14 +40,13 @@ public class TestLimitLatch extends TestCase {
                 latch.getQueuedThreads().size());
         latch.countUpOrAwait();
         Thread.sleep(50);
-        assertEquals("No threads should be waiting", false,
-                latch.hasQueuedThreads());
+        assertFalse("No threads should be waiting", latch.hasQueuedThreads());
     }
 
+    @Test
     public void testOneThreadWaitCountUp() throws Exception {
         LimitLatch latch = new LimitLatch(1);
-        assertEquals("No threads should be waiting", false,
-                latch.hasQueuedThreads());
+        assertFalse("No threads should be waiting", latch.hasQueuedThreads());
         Thread testThread = new TestThread(latch);
         latch.countUpOrAwait();
         testThread.start();
@@ -53,14 +55,13 @@ public class TestLimitLatch extends TestCase {
                 latch.getQueuedThreads().size());
         latch.countDown();
         Thread.sleep(50);
-        assertEquals("No threads should be waiting", false,
-                latch.hasQueuedThreads());
+        assertFalse("No threads should be waiting", latch.hasQueuedThreads());
     }
 
+    @Test
     public void testOneRelease() throws Exception {
         LimitLatch latch = new LimitLatch(1);
-        assertEquals("No threads should be waiting", false,
-                latch.hasQueuedThreads());
+        assertFalse("No threads should be waiting", latch.hasQueuedThreads());
         Thread testThread = new TestThread(latch);
         latch.countUpOrAwait();
         testThread.start();
@@ -69,14 +70,13 @@ public class TestLimitLatch extends TestCase {
                 latch.getQueuedThreads().size());
         latch.releaseAll();
         Thread.sleep(50);
-        assertEquals("No threads should be waiting", false,
-                latch.hasQueuedThreads());
+        assertFalse("No threads should be waiting", latch.hasQueuedThreads());
     }
 
+    @Test
     public void testTenWait() throws Exception {
         LimitLatch latch = new LimitLatch(10);
-        assertEquals("No threads should be waiting", false,
-                latch.hasQueuedThreads());
+        assertFalse("No threads should be waiting", latch.hasQueuedThreads());
         Thread[] testThread = new TestThread[30];
         for (int i = 0; i < 30; i++) {
             testThread[i] = new TestThread(latch, 1000);
@@ -89,8 +89,7 @@ public class TestLimitLatch extends TestCase {
         assertEquals("10 threads should be waiting", 10,
                 latch.getQueuedThreads().size());
         Thread.sleep(1000);
-        assertEquals("No threads should be waiting", false,
-                latch.hasQueuedThreads());
+        assertFalse("No threads should be waiting", latch.hasQueuedThreads());
     }
 
     private class TestThread extends Thread {

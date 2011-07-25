@@ -17,10 +17,11 @@
 
 package org.apache.tomcat.util.http; 
 
-import junit.framework.TestCase;
+import org.junit.Test;
 
-public class TestCookies extends TestCase {
+public class TestCookies {
 
+    @Test
     public void testCookies() throws Exception {
         test("foo=bar; a=b", "foo", "bar", "a", "b");
         test("foo=bar;a=b", "foo", "bar", "a", "b");
@@ -99,7 +100,7 @@ public class TestCookies extends TestCase {
         test("$Version=0;foo=bar", 0);
     }
 
-
+    @Test
     public void testNameOnlyCookies() throws Exception {
         // Bug 49000
         test("fred=1; jim=2; bob", "fred", "1", "jim", "2");
