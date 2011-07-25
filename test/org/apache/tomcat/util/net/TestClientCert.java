@@ -18,8 +18,12 @@ package org.apache.tomcat.util.net;
 
 import java.util.Arrays;
 
+import static org.junit.Assert.assertEquals;
+
+import org.junit.Test;
+
 import org.apache.catalina.startup.Tomcat;
-import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.catalina.startup.TomcatBaseTestJUnit4;
 import org.apache.tomcat.util.buf.ByteChunk;
 
 /**
@@ -27,8 +31,9 @@ import org.apache.tomcat.util.buf.ByteChunk;
  * generated using a test CA the files for which are in the Tomcat PMC private
  * repository since not all of them are AL2 licensed.
  */
-public class TestClientCert extends TomcatBaseTest {
-    
+public class TestClientCert extends TomcatBaseTestJUnit4 {
+
+    @Test
     public void testClientCertGet() throws Exception {
         if (!TesterSupport.isRenegotiationSupported(getTomcatInstance())) {
             return;
@@ -44,25 +49,28 @@ public class TestClientCert extends TomcatBaseTest {
         assertEquals("OK", res.toString());
     }
 
+    @Test
     public void testClientCertPostSmaller() throws Exception {
         Tomcat tomcat = getTomcatInstance();
         int bodySize = tomcat.getConnector().getMaxSavePostSize() / 2; 
         doTestClientCertPost(bodySize, false);
     }
 
+    @Test
     public void testClientCertPostSame() throws Exception {
         Tomcat tomcat = getTomcatInstance();
         int bodySize = tomcat.getConnector().getMaxSavePostSize(); 
         doTestClientCertPost(bodySize, false);
     }
 
+    @Test
     public void testClientCertPostLarger() throws Exception {
         Tomcat tomcat = getTomcatInstance();
         int bodySize = tomcat.getConnector().getMaxSavePostSize() * 2; 
         doTestClientCertPost(bodySize, true);
     }
 
-    public void doTestClientCertPost(int bodySize, boolean expectProtectedFail)
+    private void doTestClientCertPost(int bodySize, boolean expectProtectedFail)
             throws Exception {
         if (!TesterSupport.isRenegotiationSupported(getTomcatInstance())) {
             return;
