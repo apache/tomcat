@@ -25,45 +25,59 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
+import org.junit.Test;
+
 import org.apache.catalina.Context;
 import org.apache.catalina.startup.Tomcat;
-import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.catalina.startup.TomcatBaseTestJUnit4;
 import org.apache.tomcat.util.buf.ByteChunk;
 
-public class TestCoyoteAdapter extends TomcatBaseTest {
+public class TestCoyoteAdapter extends TomcatBaseTestJUnit4 {
 
+    @Test
     public void testPathParmsRootNone() throws Exception {
         pathParamTest("/", "none");
     }
 
+    @Test
     public void testPathParmsFooNone() throws Exception {
         pathParamTest("/foo", "none");
     }
 
+    @Test
     public void testPathParmsRootSessionOnly() throws Exception {
         pathParamTest("/;jsessionid=1234", "1234");
     }
 
+    @Test
     public void testPathParmsFooSessionOnly() throws Exception {
         pathParamTest("/foo;jsessionid=1234", "1234");
     }
 
+    @Test
     public void testPathParmsFooSessionDummy() throws Exception {
         pathParamTest("/foo;jsessionid=1234;dummy", "1234");
     }
 
+    @Test
     public void testPathParmsFooSessionDummyValue() throws Exception {
         pathParamTest("/foo;jsessionid=1234;dummy=5678", "1234");
     }
 
+    @Test
     public void testPathParmsFooSessionValue() throws Exception {
         pathParamTest("/foo;jsessionid=1234;=5678", "1234");
     }
 
+    @Test
     public void testPathParmsFooSessionBar() throws Exception {
         pathParamTest("/foo;jsessionid=1234/bar", "1234");
     }
 
+    @Test
     public void testPathParamsRedirect() throws Exception {
         // Setup Tomcat instance
         Tomcat tomcat = getTomcatInstance();
@@ -131,14 +145,17 @@ public class TestCoyoteAdapter extends TomcatBaseTest {
         }
     }
 
+    @Test
     public void testPathParamExtRootNoParam() throws Exception {
         pathParamExtenionTest("/testapp/blah.txt", "none");
     }
 
+    @Test
     public void testPathParamExtLevel1NoParam() throws Exception {
         pathParamExtenionTest("/testapp/blah/blah.txt", "none");
     }
 
+    @Test
     public void testPathParamExtLevel1WithParam() throws Exception {
         pathParamExtenionTest("/testapp/blah;x=y/blah.txt", "none");
     }

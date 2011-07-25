@@ -23,18 +23,24 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import static org.junit.Assert.assertTrue;
+
+import org.junit.Test;
+
 import org.apache.catalina.Context;
 import org.apache.catalina.startup.SimpleHttpClient;
 import org.apache.catalina.startup.Tomcat;
-import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.catalina.startup.TomcatBaseTestJUnit4;
 
-public class TestKeepAliveCount extends TomcatBaseTest{
+public class TestKeepAliveCount extends TomcatBaseTestJUnit4 {
 
+    @Test
     public void testHttp10() throws Exception {
         TestKeepAliveClient client = new TestKeepAliveClient();
         client.doHttp10Request();
     }
-    
+
+    @Test
     public void testHttp11() throws Exception {
         TestKeepAliveClient client = new TestKeepAliveClient();
         client.doHttp11Request();

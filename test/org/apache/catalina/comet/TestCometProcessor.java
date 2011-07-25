@@ -28,13 +28,19 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+import org.junit.Test;
+
 import org.apache.catalina.Context;
 import org.apache.catalina.comet.CometEvent.EventType;
 import org.apache.catalina.startup.Tomcat;
-import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.catalina.startup.TomcatBaseTestJUnit4;
 
-public class TestCometProcessor extends TomcatBaseTest {
+public class TestCometProcessor extends TomcatBaseTestJUnit4 {
 
+    @Test
     public void testSimpleCometClient() throws Exception {
         
         if (!isCometSupported()) {
