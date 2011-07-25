@@ -30,19 +30,28 @@ import java.util.TimeZone;
 
 import javax.servlet.http.HttpServletResponse;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+import org.junit.Test;
+
 import static org.apache.catalina.startup.SimpleHttpClient.CRLF;
 
 import org.apache.catalina.startup.SimpleHttpClient;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.catalina.startup.TomcatBaseTestJUnit4;
 import org.apache.tomcat.util.buf.ByteChunk;
 
-public class TestDefaultServlet extends TomcatBaseTest {
+public class TestDefaultServlet extends TomcatBaseTestJUnit4 {
 
     /**
      * Test attempting to access special paths (WEB-INF/META-INF) using
      * DefaultServlet. 
      */
+    @Test
     public void testGetSpecials() throws Exception {
         Tomcat tomcat = getTomcatInstance();
         
@@ -82,6 +91,7 @@ public class TestDefaultServlet extends TomcatBaseTest {
      * Test https://issues.apache.org/bugzilla/show_bug.cgi?id=50026
      * Verify serving of resources from context root with subpath mapping.
      */
+    @Test
     public void testGetWithSubpathmount() throws Exception {
         Tomcat tomcat = getTomcatInstance();
         
@@ -151,6 +161,7 @@ public class TestDefaultServlet extends TomcatBaseTest {
      * Test https://issues.apache.org/bugzilla/show_bug.cgi?id=50413 Serving a
      * custom error page
      */
+    @Test
     public void testCustomErrorPage() throws Exception {
         File appDir = new File(getTemporaryDirectory(), "MyApp");
         File webInf = new File(appDir, "WEB-INF");
@@ -235,6 +246,7 @@ public class TestDefaultServlet extends TomcatBaseTest {
      * Test what happens if a custom 404 page is configured,
      * but its file is actually missing.
      */
+    @Test
     public void testCustomErrorPageMissing() throws Exception {
         File appDir = new File(getTemporaryDirectory(), "MyApp");
         File webInf = new File(appDir, "WEB-INF");

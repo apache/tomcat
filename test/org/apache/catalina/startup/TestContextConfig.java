@@ -29,15 +29,22 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+import org.junit.Test;
+
 import org.apache.catalina.core.StandardContext;
 import org.apache.tomcat.util.buf.ByteChunk;
 
-public class TestContextConfig extends TomcatBaseTest {
+public class TestContextConfig extends TomcatBaseTestJUnit4 {
 
+    @Test
     public void testOverrideWithSCIDefaultName() throws Exception {
         doTestOverrideDefaultServletWithSCI("default");
     }
 
+    @Test
     public void testOverrideWithSCIDefaultMapping() throws Exception {
         doTestOverrideDefaultServletWithSCI("anything");
     }
@@ -69,6 +76,7 @@ public class TestContextConfig extends TomcatBaseTest {
         assertEquals("OK - Custom default Servlet", res.toString());
     }
 
+    @Test
     public void testBug51396() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
