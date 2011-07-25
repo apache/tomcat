@@ -20,13 +20,18 @@ import java.io.File;
 
 import javax.servlet.http.HttpServletResponse;
 
+import static org.junit.Assert.assertEquals;
+
+import org.junit.Test;
+
 import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.startup.Tomcat;
-import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.catalina.startup.TomcatBaseTestJUnit4;
 import org.apache.tomcat.util.buf.ByteChunk;
 
-public class TestCompositeELResolver extends TomcatBaseTest {
+public class TestCompositeELResolver extends TomcatBaseTestJUnit4 {
 
+    @Test
     public void testBug50408() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
