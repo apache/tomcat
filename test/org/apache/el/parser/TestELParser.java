@@ -22,12 +22,16 @@ import javax.el.ELException;
 import javax.el.ExpressionFactory;
 import javax.el.ValueExpression;
 
-import junit.framework.TestCase;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
+import org.junit.Test;
 
 import org.apache.jasper.el.ELContextImpl;
 
-public class TestELParser extends TestCase {
+public class TestELParser {
 
+    @Test
     public void testBug49081() {
         // OP's report
         testExpression("#${1+1}", "#2");
@@ -55,7 +59,8 @@ public class TestELParser extends TestCase {
         testExpression("$#{1+1}", "$2");
         testExpression("$#${1+1}", "$#2");
     }
-    
+
+    @Test
     public void testJavaKeyWordSuffix() {
         ExpressionFactory factory = ExpressionFactory.newInstance();
         ELContext context = new ELContextImpl();
@@ -77,6 +82,7 @@ public class TestELParser extends TestCase {
         assertNotNull(e);
     }
 
+    @Test
     public void testJavaKeyWordIdentifier() {
         ExpressionFactory factory = ExpressionFactory.newInstance();
         ELContext context = new ELContextImpl();

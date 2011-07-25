@@ -22,16 +22,22 @@ import javax.el.ExpressionFactory;
 import javax.el.MethodExpression;
 import javax.el.ValueExpression;
 
-import junit.framework.TestCase;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+import org.junit.Before;
+import org.junit.Test;
 
 import org.apache.jasper.el.ELContextImpl;
 
-public class TestMethodExpressionImpl extends TestCase {
+public class TestMethodExpressionImpl {
 
     private ExpressionFactory factory;
     private ELContext context;
-    
-    @Override
+
+    @Before
     public void setUp() {
         factory = ExpressionFactory.newInstance();
         context = new ELContextImpl();
@@ -70,7 +76,8 @@ public class TestMethodExpressionImpl extends TestCase {
         context.getVariableMapper().setVariable("beanC",
                 factory.createValueExpression(beanC, TesterBeanC.class));
     }
-    
+
+    @Test
     public void testIsParametersProvided() {
         TesterBeanB beanB = new TesterBeanB();
         beanB.setName("Tomcat");
@@ -88,6 +95,7 @@ public class TestMethodExpressionImpl extends TestCase {
         assertTrue(me2.isParmetersProvided());
     }
 
+    @Test
     public void testInvoke() {
         TesterBeanB beanB = new TesterBeanB();
         beanB.setName("B");
@@ -116,6 +124,7 @@ public class TestMethodExpressionImpl extends TestCase {
                 me3.invoke(context, new Object[] { null }));
     }
 
+    @Test
     public void testInvokeWithSuper() {
         MethodExpression me = factory.createMethodExpression(context,
                 "${beanA.setBean(beanBB)}", null ,
@@ -126,21 +135,24 @@ public class TestMethodExpressionImpl extends TestCase {
         Object r = ve.getValue(context);
         assertEquals("BB", r);
     }
-    
+
+    @Test
     public void testInvokeWithSuperABNoReturnTypeNoParamTypes() {
         MethodExpression me2 = factory.createMethodExpression(context,
                 "${beanC.sayHello(beanA,beanB)}", null , null);
         Object r2 = me2.invoke(context, null);
         assertEquals("AB: Hello A from B", r2.toString());
     }
-    
+
+    @Test
     public void testInvokeWithSuperABReturnTypeNoParamTypes() {
         MethodExpression me3 = factory.createMethodExpression(context,
                 "${beanC.sayHello(beanA,beanB)}", String.class , null);
         Object r3 = me3.invoke(context, null);
         assertEquals("AB: Hello A from B", r3.toString());
     }
-    
+
+    @Test
     public void testInvokeWithSuperABNoReturnTypeParamTypes() {
         MethodExpression me4 = factory.createMethodExpression(context,
                 "${beanC.sayHello(beanA,beanB)}", null ,
@@ -148,7 +160,8 @@ public class TestMethodExpressionImpl extends TestCase {
         Object r4 = me4.invoke(context, null);
         assertEquals("AB: Hello A from B", r4.toString());
     }
-    
+
+    @Test
     public void testInvokeWithSuperABReturnTypeParamTypes() {
         MethodExpression me5 = factory.createMethodExpression(context,
                 "${beanC.sayHello(beanA,beanB)}", String.class ,
@@ -156,28 +169,32 @@ public class TestMethodExpressionImpl extends TestCase {
         Object r5 = me5.invoke(context, null);
         assertEquals("AB: Hello A from B", r5.toString());
     }
-    
+
+    @Test
     public void testInvokeWithSuperABB() {
         MethodExpression me6 = factory.createMethodExpression(context,
                 "${beanC.sayHello(beanA,beanBB)}", null , null);
         Object r6 = me6.invoke(context, null);
         assertEquals("ABB: Hello A from BB", r6.toString());
     }
-    
+
+    @Test
     public void testInvokeWithSuperABBB() {
         MethodExpression me7 = factory.createMethodExpression(context,
                 "${beanC.sayHello(beanA,beanBBB)}", null , null);
         Object r7 = me7.invoke(context, null);
         assertEquals("ABB: Hello A from BBB", r7.toString());
     }
-    
+
+    @Test
     public void testInvokeWithSuperAAB() {
         MethodExpression me8 = factory.createMethodExpression(context,
                 "${beanC.sayHello(beanAA,beanB)}", null , null);
         Object r8 = me8.invoke(context, null);
         assertEquals("AAB: Hello AA from B", r8.toString());
     }
-    
+
+    @Test
     public void testInvokeWithSuperAABB() {
         MethodExpression me9 = factory.createMethodExpression(context,
                 "${beanC.sayHello(beanAA,beanBB)}", null , null);
@@ -190,7 +207,8 @@ public class TestMethodExpressionImpl extends TestCase {
         // Expected to fail
         assertNotNull(e);
     }
-    
+
+    @Test
     public void testInvokeWithSuperAABBB() {
         // The Java compiler reports this as ambiguous. Using the parameter that
         // matches exactly seems reasonable to limit the scope of the method
@@ -200,14 +218,16 @@ public class TestMethodExpressionImpl extends TestCase {
         Object r10 = me10.invoke(context, null);
         assertEquals("AAB: Hello AA from BBB", r10.toString());
     }
-    
+
+    @Test
     public void testInvokeWithSuperAAAB() {
         MethodExpression me11 = factory.createMethodExpression(context,
                 "${beanC.sayHello(beanAAA,beanB)}", null , null);
         Object r11 = me11.invoke(context, null);
         assertEquals("AAB: Hello AAA from B", r11.toString());
     }
-    
+
+    @Test
     public void testInvokeWithSuperAAABB() {
         // The Java compiler reports this as ambiguous. Using the parameter that
         // matches exactly seems reasonable to limit the scope of the method
@@ -217,7 +237,8 @@ public class TestMethodExpressionImpl extends TestCase {
         Object r12 = me12.invoke(context, null);
         assertEquals("ABB: Hello AAA from BB", r12.toString());
     }
-    
+
+    @Test
     public void testInvokeWithSuperAAABBB() {
         MethodExpression me13 = factory.createMethodExpression(context,
                 "${beanC.sayHello(beanAAA,beanBBB)}", null , null);
@@ -230,7 +251,8 @@ public class TestMethodExpressionImpl extends TestCase {
         // Expected to fail
         assertNotNull(e);
     }
-    
+
+    @Test
     public void testInvokeWithVarArgsAB() throws Exception {
         MethodExpression me1 = factory.createMethodExpression(context,
                 "${beanC.sayHello(beanA,beanB,beanB)}", null , null);
@@ -243,21 +265,24 @@ public class TestMethodExpressionImpl extends TestCase {
         // Expected to fail
         assertNotNull(e);
     }
-    
+
+    @Test
     public void testInvokeWithVarArgsABB() throws Exception {
         MethodExpression me2 = factory.createMethodExpression(context,
                 "${beanC.sayHello(beanA,beanBB,beanBB)}", null , null);
         Object r2 = me2.invoke(context, null);
         assertEquals("ABB[]: Hello A from BB, BB", r2.toString());
     }
-    
+
+    @Test
     public void testInvokeWithVarArgsABBB() throws Exception {
         MethodExpression me3 = factory.createMethodExpression(context,
                 "${beanC.sayHello(beanA,beanBBB,beanBBB)}", null , null);
         Object r3 = me3.invoke(context, null);
         assertEquals("ABB[]: Hello A from BBB, BBB", r3.toString());
     }
-    
+
+    @Test
     public void testInvokeWithVarArgsAAB() throws Exception {
         MethodExpression me4 = factory.createMethodExpression(context,
                 "${beanC.sayHello(beanAA,beanB,beanB)}", null , null);
@@ -270,21 +295,24 @@ public class TestMethodExpressionImpl extends TestCase {
         // Expected to fail
         assertNotNull(e);
     }
-    
+
+    @Test
     public void testInvokeWithVarArgsAABB() throws Exception {
         MethodExpression me5 = factory.createMethodExpression(context,
                 "${beanC.sayHello(beanAA,beanBB,beanBB)}", null , null);
         Object r5 = me5.invoke(context, null);
         assertEquals("ABB[]: Hello AA from BB, BB", r5.toString());
     }
-    
+
+    @Test
     public void testInvokeWithVarArgsAABBB() throws Exception {
         MethodExpression me6 = factory.createMethodExpression(context,
                 "${beanC.sayHello(beanAA,beanBBB,beanBBB)}", null , null);
         Object r6 = me6.invoke(context, null);
         assertEquals("ABB[]: Hello AA from BBB, BBB", r6.toString());
     }
-    
+
+    @Test
     public void testInvokeWithVarArgsAAAB() throws Exception {
         MethodExpression me7 = factory.createMethodExpression(context,
                 "${beanC.sayHello(beanAAA,beanB,beanB)}", null , null);
@@ -297,25 +325,28 @@ public class TestMethodExpressionImpl extends TestCase {
         // Expected to fail
         assertNotNull(e);
     }
-    
+
+    @Test
     public void testInvokeWithVarArgsAAABB() throws Exception {
         MethodExpression me8 = factory.createMethodExpression(context,
                 "${beanC.sayHello(beanAAA,beanBB,beanBB)}", null , null);
         Object r8 = me8.invoke(context, null);
         assertEquals("ABB[]: Hello AAA from BB, BB", r8.toString());
     }
-    
+
+    @Test
     public void testInvokeWithVarArgsAAABBB() throws Exception {
         MethodExpression me9 = factory.createMethodExpression(context,
                 "${beanC.sayHello(beanAAA,beanBBB,beanBBB)}", null , null);
         Object r9 = me9.invoke(context, null);
         assertEquals("ABB[]: Hello AAA from BBB, BBB", r9.toString());
     }
-    
+
     /*
      * This is also tested implicitly in numerous places elsewhere in this
      * class.
      */
+    @Test
     public void testBug49655() throws Exception {
         // This is the call the failed
         MethodExpression me = factory.createMethodExpression(context,
@@ -326,7 +357,8 @@ public class TestMethodExpressionImpl extends TestCase {
                 "#{beanA.name}", java.lang.String.class);
         assertEquals("New value", ve.getValue(context));
     }
-    
+
+    @Test
     public void testBugPrimitives() throws Exception {
         MethodExpression me = factory.createMethodExpression(context,
                 "${beanA.setValLong(5)}", null, null);
@@ -335,7 +367,8 @@ public class TestMethodExpressionImpl extends TestCase {
                 "#{beanA.valLong}", java.lang.String.class);
         assertEquals("5", ve.getValue(context));
     }
-    
+
+    @Test
     public void testBug50449a() throws Exception {
         MethodExpression me1 = factory.createMethodExpression(context,
                 "${beanB.sayHello()}", null, null);
@@ -343,13 +376,15 @@ public class TestMethodExpressionImpl extends TestCase {
         assertEquals("Hello from B", actual);
     }
 
+    @Test
     public void testBug50449b() throws Exception {
         MethodExpression me1 = factory.createMethodExpression(context,
                 "${beanB.sayHello('Tomcat')}", null, null);
         String actual = (String) me1.invoke(context, null);
         assertEquals("Hello Tomcat from B", actual);
     }
-    
+
+    @Test
     public void testBug50790a() throws Exception {
         ValueExpression ve = factory.createValueExpression(context,
                 "#{beanAA.name.contains(beanA.name)}", java.lang.Boolean.class);
@@ -357,6 +392,7 @@ public class TestMethodExpressionImpl extends TestCase {
         assertEquals(Boolean.TRUE, actual);
     }
 
+    @Test
     public void testBug50790b() throws Exception {
         ValueExpression ve = factory.createValueExpression(context,
                 "#{beanA.name.contains(beanAA.name)}", java.lang.Boolean.class);
