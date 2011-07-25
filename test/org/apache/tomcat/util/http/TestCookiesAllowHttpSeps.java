@@ -31,9 +31,9 @@ import org.junit.Test;
 import org.apache.catalina.Context;
 import org.apache.catalina.startup.SimpleHttpClient;
 import org.apache.catalina.startup.Tomcat;
-import org.apache.catalina.startup.TomcatBaseTestJUnit4;
+import org.apache.catalina.startup.TomcatBaseTest;
 
-public class TestCookiesAllowHttpSeps extends TomcatBaseTestJUnit4 {
+public class TestCookiesAllowHttpSeps extends TomcatBaseTest {
 
     private static final String COOKIE_WITH_SEPS = "name=val(ue";
 

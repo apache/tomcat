@@ -29,9 +29,9 @@ import org.junit.Test;
 import org.apache.catalina.LifecycleState;
 import org.apache.catalina.deploy.ContextEnvironment;
 import org.apache.catalina.startup.Tomcat;
-import org.apache.catalina.startup.TomcatBaseTestJUnit4;
+import org.apache.catalina.startup.TomcatBaseTest;
 
-public class TestNamingContextListener extends TomcatBaseTestJUnit4 {
+public class TestNamingContextListener extends TomcatBaseTest {
 
     private static final String JNDI_NAME = "TestName";
     private static final String JNDI_VALUE= "Test Value";

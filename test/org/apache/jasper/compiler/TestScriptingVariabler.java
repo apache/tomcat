@@ -30,9 +30,9 @@ import static org.junit.Assert.assertNull;
 import org.junit.Test;
 
 import org.apache.catalina.startup.Tomcat;
-import org.apache.catalina.startup.TomcatBaseTestJUnit4;
+import org.apache.catalina.startup.TomcatBaseTest;
 
-public class TestScriptingVariabler extends TomcatBaseTestJUnit4 {
+public class TestScriptingVariabler extends TomcatBaseTest {
 
     @Test
     public void testBug42390() throws Exception {

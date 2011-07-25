@@ -42,13 +42,13 @@ import org.apache.catalina.deploy.LoginConfig;
 import org.apache.catalina.startup.SimpleHttpClient;
 import org.apache.catalina.startup.TestTomcat.MapRealm;
 import org.apache.catalina.startup.Tomcat;
-import org.apache.catalina.startup.TomcatBaseTestJUnit4;
+import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.util.buf.ByteChunk;
 
 /**
  * Test case for {@link Request}. 
  */
-public class TestRequest extends TomcatBaseTestJUnit4 {
+public class TestRequest extends TomcatBaseTest {
 
     /**
      * Test case for https://issues.apache.org/bugzilla/show_bug.cgi?id=37794

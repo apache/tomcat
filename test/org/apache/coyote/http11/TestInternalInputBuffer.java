@@ -34,9 +34,9 @@ import org.apache.catalina.Context;
 import org.apache.catalina.connector.Connector;
 import org.apache.catalina.startup.SimpleHttpClient;
 import org.apache.catalina.startup.Tomcat;
-import org.apache.catalina.startup.TomcatBaseTestJUnit4;
+import org.apache.catalina.startup.TomcatBaseTest;
 
-public class TestInternalInputBuffer extends TomcatBaseTestJUnit4 {
+public class TestInternalInputBuffer extends TomcatBaseTest {
     
     /**
      * Test case for https://issues.apache.org/bugzilla/show_bug.cgi?id=48839

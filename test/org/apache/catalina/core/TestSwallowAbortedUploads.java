@@ -38,11 +38,11 @@ import org.apache.catalina.Context;
 import org.apache.catalina.Wrapper;
 import org.apache.catalina.startup.SimpleHttpClient;
 import org.apache.catalina.startup.Tomcat;
-import org.apache.catalina.startup.TomcatBaseTestJUnit4;
+import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
-public class TestSwallowAbortedUploads extends TomcatBaseTestJUnit4 {
+public class TestSwallowAbortedUploads extends TomcatBaseTest {
 
     private static Log log = LogFactory.getLog(TestSwallowAbortedUploads.class);
 

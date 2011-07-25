@@ -30,10 +30,10 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 
 import org.apache.catalina.startup.Tomcat;
-import org.apache.catalina.startup.TomcatBaseTestJUnit4;
+import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.util.buf.ByteChunk;
 
-public class TestValidator extends TomcatBaseTestJUnit4 {
+public class TestValidator extends TomcatBaseTest {
 
     @Test
     public void testBug47331() throws Exception {

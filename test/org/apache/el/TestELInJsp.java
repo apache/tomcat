@@ -24,7 +24,7 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 
 import org.apache.catalina.startup.Tomcat;
-import org.apache.catalina.startup.TomcatBaseTestJUnit4;
+import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.util.buf.ByteChunk;
 
 /**
@@ -32,7 +32,7 @@ import org.apache.tomcat.util.buf.ByteChunk;
  * tests may be found in {@link TestELEvaluation} and
  * {@link org.apache.jasper.compiler.TestAttributeParser}.
  */
-public class TestELInJsp extends TomcatBaseTestJUnit4 {
+public class TestELInJsp extends TomcatBaseTest {
 
     @Test
     public void testBug36923() throws Exception {

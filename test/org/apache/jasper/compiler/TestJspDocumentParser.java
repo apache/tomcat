@@ -28,10 +28,10 @@ import static org.junit.Assert.assertNull;
 import org.junit.Test;
 
 import org.apache.catalina.startup.Tomcat;
-import org.apache.catalina.startup.TomcatBaseTestJUnit4;
+import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.util.buf.ByteChunk;
 
-public class TestJspDocumentParser extends TomcatBaseTestJUnit4 {
+public class TestJspDocumentParser extends TomcatBaseTest {
 
     @Test
     public void testBug47977() throws Exception {

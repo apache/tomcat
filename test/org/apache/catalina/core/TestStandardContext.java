@@ -58,10 +58,10 @@ import org.apache.catalina.deploy.LoginConfig;
 import org.apache.catalina.startup.SimpleHttpClient;
 import org.apache.catalina.startup.TestTomcat.MapRealm;
 import org.apache.catalina.startup.Tomcat;
-import org.apache.catalina.startup.TomcatBaseTestJUnit4;
+import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.util.buf.ByteChunk;
 
-public class TestStandardContext extends TomcatBaseTestJUnit4 {
+public class TestStandardContext extends TomcatBaseTest {
 
     private static final String REQUEST =
         "GET / HTTP/1.1\r\n" +

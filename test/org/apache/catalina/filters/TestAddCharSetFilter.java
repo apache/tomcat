@@ -36,10 +36,10 @@ import org.apache.catalina.Context;
 import org.apache.catalina.deploy.FilterDef;
 import org.apache.catalina.deploy.FilterMap;
 import org.apache.catalina.startup.Tomcat;
-import org.apache.catalina.startup.TomcatBaseTestJUnit4;
+import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.util.buf.ByteChunk;
 
-public class TestAddCharSetFilter extends TomcatBaseTestJUnit4 {
+public class TestAddCharSetFilter extends TomcatBaseTest {
 
     @Test
     public void testNoneSpecifiedMode1() throws Exception {

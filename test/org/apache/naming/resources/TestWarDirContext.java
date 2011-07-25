@@ -25,10 +25,10 @@ import org.junit.Test;
 import org.apache.catalina.core.JreMemoryLeakPreventionListener;
 import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.startup.Tomcat;
-import org.apache.catalina.startup.TomcatBaseTestJUnit4;
+import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.util.buf.ByteChunk;
 
-public class TestWarDirContext extends TomcatBaseTestJUnit4 {
+public class TestWarDirContext extends TomcatBaseTest {
     
     @Override
     public void setUp() throws Exception {

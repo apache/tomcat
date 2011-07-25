@@ -32,9 +32,9 @@ import org.junit.Test;
 import org.apache.catalina.Context;
 import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.startup.Tomcat;
-import org.apache.catalina.startup.TomcatBaseTestJUnit4;
+import org.apache.catalina.startup.TomcatBaseTest;
 
-public class TestWebappClassLoaderMemoryLeak extends TomcatBaseTestJUnit4 {
+public class TestWebappClassLoaderMemoryLeak extends TomcatBaseTest {
 
     @Test
     public void testTimerThreadLeak() throws Exception {

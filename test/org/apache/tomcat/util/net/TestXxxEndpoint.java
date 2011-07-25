@@ -28,7 +28,7 @@ import org.junit.Test;
 
 import org.apache.catalina.connector.Connector;
 import org.apache.catalina.startup.Tomcat;
-import org.apache.catalina.startup.TomcatBaseTestJUnit4;
+import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.jni.Address;
@@ -42,7 +42,7 @@ import org.apache.tomcat.jni.Socket;
  * Test case for the Endpoint implementations. The testing framework will ensure
  * that each implementation is tested.
  */
-public class TestXxxEndpoint extends TomcatBaseTestJUnit4 {
+public class TestXxxEndpoint extends TomcatBaseTest {
 
     private static Log log = LogFactory.getLog(TestXxxEndpoint.class);
 
