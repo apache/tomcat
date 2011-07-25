@@ -22,12 +22,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static org.junit.Assert.assertTrue;
+
+import org.junit.Test;
+
 import org.apache.catalina.startup.Tomcat;
-import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.catalina.startup.TomcatBaseTestJUnit4;
 import org.apache.tomcat.util.buf.ByteChunk;
 
-public class TestCompiler extends TomcatBaseTest {
-    
+public class TestCompiler extends TomcatBaseTestJUnit4 {
+
+    @Test
     public void testBug49726a() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
@@ -49,6 +54,7 @@ public class TestCompiler extends TomcatBaseTest {
         assertTrue(headers.get("Content-Type").get(0).startsWith("text/html"));
     }
 
+    @Test
     public void testBug49726b() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 

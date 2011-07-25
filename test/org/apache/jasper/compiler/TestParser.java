@@ -21,16 +21,22 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+import org.junit.Test;
+
 import org.apache.catalina.startup.Tomcat;
-import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.catalina.startup.TomcatBaseTestJUnit4;
 import org.apache.tomcat.util.buf.ByteChunk;
 
 /**
  * Tests are duplicated in {@link TestParserNoStrictWhitespace} with the strict
  * whitespace parsing disabled.
  */
-public class TestParser extends TomcatBaseTest {
-    
+public class TestParser extends TomcatBaseTestJUnit4 {
+
+    @Test
     public void testBug48627() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
@@ -51,6 +57,7 @@ public class TestParser extends TomcatBaseTest {
         assertEcho(result, "01-\\");
     }
 
+    @Test
     public void testBug48668a() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
@@ -96,6 +103,7 @@ public class TestParser extends TomcatBaseTest {
         assertEcho(result, "53-Hello #{'foo}");
     }
 
+    @Test
     public void testBug48668b() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
@@ -112,6 +120,7 @@ public class TestParser extends TomcatBaseTest {
         assertEcho(result, "01-Hello world</p>#{foo2");
     }
 
+    @Test
     public void testBug49297NoSpaceStrict() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
@@ -127,7 +136,8 @@ public class TestParser extends TomcatBaseTest {
 
         assertEquals(500, sc);
     }
-    
+
+    @Test
     public void testBug49297DuplicateAttr() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
@@ -143,7 +153,8 @@ public class TestParser extends TomcatBaseTest {
 
         assertEquals(500, sc);
     }
-    
+
+    @Test
     public void testBug49297MultipleImport1() throws Exception {
 
         Tomcat tomcat = getTomcatInstance();
@@ -163,6 +174,7 @@ public class TestParser extends TomcatBaseTest {
         assertEcho(res.toString(), "OK");
     }
 
+    @Test
     public void testBug49297MultipleImport2() throws Exception {
 
         Tomcat tomcat = getTomcatInstance();
@@ -182,6 +194,7 @@ public class TestParser extends TomcatBaseTest {
         assertEcho(res.toString(), "OK");
     }
 
+    @Test
     public void testBug49297MultiplePageEncoding1() throws Exception {
 
         Tomcat tomcat = getTomcatInstance();
@@ -200,6 +213,7 @@ public class TestParser extends TomcatBaseTest {
         assertEquals(500, sc);
     }
 
+    @Test
     public void testBug49297MultiplePageEncoding2() throws Exception {
 
         Tomcat tomcat = getTomcatInstance();
@@ -218,6 +232,7 @@ public class TestParser extends TomcatBaseTest {
         assertEquals(500, sc);
     }
 
+    @Test
     public void testBug49297MultiplePageEncoding3() throws Exception {
 
         Tomcat tomcat = getTomcatInstance();
@@ -236,6 +251,7 @@ public class TestParser extends TomcatBaseTest {
         assertEquals(500, sc);
     }
 
+    @Test
     public void testBug49297MultiplePageEncoding4() throws Exception {
 
         Tomcat tomcat = getTomcatInstance();
@@ -254,6 +270,7 @@ public class TestParser extends TomcatBaseTest {
         assertEquals(500, sc);
     }
 
+    @Test
     public void testBug49297Tag() throws Exception {
 
         Tomcat tomcat = getTomcatInstance();
