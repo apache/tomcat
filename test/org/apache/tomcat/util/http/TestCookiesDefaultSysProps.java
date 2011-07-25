@@ -21,6 +21,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static org.junit.Assert.assertEquals;
+
+import org.junit.Test;
+
 import org.apache.catalina.startup.Tomcat;
 import org.apache.tomcat.util.buf.ByteChunk;
 
@@ -33,6 +37,7 @@ import org.apache.tomcat.util.buf.ByteChunk;
 public class TestCookiesDefaultSysProps extends CookiesBaseTest {
 
     @Override
+    @Test
     public void testCookiesInstance() throws Exception {
 
         Tomcat tomcat = getTomcatInstance();

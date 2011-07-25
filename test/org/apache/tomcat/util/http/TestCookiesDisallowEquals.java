@@ -24,16 +24,21 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import static org.junit.Assert.assertEquals;
+
+import org.junit.Test;
+
 import org.apache.catalina.Context;
 import org.apache.catalina.startup.SimpleHttpClient;
 import org.apache.catalina.startup.Tomcat;
-import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.catalina.startup.TomcatBaseTestJUnit4;
 
-public class TestCookiesDisallowEquals extends TomcatBaseTest{
+public class TestCookiesDisallowEquals extends TomcatBaseTestJUnit4 {
 
     private static final String COOKIE_WITH_EQUALS = "name=value=withequals";
     private static final String COOKIE_TRUNCATED = "name=value";
-    
+
+    @Test
     public void testWithEquals() throws Exception {
         TestCookieEqualsClient client = new TestCookieEqualsClient();
         client.doRequest();

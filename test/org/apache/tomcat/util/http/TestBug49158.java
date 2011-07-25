@@ -28,6 +28,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import static org.junit.Assert.assertEquals;
+
+import org.junit.Test;
+
 import org.apache.catalina.Context;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.tomcat.util.buf.ByteChunk;
@@ -42,6 +46,7 @@ public class TestBug49158 extends CookiesBaseTest {
     public static final String path = "49158";
     
     @Override
+    @Test
     public void testCookiesInstance() throws Exception {
         Tomcat tomcat = getTomcatInstance();
         addServlets(tomcat);
