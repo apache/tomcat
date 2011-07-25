@@ -28,7 +28,13 @@ import javax.servlet.ServletContainerInitializer;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 
-import junit.framework.TestCase;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+import org.junit.Test;
 
 import org.apache.catalina.Container;
 import org.apache.catalina.Loader;
@@ -45,8 +51,9 @@ import org.apache.catalina.deploy.WebXml;
  * @author Peter Rossbach
  * @version $Revision$
  */
-public class TestContextConfigAnnotation extends TestCase {
+public class TestContextConfigAnnotation {
 
+    @Test
     public void testAnnotation() throws Exception {
         WebXml webxml = new WebXml();
         ContextConfig config = new ContextConfig();
@@ -72,6 +79,7 @@ public class TestContextConfigAnnotation extends TestCase {
 
     }
 
+    @Test
     public void testOverwriteAnnotation() throws Exception {
         WebXml webxml = new WebXml();
         ServletDef servletDef = new ServletDef();
@@ -111,6 +119,7 @@ public class TestContextConfigAnnotation extends TestCase {
         assertNull(servletDef.getJspFile());
     }
 
+    @Test
     public void testNoMapping() throws Exception {
         WebXml webxml = new WebXml();
         ContextConfig config = new ContextConfig();
@@ -128,6 +137,7 @@ public class TestContextConfigAnnotation extends TestCase {
 
     }
 
+    @Test
     public void testSetupWebXMLNoMapping() throws Exception {
         WebXml webxml = new WebXml();
         ServletDef servletDef = new ServletDef();
@@ -150,6 +160,7 @@ public class TestContextConfigAnnotation extends TestCase {
         assertEquals(servletDef, servletDef1);
     }
 
+    @Test
     public void testDuplicateMapping() throws Exception {
         WebXml webxml = new WebXml();
         ContextConfig config = new ContextConfig();
@@ -166,6 +177,7 @@ public class TestContextConfigAnnotation extends TestCase {
         assertNull(servletDef);
     }
 
+    @Test
     public void testFilterMapping() throws Exception {
         WebXml webxml = new WebXml();
         ContextConfig config = new ContextConfig();
@@ -180,6 +192,7 @@ public class TestContextConfigAnnotation extends TestCase {
         assertEquals("Servlet says: ",fdef.getParameterMap().get("message"));
     }
     
+    @Test
     public void testOverwriteFilterMapping() throws Exception {
         WebXml webxml = new WebXml();
         FilterDef filterDef = new FilterDef();
@@ -234,6 +247,7 @@ public class TestContextConfigAnnotation extends TestCase {
         
     }
 
+    @Test
     public void testDuplicateFilterMapping() throws Exception {
         WebXml webxml = new WebXml();
         ContextConfig config = new ContextConfig();
@@ -250,6 +264,7 @@ public class TestContextConfigAnnotation extends TestCase {
         assertNull(filterDef);
     }
 
+    @Test
     public void testCheckHandleTypes() throws Exception {
         ContextConfig config = new ContextConfig();
         
