@@ -24,16 +24,21 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import static org.junit.Assert.assertEquals;
+
+import org.junit.Test;
+
 import org.apache.catalina.Context;
 import org.apache.catalina.startup.SimpleHttpClient;
 import org.apache.catalina.startup.Tomcat;
-import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.catalina.startup.TomcatBaseTestJUnit4;
 
-public class TestCookiesAllowNameOnly extends TomcatBaseTest{
+public class TestCookiesAllowNameOnly extends TomcatBaseTestJUnit4 {
 
     private static final String COOKIE_WITH_NAME_ONLY_1 = "bob";
     private static final String COOKIE_WITH_NAME_ONLY_2 = "bob=";
-    
+
+    @Test
     public void testWithEquals() throws Exception {
         System.setProperty(
                 "org.apache.tomcat.util.http.ServerCookie.ALLOW_NAME_ONLY",
