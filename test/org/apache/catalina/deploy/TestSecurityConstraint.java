@@ -25,9 +25,14 @@ import javax.servlet.ServletSecurityElement;
 import javax.servlet.annotation.ServletSecurity;
 import javax.servlet.annotation.ServletSecurity.EmptyRoleSemantic;
 
-import junit.framework.TestCase;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
-public class TestSecurityConstraint extends TestCase {
+import org.junit.Test;
+
+public class TestSecurityConstraint {
 
     private static final String URL_PATTERN = "/test";
     private static final String ROLE1 = "R1";
@@ -35,6 +40,7 @@ public class TestSecurityConstraint extends TestCase {
     /**
      * Uses the examples in SRV.13.4 as the basis for these tests
      */
+    @Test
     public void testCreateConstraints() {
         
         ServletSecurityElement element;
@@ -59,9 +65,8 @@ public class TestSecurityConstraint extends TestCase {
         result = SecurityConstraint.createConstraints(element, URL_PATTERN);
 
         assertEquals(1, result.length);
-        assertEquals(false, result[0].getAuthConstraint());
-        assertEquals(true,
-                result[0].findCollections()[0].findPattern(URL_PATTERN));
+        assertFalse(result[0].getAuthConstraint());
+        assertTrue(result[0].findCollections()[0].findPattern(URL_PATTERN));
         assertEquals(0, result[0].findCollections()[0].findMethods().length);
         assertEquals(ServletSecurity.TransportGuarantee.CONFIDENTIAL.name(),
                 result[0].getUserConstraint());
@@ -73,9 +78,8 @@ public class TestSecurityConstraint extends TestCase {
         result = SecurityConstraint.createConstraints(element, URL_PATTERN);
 
         assertEquals(1, result.length);
-        assertEquals(true, result[0].getAuthConstraint());
-        assertEquals(true,
-                result[0].findCollections()[0].findPattern(URL_PATTERN));
+        assertTrue(result[0].getAuthConstraint());
+        assertTrue(result[0].findCollections()[0].findPattern(URL_PATTERN));
         assertEquals(0, result[0].findCollections()[0].findMethods().length);
         assertEquals(ServletSecurity.TransportGuarantee.NONE.name(),
                 result[0].getUserConstraint());
@@ -87,11 +91,10 @@ public class TestSecurityConstraint extends TestCase {
         result = SecurityConstraint.createConstraints(element, URL_PATTERN);
 
         assertEquals(1, result.length);
-        assertEquals(true, result[0].getAuthConstraint());
+        assertTrue(result[0].getAuthConstraint());
         assertEquals(1, result[0].findAuthRoles().length);
-        assertEquals(true, result[0].findAuthRole(ROLE1));
-        assertEquals(true,
-                result[0].findCollections()[0].findPattern(URL_PATTERN));
+        assertTrue(result[0].findAuthRole(ROLE1));
+        assertTrue(result[0].findCollections()[0].findPattern(URL_PATTERN));
         assertEquals(0, result[0].findCollections()[0].findMethods().length);
         assertEquals(ServletSecurity.TransportGuarantee.NONE.name(),
                 result[0].getUserConstraint());
@@ -115,11 +118,10 @@ public class TestSecurityConstraint extends TestCase {
         
         assertEquals(2, result.length);
         for (int i = 0; i < 2; i++) {
-            assertEquals(true, result[i].getAuthConstraint());
+            assertTrue(result[i].getAuthConstraint());
             assertEquals(1, result[i].findAuthRoles().length);
-            assertEquals(true, result[i].findAuthRole(ROLE1));
-            assertEquals(true,
-                    result[i].findCollections()[0].findPattern(URL_PATTERN));
+            assertTrue(result[i].findAuthRole(ROLE1));
+            assertTrue(result[i].findCollections()[0].findPattern(URL_PATTERN));
             assertEquals(1, result[i].findCollections()[0].findMethods().length);
             String method = result[i].findCollections()[0].findMethods()[0];
             if ("GET".equals(method)) {
@@ -147,16 +149,15 @@ public class TestSecurityConstraint extends TestCase {
         
         assertEquals(2, result.length);
         for (int i = 0; i < 2; i++) {
-            assertEquals(true,
-                    result[i].findCollections()[0].findPattern(URL_PATTERN));
+            assertTrue(result[i].findCollections()[0].findPattern(URL_PATTERN));
             if (result[i].findCollections()[0].findMethods().length == 1) {
                 assertEquals("GET",
                         result[i].findCollections()[0].findMethods()[0]);
-                assertEquals(false, result[i].getAuthConstraint());
+                assertFalse(result[i].getAuthConstraint());
             } else if (result[i].findCollections()[0].findOmittedMethods().length == 1) {
                 assertEquals("GET",
                         result[i].findCollections()[0].findOmittedMethods()[0]);
-                assertEquals(true, result[i].getAuthConstraint());
+                assertTrue(result[i].getAuthConstraint());
                 assertEquals(1, result[i].findAuthRoles().length);
                 assertEquals(ROLE1, result[i].findAuthRoles()[0]);
             } else {
@@ -182,17 +183,16 @@ public class TestSecurityConstraint extends TestCase {
         
         assertEquals(2, result.length);
         for (int i = 0; i < 2; i++) {
-            assertEquals(true,
-                    result[i].findCollections()[0].findPattern(URL_PATTERN));
+            assertTrue(result[i].findCollections()[0].findPattern(URL_PATTERN));
             if (result[i].findCollections()[0].findMethods().length == 1) {
                 assertEquals("TRACE",
                         result[i].findCollections()[0].findMethods()[0]);
-                assertEquals(true, result[i].getAuthConstraint());
+                assertTrue(result[i].getAuthConstraint());
                 assertEquals(0, result[i].findAuthRoles().length);
             } else if (result[i].findCollections()[0].findOmittedMethods().length == 1) {
                 assertEquals("TRACE",
                         result[i].findCollections()[0].findOmittedMethods()[0]);
-                assertEquals(true, result[i].getAuthConstraint());
+                assertTrue(result[i].getAuthConstraint());
                 assertEquals(1, result[i].findAuthRoles().length);
                 assertEquals(ROLE1, result[i].findAuthRoles()[0]);
             } else {

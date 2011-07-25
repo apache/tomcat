@@ -23,12 +23,17 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
-import junit.framework.TestCase;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * Test case for {@link WebXml} fragment ordering.
  */
-public class TestWebXmlOrdering extends TestCase {
+public class TestWebXmlOrdering {
     private WebXml app;
     private WebXml a;
     private WebXml b;
@@ -38,9 +43,8 @@ public class TestWebXmlOrdering extends TestCase {
     private WebXml f;
     private Map<String,WebXml> fragments;
 
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
+    @Before
+    public void setUp() throws Exception {
         app = new WebXml();
         a = new WebXml();
         a.setName("a");
@@ -63,6 +67,7 @@ public class TestWebXmlOrdering extends TestCase {
         fragments.put("f",f);
     }
 
+    @Test
     public void testOrderWebFragmentsAbsolute() {
         app.addAbsoluteOrdering("c");
         app.addAbsoluteOrdering("a");
@@ -81,6 +86,7 @@ public class TestWebXmlOrdering extends TestCase {
         assertFalse(iter.hasNext());
     }
 
+    @Test
     public void testOrderWebFragmentsAbsolutePartial() {
         app.addAbsoluteOrdering("c");
         app.addAbsoluteOrdering("a");
@@ -93,6 +99,7 @@ public class TestWebXmlOrdering extends TestCase {
         assertFalse(iter.hasNext());
     }
 
+    @Test
     public void testOrderWebFragmentsAbsoluteOthersStart() {
         app.addAbsoluteOrdering(WebXml.ORDER_OTHERS);
         app.addAbsoluteOrdering("b");
@@ -117,6 +124,7 @@ public class TestWebXmlOrdering extends TestCase {
         assertFalse(iter.hasNext());
     }
 
+    @Test
     public void testOrderWebFragmentsAbsoluteOthersMiddle() {
         app.addAbsoluteOrdering("b");
         app.addAbsoluteOrdering(WebXml.ORDER_OTHERS);
@@ -142,6 +150,7 @@ public class TestWebXmlOrdering extends TestCase {
         assertFalse(iter.hasNext());
     }
 
+    @Test
     public void testWebFragmentsAbsoluteWrongFragmentName() {
         app.addAbsoluteOrdering("a");
         app.addAbsoluteOrdering("z");
@@ -149,7 +158,8 @@ public class TestWebXmlOrdering extends TestCase {
         assertEquals(1,ordered.size());
         assertEquals(fragments.get("a"),ordered.toArray()[0]);
     }
-    
+
+    @Test
     public void testOrderWebFragmentsAbsoluteOthersEnd() {
         app.addAbsoluteOrdering("b");
         app.addAbsoluteOrdering("d");
@@ -175,6 +185,7 @@ public class TestWebXmlOrdering extends TestCase {
         assertFalse(iter.hasNext());
     }
 
+    @Test
     public void testOrderWebFragmentsRelative1() {
         // First example from servlet spec
         a.addAfterOrderingOthers();
@@ -194,7 +205,8 @@ public class TestWebXmlOrdering extends TestCase {
         assertEquals(c,iter.next());
         assertEquals(a,iter.next());
     }
-    
+
+    @Test
     public void testOrderWebFragmentsRelative2() {
         // Second example - use fragment a for no-id fragment
         a.addAfterOrderingOthers();
@@ -216,7 +228,8 @@ public class TestWebXmlOrdering extends TestCase {
         assertEquals(c,iter.next());
         assertEquals(d,iter.next());
     }
-    
+
+    @Test
     public void testOrderWebFragmentsRelative3() {
         // Third example from spec
         a.addAfterOrdering("b");
@@ -235,7 +248,8 @@ public class TestWebXmlOrdering extends TestCase {
         assertEquals(b,iter.next());
         assertEquals(a,iter.next());
     }
-    
+
+    @Test
     public void testOrderWebFragmentsrelativeCircular() {
         a.addBeforeOrdering("b");
         b.addBeforeOrdering("a");
