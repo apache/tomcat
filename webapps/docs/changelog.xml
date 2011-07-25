@@ -109,6 +109,11 @@
         <bug>51532</bug>: JSP files with dependencies in JARs were recompiled on
         every access leading to poor performance. (markt)
       </fix>
+      <fix>
+        <bug>51544</bug>: Correctly resolve bean methods in EL so accessible
+        methods that are overridden by inaccessible methods do not cause an
+        IllegalAccessException. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
