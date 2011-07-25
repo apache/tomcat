@@ -176,10 +176,10 @@ commons-daemon.native.win.loc.1=${base-commons.loc.1}/daemon/binaries/windows/co
 commons-daemon.native.win.loc.2=${base-commons.loc.2}/daemon/binaries/windows/commons-daemon-${commons-daemon.version}-bin-windows.zip
 
 # ----- JUnit Unit Test Suite, version 3.7 or later -----
-junit.home=${base.path}/junit3.8.2
+junit.home=${base.path}/junit4.8.2
 junit.lib=${junit.home}
-junit.jar=${junit.lib}/junit.jar
-junit.loc=${base-sf.loc}/junit/junit3.8.2.zip
+junit.jar=${junit.lib}/junit-4.8.2.jar
+junit.loc=http://cloud.github.com/downloads/KentBeck/junit/junit4.8.2.zip
 
 # ----- Checkstyle, version 5.1 or later -----
 checkstyle.version=5.3
