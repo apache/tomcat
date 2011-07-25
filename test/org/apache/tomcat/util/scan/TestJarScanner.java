@@ -19,10 +19,18 @@ package org.apache.tomcat.util.scan;
 
 import java.util.StringTokenizer;
 
-import org.apache.catalina.startup.TomcatBaseTest;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
-public class TestJarScanner extends TomcatBaseTest {
+import org.junit.Test;
 
+import org.apache.catalina.startup.TomcatBaseTestJUnit4;
+
+public class TestJarScanner extends TomcatBaseTestJUnit4 {
+
+    @Test
     public void testJarsToSkipFormat() {
 
         String jarList = System.getProperty(Constants.SKIP_JARS_PROPERTY);

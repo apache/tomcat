@@ -21,9 +21,15 @@ import java.net.SocketException;
 
 import javax.net.ssl.SSLHandshakeException;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+import org.junit.Test;
+
 import org.apache.catalina.connector.Connector;
 import org.apache.catalina.startup.Tomcat;
-import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.catalina.startup.TomcatBaseTestJUnit4;
 import org.apache.coyote.ProtocolHandler;
 import org.apache.coyote.http11.AbstractHttp11JsseProtocol;
 import org.apache.tomcat.util.buf.ByteChunk;
@@ -34,8 +40,9 @@ import org.apache.tomcat.util.net.jsse.TesterBug50640SslImpl;
  * generated using a test CA the files for which are in the Tomcat PMC private
  * repository since not all of them are AL2 licensed.
  */
-public class TestCustomSsl extends TomcatBaseTest {
+public class TestCustomSsl extends TomcatBaseTestJUnit4 {
 
+    @Test
     public void testCustomSslImplementation() throws Exception {
 
         TesterSupport.configureClientSsl();
@@ -71,10 +78,12 @@ public class TestCustomSsl extends TomcatBaseTest {
         assertTrue(res.toString().indexOf("<h1>Hello World!</h1>") > 0);
     }
 
+    @Test
     public void testCustomTrustManager1() throws Exception {
         doTestCustomTrustManager(false);
     }
-    
+
+    @Test
     public void testCustomTrustManager2() throws Exception {
         doTestCustomTrustManager(true);
     }
