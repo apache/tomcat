@@ -31,9 +31,9 @@ import org.junit.Test;
 import org.apache.catalina.Context;
 import org.apache.catalina.startup.SimpleHttpClient;
 import org.apache.catalina.startup.Tomcat;
-import org.apache.catalina.startup.TomcatBaseTestJUnit4;
+import org.apache.catalina.startup.TomcatBaseTest;
 
-public class TestCookiesAllowNameOnly extends TomcatBaseTestJUnit4 {
+public class TestCookiesAllowNameOnly extends TomcatBaseTest {
 
     private static final String COOKIE_WITH_NAME_ONLY_1 = "bob";
     private static final String COOKIE_WITH_NAME_ONLY_2 = "bob=";

@@ -37,7 +37,7 @@ import org.junit.Test;
 import org.apache.catalina.core.StandardContext;
 import org.apache.tomcat.util.buf.ByteChunk;
 
-public class TestContextConfig extends TomcatBaseTestJUnit4 {
+public class TestContextConfig extends TomcatBaseTest {
 
     @Test
     public void testOverrideWithSCIDefaultName() throws Exception {

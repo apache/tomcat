@@ -29,9 +29,9 @@ import org.apache.catalina.Context;
 import org.apache.catalina.startup.SimpleHttpClient;
 import org.apache.catalina.startup.TesterServlet;
 import org.apache.catalina.startup.Tomcat;
-import org.apache.catalina.startup.TomcatBaseTestJUnit4;
+import org.apache.catalina.startup.TomcatBaseTest;
 
-public class TestAbstractHttp11Processor extends TomcatBaseTestJUnit4 {
+public class TestAbstractHttp11Processor extends TomcatBaseTest {
 
     @Test
     public void testWithTEVoid() throws Exception {

@@ -34,11 +34,11 @@ import org.apache.catalina.deploy.SecurityConstraint;
 import org.apache.catalina.startup.TestTomcat.MapRealm;
 import org.apache.catalina.startup.TesterServlet;
 import org.apache.catalina.startup.Tomcat;
-import org.apache.catalina.startup.TomcatBaseTestJUnit4;
+import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.catalina.util.MD5Encoder;
 import org.apache.tomcat.util.buf.ByteChunk;
 
-public class TesterDigestAuthenticatorPerformance extends TomcatBaseTestJUnit4 {
+public class TesterDigestAuthenticatorPerformance extends TomcatBaseTest {
 
     private static String USER = "user";
     private static String PWD = "pwd";

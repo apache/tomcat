@@ -34,7 +34,7 @@ import org.apache.catalina.Context;
 import org.apache.catalina.loader.WebappClassLoader;
 import org.apache.tomcat.util.buf.ByteChunk;
 
-public class TestTomcatClassLoader extends TomcatBaseTestJUnit4 {
+public class TestTomcatClassLoader extends TomcatBaseTest {
 
     @Test
     public void testDefaultClassLoader() throws Exception {

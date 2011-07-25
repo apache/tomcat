@@ -26,13 +26,13 @@ import org.apache.catalina.Context;
 import org.apache.catalina.Wrapper;
 import org.apache.catalina.startup.TesterServlet;
 import org.apache.catalina.startup.Tomcat;
-import org.apache.catalina.startup.TomcatBaseTestJUnit4;
+import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.util.buf.ByteChunk;
 
 /**
  * Test cases for {@link Connector}. 
  */
-public class TestConnector extends TomcatBaseTestJUnit4 {
+public class TestConnector extends TomcatBaseTest {
 
     @Test
     public void testStop() throws Exception {

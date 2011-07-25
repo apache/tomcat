@@ -42,10 +42,9 @@ import static org.apache.catalina.startup.SimpleHttpClient.CRLF;
 import org.apache.catalina.startup.SimpleHttpClient;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
-import org.apache.catalina.startup.TomcatBaseTestJUnit4;
 import org.apache.tomcat.util.buf.ByteChunk;
 
-public class TestDefaultServlet extends TomcatBaseTestJUnit4 {
+public class TestDefaultServlet extends TomcatBaseTest {
 
     /**
      * Test attempting to access special paths (WEB-INF/META-INF) using

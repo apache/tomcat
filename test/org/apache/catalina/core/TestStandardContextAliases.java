@@ -33,10 +33,10 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 
 import org.apache.catalina.startup.Tomcat;
-import org.apache.catalina.startup.TomcatBaseTestJUnit4;
+import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.util.buf.ByteChunk;
 
-public class TestStandardContextAliases extends TomcatBaseTestJUnit4 {
+public class TestStandardContextAliases extends TomcatBaseTest {
 
     @Test
     public void testDirContextAliases() throws Exception {

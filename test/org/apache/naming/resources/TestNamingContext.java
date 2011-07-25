@@ -36,10 +36,10 @@ import org.junit.Test;
 import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.deploy.ContextResource;
 import org.apache.catalina.startup.Tomcat;
-import org.apache.catalina.startup.TomcatBaseTestJUnit4;
+import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.util.buf.ByteChunk;
 
-public class TestNamingContext extends TomcatBaseTestJUnit4 {
+public class TestNamingContext extends TomcatBaseTest {
 
     @Test
     public void testLookupSingletonResource() throws Exception {

@@ -33,7 +33,7 @@ import org.junit.Test;
 
 import org.apache.catalina.core.StandardHost;
 import org.apache.catalina.startup.Tomcat;
-import org.apache.catalina.startup.TomcatBaseTestJUnit4;
+import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.util.modeler.Registry;
 
 /**
@@ -41,7 +41,7 @@ import org.apache.tomcat.util.modeler.Registry;
  * don't necessarily apply to one specific Tomcat class.
  *
  */
-public class TestRegistration extends TomcatBaseTestJUnit4 {
+public class TestRegistration extends TomcatBaseTest {
 
     private static final String contextName = "/foo";
 

@@ -24,14 +24,14 @@ import org.junit.Test;
 
 import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.startup.Tomcat;
-import org.apache.catalina.startup.TomcatBaseTestJUnit4;
+import org.apache.catalina.startup.TomcatBaseTest;
 
 /**
  * Unit test for the {@link ProxyDirContext}.
  * @author Marc Guillemot
  * @version $Revision: $
  */
-public class TestProxyDirContext extends TomcatBaseTestJUnit4 {
+public class TestProxyDirContext extends TomcatBaseTest {
 
     /**
      * lookup doesn't always throw the same exception.

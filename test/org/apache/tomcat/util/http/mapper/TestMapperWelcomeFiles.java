@@ -33,10 +33,10 @@ import org.junit.Test;
 
 import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.startup.Tomcat;
-import org.apache.catalina.startup.TomcatBaseTestJUnit4;
+import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.util.buf.ByteChunk;
 
-public class TestMapperWelcomeFiles extends TomcatBaseTestJUnit4 {
+public class TestMapperWelcomeFiles extends TomcatBaseTest {
 
     @Test
     public void testWelcomeFileNotStrict() throws Exception {

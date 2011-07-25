@@ -43,9 +43,9 @@ import org.apache.catalina.filters.ExpiresFilter.DurationUnit;
 import org.apache.catalina.filters.ExpiresFilter.ExpiresConfiguration;
 import org.apache.catalina.filters.ExpiresFilter.StartingPoint;
 import org.apache.catalina.startup.Tomcat;
-import org.apache.catalina.startup.TomcatBaseTestJUnit4;
+import org.apache.catalina.startup.TomcatBaseTest;
 
-public class TestExpiresFilter extends TomcatBaseTestJUnit4 {
+public class TestExpiresFilter extends TomcatBaseTest {
     public static final String TEMP_DIR = System.getProperty("java.io.tmpdir");
 
     @Test

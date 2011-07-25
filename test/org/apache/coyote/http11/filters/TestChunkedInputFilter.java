@@ -34,9 +34,9 @@ import org.junit.Test;
 import org.apache.catalina.Context;
 import org.apache.catalina.startup.SimpleHttpClient;
 import org.apache.catalina.startup.Tomcat;
-import org.apache.catalina.startup.TomcatBaseTestJUnit4;
+import org.apache.catalina.startup.TomcatBaseTest;
 
-public class TestChunkedInputFilter extends TomcatBaseTestJUnit4 {
+public class TestChunkedInputFilter extends TomcatBaseTest {
 
     @Test
     public void testTrailingHeaders() throws Exception {

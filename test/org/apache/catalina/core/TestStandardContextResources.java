@@ -41,10 +41,10 @@ import org.apache.catalina.deploy.WebXml;
 import org.apache.catalina.startup.Constants;
 import org.apache.catalina.startup.ContextConfig;
 import org.apache.catalina.startup.Tomcat;
-import org.apache.catalina.startup.TomcatBaseTestJUnit4;
+import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.util.buf.ByteChunk;
 
-public class TestStandardContextResources extends TomcatBaseTestJUnit4 {
+public class TestStandardContextResources extends TomcatBaseTest {
 
     @Override
     public void setUp() throws Exception {

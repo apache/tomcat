@@ -26,10 +26,10 @@ import org.junit.Test;
 
 import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.startup.Tomcat;
-import org.apache.catalina.startup.TomcatBaseTestJUnit4;
+import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.naming.resources.FileDirContext;
 
-public class TestVirtualWebappLoader extends TomcatBaseTestJUnit4 {
+public class TestVirtualWebappLoader extends TomcatBaseTest {
 
     @Test
     public void testModified() throws Exception {

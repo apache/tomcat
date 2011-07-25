@@ -56,10 +56,10 @@ import org.apache.catalina.authenticator.BasicAuthenticator;
 import org.apache.catalina.deploy.LoginConfig;
 import org.apache.catalina.startup.TestTomcat.MapRealm;
 import org.apache.catalina.startup.Tomcat;
-import org.apache.catalina.startup.TomcatBaseTestJUnit4;
+import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.util.buf.ByteChunk;
 
-public class TestStandardWrapper extends TomcatBaseTestJUnit4 {
+public class TestStandardWrapper extends TomcatBaseTest {
 
     @Test
     public void testSecurityAnnotationsSimple() throws Exception {

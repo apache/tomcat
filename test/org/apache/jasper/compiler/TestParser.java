@@ -27,14 +27,14 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 
 import org.apache.catalina.startup.Tomcat;
-import org.apache.catalina.startup.TomcatBaseTestJUnit4;
+import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.util.buf.ByteChunk;
 
 /**
  * Tests are duplicated in {@link TestParserNoStrictWhitespace} with the strict
  * whitespace parsing disabled.
  */
-public class TestParser extends TomcatBaseTestJUnit4 {
+public class TestParser extends TomcatBaseTest {
 
     @Test
     public void testBug48627() throws Exception {

@@ -37,10 +37,10 @@ import org.junit.Test;
 
 import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.startup.Tomcat;
-import org.apache.catalina.startup.TomcatBaseTestJUnit4;
+import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.util.buf.ByteChunk;
 
-public class TestGenerator extends TomcatBaseTestJUnit4 {
+public class TestGenerator extends TomcatBaseTest {
 
     @Test
     public void testBug45015a() throws Exception {
