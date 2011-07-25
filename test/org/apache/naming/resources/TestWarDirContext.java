@@ -18,13 +18,17 @@ package org.apache.naming.resources;
 
 import java.io.File;
 
+import static org.junit.Assert.assertEquals;
+
+import org.junit.Test;
+
 import org.apache.catalina.core.JreMemoryLeakPreventionListener;
 import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.startup.Tomcat;
-import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.catalina.startup.TomcatBaseTestJUnit4;
 import org.apache.tomcat.util.buf.ByteChunk;
 
-public class TestWarDirContext extends TomcatBaseTest {
+public class TestWarDirContext extends TomcatBaseTestJUnit4 {
     
     @Override
     public void setUp() throws Exception {
@@ -43,6 +47,7 @@ public class TestWarDirContext extends TomcatBaseTest {
     /**
      * Check https://jira.springsource.org/browse/SPR-7350 isn't really an issue
      */
+    @Test
     public void testLookupException() throws Exception {
         Tomcat tomcat = getTomcatInstance();
         
@@ -63,6 +68,7 @@ public class TestWarDirContext extends TomcatBaseTest {
      * Additional test following on from SPR-7350 above to check files that
      * contain JNDI reserved characters can be served when caching is enabled.
      */
+    @Test
     public void testReservedJNDIFileNamesWithCache() throws Exception {
         Tomcat tomcat = getTomcatInstance();
         
@@ -92,6 +98,7 @@ public class TestWarDirContext extends TomcatBaseTest {
      * Additional test following on from SPR-7350 above to check files that
      * contain JNDI reserved characters can be served when caching is disabled.
      */
+    @Test
     public void testReservedJNDIFileNamesNoCache() throws Exception {
         Tomcat tomcat = getTomcatInstance();
         

@@ -26,18 +26,23 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import static org.junit.Assert.assertTrue;
+
+import org.junit.Test;
+
 import org.apache.catalina.Context;
 import org.apache.catalina.connector.Connector;
 import org.apache.catalina.startup.SimpleHttpClient;
 import org.apache.catalina.startup.Tomcat;
-import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.catalina.startup.TomcatBaseTestJUnit4;
 
-public class TestInternalInputBuffer extends TomcatBaseTest {
+public class TestInternalInputBuffer extends TomcatBaseTestJUnit4 {
     
     /**
      * Test case for https://issues.apache.org/bugzilla/show_bug.cgi?id=48839
      * with BIO
      */
+    @Test
     public void testBug48839BIO() {
         
         Bug48839Client client = new Bug48839Client();
@@ -54,6 +59,7 @@ public class TestInternalInputBuffer extends TomcatBaseTest {
      * Test case for https://issues.apache.org/bugzilla/show_bug.cgi?id=48839
      * with NIO
      */
+    @Test
     public void testBug48839NIO() {
         
         Bug48839Client client = new Bug48839Client();

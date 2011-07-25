@@ -19,14 +19,21 @@ package org.apache.coyote.http11;
 import java.io.File;
 import java.io.IOException;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
+import org.junit.Test;
+
 import org.apache.catalina.Context;
 import org.apache.catalina.startup.SimpleHttpClient;
 import org.apache.catalina.startup.TesterServlet;
 import org.apache.catalina.startup.Tomcat;
-import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.catalina.startup.TomcatBaseTestJUnit4;
 
-public class TestAbstractHttp11Processor extends TomcatBaseTest {
+public class TestAbstractHttp11Processor extends TomcatBaseTestJUnit4 {
 
+    @Test
     public void testWithTEVoid() throws Exception {
         Tomcat tomcat = getTomcatInstance();
         
@@ -55,6 +62,7 @@ public class TestAbstractHttp11Processor extends TomcatBaseTest {
         assertTrue(client.isResponse501());
     }
 
+    @Test
     public void testWithTEBuffered() throws Exception {
         Tomcat tomcat = getTomcatInstance();
         
@@ -84,6 +92,7 @@ public class TestAbstractHttp11Processor extends TomcatBaseTest {
     }
 
 
+    @Test
     public void testWithTEIdentity() throws Exception {
         Tomcat tomcat = getTomcatInstance();
         
@@ -115,6 +124,7 @@ public class TestAbstractHttp11Processor extends TomcatBaseTest {
     }
 
 
+    @Test
     public void testWithTESavedRequest() throws Exception {
         Tomcat tomcat = getTomcatInstance();
         
@@ -144,6 +154,7 @@ public class TestAbstractHttp11Processor extends TomcatBaseTest {
     }
 
 
+    @Test
     public void testWithTEUnsupported() throws Exception {
         Tomcat tomcat = getTomcatInstance();
         
@@ -173,6 +184,7 @@ public class TestAbstractHttp11Processor extends TomcatBaseTest {
     }
 
 
+    @Test
     public void testPipelining() throws Exception {
         Tomcat tomcat = getTomcatInstance();
         

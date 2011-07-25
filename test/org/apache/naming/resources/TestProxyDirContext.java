@@ -18,20 +18,25 @@ package org.apache.naming.resources;
 
 import javax.naming.NameNotFoundException;
 
+import static org.junit.Assert.fail;
+
+import org.junit.Test;
+
 import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.startup.Tomcat;
-import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.catalina.startup.TomcatBaseTestJUnit4;
 
 /**
  * Unit test for the {@link ProxyDirContext}.
  * @author Marc Guillemot
  * @version $Revision: $
  */
-public class TestProxyDirContext extends TomcatBaseTest {
+public class TestProxyDirContext extends TomcatBaseTestJUnit4 {
 
     /**
      * lookup doesn't always throw the same exception.
      */
+    @Test
     public void testLookupException() throws Exception {
         Tomcat tomcat = getTomcatInstance();
         
