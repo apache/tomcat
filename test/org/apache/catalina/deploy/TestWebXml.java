@@ -17,13 +17,16 @@
 
 package org.apache.catalina.deploy;
 
-import junit.framework.TestCase;
+import static org.junit.Assert.assertEquals;
+
+import org.junit.Test;
 
 /**
  * Test case for {@link WebXml}.
  */
-public class TestWebXml extends TestCase {
+public class TestWebXml {
 
+    @Test
     public void testParseVersion() {
         
         WebXml webxml = new WebXml();
@@ -70,7 +73,8 @@ public class TestWebXml extends TestCase {
         assertEquals(2, webxml.getMajorVersion());
         assertEquals(500, webxml.getMinorVersion());
     }
-    
+
+    @Test
     public void testParsePublicIdVersion22() {
         
         WebXml webxml = new WebXml();
@@ -82,6 +86,7 @@ public class TestWebXml extends TestCase {
         assertEquals("2.2", webxml.getVersion());
     }
 
+    @Test
     public void testParsePublicIdVersion23() {
         
         WebXml webxml = new WebXml();
@@ -93,6 +98,7 @@ public class TestWebXml extends TestCase {
         assertEquals("2.3", webxml.getVersion());
     }
 
+    @Test
     public void testParsePublicIdVersion24() {
         
         WebXml webxml = new WebXml();
@@ -104,6 +110,7 @@ public class TestWebXml extends TestCase {
         assertEquals("2.4", webxml.getVersion());
     }
 
+    @Test
     public void testParsePublicIdVersion25() {
         
         WebXml webxml = new WebXml();
@@ -115,6 +122,7 @@ public class TestWebXml extends TestCase {
         assertEquals("2.5", webxml.getVersion());
     }
 
+    @Test
     public void testParsePublicIdVersion30() {
         
         WebXml webxml = new WebXml();
