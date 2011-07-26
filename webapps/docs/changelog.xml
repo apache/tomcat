@@ -158,6 +158,9 @@
         <bug>51531</bug>: Update sample Eclipse classpath file to reflect
         updated ECJ jar. Patch provided by Ian Brandt. (markt)
       </fix>
+      <update>
+        Converted Tomcat unit tests to JUnit 4. (kkolinko)
+      </update>
     </changelog>
   </subsection>
 </section>
