@@ -14,8 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.catalina;
 
 
@@ -28,35 +26,38 @@ package org.apache.catalina;
  * The valid state transitions for components that support {@link Lifecycle}
  * are:
  * <pre>
- *    init()
- * NEW ->-- INITIALIZING
- * |||           |                  --------------------<-----------------------
- * |||           |auto              |                                          |
- * |||          \|/    start()     \|/       auto          auto         stop() |
- * |||      INITIALIZED -->-- STARTING_PREP -->- STARTING -->- STARTED -->---  |
- * |||                              ^                             |         |  |
- * |||        start()               |                             |         |  |
- * ||----------->--------------------                             |         |  |
- * ||                                                             |         |  |
- * |---                auto                    auto               |         |  |
- * |  |          ---------<----- MUST_STOP ---------------------<--         |  |
- * |  |          |                                                          |  |
- * |  |          ---------------------------<--------------------------------  ^
- * |  |          |                                                             |
- * |  |         \|/            auto                 auto              start()  |
- * |  |     STOPPING_PREP ------>----- STOPPING ------>----- STOPPED ---->------
- * |  |                                   ^                  |  |  ^
- * |  |                  stop()           |                  |  |  |
- * |  |          --------------------------                  |  |  |
- * |  |          |                                  auto     |  |  |
- * |  |          |                  MUST_DESTROY------<-------  |  |
- * |  |          |                    |                         |  |
- * |  |          |                    |auto                     |  |
- * |  |          |    destroy()      \|/              destroy() |  |
- * |  |       FAILED ---->------ DESTROYING ---<-----------------  |
- * |  |                           ^     |                          |
- * |  |        destroy()          |     |auto                      |
- * |  -----------------------------    \|/                         |
+ *            start()
+ *  -----------------------------
+ *  |                           |
+ *  | init()                    |
+ * NEW ->-- INITIALIZING        |
+ * | |           |              |     ------------------<-----------------------
+ * | |           |auto          |     |                                        |
+ * | |          \|/    start() \|/   \|/     auto          auto         stop() |
+ * | |      INITIALIZED -->-- STARTING_PREP -->- STARTING -->- STARTED -->---  |
+ * | |         |                                                  |         |  |
+ * | |         |                                                  |         |  |
+ * | |         |                                                  |         |  |
+ * | |destroy()|                                                  |         |  |
+ * | -->-----<--       auto                    auto               |         |  |
+ * |     |       ---------<----- MUST_STOP ---------------------<--         |  |
+ * |     |       |                                                          |  |
+ * |    \|/      ---------------------------<--------------------------------  ^
+ * |     |       |                                                             |
+ * |     |      \|/            auto                 auto              start()  |
+ * |     |  STOPPING_PREP ------>----- STOPPING ------>----- STOPPED ---->------
+ * |     |                                ^                  |  |  ^
+ * |     |               stop()           |                  |  |  |
+ * |     |       --------------------------                  |  |  |
+ * |     |       |                                  auto     |  |  |
+ * |     |       |                  MUST_DESTROY------<-------  |  |
+ * |     |       |                    |                         |  |
+ * |     |       |                    |auto                     |  |
+ * |     |       |    destroy()      \|/              destroy() |  |
+ * |     |    FAILED ---->------ DESTROYING ---<-----------------  |
+ * |     |                        ^     |                          |
+ * |     |     destroy()          |     |auto                      |
+ * |     -------->-----------------    \|/                         |
  * |                                 DESTROYED                     |
  * |                                                               |
  * |                            stop()                             |
@@ -93,7 +94,8 @@ package org.apache.catalina;
  * methods that trigger the changed. No {@link LifecycleEvent}s are fired if the
  * attempted transition is not valid.
  * 
- * TODO: Not all components may transition from STOPPED to STARTING_PREP
+ * TODO: Not all components may transition from STOPPED to STARTING_PREP. These
+ *       components should use MUST_DESTROY to signal this.
  *
  * @author Craig R. McClanahan
  * @version $Id$
