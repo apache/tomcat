@@ -16,24 +16,26 @@
  */
 package org.apache.catalina.tribes.group.interceptors;
 
-import junit.framework.TestCase;
-import junit.framework.TestResult;
-import junit.framework.TestSuite;
+import static org.junit.Assert.assertEquals;
+
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 import org.apache.catalina.tribes.Channel;
 import org.apache.catalina.tribes.Member;
 import org.apache.catalina.tribes.group.GroupChannel;
 
-public class TestNonBlockingCoordinator extends TestCase {
+public class TestNonBlockingCoordinator {
 
-    GroupChannel[] channels = null;
-    NonBlockingCoordinator[] coordinators = null;
-    int channelCount = 10;
-    Thread[] threads = null;
-    @Override
-    protected void setUp() throws Exception {
+    private GroupChannel[] channels = null;
+    private NonBlockingCoordinator[] coordinators = null;
+    private int channelCount = 10;
+    private Thread[] threads = null;
+
+    @Before
+    public void setUp() throws Exception {
         System.out.println("Setup");
-        super.setUp();
         channels = new GroupChannel[channelCount];
         coordinators = new NonBlockingCoordinator[channelCount];
         threads = new Thread[channelCount];
@@ -59,7 +61,8 @@ public class TestNonBlockingCoordinator extends TestCase {
         for ( int i=0; i<channelCount; i++ ) threads[i].join();
         Thread.sleep(1000);
     }
-    
+
+    @Test
     public void testCoord1() throws Exception {
         for (int i=1; i<channelCount; i++ ) 
             assertEquals("Message count expected to be equal.",channels[i-1].getMembers().length,channels[i].getMembers().length);
@@ -70,7 +73,8 @@ public class TestNonBlockingCoordinator extends TestCase {
         System.out.println("Coordinator[1] is:"+member);
         
     }
-    
+
+    @Test
     public void testCoord2() throws Exception {
         Member member = coordinators[1].getCoordinator();
         System.out.println("Coordinator[2a] is:" + member);
@@ -91,19 +95,16 @@ public class TestNonBlockingCoordinator extends TestCase {
         System.out.println("Coordinator[2b] is:" + member);
     }
 
-    @Override
-    protected void tearDown() throws Exception {
+    @After
+    public void tearDown() throws Exception {
         System.out.println("tearDown");
-        super.tearDown();
         for ( int i=0; i<channelCount; i++ ) {
             channels[i].stop(Channel.DEFAULT);
         }
     }
-    
+
     public static void main(String[] args) throws Exception {
-        TestSuite suite = new TestSuite();
-        suite.addTestSuite(TestNonBlockingCoordinator.class);
-        suite.run(new TestResult());
+        org.junit.runner.JUnitCore.main(TestNonBlockingCoordinator.class.getName());
     }
 
 

@@ -18,7 +18,12 @@ package org.apache.catalina.tribes.group.interceptors;
 
 import java.util.ArrayList;
 
-import junit.framework.TestCase;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 import org.apache.catalina.tribes.ByteMessage;
 import org.apache.catalina.tribes.Channel;
@@ -38,16 +43,16 @@ import org.apache.catalina.tribes.group.GroupChannel;
  * @author not attributable
  * @version 1.0
  */
-public class TestTcpFailureDetector extends TestCase {
+public class TestTcpFailureDetector {
     private TcpFailureDetector tcpFailureDetector1 = null;
     private TcpFailureDetector tcpFailureDetector2 = null;
     private ManagedChannel channel1 = null;
     private ManagedChannel channel2 = null;
     private TestMbrListener mbrlist1 = null;
     private TestMbrListener mbrlist2 = null;
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
+
+    @Before
+    public void setUp() throws Exception {
         channel1 = new GroupChannel();
         channel2 = new GroupChannel();
         channel1.getMembershipService().setPayload("Channel-1".getBytes("ASCII"));
@@ -66,7 +71,8 @@ public class TestTcpFailureDetector extends TestCase {
         mbrlist1.members.clear();
         mbrlist2.members.clear();
     }
-    
+
+    @Test
     public void testTcpSendFailureMemberDrop() throws Exception {
         System.out.println("testTcpSendFailureMemberDrop()");
         clear();
@@ -78,7 +84,7 @@ public class TestTcpFailureDetector extends TestCase {
         ByteMessage msg = new ByteMessage(new byte[1024]);
         try {
             channel1.send(channel1.getMembers(), msg, 0);
-            assertEquals("Message send should have failed.",true,false);
+            fail("Message send should have failed.");
         } catch ( ChannelException x ) {
             // Ignore
         }
@@ -86,7 +92,8 @@ public class TestTcpFailureDetector extends TestCase {
         channel1.stop(Channel.DEFAULT);
         channel2.stop(Channel.DEFAULT);
     }
-    
+
+    @Test
     public void testTcpFailureMemberAdd() throws Exception {
         System.out.println("testTcpFailureMemberAdd()");
         clear();
@@ -102,6 +109,7 @@ public class TestTcpFailureDetector extends TestCase {
         channel2.stop(Channel.DEFAULT);
     }
 
+    @Test
     public void testTcpMcastFail() throws Exception {
         System.out.println("testTcpMcastFail()");
         clear();
@@ -116,22 +124,20 @@ public class TestTcpFailureDetector extends TestCase {
             assertEquals("Expecting member count to be equal",mbrlist1.members.size(),mbrlist2.members.size());
             channel1.send(channel1.getMembers(), msg, 0);
         } catch ( ChannelException x ) {
-            assertEquals("Message send should have succeeded.",true,false);
+            fail("Message send should have succeeded.");
         }
         channel1.stop(Channel.DEFAULT);
         channel2.stop(Channel.DEFAULT);
     }
 
-
-    @Override
-    protected void tearDown() throws Exception {
+    @After
+    public void tearDown() throws Exception {
         tcpFailureDetector1 = null;
         tcpFailureDetector2 = null;
         try { channel1.stop(Channel.DEFAULT);}catch (Exception ignore){ /* Ignore */ }
         channel1 = null;
         try { channel2.stop(Channel.DEFAULT);}catch (Exception ignore){ /* Ignore */ }
         channel2 = null;
-        super.tearDown();
     }
     
     public static class TestMbrListener implements MembershipListener {

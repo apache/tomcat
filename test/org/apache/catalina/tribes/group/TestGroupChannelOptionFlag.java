@@ -16,7 +16,12 @@
  */
 package org.apache.catalina.tribes.group;
 
-import junit.framework.TestCase;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 import org.apache.catalina.tribes.Channel;
 import org.apache.catalina.tribes.ChannelException;
@@ -32,22 +37,21 @@ import org.apache.catalina.tribes.ChannelInterceptor;
  * @author not attributable
  * @version 1.0
  */
-public class TestGroupChannelOptionFlag extends TestCase {
-    GroupChannel channel = null;
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
+public class TestGroupChannelOptionFlag {
+    private GroupChannel channel = null;
+
+    @Before
+    public void setUp() throws Exception {
         channel = new GroupChannel();
     }
 
-    @Override
-    protected void tearDown() throws Exception {
-        super.tearDown();
+    @After
+    public void tearDown() throws Exception {
         if ( channel != null ) try {channel.stop(Channel.DEFAULT);}catch ( Exception ignore) { /* Ignore */ }
         channel = null;
     }
-    
-    
+
+    @Test
     public void testOptionConflict() throws Exception {
         boolean error = false;
         channel.setOptionCheck(true);
@@ -62,9 +66,10 @@ public class TestGroupChannelOptionFlag extends TestCase {
         }catch ( ChannelException x ) {
             if ( x.getMessage().indexOf("option flag conflict") >= 0 ) error = true;
         }
-        assertEquals(true,error);
+        assertTrue(error);
     }
 
+    @Test
     public void testOptionNoConflict() throws Exception {
         boolean error = false;
         channel.setOptionCheck(true);
@@ -82,7 +87,7 @@ public class TestGroupChannelOptionFlag extends TestCase {
         }catch ( ChannelException x ) {
             if ( x.getMessage().indexOf("option flag conflict") >= 0 ) error = true;
         }
-        assertEquals(false,error);
+        assertFalse(error);
     }
     
     public static class TestInterceptor extends ChannelInterceptorBase {
