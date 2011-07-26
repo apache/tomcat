@@ -168,7 +168,10 @@
         updated ECJ jar. Patch provided by Ian Brandt. (markt)
       </fix>
       <update>
-        Converted Tomcat unit tests to JUnit 4. (kkolinko)
+        Convert Tomcat unit tests to JUnit 4. (kkolinko)
+      </update>
+      <update>
+        Update optional CheckStyle library to 5.4. (kkolinko)
       </update>
     </changelog>
   </subsection>
