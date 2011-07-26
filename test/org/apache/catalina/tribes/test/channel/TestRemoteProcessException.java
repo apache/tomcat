@@ -21,7 +21,11 @@ import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Random;
 
-import junit.framework.TestCase;
+import static org.junit.Assert.assertEquals;
+
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 import org.apache.catalina.tribes.Channel;
 import org.apache.catalina.tribes.ChannelListener;
@@ -38,14 +42,14 @@ import org.apache.catalina.tribes.group.GroupChannel;
  * @author not attributable
  * @version 1.0
  */
-public class TestRemoteProcessException extends TestCase {
-    int msgCount = 10000;
-    GroupChannel channel1;
-    GroupChannel channel2;
-    Listener listener1;
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
+public class TestRemoteProcessException {
+    private int msgCount = 10000;
+    private GroupChannel channel1;
+    private GroupChannel channel2;
+    private Listener listener1;
+
+    @Before
+    public void setUp() throws Exception {
         channel1 = new GroupChannel();
         channel2 = new GroupChannel();
         listener1 = new Listener();
@@ -54,13 +58,13 @@ public class TestRemoteProcessException extends TestCase {
         channel2.start(Channel.DEFAULT);
     }
 
-    @Override
-    protected void tearDown() throws Exception {
-        super.tearDown();
+    @After
+    public void tearDown() throws Exception {
         channel1.stop(Channel.DEFAULT);
         channel2.stop(Channel.DEFAULT);
     }
 
+    @Test
     public void testDataSendSYNCACK() throws Exception {
         System.err.println("Starting SYNC_ACK");
         int errC=0, nerrC=0;

@@ -22,7 +22,11 @@ import java.util.Random;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
-import junit.framework.TestCase;
+import static org.junit.Assert.assertEquals;
+
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 import org.apache.catalina.tribes.Channel;
 import org.apache.catalina.tribes.ChannelListener;
@@ -38,16 +42,18 @@ import org.apache.catalina.tribes.transport.ReplicationTransmitter;
 
 /**
  */
-public class TestMulticastPackages extends TestCase {
-    int msgCount = 500;
-    int threadCount = 20;
-    GroupChannel channel1;
-    GroupChannel channel2;
-    Listener listener1;
-    int threadCounter = 0;
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
+public class TestMulticastPackages {
+    private int msgCount = 500;
+    private int threadCount = 20;
+    private GroupChannel channel1;
+    private GroupChannel channel2;
+    private Listener listener1;
+
+    @SuppressWarnings("unused")
+    private int threadCounter = 0;
+
+    @Before
+    public void setUp() throws Exception {
         channel1 = new GroupChannel();
         channel1.addInterceptor(new MessageDispatch15Interceptor());
         channel2 = new GroupChannel();
@@ -68,13 +74,13 @@ public class TestMulticastPackages extends TestCase {
         channel2.start(Channel.DEFAULT);
     }
 
-    @Override
-    protected void tearDown() throws Exception {
-        super.tearDown();
+    @After
+    public void tearDown() throws Exception {
         channel1.stop(Channel.DEFAULT);
         channel2.stop(Channel.DEFAULT);
     }
 
+    @Test
     public void testSingleDataSendNO_ACK() throws Exception {
         AbstractSender s1 =(AbstractSender) ((ReplicationTransmitter)channel1.getChannelSender()).getTransport();
         AbstractSender s2 =(AbstractSender) ((ReplicationTransmitter)channel2.getChannelSender()).getTransport();
@@ -96,6 +102,7 @@ public class TestMulticastPackages extends TestCase {
         System.out.println();
     }
 
+    @Test
     public void testDataSendASYNCM() throws Exception {
         final AtomicInteger counter = new AtomicInteger(0);
         ReceiverBase rb1 = (ReceiverBase)channel1.getChannelReceiver();
@@ -138,6 +145,8 @@ public class TestMulticastPackages extends TestCase {
         printMissingMsgs(listener1.nrs,counter.get());
         assertEquals("Checking success messages.",msgCount*threadCount,listener1.count.get());
     }
+
+    @Test
     public void testDataSendASYNC() throws Exception {
         System.err.println("Starting ASYNC");
         for (int i=0; i<msgCount; i++) channel1.send(new Member[] {channel2.getLocalMember(false)},Data.createRandomData(1024),Channel.SEND_OPTIONS_ASYNCHRONOUS|Channel.SEND_OPTIONS_MULTICAST);
@@ -148,6 +157,7 @@ public class TestMulticastPackages extends TestCase {
         assertEquals("Checking success messages.",msgCount,listener1.count.get());
     }
 
+    @Test
     public void testDataSendACK() throws Exception {
         System.err.println("Starting ACK");
         for (int i=0; i<msgCount; i++) channel1.send(new Member[] {channel2.getLocalMember(false)},Data.createRandomData(1024),Channel.SEND_OPTIONS_USE_ACK|Channel.SEND_OPTIONS_MULTICAST);
@@ -156,6 +166,7 @@ public class TestMulticastPackages extends TestCase {
         assertEquals("Checking success messages.",msgCount,listener1.count.get());
     }
 
+    @Test
     public void testDataSendSYNCACK() throws Exception {
         System.err.println("Starting SYNC_ACK");
         for (int i=0; i<msgCount; i++) channel1.send(new Member[] {channel2.getLocalMember(false)},Data.createRandomData(1024),Channel.SEND_OPTIONS_SYNCHRONIZED_ACK|Channel.SEND_OPTIONS_USE_ACK|Channel.SEND_OPTIONS_MULTICAST);

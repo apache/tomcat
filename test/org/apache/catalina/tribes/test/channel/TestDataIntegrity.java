@@ -20,7 +20,11 @@ import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Random;
 
-import junit.framework.TestCase;
+import static org.junit.Assert.assertEquals;
+
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 import org.apache.catalina.tribes.Channel;
 import org.apache.catalina.tribes.ChannelListener;
@@ -38,16 +42,18 @@ import org.apache.catalina.tribes.group.interceptors.MessageDispatch15Intercepto
  * @author not attributable
  * @version 1.0
  */
-public class TestDataIntegrity extends TestCase {
-    int msgCount = 500;
-    int threadCount = 20;
-    GroupChannel channel1;
-    GroupChannel channel2;
-    Listener listener1;
-    int threadCounter = 0;
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
+public class TestDataIntegrity {
+    private int msgCount = 500;
+    private int threadCount = 20;
+    private GroupChannel channel1;
+    private GroupChannel channel2;
+    private Listener listener1;
+
+    @SuppressWarnings("unused")
+    private int threadCounter = 0;
+
+    @Before
+    public void setUp() throws Exception {
         channel1 = new GroupChannel();
         channel1.addInterceptor(new MessageDispatch15Interceptor());
         channel2 = new GroupChannel();
@@ -58,13 +64,13 @@ public class TestDataIntegrity extends TestCase {
         channel2.start(Channel.DEFAULT);
     }
 
-    @Override
-    protected void tearDown() throws Exception {
-        super.tearDown();
+    @After
+    public void tearDown() throws Exception {
         channel1.stop(Channel.DEFAULT);
         channel2.stop(Channel.DEFAULT);
     }
 
+    @Test
     public void testDataSendNO_ACK() throws Exception {
         System.err.println("Starting NO_ACK");
         Thread[] threads = new Thread[threadCount];
@@ -94,6 +100,7 @@ public class TestDataIntegrity extends TestCase {
         assertEquals("Checking success messages.",msgCount*threadCount,listener1.count);
     }
 
+    @Test
     public void testDataSendASYNCM() throws Exception {
             System.err.println("Starting ASYNC MULTI THREAD");
             Thread[] threads = new Thread[threadCount];
@@ -122,6 +129,8 @@ public class TestDataIntegrity extends TestCase {
             System.err.println("Finished ASYNC MULTI THREAD ["+listener1.count+"]");
             assertEquals("Checking success messages.",msgCount*threadCount,listener1.count);
     }
+
+    @Test
     public void testDataSendASYNC() throws Exception {
         System.err.println("Starting ASYNC");
         for (int i=0; i<msgCount; i++) channel1.send(new Member[] {channel2.getLocalMember(false)},Data.createRandomData(),Channel.SEND_OPTIONS_ASYNCHRONOUS);
@@ -132,6 +141,7 @@ public class TestDataIntegrity extends TestCase {
         assertEquals("Checking success messages.",msgCount,listener1.count);
     }
 
+    @Test
     public void testDataSendACK() throws Exception {
         System.err.println("Starting ACK");
         for (int i=0; i<msgCount; i++) channel1.send(new Member[] {channel2.getLocalMember(false)},Data.createRandomData(),Channel.SEND_OPTIONS_USE_ACK);
@@ -140,6 +150,7 @@ public class TestDataIntegrity extends TestCase {
         assertEquals("Checking success messages.",msgCount,listener1.count);
     }
 
+    @Test
     public void testDataSendSYNCACK() throws Exception {
         System.err.println("Starting SYNC_ACK");
         for (int i=0; i<msgCount; i++) channel1.send(new Member[] {channel2.getLocalMember(false)},Data.createRandomData(),Channel.SEND_OPTIONS_SYNCHRONIZED_ACK|Channel.SEND_OPTIONS_USE_ACK);
