@@ -274,7 +274,8 @@ public abstract class LifecycleBase implements Lifecycle {
         
         if (!state.equals(LifecycleState.STOPPED) &&
                 !state.equals(LifecycleState.FAILED) &&
-                !state.equals(LifecycleState.NEW)) {
+                !state.equals(LifecycleState.NEW) &&
+                !state.equals(LifecycleState.INITIALIZED)) {
             invalidTransition(Lifecycle.BEFORE_DESTROY_EVENT);
         }
 

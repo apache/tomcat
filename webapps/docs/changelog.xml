@@ -86,6 +86,10 @@
         Authenticators, now return a 500 response rather than a 200 response.
         (markt)
       </fix>
+      <fix>
+        <bug>51555</bug>: Allow destroy() to be called on Lifecycle components
+        that are in the initialized state. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
