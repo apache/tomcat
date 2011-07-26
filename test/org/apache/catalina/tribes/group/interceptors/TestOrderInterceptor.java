@@ -21,9 +21,12 @@ import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import junit.framework.TestCase;
-import junit.framework.TestResult;
-import junit.framework.TestSuite;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.fail;
+
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 import org.apache.catalina.tribes.Channel;
 import org.apache.catalina.tribes.ChannelException;
@@ -34,7 +37,7 @@ import org.apache.catalina.tribes.group.ChannelInterceptorBase;
 import org.apache.catalina.tribes.group.GroupChannel;
 import org.apache.catalina.tribes.group.InterceptorPayload;
 
-public class TestOrderInterceptor extends TestCase {
+public class TestOrderInterceptor {
 
     GroupChannel[] channels = null;
     OrderInterceptor[] orderitcs = null;
@@ -42,10 +45,10 @@ public class TestOrderInterceptor extends TestCase {
     TestListener[] test = null;
     int channelCount = 2;
     Thread[] threads = null;
-    @Override
-    protected void setUp() throws Exception {
+
+    @Before
+    public void setUp() throws Exception {
         System.out.println("Setup");
-        super.setUp();
         channels = new GroupChannel[channelCount];
         orderitcs = new OrderInterceptor[channelCount];
         mangleitcs = new MangleOrderInterceptor[channelCount];
@@ -78,7 +81,8 @@ public class TestOrderInterceptor extends TestCase {
         for ( int i=0; i<channelCount; i++ ) threads[i].join();
         Thread.sleep(1000);
     }
-    
+
+    @Test
     public void testOrder1() throws Exception {
         Member[] dest = channels[0].getMembers();
         final AtomicInteger value = new AtomicInteger(0);
@@ -87,10 +91,11 @@ public class TestOrderInterceptor extends TestCase {
         }
         Thread.sleep(5000);
         for ( int i=0; i<test.length; i++ ) {
-            assertEquals(false,test[i].fail);
+            assertFalse(test[i].fail);
         }
     }
-    
+
+    @Test
     public void testOrder2() throws Exception {
         final Member[] dest = channels[0].getMembers();
         final AtomicInteger value = new AtomicInteger(0);
@@ -125,24 +130,20 @@ public class TestOrderInterceptor extends TestCase {
         }
         Thread.sleep(5000);
         for ( int i=0; i<test.length; i++ ) {
-            assertEquals(false,test[i].fail);
+            assertFalse(test[i].fail);
         }
     }
 
-
-    @Override
-    protected void tearDown() throws Exception {
+    @After
+    public void tearDown() throws Exception {
         System.out.println("tearDown");
-        super.tearDown();
         for ( int i=0; i<channelCount; i++ ) {
             channels[i].stop(Channel.DEFAULT);
         }
     }
-    
-    public static void main(String[] args) throws Exception {
-        TestSuite suite = new TestSuite();
-        suite.addTestSuite(TestOrderInterceptor.class);
-        suite.run(new TestResult());
+
+    public static void main(String[] args) {
+        org.junit.runner.JUnitCore.main(TestOrderInterceptor.class.getName());
     }
     
     public static class TestListener implements ChannelListener {

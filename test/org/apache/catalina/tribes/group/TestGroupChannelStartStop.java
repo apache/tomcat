@@ -16,7 +16,11 @@
  */
 package org.apache.catalina.tribes.group;
 
-import junit.framework.TestCase;
+import static org.junit.Assert.assertEquals;
+
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 import org.apache.catalina.tribes.Channel;
 import org.apache.catalina.tribes.transport.ReceiverBase;
@@ -25,21 +29,21 @@ import org.apache.catalina.tribes.transport.ReceiverBase;
  * @author Filip Hanik
  * @version 1.0
  */
-public class TestGroupChannelStartStop extends TestCase {
-    GroupChannel channel = null;
-    int udpPort = 45543;
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
+public class TestGroupChannelStartStop {
+    private GroupChannel channel = null;
+    private int udpPort = 45543;
+
+    @Before
+    public void setUp() throws Exception {
         channel = new GroupChannel();
     }
 
-    @Override
-    protected void tearDown() throws Exception {
-        super.tearDown();
+    @After
+    public void tearDown() throws Exception {
         try {channel.stop(Channel.DEFAULT);}catch (Exception ignore){ /* Ignore */ }
     }
 
+    @Test
     public void testDoubleFullStart() throws Exception {
         int count = 0;
         try {
@@ -54,12 +58,13 @@ public class TestGroupChannelStartStop extends TestCase {
         channel.stop(Channel.DEFAULT);
     }
 
+    @Test
     public void testScrap() throws Exception {
         System.out.println(channel.getChannelReceiver().getClass());
         ((ReceiverBase)channel.getChannelReceiver()).setMaxThreads(1);
     }
 
-
+    @Test
     public void testDoublePartialStart() throws Exception {
         //try to double start the RX
         int count = 0;
@@ -113,6 +118,7 @@ public class TestGroupChannelStartStop extends TestCase {
         channel.stop(Channel.DEFAULT);
     }
 
+    @Test
     public void testFalseOption() throws Exception {
         int flag = 0xFFF0;//should get ignored by the underlying components
         int count = 0;
@@ -128,6 +134,7 @@ public class TestGroupChannelStartStop extends TestCase {
         channel.stop(Channel.DEFAULT);
     }
 
+    @Test
     public void testUdpReceiverStart() throws Exception {
         ReceiverBase rb = (ReceiverBase)channel.getChannelReceiver();
         rb.setUdpPort(udpPort);

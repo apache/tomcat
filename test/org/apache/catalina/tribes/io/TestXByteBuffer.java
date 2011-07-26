@@ -16,15 +16,21 @@
  */
 package org.apache.catalina.tribes.io;
 
-import junit.framework.TestCase;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
-public class TestXByteBuffer extends TestCase {
+import org.junit.Test;
 
+public class TestXByteBuffer {
+
+    @Test
     public void testEmptyArray() throws Exception {
         Object obj = XByteBuffer.deserialize(new byte[0]);
         assertNull(obj);
     }
 
+    @Test
     public void testSerializationString() throws Exception {
         String test = "This is as test.";
         byte[] msg = XByteBuffer.serialize(test);

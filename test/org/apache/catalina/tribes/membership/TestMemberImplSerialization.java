@@ -18,7 +18,11 @@ package org.apache.catalina.tribes.membership;
 
 import java.util.Arrays;
 
-import junit.framework.TestCase;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * <p>Title: </p>
@@ -30,13 +34,13 @@ import junit.framework.TestCase;
  * @author not attributable
  * @version 1.0
  */
-public class TestMemberImplSerialization extends TestCase {
-    MemberImpl m1, m2, p1,p2;
-    byte[] payload = null;
-    int udpPort = 3445;
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
+public class TestMemberImplSerialization {
+    private MemberImpl m1, m2, p1,p2;
+    private byte[] payload = null;
+    private int udpPort = 3445;
+
+    @Before
+    public void setUp() throws Exception {
         payload = new byte[333];
         Arrays.fill(payload,(byte)1);
         m1 = new MemberImpl("localhost",3333,1,payload);
@@ -52,7 +56,8 @@ public class TestMemberImplSerialization extends TestCase {
         m1.setUdpPort(udpPort);
         m2.setUdpPort(m1.getUdpPort());
     }
-    
+
+    @Test
     public void testCompare() throws Exception {
         assertTrue(m1.equals(m2));
         assertTrue(m2.equals(m1));
@@ -62,7 +67,8 @@ public class TestMemberImplSerialization extends TestCase {
         assertFalse(m2.equals(p2));
         assertFalse(p1.equals(p2));
     }
-    
+
+    @Test
     public void testUdpPort() throws Exception {
         byte[] md1 = m1.getData();
         byte[] md2 = m2.getData();
@@ -70,10 +76,11 @@ public class TestMemberImplSerialization extends TestCase {
         MemberImpl a1 = MemberImpl.getMember(md1);
         MemberImpl a2 = MemberImpl.getMember(md2);
         
-        assertEquals(true, a1.getUdpPort()==a2.getUdpPort());
-        assertEquals(true,a1.getUdpPort()==udpPort);
+        assertTrue(a1.getUdpPort()==a2.getUdpPort());
+        assertTrue(a1.getUdpPort()==udpPort);
     }
-    
+
+    @Test
     public void testSerializationOne() throws Exception {
         MemberImpl m = m1;
         byte[] md1 = m.getData(false,true);

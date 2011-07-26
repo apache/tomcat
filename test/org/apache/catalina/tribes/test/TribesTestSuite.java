@@ -16,9 +16,9 @@
  */
 package org.apache.catalina.tribes.test;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+import org.junit.runner.RunWith;
+import org.junit.runners.Suite;
+import org.junit.runners.Suite.SuiteClasses;
 
 import org.apache.catalina.tribes.group.TestGroupChannelMemberArrival;
 import org.apache.catalina.tribes.group.TestGroupChannelOptionFlag;
@@ -35,33 +35,19 @@ import org.apache.catalina.tribes.test.channel.TestMulticastPackages;
 import org.apache.catalina.tribes.test.channel.TestRemoteProcessException;
 import org.apache.catalina.tribes.test.channel.TestUdpPackages;
 
-public class TribesTestSuite
-    extends TestCase {
-
-    public TribesTestSuite(String s) {
-        super(s);
-    }
-
-    public static Test suite() {
-        TestSuite suite = new TestSuite();
+@RunWith(Suite.class)
+@SuiteClasses({
         // o.a.catalina.tribes.test.channel
-        suite.addTestSuite(TestGroupChannelStartStop.class);
-        suite.addTestSuite(TestGroupChannelOptionFlag.class);
-        suite.addTestSuite(TestDataIntegrity.class);
-        suite.addTestSuite(TestMulticastPackages.class);
-        suite.addTestSuite(TestRemoteProcessException.class);
-        suite.addTestSuite(TestUdpPackages.class);
+        TestGroupChannelStartStop.class, TestGroupChannelOptionFlag.class,
+        TestDataIntegrity.class, TestMulticastPackages.class,
+        TestRemoteProcessException.class, TestUdpPackages.class,
         // o.a.catalina.tribes.test.interceptors
-        suite.addTestSuite(TestNonBlockingCoordinator.class);
-        suite.addTestSuite(TestOrderInterceptor.class);
+        TestNonBlockingCoordinator.class, TestOrderInterceptor.class,
         // o.a.catalina.tribes.test.io
-        suite.addTestSuite(TestGroupChannelSenderConnections.class);
-        suite.addTestSuite(TestXByteBuffer.class);
+        TestGroupChannelSenderConnections.class, TestXByteBuffer.class,
         // o.a.catalina.tribes.test.membership
-        suite.addTestSuite(TestMemberImplSerialization.class);
-        suite.addTestSuite(TestDomainFilterInterceptor.class);
-        suite.addTestSuite(TestGroupChannelMemberArrival.class);
-        suite.addTestSuite(TestTcpFailureDetector.class);
-        return suite;
-    }
+        TestMemberImplSerialization.class, TestDomainFilterInterceptor.class,
+        TestGroupChannelMemberArrival.class, TestTcpFailureDetector.class })
+public class TribesTestSuite {
+
 }
