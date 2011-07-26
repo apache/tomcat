@@ -222,7 +222,7 @@
     <li><b>%v</b> - Local server name</li>
     <li><b>%D</b> - Time taken to process the request, in millis</li>
     <li><b>%T</b> - Time taken to process the request, in seconds</li>
-    <li><b>%I</b> - current request thread name (can compare later with stacktraces)</li>
+    <li><b>%I</b> - Current request thread name (can compare later with stacktraces)</li>
     </ul>
 
     <p>
@@ -411,6 +411,7 @@
     <li><b>sc-status</b> - HTTP status code of the response</li>
     <li><b>time</b> - Time the request was served in HH:mm:ss format for GMT</li>
     <li><b>time-taken</b> - Time (in seconds as floating point) taken to serve the request</li>
+    <li><b>x-threadname</b> - Current request thread name (can compare later with stacktraces)</li>
     </ul>
 
     <p>For any of the <code>x-H(XXX)</code> the following method will be called from the

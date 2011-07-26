@@ -64,6 +64,7 @@ import org.apache.tomcat.util.ExceptionUtils;
  * <li><code>sc-status</code>:  The status code</li>
  * <li><code>time</code>:  Time the request was served</li>
  * <li><code>time-taken</code>:  Time (in seconds) taken to serve the request</li>
+ * <li><code>x-threadname</code>: Current request thread name (can compare later with stacktraces)</li>
  * <li><code>x-A(XXX)</code>: Pull XXX attribute from the servlet context </li>
  * <li><code>x-C(XXX)</code>: Pull the first cookie of the name XXX </li>
  * <li><code>x-O(XXX)</code>: Pull the all response header values XXX </li>
@@ -745,6 +746,10 @@ public class ExtendedAccessLogValve extends AccessLogValve {
             return null;
         }
         String token = tokenizer.getToken();
+        if ("threadname".equals(token)) {
+            return new ThreadNameElement();
+        }
+
         if (!tokenizer.hasParameter()) {
             log.error("x param in wrong format. Needs to be 'x-#(...)' read the docs!");
             return null;
