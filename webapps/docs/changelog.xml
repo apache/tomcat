@@ -76,7 +76,7 @@
         &lt;others/&gt; tag when using absolute ordering. (markt)
       </fix>
       <add>
-        Move the SetCharacaterEncoding filter from the examples web application
+        Move the SetCharacterEncoding filter from the examples web application
         to the <code>org.apache.catalina.filters</code> package so it is
         available for all web applications. (markt)
       </add>
@@ -90,6 +90,11 @@
         <bug>51555</bug>: Allow destroy() to be called on Lifecycle components
         that are in the initialized state. (markt)
       </fix>
+      <add>
+        Add x-threadname pattern format token to ExtendedAccessLogValve to log
+        the current request thread name. Based on a patch from Felix Schumacher.
+        (timw)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
