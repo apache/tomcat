@@ -21,7 +21,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
 
-import junit.framework.TestCase;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 import org.apache.catalina.tribes.Channel;
 import org.apache.catalina.tribes.ChannelListener;
@@ -29,14 +31,13 @@ import org.apache.catalina.tribes.ManagedChannel;
 import org.apache.catalina.tribes.Member;
 import org.apache.catalina.tribes.transport.ReplicationTransmitter;
 
-public class TestGroupChannelSenderConnections extends TestCase {
+public class TestGroupChannelSenderConnections {
     private static int count = 2;
     private ManagedChannel[] channels = new ManagedChannel[count];
     private TestMsgListener[] listeners = new TestMsgListener[count];
 
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
+    @Before
+    public void setUp() throws Exception {
         for (int i = 0; i < channels.length; i++) {
             channels[i] = new GroupChannel();
             channels[i].getMembershipService().setPayload( ("Channel-" + (i + 1)).getBytes("ASCII"));
@@ -65,10 +66,12 @@ public class TestGroupChannelSenderConnections extends TestCase {
 
     }
 
+    @Test
     public void testConnectionLinger() throws Exception {
         sendMessages(0,15000);
     }
-    
+
+    @Test
     public void testKeepAliveCount() throws Exception {
         System.out.println("Setting keep alive count to 0");
         for (int i = 0; i < channels.length; i++) {
@@ -78,6 +81,7 @@ public class TestGroupChannelSenderConnections extends TestCase {
         sendMessages(1000,15000);
     }
 
+    @Test
     public void testKeepAliveTime() throws Exception {
         System.out.println("Setting keep alive count to 1 second");
         for (int i = 0; i < channels.length; i++) {
@@ -87,8 +91,8 @@ public class TestGroupChannelSenderConnections extends TestCase {
         sendMessages(2000,15000);
     }
 
-    @Override
-    protected void tearDown() throws Exception {
+    @After
+    public void tearDown() throws Exception {
         for (int i = 0; i < channels.length; i++) {
             channels[i].stop(Channel.DEFAULT);
         }
