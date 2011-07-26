@@ -31,7 +31,6 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 
 import org.apache.catalina.Context;
-import org.apache.catalina.connector.Connector;
 import org.apache.catalina.startup.SimpleHttpClient;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
@@ -40,53 +39,27 @@ public class TestInternalInputBuffer extends TomcatBaseTest {
     
     /**
      * Test case for https://issues.apache.org/bugzilla/show_bug.cgi?id=48839
-     * with BIO
      */
     @Test
-    public void testBug48839BIO() {
+    public void testBug48839() {
         
         Bug48839Client client = new Bug48839Client();
         client.setPort(getPort());
         
-        // BIO test
-        client.doRequest(false);
+        client.doRequest();
         assertTrue(client.isResponse200());
         assertTrue(client.isResponseBodyOK());
     }
 
     
     /**
-     * Test case for https://issues.apache.org/bugzilla/show_bug.cgi?id=48839
-     * with NIO
-     */
-    @Test
-    public void testBug48839NIO() {
-        
-        Bug48839Client client = new Bug48839Client();
-        client.setPort(getPort());
-        
-        // NIO test
-        client.doRequest(true);
-        assertTrue(client.isResponse200());
-        assertTrue(client.isResponseBodyOK());
-    }
-
-    /**
      * Bug 48839 test client.
      */
     private class Bug48839Client extends SimpleHttpClient {
                 
-        private Exception doRequest(boolean useNio) {
+        private Exception doRequest() {
         
             Tomcat tomcat = getTomcatInstance();
-            
-            if (useNio) {
-                Connector connector = 
-                    new Connector("org.apache.coyote.http11.Http11NioProtocol");
-                connector.setPort(getPort());
-                tomcat.getService().addConnector(connector);
-                tomcat.setConnector(connector);
-            }
             
             Context root = tomcat.addContext("", TEMP_DIR);
             Tomcat.addServlet(root, "Bug48839", new Bug48839Servlet());
