@@ -128,24 +128,11 @@ a img {
 }
 
 #asf-box {
-    padding: 0 20px;
-    margin: 0 0 20px;
-    text-align: left;
-}
-
-#version {
-    padding: 6px top left;
-    float: left;
-    width: 30%;
-}
-#version h2 {
+    height: 40px;
+    background: #fff url(asf-logo.png) no-repeat top right;}
+#asf-box h1 {
     padding: 0;
     margin: 0;
-}
-#upper-asf {
-    float: right;
-    width: 60%;
-    text-align: right;
 }
 
 #upper {
@@ -290,10 +277,10 @@ a img {
 #lower li {
     font-size: 9pt;
     color: #753;
-    margin: 0 0 0.25em;
+    margin: 0 0 0.1em;
 }
 #lower li {
-    padding: 5px;
+    padding: 3px 5px;
 }
 #lower li strong {
     color: #a53;
@@ -322,7 +309,7 @@ a img {
 #low-manage div,
 #low-docs div,
 #low-help div {
-    min-height: 300px;
+    min-height: 280px;
     border: 3px solid #ffdc75;
     background-color: #fff1c8;
     padding: 10px;
