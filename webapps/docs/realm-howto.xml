@@ -196,9 +196,7 @@ techniques are supported:</p>
     method will return the digested password.</li>
 <li>If you want to execute a command line utility to calculate the digested
     password, simply execute
-<source>
-java org.apache.catalina.realm.RealmBase \
-    -a {algorithm} {cleartext-password}
+<source>CATALINA_HOME/bin/digest.[bat|sh] -a {algorithm} {cleartext-password}
 </source>
     and the digested version of this cleartext password will be returned to
     standard output.</li>
@@ -215,19 +213,8 @@ java org.apache.catalina.realm.RealmBase \
    not specified in web.xml, the default value of <code>Authentication
    required</code> is used.</p>
 
-<p>To use either of the above techniques, the following jar files will need
-to be on your class path to make the <code>RealmBase</code> class available:
-</p>
-
-<ul>
-  <li>$CATALINA_HOME/bin/tomcat-juli.jar</li>
-  <li>$CATALINA_HOME/lib/catalina.jar</li>
-  <li>$CATALINA_HOME/lib/tomcat-util.jar</li>
-</ul>
-
 <p>Non-ASCII usernames and/or passwords are supported using
-<source>java org.apache.catalina.realm.RealmBase \
-    -a {algorithm} -e {encoding} {input}
+<source>CATALINA_HOME/bin/digest.[bat|sh] -a {algorithm} -e {encoding} {input}
 </source>
 but care is required to ensure that the non-ASCII input is
 correctly passed to the digester.

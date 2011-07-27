@@ -158,6 +158,11 @@
         the implications of setting the path attribute on a Context element in
         server.xml. (markt)
       </update>
+      <fix>
+        <bug>51561</bug>: Update the Realm page within the documentation web
+        application to recommend the use of digest.[bat|sh] to generate digests
+        rather than calling RealmBase directly. (markt) 
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
