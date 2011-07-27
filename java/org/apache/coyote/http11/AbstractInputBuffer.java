@@ -27,20 +27,7 @@ import org.apache.tomcat.util.res.StringManager;
 
 public abstract class AbstractInputBuffer implements InputBuffer{
 
-    public abstract boolean parseRequestLine(boolean useAvailableDataOnly) throws IOException;
-    
-    public abstract boolean parseHeaders() throws IOException;
-    
-    protected abstract boolean fill(boolean block) throws IOException; 
-
-    // -------------------------------------------------------------- Constants
-
-
-    // ----------------------------------------------------------- Constructors
-
-
-    // -------------------------------------------------------------- Variables
-
+    protected static final boolean[] HTTP_TOKEN_CHAR = new boolean[128];
 
     /**
      * The string manager for this package.
@@ -49,7 +36,55 @@ public abstract class AbstractInputBuffer implements InputBuffer{
         StringManager.getManager(Constants.Package);
 
 
-    // ----------------------------------------------------- Instance Variables
+    static {
+        for (int i = 0; i < 128; i++) {
+            if (i < 32) {
+                HTTP_TOKEN_CHAR[i] = false;
+            } else if (i == 127) {
+                HTTP_TOKEN_CHAR[i] = false;
+            } else if (i == '(') {
+                HTTP_TOKEN_CHAR[i] = false;
+            } else if (i == ')') {
+                HTTP_TOKEN_CHAR[i] = false;
+            } else if (i == '<') {
+                HTTP_TOKEN_CHAR[i] = false;
+            } else if (i == '>') {
+                HTTP_TOKEN_CHAR[i] = false;
+            } else if (i == '@') {
+                HTTP_TOKEN_CHAR[i] = false;
+            } else if (i == ',') {
+                HTTP_TOKEN_CHAR[i] = false;
+            } else if (i == ';') {
+                HTTP_TOKEN_CHAR[i] = false;
+            } else if (i == ':') {
+                HTTP_TOKEN_CHAR[i] = false;
+            } else if (i == '\\') {
+                HTTP_TOKEN_CHAR[i] = false;
+            } else if (i == '\"') {
+                HTTP_TOKEN_CHAR[i] = false;
+            } else if (i == '/') {
+                HTTP_TOKEN_CHAR[i] = false;
+            } else if (i == '[') {
+                HTTP_TOKEN_CHAR[i] = false;
+            } else if (i == ']') {
+                HTTP_TOKEN_CHAR[i] = false;
+            } else if (i == '?') {
+                HTTP_TOKEN_CHAR[i] = false;
+            } else if (i == '=') {
+                HTTP_TOKEN_CHAR[i] = false;
+            } else if (i == '{') {
+                HTTP_TOKEN_CHAR[i] = false;
+            } else if (i == '}') {
+                HTTP_TOKEN_CHAR[i] = false;
+            } else if (i == ' ') {
+                HTTP_TOKEN_CHAR[i] = false;
+            } else if (i == '\t') {
+                HTTP_TOKEN_CHAR[i] = false;
+            } else {
+                HTTP_TOKEN_CHAR[i] = true;
+            }
+        }
+    }
 
 
     /**
@@ -217,6 +252,13 @@ public abstract class AbstractInputBuffer implements InputBuffer{
     }
 
 
+    public abstract boolean parseRequestLine(boolean useAvailableDataOnly) throws IOException;
+    
+    public abstract boolean parseHeaders() throws IOException;
+    
+    protected abstract boolean fill(boolean block) throws IOException; 
+
+
     // --------------------------------------------------------- Public Methods
 
 
@@ -308,6 +350,4 @@ public abstract class AbstractInputBuffer implements InputBuffer{
             return activeFilters[lastActiveFilter].doRead(chunk,req);
 
     }
-
-    
 }
