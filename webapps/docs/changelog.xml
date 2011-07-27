@@ -142,6 +142,10 @@
         configuration page in the documentation web application. (markt)
       </fix>
       <fix>
+        <bug>49122</bug>: Improvements and fixes for index page for ROOT web
+        application. Based on a patch provided by pidster. (markt)
+      </fix>
+      <fix>
         <bug>51516</bug>: Correct documentation web application to show correct
         system property name for changing the name of the SSO session cookie.
         (markt)

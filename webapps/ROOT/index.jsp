@@ -21,6 +21,7 @@ java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy");
 request.setAttribute("year", sdf.format(new java.util.Date()));
 request.setAttribute("tomcat7Url", "http://tomcat.apache.org/");
 request.setAttribute("tomcat7DocUrl", "/docs/");
+request.setAttribute("tomcat7ExamplesUrl", "/examples/");
 %>
 <html lang="en">
     <head>
@@ -35,20 +36,15 @@ request.setAttribute("tomcat7DocUrl", "/docs/");
             <div id="navigation" class="curved container">
                 <span id="nav-home"><a href="${tomcat7Url}">Home</a></span>
                 <span id="nav-hosts"><a href="${tomcat7DocUrl}">Documentation</a></span>
-                <span id="nav-hosts"><a href="${tomcat7DocUrl}config/">Configuration</a></span>
+                <span id="nav-config"><a href="${tomcat7DocUrl}config/">Configuration</a></span>
+                <span id="nav-examples"><a href="${tomcat7ExamplesUrl}">Examples</a></span>
                 <span id="nav-wiki"><a href="http://wiki.apache.org/tomcat/FrontPage">Wiki</a></span>
                 <span id="nav-lists"><a href="${tomcat7Url}lists.html">Mailing Lists</a></span>
                 <span id="nav-help"><a href="${tomcat7Url}findhelp.html">Find Help</a></span>
                 <br class="separator" />
             </div>
             <div id="asf-box">
-                <div id="version">
-                    <h1><%=request.getServletContext().getServerInfo() %></h1>
-                </div>
-                <div id="upper-asf">
-                    <a href="http://www.apache.org/"><img src="asf-logo.png" /></a>
-                </div>
-                <br class="separator" />
+                <h1>${pageContext.servletContext.serverInfo}</h1>
             </div>
             <div id="upper" class="curved container">
                 <div id="congrats" class="curved container">
@@ -95,8 +91,8 @@ request.setAttribute("tomcat7DocUrl", "/docs/");
                 </div>
                 <div class="col25">
                     <div class="container">
-                        <p><a href="/examples/servlets/">Servlet Examples</a></p>
-                        <p><a href="/examples/jsp/">JSP Examples</a></p>
+                        <p><a href="${tomcat7ExamplesUrl}servlets/">Servlet Examples</a></p>
+                        <p><a href="${tomcat7ExamplesUrl}jsp/">JSP Examples</a></p>
                     </div>
                 </div>
                 <div class="col25">
@@ -114,14 +110,13 @@ request.setAttribute("tomcat7DocUrl", "/docs/");
                         <p>For security, access to the <a href="/manager/html">manager webapp</a> is restricted.
                         Users are defined in:</p>
                         <pre>$CATALINA_HOME/conf/tomcat-users.xml</pre>
-                        <p>In Tomcat 7.0 access to the manager application is split between different users.</p>
-                        <p><a href="${tomcat7DocUrl}manager-howto.html">Read more...</a></p>
+                        <p>In Tomcat 7.0 access to the manager application is split between 
+                           different users. &nbsp; <a href="${tomcat7DocUrl}manager-howto.html">Read more...</a></p>
                         <br />
                         <h4><a href="${tomcat7DocUrl}RELEASE-NOTES.txt">Release Notes</a></h4>
                         <h4><a href="${tomcat7DocUrl}changelog.html">Changelog</a></h4>
                         <h4><a href="${tomcat7Url}migration.html">Migration Guide</a></h4>
-                        <h4><a href="${tomcat7Url}security.html">Security Updates</a></h4>
-
+                        <h4><a href="${tomcat7Url}security.html">Security Notices</a></h4>
                     </div>
                 </div>
                 <div id="low-docs" class="">
@@ -137,15 +132,13 @@ request.setAttribute("tomcat7DocUrl", "/docs/");
                             <li><a href="https://issues.apache.org/bugzilla/buglist.cgi?bug_status=UNCONFIRMED&amp;bug_status=NEW&amp;bug_status=ASSIGNED&amp;bug_status=REOPENED&amp;bug_status=RESOLVED&amp;resolution=LATER&amp;resolution=REMIND&amp;resolution=---&amp;bugidtype=include&amp;product=Tomcat+7&amp;cmdtype=doit&amp;order=Importance">Tomcat 7.0 Bug Database</a></li>
                             <li><a href="${tomcat7DocUrl}api/index.html">Tomcat 7.0 JavaDocs</a></li>
                             <li><a href="http://svn.apache.org/repos/asf/tomcat/tc7.0.x/">Tomcat 7.0 SVN Repository</a></li>
-                            <li><a href="/examples/">Tomcat 7.0 Examples</a></li>
                         </ul>
                     </div>
                 </div>
                 <div id="low-help" class="">
                     <div class="curved container">
                         <h3>Getting Help</h3>
-                        <h4><a href="${tomcat7Url}faq/">FAQ</a></h4>
-                        <h4><a href="${tomcat7Url}lists.html">Mailing Lists</a></h4>
+                        <h4><a href="${tomcat7Url}faq/">FAQ</a> and <a href="${tomcat7Url}lists.html">Mailing Lists</a></h4>
                         <p>The following mailing lists are available:</p>
                         <ul>
                             <li id="list-announce"><strong><a href="mailto:announce-subscribe@tomcat.apache.org">announce@tomcat.apache.org</a><br />
