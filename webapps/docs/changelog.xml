@@ -142,6 +142,11 @@
         configuration page in the documentation web application. (markt)
       </fix>
       <fix>
+        <bug>48997</bug>: Fixed some typos and correct cross-referencing to the
+        HTTP Connector documentation with the SSL How-To page of the
+        documentation web application. (markt)
+      </fix>
+      <fix>
         <bug>49122</bug>: Improvements and fixes for index page for ROOT web
         application. Based on a patch provided by pidster. (markt)
       </fix>
