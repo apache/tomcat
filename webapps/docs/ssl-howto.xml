@@ -47,7 +47,7 @@
 <p>To install and configure SSL support on Tomcat, you need to follow
 these simple steps.  For more information, read the rest of this HOW-TO.</p>
 <ol>
-<li>Create a certificate keystore file to store the servers private key and
+<li>Create a keystore file to store the server&apos;s private key and
 self-signed certificate by executing the following command:
 <p>Windows:</p>
 <source>
