@@ -47,7 +47,8 @@
 <p>To install and configure SSL support on Tomcat, you need to follow
 these simple steps.  For more information, read the rest of this HOW-TO.</p>
 <ol>
-<li>Create a certificate keystore by executing the following command:
+<li>Create a certificate keystore file to store the servers private key and
+self-signed certificate by executing the following command:
 <p>Windows:</p>
 <source>
 %JAVA_HOME%\bin\keytool -genkey -alias tomcat -keyalg RSA
@@ -370,13 +371,16 @@ file installed with Tomcat.  For JSSE, it should look something like this:</p>
 </source>
 </p>
 
-<p>You will note that the Connector element itself is commented out by default,
-so you will need to remove the comment tags around it.  Then, you can
-customize the specified attributes as necessary.  For detailed information
-about the various options, consult the
-<a href="config/index.html">Server Configuration Reference</a>.  The
-following discussion covers only those attributes of most interest when
-setting up SSL communication.</p>
+<p>You will note that the example SSL connector elements are commented out by
+default. You can either remove the comment tags from around the the example SSL
+connector you wish to use or add a new Connector element of your own. In either
+case, you will need to configure the SSL Connector for your requirements
+and environment. The configuration options and information on which attributes
+are mandatory, are documented in the SSL Support section of the
+<a href="docs/config/http.html#SSL Support">HTTP connector</a> configuration
+reference. Make sure that you use the correct attributes for the connector you
+are using. The BIO and NIO connectors use JSSE whereas the APR/native connector
+uses APR.</p>
 
 <p>The <code>port</code> attribute (default value is 8443) is the TCP/IP
 port number on which Tomcat will listen for secure connections.  You can
@@ -393,22 +397,12 @@ numbers lower than 1024 on many operating systems.</p>
   that SSL is required, as required by the Servlet Specification.</p>
   </em></blockquote>
 
-<p>There are additional options used to configure the SSL protocol. You may
-need to add or change some attributes, depending on how you configured your
-keystore earlier. If you are using a Java JSSE based SSL connector then
-configuration options are documented in the
-<a href="config/http.html">Java HTTP connector</a> configuration
-reference. If you are using the APR/native connector then refer to the
-<a href="apr.html">APR connector</a> configuration guide for details of the
-available configuration options.</p>
-
 <p>After completing these configuration changes, you must restart Tomcat as
 you normally do, and you should be in business.  You should be able to access
 any web application supported by Tomcat via SSL.  For example, try:</p>
 <source>
 https://localhost:8443
 </source>
-
 <p>and you should see the usual Tomcat splash page (unless you have modified
 the ROOT web application).  If this does not work, the following section
 contains some troubleshooting tips.</p>
@@ -477,13 +471,6 @@ SSL communications, and what to do about them.</p>
 
 <ul>
 
-<li>I get "java.security.NoSuchAlgorithmException" errors in my
-    log files.
-    <blockquote>
-    <p>The JVM cannot find the JSSE JAR files.  Follow all of the directions to
-    <a href="#Download and Install JSSE">download and install JSSE</a>.</p>
-    </blockquote></li>
-
 <li>When Tomcat starts up, I get an exception like
     "java.io.FileNotFoundException: {some-directory}/{some-file} not found".
     <blockquote>
@@ -518,7 +505,7 @@ SSL communications, and what to do about them.</p>
     enabled."
     <blockquote>
     <p>A likely explanation is that Tomcat cannot find the alias for the server
-    key withinthe specified keystore. Check that the correct
+    key within the specified keystore. Check that the correct
     <code>keystoreFile</code> and <code>keyAlias</code> are specified in the
     <code>&lt;Connector&gt;</code> element in the
     <a href="#Edit the Tomcat Configuration File">Tomcat configuration file</a>.
