@@ -116,6 +116,10 @@
         <bug>51503</bug>: Add additional validation that prevents a connector
         from starting if it does not have a port > 0. (markt)
       </fix>
+      <fix>
+        <bug>51557</bug>: Ignore HTTP headers that do not comply with RFC 2616
+        and use header names that are not tokens. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">

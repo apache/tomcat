@@ -14,8 +14,6 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
-
 package org.apache.coyote.http11;
 
 import java.io.EOFException;
@@ -40,9 +38,6 @@ import org.apache.tomcat.util.net.NioSelectorPool;
  */
 public class InternalNioInputBuffer extends AbstractInputBuffer {
 
-    /**
-     * Logger.
-     */
     private static final org.apache.juli.logging.Log log =
         org.apache.juli.logging.LogFactory.getLog(InternalNioInputBuffer.class);
 
@@ -52,7 +47,8 @@ public class InternalNioInputBuffer extends AbstractInputBuffer {
     // -------------------------------------------------------------- Constants
 
     enum HeaderParseStatus {DONE, HAVE_MORE_HEADERS, NEED_MORE_DATA}
-    enum HeaderParsePosition {HEADER_START, HEADER_NAME, HEADER_VALUE, HEADER_MULTI_LINE}
+    enum HeaderParsePosition {HEADER_START, HEADER_NAME, HEADER_VALUE,
+        HEADER_MULTI_LINE, HEADER_SKIPLINE}
     // ----------------------------------------------------------- Constructors
     
 
@@ -561,6 +557,10 @@ public class InternalNioInputBuffer extends AbstractInputBuffer {
             if (buf[pos] == Constants.COLON) {
                 headerParsePos = HeaderParsePosition.HEADER_VALUE;
                 headerData.headerValue = headers.addValue(buf, headerData.start, pos - headerData.start);
+            } else if (!HTTP_TOKEN_CHAR[buf[pos]]) {
+                // If a non-token header is detected, skip the line and
+                // ignore the header
+                return skipLine();
             }
             chr = buf[pos];
             if ((chr >= Constants.A) && (chr <= Constants.Z)) {
@@ -576,6 +576,10 @@ public class InternalNioInputBuffer extends AbstractInputBuffer {
         }
 
         
+        while (headerParsePos == HeaderParsePosition.HEADER_SKIPLINE) {
+            return skipLine();
+        }
+
         //
         // Reading the header value (which can be spanned over multiple lines)
         //
@@ -673,6 +677,41 @@ public class InternalNioInputBuffer extends AbstractInputBuffer {
         return HeaderParseStatus.HAVE_MORE_HEADERS;
     }
     
+    private HeaderParseStatus skipLine() throws IOException {
+        headerParsePos = HeaderParsePosition.HEADER_SKIPLINE;
+        boolean eol = false;
+
+        // Reading bytes until the end of the line
+        while (!eol) {
+
+            // Read new bytes if needed
+            if (pos >= lastValid) {
+                if (!fill(true,false)) {
+                    return HeaderParseStatus.NEED_MORE_DATA;
+                }
+            }
+
+            if (buf[pos] == Constants.CR) {
+                // Skip
+            } else if (buf[pos] == Constants.LF) {
+                eol = true;
+            } else {
+                headerData.lastSignificantChar = pos;
+            }
+
+            pos++;
+        }
+        if (log.isDebugEnabled()) {
+            log.debug(sm.getString("iib.invalidheader", new String(buf,
+                    headerData.start,
+                    headerData.lastSignificantChar - headerData.start + 1,
+                    DEFAULT_CHARSET)));
+        }
+
+        headerParsePos = HeaderParsePosition.HEADER_START;
+        return HeaderParseStatus.HAVE_MORE_HEADERS;
+    }
+
     protected HeaderParseData headerData = new HeaderParseData();
     public static class HeaderParseData {
         int start = 0;

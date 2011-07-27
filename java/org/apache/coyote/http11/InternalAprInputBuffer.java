@@ -14,17 +14,18 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
-
 package org.apache.coyote.http11;
 
 import java.io.EOFException;
 import java.io.IOException;
 import java.net.SocketTimeoutException;
 import java.nio.ByteBuffer;
+import java.nio.charset.Charset;
 
 import org.apache.coyote.InputBuffer;
 import org.apache.coyote.Request;
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.jni.Socket;
 import org.apache.tomcat.jni.Status;
 import org.apache.tomcat.util.buf.ByteChunk;
@@ -38,9 +39,8 @@ import org.apache.tomcat.util.buf.MessageBytes;
  */
 public class InternalAprInputBuffer extends AbstractInputBuffer {
 
-
-    // -------------------------------------------------------------- Constants
-
+    private static final Log log =
+        LogFactory.getLog(InternalAprInputBuffer.class);
 
     // ----------------------------------------------------------- Constructors
 
@@ -394,6 +394,11 @@ public class InternalAprInputBuffer extends AbstractInputBuffer {
             if (buf[pos] == Constants.COLON) {
                 colon = true;
                 headerValue = headers.addValue(buf, start, pos - start);
+            } else if (!HTTP_TOKEN_CHAR[buf[pos]]) {
+                // If a non-token header is detected, skip the line and
+                // ignore the header
+                skipLine(start);
+                return true;
             }
             chr = buf[pos];
             if ((chr >= Constants.A) && (chr <= Constants.Z)) {
@@ -495,6 +500,38 @@ public class InternalAprInputBuffer extends AbstractInputBuffer {
 
     }
 
+    
+    private void skipLine(int start) throws IOException {
+        boolean eol = false;
+        int lastRealByte = start;
+        if (pos - 1 > start) {
+            lastRealByte = pos - 1;
+        }
+        
+        while (!eol) {
+
+            // Read new bytes if needed
+            if (pos >= lastValid) {
+                if (!fill())
+                    throw new EOFException(sm.getString("iib.eof.error"));
+            }
+
+            if (buf[pos] == Constants.CR) {
+                // Skip
+            } else if (buf[pos] == Constants.LF) {
+                eol = true;
+            } else {
+                lastRealByte = pos;
+            }
+            pos++;
+        }
+
+        if (log.isDebugEnabled()) {
+            log.debug(sm.getString("iib.invalidheader", new String(buf, start,
+                    lastRealByte - start + 1, Charset.forName("ISO-8859-1"))));
+        }
+    }
+    
     
     /**
      * Available bytes (note that due to encoding, this may not correspond )
