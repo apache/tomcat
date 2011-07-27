@@ -41,7 +41,7 @@ part of the domain.</p>
 <p>There are several options for implementing integrated Windows authentication
 with Apache Tomcat. They are:
 <ul>
-<li>Built-in Tomcat support (work in progress, not yet available).</li>
+<li>Built-in Tomcat support.</li>
 <li>Use a third party library such as Waffle.</li>
 <li>Use a reverse proxy that supports Windows authentication to perform the
 authentication step such as IIS or httpd.</li>
