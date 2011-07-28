@@ -79,7 +79,18 @@ for i in w3m elinks links
 do
     EXPTOOL="`which $i 2>/dev/null || type $i 2>&1`"
     if [ -x "$EXPTOOL" ]; then
-        EXPOPTS="`eval echo \"\$$i_opts\"`"
+        case ${i} in
+          w3m)
+            EXPOPTS="${w3m_opts}"
+            ;;
+          elinks)
+            EXPOPTS="${elinks_opts}"
+            ;;
+          links)
+            EXPOPTS="${links_opts}"
+            ;;
+        esac
+        echo "Using: ${EXPTOOL} ${EXPOPTS} ..."
         break
     fi
 done
@@ -91,6 +102,15 @@ if [ ! -x "$EXPTOOL" ]; then
     exit 1
 fi
 PERL="`which perl 2>/dev/null || type perl 2>&1`"
+if [ -x "$PERL" ]; then
+  echo "Using $PERL"
+else
+  echo ""
+  echo "Cannot find perl"
+  echo "Make sure you have perl in the PATH"
+  echo ""
+  exit 1
+fi
 echo $JKJNIEXT | egrep -e 'x$' > /dev/null 2>&1
 if [ $? -eq 0 ]; then
     USE_BRANCH=1
@@ -121,7 +141,9 @@ for i in native java xdocs examples test build.xml build.properties.default
 do
     svn export ${JKJNISVN}/${i} ${JKJNIDIST}/jni/${i}
     if [ $? -ne 0 ]; then
+        echo ""
         echo "svn export ${i} failed"
+        echo ""
         exit 1
     fi
 done
@@ -130,6 +152,12 @@ top="`pwd`"
 cd ${JKJNIDIST}/jni/xdocs
 ant
 $EXPTOOL $EXPOPTS ../build/docs/miscellaneous/printer/changelog.html > ../../CHANGELOG.txt 2>/dev/null
+if [ $? -ne 0 ]; then
+    echo ""
+    echo "$EXPTOOL $EXPOPTS ../build/docs/miscellaneous/printer/changelog.html failed"
+    echo ""
+    exit 1
+fi
 cd "$top"
 rm -rf ${JKJNIDIST}/jni/xdocs
 mv ${JKJNIDIST}/jni/build/docs ${JKJNIDIST}/jni/docs
@@ -137,14 +165,20 @@ rm -rf ${JKJNIDIST}/jni/build
 for i in KEYS LICENSE NOTICE README.txt
 do
     svn cat ${JKJNISVN}/${i} > ${JKJNIDIST}/${i}
+    if [ $? -ne 0 ]; then
+        echo ""
+        echo "svn cat ${JKJNISVN}/${i} failed"
+        echo ""
+        exit 1
+    fi
 done
 #
 # Prebuild
 cd ${JKJNIDIST}/jni/native
-./buildconf --with-apr=$apr_src_dir
+./buildconf --with-apr=$apr_src_dir || exit 1
 cd "$top"
 # Create source distribution
-tar -cf - ${JKJNIDIST} | gzip -c9 > ${JKJNIDIST}.tar.gz
+tar -cf - ${JKJNIDIST} | gzip -c9 > ${JKJNIDIST}.tar.gz || exit 1
 #
 # Create Win32 source distribution
 JKWINDIST=tomcat-native-${JKJNIVER}-win32-src
@@ -154,14 +188,28 @@ for i in native java xdocs examples test build.xml build.properties.default
 do
     svn export --native-eol CRLF ${JKJNISVN}/${i} ${JKWINDIST}/jni/${i}
     if [ $? -ne 0 ]; then
+        echo ""
         echo "svn export ${i} failed"
+        echo ""
         exit 1
     fi
 done
 top="`pwd`"
 cd ${JKWINDIST}/jni/xdocs
 ant
+if [ $? -ne 0 ]; then
+    echo ""
+    echo "ant (building docs failed)"
+    echo ""
+    exit 1
+fi
 $EXPTOOL $EXPOPTS ../build/docs/miscellaneous/printer/changelog.html > ../../CHANGELOG.txt 2>/dev/null
+if [ $? -ne 0 ]; then
+    echo ""
+    echo "$EXPTOOL $EXPOPTS ../build/docs/miscellaneous/printer/changelog.html failed"
+    echo ""
+    exit 1
+fi
 cd "$top"
 
 rm -rf ${JKWINDIST}/jni/xdocs
@@ -170,12 +218,7 @@ rm -rf ${JKWINDIST}/jni/build
 for i in KEYS LICENSE NOTICE README.txt
 do
     svn cat ${JKJNISVN}/${i} > ${JKWINDIST}/${i}
-    if [ -x "$PERL" ]; then
-        $PERL ${JKWINDIST}/jni/native/build/lineends.pl --cr ${JKWINDIST}/${i}
-    fi
+    $PERL ${JKWINDIST}/jni/native/build/lineends.pl --cr ${JKWINDIST}/${i}
 done
-if [ -x "$PERL" ]; then
-    $PERL ${JKWINDIST}/jni/native/build/lineends.pl --cr ${JKWINDIST}/CHANGELOG.txt
-fi
+$PERL ${JKWINDIST}/jni/native/build/lineends.pl --cr ${JKWINDIST}/CHANGELOG.txt
 zip -9rqyo ${JKWINDIST}.zip ${JKWINDIST}
-
