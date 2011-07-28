@@ -36,7 +36,17 @@
   new documentation project for Tomcat Native was started.
   </p>
 </section>
-<section name="Changes between 1.1.20 and 1.1.21">
+<section name="Changes between 1.1.21 and 1.1.22">
+  <changelog>
+    <fix>
+      Arrange release packaging script. (jfclere).
+    </fix>
+    <fix>
+      Fix typos in the changelog. (markt).
+    </fix>
+  </changelog>
+</section>
+<section name="Changes between 1.1.20 and 1.1.21 (not released)">
   <changelog>
     <fix>
       <bug>50394</bug>: InternalAprInputBuffer.fill() doesn't deal correctly with EOF. (jfclere)
