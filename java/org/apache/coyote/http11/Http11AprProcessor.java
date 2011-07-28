@@ -185,6 +185,7 @@ public class Http11AprProcessor extends AbstractHttp11Processor<Long> {
         
         boolean keptAlive = false;
         boolean openSocket = false;
+        boolean sendfileInProgress = false;
 
         while (!error && keepAlive && !comet && !isAsync() && !endpoint.isPaused()) {
 
@@ -305,17 +306,19 @@ public class Http11AprProcessor extends AbstractHttp11Processor<Long> {
                 sendfileData.socket = socketRef;
                 sendfileData.keepAlive = keepAlive;
                 if (!((AprEndpoint)endpoint).getSendfile().add(sendfileData)) {
+                    // Didn't send all of the data to sendfile.
                     if (sendfileData.socket == 0) {
-                        // Didn't send all the data but the socket is no longer
-                        // set. Something went wrong. Close the connection.
-                        // Too late to set status code.
+                        // The socket is no longer set. Something went wrong.
+                        // Close the connection. Too late to set status code.
                         if (log.isDebugEnabled()) {
                             log.debug(sm.getString(
                                     "http11processor.sendfile.error"));
                         }
                         error = true;
                     } else {
-                        openSocket = true;
+                        // The sendfile Poller will add the socket to the main
+                        // Poller once sendfile processing is complete
+                        sendfileInProgress = true;
                     }
                     break;
                 }
@@ -332,7 +335,11 @@ public class Http11AprProcessor extends AbstractHttp11Processor<Long> {
         } else if (comet  || isAsync()) {
             return SocketState.LONG;
         } else {
-            return (openSocket) ? SocketState.OPEN : SocketState.CLOSED;
+            if (sendfileInProgress) {
+                return SocketState.SENDFILE;
+            } else {
+                return (openSocket) ? SocketState.OPEN : SocketState.CLOSED;
+            }
         }
         
     }
