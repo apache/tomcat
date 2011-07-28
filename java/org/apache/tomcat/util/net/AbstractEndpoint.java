@@ -54,7 +54,7 @@ public abstract class AbstractEndpoint {
         public enum SocketState {
             // TODO Add a new state to the AsyncStateMachine and remove
             //      ASYNC_END (if possible)
-            OPEN, CLOSED, LONG, ASYNC_END
+            OPEN, CLOSED, LONG, ASYNC_END, SENDFILE
         }
         
 

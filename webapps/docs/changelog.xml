@@ -124,6 +124,10 @@
         Improve error handling for HTTP APR if an error occurs while using
         sendfile. (markt) 
       </add>
+      <fix>
+        Ensure that when using sendfile, HTTP APR sockets are not added to
+        multiple pollers. This may cause errors during shutdown. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">

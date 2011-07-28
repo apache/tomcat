@@ -525,10 +525,15 @@ public abstract class AbstractProtocol implements ProtocolHandler,
                     // socket associated with the processor. Exact requirements
                     // depend on type of long poll
                     longPoll(socket, processor);
-                } else if (state == SocketState.OPEN){
+                } else if (state == SocketState.OPEN) {
                     // In keep-alive but between requests. OK to recycle
                     // processor. Continue to poll for the next request.
                     release(socket, processor, false, true);
+                } else if (state == SocketState.SENDFILE) {
+                    // Sendfile in progress. If it fails, the socket will be
+                    // closed. If it works, the socket will be re-added to the
+                    // poller
+                    release(socket, processor, false, false);
                 } else {
                     // Connection closed. OK to recycle the processor.
                     release(socket, processor, true, false);
