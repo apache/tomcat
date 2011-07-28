@@ -48,7 +48,7 @@
       <bug>51437</bug>: Try loading certificate in DER format if PEM was invalid. (mturk)
     </fix>
     <fix>
-      <bug>49557</bug>: index erro in the loop to get the env info in the proc.create function. (kkolinko, jfclere)
+      <bug>49557</bug>: index error in the loop to get the env info in the proc.create function. (kkolinko, jfclere)
     </fix>
     <fix>
       <bug>49851</bug>: JNI Registry.deleteKey and Registry.deleteValue corrupt Windows registry. (jfclere)
