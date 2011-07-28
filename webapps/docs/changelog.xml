@@ -120,6 +120,10 @@
         <bug>51557</bug>: Ignore HTTP headers that do not comply with RFC 2616
         and use header names that are not tokens. (markt)
       </fix>
+      <add>
+        Improve error handling for HTTP APR if an error occurs while using
+        sendfile. (markt) 
+      </add>
     </changelog>
   </subsection>
   <subsection name="Jasper">
