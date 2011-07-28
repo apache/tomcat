@@ -19,7 +19,7 @@ package org.apache.tomcat.util.net;
 import java.io.File;
 import java.net.SocketException;
 
-import javax.net.ssl.SSLHandshakeException;
+import javax.net.ssl.SSLException;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -139,7 +139,7 @@ public class TestCustomSsl extends TomcatBaseTest {
                 fail(se.getMessage());
                 se.printStackTrace();
             }
-        } catch (SSLHandshakeException he) {
+        } catch (SSLException he) {
             if (serverTrustAll) {
                 fail(he.getMessage());
                 he.printStackTrace();
