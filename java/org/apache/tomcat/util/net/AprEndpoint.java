@@ -1448,6 +1448,13 @@ public class AprEndpoint extends AbstractEndpoint {
             // Initialize fd from data given
             try {
                 data.fdpool = Socket.pool(data.socket);
+            } catch (Exception e) {
+                // Pool not created so no need to destroy it.
+                log.error(sm.getString("endpoint.sendfile.error"), e);
+                data.socket = 0;
+                return false;
+            }
+            try {
                 data.fd = File.open
                     (data.fileName, File.APR_FOPEN_READ
                      | File.APR_FOPEN_SENDFILE_ENABLED | File.APR_FOPEN_BINARY,
@@ -1482,6 +1489,8 @@ public class AprEndpoint extends AbstractEndpoint {
                 }
             } catch (Exception e) {
                 log.error(sm.getString("endpoint.sendfile.error"), e);
+                Pool.destroy(data.fdpool);
+                data.socket = 0;
                 return false;
             }
             // Add socket to the list. Newly added sockets will wait
