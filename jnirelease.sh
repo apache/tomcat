@@ -15,6 +15,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+
+#
+# BEFORE releasing don't forget to edit and commit
+#        native/include/tcn_version.h
+#        native/os/win32/libtcnative.rc
+
 # Default place to look for apr source.  Can be overridden with 
 #   --with-apr=[directory]
 apr_src_dir=`pwd`/srclib/apr
