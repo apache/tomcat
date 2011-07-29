@@ -63,6 +63,7 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
      * End message array.
      */
     protected static final byte[] endMessageArray;
+    protected static final byte[] endAndCloseMessageArray;
 
 
     /**
@@ -87,6 +88,16 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
         endMessageArray = new byte[endMessage.getLen()];
         System.arraycopy(endMessage.getBuffer(), 0, endMessageArray, 0,
                 endMessage.getLen());
+
+        // Allocate the end and close message array
+        AjpMessage endAndCloseMessage = new AjpMessage(16);
+        endAndCloseMessage.reset();
+        endAndCloseMessage.appendByte(Constants.JK_AJP13_END_RESPONSE);
+        endAndCloseMessage.appendByte(0);
+        endAndCloseMessage.end();
+        endAndCloseMessageArray = new byte[endAndCloseMessage.getLen()];
+        System.arraycopy(endAndCloseMessage.getBuffer(), 0, endAndCloseMessageArray, 0,
+                endAndCloseMessage.getLen());
 
         // Allocate the flush message array
         AjpMessage flushMessage = new AjpMessage(16);
