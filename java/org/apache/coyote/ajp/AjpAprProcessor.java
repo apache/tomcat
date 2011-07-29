@@ -299,10 +299,16 @@ public class AjpAprProcessor extends AbstractAjpProcessor<Long> {
         finished = true;
 
         // Add the end message
-        if (outputBuffer.position() + endMessageArray.length > outputBuffer.capacity()) {
+        byte[] messageArray;
+        if (error) {
+            messageArray = endAndCloseMessageArray;
+        } else {
+            messageArray = endMessageArray;
+        }
+        if (outputBuffer.position() + messageArray.length > outputBuffer.capacity()) {
             flush(false);
         }
-        outputBuffer.put(endMessageArray);
+        outputBuffer.put(messageArray);
         flush(false);
 
     }

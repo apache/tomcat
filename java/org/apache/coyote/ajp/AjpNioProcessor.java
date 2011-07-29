@@ -319,7 +319,13 @@ public class AjpNioProcessor extends AbstractAjpProcessor<NioChannel> {
         finished = true;
 
         // Add the end message
-        output(endMessageArray, 0, endMessageArray.length);
+        byte[] messageArray;
+        if (error) {
+            messageArray = endAndCloseMessageArray;
+        } else {
+            messageArray = endMessageArray;
+        }
+        output(messageArray, 0, messageArray.length);
     }
 
 
