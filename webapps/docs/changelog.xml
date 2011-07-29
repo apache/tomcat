@@ -180,6 +180,12 @@
         application to recommend the use of digest.[bat|sh] to generate digests
         rather than calling RealmBase directly. (markt) 
       </fix>
+      <fix>
+        <bug>51567</bug>: Update the class loading page of the documentation
+        web application to include information on the search order for the
+        common class loader when separate values are used for $CATALINA_HOME and
+        $CATALINA_BASE. (markt) 
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">

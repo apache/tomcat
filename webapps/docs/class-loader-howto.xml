@@ -100,10 +100,17 @@ loaders as it is initialized:</p>
 <li><strong>Common</strong> - This class loader contains additional classes
     that are made visible to both Tomcat internal classes and to all web
     applications.  Normally, application classes should <strong>NOT</strong>
-    be placed here.  All unpacked classes and resources in
-    <code>$CATALINA_HOME/lib</code>, as well as classes and
-    resources in JAR files are made visible through this
-    class loader.  By default, that includes the following:
+    be placed here.  The locations searched by this class loader are defined by
+    the <code>common.loader</code> property in
+    $CATALINA_BASE/conf/catalina.properties. The default setting will search the
+    following locations in the order they are listed:
+    <ul>
+      <li>unpacked classes and resources in <code>$CATALINA_BASE/lib</code></li>
+      <li>JAR files in <code>$CATALINA_BASE/lib</code></li>
+      <li>unpacked classes and resources in <code>$CATALINA_HOME/lib</code></li>
+      <li>JAR files in <code>$CATALINA_HOME/lib</code></li>
+    </ul>
+    By default, this includes the following:
     <ul>
     <li><em>annotations-api.jar</em> - JEE annotations classes.</li>
     <li><em>catalina.jar</em> - Implementation of the Catalina servlet
