@@ -29,6 +29,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
@@ -66,39 +67,19 @@ public class TestCometProcessor extends TomcatBaseTest {
         os.write("transfer-encoding: chunked\r\n".getBytes());
         os.write("\r\n".getBytes());
         
-        Thread writeThread = new Thread(new Runnable() {
-            
-            @Override
-            public void run() {
-                try {
-                    for (int i = 0; i < 4; i++) {
-                        os.write("4\r\n".getBytes());
-                        os.write("PING\r\n".getBytes());
-                        os.flush();
-                        Thread.sleep(1000);
-                    }
-                    os.write("0\r\n".getBytes());
-                    os.write("\r\n".getBytes());
-                } catch (Throwable e) {
-                    e.printStackTrace();
-                }
-            }
-        });
-
+        PingWriterThread writeThread = new PingWriterThread(4, os);
         writeThread.start();
         
-        StringBuffer buffer = new StringBuffer();
         socket.setSoTimeout(25000);
         InputStream is = socket.getInputStream();
-        int c = is.read();
-        while (c > -1) {
-            buffer.append((char) c);
-            c = is.read();
-        }
+        ResponseReaderThread readThread = new ResponseReaderThread(is);
+        readThread.start();
+        readThread.join();
         os.close();
+        is.close();
         
         // Validate response
-        String[] response = buffer.toString().split("\r\n");
+        String[] response = readThread.getResponse().split("\r\n");
         assertEquals("HTTP/1.1 200 OK", response[0]);
         assertEquals("Server: Apache-Coyote/1.1", response[1]);
         assertTrue(response[2].startsWith("Set-Cookie: JSESSIONID="));
@@ -129,6 +110,59 @@ public class TestCometProcessor extends TomcatBaseTest {
         assertEquals(26, response.length);
     }
     
+    /**
+     * Tests if the Comet connection is closed if the Tomcat connector is
+     * stopped.
+     */
+    @Test
+    public void testCometConnectorStop() throws Exception {
+        
+        if (!isCometSupported()) {
+            return;
+        }
+
+        // Setup Tomcat instance
+        Tomcat tomcat = getTomcatInstance();
+        Context root = tomcat.addContext("", TEMP_DIR);
+        Tomcat.addServlet(root, "comet", new SimpleCometServlet());
+        root.addServletMapping("/", "comet");
+        tomcat.start();
+
+        // Create connection to Comet servlet
+        final Socket socket =
+            SocketFactory.getDefault().createSocket("localhost", getPort());
+        socket.setSoTimeout(60000);
+        
+        final OutputStream os = socket.getOutputStream();
+        String requestLine = "POST http://localhost:" + getPort() +
+                "/ HTTP/1.1\r\n";
+        os.write(requestLine.getBytes());
+        os.write("transfer-encoding: chunked\r\n".getBytes());
+        os.write("\r\n".getBytes());
+        
+        PingWriterThread writeThread = new PingWriterThread(100, os);
+        writeThread.start();
+
+        socket.setSoTimeout(60000);
+        InputStream is = socket.getInputStream();
+        ResponseReaderThread readThread = new ResponseReaderThread(is);
+        readThread.start();
+        
+        // Allow the first couple of PING messages to be written
+        Thread.sleep(3000);
+        
+        tomcat.getConnector().stop();
+        tomcat.getConnector().destroy();
+
+        // Sleep for a couple of seconds to give enough time for the connector
+        // stop message to be processed
+        Thread.sleep(2000);
+
+        // Write should trigger an exception once the connector stops since the
+        // socket should be closed
+        assertNotNull(writeThread.getException());
+    }
+
     private boolean isCometSupported() {
         String protocol =
             getTomcatInstance().getConnector().getProtocolHandlerClassName();
@@ -175,6 +209,70 @@ public class TestCometProcessor extends TomcatBaseTest {
                 event.close();
             }
             response.getWriter().flush();
+        }
+    }
+
+    private static class PingWriterThread extends Thread {
+        
+        private int pingCount;
+        private OutputStream os;
+        private Exception e = null;
+
+        public PingWriterThread(int pingCount, OutputStream os) {
+            this.pingCount = pingCount;
+            this.os = os;
+        }
+
+        public Exception getException() {
+            return e;
+        }
+
+        @Override
+        public void run() {
+            try {
+                for (int i = 0; i < pingCount; i++) {
+                    os.write("4\r\n".getBytes());
+                    os.write("PING\r\n".getBytes());
+                    os.flush();
+                    Thread.sleep(1000);
+                }
+                os.write("0\r\n".getBytes());
+                os.write("\r\n".getBytes());
+            } catch (Exception e) {
+                this.e = e;
+            }
+        }
+    }
+
+    private static class ResponseReaderThread extends Thread {
+
+        private InputStream is;
+        private StringBuilder response = new StringBuilder();
+        private Exception e = null;
+
+        public ResponseReaderThread(InputStream is) {
+            this.is = is;
+        }
+
+        public String getResponse() {
+            return response.toString();
+        }
+
+        public Exception getException() {
+            return e;
+        }
+
+        @Override
+        public void run() {
+            try {
+                int c = is.read();
+                while (c > -1) {
+                    response.append((char) c);
+                    c = is.read();
+                }
+            } catch (Exception e) {
+                this.e = e;
+            }
         }
     }
 }
