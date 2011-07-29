@@ -128,6 +128,10 @@
         Ensure that when using sendfile, HTTP APR sockets are not added to
         multiple pollers. This may cause errors during shutdown. (markt)
       </fix>
+      <update>
+        Set <code>reuse</code> flag of final AJP <code>END_RESPONSE</code>
+        packet to <code>0</code> if we plan to close the connection. (rjung)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Jasper">

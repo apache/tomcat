@@ -313,7 +313,7 @@ public class AjpProcessor extends AbstractAjpProcessor<Socket> {
         finished = true;
 
         // Add the end message
-        output.write(endMessageArray);
+        output.write(error ? endAndCloseMessageArray : endMessageArray);
 
     }
 
