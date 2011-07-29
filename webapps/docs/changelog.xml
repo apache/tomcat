@@ -186,6 +186,9 @@
         common class loader when separate values are used for $CATALINA_HOME and
         $CATALINA_BASE. (markt) 
       </fix>
+      <update>
+        Improve class loading documentation. (kkolinko)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Other">
