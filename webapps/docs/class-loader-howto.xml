@@ -195,29 +195,31 @@ loading looks in the following repositories, in this order:</p>
 </section>
 
 
-<section name="XML Parsers and JavaSE 5">
+<section name="XML Parsers and Java">
 
-<p>Among many other changes, the JavaSE 5 release packages the JAXP APIs, and
-a version of Apache Xerces, inside the JRE.  This has impacts on applications
-that wish to use their own XML parser.</p>
+<p>Starting with Java 1.4 a copy of JAXP APIs and an XML parser are packed
+inside the JRE.  This has impacts on applications that wish to use their own
+XML parser.</p>
 
-<p>In previous versions of Tomcat, you could simply replace the XML parser
-in the <code>$CATALINA_HOME/common/lib</code> directory to change the parser
+<p>In old versions of Tomcat, you could simply replace the XML parser
+in the Tomcat libraries directory to change the parser
 used by all web applications.  However, this technique will not be effective
-when you are running on JSE 5, because the usual class loader delegation
-process will always choose the implementation inside the JDK in preference
-to this one.</p>
+when you are running modern versions of Java, because the usual class loader
+delegation process will always choose the implementation inside the JDK in
+preference to this one.</p>
 
-<p>JDK 1.5 supports a mechanism called the "Endorsed Standards Override
-Mechanism" to allow replacement of APIs created outside of the JCP (i.e.
-DOM and SAX from W3C).  It can also be used to update the XML parser
+<p>Java supports a mechanism called the "Endorsed Standards Override
+Mechanism" to allow replacement of APIs created outside of the JCP
+(i.e. DOM and SAX from W3C).  It can also be used to update the XML parser
 implementation.  For more information, see:
 <a href="http://download.oracle.com/javase/1.5.0/docs/guide/standards/index.html">
 http://download.oracle.com/javase/1.5.0/docs/guide/standards/index.html</a>.</p>
 
 <p>Tomcat utilizes this mechanism by including the system property setting
 <code>-Djava.endorsed.dirs=$JAVA_ENDORSED_DIRS</code> in the
-command line that starts the container.</p>
+command line that starts the container. The default value of this option is
+<em>$CATALINA_HOME/endorsed</em>. This <em>endorsed</em> directory is not
+created by default.</p>
 
 </section>
 
