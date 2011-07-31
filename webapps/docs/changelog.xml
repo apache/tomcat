@@ -100,6 +100,11 @@
         to/from URLs when working with resources from a Context so special
         characters don't cause issues. (markt)
       </fix>
+      <fix>
+        <bug>51586</bug>: Expand error handling to cover anything that is
+        recoverable (or might be recoverable) when loading classes during
+        HandlesTypes processing. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
