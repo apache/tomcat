@@ -95,6 +95,11 @@
         the current request thread name. Based on a patch from Felix Schumacher.
         (timw)
       </add>
+      <fix>
+        <bug>51584</bug>: Ensure file paths are encoded/decoded when translated
+        to/from URLs when working with resources from a Context so special
+        characters don't cause issues. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

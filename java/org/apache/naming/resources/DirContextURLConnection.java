@@ -22,6 +22,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.security.Permission;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -153,6 +155,7 @@ public class DirContextURLConnection
                         path = path.substring(contextPath.length());
                     }
                 }
+                path = URLDecoder.decode(path, "UTF-8");
                 object = context.lookup(path);
                 attributes = context.getAttributes(path);
                 if (object instanceof Resource)
@@ -385,7 +388,8 @@ public class DirContextURLConnection
 
         // Reopen resource
         try {
-            resource = (Resource) context.lookup(getURL().getFile());
+            resource = (Resource) context.lookup(
+                    URLDecoder.decode(getURL().getFile(), "UTF-8"));
         } catch (NamingException e) {
             // Ignore
         }
@@ -445,7 +449,8 @@ public class DirContextURLConnection
                     context.list(file.substring(start));
                 while (enumeration.hasMoreElements()) {
                     NameClassPair ncp = enumeration.nextElement();
-                    result.addElement(ncp.getName());
+                    result.addElement(
+                            URLEncoder.encode(ncp.getName(), "UTF-8"));
                 }
             } catch (NamingException e) {
                 // Unexpected exception
