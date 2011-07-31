@@ -2016,6 +2016,11 @@ public class ContextConfig
             log.warn(sm.getString("contextConfig.invalidSciHandlesTypes",
                     className), e);
             return;
+        } catch (Throwable t) {
+            ExceptionUtils.handleThrowable(t);
+            log.warn(sm.getString("contextConfig.invalidSciHandlesTypes",
+                    className), t);
+            return;
         }
 
         if (clazz.isAnnotation()) {
