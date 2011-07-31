@@ -131,7 +131,7 @@ public class TestCometProcessor extends TomcatBaseTest {
         // Create connection to Comet servlet
         final Socket socket =
             SocketFactory.getDefault().createSocket("localhost", getPort());
-        socket.setSoTimeout(60000);
+        socket.setSoTimeout(10000);
         
         final OutputStream os = socket.getOutputStream();
         String requestLine = "POST http://localhost:" + getPort() +
@@ -143,7 +143,6 @@ public class TestCometProcessor extends TomcatBaseTest {
         PingWriterThread writeThread = new PingWriterThread(100, os);
         writeThread.start();
 
-        socket.setSoTimeout(60000);
         InputStream is = socket.getInputStream();
         ResponseReaderThread readThread = new ResponseReaderThread(is);
         readThread.start();
