@@ -566,8 +566,18 @@ public class StandardWrapper extends ContainerBase
      */
     public boolean isSingleThreadModel() {
 
+        // Short-cuts
+        // If singleThreadModel is true, must have already checked this
+        // If instance != null, must have already loaded 
+        if (singleThreadModel || instance != null) {
+            return singleThreadModel;
+        }
+        
+        // The logic to determine this safely is more complex than one might
+        // expect. allocate() already has the necessary logic so re-use it.
         try {
-            loadServlet();
+            Servlet s = allocate();
+            deallocate(s);
         } catch (Throwable t) {
             ExceptionUtils.handleThrowable(t);
         }
@@ -608,7 +618,9 @@ public class StandardWrapper extends ContainerBase
     @Override
     public String[] getServletMethods() throws ServletException {
 
-        Class<? extends Servlet> servletClazz = loadServlet().getClass();
+        instance = loadServlet();
+        
+        Class<? extends Servlet> servletClazz = instance.getClass();
         if (!javax.servlet.http.HttpServlet.class.isAssignableFrom(
                                                         servletClazz)) {
             return DEFAULT_SERVLET_METHODS;
