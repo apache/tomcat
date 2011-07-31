@@ -30,7 +30,7 @@
   cd ..
   ant jar
   Run one of the example (the echo one):
-  ant echo-example
+  ant run-echo
  
   Using it in Tomcat:
   1 - In <Connector> use of conf/server.xml:
