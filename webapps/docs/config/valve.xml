@@ -149,6 +149,9 @@
       <attribute name="resolveHosts" required="false">
         <p>This attribute is no longer supported. Use the connector
         attribute <code>enableLookups</code> instead.</p>
+        <p>If you have <code>enableLookups</code> on the connector set to
+        <code>true</code> and want to ignore it, use <b>%a</b> instead of
+        <b>%h</b> in the value of <code>pattern</code>.</p>
       </attribute>
 
       <attribute name="suffix" required="false">
@@ -399,7 +402,8 @@
     <p>The following format tokens are supported:</p>
     <ul>
     <li><b>bytes</b> - Bytes sent, excluding HTTP headers, or '-' if zero</li>
-    <li><b>c-dns</b> - Remote host name</li>
+    <li><b>c-dns</b> - Remote host name (or IP address if
+        <code>enableLookups</code> for the connector is false)</li>
     <li><b>c-ip</b> - Remote IP address</li>
     <li><b>cs-method</b> - Request method (GET, POST, etc.)</li>
     <li><b>cs-uri</b> - Request URI</li>
