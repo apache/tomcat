@@ -231,6 +231,11 @@
       <update>
         Update optional CheckStyle library to 5.4. (kkolinko)
       </update>
+      <update>
+        Remove <code>resolveHosts</code> attribute from AccessLogValve
+        configuration in the default <code>server.xml</code>. It was documented
+        in 7.0.19 that it has no effect. (kkolinko)
+      </update>
     </changelog>
   </subsection>
 </section>
