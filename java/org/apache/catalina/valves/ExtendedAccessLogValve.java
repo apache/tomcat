@@ -49,7 +49,8 @@ import org.apache.tomcat.util.ExceptionUtils;
  *
  * The following fields are supported:
  * <ul>
- * <li><code>c-dns</code>:  Client hostname</li>
+ * <li><code>c-dns</code>:  Client hostname (or ip address if
+ * <code>enableLookups</code> for the connector is false)</li>
  * <li><code>c-ip</code>:  Client ip address</li>
  * <li><code>bytes</code>:  bytes served</li>
  * <li><code>cs-method</code>:  request method</li>
