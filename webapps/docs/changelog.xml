@@ -236,6 +236,10 @@
         configuration in the default <code>server.xml</code>. It was documented
         in 7.0.19 that it has no effect. (kkolinko)
       </update>
+      <update>
+        Simplify mapping for <code>jsp</code> servlet in the default
+        <code>web.xml</code>. (kkolinko)
+      </update>
     </changelog>
   </subsection>
 </section>
