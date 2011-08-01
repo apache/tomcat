@@ -1049,7 +1049,7 @@ Function createShortcuts
   ${EndIf}
 
   CreateShortCut "$SMPROGRAMS\Apache Tomcat @VERSION_MAJOR_MINOR@ $TomcatServiceName\Uninstall Tomcat @VERSION_MAJOR_MINOR@.lnk" \
-                 "$INSTDIR\Uninstall.exe" "-ServiceName=$TomcatServiceName"
+                 "$INSTDIR\Uninstall.exe" '-ServiceName="$TomcatServiceName"'
 
   CreateShortCut "$SMPROGRAMS\Apache Tomcat @VERSION_MAJOR_MINOR@ $TomcatServiceName\Tomcat @VERSION_MAJOR_MINOR@ Program Directory.lnk" \
                  "$INSTDIR"

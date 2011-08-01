@@ -240,6 +240,10 @@
         Simplify mapping for <code>jsp</code> servlet in the default
         <code>web.xml</code>. (kkolinko)
       </update>
+      <fix>
+        Correctly handle uninstall with the Windows installer of the service is
+        installed with a name that contains a &apos;-&apos; character. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
