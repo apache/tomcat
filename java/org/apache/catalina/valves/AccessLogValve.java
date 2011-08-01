@@ -72,7 +72,8 @@ import org.apache.tomcat.util.buf.B2CConverter;
  * <li><b>%b</b> - Bytes sent, excluding HTTP headers, or '-' if no bytes
  *     were sent
  * <li><b>%B</b> - Bytes sent, excluding HTTP headers
- * <li><b>%h</b> - Remote host name
+ * <li><b>%h</b> - Remote host name (or IP address if
+ * <code>enableLookups</code> for the connector is false)
  * <li><b>%H</b> - Request protocol
  * <li><b>%l</b> - Remote logical username from identd (always returns '-')
  * <li><b>%m</b> - Request method
