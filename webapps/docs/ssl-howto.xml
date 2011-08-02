@@ -377,7 +377,7 @@ connector you wish to use or add a new Connector element of your own. In either
 case, you will need to configure the SSL Connector for your requirements
 and environment. The configuration options and information on which attributes
 are mandatory, are documented in the SSL Support section of the
-<a href="docs/config/http.html#SSL Support">HTTP connector</a> configuration
+<a href="config/http.html#SSL Support">HTTP connector</a> configuration
 reference. Make sure that you use the correct attributes for the connector you
 are using. The BIO and NIO connectors use JSSE whereas the APR/native connector
 uses APR.</p>
