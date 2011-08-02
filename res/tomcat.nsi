@@ -1085,6 +1085,14 @@ FunctionEnd
 
 Section Uninstall
 
+  ${If} $TomcatServiceName == ""
+    MessageBox MB_ICONSTOP|MB_OK \
+        "No service name specified to uninstall. This will be provided automatically if you uninstall via \
+         Add/Remove Programs or the shortcut on the Start menu. Alternatively, call the installer from \
+         the command line with -serviceName=$\"<name of service>$\"."
+    Quit
+  ${EndIf}
+  
   Delete "$INSTDIR\Uninstall.exe"
 
   ; Stop Tomcat service monitor if running
