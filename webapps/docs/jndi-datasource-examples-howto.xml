@@ -206,8 +206,7 @@ resource to your <a href="config/context.html">Context</a>.</p>
 <p>For example:
 
 <source>
-&lt;Context path="/DBTest" docBase="DBTest"
-        reloadable="true" crossContext="true"&gt;
+&lt;Context&gt;
 
     &lt;!-- maxActive: Maximum number of dB connections in pool. Make sure you
          configure your mysqld max_connections large enough to handle
@@ -411,8 +410,7 @@ The Context element should look something like the following.
 </p>
 
 <source>
-&lt;Context path="/someApp" docBase="someApp"
-   crossContext="true" reloadable="true"&gt;
+&lt;Context&gt;
 
 &lt;Resource name="jdbc/postgres" auth="Container"
           type="javax.sql.DataSource" driverClassName="org.postgresql.Driver"
