@@ -71,7 +71,7 @@ Manager web application <code>Context</code> to a new host install the
 <code>$CATALINA_BASE/conf/[enginename]/[hostname]</code> folder. Here is an
 example:</p>
 <pre>
-&lt;Context path="/manager" privileged="true"
+&lt;Context privileged="true"
          docBase="/usr/local/kinetic/tomcat7/server/webapps/manager"&gt;
 &lt;/Context&gt;
 </pre>
@@ -162,8 +162,7 @@ could be restricted by the remote IP address or host by adding a
 <code>RemoteAddrValve</code> or <code>RemoteHostValve</code>.  Here is
 an example of restricting access to the localhost by IP address:</p>
 <pre>
-&lt;Context path="/manager" privileged="true"
-         docBase="/usr/local/kinetic/tomcat7/server/webapps/manager"&gt;
+&lt;Context privileged="true"&gt;
          &lt;Valve className="org.apache.catalina.valves.RemoteAddrValve"
                 allow="127\.0\.0\.1"/&gt;
 &lt;/Context&gt;
