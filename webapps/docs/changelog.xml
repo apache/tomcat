@@ -114,6 +114,11 @@
         of a Servlet instance always do so in way that correctly instantiates a
         Servlet instance. (markt)
       </fix>
+      <fix>
+        Committing connection if autoCommit is false.
+        Make sure committed connection is returned to the pool if datasource is 
+        enabled. (kfujino)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

@@ -1015,6 +1015,15 @@ public class JDBCStore extends StoreBase {
             ExceptionUtils.handleThrowable(f);
         }
         this.preparedLoadSql = null;
+        
+        // Commit if autoCommit is false
+        try {
+            if (!dbConnection.getAutoCommit()) {
+                dbConnection.commit();
+            }            
+        } catch (SQLException e) {
+            manager.getContainer().getLogger().error(sm.getString(getStoreName() + ".commitSQLException"), e);
+        }
 
         // Close this database connection, and log any errors
         try {
