@@ -115,7 +115,7 @@
         Servlet instance. (markt)
       </fix>
       <fix>
-        Committing connection if autoCommit is false.
+        In JDBCStore: Committing connection if autoCommit is false.
         Make sure committed connection is returned to the pool if datasource is 
         enabled. (kfujino)
       </fix>
@@ -215,7 +215,8 @@
         $CATALINA_BASE. (markt) 
       </fix>
       <update>
-        Improve class loading documentation. (kkolinko)
+        Improve class loading documentation and logging documentation.
+        (kkolinko)
       </update>
       <add>
         Add information to the security page of the the documentation web
