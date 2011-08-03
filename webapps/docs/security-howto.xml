@@ -187,6 +187,12 @@
       proxy uses AJP then the SSL attributes of the client connection are
       passed via the AJP protocol and separate connectors are not needed.</p>
       
+      <p>The <strong>ciphers</strong> attribute controls the ciphers used for
+      SSL connections. By default, the default ciphers for the JVM will be used.
+      This usually means that the weak export grade ciphers will be included in
+      the list of available ciphers. Secure environments will normally want to
+      configure a more limited set of ciphers.</p>
+      
       <p>The <strong>tomcatAuthentication</strong> attribute is used with the
       AJP connectors to determine if Tomcat should authenticate the user or if
       authentication can be delegated to the reverse proxy that will then pass
