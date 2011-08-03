@@ -217,6 +217,10 @@
       <update>
         Improve class loading documentation. (kkolinko)
       </update>
+      <add>
+        Add information to the security page of the the documentation web
+        application for the ciphers attribute of the Connector element. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Other">
