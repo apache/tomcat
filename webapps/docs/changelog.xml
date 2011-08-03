@@ -254,6 +254,9 @@
         without a service name from executing since the uninstall will not be
         complete. (markt)
       </fix>
+      <update>
+        Update to Apache Commons Daemon 1.0.7. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
