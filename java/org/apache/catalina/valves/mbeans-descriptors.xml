@@ -44,6 +44,14 @@
                writeable="false"/>
 
     <attribute name="condition"
+               description="The value to look for conditional logging. The same as conditionUnless."
+               type="java.lang.String"/>
+
+    <attribute name="conditionIf"
+               description="The value to look for conditional logging."
+               type="java.lang.String"/>
+
+    <attribute name="conditionUnless"
                description="The value to look for conditional logging."
                type="java.lang.String"/>
 
@@ -204,6 +212,14 @@
                writeable="false"/>
 
     <attribute name="condition"
+               description="The value to look for conditional logging. The same as conditionUnless."
+               type="java.lang.String"/>
+
+    <attribute name="conditionIf"
+               description="The value to look for conditional logging."
+               type="java.lang.String"/>
+
+    <attribute name="conditionUnless"
                description="The value to look for conditional logging."
                type="java.lang.String"/>
 
