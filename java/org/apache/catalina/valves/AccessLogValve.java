@@ -135,9 +135,13 @@ import org.apache.tomcat.util.buf.B2CConverter;
  * 
  * <p>
  * Conditional logging is also supported. This can be done with the
- * <code>condition</code> property.
- * If the value returned from ServletRequest.getAttribute(condition)
+ * <code>conditionUnless</code> and <code>conditionIf</code> properties.
+ * If the value returned from ServletRequest.getAttribute(conditionUnless)
  * yields a non-null value, the logging will be skipped.
+ * If the value returned from ServletRequest.getAttribute(conditionIf)
+ * yields the null value, the logging will be skipped.
+ * The <code>condition</code> attribute is synonym for
+ * <code>conditionUnless</code> and is provided for backwards compatibility.
  * </p>
  * 
  * <p>
@@ -524,13 +528,19 @@ public class AccessLogValve extends ValveBase implements AccessLog {
      * agent renames the log file so we can automagically recreate it.
      */
     private boolean checkExists = false;
-    
-    
+
+
     /**
-     * Are we doing conditional logging. default false.
+     * Are we doing conditional logging. default null.
+     * It is the value of <code>conditionUnless</code> property.
      */
     protected String condition = null;
 
+    /**
+     * Are we doing conditional logging. default null.
+     * It is the value of <code>conditionIf</code> property.
+     */
+    protected String conditionIf = null;
 
     /**
      * Date format to place in log file name. Use at your own risk!
@@ -788,6 +798,46 @@ public class AccessLogValve extends ValveBase implements AccessLog {
 
 
     /**
+     * Return whether the attribute name to look for when
+     * performing conditional logging. If null, every
+     * request is logged.
+     */
+    public String getConditionUnless() {
+        return getCondition();
+    }
+
+
+    /**
+     * Set the ServletRequest.attribute to look for to perform
+     * conditional logging. Set to null to log everything.
+     *
+     * @param condition Set to null to log everything
+     */
+    public void setConditionUnless(String condition) {
+        setCondition(condition);
+    }
+
+    /**
+     * Return whether the attribute name to look for when
+     * performing conditional logging. If null, every
+     * request is logged.
+     */
+    public String getConditionIf() {
+        return conditionIf;
+    }
+
+
+    /**
+     * Set the ServletRequest.attribute to look for to perform
+     * conditional logging. Set to null to log everything.
+     *
+     * @param condition Set to null to log everything
+     */
+    public void setConditionIf(String condition) {
+        this.conditionIf = condition;
+    }
+
+    /**
      *  Return the date format date based log rotation.
      */
     public String getFileDateFormat() {
@@ -882,9 +932,11 @@ public class AccessLogValve extends ValveBase implements AccessLog {
     
     @Override
     public void log(Request request, Response response, long time) {
-        if (!getState().isAvailable() || !getEnabled() ||
-                logElements == null || condition != null
-                && null != request.getRequest().getAttribute(condition)) {
+        if (!getState().isAvailable() || !getEnabled() || logElements == null
+                || condition != null
+                && null != request.getRequest().getAttribute(condition)
+                || conditionIf != null
+                && null == request.getRequest().getAttribute(conditionIf)) {
             return;
         }
 

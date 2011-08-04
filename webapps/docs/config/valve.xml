@@ -168,7 +168,18 @@
         </p>
       </attribute>
 
-      <attribute name="condition" required="false">
+      <attribute name="conditionIf" required="false">
+        <p>Turns on conditional logging. If set, requests will be
+           logged only if <code>ServletRequest.getAttribute()</code> is
+           not null. For example, if this value is set to
+           <code>important</code>, then a particular request will only be logged
+           if <code>ServletRequest.getAttribute("important") != null</code>.
+           The use of Filters is an easy way to set/unset the attribute
+           in the ServletRequest on many different requests.
+        </p>
+      </attribute>
+
+      <attribute name="conditionUnless" required="false">
         <p>Turns on conditional logging. If set, requests will be
            logged only if <code>ServletRequest.getAttribute()</code> is
            null. For example, if this value is set to
@@ -176,6 +187,12 @@
            if <code>ServletRequest.getAttribute("junk") == null</code>.
            The use of Filters is an easy way to set/unset the attribute
            in the ServletRequest on many different requests.
+        </p>
+      </attribute>
+
+      <attribute name="condition" required="false">
+        <p>The same as <code>conditionUnless</code>. This attribute is
+           provided for backwards compatibility.
         </p>
       </attribute>
 
@@ -360,7 +377,18 @@
         </p>
       </attribute>
 
-      <attribute name="condition" required="false">
+      <attribute name="conditionIf" required="false">
+        <p>Turns on conditional logging. If set, requests will be
+           logged only if <code>ServletRequest.getAttribute()</code> is
+           not null. For example, if this value is set to
+           <code>important</code>, then a particular request will only be logged
+           if <code>ServletRequest.getAttribute("important") != null</code>.
+           The use of Filters is an easy way to set/unset the attribute
+           in the ServletRequest on many different requests.
+        </p>
+      </attribute>
+
+      <attribute name="conditionUnless" required="false">
         <p>Turns on conditional logging. If set, requests will be
            logged only if <code>ServletRequest.getAttribute()</code> is
            null. For example, if this value is set to
@@ -368,6 +396,12 @@
            if <code>ServletRequest.getAttribute("junk") == null</code>.
            The use of Filters is an easy way to set/unset the attribute
            in the ServletRequest on many different requests.
+        </p>
+      </attribute>
+
+      <attribute name="condition" required="false">
+        <p>The same as <code>conditionUnless</code>. This attribute is
+           provided for backwards compatibility.
         </p>
       </attribute>
 
