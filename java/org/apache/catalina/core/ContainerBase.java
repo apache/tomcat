@@ -1144,13 +1144,20 @@ public abstract class ContainerBase extends LifecycleMBeanBase
         if (accessLogScanComplete) {
             return accessLog;
         }
-        
+
+        AccessLogAdapter adapter = null;
         Valve valves[] = getPipeline().getValves();
         for (Valve valve : valves) {
             if (valve instanceof AccessLog) {
-                accessLog = (AccessLog) valve;
-                break;
+                if (adapter == null) {
+                    adapter = new AccessLogAdapter((AccessLog) valve);
+                } else {
+                    adapter.add((AccessLog) valve);
+                }
             }
+        }
+        if (adapter != null) {
+            accessLog = adapter;
         }
         accessLogScanComplete = true;
         return accessLog;
