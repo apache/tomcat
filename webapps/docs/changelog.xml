@@ -125,6 +125,10 @@
         conditional logging that logs only if a request attribute is present.
         (kkolinko)
       </add>
+      <fix>
+        Allow to have several AccessLogValve instances in the same scope (e.g.
+        in the same Context). (kkolinko)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
