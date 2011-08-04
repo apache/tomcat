@@ -129,6 +129,10 @@
         Allow to have several AccessLogValve instances in the same scope (e.g.
         in the same Context). (kkolinko)
       </fix>
+      <fix>
+        <bug>51614</bug>: Avoid two times calls of store.load() and 
+        session.expire() in PersistentManager. (kfujino)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
