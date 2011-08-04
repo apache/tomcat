@@ -119,6 +119,12 @@
         Make sure committed connection is returned to the pool if datasource is 
         enabled. (kfujino)
       </fix>
+      <add>
+        Split <code>condition</code> attribute of AccessLogValve into two,
+        <code>conditionIf</code> and <code>conditionUnless</code>. Implement
+        conditional logging that logs only if a request attribute is present.
+        (kkolinko)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
