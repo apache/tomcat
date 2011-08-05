@@ -5459,7 +5459,8 @@ public class StandardContext extends ContainerBase
                         // Stop ContainerBackgroundProcessor thread
                         threadStop();
             
-                        if (manager != null && manager instanceof Lifecycle) {
+                        if (manager != null && manager instanceof Lifecycle &&
+                                ((Lifecycle) manager).getState().isAvailable()) {
                             try {
                                 ((Lifecycle) manager).stop();
                             } catch (LifecycleException e) {
@@ -5507,7 +5508,8 @@ public class StandardContext extends ContainerBase
             fireLifecycleEvent(Lifecycle.CONFIGURE_STOP_EVENT, null);
 
             // Stop the Valves in our pipeline (including the basic), if any
-            if (pipeline instanceof Lifecycle) {
+            if (pipeline instanceof Lifecycle &&
+                    ((Lifecycle) pipeline).getState().isAvailable()) {
                 ((Lifecycle) pipeline).stop();
             }
 
