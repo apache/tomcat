@@ -289,6 +289,10 @@
       <update>
         Update to Apache Commons Daemon 1.0.7. (markt)
       </update>
+      <fix>
+        <bug>51621</bug>: Add additional required JARs to the deployer
+        distribution. (markt) 
+      </fix>
     </changelog>
   </subsection>
 </section>
