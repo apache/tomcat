@@ -138,6 +138,10 @@
         <bug>51614</bug>: Avoid calling store.load() and  session.expire()
         twice in PersistentManager when expiring sessions. (kfujino)
       </fix>
+      <fix>
+        Prevent spurious log warnings on container stop if a child component has
+        previously failed. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

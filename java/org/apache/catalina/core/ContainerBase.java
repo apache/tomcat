@@ -1062,7 +1062,8 @@ public abstract class ContainerBase extends LifecycleMBeanBase
         setState(LifecycleState.STOPPING);
 
         // Stop the Valves in our pipeline (including the basic), if any
-        if (pipeline instanceof Lifecycle) {
+        if (pipeline instanceof Lifecycle &&
+                ((Lifecycle) pipeline).getState().isAvailable()) {
             ((Lifecycle) pipeline).stop();
         }
 
@@ -1082,7 +1083,8 @@ public abstract class ContainerBase extends LifecycleMBeanBase
         if ((cluster != null) && (cluster instanceof Lifecycle)) {
             ((Lifecycle) cluster).stop();
         }
-        if ((manager != null) && (manager instanceof Lifecycle)) {
+        if ((manager != null) && (manager instanceof Lifecycle) &&
+                ((Lifecycle) manager).getState().isAvailable() ) {
             ((Lifecycle) manager).stop();
         }
         if ((logger != null) && (logger instanceof Lifecycle)) {
