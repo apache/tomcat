@@ -23,6 +23,7 @@ import org.apache.catalina.LifecycleListener;
 import org.apache.catalina.LifecycleState;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.res.StringManager;
 
 
@@ -99,9 +100,11 @@ public abstract class LifecycleBase implements Lifecycle {
 
         try {
             initInternal();
-        } catch (LifecycleException e) {
+        } catch (Throwable t) {
+            ExceptionUtils.handleThrowable(t);
             setStateInternal(LifecycleState.FAILED, null, false);
-            throw e;
+            throw new LifecycleException(
+                    sm.getString("lifecycleBase.initFail",toString()), t);
         }
 
         setStateInternal(LifecycleState.INITIALIZED, null, false);
@@ -143,9 +146,11 @@ public abstract class LifecycleBase implements Lifecycle {
 
         try {
             startInternal();
-        } catch (LifecycleException e) {
+        } catch (Throwable t) {
+            ExceptionUtils.handleThrowable(t);
             setStateInternal(LifecycleState.FAILED, null, false);
-            throw e;
+            throw new LifecycleException(
+                    sm.getString("lifecycleBase.startFail",toString()), t);
         }
 
         if (state.equals(LifecycleState.FAILED) ||
@@ -223,9 +228,11 @@ public abstract class LifecycleBase implements Lifecycle {
 
         try {
             stopInternal();
-        } catch (LifecycleException e) {
+        } catch (Throwable t) {
+            ExceptionUtils.handleThrowable(t);
             setStateInternal(LifecycleState.FAILED, null, false);
-            throw e;
+            throw new LifecycleException(
+                    sm.getString("lifecycleBase.stopFail",toString()), t);
         }
 
         if (state.equals(LifecycleState.MUST_DESTROY)) {
@@ -283,9 +290,11 @@ public abstract class LifecycleBase implements Lifecycle {
         
         try {
             destroyInternal();
-        } catch (LifecycleException e) {
+        } catch (Throwable t) {
+            ExceptionUtils.handleThrowable(t);
             setStateInternal(LifecycleState.FAILED, null, false);
-            throw e;
+            throw new LifecycleException(
+                    sm.getString("lifecycleBase.destroyFail",toString()), t);
         }
         
         setStateInternal(LifecycleState.DESTROYED, null, false);
