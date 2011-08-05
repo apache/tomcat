@@ -130,6 +130,11 @@
         in the same Context). (kkolinko)
       </fix>
       <fix>
+        <bug>51610</bug>: If an unchecked exception occurs during a lifecycle
+        transition (e.g. web application start) ensure that the component is
+        put into the failed state. (markt)
+      </fix>
+      <fix>
         <bug>51614</bug>: Avoid calling store.load() and  session.expire()
         twice in PersistentManager when expiring sessions. (kfujino)
       </fix>
