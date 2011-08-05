@@ -130,8 +130,8 @@
         in the same Context). (kkolinko)
       </fix>
       <fix>
-        <bug>51614</bug>: Avoid two times calls of store.load() and 
-        session.expire() in PersistentManager. (kfujino)
+        <bug>51614</bug>: Avoid calling store.load() and  session.expire()
+        twice in PersistentManager when expiring sessions. (kfujino)
       </fix>
     </changelog>
   </subsection>
