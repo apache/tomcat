@@ -264,7 +264,7 @@ public class PooledConnection {
         if (pwd != null) properties.setProperty(PROP_PASSWORD, pwd);
 
         try {
-            connection = connection = driver.connect(driverURL, properties);
+            connection = driver.connect(driverURL, properties);
         } catch (Exception x) {
             if (log.isDebugEnabled()) {
                 log.debug("Unable to connect to database.", x);
