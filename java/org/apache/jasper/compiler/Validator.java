@@ -896,6 +896,7 @@ class Validator {
             if (attrs == null) {
                 err.jspError(n, "jsp.error.jspelement.missing.name");
             }
+            @SuppressWarnings("null") // Exception will have been thrown above
             int xmlAttrLen = attrs.getLength();
 
             Node.Nodes namedAttrs = n.getNamedAttributeNodes();
