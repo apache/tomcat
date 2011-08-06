@@ -122,7 +122,8 @@ public class Http11Processor extends AbstractHttp11Processor<Socket> {
 
 
     /**
-     * Process pipelined HTTP requests on the specified socket.
+     * Process pipelined HTTP requests using the specified input and output
+     * streams.
      *
      * @param socketWrapper Socket from which the HTTP requests will be read
      *               and the HTTP responses will be written.
