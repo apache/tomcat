@@ -198,13 +198,13 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
      * @throws IOException error during an I/O operation
      */
     @Override
-    public SocketState process(SocketWrapper<NioChannel> socket)
+    public SocketState process(SocketWrapper<NioChannel> socketWrapper)
         throws IOException {
         RequestInfo rp = request.getRequestProcessor();
         rp.setStage(org.apache.coyote.Constants.STAGE_PARSE);
 
         // Setting up the socket
-        this.socket = socket;
+        this.socket = socketWrapper;
         inputBuffer.setSocket(this.socket.getSocket());
         outputBuffer.setSocket(this.socket.getSocket());
         inputBuffer.setSelectorPool(((NioEndpoint)endpoint).getSelectorPool());
@@ -224,11 +224,11 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
         
         while (!error && keepAlive && !comet && !isAsync() && !endpoint.isPaused()) {
             //always default to our soTimeout
-            socket.setTimeout(soTimeout);
+            socketWrapper.setTimeout(soTimeout);
             // Parsing the request header
             try {
                 if( !disableUploadTimeout && keptAlive && soTimeout > 0 ) {
-                    socket.getSocket().getIOChannel().socket().setSoTimeout((int)soTimeout);
+                    socketWrapper.getSocket().getIOChannel().socket().setSoTimeout((int)soTimeout);
                 }
                 if (!inputBuffer.parseRequestLine(keptAlive)) {
                     // Haven't finished reading the request so keep the socket
@@ -239,7 +239,7 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
                         // No data read, OK to recycle the processor
                         // Continue to use keep alive timeout
                         if (keepAliveTimeout>0) {
-                            socket.setTimeout(keepAliveTimeout);
+                            socketWrapper.setTimeout(keepAliveTimeout);
                         }
                     } else {
                         // Started to read request line. Need to keep processor
@@ -266,7 +266,7 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
                     }
                     request.setStartTime(System.currentTimeMillis());
                     if (!disableUploadTimeout) { //only for body, not for request headers
-                        socket.getSocket().getIOChannel().socket().setSoTimeout(
+                        socketWrapper.getSocket().getIOChannel().socket().setSoTimeout(
                                 connectionUploadTimeout);
                     }
                 }
@@ -306,7 +306,7 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
             
             if (maxKeepAliveRequests == 1 )
                 keepAlive = false;
-            if (maxKeepAliveRequests > 0 && socket.decrementKeepAlive() <= 0)
+            if (maxKeepAliveRequests > 0 && socketWrapper.decrementKeepAlive() <= 0)
                 keepAlive = false;
 
             // Process the request in the adapter
@@ -325,8 +325,8 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
                                 statusDropsConnection(response.getStatus()));
                     }
                     // Comet support
-                    SelectionKey key = socket.getSocket().getIOChannel().keyFor(
-                            socket.getSocket().getPoller().getSelector());
+                    SelectionKey key = socketWrapper.getSocket().getIOChannel().keyFor(
+                            socketWrapper.getSocket().getPoller().getSelector());
                     if (key != null) {
                         NioEndpoint.KeyAttachment attach = (NioEndpoint.KeyAttachment) key.attachment();
                         if (attach != null)  {
@@ -374,13 +374,13 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
             
             // Do sendfile as needed: add socket to sendfile and end
             if (sendfileData != null && !error) {
-                ((KeyAttachment) socket).setSendfileData(sendfileData);
+                ((KeyAttachment) socketWrapper).setSendfileData(sendfileData);
                 sendfileData.keepAlive = keepAlive;
-                SelectionKey key = socket.getSocket().getIOChannel().keyFor(
-                        socket.getSocket().getPoller().getSelector());
+                SelectionKey key = socketWrapper.getSocket().getIOChannel().keyFor(
+                        socketWrapper.getSocket().getPoller().getSelector());
                 //do the first write on this thread, might as well
-                openSocket = socket.getSocket().getPoller().processSendfile(key,
-                        (KeyAttachment) socket, true, true);
+                openSocket = socketWrapper.getSocket().getPoller().processSendfile(key,
+                        (KeyAttachment) socketWrapper, true, true);
                 break;
             }
 
