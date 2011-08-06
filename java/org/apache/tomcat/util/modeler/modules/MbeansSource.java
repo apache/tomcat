@@ -84,10 +84,12 @@ public class MbeansSource extends ModelerSource implements MbeansSourceMBean
        this.type=type;
     }
 
+    @Override
     public void setSource( Object source ) {
         this.source=source;
     }
 
+    @Override
     public Object getSource() {
         return source;
     }
@@ -99,6 +101,7 @@ public class MbeansSource extends ModelerSource implements MbeansSourceMBean
     /** Return the list of mbeans created by this source.
      *  It can be used to implement runtime services.
      */
+    @Override
     public List<ObjectName> getMBeans() {
         return mbeans;
     }
@@ -122,6 +125,7 @@ public class MbeansSource extends ModelerSource implements MbeansSourceMBean
         registry.invoke(mbeans, "stop", false);        
     }
     
+    @Override
     public void init() throws Exception {
         if( mbeans==null) execute();
         if( registry==null ) registry=Registry.getRegistry(null, null);
@@ -133,6 +137,7 @@ public class MbeansSource extends ModelerSource implements MbeansSourceMBean
         registry.invoke(mbeans, "destroy", false);                
     }
     
+    @Override
     public void load() throws Exception {
         execute(); // backward compat
     }
@@ -300,6 +305,7 @@ public class MbeansSource extends ModelerSource implements MbeansSourceMBean
     /** Store the mbeans. 
      * XXX add a background thread to store it periodically 
      */ 
+    @Override
     public void save() {
         // XXX customize no often than ( based on standard descriptor ), etc.
         // It doesn't work very well if we call this on each set att - 
