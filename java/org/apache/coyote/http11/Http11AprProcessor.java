@@ -167,14 +167,14 @@ public class Http11AprProcessor extends AbstractHttp11Processor<Long> {
      * @throws IOException error during an I/O operation
      */
     @Override
-    public SocketState process(SocketWrapper<Long> socket)
+    public SocketState process(SocketWrapper<Long> socketWrapper)
         throws IOException {
         RequestInfo rp = request.getRequestProcessor();
         rp.setStage(org.apache.coyote.Constants.STAGE_PARSE);
 
         // Setting up the socket
-        this.socket = socket;
-        long socketRef = socket.getSocket().longValue();
+        this.socket = socketWrapper;
+        long socketRef = socketWrapper.getSocket().longValue();
         inputBuffer.setSocket(socketRef);
         outputBuffer.setSocket(socketRef);
 
