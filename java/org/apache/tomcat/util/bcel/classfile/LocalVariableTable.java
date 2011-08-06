@@ -96,6 +96,7 @@ public class LocalVariableTable extends Attribute {
      * @deprecated since 5.2 because multiple variables can share the
      *             same slot, use getLocalVariable(int index, int pc) instead.
      */
+    @java.lang.Deprecated
     public final LocalVariable getLocalVariable( int index ) {
         for (int i = 0; i < local_variable_table_length; i++) {
             if (local_variable_table[i].getIndex() == index) {

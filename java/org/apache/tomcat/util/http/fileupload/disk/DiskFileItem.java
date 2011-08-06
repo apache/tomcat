@@ -229,6 +229,7 @@ public class DiskFileItem
      *
      * @throws IOException if an error occurs.
      */
+    @Override
     public InputStream getInputStream()
         throws IOException {
         if (!isInMemory()) {
@@ -249,6 +250,7 @@ public class DiskFileItem
      * @return The content type passed by the agent or <code>null</code> if
      *         not defined.
      */
+    @Override
     public String getContentType() {
         return contentType;
     }
@@ -279,6 +281,7 @@ public class DiskFileItem
      *   a security attack. If you intend to use the file name anyways, catch
      *   the exception and use InvalidFileNameException#getName().
      */
+    @Override
     public String getName() {
         return Streams.checkFileName(fileName);
     }
@@ -294,6 +297,7 @@ public class DiskFileItem
      * @return <code>true</code> if the file contents will be read
      *         from memory; <code>false</code> otherwise.
      */
+    @Override
     public boolean isInMemory() {
         if (cachedContent != null) {
             return true;
@@ -307,6 +311,7 @@ public class DiskFileItem
      *
      * @return The size of the file, in bytes.
      */
+    @Override
     public long getSize() {
         if (size >= 0) {
             return size;
@@ -327,6 +332,7 @@ public class DiskFileItem
      *
      * @return The contents of the file as an array of bytes.
      */
+    @Override
     public byte[] get() {
         if (isInMemory()) {
             if (cachedContent == null) {
@@ -369,6 +375,7 @@ public class DiskFileItem
      * @throws UnsupportedEncodingException if the requested character
      *                                      encoding is not available.
      */
+    @Override
     public String getString(final String charset)
         throws UnsupportedEncodingException {
         return new String(get(), charset);
@@ -384,6 +391,7 @@ public class DiskFileItem
      *
      * TODO Consider making this method throw UnsupportedEncodingException.
      */
+    @Override
     public String getString() {
         byte[] rawdata = get();
         String charset = getCharSet();
@@ -418,6 +426,7 @@ public class DiskFileItem
      *
      * @throws Exception if an error occurs.
      */
+    @Override
     public void write(File file) throws Exception {
         if (isInMemory()) {
             FileOutputStream fout = null;
@@ -484,6 +493,7 @@ public class DiskFileItem
      * collected, this method can be used to ensure that this is done at an
      * earlier time, thus preserving system resources.
      */
+    @Override
     public void delete() {
         cachedContent = null;
         File outputFile = getStoreLocation();
@@ -502,6 +512,7 @@ public class DiskFileItem
      * @see #setFieldName(java.lang.String)
      *
      */
+    @Override
     public String getFieldName() {
         return fieldName;
     }
@@ -515,6 +526,7 @@ public class DiskFileItem
      * @see #getFieldName()
      *
      */
+    @Override
     public void setFieldName(String fieldName) {
         this.fieldName = fieldName;
     }
@@ -530,6 +542,7 @@ public class DiskFileItem
      * @see #setFormField(boolean)
      *
      */
+    @Override
     public boolean isFormField() {
         return isFormField;
     }
@@ -545,6 +558,7 @@ public class DiskFileItem
      * @see #isFormField()
      *
      */
+    @Override
     public void setFormField(boolean state) {
         isFormField = state;
     }
@@ -559,6 +573,7 @@ public class DiskFileItem
      *
      * @throws IOException if an error occurs.
      */
+    @Override
     public OutputStream getOutputStream()
         throws IOException {
         if (dfos == null) {
@@ -729,6 +744,7 @@ public class DiskFileItem
      * Returns the file item headers.
      * @return The file items headers.
      */
+    @Override
     public FileItemHeaders getHeaders() {
         return headers;
     }
@@ -737,6 +753,7 @@ public class DiskFileItem
      * Sets the file item headers.
      * @param pHeaders The file items headers.
      */
+    @Override
     public void setHeaders(FileItemHeaders pHeaders) {
         headers = pHeaders;
     }

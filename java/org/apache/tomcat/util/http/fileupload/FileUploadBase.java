@@ -639,6 +639,7 @@ public abstract class FileUploadBase {
              * Returns the items content type, or null.
              * @return Content type, if known, or null.
              */
+            @Override
             public String getContentType() {
                 return contentType;
             }
@@ -647,6 +648,7 @@ public abstract class FileUploadBase {
              * Returns the items field name.
              * @return Field name.
              */
+            @Override
             public String getFieldName() {
                 return fieldName;
             }
@@ -659,6 +661,7 @@ public abstract class FileUploadBase {
              *   use the file name anyways, catch the exception and use
              *   InvalidFileNameException#getName().
              */
+            @Override
             public String getName() {
                 return Streams.checkFileName(name);
             }
@@ -668,6 +671,7 @@ public abstract class FileUploadBase {
              * @return True, if the item is a form field,
              *   otherwise false.
              */
+            @Override
             public boolean isFormField() {
                 return formField;
             }
@@ -678,6 +682,7 @@ public abstract class FileUploadBase {
              * @return Opened input stream.
              * @throws IOException An I/O error occurred.
              */
+            @Override
             public InputStream openStream() throws IOException {
                 if (opened) {
                     throw new IllegalStateException(
@@ -701,6 +706,7 @@ public abstract class FileUploadBase {
              * Returns the file item headers.
              * @return The items header object
              */
+            @Override
             public FileItemHeaders getHeaders() {
                 return headers;
             }
@@ -709,6 +715,7 @@ public abstract class FileUploadBase {
              * Sets the file item headers.
              * @param pHeaders The items header object
              */
+            @Override
             public void setHeaders(FileItemHeaders pHeaders) {
                 headers = pHeaders;
             }
@@ -915,6 +922,7 @@ public abstract class FileUploadBase {
          * @return True, if one or more additional file items
          *   are available, otherwise false.
          */
+        @Override
         public boolean hasNext() throws FileUploadException, IOException {
             if (eof) {
                 return false;
@@ -935,6 +943,7 @@ public abstract class FileUploadBase {
          * @return FileItemStream instance, which provides
          *   access to the next file item.
          */
+        @Override
         public FileItemStream next() throws FileUploadException, IOException {
             if (eof  ||  (!itemValid && !hasNext())) {
                 throw new NoSuchElementException();
