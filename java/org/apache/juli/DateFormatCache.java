@@ -53,7 +53,6 @@ public class DateFormatCache {
     /* Number of cached entries */
     private int cacheSize = 0;
 
-    private DateFormatCache parent;
     private Cache cache;
 
     /**
@@ -85,7 +84,6 @@ public class DateFormatCache {
     public DateFormatCache(int size, String format, DateFormatCache parent) {
         cacheSize = size;
         this.format = tidyFormat(format);
-        this.parent = parent;
         Cache parentCache = null;
         if (parent != null) {
             synchronized(parent) {

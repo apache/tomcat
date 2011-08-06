@@ -293,6 +293,9 @@
         <bug>51621</bug>: Add additional required JARs to the deployer
         distribution. (markt) 
       </fix>
+      <fix>
+        Fix a small number of warnings reported by FindBugs. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
