@@ -52,6 +52,11 @@
     <Bug code="IS"/>
   </Match>
   <Match>
+    <Class name="org.apache.catalina.authenticator.DigestAuthenticator"/>
+    <Field name="cnonces"/>
+    <Bug code="IS"/>
+  </Match>
+  <Match>
     <Class name="org.apache.catalina.connector.CoyoteReader"/>
     <Method name="readLine"/>
     <Bug code="RR"/>
