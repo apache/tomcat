@@ -173,12 +173,13 @@ public class FileHandler
         String tsDate = tsString.substring(0, 10);
 
         writerLock.readLock().lock();
-        // If the date has changed, switch log files
-        if (rotatable && !date.equals(tsDate)) {
-            // Update to writeLock before we switch
-            writerLock.readLock().unlock();
-            writerLock.writeLock().lock();
-            try {
+        try {
+            // If the date has changed, switch log files
+            if (rotatable && !date.equals(tsDate)) {
+                // Update to writeLock before we switch
+                writerLock.readLock().unlock();
+                writerLock.writeLock().lock();
+
                 // Make sure another thread hasn't already done this
                 if (!date.equals(tsDate)) {
                     closeWriter();
@@ -188,9 +189,9 @@ public class FileHandler
                 // Down grade to read-lock. This ensures the writer remains valid
                 // until the log message is written
                 writerLock.readLock().lock();
-            } finally {
-                writerLock.writeLock().unlock();
             }
+        } finally {
+            writerLock.writeLock().unlock();
         }
 
         try {
@@ -362,7 +363,12 @@ public class FileHandler
 
         // Create the directory if necessary
         File dir = new File(directory);
-        dir.mkdirs();
+        if (!dir.mkdirs()) {
+            reportError("Unable to create [" + dir + "]", null,
+                    ErrorManager.OPEN_FAILURE);
+            writer = null;
+            return;
+        }
 
         // Open the current log file
         writerLock.writeLock().lock();
@@ -371,7 +377,12 @@ public class FileHandler
                     + (rotatable ? date : "") + suffix);
             File parent = pathname.getParentFile();
             if (!parent.exists()) {
-                parent.mkdirs();
+                if (!parent.mkdirs()) {
+                    reportError("Unable to create [" + parent + "]", null,
+                            ErrorManager.OPEN_FAILURE);
+                    writer = null;
+                    return;
+                }
             }
             String encoding = getEncoding();
             FileOutputStream fos = new FileOutputStream(pathname, true);
