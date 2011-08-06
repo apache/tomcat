@@ -510,6 +510,7 @@ class PageDataImpl extends PageData implements TagConstants {
             Attributes attrs = n.getAttributes();
             int len = (attrs == null) ? 0 : attrs.getLength();
             for (int i=0; i<len; i++) {
+                @SuppressWarnings("null")  // If attrs==null, len == 0
                 String attrName = attrs.getQName(i);
                 if (!"pageEncoding".equals(attrName)
                         && !"contentType".equals(attrName)) {
@@ -530,6 +531,7 @@ class PageDataImpl extends PageData implements TagConstants {
 
             // append remaining attributes
             for (int i=0; i<len; i++) {
+                @SuppressWarnings("null")  // If attrs==null, len == 0
                 String attrName = attrs.getQName(i);
                 if ("import".equals(attrName) || "contentType".equals(attrName)
                         || "pageEncoding".equals(attrName)) {
@@ -601,6 +603,7 @@ class PageDataImpl extends PageData implements TagConstants {
             Attributes attrs = n.getAttributes();
             int len = (attrs == null) ? 0 : attrs.getLength();
             for (int i=0; i<len; i++) {
+                @SuppressWarnings("null")  // If attrs==null, len == 0
                 String attrName = attrs.getQName(i);
                 if (!"pageEncoding".equals(attrName)) {
                     append = true;
@@ -696,6 +699,7 @@ class PageDataImpl extends PageData implements TagConstants {
             Attributes attrs = n.getTaglibAttributes();
             int len = (attrs == null) ? 0 : attrs.getLength();
             for (int i=0; i<len; i++) {
+                @SuppressWarnings("null")  // If attrs==null, len == 0
                 String name = attrs.getQName(i);
                 String value = attrs.getValue(i);
                 buf.append("  ").append(name).append("=\"").append(value).append("\"\n");
@@ -708,6 +712,7 @@ class PageDataImpl extends PageData implements TagConstants {
             len = (attrs == null) ? 0 : attrs.getLength();
             boolean defaultNSSeen = false;
             for (int i=0; i<len; i++) {
+                @SuppressWarnings("null")  // If attrs==null, len == 0
                 String name = attrs.getQName(i);
                 String value = attrs.getValue(i);
                 buf.append("  ").append(name).append("=\"").append(value).append("\"\n");
@@ -724,6 +729,7 @@ class PageDataImpl extends PageData implements TagConstants {
             attrs = n.getAttributes();
             len = (attrs == null) ? 0 : attrs.getLength();
             for (int i=0; i<len; i++) {
+                @SuppressWarnings("null")  // If attrs==null, len == 0
                 String name = attrs.getQName(i);
                 String value = attrs.getValue(i);
                 buf.append("  ").append(name).append("=\"");
