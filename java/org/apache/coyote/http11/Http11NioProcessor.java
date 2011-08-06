@@ -192,6 +192,9 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
      * Process pipelined HTTP requests using the specified input and output
      * streams.
      *
+     * @param socketWrapper Socket from which the HTTP requests will be read
+     *               and the HTTP responses will be written.
+     *  
      * @throws IOException error during an I/O operation
      */
     @Override
