@@ -85,6 +85,7 @@ public class RulesBase implements Rules {
      * Return the Digester instance with which this Rules instance is
      * associated.
      */
+    @Override
     public Digester getDigester() {
 
         return (this.digester);
@@ -97,6 +98,7 @@ public class RulesBase implements Rules {
      *
      * @param digester The newly associated Digester instance
      */
+    @Override
     public void setDigester(Digester digester) {
 
         this.digester = digester;
@@ -113,6 +115,7 @@ public class RulesBase implements Rules {
      * Return the namespace URI that will be applied to all subsequently
      * added <code>Rule</code> objects.
      */
+    @Override
     public String getNamespaceURI() {
 
         return (this.namespaceURI);
@@ -128,6 +131,7 @@ public class RulesBase implements Rules {
      *  subsequently added rules, or <code>null</code> for matching
      *  regardless of the current namespace URI
      */
+    @Override
     public void setNamespaceURI(String namespaceURI) {
 
         this.namespaceURI = namespaceURI;
@@ -144,6 +148,7 @@ public class RulesBase implements Rules {
      * @param pattern Nesting pattern to be matched for this Rule
      * @param rule Rule instance to be registered
      */
+    @Override
     public void add(String pattern, Rule rule) {
         // to help users who accidently add '/' to the end of their patterns
         int patternLength = pattern.length();
@@ -172,6 +177,7 @@ public class RulesBase implements Rules {
     /**
      * Clear all existing Rule instance registrations.
      */
+    @Override
     public void clear() {
 
         cache.clear();
@@ -191,6 +197,7 @@ public class RulesBase implements Rules {
      *  or <code>null</code> to match regardless of namespace URI
      * @param pattern Nesting pattern to be matched
      */
+    @Override
     public List<Rule> match(String namespaceURI, String pattern) {
 
         // List rulesList = (List) this.cache.get(pattern);
@@ -228,6 +235,7 @@ public class RulesBase implements Rules {
      * in the order originally registered through the <code>add()</code>
      * method.
      */
+    @Override
     public List<Rule> rules() {
 
         return (this.rules);

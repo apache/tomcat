@@ -204,6 +204,7 @@ public class Registry implements RegistryMBean, MBeanRegistration  {
      * 
      * @since 1.1
      */ 
+    @Override
     public void stop() {
         descriptorsByClass = new HashMap<String,ManagedBean>();
         descriptors = new HashMap<String,ManagedBean>();
@@ -225,6 +226,7 @@ public class Registry implements RegistryMBean, MBeanRegistration  {
      * 
      * @since 1.1
      */ 
+    @Override
     public List<ObjectName> loadMBeans( Object source, ClassLoader cl )
             throws Exception
     {
@@ -242,6 +244,7 @@ public class Registry implements RegistryMBean, MBeanRegistration  {
      * 
      * @param source
      */ 
+    @Override
     public void loadMetadata(Object source ) throws Exception {
         loadDescriptors( null, source, null );
     }
@@ -275,6 +278,7 @@ public class Registry implements RegistryMBean, MBeanRegistration  {
      *
      * @since 1.1
      */ 
+    @Override
     public void registerComponent(Object bean, String oname, String type)
            throws Exception
     {
@@ -288,6 +292,7 @@ public class Registry implements RegistryMBean, MBeanRegistration  {
      * 
      * @since 1.1
      */ 
+    @Override
     public void unregisterComponent( String oname ) {
         try {
             unregisterComponent(new ObjectName(oname));
@@ -306,6 +311,7 @@ public class Registry implements RegistryMBean, MBeanRegistration  {
      * @throws Exception
      * @since 1.1
      */
+    @Override
     public void invoke(List<ObjectName> mbeans, String operation,
             boolean failFirst ) throws Exception {
         if( mbeans==null ) {
@@ -341,6 +347,7 @@ public class Registry implements RegistryMBean, MBeanRegistration  {
      * @return  An unique id for the domain:name combination
      * @since 1.1
      */
+    @Override
     public synchronized int getId( String domain, String name) {
         if( domain==null) {
             domain="";
@@ -858,6 +865,7 @@ public class Registry implements RegistryMBean, MBeanRegistration  {
 
     // -------------------- Registration  --------------------
     
+    @Override
     public ObjectName preRegister(MBeanServer server,
                                   ObjectName name) throws Exception 
     {
@@ -865,12 +873,15 @@ public class Registry implements RegistryMBean, MBeanRegistration  {
         return name;
     }
 
+    @Override
     public void postRegister(Boolean registrationDone) {
     }
 
+    @Override
     public void preDeregister() throws Exception {
     }
 
+    @Override
     public void postDeregister() {
     }
 
