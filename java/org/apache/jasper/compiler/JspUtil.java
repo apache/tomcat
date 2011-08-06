@@ -119,6 +119,7 @@ public class JspUtil {
         int tempLength = (attrs == null) ? 0 : attrs.getLength();
         Vector<String> temp = new Vector<String>(tempLength, 1);
         for (int i = 0; i < tempLength; i++) {
+            @SuppressWarnings("null")  // If attrs==null, tempLength == 0
             String qName = attrs.getQName(i);
             if ((!qName.equals("xmlns")) && (!qName.startsWith("xmlns:")))
                 temp.addElement(qName);
