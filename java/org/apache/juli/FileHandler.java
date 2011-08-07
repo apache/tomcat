@@ -363,7 +363,7 @@ public class FileHandler
 
         // Create the directory if necessary
         File dir = new File(directory);
-        if (!dir.mkdirs()) {
+        if (!dir.exists() && !dir.mkdirs()) {
             reportError("Unable to create [" + dir + "]", null,
                     ErrorManager.OPEN_FAILURE);
             writer = null;
