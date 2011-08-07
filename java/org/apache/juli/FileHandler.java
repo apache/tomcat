@@ -172,29 +172,29 @@ public class FileHandler
         String tsString = ts.toString().substring(0, 19);
         String tsDate = tsString.substring(0, 10);
 
-        writerLock.readLock().lock();
         try {
+            writerLock.readLock().lock();
             // If the date has changed, switch log files
             if (rotatable && !date.equals(tsDate)) {
-                // Update to writeLock before we switch
-                writerLock.readLock().unlock();
-                writerLock.writeLock().lock();
-
-                // Make sure another thread hasn't already done this
-                if (!date.equals(tsDate)) {
-                    closeWriter();
-                    date = tsDate;
-                    openWriter();
+                try {
+                    // Update to writeLock before we switch
+                    writerLock.readLock().unlock();
+                    writerLock.writeLock().lock();
+    
+                    // Make sure another thread hasn't already done this
+                    if (!date.equals(tsDate)) {
+                        closeWriter();
+                        date = tsDate;
+                        openWriter();
+                    }
+                } finally {
+                    writerLock.writeLock().unlock();
+                    // Down grade to read-lock. This ensures the writer remains valid
+                    // until the log message is written
+                    writerLock.readLock().lock();
                 }
-                // Down grade to read-lock. This ensures the writer remains valid
-                // until the log message is written
-                writerLock.readLock().lock();
             }
-        } finally {
-            writerLock.writeLock().unlock();
-        }
 
-        try {
             String result = null;
             try {
                 result = getFormatter().format(record);
