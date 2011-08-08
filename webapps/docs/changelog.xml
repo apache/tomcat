@@ -305,6 +305,10 @@
       <fix>
         Fix a small number of warnings reported by FindBugs. (markt)
       </fix>
+      <update>
+        Update to version 1.1.22 of the native component for the AJP APR/native
+        and HTTP APR/native connectors. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
