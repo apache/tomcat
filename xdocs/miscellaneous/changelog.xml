@@ -36,6 +36,13 @@
   new documentation project for Tomcat Native was started.
   </p>
 </section>
+<section name="Changes between 1.1.22 and 1.1.23">
+  <changelog>
+    <update>
+      <bug>50570</bug>: Allow explicit use of FIPS mode in APR lifecycle listener (native support only in this update; Java support to follow). Based upon a patch from Chris Beckey. (schultz)
+    </update>
+  </changelog>
+</section>
 <section name="Changes between 1.1.21 and 1.1.22">
   <changelog>
     <fix>

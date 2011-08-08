@@ -607,6 +607,32 @@ TCN_IMPLEMENT_CALL(void, SSL, randSet)(TCN_STDARGS, jstring file)
     }
     TCN_FREE_CSTRING(file);
 }
+
+TCN_IMPLEMENT_CALL(jint, SSL, fipsModeSet)(TCN_STDARGS, jint mode)
+{
+    int r = 0;
+    UNREFERENCED(o);
+
+#ifdef OPENSSL_FIPS
+    if(1 != (r = (jint)FIPS_mode_set((int)mode))) {
+      /* arrange to get a human-readable error message */
+      unsigned long err = ERR_get_error();
+      char msg[256];
+
+      /* ERR_load_crypto_strings() already called in initialize() */
+
+      ERR_error_string_n(err, msg, 256);
+
+      tcn_ThrowException(e, msg);
+    }
+#else
+    /* FIPS is unavailable */
+    tcn_ThrowException(e, "FIPS was not available to tcnative at build time. You will need to re-build tcnative against an OpenSSL with FIPS.");
+#endif
+
+    return r;
+}
+
 /* OpenSSL Java Stream BIO */
 
 typedef struct  {
@@ -978,6 +1004,14 @@ TCN_IMPLEMENT_CALL(void, SSL, randSet)(TCN_STDARGS, jstring file)
 {
     UNREFERENCED_STDARGS;
     UNREFERENCED(file);
+}
+
+TCN_IMPLEMENT_CALL(jint, SSL, fipsModeSet)(TCN_STDARGS, jint mode)
+{
+    UNREFERENCED_STDARGS;
+    UNREFERENCED(mode);
+
+    return 0;
 }
 
 TCN_IMPLEMENT_CALL(jlong, SSL, newBIO)(TCN_STDARGS, jlong pool,
