@@ -142,6 +142,10 @@
         Prevent spurious log warnings on container stop if a child component has
         previously failed. (markt)
       </fix>
+      <fix>
+        Add missing getter and setter for the alwaysUseSession attribute of the
+        authenticators. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

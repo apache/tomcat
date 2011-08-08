@@ -204,6 +204,16 @@ public abstract class AuthenticatorBase extends ValveBase
     // ------------------------------------------------------------- Properties
 
 
+    public boolean getAlwaysUseSession() {
+        return alwaysUseSession;
+    }
+
+
+    public void setAlwaysUseSession(boolean alwaysUseSession) {
+        this.alwaysUseSession = alwaysUseSession;
+    }
+
+
     /**
      * Return the cache authenticated Principals flag.
      */
