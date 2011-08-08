@@ -179,6 +179,11 @@
         Set <code>reuse</code> flag of final AJP <code>END_RESPONSE</code>
         packet to <code>0</code> if we plan to close the connection. (rjung)
       </update>
+      <update>
+        Correctly indicate if socket is closing when calling recycle for the AJP
+        NIO processor. Note since the flag is unused in this case there were no
+        bugs triggered by the re-factoring error. (rjung)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Jasper">
