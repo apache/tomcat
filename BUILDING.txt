@@ -72,7 +72,7 @@ do the following:
   http://svn.apache.org/repos/asf/tomcat/tc@VERSION_MAJOR_MINOR@.x/
 
 * Download a source package from:
-  http://tomcat.apache.org/download-70.cgi
+  http://tomcat.apache.org/download-@VERSION_MAJOR@0.cgi
 
 * Checkout the source using SVN, selecting the desired version or
   branch (current development source is at 
