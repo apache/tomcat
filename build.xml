@@ -15,7 +15,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 -->
-<project name="Tomcat 7.0" default="deploy" basedir=".">
+<project name="Tomcat 8.0" default="deploy" basedir=".">
 
   <!-- ===================== Initialize Property Values ==================== -->
 
@@ -1688,7 +1688,7 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
 
   <target name="release"
     depends="clean,clean-depend,dist-deployer,installer,package-zip,package-winzip,package-tgz,package-deployer-zip,package-deployer-tgz,javadoc,package-docs-tgz,package-src-zip,package-src-tgz,package-src-jar"
-    description="Create a Tomcat 7 packaged distribution">
+    description="Create a Tomcat 8 packaged distribution">
 
     <copy file="KEYS"
          todir="${tomcat.release}/v${version}"/>
