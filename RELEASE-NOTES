@@ -137,35 +137,6 @@ and putting them in the shared classloader instead (JARs should be put in the
 "lib" folder, and classes should be put in the "classes" folder).
 
 
-================
-Tomcat on Linux:
-================
-GLIBC 2.2 / Linux 2.4 users should define an environment variable:
-export LD_ASSUME_KERNEL=2.2.5
-
-Redhat Linux 9.0 users should use the following setting to avoid
-stability problems:
-export LD_ASSUME_KERNEL=2.4.1
-
-There are some Linux bugs reported against the NIO sendfile behavior, make sure you
-have a JDK that is up to date, or disable sendfile behavior in the Connector.<br/>
-6427312: (fc) FileChannel.transferTo() throws IOException "system call interrupted"<br/>
-5103988: (fc) FileChannel.transferTo should return -1 for EAGAIN instead throws IOException<br/>
-6253145: (fc) FileChannel.transferTo on Linux fails when going beyond 2GB boundary<br/>
-6470086: (fc) FileChannel.transferTo(2147483647, 1, channel) cause "Value too large" exception<br/>
-
-
-=============================
-Enabling SSI and CGI Support:
-=============================
-Because of the security risks associated with CGI and SSI available
-to web applications, these features are disabled by default.  
-
-To enable and configure CGI support, please see the cgi-howto.html page.
-
-To enable and configue SSI support, please see the ssi-howto.html page.
-
-
 ======================
 Security manager URLs:
 ======================
@@ -189,7 +160,8 @@ the check.
 ==============================
 Viewing the Tomcat Change Log:
 ==============================
-See changelog.html in this directory.
+The full change log is available from http://tomcat.apache.org and is also
+included in the documentation web application.
 
 
 =============================
