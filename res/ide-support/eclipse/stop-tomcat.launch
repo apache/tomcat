@@ -25,5 +25,5 @@
 <stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="org.apache.catalina.startup.Bootstrap"/>
 <stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="stop"/>
 <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="tomcat-8.0.x"/>
-<stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-Dcatalina.home=${project_loc:/tomcat-7.0.x/java/org/apache/catalina/startup/Bootstrap.java}/output/build"/>
+<stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-Dcatalina.home=${project_loc:/tomcat-8.0.x/java/org/apache/catalina/startup/Bootstrap.java}/output/build"/>
 </launchConfiguration>
