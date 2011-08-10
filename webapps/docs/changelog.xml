@@ -60,6 +60,10 @@
         <bug>51640</bug>: Improve the memory leak prevention for leaks triggered
         by java.sql.DriverManager. (markt)
       </add>
+      <fix>
+        <bug>51644</bug>: Fix annotation scanning for contexts with a
+        multi-level context path such as /a/b. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
