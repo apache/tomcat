@@ -54,6 +54,14 @@
   issues to not "pop up" wrt. others).
 -->
 <section name="Tomcat 7.0.21 (markt)">
+  <subsection name="Catalina">
+    <changelog>
+      <add>
+        <bug>51640</bug>: Improve the memory leak prevention for leaks triggered
+        by java.sql.DriverManager. (markt)
+      </add>
+    </changelog>
+  </subsection>
   <subsection name="Coyote">
     <changelog>
       <bug>51641</bug>: Use correct key when removing processor instances from
