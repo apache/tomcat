@@ -53,6 +53,14 @@
   They eventually become mixed with the numbered issues. (I.e., numbered
   issues to not "pop up" wrt. others).
 -->
+<section name="Tomcat 7.0.21 (markt)">
+  <subsection name="Coyote">
+    <changelog>
+      <bug>51641</bug>: Use correct key when removing processor instances from
+      the connections map during clean-up. Patch provided by zhh. (mark)
+    </changelog>
+  </subsection>
+</section>
 <section name="Tomcat 7.0.20 (markt)">
   <subsection name="Catalina">
     <changelog>
