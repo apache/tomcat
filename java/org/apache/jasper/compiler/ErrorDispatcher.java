@@ -22,6 +22,7 @@ import java.io.StringReader;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 
+import org.apache.jasper.Constants;
 import org.apache.jasper.JasperException;
 import org.apache.jasper.JspCompilationContext;
 import org.xml.sax.SAXException;
@@ -473,7 +474,7 @@ public class ErrorDispatcher {
             // Ignore messages preceding first error
             if (errMsgBuf != null) {
                 errMsgBuf.append(line);
-                errMsgBuf.append("\n");
+                errMsgBuf.append(Constants.NEWLINE);
             }
         }
         
