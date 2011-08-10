@@ -436,14 +436,20 @@ public class DirContextURLConnection
                 // This will be of the form /<hostname>/<contextpath>/file name
                 // if <contextpath> is not empty otherwise this will be of the
                 // form /<hostname>/file name
-                // Strip off the hostname and the contextpath
+                // Strip off the hostname and the contextpath (note that context
+                // path may contain '/'
                 int start;
-                if(context instanceof ProxyDirContext &&
-                        "".equals(((ProxyDirContext)context).getContextPath())){
-                    start = file.indexOf('/',1);
-                }
-                else
+                if (context instanceof ProxyDirContext) {
+                    String cp = ((ProxyDirContext)context).getContextPath();
+                    String h = ((ProxyDirContext)context).getHostName();
+                    if ("".equals(cp)) {
+                        start = h.length() + 2;
+                    } else {
+                        start = h.length() + cp.length() + 2;
+                    }
+                } else {
                     start = file.indexOf('/', file.indexOf('/', 1) + 1);
+                }
                 
                 NamingEnumeration<NameClassPair> enumeration =
                     context.list(file.substring(start));
