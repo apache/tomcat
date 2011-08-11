@@ -15,7 +15,7 @@
   limitations under the License.
 ================================================================================
 
-The following settings are for Helios Service Release 1
+The following settings are for Indigo Release
 W = Warning
 I = Ignore
 E = Error
@@ -29,6 +29,8 @@ Code style
  - Method with a constructor name       - W
  - Parameter assignment                 - I
  - Non-externalized strings             - I
+ - Method can be static                 - I (Eclipse 3.7+)
+ - Method can potentially be static     - I (Eclipse 3.7+)
 Potential programming errors
  - All                                  - W
 Name shadowing and conflicts
