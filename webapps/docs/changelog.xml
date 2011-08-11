@@ -75,8 +75,10 @@
   </subsection>
   <subsection name="Coyote">
     <changelog>
-      <bug>51641</bug>: Use correct key when removing processor instances from
-      the connections map during clean-up. Patch provided by zhh. (mark)
+      <fix>
+        <bug>51641</bug>: Use correct key when removing processor instances from
+        the connections map during clean-up. Patch provided by zhh. (mark)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
