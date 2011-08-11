@@ -23,6 +23,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
@@ -296,6 +297,13 @@ public class NamingContextListener
             }
 
             ContextAccessController.unsetSecurityToken(getName(), container);
+            
+            // unregister mbeans.
+            Collection<ObjectName> names = objectNames.values();
+            for (ObjectName objectName : names) {
+                Registry.getRegistry(null, null).unregisterComponent(objectName);
+            }
+            objectNames.clear();
 
             namingContext = null;
             envCtx = null;
