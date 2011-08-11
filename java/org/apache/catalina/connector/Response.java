@@ -49,6 +49,7 @@ import org.apache.catalina.core.ApplicationSessionCookieConfig;
 import org.apache.catalina.security.SecurityUtil;
 import org.apache.catalina.util.CharsetMapper;
 import org.apache.catalina.util.DateTool;
+import org.apache.catalina.util.RequestUtil;
 import org.apache.tomcat.util.buf.CharChunk;
 import org.apache.tomcat.util.buf.UEncoder;
 import org.apache.tomcat.util.http.FastHttpDateFormat;
@@ -1335,8 +1336,8 @@ public class Response
             setStatus(SC_FOUND);
             setHeader("Location", absolute);
             PrintWriter writer = getWriter();
-            writer.print(
-                    sm.getString("coyoteResponse.sendRedirect.note", absolute));
+            writer.print(sm.getString("coyoteResponse.sendRedirect.note",
+                    RequestUtil.filter(absolute)));
             flushBuffer();
         } catch (IllegalArgumentException e) {
             setStatus(SC_NOT_FOUND);
