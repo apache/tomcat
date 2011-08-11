@@ -57,6 +57,10 @@
   <subsection name="Catalina">
     <changelog>
       <add>
+        <bug>41718</bug>: Include a response body when sending a redirect.
+        (markt)
+      </add>
+      <add>
         <bug>51640</bug>: Improve the memory leak prevention for leaks triggered
         by java.sql.DriverManager. (markt)
       </add>
