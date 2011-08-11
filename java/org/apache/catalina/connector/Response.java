@@ -1327,13 +1327,17 @@ public class Response
             return; 
 
         // Clear any data content that has been buffered
-        resetBuffer();
+        resetBuffer(true);
 
         // Generate a temporary redirect to the specified location
         try {
             String absolute = toAbsolute(location);
             setStatus(SC_FOUND);
             setHeader("Location", absolute);
+            PrintWriter writer = getWriter();
+            writer.print(
+                    sm.getString("coyoteResponse.sendRedirect.note", absolute));
+            flushBuffer();
         } catch (IllegalArgumentException e) {
             setStatus(SC_NOT_FOUND);
         }
