@@ -64,6 +64,9 @@
         <bug>51644</bug>: Fix annotation scanning for contexts with a
         multi-level context path such as /a/b. (markt)
       </fix>
+      <fix>
+        Unregisters MBean of DataSource when web application stops. (kfujino)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
