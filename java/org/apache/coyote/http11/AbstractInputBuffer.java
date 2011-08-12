@@ -17,7 +17,6 @@
 package org.apache.coyote.http11;
 
 import java.io.IOException;
-import java.io.InputStream;
 
 import org.apache.coyote.InputBuffer;
 import org.apache.coyote.Request;
@@ -137,12 +136,6 @@ public abstract class AbstractInputBuffer implements InputBuffer{
 
 
     /**
-     * Underlying input stream.
-     */
-    protected InputStream inputStream;
-
-
-    /**
      * Underlying input buffer.
      */
     protected InputBuffer inputStreamInputBuffer;
@@ -168,28 +161,6 @@ public abstract class AbstractInputBuffer implements InputBuffer{
 
 
     // ------------------------------------------------------------- Properties
-
-
-    /**
-     * Set the underlying socket input stream.
-     */
-    public void setInputStream(InputStream inputStream) {
-
-        // FIXME: Check for null ?
-
-        this.inputStream = inputStream;
-
-    }
-
-
-    /**
-     * Get the underlying socket input stream.
-     */
-    public InputStream getInputStream() {
-
-        return inputStream;
-
-    }
 
 
     /**
@@ -271,7 +242,6 @@ public abstract class AbstractInputBuffer implements InputBuffer{
         // Recycle Request object
         request.recycle();
 
-        inputStream = null;
         lastValid = 0;
         pos = 0;
         lastActiveFilter = -1;

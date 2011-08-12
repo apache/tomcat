@@ -18,6 +18,7 @@ package org.apache.coyote.http11;
 
 import java.io.EOFException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.Charset;
 
 import org.apache.coyote.InputBuffer;
@@ -36,6 +37,12 @@ import org.apache.tomcat.util.buf.MessageBytes;
 public class InternalInputBuffer extends AbstractInputBuffer {
 
     private static final Log log = LogFactory.getLog(InternalInputBuffer.class);
+
+
+    /**
+     * Underlying input stream.
+     */
+    protected InputStream inputStream;
 
 
     /**
@@ -58,6 +65,29 @@ public class InternalInputBuffer extends AbstractInputBuffer {
         swallowInput = true;
 
     }
+
+    
+    /**
+     * Set the underlying socket input stream.
+     */
+    public void setInputStream(InputStream inputStream) {
+
+        // FIXME: Check for null ?
+
+        this.inputStream = inputStream;
+
+    }
+
+
+    /**
+     * Get the underlying socket input stream.
+     */
+    public InputStream getInputStream() {
+
+        return inputStream;
+
+    }
+
 
     /**
      * Read the request line. This function is meant to be used during the 
@@ -425,6 +455,13 @@ public class InternalInputBuffer extends AbstractInputBuffer {
 
         return true;
 
+    }
+
+
+    @Override
+    public void recycle() {
+        super.recycle();
+        inputStream = null;
     }
 
 
