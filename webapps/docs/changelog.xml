@@ -89,6 +89,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Web applications">
+    <changelog>
+      <fix>
+        <bug>51649</bug>: Update the documentation web application to include
+        the ThreadLocal leak prevention listener. (markt)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 7.0.20 (markt)" rtext="released 2011-08-11">
   <subsection name="Catalina">
