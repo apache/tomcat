@@ -175,8 +175,7 @@ public class Http11AprProcessor extends AbstractHttp11Processor<Long> {
         // Setting up the socket
         this.socket = socketWrapper;
         inputBuffer.init(socketWrapper, endpoint);
-        long socketRef = socketWrapper.getSocket().longValue();
-        outputBuffer.setSocket(socketRef);
+        outputBuffer.init(socketWrapper, endpoint);
 
         // Error flag
         error = false;
@@ -189,6 +188,8 @@ public class Http11AprProcessor extends AbstractHttp11Processor<Long> {
         boolean keptAlive = false;
         boolean openSocket = false;
         boolean sendfileInProgress = false;
+
+        long socketRef = socketWrapper.getSocket().longValue();
 
         while (!error && keepAlive && !comet && !isAsync() && !endpoint.isPaused()) {
 
@@ -624,7 +625,7 @@ public class Http11AprProcessor extends AbstractHttp11Processor<Long> {
     }
 
     @Override
-    protected AbstractOutputBuffer getOutputBuffer() {
+    protected AbstractOutputBuffer<Long> getOutputBuffer() {
         return outputBuffer;
     }
 }

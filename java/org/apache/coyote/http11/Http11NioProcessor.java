@@ -206,8 +206,7 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
         // Setting up the socket
         this.socket = socketWrapper;
         inputBuffer.init(socketWrapper, endpoint);
-        outputBuffer.setSocket(this.socket.getSocket());
-        outputBuffer.setSelectorPool(((NioEndpoint)endpoint).getSelectorPool());
+        outputBuffer.init(socketWrapper, endpoint);
 
         // Error flag
         error = false;
@@ -651,7 +650,7 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
     }
 
     @Override
-    protected AbstractOutputBuffer getOutputBuffer() {
+    protected AbstractOutputBuffer<NioChannel> getOutputBuffer() {
         return outputBuffer;
     }
 
