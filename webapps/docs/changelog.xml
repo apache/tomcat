@@ -71,6 +71,10 @@
       <fix>
         Unregisters MBean of DataSource when web application stops. (kfujino)
       </fix>
+      <fix>
+        <bug>51650</bug>: Code clean-up. Patch provided by Felix Schumacher.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
