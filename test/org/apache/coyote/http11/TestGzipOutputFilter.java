@@ -54,7 +54,7 @@ public class TestGzipOutputFilter {
         Response res = new Response();
         InternalOutputBuffer iob = new InternalOutputBuffer(res, 8 * 1024);
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        iob.setOutputStream(bos);
+        iob.outputStream = bos;
         res.setOutputBuffer(iob);
 
         // set up GzipOutputFilter to attach to the InternalOutputBuffer

@@ -139,7 +139,7 @@ public class Http11Processor extends AbstractHttp11Processor<Socket> {
         // Setting up the I/O
         this.socket = socketWrapper;
         inputBuffer.init(socketWrapper, endpoint);
-        outputBuffer.setOutputStream(socket.getSocket().getOutputStream());
+        outputBuffer.init(socketWrapper, endpoint);
 
         // Error flag
         error = false;
@@ -563,7 +563,7 @@ public class Http11Processor extends AbstractHttp11Processor<Socket> {
     }
 
     @Override
-    protected AbstractOutputBuffer getOutputBuffer() {
+    protected AbstractOutputBuffer<Socket> getOutputBuffer() {
         return outputBuffer;
     }
 
