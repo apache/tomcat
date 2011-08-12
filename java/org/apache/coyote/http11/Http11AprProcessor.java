@@ -174,8 +174,8 @@ public class Http11AprProcessor extends AbstractHttp11Processor<Long> {
 
         // Setting up the socket
         this.socket = socketWrapper;
+        inputBuffer.init(socketWrapper, endpoint);
         long socketRef = socketWrapper.getSocket().longValue();
-        inputBuffer.setSocket(socketRef);
         outputBuffer.setSocket(socketRef);
 
         // Error flag
@@ -619,7 +619,7 @@ public class Http11AprProcessor extends AbstractHttp11Processor<Long> {
     }
 
     @Override
-    protected AbstractInputBuffer getInputBuffer() {
+    protected AbstractInputBuffer<Long> getInputBuffer() {
         return inputBuffer;
     }
 

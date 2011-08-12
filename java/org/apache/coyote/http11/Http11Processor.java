@@ -138,7 +138,7 @@ public class Http11Processor extends AbstractHttp11Processor<Socket> {
 
         // Setting up the I/O
         this.socket = socketWrapper;
-        inputBuffer.setInputStream(socket.getSocket().getInputStream());
+        inputBuffer.init(socketWrapper, endpoint);
         outputBuffer.setOutputStream(socket.getSocket().getOutputStream());
 
         // Error flag
@@ -558,7 +558,7 @@ public class Http11Processor extends AbstractHttp11Processor<Socket> {
     }
 
     @Override
-    protected AbstractInputBuffer getInputBuffer() {
+    protected AbstractInputBuffer<Socket> getInputBuffer() {
         return inputBuffer;
     }
 

@@ -22,9 +22,11 @@ import org.apache.coyote.InputBuffer;
 import org.apache.coyote.Request;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.http.MimeHeaders;
+import org.apache.tomcat.util.net.AbstractEndpoint;
+import org.apache.tomcat.util.net.SocketWrapper;
 import org.apache.tomcat.util.res.StringManager;
 
-public abstract class AbstractInputBuffer implements InputBuffer{
+public abstract class AbstractInputBuffer<S> implements InputBuffer{
 
     protected static final boolean[] HTTP_TOKEN_CHAR = new boolean[128];
 
@@ -223,11 +225,15 @@ public abstract class AbstractInputBuffer implements InputBuffer{
     }
 
 
-    public abstract boolean parseRequestLine(boolean useAvailableDataOnly) throws IOException;
+    public abstract boolean parseRequestLine(boolean useAvailableDataOnly)
+        throws IOException;
     
     public abstract boolean parseHeaders() throws IOException;
     
     protected abstract boolean fill(boolean block) throws IOException; 
+
+    protected abstract void init(SocketWrapper<S> socketWrapper,
+            AbstractEndpoint endpoint) throws IOException;
 
 
     // --------------------------------------------------------- Public Methods

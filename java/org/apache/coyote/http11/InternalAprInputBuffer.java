@@ -30,6 +30,8 @@ import org.apache.tomcat.jni.Socket;
 import org.apache.tomcat.jni.Status;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.buf.MessageBytes;
+import org.apache.tomcat.util.net.AbstractEndpoint;
+import org.apache.tomcat.util.net.SocketWrapper;
 
 /**
  * Implementation of InputBuffer which provides HTTP request header parsing as
@@ -37,7 +39,7 @@ import org.apache.tomcat.util.buf.MessageBytes;
  *
  * @author <a href="mailto:remm@apache.org">Remy Maucherat</a>
  */
-public class InternalAprInputBuffer extends AbstractInputBuffer {
+public class InternalAprInputBuffer extends AbstractInputBuffer<Long> {
 
     private static final Log log =
         LogFactory.getLog(InternalAprInputBuffer.class);
@@ -78,37 +80,16 @@ public class InternalAprInputBuffer extends AbstractInputBuffer {
     /**
      * Direct byte buffer used to perform actual reading.
      */
-    protected ByteBuffer bbuf;
+    private ByteBuffer bbuf;
 
 
     /**
      * Underlying socket.
      */
-    protected long socket;
-
-
-    // ------------------------------------------------------------- Properties
-
-
-    /**
-     * Set the underlying socket.
-     */
-    public void setSocket(long socket) {
-        this.socket = socket;
-        Socket.setrbb(this.socket, bbuf);
-    }
-
-
-    /**
-     * Get the underlying socket input stream.
-     */
-    public long getSocket() {
-        return socket;
-    }
+    private long socket;
 
 
     // --------------------------------------------------------- Public Methods
-
 
     /**
      * Recycle the input buffer. This should be called when closing the 
@@ -341,7 +322,7 @@ public class InternalAprInputBuffer extends AbstractInputBuffer {
      * HTTP header parsing is done
      */
     @SuppressWarnings("null") // headerValue cannot be null
-    public boolean parseHeader()
+    private boolean parseHeader()
         throws IOException {
 
         //
@@ -567,6 +548,14 @@ public class InternalAprInputBuffer extends AbstractInputBuffer {
 
     // ------------------------------------------------------ Protected Methods
 
+    @Override
+    protected void init(SocketWrapper<Long> socketWrapper,
+            AbstractEndpoint endpoint) throws IOException {
+
+        socket = socketWrapper.getSocket().longValue();
+        Socket.setrbb(this.socket, bbuf);
+    }
+
 
     @Override
     protected boolean fill(boolean block) throws IOException {
@@ -666,11 +655,6 @@ public class InternalAprInputBuffer extends AbstractInputBuffer {
             pos = lastValid;
 
             return (length);
-
         }
-
-
     }
-
-
 }
