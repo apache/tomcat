@@ -19,6 +19,7 @@ package org.apache.coyote.http11;
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.Socket;
 import java.nio.charset.Charset;
 
 import org.apache.coyote.InputBuffer;
@@ -27,6 +28,8 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.buf.MessageBytes;
+import org.apache.tomcat.util.net.AbstractEndpoint;
+import org.apache.tomcat.util.net.SocketWrapper;
 
 /**
  * Implementation of InputBuffer which provides HTTP request header parsing as
@@ -34,7 +37,7 @@ import org.apache.tomcat.util.buf.MessageBytes;
  *
  * @author <a href="mailto:remm@apache.org">Remy Maucherat</a>
  */
-public class InternalInputBuffer extends AbstractInputBuffer {
+public class InternalInputBuffer extends AbstractInputBuffer<Socket> {
 
     private static final Log log = LogFactory.getLog(InternalInputBuffer.class);
 
@@ -42,7 +45,7 @@ public class InternalInputBuffer extends AbstractInputBuffer {
     /**
      * Underlying input stream.
      */
-    protected InputStream inputStream;
+    private InputStream inputStream;
 
 
     /**
@@ -67,28 +70,6 @@ public class InternalInputBuffer extends AbstractInputBuffer {
     }
 
     
-    /**
-     * Set the underlying socket input stream.
-     */
-    public void setInputStream(InputStream inputStream) {
-
-        // FIXME: Check for null ?
-
-        this.inputStream = inputStream;
-
-    }
-
-
-    /**
-     * Get the underlying socket input stream.
-     */
-    public InputStream getInputStream() {
-
-        return inputStream;
-
-    }
-
-
     /**
      * Read the request line. This function is meant to be used during the 
      * HTTP request header parsing. Do NOT attempt to read the request body 
@@ -297,7 +278,7 @@ public class InternalInputBuffer extends AbstractInputBuffer {
      * HTTP header parsing is done
      */
     @SuppressWarnings("null") // headerValue cannot be null
-    public boolean parseHeader()
+    private boolean parseHeader()
         throws IOException {
 
         //
@@ -468,6 +449,14 @@ public class InternalInputBuffer extends AbstractInputBuffer {
     // ------------------------------------------------------ Protected Methods
 
 
+    @Override
+    protected void init(SocketWrapper<Socket> socketWrapper,
+            AbstractEndpoint endpoint) throws IOException {
+        inputStream = socketWrapper.getSocket().getInputStream();
+    }
+
+
+
     private void skipLine(int start) throws IOException {
         boolean eol = false;
         int lastRealByte = start;
@@ -576,11 +565,6 @@ public class InternalInputBuffer extends AbstractInputBuffer {
             pos = lastValid;
 
             return (length);
-
         }
-
-
     }
-
-
 }
