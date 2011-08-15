@@ -70,6 +70,9 @@ public class TestStandardContextValve extends TomcatBaseTest {
         int rc = getUrl("http://localhost:" + getPort() + "/invalid",
                 new ByteChunk(), null);
 
+        tomcat.stop();
+        tomcat.destroy();
+
         assertEquals(Response.SC_NOT_FOUND, rc);
         assertEquals("InitErrorDestroy", trace.toString());
     }
