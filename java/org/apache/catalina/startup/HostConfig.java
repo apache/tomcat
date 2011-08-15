@@ -78,12 +78,6 @@ public class HostConfig
 
 
     /**
-     * App base.
-     */
-    protected File appBase = null;
-
-
-    /**
      * Config base.
      */
     protected File configBase = null;
@@ -404,22 +398,6 @@ public class HostConfig
     
 
     /**
-     * Return a File object representing the "application root" directory
-     * for our associated Host.
-     */
-    protected File appBase() {
-
-        if (appBase != null) {
-            return appBase;
-        }
-        
-        appBase = returnCanonicalPath(host.getAppBase());
-        return appBase;
-
-    }
-
-
-    /**
      * Return a File object representing the "configuration root" directory
      * for our associated Host.
      */
@@ -461,7 +439,7 @@ public class HostConfig
      */
     protected void deployApps() {
 
-        File appBase = appBase();
+        File appBase = host.getAppBaseFile();
         File configBase = configBase();
         String[] filteredAppPaths = filterAppPaths(appBase.list());
         // Deploy XML descriptors from configBase
@@ -514,7 +492,7 @@ public class HostConfig
      */
     protected void deployApps(String name) {
 
-        File appBase = appBase();
+        File appBase = host.getAppBaseFile();
         File configBase = configBase();
         ContextName cn = new ContextName(name);
         String baseName = cn.getBaseName();
@@ -609,11 +587,11 @@ public class HostConfig
             if (context.getDocBase() != null) {
                 File docBase = new File(context.getDocBase());
                 if (!docBase.isAbsolute()) {
-                    docBase = new File(appBase(), context.getDocBase());
+                    docBase = new File(host.getAppBaseFile(), context.getDocBase());
                 }
                 // If external docBase, register .xml as redeploy first
                 if (!docBase.getCanonicalPath().startsWith(
-                        appBase().getAbsolutePath() + File.separator)) {
+                        host.getAppBaseFile().getAbsolutePath() + File.separator)) {
                     isExternal = true;
                     deployedApp.redeployResources.put(
                             contextXml.getAbsolutePath(),
@@ -634,13 +612,13 @@ public class HostConfig
             // Get paths for WAR and expanded WAR in appBase
 
             // default to appBase dir + name
-            File expandedDocBase = new File(appBase(), cn.getBaseName());
+            File expandedDocBase = new File(host.getAppBaseFile(), cn.getBaseName());
             if (context.getDocBase() != null) {
                 // first assume docBase is absolute
                 expandedDocBase = new File(context.getDocBase());
                 if (!expandedDocBase.isAbsolute()) {
                     // if docBase specified and relative, it must be relative to appBase
-                    expandedDocBase = new File(appBase(), context.getDocBase());
+                    expandedDocBase = new File(host.getAppBaseFile(), context.getDocBase());
                 }
             }
             // Add the eventual unpacked WAR and all the resources which will be
@@ -782,7 +760,7 @@ public class HostConfig
             xml = new File(configBase(),
                     file.substring(0, file.lastIndexOf(".")) + ".xml");
         } else {
-            xml = new File(appBase(),
+            xml = new File(host.getAppBaseFile(),
                     file.substring(0, file.lastIndexOf(".")) +
                     "/META-INF/context.xml");
         }
@@ -933,7 +911,7 @@ public class HostConfig
             // If we're unpacking WARs, the docBase will be mutated after
             // starting the context
             if (unpackWARs && (context.getDocBase() != null)) {
-                File docBase = new File(appBase(), cn.getBaseName());
+                File docBase = new File(host.getAppBaseFile(), cn.getBaseName());
                 deployedApp.redeployResources.put(docBase.getAbsolutePath(),
                         Long.valueOf(docBase.lastModified()));
                 addWatchedResources(deployedApp, docBase.getAbsolutePath(),
@@ -1102,7 +1080,7 @@ public class HostConfig
         if (docBase != null) {
             docBaseFile = new File(docBase);
             if (!docBaseFile.isAbsolute()) {
-                docBaseFile = new File(appBase(), docBase);
+                docBaseFile = new File(host.getAppBaseFile(), docBase);
             }
         }
         String[] watchedResources = context.findWatchedResources();
@@ -1161,7 +1139,7 @@ public class HostConfig
                             File current = new File(resources[j]);
                             current = current.getCanonicalFile();
                             if ((current.getAbsolutePath().startsWith(
-                                    appBase().getAbsolutePath() +
+                                    host.getAppBaseFile().getAbsolutePath() +
                                     File.separator))
                                     || (current.getAbsolutePath().startsWith(
                                             configBase().getAbsolutePath()))) {
@@ -1212,7 +1190,7 @@ public class HostConfig
                         File current = new File(resources[j]);
                         current = current.getCanonicalFile();
                         if ((current.getAbsolutePath().startsWith(
-                                appBase().getAbsolutePath() + File.separator))
+                                host.getAppBaseFile().getAbsolutePath() + File.separator))
                             || (current.getAbsolutePath().startsWith(
                                     configBase().getAbsolutePath()))) {
                             if (log.isDebugEnabled())
@@ -1233,7 +1211,7 @@ public class HostConfig
                         File current = new File(resources2[j]);
                         current = current.getCanonicalFile();
                         if ((current.getAbsolutePath().startsWith(
-                                appBase().getAbsolutePath() + File.separator))
+                                host.getAppBaseFile().getAbsolutePath() + File.separator))
                             || ((current.getAbsolutePath().startsWith(
                                     configBase().getAbsolutePath())
                                  && (current.getAbsolutePath().endsWith(".xml"))))) {
@@ -1310,7 +1288,7 @@ public class HostConfig
         }
         
         if (host.getCreateDirs()) {
-            File[] dirs = new File[] {appBase(),configBase()};
+            File[] dirs = new File[] {host.getAppBaseFile(),configBase()};
             for (int i=0; i<dirs.length; i++) {
                 if ( (!dirs[i].isDirectory()) && (!dirs[i].mkdirs())) {
                     log.error(sm.getString("hostConfig.createDirs",dirs[i]));
@@ -1318,9 +1296,9 @@ public class HostConfig
             }
         }
 
-        if (!appBase().isDirectory()) {
-            log.error(sm.getString(
-                    "hostConfig.appBase", host.getName(), appBase().getPath()));
+        if (!host.getAppBaseFile().isDirectory()) {
+            log.error(sm.getString("hostConfig.appBase", host.getName(),
+                    host.getAppBaseFile().getPath()));
             host.setDeployOnStartup(false);
             host.setAutoDeploy(false);
         }
@@ -1347,7 +1325,6 @@ public class HostConfig
             }
         }
         oname = null;
-        appBase = null;
         configBase = null;
 
     }
@@ -1403,7 +1380,7 @@ public class HostConfig
         if (context.getDocBase() != null) {
             File docBase = new File(context.getDocBase());
             if (!docBase.isAbsolute()) {
-                docBase = new File(appBase(), context.getDocBase());
+                docBase = new File(host.getAppBaseFile(), context.getDocBase());
             }
             deployedApp.redeployResources.put(docBase.getAbsolutePath(),
                     Long.valueOf(docBase.lastModified()));
@@ -1415,7 +1392,7 @@ public class HostConfig
         // Add the eventual unpacked WAR and all the resources which will be
         // watched inside it
         if (isWar && unpackWARs) {
-            File docBase = new File(appBase(), context.getBaseName());
+            File docBase = new File(host.getAppBaseFile(), context.getBaseName());
             deployedApp.redeployResources.put(docBase.getAbsolutePath(),
                         Long.valueOf(docBase.lastModified()));
             addWatchedResources(deployedApp, docBase.getAbsolutePath(), context);

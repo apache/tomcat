@@ -308,7 +308,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
 
                 // Identify the appBase of the owning Host of this Context
                 // (if any)
-                File file = new File(getAppBase(), filename);
+                File file = new File(host.getAppBaseFile(), filename);
                 if (file.exists()) {
                     message = smClient.getString(
                             "htmlManagerServlet.deployUploadWarExists",

@@ -495,29 +495,6 @@ public class FarmWarDeployer extends ClusterListener
     }
 
     /**
-     * Return a File object representing the "application root" directory for
-     * our associated Host.
-     */
-    protected File getAppBase() {
-
-        if (appBase != null) {
-            return appBase;
-        }
-
-        File file = new File(host.getAppBase());
-        if (!file.isAbsolute())
-            file = new File(System.getProperty(Globals.CATALINA_BASE_PROP), host
-                    .getAppBase());
-        try {
-            appBase = file.getCanonicalFile();
-        } catch (IOException e) {
-            appBase = file;
-        }
-        return (appBase);
-
-    }
-
-    /**
      * Invoke the remove method on the deployer.
      */
     protected void remove(String contextName) throws Exception {
@@ -530,8 +507,8 @@ public class FarmWarDeployer extends ClusterListener
                         contextName));
             context.stop();
             String baseName = context.getBaseName();
-            File war = new File(getAppBase(), baseName + ".war");
-            File dir = new File(getAppBase(), baseName);
+            File war = new File(host.getAppBaseFile(), baseName + ".war");
+            File dir = new File(host.getAppBaseFile(), baseName);
             File xml = new File(configBase, baseName + ".xml");
             if (war.exists()) {
                 if (!war.delete()) {

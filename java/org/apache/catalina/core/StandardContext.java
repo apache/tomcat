@@ -5857,10 +5857,7 @@ public class StandardContext extends ContainerBase
                 docBase = (new File(engineBase(), getDocBase())).getPath();
             } else {
                 // Use the "appBase" property of this container
-                String appBase = ((Host) container).getAppBase();
-                file = new File(appBase);
-                if (!file.isAbsolute())
-                    file = new File(engineBase(), appBase);
+                file = ((Host) container).getAppBaseFile();
                 docBase = (new File(file, getDocBase())).getPath();
             }
         } else {
