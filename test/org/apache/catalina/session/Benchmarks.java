@@ -72,7 +72,11 @@ public class Benchmarks {
 
         // Create a default session manager
         StandardManager mgr = new StandardManager();
-        mgr.startInternal();
+        try {
+            mgr.startInternal();
+        } catch (LifecycleException e) {
+            // Ignore - this is expected
+        }
         mgr.generateSessionId();
         while (mgr.sessionCreationTiming.size() <
                 ManagerBase.TIMING_STATS_CACHE_SIZE) {
@@ -164,7 +168,11 @@ public class Benchmarks {
 
         // Create a default session manager
         StandardManager mgr = new StandardManager();
-        mgr.startInternal();
+        try {
+            mgr.startInternal();
+        } catch (LifecycleException e) {
+            // Ignore - this is expected
+        }
         mgr.setContainer(new StandardContext());
         mgr.generateSessionId();
         while (mgr.sessionCreationTiming.size() <
