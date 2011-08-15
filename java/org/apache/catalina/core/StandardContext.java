@@ -5871,24 +5871,6 @@ public class StandardContext extends ContainerBase
 
 
     /**
-     * Get app base.
-     */
-    protected String getAppBase() {
-        String appBase = null;
-        Container container = this;
-        while (container != null) {
-            if (container instanceof Host)
-                break;
-            container = container.getParent();
-        }
-        if (container != null) {
-            appBase = ((Host) container).getAppBase();
-        }
-        return appBase;
-    }
-
-
-    /**
      * Get naming context full name.
      */
     private String getNamingContextName() {
