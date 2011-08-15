@@ -1318,6 +1318,13 @@ public class HostConfig
             }
         }
 
+        if (!appBase().isDirectory()) {
+            log.error(sm.getString(
+                    "hostConfig.appBase", host.getName(), appBase().getPath()));
+            host.setDeployOnStartup(false);
+            host.setAutoDeploy(false);
+        }
+
         if (host.getDeployOnStartup())
             deployApps();
         
