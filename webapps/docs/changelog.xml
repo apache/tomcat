@@ -332,7 +332,7 @@
         <code>web.xml</code>. (kkolinko)
       </update>
       <fix>
-        Correctly handle uninstall with the Windows installer of the service is
+        Correctly handle uninstall with the Windows installer if the service is
         installed with a name that contains a &apos;-&apos; character. (markt)
       </fix>
       <fix>
