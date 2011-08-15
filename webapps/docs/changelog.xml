@@ -54,13 +54,6 @@
   issues to not "pop up" wrt. others).
 -->
 <section name="Tomcat 7.0.21 (markt)">
-  <subsection name="jdbc-pool">
-    <changelog>
-      <add>
-        <rev>1157874</rev><bug>51583</bug>: Fix shutdown delay  (fhanik)
-      </add>
-    </changelog>
-  </subsection>  
   <subsection name="Catalina">
     <changelog>
       <add>
@@ -114,6 +107,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Other">
+    <changelog>
+      <add>
+        <rev>1157874</rev><bug>51583</bug>: Fix jdbc-pool shutdown delay.
+        (fhanik)
+      </add>
+    </changelog>
+  </subsection>  
 </section>
 <section name="Tomcat 7.0.20 (markt)" rtext="released 2011-08-11">
   <subsection name="Catalina">
