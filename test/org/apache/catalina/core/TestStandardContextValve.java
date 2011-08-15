@@ -121,6 +121,17 @@ public class TestStandardContextValve extends TomcatBaseTest {
         int rc = getUrl("http://localhost:" + getPort() + "/test",
                 new ByteChunk(), null);
 
+        // Need to allow time (but not too long in case the test fails) for
+        // ServletRequestListener to complete
+        int i = 20;
+        while (i > 0) {
+            if (trace.toString().endsWith("Destroy")) {
+                break;
+            }
+            Thread.sleep(250);
+            i--;
+        }
+
         assertEquals(Response.SC_NOT_FOUND, rc);
         assertEquals("InitErrorDestroy", trace.toString());
     }
