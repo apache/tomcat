@@ -47,6 +47,14 @@
   should be listed here.
 -->
 <section name="Tomcat 8.0.0">
+  <subsection name="Catalina">
+    <changelog>
+      <scode>
+        Remove duplicate code that converted a Host&apos;s appBase attribute to
+        a canonical file. (markt)
+      </scode>
+    </changelog>
+  </subsection>
 </section>
 </body>
 </document>

@@ -473,12 +473,7 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
 
         // Identify the appBase of the owning Host of this Context
         // (if any)
-        String appBase = ((Host) context.getParent()).getAppBase();
-        deployed = new File(appBase);
-        if (!deployed.isAbsolute()) {
-            deployed = new File(System.getProperty(Globals.CATALINA_BASE_PROP),
-                                appBase);
-        }
+        deployed = ((Host) context.getParent()).getAppBaseFile();
         configBase = new File(System.getProperty(Globals.CATALINA_BASE_PROP), "conf");
         Container container = context;
         Container host = null;
@@ -667,7 +662,7 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
                         File localWarCopy = new File(deployedPath, baseName + ".war");
                         copy(localWar, localWarCopy);
                         localWar = localWarCopy;
-                        copy(localWar, new File(getAppBase(), baseName + ".war"));
+                        copy(localWar, new File(host.getAppBaseFile(), baseName + ".war"));
                     }
                     // Perform new deployment
                     check(name);
@@ -735,7 +730,7 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
             if (!isServiced(name)) {
                 addServiced(name);
                 try {
-                    copy(localWar, new File(getAppBase(), baseName + ".war"));
+                    copy(localWar, new File(host.getAppBaseFile(), baseName + ".war"));
                     // Perform new deployment
                     check(name);
                 } finally {
@@ -846,10 +841,10 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
                     if (war != null) {
                         if (war.endsWith(".war")) {
                             copy(new File(war), 
-                                    new File(getAppBase(), baseName + ".war"));
+                                    new File(host.getAppBaseFile(), baseName + ".war"));
                         } else {
                             copy(new File(war), 
-                                    new File(getAppBase(), baseName));
+                                    new File(host.getAppBaseFile(), baseName));
                         }
                     }
                     // Perform new deployment
@@ -1352,8 +1347,8 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
                     ExceptionUtils.handleThrowable(t);
                 }
                 try {
-                    File war = new File(getAppBase(), baseName + ".war");
-                    File dir = new File(getAppBase(), baseName);
+                    File war = new File(host.getAppBaseFile(), baseName + ".war");
+                    File dir = new File(host.getAppBaseFile(), baseName);
                     File xml = new File(configBase, baseName + ".xml");
                     if (war.exists() && !war.delete()) {
                         writer.println(smClient.getString(
@@ -1387,30 +1382,6 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
 
 
     // -------------------------------------------------------- Support Methods
-
-
-    /**
-     * Return a File object representing the "application root" directory
-     * for our associated Host.
-     */
-    protected File getAppBase() {
-
-        if (appBase != null) {
-            return appBase;
-        }
-
-        File file = new File(host.getAppBase());
-        if (!file.isAbsolute())
-            file = new File(System.getProperty(Globals.CATALINA_BASE_PROP),
-                            host.getAppBase());
-        try {
-            appBase = file.getCanonicalFile();
-        } catch (IOException e) {
-            appBase = file;
-        }
-        return (appBase);
-
-    }
 
 
     /**

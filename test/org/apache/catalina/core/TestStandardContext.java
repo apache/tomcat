@@ -75,7 +75,7 @@ public class TestStandardContext extends TomcatBaseTest {
         // Set up a container
         Tomcat tomcat = getTomcatInstance();
         
-        File docBase = new File(tomcat.getHost().getAppBase(), "ROOT");
+        File docBase = new File(tomcat.getHost().getAppBaseFile(), "ROOT");
         if (!docBase.exists() && !docBase.mkdirs()) {
             fail("Unable to create docBase");
         }

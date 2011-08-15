@@ -688,16 +688,7 @@ public class ContextConfig
         throws IOException {
         
         Host host = (Host) context.getParent();
-        String appBase = host.getAppBase();
-
-        File canonicalAppBase = new File(appBase);
-        if (canonicalAppBase.isAbsolute()) {
-            canonicalAppBase = canonicalAppBase.getCanonicalFile();
-        } else {
-            canonicalAppBase = 
-                new File(System.getProperty(Globals.CATALINA_BASE_PROP), appBase)
-                .getCanonicalFile();
-        }
+        File appBase = host.getAppBaseFile();
 
         String docBase = context.getDocBase();
         if (docBase == null) {
@@ -712,7 +703,7 @@ public class ContextConfig
 
         File file = new File(docBase);
         if (!file.isAbsolute()) {
-            docBase = (new File(canonicalAppBase, docBase)).getPath();
+            docBase = (new File(appBase, docBase)).getPath();
         } else {
             docBase = file.getCanonicalPath();
         }
@@ -727,7 +718,7 @@ public class ContextConfig
         if (host instanceof StandardHost) {
             unpackWARs = ((StandardHost) host).isUnpackWARs() &&
                     ((StandardContext) context).getUnpackWAR() &&
-                    (docBase.startsWith(canonicalAppBase.getPath()));
+                    (docBase.startsWith(host.getAppBaseFile().getPath()));
         }
 
         if (docBase.toLowerCase(Locale.ENGLISH).endsWith(".war") && !file.isDirectory() && unpackWARs) {
@@ -765,8 +756,8 @@ public class ContextConfig
             }
         }
 
-        if (docBase.startsWith(canonicalAppBase.getPath() + File.separatorChar)) {
-            docBase = docBase.substring(canonicalAppBase.getPath().length());
+        if (docBase.startsWith(appBase.getPath() + File.separatorChar)) {
+            docBase = docBase.substring(appBase.getPath().length());
             docBase = docBase.replace(File.separatorChar, '/');
             if (docBase.startsWith("/")) {
                 docBase = docBase.substring(1);
@@ -786,7 +777,6 @@ public class ContextConfig
             && ((StandardContext) context).getAntiResourceLocking()) {
             
             Host host = (Host) context.getParent();
-            String appBase = host.getAppBase();
             String docBase = context.getDocBase();
             if (docBase == null)
                 return;
@@ -797,11 +787,7 @@ public class ContextConfig
             }
             File docBaseFile = new File(docBase);
             if (!docBaseFile.isAbsolute()) {
-                File file = new File(appBase);
-                if (!file.isAbsolute()) {
-                    file = new File(System.getProperty(Globals.CATALINA_BASE_PROP), appBase);
-                }
-                docBaseFile = new File(file, docBase);
+                docBaseFile = new File(host.getAppBaseFile(), docBase);
             }
             
             String path = context.getPath();
@@ -1077,12 +1063,11 @@ public class ContextConfig
 
         // Remove (partially) folders and files created by antiLocking
         Host host = (Host) context.getParent();
-        String appBase = host.getAppBase();
         String docBase = context.getDocBase();
         if ((docBase != null) && (originalDocBase != null)) {
             File docBaseFile = new File(docBase);
             if (!docBaseFile.isAbsolute()) {
-                docBaseFile = new File(appBase, docBase);
+                docBaseFile = new File(host.getAppBaseFile(), docBase);
             }
             // No need to log failure - it is expected in this case
             ExpandWar.delete(docBaseFile, false);

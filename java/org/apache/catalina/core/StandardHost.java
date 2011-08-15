@@ -17,6 +17,8 @@
 package org.apache.catalina.core;
 
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -26,6 +28,7 @@ import java.util.regex.Pattern;
 
 import org.apache.catalina.Container;
 import org.apache.catalina.Context;
+import org.apache.catalina.Globals;
 import org.apache.catalina.Host;
 import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleEvent;
@@ -82,6 +85,7 @@ public class StandardHost extends ContainerBase implements Host {
      * The application root for this Host.
      */
     private String appBase = "webapps";
+    private volatile File appBaseFile = null;
 
     /**
      * The XML root for this Host.
@@ -186,22 +190,40 @@ public class StandardHost extends ContainerBase implements Host {
      */
     @Override
     public String getAppBase() {
-
         return (this.appBase);
-
     }
+
 
     /**
-     * Return the XML root for this Host.  This can be an absolute
-     * pathname, a relative pathname, or a URL.
-     * If null, defaults to ${catalina.base}/conf/ directory
+     * ({@inheritDoc}
      */
     @Override
-    public String getXmlBase() {
+    public File getAppBaseFile() {
+        
+        if (appBaseFile != null) {
+            return appBaseFile;
+        }
 
-        return (this.xmlBase);
+        File file = new File(getAppBase());
+        
+        // If not absolute, make it absolute
+        if (!file.isAbsolute()) {
+            // This system property should always be set
+            file = new File(System.getProperty(Globals.CATALINA_BASE_PROP),
+                    file.getPath());
+        }
+        
+        // Make it canonical if possible
+        try {
+            file = file.getCanonicalFile();
+        } catch (IOException ioe) {
+            // Ignore
+        }
 
+        this.appBaseFile = file;
+        return file;
     }
+
 
     /**
      * Set the application root for this Host.  This can be an absolute
@@ -215,9 +237,23 @@ public class StandardHost extends ContainerBase implements Host {
         String oldAppBase = this.appBase;
         this.appBase = appBase;
         support.firePropertyChange("appBase", oldAppBase, this.appBase);
+        this.appBaseFile = null;
+    }
+
+
+    /**
+     * Return the XML root for this Host.  This can be an absolute
+     * pathname, a relative pathname, or a URL.
+     * If null, defaults to ${catalina.base}/conf/ directory
+     */
+    @Override
+    public String getXmlBase() {
+
+        return (this.xmlBase);
 
     }
-    
+
+
     /**
      * Set the Xml root for this Host.  This can be an absolute
      * pathname, a relative pathname, or a URL.
@@ -233,6 +269,7 @@ public class StandardHost extends ContainerBase implements Host {
         support.firePropertyChange("xmlBase", oldXmlBase, this.xmlBase);
 
     }
+
 
     /**
      * Returns true if the Host will attempt to create directories for appBase and xmlBase

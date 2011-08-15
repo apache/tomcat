@@ -31,7 +31,6 @@ import java.util.Enumeration;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
-import org.apache.catalina.Globals;
 import org.apache.catalina.Host;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -77,18 +76,7 @@ public class ExpandWar {
         throws IOException {
 
         // Make sure that there is no such directory already existing
-        File appBase = new File(host.getAppBase());
-        if (!appBase.isAbsolute()) {
-            appBase = new File(System.getProperty(Globals.CATALINA_BASE_PROP),
-                               host.getAppBase());
-        }
-        if (!appBase.exists() || !appBase.isDirectory()) {
-            throw new IOException
-                (sm.getString("hostConfig.appBase",
-                              appBase.getAbsolutePath()));
-        }
-        
-        File docBase = new File(appBase, pathname);
+        File docBase = new File(host.getAppBaseFile(), pathname);
         if (docBase.exists()) {
             // War file is already installed
             return (docBase.getAbsolutePath());
@@ -193,14 +181,7 @@ public class ExpandWar {
     public static void validate(Host host, URL war, String pathname)
         throws IOException {
 
-        // Make the appBase absolute
-        File appBase = new File(host.getAppBase());
-        if (!appBase.isAbsolute()) {
-            appBase = new File(System.getProperty(Globals.CATALINA_BASE_PROP),
-                               host.getAppBase());
-        }
-        
-        File docBase = new File(appBase, pathname);
+        File docBase = new File(host.getAppBaseFile(), pathname);
 
         // Calculate the document base directory
         String canonicalDocBasePrefix = docBase.getCanonicalPath();

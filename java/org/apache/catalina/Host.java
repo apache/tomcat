@@ -16,6 +16,7 @@
  */
 package org.apache.catalina;
 
+import java.io.File;
 import java.util.regex.Pattern;
 
 
@@ -83,11 +84,19 @@ public interface Host extends Container {
      */
     public void setXmlBase(String xmlBase);
 
-        /**
+    /**
      * Return the application root for this Host.  This can be an absolute
      * pathname, a relative pathname, or a URL.
      */
     public String getAppBase();
+
+
+    /**
+     * Return an absolute {@link File} for the appBase of this Host. The file
+     * will be canonical if possible. There is no guarantee that that the
+     * appBase exists.
+     */
+    public File getAppBaseFile();
 
 
     /**
