@@ -81,6 +81,10 @@
         is completed before the requestDestroyed event of any
         ServletRequestListener is fired. (markt)
       </fix>
+      <fix>
+        <bug>51654</bug>: Improve handling of invalid appBase settings for Host
+        elements. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
