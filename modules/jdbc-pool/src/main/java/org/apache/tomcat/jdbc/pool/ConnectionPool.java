@@ -364,7 +364,9 @@ public class ConnectionPool {
                         release(con);
                     else
                         abandon(con);
-                    con = pool.poll(1000, TimeUnit.MILLISECONDS);
+                    if (pool.size()>0) {
+                        con = pool.poll(1000, TimeUnit.MILLISECONDS);
+                    }
                 } //while
             } catch (InterruptedException ex) {
                 Thread.interrupted();
