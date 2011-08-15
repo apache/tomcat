@@ -82,6 +82,12 @@
         <bug>51650</bug>: Code clean-up. Patch provided by Felix Schumacher.
         (markt)
       </fix>
+      <fix>
+        <bug>51653</bug>: Move application level error page handling from the
+        Host to the Context. This ensures that application error page handling
+        is completed before the requestDestroyed event of any
+        ServletRequestListener is fired. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
