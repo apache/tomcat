@@ -280,7 +280,7 @@ public class DigestAuthenticator extends AuthenticatorBase {
 
         // Send an "unauthorized" response and an appropriate challenge
 
-        // Next, generate a nOnce token (that is a token which is supposed
+        // Next, generate a nonce token (that is a token which is supposed
         // to be unique).
         String nonce = generateNonce(request);
 
@@ -395,7 +395,7 @@ public class DigestAuthenticator extends AuthenticatorBase {
      *      WWW-Authenticate    = "WWW-Authenticate" ":" "Digest"
      *                            digest-challenge
      *
-     *      digest-challenge    = 1#( realm | [ domain ] | nOnce |
+     *      digest-challenge    = 1#( realm | [ domain ] | nonce |
      *                  [ digest-opaque ] |[ stale ] | [ algorithm ] )
      *
      *      realm               = "realm" "=" realm-value
@@ -412,12 +412,12 @@ public class DigestAuthenticator extends AuthenticatorBase {
      * @param response HTTP Servlet response
      * @param config    Login configuration describing how authentication
      *              should be performed
-     * @param nOnce nonce token
+     * @param nonce nonce token
      */
     protected void setAuthenticateHeader(HttpServletRequest request,
                                          HttpServletResponse response,
                                          LoginConfig config,
-                                         String nOnce,
+                                         String nonce,
                                          boolean isNonceStale) {
 
         // Get the realm name
@@ -428,11 +428,11 @@ public class DigestAuthenticator extends AuthenticatorBase {
         String authenticateHeader;
         if (isNonceStale) {
             authenticateHeader = "Digest realm=\"" + realmName + "\", " +
-            "qop=\"" + QOP + "\", nonce=\"" + nOnce + "\", " + "opaque=\"" +
+            "qop=\"" + QOP + "\", nonce=\"" + nonce + "\", " + "opaque=\"" +
             getOpaque() + "\", stale=true";
         } else {
             authenticateHeader = "Digest realm=\"" + realmName + "\", " +
-            "qop=\"" + QOP + "\", nonce=\"" + nOnce + "\", " + "opaque=\"" +
+            "qop=\"" + QOP + "\", nonce=\"" + nonce + "\", " + "opaque=\"" +
             getOpaque() + "\"";
         }
 
@@ -603,20 +603,20 @@ public class DigestAuthenticator extends AuthenticatorBase {
             if (i < 0 || (i + 1) == nonce.length()) {
                 return false;
             }
-            long nOnceTime;
+            long nonceTime;
             try {
-                nOnceTime = Long.parseLong(nonce.substring(0, i));
+                nonceTime = Long.parseLong(nonce.substring(0, i));
             } catch (NumberFormatException nfe) {
                 return false;
             }
             String md5clientIpTimeKey = nonce.substring(i + 1);
             long currentTime = System.currentTimeMillis();
-            if ((currentTime - nOnceTime) > nonceValidity) {
+            if ((currentTime - nonceTime) > nonceValidity) {
                 nonceStale = true;
                 return false;
             }
             String serverIpTimeKey =
-                request.getRemoteAddr() + ":" + nOnceTime + ":" + key;
+                request.getRemoteAddr() + ":" + nonceTime + ":" + key;
             byte[] buffer = null;
             synchronized (md5Helper) {
                 buffer = md5Helper.digest(
