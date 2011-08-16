@@ -299,10 +299,12 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
                 }
             }
             
-            if (maxKeepAliveRequests == 1 )
+            if (maxKeepAliveRequests == 1) {
                 keepAlive = false;
-            if (maxKeepAliveRequests > 0 && socketWrapper.decrementKeepAlive() <= 0)
+            } else if (maxKeepAliveRequests > 0 &&
+                    socketWrapper.decrementKeepAlive() <= 0) {
                 keepAlive = false;
+            }
 
             // Process the request in the adapter
             if (!error) {

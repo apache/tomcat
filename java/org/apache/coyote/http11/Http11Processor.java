@@ -148,10 +148,6 @@ public class Http11Processor extends AbstractHttp11Processor<Socket> {
 
         int soTimeout = endpoint.getSoTimeout();
 
-        if (maxKeepAliveRequests > 0) {
-            socketWrapper.decrementKeepAlive();
-        }
-        
         int threadRatio = -1;   
         // These may return zero or negative values     
         // Only calculate a thread ratio when both are >0 to ensure we get a    
@@ -269,7 +265,10 @@ public class Http11Processor extends AbstractHttp11Processor<Socket> {
                 }
             }
 
-            if (socketWrapper.getKeepAliveLeft() == 0) {
+            if (maxKeepAliveRequests == 1) {
+                keepAlive = false;
+            } else if (maxKeepAliveRequests > 0 &&
+                    socketWrapper.decrementKeepAlive() <= 0) {
                 keepAlive = false;
             }
 
@@ -350,10 +349,6 @@ public class Http11Processor extends AbstractHttp11Processor<Socket> {
             // used by another connection
             if (isAsync() || error || inputBuffer.lastValid == 0) {
                 break;
-            }
-            
-            if (maxKeepAliveRequests > 0) {
-                socketWrapper.decrementKeepAlive();
             }
         }
 
