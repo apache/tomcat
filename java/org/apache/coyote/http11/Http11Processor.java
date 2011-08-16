@@ -144,6 +144,7 @@ public class Http11Processor extends AbstractHttp11Processor<Socket> {
         // Error flag
         error = false;
         keepAlive = true;
+        comet = false;
 
         if (maxKeepAliveRequests > 0) {
             socketWrapper.decrementKeepAlive();
