@@ -778,6 +778,14 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
     
 
     /**
+     * Processors (currently only HTTP BIO) may elect to disable HTTP keep-alive
+     * in some circumstances. This method allows the processor implementation to
+     * determine if keep-alive should be disabled or not. 
+     */
+    protected abstract boolean disableKeepAlive();
+
+
+    /**
      * After reading the request headers, we have to setup the request filters.
      */
     protected void prepareRequest() {
