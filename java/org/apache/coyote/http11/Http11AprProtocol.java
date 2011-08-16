@@ -217,7 +217,7 @@ public class Http11AprProtocol extends AbstractHttp11Protocol {
             recycledProcessors.offer(processor);
             if (addToPoller) {
                 ((AprEndpoint)proto.endpoint).getPoller().add(
-                        socket.getSocket().longValue());
+                        socket.getSocket().longValue(), true);
             }
         }
 
@@ -236,7 +236,7 @@ public class Http11AprProtocol extends AbstractHttp11Protocol {
                 socket.setAsync(true);
             } else if (processor.comet) {
                 ((AprEndpoint) proto.endpoint).getCometPoller().add(
-                        socket.getSocket().longValue());
+                        socket.getSocket().longValue(), false);
             }
         }
 
