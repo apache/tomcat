@@ -500,7 +500,7 @@ public class CoyoteAdapter implements Adapter {
                             request, response, time, true);
                 } else if (request.mappingData.host != null) {
                     logged = true;
-                    ((Context) request.mappingData.context).logAccess(
+                    ((Host) request.mappingData.host).logAccess(
                             request, response, time, true);
                 }
             }
