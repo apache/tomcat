@@ -612,14 +612,14 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
      * Exposes input buffer to super class to allow better code re-use.
      * @return  The input buffer used by the processor. 
      */
-    protected abstract AbstractInputBuffer getInputBuffer();
+    protected abstract AbstractInputBuffer<S> getInputBuffer();
 
     
     /**
      * Exposes output buffer to super class to allow better code re-use.
      * @return  The output buffer used by the processor. 
      */
-    protected abstract AbstractOutputBuffer getOutputBuffer();
+    protected abstract AbstractOutputBuffer<S> getOutputBuffer();
 
     
     /**
@@ -747,7 +747,7 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
             InputFilter savedBody = new SavedRequestInputFilter(body);
             savedBody.setRequest(request);
 
-            AbstractInputBuffer internalBuffer = (AbstractInputBuffer)
+            AbstractInputBuffer<S> internalBuffer = (AbstractInputBuffer<S>)
                 request.getInputBuffer();
             internalBuffer.addActiveFilter(savedBody);
         } else if (actionCode == ActionCode.ASYNC_START) {
