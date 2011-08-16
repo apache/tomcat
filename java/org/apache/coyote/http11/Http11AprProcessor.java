@@ -182,8 +182,9 @@ public class Http11AprProcessor extends AbstractHttp11Processor<Long> {
         keepAlive = true;
         comet = false;
 
-        int keepAliveLeft = maxKeepAliveRequests;
         long soTimeout = endpoint.getSoTimeout();
+
+        int keepAliveLeft = maxKeepAliveRequests;
         
         boolean keptAlive = false;
         boolean openSocket = false;

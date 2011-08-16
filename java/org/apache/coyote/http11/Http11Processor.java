@@ -146,12 +146,12 @@ public class Http11Processor extends AbstractHttp11Processor<Socket> {
         keepAlive = true;
         comet = false;
 
+        int soTimeout = endpoint.getSoTimeout();
+
         if (maxKeepAliveRequests > 0) {
             socketWrapper.decrementKeepAlive();
         }
         
-        int soTimeout = endpoint.getSoTimeout();
-
         int threadRatio = -1;   
         // These may return zero or negative values     
         // Only calculate a thread ratio when both are >0 to ensure we get a    

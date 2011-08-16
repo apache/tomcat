@@ -123,7 +123,6 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
         throws IOException {
 
         long soTimeout = endpoint.getSoTimeout();
-        int keepAliveTimeout = endpoint.getKeepAliveTimeout();
 
         RequestInfo rp = request.getRequestProcessor();
         final NioEndpoint.KeyAttachment attach = (NioEndpoint.KeyAttachment)socket.getSocket().getAttachment(false);
@@ -176,7 +175,6 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
         if (!error && attach != null &&
                 asyncStateMachine.isAsyncDispatching()) {
             long soTimeout = endpoint.getSoTimeout();
-            int keepAliveTimeout = endpoint.getKeepAliveTimeout();
 
             //reset the timeout
             if (keepAlive && keepAliveTimeout>0) {
@@ -214,7 +212,6 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
         comet = false;
         
         long soTimeout = endpoint.getSoTimeout();
-        int keepAliveTimeout = endpoint.getKeepAliveTimeout();
 
         boolean keptAlive = false;
         boolean openSocket = false;
