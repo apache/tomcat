@@ -85,6 +85,10 @@
         <bug>51654</bug>: Improve handling of invalid appBase settings for Host
         elements. (markt)
       </fix>
+      <fix>
+        <bug>51658</bug>: Fix possible NPE when logging a failed request. Based
+        on a suggestion by Felix Schumacher. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
