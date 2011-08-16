@@ -27,9 +27,11 @@ import org.apache.coyote.Response;
 import org.apache.tomcat.util.MutableInteger;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.http.HttpMessages;
+import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.net.NioChannel;
 import org.apache.tomcat.util.net.NioEndpoint;
 import org.apache.tomcat.util.net.NioSelectorPool;
+import org.apache.tomcat.util.net.SocketWrapper;
 
 /**
  * Output buffer.
@@ -37,7 +39,7 @@ import org.apache.tomcat.util.net.NioSelectorPool;
  * @author <a href="mailto:remm@apache.org">Remy Maucherat</a>
  * @author Filip Hanik
  */
-public class InternalNioOutputBuffer extends AbstractOutputBuffer {
+public class InternalNioOutputBuffer extends AbstractOutputBuffer<NioChannel> {
 
     // ----------------------------------------------------------- Constructors
 
@@ -68,36 +70,18 @@ public class InternalNioOutputBuffer extends AbstractOutputBuffer {
     /**
      * Number of bytes last written
      */
-    protected MutableInteger lastWrite = new MutableInteger(1);
+    private MutableInteger lastWrite = new MutableInteger(1);
 
     /**
      * Underlying socket.
      */
-    protected NioChannel socket;
+    private NioChannel socket;
     
     /**
      * Selector pool, for blocking reads and blocking writes
      */
-    protected NioSelectorPool pool;
+    private NioSelectorPool pool;
 
-
-    // ------------------------------------------------------------- Properties
-
-
-    /**
-     * Set the underlying socket.
-     */
-    public void setSocket(NioChannel socket) {
-        this.socket = socket;
-    }
-
-    public void setSelectorPool(NioSelectorPool pool) { 
-        this.pool = pool;
-    }
-
-    public NioSelectorPool getSelectorPool() {
-        return pool;
-    }    
 
     // --------------------------------------------------------- Public Methods
 
@@ -178,18 +162,18 @@ public class InternalNioOutputBuffer extends AbstractOutputBuffer {
         long writeTimeout = att.getTimeout();
         Selector selector = null;
         try {
-            selector = getSelectorPool().get();
+            selector = pool.get();
         } catch ( IOException x ) {
             //ignore
         }
         try {
-            written = getSelectorPool().write(bytebuffer, socket, selector, writeTimeout, block,lastWrite);
+            written = pool.write(bytebuffer, socket, selector, writeTimeout, block,lastWrite);
             //make sure we are flushed 
             do {
                 if (socket.flush(true,selector,writeTimeout,lastWrite)) break;
             }while ( true );
         }finally { 
-            if ( selector != null ) getSelectorPool().put(selector);
+            if ( selector != null ) pool.put(selector);
         }
         if ( block ) bytebuffer.clear(); //only clear
         this.total = 0;
@@ -198,6 +182,14 @@ public class InternalNioOutputBuffer extends AbstractOutputBuffer {
 
 
     // ------------------------------------------------------ Protected Methods
+
+    @Override
+    public void init(SocketWrapper<NioChannel> socketWrapper,
+            AbstractEndpoint endpoint) throws IOException {
+
+        socket = socketWrapper.getSocket();
+        pool = ((NioEndpoint)endpoint).getSelectorPool();
+    }
 
 
     /**
@@ -220,7 +212,7 @@ public class InternalNioOutputBuffer extends AbstractOutputBuffer {
 
     }
 
-    int total = 0;
+    private int total = 0;
     private synchronized void addToBB(byte[] buf, int offset, int length) throws IOException {
         while (length > 0) {
             int thisTime = length;
@@ -245,8 +237,7 @@ public class InternalNioOutputBuffer extends AbstractOutputBuffer {
     /**
      * Callback to write data from the buffer.
      */
-    protected void flushBuffer()
-        throws IOException {
+    private void flushBuffer() throws IOException {
 
         //prevent timeout for async,
         SelectionKey key = socket.getIOChannel().keyFor(socket.getPoller().getSelector());
@@ -294,6 +285,4 @@ public class InternalNioOutputBuffer extends AbstractOutputBuffer {
             return byteCount;
         }
     }
-
-
 }

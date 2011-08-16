@@ -97,6 +97,10 @@
         <bug>51641</bug>: Use correct key when removing processor instances from
         the connections map during clean-up. Patch provided by zhh. (mark)
       </fix>
+      <fix>
+        More changes to align the code between the different HTTP connectors.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">

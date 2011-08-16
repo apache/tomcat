@@ -123,7 +123,6 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
         throws IOException {
 
         long soTimeout = endpoint.getSoTimeout();
-        int keepAliveTimeout = endpoint.getKeepAliveTimeout();
 
         RequestInfo rp = request.getRequestProcessor();
         final NioEndpoint.KeyAttachment attach = (NioEndpoint.KeyAttachment)socket.getSocket().getAttachment(false);
@@ -176,7 +175,6 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
         if (!error && attach != null &&
                 asyncStateMachine.isAsyncDispatching()) {
             long soTimeout = endpoint.getSoTimeout();
-            int keepAliveTimeout = endpoint.getKeepAliveTimeout();
 
             //reset the timeout
             if (keepAlive && keepAliveTimeout>0) {
@@ -205,18 +203,19 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
 
         // Setting up the socket
         this.socket = socketWrapper;
-        inputBuffer.setSocket(this.socket.getSocket());
-        outputBuffer.setSocket(this.socket.getSocket());
-        inputBuffer.setSelectorPool(((NioEndpoint)endpoint).getSelectorPool());
-        outputBuffer.setSelectorPool(((NioEndpoint)endpoint).getSelectorPool());
+        inputBuffer.init(socketWrapper, endpoint);
+        outputBuffer.init(socketWrapper, endpoint);
 
         // Error flag
         error = false;
         keepAlive = true;
         comet = false;
         
-        long soTimeout = endpoint.getSoTimeout();
-        int keepAliveTimeout = endpoint.getKeepAliveTimeout();
+        int soTimeout = endpoint.getSoTimeout();
+
+        if (disableKeepAlive()) {
+            socketWrapper.setKeepAliveLeft(0);
+        }
 
         boolean keptAlive = false;
         boolean openSocket = false;
@@ -228,7 +227,7 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
             // Parsing the request header
             try {
                 if( !disableUploadTimeout && keptAlive && soTimeout > 0 ) {
-                    socketWrapper.getSocket().getIOChannel().socket().setSoTimeout((int)soTimeout);
+                    socketWrapper.getSocket().getIOChannel().socket().setSoTimeout(soTimeout);
                 }
                 if (!inputBuffer.parseRequestLine(keptAlive)) {
                     // Haven't finished reading the request so keep the socket
@@ -304,10 +303,12 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
                 }
             }
             
-            if (maxKeepAliveRequests == 1 )
+            if (maxKeepAliveRequests == 1) {
                 keepAlive = false;
-            if (maxKeepAliveRequests > 0 && socketWrapper.decrementKeepAlive() <= 0)
+            } else if (maxKeepAliveRequests > 0 &&
+                    socketWrapper.decrementKeepAlive() <= 0) {
                 keepAlive = false;
+            }
 
             // Process the request in the adapter
             if (!error) {
@@ -398,6 +399,12 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
             return (openSocket) ? (readComplete?SocketState.OPEN:SocketState.LONG) : SocketState.CLOSED;
         }
 
+    }
+
+
+    @Override
+    protected boolean disableKeepAlive() {
+        return false;
     }
 
 
@@ -647,12 +654,12 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
     }
 
     @Override
-    protected AbstractInputBuffer getInputBuffer() {
+    protected AbstractInputBuffer<NioChannel> getInputBuffer() {
         return inputBuffer;
     }
 
     @Override
-    protected AbstractOutputBuffer getOutputBuffer() {
+    protected AbstractOutputBuffer<NioChannel> getOutputBuffer() {
         return outputBuffer;
     }
 

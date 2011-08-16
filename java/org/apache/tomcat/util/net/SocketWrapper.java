@@ -45,7 +45,6 @@ public class SocketWrapper<E> {
     public long getTimeout() {return this.timeout;}
     public boolean getError() { return error; }
     public void setError(boolean error) { this.error = error; }
-    public int getKeepAliveLeft() { return this.keepAliveLeft; }
     public void setKeepAliveLeft(int keepAliveLeft) { this.keepAliveLeft = keepAliveLeft;}
     public int decrementKeepAlive() { return (--keepAliveLeft);}
     public boolean isKeptAlive() {return keptAlive;}

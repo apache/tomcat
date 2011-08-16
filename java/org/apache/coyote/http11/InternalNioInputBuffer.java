@@ -25,9 +25,11 @@ import org.apache.coyote.InputBuffer;
 import org.apache.coyote.Request;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.buf.MessageBytes;
+import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.net.NioChannel;
 import org.apache.tomcat.util.net.NioEndpoint;
 import org.apache.tomcat.util.net.NioSelectorPool;
+import org.apache.tomcat.util.net.SocketWrapper;
 
 /**
  * Implementation of InputBuffer which provides HTTP request header parsing as
@@ -36,7 +38,7 @@ import org.apache.tomcat.util.net.NioSelectorPool;
  * @author <a href="mailto:remm@apache.org">Remy Maucherat</a>
  * @author Filip Hanik
  */
-public class InternalNioInputBuffer extends AbstractInputBuffer {
+public class InternalNioInputBuffer extends AbstractInputBuffer<NioChannel> {
 
     private static final org.apache.juli.logging.Log log =
         org.apache.juli.logging.LogFactory.getLog(InternalNioInputBuffer.class);
@@ -84,22 +86,22 @@ public class InternalNioInputBuffer extends AbstractInputBuffer {
      * Parsing state - used for non blocking parsing so that
      * when more data arrives, we can pick up where we left off.
      */
-    protected boolean parsingRequestLine;
-    protected int parsingRequestLinePhase = 0;
-    protected boolean parsingRequestLineEol = false;
-    protected int parsingRequestLineStart = 0;
-    protected int parsingRequestLineQPos = -1;
-    protected HeaderParsePosition headerParsePos;
+    private boolean parsingRequestLine;
+    private int parsingRequestLinePhase = 0;
+    private boolean parsingRequestLineEol = false;
+    private int parsingRequestLineStart = 0;
+    private int parsingRequestLineQPos = -1;
+    private HeaderParsePosition headerParsePos;
 
     /**
      * Underlying socket.
      */
-    protected NioChannel socket;
+    private NioChannel socket;
     
     /**
      * Selector pool, for blocking reads and blocking writes
      */
-    protected NioSelectorPool pool;
+    private NioSelectorPool pool;
 
 
     /**
@@ -124,47 +126,8 @@ public class InternalNioInputBuffer extends AbstractInputBuffer {
      */
     private int skipBlankLinesBytes;
 
-    // ------------------------------------------------------------- Properties
-
-
-    /**
-     * Set the underlying socket.
-     */
-    public void setSocket(NioChannel socket) {
-        this.socket = socket;
-        socketReadBufferSize = socket.getBufHandler().getReadBuffer().capacity();
-        int bufLength = skipBlankLinesSize + headerBufferSize
-                + socketReadBufferSize;
-        if (buf == null || buf.length < bufLength) {
-            buf = new byte[bufLength];
-        }
-    }
-    
-    /**
-     * Get the underlying socket input stream.
-     */
-    public NioChannel getSocket() {
-        return socket;
-    }
-
-    public void setSelectorPool(NioSelectorPool pool) { 
-        this.pool = pool;
-    }
-    
-    public NioSelectorPool getSelectorPool() {
-        return pool;
-    }
-
 
     // --------------------------------------------------------- Public Methods
-    /**
-     * Issues a non blocking read
-     * @return int
-     * @throws IOException
-     */
-    public int nbRead() throws IOException {
-        return readSocket(true,false);
-    }
 
     /**
      * Recycle the input buffer. This should be called when closing the 
@@ -429,18 +392,18 @@ public class InternalNioInputBuffer extends AbstractInputBuffer {
         if ( block ) {
             Selector selector = null;
             try {
-                selector = getSelectorPool().get();
+                selector = pool.get();
             } catch ( IOException x ) {
                 // Ignore
             }
             try {
                 NioEndpoint.KeyAttachment att = (NioEndpoint.KeyAttachment)socket.getAttachment(false);
                 if ( att == null ) throw new IOException("Key must be cancelled.");
-                nRead = getSelectorPool().read(socket.getBufHandler().getReadBuffer(),socket,selector,att.getTimeout());
+                nRead = pool.read(socket.getBufHandler().getReadBuffer(),socket,selector,att.getTimeout());
             } catch ( EOFException eof ) {
                 nRead = -1;
             } finally { 
-                if ( selector != null ) getSelectorPool().put(selector);
+                if ( selector != null ) pool.put(selector);
             }
         } else {
             nRead = socket.read(socket.getBufHandler().getReadBuffer());
@@ -500,7 +463,7 @@ public class InternalNioInputBuffer extends AbstractInputBuffer {
      * @return false after reading a blank line (which indicates that the
      * HTTP header parsing is done
      */
-    public HeaderParseStatus parseHeader()
+    private HeaderParseStatus parseHeader()
         throws IOException {
 
         //
@@ -677,6 +640,10 @@ public class InternalNioInputBuffer extends AbstractInputBuffer {
         return HeaderParseStatus.HAVE_MORE_HEADERS;
     }
     
+    public int getParsingRequestLinePhase() {
+        return parsingRequestLinePhase;
+    }
+
     private HeaderParseStatus skipLine() throws IOException {
         headerParsePos = HeaderParsePosition.HEADER_SKIPLINE;
         boolean eol = false;
@@ -712,7 +679,7 @@ public class InternalNioInputBuffer extends AbstractInputBuffer {
         return HeaderParseStatus.HAVE_MORE_HEADERS;
     }
 
-    protected HeaderParseData headerData = new HeaderParseData();
+    private HeaderParseData headerData = new HeaderParseData();
     public static class HeaderParseData {
         int start = 0;
         int realPos = 0;
@@ -742,6 +709,24 @@ public class InternalNioInputBuffer extends AbstractInputBuffer {
 
 
     // ------------------------------------------------------ Protected Methods
+
+    @Override
+    protected void init(SocketWrapper<NioChannel> socketWrapper,
+            AbstractEndpoint endpoint) throws IOException {
+
+        socket = socketWrapper.getSocket();
+        socketReadBufferSize =
+            socket.getBufHandler().getReadBuffer().capacity();
+
+        int bufLength = skipBlankLinesSize + headerBufferSize
+                + socketReadBufferSize;
+        if (buf == null || buf.length < bufLength) {
+            buf = new byte[bufLength];
+        }
+
+        pool = ((NioEndpoint)endpoint).getSelectorPool();
+    }
+
 
     /**
      * Fill the internal buffer using data from the underlying input stream.
@@ -804,16 +789,6 @@ public class InternalNioInputBuffer extends AbstractInputBuffer {
             pos = lastValid;
 
             return (length);
-
         }
-
-
     }
-
-
-    public int getParsingRequestLinePhase() {
-        return parsingRequestLinePhase;
-    }
-
-
 }

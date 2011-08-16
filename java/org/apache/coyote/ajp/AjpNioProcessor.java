@@ -101,7 +101,6 @@ public class AjpNioProcessor extends AbstractAjpProcessor<NioChannel> {
         this.socket = socket.getSocket();
         
         long soTimeout = endpoint.getSoTimeout();
-        int keepAliveTimeout = endpoint.getKeepAliveTimeout();
 
         // Error flag
         error = false;
