@@ -213,6 +213,10 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
         
         long soTimeout = endpoint.getSoTimeout();
 
+        if (disableKeepAlive()) {
+            socketWrapper.setKeepAliveLeft(0);
+        }
+
         boolean keptAlive = false;
         boolean openSocket = false;
         boolean readComplete = true;
@@ -395,6 +399,12 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
             return (openSocket) ? (readComplete?SocketState.OPEN:SocketState.LONG) : SocketState.CLOSED;
         }
 
+    }
+
+
+    @Override
+    protected boolean disableKeepAlive() {
+        return false;
     }
 
 
