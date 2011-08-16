@@ -184,8 +184,6 @@ public class Http11AprProcessor extends AbstractHttp11Processor<Long> {
 
         long soTimeout = endpoint.getSoTimeout();
 
-        int keepAliveLeft = maxKeepAliveRequests;
-        
         boolean keptAlive = false;
         boolean openSocket = false;
         boolean sendfileInProgress = false;
@@ -253,8 +251,12 @@ public class Http11AprProcessor extends AbstractHttp11Processor<Long> {
                 }
             }
 
-            if (maxKeepAliveRequests > 0 && --keepAliveLeft == 0)
+            if (maxKeepAliveRequests == 1) {
                 keepAlive = false;
+            } else if (maxKeepAliveRequests > 0 &&
+                    socketWrapper.decrementKeepAlive() <= 0) {
+                keepAlive = false;
+            }
 
             // Process the request in the adapter
             if (!error) {
