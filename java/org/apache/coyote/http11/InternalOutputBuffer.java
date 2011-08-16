@@ -19,17 +19,20 @@ package org.apache.coyote.http11;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.net.Socket;
 
 import org.apache.coyote.OutputBuffer;
 import org.apache.coyote.Response;
 import org.apache.tomcat.util.buf.ByteChunk;
+import org.apache.tomcat.util.net.AbstractEndpoint;
+import org.apache.tomcat.util.net.SocketWrapper;
 
 /**
  * Output buffer.
  * 
  * @author <a href="mailto:remm@apache.org">Remy Maucherat</a>
  */
-public class InternalOutputBuffer extends AbstractOutputBuffer
+public class InternalOutputBuffer extends AbstractOutputBuffer<Socket>
     implements ByteChunk.ByteOutputChannel {
 
     // ----------------------------------------------------------- Constructors
@@ -58,7 +61,7 @@ public class InternalOutputBuffer extends AbstractOutputBuffer
     }
 
     /**
-     * Underlying output stream.
+     * Underlying output stream. Note: protected to assist with unit testing
      */
     protected OutputStream outputStream;
 
@@ -66,26 +69,14 @@ public class InternalOutputBuffer extends AbstractOutputBuffer
     /**
      * Socket buffer.
      */
-    protected ByteChunk socketBuffer;
+    private ByteChunk socketBuffer;
 
 
     /**
      * Socket buffer (extra buffering to reduce number of packets sent).
      */
-    protected boolean useSocketBuffer = false;    
+    private boolean useSocketBuffer = false;    
     
-
-    /**
-     * Set the underlying socket output stream.
-     */
-    public void setOutputStream(OutputStream outputStream) {
-
-        // FIXME: Check for null ?
-
-        this.outputStream = outputStream;
-
-    }
-
 
     /**
      * Set the socket buffer size.
@@ -103,6 +94,13 @@ public class InternalOutputBuffer extends AbstractOutputBuffer
 
 
     // --------------------------------------------------------- Public Methods
+
+    @Override
+    public void init(SocketWrapper<Socket> socketWrapper,
+            AbstractEndpoint endpoint) throws IOException {
+
+        outputStream = socketWrapper.getSocket().getOutputStream();
+    }
 
 
     /**
@@ -255,6 +253,4 @@ public class InternalOutputBuffer extends AbstractOutputBuffer
             return byteCount;
         }
     }
-
-
 }

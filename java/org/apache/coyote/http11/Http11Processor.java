@@ -138,30 +138,17 @@ public class Http11Processor extends AbstractHttp11Processor<Socket> {
 
         // Setting up the I/O
         this.socket = socketWrapper;
-        inputBuffer.setInputStream(socket.getSocket().getInputStream());
-        outputBuffer.setOutputStream(socket.getSocket().getOutputStream());
+        inputBuffer.init(socketWrapper, endpoint);
+        outputBuffer.init(socketWrapper, endpoint);
 
         // Error flag
         error = false;
         keepAlive = true;
+        comet = false;
 
-        if (maxKeepAliveRequests > 0) {
-            socketWrapper.decrementKeepAlive();
-        }
-        
         int soTimeout = endpoint.getSoTimeout();
 
-        int threadRatio = -1;   
-        // These may return zero or negative values     
-        // Only calculate a thread ratio when both are >0 to ensure we get a    
-        // sensible result      
-        if (endpoint.getCurrentThreadsBusy() >0 &&      
-                endpoint.getMaxThreads() >0) {      
-            threadRatio = (endpoint.getCurrentThreadsBusy() * 100)      
-                    / endpoint.getMaxThreads();     
-        }   
-        // Disable keep-alive if we are running low on threads      
-        if (threadRatio > getDisableKeepAlivePercentage()) {     
+        if (disableKeepAlive()) {
             socketWrapper.setKeepAliveLeft(0);
         }
 
@@ -268,7 +255,10 @@ public class Http11Processor extends AbstractHttp11Processor<Socket> {
                 }
             }
 
-            if (socketWrapper.getKeepAliveLeft() == 0) {
+            if (maxKeepAliveRequests == 1) {
+                keepAlive = false;
+            } else if (maxKeepAliveRequests > 0 &&
+                    socketWrapper.decrementKeepAlive() <= 0) {
                 keepAlive = false;
             }
 
@@ -350,10 +340,6 @@ public class Http11Processor extends AbstractHttp11Processor<Socket> {
             if (isAsync() || error || inputBuffer.lastValid == 0) {
                 break;
             }
-            
-            if (maxKeepAliveRequests > 0) {
-                socketWrapper.decrementKeepAlive();
-            }
         }
 
         rp.setStage(org.apache.coyote.Constants.STAGE_ENDED);
@@ -371,6 +357,26 @@ public class Http11Processor extends AbstractHttp11Processor<Socket> {
     }
     
     
+    @Override
+    protected boolean disableKeepAlive() {
+        int threadRatio = -1;   
+        // These may return zero or negative values     
+        // Only calculate a thread ratio when both are >0 to ensure we get a    
+        // sensible result      
+        if (endpoint.getCurrentThreadsBusy() >0 &&      
+                endpoint.getMaxThreads() >0) {      
+            threadRatio = (endpoint.getCurrentThreadsBusy() * 100)      
+                    / endpoint.getMaxThreads();     
+        }   
+        // Disable keep-alive if we are running low on threads      
+        if (threadRatio > getDisableKeepAlivePercentage()) {     
+            return true;
+        }
+        
+        return false;
+    }
+
+
     @Override
     protected void resetTimeouts() {
         // NOOP for APR
@@ -558,12 +564,12 @@ public class Http11Processor extends AbstractHttp11Processor<Socket> {
     }
 
     @Override
-    protected AbstractInputBuffer getInputBuffer() {
+    protected AbstractInputBuffer<Socket> getInputBuffer() {
         return inputBuffer;
     }
 
     @Override
-    protected AbstractOutputBuffer getOutputBuffer() {
+    protected AbstractOutputBuffer<Socket> getOutputBuffer() {
         return outputBuffer;
     }
 

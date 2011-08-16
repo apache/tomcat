@@ -26,13 +26,15 @@ import org.apache.coyote.Response;
 import org.apache.tomcat.jni.Socket;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.http.HttpMessages;
+import org.apache.tomcat.util.net.AbstractEndpoint;
+import org.apache.tomcat.util.net.SocketWrapper;
 
 /**
  * Output buffer.
  * 
  * @author <a href="mailto:remm@apache.org">Remy Maucherat</a>
  */
-public class InternalAprOutputBuffer extends AbstractOutputBuffer {
+public class InternalAprOutputBuffer extends AbstractOutputBuffer<Long> {
 
 
     // ----------------------------------------------------------- Constructors
@@ -72,28 +74,24 @@ public class InternalAprOutputBuffer extends AbstractOutputBuffer {
     /**
      * Underlying socket.
      */
-    protected long socket;
+    private long socket;
 
 
     /**
      * Direct byte buffer used for writing.
      */
-    protected ByteBuffer bbuf = null;
+    private ByteBuffer bbuf = null;
 
     
-    // ------------------------------------------------------------- Properties
+    // --------------------------------------------------------- Public Methods
 
+    @Override
+    public void init(SocketWrapper<Long> socketWrapper,
+            AbstractEndpoint endpoint) throws IOException {
 
-    /**
-     * Set the underlying socket.
-     */
-    public void setSocket(long socket) {
-        this.socket = socket;
+        socket = socketWrapper.getSocket().longValue();
         Socket.setsbb(this.socket, bbuf);
     }
-
-
-    // --------------------------------------------------------- Public Methods
 
 
     /**
@@ -197,11 +195,10 @@ public class InternalAprOutputBuffer extends AbstractOutputBuffer {
     }
 
 
-
     /**
      * Callback to write data from the buffer.
      */
-    protected void flushBuffer()
+    private void flushBuffer()
         throws IOException {
         if (bbuf.position() > 0) {
             if (Socket.sendbb(socket, 0, bbuf.position()) < 0) {
@@ -253,6 +250,4 @@ public class InternalAprOutputBuffer extends AbstractOutputBuffer {
             return byteCount;
         }
     }
-
-
 }

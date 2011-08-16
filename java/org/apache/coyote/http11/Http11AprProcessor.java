@@ -174,21 +174,25 @@ public class Http11AprProcessor extends AbstractHttp11Processor<Long> {
 
         // Setting up the socket
         this.socket = socketWrapper;
-        long socketRef = socketWrapper.getSocket().longValue();
-        inputBuffer.setSocket(socketRef);
-        outputBuffer.setSocket(socketRef);
+        inputBuffer.init(socketWrapper, endpoint);
+        outputBuffer.init(socketWrapper, endpoint);
 
         // Error flag
         error = false;
         keepAlive = true;
         comet = false;
 
-        int keepAliveLeft = maxKeepAliveRequests;
-        long soTimeout = endpoint.getSoTimeout();
-        
+        int soTimeout = endpoint.getSoTimeout();
+
+        if (disableKeepAlive()) {
+            socketWrapper.setKeepAliveLeft(0);
+        }
+
         boolean keptAlive = false;
         boolean openSocket = false;
         boolean sendfileInProgress = false;
+
+        long socketRef = socketWrapper.getSocket().longValue();
 
         while (!error && keepAlive && !comet && !isAsync() && !endpoint.isPaused()) {
 
@@ -251,8 +255,12 @@ public class Http11AprProcessor extends AbstractHttp11Processor<Long> {
                 }
             }
 
-            if (maxKeepAliveRequests > 0 && --keepAliveLeft == 0)
+            if (maxKeepAliveRequests == 1) {
                 keepAlive = false;
+            } else if (maxKeepAliveRequests > 0 &&
+                    socketWrapper.decrementKeepAlive() <= 0) {
+                keepAlive = false;
+            }
 
             // Process the request in the adapter
             if (!error) {
@@ -345,6 +353,12 @@ public class Http11AprProcessor extends AbstractHttp11Processor<Long> {
             }
         }
         
+    }
+
+
+    @Override
+    protected boolean disableKeepAlive() {
+        return false;
     }
 
 
@@ -619,12 +633,12 @@ public class Http11AprProcessor extends AbstractHttp11Processor<Long> {
     }
 
     @Override
-    protected AbstractInputBuffer getInputBuffer() {
+    protected AbstractInputBuffer<Long> getInputBuffer() {
         return inputBuffer;
     }
 
     @Override
-    protected AbstractOutputBuffer getOutputBuffer() {
+    protected AbstractOutputBuffer<Long> getOutputBuffer() {
         return outputBuffer;
     }
 }
