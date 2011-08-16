@@ -247,6 +247,7 @@ public class Http11AprProtocol extends AbstractHttp11Protocol {
                     proto.getMaxTrailerSize());
             processor.setAdapter(proto.adapter);
             processor.setMaxKeepAliveRequests(proto.getMaxKeepAliveRequests());
+            processor.setKeepAliveTimeout(proto.getKeepAliveTimeout());
             processor.setConnectionUploadTimeout(
                     proto.getConnectionUploadTimeout());
             processor.setDisableUploadTimeout(proto.getDisableUploadTimeout());
