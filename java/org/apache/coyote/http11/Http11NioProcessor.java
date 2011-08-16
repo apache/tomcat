@@ -211,7 +211,7 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
         keepAlive = true;
         comet = false;
         
-        long soTimeout = endpoint.getSoTimeout();
+        int soTimeout = endpoint.getSoTimeout();
 
         if (disableKeepAlive()) {
             socketWrapper.setKeepAliveLeft(0);
@@ -227,7 +227,7 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
             // Parsing the request header
             try {
                 if( !disableUploadTimeout && keptAlive && soTimeout > 0 ) {
-                    socketWrapper.getSocket().getIOChannel().socket().setSoTimeout((int)soTimeout);
+                    socketWrapper.getSocket().getIOChannel().socket().setSoTimeout(soTimeout);
                 }
                 if (!inputBuffer.parseRequestLine(keptAlive)) {
                     // Haven't finished reading the request so keep the socket
