@@ -173,6 +173,12 @@
         it is strongly recommended that this protection is enabled. The default
         is <code>true</code>.</p>
       </attribute>
+      <attribute name="awtThreadProtection" required="false">
+        <p>Enables protection so that calls to
+        <code>java.awt.Toolkit.getDefaultToolkit()</code> triggered by a web
+        application do not result in a memory leak.
+        Defaults to <code>false</code> because an AWT thread is launched.</p>
+      </attribute>
 
       <attribute name="driverManagerProtection" required="false">
         <p>The first use of <code>java.sql.DriverManager</code> will trigger the
