@@ -67,6 +67,18 @@ public class JreMemoryLeakPreventionListener implements LifecycleListener {
     public void setAppContextProtection(boolean appContextProtection) {
         this.appContextProtection = appContextProtection;
     }
+
+    /**
+     * Protect against the memory leak caused when the first call to
+     * <code>java.awt.Toolkit.getDefaultToolkit()</code> is triggered
+     * by a web application. Defaults to <code>false</code> because a new
+     * Thread is launched.
+     */
+    private boolean awtThreadProtection = false;
+    public boolean isAWTThreadProtection() { return awtThreadProtection; }
+    public void setAWTThreadProtection(boolean awtThreadProtection) {
+      this.awtThreadProtection = awtThreadProtection;
+    }
     
     /**
      * Protect against the memory leak caused when the first call to
@@ -217,6 +229,12 @@ public class JreMemoryLeakPreventionListener implements LifecycleListener {
                 // be an issue.
                 if (appContextProtection) {
                     ImageIO.getCacheDirectory();
+                }
+
+                // Trigger the creation of the AWT (AWT-Windows, AWT-XAWT,
+                // etc.) thread
+                if(awtThreadProtection) {
+                  java.awt.Toolkit.getDefaultToolkit();
                 }
                 
                 /*

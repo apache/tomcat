@@ -89,6 +89,10 @@
         <bug>51658</bug>: Fix possible NPE when logging a failed request. Based
         on a suggestion by Felix Schumacher. (markt)
       </fix>
+      <fix>
+        <bug>51688</bug> JreMemoryLeakPreventionListener now protects against
+        AWT thread creation. (schultz)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
