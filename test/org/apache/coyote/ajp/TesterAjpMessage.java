@@ -67,4 +67,17 @@ public class TesterAjpMessage extends AjpMessage {
             return readString(len);
         }
     }
+
+    @Override
+    public void end() {
+        len = pos;
+        int dLen = len - 4;
+
+        buf[0] = (byte) 0x12;
+        buf[1] = (byte) 0x34;
+        buf[2] = (byte) ((dLen>>>8) & 0xFF);
+        buf[3] = (byte) (dLen & 0xFF);
+    }
+
+    
 }
