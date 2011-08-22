@@ -348,13 +348,18 @@ public class AjpMessage {
         return buf.length;
     }
     
-    
+    @Deprecated
     public int processHeader() {
+        return processHeader(true);
+    }
+    
+    public int processHeader(boolean toContainer) {
         pos = 0;
         int mark = getInt();
         len = getInt();
         // Verify message signature
-        if ((mark != 0x1234) && (mark != 0x4142)) {
+        if ((toContainer && mark != 0x1234) ||
+                (!toContainer && mark != 0x4142)) {
             log.error(sm.getString("ajpmessage.invalid", "" + mark));
             if (log.isDebugEnabled()) {
                 dump("In: ");

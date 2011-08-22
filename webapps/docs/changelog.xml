@@ -105,6 +105,10 @@
         More changes to align the code between the different HTTP connectors.
         (markt)
       </fix>
+      <fix>
+        Ensure AjpMessage headers are correct for the direction of the message.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">

@@ -414,7 +414,7 @@ public class AjpProcessor extends AbstractAjpProcessor<Socket> {
 
         read(buf, 0, headerLength);
 
-        int messageLength = message.processHeader();
+        int messageLength = message.processHeader(true);
         if (messageLength < 0) {
             // Invalid AJP header signature
             // TODO: Throw some exception and close the connection to frontend.
