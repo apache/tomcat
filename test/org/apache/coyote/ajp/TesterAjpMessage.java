@@ -17,7 +17,7 @@
 package org.apache.coyote.ajp;
 
 /**
- * Extends {@link AjpMessage} to provide additional methods for writing to the
+ * Extends {@link AjpMessage} to provide additional methods for reading from the
  * message.
  * TODO: See if it makes sense for any/all of these methods to be transferred to
  *       AjpMessage
