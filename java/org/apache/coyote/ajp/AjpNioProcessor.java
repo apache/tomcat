@@ -465,7 +465,7 @@ public class AjpNioProcessor extends AbstractAjpProcessor<NioChannel> {
             return 0;
         }
         
-        int messageLength = message.processHeader();
+        int messageLength = message.processHeader(true);
         if (messageLength < 0) {
             // Invalid AJP header signature
             throw new IOException(sm.getString("ajpmessage.invalidLength",

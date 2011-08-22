@@ -101,7 +101,7 @@ public class TestAbstractAjpProcessor extends TomcatBaseTest {
         assertEquals((byte) 'B', message.buf[1]);
         
         // Set the start position and read the length
-        message.processHeader();
+        message.processHeader(false);
         
         // Check the length
         assertTrue(message.len > 0);
@@ -136,7 +136,7 @@ public class TestAbstractAjpProcessor extends TomcatBaseTest {
         assertEquals((byte) 'B', message.buf[1]);
         
         // Set the start position and read the length
-        message.processHeader();
+        message.processHeader(false);
         
         // Should be a body chunk message
         assertEquals(0x03, message.readByte());
@@ -153,7 +153,7 @@ public class TestAbstractAjpProcessor extends TomcatBaseTest {
         assertEquals((byte) 'A', message.buf[0]);
         assertEquals((byte) 'B', message.buf[1]);
 
-        message.processHeader();
+        message.processHeader(false);
         
         // Should be an end body message
         assertEquals(0x05, message.readByte());
