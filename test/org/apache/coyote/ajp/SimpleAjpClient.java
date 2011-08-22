@@ -149,7 +149,7 @@ public class SimpleAjpClient {
 
         read(is, buf, 0, headerLength);
 
-        int messageLength = message.processHeader();
+        int messageLength = message.processHeader(false);
         if (messageLength < 0) {
             throw new IOException("Invalid AJP message length");
         } else if (messageLength == 0) {
