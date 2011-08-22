@@ -55,6 +55,13 @@
       </scode>
     </changelog>
   </subsection>
+  <subsection name="Other">
+    <changelog>
+      <scode>
+        Remove unused, deprecated code. (markt)
+      </scode>
+    </changelog>
+  </subsection>
 </section>
 </body>
 </document>
