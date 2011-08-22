@@ -348,10 +348,6 @@ public class AjpMessage {
         return buf.length;
     }
     
-    @Deprecated
-    public int processHeader() {
-        return processHeader(true);
-    }
     
     public int processHeader(boolean toContainer) {
         pos = 0;
