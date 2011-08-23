@@ -487,11 +487,11 @@ public class AjpProcessor extends AbstractAjpProcessor<Socket> {
                     thisTime = chunkSize;
                 }
                 len -= thisTime;
-                responseHeaderMessage.reset();
-                responseHeaderMessage.appendByte(Constants.JK_AJP13_SEND_BODY_CHUNK);
-                responseHeaderMessage.appendBytes(chunk.getBytes(), chunk.getOffset() + off, thisTime);
-                responseHeaderMessage.end();
-                output.write(responseHeaderMessage.getBuffer(), 0, responseHeaderMessage.getLen());
+                responseMessage.reset();
+                responseMessage.appendByte(Constants.JK_AJP13_SEND_BODY_CHUNK);
+                responseMessage.appendBytes(chunk.getBytes(), chunk.getOffset() + off, thisTime);
+                responseMessage.end();
+                output.write(responseMessage.getBuffer(), 0, responseMessage.getLen());
 
                 off += thisTime;
             }
