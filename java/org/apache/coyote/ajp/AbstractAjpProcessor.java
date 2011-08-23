@@ -555,17 +555,6 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
 
 
     /**
-     * Callback to write data from the buffer.
-     */
-    protected void flush(boolean explicit) throws IOException {
-        if (explicit && !finished) {
-            // Send the flush message
-            output(flushMessageArray, 0, flushMessageArray.length);
-        }
-    }
-
-    
-    /**
      * After reading the request headers, we have to setup the request filters.
      */
     protected void prepareRequest() {
@@ -938,6 +927,17 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
     }
 
 
+    /**
+     * Callback to write data from the buffer.
+     */
+    protected void flush(boolean explicit) throws IOException {
+        if (explicit && !finished) {
+            // Send the flush message
+            output(flushMessageArray, 0, flushMessageArray.length);
+        }
+    }
+
+    
     /**
      * Finish AJP response.
      */
