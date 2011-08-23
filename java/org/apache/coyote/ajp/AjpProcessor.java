@@ -129,7 +129,6 @@ public class AjpProcessor extends AbstractAjpProcessor<Socket> {
                 // Get first message of the request
                 if (!readMessage(requestHeaderMessage)) {
                     // This means a connection timeout
-                    rp.setStage(org.apache.coyote.Constants.STAGE_ENDED);
                     break;
                 }
                 // Set back timeout if keep alive timeout is enabled

@@ -59,7 +59,6 @@ public class AjpAprProcessor extends AbstractAjpProcessor<Long> {
         return log;
     }
 
-
     // ----------------------------------------------------------- Constructors
 
 
@@ -132,7 +131,6 @@ public class AjpAprProcessor extends AbstractAjpProcessor<Long> {
                     // This means that no data is available right now
                     // (long keepalive), so that the processor should be recycled
                     // and the method should return true
-                    rp.setStage(org.apache.coyote.Constants.STAGE_ENDED);
                     break;
                 }
                 // Check message type, process right away and break if

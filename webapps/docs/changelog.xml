@@ -109,6 +109,9 @@
         Ensure AjpMessage headers are correct for the direction of the message.
         (markt)
       </fix>
+      <scode>
+        Code clean-up in the AJP processor implementations. (markt) 
+      </scode>
     </changelog>
   </subsection>
   <subsection name="Jasper">
