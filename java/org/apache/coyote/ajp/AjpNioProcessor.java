@@ -486,14 +486,4 @@ public class AjpNioProcessor extends AbstractAjpProcessor<NioChannel> {
     }
 
 
-    /**
-     * Callback to write data from the buffer.
-     */
-    @Override
-    protected void flush(boolean explicit) throws IOException {
-        if (explicit && !finished) {
-            // Send the flush message
-            output(flushMessageArray, 0, flushMessageArray.length);
-        }
-    }
 }

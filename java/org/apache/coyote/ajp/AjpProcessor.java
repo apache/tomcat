@@ -433,16 +433,4 @@ public class AjpProcessor extends AbstractAjpProcessor<Socket> {
             return true;
         }
     }
-
-
-    /**
-     * Callback to write data from the buffer.
-     */
-    @Override
-    protected void flush(boolean explicit) throws IOException {
-        if (explicit && !finished) {
-            // Send the flush message
-            output.write(flushMessageArray);
-        }
-    }
 }
