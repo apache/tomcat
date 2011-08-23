@@ -1010,9 +1010,9 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
      */
     protected class SocketInputBuffer implements InputBuffer {
 
-
         /**
-         * Read bytes into the specified chunk.
+         * Read bytes into the specified chunk. If no chunk is specified, the
+         * bytes are swallowed.
          */
         @Override
         public int doRead(ByteChunk chunk, Request req)
@@ -1033,7 +1033,9 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
             }
             ByteChunk bc = bodyBytes.getByteChunk();
             bodyBytesRead += bc.getLength();
-            chunk.setBytes(bc.getBuffer(), bc.getStart(), bc.getLength());
+            if (chunk != null) {
+                chunk.setBytes(bc.getBuffer(), bc.getStart(), bc.getLength());
+            }
             empty = true;
             return bc.getLength();
         }
