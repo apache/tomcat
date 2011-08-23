@@ -287,32 +287,6 @@ public class AjpProcessor extends AbstractAjpProcessor<Socket> {
         output.write(src, offset, length);
     }
 
-    /**
-     * Finish AJP response.
-     */
-    @Override
-    protected void finish() throws IOException {
-
-        if (!response.isCommitted()) {
-            // Validate and write response headers
-            try {
-                prepareResponse();
-            } catch (IOException e) {
-                // Set error flag
-                error = true;
-            }
-        }
-
-        if (finished)
-            return;
-
-        finished = true;
-
-        // Add the end message
-        output.write(error ? endAndCloseMessageArray : endMessageArray);
-
-    }
-
 
     /**
      * Read at least the specified amount of bytes, and place them
@@ -431,18 +405,6 @@ public class AjpProcessor extends AbstractAjpProcessor<Socket> {
             }
             read(buf, headerLength, messageLength);
             return true;
-        }
-    }
-
-
-    /**
-     * Callback to write data from the buffer.
-     */
-    @Override
-    protected void flush(boolean explicit) throws IOException {
-        if (explicit && !finished) {
-            // Send the flush message
-            output.write(flushMessageArray);
         }
     }
 }
