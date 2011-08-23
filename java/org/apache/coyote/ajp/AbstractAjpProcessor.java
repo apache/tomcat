@@ -458,11 +458,6 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
         }
     }
 
-    // Methods called by action()
-    protected abstract void actionInternal(ActionCode actionCode, Object param);
-    protected abstract void flush(boolean tbd) throws IOException;
-    protected abstract void finish() throws IOException;
-
 
     @Override
     public SocketState asyncDispatch(SocketStatus status) {
@@ -506,12 +501,6 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
 
 
     @Override
-    protected final boolean isComet() {
-        // AJP does not support Comet
-        return false;
-    }
-
-    @Override
     public SocketState event(SocketStatus status) throws IOException {
         // Should never reach this code but in case we do...
         throw new IOException(
@@ -541,7 +530,24 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
         byteCount = 0;
     }
 
+
     // ------------------------------------------------------ Protected Methods
+
+    // Methods called by action()
+    protected abstract void actionInternal(ActionCode actionCode, Object param);
+    protected abstract void flush(boolean tbd) throws IOException;
+    protected abstract void finish() throws IOException;
+
+    // Methods called by prepareResponse()
+    protected abstract void output(byte[] src, int offset, int length)
+            throws IOException;
+
+
+    @Override
+    protected final boolean isComet() {
+        // AJP does not support Comet
+        return false;
+    }
 
 
     /**
@@ -855,8 +861,7 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
      * When committing the response, we have to validate the set of headers, as
      * well as setup the response filters.
      */
-    protected void prepareResponse()
-    throws IOException {
+    protected void prepareResponse() throws IOException {
 
         response.setCommitted(true);
 
@@ -917,10 +922,6 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
                 responseHeaderMessage.getLen());
     }
 
-    // Methods called by prepareResponse()
-    protected abstract void output(byte[] src, int offset, int length)
-    throws IOException;
-
 
     // ------------------------------------- InputStreamInputBuffer Inner Class
 
@@ -929,8 +930,7 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
      * This class is an input buffer which will read its data from an input
      * stream.
      */
-    protected class SocketInputBuffer
-    implements InputBuffer {
+    protected class SocketInputBuffer implements InputBuffer {
 
 
         /**
