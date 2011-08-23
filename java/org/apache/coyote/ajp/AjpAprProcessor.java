@@ -269,43 +269,15 @@ public class AjpAprProcessor extends AbstractAjpProcessor<Long> {
     protected void output(byte[] src, int offset, int length)
             throws IOException {
         outputBuffer.put(src, offset, length);
-    }
-
-
-    /**
-     * Finish AJP response.
-     */
-    @Override
-    protected void finish() throws IOException {
-
-        if (!response.isCommitted()) {
-            // Validate and write response headers
-            try {
-                prepareResponse();
-            } catch (IOException e) {
-                // Set error flag
-                error = true;
+        
+        long socketRef = socket.getSocket().longValue();
+        
+        if (outputBuffer.position() > 0) {
+            if ((socketRef != 0) && Socket.sendbb(socketRef, 0, outputBuffer.position()) < 0) {
+                throw new IOException(sm.getString("ajpprocessor.failedsend"));
             }
+            outputBuffer.clear();
         }
-
-        if (finished)
-            return;
-
-        finished = true;
-
-        // Add the end message
-        byte[] messageArray;
-        if (error) {
-            messageArray = endAndCloseMessageArray;
-        } else {
-            messageArray = endMessageArray;
-        }
-        if (outputBuffer.position() + messageArray.length > outputBuffer.capacity()) {
-            flush(false);
-        }
-        outputBuffer.put(messageArray);
-        flush(false);
-
     }
 
 
@@ -496,29 +468,5 @@ public class AjpAprProcessor extends AbstractAjpProcessor<Long> {
         inputBuffer.limit(0);
         outputBuffer.clear();
 
-    }
-
-
-    /**
-     * Callback to write data from the buffer.
-     */
-    @Override
-    protected void flush(boolean explicit) throws IOException {
-        
-        long socketRef = socket.getSocket().longValue();
-        
-        if (outputBuffer.position() > 0) {
-            if ((socketRef != 0) && Socket.sendbb(socketRef, 0, outputBuffer.position()) < 0) {
-                throw new IOException(sm.getString("ajpprocessor.failedsend"));
-            }
-            outputBuffer.clear();
-        }
-        // Send explicit flush message
-        if (explicit && !finished &&  (socketRef != 0)) {
-            if (Socket.send(socketRef, flushMessageArray, 0,
-                    flushMessageArray.length) < 0) {
-                throw new IOException(sm.getString("ajpprocessor.failedflush"));
-            }
-        }
     }
 }
