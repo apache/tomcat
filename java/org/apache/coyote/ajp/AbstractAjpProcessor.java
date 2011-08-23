@@ -146,9 +146,9 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
 
 
     /**
-     * Message used for response header composition.
+     * Message used for response composition.
      */
-    protected AjpMessage responseHeaderMessage = null;
+    protected AjpMessage responseMessage = null;
 
 
     /**
@@ -234,7 +234,7 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
         request.setInputBuffer(new SocketInputBuffer());
 
         requestHeaderMessage = new AjpMessage(packetSize);
-        responseHeaderMessage = new AjpMessage(packetSize);
+        responseMessage = new AjpMessage(packetSize);
         bodyMessage = new AjpMessage(packetSize);
 
         // Set the getBody message buffer
@@ -865,11 +865,11 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
 
         response.setCommitted(true);
 
-        responseHeaderMessage.reset();
-        responseHeaderMessage.appendByte(Constants.JK_AJP13_SEND_HEADERS);
+        responseMessage.reset();
+        responseMessage.appendByte(Constants.JK_AJP13_SEND_HEADERS);
 
         // HTTP header contents
-        responseHeaderMessage.appendInt(response.getStatus());
+        responseMessage.appendInt(response.getStatus());
         String message = null;
         if (org.apache.coyote.Constants.USE_CUSTOM_STATUS_MSG_IN_HEADER &&
                 HttpMessages.isSafeInHttpHeader(response.getMessage())) {
@@ -883,7 +883,7 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
             message = Integer.toString(response.getStatus());
         }
         tmpMB.setString(message);
-        responseHeaderMessage.appendBytes(tmpMB);
+        responseMessage.appendBytes(tmpMB);
 
         // Special headers
         MimeHeaders headers = response.getMimeHeaders();
@@ -902,24 +902,24 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
 
         // Other headers
         int numHeaders = headers.size();
-        responseHeaderMessage.appendInt(numHeaders);
+        responseMessage.appendInt(numHeaders);
         for (int i = 0; i < numHeaders; i++) {
             MessageBytes hN = headers.getName(i);
             int hC = Constants.getResponseAjpIndex(hN.toString());
             if (hC > 0) {
-                responseHeaderMessage.appendInt(hC);
+                responseMessage.appendInt(hC);
             }
             else {
-                responseHeaderMessage.appendBytes(hN);
+                responseMessage.appendBytes(hN);
             }
             MessageBytes hV=headers.getValue(i);
-            responseHeaderMessage.appendBytes(hV);
+            responseMessage.appendBytes(hV);
         }
 
         // Write to buffer
-        responseHeaderMessage.end();
-        output(responseHeaderMessage.getBuffer(), 0,
-                responseHeaderMessage.getLen());
+        responseMessage.end();
+        output(responseMessage.getBuffer(), 0,
+                responseMessage.getLen());
     }
 
 
