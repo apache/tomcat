@@ -220,9 +220,9 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
 
 
     /**
-     * Bytes written to client for the current request
+     * Bytes written to client for the current request.
      */
-    protected long byteCount = 0;
+    protected long bytesWritten = 0;
 
 
     // ------------------------------------------------------------ Constructor
@@ -529,7 +529,7 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
         request.recycle();
         response.recycle();
         certificates.recycle();
-        byteCount = 0;
+        bytesWritten = 0;
     }
 
 
@@ -1079,13 +1079,13 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
                 off += thisTime;
             }
 
-            byteCount += chunk.getLength();
+            bytesWritten += chunk.getLength();
             return chunk.getLength();
         }
 
         @Override
         public long getBytesWritten() {
-            return byteCount;
+            return bytesWritten;
         }
     }
 }
