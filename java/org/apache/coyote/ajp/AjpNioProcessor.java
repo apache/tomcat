@@ -111,7 +111,6 @@ public class AjpNioProcessor extends AbstractAjpProcessor<NioChannel> {
                 // Get first message of the request
                 int bytesRead = readMessage(requestHeaderMessage, false);
                 if (bytesRead == 0) {
-                    rp.setStage(org.apache.coyote.Constants.STAGE_ENDED);
                     break;
                 }
                 // Set back timeout if keep alive timeout is enabled
