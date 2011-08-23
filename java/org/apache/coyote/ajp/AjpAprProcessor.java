@@ -377,35 +377,6 @@ public class AjpAprProcessor extends AbstractAjpProcessor<Long> {
         return true;
     }
 
-    /**
-     * Get more request body data from the web server and store it in the
-     * internal buffer.
-     *
-     * @return true if there is more data, false if not.
-     */
-    @Override
-    protected boolean refillReadBuffer() throws IOException {
-        // If the server returns an empty packet, assume that that end of
-        // the stream has been reached (yuck -- fix protocol??).
-        // FORM support
-        if (replay) {
-            endOfStream = true; // we've read everything there is
-        }
-        if (endOfStream) {
-            return false;
-        }
-
-        // Request more data immediately
-        Socket.send(socket.getSocket().longValue(), getBodyMessageArray, 0,
-                getBodyMessageArray.length);
-
-        boolean moreData = receive();
-        if( !moreData ) {
-            endOfStream = true;
-        }
-        return moreData;
-    }
-
 
     /**
      * Read an AJP message.

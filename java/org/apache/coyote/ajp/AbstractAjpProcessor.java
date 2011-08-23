@@ -544,7 +544,6 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
 
     // Methods used by SocketInputBuffer
     protected abstract boolean receive() throws IOException;
-    protected abstract boolean refillReadBuffer() throws IOException;
 
 
     @Override
@@ -555,16 +554,33 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
 
 
     /**
-     * Callback to write data from the buffer.
+     * Get more request body data from the web server and store it in the
+     * internal buffer.
+     *
+     * @return true if there is more data, false if not.
      */
-    protected void flush(boolean explicit) throws IOException {
-        if (explicit && !finished) {
-            // Send the flush message
-            output(flushMessageArray, 0, flushMessageArray.length);
+    protected boolean refillReadBuffer() throws IOException {
+        // If the server returns an empty packet, assume that that end of
+        // the stream has been reached (yuck -- fix protocol??).
+        // FORM support
+        if (replay) {
+            endOfStream = true; // we've read everything there is
         }
+        if (endOfStream) {
+            return false;
+        }
+
+        // Request more data immediately
+        output(getBodyMessageArray, 0, getBodyMessageArray.length);
+
+        boolean moreData = receive();
+        if( !moreData ) {
+            endOfStream = true;
+        }
+        return moreData;
     }
 
-    
+
     /**
      * After reading the request headers, we have to setup the request filters.
      */
@@ -938,6 +954,17 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
     }
 
 
+    /**
+     * Callback to write data from the buffer.
+     */
+    protected void flush(boolean explicit) throws IOException {
+        if (explicit && !finished) {
+            // Send the flush message
+            output(flushMessageArray, 0, flushMessageArray.length);
+        }
+    }
+
+    
     /**
      * Finish AJP response.
      */
