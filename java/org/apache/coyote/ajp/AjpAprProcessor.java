@@ -21,15 +21,12 @@ import java.io.InterruptedIOException;
 import java.nio.ByteBuffer;
 
 import org.apache.coyote.ActionCode;
-import org.apache.coyote.OutputBuffer;
 import org.apache.coyote.RequestInfo;
-import org.apache.coyote.Response;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.jni.Socket;
 import org.apache.tomcat.jni.Status;
 import org.apache.tomcat.util.ExceptionUtils;
-import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
 import org.apache.tomcat.util.net.AprEndpoint;
 import org.apache.tomcat.util.net.SocketStatus;
@@ -522,70 +519,6 @@ public class AjpAprProcessor extends AbstractAjpProcessor<Long> {
                     flushMessageArray.length) < 0) {
                 throw new IOException(sm.getString("ajpprocessor.failedflush"));
             }
-        }
-    }
-
-
-    // ----------------------------------- OutputStreamOutputBuffer Inner Class
-
-
-    /**
-     * This class is an output buffer which will write data to an output
-     * stream.
-     */
-    protected class SocketOutputBuffer
-        implements OutputBuffer {
-
-
-        /**
-         * Write chunk.
-         */
-        @Override
-        public int doWrite(ByteChunk chunk, Response res)
-            throws IOException {
-
-            if (!response.isCommitted()) {
-                // Validate and write response headers
-                try {
-                    prepareResponse();
-                } catch (IOException e) {
-                    // Set error flag
-                    error = true;
-                }
-            }
-
-            int len = chunk.getLength();
-            // 4 - hardcoded, byte[] marshaling overhead
-            // Adjust allowed size if packetSize != default (Constants.MAX_PACKET_SIZE)
-            int chunkSize = Constants.MAX_SEND_SIZE + packetSize - Constants.MAX_PACKET_SIZE;
-            int off = 0;
-            while (len > 0) {
-                int thisTime = len;
-                if (thisTime > chunkSize) {
-                    thisTime = chunkSize;
-                }
-                len -= thisTime;
-                if (outputBuffer.position() + thisTime +
-                    Constants.H_SIZE + 4 > outputBuffer.capacity()) {
-                    flush(false);
-                }
-                outputBuffer.put((byte) 0x41);
-                outputBuffer.put((byte) 0x42);
-                outputBuffer.putShort((short) (thisTime + 4));
-                outputBuffer.put(Constants.JK_AJP13_SEND_BODY_CHUNK);
-                outputBuffer.putShort((short) thisTime);
-                outputBuffer.put(chunk.getBytes(), chunk.getOffset() + off, thisTime);
-                outputBuffer.put((byte) 0x00);
-                off += thisTime;
-            }
-
-            byteCount += chunk.getLength();
-            return chunk.getLength();
-        }
-
-        @Override
-        public long getBytesWritten() {
-            return byteCount;
         }
     }
 }

@@ -110,7 +110,8 @@
         (markt)
       </fix>
       <scode>
-        Code clean-up in the AJP processor implementations. (markt) 
+        Code clean-up and re-factoring to reduce duplicate code in the AJP
+        processor implementations. (markt) 
       </scode>
     </changelog>
   </subsection>
