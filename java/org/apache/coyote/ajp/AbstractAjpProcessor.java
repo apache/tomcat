@@ -537,7 +537,6 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
 
     // Methods called by action()
     protected abstract void actionInternal(ActionCode actionCode, Object param);
-    protected abstract void flush(boolean tbd) throws IOException;
     protected abstract void finish() throws IOException;
 
     // Methods called by prepareResponse()
@@ -556,6 +555,17 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
     }
 
 
+    /**
+     * Callback to write data from the buffer.
+     */
+    protected void flush(boolean explicit) throws IOException {
+        if (explicit && !finished) {
+            // Send the flush message
+            output(flushMessageArray, 0, flushMessageArray.length);
+        }
+    }
+
+    
     /**
      * After reading the request headers, we have to setup the request filters.
      */
