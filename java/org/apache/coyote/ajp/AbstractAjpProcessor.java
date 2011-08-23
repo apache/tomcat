@@ -220,9 +220,15 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
 
 
     /**
-     * Bytes written to client for the current request
+     * Bytes written to client for the current request.
      */
-    protected long byteCount = 0;
+    protected long bytesWritten = 0;
+
+
+    /**
+     * Request body bytes read for the current request.
+     */
+    protected long bodyBytesRead = 0;
 
 
     // ------------------------------------------------------------ Constructor
@@ -529,7 +535,8 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
         request.recycle();
         response.recycle();
         certificates.recycle();
-        byteCount = 0;
+        bytesWritten = 0;
+        bodyBytesRead = 0;
     }
 
 
@@ -1003,12 +1010,12 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
      */
     protected class SocketInputBuffer implements InputBuffer {
 
-
         /**
-         * Read bytes into the specified chunk.
+         * Read bytes into the specified chunk. If no chunk is specified, the
+         * bytes are swallowed.
          */
         @Override
-        public int doRead(ByteChunk chunk, Request req )
+        public int doRead(ByteChunk chunk, Request req)
         throws IOException {
 
             if (endOfStream) {
@@ -1025,10 +1032,12 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
                 }
             }
             ByteChunk bc = bodyBytes.getByteChunk();
-            chunk.setBytes(bc.getBuffer(), bc.getStart(), bc.getLength());
+            bodyBytesRead += bc.getLength();
+            if (chunk != null) {
+                chunk.setBytes(bc.getBuffer(), bc.getStart(), bc.getLength());
+            }
             empty = true;
-            return chunk.getLength();
-
+            return bc.getLength();
         }
 
     }
@@ -1079,13 +1088,13 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
                 off += thisTime;
             }
 
-            byteCount += chunk.getLength();
+            bytesWritten += chunk.getLength();
             return chunk.getLength();
         }
 
         @Override
         public long getBytesWritten() {
-            return byteCount;
+            return bytesWritten;
         }
     }
 }
