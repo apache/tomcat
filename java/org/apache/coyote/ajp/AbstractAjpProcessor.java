@@ -225,6 +225,12 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
     protected long bytesWritten = 0;
 
 
+    /**
+     * Request body bytes read for the current request.
+     */
+    protected long bodyBytesRead = 0;
+
+
     // ------------------------------------------------------------ Constructor
 
     public AbstractAjpProcessor(int packetSize, AbstractEndpoint endpoint) {
@@ -530,6 +536,7 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
         response.recycle();
         certificates.recycle();
         bytesWritten = 0;
+        bodyBytesRead = 0;
     }
 
 
@@ -1008,7 +1015,7 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
          * Read bytes into the specified chunk.
          */
         @Override
-        public int doRead(ByteChunk chunk, Request req )
+        public int doRead(ByteChunk chunk, Request req)
         throws IOException {
 
             if (endOfStream) {
@@ -1025,10 +1032,10 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
                 }
             }
             ByteChunk bc = bodyBytes.getByteChunk();
+            bodyBytesRead += bc.getLength();
             chunk.setBytes(bc.getBuffer(), bc.getStart(), bc.getLength());
             empty = true;
-            return chunk.getLength();
-
+            return bc.getLength();
         }
 
     }
