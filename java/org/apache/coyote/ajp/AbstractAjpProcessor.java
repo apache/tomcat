@@ -537,7 +537,6 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
 
     // Methods called by action()
     protected abstract void actionInternal(ActionCode actionCode, Object param);
-    protected abstract void finish() throws IOException;
 
     // Methods called by prepareResponse()
     protected abstract void output(byte[] src, int offset, int length)
@@ -936,6 +935,35 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
         responseMessage.end();
         output(responseMessage.getBuffer(), 0,
                 responseMessage.getLen());
+    }
+
+
+    /**
+     * Finish AJP response.
+     */
+    protected void finish() throws IOException {
+
+        if (!response.isCommitted()) {
+            // Validate and write response headers
+            try {
+                prepareResponse();
+            } catch (IOException e) {
+                // Set error flag
+                error = true;
+            }
+        }
+
+        if (finished)
+            return;
+
+        finished = true;
+
+        // Add the end message
+        if (error) {
+            output(endAndCloseMessageArray, 0, endAndCloseMessageArray.length);
+        } else {
+            output(endMessageArray, 0, endMessageArray.length);
+        }
     }
 
 

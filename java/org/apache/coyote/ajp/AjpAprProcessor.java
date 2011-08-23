@@ -282,43 +282,6 @@ public class AjpAprProcessor extends AbstractAjpProcessor<Long> {
 
 
     /**
-     * Finish AJP response.
-     */
-    @Override
-    protected void finish() throws IOException {
-
-        if (!response.isCommitted()) {
-            // Validate and write response headers
-            try {
-                prepareResponse();
-            } catch (IOException e) {
-                // Set error flag
-                error = true;
-            }
-        }
-
-        if (finished)
-            return;
-
-        finished = true;
-
-        // Add the end message
-        byte[] messageArray;
-        if (error) {
-            messageArray = endAndCloseMessageArray;
-        } else {
-            messageArray = endMessageArray;
-        }
-        if (outputBuffer.position() + messageArray.length > outputBuffer.capacity()) {
-            flush(false);
-        }
-        outputBuffer.put(messageArray);
-        flush(false);
-
-    }
-
-
-    /**
      * Read at least the specified amount of bytes, and place them
      * in the input buffer.
      */
