@@ -1091,7 +1091,7 @@ Section Uninstall
     MessageBox MB_ICONSTOP|MB_OK \
         "No service name specified to uninstall. This will be provided automatically if you uninstall via \
          Add/Remove Programs or the shortcut on the Start menu. Alternatively, call the installer from \
-         the command line with -serviceName=$\"<name of service>$\"."
+         the command line with -ServiceName=$\"<name of service>$\"."
     Quit
   ${EndIf}
   
@@ -1166,7 +1166,7 @@ SectionEnd
 ; =================
 Function un.onInit
   ${GetParameters} $R0
-  ${GetOPtions} $R0 "-ServiceName=" $R1
+  ${GetOptions} $R0 "-ServiceName=" $R1
   StrCpy $TomcatServiceName $R1
   StrCpy $TomcatServiceFileName $R1.exe
   StrCpy $TomcatServiceManagerFileName $R1w.exe
