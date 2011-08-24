@@ -79,7 +79,7 @@ public class JreMemoryLeakPreventionListener implements LifecycleListener {
     public void setAWTThreadProtection(boolean awtThreadProtection) {
       this.awtThreadProtection = awtThreadProtection;
     }
-    
+
     /**
      * Protect against the memory leak caused when the first call to
      * <code>sun.misc.GC.requestLatency(long)</code> is triggered by a web
@@ -233,10 +233,10 @@ public class JreMemoryLeakPreventionListener implements LifecycleListener {
 
                 // Trigger the creation of the AWT (AWT-Windows, AWT-XAWT,
                 // etc.) thread
-                if(awtThreadProtection) {
+                if (awtThreadProtection) {
                   java.awt.Toolkit.getDefaultToolkit();
                 }
-                
+
                 /*
                  * Several components end up calling:
                  * sun.misc.GC.requestLatency(long)

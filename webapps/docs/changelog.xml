@@ -90,7 +90,7 @@
         on a suggestion by Felix Schumacher. (markt)
       </fix>
       <fix>
-        <bug>51688</bug> JreMemoryLeakPreventionListener now protects against
+        <bug>51688</bug>: JreMemoryLeakPreventionListener now protects against
         AWT thread creation. (schultz)
       </fix>
     </changelog>
