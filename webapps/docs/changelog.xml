@@ -93,6 +93,11 @@
         <bug>51688</bug>: JreMemoryLeakPreventionListener now protects against
         AWT thread creation. (schultz)
       </fix>
+      <fix>
+        <bug>51713</bug>: Improve message that is logged if there is an error
+        in the value of <code>protocol</code> in a <code>Connector</code>.
+        (kkolinko)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
