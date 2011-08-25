@@ -291,11 +291,13 @@ public class AjpMessage {
     public int getInt() {
         int b1 = buf[pos++] & 0xFF;
         int b2 = buf[pos++] & 0xFF;
+        validatePos(pos);
         return (b1<<8) + b2;
     }
 
 
     public int peekInt() {
+        validatePos(pos + 2);
         int b1 = buf[pos] & 0xFF;
         int b2 = buf[pos+1] & 0xFF;
         return (b1<<8) + b2;
@@ -304,6 +306,7 @@ public class AjpMessage {
     
     public byte getByte() {
         byte res = buf[pos++];
+        validatePos(pos);
         return res;
     }
 
@@ -314,6 +317,7 @@ public class AjpMessage {
             mb.recycle();
             return;
         }
+        validatePos(pos + length + 1);
         mb.setBytes(buf, pos, length);
         mb.getCharChunk().recycle(); // not valid anymore
         pos += length;
@@ -335,6 +339,7 @@ public class AjpMessage {
         b1 |= (buf[pos++] & 0xFF);
         b1 <<=8;
         b1 |= (buf[pos++] & 0xFF);
+        validatePos(pos);
         return  b1;
     }
 
@@ -389,6 +394,13 @@ public class AjpMessage {
     }
 
 
+    private void validatePos(int posToTest) {
+        if (posToTest > len + 4) {
+            // Trying to read data beyond the end of the AJP message 
+            throw new ArrayIndexOutOfBoundsException(sm.getString(
+                    "ajpMessage.invalidPos", Integer.valueOf(pos)));
+        }
+    }
     // ------------------------------------------------------ Protected Methods
 
 
