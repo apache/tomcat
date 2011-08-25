@@ -143,7 +143,7 @@
   <subsection name="Other">
     <changelog>
       <add>
-        <rev>1157874</rev><bug>51583</bug>: Fix jdbc-pool shutdown delay.
+        <bug>51583</bug> (<rev>1157874</rev>): Fix jdbc-pool shutdown delay.
         (fhanik)
       </add>
     </changelog>
@@ -251,7 +251,7 @@
         flushing a closed socket. (jfclere)
       </fix>
       <fix>
-        <bug>50394</bug>: Return -1 instead throwing an exception when
+        <bug>50394</bug>: Return -1 instead of throwing an exception when
         encountering an EOF while processing an input stream with the HTTP APR
         connector. (jfclere)
       </fix>
@@ -1826,7 +1826,7 @@
   <subsection name="Tribes">
     <changelog>
       <fix>
-        <rev>1068549</rev> <bug>50667</bug>: Allow RPC callers to get
+        <bug>50667</bug> (<rev>1068549</rev>): Allow RPC callers to get
         confirmation when sending a reply. (fhanik)
       </fix>  
     </changelog>
