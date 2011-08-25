@@ -75,7 +75,7 @@ public class Connector extends LifecycleMBeanBase  {
             this.protocolHandler = (ProtocolHandler) clazz.newInstance();
         } catch (Exception e) {
             log.error(sm.getString(
-                    "coyoteConnector.protocolHandlerInstantiationFailed", e), e);
+                    "coyoteConnector.protocolHandlerInstantiationFailed"), e);
         }
     }
 
