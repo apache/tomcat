@@ -118,6 +118,10 @@
         Code clean-up and re-factoring to reduce duplicate code in the AJP
         processor implementations. (markt) 
       </scode>
+      <add>
+        Detect incomplete AJP messages and reject the associated request if one
+        is found. (markt) 
+      </add>
     </changelog>
   </subsection>
   <subsection name="Jasper">
