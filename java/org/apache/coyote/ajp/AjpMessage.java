@@ -398,7 +398,7 @@ public class AjpMessage {
         if (posToTest > len + 4) {
             // Trying to read data beyond the end of the AJP message 
             throw new ArrayIndexOutOfBoundsException(sm.getString(
-                    "ajpMessage.invalidPos", Integer.valueOf(pos)));
+                    "ajpMessage.invalidPos", Integer.valueOf(posToTest)));
         }
     }
     // ------------------------------------------------------ Protected Methods
