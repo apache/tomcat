@@ -335,7 +335,7 @@ public class AjpProcessor extends AbstractAjpProcessor<Socket> {
             return false;
         }
 
-        bodyMessage.getBytes(bodyBytes);
+        bodyMessage.getBodyBytes(bodyBytes);
         empty = false;
         return true;
     }
