@@ -372,7 +372,7 @@ public class AjpAprProcessor extends AbstractAjpProcessor<Long> {
             return false;
         }
 
-        bodyMessage.getBytes(bodyBytes);
+        bodyMessage.getBodyBytes(bodyBytes);
         empty = false;
         return true;
     }
