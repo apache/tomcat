@@ -312,16 +312,30 @@ public class AjpMessage {
 
     
     public void getBytes(MessageBytes mb) {
+        doGetBytes(mb, true);
+    }
+    
+    public void getBodyBytes(MessageBytes mb) {
+        doGetBytes(mb, false);
+    }
+    
+    private void doGetBytes(MessageBytes mb, boolean terminated) {
         int length = getInt();
         if ((length == 0xFFFF) || (length == -1)) {
             mb.recycle();
             return;
         }
-        validatePos(pos + length + 1);
+        if (terminated) {
+            validatePos(pos + length + 1);
+        } else {
+            validatePos(pos + length);
+        }
         mb.setBytes(buf, pos, length);
         mb.getCharChunk().recycle(); // not valid anymore
         pos += length;
-        pos++; // Skip the terminating \0
+        if (terminated) {
+            pos++; // Skip the terminating \0
+        }
     }
     
     
