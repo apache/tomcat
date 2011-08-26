@@ -146,6 +146,10 @@
         <bug>51583</bug> (<rev>1157874</rev>, <rev>1162102</rev>): Fix
         shutdown delay in jdbc-pool. (fhanik/kkolinko)
       </add>
+      <fix>
+        <bug>51558</bug>: Don&apos;t force the use of StandardManager when using
+        any of the <code>Tomcat#addWebapp()</code> methods. (markt)
+      </fix>
     </changelog>
   </subsection>  
 </section>
