@@ -35,6 +35,7 @@ import javax.naming.NamingException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
@@ -51,7 +52,7 @@ import org.apache.tomcat.util.buf.ByteChunk;
 public class TestTomcat extends TomcatBaseTest {
 
     /**
-     * Simple servlet to test in-line registration 
+     * Simple servlet to test in-line registration.
      */
     public static class HelloWorld extends HttpServlet {
 
@@ -60,6 +61,22 @@ public class TestTomcat extends TomcatBaseTest {
         @Override
         public void doGet(HttpServletRequest req, HttpServletResponse res) 
                 throws IOException {
+            res.getWriter().write("Hello world");
+        }
+    }
+
+    /**
+     * Simple servlet to test the default session manager.
+     */
+    public static class HelloWorldSession extends HttpServlet {
+
+        private static final long serialVersionUID = 1L;
+
+        @Override
+        public void doGet(HttpServletRequest req, HttpServletResponse res) 
+                throws IOException {
+            HttpSession s = req.getSession(true);
+            s.getId();
             res.getWriter().write("Hello world");
         }
     }
@@ -235,6 +252,25 @@ public class TestTomcat extends TomcatBaseTest {
         ByteChunk res = getUrl("http://localhost:" + getPort() +
                 "/examples/jsp/jsp2/el/basic-arithmetic.jsp");
         assertTrue(res.toString().indexOf("<td>${(1==2) ? 3 : 4}</td>") > 0);
+    }
+
+    @Test
+    public void testSession() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+        
+        // Must have a real docBase - just use temp
+        org.apache.catalina.Context ctx = 
+            tomcat.addContext("", System.getProperty("java.io.tmpdir"));
+        // You can customize the context by calling 
+        // its API
+        
+        Tomcat.addServlet(ctx, "myServlet", new HelloWorldSession());
+        ctx.addServletMapping("/", "myServlet");
+        
+        tomcat.start();
+        
+        ByteChunk res = getUrl("http://localhost:" + getPort() + "/");
+        assertEquals("Hello world", res.toString());
     }
 
     @Test
