@@ -113,7 +113,7 @@ public abstract class TomcatBaseTest {
                 getBuildDirectory(), "conf/logging.properties").toString());
 
         tempDir = new File(System.getProperty("tomcat.test.temp", "output/tmp"));
-        if (!tempDir.exists() && !tempDir.mkdirs()) {
+        if (!tempDir.mkdirs() && !tempDir.isDirectory()) {
             fail("Unable to create temporary directory for test");
         }
         

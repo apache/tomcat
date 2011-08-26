@@ -709,7 +709,7 @@ public class JspCompilationContext {
     protected boolean makeOutputDir() {
         synchronized(outputDirLock) {
             File outDirFile = new File(outputDir);
-            return (outDirFile.exists() || outDirFile.mkdirs());
+            return (outDirFile.mkdirs() || outDirFile.isDirectory());
         }
     }
 

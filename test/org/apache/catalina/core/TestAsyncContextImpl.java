@@ -411,7 +411,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         
         // Create the folder that will trigger the redirect
         File foo = new File(docBase, "async");
-        if (!foo.exists() && !foo.mkdirs()) {
+        if (!foo.mkdirs() && !foo.isDirectory()) {
             fail("Unable to create async directory in docBase");
         }
         

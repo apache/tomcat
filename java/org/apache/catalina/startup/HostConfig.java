@@ -1312,7 +1312,7 @@ public class HostConfig
         if (host.getCreateDirs()) {
             File[] dirs = new File[] {appBase(),configBase()};
             for (int i=0; i<dirs.length; i++) {
-                if ( (!dirs[i].isDirectory()) && (!dirs[i].mkdirs())) {
+                if (!dirs[i].mkdirs() && !dirs[i].isDirectory()) {
                     log.error(sm.getString("hostConfig.createDirs",dirs[i]));
                 }
             }
