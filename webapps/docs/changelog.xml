@@ -143,8 +143,8 @@
   <subsection name="Other">
     <changelog>
       <add>
-        <bug>51583</bug> (<rev>1157874</rev>): Fix jdbc-pool shutdown delay.
-        (fhanik)
+        <bug>51583</bug> (<rev>1157874</rev>, <rev>1162102</rev>): Fix
+        shutdown delay in jdbc-pool. (fhanik/kkolinko)
       </add>
     </changelog>
   </subsection>  
