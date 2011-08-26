@@ -55,7 +55,6 @@ import org.apache.catalina.core.StandardWrapper;
 import org.apache.catalina.deploy.LoginConfig;
 import org.apache.catalina.realm.GenericPrincipal;
 import org.apache.catalina.realm.RealmBase;
-import org.apache.catalina.session.StandardManager;
 
 // TODO: lazy init for the temp dir - only when a JSP is compiled or 
 // get temp dir is called we need to create it. This will avoid the 
@@ -747,7 +746,6 @@ public class Tomcat {
         ctx.addServletMapping("*.jspx", "jsp");
 
         // Sessions
-        ctx.setManager( new StandardManager());
         ctx.setSessionTimeout(30);
         
         // MIME mappings
