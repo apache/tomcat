@@ -615,7 +615,10 @@ public class InternalAprInputBuffer extends AbstractInputBuffer<Long> {
             } else {
                 if ((-nRead) == Status.ETIMEDOUT || (-nRead) == Status.TIMEUP) {
                     throw new SocketTimeoutException(sm.getString("iib.failedread"));
-                } else if (nRead != 0) {
+                } else if (nRead == 0) {
+                    // APR_STATUS_IS_EOF, since native 1.1.22
+                    return false;
+                } else {
                     throw new IOException(sm.getString("iib.failedread"));
                 }
             }
