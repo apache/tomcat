@@ -87,7 +87,7 @@ public class TestCoyoteAdapter extends TomcatBaseTest {
         
         // Create the folder that will trigger the redirect
         File foo = new File(docBase, "foo");
-        if (!foo.exists() && !foo.mkdirs()) {
+        if (!foo.mkdirs() && !foo.isDirectory()) {
             fail("Unable to create foo directory in docBase");
         }
         

@@ -6057,7 +6057,7 @@ public class StandardContext extends ContainerBase
                         workDir, catalinaHomePath, getName()), e);
             }
         }
-        if (!dir.exists() && !dir.mkdirs()) {
+        if (!dir.mkdirs() && !dir.isDirectory()) {
             log.warn(sm.getString("standardContext.workCreateFail", dir,
                     getName()));
         }

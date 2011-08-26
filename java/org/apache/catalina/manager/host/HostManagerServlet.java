@@ -381,13 +381,11 @@ public class HostManagerServlet
         } catch (IOException e) {
             appBaseFile = file;
         }
-        if (!appBaseFile.exists()) {
-            if (!appBaseFile.mkdirs()) {
-                writer.println(smClient.getString(
-                        "hostManagerServlet.appBaseCreateFail",
-                        appBaseFile.toString(), name));
-                return;
-            }
+        if (!appBaseFile.mkdirs() && !appBaseFile.isDirectory()) {
+            writer.println(smClient.getString(
+                    "hostManagerServlet.appBaseCreateFail",
+                    appBaseFile.toString(), name));
+            return;
         }
         
         // Create base for config files
@@ -704,10 +702,8 @@ public class HostManagerServlet
         if (installedHost != null) {
             configBase = new File(configBase, hostName);
         }
-        if (!configBase.exists()) {
-            if (!configBase.mkdirs()) {
-                return null;
-            }
+        if (!configBase.mkdirs() && !configBase.isDirectory()) {
+            return null;
         }
         return configBase;
     }

@@ -636,7 +636,7 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
         File deployedPath = deployed;
         if (tag != null) {
             deployedPath = new File(versioned, tag);
-            if (!deployedPath.isDirectory() && !deployedPath.mkdirs()) {
+            if (!deployedPath.mkdirs() && !deployedPath.isDirectory()) {
                 writer.println(smClient.getString("managerServlet.mkdirFail",
                         deployedPath));
                 return;
@@ -830,7 +830,7 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
                 addServiced(name);
                 try {
                     if (config != null) {
-                        if (!configBase.isDirectory() && !configBase.mkdirs()) {
+                        if (!configBase.mkdirs() && !configBase.isDirectory()) {
                             writer.println(smClient.getString(
                                     "managerServlet.mkdirFail",configBase));
                             return;

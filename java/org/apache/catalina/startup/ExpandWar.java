@@ -115,7 +115,10 @@ public class ExpandWar {
                 if (last >= 0) {
                     File parent = new File(docBase,
                                            name.substring(0, last));
-                    parent.mkdirs();
+                    if (!parent.mkdirs() && !parent.isDirectory()) {
+                        throw new IOException(
+                                sm.getString("expandWar.createFailed", parent));
+                    }
                 }
                 if (name.endsWith("/")) {
                     continue;

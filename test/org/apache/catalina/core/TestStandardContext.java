@@ -76,7 +76,7 @@ public class TestStandardContext extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
         
         File docBase = new File(tomcat.getHost().getAppBaseFile(), "ROOT");
-        if (!docBase.exists() && !docBase.mkdirs()) {
+        if (!docBase.mkdirs() && !docBase.isDirectory()) {
             fail("Unable to create docBase");
         }
         

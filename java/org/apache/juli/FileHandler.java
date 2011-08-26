@@ -363,7 +363,7 @@ public class FileHandler
 
         // Create the directory if necessary
         File dir = new File(directory);
-        if (!dir.exists() && !dir.mkdirs()) {
+        if (!dir.mkdirs() && !dir.isDirectory()) {
             reportError("Unable to create [" + dir + "]", null,
                     ErrorManager.OPEN_FAILURE);
             writer = null;
@@ -376,13 +376,11 @@ public class FileHandler
             File pathname = new File(dir.getAbsoluteFile(), prefix
                     + (rotatable ? date : "") + suffix);
             File parent = pathname.getParentFile();
-            if (!parent.exists()) {
-                if (!parent.mkdirs()) {
-                    reportError("Unable to create [" + parent + "]", null,
-                            ErrorManager.OPEN_FAILURE);
-                    writer = null;
-                    return;
-                }
+            if (!parent.mkdirs() && !parent.isDirectory()) {
+                reportError("Unable to create [" + parent + "]", null,
+                        ErrorManager.OPEN_FAILURE);
+                writer = null;
+                return;
             }
             String encoding = getEncoding();
             FileOutputStream fos = new FileOutputStream(pathname, true);

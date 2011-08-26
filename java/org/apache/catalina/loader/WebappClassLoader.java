@@ -3011,8 +3011,11 @@ public class WebappClassLoader
                                             throw new IllegalArgumentException(
                                                     sm.getString("webappClassLoader.validationErrorJarPath",
                                                             jarEntry2.getName()), ioe);
-                                        }                                 
-                                        resourceFile.getParentFile().mkdirs();
+                                        }
+                                        File parentFile = resourceFile.getParentFile();
+                                        if (!parentFile.mkdirs() && !parentFile.exists()) {
+                                            // Ignore the error (like the IOExceptions below)
+                                        }
                                         FileOutputStream os = null;
                                         InputStream is = null;
                                         try {
