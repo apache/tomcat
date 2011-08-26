@@ -1081,10 +1081,8 @@ public class AccessLogValve extends ValveBase implements AccessLog {
         File dir = new File(directory);
         if (!dir.isAbsolute())
             dir = new File(System.getProperty(Globals.CATALINA_BASE_PROP), directory);
-        if (!dir.exists()) {
-            if (!dir.mkdirs()) {
-                log.error(sm.getString("accessLogValve.openDirFail", dir));
-            }
+        if (!dir.mkdirs() && !dir.isDirectory()) {
+            log.error(sm.getString("accessLogValve.openDirFail", dir));
         }
 
         // Open the current log file
@@ -1097,10 +1095,8 @@ public class AccessLogValve extends ValveBase implements AccessLog {
             pathname = new File(dir.getAbsoluteFile(), prefix + suffix);
         }
         File parent = pathname.getParentFile();
-        if (!parent.exists()) {
-            if (!parent.mkdirs()) {
-                log.error(sm.getString("accessLogValve.openDirFail", parent));
-            }
+        if (!parent.mkdirs() && !parent.isDirectory()) {
+            log.error(sm.getString("accessLogValve.openDirFail", parent));
         }
 
         Charset charset = null;

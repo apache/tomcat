@@ -150,6 +150,10 @@
         <bug>51558</bug>: Don&apos;t force the use of StandardManager when using
         any of the <code>Tomcat#addWebapp()</code> methods. (markt)
       </fix>
+      <fix>
+        <bug>51704</bug>: Make use of <code>File#mkdirs()</code> more robust.
+        (markt)
+      </fix>
     </changelog>
   </subsection>  
 </section>

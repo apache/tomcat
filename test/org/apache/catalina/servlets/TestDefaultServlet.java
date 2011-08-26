@@ -164,7 +164,7 @@ public class TestDefaultServlet extends TomcatBaseTest {
     public void testCustomErrorPage() throws Exception {
         File appDir = new File(getTemporaryDirectory(), "MyApp");
         File webInf = new File(appDir, "WEB-INF");
-        if (!webInf.mkdirs()) {
+        if (!webInf.mkdirs() && !webInf.isDirectory()) {
             fail("Unable to create directory [" + webInf + "]");
         }
         Writer w = new OutputStreamWriter(new FileOutputStream(new File(appDir,
@@ -249,7 +249,7 @@ public class TestDefaultServlet extends TomcatBaseTest {
     public void testCustomErrorPageMissing() throws Exception {
         File appDir = new File(getTemporaryDirectory(), "MyApp");
         File webInf = new File(appDir, "WEB-INF");
-        if (!webInf.mkdirs()) {
+        if (!webInf.mkdirs() && !webInf.isDirectory()) {
             fail("Unable to create directory [" + webInf + "]");
         }
         Writer w = new OutputStreamWriter(new FileOutputStream(new File(appDir,

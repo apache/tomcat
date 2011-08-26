@@ -1149,9 +1149,11 @@ public final class CGIServlet extends HttpServlet {
             String dirPath = destPath.toString().substring(
                     0,destPath.toString().lastIndexOf("/"));
             File dir = new File(dirPath);
-            if (!dir.mkdirs() && debug >= 2) {
-                log("expandCGIScript: failed to create directories for '" +
-                        dir.getAbsolutePath() + "'");
+            if (!dir.mkdirs() && !dir.isDirectory()) {
+                if (debug >= 2) {
+                    log("expandCGIScript: failed to create directories for '" +
+                            dir.getAbsolutePath() + "'");
+                }
                 return;
             }
 
