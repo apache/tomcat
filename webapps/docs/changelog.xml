@@ -94,6 +94,11 @@
         AWT thread creation. (schultz)
       </fix>
       <fix>
+        <bug>51712</bug>: Ensure cache control headers are sent when appropriate
+        even if the request is secure. Patch provided by Michael Zampani.
+        (markt)
+      </fix>
+      <fix>
         <bug>51713</bug>: Improve message that is logged if there is an error
         in the value of <code>protocol</code> in a <code>Connector</code>.
         (kkolinko)
