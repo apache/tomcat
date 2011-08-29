@@ -132,6 +132,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Cluster">
+    <changelog>
+      <add>
+        <bug>51736</bug>: Make rpcTimeout configurable in BackupManager. 
+        (kfujino)
+      </add>
+    </changelog>
+  </subsection>
   <subsection name="Web applications">
     <changelog>
       <fix>
