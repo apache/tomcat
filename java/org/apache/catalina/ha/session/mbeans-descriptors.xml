@@ -539,6 +539,10 @@
       name="rejectedSessions"
       description="Number of sessions we rejected due to maxActive beeing reached"
       type="int"/>
+    <attribute
+      name="rpcTimeout"
+      description="Timeout for RPC messages, how long we will wait for a reply"
+      type="long"/>
     <operation
       name="expireSession"
       description="Expired the given session"
