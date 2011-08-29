@@ -103,6 +103,10 @@
         in the value of <code>protocol</code> in a <code>Connector</code>.
         (kkolinko)
       </fix>
+      <fix>
+        <bug>51739</bug>: When using a landing page with FORM authentication
+        ensure that the request has a valid HTTP method. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
