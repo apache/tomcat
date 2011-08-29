@@ -131,6 +131,10 @@
         Detect incomplete AJP messages and reject the associated request if one
         is found. (markt) 
       </add>
+      <fix>
+        <bug>51698</bug>: Fix CVE-2011-3190. Prevent AJP message injection.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
