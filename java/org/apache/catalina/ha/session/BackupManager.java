@@ -67,6 +67,11 @@ public class BackupManager extends ClusterManagerBase
     private int mapSendOptions = Channel.SEND_OPTIONS_SYNCHRONIZED_ACK|Channel.SEND_OPTIONS_USE_ACK;
 
     /**
+     * Timeout for RPC messages.
+     */
+    private long rpcTimeout = DEFAULT_REPL_TIMEOUT;
+
+    /**
      * Constructor, just calls super()
      *
      */
@@ -158,7 +163,7 @@ public class BackupManager extends ClusterManagerBase
             CatalinaCluster catclust = cluster;
             LazyReplicatedMap map = new LazyReplicatedMap(this,
                                                           catclust.getChannel(),
-                                                          DEFAULT_REPL_TIMEOUT,
+                                                          rpcTimeout,
                                                           getMapName(),
                                                           getClassLoaders());
             map.setChannelSendOptions(mapSendOptions);
@@ -238,6 +243,14 @@ public class BackupManager extends ClusterManagerBase
         return mapSendOptions;
     }
 
+    public void setRpcTimeout(long rpcTimeout) {
+        this.rpcTimeout = rpcTimeout;
+    }
+
+    public long getRpcTimeout() {
+        return rpcTimeout;
+    }
+
     @Override
     public String[] getInvalidatedSessions() {
         return new String[0];
@@ -252,6 +265,7 @@ public class BackupManager extends ClusterManagerBase
         result.notifyListenersOnReplication = notifyListenersOnReplication;
         result.mapSendOptions = mapSendOptions;
         result.maxActiveSessions = maxActiveSessions;
+        result.rpcTimeout = rpcTimeout;
         return result;
     }
 

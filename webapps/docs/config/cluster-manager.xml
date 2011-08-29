@@ -132,6 +132,11 @@
         sessions where the current node is the primary node for the session are
         considered active sessions.
       </attribute>
+      <attribute name="rpcTimeout" required="false">
+        Timeout for RPC message used for broadcast and transfer state from 
+        another map.
+        Default value is <code>15000</code> milliseconds.
+      </attribute>
     </attributes>
   </subsection>
 </section>

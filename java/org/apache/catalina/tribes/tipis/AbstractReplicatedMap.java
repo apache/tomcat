@@ -305,14 +305,20 @@ public abstract class AbstractReplicatedMap extends ConcurrentHashMap implements
      * @throws ChannelException
      */
     protected void broadcast(int msgtype, boolean rpc) throws ChannelException {
+        // No destination.
+        if (channel.getMembers().length == 0 ) return;
         //send out a map membership message, only wait for the first reply
         MapMessage msg = new MapMessage(this.mapContextName, msgtype,
                                         false, null, null, null, channel.getLocalMember(false), null);
         if ( rpc) {
             Response[] resp = rpcChannel.send(channel.getMembers(), msg, RpcChannel.FIRST_REPLY, (channelSendOptions),rpcTimeout);
-            for (int i = 0; i < resp.length; i++) {
-                mapMemberAdded(resp[i].getSource());
-                messageReceived(resp[i].getMessage(), resp[i].getSource());
+            if (resp.length > 0) {
+                for (int i = 0; i < resp.length; i++) {
+                    mapMemberAdded(resp[i].getSource());
+                    messageReceived(resp[i].getMessage(), resp[i].getSource());
+                }
+            } else {
+                log.warn("broadcast 0 replies, probably a timeout.");
             }
         } else {
             channel.send(channel.getMembers(),msg,channelSendOptions);
