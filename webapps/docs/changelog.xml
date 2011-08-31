@@ -53,6 +53,41 @@
   They eventually become mixed with the numbered issues. (I.e., numbered
   issues to not "pop up" wrt. others).
 -->
+<section name="Tomcat 7.0.22">
+  <subsection name="Catalina">
+    <changelog>
+      <fix>
+        <bug>51744</bug>: Prevent application code from closing the associated
+        JNDI context while the application is running. (markt)
+      </fix>
+      <add>
+        <bug>51741</bug>: Fixes a problem with Eclipse WTP "Serve modules without 
+        publishing" feature where applications failed to access resources when using
+        getResource() on the classloader. (slaurent)
+      </add>
+    </changelog>
+  </subsection>
+  <subsection name="Coyote">
+    <changelog>
+    </changelog>
+  </subsection>
+  <subsection name="Jasper">
+    <changelog>
+    </changelog>
+  </subsection>
+  <subsection name="Cluster">
+    <changelog>
+    </changelog>
+  </subsection>
+  <subsection name="Web applications">
+    <changelog>
+    </changelog>
+  </subsection>
+  <subsection name="Other">
+    <changelog>
+    </changelog>
+  </subsection>  
+</section>
 <section name="Tomcat 7.0.21 (markt)">
   <subsection name="Catalina">
     <changelog>
@@ -106,10 +141,6 @@
       <fix>
         <bug>51739</bug>: When using a landing page with FORM authentication
         ensure that the request has a valid HTTP method. (markt)
-      </fix>
-      <fix>
-        <bug>51744</bug>: Prevent application code from closing the associated
-        JNDI context while the application is running. (markt)
       </fix>
     </changelog>
   </subsection>
