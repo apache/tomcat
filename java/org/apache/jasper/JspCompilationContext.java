@@ -385,49 +385,6 @@ public class JspCompilationContext {
         return jspUri;
     }
 
-    /**
-     * @deprecated Will be removed in Tomcat 8.0.x. Use
-     * {@link #getLastModified(String)} instead.
-     */
-    @Deprecated
-    public long getJspLastModified() {
-        long result = -1;
-        URLConnection uc = null;
-        try {
-            URL jspUrl = getResource(getJspFile());
-            if (jspUrl == null) {
-                incrementRemoved();
-                return result;
-            }
-            uc = jspUrl.openConnection();
-            if (uc instanceof JarURLConnection) {
-                result = ((JarURLConnection) uc).getJarEntry().getTime();
-            } else {
-                result = uc.getLastModified();
-            }
-        } catch (IOException e) {
-            if (log.isDebugEnabled()) {
-                log.debug(Localizer.getMessage(
-                        "jsp.error.lastModified", getJspFile()), e);
-            }
-            result = -1;
-        } finally {
-            if (uc != null) {
-                try {
-                    uc.getInputStream().close();
-                } catch (IOException e) {
-                    if (log.isDebugEnabled()) {
-                        log.debug(Localizer.getMessage(
-                                "jsp.error.lastModified", getJspFile()), e);
-                    }
-                    result = -1;
-                }
-            }
-        }
-        return result;
-    }
-
-
     public Long getLastModified(String resource) {
         long result = -1;
         URLConnection uc = null;
