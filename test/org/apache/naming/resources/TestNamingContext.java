@@ -214,5 +214,61 @@ public class TestNamingContext extends TomcatBaseTest {
         }
     }
     
+    @Test
+    public void testBug51744() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+        tomcat.enableNaming();
+        
+        // Must have a real docBase - just use temp
+        StandardContext ctx = (StandardContext)
+            tomcat.addContext("", System.getProperty("java.io.tmpdir"));
+        
+        // Map the test Servlet
+        Bug51744Servlet bug51744Servlet = new Bug51744Servlet();
+        Tomcat.addServlet(ctx, "bug51744Servlet", bug51744Servlet);
+        ctx.addServletMapping("/", "bug51744Servlet");
 
+        tomcat.start();
+
+        ByteChunk bc = new ByteChunk();
+        int rc = getUrl("http://localhost:" + getPort() + "/", bc, null);
+        assertEquals(200, rc);
+        assertEquals(Bug51744Servlet.EXPECTED, bc.toString());
+    }
+
+    public static final class Bug51744Servlet extends HttpServlet {
+
+        private static final long serialVersionUID = 1L;
+
+        public static final String EXPECTED = "TestValue";
+
+        @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+                throws ServletException, IOException {
+
+            resp.setContentType("text/plain;UTF-8");
+            PrintWriter out = resp.getWriter();
+
+            try {
+                Context ctx1 = new InitialContext();
+                Context env1 = (Context) ctx1.lookup("java:comp/env");
+                env1.addToEnvironment("TestName", EXPECTED);
+
+                boolean error = false;
+                try {
+                    env1.close();
+                } catch (NamingException ne) {
+                    error = true;
+                }
+                if (!error) {
+                    throw new ServletException(
+                            "No error when one was expected");
+                }
+                
+                out.print(env1.getEnvironment().get("TestName"));
+            } catch (NamingException ne) {
+                ne.printStackTrace(out);
+            }
+        }
+    }
 }

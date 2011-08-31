@@ -107,6 +107,10 @@
         <bug>51739</bug>: When using a landing page with FORM authentication
         ensure that the request has a valid HTTP method. (markt)
       </fix>
+      <fix>
+        <bug>51744</bug>: Prevent application code from closing the associated
+        JNDI context while the application is running. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
