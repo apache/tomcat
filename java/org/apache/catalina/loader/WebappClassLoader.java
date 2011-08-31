@@ -2898,11 +2898,22 @@ public class WebappClassLoader
 
                 // Note : Not getting an exception here means the resource was
                 // found
-                entry = findResourceInternal(files[i], path);
 
                 ResourceAttributes attributes =
                     (ResourceAttributes) resources.getAttributes(fullPath);
                 contentLength = (int) attributes.getContentLength();
+                String canonicalPath = attributes.getCanonicalPath();
+                if (canonicalPath != null) {
+                    // we create the ResourceEntry based on the information returned
+                    // by the DirContext rather than just using the path to the
+                    // repository. This allows to have smart DirContext implementations 
+                    // that "virtualize" the docbase (e.g. Eclipse WTP)
+                    entry = findResourceInternal(new File(canonicalPath), "");
+                } else {
+                    // probably a resource not in the filesystem (e.g. in a
+                    // packaged war)
+                    entry = findResourceInternal(files[i], path);
+                }
                 entry.lastModified = attributes.getLastModified();
 
                 if (resource != null) {
