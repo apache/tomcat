@@ -743,8 +743,8 @@ public class NamingContext implements Context {
      * @exception NamingException if a naming exception is encountered
      */
     @Override
-    public void close()
-        throws NamingException {
+    public void close() throws NamingException {
+        checkWritable();
         env.clear();
     }
 
