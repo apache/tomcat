@@ -83,7 +83,7 @@ public interface Host extends Container {
      */
     public void setXmlBase(String xmlBase);
 
-        /**
+    /**
      * Return the application root for this Host.  This can be an absolute
      * pathname, a relative pathname, or a URL.
      */
