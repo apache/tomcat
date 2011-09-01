@@ -379,7 +379,7 @@ public class Http11Processor extends AbstractHttp11Processor<Socket> {
 
     @Override
     protected void resetTimeouts() {
-        // NOOP for APR
+        // NOOP for BIO
     }
 
 
