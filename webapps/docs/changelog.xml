@@ -67,22 +67,6 @@
       </add>
     </changelog>
   </subsection>
-  <subsection name="Coyote">
-    <changelog>
-    </changelog>
-  </subsection>
-  <subsection name="Jasper">
-    <changelog>
-    </changelog>
-  </subsection>
-  <subsection name="Cluster">
-    <changelog>
-    </changelog>
-  </subsection>
-  <subsection name="Web applications">
-    <changelog>
-    </changelog>
-  </subsection>
   <subsection name="Other">
     <changelog>
     <fix>
