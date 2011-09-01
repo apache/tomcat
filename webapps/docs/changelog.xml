@@ -85,6 +85,11 @@
   </subsection>
   <subsection name="Other">
     <changelog>
+    <fix>
+        In jdbc-pool: Avoid IllegalArgumentException when setting maxActive 
+        less than or equal to 0.
+        ArrayBlockingQueue doesn't allow capacity of 0 or less. (kfujino)
+      </fix>
     </changelog>
   </subsection>  
 </section>
