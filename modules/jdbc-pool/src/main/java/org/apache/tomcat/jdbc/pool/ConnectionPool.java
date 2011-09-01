@@ -394,22 +394,6 @@ public class ConnectionPool {
      */
     protected void init(PoolConfiguration properties) throws SQLException {
         poolProperties = properties;
-        //make space for 10 extra in case we flow over a bit
-        busy = new ArrayBlockingQueue<PooledConnection>(properties.getMaxActive(),false);
-        //busy = new FairBlockingQueue<PooledConnection>();
-        //make space for 10 extra in case we flow over a bit
-        if (properties.isFairQueue()) {
-            idle = new FairBlockingQueue<PooledConnection>();
-            //idle = new MultiLockFairBlockingQueue<PooledConnection>();
-        } else {
-            idle = new ArrayBlockingQueue<PooledConnection>(properties.getMaxActive(),properties.isFairQueue());
-        }
-
-        //if the evictor thread is supposed to run, start it now
-        if (properties.isPoolSweeperEnabled()) {
-            poolCleaner = new PoolCleaner("[Pool-Cleaner]:" + properties.getName(), this, properties.getTimeBetweenEvictionRunsMillis());
-            poolCleaner.start();
-        } //end if
 
         //make sure the pool is properly configured
         if (properties.getMaxActive()<1) {
@@ -432,6 +416,23 @@ public class ConnectionPool {
             log.warn("maxIdle is smaller than minIdle, setting maxIdle to: "+properties.getMinIdle());
             properties.setMaxIdle(properties.getMinIdle());
         }
+
+        //make space for 10 extra in case we flow over a bit
+        busy = new ArrayBlockingQueue<PooledConnection>(properties.getMaxActive(),false);
+        //busy = new FairBlockingQueue<PooledConnection>();
+        //make space for 10 extra in case we flow over a bit
+        if (properties.isFairQueue()) {
+            idle = new FairBlockingQueue<PooledConnection>();
+            //idle = new MultiLockFairBlockingQueue<PooledConnection>();
+        } else {
+            idle = new ArrayBlockingQueue<PooledConnection>(properties.getMaxActive(),properties.isFairQueue());
+        }
+
+        //if the evictor thread is supposed to run, start it now
+        if (properties.isPoolSweeperEnabled()) {
+            poolCleaner = new PoolCleaner("[Pool-Cleaner]:" + properties.getName(), this, properties.getTimeBetweenEvictionRunsMillis());
+            poolCleaner.start();
+        } //end if
         
         //create JMX MBean
         if (this.getPoolProperties().isJmxEnabled()) createMBean();
