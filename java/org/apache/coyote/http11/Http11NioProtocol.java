@@ -74,9 +74,6 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol {
 
     // -------------------- Properties--------------------
     
-
-    private int socketCloseDelay=-1;
-    
     private Http11ConnectionHandler cHandler;
 
     // -------------------- Pool setup --------------------
@@ -125,14 +122,6 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol {
     }
     
     // -------------------- Tcp setup --------------------
-    public int getSocketCloseDelay() {
-        return socketCloseDelay;
-    }
-
-    public void setSocketCloseDelay( int d ) {
-        socketCloseDelay=d;
-    }
-
     public void setOomParachute(int oomParachute) {
         ((NioEndpoint)endpoint).setOomParachute(oomParachute);
     }
