@@ -57,6 +57,12 @@
   <subsection name="Catalina">
     <changelog>
       <fix>
+        <bug>51550</bug>: An additional change that ensures any exceptions
+        thrown by an Authenticator (or any other Valve configured for the
+        Context) will be handled by the custom error pages for the Context if an
+        appropriate error page is configured. (markt) 
+      </fix>
+      <fix>
         <bug>51744</bug>: Prevent application code from closing the associated
         JNDI context while the application is running. (markt)
       </fix>
