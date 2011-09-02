@@ -65,6 +65,12 @@
         publishing" feature where applications failed to access resources when using
         getResource() on the classloader. (slaurent)
       </add>
+      <fix>
+        Correct a regression with the fix for <bug>51653</bug> that broke custom
+        error pages for 4xx responses from the Authenticators. Error handling
+        and request listeners are now handled in the StandardHostValve to ensure
+        they wrap all Context level activity. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
