@@ -164,7 +164,13 @@ final class StandardHostValve extends ValveBase {
         if (asyncAtStart || context.fireRequestInitEvent(request)) {
 
             // Ask this Context to process this request
-            context.getPipeline().getFirst().invoke(request, response);
+            try {
+                context.getPipeline().getFirst().invoke(request, response);
+            } catch (Throwable t) {
+                ExceptionUtils.handleThrowable(t);
+                request.setAttribute(RequestDispatcher.ERROR_EXCEPTION, t);
+                throwable(request, response, t);
+            }
     
             // If the request was async at the start and an error occurred then
             // the async error handling will kick-in and that will fire the
