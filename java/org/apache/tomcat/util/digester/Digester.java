@@ -330,14 +330,14 @@ public class Digester extends DefaultHandler {
      * The Log to which most logging calls will be made.
      */
     protected Log log =
-        LogFactory.getLog("org.apache.commons.digester.Digester");
+        LogFactory.getLog("org.apache.tomcat.util.digester.Digester");
 
 
     /**
      * The Log to which all SAX event related logging calls will be made.
      */
     protected Log saxLog =
-        LogFactory.getLog("org.apache.commons.digester.Digester.sax");
+        LogFactory.getLog("org.apache.tomcat.util.digester.Digester.sax");
     
         
     /** Stacks used for interrule communication, indexed by name String */
@@ -2530,8 +2530,8 @@ public class Digester extends DefaultHandler {
             return;
         }
 
-        log = LogFactory.getLog("org.apache.commons.digester.Digester");
-        saxLog = LogFactory.getLog("org.apache.commons.digester.Digester.sax");
+        log = LogFactory.getLog("org.apache.tomcat.util.digester.Digester");
+        saxLog = LogFactory.getLog("org.apache.tomcat.util.digester.Digester.sax");
 
         // Perform lazy configuration as needed
         initialize(); // call hook method for subclasses that want to be initialized once only
