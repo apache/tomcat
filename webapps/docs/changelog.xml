@@ -73,6 +73,14 @@
       connector. (markt)</code>
     </changelog>
   </subsection>
+  <subsection name="Web applications">
+    <changelog>
+      <fix>
+        Correct the documentation for connectionLinger for the AJP and HTTP
+        connectors. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <fix>
