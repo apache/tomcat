@@ -146,6 +146,7 @@ public class Http11Processor extends AbstractHttp11Processor<Socket> {
         keepAlive = true;
         comet = false;
         openSocket = false;
+        sendfileInProgress = false;
 
         int soTimeout = endpoint.getSoTimeout();
 
@@ -313,10 +314,8 @@ public class Http11Processor extends AbstractHttp11Processor<Socket> {
 
             rp.setStage(org.apache.coyote.Constants.STAGE_KEEPALIVE);
 
-            // If we don't have a pipe-lined request allow this thread to be
-            // used by another connection
-            if (isAsync() || error || inputBuffer.lastValid == 0) {
-                break;
+            if (breakKeepAliveLoop(socketWrapper)) {
+            	break;
             }
         }
 
@@ -333,7 +332,18 @@ public class Http11Processor extends AbstractHttp11Processor<Socket> {
             }
         } 
     }
-    
+
+
+    @Override
+    protected boolean breakKeepAliveLoop(SocketWrapper<Socket> socketWrapper) {
+        // If we don't have a pipe-lined request allow this thread to be
+        // used by another connection
+        if (isAsync() || error || inputBuffer.lastValid == 0) {
+            return true;
+        }
+        return false;
+    }
+
     
     @Override
     protected boolean disableKeepAlive() {

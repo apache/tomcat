@@ -47,6 +47,7 @@ import org.apache.tomcat.util.http.MimeHeaders;
 import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
 import org.apache.tomcat.util.net.SocketStatus;
+import org.apache.tomcat.util.net.SocketWrapper;
 import org.apache.tomcat.util.res.StringManager;
 
 public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
@@ -83,6 +84,14 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
      * alive or send file.
      */
     protected boolean openSocket = false;
+
+
+    /**
+     * Flag that indicates that send file processing is in progress and that the
+     * socket should not be returned to the poller (where a poller is used).
+     */
+    protected boolean sendfileInProgress = false;
+
 
     /**
      * HTTP/1.1 flag.
@@ -1303,7 +1312,18 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
         }
 
     }
-    
+
+
+    /**
+     * Checks to see of the keep-alive loop should be broken, performing any
+     * processing (e.g. send file handling) that may have an impact on whether
+     * or not the keep-alive loop should be broken.
+     * @return
+     */
+    protected abstract boolean breakKeepAliveLoop(
+    		SocketWrapper<S> socketWrapper);
+
+
     public final void recycle() {
         getInputBuffer().recycle();
         getOutputBuffer().recycle();

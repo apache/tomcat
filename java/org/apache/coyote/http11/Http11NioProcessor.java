@@ -211,6 +211,7 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
         keepAlive = true;
         comet = false;
         openSocket = false;
+        sendfileInProgress = false;
         
         int soTimeout = endpoint.getSoTimeout();
 
@@ -380,16 +381,8 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
 
             rp.setStage(org.apache.coyote.Constants.STAGE_KEEPALIVE);
 
-            // Do sendfile as needed: add socket to sendfile and end
-            if (sendfileData != null && !error) {
-                ((KeyAttachment) socketWrapper).setSendfileData(sendfileData);
-                sendfileData.keepAlive = keepAlive;
-                SelectionKey key = socketWrapper.getSocket().getIOChannel().keyFor(
-                        socketWrapper.getSocket().getPoller().getSelector());
-                //do the first write on this thread, might as well
-                openSocket = socketWrapper.getSocket().getPoller().processSendfile(key,
-                        (KeyAttachment) socketWrapper, true, true);
-                break;
+            if (breakKeepAliveLoop(socketWrapper)) {
+            	break;
             }
         }
 
@@ -401,7 +394,24 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
         } else {
             return (openSocket) ? (readComplete?SocketState.OPEN:SocketState.LONG) : SocketState.CLOSED;
         }
+    }
 
+
+    @Override
+    protected boolean breakKeepAliveLoop(
+    		SocketWrapper<NioChannel> socketWrapper) {
+        // Do sendfile as needed: add socket to sendfile and end
+        if (sendfileData != null && !error) {
+            ((KeyAttachment) socketWrapper).setSendfileData(sendfileData);
+            sendfileData.keepAlive = keepAlive;
+            SelectionKey key = socketWrapper.getSocket().getIOChannel().keyFor(
+                    socketWrapper.getSocket().getPoller().getSelector());
+            //do the first write on this thread, might as well
+            openSocket = socketWrapper.getSocket().getPoller().processSendfile(key,
+                    (KeyAttachment) socketWrapper, true, true);
+            return true;
+        }
+    	return false;
     }
 
 
