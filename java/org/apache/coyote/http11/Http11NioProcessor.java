@@ -206,7 +206,7 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
         inputBuffer.init(socketWrapper, endpoint);
         outputBuffer.init(socketWrapper, endpoint);
 
-        // Error flag
+        // Flags
         error = false;
         keepAlive = true;
         comet = false;
@@ -256,6 +256,7 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
                     }
                 }
                 if (!endpoint.isPaused()) {
+                    request.setStartTime(System.currentTimeMillis());
                     keptAlive = true;
                     if ( !inputBuffer.parseHeaders() ) {
                         //we've read part of the request, don't recycle it
@@ -264,7 +265,6 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
                         readComplete = false;
                         break;
                     }
-                    request.setStartTime(System.currentTimeMillis());
                     if (!disableUploadTimeout) { //only for body, not for request headers
                         socketWrapper.getSocket().getIOChannel().socket().setSoTimeout(
                                 connectionUploadTimeout);
