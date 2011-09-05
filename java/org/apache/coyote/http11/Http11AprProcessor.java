@@ -182,6 +182,7 @@ public class Http11AprProcessor extends AbstractHttp11Processor<Long> {
         keepAlive = true;
         comet = false;
         openSocket = false;
+        sendfileInProgress = false;
 
         int soTimeout = endpoint.getSoTimeout();
 
@@ -190,7 +191,6 @@ public class Http11AprProcessor extends AbstractHttp11Processor<Long> {
         }
 
         boolean keptAlive = false;
-        boolean sendfileInProgress = false;
 
         long socketRef = socketWrapper.getSocket().longValue();
 
@@ -319,27 +319,8 @@ public class Http11AprProcessor extends AbstractHttp11Processor<Long> {
 
             rp.setStage(org.apache.coyote.Constants.STAGE_KEEPALIVE);
 
-            // Do sendfile as needed: add socket to sendfile and end
-            if (sendfileData != null && !error) {
-                sendfileData.socket = socketRef;
-                sendfileData.keepAlive = keepAlive;
-                if (!((AprEndpoint)endpoint).getSendfile().add(sendfileData)) {
-                    // Didn't send all of the data to sendfile.
-                    if (sendfileData.socket == 0) {
-                        // The socket is no longer set. Something went wrong.
-                        // Close the connection. Too late to set status code.
-                        if (log.isDebugEnabled()) {
-                            log.debug(sm.getString(
-                                    "http11processor.sendfile.error"));
-                        }
-                        error = true;
-                    } else {
-                        // The sendfile Poller will add the socket to the main
-                        // Poller once sendfile processing is complete
-                        sendfileInProgress = true;
-                    }
-                    break;
-                }
+            if (breakKeepAliveLoop(socketWrapper)) {
+            	break;
             }
         }
 
@@ -357,6 +338,34 @@ public class Http11AprProcessor extends AbstractHttp11Processor<Long> {
             }
         }
         
+    }
+
+
+    @Override
+    protected boolean breakKeepAliveLoop(SocketWrapper<Long> socketWrapper) {
+        // Do sendfile as needed: add socket to sendfile and end
+        if (sendfileData != null && !error) {
+            sendfileData.socket = socketWrapper.getSocket().longValue();
+            sendfileData.keepAlive = keepAlive;
+            if (!((AprEndpoint)endpoint).getSendfile().add(sendfileData)) {
+                // Didn't send all of the data to sendfile.
+                if (sendfileData.socket == 0) {
+                    // The socket is no longer set. Something went wrong.
+                    // Close the connection. Too late to set status code.
+                    if (log.isDebugEnabled()) {
+                        log.debug(sm.getString(
+                                "http11processor.sendfile.error"));
+                    }
+                    error = true;
+                } else {
+                    // The sendfile Poller will add the socket to the main
+                    // Poller once sendfile processing is complete
+                    sendfileInProgress = true;
+                }
+                return true;
+            }
+        }
+        return false;
     }
 
 
