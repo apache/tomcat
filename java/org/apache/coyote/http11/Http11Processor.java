@@ -310,13 +310,13 @@ public class Http11Processor extends AbstractHttp11Processor<Socket> {
                 outputBuffer.nextRequest();
             }
 
+            rp.setStage(org.apache.coyote.Constants.STAGE_KEEPALIVE);
+
             // If we don't have a pipe-lined request allow this thread to be
             // used by another connection
             if (isAsync() || error || inputBuffer.lastValid == 0) {
                 break;
             }
-
-            rp.setStage(org.apache.coyote.Constants.STAGE_KEEPALIVE);
         }
 
         rp.setStage(org.apache.coyote.Constants.STAGE_ENDED);

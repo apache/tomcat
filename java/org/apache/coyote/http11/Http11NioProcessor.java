@@ -377,7 +377,9 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
                 inputBuffer.nextRequest();
                 outputBuffer.nextRequest();
             }
-            
+
+            rp.setStage(org.apache.coyote.Constants.STAGE_KEEPALIVE);
+
             // Do sendfile as needed: add socket to sendfile and end
             if (sendfileData != null && !error) {
                 ((KeyAttachment) socketWrapper).setSendfileData(sendfileData);
@@ -389,8 +391,6 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
                         (KeyAttachment) socketWrapper, true, true);
                 break;
             }
-
-            rp.setStage(org.apache.coyote.Constants.STAGE_KEEPALIVE);
         }
 
         rp.setStage(org.apache.coyote.Constants.STAGE_ENDED);
