@@ -219,11 +219,11 @@ public class Http11AprProcessor extends AbstractHttp11Processor<Long> {
                 if (!endpoint.isPaused()) {
                     request.setStartTime(System.currentTimeMillis());
                     keptAlive = true;
+                    inputBuffer.parseHeaders();
                     if (!disableUploadTimeout) {
                         Socket.timeoutSet(socketRef,
                                 connectionUploadTimeout * 1000);
                     }
-                    inputBuffer.parseHeaders();
                 }
             } catch (IOException e) {
                 if (log.isDebugEnabled()) {

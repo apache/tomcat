@@ -212,12 +212,12 @@ public class Http11Processor extends AbstractHttp11Processor<Socket> {
                 } else {
                     request.setStartTime(System.currentTimeMillis());
                     keptAlive = true;
-                    if (disableUploadTimeout) {
-                        socket.getSocket().setSoTimeout(soTimeout);
-                    } else {
+                    // Reset timeout for reading headers
+                    socket.getSocket().setSoTimeout(soTimeout);
+                    inputBuffer.parseHeaders();
+                    if (!disableUploadTimeout) {
                         socket.getSocket().setSoTimeout(connectionUploadTimeout);
                     }
-                    inputBuffer.parseHeaders();
                 }
             } catch (IOException e) {
                 if (log.isDebugEnabled()) {
