@@ -295,13 +295,7 @@ public class Http11Processor extends AbstractHttp11Processor<Socket> {
             if (!isAsync())
                 endRequest();
 
-            try {
-                rp.setStage(org.apache.coyote.Constants.STAGE_ENDOUTPUT);
-            } catch (Throwable t) {
-                ExceptionUtils.handleThrowable(t);
-                log.error(sm.getString("http11processor.response.finish"), t);
-                error = true;
-            }
+            rp.setStage(org.apache.coyote.Constants.STAGE_ENDOUTPUT);
 
             // If there was an error, make sure the request is counted as
             // and error, and update the statistics counter
