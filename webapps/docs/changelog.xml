@@ -97,6 +97,10 @@
         Correct the documentation for connectionLinger for the AJP and HTTP
         connectors. (markt)
       </fix>
+      <fix>
+        Correct the documentation for the connectionTimeout for the HTTP
+        connectors to show the correct default value. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
