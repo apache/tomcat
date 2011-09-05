@@ -67,9 +67,9 @@
         JNDI context while the application is running. (markt)
       </fix>
       <add>
-        <bug>51741</bug>: Fixes a problem with Eclipse WTP "Serve modules without 
-        publishing" feature where applications failed to access resources when using
-        getResource() on the classloader. (slaurent)
+        <bug>51741</bug>: Fixes a problem with Eclipse WTP "Serve modules
+        without publishing" feature where applications failed to access
+        resources when using getResource() on the classloader. (slaurent)
       </add>
       <fix>
         Correct a regression with the fix for <bug>51653</bug> that broke custom
