@@ -284,16 +284,16 @@ public class Http11Processor extends AbstractHttp11Processor<Socket> {
 
             // Finish the handling of the request
             rp.setStage(org.apache.coyote.Constants.STAGE_ENDINPUT);
-            
-            if(error && !isAsync()) {
-                // If we know we are closing the connection, don't drain
-                // input. This way uploading a 100GB file doesn't tie up the
-                // thread if the servlet has rejected it.
-                inputBuffer.setSwallowInput(false);
-            }
 
-            if (!isAsync())
+            if(!isAsync() && !comet) {
+                if (error) {
+                    // If we know we are closing the connection, don't drain
+                    // input. This way uploading a 100GB file doesn't tie up the
+                    // thread if the servlet has rejected it.
+                    inputBuffer.setSwallowInput(false);
+                }
                 endRequest();
+            }
 
             rp.setStage(org.apache.coyote.Constants.STAGE_ENDOUTPUT);
 
@@ -304,11 +304,6 @@ public class Http11Processor extends AbstractHttp11Processor<Socket> {
             }
             request.updateCounters();
 
-            rp.setStage(org.apache.coyote.Constants.STAGE_KEEPALIVE);
-
-            // Don't reset the param - we'll see it as ended. Next request
-            // will reset it
-            // thrA.setParam(null);
             // Next request
             if (!isAsync() || error) {
                 inputBuffer.nextRequest();
@@ -320,6 +315,8 @@ public class Http11Processor extends AbstractHttp11Processor<Socket> {
             if (isAsync() || error || inputBuffer.lastValid == 0) {
                 break;
             }
+
+            rp.setStage(org.apache.coyote.Constants.STAGE_KEEPALIVE);
         }
 
         rp.setStage(org.apache.coyote.Constants.STAGE_ENDED);
