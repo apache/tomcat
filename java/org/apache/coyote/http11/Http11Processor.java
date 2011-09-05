@@ -346,8 +346,8 @@ public class Http11Processor extends AbstractHttp11Processor<Socket> {
 
     @Override
     protected void setCometTimeouts(SocketWrapper<Socket> socketWrapper) {
-    	// NO-OP for BIO
-    	return;
+        // NO-OP for BIO
+        return;
     }
 
 
