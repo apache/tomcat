@@ -183,6 +183,7 @@ public class Http11AprProcessor extends AbstractHttp11Processor<Long> {
         comet = false;
         openSocket = false;
         sendfileInProgress = false;
+        readComplete = true;
 
         int soTimeout = endpoint.getSoTimeout();
 
@@ -320,7 +321,7 @@ public class Http11AprProcessor extends AbstractHttp11Processor<Long> {
             rp.setStage(org.apache.coyote.Constants.STAGE_KEEPALIVE);
 
             if (breakKeepAliveLoop(socketWrapper)) {
-            	break;
+                break;
             }
         }
 
@@ -334,10 +335,17 @@ public class Http11AprProcessor extends AbstractHttp11Processor<Long> {
             if (sendfileInProgress) {
                 return SocketState.SENDFILE;
             } else {
-                return (openSocket) ? SocketState.OPEN : SocketState.CLOSED;
+                if (openSocket) {
+                    if (readComplete) {
+                        return SocketState.OPEN;
+                    } else {
+                        return SocketState.LONG;
+                    }
+                } else {
+                    return SocketState.CLOSED;
+                }
             }
         }
-        
     }
 
 

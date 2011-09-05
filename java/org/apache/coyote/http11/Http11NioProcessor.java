@@ -212,6 +212,7 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
         comet = false;
         openSocket = false;
         sendfileInProgress = false;
+        readComplete = true;
         
         int soTimeout = endpoint.getSoTimeout();
 
@@ -220,7 +221,6 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
         }
 
         boolean keptAlive = false;
-        boolean readComplete = true;
         
         while (!error && keepAlive && !comet && !isAsync() && !endpoint.isPaused()) {
             //always default to our soTimeout
@@ -382,24 +382,37 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
             rp.setStage(org.apache.coyote.Constants.STAGE_KEEPALIVE);
 
             if (breakKeepAliveLoop(socketWrapper)) {
-            	break;
+                break;
             }
         }
 
         rp.setStage(org.apache.coyote.Constants.STAGE_ENDED);
+
         if (error || endpoint.isPaused()) {
             return SocketState.CLOSED;
         } else if (comet || isAsync()) {
             return SocketState.LONG;
         } else {
-            return (openSocket) ? (readComplete?SocketState.OPEN:SocketState.LONG) : SocketState.CLOSED;
+            if (sendfileInProgress) {
+                return SocketState.SENDFILE;
+            } else {
+                if (openSocket) {
+                    if (readComplete) {
+                        return SocketState.OPEN;
+                    } else {
+                        return SocketState.LONG;
+                    }
+                } else {
+                    return SocketState.CLOSED;
+                }
+            }
         }
     }
 
 
     @Override
     protected boolean breakKeepAliveLoop(
-    		SocketWrapper<NioChannel> socketWrapper) {
+            SocketWrapper<NioChannel> socketWrapper) {
         // Do sendfile as needed: add socket to sendfile and end
         if (sendfileData != null && !error) {
             ((KeyAttachment) socketWrapper).setSendfileData(sendfileData);
@@ -411,7 +424,7 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
                     (KeyAttachment) socketWrapper, true, true);
             return true;
         }
-    	return false;
+        return false;
     }
 
 

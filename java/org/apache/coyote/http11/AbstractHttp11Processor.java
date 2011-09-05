@@ -94,6 +94,11 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
 
 
     /**
+     * Flag that indicates if the request headers have been completely read.
+     */
+    protected boolean readComplete = true;
+
+    /**
      * HTTP/1.1 flag.
      */
     protected boolean http11 = true;

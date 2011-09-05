@@ -147,6 +147,7 @@ public class Http11Processor extends AbstractHttp11Processor<Socket> {
         comet = false;
         openSocket = false;
         sendfileInProgress = false;
+        readComplete = true;
 
         int soTimeout = endpoint.getSoTimeout();
 
@@ -315,22 +316,31 @@ public class Http11Processor extends AbstractHttp11Processor<Socket> {
             rp.setStage(org.apache.coyote.Constants.STAGE_KEEPALIVE);
 
             if (breakKeepAliveLoop(socketWrapper)) {
-            	break;
+                break;
             }
         }
 
         rp.setStage(org.apache.coyote.Constants.STAGE_ENDED);
+
         if (error || endpoint.isPaused()) {
             return SocketState.CLOSED;
-        } else if (isAsync()) {
+        } else if (comet || isAsync()) {
             return SocketState.LONG;
         } else {
-            if (!keepAlive) {
-                return SocketState.CLOSED;
+            if (sendfileInProgress) {
+                return SocketState.SENDFILE;
             } else {
-                return SocketState.OPEN;
+                if (openSocket) {
+                    if (readComplete) {
+                        return SocketState.OPEN;
+                    } else {
+                        return SocketState.LONG;
+                    }
+                } else {
+                    return SocketState.CLOSED;
+                }
             }
-        } 
+        }
     }
 
 
