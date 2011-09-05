@@ -316,7 +316,9 @@ public class Http11AprProcessor extends AbstractHttp11Processor<Long> {
                 inputBuffer.nextRequest();
                 outputBuffer.nextRequest();
             }
-            
+
+            rp.setStage(org.apache.coyote.Constants.STAGE_KEEPALIVE);
+
             // Do sendfile as needed: add socket to sendfile and end
             if (sendfileData != null && !error) {
                 sendfileData.socket = socketRef;
@@ -339,8 +341,6 @@ public class Http11AprProcessor extends AbstractHttp11Processor<Long> {
                     break;
                 }
             }
-            
-            rp.setStage(org.apache.coyote.Constants.STAGE_KEEPALIVE);
         }
 
         rp.setStage(org.apache.coyote.Constants.STAGE_ENDED);
