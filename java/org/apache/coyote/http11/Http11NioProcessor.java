@@ -326,19 +326,7 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
                                 (!isAsync() &&
                                 statusDropsConnection(response.getStatus()));
                     }
-                    // Comet support
-                    SelectionKey key = socketWrapper.getSocket().getIOChannel().keyFor(
-                            socketWrapper.getSocket().getPoller().getSelector());
-                    if (key != null) {
-                        NioEndpoint.KeyAttachment attach = (NioEndpoint.KeyAttachment) key.attachment();
-                        if (attach != null)  {
-                            attach.setComet(comet);
-                            if (comet) {
-                                Integer comettimeout = (Integer) request.getAttribute("org.apache.tomcat.comet.timeout");
-                                if (comettimeout != null) attach.setTimeout(comettimeout.longValue());
-                            }
-                        }
-                    }
+                    setCometTimeouts(socketWrapper);
                 } catch (InterruptedIOException e) {
                     error = true;
                 } catch (Throwable t) {
@@ -404,6 +392,24 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
                     }
                 } else {
                     return SocketState.CLOSED;
+                }
+            }
+        }
+    }
+
+
+    @Override
+    protected void setCometTimeouts(SocketWrapper<NioChannel> socketWrapper) {
+        // Comet support
+        SelectionKey key = socketWrapper.getSocket().getIOChannel().keyFor(
+                socketWrapper.getSocket().getPoller().getSelector());
+        if (key != null) {
+            NioEndpoint.KeyAttachment attach = (NioEndpoint.KeyAttachment) key.attachment();
+            if (attach != null)  {
+                attach.setComet(comet);
+                if (comet) {
+                    Integer comettimeout = (Integer) request.getAttribute("org.apache.tomcat.comet.timeout");
+                    if (comettimeout != null) attach.setTimeout(comettimeout.longValue());
                 }
             }
         }

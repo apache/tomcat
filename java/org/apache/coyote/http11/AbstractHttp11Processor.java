@@ -1291,6 +1291,12 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
     protected abstract void resetTimeouts();
 
 
+    /**
+     * Provides a mechanism for those connectors (currently only NIO) that need
+     * that need to set comment timeouts.
+     */
+    protected abstract void setCometTimeouts(SocketWrapper<S> socketWrapper);
+
     public void endRequest() {
 
         // Finish the handling of the request

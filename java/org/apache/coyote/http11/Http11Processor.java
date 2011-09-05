@@ -272,7 +272,7 @@ public class Http11Processor extends AbstractHttp11Processor<Socket> {
                                 (!isAsync() &&
                                 statusDropsConnection(response.getStatus()));
                     }
-
+                    setCometTimeouts(socketWrapper);
                 } catch (InterruptedIOException e) {
                     error = true;
                 } catch (Throwable t) {
@@ -341,6 +341,13 @@ public class Http11Processor extends AbstractHttp11Processor<Socket> {
                 }
             }
         }
+    }
+
+
+    @Override
+    protected void setCometTimeouts(SocketWrapper<Socket> socketWrapper) {
+    	// NO-OP for BIO
+    	return;
     }
 
 
