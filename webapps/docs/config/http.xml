@@ -317,7 +317,7 @@
     <attribute name="connectionTimeout" required="false">
       <p>The number of milliseconds this <strong>Connector</strong> will wait,
       after accepting a connection, for the request URI line to be
-      presented.  The default value is 20000 (i.e. 20 seconds).</p>
+      presented.  The default value is 60000 (i.e. 60 seconds).</p>
     </attribute>
     
     <attribute name="connectionUploadTimeout" required="false">
