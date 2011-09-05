@@ -278,6 +278,7 @@ public class Http11AprProcessor extends AbstractHttp11Processor<Long> {
                                 (!isAsync() &&
                                 statusDropsConnection(response.getStatus()));
                     }
+                    setCometTimeouts(socketWrapper);
                 } catch (InterruptedIOException e) {
                     error = true;
                 } catch (Throwable t) {
@@ -346,6 +347,13 @@ public class Http11AprProcessor extends AbstractHttp11Processor<Long> {
                 }
             }
         }
+    }
+
+
+    @Override
+    protected void setCometTimeouts(SocketWrapper<Long> socketWrapper) {
+    	// NO-OP for APR/native
+    	return;
     }
 
 
