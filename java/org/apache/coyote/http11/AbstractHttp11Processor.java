@@ -1332,7 +1332,7 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
      * @return
      */
     protected abstract boolean breakKeepAliveLoop(
-    		SocketWrapper<S> socketWrapper);
+            SocketWrapper<S> socketWrapper);
 
 
     public final void recycle() {

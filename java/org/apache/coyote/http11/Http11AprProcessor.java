@@ -352,8 +352,8 @@ public class Http11AprProcessor extends AbstractHttp11Processor<Long> {
 
     @Override
     protected void setCometTimeouts(SocketWrapper<Long> socketWrapper) {
-    	// NO-OP for APR/native
-    	return;
+        // NO-OP for APR/native
+        return;
     }
 
 
