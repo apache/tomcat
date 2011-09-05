@@ -79,6 +79,12 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
 
 
     /**
+     * Flag used to indicate that the socket should be kept open (e.g. for keep
+     * alive or send file.
+     */
+    protected boolean openSocket = false;
+
+    /**
      * HTTP/1.1 flag.
      */
     protected boolean http11 = true;

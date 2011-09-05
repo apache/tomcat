@@ -181,6 +181,7 @@ public class Http11AprProcessor extends AbstractHttp11Processor<Long> {
         error = false;
         keepAlive = true;
         comet = false;
+        openSocket = false;
 
         int soTimeout = endpoint.getSoTimeout();
 
@@ -189,7 +190,6 @@ public class Http11AprProcessor extends AbstractHttp11Processor<Long> {
         }
 
         boolean keptAlive = false;
-        boolean openSocket = false;
         boolean sendfileInProgress = false;
 
         long socketRef = socketWrapper.getSocket().longValue();

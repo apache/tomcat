@@ -210,6 +210,7 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
         error = false;
         keepAlive = true;
         comet = false;
+        openSocket = false;
         
         int soTimeout = endpoint.getSoTimeout();
 
@@ -218,7 +219,6 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
         }
 
         boolean keptAlive = false;
-        boolean openSocket = false;
         boolean readComplete = true;
         
         while (!error && keepAlive && !comet && !isAsync() && !endpoint.isPaused()) {
