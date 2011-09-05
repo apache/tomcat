@@ -290,14 +290,19 @@ public class Http11AprProcessor extends AbstractHttp11Processor<Long> {
             }
 
             // Finish the handling of the request
-            if (!comet && !isAsync()) {
-                // If we know we are closing the connection, don't drain input.
-                // This way uploading a 100GB file doesn't tie up the thread 
-                // if the servlet has rejected it.
-                if(error)
+            rp.setStage(org.apache.coyote.Constants.STAGE_ENDINPUT);
+
+            if (!isAsync() && !comet) {
+                if (error) {
+                    // If we know we are closing the connection, don't drain
+                    // input. This way uploading a 100GB file doesn't tie up the
+                    // thread if the servlet has rejected it.
                     inputBuffer.setSwallowInput(false);
+                }
                 endRequest();
             }
+
+            rp.setStage(org.apache.coyote.Constants.STAGE_ENDOUTPUT);
 
             // If there was an error, make sure the request is counted as
             // and error, and update the statistics counter
@@ -336,7 +341,6 @@ public class Http11AprProcessor extends AbstractHttp11Processor<Long> {
             }
             
             rp.setStage(org.apache.coyote.Constants.STAGE_KEEPALIVE);
-
         }
 
         rp.setStage(org.apache.coyote.Constants.STAGE_ENDED);
