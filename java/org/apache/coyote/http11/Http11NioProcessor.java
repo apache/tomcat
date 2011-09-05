@@ -222,7 +222,9 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
 
         boolean keptAlive = false;
         
-        while (!error && keepAlive && !comet && !isAsync() && !endpoint.isPaused()) {
+        while (!error && keepAlive && !comet && !isAsync() &&
+                !endpoint.isPaused()) {
+
             //always default to our soTimeout
             socketWrapper.setTimeout(soTimeout);
             // Parsing the request header

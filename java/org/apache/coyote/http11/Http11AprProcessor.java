@@ -195,7 +195,8 @@ public class Http11AprProcessor extends AbstractHttp11Processor<Long> {
 
         long socketRef = socketWrapper.getSocket().longValue();
 
-        while (!error && keepAlive && !comet && !isAsync() && !endpoint.isPaused()) {
+        while (!error && keepAlive && !comet && !isAsync() &&
+                !endpoint.isPaused()) {
 
             // Parsing the request header
             try {

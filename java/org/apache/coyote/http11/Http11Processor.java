@@ -157,7 +157,8 @@ public class Http11Processor extends AbstractHttp11Processor<Socket> {
 
         boolean keptAlive = socketWrapper.isKeptAlive();
 
-        while (!error && keepAlive && !endpoint.isPaused()) {
+        while (!error && keepAlive && !comet && !isAsync() &&
+                !endpoint.isPaused()) {
 
             // Parsing the request header
             try {
@@ -358,7 +359,7 @@ public class Http11Processor extends AbstractHttp11Processor<Socket> {
     protected boolean breakKeepAliveLoop(SocketWrapper<Socket> socketWrapper) {
         // If we don't have a pipe-lined request allow this thread to be
         // used by another connection
-        if (isAsync() || error || inputBuffer.lastValid == 0) {
+        if (inputBuffer.lastValid == 0) {
             return true;
         }
         return false;
