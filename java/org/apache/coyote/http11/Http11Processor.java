@@ -145,6 +145,7 @@ public class Http11Processor extends AbstractHttp11Processor<Socket> {
         error = false;
         keepAlive = true;
         comet = false;
+        openSocket = false;
 
         int soTimeout = endpoint.getSoTimeout();
 
