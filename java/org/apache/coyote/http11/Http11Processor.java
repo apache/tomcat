@@ -283,24 +283,18 @@ public class Http11Processor extends AbstractHttp11Processor<Socket> {
             }
 
             // Finish the handling of the request
-            try {
-                rp.setStage(org.apache.coyote.Constants.STAGE_ENDINPUT);
-                // If we know we are closing the connection, don't drain input.
-                // This way uploading a 100GB file doesn't tie up the thread 
-                // if the servlet has rejected it.
-                
-                if(error && !isAsync())
-                    inputBuffer.setSwallowInput(false);
-                if (!isAsync())
-                    endRequest();
-            } catch (Throwable t) {
-                ExceptionUtils.handleThrowable(t);
-                log.error(sm.getString("http11processor.request.finish"), t);
-                // 500 - Internal Server Error
-                response.setStatus(500);
-                adapter.log(request, response, 0);
-                error = true;
+            rp.setStage(org.apache.coyote.Constants.STAGE_ENDINPUT);
+            
+            if(error && !isAsync()) {
+                // If we know we are closing the connection, don't drain
+                // input. This way uploading a 100GB file doesn't tie up the
+                // thread if the servlet has rejected it.
+                inputBuffer.setSwallowInput(false);
             }
+
+            if (!isAsync())
+                endRequest();
+
             try {
                 rp.setStage(org.apache.coyote.Constants.STAGE_ENDOUTPUT);
             } catch (Throwable t) {
