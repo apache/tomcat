@@ -106,6 +106,10 @@
         less than or equal to 0.
         ArrayBlockingQueue doesn't allow capacity of 0 or less. (kfujino)
       </fix>
+      <code>
+        Further re-factoring of the HTTP connectors to align the BIO, NIO and
+        APR implementations. (markt) 
+      </code>
     </changelog>
   </subsection>  
 </section>

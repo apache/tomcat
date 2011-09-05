@@ -152,14 +152,6 @@ public class Http11Processor extends AbstractHttp11Processor<Socket> {
             socketWrapper.setKeepAliveLeft(0);
         }
 
-        try {
-            socket.getSocket().setSoTimeout(soTimeout);
-        } catch (Throwable t) {
-            ExceptionUtils.handleThrowable(t);
-            log.debug(sm.getString("http11processor.socket.timeout"), t);
-            error = true;
-        }
-
         boolean keptAlive = socketWrapper.isKeptAlive();
 
         while (!error && keepAlive && !endpoint.isPaused()) {
