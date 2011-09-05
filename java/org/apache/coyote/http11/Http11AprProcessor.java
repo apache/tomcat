@@ -177,7 +177,7 @@ public class Http11AprProcessor extends AbstractHttp11Processor<Long> {
         inputBuffer.init(socketWrapper, endpoint);
         outputBuffer.init(socketWrapper, endpoint);
 
-        // Error flag
+        // Flags
         error = false;
         keepAlive = true;
         comet = false;
@@ -226,6 +226,9 @@ public class Http11AprProcessor extends AbstractHttp11Processor<Long> {
                     inputBuffer.parseHeaders();
                 }
             } catch (IOException e) {
+                if (log.isDebugEnabled()) {
+                    log.debug(sm.getString("http11processor.header.parse"), e);
+                }
                 error = true;
                 break;
             } catch (Throwable t) {
