@@ -1340,7 +1340,7 @@ public class NioEndpoint extends AbstractEndpoint {
                               (ka.interestOps()&SelectionKey.OP_WRITE) == SelectionKey.OP_WRITE) {
                         //only timeout sockets that we are waiting for a read from
                         long delta = now - ka.getLastAccess();
-                        long timeout = (ka.getTimeout()==-1)?((long) socketProperties.getSoTimeout()):(ka.getTimeout());
+                        long timeout = ka.getTimeout();
                         boolean isTimedout = timeout > 0 && delta > timeout;
                         if ( close ) {
                             key.interestOps(0); 
@@ -1350,7 +1350,7 @@ public class NioEndpoint extends AbstractEndpoint {
                             key.interestOps(0); 
                             ka.interestOps(0); //avoid duplicate timeout calls
                             cancelledKey(key, SocketStatus.TIMEOUT,true);
-                        } else {
+                        } else if (timeout > -1) {
                             long nextTime = now+(timeout-delta);
                             nextExpiration = (nextTime < nextExpiration)?nextTime:nextExpiration;
                         }

@@ -1129,7 +1129,7 @@ public class AprEndpoint extends AbstractEndpoint {
             int size = getMaxConnections() / pollerThreadCount;
             int keepAliveTimeout = getKeepAliveTimeout();
             int socketTimeout = socketProperties.getSoTimeout();
-            if (keepAliveTimeout > 0 && !comet) {
+            if (keepAliveTimeout != socketTimeout && !comet) {
                 separateKeepAlive = true;
             }
             connectionPollset = allocatePoller(size, pool, socketTimeout);
