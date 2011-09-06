@@ -160,6 +160,8 @@ public class AprEndpoint extends AbstractEndpoint {
     public boolean getUseComet() { return useComet; }
     @Override
     public boolean getUseCometTimeout() { return false; } // Not supported
+    @Override
+    public boolean getUsePolling() { return true; } // Always supported
 
 
     /**

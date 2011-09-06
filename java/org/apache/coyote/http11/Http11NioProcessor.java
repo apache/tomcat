@@ -213,6 +213,11 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
         openSocket = false;
         sendfileInProgress = false;
         readComplete = true;
+        if (endpoint.getUsePolling()) {
+            keptAlive = false;
+        } else {
+            keptAlive = socketWrapper.isKeptAlive();
+        }
         
         int soTimeout = endpoint.getSoTimeout();
 
@@ -220,8 +225,6 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
             socketWrapper.setKeepAliveLeft(0);
         }
 
-        boolean keptAlive = false;
-        
         while (!error && keepAlive && !comet && !isAsync() &&
                 !endpoint.isPaused()) {
 

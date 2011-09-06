@@ -108,6 +108,8 @@ public class JIoEndpoint extends AbstractEndpoint {
     public boolean getUseCometTimeout() { return false; } // Not supported
     @Override
     public boolean getDeferAccept() { return false; } // Not supported
+    @Override
+    public boolean getUsePolling() { return false; } // Not supported
 
 
     // ------------------------------------------------ Handler Inner Interface
