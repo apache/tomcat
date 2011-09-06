@@ -559,9 +559,12 @@ public abstract class AbstractEndpoint {
 
     protected abstract Log getLog();
     // Flags to indicate optional feature support
+    // Some of these are always hard-coded, some are hard-coded to false (i.e.
+    // the endpoint does not support them) and some are configurable.
     public abstract boolean getUseSendfile();
     public abstract boolean getUseComet();
     public abstract boolean getUseCometTimeout();
+    public abstract boolean getUsePolling();
     
     protected LimitLatch initializeConnectionLatch() {
         if (connectionLimitLatch==null) {

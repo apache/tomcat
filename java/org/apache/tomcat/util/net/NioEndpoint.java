@@ -332,6 +332,8 @@ public class NioEndpoint extends AbstractEndpoint {
     public boolean getUseComet() { return useComet; }
     @Override
     public boolean getUseCometTimeout() { return getUseComet(); }
+    @Override
+    public boolean getUsePolling() { return true; } // Always supported
 
 
     /**

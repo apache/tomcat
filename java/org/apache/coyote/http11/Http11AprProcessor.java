@@ -184,14 +184,17 @@ public class Http11AprProcessor extends AbstractHttp11Processor<Long> {
         openSocket = false;
         sendfileInProgress = false;
         readComplete = true;
+        if (endpoint.getUsePolling()) {
+            keptAlive = false;
+        } else {
+            keptAlive = socketWrapper.isKeptAlive();
+        }
 
         int soTimeout = endpoint.getSoTimeout();
 
         if (disableKeepAlive()) {
             socketWrapper.setKeepAliveLeft(0);
         }
-
-        boolean keptAlive = false;
 
         long socketRef = socketWrapper.getSocket().longValue();
 

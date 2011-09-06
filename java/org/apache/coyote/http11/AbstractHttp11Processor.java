@@ -87,6 +87,16 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
 
 
     /**
+     * Flag used to indicate that the socket should treat the next request
+     * processed like a keep-alive connection - i.e. one where there may not be
+     * any data to process. The initial value of this flag on entering the
+     * process method is different for connectors that use polling (NIO / APR -
+     * data is always expected) compared to those that use blocking (BIO - data
+     * is only expected if the connection isn't in the keep-alive state).
+     */
+    protected boolean keptAlive;
+
+    /**
      * Flag that indicates that send file processing is in progress and that the
      * socket should not be returned to the poller (where a poller is used).
      */
