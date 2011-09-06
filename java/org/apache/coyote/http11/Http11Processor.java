@@ -165,7 +165,7 @@ public class Http11Processor extends AbstractHttp11Processor<Socket> {
             try {
                 setRequestLineReadTimeout();
                 
-                if (!inputBuffer.parseRequestLine(false)) {
+                if (!inputBuffer.parseRequestLine(keptAlive)) {
                     if (handleIncompleteRequestLineRead()) {
                         break;
                     }
