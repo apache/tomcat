@@ -219,8 +219,6 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
             keptAlive = socketWrapper.isKeptAlive();
         }
         
-        int soTimeout = endpoint.getSoTimeout();
-
         if (disableKeepAlive()) {
             socketWrapper.setKeepAliveLeft(0);
         }
@@ -228,13 +226,10 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
         while (!error && keepAlive && !comet && !isAsync() &&
                 !endpoint.isPaused()) {
 
-            //always default to our soTimeout
-            socketWrapper.setTimeout(soTimeout);
             // Parsing the request header
             try {
-                if( !disableUploadTimeout && keptAlive && soTimeout > 0 ) {
-                    socketWrapper.getSocket().getIOChannel().socket().setSoTimeout(soTimeout);
-                }
+                setRequestLineReadTimeout();
+                
                 if (!inputBuffer.parseRequestLine(keptAlive)) {
                     // Haven't finished reading the request so keep the socket
                     // open
@@ -372,6 +367,11 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
                 outputBuffer.nextRequest();
             }
 
+            if (!disableUploadTimeout) { //only for body, not for request headers
+                socketWrapper.getSocket().getIOChannel().socket().setSoTimeout(
+                        endpoint.getSoTimeout());
+            }
+
             rp.setStage(org.apache.coyote.Constants.STAGE_KEEPALIVE);
 
             if (breakKeepAliveLoop(socketWrapper)) {
@@ -400,6 +400,33 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
                 }
             }
         }
+    }
+
+
+    @Override
+    protected boolean disableKeepAlive() {
+        return false;
+    }
+
+
+    @Override
+    protected void setRequestLineReadTimeout() throws IOException {
+        // socket.setTimeout()
+        //     - timeout used by poller
+        // socket.getSocket().getIOChannel().socket().setSoTimeout()
+        //     - timeout used for blocking reads
+
+        // When entering the processing loop there will always be data to read
+        // so no point changing timeouts at this point
+        
+        // For the second and subsequent executions of the processing loop, a
+        // non-blocking read is used so again no need to set the timeouts
+        
+        // Because NIO supports non-blocking reading of the request line and
+        // headers the timeouts need to be set when returning the socket to
+        // the poller rather than here.
+        
+        // NO-OP
     }
 
 
@@ -435,12 +462,6 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
                     (KeyAttachment) socketWrapper, true, true);
             return true;
         }
-        return false;
-    }
-
-
-    @Override
-    protected boolean disableKeepAlive() {
         return false;
     }
 

@@ -190,8 +190,6 @@ public class Http11AprProcessor extends AbstractHttp11Processor<Long> {
             keptAlive = socketWrapper.isKeptAlive();
         }
 
-        int soTimeout = endpoint.getSoTimeout();
-
         if (disableKeepAlive()) {
             socketWrapper.setKeepAliveLeft(0);
         }
@@ -203,9 +201,8 @@ public class Http11AprProcessor extends AbstractHttp11Processor<Long> {
 
             // Parsing the request header
             try {
-                if( !disableUploadTimeout && keptAlive && soTimeout > 0 ) {
-                    Socket.timeoutSet(socketRef, soTimeout * 1000);
-                }
+                setRequestLineReadTimeout();
+                
                 if (!inputBuffer.parseRequestLine(keptAlive)) {
                     // This means that no data is available right now
                     // (long keepalive), so that the processor should be recycled
@@ -326,6 +323,10 @@ public class Http11AprProcessor extends AbstractHttp11Processor<Long> {
                 outputBuffer.nextRequest();
             }
 
+            if (!disableUploadTimeout) {
+                Socket.timeoutSet(socketRef, endpoint.getSoTimeout() * 1000);
+            }
+
             rp.setStage(org.apache.coyote.Constants.STAGE_KEEPALIVE);
 
             if (breakKeepAliveLoop(socketWrapper)) {
@@ -354,6 +355,36 @@ public class Http11AprProcessor extends AbstractHttp11Processor<Long> {
                 }
             }
         }
+    }
+
+
+    @Override
+    protected boolean disableKeepAlive() {
+        return false;
+    }
+
+
+    @Override
+    protected void setRequestLineReadTimeout() throws IOException {
+        // Timeouts while in the poller are handled entirely by the poller
+        // Only need to be concerned with socket timeouts
+
+        // APR uses simulated blocking so if some request line data is present
+        // then it must all be presented (with the normal socket timeout).
+        
+        // When entering the processing loop for the first time there will
+        // always be some data to read so the keep-alive timeout is not required
+        
+        // For the second and subsequent executions of the processing loop, if
+        // there is no request line data present then no further data will be
+        // read from the socket. If there is request line data present then it
+        // must all be presented (with the normal socket timeout)
+
+        // When the socket is created it is given the correct timeout.
+        // sendfile may change the timeout but will restore it
+        // This processor may change the timeout for uploads but will restore it
+        
+        // NO-OP
     }
 
 
@@ -388,12 +419,6 @@ public class Http11AprProcessor extends AbstractHttp11Processor<Long> {
                 return true;
             }
         }
-        return false;
-    }
-
-
-    @Override
-    protected boolean disableKeepAlive() {
         return false;
     }
 

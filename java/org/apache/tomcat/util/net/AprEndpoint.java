@@ -752,8 +752,7 @@ public class AprEndpoint extends AbstractEndpoint {
                 Socket.optSet(socket, Socket.APR_SO_LINGER, socketProperties.getSoLingerTime());
             if (socketProperties.getTcpNoDelay())
                 Socket.optSet(socket, Socket.APR_TCP_NODELAY, (socketProperties.getTcpNoDelay() ? 1 : 0));
-            if (socketProperties.getSoTimeout() > 0)
-                Socket.timeoutSet(socket, socketProperties.getSoTimeout() * 1000);
+            Socket.timeoutSet(socket, socketProperties.getSoTimeout() * 1000);
 
             // 2: SSL handshake
             step = 2;

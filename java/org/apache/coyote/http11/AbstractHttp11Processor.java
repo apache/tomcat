@@ -96,6 +96,7 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
      */
     protected boolean keptAlive;
 
+
     /**
      * Flag that indicates that send file processing is in progress and that the
      * socket should not be returned to the poller (where a poller is used).
@@ -813,6 +814,12 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
      * determine if keep-alive should be disabled or not. 
      */
     protected abstract boolean disableKeepAlive();
+
+
+    /**
+     * Configures the timeout to be used for reading the request line.
+     */
+    protected abstract void setRequestLineReadTimeout() throws IOException;
 
 
     /**
