@@ -1293,7 +1293,7 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
 
     /**
      * Provides a mechanism for those connectors (currently only NIO) that need
-     * that need to set comment timeouts.
+     * that need to set comet timeouts.
      */
     protected abstract void setCometTimeouts(SocketWrapper<S> socketWrapper);
 
