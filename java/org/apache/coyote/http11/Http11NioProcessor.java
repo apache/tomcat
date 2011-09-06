@@ -244,9 +244,10 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
                 } else {
                     request.setStartTime(System.currentTimeMillis());
                     keptAlive = true;
-                    if ( !inputBuffer.parseHeaders() ) {
-                        //we've read part of the request, don't recycle it
-                        //instead associate it with the socket
+                    // Currently only NIO will ever return false here
+                    if (!inputBuffer.parseHeaders()) {
+                        // We've read part of the request, don't recycle it
+                        // instead associate it with the socket
                         openSocket = true;
                         readComplete = false;
                         break;

@@ -217,7 +217,14 @@ public class Http11AprProcessor extends AbstractHttp11Processor<Long> {
                 } else {
                     request.setStartTime(System.currentTimeMillis());
                     keptAlive = true;
-                    inputBuffer.parseHeaders();
+                    // Currently only NIO will ever return false here
+                    if (!inputBuffer.parseHeaders()) {
+                        // We've read part of the request, don't recycle it
+                        // instead associate it with the socket
+                        openSocket = true;
+                        readComplete = false;
+                        break;
+                    }
                     if (!disableUploadTimeout) {
                         Socket.timeoutSet(socketRef,
                                 connectionUploadTimeout * 1000);
