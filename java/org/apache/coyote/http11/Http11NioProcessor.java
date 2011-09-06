@@ -201,7 +201,7 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
         RequestInfo rp = request.getRequestProcessor();
         rp.setStage(org.apache.coyote.Constants.STAGE_PARSE);
 
-        // Setting up the socket
+        // Setting up the I/O
         this.socket = socketWrapper;
         inputBuffer.init(socketWrapper, endpoint);
         outputBuffer.init(socketWrapper, endpoint);
@@ -329,7 +329,7 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
             rp.setStage(org.apache.coyote.Constants.STAGE_ENDINPUT);
 
             if (!isAsync() && !comet) {
-                if(error) {
+                if (error) {
                     // If we know we are closing the connection, don't drain
                     // input. This way uploading a 100GB file doesn't tie up the
                     // thread if the servlet has rejected it.
@@ -347,8 +347,7 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
             }
             request.updateCounters();
 
-            if (!comet && !isAsync()) {
-                // Next request
+            if (!isAsync() && !comet || error) {
                 inputBuffer.nextRequest();
                 outputBuffer.nextRequest();
             }

@@ -263,7 +263,7 @@ public class Http11Processor extends AbstractHttp11Processor<Socket> {
             // Finish the handling of the request
             rp.setStage(org.apache.coyote.Constants.STAGE_ENDINPUT);
 
-            if(!isAsync() && !comet) {
+            if (!isAsync() && !comet) {
                 if (error) {
                     // If we know we are closing the connection, don't drain
                     // input. This way uploading a 100GB file doesn't tie up the
@@ -282,8 +282,7 @@ public class Http11Processor extends AbstractHttp11Processor<Socket> {
             }
             request.updateCounters();
 
-            // Next request
-            if (!isAsync() || error) {
+            if (!isAsync() && !comet || error) {
                 inputBuffer.nextRequest();
                 outputBuffer.nextRequest();
             }
