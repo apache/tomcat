@@ -179,8 +179,6 @@ public class Http11Processor extends AbstractHttp11Processor<Socket> {
                 } else {
                     request.setStartTime(System.currentTimeMillis());
                     keptAlive = true;
-                    // Reset timeout for reading headers
-                    socket.getSocket().setSoTimeout(endpoint.getSoTimeout());
                     // Currently only NIO will ever return false here
                     if (!inputBuffer.parseHeaders()) {
                         // We've read part of the request, don't recycle it
