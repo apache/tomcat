@@ -204,16 +204,7 @@ public class Http11AprProcessor extends AbstractHttp11Processor<Long> {
                 setRequestLineReadTimeout();
                 
                 if (!inputBuffer.parseRequestLine(keptAlive)) {
-                    // This means that no data is available right now
-                    // (long keepalive), so that the processor should be recycled
-                    // and the method should return true
-                    openSocket = true;
-                    if (endpoint.isPaused()) {
-                        // 503 - Service unavailable
-                        response.setStatus(503);
-                        adapter.log(request, response, 0);
-                        error = true;
-                    } else {
+                    if (handleIncompleteRequestLineRead()) {
                         break;
                     }
                 }
@@ -389,9 +380,26 @@ public class Http11AprProcessor extends AbstractHttp11Processor<Long> {
 
 
     @Override
+    protected boolean handleIncompleteRequestLineRead() {
+        // This means that no data is available right now
+        // (long keepalive), so that the processor should be recycled
+        // and the method should return true
+        openSocket = true;
+        if (endpoint.isPaused()) {
+            // 503 - Service unavailable
+            response.setStatus(503);
+            adapter.log(request, response, 0);
+            error = true;
+        } else {
+            return true;
+        }
+        return false;
+    }
+
+
+    @Override
     protected void setCometTimeouts(SocketWrapper<Long> socketWrapper) {
         // NO-OP for APR/native
-        return;
     }
 
 

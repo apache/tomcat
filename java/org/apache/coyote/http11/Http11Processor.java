@@ -154,8 +154,6 @@ public class Http11Processor extends AbstractHttp11Processor<Socket> {
             keptAlive = socketWrapper.isKeptAlive();
         }
 
-        int soTimeout = endpoint.getSoTimeout();
-
         if (disableKeepAlive()) {
             socketWrapper.setKeepAliveLeft(0);
         }
@@ -167,7 +165,12 @@ public class Http11Processor extends AbstractHttp11Processor<Socket> {
             try {
                 setRequestLineReadTimeout();
                 
-                inputBuffer.parseRequestLine(false);
+                if (!inputBuffer.parseRequestLine(false)) {
+                    if (handleIncompleteRequestLineRead()) {
+                        break;
+                    }
+                }
+
                 if (endpoint.isPaused()) {
                     // 503 - Service unavailable
                     response.setStatus(503);
@@ -177,7 +180,7 @@ public class Http11Processor extends AbstractHttp11Processor<Socket> {
                     request.setStartTime(System.currentTimeMillis());
                     keptAlive = true;
                     // Reset timeout for reading headers
-                    socket.getSocket().setSoTimeout(soTimeout);
+                    socket.getSocket().setSoTimeout(endpoint.getSoTimeout());
                     inputBuffer.parseHeaders();
                     if (!disableUploadTimeout) {
                         socket.getSocket().setSoTimeout(connectionUploadTimeout);
@@ -382,9 +385,15 @@ public class Http11Processor extends AbstractHttp11Processor<Socket> {
 
 
     @Override
+    protected boolean handleIncompleteRequestLineRead() {
+        // Not used with BIO since it uses blocking reads
+        return false;
+    }
+
+
+    @Override
     protected void setCometTimeouts(SocketWrapper<Socket> socketWrapper) {
         // NO-OP for BIO
-        return;
     }
 
 

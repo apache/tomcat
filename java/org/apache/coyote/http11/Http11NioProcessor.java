@@ -231,27 +231,7 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
                 setRequestLineReadTimeout();
                 
                 if (!inputBuffer.parseRequestLine(keptAlive)) {
-                    // Haven't finished reading the request so keep the socket
-                    // open
-                    openSocket = true;
-                    // Check to see if we have read any of the request line yet
-                    if (inputBuffer.getParsingRequestLinePhase()<2) {
-                        // No data read, OK to recycle the processor
-                        // Continue to use keep alive timeout
-                        if (keepAliveTimeout>0) {
-                            socketWrapper.setTimeout(keepAliveTimeout);
-                        }
-                    } else {
-                        // Started to read request line. Need to keep processor
-                        // associated with socket
-                        readComplete = false;
-                    }
-                    if (endpoint.isPaused()) {
-                        // 503 - Service unavailable
-                        response.setStatus(503);
-                        adapter.log(request, response, 0);
-                        error = true;
-                    } else {
+                    if (handleIncompleteRequestLineRead()) {
                         break;
                     }
                 }
@@ -427,6 +407,35 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
         // the poller rather than here.
         
         // NO-OP
+    }
+
+
+    @Override
+    protected boolean handleIncompleteRequestLineRead() {
+        // Haven't finished reading the request so keep the socket
+        // open
+        openSocket = true;
+        // Check to see if we have read any of the request line yet
+        if (inputBuffer.getParsingRequestLinePhase()<2) {
+            // No data read, OK to recycle the processor
+            // Continue to use keep alive timeout
+            if (keepAliveTimeout>0) {
+                socket.setTimeout(keepAliveTimeout);
+            }
+        } else {
+            // Started to read request line. Need to keep processor
+            // associated with socket
+            readComplete = false;
+        }
+        if (endpoint.isPaused()) {
+            // 503 - Service unavailable
+            response.setStatus(503);
+            adapter.log(request, response, 0);
+            error = true;
+        } else {
+            return true;
+        }
+        return false;
     }
 
 
