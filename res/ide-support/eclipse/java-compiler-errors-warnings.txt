@@ -50,6 +50,7 @@ Unnecessary code
    (all additional check boxes)
 Generic types
  - All                                  - W
+   (ignore unavoidable generics warnings)   (Eclipse 3.7+)
 Annotations
  - All                                  - W
    (all additional check boxes)
