@@ -188,7 +188,7 @@ public class Http11Processor extends AbstractHttp11Processor<Socket> {
                         break;
                     }
                     if (!disableUploadTimeout) {
-                        socket.getSocket().setSoTimeout(connectionUploadTimeout);
+                        setSocketTimeout(connectionUploadTimeout);
                     }
                 }
             } catch (IOException e) {
@@ -289,7 +289,7 @@ public class Http11Processor extends AbstractHttp11Processor<Socket> {
             }
 
             if (!disableUploadTimeout) {
-                socket.getSocket().setSoTimeout(endpoint.getSoTimeout());
+                setSocketTimeout(endpoint.getSoTimeout());
             }
 
             rp.setStage(org.apache.coyote.Constants.STAGE_KEEPALIVE);
@@ -396,6 +396,12 @@ public class Http11Processor extends AbstractHttp11Processor<Socket> {
     }
 
 
+    @Override
+    protected void setSocketTimeout(int timeout) throws IOException {
+        socket.getSocket().setSoTimeout(timeout);
+    }
+    
+    
     @Override
     protected void setCometTimeouts(SocketWrapper<Socket> socketWrapper) {
         // NO-OP for BIO

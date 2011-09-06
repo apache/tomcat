@@ -252,9 +252,8 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
                         readComplete = false;
                         break;
                     }
-                    if (!disableUploadTimeout) { //only for body, not for request headers
-                        socketWrapper.getSocket().getIOChannel().socket().setSoTimeout(
-                                connectionUploadTimeout);
+                    if (!disableUploadTimeout) {
+                        setSocketTimeout(connectionUploadTimeout);
                     }
                 }
             } catch (IOException e) {
@@ -354,9 +353,8 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
                 outputBuffer.nextRequest();
             }
 
-            if (!disableUploadTimeout) { //only for body, not for request headers
-                socketWrapper.getSocket().getIOChannel().socket().setSoTimeout(
-                        endpoint.getSoTimeout());
+            if (!disableUploadTimeout) {
+                setSocketTimeout(endpoint.getSoTimeout());
             }
 
             rp.setStage(org.apache.coyote.Constants.STAGE_KEEPALIVE);
@@ -446,6 +444,12 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
     }
 
 
+    @Override
+    protected void setSocketTimeout(int timeout) throws IOException {
+        socket.getSocket().getIOChannel().socket().setSoTimeout(timeout);
+    }
+
+    
     @Override
     protected void setCometTimeouts(SocketWrapper<NioChannel> socketWrapper) {
         // Comet support
