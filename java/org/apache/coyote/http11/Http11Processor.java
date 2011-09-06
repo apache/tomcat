@@ -165,48 +165,8 @@ public class Http11Processor extends AbstractHttp11Processor<Socket> {
 
             // Parsing the request header
             try {
-                int standardTimeout = 0;
-                if (keptAlive) {
-                    if (keepAliveTimeout > 0) {
-                        standardTimeout = keepAliveTimeout;
-                    } else if (soTimeout > 0) {
-                        standardTimeout = soTimeout;
-                    }
-                }
-                /*
-                 * When there is no data in the buffer and this is not the first
-                 * request on this connection and timeouts are being used the
-                 * first read for this request may need a different timeout to
-                 * take account of time spent waiting for a processing thread.
-                 * 
-                 * This is a little hacky but better than exposing the socket
-                 * and the timeout info to the InputBuffer
-                 */
-                if (inputBuffer.lastValid == 0 &&
-                        socketWrapper.getLastAccess() > -1 &&
-                        standardTimeout > 0) {
-
-                    long queueTime = System.currentTimeMillis() -
-                            socketWrapper.getLastAccess();
-                    int firstReadTimeout;
-                    if (queueTime >= standardTimeout) {
-                        // Queued for longer than timeout but there might be
-                        // data so use shortest possible timeout
-                        firstReadTimeout = 1;
-                    } else {
-                        // Cast is safe since queueTime must be less than
-                        // standardTimeout which is an int
-                        firstReadTimeout = standardTimeout - (int) queueTime;
-                    }
-                    socket.getSocket().setSoTimeout(firstReadTimeout);
-                    if (!inputBuffer.fill()) {
-                        throw new EOFException(sm.getString("iib.eof.error"));
-                    }
-                }
-                if (standardTimeout > 0) {
-                    socket.getSocket().setSoTimeout(standardTimeout);
-                }
-
+                setRequestLineReadTimeout();
+                
                 inputBuffer.parseRequestLine(false);
                 if (endpoint.isPaused()) {
                     // 503 - Service unavailable
@@ -320,6 +280,10 @@ public class Http11Processor extends AbstractHttp11Processor<Socket> {
                 outputBuffer.nextRequest();
             }
 
+            if (!disableUploadTimeout) {
+                socket.getSocket().setSoTimeout(endpoint.getSoTimeout());
+            }
+
             rp.setStage(org.apache.coyote.Constants.STAGE_KEEPALIVE);
 
             if (breakKeepAliveLoop(socketWrapper)) {
@@ -352,24 +316,6 @@ public class Http11Processor extends AbstractHttp11Processor<Socket> {
 
 
     @Override
-    protected void setCometTimeouts(SocketWrapper<Socket> socketWrapper) {
-        // NO-OP for BIO
-        return;
-    }
-
-
-    @Override
-    protected boolean breakKeepAliveLoop(SocketWrapper<Socket> socketWrapper) {
-        // If we don't have a pipe-lined request allow this thread to be
-        // used by another connection
-        if (inputBuffer.lastValid == 0) {
-            return true;
-        }
-        return false;
-    }
-
-    
-    @Override
     protected boolean disableKeepAlive() {
         int threadRatio = -1;   
         // These may return zero or negative values     
@@ -389,6 +335,70 @@ public class Http11Processor extends AbstractHttp11Processor<Socket> {
     }
 
 
+    @Override
+    protected void setRequestLineReadTimeout() throws IOException {
+        
+        int standardTimeout = 0;
+        
+        if (keptAlive) {
+            if (keepAliveTimeout > 0) {
+                standardTimeout = keepAliveTimeout;
+            } else if (endpoint.getSoTimeout() > 0) {
+                standardTimeout = endpoint.getSoTimeout();
+            }
+        }
+        /*
+         * When there is no data in the buffer and this is not the first
+         * request on this connection and timeouts are being used the
+         * first read for this request may need a different timeout to
+         * take account of time spent waiting for a processing thread.
+         * 
+         * This is a little hacky but better than exposing the socket
+         * and the timeout info to the InputBuffer
+         */
+        if (inputBuffer.lastValid == 0 && socket.getLastAccess() > -1 &&
+                standardTimeout > 0) {
+
+            long queueTime = System.currentTimeMillis() - socket.getLastAccess();
+            int firstReadTimeout;
+            if (queueTime >= standardTimeout) {
+                // Queued for longer than timeout but there might be
+                // data so use shortest possible timeout
+                firstReadTimeout = 1;
+            } else {
+                // Cast is safe since queueTime must be less than
+                // standardTimeout which is an int
+                firstReadTimeout = standardTimeout - (int) queueTime;
+            }
+            socket.getSocket().setSoTimeout(firstReadTimeout);
+            if (!inputBuffer.fill()) {
+                throw new EOFException(sm.getString("iib.eof.error"));
+            }
+            // Once the first byte has been read, the standard timeout should be
+            // used so restore it here.
+            socket.getSocket().setSoTimeout(endpoint.getSoTimeout());
+        }
+    }
+
+
+    @Override
+    protected void setCometTimeouts(SocketWrapper<Socket> socketWrapper) {
+        // NO-OP for BIO
+        return;
+    }
+
+
+    @Override
+    protected boolean breakKeepAliveLoop(SocketWrapper<Socket> socketWrapper) {
+        // If we don't have a pipe-lined request allow this thread to be
+        // used by another connection
+        if (inputBuffer.lastValid == 0) {
+            return true;
+        }
+        return false;
+    }
+
+    
     @Override
     protected void resetTimeouts() {
         // NOOP for BIO
