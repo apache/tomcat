@@ -181,7 +181,14 @@ public class Http11Processor extends AbstractHttp11Processor<Socket> {
                     keptAlive = true;
                     // Reset timeout for reading headers
                     socket.getSocket().setSoTimeout(endpoint.getSoTimeout());
-                    inputBuffer.parseHeaders();
+                    // Currently only NIO will ever return false here
+                    if (!inputBuffer.parseHeaders()) {
+                        // We've read part of the request, don't recycle it
+                        // instead associate it with the socket
+                        openSocket = true;
+                        readComplete = false;
+                        break;
+                    }
                     if (!disableUploadTimeout) {
                         socket.getSocket().setSoTimeout(connectionUploadTimeout);
                     }
