@@ -137,7 +137,7 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
                         if (comettimeout != null) attach.setTimeout(comettimeout.longValue());
                     } else {
                         //reset the timeout
-                        if (keepAlive && keepAliveTimeout>0) {
+                        if (keepAlive) {
                             attach.setTimeout(keepAliveTimeout);
                         } else {
                             attach.setTimeout(soTimeout);
@@ -177,7 +177,7 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
             long soTimeout = endpoint.getSoTimeout();
 
             //reset the timeout
-            if (keepAlive && keepAliveTimeout>0) {
+            if (keepAlive) {
                 attach.setTimeout(keepAliveTimeout);
             } else {
                 attach.setTimeout(soTimeout);
@@ -421,9 +421,11 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
         openSocket = true;
         // Check to see if we have read any of the request line yet
         if (inputBuffer.getParsingRequestLinePhase() < 2) {
-            // Haven't read the request line. Must be keep-alive
-            // Make sure poller uses keepAlive from here onwards
-            socket.setTimeout(endpoint.getKeepAliveTimeout());
+            if (socket.getLastAccess() > -1 || keptAlive) {
+                // Haven't read the request line and have previously processed a
+                // request. Must be keep-alive. Make sure poller uses keepAlive.
+                socket.setTimeout(endpoint.getKeepAliveTimeout());
+            }
         } else {
             // Started to read request line. Need to keep processor
             // associated with socket

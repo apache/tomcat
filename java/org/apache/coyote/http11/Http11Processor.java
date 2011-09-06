@@ -345,15 +345,6 @@ public class Http11Processor extends AbstractHttp11Processor<Socket> {
     @Override
     protected void setRequestLineReadTimeout() throws IOException {
         
-        int standardTimeout = 0;
-        
-        if (keptAlive) {
-            if (keepAliveTimeout > 0) {
-                standardTimeout = keepAliveTimeout;
-            } else if (endpoint.getSoTimeout() > 0) {
-                standardTimeout = endpoint.getSoTimeout();
-            }
-        }
         /*
          * When there is no data in the buffer and this is not the first
          * request on this connection and timeouts are being used the
@@ -363,19 +354,23 @@ public class Http11Processor extends AbstractHttp11Processor<Socket> {
          * This is a little hacky but better than exposing the socket
          * and the timeout info to the InputBuffer
          */
-        if (inputBuffer.lastValid == 0 && socket.getLastAccess() > -1 &&
-                standardTimeout > 0) {
-
-            long queueTime = System.currentTimeMillis() - socket.getLastAccess();
+        if (inputBuffer.lastValid == 0 && socket.getLastAccess() > -1) {
             int firstReadTimeout;
-            if (queueTime >= standardTimeout) {
-                // Queued for longer than timeout but there might be
-                // data so use shortest possible timeout
-                firstReadTimeout = 1;
+            if (keepAliveTimeout == -1) {
+                firstReadTimeout = 0;
             } else {
-                // Cast is safe since queueTime must be less than
-                // standardTimeout which is an int
-                firstReadTimeout = standardTimeout - (int) queueTime;
+                long queueTime =
+                    System.currentTimeMillis() - socket.getLastAccess();
+
+                if (queueTime >= keepAliveTimeout) {
+                    // Queued for longer than timeout but there might be
+                    // data so use shortest possible timeout
+                    firstReadTimeout = 1;
+                } else {
+                    // Cast is safe since queueTime must be less than
+                    // keepAliveTimeout which is an int
+                    firstReadTimeout = keepAliveTimeout - (int) queueTime;
+                }
             }
             socket.getSocket().setSoTimeout(firstReadTimeout);
             if (!inputBuffer.fill()) {
