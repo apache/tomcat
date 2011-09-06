@@ -420,16 +420,16 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
         // open
         openSocket = true;
         // Check to see if we have read any of the request line yet
-        if (inputBuffer.getParsingRequestLinePhase()<2) {
-            // No data read, OK to recycle the processor
-            // Continue to use keep alive timeout
-            if (keepAliveTimeout>0) {
-                socket.setTimeout(keepAliveTimeout);
-            }
+        if (inputBuffer.getParsingRequestLinePhase() < 2) {
+            // Haven't read the request line. Must be keep-alive
+            // Make sure poller uses keepAlive from here onwards
+            socket.setTimeout(endpoint.getKeepAliveTimeout());
         } else {
             // Started to read request line. Need to keep processor
             // associated with socket
             readComplete = false;
+            // Make sure poller uses soTimeout from here onwards
+            socket.setTimeout(endpoint.getSoTimeout());
         }
         if (endpoint.isPaused()) {
             // 503 - Service unavailable
