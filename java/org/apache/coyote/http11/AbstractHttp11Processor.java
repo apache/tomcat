@@ -830,6 +830,13 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
      */
     protected abstract boolean handleIncompleteRequestLineRead();
 
+
+    /**
+     * Set the socket timeout.
+     */
+    protected abstract void setSocketTimeout(int timeout) throws IOException;
+
+
     /**
      * After reading the request headers, we have to setup the request filters.
      */

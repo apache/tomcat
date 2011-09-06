@@ -194,8 +194,6 @@ public class Http11AprProcessor extends AbstractHttp11Processor<Long> {
             socketWrapper.setKeepAliveLeft(0);
         }
 
-        long socketRef = socketWrapper.getSocket().longValue();
-
         while (!error && keepAlive && !comet && !isAsync() &&
                 !endpoint.isPaused()) {
 
@@ -226,8 +224,7 @@ public class Http11AprProcessor extends AbstractHttp11Processor<Long> {
                         break;
                     }
                     if (!disableUploadTimeout) {
-                        Socket.timeoutSet(socketRef,
-                                connectionUploadTimeout * 1000);
+                        setSocketTimeout(connectionUploadTimeout);
                     }
                 }
             } catch (IOException e) {
@@ -328,7 +325,7 @@ public class Http11AprProcessor extends AbstractHttp11Processor<Long> {
             }
 
             if (!disableUploadTimeout) {
-                Socket.timeoutSet(socketRef, endpoint.getSoTimeout() * 1000);
+                setSocketTimeout(endpoint.getSoTimeout());
             }
 
             rp.setStage(org.apache.coyote.Constants.STAGE_KEEPALIVE);
@@ -410,6 +407,12 @@ public class Http11AprProcessor extends AbstractHttp11Processor<Long> {
     }
 
 
+    @Override
+    protected void setSocketTimeout(int timeout) {
+        Socket.timeoutSet(socket.getSocket().longValue(), timeout * 1000);
+    }
+    
+    
     @Override
     protected void setCometTimeouts(SocketWrapper<Long> socketWrapper) {
         // NO-OP for APR/native
