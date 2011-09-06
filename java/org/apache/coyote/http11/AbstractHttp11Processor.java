@@ -823,6 +823,14 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
 
 
     /**
+     * Defines how a connector handles an incomplete request line read.
+     * 
+     * @returns <code>true</code> if the processor should break out of the
+     *          processing loop, otherwise <code>false</code>.
+     */
+    protected abstract boolean handleIncompleteRequestLineRead();
+
+    /**
      * After reading the request headers, we have to setup the request filters.
      */
     protected void prepareRequest() {
