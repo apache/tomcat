@@ -172,7 +172,7 @@ public class Http11AprProcessor extends AbstractHttp11Processor<Long> {
         RequestInfo rp = request.getRequestProcessor();
         rp.setStage(org.apache.coyote.Constants.STAGE_PARSE);
 
-        // Setting up the socket
+        // Setting up the I/O
         this.socket = socketWrapper;
         inputBuffer.init(socketWrapper, endpoint);
         outputBuffer.init(socketWrapper, endpoint);
@@ -318,8 +318,7 @@ public class Http11AprProcessor extends AbstractHttp11Processor<Long> {
             }
             request.updateCounters();
 
-            if (!comet && !isAsync()) {
-                // Next request
+            if (!isAsync() && !comet || error) {
                 inputBuffer.nextRequest();
                 outputBuffer.nextRequest();
             }
@@ -339,7 +338,7 @@ public class Http11AprProcessor extends AbstractHttp11Processor<Long> {
 
         if (error || endpoint.isPaused()) {
             return SocketState.CLOSED;
-        } else if (comet  || isAsync()) {
+        } else if (comet || isAsync()) {
             return SocketState.LONG;
         } else {
             if (sendfileInProgress) {
