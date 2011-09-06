@@ -235,7 +235,13 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
                         break;
                     }
                 }
-                if (!endpoint.isPaused()) {
+                
+                if (endpoint.isPaused()) {
+                    // 503 - Service unavailable
+                    response.setStatus(503);
+                    adapter.log(request, response, 0);
+                    error = true;
+                } else {
                     request.setStartTime(System.currentTimeMillis());
                     keptAlive = true;
                     if ( !inputBuffer.parseHeaders() ) {
