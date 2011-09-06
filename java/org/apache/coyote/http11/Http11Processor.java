@@ -409,6 +409,7 @@ public class Http11Processor extends AbstractHttp11Processor<Socket> {
 
     @Override
     protected boolean breakKeepAliveLoop(SocketWrapper<Socket> socketWrapper) {
+        openSocket = true;
         // If we don't have a pipe-lined request allow this thread to be
         // used by another connection
         if (inputBuffer.lastValid == 0) {
