@@ -89,6 +89,10 @@
     <changelog>
       <code>Remove unused and undocumented socketCloseDelay attribute from NIO
       connector. (markt)</code>
+      <fix>
+        <bug>49683</bug>: Support separate connection and keep-alive timeouts
+        for the APR/native connector HTTP and AJP connectors. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
