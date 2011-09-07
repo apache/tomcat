@@ -219,7 +219,7 @@ public class Http11AprProcessor extends AbstractHttp11Processor<Long> {
 
     @Override
     protected boolean breakKeepAliveLoop(SocketWrapper<Long> socketWrapper) {
-        openSocket = true;
+        openSocket = keepAlive;
         // Do sendfile as needed: add socket to sendfile and end
         if (sendfileData != null && !error) {
             sendfileData.socket = socketWrapper.getSocket().longValue();
