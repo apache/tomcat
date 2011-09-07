@@ -31,6 +31,7 @@ import java.security.PrivilegedAction;
 import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -401,6 +402,10 @@ public class DefaultInstanceManager implements InstanceManager {
                         annotations.add(new AnnotationCacheEntry(method,
                                 annotation.name()));
                     }
+                }
+                if (annotations.size() == 0) {
+                    // Use common empty list to save memory 
+                    annotations = Collections.emptyList();
                 }
                 annotationCache.put(clazz, annotations);
             } else {
