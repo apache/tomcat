@@ -83,6 +83,11 @@
         than the expected <code>org.apache.tomcat.util.digester.Digester</code>.
         The digester has been changed to use the expected logger name. (markt)
       </fix>
+      <fix>
+        <bug>51774</bug>: Fix incorrect cached method signature that prevented
+        session tracking modes from being defined in web.xml when running under
+        a security manager. (markt) 
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
