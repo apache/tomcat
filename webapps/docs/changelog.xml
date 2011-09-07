@@ -88,6 +88,12 @@
         session tracking modes from being defined in web.xml when running under
         a security manager. (markt) 
       </fix>
+      <add>
+        Add an annotation cache to the <code>DefaultInstanceManager</code> that
+        improves performance for applications that make use of a lot of
+        non-poolable objects (e.g. tag files) that need to be scanned for
+        annotations when created. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
