@@ -21,6 +21,7 @@ package org.apache.catalina.core;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -29,8 +30,11 @@ import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -65,6 +69,8 @@ public class DefaultInstanceManager implements InstanceManager {
     private Properties restrictedFilters = new Properties();
     private Properties restrictedListeners = new Properties();
     private Properties restrictedServlets = new Properties();
+    private Map<Class<?>,List<AnnotationCacheEntry>> annotationCache =
+        new ConcurrentHashMap<Class<?>, List<AnnotationCacheEntry>>();
 
     public DefaultInstanceManager(Context context, Map<String, Map<String, String>> injectionMap, org.apache.catalina.Context catalinaContext, ClassLoader containerClassLoader) {
         classLoader = catalinaContext.getLoader().getClassLoader();
@@ -276,97 +282,138 @@ public class DefaultInstanceManager implements InstanceManager {
         Class<?> clazz = instance.getClass();
         
         while (clazz != null) {
-            // Initialize fields annotations
-            Field[] fields = null;
-            if (Globals.IS_SECURITY_ENABLED) {
-                final Class<?> clazz2 = clazz;
-                fields = AccessController.doPrivileged(
-                        new PrivilegedAction<Field[]>(){
-                    @Override
-                    public Field[] run(){
-                        return clazz2.getDeclaredFields();
-                    }
-                });
-            } else {
-                fields = clazz.getDeclaredFields();
-            }
-            for (Field field : fields) {
-                if (injections != null && injections.containsKey(field.getName())) {
-                    lookupFieldResource(context, instance, field,
-                            injections.get(field.getName()), clazz);
-                } else if (field.isAnnotationPresent(Resource.class)) {
-                    Resource annotation = field.getAnnotation(Resource.class);
-                    lookupFieldResource(context, instance, field,
-                            annotation.name(), clazz);
-                } else if (field.isAnnotationPresent(EJB.class)) {
-                    EJB annotation = field.getAnnotation(EJB.class);
-                    lookupFieldResource(context, instance, field,
-                            annotation.name(), clazz);
-                } else if (field.isAnnotationPresent(WebServiceRef.class)) {
-                    WebServiceRef annotation =
-                            field.getAnnotation(WebServiceRef.class);
-                    lookupFieldResource(context, instance, field,
-                            annotation.name(), clazz);
-                } else if (field.isAnnotationPresent(PersistenceContext.class)) {
-                    PersistenceContext annotation =
-                            field.getAnnotation(PersistenceContext.class);
-                    lookupFieldResource(context, instance, field,
-                            annotation.name(), clazz);
-                } else if (field.isAnnotationPresent(PersistenceUnit.class)) {
-                    PersistenceUnit annotation =
-                            field.getAnnotation(PersistenceUnit.class);
-                    lookupFieldResource(context, instance, field,
-                            annotation.name(), clazz);
+            List<AnnotationCacheEntry> annotations = annotationCache.get(clazz);
+            if (annotations == null) {
+                annotations = new ArrayList<AnnotationCacheEntry>();
+                // Initialize fields annotations
+                Field[] fields = null;
+                if (Globals.IS_SECURITY_ENABLED) {
+                    final Class<?> clazz2 = clazz;
+                    fields = AccessController.doPrivileged(
+                            new PrivilegedAction<Field[]>(){
+                        @Override
+                        public Field[] run(){
+                            return clazz2.getDeclaredFields();
+                        }
+                    });
+                } else {
+                    fields = clazz.getDeclaredFields();
                 }
-            }
-    
-            // Initialize methods annotations
-            Method[] methods = null;
-            if (Globals.IS_SECURITY_ENABLED) {
-                final Class<?> clazz2 = clazz;
-                methods = AccessController.doPrivileged(
-                        new PrivilegedAction<Method[]>(){
-                    @Override
-                    public Method[] run(){
-                        return clazz2.getDeclaredMethods();
+                for (Field field : fields) {
+                    if (injections != null && injections.containsKey(field.getName())) {
+                        lookupFieldResource(context, instance, field,
+                                injections.get(field.getName()), clazz);
+                        annotations.add(new AnnotationCacheEntry(field,
+                                injections.get(field.getName())));
+                    } else if (field.isAnnotationPresent(Resource.class)) {
+                        Resource annotation = field.getAnnotation(Resource.class);
+                        lookupFieldResource(context, instance, field,
+                                annotation.name(), clazz);
+                        annotations.add(new AnnotationCacheEntry(field,
+                                annotation.name()));
+                    } else if (field.isAnnotationPresent(EJB.class)) {
+                        EJB annotation = field.getAnnotation(EJB.class);
+                        lookupFieldResource(context, instance, field,
+                                annotation.name(), clazz);
+                        annotations.add(new AnnotationCacheEntry(field,
+                                annotation.name()));
+                    } else if (field.isAnnotationPresent(WebServiceRef.class)) {
+                        WebServiceRef annotation =
+                                field.getAnnotation(WebServiceRef.class);
+                        lookupFieldResource(context, instance, field,
+                                annotation.name(), clazz);
+                        annotations.add(new AnnotationCacheEntry(field,
+                                annotation.name()));
+                    } else if (field.isAnnotationPresent(PersistenceContext.class)) {
+                        PersistenceContext annotation =
+                                field.getAnnotation(PersistenceContext.class);
+                        lookupFieldResource(context, instance, field,
+                                annotation.name(), clazz);
+                        annotations.add(new AnnotationCacheEntry(field,
+                                annotation.name()));
+                    } else if (field.isAnnotationPresent(PersistenceUnit.class)) {
+                        PersistenceUnit annotation =
+                                field.getAnnotation(PersistenceUnit.class);
+                        lookupFieldResource(context, instance, field,
+                                annotation.name(), clazz);
+                        annotations.add(new AnnotationCacheEntry(field,
+                                annotation.name()));
                     }
-                });
-            } else {
-                methods = clazz.getDeclaredMethods();
-            }
-            for (Method method : methods) {
-                String methodName = method.getName();
-                if (injections != null && methodName.startsWith("set") && methodName.length() > 3) {
-                    String fieldName = Character.toLowerCase(methodName.charAt(3)) + methodName.substring(4);
-                    if (injections.containsKey(fieldName)) {
+                }
+        
+                // Initialize methods annotations
+                Method[] methods = null;
+                if (Globals.IS_SECURITY_ENABLED) {
+                    final Class<?> clazz2 = clazz;
+                    methods = AccessController.doPrivileged(
+                            new PrivilegedAction<Method[]>(){
+                        @Override
+                        public Method[] run(){
+                            return clazz2.getDeclaredMethods();
+                        }
+                    });
+                } else {
+                    methods = clazz.getDeclaredMethods();
+                }
+                for (Method method : methods) {
+                    String methodName = method.getName();
+                    if (injections != null && methodName.startsWith("set") && methodName.length() > 3) {
+                        String fieldName = Character.toLowerCase(methodName.charAt(3)) + methodName.substring(4);
+                        if (injections.containsKey(fieldName)) {
+                            lookupMethodResource(context, instance, method,
+                                    injections.get(fieldName), clazz);
+                            annotations.add(new AnnotationCacheEntry(method,
+                                    injections.get(method.getName())));
+                            break;
+                        }
+                    }
+                    if (method.isAnnotationPresent(Resource.class)) {
+                        Resource annotation = method.getAnnotation(Resource.class);
                         lookupMethodResource(context, instance, method,
-                                injections.get(fieldName), clazz);
-                        break;
+                                annotation.name(), clazz);
+                        annotations.add(new AnnotationCacheEntry(method,
+                                annotation.name()));
+                    } else if (method.isAnnotationPresent(EJB.class)) {
+                        EJB annotation = method.getAnnotation(EJB.class);
+                        lookupMethodResource(context, instance, method,
+                                annotation.name(), clazz);
+                        annotations.add(new AnnotationCacheEntry(method,
+                                annotation.name()));
+                    } else if (method.isAnnotationPresent(WebServiceRef.class)) {
+                        WebServiceRef annotation =
+                                method.getAnnotation(WebServiceRef.class);
+                        lookupMethodResource(context, instance, method,
+                                annotation.name(), clazz);
+                        annotations.add(new AnnotationCacheEntry(method,
+                                annotation.name()));
+                    } else if (method.isAnnotationPresent(PersistenceContext.class)) {
+                        PersistenceContext annotation =
+                                method.getAnnotation(PersistenceContext.class);
+                        lookupMethodResource(context, instance, method,
+                                annotation.name(), clazz);
+                        annotations.add(new AnnotationCacheEntry(method,
+                                annotation.name()));
+                    } else if (method.isAnnotationPresent(PersistenceUnit.class)) {
+                        PersistenceUnit annotation =
+                                method.getAnnotation(PersistenceUnit.class);
+                        lookupMethodResource(context, instance, method,
+                                annotation.name(), clazz);
+                        annotations.add(new AnnotationCacheEntry(method,
+                                annotation.name()));
                     }
                 }
-                if (method.isAnnotationPresent(Resource.class)) {
-                    Resource annotation = method.getAnnotation(Resource.class);
-                    lookupMethodResource(context, instance, method,
-                            annotation.name(), clazz);
-                } else if (method.isAnnotationPresent(EJB.class)) {
-                    EJB annotation = method.getAnnotation(EJB.class);
-                    lookupMethodResource(context, instance, method,
-                            annotation.name(), clazz);
-                } else if (method.isAnnotationPresent(WebServiceRef.class)) {
-                    WebServiceRef annotation =
-                            method.getAnnotation(WebServiceRef.class);
-                    lookupMethodResource(context, instance, method,
-                            annotation.name(), clazz);
-                } else if (method.isAnnotationPresent(PersistenceContext.class)) {
-                    PersistenceContext annotation =
-                            method.getAnnotation(PersistenceContext.class);
-                    lookupMethodResource(context, instance, method,
-                            annotation.name(), clazz);
-                } else if (method.isAnnotationPresent(PersistenceUnit.class)) {
-                    PersistenceUnit annotation =
-                            method.getAnnotation(PersistenceUnit.class);
-                    lookupMethodResource(context, instance, method,
-                            annotation.name(), clazz);
+                annotationCache.put(clazz, annotations);
+            } else {
+                for (AnnotationCacheEntry entry : annotations) {
+                    if (entry.getAccessibleObject() instanceof Method) {
+                        lookupMethodResource(context, instance,
+                                (Method) entry.getAccessibleObject(),
+                                entry.getName(), clazz);
+                    } else {
+                        lookupFieldResource(context, instance,
+                                (Field) entry.getAccessibleObject(),
+                                entry.getName(), clazz);
+                    }
                 }
             }
             clazz = clazz.getSuperclass();
@@ -528,5 +575,24 @@ public class DefaultInstanceManager implements InstanceManager {
             return jndiName.substring(14);
         }
         return jndiName;
+    }
+
+    private static final class AnnotationCacheEntry {
+        private final AccessibleObject accessibleObject;
+        private final String name;
+
+        public AnnotationCacheEntry(AccessibleObject accessibleObject,
+                String name) {
+            this.accessibleObject = accessibleObject;
+            this.name = name;
+        }
+
+        public AccessibleObject getAccessibleObject() {
+            return accessibleObject;
+        }
+
+        public String getName() {
+            return name;
+        }
     }
 }
