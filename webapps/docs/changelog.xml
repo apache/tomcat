@@ -62,15 +62,15 @@
         Context) will be handled by the custom error pages for the Context if an
         appropriate error page is configured. (markt) 
       </fix>
-      <fix>
-        <bug>51744</bug>: Prevent application code from closing the associated
-        JNDI context while the application is running. (markt)
-      </fix>
       <add>
         <bug>51741</bug>: Fixes a problem with Eclipse WTP "Serve modules
         without publishing" feature where applications failed to access
         resources when using getResource() on the classloader. (slaurent)
       </add>
+      <fix>
+        <bug>51744</bug>: Prevent application code from closing the associated
+        JNDI context while the application is running. (markt)
+      </fix>
       <fix>
         Correct a regression with the fix for <bug>51653</bug> that broke custom
         error pages for 4xx responses from the Authenticators. Error handling
@@ -92,8 +92,10 @@
   </subsection>
   <subsection name="Coyote">
     <changelog>
-      <code>Remove unused and undocumented socketCloseDelay attribute from NIO
-      connector. (markt)</code>
+      <update>
+        Remove unused and undocumented socketCloseDelay attribute from NIO
+        connector. (markt)
+      </update>
       <fix>
         <bug>49683</bug>: Support separate connection and keep-alive timeouts
         for the APR/native connector HTTP and AJP connectors. (markt)
@@ -103,8 +105,8 @@
   <subsection name="Web applications">
     <changelog>
       <fix>
-        Correct the documentation for connectionLinger for the AJP and HTTP
-        connectors. (markt)
+        Correct the documentation for <code>connectionLinger</code> attribute
+        for the AJP and HTTP connectors. (markt)
       </fix>
     </changelog>
   </subsection>
@@ -115,10 +117,10 @@
         less than or equal to 0.
         ArrayBlockingQueue doesn't allow capacity of 0 or less. (kfujino)
       </fix>
-      <code>
+      <update>
         Further re-factoring of the HTTP connectors to align the BIO, NIO and
         APR implementations. (markt) 
-      </code>
+      </update>
     </changelog>
   </subsection>  
 </section>
