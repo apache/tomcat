@@ -92,14 +92,18 @@
   </subsection>
   <subsection name="Coyote">
     <changelog>
-      <update>
+      <scode>
         Remove unused and undocumented socketCloseDelay attribute from NIO
         connector. (markt)
-      </update>
+      </scode>
       <fix>
         <bug>49683</bug>: Support separate connection and keep-alive timeouts
         for the APR/native connector HTTP and AJP connectors. (markt)
       </fix>
+      <scode>
+        Further re-factoring of the HTTP connectors to align the BIO, NIO and
+        APR implementations. (markt) 
+      </scode>
     </changelog>
   </subsection>
   <subsection name="Web applications">
@@ -117,10 +121,6 @@
         less than or equal to 0.
         ArrayBlockingQueue doesn't allow capacity of 0 or less. (kfujino)
       </fix>
-      <update>
-        Further re-factoring of the HTTP connectors to align the BIO, NIO and
-        APR implementations. (markt) 
-      </update>
     </changelog>
   </subsection>  
 </section>
