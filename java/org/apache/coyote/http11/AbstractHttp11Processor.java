@@ -1028,7 +1028,7 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
 
         if (error || endpoint.isPaused()) {
             return SocketState.CLOSED;
-        } else if (comet || isAsync()) {
+        } else if (isAsync() || comet) {
             return SocketState.LONG;
         } else {
             if (sendfileInProgress) {
