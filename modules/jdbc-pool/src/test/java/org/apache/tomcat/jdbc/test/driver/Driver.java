@@ -45,27 +45,33 @@ public class Driver implements java.sql.Driver {
     public Driver() {
     }
     
+    @Override
     public boolean acceptsURL(String url) throws SQLException {
         return url!=null && url.equals(Driver.url);
     }
 
+    @Override
     public Connection connect(String url, Properties info) throws SQLException {
         connectCount.addAndGet(1);
         return new org.apache.tomcat.jdbc.test.driver.Connection(info);
     }
 
+    @Override
     public int getMajorVersion() {
         return 0;
     }
 
+    @Override
     public int getMinorVersion() {
         return 0;
     }
 
+    @Override
     public DriverPropertyInfo[] getPropertyInfo(String url, Properties info) throws SQLException {
         return null;
     }
 
+    @Override
     public boolean jdbcCompliant() {
         return false;
     }

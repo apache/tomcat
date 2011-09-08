@@ -41,39 +41,50 @@ import java.util.Map;
 public class ResultSet implements java.sql.ResultSet {
     boolean hasNext = true;
     
+    @Override
     public boolean absolute(int row) throws SQLException {
         return false;
     }
 
+    @Override
     public void afterLast() throws SQLException {
     }
 
+    @Override
     public void beforeFirst() throws SQLException {
     }
 
+    @Override
     public void cancelRowUpdates() throws SQLException {
     }
 
+    @Override
     public void clearWarnings() throws SQLException {
     }
+    @Override
     public void close() throws SQLException {
     }
 
+    @Override
     public void deleteRow() throws SQLException {
     }
 
+    @Override
     public int findColumn(String columnLabel) throws SQLException {
         return 0;
     }
 
+    @Override
     public boolean first() throws SQLException {
         return hasNext;
     }
 
+    @Override
     public Array getArray(int columnIndex) throws SQLException {
         return null;
     }
 
+    @Override
     public Array getArray(String columnLabel) throws SQLException {
         return null;
     }
