@@ -37,14 +37,13 @@ public class FairnessTest extends DefaultTestCase {
     }
     
     protected boolean run = true;
-    protected long sleep = Long.getLong("sleep", 10);
-    protected long complete = Long.getLong("complete",20000);
+    protected long sleep = Long.getLong("sleep", 10).longValue();
+    protected long complete = Long.getLong("complete",20000).longValue();
     protected boolean printthread = Boolean.getBoolean("printthread");
     CountDownLatch latch = null;
     protected void printThreadResults(TestThread[] threads, String name, int active, int expected) {
         long minfetch = Long.MAX_VALUE, maxfetch = Long.MIN_VALUE, totalfetch = 0;
-        long maxwait = 0, minwait = Long.MAX_VALUE, averagewait = 0, totalwait = 0;
-        float avgfetch = 0;
+        long maxwait = 0, minwait = Long.MAX_VALUE, totalwait = 0;
         for (int i=0; i<threads.length; i++) {
             TestThread t = threads[i];
             totalfetch += t.nroffetch;
@@ -54,11 +53,11 @@ public class FairnessTest extends DefaultTestCase {
             minfetch = Math.min(minfetch, t.nroffetch);
             maxfetch = Math.max(maxfetch, t.nroffetch);
             if (FairnessTest.this.printthread)
-                System.out.println(t.getName()+" : Nr-of-fetch:"+t.nroffetch+ " Max fetch Time:"+(((float)t.maxwait)/1000000f)+"ms. :Max close time:"+(((float)t.cmax)/1000000f)+"ms.");
+                System.out.println(t.getName()+" : Nr-of-fetch:"+t.nroffetch+ " Max fetch Time:"+t.maxwait/1000000f+"ms. :Max close time:"+t.cmax/1000000f+"ms.");
         }
         System.out.println("["+name+"] Max fetch:"+(maxfetch)+" Min fetch:"+(minfetch)+" Average fetch:"+
                            (((float)totalfetch))/(float)threads.length);
-        System.out.println("["+name+"] Max wait:"+(((float)maxwait)/1000000f)+"ms. Min wait:"+(((float)minwait)/1000000f)+"ms. Average wait:"+(((((float)totalwait))/(float)totalfetch)/1000000f)+" ms.");
+        System.out.println("["+name+"] Max wait:"+maxwait/1000000f+"ms. Min wait:"+minwait/1000000f+"ms. Average wait:"+(((((float)totalwait))/(float)totalfetch)/1000000f)+" ms.");
         System.out.println("["+name+"] Max active:"+active+" Expected Active:"+expected);
         
         
@@ -89,6 +88,7 @@ public class FairnessTest extends DefaultTestCase {
         this.run = false;
         long delta = System.currentTimeMillis() - start;
         printThreadResults(threads,"testDBCPThreads20Connections10",this.tDatasource.getNumActive(),10);
+        System.out.println("Test completed in: " + delta + "ms.");
         tearDown();
     }
 
@@ -118,8 +118,8 @@ public class FairnessTest extends DefaultTestCase {
         this.run = false;
         long delta = System.currentTimeMillis() - start;
         printThreadResults(threads,"testPoolThreads20Connections10",this.datasource.getSize(),10);
+        System.out.println("Test completed in: " + delta + "ms.");
         tearDown();
-
     }
 
     public void testPoolThreads20Connections10Fair() throws Exception {
@@ -148,6 +148,7 @@ public class FairnessTest extends DefaultTestCase {
         this.run = false;
         long delta = System.currentTimeMillis() - start;
         printThreadResults(threads,"testPoolThreads20Connections10Fair",this.datasource.getSize(),10);
+        System.out.println("Test completed in: " + delta + "ms.");
         tearDown();
     }
  
@@ -178,6 +179,7 @@ public class FairnessTest extends DefaultTestCase {
         this.run = false;
         long delta = System.currentTimeMillis() - start;
         printThreadResults(threads,"testPoolThreads20Connections10FairAsync",this.datasource.getSize(),10);
+        System.out.println("Test completed in: " + delta + "ms.");
         tearDown();
     }
     
@@ -268,13 +270,13 @@ public class FairnessTest extends DefaultTestCase {
             }
             if (System.getProperty("print-thread-stats")!=null) {
                 System.out.println("["+getName()+"] "+
-                    "\n\tMax time to retrieve connection:"+(((float)maxwait)/1000f/1000f)+" ms."+
-                    "\n\tTotal time to retrieve connection:"+(((float)totalwait)/1000f/1000f)+" ms."+
-                    "\n\tAverage time to retrieve connection:"+(((float)totalwait)/1000f/1000f)/(float)nroffetch+" ms."+
-                    "\n\tMax time to close connection:"+(((float)cmax)/1000f/1000f)+" ms."+
-                    "\n\tTotal time to close connection:"+(((float)totalcmax)/1000f/1000f)+" ms."+
-                    "\n\tAverage time to close connection:"+(((float)totalcmax)/1000f/1000f)/(float)nroffetch+" ms."+
-                    "\n\tRun time:"+(((float)totalruntime)/1000f/1000f)+" ms."+
+                    "\n\tMax time to retrieve connection:"+maxwait/1000000f+" ms."+
+                    "\n\tTotal time to retrieve connection:"+totalwait/1000000f+" ms."+
+                    "\n\tAverage time to retrieve connection:"+totalwait/1000000f/nroffetch+" ms."+
+                    "\n\tMax time to close connection:"+cmax/1000000f+" ms."+
+                    "\n\tTotal time to close connection:"+totalcmax/1000000f+" ms."+
+                    "\n\tAverage time to close connection:"+totalcmax/1000000f/nroffetch+" ms."+
+                    "\n\tRun time:"+totalruntime/1000000f+" ms."+
                     "\n\tNr of fetch:"+nroffetch);
             }
         }

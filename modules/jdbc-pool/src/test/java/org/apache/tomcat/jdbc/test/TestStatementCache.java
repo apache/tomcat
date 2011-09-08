@@ -33,8 +33,7 @@ public class TestStatementCache extends DefaultTestCase {
     
     @Override
     protected void tearDown() throws Exception {
-        // TODO Auto-generated method stub
-        this.interceptor = null;
+        interceptor = null;
         super.tearDown();
     }
 

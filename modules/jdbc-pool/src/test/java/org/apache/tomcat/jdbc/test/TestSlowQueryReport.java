@@ -159,14 +159,13 @@ public class TestSlowQueryReport extends DefaultTestCase {
         this.datasource.setJdbcInterceptors(SlowQueryReport.class.getName());
         Connection con = this.datasource.getConnection();
         String slowSql = "select 1 from non_existent";
-        int exceptionCount = 0;
         for (int i=0; i<count; i++) {
             Statement st = con.createStatement();
             try {
                 ResultSet rs = st.executeQuery(slowSql);
                 rs.close();
             }catch (Exception x) {
-                exceptionCount++;
+                // NO-OP
             }
             st.close();
             
@@ -186,6 +185,7 @@ public class TestSlowQueryReport extends DefaultTestCase {
     
     public class ClientListener implements NotificationListener {
         volatile int notificationCount = 0;
+        @Override
         public void handleNotification(Notification notification,
                                        Object handback) {
             notificationCount++;
