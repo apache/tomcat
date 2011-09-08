@@ -20,7 +20,6 @@ package org.apache.tomcat.jdbc.test;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Random;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
