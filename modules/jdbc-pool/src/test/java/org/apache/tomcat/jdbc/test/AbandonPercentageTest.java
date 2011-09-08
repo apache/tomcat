@@ -108,7 +108,7 @@ public class AbandonPercentageTest extends DefaultTestCase {
         assertEquals("Number of connections active/busy should be "+con.length,con.length,datasource.getPool().getActive());
         this.datasource.getPoolProperties().setRemoveAbandonedTimeout(1);
         Thread.sleep(2500);
-        this.assertTrue("Number of connections should be less than 50.", (datasource.getPool().getActive()<50));
+        assertTrue("Number of connections should be less than 50.", (datasource.getPool().getActive()<50));
         this.datasource.getPoolProperties().setAbandonWhenPercentageFull(0);
         Thread.sleep(2500);
         assertEquals("Number of connections active/busy should be "+0,0,datasource.getPool().getActive());

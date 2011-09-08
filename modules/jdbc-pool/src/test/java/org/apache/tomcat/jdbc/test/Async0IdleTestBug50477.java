@@ -40,7 +40,7 @@ public class Async0IdleTestBug50477 extends DefaultTestCase {
         this.datasource.getPoolProperties().setInitialSize(0);
         try {
             Future<Connection> cf = ((DataSourceProxy)datasource).getConnectionAsync();
-            Connection con  = cf.get(5, TimeUnit.SECONDS);
+            cf.get(5, TimeUnit.SECONDS);
         }finally {
             tearDown();
         }
