@@ -141,6 +141,7 @@ public class DefaultInstanceManager implements InstanceManager {
     private Object newInstance(Object instance, Class<?> clazz) throws IllegalAccessException, InvocationTargetException, NamingException {
         if (!ignoreAnnotations) {
             Map<String, String> injections = injectionMap.get(clazz.getName());
+            populateAnnotationsCache(clazz, injections);
             processAnnotations(instance, injections);
             postConstruct(instance, clazz);
         }
@@ -170,41 +171,18 @@ public class DefaultInstanceManager implements InstanceManager {
             postConstruct(instance, superClass);
         }
 
-        Method[] methods = null;
-        if (Globals.IS_SECURITY_ENABLED) {
-            methods = AccessController.doPrivileged(
-                    new PrivilegedAction<Method[]>(){
-                @Override
-                public Method[] run(){
-                    return clazz.getDeclaredMethods();
-                }
-            });
-        } else {
-            methods = clazz.getDeclaredMethods();
-        }
-        Method postConstruct = null;
-        for (Method method : methods) {
-            if (method.isAnnotationPresent(PostConstruct.class)) {
-                if ((postConstruct != null)
-                        || (method.getParameterTypes().length != 0)
-                        || (Modifier.isStatic(method.getModifiers()))
-                        || (method.getExceptionTypes().length > 0)
-                        || (!method.getReturnType().getName().equals("void"))) {
-                    throw new IllegalArgumentException("Invalid PostConstruct annotation");
-                }
-                postConstruct = method;
-            }
-        }
-
         // At the end the postconstruct annotated
         // method is invoked
-        if (postConstruct != null) {
-            boolean accessibility = postConstruct.isAccessible();
-            postConstruct.setAccessible(true);
-            postConstruct.invoke(instance);
-            postConstruct.setAccessible(accessibility);
+        List<AnnotationCacheEntry> annotations = annotationCache.get(clazz);
+        for (AnnotationCacheEntry entry : annotations) {
+            if (entry.getType() == AnnotationCacheEntryType.POST_CONSTRUCT) {
+                Method postConstruct = (Method) entry.getAccessibleObject();
+                boolean accessibility = postConstruct.isAccessible();
+                postConstruct.setAccessible(true);
+                postConstruct.invoke(instance);
+                postConstruct.setAccessible(accessibility);
+            }
         }
-
     }
 
 
@@ -224,41 +202,198 @@ public class DefaultInstanceManager implements InstanceManager {
             preDestroy(instance, superClass);
         }
 
-        Method[] methods;
-        if (Globals.IS_SECURITY_ENABLED) {
-            methods = AccessController.doPrivileged(
-                    new PrivilegedAction<Method[]>(){
-                @Override
-                public Method[] run(){
-                    return clazz.getDeclaredMethods();
-                }
-            });
-        } else {
-            methods = clazz.getDeclaredMethods();
-        }
-        Method preDestroy = null;
-        for (Method method : methods) {
-            if (method.isAnnotationPresent(PreDestroy.class)) {
-                if ((method.getParameterTypes().length != 0)
-                        || (Modifier.isStatic(method.getModifiers()))
-                        || (method.getExceptionTypes().length > 0)
-                        || (!method.getReturnType().getName().equals("void"))) {
-                    throw new IllegalArgumentException("Invalid PreDestroy annotation");
-                }
-                preDestroy = method;
-                break;
-            }
-        }
-
         // At the end the postconstruct annotated
         // method is invoked
-        if (preDestroy != null) {
-            boolean accessibility = preDestroy.isAccessible();
-            preDestroy.setAccessible(true);
-            preDestroy.invoke(instance);
-            preDestroy.setAccessible(accessibility);
+        List<AnnotationCacheEntry> annotations = annotationCache.get(clazz);
+        for (AnnotationCacheEntry entry : annotations) {
+            if (entry.getType() == AnnotationCacheEntryType.PRE_DESTROY) {
+                Method preDestroy = (Method) entry.getAccessibleObject();
+                boolean accessibility = preDestroy.isAccessible();
+                preDestroy.setAccessible(true);
+                preDestroy.invoke(instance);
+                preDestroy.setAccessible(accessibility);
+            }
+        }
+    }
+
+
+    /**
+     * Make sure that the annotations cache has been populated for the provided
+     * class.
+     *
+     * @param clazz         clazz to populate annotations for
+     * @param injections    map of injections for this class from xml deployment
+     *                      descriptor
+     * @throws IllegalAccessException       if injection target is inaccessible
+     * @throws javax.naming.NamingException if value cannot be looked up in jndi
+     * @throws java.lang.reflect.InvocationTargetException
+     *                                      if injection fails
+     */
+    protected void populateAnnotationsCache(Class<?> clazz,
+            Map<String, String> injections) throws IllegalAccessException,
+            InvocationTargetException, NamingException {
+
+        if (context == null) {
+            // No resource injection
+            return;
         }
 
+        while (clazz != null) {
+            List<AnnotationCacheEntry> annotations = annotationCache.get(clazz);
+            if (annotations == null) {
+                annotations = new ArrayList<AnnotationCacheEntry>();
+                // Initialize fields annotations
+                Field[] fields = null;
+                if (Globals.IS_SECURITY_ENABLED) {
+                    final Class<?> clazz2 = clazz;
+                    fields = AccessController.doPrivileged(
+                            new PrivilegedAction<Field[]>(){
+                        @Override
+                        public Field[] run(){
+                            return clazz2.getDeclaredFields();
+                        }
+                    });
+                } else {
+                    fields = clazz.getDeclaredFields();
+                }
+                for (Field field : fields) {
+                    if (injections != null && injections.containsKey(field.getName())) {
+                        annotations.add(new AnnotationCacheEntry(field,
+                                injections.get(field.getName()),
+                                AnnotationCacheEntryType.FIELD));
+                    } else if (field.isAnnotationPresent(Resource.class)) {
+                        Resource annotation = field.getAnnotation(Resource.class);
+                        annotations.add(new AnnotationCacheEntry(field,
+                                annotation.name(),
+                                AnnotationCacheEntryType.FIELD));
+                    } else if (field.isAnnotationPresent(EJB.class)) {
+                        EJB annotation = field.getAnnotation(EJB.class);
+                        annotations.add(new AnnotationCacheEntry(field,
+                                annotation.name(),
+                                AnnotationCacheEntryType.FIELD));
+                    } else if (field.isAnnotationPresent(WebServiceRef.class)) {
+                        WebServiceRef annotation =
+                                field.getAnnotation(WebServiceRef.class);
+                        annotations.add(new AnnotationCacheEntry(field,
+                                annotation.name(),
+                                AnnotationCacheEntryType.FIELD));
+                    } else if (field.isAnnotationPresent(PersistenceContext.class)) {
+                        PersistenceContext annotation =
+                                field.getAnnotation(PersistenceContext.class);
+                        annotations.add(new AnnotationCacheEntry(field,
+                                annotation.name(),
+                                AnnotationCacheEntryType.FIELD));
+                    } else if (field.isAnnotationPresent(PersistenceUnit.class)) {
+                        PersistenceUnit annotation =
+                                field.getAnnotation(PersistenceUnit.class);
+                        annotations.add(new AnnotationCacheEntry(field,
+                                annotation.name(),
+                                AnnotationCacheEntryType.FIELD));
+                    }
+                }
+        
+                // Initialize methods annotations
+                Method[] methods = null;
+                if (Globals.IS_SECURITY_ENABLED) {
+                    final Class<?> clazz2 = clazz;
+                    methods = AccessController.doPrivileged(
+                            new PrivilegedAction<Method[]>(){
+                        @Override
+                        public Method[] run(){
+                            return clazz2.getDeclaredMethods();
+                        }
+                    });
+                } else {
+                    methods = clazz.getDeclaredMethods();
+                }
+                Method postConstruct = null;
+                Method preDestroy = null;
+                for (Method method : methods) {
+                    String methodName = method.getName();
+                    if (injections != null && methodName.startsWith("set") && methodName.length() > 3) {
+                        String fieldName = Character.toLowerCase(methodName.charAt(3)) + methodName.substring(4);
+                        if (injections.containsKey(fieldName)) {
+                            annotations.add(new AnnotationCacheEntry(method,
+                                    injections.get(method.getName()),
+                                    AnnotationCacheEntryType.FIELD));
+                            break;
+                        }
+                    }
+                    if (method.isAnnotationPresent(Resource.class)) {
+                        Resource annotation = method.getAnnotation(Resource.class);
+                        annotations.add(new AnnotationCacheEntry(method,
+                                annotation.name(),
+                                AnnotationCacheEntryType.FIELD));
+                    } else if (method.isAnnotationPresent(EJB.class)) {
+                        EJB annotation = method.getAnnotation(EJB.class);
+                        annotations.add(new AnnotationCacheEntry(method,
+                                annotation.name(),
+                                AnnotationCacheEntryType.FIELD));
+                    } else if (method.isAnnotationPresent(WebServiceRef.class)) {
+                        WebServiceRef annotation =
+                                method.getAnnotation(WebServiceRef.class);
+                        annotations.add(new AnnotationCacheEntry(method,
+                                annotation.name(),
+                                AnnotationCacheEntryType.FIELD));
+                    } else if (method.isAnnotationPresent(PersistenceContext.class)) {
+                        PersistenceContext annotation =
+                                method.getAnnotation(PersistenceContext.class);
+                        annotations.add(new AnnotationCacheEntry(method,
+                                annotation.name(),
+                                AnnotationCacheEntryType.FIELD));
+                    } else if (method.isAnnotationPresent(PersistenceUnit.class)) {
+                        PersistenceUnit annotation =
+                                method.getAnnotation(PersistenceUnit.class);
+                        annotations.add(new AnnotationCacheEntry(method,
+                                annotation.name(),
+                                AnnotationCacheEntryType.FIELD));
+                    }
+
+                    if (method.isAnnotationPresent(PostConstruct.class)) {
+                        if ((postConstruct != null) ||
+                                (method.getParameterTypes().length != 0) ||
+                                (Modifier.isStatic(method.getModifiers())) ||
+                                (method.getExceptionTypes().length > 0) ||
+                                (!method.getReturnType().getName().equals("void"))) {
+                            throw new IllegalArgumentException(
+                                    "Invalid PostConstruct annotation");
+                        }
+                        postConstruct = method;
+                    }
+                    
+                    if (method.isAnnotationPresent(PreDestroy.class)) {
+                        if ((preDestroy != null ||
+                                method.getParameterTypes().length != 0) ||
+                                (Modifier.isStatic(method.getModifiers())) ||
+                                (method.getExceptionTypes().length > 0) ||
+                                (!method.getReturnType().getName().equals("void"))) {
+                            throw new IllegalArgumentException(
+                                    "Invalid PreDestroy annotation");
+                        }
+                        preDestroy = method;
+                    }
+                }
+                if (postConstruct != null) {
+                    annotations.add(new AnnotationCacheEntry(postConstruct,
+                            null, AnnotationCacheEntryType.POST_CONSTRUCT));
+                }
+                if (preDestroy != null) {
+                    annotations.add(new AnnotationCacheEntry(preDestroy,
+                            null, AnnotationCacheEntryType.PRE_DESTROY));
+                }
+                if (annotations.size() == 0) {
+                    // Use common empty list to save memory 
+                    annotations = Collections.emptyList();
+                }
+                annotationCache.put(clazz, annotations);
+            } else {
+                // If the annotations for this class have been cached, the
+                // annotations for all the super classes will have been cachced
+                // as well
+                break;
+            }
+            clazz = clazz.getSuperclass();
+        }
     }
 
 
@@ -284,132 +419,8 @@ public class DefaultInstanceManager implements InstanceManager {
         
         while (clazz != null) {
             List<AnnotationCacheEntry> annotations = annotationCache.get(clazz);
-            if (annotations == null) {
-                annotations = new ArrayList<AnnotationCacheEntry>();
-                // Initialize fields annotations
-                Field[] fields = null;
-                if (Globals.IS_SECURITY_ENABLED) {
-                    final Class<?> clazz2 = clazz;
-                    fields = AccessController.doPrivileged(
-                            new PrivilegedAction<Field[]>(){
-                        @Override
-                        public Field[] run(){
-                            return clazz2.getDeclaredFields();
-                        }
-                    });
-                } else {
-                    fields = clazz.getDeclaredFields();
-                }
-                for (Field field : fields) {
-                    if (injections != null && injections.containsKey(field.getName())) {
-                        lookupFieldResource(context, instance, field,
-                                injections.get(field.getName()), clazz);
-                        annotations.add(new AnnotationCacheEntry(field,
-                                injections.get(field.getName())));
-                    } else if (field.isAnnotationPresent(Resource.class)) {
-                        Resource annotation = field.getAnnotation(Resource.class);
-                        lookupFieldResource(context, instance, field,
-                                annotation.name(), clazz);
-                        annotations.add(new AnnotationCacheEntry(field,
-                                annotation.name()));
-                    } else if (field.isAnnotationPresent(EJB.class)) {
-                        EJB annotation = field.getAnnotation(EJB.class);
-                        lookupFieldResource(context, instance, field,
-                                annotation.name(), clazz);
-                        annotations.add(new AnnotationCacheEntry(field,
-                                annotation.name()));
-                    } else if (field.isAnnotationPresent(WebServiceRef.class)) {
-                        WebServiceRef annotation =
-                                field.getAnnotation(WebServiceRef.class);
-                        lookupFieldResource(context, instance, field,
-                                annotation.name(), clazz);
-                        annotations.add(new AnnotationCacheEntry(field,
-                                annotation.name()));
-                    } else if (field.isAnnotationPresent(PersistenceContext.class)) {
-                        PersistenceContext annotation =
-                                field.getAnnotation(PersistenceContext.class);
-                        lookupFieldResource(context, instance, field,
-                                annotation.name(), clazz);
-                        annotations.add(new AnnotationCacheEntry(field,
-                                annotation.name()));
-                    } else if (field.isAnnotationPresent(PersistenceUnit.class)) {
-                        PersistenceUnit annotation =
-                                field.getAnnotation(PersistenceUnit.class);
-                        lookupFieldResource(context, instance, field,
-                                annotation.name(), clazz);
-                        annotations.add(new AnnotationCacheEntry(field,
-                                annotation.name()));
-                    }
-                }
-        
-                // Initialize methods annotations
-                Method[] methods = null;
-                if (Globals.IS_SECURITY_ENABLED) {
-                    final Class<?> clazz2 = clazz;
-                    methods = AccessController.doPrivileged(
-                            new PrivilegedAction<Method[]>(){
-                        @Override
-                        public Method[] run(){
-                            return clazz2.getDeclaredMethods();
-                        }
-                    });
-                } else {
-                    methods = clazz.getDeclaredMethods();
-                }
-                for (Method method : methods) {
-                    String methodName = method.getName();
-                    if (injections != null && methodName.startsWith("set") && methodName.length() > 3) {
-                        String fieldName = Character.toLowerCase(methodName.charAt(3)) + methodName.substring(4);
-                        if (injections.containsKey(fieldName)) {
-                            lookupMethodResource(context, instance, method,
-                                    injections.get(fieldName), clazz);
-                            annotations.add(new AnnotationCacheEntry(method,
-                                    injections.get(method.getName())));
-                            break;
-                        }
-                    }
-                    if (method.isAnnotationPresent(Resource.class)) {
-                        Resource annotation = method.getAnnotation(Resource.class);
-                        lookupMethodResource(context, instance, method,
-                                annotation.name(), clazz);
-                        annotations.add(new AnnotationCacheEntry(method,
-                                annotation.name()));
-                    } else if (method.isAnnotationPresent(EJB.class)) {
-                        EJB annotation = method.getAnnotation(EJB.class);
-                        lookupMethodResource(context, instance, method,
-                                annotation.name(), clazz);
-                        annotations.add(new AnnotationCacheEntry(method,
-                                annotation.name()));
-                    } else if (method.isAnnotationPresent(WebServiceRef.class)) {
-                        WebServiceRef annotation =
-                                method.getAnnotation(WebServiceRef.class);
-                        lookupMethodResource(context, instance, method,
-                                annotation.name(), clazz);
-                        annotations.add(new AnnotationCacheEntry(method,
-                                annotation.name()));
-                    } else if (method.isAnnotationPresent(PersistenceContext.class)) {
-                        PersistenceContext annotation =
-                                method.getAnnotation(PersistenceContext.class);
-                        lookupMethodResource(context, instance, method,
-                                annotation.name(), clazz);
-                        annotations.add(new AnnotationCacheEntry(method,
-                                annotation.name()));
-                    } else if (method.isAnnotationPresent(PersistenceUnit.class)) {
-                        PersistenceUnit annotation =
-                                method.getAnnotation(PersistenceUnit.class);
-                        lookupMethodResource(context, instance, method,
-                                annotation.name(), clazz);
-                        annotations.add(new AnnotationCacheEntry(method,
-                                annotation.name()));
-                    }
-                }
-                if (annotations.size() == 0) {
-                    // Use common empty list to save memory 
-                    annotations = Collections.emptyList();
-                }
-                annotationCache.put(clazz, annotations);
-            } else {
-                for (AnnotationCacheEntry entry : annotations) {
+            for (AnnotationCacheEntry entry : annotations) {
+                if (entry.getType() == AnnotationCacheEntryType.FIELD) {
                     if (entry.getAccessibleObject() instanceof Method) {
                         lookupMethodResource(context, instance,
                                 (Method) entry.getAccessibleObject(),
@@ -423,7 +434,6 @@ public class DefaultInstanceManager implements InstanceManager {
             }
             clazz = clazz.getSuperclass();
         }
-
     }
 
 
@@ -585,11 +595,13 @@ public class DefaultInstanceManager implements InstanceManager {
     private static final class AnnotationCacheEntry {
         private final AccessibleObject accessibleObject;
         private final String name;
+        private final AnnotationCacheEntryType type;
 
         public AnnotationCacheEntry(AccessibleObject accessibleObject,
-                String name) {
+                String name, AnnotationCacheEntryType type) {
             this.accessibleObject = accessibleObject;
             this.name = name;
+            this.type = type;
         }
 
         public AccessibleObject getAccessibleObject() {
@@ -599,5 +611,12 @@ public class DefaultInstanceManager implements InstanceManager {
         public String getName() {
             return name;
         }
+        public AnnotationCacheEntryType getType() {
+            return type;
+        }
+    }
+
+    private static enum AnnotationCacheEntryType {
+        FIELD, POST_CONSTRUCT, PRE_DESTROY
     }
 }
