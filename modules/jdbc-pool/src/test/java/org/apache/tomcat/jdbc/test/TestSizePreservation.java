@@ -90,6 +90,7 @@ public class TestSizePreservation extends TestCase {
         final int iterations = 1000;
         final AtomicInteger loopcount = new AtomicInteger(0);
         final Runnable run = new Runnable() {
+            @Override
             public void run() {
                 try {
                     while (loopcount.incrementAndGet() < iterations) {

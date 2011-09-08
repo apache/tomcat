@@ -45,8 +45,8 @@ public class DefaultProperties extends PoolProperties {
         username = System.getProperty("username","root");
         
         validationQuery = System.getProperty("validationQuery","SELECT 1");
-        defaultAutoCommit = true;
-        defaultReadOnly = false;
+        defaultAutoCommit = Boolean.TRUE;
+        defaultReadOnly = Boolean.FALSE;
         defaultTransactionIsolation = DataSourceFactory.UNKNOWN_TRANSACTIONISOLATION;
         connectionProperties = null;
         defaultCatalog = null;
@@ -67,7 +67,7 @@ public class DefaultProperties extends PoolProperties {
         logAbandoned = true;
         validationInterval = 0; //always validate
         initSQL = null;
-        testOnConnect = false;;
+        testOnConnect = false;
         dbProperties.setProperty("user",username);
         dbProperties.setProperty("password",password);
     }

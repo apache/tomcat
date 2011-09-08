@@ -63,6 +63,7 @@ public class TestConcurrency extends DefaultTestCase {
         final int iter = 1000 * 10;
         final AtomicInteger loopcount = new AtomicInteger(0);
         final Runnable run = new Runnable() {
+            @Override
             public void run() {
                 try {
                     while (loopcount.incrementAndGet() < iter) {
@@ -117,6 +118,7 @@ public class TestConcurrency extends DefaultTestCase {
         final int iter = 100000 * 10;
         final AtomicInteger loopcount = new AtomicInteger(0);
         final Runnable run = new Runnable() {
+            @Override
             public void run() {
                 try {
                     while (loopcount.incrementAndGet() < iter) {
@@ -167,6 +169,7 @@ public class TestConcurrency extends DefaultTestCase {
         final int iter = 100000 * 10;
         final AtomicInteger loopcount = new AtomicInteger(0);
         final Runnable run = new Runnable() {
+            @Override
             public void run() {
                 try {
                     while (loopcount.incrementAndGet() < iter) {
