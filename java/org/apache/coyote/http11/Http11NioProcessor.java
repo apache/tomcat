@@ -137,7 +137,7 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
                         if (comettimeout != null) attach.setTimeout(comettimeout.longValue());
                     } else {
                         //reset the timeout
-                        if (keepAlive && keepAliveTimeout>0) {
+                        if (keepAlive) {
                             attach.setTimeout(keepAliveTimeout);
                         } else {
                             attach.setTimeout(soTimeout);
@@ -177,7 +177,7 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
             long soTimeout = endpoint.getSoTimeout();
 
             //reset the timeout
-            if (keepAlive && keepAliveTimeout>0) {
+            if (keepAlive) {
                 attach.setTimeout(keepAliveTimeout);
             } else {
                 attach.setTimeout(soTimeout);
@@ -186,224 +186,102 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
     }
 
 
-    /**
-     * Process pipelined HTTP requests using the specified input and output
-     * streams.
-     *
-     * @param socketWrapper Socket from which the HTTP requests will be read
-     *               and the HTTP responses will be written.
-     *  
-     * @throws IOException error during an I/O operation
-     */
     @Override
-    public SocketState process(SocketWrapper<NioChannel> socketWrapper)
-        throws IOException {
-        RequestInfo rp = request.getRequestProcessor();
-        rp.setStage(org.apache.coyote.Constants.STAGE_PARSE);
-
-        // Setting up the socket
-        this.socket = socketWrapper;
-        inputBuffer.init(socketWrapper, endpoint);
-        outputBuffer.init(socketWrapper, endpoint);
-
-        // Error flag
-        error = false;
-        keepAlive = true;
-        comet = false;
-        
-        int soTimeout = endpoint.getSoTimeout();
-
-        if (disableKeepAlive()) {
-            socketWrapper.setKeepAliveLeft(0);
-        }
-
-        boolean keptAlive = false;
-        boolean openSocket = false;
-        boolean readComplete = true;
-        
-        while (!error && keepAlive && !comet && !isAsync() && !endpoint.isPaused()) {
-            //always default to our soTimeout
-            socketWrapper.setTimeout(soTimeout);
-            // Parsing the request header
-            try {
-                if( !disableUploadTimeout && keptAlive && soTimeout > 0 ) {
-                    socketWrapper.getSocket().getIOChannel().socket().setSoTimeout(soTimeout);
-                }
-                if (!inputBuffer.parseRequestLine(keptAlive)) {
-                    // Haven't finished reading the request so keep the socket
-                    // open
-                    openSocket = true;
-                    // Check to see if we have read any of the request line yet
-                    if (inputBuffer.getParsingRequestLinePhase()<2) {
-                        // No data read, OK to recycle the processor
-                        // Continue to use keep alive timeout
-                        if (keepAliveTimeout>0) {
-                            socketWrapper.setTimeout(keepAliveTimeout);
-                        }
-                    } else {
-                        // Started to read request line. Need to keep processor
-                        // associated with socket
-                        readComplete = false;
-                    }
-                    if (endpoint.isPaused()) {
-                        // 503 - Service unavailable
-                        response.setStatus(503);
-                        adapter.log(request, response, 0);
-                        error = true;
-                    } else {
-                        break;
-                    }
-                }
-                if (!endpoint.isPaused()) {
-                    keptAlive = true;
-                    if ( !inputBuffer.parseHeaders() ) {
-                        //we've read part of the request, don't recycle it
-                        //instead associate it with the socket
-                        openSocket = true;
-                        readComplete = false;
-                        break;
-                    }
-                    request.setStartTime(System.currentTimeMillis());
-                    if (!disableUploadTimeout) { //only for body, not for request headers
-                        socketWrapper.getSocket().getIOChannel().socket().setSoTimeout(
-                                connectionUploadTimeout);
-                    }
-                }
-            } catch (IOException e) {
-                if (log.isDebugEnabled()) {
-                    log.debug(sm.getString("http11processor.header.parse"), e);
-                }
-                error = true;
-                break;
-            } catch (Throwable t) {
-                ExceptionUtils.handleThrowable(t);
-                if (log.isDebugEnabled()) {
-                    log.debug(sm.getString("http11processor.header.parse"), t);
-                }
-                // 400 - Bad Request
-                response.setStatus(400);
-                adapter.log(request, response, 0);
-                error = true;
-            }
-
-            if (!error) {
-                // Setting up filters, and parse some request headers
-                rp.setStage(org.apache.coyote.Constants.STAGE_PREPARE);
-                try {
-                    prepareRequest();
-                } catch (Throwable t) {
-                    ExceptionUtils.handleThrowable(t);
-                    if (log.isDebugEnabled()) {
-                        log.debug(sm.getString("http11processor.request.prepare"), t);
-                    }
-                    // 400 - Internal Server Error
-                    response.setStatus(400);
-                    adapter.log(request, response, 0);
-                    error = true;
-                }
-            }
-            
-            if (maxKeepAliveRequests == 1) {
-                keepAlive = false;
-            } else if (maxKeepAliveRequests > 0 &&
-                    socketWrapper.decrementKeepAlive() <= 0) {
-                keepAlive = false;
-            }
-
-            // Process the request in the adapter
-            if (!error) {
-                try {
-                    rp.setStage(org.apache.coyote.Constants.STAGE_SERVICE);
-                    adapter.service(request, response);
-                    // Handle when the response was committed before a serious
-                    // error occurred.  Throwing a ServletException should both
-                    // set the status to 500 and set the errorException.
-                    // If we fail here, then the response is likely already
-                    // committed, so we can't try and set headers.
-                    if(keepAlive && !error) { // Avoid checking twice.
-                        error = response.getErrorException() != null ||
-                                (!isAsync() &&
-                                statusDropsConnection(response.getStatus()));
-                    }
-                    // Comet support
-                    SelectionKey key = socketWrapper.getSocket().getIOChannel().keyFor(
-                            socketWrapper.getSocket().getPoller().getSelector());
-                    if (key != null) {
-                        NioEndpoint.KeyAttachment attach = (NioEndpoint.KeyAttachment) key.attachment();
-                        if (attach != null)  {
-                            attach.setComet(comet);
-                            if (comet) {
-                                Integer comettimeout = (Integer) request.getAttribute("org.apache.tomcat.comet.timeout");
-                                if (comettimeout != null) attach.setTimeout(comettimeout.longValue());
-                            }
-                        }
-                    }
-                } catch (InterruptedIOException e) {
-                    error = true;
-                } catch (Throwable t) {
-                    ExceptionUtils.handleThrowable(t);
-                    log.error(sm.getString("http11processor.request.process"), t);
-                    // 500 - Internal Server Error
-                    response.setStatus(500);
-                    adapter.log(request, response, 0);
-                    error = true;
-                }
-            }
-
-            // Finish the handling of the request
-            if (!comet && !isAsync()) {
-                // If we know we are closing the connection, don't drain input.
-                // This way uploading a 100GB file doesn't tie up the thread 
-                // if the servlet has rejected it.
-                if(error)
-                    inputBuffer.setSwallowInput(false);
-                endRequest();
-            }
-
-            // If there was an error, make sure the request is counted as
-            // and error, and update the statistics counter
-            if (error) {
-                response.setStatus(500);
-            }
-            request.updateCounters();
-
-            if (!comet && !isAsync()) {
-                // Next request
-                inputBuffer.nextRequest();
-                outputBuffer.nextRequest();
-            }
-            
-            // Do sendfile as needed: add socket to sendfile and end
-            if (sendfileData != null && !error) {
-                ((KeyAttachment) socketWrapper).setSendfileData(sendfileData);
-                sendfileData.keepAlive = keepAlive;
-                SelectionKey key = socketWrapper.getSocket().getIOChannel().keyFor(
-                        socketWrapper.getSocket().getPoller().getSelector());
-                //do the first write on this thread, might as well
-                openSocket = socketWrapper.getSocket().getPoller().processSendfile(key,
-                        (KeyAttachment) socketWrapper, true, true);
-                break;
-            }
-
-
-            rp.setStage(org.apache.coyote.Constants.STAGE_KEEPALIVE);
-
-        }//while
-
-        rp.setStage(org.apache.coyote.Constants.STAGE_ENDED);
-        if (error || endpoint.isPaused()) {
-            return SocketState.CLOSED;
-        } else if (comet || isAsync()) {
-            return SocketState.LONG;
-        } else {
-            return (openSocket) ? (readComplete?SocketState.OPEN:SocketState.LONG) : SocketState.CLOSED;
-        }
-
+    protected boolean disableKeepAlive() {
+        return false;
     }
 
 
     @Override
-    protected boolean disableKeepAlive() {
+    protected void setRequestLineReadTimeout() throws IOException {
+        // socket.setTimeout()
+        //     - timeout used by poller
+        // socket.getSocket().getIOChannel().socket().setSoTimeout()
+        //     - timeout used for blocking reads
+
+        // When entering the processing loop there will always be data to read
+        // so no point changing timeouts at this point
+        
+        // For the second and subsequent executions of the processing loop, a
+        // non-blocking read is used so again no need to set the timeouts
+        
+        // Because NIO supports non-blocking reading of the request line and
+        // headers the timeouts need to be set when returning the socket to
+        // the poller rather than here.
+        
+        // NO-OP
+    }
+
+
+    @Override
+    protected boolean handleIncompleteRequestLineRead() {
+        // Haven't finished reading the request so keep the socket
+        // open
+        openSocket = true;
+        // Check to see if we have read any of the request line yet
+        if (inputBuffer.getParsingRequestLinePhase() < 2) {
+            if (socket.getLastAccess() > -1 || keptAlive) {
+                // Haven't read the request line and have previously processed a
+                // request. Must be keep-alive. Make sure poller uses keepAlive.
+                socket.setTimeout(endpoint.getKeepAliveTimeout());
+            }
+        } else {
+            // Started to read request line. Need to keep processor
+            // associated with socket
+            readComplete = false;
+            // Make sure poller uses soTimeout from here onwards
+            socket.setTimeout(endpoint.getSoTimeout());
+        }
+        if (endpoint.isPaused()) {
+            // 503 - Service unavailable
+            response.setStatus(503);
+            adapter.log(request, response, 0);
+            error = true;
+        } else {
+            return true;
+        }
+        return false;
+    }
+
+
+    @Override
+    protected void setSocketTimeout(int timeout) throws IOException {
+        socket.getSocket().getIOChannel().socket().setSoTimeout(timeout);
+    }
+
+    
+    @Override
+    protected void setCometTimeouts(SocketWrapper<NioChannel> socketWrapper) {
+        // Comet support
+        SelectionKey key = socketWrapper.getSocket().getIOChannel().keyFor(
+                socketWrapper.getSocket().getPoller().getSelector());
+        if (key != null) {
+            NioEndpoint.KeyAttachment attach = (NioEndpoint.KeyAttachment) key.attachment();
+            if (attach != null)  {
+                attach.setComet(comet);
+                if (comet) {
+                    Integer comettimeout = (Integer) request.getAttribute("org.apache.tomcat.comet.timeout");
+                    if (comettimeout != null) attach.setTimeout(comettimeout.longValue());
+                }
+            }
+        }
+    }
+
+
+    @Override
+    protected boolean breakKeepAliveLoop(
+            SocketWrapper<NioChannel> socketWrapper) {
+        // Do sendfile as needed: add socket to sendfile and end
+        if (sendfileData != null && !error) {
+            ((KeyAttachment) socketWrapper).setSendfileData(sendfileData);
+            sendfileData.keepAlive = keepAlive;
+            SelectionKey key = socketWrapper.getSocket().getIOChannel().keyFor(
+                    socketWrapper.getSocket().getPoller().getSelector());
+            //do the first write on this thread, might as well
+            openSocket = socketWrapper.getSocket().getPoller().processSendfile(key,
+                    (KeyAttachment) socketWrapper, true, true);
+            return true;
+        }
         return false;
     }
 
@@ -651,6 +529,11 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
             return true;
         }
         return false;
+    }
+
+    @Override
+    protected void setSocketWrapper(SocketWrapper<NioChannel> socketWrapper) {
+        this.socket = socketWrapper;
     }
 
     @Override

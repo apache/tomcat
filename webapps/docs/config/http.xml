@@ -317,7 +317,10 @@
     <attribute name="connectionTimeout" required="false">
       <p>The number of milliseconds this <strong>Connector</strong> will wait,
       after accepting a connection, for the request URI line to be
-      presented.  The default value is 60000 (i.e. 60 seconds).</p>
+      presented. Use a value of -1 to indicate no (i.e. infinite) timeout.
+      The default value is 60000 (i.e. 60 seconds) but note that the standard
+      server.xml that ships with Tomcat sets this to 20000 (i.e. 20 seconds).
+      </p>
     </attribute>
     
     <attribute name="connectionUploadTimeout" required="false">
@@ -347,7 +350,8 @@
       <p>The number of milliseconds this <strong>Connector</strong> will wait
       for another HTTP request before closing the connection. The default value
       is to use the value that has been set for the
-      <strong>connectionTimeout</strong> attribute.</p>
+      <strong>connectionTimeout</strong> attribute.
+      Use a value of -1 to indicate no (i.e. infinite) timeout.</p>
     </attribute>
 
     <attribute name="maxConnections" required="false">

@@ -160,6 +160,8 @@ public class AprEndpoint extends AbstractEndpoint {
     public boolean getUseComet() { return useComet; }
     @Override
     public boolean getUseCometTimeout() { return false; } // Not supported
+    @Override
+    public boolean getUsePolling() { return true; } // Always supported
 
 
     /**
@@ -750,8 +752,7 @@ public class AprEndpoint extends AbstractEndpoint {
                 Socket.optSet(socket, Socket.APR_SO_LINGER, socketProperties.getSoLingerTime());
             if (socketProperties.getTcpNoDelay())
                 Socket.optSet(socket, Socket.APR_TCP_NODELAY, (socketProperties.getTcpNoDelay() ? 1 : 0));
-            if (socketProperties.getSoTimeout() > 0)
-                Socket.timeoutSet(socket, socketProperties.getSoTimeout() * 1000);
+            Socket.timeoutSet(socket, socketProperties.getSoTimeout() * 1000);
 
             // 2: SSL handshake
             step = 2;
@@ -1128,7 +1129,7 @@ public class AprEndpoint extends AbstractEndpoint {
             int size = getMaxConnections() / pollerThreadCount;
             int keepAliveTimeout = getKeepAliveTimeout();
             int socketTimeout = socketProperties.getSoTimeout();
-            if (keepAliveTimeout > 0 && !comet) {
+            if (keepAliveTimeout != socketTimeout && !comet) {
                 separateKeepAlive = true;
             }
             connectionPollset = allocatePoller(size, pool, socketTimeout);

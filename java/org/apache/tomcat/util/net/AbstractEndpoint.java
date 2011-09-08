@@ -170,12 +170,18 @@ public abstract class AbstractEndpoint {
     private BindState bindState = BindState.UNBOUND;
 
     /**
-     * Keepalive timeout, if lesser or equal to 0 then soTimeout will be used.
+     * Keepalive timeout, if not set the soTimeout is used.
      */
-    private int keepAliveTimeout = -1;
-    public int getKeepAliveTimeout() { return keepAliveTimeout;}
+    private Integer keepAliveTimeout = null;
+    public int getKeepAliveTimeout() {
+        if (keepAliveTimeout == null) {
+            return getSoTimeout();
+        } else {
+            return keepAliveTimeout.intValue();
+        }
+    }
     public void setKeepAliveTimeout(int keepAliveTimeout) {
-        this.keepAliveTimeout = keepAliveTimeout;
+        this.keepAliveTimeout = Integer.valueOf(keepAliveTimeout);
     }
 
 
@@ -559,9 +565,12 @@ public abstract class AbstractEndpoint {
 
     protected abstract Log getLog();
     // Flags to indicate optional feature support
+    // Some of these are always hard-coded, some are hard-coded to false (i.e.
+    // the endpoint does not support them) and some are configurable.
     public abstract boolean getUseSendfile();
     public abstract boolean getUseComet();
     public abstract boolean getUseCometTimeout();
+    public abstract boolean getUsePolling();
     
     protected LimitLatch initializeConnectionLatch() {
         if (connectionLimitLatch==null) {
