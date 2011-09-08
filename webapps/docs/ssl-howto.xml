@@ -582,7 +582,7 @@ public class SessionTrackingModeListener implements ServletContextListener {
 <p>To access the SSL session ID from the request, use:<br />
 
   <code>
-    String sslID = (String)request.getAttribute("javax.servlet.request.ssl_session");
+    String sslID = (String)request.getAttribute("javax.servlet.request.ssl_session_id");
   </code>
 <br />
 For additional discussion on this area, please see
