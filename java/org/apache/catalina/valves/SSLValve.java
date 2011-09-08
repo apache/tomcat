@@ -125,6 +125,7 @@ public class SSLValve extends ValveBase {
         strcert0 = mygetHeader(request, "ssl_session_id");
         if (strcert0 != null) {
             request.setAttribute(Globals.SSL_SESSION_ID_ATTR, strcert0);
+            request.setAttribute(Globals.SSL_SESSION_ID_TOMCAT_ATTR, strcert0);
         }
         strcert0 = mygetHeader(request, "ssl_cipher_usekeysize");
         if (strcert0 != null) {

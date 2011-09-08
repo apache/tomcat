@@ -98,8 +98,14 @@ public final class Globals {
      * for this SSL connection (as an object of type java.lang.String).
      */
     public static final String SSL_SESSION_ID_ATTR =
+        "javax.servlet.request.ssl_session_id";
+    /**
+     * Tomcat specific attribute as used in Tomcat 6.
+     * @deprecated
+     */
+    @Deprecated
+    public static final String SSL_SESSION_ID_TOMCAT_ATTR =
         "javax.servlet.request.ssl_session";
-
 
     /**
      * The request attribute key for the session manager.

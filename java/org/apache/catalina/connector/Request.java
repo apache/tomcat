@@ -965,6 +965,7 @@ public class Request
             attr = coyoteRequest.getAttribute(Globals.SSL_SESSION_ID_ATTR);
             if(attr != null) {
                 attributes.put(Globals.SSL_SESSION_ID_ATTR, attr);
+                attributes.put(Globals.SSL_SESSION_ID_TOMCAT_ATTR, attr);
             }
             attr = coyoteRequest.getAttribute(Globals.SSL_SESSION_MGR_ATTR);
             if(attr != null) {
@@ -985,6 +986,7 @@ public class Request
             Globals.CIPHER_SUITE_ATTR.equals(name) ||
             Globals.KEY_SIZE_ATTR.equals(name)  ||
             Globals.SSL_SESSION_ID_ATTR.equals(name) ||
+            Globals.SSL_SESSION_ID_TOMCAT_ATTR.equals(name) ||
             Globals.SSL_SESSION_MGR_ATTR.equals(name);
     }
 
@@ -1003,6 +1005,8 @@ public class Request
      * <li>{@link Globals#CIPHER_SUITE_ATTR} (SSL connections only)</li>
      * <li>{@link Globals#KEY_SIZE_ATTR} (SSL connections only)</li>
      * <li>{@link Globals#SSL_SESSION_ID_ATTR} (SSL connections only)</li>
+     * <li>{@link Globals#SSL_SESSION_ID_TOMCAT_ATTR} (SSL connections only)
+     * </li>
      * <li>{@link Globals#SSL_SESSION_MGR_ATTR} (SSL connections only)</li>
      * </ul>
      * The underlying connector may also expose request attributes. These all
