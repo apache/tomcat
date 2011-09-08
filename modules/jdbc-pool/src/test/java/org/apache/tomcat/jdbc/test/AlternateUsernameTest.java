@@ -106,6 +106,7 @@ public class AlternateUsernameTest extends DefaultTestCase {
             useuser = user!=null;
         }
         
+        @Override
         public TestResult call() {
             TestResult test = new TestResult();
             PooledConnection pcon = null;
