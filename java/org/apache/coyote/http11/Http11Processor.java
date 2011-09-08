@@ -18,16 +18,13 @@ package org.apache.coyote.http11;
 
 import java.io.EOFException;
 import java.io.IOException;
-import java.io.InterruptedIOException;
 import java.net.InetAddress;
 import java.net.Socket;
 
 import org.apache.coyote.ActionCode;
-import org.apache.coyote.RequestInfo;
 import org.apache.coyote.http11.filters.BufferedInputFilter;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
-import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
 import org.apache.tomcat.util.net.JIoEndpoint;
 import org.apache.tomcat.util.net.SSLSupport;
@@ -121,234 +118,6 @@ public class Http11Processor extends AbstractHttp11Processor<Socket> {
     }
 
 
-    /**
-     * Process pipelined HTTP requests using the specified input and output
-     * streams.
-     *
-     * @param socketWrapper Socket from which the HTTP requests will be read
-     *               and the HTTP responses will be written.
-     *  
-     * @throws IOException error during an I/O operation
-     */
-    @Override
-    public SocketState process(SocketWrapper<Socket> socketWrapper)
-        throws IOException {
-        RequestInfo rp = request.getRequestProcessor();
-        rp.setStage(org.apache.coyote.Constants.STAGE_PARSE);
-
-        // Setting up the I/O
-        this.socket = socketWrapper;
-        inputBuffer.init(socketWrapper, endpoint);
-        outputBuffer.init(socketWrapper, endpoint);
-
-        // Error flag
-        error = false;
-        keepAlive = true;
-        comet = false;
-
-        int soTimeout = endpoint.getSoTimeout();
-
-        if (disableKeepAlive()) {
-            socketWrapper.setKeepAliveLeft(0);
-        }
-
-        boolean keptAlive = socketWrapper.isKeptAlive();
-
-        while (!error && keepAlive && !endpoint.isPaused()) {
-
-            // Parsing the request header
-            try {
-                int standardTimeout = 0;
-                if (keptAlive) {
-                    if (keepAliveTimeout > 0) {
-                        standardTimeout = keepAliveTimeout;
-                    } else if (soTimeout > 0) {
-                        standardTimeout = soTimeout;
-                    }
-                }
-                /*
-                 * When there is no data in the buffer and this is not the first
-                 * request on this connection and timeouts are being used the
-                 * first read for this request may need a different timeout to
-                 * take account of time spent waiting for a processing thread.
-                 * 
-                 * This is a little hacky but better than exposing the socket
-                 * and the timeout info to the InputBuffer
-                 */
-                if (inputBuffer.lastValid == 0 &&
-                        socketWrapper.getLastAccess() > -1 &&
-                        standardTimeout > 0) {
-
-                    long queueTime = System.currentTimeMillis() -
-                            socketWrapper.getLastAccess();
-                    int firstReadTimeout;
-                    if (queueTime >= standardTimeout) {
-                        // Queued for longer than timeout but there might be
-                        // data so use shortest possible timeout
-                        firstReadTimeout = 1;
-                    } else {
-                        // Cast is safe since queueTime must be less than
-                        // standardTimeout which is an int
-                        firstReadTimeout = standardTimeout - (int) queueTime;
-                    }
-                    socket.getSocket().setSoTimeout(firstReadTimeout);
-                    if (!inputBuffer.fill()) {
-                        throw new EOFException(sm.getString("iib.eof.error"));
-                    }
-                }
-                if (standardTimeout > 0) {
-                    socket.getSocket().setSoTimeout(standardTimeout);
-                }
-
-                inputBuffer.parseRequestLine(false);
-                if (endpoint.isPaused()) {
-                    // 503 - Service unavailable
-                    response.setStatus(503);
-                    adapter.log(request, response, 0);
-                    error = true;
-                } else {
-                    request.setStartTime(System.currentTimeMillis());
-                    keptAlive = true;
-                    if (disableUploadTimeout) {
-                        socket.getSocket().setSoTimeout(soTimeout);
-                    } else {
-                        socket.getSocket().setSoTimeout(connectionUploadTimeout);
-                    }
-                    inputBuffer.parseHeaders();
-                }
-            } catch (IOException e) {
-                error = true;
-                break;
-            } catch (Throwable t) {
-                ExceptionUtils.handleThrowable(t);
-                if (log.isDebugEnabled()) {
-                    log.debug(sm.getString("http11processor.header.parse"), t);
-                }
-                // 400 - Bad Request
-                response.setStatus(400);
-                adapter.log(request, response, 0);
-                error = true;
-            }
-
-            if (!error) {
-                // Setting up filters, and parse some request headers
-                rp.setStage(org.apache.coyote.Constants.STAGE_PREPARE);
-                try {
-                    prepareRequest();
-                } catch (Throwable t) {
-                    ExceptionUtils.handleThrowable(t);
-                    if (log.isDebugEnabled()) {
-                        log.debug(sm.getString("http11processor.request.prepare"), t);
-                    }
-                    // 400 - Internal Server Error
-                    response.setStatus(400);
-                    adapter.log(request, response, 0);
-                    error = true;
-                }
-            }
-
-            if (maxKeepAliveRequests == 1) {
-                keepAlive = false;
-            } else if (maxKeepAliveRequests > 0 &&
-                    socketWrapper.decrementKeepAlive() <= 0) {
-                keepAlive = false;
-            }
-
-            // Process the request in the adapter
-            if (!error) {
-                try {
-                    rp.setStage(org.apache.coyote.Constants.STAGE_SERVICE);
-                    adapter.service(request, response);
-                    // Handle when the response was committed before a serious
-                    // error occurred.  Throwing a ServletException should both
-                    // set the status to 500 and set the errorException.
-                    // If we fail here, then the response is likely already
-                    // committed, so we can't try and set headers.
-                    if(keepAlive && !error) { // Avoid checking twice.
-                        error = response.getErrorException() != null ||
-                                (!isAsync() &&
-                                statusDropsConnection(response.getStatus()));
-                    }
-
-                } catch (InterruptedIOException e) {
-                    error = true;
-                } catch (Throwable t) {
-                    ExceptionUtils.handleThrowable(t);
-                    log.error(sm.getString("http11processor.request.process"), t);
-                    // 500 - Internal Server Error
-                    response.setStatus(500);
-                    adapter.log(request, response, 0);
-                    error = true;
-                }
-            }
-
-            // Finish the handling of the request
-            try {
-                rp.setStage(org.apache.coyote.Constants.STAGE_ENDINPUT);
-                // If we know we are closing the connection, don't drain input.
-                // This way uploading a 100GB file doesn't tie up the thread 
-                // if the servlet has rejected it.
-                
-                if(error && !isAsync())
-                    inputBuffer.setSwallowInput(false);
-                if (!isAsync())
-                    endRequest();
-            } catch (Throwable t) {
-                ExceptionUtils.handleThrowable(t);
-                log.error(sm.getString("http11processor.request.finish"), t);
-                // 500 - Internal Server Error
-                response.setStatus(500);
-                adapter.log(request, response, 0);
-                error = true;
-            }
-            try {
-                rp.setStage(org.apache.coyote.Constants.STAGE_ENDOUTPUT);
-            } catch (Throwable t) {
-                ExceptionUtils.handleThrowable(t);
-                log.error(sm.getString("http11processor.response.finish"), t);
-                error = true;
-            }
-
-            // If there was an error, make sure the request is counted as
-            // and error, and update the statistics counter
-            if (error) {
-                response.setStatus(500);
-            }
-            request.updateCounters();
-
-            rp.setStage(org.apache.coyote.Constants.STAGE_KEEPALIVE);
-
-            // Don't reset the param - we'll see it as ended. Next request
-            // will reset it
-            // thrA.setParam(null);
-            // Next request
-            if (!isAsync() || error) {
-                inputBuffer.nextRequest();
-                outputBuffer.nextRequest();
-            }
-
-            // If we don't have a pipe-lined request allow this thread to be
-            // used by another connection
-            if (isAsync() || error || inputBuffer.lastValid == 0) {
-                break;
-            }
-        }
-
-        rp.setStage(org.apache.coyote.Constants.STAGE_ENDED);
-        if (error || endpoint.isPaused()) {
-            return SocketState.CLOSED;
-        } else if (isAsync()) {
-            return SocketState.LONG;
-        } else {
-            if (!keepAlive) {
-                return SocketState.CLOSED;
-            } else {
-                return SocketState.OPEN;
-            }
-        } 
-    }
-    
-    
     @Override
     protected boolean disableKeepAlive() {
         int threadRatio = -1;   
@@ -369,6 +138,78 @@ public class Http11Processor extends AbstractHttp11Processor<Socket> {
     }
 
 
+    @Override
+    protected void setRequestLineReadTimeout() throws IOException {
+        
+        /*
+         * When there is no data in the buffer and this is not the first
+         * request on this connection and timeouts are being used the
+         * first read for this request may need a different timeout to
+         * take account of time spent waiting for a processing thread.
+         * 
+         * This is a little hacky but better than exposing the socket
+         * and the timeout info to the InputBuffer
+         */
+        if (inputBuffer.lastValid == 0 && socket.getLastAccess() > -1) {
+            int firstReadTimeout;
+            if (keepAliveTimeout == -1) {
+                firstReadTimeout = 0;
+            } else {
+                long queueTime =
+                    System.currentTimeMillis() - socket.getLastAccess();
+
+                if (queueTime >= keepAliveTimeout) {
+                    // Queued for longer than timeout but there might be
+                    // data so use shortest possible timeout
+                    firstReadTimeout = 1;
+                } else {
+                    // Cast is safe since queueTime must be less than
+                    // keepAliveTimeout which is an int
+                    firstReadTimeout = keepAliveTimeout - (int) queueTime;
+                }
+            }
+            socket.getSocket().setSoTimeout(firstReadTimeout);
+            if (!inputBuffer.fill()) {
+                throw new EOFException(sm.getString("iib.eof.error"));
+            }
+            // Once the first byte has been read, the standard timeout should be
+            // used so restore it here.
+            socket.getSocket().setSoTimeout(endpoint.getSoTimeout());
+        }
+    }
+
+
+    @Override
+    protected boolean handleIncompleteRequestLineRead() {
+        // Not used with BIO since it uses blocking reads
+        return false;
+    }
+
+
+    @Override
+    protected void setSocketTimeout(int timeout) throws IOException {
+        socket.getSocket().setSoTimeout(timeout);
+    }
+    
+    
+    @Override
+    protected void setCometTimeouts(SocketWrapper<Socket> socketWrapper) {
+        // NO-OP for BIO
+    }
+
+
+    @Override
+    protected boolean breakKeepAliveLoop(SocketWrapper<Socket> socketWrapper) {
+        openSocket = keepAlive;
+        // If we don't have a pipe-lined request allow this thread to be
+        // used by another connection
+        if (inputBuffer.lastValid == 0) {
+            return true;
+        }
+        return false;
+    }
+
+    
     @Override
     protected void resetTimeouts() {
         // NOOP for BIO
@@ -553,6 +394,11 @@ public class Http11Processor extends AbstractHttp11Processor<Socket> {
         Exception e = new Exception();
         log.error(sm.getString("http11processor.neverused"), e);
         return false;
+    }
+
+    @Override
+    protected void setSocketWrapper(SocketWrapper<Socket> socketWrapper) {
+        this.socket = socketWrapper;
     }
 
     @Override
