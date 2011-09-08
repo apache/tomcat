@@ -152,7 +152,7 @@ public class Benchmarks {
      * 16 threads - ~45,600ms
      */
     @Test
-    public void testManagerBaseCreateSession() throws LifecycleException {
+    public void testManagerBaseCreateSession() {
         doTestManagerBaseCreateSession(1, 1000000);
         doTestManagerBaseCreateSession(2, 1000000);
         doTestManagerBaseCreateSession(4, 1000000);
@@ -163,8 +163,8 @@ public class Benchmarks {
     }
     
     
-    private void doTestManagerBaseCreateSession(int threadCount, int iterCount)
-            throws LifecycleException {
+    private void doTestManagerBaseCreateSession(int threadCount,
+            int iterCount) {
 
         // Create a default session manager
         StandardManager mgr = new StandardManager();
