@@ -38,8 +38,8 @@ public class ConnectCountTest extends DefaultTestCase {
     }
     
     protected boolean run = true;
-    protected long sleep = Long.getLong("sleep", 10);
-    protected long complete = Long.getLong("complete",20000);
+    protected long sleep = Long.getLong("sleep", 10).longValue();
+    protected long complete = Long.getLong("complete",20000).longValue();
     protected boolean printthread = Boolean.getBoolean("printthread");
     CountDownLatch latch = null;
 
@@ -67,8 +67,7 @@ public class ConnectCountTest extends DefaultTestCase {
 
     protected void printThreadResults(TestThread[] threads, String name, int active, int expected) {
         long minfetch = Long.MAX_VALUE, maxfetch = Long.MIN_VALUE, totalfetch = 0;
-        long maxwait = 0, minwait = Long.MAX_VALUE, averagewait = 0, totalwait = 0;
-        float avgfetch = 0;
+        long maxwait = 0, minwait = Long.MAX_VALUE, totalwait = 0;
         for (int i=0; i<threads.length; i++) {
             TestThread t = threads[i];
             totalfetch += t.nroffetch;
@@ -112,6 +111,7 @@ public class ConnectCountTest extends DefaultTestCase {
         this.run = false;
         long delta = System.currentTimeMillis() - start;
         printThreadResults(threads,"testDBCPThreads20Connections10",Driver.connectCount.get(),10);
+        System.out.println("Test completed in: " + delta + "ms.");
         tearDown();
     }
 
@@ -139,6 +139,7 @@ public class ConnectCountTest extends DefaultTestCase {
         this.run = false;
         long delta = System.currentTimeMillis() - start;
         printThreadResults(threads,"testPoolThreads20Connections10",Driver.connectCount.get(),10);
+        System.out.println("Test completed in: " + delta + "ms.");
         tearDown();
 
     }
@@ -168,6 +169,7 @@ public class ConnectCountTest extends DefaultTestCase {
         this.run = false;
         long delta = System.currentTimeMillis() - start;
         printThreadResults(threads,"testPoolThreads20Connections10Fair",Driver.connectCount.get(),10);
+        System.out.println("Test completed in: " + delta + "ms.");
         tearDown();
     }
  
@@ -198,6 +200,7 @@ public class ConnectCountTest extends DefaultTestCase {
         this.run = false;
         long delta = System.currentTimeMillis() - start;
         printThreadResults(threads,"testPoolThreads20Connections10FairAsync",Driver.connectCount.get(),10);
+        System.out.println("Test completed in: " + delta + "ms.");
         tearDown();
     }
     
