@@ -94,6 +94,11 @@
         non-poolable objects (e.g. tag files) that need to be scanned for
         annotations when created. (markt)
       </add>
+      <fix>
+        Use the specification compliant request attribute of
+        <code>javax.servlet.request.ssl_session_id</code> to access the SSL
+        session ID and deprecated the Tomcat specific request attribute. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
