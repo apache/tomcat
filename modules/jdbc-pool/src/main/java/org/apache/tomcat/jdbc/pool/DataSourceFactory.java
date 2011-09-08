@@ -142,6 +142,7 @@ public class DataSourceFactory implements ObjectFactory {
         PROP_URL,
         PROP_USERNAME,
         PROP_VALIDATIONQUERY,
+        PROP_VALIDATOR_CLASS_NAME,
         PROP_VALIDATIONINTERVAL,
         PROP_ACCESSTOUNDERLYINGCONNECTIONALLOWED,
         PROP_REMOVEABANDONED,
@@ -161,6 +162,7 @@ public class DataSourceFactory implements ObjectFactory {
         PROP_USE_CON_LOCK,
         PROP_DATASOURCE,
         PROP_DATASOURCE_JNDI,
+        PROP_SUSPECT_TIMEOUT,
         PROP_ALTERNATE_USERNAME_ALLOWED
     };
 
