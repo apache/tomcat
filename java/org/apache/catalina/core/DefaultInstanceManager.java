@@ -205,6 +205,10 @@ public class DefaultInstanceManager implements InstanceManager {
         // At the end the postconstruct annotated
         // method is invoked
         List<AnnotationCacheEntry> annotations = annotationCache.get(clazz);
+        if (annotations == null) {
+            // instance not created through the instance manager
+            return;
+        }
         for (AnnotationCacheEntry entry : annotations) {
             if (entry.getType() == AnnotationCacheEntryType.PRE_DESTROY) {
                 Method preDestroy = (Method) entry.getAccessibleObject();
