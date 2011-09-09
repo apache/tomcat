@@ -46,7 +46,7 @@ public class XercesParser{
      * The Log to which all SAX event related logging calls will be made.
      */
     private static final Log log =
-        LogFactory.getLog("org.apache.commons.digester.Digester.sax");
+        LogFactory.getLog("org.apache.tomcat.util.digester.Digester.sax");
 
 
     /**
