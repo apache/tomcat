@@ -121,14 +121,14 @@ public class Http11Processor extends AbstractHttp11Processor<Socket> {
     @Override
     protected boolean disableKeepAlive() {
         int threadRatio = -1;   
-        // These may return zero or negative values     
-        // Only calculate a thread ratio when both are >0 to ensure we get a    
-        // sensible result      
-        if (endpoint.getCurrentThreadsBusy() >0 &&      
-                endpoint.getMaxThreads() >0) {      
-            threadRatio = (endpoint.getCurrentThreadsBusy() * 100)      
-                    / endpoint.getMaxThreads();     
-        }   
+        // These may return zero or negative values
+        // Only calculate a thread ratio when both are >0 to ensure we get a
+        // sensible result
+        int maxThreads, threadsBusy;
+        if ((maxThreads = endpoint.getMaxThreads()) > 0
+                && (threadsBusy = endpoint.getCurrentThreadsBusy()) > 0) {
+            threadRatio = (threadsBusy * 100) / maxThreads;
+        }
         // Disable keep-alive if we are running low on threads      
         if (threadRatio > getDisableKeepAlivePercentage()) {     
             return true;
