@@ -81,7 +81,8 @@
         <bug>51758</bug>: The digester (used for processing XML files) used the
         logger name <code>org.apache.commons.digester.Digester</code> rather
         than the expected <code>org.apache.tomcat.util.digester.Digester</code>.
-        The digester has been changed to use the expected logger name. (markt)
+        The digester has been changed to use the expected logger name.
+        (markt/kkolinko)
       </fix>
       <fix>
         <bug>51774</bug>: Fix incorrect cached method signature that prevented
