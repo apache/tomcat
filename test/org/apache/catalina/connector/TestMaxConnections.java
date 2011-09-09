@@ -60,7 +60,7 @@ public class TestMaxConnections extends TomcatBaseTest {
         }
         
         assertTrue("The number of successful requests should have been 4-5, actual "+passcount,4==passcount || 5==passcount);
-        
+        System.out.println("There were [" + connectfail + "] connection failures");
     }
 
     private static class ConnectThread extends Thread {
