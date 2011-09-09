@@ -41,7 +41,7 @@ public class GenericParser{
      * The Log to which all SAX event related logging calls will be made.
      */
     private static final Log log =
-        LogFactory.getLog("org.apache.commons.digester.Digester.sax");
+        LogFactory.getLog("org.apache.tomcat.util.digester.Digester.sax");
 
     /**
      * The JAXP 1.2 property required to set up the schema location.

@@ -102,7 +102,7 @@ public class Digester extends DefaultHandler {
                     initialized = true;
                 } catch (Throwable t) {
                     ExceptionUtils.handleThrowable(t);
-                    LogFactory.getLog("org.apache.commons.digester.Digester").
+                    LogFactory.getLog("org.apache.tomcat.util.digester.Digester").
                         error("Unable to load property source["+className+"].",t);
                 }
             }
