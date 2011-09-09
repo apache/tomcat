@@ -133,6 +133,7 @@
         ArrayBlockingQueue doesn't allow capacity of 0 or less. (kfujino)
       </fix>
       <fix>
+        <bug>51139</bug>:
         In jdbc-pool: validatorClassName and suspectTimeout are ignored. 
         In order to support them correctly, validatorClassName and 
         suspectTimeout are added to a property list. (kfujino)
