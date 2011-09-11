@@ -166,6 +166,11 @@ public class DefaultInstanceManager implements InstanceManager {
      */
     protected void postConstruct(Object instance, final Class<?> clazz)
             throws IllegalAccessException, InvocationTargetException {
+        if (context == null) {
+            // No resource injection
+            return;
+        }
+
         Class<?> superClass = clazz.getSuperclass();
         if (superClass != Object.class) {
             postConstruct(instance, superClass);
