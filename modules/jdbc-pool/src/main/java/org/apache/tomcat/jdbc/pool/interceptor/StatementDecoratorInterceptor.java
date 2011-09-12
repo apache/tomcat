@@ -127,7 +127,7 @@ public class StatementDecoratorInterceptor extends AbstractCreateStatementInterc
         result = constructor.newInstance(new Object[] { statementProxy });
         statementProxy.setActualProxy(result);
         statementProxy.setConnection(proxy);
-        statementProxy.setConnection(constructor);
+        statementProxy.setConstructor(constructor);
         return result;
     }
 
