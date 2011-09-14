@@ -1081,13 +1081,11 @@ public class NioEndpoint extends AbstractEndpoint {
                     }
                     try {
                         if ( !close ) {
-                            if (wakeupCounter.get()>0) {
+                            if (wakeupCounter.getAndSet(-1) > 0) {
                                 //if we are here, means we have other stuff to do
                                 //do a non blocking select
                                 keyCount = selector.selectNow();
-                            }else {
-                                keyCount = selector.keys().size();
-                                wakeupCounter.set(-1);
+                            } else {
                                 keyCount = selector.select(selectorTimeout);
                             }
                             wakeupCounter.set(0);
