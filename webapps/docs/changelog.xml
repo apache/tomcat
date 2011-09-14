@@ -139,6 +139,11 @@
         In order to support them correctly, validatorClassName and 
         suspectTimeout are added to a property list. (kfujino)
       </fix>
+      <fix>
+        <bug>51786</bug>:
+        In jdbc-pool: Discarded connection is not active in a pool any longer. 
+        It removes from the active connection list. (kfujino)
+      </fix>
     </changelog>
   </subsection>  
 </section>
