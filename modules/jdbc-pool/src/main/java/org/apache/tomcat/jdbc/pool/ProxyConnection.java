@@ -94,7 +94,7 @@ public class ProxyConnection extends JdbcInterceptor {
             return Boolean.valueOf(isClosed());
         }
         if (compare(CLOSE_VAL,method)) {
-            if (isClosed()) return null; //noop for already closed.
+            if (connection==null) return null; //noop for already closed.
             PooledConnection poolc = this.connection;
             this.connection = null;
             pool.returnConnection(poolc);
