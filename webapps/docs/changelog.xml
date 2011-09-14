@@ -104,6 +104,9 @@
   </subsection>
   <subsection name="Coyote">
     <changelog>
+      <fix>
+        <bug>51794</bug>: Fix race condition in NioEndpoint(fhanik)
+      </fix>
       <scode>
         Remove unused and undocumented socketCloseDelay attribute from NIO
         connector. (markt)
