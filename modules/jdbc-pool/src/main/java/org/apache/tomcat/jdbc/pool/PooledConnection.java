@@ -309,7 +309,7 @@ public class PooledConnection {
      * @param finalize if set to true, a call to {@link ConnectionPool#finalize(PooledConnection)} is called.
      */
     private void disconnect(boolean finalize) {
-        if (isDiscarded()) {
+        if (isDiscarded() && connection == null) {
             return;
         }
         setDiscarded(true);
