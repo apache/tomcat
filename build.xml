@@ -1055,21 +1055,23 @@
 
   <target name="test" description="Runs the JUnit test cases"
           depends="test-bio,test-nio,test-apr" >
+    <fail if="test.result.error" message='Some tests completed with an Error. See ${tomcat.build}/logs for details, search for "FAILED".' />
+    <fail if="test.result.failure" message='Some tests completed with a Failure. See ${tomcat.build}/logs for details, search for "FAILED".' />
   </target>
   
-  <target name="test-bio" description="Runs the JUnit test cases for BIO"
+  <target name="test-bio" description="Runs the JUnit test cases for BIO. Does not stop on errors."
           depends="test-compile,deploy" if="${execute.test.bio}">
     <runtests protocol="org.apache.coyote.http11.Http11Protocol"
               extension=".BIO.txt" />
   </target>
   
-  <target name="test-nio" description="Runs the JUnit test cases for NIO"
+  <target name="test-nio" description="Runs the JUnit test cases for NIO. Does not stop on errors."
           depends="test-compile,deploy" if="${execute.test.nio}">
     <runtests protocol="org.apache.coyote.http11.Http11NioProtocol"
               extension=".NIO.txt" />
   </target>
   
-  <target name="test-apr" description="Runs the JUnit test cases for APR"
+  <target name="test-apr" description="Runs the JUnit test cases for APR. Does not stop on errors."
           depends="test-compile,deploy,test-apr-exists"
           if="${apr.exists}">
     <runtests protocol="org.apache.coyote.http11.Http11AprProtocol"
@@ -1082,14 +1084,18 @@
   </target>
 
   <macrodef name="runtests"
-            description="Runs the unit tests using the specified connector" >
+            description="Runs the unit tests using the specified connector.
+              Does not stop on errors, but sets 'test.result.error' and 'test.result.failure' properties.">
     <attribute name="protocol"
                description="The class name for the connector protocol"/>
     <attribute name="extension"
                description="The extension to use to distinguish the output"/>
 
     <sequential>
-      <junit printsummary="yes" fork="yes" dir="." showoutput="yes">
+      <junit printsummary="yes" fork="yes" dir="." showoutput="yes"
+        errorproperty="test.result.error"
+        failureproperty="test.result.failure"
+        haltonfailure="${test.haltonfailure}" >
 
         <jvmarg value="${test.jvmarg.egd}"/>
         <jvmarg value="-Djava.library.path=${test.apr.loc}"/>
@@ -1106,11 +1112,7 @@
 
         <!-- If test.entry is defined, run a single test, otherwise run all valid tests -->
         <test todir="${tomcat.build}/logs" name="${test.entry}" if="test.entry"/>
-        <batchtest todir="${tomcat.build}/logs"
-                   unless="test.entry"
-                   errorproperty="test.result.error"
-                   failureproperty="test.result.failure"
-                   haltonfailure="${test.haltonfailure}">
+        <batchtest todir="${tomcat.build}/logs" unless="test.entry">
           <fileset dir="test" >
             <!-- Include all by default -->
             <include name="${test.name}" />
@@ -1121,9 +1123,6 @@
           </fileset>
         </batchtest>
       </junit>
-
-      <fail if="test.result.error" message="Some tests completed with an Error. See ${tomcat.build}/logs for details." />
-      <fail if="test.result.failure" message="Some tests completed with a Failure. See ${tomcat.build}/logs for details." />
     </sequential>
   </macrodef>
 
