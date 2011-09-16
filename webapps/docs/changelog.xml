@@ -147,6 +147,12 @@
         In jdbc-pool: Discarded connection is not active in a pool any longer. 
         It removes from the active connection list. (kfujino)
       </fix>
+      <update>
+        Update the "test" target in the default build file to report a test
+        failure only after all available connector variants (bio, nio, apr)
+        have been tested. Do not stop after first connector that fails.
+        (kkolinko)
+      </update>
     </changelog>
   </subsection>  
 </section>
