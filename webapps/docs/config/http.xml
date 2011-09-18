@@ -990,7 +990,7 @@
       used.</p>
     </attribute>
 
-    <attribute name="sslImplemenationName" required="false">
+    <attribute name="sslImplementationName" required="false">
       <p>The class name of the SSL implementation to use. If not specified, the
       default of <code>org.apache.tomcat.util.net.jsse.JSSEImplementation</code>
       will be used which wraps JVM&apos;s default JSSE provider. Note that the
