@@ -19,6 +19,7 @@ package org.apache.catalina.ha.session;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.util.regex.Pattern;
 
 import org.apache.catalina.Container;
 import org.apache.catalina.Loader;
@@ -34,6 +35,64 @@ import org.apache.catalina.tribes.io.ReplicationStream;
 
 public abstract class ClusterManagerBase extends ManagerBase
         implements ClusterManager {
+
+    /**
+     * The pattern used for including session attributes to
+     *  replication, e.g. <code>^(userName|sessionHistory)$</code>.
+     *  If not set, all session attributes will be eligible for replication.
+     */
+    private String sessionAttributeFilter = null;
+
+    /**
+     * The compiled pattern used for including session attributes to
+     * replication, e.g. <code>^(userName|sessionHistory)$</code>.
+     * If not set, all session attributes will be eligible for replication.
+     */
+    private Pattern sessionAttributePattern = null;
+
+
+    /**
+     * Return the string pattern used for including session attributes
+     * to replication.
+     *
+     * @return the sessionAttributeFilter
+     */
+    public String getSessionAttributeFilter() {
+        return sessionAttributeFilter;
+    }
+
+    /**
+     * Set the pattern used for including session attributes to replication.
+     * If not set, all session attributes will be eligible for replication.
+     * <p>
+     * E.g. <code>^(userName|sessionHistory)$</code>
+     * </p>
+     *
+     * @param sessionAttributeFilter
+     *            the filter name pattern to set
+     */
+    public void setSessionAttributeFilter(String sessionAttributeFilter) {
+        if (sessionAttributeFilter == null
+            || sessionAttributeFilter.trim().equals("")) {
+            this.sessionAttributeFilter = null;
+            sessionAttributePattern = null;
+        } else {
+            this.sessionAttributeFilter = sessionAttributeFilter;
+            sessionAttributePattern = Pattern.compile(sessionAttributeFilter);
+        }
+    }
+
+    /**
+     * Check whether the given session attribute should be distributed
+     *
+     * @return true if the attribute should be distributed
+     */
+    public boolean willAttributeDistribute(String name) {
+        if (sessionAttributePattern == null) {
+            return true;
+        }
+        return sessionAttributePattern.matcher(name).matches();
+    }
 
     public static ClassLoader[] getClassLoaders(Container container) {
         Loader loader = null;
