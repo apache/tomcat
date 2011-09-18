@@ -54,7 +54,7 @@ public class TestCustomSsl extends TomcatBaseTest {
             return;
         }
 
-        connector.setProperty("sslImplemenationName", 
+        connector.setProperty("sslImplementationName", 
                 "org.apache.tomcat.util.net.jsse.TesterBug50640SslImpl");
         connector.setProperty(TesterBug50640SslImpl.PROPERTY_NAME,
                 TesterBug50640SslImpl.PROPERTY_VALUE);
