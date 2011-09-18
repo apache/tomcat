@@ -83,6 +83,15 @@
         sessions to expire on all nodes when a shutdown occurs on one node, set
         this value to <code>true</code>. Default value is <code>false</code>.
       </attribute>
+      <attribute name="sessionAttributeFilter" required="false">
+        A regular expression used to filter, which session attributes will
+        be replicated. An attribute will only be replicated, if its name
+        matches this pattern. If the pattern is not set (default), all
+        attributes are eligible for replication. As an example, the value
+        <code>^(userName|sessionHistory)$</code> will onlyreplicate the two
+        session attributes named <code>userName</code> and
+        <code>sessionHistory</code>.
+      </attribute>
     </attributes>
   </subsection> 
   <subsection name="org.apache.catalina.ha.session.DeltaManager Attributes">
