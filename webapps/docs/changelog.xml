@@ -123,6 +123,10 @@
         Further re-factoring of the HTTP connectors to align the BIO, NIO and
         APR implementations. (markt) 
       </scode>
+      <fix>
+        <bug>51811</bug>: Correct SSL configuration property name from
+        sslImplemenationName to sslImplementationName. (rjung)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">

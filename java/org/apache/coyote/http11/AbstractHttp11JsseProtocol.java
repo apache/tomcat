@@ -103,10 +103,10 @@ public abstract class AbstractHttp11JsseProtocol
         return endpoint.getAllowUnsafeLegacyRenegotiation();
     }
 
-    private String sslImplemenationName = null;
-    public String getSslImplemenationName() { return sslImplemenationName; }
-    public void setSslImplemenationName(String s) {
-        this.sslImplemenationName = s;
+    private String sslImplementationName = null;
+    public String getSslImplementationName() { return sslImplementationName; }
+    public void setSslImplementationName(String s) {
+        this.sslImplementationName = s;
     }
 
     // ------------------------------------------------------- Lifecycle methods
@@ -115,7 +115,7 @@ public abstract class AbstractHttp11JsseProtocol
     public void init() throws Exception {
         // SSL implementation needs to be in place before end point is
         // initialized
-        sslImplementation = SSLImplementation.getInstance(sslImplemenationName);
+        sslImplementation = SSLImplementation.getInstance(sslImplementationName);
         super.init();
     }
 }
