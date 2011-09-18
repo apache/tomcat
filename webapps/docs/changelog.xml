@@ -104,6 +104,10 @@
         Allow to overwrite the check for distributability
         of session attributes by session implementations. (rjung)
       </add>
+      <update>
+        Add Java 7 sunec.jar and zipfs.jar to the list of JARs
+        to skip when scanning for TLDs and web fragments. (rjung)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Coyote">
