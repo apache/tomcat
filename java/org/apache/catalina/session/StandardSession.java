@@ -1449,7 +1449,7 @@ public class StandardSession implements HttpSession, Session, Serializable {
             throw new IllegalStateException(sm.getString(
                     "standardSession.setAttribute.ise", getIdInternal()));
         if ((manager != null) && manager.getDistributable() &&
-          !(value instanceof Serializable))
+          !isAttributeDistributable(name, value))
             throw new IllegalArgumentException
                 (sm.getString("standardSession.setAttribute.iae", name));
         // Construct an event with the new value
@@ -1556,6 +1556,19 @@ public class StandardSession implements HttpSession, Session, Serializable {
      */
     protected boolean isValidInternal() {
         return (this.isValid || this.expiring);
+    }
+
+    /**
+     * Check whether the Object can be distributed. This implementation
+     * simply checks for serializability. Derived classes might use other
+     * distribution technology not based on serialization and can extend
+     * this check.
+     * @param name The name of the attribute to check
+     * @param value The value of the attribute to check
+     * @return true if the attribute is distributable, false otherwise
+     */
+    protected boolean isAttributeDistributable(String name, Object value) {
+        return value instanceof Serializable;
     }
 
 
@@ -1694,7 +1707,7 @@ public class StandardSession implements HttpSession, Session, Serializable {
 
 
     /**
-     * Exclude attribute that cannot be serialized.
+     * Exclude standard attributes that cannot be serialized.
      * @param name the attribute's name
      */
     protected boolean exclude(String name){

@@ -100,6 +100,10 @@
         <code>javax.servlet.request.ssl_session_id</code> to access the SSL
         session ID and deprecated the Tomcat specific request attribute. (markt)
       </fix>
+      <add>
+        Allow to overwrite the check for distributability
+        of session attributes by session implementations. (rjung)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
@@ -119,6 +123,15 @@
         Further re-factoring of the HTTP connectors to align the BIO, NIO and
         APR implementations. (markt) 
       </scode>
+    </changelog>
+  </subsection>
+  <subsection name="Cluster">
+    <changelog>
+      <add>
+        New cluster manager attribute <code>sessionAttributeFilter</code>
+        allows to filter which session attributes are replicated using a
+        regular expression applied to the attribute name. (rjung)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Web applications">
