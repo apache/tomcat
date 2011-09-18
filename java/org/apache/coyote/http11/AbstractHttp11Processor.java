@@ -831,8 +831,8 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
     /**
      * Defines how a connector handles an incomplete request line read.
      * 
-     * @returns <code>true</code> if the processor should break out of the
-     *          processing loop, otherwise <code>false</code>.
+     * @return <code>true</code> if the processor should break out of the
+     *         processing loop, otherwise <code>false</code>.
      */
     protected abstract boolean handleIncompleteRequestLineRead();
 
@@ -1569,10 +1569,10 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
 
 
     /**
-     * Checks to see of the keep-alive loop should be broken, performing any
-     * processing (e.g. send file handling) that may have an impact on whether
+     * Checks to see if the keep-alive loop should be broken, performing any
+     * processing (e.g. sendfile handling) that may have an impact on whether
      * or not the keep-alive loop should be broken.
-     * @return
+     * @return true if the keep-alive loop should be broken
      */
     protected abstract boolean breakKeepAliveLoop(
             SocketWrapper<S> socketWrapper);
