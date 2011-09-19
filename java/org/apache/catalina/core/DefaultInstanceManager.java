@@ -21,6 +21,7 @@ package org.apache.catalina.core;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.ref.WeakReference;
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -35,7 +36,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.WeakHashMap;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -70,8 +71,8 @@ public class DefaultInstanceManager implements InstanceManager {
     private Properties restrictedFilters = new Properties();
     private Properties restrictedListeners = new Properties();
     private Properties restrictedServlets = new Properties();
-    private Map<Class<?>,List<AnnotationCacheEntry>> annotationCache =
-        new ConcurrentHashMap<Class<?>, List<AnnotationCacheEntry>>();
+    private final Map<Class<?>,WeakReference<List<AnnotationCacheEntry>>> annotationCache =
+        new WeakHashMap<Class<?>, WeakReference<List<AnnotationCacheEntry>>>();
 
     public DefaultInstanceManager(Context context, Map<String, Map<String, String>> injectionMap, org.apache.catalina.Context catalinaContext, ClassLoader containerClassLoader) {
         classLoader = catalinaContext.getLoader().getClassLoader();
@@ -178,7 +179,10 @@ public class DefaultInstanceManager implements InstanceManager {
 
         // At the end the postconstruct annotated
         // method is invoked
-        List<AnnotationCacheEntry> annotations = annotationCache.get(clazz);
+        List<AnnotationCacheEntry> annotations;
+        synchronized (annotationCache) {
+            annotations = annotationCache.get(clazz).get();
+        }
         for (AnnotationCacheEntry entry : annotations) {
             if (entry.getType() == AnnotationCacheEntryType.POST_CONSTRUCT) {
                 Method postConstruct = (Method) entry.getAccessibleObject();
@@ -209,7 +213,14 @@ public class DefaultInstanceManager implements InstanceManager {
 
         // At the end the postconstruct annotated
         // method is invoked
-        List<AnnotationCacheEntry> annotations = annotationCache.get(clazz);
+        List<AnnotationCacheEntry> annotations = null;
+        synchronized (annotationCache) {
+            WeakReference<List<AnnotationCacheEntry>> ref =
+                annotationCache.get(clazz);
+            if (ref != null) {
+                annotations = ref.get();
+            }
+        }
         if (annotations == null) {
             // instance not created through the instance manager
             return;
@@ -243,7 +254,14 @@ public class DefaultInstanceManager implements InstanceManager {
             InvocationTargetException, NamingException {
 
         while (clazz != null) {
-            List<AnnotationCacheEntry> annotations = annotationCache.get(clazz);
+            List<AnnotationCacheEntry> annotations = null;
+            synchronized (annotationCache) {
+                WeakReference<List<AnnotationCacheEntry>> ref =
+                    annotationCache.get(clazz);
+                if (ref != null) {
+                    annotations = ref.get();
+                }
+            }
             if (annotations == null) {
                 annotations = new ArrayList<AnnotationCacheEntry>();
                 
@@ -396,7 +414,11 @@ public class DefaultInstanceManager implements InstanceManager {
                     // Use common empty list to save memory 
                     annotations = Collections.emptyList();
                 }
-                annotationCache.put(clazz, annotations);
+                synchronized (annotationCache) {
+                    annotationCache.put(clazz,
+                            new WeakReference<List<AnnotationCacheEntry>>(
+                                    annotations));
+                }
             } else {
                 // If the annotations for this class have been cached, the
                 // annotations for all the super classes will have been cachced
@@ -429,7 +451,10 @@ public class DefaultInstanceManager implements InstanceManager {
         Class<?> clazz = instance.getClass();
         
         while (clazz != null) {
-            List<AnnotationCacheEntry> annotations = annotationCache.get(clazz);
+            List<AnnotationCacheEntry> annotations;
+            synchronized (annotationCache) {
+                annotations = annotationCache.get(clazz).get();
+            }
             for (AnnotationCacheEntry entry : annotations) {
                 if (entry.getType() == AnnotationCacheEntryType.FIELD) {
                     if (entry.getAccessibleObject() instanceof Method) {
@@ -444,6 +469,16 @@ public class DefaultInstanceManager implements InstanceManager {
                 }
             }
             clazz = clazz.getSuperclass();
+        }
+    }
+
+
+    /**
+     * Makes cache size available to unit tests.
+     */
+    protected int getAnnotationCacheSize() {
+        synchronized (annotationCache) {
+            return annotationCache.size();
         }
     }
 
