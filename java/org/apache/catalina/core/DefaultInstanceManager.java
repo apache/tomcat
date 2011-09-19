@@ -179,13 +179,15 @@ public class DefaultInstanceManager implements InstanceManager {
         // At the end the postconstruct annotated
         // method is invoked
         List<AnnotationCacheEntry> annotations = annotationCache.get(clazz);
-        for (AnnotationCacheEntry entry : annotations) {
-            if (entry.getType() == AnnotationCacheEntryType.POST_CONSTRUCT) {
-                Method postConstruct = (Method) entry.getAccessibleObject();
-                boolean accessibility = postConstruct.isAccessible();
-                postConstruct.setAccessible(true);
-                postConstruct.invoke(instance);
-                postConstruct.setAccessible(accessibility);
+        if (annotations != null) {
+            for (AnnotationCacheEntry entry : annotations) {
+                if (entry.getType() == AnnotationCacheEntryType.POST_CONSTRUCT) {
+                    Method postConstruct = (Method) entry.getAccessibleObject();
+                    boolean accessibility = postConstruct.isAccessible();
+                    postConstruct.setAccessible(true);
+                    postConstruct.invoke(instance);
+                    postConstruct.setAccessible(accessibility);
+                }
             }
         }
     }
