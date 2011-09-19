@@ -250,6 +250,7 @@ public final class JspRuntimeContext {
                                                replaced.getJspUri(), context.getContextPath()));
             }
             unloadJspServletWrapper(replaced);
+            entry.clearReplaced();
         }
         return entry;
     }

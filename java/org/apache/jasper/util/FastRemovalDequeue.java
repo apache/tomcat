@@ -284,6 +284,10 @@ public class FastRemovalDequeue<T> {
             this.replaced = replaced;
         }
 
+        public final void clearReplaced() {
+            this.replaced = null;
+        }
+        
         private final Entry getNext() {
             return next;
         }

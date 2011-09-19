@@ -133,6 +133,17 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Jasper">
+    <changelog>
+      <fix>
+        When unloading JSPs due to configuration of the
+        <code>maxLoadedJsps</code> initialisation parameter, the unloading code
+        was retaining a reference to the to the unloaded JSP preventing the
+        associated class from being unloaded until the JSP that replaced it was
+        itself unloaded. (markt) 
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Cluster">
     <changelog>
       <add>
