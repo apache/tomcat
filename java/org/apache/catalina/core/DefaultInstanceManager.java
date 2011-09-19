@@ -187,9 +187,11 @@ public class DefaultInstanceManager implements InstanceManager {
             if (entry.getType() == AnnotationCacheEntryType.POST_CONSTRUCT) {
                 Method postConstruct = (Method) entry.getAccessibleObject();
                 boolean accessibility = postConstruct.isAccessible();
-                postConstruct.setAccessible(true);
-                postConstruct.invoke(instance);
-                postConstruct.setAccessible(accessibility);
+                synchronized (postConstruct) {
+                    postConstruct.setAccessible(true);
+                    postConstruct.invoke(instance);
+                    postConstruct.setAccessible(accessibility);
+                }
             }
         }
     }
@@ -229,9 +231,11 @@ public class DefaultInstanceManager implements InstanceManager {
             if (entry.getType() == AnnotationCacheEntryType.PRE_DESTROY) {
                 Method preDestroy = (Method) entry.getAccessibleObject();
                 boolean accessibility = preDestroy.isAccessible();
-                preDestroy.setAccessible(true);
-                preDestroy.invoke(instance);
-                preDestroy.setAccessible(accessibility);
+                synchronized (preDestroy) {
+                    preDestroy.setAccessible(true);
+                    preDestroy.invoke(instance);
+                    preDestroy.setAccessible(accessibility);
+                }
             }
         }
     }
@@ -572,9 +576,11 @@ public class DefaultInstanceManager implements InstanceManager {
         }
 
         accessibility = field.isAccessible();
-        field.setAccessible(true);
-        field.set(instance, lookedupResource);
-        field.setAccessible(accessibility);
+        synchronized (field) {
+            field.setAccessible(true);
+            field.set(instance, lookedupResource);
+            field.setAccessible(accessibility);
+        }
     }
 
     /**
@@ -614,9 +620,11 @@ public class DefaultInstanceManager implements InstanceManager {
         }
 
         accessibility = method.isAccessible();
-        method.setAccessible(true);
-        method.invoke(instance, lookedupResource);
-        method.setAccessible(accessibility);
+        synchronized (method) {
+            method.setAccessible(true);
+            method.invoke(instance, lookedupResource);
+            method.setAccessible(accessibility);
+        }
     }
 
     public static String getName(Method setter) {
