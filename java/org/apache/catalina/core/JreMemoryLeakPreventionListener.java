@@ -81,6 +81,19 @@ public class JreMemoryLeakPreventionListener implements LifecycleListener {
     }
 
     /**
+     * Protect against the memory leak caused when the
+     * <code>sun.java2d.Disposer</code> class is loaded by a web application.
+     * Defaults to <code>false</code> because a new Thread is launched.
+     */
+    private boolean java2dDisposerProtection = false;
+    public boolean isJava2DDisposerProtection() {
+        return java2dDisposerProtection;
+    }
+    public void setJava2DDisposerProtection(boolean java2dDisposerProtection) {
+        this.java2dDisposerProtection = java2dDisposerProtection;
+    }
+
+    /**
      * Protect against the memory leak caused when the first call to
      * <code>sun.misc.GC.requestLatency(long)</code> is triggered by a web
      * application. This first call will start a GC Daemon thread with the
@@ -235,6 +248,18 @@ public class JreMemoryLeakPreventionListener implements LifecycleListener {
                 // etc.) thread
                 if (awtThreadProtection) {
                   java.awt.Toolkit.getDefaultToolkit();
+                }
+
+                // Trigger the creation of the "Java2D Disposer" thread.
+                // See https://issues.apache.org/bugzilla/show_bug.cgi?id=51687
+                if(java2dDisposerProtection) {
+                    try {
+                        Class.forName("sun.java2d.Disposer");
+                    }
+                    catch (ClassNotFoundException cnfe) {
+                        // Ignore this case: we must be running on a
+                        // non-Sun-based JRE.
+                    }
                 }
 
                 /*
