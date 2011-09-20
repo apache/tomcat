@@ -24,7 +24,6 @@ import org.apache.catalina.DistributedManager;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.LifecycleState;
 import org.apache.catalina.Session;
-import org.apache.catalina.ha.CatalinaCluster;
 import org.apache.catalina.ha.ClusterManager;
 import org.apache.catalina.ha.ClusterMessage;
 import org.apache.catalina.tribes.Channel;
@@ -52,15 +51,6 @@ public class BackupManager extends ClusterManagerBase
      */
     protected String name;
 
-    /**
-     * A reference to the cluster
-     */
-    protected CatalinaCluster cluster;
-    
-    /**
-     * Should listeners be notified?
-     */
-    private boolean notifyListenersOnReplication;
     /**
      * 
      */
@@ -91,13 +81,6 @@ public class BackupManager extends ClusterManagerBase
     public void setExpireSessionsOnShutdown(boolean expireSessionsOnShutdown)
     {
         mExpireSessionsOnShutdown = expireSessionsOnShutdown;
-    }
-
-    @Override
-    public void setCluster(CatalinaCluster cluster) {
-        if(log.isDebugEnabled())
-            log.debug("Cluster associated with BackupManager");
-        this.cluster = cluster;
     }
 
     public boolean getExpireSessionsOnShutdown()
@@ -160,9 +143,8 @@ public class BackupManager extends ClusterManagerBase
 
         try {
             cluster.registerManager(this);
-            CatalinaCluster catclust = cluster;
             LazyReplicatedMap map = new LazyReplicatedMap(this,
-                                                          catclust.getChannel(),
+                                                          cluster.getChannel(),
                                                           rpcTimeout,
                                                           getMapName(),
                                                           getClassLoaders());
@@ -176,8 +158,7 @@ public class BackupManager extends ClusterManagerBase
     }
     
     public String getMapName() {
-        CatalinaCluster catclust = cluster;
-        String name = catclust.getManagerName(getName(),this)+"-"+"map";
+        String name = cluster.getManagerName(getName(),this)+"-"+"map";
         if ( log.isDebugEnabled() ) log.debug("Backup manager, Setting map name to:"+name);
         return name;
     }
@@ -219,24 +200,9 @@ public class BackupManager extends ClusterManagerBase
     public void setName(String name) {
         this.name = name;
     }
-    @Override
-    public boolean isNotifyListenersOnReplication() {
-        return notifyListenersOnReplication;
-    }
-    public void setNotifyListenersOnReplication(boolean notifyListenersOnReplication) {
-        this.notifyListenersOnReplication = notifyListenersOnReplication;
-    }
 
     public void setMapSendOptions(int mapSendOptions) {
         this.mapSendOptions = mapSendOptions;
-    }
-
-    /* 
-     * @see org.apache.catalina.ha.ClusterManager#getCluster()
-     */
-    @Override
-    public CatalinaCluster getCluster() {
-        return cluster;
     }
 
     public int getMapSendOptions() {
