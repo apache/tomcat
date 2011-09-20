@@ -262,7 +262,7 @@ public class TestCometProcessor extends TomcatBaseTest {
 
         private InputStream is;
         private StringBuilder response = new StringBuilder();
-        private Exception e = null;
+        private volatile Exception e = null;
 
         public ResponseReaderThread(InputStream is) {
             this.is = is;
@@ -284,7 +284,6 @@ public class TestCometProcessor extends TomcatBaseTest {
                     response.append((char) c);
                     c = is.read();
                 }
-                System.out.println("EOF");
             } catch (Exception e) {
                 this.e = e;
             }
