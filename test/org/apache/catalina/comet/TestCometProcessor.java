@@ -154,14 +154,27 @@ public class TestCometProcessor extends TomcatBaseTest {
         tomcat.getConnector().stop();
         tomcat.getConnector().destroy();
 
-        // Sleep for a couple of seconds to give enough time for the connector
-        // stop message to be processed
-        Thread.sleep(2000);
+        // Wait for the write thread to stop
+        int count = 0;
+        while (writeThread.isAlive() && count < 100) {
+            Thread.sleep(100);
+            count ++;
+        }
+
+        // Wait for the read thread to stop
+        count = 0;
+        while (readThread.isAlive() && count < 100) {
+            Thread.sleep(100);
+            count ++;
+        }
 
         // Write should trigger an exception once the connector stops since the
         // socket should be closed
-        assertNotNull(writeThread.getException());
-        assertNull(readThread.getException());
+        assertNotNull("No exception in writing thread",
+                writeThread.getException());
+        // Read should terminate gracefully with an EOF
+        assertNull("Read thread terminated with an exception",
+                readThread.getException());
     }
 
     private boolean isCometSupported() {
@@ -217,7 +230,7 @@ public class TestCometProcessor extends TomcatBaseTest {
         
         private int pingCount;
         private OutputStream os;
-        private Exception e = null;
+        private volatile Exception e = null;
 
         public PingWriterThread(int pingCount, OutputStream os) {
             this.pingCount = pingCount;
@@ -271,6 +284,7 @@ public class TestCometProcessor extends TomcatBaseTest {
                     response.append((char) c);
                     c = is.read();
                 }
+                System.out.println("EOF");
             } catch (Exception e) {
                 this.e = e;
             }
