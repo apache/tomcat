@@ -131,6 +131,11 @@
         <bug>51811</bug>: Correct SSL configuration property name from
         sslImplemenationName to sslImplementationName. (rjung)
       </fix>
+      <fix>
+        Fix a timing issue in NIO connector that meant that stopping a connector
+        did not trigger a Comet END event if the associated processor was
+        processing a READ event when the connector was stopped. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
