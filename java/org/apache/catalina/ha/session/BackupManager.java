@@ -225,10 +225,8 @@ public class BackupManager extends ClusterManagerBase
     @Override
     public ClusterManager cloneFromTemplate() {
         BackupManager result = new BackupManager();
+        clone(result);
         result.mExpireSessionsOnShutdown = mExpireSessionsOnShutdown;
-        result.name = "Clone-from-"+name;
-        result.cluster = cluster;
-        result.notifyListenersOnReplication = notifyListenersOnReplication;
         result.mapSendOptions = mapSendOptions;
         result.maxActiveSessions = maxActiveSessions;
         result.rpcTimeout = rpcTimeout;

@@ -45,7 +45,7 @@ public abstract class ClusterManagerBase extends ManagerBase
     /**
      * Should listeners be notified?
      */
-    protected boolean notifyListenersOnReplication = true;
+    private boolean notifyListenersOnReplication = true;
 
     /**
      * The pattern used for including session attributes to
@@ -179,4 +179,13 @@ public abstract class ClusterManagerBase extends ManagerBase
     public void unload() {
         // NOOP
     }
+
+    protected void clone(ClusterManagerBase copy) {
+        copy.name = "Clone-from-" + getName();
+        copy.cluster = getCluster();
+        copy.maxActiveSessions = getMaxActiveSessions();
+        copy.notifyListenersOnReplication = isNotifyListenersOnReplication();
+        copy.sessionAttributeFilter = getSessionAttributeFilter();
+    }
+
 }

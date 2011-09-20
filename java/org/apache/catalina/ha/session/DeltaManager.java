@@ -1319,7 +1319,7 @@ public class DeltaManager extends ClusterManagerBase{
             try {
                 session.lock();
                 DeltaRequest dreq = deserializeDeltaRequest(session, delta);
-                dreq.execute(session, notifyListenersOnReplication);
+                dreq.execute(session, isNotifyListenersOnReplication());
                 session.setPrimarySession(false);
             }finally {
                 session.unlock();
@@ -1479,12 +1479,9 @@ public class DeltaManager extends ClusterManagerBase{
     @Override
     public ClusterManager cloneFromTemplate() {
         DeltaManager result = new DeltaManager();
-        result.name = "Clone-from-"+name;
-        result.cluster = cluster;
+        clone(result);
         result.replicationValve = replicationValve;
-        result.maxActiveSessions = maxActiveSessions;
         result.expireSessionsOnShutdown = expireSessionsOnShutdown;
-        result.notifyListenersOnReplication = notifyListenersOnReplication;
         result.notifySessionListenersOnReplication = notifySessionListenersOnReplication;
         result.notifyContainerListenersOnReplication = notifyContainerListenersOnReplication;
         result.stateTransferTimeout = stateTransferTimeout;
