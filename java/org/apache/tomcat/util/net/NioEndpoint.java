@@ -1160,7 +1160,7 @@ public class NioEndpoint extends AbstractEndpoint {
             boolean result = true;
             try {
                 if ( close ) {
-                    cancelledKey(sk, SocketStatus.STOP, false);
+                    cancelledKey(sk, SocketStatus.STOP, attachment.comet);
                 } else if ( sk.isValid() && attachment != null ) {
                     attachment.access();//make sure we don't time out valid sockets
                     sk.attach(attachment);//cant remember why this is here
