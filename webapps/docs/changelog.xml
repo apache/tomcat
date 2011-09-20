@@ -63,6 +63,10 @@
         appropriate error page is configured. (markt) 
       </fix>
       <fix>
+        <bug>51580</bug>: Added a nicer error message when a WAR file contains
+        filenames not properly encoded in UTF-8. (schultz)
+      </fix>
+      <fix>
         <bug>51687</bug>: Added (optional) protection against
         sun.java2d.Disposer thread pinning a WebappClassLoader into memory
         in the JreMemoryLeakPreventionListener. (schultz)
