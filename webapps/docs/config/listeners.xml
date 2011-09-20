@@ -199,6 +199,13 @@
         startup on non-Sun JVMs. The default is <code>true</code>.</p>
       </attribute>
 
+      <attribute name="java2DDisposerProtection" required="false">
+        <p>Enables protection so that loading the
+        <code>sun.java2d.Disposer</code> class by a web application does not
+        result in a memory leak.
+        Defaults to <code>false</code> because a thread is launched.</p>
+      </attribute>
+
       <attribute name="ldapPoolProtection" required="false">
         <p>Enables protection so that the PoolCleaner thread started by
         <code>com.sun.jndi.ldap.LdapPoolManager</code> does not result in a 
