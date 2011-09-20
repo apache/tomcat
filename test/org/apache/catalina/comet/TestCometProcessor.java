@@ -30,7 +30,6 @@ import javax.servlet.http.HttpSession;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
@@ -152,6 +151,8 @@ public class TestCometProcessor extends TomcatBaseTest {
         Thread.sleep(3000);
         
         tomcat.getConnector().stop();
+        // Allow the executor a chance to send the end event
+        Thread.sleep(100);
         tomcat.getConnector().destroy();
 
         // Wait for the write thread to stop
@@ -171,9 +172,11 @@ public class TestCometProcessor extends TomcatBaseTest {
         // socket should be closed
         assertNotNull("No exception in writing thread",
                 writeThread.getException());
-        // Read should terminate gracefully with an EOF
-        assertNull("Read thread terminated with an exception",
-                readThread.getException());
+
+        // Termination of Read thread varies by platform and protocol
+        // In all cases, the END event should be sent.
+        assertTrue("Comet END event not received",
+                readThread.getResponse().contains("Client: END"));
     }
 
     private boolean isCometSupported() {
@@ -261,7 +264,6 @@ public class TestCometProcessor extends TomcatBaseTest {
 
         private InputStream is;
         private StringBuilder response = new StringBuilder();
-        private volatile Exception e = null;
 
         public ResponseReaderThread(InputStream is) {
             this.is = is;
@@ -269,10 +271,6 @@ public class TestCometProcessor extends TomcatBaseTest {
 
         public String getResponse() {
             return response.toString();
-        }
-
-        public Exception getException() {
-            return e;
         }
 
         @Override
@@ -284,7 +282,7 @@ public class TestCometProcessor extends TomcatBaseTest {
                     c = is.read();
                 }
             } catch (Exception e) {
-                this.e = e;
+                // Ignore
             }
         }
     }
