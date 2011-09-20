@@ -124,6 +124,7 @@ public class TestCometProcessor extends TomcatBaseTest {
 
         // Setup Tomcat instance
         Tomcat tomcat = getTomcatInstance();
+        tomcat.getConnector().setAttribute("connectionTimeout", "200000");
         Context root = tomcat.addContext("", TEMP_DIR);
         Tomcat.addServlet(root, "comet", new SimpleCometServlet());
         root.addServletMapping("/", "comet");
@@ -132,7 +133,8 @@ public class TestCometProcessor extends TomcatBaseTest {
         // Create connection to Comet servlet
         final Socket socket =
             SocketFactory.getDefault().createSocket("localhost", getPort());
-        socket.setSoTimeout(10000);
+        socket.setSoTimeout(100000);
+        System.out.println(socket.getLocalPort());
         
         final OutputStream os = socket.getOutputStream();
         String requestLine = "POST http://localhost:" + getPort() +
@@ -160,7 +162,12 @@ public class TestCometProcessor extends TomcatBaseTest {
             Thread.sleep(100);
             count ++;
         }
-
+        System.out.println("Writer sent " + writeThread.getPingCount() +
+                " pings");
+        if (writeThread.isAlive()) {
+            System.out.println("Writer not stopped");
+        }
+        
         // Wait for the read thread to stop
         count = 0;
         while (readThread.isAlive() && count < 100) {
@@ -228,12 +235,13 @@ public class TestCometProcessor extends TomcatBaseTest {
 
     private static class PingWriterThread extends Thread {
         
-        private int pingCount;
+        private int maxPingCount;
+        private volatile int pingCount;
         private OutputStream os;
         private volatile Exception e = null;
 
-        public PingWriterThread(int pingCount, OutputStream os) {
-            this.pingCount = pingCount;
+        public PingWriterThread(int maxPingCount, OutputStream os) {
+            this.maxPingCount = maxPingCount;
             this.os = os;
         }
 
@@ -241,10 +249,14 @@ public class TestCometProcessor extends TomcatBaseTest {
             return e;
         }
 
+        public int getPingCount() {
+            return pingCount;
+        }
+
         @Override
         public void run() {
             try {
-                for (int i = 0; i < pingCount; i++) {
+                for (pingCount = 0; pingCount < maxPingCount; pingCount++) {
                     os.write("4\r\n".getBytes());
                     os.write("PING\r\n".getBytes());
                     os.flush();
