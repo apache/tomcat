@@ -87,7 +87,6 @@ public class DeltaManager extends ClusterManagerBase{
      */
     protected static String managerName = "DeltaManager";
     protected String name = null;
-    private CatalinaCluster cluster = null;
 
     /**
      * cached replication valve cluster container!
@@ -95,7 +94,6 @@ public class DeltaManager extends ClusterManagerBase{
     private volatile ReplicationValve replicationValve = null ;
     
     private boolean expireSessionsOnShutdown = false;
-    private boolean notifyListenersOnReplication = true;
     private boolean notifySessionListenersOnReplication = true;
     private boolean notifyContainerListenersOnReplication  = true;
     private volatile boolean stateTransfered = false ;
@@ -412,15 +410,6 @@ public class DeltaManager extends ClusterManagerBase{
         this.expireSessionsOnShutdown = expireSessionsOnShutdown;
     }
     
-    @Override
-    public boolean isNotifyListenersOnReplication() {
-        return notifyListenersOnReplication;
-    }
-
-    public void setNotifyListenersOnReplication(boolean notifyListenersOnReplication) {
-        this.notifyListenersOnReplication = notifyListenersOnReplication;
-    }
-
     public boolean isNotifyContainerListenersOnReplication() {
         return notifyContainerListenersOnReplication;
     }
@@ -430,16 +419,6 @@ public class DeltaManager extends ClusterManagerBase{
         this.notifyContainerListenersOnReplication = notifyContainerListenersOnReplication;
     }
     
-    @Override
-    public CatalinaCluster getCluster() {
-        return cluster;
-    }
-
-    @Override
-    public void setCluster(CatalinaCluster cluster) {
-        this.cluster = cluster;
-    }
-
     // --------------------------------------------------------- Public Methods
 
     /**
