@@ -30,6 +30,7 @@ import java.nio.channels.FileChannel;
 import java.util.Enumeration;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
+import java.util.zip.ZipException;
 
 import org.apache.catalina.Globals;
 import org.apache.catalina.Host;
@@ -136,6 +137,9 @@ public class ExpandWar {
                     continue;
                 }
                 input = jarFile.getInputStream(jarEntry);
+
+                if(null == input)
+                    throw new ZipException(sm.getString("expandWar.missingJarEntry", jarEntry.getName()));
 
                 // Bugzilla 33636
                 expand(input, expandedFile);
