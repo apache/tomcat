@@ -156,14 +156,13 @@ public class TestCometProcessor extends TomcatBaseTest {
 
         // Wait for the write thread to stop
         int count = 0;
-        while (writeThread.isAlive() && count < 100) {
+        while (writeThread.isAlive() && count < 50) {
             Thread.sleep(100);
             count ++;
         }
 
         // Wait for the read thread to stop
-        count = 0;
-        while (readThread.isAlive() && count < 100) {
+        while (readThread.isAlive() && count < 50) {
             Thread.sleep(100);
             count ++;
         }
