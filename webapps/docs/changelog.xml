@@ -62,6 +62,11 @@
         Context) will be handled by the custom error pages for the Context if an
         appropriate error page is configured. (markt) 
       </fix>
+      <fix>
+        <bug>51687</bug>: Added (optional) protection against
+        sun.java2d.Disposer thread pinning a WebappClassLoader into memory
+        in the JreMemoryLeakPreventionListener. (schultz)
+      </fix>
       <add>
         <bug>51741</bug>: Fixes a problem with Eclipse WTP "Serve modules
         without publishing" feature where applications failed to access
