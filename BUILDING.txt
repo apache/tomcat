@@ -112,7 +112,7 @@ do the following:
 
 (3) Updating sources
 
-It is recommended that you regularly update the downloaded Tomcat 7 sources
+It is recommended that you regularly update the downloaded Tomcat @VERSION_MAJOR_MINOR@ sources
 using your SVN client.
 
 (4) Rebuilds
