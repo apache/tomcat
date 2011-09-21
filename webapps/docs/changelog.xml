@@ -160,6 +160,13 @@
         associated class from being unloaded until the JSP that replaced it was
         itself unloaded. (markt) 
       </fix>
+      <fix>
+        <bug>51852</bug>: Correct two problems in the handling of varargs
+        methods with the BeanELResolver. The first meant the wrong method was
+        sometimes called and the second that an ArrayIndexOutOfBoundsExceptions
+        could be thrown. Patch (including a test case) provided by Matt Benson.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">
