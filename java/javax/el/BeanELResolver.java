@@ -414,15 +414,16 @@ public class BeanELResolver extends ELResolver {
             }
             Method[] methods = clazz.getMethods();
             for (Method m : methods) {
-                if (methodName.equals(m.getName()) && 
-                        m.getParameterTypes().length == paramCount) {
-                    // Same number of parameters - use the first match
-                    matchingMethod = getMethod(clazz, m);
-                    break;
-                }
-                if (m.isVarArgs() && methodName.equals(m.getName()) && 
-                            paramCount > m.getParameterTypes().length - 2 ) {
-                    matchingMethod = getMethod(clazz, m);
+                if (methodName.equals(m.getName())) {
+                    if (m.getParameterTypes().length == paramCount) {
+                        // Same number of parameters - use the first match
+                        matchingMethod = getMethod(clazz, m);
+                        break;
+                    }
+                    if (m.isVarArgs()
+                            && paramCount > m.getParameterTypes().length - 2) {
+                        matchingMethod = getMethod(clazz, m);
+                    }
                 }
             }
             if (matchingMethod == null) {
