@@ -121,9 +121,6 @@
   </subsection>
   <subsection name="Coyote">
     <changelog>
-      <fix>
-        <bug>51794</bug>: Fix race condition in NioEndpoint(fhanik)
-      </fix>
       <scode>
         Remove unused and undocumented socketCloseDelay attribute from NIO
         connector. (markt)
@@ -137,6 +134,9 @@
         APR implementations. (markt) 
       </scode>
       <fix>
+        <bug>51794</bug>: Fix race condition in NioEndpoint. (fhanik)
+      </fix>
+      <fix>
         <bug>51811</bug>: Correct SSL configuration property name from
         sslImplemenationName to sslImplementationName. (rjung)
       </fix>
@@ -144,6 +144,10 @@
         Fix a timing issue in NIO connector that meant that stopping a connector
         did not trigger a Comet END event if the associated processor was
         processing a READ event when the connector was stopped. (markt)
+      </fix>
+      <fix>
+        Replace unneeded call that iterated events queue in NioEndpoint.Poller.
+        (kkolinko)
       </fix>
     </changelog>
   </subsection>
