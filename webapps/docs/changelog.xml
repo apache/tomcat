@@ -149,6 +149,10 @@
         Replace unneeded call that iterated events queue in NioEndpoint.Poller.
         (kkolinko)
       </fix>
+      <fix>
+        <bug>51860</bug>: Fix issues if using NIO with a custom
+        SSLImplementation. Based on a suggestion by Roman Tsirulnikov. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
