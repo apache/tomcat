@@ -185,7 +185,7 @@ public abstract class ClusterManagerBase extends ManagerBase
         copy.cluster = getCluster();
         copy.maxActiveSessions = getMaxActiveSessions();
         copy.notifyListenersOnReplication = isNotifyListenersOnReplication();
-        copy.sessionAttributeFilter = getSessionAttributeFilter();
+        copy.setSessionAttributeFilter(getSessionAttributeFilter());
     }
 
 }

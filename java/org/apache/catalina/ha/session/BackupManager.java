@@ -228,7 +228,6 @@ public class BackupManager extends ClusterManagerBase
         clone(result);
         result.mExpireSessionsOnShutdown = mExpireSessionsOnShutdown;
         result.mapSendOptions = mapSendOptions;
-        result.maxActiveSessions = maxActiveSessions;
         result.rpcTimeout = rpcTimeout;
         return result;
     }
