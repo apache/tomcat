@@ -970,13 +970,19 @@ public class NioEndpoint extends AbstractEndpoint {
             else r.reset(socket,null,interestOps);
             addEvent(r);
         }
-        
+
+        /**
+         * Processes events in the event queue of the Poller.
+         * 
+         * @return <code>true</code> if some events were processed,
+         *   <code>false</code> if queue was empty
+         */
         public boolean events() {
             boolean result = false;
 
             Runnable r = null;
-            result = (events.size() > 0);
             while ( (r = events.poll()) != null ) {
+                result = true;
                 try {
                     r.run();
                     if ( r instanceof PollerEvent ) {
