@@ -38,7 +38,6 @@ public enum ActionCode {
      */
     CLIENT_FLUSH,
 
-    CUSTOM,
     RESET,
 
     /**

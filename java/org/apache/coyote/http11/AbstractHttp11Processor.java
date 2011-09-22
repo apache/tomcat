@@ -774,10 +774,6 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
 
             getOutputBuffer().reset();
 
-        } else if (actionCode == ActionCode.CUSTOM) {
-            // Do nothing
-            // TODO Remove this action
-
         } else if (actionCode == ActionCode.REQ_SET_BODY_REPLAY) {
             ByteChunk body = (ByteChunk) param;
             
