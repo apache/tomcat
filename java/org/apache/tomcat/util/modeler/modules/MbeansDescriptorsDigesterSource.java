@@ -44,7 +44,7 @@ public class MbeansDescriptorsDigesterSource extends ModelerSource
     List<ObjectName> mbeans = new ArrayList<ObjectName>();
     protected static volatile Digester digester = null;
     
-    protected static Digester createDigester(Registry registry) {
+    protected static Digester createDigester() {
 
         Digester digester = new Digester();
         digester.setNamespaceAware(false);
@@ -223,7 +223,7 @@ public class MbeansDescriptorsDigesterSource extends ModelerSource
         InputStream stream = (InputStream) source;
 
         if (digester == null) {
-            digester = createDigester(registry);
+            digester = createDigester();
         }
         ArrayList<ManagedBean> loadedMbeans = new ArrayList<ManagedBean>();
         
