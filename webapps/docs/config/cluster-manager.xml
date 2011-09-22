@@ -88,7 +88,7 @@
         be replicated. An attribute will only be replicated, if its name
         matches this pattern. If the pattern is not set (default), all
         attributes are eligible for replication. As an example, the value
-        <code>^(userName|sessionHistory)$</code> will onlyreplicate the two
+        <code>^(userName|sessionHistory)$</code> will only replicate the two
         session attributes named <code>userName</code> and
         <code>sessionHistory</code>.
       </attribute>
