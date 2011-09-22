@@ -36,6 +36,7 @@ import javax.servlet.http.HttpServletResponse;
 
 public final class Hello extends HttpServlet {
 
+    private static final long serialVersionUID = 1L;
 
     /**
      * Respond to a GET request for the content produced by
@@ -47,6 +48,7 @@ public final class Hello extends HttpServlet {
      * @exception IOException if an input/output error occurs
      * @exception ServletException if a servlet error occurs
      */
+    @Override
     public void doGet(HttpServletRequest request,
                       HttpServletResponse response)
       throws IOException, ServletException {
