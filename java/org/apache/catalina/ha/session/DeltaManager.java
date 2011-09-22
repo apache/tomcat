@@ -87,7 +87,6 @@ public class DeltaManager extends ClusterManagerBase{
      */
     protected static String managerName = "DeltaManager";
     protected String name = null;
-    private CatalinaCluster cluster = null;
 
     /**
      * cached replication valve cluster container!
@@ -95,7 +94,6 @@ public class DeltaManager extends ClusterManagerBase{
     private volatile ReplicationValve replicationValve = null ;
     
     private boolean expireSessionsOnShutdown = false;
-    private boolean notifyListenersOnReplication = true;
     private boolean notifySessionListenersOnReplication = true;
     private boolean notifyContainerListenersOnReplication  = true;
     private volatile boolean stateTransfered = false ;
@@ -412,15 +410,6 @@ public class DeltaManager extends ClusterManagerBase{
         this.expireSessionsOnShutdown = expireSessionsOnShutdown;
     }
     
-    @Override
-    public boolean isNotifyListenersOnReplication() {
-        return notifyListenersOnReplication;
-    }
-
-    public void setNotifyListenersOnReplication(boolean notifyListenersOnReplication) {
-        this.notifyListenersOnReplication = notifyListenersOnReplication;
-    }
-
     public boolean isNotifyContainerListenersOnReplication() {
         return notifyContainerListenersOnReplication;
     }
@@ -430,16 +419,6 @@ public class DeltaManager extends ClusterManagerBase{
         this.notifyContainerListenersOnReplication = notifyContainerListenersOnReplication;
     }
     
-    @Override
-    public CatalinaCluster getCluster() {
-        return cluster;
-    }
-
-    @Override
-    public void setCluster(CatalinaCluster cluster) {
-        this.cluster = cluster;
-    }
-
     // --------------------------------------------------------- Public Methods
 
     /**
@@ -1340,7 +1319,7 @@ public class DeltaManager extends ClusterManagerBase{
             try {
                 session.lock();
                 DeltaRequest dreq = deserializeDeltaRequest(session, delta);
-                dreq.execute(session, notifyListenersOnReplication);
+                dreq.execute(session, isNotifyListenersOnReplication());
                 session.setPrimarySession(false);
             }finally {
                 session.unlock();
@@ -1500,12 +1479,9 @@ public class DeltaManager extends ClusterManagerBase{
     @Override
     public ClusterManager cloneFromTemplate() {
         DeltaManager result = new DeltaManager();
-        result.name = "Clone-from-"+name;
-        result.cluster = cluster;
+        clone(result);
         result.replicationValve = replicationValve;
-        result.maxActiveSessions = maxActiveSessions;
         result.expireSessionsOnShutdown = expireSessionsOnShutdown;
-        result.notifyListenersOnReplication = notifyListenersOnReplication;
         result.notifySessionListenersOnReplication = notifySessionListenersOnReplication;
         result.notifyContainerListenersOnReplication = notifyContainerListenersOnReplication;
         result.stateTransferTimeout = stateTransferTimeout;

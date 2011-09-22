@@ -23,6 +23,7 @@ import java.util.regex.Pattern;
 
 import org.apache.catalina.Container;
 import org.apache.catalina.Loader;
+import org.apache.catalina.ha.CatalinaCluster;
 import org.apache.catalina.ha.ClusterManager;
 import org.apache.catalina.session.ManagerBase;
 import org.apache.catalina.tribes.io.ReplicationStream;
@@ -35,6 +36,16 @@ import org.apache.catalina.tribes.io.ReplicationStream;
 
 public abstract class ClusterManagerBase extends ManagerBase
         implements ClusterManager {
+
+    /**
+     * A reference to the cluster
+     */
+    protected CatalinaCluster cluster = null;
+
+    /**
+     * Should listeners be notified?
+     */
+    private boolean notifyListenersOnReplication = true;
 
     /**
      * The pattern used for including session attributes to
@@ -50,6 +61,27 @@ public abstract class ClusterManagerBase extends ManagerBase
      */
     private Pattern sessionAttributePattern = null;
 
+    /* 
+     * @see org.apache.catalina.ha.ClusterManager#getCluster()
+     */
+    @Override
+    public CatalinaCluster getCluster() {
+        return cluster;
+    }
+
+    @Override
+    public void setCluster(CatalinaCluster cluster) {
+        this.cluster = cluster;
+    }
+
+    @Override
+    public boolean isNotifyListenersOnReplication() {
+        return notifyListenersOnReplication;
+    }
+
+    public void setNotifyListenersOnReplication(boolean notifyListenersOnReplication) {
+        this.notifyListenersOnReplication = notifyListenersOnReplication;
+    }
 
     /**
      * Return the string pattern used for including session attributes
@@ -147,4 +179,13 @@ public abstract class ClusterManagerBase extends ManagerBase
     public void unload() {
         // NOOP
     }
+
+    protected void clone(ClusterManagerBase copy) {
+        copy.name = "Clone-from-" + getName();
+        copy.cluster = getCluster();
+        copy.maxActiveSessions = getMaxActiveSessions();
+        copy.notifyListenersOnReplication = isNotifyListenersOnReplication();
+        copy.setSessionAttributeFilter(getSessionAttributeFilter());
+    }
+
 }
