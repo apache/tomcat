@@ -175,6 +175,10 @@
   </subsection>
   <subsection name="Cluster">
     <changelog>
+      <update>
+        Refactor cluster manager configuration: move handling of common
+        attributes to base class. (kfujino, rjung)
+      </update>
       <add>
         New cluster manager attribute <code>sessionAttributeFilter</code>
         allows to filter which session attributes are replicated using a
