@@ -176,7 +176,6 @@ public class InternalNioOutputBuffer extends AbstractOutputBuffer<NioChannel> {
             if ( selector != null ) pool.put(selector);
         }
         if ( block ) bytebuffer.clear(); //only clear
-        this.total = 0;
         return written;
     } 
 
@@ -212,7 +211,6 @@ public class InternalNioOutputBuffer extends AbstractOutputBuffer<NioChannel> {
 
     }
 
-    private int total = 0;
     private synchronized void addToBB(byte[] buf, int offset, int length) throws IOException {
         while (length > 0) {
             int thisTime = length;
@@ -227,7 +225,6 @@ public class InternalNioOutputBuffer extends AbstractOutputBuffer<NioChannel> {
             socket.getBufHandler().getWriteBuffer().put(buf, offset, thisTime);
             length = length - thisTime;
             offset = offset + thisTime;
-            total += thisTime;
         }
         NioEndpoint.KeyAttachment ka = (NioEndpoint.KeyAttachment)socket.getAttachment(false);
         if ( ka!= null ) ka.access();//prevent timeouts for just doing client writes
