@@ -181,6 +181,16 @@
         Defaults to <code>false</code> because an AWT thread is launched.</p>
       </attribute>
 
+      <attribute name="classesToInitialize" required="false">
+        <p>List of comma-separated fully qualified class names to load and initialize 
+        during the startup of this Listener. This allows to pre-load classes that are 
+        known to provoke classloader leaks if they are loaded during a request 
+        processing. Non-JRE classes may be referenced, like 
+        <code>oracle.jdbc.driver.OracleTimeoutThreadPerVM</code>.
+        The default value is empty, but specific JRE classes are loaded by other leak 
+        protection features managed by other attributes of this Listener.</p>
+      </attribute>
+
       <attribute name="driverManagerProtection" required="false">
         <p>The first use of <code>java.sql.DriverManager</code> will trigger the
         loading of JDBNC Driver in the the current class loader. The web
