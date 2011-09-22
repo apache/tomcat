@@ -43,6 +43,7 @@ import javax.management.ObjectName;
 import javax.management.ReflectionException;
 import javax.management.RuntimeErrorException;
 import javax.management.RuntimeOperationsException;
+import javax.management.modelmbean.InvalidTargetObjectTypeException;
 import javax.management.modelmbean.ModelMBeanNotificationBroadcaster;
 
 import org.apache.juli.logging.Log;
@@ -498,13 +499,16 @@ public class BaseModelMBean implements DynamicMBean, MBeanRegistration, ModelMBe
      *
      * @exception InstanceNotFoundException if the managed resource object
      *  cannot be found
+     * @exception InvalidTargetObjectTypeException if the managed resource
+     *  object is of the wrong type
      * @exception MBeanException if the initializer of the object throws
      *  an exception
      * @exception RuntimeOperationsException if the managed resource or the
      *  resource type is <code>null</code> or invalid
      */
-    public Object getManagedResource() throws InstanceNotFoundException,
-            MBeanException, RuntimeOperationsException {
+    public Object getManagedResource()
+        throws InstanceNotFoundException, InvalidTargetObjectTypeException,
+        MBeanException, RuntimeOperationsException {
 
         if (resource == null)
             throw new RuntimeOperationsException
