@@ -87,10 +87,10 @@ public final class SecurityClassLoad {
              "DefaultInstanceManager$3");
         loader.loadClass
             (basePackage +
-             "DefaultInstanceManager$4");
+             "DefaultInstanceManager$AnnotationCacheEntry");
         loader.loadClass
             (basePackage +
-             "DefaultInstanceManager$5");
+             "DefaultInstanceManager$AnnotationCacheEntryType");
         loader.loadClass
             (basePackage +
              "ApplicationHttpRequest$AttributeNamesEnumerator");
