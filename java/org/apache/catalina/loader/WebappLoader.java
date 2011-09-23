@@ -1036,7 +1036,6 @@ public class WebappLoader extends LifecycleMBeanBase
 
         // Assemble the class path information from our class loader chain
         ClassLoader loader = getClassLoader();
-        int layers = 0;
         int n = 0;
         while (loader != null) {
             if (!(loader instanceof URLClassLoader)) {
@@ -1073,7 +1072,6 @@ public class WebappLoader extends LifecycleMBeanBase
                 n++;
             }
             loader = loader.getParent();
-            layers++;
         }
 
         this.classpath=classpath.toString();
