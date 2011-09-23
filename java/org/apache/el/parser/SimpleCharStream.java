@@ -6,7 +6,7 @@ package org.apache.el.parser;
  * An implementation of interface CharStream, where the stream is assumed to
  * contain only ASCII characters (without unicode processing).
  */
-
+@SuppressWarnings("all") // Ignore warnings in generated code
 public class SimpleCharStream
 {
 /** Whether parser is static. */

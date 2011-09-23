@@ -2,6 +2,7 @@
 package org.apache.el.parser;
 
 /** Token Manager. */
+@SuppressWarnings("all") // Ignore warnings in generated code
 public class ELParserTokenManager implements ELParserConstants
 {
 
