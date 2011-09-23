@@ -35,6 +35,7 @@ import javax.security.cert.X509Certificate;
 
 import org.apache.tomcat.util.net.SSLSessionManager;
 import org.apache.tomcat.util.net.SSLSupport;
+import org.apache.tomcat.util.res.StringManager;
 
 /** JSSESupport
 
@@ -56,6 +57,9 @@ class JSSESupport implements SSLSupport, SSLSessionManager {
     private static final org.apache.juli.logging.Log log =
         org.apache.juli.logging.LogFactory.getLog(JSSESupport.class);
     
+    private static final StringManager sm =
+        StringManager.getManager("org.apache.tomcat.util.net.jsse.res");
+
     private static final Map<SSLSession,Integer> keySizeCache =
         new WeakHashMap<SSLSession, Integer>();
 
@@ -94,7 +98,7 @@ class JSSESupport implements SSLSupport, SSLSessionManager {
         try {
             certs = session.getPeerCertificates();
         } catch( Throwable t ) {
-            log.debug("Error getting client certs",t);
+            log.debug(sm.getString("jsseSupport.clientCertError"), t);
             return null;
         }
         if( certs==null ) return null;
@@ -115,7 +119,8 @@ class JSSESupport implements SSLSupport, SSLSessionManager {
                     x509Certs[i] = (java.security.cert.X509Certificate)
                             cf.generateCertificate(stream);
                 } catch(Exception ex) { 
-                    log.info("Error translating cert " + certs[i], ex);
+                    log.info(sm.getString(
+                            "jseeSupport.certTranslationError", certs[i]), ex);
                     return null;
                 }
             }
@@ -153,7 +158,7 @@ class JSSESupport implements SSLSupport, SSLSessionManager {
 
     protected void handShake() throws IOException {
         if( ssl.getWantClientAuth() ) {
-            log.debug("No client cert sent for want");
+            log.debug(sm.getString("jsseSupport.noCertWant"));
         } else {
             ssl.setNeedClientAuth(true);
         }
@@ -161,7 +166,7 @@ class JSSESupport implements SSLSupport, SSLSessionManager {
         if (ssl.getEnabledCipherSuites().length == 0) {
             // Handshake is never going to be successful.
             // Assume this is because handshakes are disabled
-            log.warn("SSL server initiated renegotiation is disabled, closing connection");
+            log.warn(sm.getString("jsseSupport.serverRenegDisabled"));
             session.invalidate();
             ssl.close();
             return;
@@ -180,7 +185,7 @@ class JSSESupport implements SSLSupport, SSLSessionManager {
             try {
                 in.read(b);
             } catch(SSLException sslex) {
-                log.info("SSL Error getting client Certs",sslex);
+                log.info(sm.getString("jsseSupport.clientCertError"), sslex);
                 throw sslex;
             } catch (IOException e) {
                 // ignore - presumably the timeout
