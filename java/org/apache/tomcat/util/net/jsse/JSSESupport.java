@@ -221,7 +221,7 @@ class JSSESupport implements SSLSupport, SSLSessionManager {
                     break;
                 }
             }
-            keySize = new Integer(size);
+            keySize = Integer.valueOf(size);
             synchronized(keySizeCache) {
                 keySizeCache.put(session, keySize);
             }
