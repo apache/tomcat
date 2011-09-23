@@ -1379,13 +1379,6 @@ public class DefaultServlet
 
         String name = cacheEntry.name;
 
-        // Number of characters to trim from the beginnings of filenames
-        int trim = name.length();
-        if (!name.endsWith("/"))
-            trim += 1;
-        if (name.equals("/"))
-            trim = 1;
-
         // Prepare a writer to a buffered area
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
         OutputStreamWriter osWriter = new OutputStreamWriter(stream, "UTF8");
