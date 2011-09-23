@@ -15,7 +15,7 @@
   limitations under the License.
 ================================================================================
 
-The following settings are for Indigo Release
+The following settings are for Indigo Release (Eclipse 3.7)
 W = Warning
 I = Ignore
 E = Error
@@ -54,4 +54,9 @@ Generic types
 Annotations
  - All                                  - W
    (all additional check boxes)
-   
+
+Note: The list of codes supported in @SuppressWarnings annotation in
+Eclipse IDE is documented here:
+
+ 3.6: http://help.eclipse.org/helios/topic/org.eclipse.jdt.doc.isv/guide/jdt_api_compile.htm
+ 3.7: http://help.eclipse.org/indigo/topic/org.eclipse.jdt.doc.user/tasks/task-suppress_warnings.htm
