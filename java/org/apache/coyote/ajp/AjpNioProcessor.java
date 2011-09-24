@@ -118,6 +118,10 @@ public class AjpNioProcessor extends AbstractAjpProcessor<NioChannel> {
                 // not regular request processing
                 int type = requestHeaderMessage.getByte();
                 if (type == Constants.JK_AJP13_CPING_REQUEST) {
+                    if (endpoint.isPaused()) {
+                        recycle(true);
+                        break;
+                    }
                     try {
                         output(pongMessageArray, 0, pongMessageArray.length);
                     } catch (IOException e) {

@@ -136,6 +136,10 @@ public class AjpProcessor extends AbstractAjpProcessor<Socket> {
                 // not regular request processing
                 int type = requestHeaderMessage.getByte();
                 if (type == Constants.JK_AJP13_CPING_REQUEST) {
+                    if (endpoint.isPaused()) {
+                        recycle(true);
+                        break;
+                    }
                     try {
                         output.write(pongMessageArray);
                     } catch (IOException e) {
