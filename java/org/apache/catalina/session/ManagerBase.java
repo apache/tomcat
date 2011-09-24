@@ -86,6 +86,12 @@ public abstract class ManagerBase extends LifecycleMBeanBase
 
 
     /**
+     * The descriptive name of this Manager implementation (for logging).
+     */
+    private static final String name = "ManagerBase";
+
+
+    /**
      * The default maximum inactive interval for Sessions created by
      * this Manager.
      */
@@ -96,12 +102,6 @@ public abstract class ManagerBase extends LifecycleMBeanBase
      * The session id length of Sessions created by this Manager.
      */
     protected int sessionIdLength = 16;
-
-
-    /**
-     * The descriptive name of this Manager implementation (for logging).
-     */
-    protected static String name = "ManagerBase";
 
 
     /**
