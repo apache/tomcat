@@ -184,7 +184,11 @@ public abstract class TomcatBaseTest {
             }
             tomcat.destroy();
         }
-        ExpandWar.delete(tempDir);
+        // Cannot delete the whole tempDir, because logs are there,
+        // and they might be open for writing. 
+        // Delete known subdirectories of it.
+        ExpandWar.delete(new File(tempDir, "webapps"));
+        ExpandWar.delete(new File(tempDir, "work"));
     }
     
     /**
