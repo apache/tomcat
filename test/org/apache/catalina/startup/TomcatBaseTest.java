@@ -24,6 +24,7 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -61,6 +62,8 @@ public abstract class TomcatBaseTest {
 
     public static final String TEMP_DIR = System.getProperty("java.io.tmpdir");
 
+    private List<File> deleteOnTearDown = new ArrayList<File>();
+
     /**
      * Make Tomcat instance accessible to sub-classes.
      */
@@ -85,8 +88,15 @@ public abstract class TomcatBaseTest {
 
     /**
      * Helper method that returns the path of the temporary directory used by
-     * the test runs. The directory is configured during {@link #setUp()} and is
-     * deleted at {@link #tearDown()}.
+     * the test runs. The directory is configured during {@link #setUp()}.
+     * 
+     * <p>
+     * It is used as <code>${catalina.base}</code> for the instance of Tomcat
+     * that is being started, but can be used to store other temporary files as
+     * well. Its <code>work</code> and <code>webapps</code> subdirectories are
+     * deleted at {@link #tearDown()}. If you have other files or directories
+     * that have to be deleted on cleanup, register them with
+     * {@link #addDeleteOnTearDown(File)}.
      */
     public File getTemporaryDirectory() {
         return tempDir;
@@ -107,6 +117,17 @@ public abstract class TomcatBaseTest {
      */
     public boolean isAccessLogEnabled() {
         return accessLogEnabled;
+    }
+
+    /**
+     * Schedule the given file or directory to be deleted during after-test
+     * cleanup.
+     * 
+     * @param file
+     *            File or directory
+     */
+    public void addDeleteOnTearDown(File file) {
+        deleteOnTearDown.add(file);
     }
 
     @Before
@@ -190,10 +211,14 @@ public abstract class TomcatBaseTest {
             tomcat.destroy();
         }
         // Cannot delete the whole tempDir, because logs are there,
-        // and they might be open for writing. 
+        // and they might be open for writing.
         // Delete known subdirectories of it.
-        ExpandWar.delete(new File(tempDir, "webapps"));
-        ExpandWar.delete(new File(tempDir, "work"));
+        deleteOnTearDown.add(new File(tempDir, "webapps"));
+        deleteOnTearDown.add(new File(tempDir, "work"));
+        for (File file : deleteOnTearDown) {
+            ExpandWar.delete(file);
+        }
+        deleteOnTearDown.clear();
     }
     
     /**
