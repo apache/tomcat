@@ -371,7 +371,7 @@ public abstract class TomcatBaseTest {
 
         @Override
         public void start() throws LifecycleException {
-            // Use fats, insecure session ID generation for all tests
+            // Use fast, insecure session ID generation for all tests
             Server server = getServer();
             for (Service service : server.findServices()) {
                 Container e = service.getContainer();
