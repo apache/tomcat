@@ -227,6 +227,11 @@
         have been tested. Do not stop after first connector that fails.
         (kkolinko)
       </update>
+      <update>
+        <bug>51887</bug>: When running the unit tests, use a fast but insecure
+        random number source for session ID generation to reduce the delays
+        caused by waiting for entropy. (kkolinko/markt)
+      </update>
     </changelog>
   </subsection>  
 </section>

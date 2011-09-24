@@ -37,10 +37,15 @@ import static org.junit.Assert.fail;
 import org.junit.After;
 import org.junit.Before;
 
+import org.apache.catalina.Container;
+import org.apache.catalina.LifecycleException;
 import org.apache.catalina.LifecycleState;
+import org.apache.catalina.Server;
+import org.apache.catalina.Service;
 import org.apache.catalina.connector.Connector;
 import org.apache.catalina.core.AprLifecycleListener;
 import org.apache.catalina.core.StandardServer;
+import org.apache.catalina.session.StandardManager;
 import org.apache.catalina.valves.AccessLogValve;
 import org.apache.tomcat.util.buf.ByteChunk;
 
@@ -126,7 +131,7 @@ public abstract class TomcatBaseTest {
             fail("Unable to create appBase for test");
         }
         
-        tomcat = new Tomcat();
+        tomcat = new TomcatWithFastSessionIDs();
 
         String protocol = getProtocol();
         Connector connector = new Connector(protocol);
@@ -362,4 +367,27 @@ public abstract class TomcatBaseTest {
         return rc;
     }
 
+    private static class TomcatWithFastSessionIDs extends Tomcat {
+
+        @Override
+        public void start() throws LifecycleException {
+            // Use fats, insecure session ID generation for all tests
+            Server server = getServer();
+            for (Service service : server.findServices()) {
+                Container e = service.getContainer();
+                for (Container h : e.findChildren()) {
+                    for (Container c : h.findChildren()) {
+                        StandardManager m = (StandardManager) c.getManager();
+                        if (m == null) {
+                            m = new StandardManager();
+                            m.setSecureRandomClass(
+                                    "org.apache.catalina.startup.FastNonSecureRandom");
+                            c.setManager(m);
+                        }
+                    }
+                }
+            }
+            super.start();
+        }
+    }
 }
