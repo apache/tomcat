@@ -566,6 +566,7 @@ public class DeltaSession extends StandardSession implements Externalizable,Clus
      * @param value The value of the attribute to check
      * @return true if the attribute is distributable, false otherwise
      */
+    @Override
     protected boolean isAttributeDistributable(String name, Object value) {
         if (manager instanceof ClusterManagerBase &&
             !((ClusterManagerBase)manager).willAttributeDistribute(name))
@@ -578,6 +579,7 @@ public class DeltaSession extends StandardSession implements Externalizable,Clus
      * @param name the attribute's name
      * @return true is attribute should not be replicated
      */
+    @Override
     protected boolean exclude(String name) {
 
         if (super.exclude(name))
