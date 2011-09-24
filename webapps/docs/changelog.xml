@@ -122,6 +122,10 @@
         <code>JreMemoryLeakPreventionListener</code> to allow pre-loading of configurable
         classes to avoid some classloader leaks. (slaurent)
       </add>
+      <fix>
+        Reduce visibility of static field <code>ManagerBase.name</code> and
+        make it final. (kkolinko)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
