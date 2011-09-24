@@ -181,10 +181,10 @@ public abstract class ClusterManagerBase extends ManagerBase
     }
 
     protected void clone(ClusterManagerBase copy) {
-        copy.name = "Clone-from-" + getName();
-        copy.cluster = getCluster();
+        copy.setName("Clone-from-" + getName());
+        copy.setCluster(getCluster());
         copy.maxActiveSessions = getMaxActiveSessions();
-        copy.notifyListenersOnReplication = isNotifyListenersOnReplication();
+        copy.setNotifyListenersOnReplication(isNotifyListenersOnReplication());
         copy.setSessionAttributeFilter(getSessionAttributeFilter());
     }
 
