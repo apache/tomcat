@@ -577,7 +577,7 @@ public class DeltaSession extends StandardSession implements Externalizable,Clus
     /**
      * Exclude attributes from replication.
      * @param name the attribute's name
-     * @return true is attribute should not be replicated
+     * @return true if attribute should not be replicated
      */
     @Override
     protected boolean exclude(String name) {
