@@ -120,7 +120,6 @@ public class AjpAprProcessor extends AbstractAjpProcessor<Long> {
         boolean keptAlive = false;
 
         while (!error && !endpoint.isPaused()) {
-
             // Parsing the request header
             try {
                 // Get first message of the request
@@ -152,7 +151,6 @@ public class AjpAprProcessor extends AbstractAjpProcessor<Long> {
                     error = true;
                     break;
                 }
-
                 keptAlive = true;
                 request.setStartTime(System.currentTimeMillis());
             } catch (IOException e) {
@@ -180,6 +178,13 @@ public class AjpAprProcessor extends AbstractAjpProcessor<Long> {
                     adapter.log(request, response, 0);
                     error = true;
                 }
+            }
+
+            if (endpoint.isPaused()) {
+                // 503 - Service unavailable
+                response.setStatus(503);
+                adapter.log(request, response, 0);
+                error = true;
             }
 
             // Process the request in the adapter
@@ -225,13 +230,15 @@ public class AjpAprProcessor extends AbstractAjpProcessor<Long> {
         }
 
         rp.setStage(org.apache.coyote.Constants.STAGE_ENDED);
-        
-        if (error || endpoint.isPaused()) {
-            return SocketState.CLOSED;
-        } else if (isAsync()) {
-            return SocketState.LONG;
+
+        if (!error && !endpoint.isPaused()) {
+            if (isAsync()) {
+                return SocketState.LONG;
+            } else {
+                return SocketState.OPEN;
+            }
         } else {
-            return SocketState.OPEN;
+            return SocketState.CLOSED;
         }
     }
 
@@ -254,7 +261,7 @@ public class AjpAprProcessor extends AbstractAjpProcessor<Long> {
                         SocketStatus.OPEN);
             }
         } else if (actionCode == ActionCode.ASYNC_SETTIMEOUT) {
-            if (param==null) return;
+            if (param == null) return;
             long timeout = ((Long)param).longValue();
             socket.setTimeout(timeout);
         } else if (actionCode == ActionCode.ASYNC_DISPATCH) {
@@ -263,8 +270,6 @@ public class AjpAprProcessor extends AbstractAjpProcessor<Long> {
                         SocketStatus.OPEN);
             }
         }
-
-
     }
 
 
