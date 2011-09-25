@@ -24,7 +24,7 @@
   <dependencies>
     <dependency>
       <groupId>org.apache.tomcat</groupId>
-      <artifactId>tomcat-jdbc</artifactId>
+      <artifactId>tomcat-juli</artifactId>
       <version>@MAVEN.DEPLOY.VERSION@</version>
       <scope>compile</scope>
     </dependency>

@@ -225,6 +225,10 @@
         In jdbc-pool: Discarded connection is not active in a pool any longer. 
         It removes from the active connection list. (kfujino)
       </fix>
+      <fix>
+        <bug>51781</bug>: In jdbc-pool: Fix dependency in Maven POM file of
+        tomcat-jbdc. (kkolinko)
+      </fix>
       <update>
         Update the "test" target in the default build file to report a test
         failure only after all available connector variants (bio, nio, apr)
