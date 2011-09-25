@@ -15,10 +15,10 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 -->
-<project name="Apache Tomcat 7 Architecture"
+<project name="Apache Tomcat 8 Architecture"
         href="http://tomcat.apache.org/">
 
-    <title>Apache Tomcat 7 Architecture</title>
+    <title>Apache Tomcat 8 Architecture</title>
 
     <logo href="/images/tomcat.gif">
       The Apache Tomcat Servlet/JSP Container

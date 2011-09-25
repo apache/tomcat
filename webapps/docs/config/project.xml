@@ -15,10 +15,10 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 -->
-<project name="Apache Tomcat 7 Configuration Reference"
+<project name="Apache Tomcat 8 Configuration Reference"
         href="http://tomcat.apache.org/">
 
-  <title>Apache Tomcat 7 Configuration Reference</title>
+  <title>Apache Tomcat 8 Configuration Reference</title>
 
   <logo href="/images/tomcat.gif">
     The Apache Tomcat Servlet/JSP Container
