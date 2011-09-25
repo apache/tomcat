@@ -98,6 +98,7 @@ public class AjpNioProcessor extends AbstractAjpProcessor<NioChannel> {
         this.socket = socket.getSocket();
         
         long soTimeout = endpoint.getSoTimeout();
+        boolean cping = false;
 
         // Error flag
         error = false;
@@ -122,6 +123,7 @@ public class AjpNioProcessor extends AbstractAjpProcessor<NioChannel> {
                         recycle(true);
                         break;
                     }
+                    cping = true;
                     try {
                         output(pongMessageArray, 0, pongMessageArray.length);
                     } catch (IOException e) {
@@ -167,12 +169,13 @@ public class AjpNioProcessor extends AbstractAjpProcessor<NioChannel> {
                 }
             }
 
-            if (endpoint.isPaused()) {
+            if (!cping && endpoint.isPaused()) {
                 // 503 - Service unavailable
                 response.setStatus(503);
                 adapter.log(request, response, 0);
                 error = true;
             }
+            cping = false;
 
             // Process the request in the adapter
             if (!error) {
