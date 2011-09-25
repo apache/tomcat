@@ -36,7 +36,7 @@
   <xsl:param    name="printer-logo"     select="'/images/printer.gif'"/>
   <xsl:param    name="apache-logo"      select="'/images/asf-logo.gif'"/>
   <xsl:param    name="relative-path"    select="'.'"/>
-  <xsl:param    name="version"          select="'7.0.x'"/>
+  <xsl:param    name="version"          select="'8.0.x'"/>
   <xsl:param    name="build-date"       select="'MMM d yyyy'"/>
   <xsl:param    name="year"             select="'yyyy'"/>
   <xsl:param    name="void-image"       select="'/images/void.gif'"/>
