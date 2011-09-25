@@ -113,6 +113,7 @@ public class AjpAprProcessor extends AbstractAjpProcessor<Long> {
         long socketRef = socket.getSocket().longValue();
         Socket.setrbb(socketRef, inputBuffer);
         Socket.setsbb(socketRef, outputBuffer);
+        boolean cping = false;
 
         // Error flag
         error = false;
@@ -137,6 +138,7 @@ public class AjpAprProcessor extends AbstractAjpProcessor<Long> {
                         recycle(true);
                         break;
                     }
+                    cping = true;
                     if (Socket.send(socketRef, pongMessageArray, 0,
                             pongMessageArray.length) < 0) {
                         error = true;
@@ -180,12 +182,13 @@ public class AjpAprProcessor extends AbstractAjpProcessor<Long> {
                 }
             }
 
-            if (endpoint.isPaused()) {
+            if (!cping && endpoint.isPaused()) {
                 // 503 - Service unavailable
                 response.setStatus(503);
                 adapter.log(request, response, 0);
                 error = true;
             }
+            cping = false;
 
             // Process the request in the adapter
             if (!error) {
