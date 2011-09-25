@@ -2171,7 +2171,8 @@
       </fix>
       <fix>
         Improve HTTP specification compliance in support of
-        <code>Accept-Language</code> header. (kkolinko)
+        <code>Accept-Language</code> header. This protects from known exploit
+        of the Oracle JVM bug that triggers a DoS, CVE-2010-4476. (kkolinko)
       </fix>
     </changelog>
   </subsection>
