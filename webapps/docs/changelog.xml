@@ -167,6 +167,9 @@
         7. (markt)
       </fix>
       <update>
+        Don't send AJP CPONG if endpoint is already paused. (rjung)
+      </update>
+      <update>
         Align APR AJP connector with NIO one. Send 503 if endpoint is paused.
         (rjung)
       </update>
