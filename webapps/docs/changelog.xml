@@ -173,6 +173,10 @@
         Align APR AJP connector with NIO one. Send 503 if endpoint is paused.
         (rjung)
       </update>
+      <update>
+        Accept AJP request even if endpoint is paused, if CPING was successful.
+        (rjung)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Jasper">
