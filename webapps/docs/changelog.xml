@@ -166,6 +166,10 @@
         Allow the BIO HTTP connector to be used with SSL when running under Java
         7. (markt)
       </fix>
+      <update>
+        Align APR AJP connector with NIO one. Send 503 if endpoint is paused.
+        (rjung)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Jasper">
