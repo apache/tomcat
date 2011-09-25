@@ -190,7 +190,7 @@ public class AjpNioProcessor extends AbstractAjpProcessor<NioChannel> {
                     error = true;
                 }
             }
-            
+
             if (isAsync() && !error) {
                 break;
             }
@@ -220,7 +220,7 @@ public class AjpNioProcessor extends AbstractAjpProcessor<NioChannel> {
 
             recycle(false);
         }
-        
+
         rp.setStage(org.apache.coyote.Constants.STAGE_ENDED);
 
         if (!error && !endpoint.isPaused()) {
@@ -232,10 +232,9 @@ public class AjpNioProcessor extends AbstractAjpProcessor<NioChannel> {
         } else {
             return SocketState.CLOSED;
         }
-        
     }
 
-    
+
     // ----------------------------------------------------- ActionHook Methods
 
 
