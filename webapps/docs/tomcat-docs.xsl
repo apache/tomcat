@@ -109,10 +109,8 @@
         </xsl:if>
         </td>
         <td>
-          <font face="arial,helvetica,sanserif">
-            <h1><xsl:value-of select="$project/title"/></h1>
-            Version <xsl:value-of select="$version"/>, <xsl:value-of select="$build-date"/>
-          </font>
+          <h1><font face="arial,helvetica,sanserif"><xsl:value-of select="$project/title"/></font></h1>
+          <font face="arial,helvetica,sanserif">Version <xsl:value-of select="$version"/>, <xsl:value-of select="$build-date"/></font>
         </td>
         <td>
           <xsl:comment>APACHE LOGO</xsl:comment>
