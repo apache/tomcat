@@ -325,7 +325,7 @@ public class AsyncStateMachine {
     }
     
     
-    public void recycle() {
+    public synchronized void recycle() {
         asyncCtxt = null;
         state = AsyncState.DISPATCHED;
     }
