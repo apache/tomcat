@@ -81,6 +81,9 @@
             .noPrint {display: none;}
             td#mainBody {width: 100%;}
         </style>
+        <style type="text/css">
+            code {color:rgb(0,64,64);}
+        </style>
     </head>
 
     <body bgcolor="{$body-bg}" text="{$body-fg}" link="{$body-link}"
