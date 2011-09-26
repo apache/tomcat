@@ -509,6 +509,16 @@
     package. Please consult the Java documentation for details of the
     expressions supported.</p>
 
+    <p><strong>Note:</strong> There is a caveat when using this valve with
+    IPv6 addresses. Format of the IP address that this valve is processing
+    depends on the API that was used to obtain it. If the address was obtained
+    from Java socket using Inet6Address class, its format will be
+    <code>x:x:x:x:x:x:x:x</code>. That is, the IP address for localhost
+    will be <code>0:0:0:0:0:0:0:1</code> instead of the more widely used
+    <code>::1</code>. Consult your access logs for the actual value.</p>
+
+    <p>See also: <a href="#Remote_Host_Filter">Remote Host Filter</a>,
+    <a href="#Remote_IP_Valve">Remote IP Valve</a>.</p>
   </subsection>
 
   <subsection name="Attributes">
@@ -544,6 +554,14 @@
 
   </subsection>
 
+  <subsection name="Example">
+    <p>To allow access only for the clients connecting from localhost:</p>
+<pre>
+    &lt;Valve className="org.apache.catalina.valves.RemoteAddrValve"
+       allow="127\.\d+\.\d+\.\d+|::1|0:0:0:0:0:0:0:1"/&gt;
+</pre>
+  </subsection>
+
 </section>
 
 
@@ -565,6 +583,7 @@
     package. Please consult the Java documentation for details of the
     expressions supported.</p>
 
+    <p>See also: <a href="#Remote_Address_Filter">Remote Address Filter</a>.</p>
   </subsection>
 
   <subsection name="Attributes">
