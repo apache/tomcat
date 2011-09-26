@@ -39,3 +39,7 @@ but possibly 7.1.x).
 
 7. Rip out all the JNDI code in resource handling and replace it with straight
    URLs (File or WAR).
+
+8. Review the connector shutdown code for timing and threading issues
+   particularly any that may result in a client socket being left open after a
+   connector.stop(). 
