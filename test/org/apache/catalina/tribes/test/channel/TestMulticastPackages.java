@@ -49,9 +49,6 @@ public class TestMulticastPackages {
     private GroupChannel channel2;
     private Listener listener1;
 
-    @SuppressWarnings("unused")
-    private int threadCounter = 0;
-
     @Before
     public void setUp() throws Exception {
         channel1 = new GroupChannel();
@@ -128,8 +125,6 @@ public class TestMulticastPackages {
                     }catch ( Exception x ) {
                         x.printStackTrace();
                         return;
-                    } finally {
-                        threadCounter++;
                     }
                 }
             };
