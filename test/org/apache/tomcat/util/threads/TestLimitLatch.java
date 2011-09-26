@@ -92,7 +92,7 @@ public class TestLimitLatch {
         assertFalse("No threads should be waiting", latch.hasQueuedThreads());
     }
 
-    private class TestThread extends Thread {
+    private static class TestThread extends Thread {
         
         private int holdTime;
         private LimitLatch latch;

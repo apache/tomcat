@@ -177,7 +177,7 @@ public class StuckThreadDetectionValve extends ValveBase {
         // Keeping a reference to the thread object here does not prevent
         // GC'ing, as the reference is removed from the Map in the finally clause
 
-        Long key = new Long(Thread.currentThread().getId());
+        Long key = Long.valueOf(Thread.currentThread().getId());
         StringBuffer requestUrl = request.getRequestURL();
         if(request.getQueryString()!=null) {
             requestUrl.append("?");
@@ -240,7 +240,7 @@ public class StuckThreadDetectionValve extends ValveBase {
         return result;
     }
 
-    private class MonitoredThread {
+    private static class MonitoredThread {
 
         /**
          * Reference to the thread to get a stack trace from background task
@@ -288,7 +288,7 @@ public class StuckThreadDetectionValve extends ValveBase {
         }
     }
 
-    private class CompletedStuckThread {
+    private static class CompletedStuckThread {
 
         private String threadName;
         private long totalActiveTime;
