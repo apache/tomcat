@@ -76,6 +76,12 @@ public class OneLineFormatter extends Formatter {
         sb.append(' ');
         sb.append(record.getLevel());
 
+        // Thread
+        sb.append(' ');
+        sb.append('[');
+        sb.append(Thread.currentThread().getName());
+        sb.append(']');
+
         // Source
         sb.append(' ');
         sb.append(record.getSourceClassName());
