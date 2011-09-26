@@ -159,7 +159,9 @@ the role <strong>manager-script</strong>.</p>
 
 <p>In addition to the password restrictions the Manager web application
 could be restricted by the remote IP address or host by adding a
-<code>RemoteAddrValve</code> or <code>RemoteHostValve</code>.  Here is
+<code>RemoteAddrValve</code> or <code>RemoteHostValve</code>.
+See <a href="config/valve.html#Remote_Address_Filter">valves documentation</a>
+for details. Here is
 an example of restricting access to the localhost by IP address:</p>
 <pre>
 &lt;Context privileged="true"&gt;
