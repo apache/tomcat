@@ -499,6 +499,8 @@ public class BaseModelMBean implements DynamicMBean, MBeanRegistration, ModelMBe
      *
      * @exception InstanceNotFoundException if the managed resource object
      *  cannot be found
+     * @exception InvalidTargetObjectTypeException if the managed resource
+     *  object is of the wrong type
      * @exception MBeanException if the initializer of the object throws
      *  an exception
      * @exception RuntimeOperationsException if the managed resource or the
