@@ -230,6 +230,10 @@
         ArrayBlockingQueue doesn't allow capacity of 0 or less. (kfujino)
       </fix>
       <fix>
+        <bug>48392</bug> (<rev>1169796</rev>): In jdbc-pool: Fix typo in
+        <code>StatementDecoratorInterceptor</code>. (fhanik) 
+      </fix>
+      <fix>
         <bug>51139</bug>:
         In jdbc-pool: validatorClassName and suspectTimeout are ignored. 
         In order to support them correctly, validatorClassName and 
@@ -241,7 +245,7 @@
         It removes from the active connection list. (kfujino)
       </fix>
       <fix>
-        <bug>51781</bug>: In jdbc-pool: Fix dependency in Maven POM file of
+        <bug>51871</bug>: In jdbc-pool: Fix dependency in Maven POM file of
         tomcat-jbdc. (kkolinko)
       </fix>
       <update>
