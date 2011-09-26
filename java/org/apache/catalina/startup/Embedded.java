@@ -160,7 +160,7 @@ public class Embedded  extends StandardService {
     /**
      * Custom mappings of login methods to authenticators
      */
-    protected HashMap<String,Authenticator> authenticators;
+    protected volatile HashMap<String,Authenticator> authenticators;
 
 
     /**
