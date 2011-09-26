@@ -126,6 +126,9 @@
         Reduce visibility of static field <code>ManagerBase.name</code> and
         make it final. (kkolinko)
       </fix>
+      <update>
+        Add thread name to juli OneLineFormatter. (rjung)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Coyote">
