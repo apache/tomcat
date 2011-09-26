@@ -1632,10 +1632,6 @@
         suggested by Werner Donn. (markt)
       </add>
       <fix>
-        <bug>50929</bug>: When wrapping an exception, include the root cause.
-        Patch provided by sebb. (markt) 
-      </fix>
-      <fix>
         Make the CSRF nonce cache serializable so that it can be replicated
         across a cluster and/or persisted across Tomcat restarts. (markt)
       </fix>
@@ -1674,6 +1670,10 @@
         since this too cannot be reliably determined. (markt)
       </fix>
       <fix>
+        <bug>50929</bug>: When wrapping an exception, include the root cause.
+        Patch provided by sebb. (markt) 
+      </fix>
+      <fix>
         <bug>50991</bug>: Fix regression in fix for <bug>25060</bug> that called
         close on a JNDI resource while it was still available to the
         application. (markt)
@@ -1701,8 +1701,8 @@
         Don&apos;t register non-singelton DataSource resources with JMX. (markt)
       </fix>
       <add>
-        Provide additional configuration options for the DIGEST authenticator.
-        (markt)
+        CVE-2011-1184: Provide additional configuration options for the DIGEST
+        authenticator. (markt)
       </add>
       <fix>
         Provide a workaround for Tomcat hanging during shutdown when running the
