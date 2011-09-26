@@ -56,13 +56,18 @@ subdirectory of your source distribution.
 
 (2.1) Download a binary distribution of Tomcat from:
 
-      http://tomcat.apache.org
+      http://tomcat.apache.org/
 
 (2.2) Unpack the binary distribution into a convenient location so that the
       distribution resides in its own directory (conventionally named
       "apache-tomcat-[version]").  For the purposes of the remainder of this document,
       the symbolic name "$CATALINA_HOME" is used to refer to the full
       pathname of the release directory.
+
+NOTE: The scripts expect that the $CATALINA_HOME environment variable is
+either set to the correct value, as defined above, or is absent. In the
+latter case the scripts will try to calculate the value for $CATALINA_HOME
+by themselves.
 
 
 (3) Start Up Tomcat
@@ -81,7 +86,7 @@ subdirectory of your source distribution.
 (3.3) Further information about configuring and running Tomcat can be found in
       the documentation included here, as well as on the Tomcat web site:
 
-      http://tomcat.apache.org
+      http://tomcat.apache.org/
 
 
 (4) Shut Down Tomcat
@@ -102,30 +107,71 @@ binary distribution shared among multiple users on the same server.  To make
 this possible, you can set the $CATALINA_BASE environment variable to the
 directory that contains the files for your 'personal' Tomcat instance.
 
-When you use $CATALINA_BASE, Tomcat will calculate all relative references for
-files in the following directories based on the value of $CATALINA_BASE instead
-of $CATALINA_HOME:
+When running with separate $CATALINA_HOME and $CATALINA_BASE, the files
+and directories are split as following:
 
-* bin  - Only setenv.sh (*nix), setenv.bat (windows) and tomcat-juli.jar
+In $CATALINA_BASE:
 
-* conf - Server configuration files (including server.xml)
+ * bin  - Only the following files:
+          setenv.sh (*nix), setenv.bat (windows) and tomcat-juli.jar
 
-* logs - Log and output files
+ * conf - Server configuration files (including server.xml)
 
-* webapps - Automatically loaded web applications
+ * lib  - Libraries
 
-* work - Temporary working directories for web applications
+ * logs - Log and output files
 
-* temp - Directory used by the JVM for temporary files (java.io.tmpdir)
+ * webapps - Automatically loaded web applications
 
-Note that by default Tomcat will first try to load classes and JARs from
-$CATALINA_BASE/lib and then $CATALINA_HOME/lib. You can place instance specific
-JARs and classes (eg JDBC drivers) in $CATALINA_BASE/lib whilst keeping the
-standard Tomcat JARs in $CATALINA_HOME/lib.
+ * work - Temporary working directories for web applications
 
-If you do not set $CATALINA_BASE, $CATALINA_BASE will default to the same value
-as $CATALINA_HOME, which means that the same directory is used for all relative
-path resolutions.
+ * temp - Directory used by the JVM for temporary files (java.io.tmpdir)
+
+
+In $CATALINA_HOME:
+
+ * bin  - Startup and shutdown scripts
+
+          The following files will be used only if they are absent in
+          $CATALINA_BASE/bin:
+
+          setenv.sh (*nix), setenv.bat (windows) and tomcat-juli.jar
+
+ * lib  - Libraries
+
+ * endorsed - Libraries that override standard "Endorsed Standards"
+          libraries provided by JRE. See Classloading documentation
+          in the User Guide for details. This directory is not created by
+          default.
+
+If $CATALINA_BASE environment variable is not set, it will default to the
+same value as $CATALINA_HOME, which means that the same directory is used
+for all relative path resolutions.
+
+
+By default Tomcat will first try to load classes and JARs from
+$CATALINA_BASE/lib and then from $CATALINA_HOME/lib. You may place instance
+specific JARs and classes (e.g. JDBC drivers) in $CATALINA_BASE/lib whilst
+keeping the standard Tomcat JARs in $CATALINA_HOME/lib.
+
+
+The values of $CATALINA_BASE and $CATALINA_HOME are available in XML
+configuration files processed by Tomcat as ${catalina.base} and
+${catalina.home} respectively.
+
+
+======================================
+Using setenv.* to Tune Tomcat Scripts
+======================================
+
+The scripts used to run Tomcat can be further configured by setting several
+environment variables. For the list of these environent variables see the
+comment at the top of catalina.sh or .bat script.
+
+The setenv.sh (*nix) or setenv.bat (windows) script can be used to
+configure all those variables except $CATALINA_BASE and $CATALINA_HOME. The
+standard scripts will execute the setenv.* script when it is present either
+in $CATALINA_BASE/bin or in $CATALINA_HOME/bin.
 
 
 ================
