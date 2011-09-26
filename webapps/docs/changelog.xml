@@ -216,6 +216,10 @@
         Correct the documentation for <code>connectionLinger</code> attribute
         for the AJP and HTTP connectors. (markt)
       </fix>
+      <update>
+        Document caveat of using <code>RemoteAddrValve</code> with IPv6
+        addresses. (kkolinko)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Other">

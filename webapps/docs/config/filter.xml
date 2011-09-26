@@ -531,6 +531,15 @@ FINE: Request "/docs/config/manager.html" with response status "200" content-typ
     package. Please consult the Java documentation for details of the
     expressions supported.</p>
 
+    <p><strong>Note:</strong> There is a caveat when using this filter with
+    IPv6 addresses. Format of the IP address that this valve is processing
+    depends on the API that was used to obtain it. If the address was obtained
+    from Java socket using Inet6Address class, its format will be
+    <code>x:x:x:x:x:x:x:x</code>. That is, the IP address for localhost
+    will be <code>0:0:0:0:0:0:0:1</code> instead of the more widely used
+    <code>::1</code>. Consult your access logs for the actual value.</p>
+
+    <p>See also: <a href="#Remote_Host_Filter">Remote Host Filter</a>.</p>
   </subsection>
 
   <subsection name="Filter Class Name">
@@ -569,6 +578,24 @@ FINE: Request "/docs/config/manager.html" with response status "200" content-typ
 
   </subsection>
 
+  <subsection name="Example">
+    <p>To allow access only for the clients connecting from localhost:</p>
+<pre>
+    &lt;filter>
+      &lt;filter-name>Remote Address Filter&lt;/filter-name>
+      &lt;filter-class>org.apache.catalina.filters.RemoteAddrFilter&lt;/filter-class>
+      &lt;init-param>
+        &lt;param-name>allow&lt;/param-name>
+        &lt;param-value>127\.\d+\.\d+\.\d+|::1|0:0:0:0:0:0:0:1&lt;/param-value>
+      &lt;/init-param>
+    &lt;/filter>
+    &lt;filter-mapping>
+      &lt;filter-name>Remote Address Filter&lt;/filter-name>
+      &lt;url-pattern>/*&lt;/url-pattern>
+    &lt;/filter-mapping>
+</pre>
+  </subsection>
+
 </section>
 
 
@@ -586,6 +613,7 @@ FINE: Request "/docs/config/manager.html" with response status "200" content-typ
     package. Please consult the Java documentation for details of the
     expressions supported.</p>
 
+    <p>See also: <a href="#Remote_Address_Filter">Remote Address Filter</a>.</p>
   </subsection>
 
   <subsection name="Filter Class Name">
