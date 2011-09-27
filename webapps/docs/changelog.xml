@@ -133,6 +133,11 @@
         Ensure Servlets that implement ContainerServlet always get treated as
         restricted. (markt)
       </fix>
+      <fix>
+        Ensure that the access log always uses the correct value for the remote
+        IP address associated with the request and that requests with multiple
+        errors do not result in multiple entires in the access log. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
