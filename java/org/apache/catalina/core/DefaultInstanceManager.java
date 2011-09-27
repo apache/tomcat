@@ -532,6 +532,10 @@ public class DefaultInstanceManager implements InstanceManager {
         if (Filter.class.isAssignableFrom(clazz)) {
             checkAccess(clazz, restrictedFilters);
         } else if (Servlet.class.isAssignableFrom(clazz)) {
+            if (ContainerServlet.class.isAssignableFrom(clazz)) {
+                throw new SecurityException("Restricted (ContainerServlet) " +
+                        clazz);
+            }
             checkAccess(clazz, restrictedServlets);
         } else {
             checkAccess(clazz, restrictedListeners);
