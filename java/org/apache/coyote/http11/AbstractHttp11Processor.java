@@ -893,7 +893,6 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
                 if (endpoint.isPaused()) {
                     // 503 - Service unavailable
                     response.setStatus(503);
-                    adapter.log(request, response, 0);
                     error = true;
                 } else {
                     request.setStartTime(System.currentTimeMillis());
@@ -1083,7 +1082,6 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
                           " Unsupported HTTP version \""+protocolMB+"\"");
             }
             response.setStatus(505);
-            adapter.log(request, response, 0);
         }
 
         MessageBytes methodMB = request.method();
@@ -1179,7 +1177,6 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
                     error = true;
                     // 501 - Unimplemented
                     response.setStatus(501);
-                    adapter.log(request, response, 0);
                 }
                 startPos = commaPos + 1;
                 commaPos = transferEncodingValue.indexOf(',', startPos);
@@ -1195,7 +1192,6 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
                               " Unsupported transfer encoding \""+encodingName+"\"");
                 }
                 response.setStatus(501);
-                adapter.log(request, response, 0);
             }
         }
 
@@ -1218,7 +1214,6 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
                           " host header missing");
             }
             response.setStatus(400);
-            adapter.log(request, response, 0);
         }
 
         parseHost(valueMB);
@@ -1247,6 +1242,10 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
         if (endpoint.getUseCometTimeout()) {
             request.setAttribute("org.apache.tomcat.comet.timeout.support",
                     Boolean.TRUE);
+        }
+        
+        if (error) {
+            adapter.log(request, response, 0);
         }
     }
 
@@ -1467,7 +1466,6 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
                     error = true;
                     // 400 - Bad request
                     response.setStatus(400);
-                    adapter.log(request, response, 0);
                     break;
                 }
                 port = port + (charValue * mult);
@@ -1548,8 +1546,9 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
             ExceptionUtils.handleThrowable(t);
             getLog().error(sm.getString("http11processor.request.finish"), t);
             // 500 - Internal Server Error
+            // Can't add a 500 to the access log since that has already been
+            // written in the Adapter.service method.
             response.setStatus(500);
-            adapter.log(request, response, 0);
             error = true;
         }
         try {

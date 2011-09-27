@@ -466,10 +466,8 @@ public class CoyoteAdapter implements Adapter {
 
         Request request = (Request) req.getNote(ADAPTER_NOTES);
         Response response = (Response) res.getNote(ADAPTER_NOTES);
-        boolean create = false;
         
         if (request == null) {
-            create = true;
             // Create objects
             request = connector.createRequest();
             request.setCoyoteRequest(req);
@@ -511,9 +509,7 @@ public class CoyoteAdapter implements Adapter {
         } catch (Throwable t) {
             ExceptionUtils.handleThrowable(t);
             log.warn(sm.getString("coyoteAdapter.accesslogFail"), t);
-        }
-        
-        if (create) {
+        } finally {
             request.recycle();
             response.recycle();
         }

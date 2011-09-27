@@ -182,7 +182,7 @@ public class AjpAprProcessor extends AbstractAjpProcessor<Long> {
                 }
             }
 
-            if (!cping && endpoint.isPaused()) {
+            if (!error && !cping && endpoint.isPaused()) {
                 // 503 - Service unavailable
                 response.setStatus(503);
                 adapter.log(request, response, 0);
