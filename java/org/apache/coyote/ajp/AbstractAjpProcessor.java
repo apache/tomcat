@@ -759,7 +759,6 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
                     secret = true;
                     if (!tmpMB.equals(requiredSecret)) {
                         response.setStatus(403);
-                        adapter.log(request, response, 0);
                         error = true;
                     }
                 }
@@ -776,7 +775,6 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
         // Check if secret was submitted if required
         if ((requiredSecret != null) && !secret) {
             response.setStatus(403);
-            adapter.log(request, response, 0);
             error = true;
         }
 
@@ -810,6 +808,9 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
         MessageBytes valueMB = request.getMimeHeaders().getValue("host");
         parseHost(valueMB);
 
+        if (error) {
+            adapter.log(request, response, 0);
+        }
     }
 
 
@@ -825,7 +826,6 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
                 request.serverName().duplicate(request.localName());
             } catch (IOException e) {
                 response.setStatus(400);
-                adapter.log(request, response, 0);
                 error = true;
             }
             return;
@@ -877,7 +877,6 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
                     error = true;
                     // 400 - Bad request
                     response.setStatus(400);
-                    adapter.log(request, response, 0);
                     break;
                 }
                 port = port + (charValue * mult);
