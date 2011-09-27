@@ -129,6 +129,10 @@
       <update>
         Add thread name to juli OneLineFormatter. (rjung)
       </update>
+      <fix>
+        Ensure Servlets that implement ContainerServlet always get treated as
+        restricted. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
