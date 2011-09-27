@@ -483,148 +483,141 @@ public class ManagedBean implements java.io.Serializable {
     }
 
     Method getGetter(String aname, BaseModelMBean mbean, Object resource) 
-            throws AttributeNotFoundException, MBeanException, ReflectionException {
-        // TODO: do we need caching ? JMX is for management, it's not supposed to require lots of performance.
-        Method m=null; // (Method)getAttMap.get( name );
+            throws AttributeNotFoundException, ReflectionException {
 
-        if( m==null ) {
-            AttributeInfo attrInfo = attributes.get(aname);
-            // Look up the actual operation to be used
-            if (attrInfo == null)
-                throw new AttributeNotFoundException(" Cannot find attribute " + aname + " for " + resource);
-            
-            String getMethod = attrInfo.getGetMethod();
-            if (getMethod == null)
-                throw new AttributeNotFoundException("Cannot find attribute " + aname + " get method name");
+        Method m = null;
 
-            Object object = null;
-            NoSuchMethodException exception = null;
+        AttributeInfo attrInfo = attributes.get(aname);
+        // Look up the actual operation to be used
+        if (attrInfo == null)
+            throw new AttributeNotFoundException(" Cannot find attribute " + aname + " for " + resource);
+        
+        String getMethod = attrInfo.getGetMethod();
+        if (getMethod == null)
+            throw new AttributeNotFoundException("Cannot find attribute " + aname + " get method name");
+
+        Object object = null;
+        NoSuchMethodException exception = null;
+        try {
+            object = mbean;
+            m = object.getClass().getMethod(getMethod, NO_ARGS_PARAM_SIG);
+        } catch (NoSuchMethodException e) {
+            exception = e;
+        }
+        if( m== null && resource != null ) {
             try {
-                object = mbean;
+                object = resource;
                 m = object.getClass().getMethod(getMethod, NO_ARGS_PARAM_SIG);
+                exception=null;
             } catch (NoSuchMethodException e) {
                 exception = e;
             }
-            if( m== null && resource != null ) {
-                try {
-                    object = resource;
-                    m = object.getClass().getMethod(getMethod, NO_ARGS_PARAM_SIG);
-                    exception=null;
-                } catch (NoSuchMethodException e) {
-                    exception = e;
-                }
-            }
-            if( exception != null )
-                throw new ReflectionException(exception,
-                                              "Cannot find getter method " + getMethod);
-            //getAttMap.put( name, m );
         }
+        if( exception != null )
+            throw new ReflectionException(exception,
+                                          "Cannot find getter method " + getMethod);
 
         return m;
     }
 
     public Method getSetter(String aname, BaseModelMBean bean, Object resource) 
-            throws AttributeNotFoundException, MBeanException, ReflectionException {
-        // Cache may be needed for getters, but it is a really bad idea for setters, this is far 
-        // less frequent.
-        Method m=null;//(Method)setAttMap.get( name );
+            throws AttributeNotFoundException, ReflectionException {
 
-        if( m==null ) {
-            AttributeInfo attrInfo = attributes.get(aname);
-            if (attrInfo == null)
-                throw new AttributeNotFoundException(" Cannot find attribute " + aname);
+        Method m = null;
 
-            // Look up the actual operation to be used
-            String setMethod = attrInfo.getSetMethod();
-            if (setMethod == null)
-                throw new AttributeNotFoundException("Cannot find attribute " + aname + " set method name");
+        AttributeInfo attrInfo = attributes.get(aname);
+        if (attrInfo == null)
+            throw new AttributeNotFoundException(" Cannot find attribute " + aname);
 
-            String argType=attrInfo.getType();
+        // Look up the actual operation to be used
+        String setMethod = attrInfo.getSetMethod();
+        if (setMethod == null)
+            throw new AttributeNotFoundException("Cannot find attribute " + aname + " set method name");
 
-            Class<?> signature[] =
-                new Class[] { BaseModelMBean.getAttributeClass( argType ) };
+        String argType=attrInfo.getType();
 
-            Object object = null;
-            NoSuchMethodException exception = null;
+        Class<?> signature[] =
+            new Class[] { BaseModelMBean.getAttributeClass( argType ) };
+
+        Object object = null;
+        NoSuchMethodException exception = null;
+        try {
+            object = bean;
+            m = object.getClass().getMethod(setMethod, signature);
+        } catch (NoSuchMethodException e) {
+            exception = e;
+        }
+        if( m== null && resource != null ) {
             try {
-                object = bean;
+                object = resource;
                 m = object.getClass().getMethod(setMethod, signature);
+                exception=null;
             } catch (NoSuchMethodException e) {
                 exception = e;
             }
-            if( m== null && resource != null ) {
-                try {
-                    object = resource;
-                    m = object.getClass().getMethod(setMethod, signature);
-                    exception=null;
-                } catch (NoSuchMethodException e) {
-                    exception = e;
-                }
-            }
-            if( exception != null )
-                throw new ReflectionException(exception,
-                                              "Cannot find setter method " + setMethod +
-                        " " + resource);
-            //setAttMap.put( name, m );
         }
+        if( exception != null )
+            throw new ReflectionException(exception,
+                                          "Cannot find setter method " + setMethod +
+                    " " + resource);
 
         return m;
     }
 
     public Method getInvoke(String aname, Object[] params, String[] signature, BaseModelMBean bean, Object resource) 
             throws MBeanException, ReflectionException {
+
         Method method = null;
-        if (method == null) {
-            if (params == null)
-                params = new Object[0];
-            if (signature == null)
-                signature = new String[0];
-            if (params.length != signature.length)
-                throw new RuntimeOperationsException(
-                        new IllegalArgumentException(
-                                "Inconsistent arguments and signature"),
-                        "Inconsistent arguments and signature");
+        
+        if (params == null)
+            params = new Object[0];
+        if (signature == null)
+            signature = new String[0];
+        if (params.length != signature.length)
+            throw new RuntimeOperationsException(
+                    new IllegalArgumentException(
+                            "Inconsistent arguments and signature"),
+                    "Inconsistent arguments and signature");
 
-            // Acquire the ModelMBeanOperationInfo information for
-            // the requested operation
-            OperationInfo opInfo = operations.get(aname);
-            if (opInfo == null)
-                throw new MBeanException(new ServiceNotFoundException(
-                        "Cannot find operation " + aname),
-                        "Cannot find operation " + aname);
+        // Acquire the ModelMBeanOperationInfo information for
+        // the requested operation
+        OperationInfo opInfo = operations.get(aname);
+        if (opInfo == null)
+            throw new MBeanException(new ServiceNotFoundException(
+                    "Cannot find operation " + aname),
+                    "Cannot find operation " + aname);
 
-            // Prepare the signature required by Java reflection APIs
-            // FIXME - should we use the signature from opInfo?
-            Class<?> types[] = new Class[signature.length];
-            for (int i = 0; i < signature.length; i++) {
-                types[i] = BaseModelMBean.getAttributeClass(signature[i]);
-            }
-
-            // Locate the method to be invoked, either in this MBean itself
-            // or in the corresponding managed resource
-            // FIXME - Accessible methods in superinterfaces?
-            Object object = null;
-            Exception exception = null;
-            try {
-                object = bean;
-                method = object.getClass().getMethod(aname, types);
-            } catch (NoSuchMethodException e) {
-                exception = e;
-            }
-            try {
-                if ((method == null) && (resource != null)) {
-                    object = resource;
-                    method = object.getClass().getMethod(aname, types);
-                }
-            } catch (NoSuchMethodException e) {
-                exception = e;
-            }
-            if (method == null) {
-                throw new ReflectionException(exception, "Cannot find method "
-                        + aname + " with this signature");
-            }
-            // invokeAttMap.put(mkey, method);
+        // Prepare the signature required by Java reflection APIs
+        // FIXME - should we use the signature from opInfo?
+        Class<?> types[] = new Class[signature.length];
+        for (int i = 0; i < signature.length; i++) {
+            types[i] = BaseModelMBean.getAttributeClass(signature[i]);
         }
+
+        // Locate the method to be invoked, either in this MBean itself
+        // or in the corresponding managed resource
+        // FIXME - Accessible methods in superinterfaces?
+        Object object = null;
+        Exception exception = null;
+        try {
+            object = bean;
+            method = object.getClass().getMethod(aname, types);
+        } catch (NoSuchMethodException e) {
+            exception = e;
+        }
+        try {
+            if ((method == null) && (resource != null)) {
+                object = resource;
+                method = object.getClass().getMethod(aname, types);
+            }
+        } catch (NoSuchMethodException e) {
+            exception = e;
+        }
+        if (method == null) {
+            throw new ReflectionException(exception, "Cannot find method "
+                    + aname + " with this signature");
+        }
+
         return method;
     }
 

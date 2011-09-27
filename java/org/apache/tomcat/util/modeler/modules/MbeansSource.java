@@ -340,8 +340,7 @@ public class MbeansSource extends ModelerSource implements MbeansSourceMBean
                         " " + value);
             ObjectName oname=new ObjectName(objectName);
             // find the type
-            if( type==null )
-                type=registry.getType(  oname, attName );
+            type=registry.getType(  oname, attName );
 
             if( type==null ) {
                 log.info("Can't find attribute " + objectName + " " + attName );
