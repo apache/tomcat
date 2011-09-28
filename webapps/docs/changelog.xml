@@ -53,6 +53,17 @@
   They eventually become mixed with the numbered issues. (I.e., numbered
   issues to not "pop up" wrt. others).
 -->
+<section name="Tomcat 7.0.23 (markt)">
+  <subsection name="Coyote">
+    <changelog>
+      <fix>
+        <bug>51905</bug>: Fix infinite loop in AprEndpoint shutdown if
+        acceptor unlock fails. Reduce timeout before forcefully closing
+        the socket from 30s to 10s. (kkolinko)
+      </fix>
+    </changelog>
+  </subsection>
+</section>
 <section name="Tomcat 7.0.22 (markt)">
   <subsection name="Catalina">
     <changelog>
