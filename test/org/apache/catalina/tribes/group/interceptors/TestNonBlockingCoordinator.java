@@ -30,15 +30,14 @@ public class TestNonBlockingCoordinator {
 
     private GroupChannel[] channels = null;
     private NonBlockingCoordinator[] coordinators = null;
-    private int channelCount = 10;
-    private Thread[] threads = null;
+    private final int channelCount = 10;
 
     @Before
     public void setUp() throws Exception {
         System.out.println("Setup");
         channels = new GroupChannel[channelCount];
         coordinators = new NonBlockingCoordinator[channelCount];
-        threads = new Thread[channelCount];
+        Thread[] threads = new Thread[channelCount];
         for ( int i=0; i<channelCount; i++ ) {
             channels[i] = new GroupChannel();
             coordinators[i] = new NonBlockingCoordinator();
@@ -57,21 +56,36 @@ public class TestNonBlockingCoordinator {
                 }
             };
         }
-        for ( int i=0; i<channelCount; i++ ) threads[i].start();
-        for ( int i=0; i<channelCount; i++ ) threads[i].join();
+        for (int i = 0; i < channelCount; i++) {
+            threads[i].start();
+        }
+        for (int i = 0; i < channelCount; i++) {
+            threads[i].join();
+        }
         Thread.sleep(1000);
     }
 
     @Test
     public void testCoord1() throws Exception {
-        for (int i=1; i<channelCount; i++ ) 
-            assertEquals("Message count expected to be equal.",channels[i-1].getMembers().length,channels[i].getMembers().length);
+        int expectedCount = channels[0].getMembers().length;
+        for (int i = 1; i < channelCount; i++) {
+            assertEquals("Message count expected to be equal.", expectedCount,
+                    channels[i].getMembers().length);
+        }
         Member member = coordinators[0].getCoordinator();
         int cnt = 0;
-        while ( member == null && (cnt++ < 100 ) ) try {Thread.sleep(100); member = coordinators[0].getCoordinator();}catch ( Exception x){ /* Ignore */ }
-        for (int i=0; i<channelCount; i++ ) assertEquals(member,coordinators[i].getCoordinator());
-        System.out.println("Coordinator[1] is:"+member);
-        
+        while (member == null && (cnt++ < 100)) {
+            try {
+                Thread.sleep(100);
+                member = coordinators[0].getCoordinator();
+            } catch (Exception x) {
+                /* Ignore */
+            }
+        }
+        for (int i = 0; i < channelCount; i++) {
+            assertEquals(member, coordinators[i].getCoordinator());
+        }
+        System.out.println("Coordinator[1] is:" + member);
     }
 
     @Test
@@ -88,10 +102,18 @@ public class TestNonBlockingCoordinator {
         }
         int dead = index;
         Thread.sleep(1000);
-        if ( index == 0 ) index = 1; else index = 0;
+        if (index == 0) {
+            index = 1;
+        } else {
+            index = 0;
+        }
         System.out.println("Member count:"+channels[index].getMembers().length);
         member = coordinators[index].getCoordinator();
-        for (int i = 1; i < channelCount; i++) if ( i != dead ) assertEquals(member, coordinators[i].getCoordinator());
+        for (int i = 1; i < channelCount; i++) {
+            if (i != dead) {
+                assertEquals(member, coordinators[i].getCoordinator());
+            }
+        }
         System.out.println("Coordinator[2b] is:" + member);
     }
 
@@ -102,10 +124,5 @@ public class TestNonBlockingCoordinator {
             channels[i].stop(Channel.DEFAULT);
         }
     }
-
-    public static void main(String[] args) throws Exception {
-        org.junit.runner.JUnitCore.main(TestNonBlockingCoordinator.class.getName());
-    }
-
 
 }
