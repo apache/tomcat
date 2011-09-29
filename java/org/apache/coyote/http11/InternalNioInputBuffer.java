@@ -48,9 +48,42 @@ public class InternalNioInputBuffer extends AbstractInputBuffer<NioChannel> {
 
     // -------------------------------------------------------------- Constants
 
-    enum HeaderParseStatus {DONE, HAVE_MORE_HEADERS, NEED_MORE_DATA}
-    enum HeaderParsePosition {HEADER_START, HEADER_NAME, HEADER_VALUE,
-        HEADER_MULTI_LINE, HEADER_SKIPLINE}
+    enum HeaderParseStatus {
+        DONE, HAVE_MORE_HEADERS, NEED_MORE_DATA
+    }
+
+    enum HeaderParsePosition {
+        /**
+         * Start of a new header. A CRLF here means that there are no more
+         * headers. Any other character starts a header name.
+         */
+        HEADER_START,
+        /**
+         * Reading a header name. All characters of header are HTTP_TOKEN_CHAR.
+         * Header name is followed by ':'. No whitespace is allowed.<br />
+         * Any non-HTTP_TOKEN_CHAR (this includes any whitespace) encountered
+         * before ':' will result in the whole line being ignored.
+         */
+        HEADER_NAME,
+        /**
+         * Reading the header value. We come into this state by two ways:<br />
+         * a) just after the ':' on the first line of the header, b) on the
+         * start of a new line when it is known that it starts with SP or HT.
+         */
+        HEADER_VALUE,
+        /**
+         * Before reading a new line of a header. Once the next byte is peeked,
+         * the state changes without advancing our position. The state becomes
+         * either HEADER_VALUE (if that first byte is SP or HT), or HEADER_START
+         * (otherwise).
+         */
+        HEADER_MULTI_LINE,
+        /**
+         * Reading all bytes until the next CRLF. The line is being ignored.
+         */
+        HEADER_SKIPLINE
+    }
+
     // ----------------------------------------------------------- Constructors
     
 
@@ -483,11 +516,11 @@ public class InternalNioInputBuffer extends AbstractInputBuffer<NioChannel> {
 
             chr = buf[pos];
 
-            if ((chr == Constants.CR) || (chr == Constants.LF)) {
-                if (chr == Constants.LF) {
-                    pos++;
-                    return HeaderParseStatus.DONE;
-                }
+            if (chr == Constants.CR) {
+                // Skip
+            } else if (chr == Constants.LF) {
+                pos++;
+                return HeaderParseStatus.DONE;
             } else {
                 break;
             }
@@ -500,13 +533,12 @@ public class InternalNioInputBuffer extends AbstractInputBuffer<NioChannel> {
             // Mark the current buffer position
             headerData.start = pos;
             headerParsePos = HeaderParsePosition.HEADER_NAME;
-        }    
+        }
 
         //
         // Reading the header name
         // Header name is always US-ASCII
         //
-
 
         while (headerParsePos == HeaderParsePosition.HEADER_NAME) {
 
@@ -538,8 +570,8 @@ public class InternalNioInputBuffer extends AbstractInputBuffer<NioChannel> {
             }
         }
 
-        
-        while (headerParsePos == HeaderParsePosition.HEADER_SKIPLINE) {
+        // Skip the line and ignore the header
+        if (headerParsePos == HeaderParsePosition.HEADER_SKIPLINE) {
             return skipLine();
         }
 
@@ -681,9 +713,29 @@ public class InternalNioInputBuffer extends AbstractInputBuffer<NioChannel> {
 
     private HeaderParseData headerData = new HeaderParseData();
     public static class HeaderParseData {
+        /**
+         * When parsing header name: first character of the header.<br />
+         * When parsing header value: first character after ':'.
+         */
         int start = 0;
+        /**
+         * When parsing header name: not used (stays as 0).<br />
+         * When parsing header value: starts as the first character after ':'.
+         * Then is increased as far as more bytes of the header are harvested.
+         * Bytes from buf[pos] are copied to buf[realPos]. Thus the string from
+         * [start] to [realPos-1] is the prepared value of the header, with
+         * whitespaces removed as needed.
+         */
         int realPos = 0;
+        /**
+         * When parsing header name: not used (stays as 0).<br />
+         * When parsing header value: position after the last not-LWS character.
+         */
         int lastSignificantChar = 0;
+        /**
+         * MB that will store the value of the header. It is null while parsing
+         * header name and is created after the name has been parsed.
+         */
         MessageBytes headerValue = null;
         public void recycle() {
             start = 0;
