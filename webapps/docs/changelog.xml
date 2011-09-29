@@ -62,6 +62,10 @@
         the socket from 30s to 10s. (kkolinko)
       </fix>
       <fix>
+        <bug>51912</bug>: Fix HTTP header processing in NIO HTTP connector.
+        (kkolinko)
+      </fix>
+      <fix>
         Improve MimeHeaders.toString(). (kkolinko)
       </fix>
     </changelog>

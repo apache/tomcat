@@ -296,11 +296,11 @@ public class InternalInputBuffer extends AbstractInputBuffer<Socket> {
 
             chr = buf[pos];
 
-            if ((chr == Constants.CR) || (chr == Constants.LF)) {
-                if (chr == Constants.LF) {
-                    pos++;
-                    return false;
-                }
+            if (chr == Constants.CR) {
+                // Skip
+            } else if (chr == Constants.LF) {
+                pos++;
+                return false;
             } else {
                 break;
             }
