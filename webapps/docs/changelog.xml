@@ -61,6 +61,9 @@
         acceptor unlock fails. Reduce timeout before forcefully closing
         the socket from 30s to 10s. (kkolinko)
       </fix>
+      <fix>
+        Improve MimeHeaders.toString(). (kkolinko)
+      </fix>
     </changelog>
   </subsection>
 </section>
