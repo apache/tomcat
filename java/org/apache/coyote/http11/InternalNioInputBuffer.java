@@ -48,9 +48,49 @@ public class InternalNioInputBuffer extends AbstractInputBuffer<NioChannel> {
 
     // -------------------------------------------------------------- Constants
 
-    enum HeaderParseStatus {DONE, HAVE_MORE_HEADERS, NEED_MORE_DATA}
-    enum HeaderParsePosition {HEADER_START, HEADER_NAME, HEADER_VALUE,
-        HEADER_MULTI_LINE, HEADER_SKIPLINE}
+    enum HeaderParseStatus {
+        DONE, HAVE_MORE_HEADERS, NEED_MORE_DATA
+    }
+
+    enum HeaderParsePosition {
+        /**
+         * Start of a new header. A CRLF here means that there are no more
+         * headers. Any other character starts a header name.
+         */
+        HEADER_START,
+        /**
+         * Reading a header name. All characters of header are HTTP_TOKEN_CHAR.
+         * Header name is followed by ':'. No whitespace is allowed.<br />
+         * Any non-HTTP_TOKEN_CHAR (this includes any whitespace) encountered
+         * before ':' will result in the whole line being ignored.
+         */
+        HEADER_NAME,
+        /**
+         * Skipping whitespace before text of header value starts, either on the
+         * first line of header value (just after ':') or on subsequent lines
+         * when it is known that subsequent line starts with SP or HT.
+         */
+        HEADER_VALUE_START,
+        /**
+         * Reading the header value. We are inside the value. Either on the
+         * first line or on any subsequent line. We come into this state from
+         * HEADER_VALUE_START after the first non-SP/non-HT byte is encountered
+         * on the line.
+         */
+        HEADER_VALUE,
+        /**
+         * Before reading a new line of a header. Once the next byte is peeked,
+         * the state changes without advancing our position. The state becomes
+         * either HEADER_VALUE_START (if that first byte is SP or HT), or
+         * HEADER_START (otherwise).
+         */
+        HEADER_MULTI_LINE,
+        /**
+         * Reading all bytes until the next CRLF. The line is being ignored.
+         */
+        HEADER_SKIPLINE
+    }
+
     // ----------------------------------------------------------- Constructors
     
 
@@ -483,11 +523,11 @@ public class InternalNioInputBuffer extends AbstractInputBuffer<NioChannel> {
 
             chr = buf[pos];
 
-            if ((chr == Constants.CR) || (chr == Constants.LF)) {
-                if (chr == Constants.LF) {
-                    pos++;
-                    return HeaderParseStatus.DONE;
-                }
+            if (chr == Constants.CR) {
+                // Skip
+            } else if (chr == Constants.LF) {
+                pos++;
+                return HeaderParseStatus.DONE;
             } else {
                 break;
             }
@@ -500,13 +540,12 @@ public class InternalNioInputBuffer extends AbstractInputBuffer<NioChannel> {
             // Mark the current buffer position
             headerData.start = pos;
             headerParsePos = HeaderParsePosition.HEADER_NAME;
-        }    
+        }
 
         //
         // Reading the header name
         // Header name is always US-ASCII
         //
-
 
         while (headerParsePos == HeaderParsePosition.HEADER_NAME) {
 
@@ -517,29 +556,32 @@ public class InternalNioInputBuffer extends AbstractInputBuffer<NioChannel> {
                 }
             }
 
-            if (buf[pos] == Constants.COLON) {
-                headerParsePos = HeaderParsePosition.HEADER_VALUE;
-                headerData.headerValue = headers.addValue(buf, headerData.start, pos - headerData.start);
-            } else if (!HTTP_TOKEN_CHAR[buf[pos]]) {
-                // If a non-token header is detected, skip the line and
-                // ignore the header
-                return skipLine();
-            }
             chr = buf[pos];
-            if ((chr >= Constants.A) && (chr <= Constants.Z)) {
-                buf[pos] = (byte) (chr - Constants.LC_OFFSET);
-            }
-
-            pos++;
-            if ( headerParsePos == HeaderParsePosition.HEADER_VALUE ) { 
+            if (chr == Constants.COLON) {
+                headerParsePos = HeaderParsePosition.HEADER_VALUE_START;
+                headerData.headerValue = headers.addValue(buf, headerData.start, pos - headerData.start);
+                pos++;
                 // Mark the current buffer position
                 headerData.start = pos;
                 headerData.realPos = pos;
+                headerData.lastSignificantChar = pos;
+                break;
+            } else if (!HTTP_TOKEN_CHAR[chr]) {
+                // If a non-token header is detected, skip the line and
+                // ignore the header
+                headerData.lastSignificantChar = pos;
+                return skipLine();
             }
+
+            // chr is next byte of header name. Convert to lowercase.
+            if ((chr >= Constants.A) && (chr <= Constants.Z)) {
+                buf[pos] = (byte) (chr - Constants.LC_OFFSET);
+            }
+            pos++;
         }
 
-        
-        while (headerParsePos == HeaderParsePosition.HEADER_SKIPLINE) {
+        // Skip the line and ignore the header
+        if (headerParsePos == HeaderParsePosition.HEADER_SKIPLINE) {
             return skipLine();
         }
 
@@ -547,36 +589,34 @@ public class InternalNioInputBuffer extends AbstractInputBuffer<NioChannel> {
         // Reading the header value (which can be spanned over multiple lines)
         //
 
-        boolean eol = false;
-
-        while (headerParsePos == HeaderParsePosition.HEADER_VALUE ||
+        while (headerParsePos == HeaderParsePosition.HEADER_VALUE_START ||
+               headerParsePos == HeaderParsePosition.HEADER_VALUE ||
                headerParsePos == HeaderParsePosition.HEADER_MULTI_LINE) {
-            if ( headerParsePos == HeaderParsePosition.HEADER_VALUE ) {
-            
-                boolean space = true;
 
+            if ( headerParsePos == HeaderParsePosition.HEADER_VALUE_START ) {
                 // Skipping spaces
-                while (space) {
-
+                while (true) {
                     // Read new bytes if needed
                     if (pos >= lastValid) {
                         if (!fill(true,false)) {//parse header 
-                            //HEADER_VALUE, should already be set
+                            //HEADER_VALUE_START
                             return HeaderParseStatus.NEED_MORE_DATA;
                         }
                     }
 
-                    if ((buf[pos] == Constants.SP) || (buf[pos] == Constants.HT)) {
+                    chr = buf[pos];
+                    if (chr == Constants.SP || chr == Constants.HT) {
                         pos++;
                     } else {
-                        space = false;
+                        headerParsePos = HeaderParsePosition.HEADER_VALUE;
+                        break;
                     }
-
                 }
-
-                headerData.lastSignificantChar = headerData.realPos;
+            }
+            if ( headerParsePos == HeaderParsePosition.HEADER_VALUE ) {
 
                 // Reading bytes until the end of the line
+                boolean eol = false;
                 while (!eol) {
 
                     // Read new bytes if needed
@@ -585,26 +625,26 @@ public class InternalNioInputBuffer extends AbstractInputBuffer<NioChannel> {
                             //HEADER_VALUE
                             return HeaderParseStatus.NEED_MORE_DATA;
                         }
-
                     }
 
-                    if (buf[pos] == Constants.CR) {
+                    chr = buf[pos];
+                    if (chr == Constants.CR) {
                         // Skip
-                    } else if (buf[pos] == Constants.LF) {
+                    } else if (chr == Constants.LF) {
                         eol = true;
-                    } else if (buf[pos] == Constants.SP) {
-                        buf[headerData.realPos] = buf[pos];
+                    } else if (chr == Constants.SP || chr == Constants.HT) {
+                        buf[headerData.realPos] = chr;
                         headerData.realPos++;
                     } else {
-                        buf[headerData.realPos] = buf[pos];
+                        buf[headerData.realPos] = chr;
                         headerData.realPos++;
                         headerData.lastSignificantChar = headerData.realPos;
                     }
 
                     pos++;
-
                 }
 
+                // Ignore whitespaces at the end of the line
                 headerData.realPos = headerData.lastSignificantChar;
 
                 // Checking the first character of the new line. If the character
@@ -624,18 +664,19 @@ public class InternalNioInputBuffer extends AbstractInputBuffer<NioChannel> {
             if ( headerParsePos == HeaderParsePosition.HEADER_MULTI_LINE ) {
                 if ( (chr != Constants.SP) && (chr != Constants.HT)) {
                     headerParsePos = HeaderParsePosition.HEADER_START;
+                    break;
                 } else {
-                    eol = false;
                     // Copying one extra space in the buffer (since there must
                     // be at least one space inserted between the lines)
                     buf[headerData.realPos] = chr;
                     headerData.realPos++;
-                    headerParsePos = HeaderParsePosition.HEADER_VALUE;
+                    headerParsePos = HeaderParsePosition.HEADER_VALUE_START;
                 }
             }
         }
         // Set the header value
-        headerData.headerValue.setBytes(buf, headerData.start, headerData.realPos - headerData.start);
+        headerData.headerValue.setBytes(buf, headerData.start,
+                headerData.lastSignificantChar - headerData.start);
         headerData.recycle();
         return HeaderParseStatus.HAVE_MORE_HEADERS;
     }
@@ -681,9 +722,32 @@ public class InternalNioInputBuffer extends AbstractInputBuffer<NioChannel> {
 
     private HeaderParseData headerData = new HeaderParseData();
     public static class HeaderParseData {
+        /**
+         * When parsing header name: first character of the header.<br />
+         * When skipping broken header line: first character of the header.<br />
+         * When parsing header value: first character after ':'.
+         */
         int start = 0;
+        /**
+         * When parsing header name: not used (stays as 0).<br />
+         * When skipping broken header line: not used (stays as 0).<br />
+         * When parsing header value: starts as the first character after ':'.
+         * Then is increased as far as more bytes of the header are harvested.
+         * Bytes from buf[pos] are copied to buf[realPos]. Thus the string from
+         * [start] to [realPos-1] is the prepared value of the header, with
+         * whitespaces removed as needed.<br />
+         */
         int realPos = 0;
+        /**
+         * When parsing header name: not used (stays as 0).<br />
+         * When skipping broken header line: last non-CR/non-LF character.<br />
+         * When parsing header value: position after the last not-LWS character.<br />
+         */
         int lastSignificantChar = 0;
+        /**
+         * MB that will store the value of the header. It is null while parsing
+         * header name and is created after the name has been parsed.
+         */
         MessageBytes headerValue = null;
         public void recycle() {
             start = 0;
