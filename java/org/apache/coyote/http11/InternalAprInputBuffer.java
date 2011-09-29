@@ -340,11 +340,11 @@ public class InternalAprInputBuffer extends AbstractInputBuffer<Long> {
 
             chr = buf[pos];
 
-            if ((chr == Constants.CR) || (chr == Constants.LF)) {
-                if (chr == Constants.LF) {
-                    pos++;
-                    return false;
-                }
+            if (chr == Constants.CR) {
+                // Skip
+            } else if (chr == Constants.LF) {
+                pos++;
+                return false;
             } else {
                 break;
             }
