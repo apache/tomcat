@@ -123,7 +123,6 @@
     method of the event.
   </li>
   <li>EventSubType.CLIENT_DISCONNECT: The client connection was closed (sub type of ERROR).
-    method of the event.
   </li>
   <li>EventSubType.IOEXCEPTION: An IO exception occurred, such as invalid content, for example, 
     an invalid chunk block (sub type of ERROR).
@@ -306,7 +305,7 @@ public class ChatServlet
        <source>CometEvent event.... event.setTimeout(30*1000);</source> or
        <source>event.getHttpServletRequest().setAttribute("org.apache.tomcat.comet.timeout", new Integer(30 * 1000));</source>
        This sets the timeout to 30 seconds.
-       Important note, in order to set this timeout, it has to be done on the <code>BEGIN</code> event.
+       Important note: in order to set this timeout, it has to be done on the <code>BEGIN</code> event.
        The default value is <code>soTimeout</code>
     </p>
     <p>If you are using the APR connector, all Comet connections will have the same timeout value. It is <code>soTimeout*50</code>
@@ -339,10 +338,10 @@ public class ChatServlet
   </p>
   
   <ul>
-  <li>org.apache.tomcat.sendfile.filename: Canonical filename of the file which will be sent as
+  <li><code>org.apache.tomcat.sendfile.filename</code>: Canonical filename of the file which will be sent as
       a String</li>
-  <li>org.apache.tomcat.sendfile.start: Start offset as a Long</li>
-  <li>org.apache.tomcat.sendfile.end: End offset as a Long</li>
+  <li><code>org.apache.tomcat.sendfile.start</code>: Start offset as a Long</li>
+  <li><code>org.apache.tomcat.sendfile.end</code>: End offset as a Long</li>
   </ul>
 
   </section>
