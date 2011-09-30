@@ -314,17 +314,6 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
 
             comet = false;
             cometClose = true;
-            SelectionKey key = socket.getSocket().getIOChannel().keyFor(socket.getSocket().getPoller().getSelector());
-            if ( key != null ) {
-                NioEndpoint.KeyAttachment attach = (NioEndpoint.KeyAttachment) key.attachment();
-                if ( attach!=null && attach.getComet()) {
-                    //if this is a comet connection
-                    //then execute the connection closure at the next selector loop
-                    //request.getAttributes().remove("org.apache.tomcat.comet.timeout");
-                    //attach.setTimeout(5000); //force a cleanup in 5 seconds
-                    //attach.setError(true); //this has caused concurrency errors
-                }
-            }
 
             try {
                 outputBuffer.endRequest();
