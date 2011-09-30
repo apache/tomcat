@@ -85,7 +85,6 @@
   <li>EventType.READ: This indicates that input data is available, and that one read can be made
        without blocking. The available and ready methods of the InputStream or
        Reader may be used to determine if there is a risk of blocking: the servlet
-       should read while data is reported available, and can make one additional read
        should read while data is reported available. When encountering a read error, 
        the servlet should report it by propagating the exception properly. Throwing 
        an exception will cause the error event to be invoked, and the connection 
