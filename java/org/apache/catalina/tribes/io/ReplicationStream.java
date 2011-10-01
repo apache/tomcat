@@ -80,8 +80,7 @@ public final class ReplicationStream extends ObjectInputStream {
         }
     }
     
-    public Class<?> resolveClass(String name)
-        throws ClassNotFoundException, IOException {
+    public Class<?> resolveClass(String name) throws ClassNotFoundException {
 
         boolean tryRepFirst = name.startsWith("org.apache.catalina.tribes");
             try {
@@ -137,7 +136,7 @@ public final class ReplicationStream extends ObjectInputStream {
 
     
     public Class<?> findReplicationClass(String name)
-        throws ClassNotFoundException, IOException {
+            throws ClassNotFoundException {
         Class<?> clazz = Class.forName(name, false, getClass().getClassLoader());
         return clazz;
     }
