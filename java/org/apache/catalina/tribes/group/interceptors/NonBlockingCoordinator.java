@@ -272,14 +272,6 @@ public class NonBlockingCoordinator extends ChannelInterceptorBase {
         }
     }
     
-    public Member getNextInLine(MemberImpl local, MemberImpl[] others) {
-        MemberImpl result = null;
-        for ( int i=0; i<others.length; i++ ) {
-            
-        }
-        return result;
-    }
-    
     public ChannelData createData(CoordinationMessage msg, MemberImpl local) {
         msg.write();
         ChannelData data = new ChannelData(true);
