@@ -321,7 +321,7 @@ public class XByteBuffer
 
     }
     
-    public ChannelData extractPackage(boolean clearFromBuffer) throws java.io.IOException {
+    public ChannelData extractPackage(boolean clearFromBuffer) {
         XByteBuffer xbuf = extractDataPackage(clearFromBuffer);
         ChannelData cdata = ChannelData.getDataFromPackage(xbuf);
         return cdata;
