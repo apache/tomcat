@@ -408,8 +408,6 @@ public class McastServiceImpl
                     data[i] = buffer.extractPackage(true);
                 }catch (IllegalStateException ise) {
                     log.debug("Unable to decode message.",ise);
-                }catch (IOException x) {
-                    log.debug("Unable to decode message.",x);
                 }
             }
             Runnable t = new Runnable() {
