@@ -282,7 +282,7 @@ public class McastService implements MembershipService,MembershipListener,Messag
         properties.setProperty("localLoopbackDisabled",String.valueOf(localLoopbackDisabled));
     }
     
-    public boolean getLocalLoopbackDisabled(boolean localLoopbackDisabled) {
+    public boolean getLocalLoopbackDisabled() {
         String p = properties.getProperty("localLoopbackDisabled");
         if(p != null){
             return Boolean.valueOf(p).booleanValue();
