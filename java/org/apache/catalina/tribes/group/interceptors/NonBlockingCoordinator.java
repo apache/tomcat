@@ -326,13 +326,13 @@ public class NonBlockingCoordinator extends ChannelInterceptorBase {
         MemberImpl local = (MemberImpl)getLocalMember(false);
         if ( local.equals(msg.getSource()) ) {
             //my message msg.src=local
-            handleMyToken(local, msg, sender,merged);
+            handleMyToken(local, msg, merged);
         } else {
             handleOtherToken(local, msg, sender,merged);
         }
     }
     
-    protected void handleMyToken(MemberImpl local, CoordinationMessage msg, Member sender,Membership merged) throws ChannelException {
+    protected void handleMyToken(MemberImpl local, CoordinationMessage msg, Membership merged) throws ChannelException {
         if ( local.equals(msg.getLeader()) ) {
             //no leadership change
             if ( Arrays.sameMembers(msg.getMembers(),merged.getMembers()) ) {
