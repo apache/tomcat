@@ -319,16 +319,16 @@ public class NonBlockingCoordinator extends ChannelInterceptorBase {
         msg.timestamp = System.currentTimeMillis();
         Membership merged = mergeOnArrive(msg);
         if (isViewConf(msg)) handleViewConf(msg, sender, merged);
-        else handleToken(msg, sender, merged);
+        else handleToken(msg, merged);
     }
     
-    protected void handleToken(CoordinationMessage msg, Member sender,Membership merged) throws ChannelException {
+    protected void handleToken(CoordinationMessage msg, Membership merged) throws ChannelException {
         MemberImpl local = (MemberImpl)getLocalMember(false);
         if ( local.equals(msg.getSource()) ) {
             //my message msg.src=local
             handleMyToken(local, msg, merged);
         } else {
-            handleOtherToken(local, msg, sender,merged);
+            handleOtherToken(local, msg, merged);
         }
     }
     
@@ -356,7 +356,7 @@ public class NonBlockingCoordinator extends ChannelInterceptorBase {
         }
     }
     
-    protected void handleOtherToken(MemberImpl local, CoordinationMessage msg, Member sender,Membership merged) throws ChannelException {
+    protected void handleOtherToken(MemberImpl local, CoordinationMessage msg, Membership merged) throws ChannelException {
         if ( local.equals(msg.getLeader()) ) {
             //I am the new leader
             //startElection(false);
