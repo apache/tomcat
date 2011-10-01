@@ -282,10 +282,6 @@ public class NonBlockingCoordinator extends ChannelInterceptorBase {
         return data;
     }
     
-    protected void viewChange(UniqueId viewId, Member[] view) {
-        //invoke any listeners
-    }
-    
     protected boolean alive(Member mbr) {
         return TcpFailureDetector.memberAlive(mbr,
                                               COORD_ALIVE,
@@ -382,7 +378,6 @@ public class NonBlockingCoordinator extends ChannelInterceptorBase {
             suggestedviewId = null;
         }
         
-        viewChange(viewId,view.getMembers());
         fireInterceptorEvent(new CoordinationEvent(CoordinationEvent.EVT_CONF_RX,this,"Accepted View"));
         
         if ( suggestedviewId == null && hasHigherPriority(merged.getMembers(),membership.getMembers()) ) {
