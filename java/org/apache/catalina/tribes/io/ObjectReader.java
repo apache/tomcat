@@ -103,7 +103,7 @@ public class ObjectReader {
        return pkgCnt;
    }
 
-     public int append(byte[] data,int off,int len, boolean count) throws java.io.IOException {
+     public int append(byte[] data,int off,int len, boolean count) {
         buffer.append(data,off,len);
         int pkgCnt = -1;
         if ( count ) pkgCnt = buffer.countPackages();
