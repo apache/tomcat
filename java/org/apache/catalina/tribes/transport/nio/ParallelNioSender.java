@@ -309,7 +309,7 @@ public class ParallelNioSender extends AbstractSender implements MultiPointSende
                 result = true;
             } else {
                 try {
-                    sender.read(null);
+                    sender.read();
                 }catch ( IOException x ) {
                     sender.disconnect();
                     sender.reset();
