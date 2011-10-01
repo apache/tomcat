@@ -193,7 +193,7 @@ public class NonBlockingCoordinator extends ChannelInterceptorBase {
             if ( others.length == 0 ) {
                 this.viewId = new UniqueId(UUIDGenerator.randomUUID(false));
                 this.view = new Membership(local,AbsoluteOrder.comp, true);
-                this.handleViewConf(this.createElectionMsg(local,others,local),local,view);
+                this.handleViewConf(this.createElectionMsg(local,others,local), view);
                 return; //the only member, no need for an election
             }
             if ( suggestedviewId != null ) {
@@ -311,14 +311,14 @@ public class NonBlockingCoordinator extends ChannelInterceptorBase {
         return merged;
     }
     
-    protected void processCoordMessage(CoordinationMessage msg, Member sender) throws ChannelException {
+    protected void processCoordMessage(CoordinationMessage msg) throws ChannelException {
         if ( !coordMsgReceived.get() ) {
             coordMsgReceived.set(true);
             synchronized (electionMutex) { electionMutex.notifyAll();}
         } 
         msg.timestamp = System.currentTimeMillis();
         Membership merged = mergeOnArrive(msg);
-        if (isViewConf(msg)) handleViewConf(msg, sender, merged);
+        if (isViewConf(msg)) handleViewConf(msg, merged);
         else handleToken(msg, merged);
     }
     
@@ -338,7 +338,7 @@ public class NonBlockingCoordinator extends ChannelInterceptorBase {
             if ( Arrays.sameMembers(msg.getMembers(),merged.getMembers()) ) {
                 msg.type = COORD_CONF;
                 super.sendMessage(Arrays.remove(msg.getMembers(),local),createData(msg,local),null);
-                handleViewConf(msg,local,merged);
+                handleViewConf(msg, merged);
             } else {
                 //membership change
                 suggestedView = new Membership(local,AbsoluteOrder.comp,true);
@@ -366,7 +366,7 @@ public class NonBlockingCoordinator extends ChannelInterceptorBase {
         }
     }
     
-    protected void handleViewConf(CoordinationMessage msg, Member sender,Membership merged) throws ChannelException {
+    protected void handleViewConf(CoordinationMessage msg, Membership merged) throws ChannelException {
         if ( viewId != null && msg.getId().equals(viewId) ) return;//we already have this view
         view = new Membership((MemberImpl)getLocalMember(false),AbsoluteOrder.comp,true);
         Arrays.fill(view,msg.getMembers());
@@ -496,7 +496,7 @@ public class NonBlockingCoordinator extends ChannelInterceptorBase {
                 CoordinationMessage cmsg = new CoordinationMessage(msg.getMessage());
                 Member[] cmbr = cmsg.getMembers();
                 fireInterceptorEvent(new CoordinationEvent(CoordinationEvent.EVT_MSG_ARRIVE,this,"Coord Msg Arrived("+Arrays.toNameString(cmbr)+")"));
-                processCoordMessage(cmsg, msg.getAddress());
+                processCoordMessage(cmsg);
             }catch ( ChannelException x ) {
                 log.error("Error processing coordination message. Could be fatal.",x);
             }
