@@ -296,7 +296,7 @@ public class NonBlockingCoordinator extends ChannelInterceptorBase {
                                               getOptionFlag());
     }
     
-    protected Membership mergeOnArrive(CoordinationMessage msg, Member sender) {
+    protected Membership mergeOnArrive(CoordinationMessage msg) {
         fireInterceptorEvent(new CoordinationEvent(CoordinationEvent.EVT_PRE_MERGE,this,"Pre merge"));
         MemberImpl local = (MemberImpl)getLocalMember(false);
         Membership merged = new Membership(local,AbsoluteOrder.comp,true);
@@ -317,7 +317,7 @@ public class NonBlockingCoordinator extends ChannelInterceptorBase {
             synchronized (electionMutex) { electionMutex.notifyAll();}
         } 
         msg.timestamp = System.currentTimeMillis();
-        Membership merged = mergeOnArrive(msg, sender);
+        Membership merged = mergeOnArrive(msg);
         if (isViewConf(msg)) handleViewConf(msg, sender, merged);
         else handleToken(msg, sender, merged);
     }
