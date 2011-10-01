@@ -349,7 +349,13 @@ final class StandardWrapperValve
         // This should be a Request attribute...
         long t1=System.currentTimeMillis();
         // FIXME: Add a flag to count the total amount of events processed ? requestCount++;
+        
         StandardWrapper wrapper = (StandardWrapper) getContainer();
+        if (wrapper == null) {
+            // Context has been shutdown. Nothing to do here.
+            return;
+        }
+
         Servlet servlet = null;
         Context context = (Context) wrapper.getParent();
 
