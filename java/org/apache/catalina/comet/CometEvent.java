@@ -34,7 +34,7 @@ public interface CometEvent {
 
     /**
      * Enumeration describing the major events that the container can invoke 
-     * the CometProcessors event() method with
+     * the CometProcessors event() method with.<br>
      * BEGIN - will be called at the beginning 
      *  of the processing of the connection. It can be used to initialize any relevant 
      *  fields using the request and response objects. Between the end of the processing 
@@ -43,7 +43,7 @@ public interface CometEvent {
      *  Note that the response object and dependent OutputStream and Writer are still 
      *  not synchronized, so when they are accessed by multiple threads, 
      *  synchronization is mandatory. After processing the initial event, the request 
-     *  is considered to be committed.
+     *  is considered to be committed.<br>
      * READ - This indicates that input data is available, and that one read can be made
      *  without blocking. The available and ready methods of the InputStream or
      *  Reader may be used to determine if there is a risk of blocking: the servlet
@@ -54,13 +54,13 @@ public interface CometEvent {
      *  Alternately, it is also possible to catch any exception, perform clean up
      *  on any data structure the servlet may be using, and using the close method
      *  of the event. It is not allowed to attempt reading data from the request 
-     *  object outside of the execution of this method.
+     *  object outside of the execution of this method.<br>
      * END - End may be called to end the processing of the request. Fields that have
      *  been initialized in the begin method should be reset. After this event has
      *  been processed, the request and response objects, as well as all their dependent
      *  objects will be recycled and used to process other requests. End will also be 
      *  called when data is available and the end of file is reached on the request input
-     *  (this usually indicates the client has pipelined a request).
+     *  (this usually indicates the client has pipelined a request).<br>
      * ERROR - Error will be called by the container in the case where an IO exception
      *  or a similar unrecoverable error occurs on the connection. Fields that have
      *  been initialized in the begin method should be reset. After this event has
@@ -71,13 +71,13 @@ public interface CometEvent {
     
     
     /**
-     * Event details
+     * Event details.<br>
      * TIMEOUT - the connection timed out (sub type of ERROR); note that this ERROR type is not fatal, and
-     *   the connection will not be closed unless the servlet uses the close method of the event
-     * CLIENT_DISCONNECT - the client connection was closed (sub type of ERROR)
-     * IOEXCEPTION - an IO exception occurred, such as invalid content, for example, an invalid chunk block (sub type of ERROR)
-     * WEBAPP_RELOAD - the webapplication is being reloaded (sub type of END)
-     * SERVER_SHUTDOWN - the server is shutting down (sub type of END)
+     *   the connection will not be closed unless the servlet uses the close method of the event<br>
+     * CLIENT_DISCONNECT - the client connection was closed (sub type of ERROR)<br>
+     * IOEXCEPTION - an IO exception occurred, such as invalid content, for example, an invalid chunk block (sub type of ERROR)<br>
+     * WEBAPP_RELOAD - the webapplication is being reloaded (sub type of END)<br>
+     * SERVER_SHUTDOWN - the server is shutting down (sub type of END)<br>
      * SESSION_END - the servlet ended the session (sub type of END)
      */
     public enum EventSubType { TIMEOUT, CLIENT_DISCONNECT, IOEXCEPTION, WEBAPP_RELOAD, SERVER_SHUTDOWN, SESSION_END }
