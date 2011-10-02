@@ -69,9 +69,11 @@
       <xsl:variable name="name">
         <xsl:value-of select="."/>
       </xsl:variable>
+      <!--
       <xsl:variable name="email">
         <xsl:value-of select="@email"/>
       </xsl:variable>
+       -->
       <meta name="author" content="{$name}"/>
       <!-- Don't publish e-mail addresses
       <meta name="email" content="{$email}"/>
@@ -80,6 +82,10 @@
         <style type="text/css" media="print">
             .noPrint {display: none;}
             td#mainBody {width: 100%;}
+        </style>
+        <style type="text/css">
+            code {color:rgb(0,128,128);padding:0 0.1em;}
+            code.attributeName {color:rgb(0,0,0);}
         </style>
     </head>
 
@@ -358,10 +364,10 @@
         <tr>
           <td align="left" valign="center">
             <xsl:if test="@required = 'true'">
-              <strong><code><xsl:value-of select="@name"/></code></strong>
+              <strong><code class="attributeName"><xsl:value-of select="@name"/></code></strong>
             </xsl:if>
             <xsl:if test="@required != 'true'">
-              <code><xsl:value-of select="@name"/></code>
+              <code class="attributeName"><xsl:value-of select="@name"/></code>
             </xsl:if>
           </td>
           <td align="left" valign="center">
