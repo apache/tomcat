@@ -78,6 +78,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Web applications">
+    <changelog>
+      <add>
+        <bug>50923</bug>: Use distinct color for <code>code</code> tag
+        in Tomcat documentation, for better readability. (kkolinko)
+      </add>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 7.0.22 (markt)" rtext="released 2011-10-01">
   <subsection name="Catalina">
