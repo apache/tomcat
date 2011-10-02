@@ -79,7 +79,7 @@ example:</p>
 <p>If you have Tomcat configured to support multiple virtual hosts
 (websites) you would need to configure a Manager for each.</p>
 
-<p>There are three ways to use the <code>Manager</code> web application.</p>
+<p>There are three ways to use the <strong>Manager</strong> web application.</p>
 <ul>
 <li>As an application with a user interface you use in your browser.
 Here is an example URL where you can replace <code>localhost</code> with
