@@ -68,7 +68,7 @@ Apache Tomcat 7, and using many of the Apache Tomcat features.</p>
     Operating the Apache Tomcat Deployer to deploy, precompile, and validate web
     applications.</li>
 <li><a href="manager-howto.html"><strong>Manager</strong></a> -
-    Operating the <code>Manager</code> web app to deploy, undeploy, and
+    Operating the <strong>Manager</strong> web app to deploy, undeploy, and
     redeploy applications while Apache Tomcat is running.</li>
 <li><a href="realm-howto.html"><strong>Realms and Access Control</strong></a>
     - Description of how to configure <em>Realms</em> (databases of users,
