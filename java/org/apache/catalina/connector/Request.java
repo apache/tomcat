@@ -2514,6 +2514,7 @@ public class Request
     
     public void cometClose() {
         coyoteRequest.action(ActionCode.COMET_CLOSE,getEvent());
+        setComet(false);
     }
     
     public void setCometTimeout(long timeout) {

@@ -95,14 +95,7 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
      */
     protected NioEndpoint.SendfileData sendfileData = null;
 
-    /**
-     * Closed flag, a Comet async thread can 
-     * signal for this Nio processor to be closed and recycled instead
-     * of waiting for a timeout.
-     * Closed by HttpServletResponse.getWriter().close()
-     */
-    protected boolean cometClose = false;
-    
+
     /**
      * Socket associated with the current connection.
      */
@@ -289,7 +282,6 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
     @Override
     public void recycleInternal() {
         socket = null;
-        cometClose = false;
         comet = false;
         sendfileData = null;
     }
@@ -307,22 +299,7 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
     @Override
     public void actionInternal(ActionCode actionCode, Object param) {
 
-        if (actionCode == ActionCode.CLOSE) {
-            // Close
-            // End the processing of the current request, and stop any further
-            // transactions with the client
-
-            comet = false;
-            cometClose = true;
-
-            try {
-                outputBuffer.endRequest();
-            } catch (IOException e) {
-                // Set error flag
-                error = true;
-            }
-
-        } else if (actionCode == ActionCode.REQ_HOST_ADDR_ATTRIBUTE) {
+        if (actionCode == ActionCode.REQ_HOST_ADDR_ATTRIBUTE) {
 
             // Get remote host address
             if ((remoteAddr == null) && (socket != null)) {
@@ -459,10 +436,13 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
             if (socket==null || socket.getSocket().getAttachment(false)==null) return;
             NioEndpoint.KeyAttachment attach = (NioEndpoint.KeyAttachment)socket.getSocket().getAttachment(false);
             attach.setCometOps(NioEndpoint.OP_CALLBACK);
-            //notify poller if not on a tomcat thread
             RequestInfo rp = request.getRequestProcessor();
-            if ( rp.getStage() != org.apache.coyote.Constants.STAGE_SERVICE ) //async handling
+            if (rp.getStage() != org.apache.coyote.Constants.STAGE_SERVICE) {
+                // Close event for this processor triggered by request
+                // processing in another processor, a non-Tomcat thread (i.e.
+                // an application controlled thread) or similar.
                 socket.getSocket().getPoller().add(socket.getSocket());
+            }
         } else if (actionCode == ActionCode.COMET_SETTIMEOUT) {
             if (param==null) return;
             if (socket==null || socket.getSocket().getAttachment(false)==null) return;

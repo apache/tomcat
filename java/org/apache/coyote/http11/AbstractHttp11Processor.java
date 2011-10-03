@@ -723,7 +723,17 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
     @Override
     public final void action(ActionCode actionCode, Object param) {
         
-        if (actionCode == ActionCode.COMMIT) {
+        if (actionCode == ActionCode.CLOSE) {
+            // End the processing of the current request
+
+            try {
+                getOutputBuffer().endRequest();
+            } catch (IOException e) {
+                // Set error flag
+                error = true;
+            }
+
+        } else if (actionCode == ActionCode.COMMIT) {
             // Commit current response
 
             if (response.isCommitted())
