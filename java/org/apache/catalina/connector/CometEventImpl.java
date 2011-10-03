@@ -93,11 +93,11 @@ public class CometEventImpl implements CometEvent {
         if (request == null) {
             throw new IllegalStateException(sm.getString("cometEvent.nullRequest"));
         }
-        boolean iscomet = request.isComet();
-        request.setComet(false);
         request.finishRequest();
         response.finishResponse();
-        if (iscomet) request.cometClose();
+        if (request.isComet()) {
+            request.cometClose();
+        }
     }
 
     @Override

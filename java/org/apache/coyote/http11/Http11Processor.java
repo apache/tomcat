@@ -244,19 +244,7 @@ public class Http11Processor extends AbstractHttp11Processor<Socket> {
     @Override
     public void actionInternal(ActionCode actionCode, Object param) {
 
-        if (actionCode == ActionCode.CLOSE) {
-            // Close
-            // End the processing of the current request, and stop any further
-            // transactions with the client
-
-            try {
-                outputBuffer.endRequest();
-            } catch (IOException e) {
-                // Set error flag
-                error = true;
-            }
-
-        } else if (actionCode == ActionCode.REQ_SSL_ATTRIBUTE ) {
+        if (actionCode == ActionCode.REQ_SSL_ATTRIBUTE ) {
 
             try {
                 if (sslSupport != null) {
