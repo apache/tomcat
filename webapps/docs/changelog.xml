@@ -65,6 +65,10 @@
   <subsection name="Coyote">
     <changelog>
       <fix>
+        <bug>51881</bug>: Correctly complete Comet requests when the Comet END
+        event is triggered asynchronously. (markt)
+      </fix>
+      <fix>
         <bug>51905</bug>: Fix infinite loop in AprEndpoint shutdown if
         acceptor unlock fails. Reduce timeout before forcefully closing
         the socket from 30s to 10s. (kkolinko)
