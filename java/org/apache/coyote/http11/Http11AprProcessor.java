@@ -273,21 +273,7 @@ public class Http11AprProcessor extends AbstractHttp11Processor<Long> {
 
         long socketRef = socket.getSocket().longValue();
         
-        if (actionCode == ActionCode.CLOSE) {
-            // Close
-
-            // End the processing of the current request, and stop any further
-            // transactions with the client
-
-            comet = false;
-            try {
-                outputBuffer.endRequest();
-            } catch (IOException e) {
-                // Set error flag
-                error = true;
-            }
-
-        } else if (actionCode == ActionCode.REQ_HOST_ADDR_ATTRIBUTE) {
+        if (actionCode == ActionCode.REQ_HOST_ADDR_ATTRIBUTE) {
 
             // Get remote host address
             if (remoteAddr == null && (socketRef != 0)) {
