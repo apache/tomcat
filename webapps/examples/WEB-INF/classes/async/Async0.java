@@ -39,7 +39,6 @@ public class Async0 extends HttpServlet {
             log.info("Received dispatch, completing on the worker thread.");
             log.info("After complete called started:"+req.isAsyncStarted());
             resp.getWriter().write("Async dispatch worked:+"+System.currentTimeMillis()+"\n");
-            req.getAsyncContext().complete();
         } else {
             resp.setContentType("text/plain");
             final AsyncContext actx = req.startAsync();
