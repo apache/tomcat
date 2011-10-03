@@ -88,6 +88,10 @@
         <bug>50923</bug>: Use distinct color for <code>code</code> tag
         in Tomcat documentation, for better readability. (kkolinko)
       </add>
+      <fix>
+        <bug>51630</bug>: Fix bug in async0 example that triggered an
+        IllegalStateException in the application log. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
