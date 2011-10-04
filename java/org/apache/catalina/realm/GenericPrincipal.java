@@ -127,7 +127,7 @@ public class GenericPrincipal implements Principal {
         if (roles != null) {
             this.roles = new String[roles.size()];
             this.roles = roles.toArray(this.roles);
-            if (this.roles.length > 0)
+            if (this.roles.length > 1)
                 Arrays.sort(this.roles);
         }
         this.loginContext = loginContext;
