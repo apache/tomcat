@@ -89,7 +89,7 @@ public final class RemoteAddrFilter
     @Override
     public void doFilterEvent(CometEvent event, CometFilterChain chain)
             throws IOException, ServletException {
-        processCometEvent(event.getHttpServletRequest().getRemoteHost(),
+        processCometEvent(event.getHttpServletRequest().getRemoteAddr(),
                 event, chain);        
     }
 
@@ -97,5 +97,4 @@ public final class RemoteAddrFilter
     protected Log getLogger() {
         return log;
     }
-    
 }
