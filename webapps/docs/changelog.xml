@@ -60,6 +60,10 @@
         <bug>51910</bug>: Prevent NPE on connector stop if Comet applications
         are being used without the CometConnectionManagerValve. (markt)
       </fix>
+      <fix>
+        <bug>51956</bug>: RemoteAddrFilter used getRemoteHost instead of
+        getRemoteAddr when filtering Comet events. (schultz)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
