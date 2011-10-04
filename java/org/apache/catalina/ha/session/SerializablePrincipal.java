@@ -108,7 +108,7 @@ public class SerializablePrincipal  implements java.io.Serializable {
         if (roles != null) {
             this.roles = new String[roles.size()];
             this.roles = roles.toArray(this.roles);
-            if (this.roles.length > 0)
+            if (this.roles.length > 1)
                 Arrays.sort(this.roles);
         }
         if (userPrincipal instanceof Serializable) {
