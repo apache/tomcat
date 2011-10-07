@@ -859,7 +859,21 @@ public class StandardContext extends ContainerBase
 
     private boolean preemptiveAuthentication = false;
 
+    private boolean sendRedirectBody = false;
+
+    
     // ----------------------------------------------------- Context Properties
+    
+    @Override
+    public boolean getSendRedirectBody() {
+        return sendRedirectBody;
+    }
+
+
+    @Override
+    public void setSendRedirectBody(boolean sendRedirectBody) {
+        this.sendRedirectBody = sendRedirectBody;
+    }
 
 
     @Override

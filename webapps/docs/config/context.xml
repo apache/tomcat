@@ -365,6 +365,14 @@
         string, else the default value will be <code>jsp</code>.</p>
       </attribute>
 
+      <attribute name="sendRedirectBody" required="false">
+        <p>If <code>true</code>, redirect responses will include a short
+        response body that includes details of the redirect as recommended by
+        RFC 2616. This is disabled by default since including a response body
+        may cause problems for some application component such as compression
+        filters.</p>
+      </attribute>
+      
       <attribute name="sessionCookieDomain" required="false">
         <p>The domain to be used for all session cookies created for this
         context. If set, this overrides any domain set by the web application.
