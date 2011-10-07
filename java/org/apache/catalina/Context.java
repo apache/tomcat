@@ -1391,5 +1391,17 @@ public interface Context extends Container {
      * resource.
      */
     public boolean getPreemptiveAuthentication();
+
+    /**
+     * Configures if a response body is included when a redirect response is
+     * sent to the client.
+     */
+    public void setSendRedirectBody(boolean enable);
+    
+    /**
+     * Dtermines if the context is configured to included a response body as
+     * part of a redirect response.
+     */
+    public boolean getSendRedirectBody();
 }
 

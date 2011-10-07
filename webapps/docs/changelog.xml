@@ -64,6 +64,12 @@
         <bug>51956</bug>: RemoteAddrFilter used getRemoteHost instead of
         getRemoteAddr when filtering Comet events. (schultz)
       </fix>
+      <fix>
+        <bug>51952</bug>: Make the inclusion of a response body with a redirect
+        response introduced to address <bug>41718</bug> optional and disabled by
+        default due to the side-effects of including a body with the response in
+        this case. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
