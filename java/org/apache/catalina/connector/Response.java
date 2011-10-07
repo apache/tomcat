@@ -1335,10 +1335,12 @@ public class Response
             String absolute = toAbsolute(location);
             setStatus(SC_FOUND);
             setHeader("Location", absolute);
-            PrintWriter writer = getWriter();
-            writer.print(sm.getString("coyoteResponse.sendRedirect.note",
-                    RequestUtil.filter(absolute)));
-            flushBuffer();
+            if (getContext().getSendRedirectBody()) {
+                PrintWriter writer = getWriter();
+                writer.print(sm.getString("coyoteResponse.sendRedirect.note",
+                        RequestUtil.filter(absolute)));
+                flushBuffer();
+            }
         } catch (IllegalArgumentException e) {
             setStatus(SC_NOT_FOUND);
         }
