@@ -17,7 +17,6 @@
 package org.apache.tomcat.jdbc.pool;
 
 
-import java.io.IOException;
 import java.sql.Connection;
 import java.util.Hashtable;
 import java.util.Properties;
@@ -183,6 +182,7 @@ public class DataSourceFactory implements ObjectFactory {
      *
      * @exception Exception if an exception occurs creating the instance
      */
+    @Override
     public Object getObjectInstance(Object obj, Name name, Context nameCtx,
                                     Hashtable<?,?> environment) throws Exception {
 
@@ -224,7 +224,7 @@ public class DataSourceFactory implements ObjectFactory {
         return createDataSource(properties,nameCtx,XA);
     }
     
-    public static PoolConfiguration parsePoolProperties(Properties properties) throws IOException{
+    public static PoolConfiguration parsePoolProperties(Properties properties) {
         PoolConfiguration poolProperties = new PoolProperties();
         String value = null;
 
@@ -516,7 +516,7 @@ public class DataSourceFactory implements ObjectFactory {
         }
         if (jndiDS==null) {
             try {
-                context = (Context) (new InitialContext());
+                context = new InitialContext();
                 jndiDS = context.lookup(poolProperties.getDataSourceJNDI());
             } catch (NamingException e) {
                 log.warn("The name \""+poolProperties.getDataSourceJNDI()+"\" can not be found in the InitialContext.");
@@ -533,7 +533,7 @@ public class DataSourceFactory implements ObjectFactory {
      * @return Properties
      * @throws Exception
      */
-    static protected Properties getProperties(String propText) throws IOException {
+    static protected Properties getProperties(String propText) {
         return PoolProperties.getProperties(propText,null);
     }
 

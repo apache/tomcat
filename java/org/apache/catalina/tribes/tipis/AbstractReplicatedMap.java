@@ -1428,7 +1428,7 @@ public abstract class AbstractReplicatedMap extends ConcurrentHashMap implements
             }
         }
         
-        protected Member[] readMembers(ObjectInput in) throws IOException, ClassNotFoundException {
+        protected Member[] readMembers(ObjectInput in) throws IOException {
             int nodecount = in.readInt();
             Member[] members = new Member[nodecount];
             for ( int i=0; i<members.length; i++ ) {

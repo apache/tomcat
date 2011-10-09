@@ -67,6 +67,7 @@ public class DataSource extends DataSourceProxy implements javax.sql.DataSource,
      * Unregisters the underlying connection pool mbean.<br/>
      * {@inheritDoc}
      */
+    @Override
     public void postDeregister() {
         if (oname!=null) unregisterJmx();
     }
@@ -75,6 +76,7 @@ public class DataSource extends DataSourceProxy implements javax.sql.DataSource,
      * no-op<br/>
      * {@inheritDoc}
      */
+    @Override
     public void postRegister(Boolean registrationDone) {
         // NOOP
     }
@@ -84,6 +86,7 @@ public class DataSource extends DataSourceProxy implements javax.sql.DataSource,
      * no-op<br/>
      * {@inheritDoc}
      */
+    @Override
     public void preDeregister() throws Exception {
         // NOOP
     }
@@ -92,6 +95,7 @@ public class DataSource extends DataSourceProxy implements javax.sql.DataSource,
      * If the connection pool MBean exists, it will be registered during this operation.<br/>
      * {@inheritDoc}
      */
+    @Override
     public ObjectName preRegister(MBeanServer server, ObjectName name) throws Exception {
         try {
             this.oname = createObjectName(name);

@@ -651,8 +651,10 @@ public class ConnectionPool {
     protected PooledConnection createConnection(long now, PooledConnection notUsed, String username, String password) throws SQLException {
         //no connections where available we'll create one
         PooledConnection con = create(false);
-        if (username!=null) con.getAttributes().put(con.PROP_USER, username);
-        if (password!=null) con.getAttributes().put(con.PROP_PASSWORD, password);
+        if (username!=null) con.getAttributes().put(
+                PooledConnection.PROP_USER, username);
+        if (password!=null) con.getAttributes().put(
+                PooledConnection.PROP_PASSWORD, password);
         boolean error = false;
         try {
             //connect and validate the connection
@@ -1075,6 +1077,7 @@ public class ConnectionPool {
         /**
          * {@inheritDoc}
          */
+        @Override
         public boolean cancel(boolean mayInterruptIfRunning) {
             if (pc!=null) {
                 return false;
@@ -1088,6 +1091,7 @@ public class ConnectionPool {
         /**
          * {@inheritDoc}
          */
+        @Override
         public Connection get() throws InterruptedException, ExecutionException {
             try {
                 return get(Long.MAX_VALUE, TimeUnit.MILLISECONDS);
@@ -1099,6 +1103,7 @@ public class ConnectionPool {
         /**
          * {@inheritDoc}
          */
+        @Override
         public Connection get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
             PooledConnection pc = this.pc!=null?this.pc:pcFuture.get(timeout,unit);
             if (pc!=null) {
@@ -1126,6 +1131,7 @@ public class ConnectionPool {
         /**
          * {@inheritDoc}
          */
+        @Override
         public boolean isCancelled() {
             return pc==null && (pcFuture.isCancelled() || cancelled.get());
         }
@@ -1133,6 +1139,7 @@ public class ConnectionPool {
         /**
          * {@inheritDoc}
          */
+        @Override
         public boolean isDone() {
             return pc!=null || pcFuture.isDone();
         }
@@ -1140,6 +1147,7 @@ public class ConnectionPool {
         /**
          * run method to be executed when cancelled by an executor
          */
+        @Override
         public void run() {
             try {
                 Connection con = get(); //complete this future

@@ -123,7 +123,8 @@ public class StatementDecoratorInterceptor extends AbstractCreateStatementInterc
                                      Object statement, Constructor<?> constructor, String sql) 
     throws InstantiationException, IllegalAccessException, InvocationTargetException {
         Object result = null;
-        StatementProxy statementProxy = new StatementProxy<Statement>((Statement)statement,sql);
+        StatementProxy<Statement> statementProxy =
+                new StatementProxy<Statement>((Statement)statement,sql);
         result = constructor.newInstance(new Object[] { statementProxy });
         statementProxy.setActualProxy(result);
         statementProxy.setConnection(proxy);
@@ -198,6 +199,7 @@ public class StatementDecoratorInterceptor extends AbstractCreateStatementInterc
             delegate = null;
         }
         
+        @Override
         public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
             if (compare(TOSTRING_VAL,method)) {
                 return toString();
@@ -243,6 +245,7 @@ public class StatementDecoratorInterceptor extends AbstractCreateStatementInterc
             return result;
         }
         
+        @Override
         public String toString() {
             StringBuffer buf = new StringBuffer(StatementProxy.class.getName());
             buf.append("[Proxy=");
@@ -268,6 +271,7 @@ public class StatementDecoratorInterceptor extends AbstractCreateStatementInterc
             this.delegate = delegate;
         }
 
+        @Override
         public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
             if (method.getName().equals("getStatement")) {
                 return this.st;

@@ -131,9 +131,7 @@ public class SlowQueryReport extends AbstractQueryReport  {
             //create the map to hold our stats
             //however TODO we need to improve the eviction
             //selection
-            queries = new ConcurrentHashMap<String,QueryStats>() {
-                
-            };
+            queries = new ConcurrentHashMap<String,QueryStats>();
             if (perPoolStats.putIfAbsent(pool.getName(), queries)!=null) {
                 //there already was one
                 queries = SlowQueryReport.perPoolStats.get(pool.getName());

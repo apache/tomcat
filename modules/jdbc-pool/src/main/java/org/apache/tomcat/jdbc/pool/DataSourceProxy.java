@@ -206,6 +206,7 @@ public class DataSourceProxy implements PoolConfiguration {
     }
 
     
+    @Override
     public String toString() {
         return super.toString()+"{"+getPoolProperties()+"}";
     }
@@ -219,6 +220,7 @@ public class DataSourceProxy implements PoolConfiguration {
      * {@inheritDoc}
      */
     
+    @Override
     public String getPoolName() {
         return pool.getName();
     }
@@ -232,6 +234,7 @@ public class DataSourceProxy implements PoolConfiguration {
      * {@inheritDoc}
      */
     
+    @Override
     public void setDriverClassName(String driverClassName) {
         this.poolProperties.setDriverClassName(driverClassName);
     }
@@ -240,6 +243,7 @@ public class DataSourceProxy implements PoolConfiguration {
      * {@inheritDoc}
      */
     
+    @Override
     public void setInitialSize(int initialSize) {
         this.poolProperties.setInitialSize(initialSize);
     }
@@ -248,6 +252,7 @@ public class DataSourceProxy implements PoolConfiguration {
      * {@inheritDoc}
      */
     
+    @Override
     public void setInitSQL(String initSQL) {
         this.poolProperties.setInitSQL(initSQL);
     }
@@ -256,6 +261,7 @@ public class DataSourceProxy implements PoolConfiguration {
      * {@inheritDoc}
      */
     
+    @Override
     public void setLogAbandoned(boolean logAbandoned) {
         this.poolProperties.setLogAbandoned(logAbandoned);
     }
@@ -264,6 +270,7 @@ public class DataSourceProxy implements PoolConfiguration {
      * {@inheritDoc}
      */
     
+    @Override
     public void setMaxActive(int maxActive) {
         this.poolProperties.setMaxActive(maxActive);
     }
@@ -272,6 +279,7 @@ public class DataSourceProxy implements PoolConfiguration {
      * {@inheritDoc}
      */
     
+    @Override
     public void setMaxIdle(int maxIdle) {
         this.poolProperties.setMaxIdle(maxIdle);
     }
@@ -280,6 +288,7 @@ public class DataSourceProxy implements PoolConfiguration {
      * {@inheritDoc}
      */
     
+    @Override
     public void setMaxWait(int maxWait) {
         this.poolProperties.setMaxWait(maxWait);
     }
@@ -288,6 +297,7 @@ public class DataSourceProxy implements PoolConfiguration {
      * {@inheritDoc}
      */
     
+    @Override
     public void setMinEvictableIdleTimeMillis(int minEvictableIdleTimeMillis) {
         this.poolProperties.setMinEvictableIdleTimeMillis(minEvictableIdleTimeMillis);
     }
@@ -296,6 +306,7 @@ public class DataSourceProxy implements PoolConfiguration {
      * {@inheritDoc}
      */
     
+    @Override
     public void setMinIdle(int minIdle) {
         this.poolProperties.setMinIdle(minIdle);
     }
@@ -304,6 +315,7 @@ public class DataSourceProxy implements PoolConfiguration {
      * {@inheritDoc}
      */
     
+    @Override
     public void setNumTestsPerEvictionRun(int numTestsPerEvictionRun) {
         this.poolProperties.setNumTestsPerEvictionRun(numTestsPerEvictionRun);
     }
@@ -312,6 +324,7 @@ public class DataSourceProxy implements PoolConfiguration {
      * {@inheritDoc}
      */
     
+    @Override
     public void setPassword(String password) {
         this.poolProperties.setPassword(password);
         this.poolProperties.getDbProperties().setProperty("password",this.poolProperties.getPassword());
@@ -321,6 +334,7 @@ public class DataSourceProxy implements PoolConfiguration {
      * {@inheritDoc}
      */
     
+    @Override
     public void setRemoveAbandoned(boolean removeAbandoned) {
         this.poolProperties.setRemoveAbandoned(removeAbandoned);
     }
@@ -329,6 +343,7 @@ public class DataSourceProxy implements PoolConfiguration {
      * {@inheritDoc}
      */
     
+    @Override
     public void setRemoveAbandonedTimeout(int removeAbandonedTimeout) {
         this.poolProperties.setRemoveAbandonedTimeout(removeAbandonedTimeout);
     }
@@ -337,6 +352,7 @@ public class DataSourceProxy implements PoolConfiguration {
      * {@inheritDoc}
      */
     
+    @Override
     public void setTestOnBorrow(boolean testOnBorrow) {
         this.poolProperties.setTestOnBorrow(testOnBorrow);
     }
@@ -345,6 +361,7 @@ public class DataSourceProxy implements PoolConfiguration {
      * {@inheritDoc}
      */
     
+    @Override
     public void setTestOnConnect(boolean testOnConnect) {
         this.poolProperties.setTestOnConnect(testOnConnect);
     }
@@ -353,6 +370,7 @@ public class DataSourceProxy implements PoolConfiguration {
      * {@inheritDoc}
      */
     
+    @Override
     public void setTestOnReturn(boolean testOnReturn) {
         this.poolProperties.setTestOnReturn(testOnReturn);
     }
@@ -361,6 +379,7 @@ public class DataSourceProxy implements PoolConfiguration {
      * {@inheritDoc}
      */
     
+    @Override
     public void setTestWhileIdle(boolean testWhileIdle) {
         this.poolProperties.setTestWhileIdle(testWhileIdle);
     }
@@ -369,6 +388,7 @@ public class DataSourceProxy implements PoolConfiguration {
      * {@inheritDoc}
      */
     
+    @Override
     public void setTimeBetweenEvictionRunsMillis(int timeBetweenEvictionRunsMillis) {
         this.poolProperties.setTimeBetweenEvictionRunsMillis(timeBetweenEvictionRunsMillis);
     }
@@ -377,6 +397,7 @@ public class DataSourceProxy implements PoolConfiguration {
      * {@inheritDoc}
      */
     
+    @Override
     public void setUrl(String url) {
         this.poolProperties.setUrl(url);
     }
@@ -385,6 +406,7 @@ public class DataSourceProxy implements PoolConfiguration {
      * {@inheritDoc}
      */
     
+    @Override
     public void setUsername(String username) {
         this.poolProperties.setUsername(username);
         this.poolProperties.getDbProperties().setProperty("user",getPoolProperties().getUsername());
@@ -394,6 +416,7 @@ public class DataSourceProxy implements PoolConfiguration {
      * {@inheritDoc}
      */
     
+    @Override
     public void setValidationInterval(long validationInterval) {
         this.poolProperties.setValidationInterval(validationInterval);
     }
@@ -402,6 +425,7 @@ public class DataSourceProxy implements PoolConfiguration {
      * {@inheritDoc}
      */
     
+    @Override
     public void setValidationQuery(String validationQuery) {
         this.poolProperties.setValidationQuery(validationQuery);
     }
@@ -410,6 +434,7 @@ public class DataSourceProxy implements PoolConfiguration {
      * {@inheritDoc}
      */
     
+    @Override
     public void setValidatorClassName(String className) {
         this.poolProperties.setValidatorClassName(className);
     }
@@ -418,6 +443,7 @@ public class DataSourceProxy implements PoolConfiguration {
      * {@inheritDoc}
      */
     
+    @Override
     public void setJdbcInterceptors(String interceptors) {
         this.getPoolProperties().setJdbcInterceptors(interceptors);
     }
@@ -426,6 +452,7 @@ public class DataSourceProxy implements PoolConfiguration {
      * {@inheritDoc}
      */
     
+    @Override
     public void setJmxEnabled(boolean enabled) {
         this.getPoolProperties().setJmxEnabled(enabled);
     }
@@ -434,6 +461,7 @@ public class DataSourceProxy implements PoolConfiguration {
      * {@inheritDoc}
      */
     
+    @Override
     public void setFairQueue(boolean fairQueue) {
         this.getPoolProperties().setFairQueue(fairQueue);
     }
@@ -442,6 +470,7 @@ public class DataSourceProxy implements PoolConfiguration {
      * {@inheritDoc}
      */
     
+    @Override
     public void setUseLock(boolean useLock) {
         this.getPoolProperties().setUseLock(useLock);
     }
@@ -450,6 +479,7 @@ public class DataSourceProxy implements PoolConfiguration {
      * {@inheritDoc}
      */
     
+    @Override
     public void setDefaultCatalog(String catalog) {
         this.getPoolProperties().setDefaultCatalog(catalog);
     }
@@ -458,6 +488,7 @@ public class DataSourceProxy implements PoolConfiguration {
      * {@inheritDoc}
      */
     
+    @Override
     public void setDefaultAutoCommit(Boolean autocommit) {
         this.getPoolProperties().setDefaultAutoCommit(autocommit);
     }
@@ -466,6 +497,7 @@ public class DataSourceProxy implements PoolConfiguration {
      * {@inheritDoc}
      */
     
+    @Override
     public void setDefaultTransactionIsolation(int defaultTransactionIsolation) {
         this.getPoolProperties().setDefaultTransactionIsolation(defaultTransactionIsolation);
     }
@@ -474,6 +506,7 @@ public class DataSourceProxy implements PoolConfiguration {
      * {@inheritDoc}
      */
     
+    @Override
     public void setConnectionProperties(String properties) {
         try {
             java.util.Properties prop = DataSourceFactory
@@ -495,6 +528,7 @@ public class DataSourceProxy implements PoolConfiguration {
      * {@inheritDoc}
      */
     
+    @Override
     public void setUseEquals(boolean useEquals) {
         this.getPoolProperties().setUseEquals(useEquals);
     }
@@ -545,6 +579,7 @@ public class DataSourceProxy implements PoolConfiguration {
      * {@inheritDoc}
      */
     
+    @Override
     public int getSuspectTimeout() {
         return getPoolProperties().getSuspectTimeout(); 
     }
@@ -553,6 +588,7 @@ public class DataSourceProxy implements PoolConfiguration {
      * {@inheritDoc}
      */
     
+    @Override
     public void setSuspectTimeout(int seconds) {
         getPoolProperties().setSuspectTimeout(seconds);
     }
@@ -661,6 +697,7 @@ public class DataSourceProxy implements PoolConfiguration {
      * {@inheritDoc}
      */
     
+    @Override
     public String getConnectionProperties() {
         return getPoolProperties().getConnectionProperties();
     }
@@ -669,6 +706,7 @@ public class DataSourceProxy implements PoolConfiguration {
      * {@inheritDoc}
      */
     
+    @Override
     public Properties getDbProperties() {
         return getPoolProperties().getDbProperties();
     }
@@ -677,6 +715,7 @@ public class DataSourceProxy implements PoolConfiguration {
      * {@inheritDoc}
      */
     
+    @Override
     public String getDefaultCatalog() {
         return getPoolProperties().getDefaultCatalog();
     }
@@ -685,6 +724,7 @@ public class DataSourceProxy implements PoolConfiguration {
      * {@inheritDoc}
      */
     
+    @Override
     public int getDefaultTransactionIsolation() {
         return getPoolProperties().getDefaultTransactionIsolation();
     }
@@ -693,6 +733,7 @@ public class DataSourceProxy implements PoolConfiguration {
      * {@inheritDoc}
      */
     
+    @Override
     public String getDriverClassName() {
         return getPoolProperties().getDriverClassName();
     }
@@ -702,6 +743,7 @@ public class DataSourceProxy implements PoolConfiguration {
      * {@inheritDoc}
      */
     
+    @Override
     public int getInitialSize() {
         return getPoolProperties().getInitialSize();
     }
@@ -710,6 +752,7 @@ public class DataSourceProxy implements PoolConfiguration {
      * {@inheritDoc}
      */
     
+    @Override
     public String getInitSQL() {
         return getPoolProperties().getInitSQL();
     }
@@ -718,6 +761,7 @@ public class DataSourceProxy implements PoolConfiguration {
      * {@inheritDoc}
      */
     
+    @Override
     public String getJdbcInterceptors() {
         return getPoolProperties().getJdbcInterceptors();
     }
@@ -726,6 +770,7 @@ public class DataSourceProxy implements PoolConfiguration {
      * {@inheritDoc}
      */
     
+    @Override
     public int getMaxActive() {
         return getPoolProperties().getMaxActive();
     }
@@ -734,6 +779,7 @@ public class DataSourceProxy implements PoolConfiguration {
      * {@inheritDoc}
      */
     
+    @Override
     public int getMaxIdle() {
         return getPoolProperties().getMaxIdle();
     }
@@ -742,6 +788,7 @@ public class DataSourceProxy implements PoolConfiguration {
      * {@inheritDoc}
      */
     
+    @Override
     public int getMaxWait() {
         return getPoolProperties().getMaxWait();
     }
@@ -750,6 +797,7 @@ public class DataSourceProxy implements PoolConfiguration {
      * {@inheritDoc}
      */
     
+    @Override
     public int getMinEvictableIdleTimeMillis() {
         return getPoolProperties().getMinEvictableIdleTimeMillis();
     }
@@ -758,6 +806,7 @@ public class DataSourceProxy implements PoolConfiguration {
      * {@inheritDoc}
      */
     
+    @Override
     public int getMinIdle() {
         return getPoolProperties().getMinIdle();
     }
@@ -766,6 +815,7 @@ public class DataSourceProxy implements PoolConfiguration {
      * {@inheritDoc}
      */
     
+    @Override
     public long getMaxAge() {
         return getPoolProperties().getMaxAge();
     }    
@@ -774,6 +824,7 @@ public class DataSourceProxy implements PoolConfiguration {
      * {@inheritDoc}
      */
     
+    @Override
     public String getName() {
         return getPoolProperties().getName();
     }
@@ -782,6 +833,7 @@ public class DataSourceProxy implements PoolConfiguration {
      * {@inheritDoc}
      */
     
+    @Override
     public int getNumTestsPerEvictionRun() {
         return getPoolProperties().getNumTestsPerEvictionRun();
     }
@@ -789,6 +841,7 @@ public class DataSourceProxy implements PoolConfiguration {
     /**
      * @return DOES NOT RETURN THE PASSWORD, IT WOULD SHOW UP IN JMX
      */
+    @Override
     public String getPassword() {
         return "Password not available as DataSource/JMX operation.";
     }
@@ -797,6 +850,7 @@ public class DataSourceProxy implements PoolConfiguration {
      * {@inheritDoc}
      */
     
+    @Override
     public int getRemoveAbandonedTimeout() {
         return getPoolProperties().getRemoveAbandonedTimeout();
     }
@@ -806,6 +860,7 @@ public class DataSourceProxy implements PoolConfiguration {
      * {@inheritDoc}
      */
     
+    @Override
     public int getTimeBetweenEvictionRunsMillis() {
         return getPoolProperties().getTimeBetweenEvictionRunsMillis();
     }
@@ -814,6 +869,7 @@ public class DataSourceProxy implements PoolConfiguration {
      * {@inheritDoc}
      */
     
+    @Override
     public String getUrl() {
         return getPoolProperties().getUrl();
     }
@@ -822,6 +878,7 @@ public class DataSourceProxy implements PoolConfiguration {
      * {@inheritDoc}
      */
     
+    @Override
     public String getUsername() {
         return getPoolProperties().getUsername();
     }
@@ -830,6 +887,7 @@ public class DataSourceProxy implements PoolConfiguration {
      * {@inheritDoc}
      */
     
+    @Override
     public long getValidationInterval() {
         return getPoolProperties().getValidationInterval();
     }
@@ -838,6 +896,7 @@ public class DataSourceProxy implements PoolConfiguration {
      * {@inheritDoc}
      */
     
+    @Override
     public String getValidationQuery() {
         return getPoolProperties().getValidationQuery();
     }
@@ -846,6 +905,7 @@ public class DataSourceProxy implements PoolConfiguration {
      * {@inheritDoc}
      */
     
+    @Override
     public String getValidatorClassName() {
         return getPoolProperties().getValidatorClassName();
     }
@@ -854,6 +914,7 @@ public class DataSourceProxy implements PoolConfiguration {
      * {@inheritDoc}
      */
     
+    @Override
     public Validator getValidator() {
         return getPoolProperties().getValidator();
     }
@@ -861,6 +922,7 @@ public class DataSourceProxy implements PoolConfiguration {
     /** 
      * {@inheritDoc}
      */
+    @Override
     public void setValidator(Validator validator) {
         getPoolProperties().setValidator(validator);
     }
@@ -870,6 +932,7 @@ public class DataSourceProxy implements PoolConfiguration {
      * {@inheritDoc}
      */
     
+    @Override
     public boolean isAccessToUnderlyingConnectionAllowed() {
         return getPoolProperties().isAccessToUnderlyingConnectionAllowed();
     }
@@ -878,6 +941,7 @@ public class DataSourceProxy implements PoolConfiguration {
      * {@inheritDoc}
      */
     
+    @Override
     public Boolean isDefaultAutoCommit() {
         return getPoolProperties().isDefaultAutoCommit();
     }
@@ -886,6 +950,7 @@ public class DataSourceProxy implements PoolConfiguration {
      * {@inheritDoc}
      */
     
+    @Override
     public Boolean isDefaultReadOnly() {
         return getPoolProperties().isDefaultReadOnly();
     }
@@ -894,6 +959,7 @@ public class DataSourceProxy implements PoolConfiguration {
      * {@inheritDoc}
      */
     
+    @Override
     public boolean isLogAbandoned() {
         return getPoolProperties().isLogAbandoned();
     }
@@ -902,6 +968,7 @@ public class DataSourceProxy implements PoolConfiguration {
      * {@inheritDoc}
      */
     
+    @Override
     public boolean isPoolSweeperEnabled() {
         return getPoolProperties().isPoolSweeperEnabled();
     }
@@ -910,6 +977,7 @@ public class DataSourceProxy implements PoolConfiguration {
      * {@inheritDoc}
      */
     
+    @Override
     public boolean isRemoveAbandoned() {
         return getPoolProperties().isRemoveAbandoned();
     }
@@ -918,6 +986,7 @@ public class DataSourceProxy implements PoolConfiguration {
      * {@inheritDoc}
      */
     
+    @Override
     public int getAbandonWhenPercentageFull() {
         return getPoolProperties().getAbandonWhenPercentageFull();
     }
@@ -926,6 +995,7 @@ public class DataSourceProxy implements PoolConfiguration {
      * {@inheritDoc}
      */
     
+    @Override
     public boolean isTestOnBorrow() {
         return getPoolProperties().isTestOnBorrow();
     }
@@ -934,6 +1004,7 @@ public class DataSourceProxy implements PoolConfiguration {
      * {@inheritDoc}
      */
     
+    @Override
     public boolean isTestOnConnect() {
         return getPoolProperties().isTestOnConnect();
     }
@@ -942,6 +1013,7 @@ public class DataSourceProxy implements PoolConfiguration {
      * {@inheritDoc}
      */
     
+    @Override
     public boolean isTestOnReturn() {
         return getPoolProperties().isTestOnReturn();
     }
@@ -950,6 +1022,7 @@ public class DataSourceProxy implements PoolConfiguration {
      * {@inheritDoc}
      */
     
+    @Override
     public boolean isTestWhileIdle() {
         return getPoolProperties().isTestWhileIdle();
     }
@@ -959,6 +1032,7 @@ public class DataSourceProxy implements PoolConfiguration {
      * {@inheritDoc}
      */
     
+    @Override
     public Boolean getDefaultAutoCommit() {
         return getPoolProperties().getDefaultAutoCommit();
     }
@@ -967,6 +1041,7 @@ public class DataSourceProxy implements PoolConfiguration {
      * {@inheritDoc}
      */
     
+    @Override
     public Boolean getDefaultReadOnly() {
         return getPoolProperties().getDefaultReadOnly();
     }
@@ -975,6 +1050,7 @@ public class DataSourceProxy implements PoolConfiguration {
      * {@inheritDoc}
      */
     
+    @Override
     public InterceptorDefinition[] getJdbcInterceptorsAsArray() {
         return getPoolProperties().getJdbcInterceptorsAsArray();
     }
@@ -983,6 +1059,7 @@ public class DataSourceProxy implements PoolConfiguration {
      * {@inheritDoc}
      */
     
+    @Override
     public boolean getUseLock() {
         return getPoolProperties().getUseLock();
     }
@@ -991,6 +1068,7 @@ public class DataSourceProxy implements PoolConfiguration {
      * {@inheritDoc}
      */
     
+    @Override
     public boolean isFairQueue() {
         return getPoolProperties().isFairQueue();
     }
@@ -999,6 +1077,7 @@ public class DataSourceProxy implements PoolConfiguration {
      * {@inheritDoc}
      */
     
+    @Override
     public boolean isJmxEnabled() {
         return getPoolProperties().isJmxEnabled();
     }
@@ -1007,6 +1086,7 @@ public class DataSourceProxy implements PoolConfiguration {
      * {@inheritDoc}
      */
     
+    @Override
     public boolean isUseEquals() {
         return getPoolProperties().isUseEquals();
     }
@@ -1015,6 +1095,7 @@ public class DataSourceProxy implements PoolConfiguration {
      * {@inheritDoc}
      */
     
+    @Override
     public void setAbandonWhenPercentageFull(int percentage) {
         getPoolProperties().setAbandonWhenPercentageFull(percentage);
     }
@@ -1023,6 +1104,7 @@ public class DataSourceProxy implements PoolConfiguration {
      * {@inheritDoc}
      */
     
+    @Override
     public void setAccessToUnderlyingConnectionAllowed(boolean accessToUnderlyingConnectionAllowed) {
         getPoolProperties().setAccessToUnderlyingConnectionAllowed(accessToUnderlyingConnectionAllowed);
     }
@@ -1031,6 +1113,7 @@ public class DataSourceProxy implements PoolConfiguration {
      * {@inheritDoc}
      */
     
+    @Override
     public void setDbProperties(Properties dbProperties) {
         getPoolProperties().setDbProperties(dbProperties);
     }
@@ -1039,6 +1122,7 @@ public class DataSourceProxy implements PoolConfiguration {
      * {@inheritDoc}
      */
     
+    @Override
     public void setDefaultReadOnly(Boolean defaultReadOnly) {
         getPoolProperties().setDefaultReadOnly(defaultReadOnly);
     }
@@ -1047,6 +1131,7 @@ public class DataSourceProxy implements PoolConfiguration {
      * {@inheritDoc}
      */
     
+    @Override
     public void setMaxAge(long maxAge) {
         getPoolProperties().setMaxAge(maxAge);
     }
@@ -1055,6 +1140,7 @@ public class DataSourceProxy implements PoolConfiguration {
      * {@inheritDoc}
      */
     
+    @Override
     public void setName(String name) {
         getPoolProperties().setName(name);
     }
@@ -1062,6 +1148,7 @@ public class DataSourceProxy implements PoolConfiguration {
     /** 
      * {@inheritDoc}
      */
+    @Override
     public void setDataSource(Object ds) {
         getPoolProperties().setDataSource(ds);
     }
@@ -1069,6 +1156,7 @@ public class DataSourceProxy implements PoolConfiguration {
     /** 
      * {@inheritDoc}
      */
+    @Override
     public Object getDataSource() {
         return getPoolProperties().getDataSource();
     }
@@ -1077,6 +1165,7 @@ public class DataSourceProxy implements PoolConfiguration {
     /** 
      * {@inheritDoc}
      */
+    @Override
     public void setDataSourceJNDI(String jndiDS) {
         getPoolProperties().setDataSourceJNDI(jndiDS);
     }
@@ -1084,6 +1173,7 @@ public class DataSourceProxy implements PoolConfiguration {
     /** 
      * {@inheritDoc}
      */
+    @Override
     public String getDataSourceJNDI() {
         return getPoolProperties().getDataSourceJNDI();
     }
@@ -1091,6 +1181,7 @@ public class DataSourceProxy implements PoolConfiguration {
     /** 
      * {@inheritDoc}
      */
+    @Override
     public boolean isAlternateUsernameAllowed() {
         return getPoolProperties().isAlternateUsernameAllowed();
     }
@@ -1098,6 +1189,7 @@ public class DataSourceProxy implements PoolConfiguration {
     /** 
      * {@inheritDoc}
      */
+    @Override
     public void setAlternateUsernameAllowed(boolean alternateUsernameAllowed) {
         getPoolProperties().setAlternateUsernameAllowed(alternateUsernameAllowed);
     }

@@ -29,8 +29,6 @@ public interface ConnectionPoolMBean extends PoolConfiguration  {
 
     public int getActive();
     
-    public boolean isPoolSweeperEnabled();
-    
     public int getNumIdle();
     
     public int getNumActive();
