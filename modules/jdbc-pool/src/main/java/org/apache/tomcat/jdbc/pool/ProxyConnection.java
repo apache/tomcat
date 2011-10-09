@@ -119,7 +119,7 @@ public class ProxyConnection extends JdbcInterceptor {
         if (compare(UNWRAP_VAL,method)) {
             return unwrap((Class<?>)args[0]);
         } else if (compare(ISWRAPPERFOR_VAL,method)) {
-            return this.isWrapperFor((Class<?>)args[0]);
+            return Boolean.valueOf(this.isWrapperFor((Class<?>)args[0]));
         }
         try {
             PooledConnection poolc = connection;

@@ -48,6 +48,7 @@ import org.apache.juli.logging.LogFactory;
 public class GenericNamingResourcesFactory implements ObjectFactory {
     private static final Log log = LogFactory.getLog(GenericNamingResourcesFactory.class);
     
+    @Override
     public Object getObjectInstance(Object obj, Name name, Context nameCtx, Hashtable<?, ?> environment) throws Exception {
         if ((obj == null) || !(obj instanceof Reference)) {
             return null;
@@ -171,7 +172,7 @@ public class GenericNamingResourcesFactory implements ObjectFactory {
                 params[1] = value;
                 if (setPropertyMethodBool != null) {
                     try {
-                        return (Boolean) setPropertyMethodBool.invoke(o, params);
+                        return ((Boolean) setPropertyMethodBool.invoke(o, params)).booleanValue();
                     }catch (IllegalArgumentException biae) {
                         //the boolean method had the wrong
                         //parameter types. lets try the other

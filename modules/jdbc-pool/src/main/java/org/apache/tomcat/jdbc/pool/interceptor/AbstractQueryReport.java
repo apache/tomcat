@@ -212,6 +212,7 @@ public abstract class AbstractQueryReport extends AbstractCreateStatementInterce
             this.query = query;
         }
         
+        @Override
         public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
             //get the name of the method for comparison
             final String name = method.getName();

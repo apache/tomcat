@@ -70,20 +70,24 @@ public class SlowQueryReportJmx extends SlowQueryReport implements NotificationE
     //==============================JMX STUFF========================
     protected volatile NotificationBroadcasterSupport notifier = new NotificationBroadcasterSupport();
 
+    @Override
     public void addNotificationListener(NotificationListener listener, NotificationFilter filter, Object handback) throws IllegalArgumentException {
         notifier.addNotificationListener(listener, filter, handback);
     }
 
     
+    @Override
     public MBeanNotificationInfo[] getNotificationInfo() {
         return notifier.getNotificationInfo();
     }
 
+    @Override
     public void removeNotificationListener(NotificationListener listener) throws ListenerNotFoundException {
         notifier.removeNotificationListener(listener);
         
     }
 
+    @Override
     public void removeNotificationListener(NotificationListener listener, NotificationFilter filter, Object handback) throws ListenerNotFoundException {
         notifier.removeNotificationListener(listener, filter, handback);
         
@@ -224,6 +228,7 @@ public class SlowQueryReportJmx extends SlowQueryReport implements NotificationE
      * JMX operation - returns all the queries we have collected.
      * @return - the slow query report as composite data.
      */
+    @Override
     public CompositeData[] getSlowQueriesCD() throws OpenDataException {
         CompositeDataSupport[] result = null;
         ConcurrentHashMap<String,QueryStats> queries = perPoolStats.get(poolName);
