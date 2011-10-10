@@ -371,8 +371,7 @@ public class FormAuthenticator
         if (log.isDebugEnabled()) {
             log.debug(sm.getString("formAuthenticator.forwardLogin",
                     request.getRequestURI(), request.getMethod(),
-                    config.getLoginPage(),
-                    context.getServletContext().getContextPath()));
+                    config.getLoginPage(), context.getName()));
         }
 
         // Always use GET for the login page, regardless of the method used
@@ -623,7 +622,7 @@ public class FormAuthenticator
             body.append(buffer, 0, bytesRead);
         }
 
-        // Only save the request body if there is somethign to save
+        // Only save the request body if there is something to save
         if (body.getLength() > 0) {
             saved.setContentType(request.getContentType());
             saved.setBody(body);
