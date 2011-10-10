@@ -61,6 +61,11 @@
         are being used without the CometConnectionManagerValve. (markt)
       </fix>
       <fix>
+        <bug>51940</bug>: Do not limit saving of request bodies during FORM
+        authentication to POST requests since any HTTP method may include a
+        request body. Based on a patch by Nicholas Sushkin. (markt)
+      </fix>
+      <fix>
         <bug>51956</bug>: RemoteAddrFilter used getRemoteHost instead of
         getRemoteAddr when filtering Comet events. (schultz)
       </fix>
