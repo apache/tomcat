@@ -1591,7 +1591,24 @@ public class Response
 
         boolean leadingSlash = location.startsWith("/");
 
-        if (leadingSlash || !hasScheme(location)) {
+        if (location.startsWith("//")) {
+            // Scheme relative
+            redirectURLCC.recycle();
+            // Add the scheme
+            String scheme = request.getScheme();
+                try {
+                redirectURLCC.append(scheme, 0, scheme.length());
+                redirectURLCC.append(':');
+                redirectURLCC.append(location, 0, location.length());
+                return redirectURLCC.toString();
+            } catch (IOException e) {
+                IllegalArgumentException iae =
+                    new IllegalArgumentException(location);
+                iae.initCause(e);
+                throw iae;
+            }
+
+        } else if (leadingSlash || !hasScheme(location)) {
 
             redirectURLCC.recycle();
 
