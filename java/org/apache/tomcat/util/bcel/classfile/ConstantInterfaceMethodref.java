@@ -42,6 +42,4 @@ public final class ConstantInterfaceMethodref extends ConstantCP {
     ConstantInterfaceMethodref(DataInputStream file) throws IOException {
         super(Constants.CONSTANT_InterfaceMethodref, file);
     }
-
-
 }

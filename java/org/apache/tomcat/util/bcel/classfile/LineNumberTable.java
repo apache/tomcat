@@ -102,8 +102,8 @@ public final class LineNumberTable extends Attribute {
      */
     @Override
     public final String toString() {
-        StringBuffer buf = new StringBuffer();
-        StringBuffer line = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
+        StringBuilder line = new StringBuilder();
         String newLine = System.getProperty("line.separator", "\n");
         for (int i = 0; i < line_number_table_length; i++) {
             line.append(line_number_table[i].toString());
@@ -134,6 +134,4 @@ public final class LineNumberTable extends Attribute {
         c.constant_pool = _constant_pool;
         return c;
     }
-
-
 }

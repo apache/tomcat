@@ -52,6 +52,6 @@ public interface AttributeReader {
      it to construct an attribute.  In the case of errors, a null can be
      returned which will cause the parsing of the class file to fail.
      */
-    public Attribute createAttribute( int name_index, int length, java.io.DataInputStream file,
+    Attribute createAttribute( int name_index, int length, java.io.DataInputStream file,
             ConstantPool constant_pool );
 }

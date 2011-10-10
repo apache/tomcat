@@ -42,6 +42,4 @@ public final class ConstantFieldref extends ConstantCP {
     ConstantFieldref(DataInputStream file) throws IOException {
         super(Constants.CONSTANT_Fieldref, file);
     }
-
-
 }

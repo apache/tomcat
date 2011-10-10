@@ -103,7 +103,7 @@ public final class InnerClasses extends Attribute {
      */
     @Override
     public final String toString() {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         for (int i = 0; i < number_of_classes; i++) {
             buf.append(inner_classes[i].toString(constant_pool)).append("\n");
         }

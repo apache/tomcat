@@ -95,7 +95,7 @@ public final class Synthetic extends Attribute {
      */
     @Override
     public final String toString() {
-        StringBuffer buf = new StringBuffer("Synthetic");
+        StringBuilder buf = new StringBuilder("Synthetic");
         if (length > 0) {
             buf.append(" ").append(Utility.toHexString(bytes));
         }
