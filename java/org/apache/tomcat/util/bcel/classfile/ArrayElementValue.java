@@ -28,7 +28,7 @@ public class ArrayElementValue extends ElementValue
     @Override
     public String toString()
     {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append("{");
         for (int i = 0; i < evalues.length; i++)
         {
@@ -63,7 +63,7 @@ public class ArrayElementValue extends ElementValue
     @Override
     public String stringifyValue()
     {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append("[");
         for (int i = 0; i < evalues.length; i++)
         {
@@ -79,6 +79,4 @@ public class ArrayElementValue extends ElementValue
     {
         return evalues;
     }
-
-    
 }

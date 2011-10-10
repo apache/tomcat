@@ -89,7 +89,7 @@ public final class Field extends FieldOrMethod {
         access = access.equals("") ? "" : (access + " ");
         signature = Utility.signatureToString(getSignature());
         name = getName();
-        StringBuffer buf = new StringBuffer(64);
+        StringBuilder buf = new StringBuilder(64);
         buf.append(access).append(signature).append(" ").append(name);
         ConstantValue cv = getConstantValue();
         if (cv != null) {

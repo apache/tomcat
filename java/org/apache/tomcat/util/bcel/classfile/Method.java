@@ -122,7 +122,7 @@ public final class Method extends FieldOrMethod {
     public final String toString() {
         ConstantUtf8 c;
         String name, signature, access; // Short cuts to constant pool
-        StringBuffer buf;
+        StringBuilder buf;
         access = Utility.accessToString(access_flags);
         // Get name and signature from constant pool
         c = (ConstantUtf8) constant_pool.getConstant(signature_index, Constants.CONSTANT_Utf8);
@@ -131,7 +131,7 @@ public final class Method extends FieldOrMethod {
         name = c.getBytes();
         signature = Utility.methodSignatureToString(signature, name, access, true,
                 getLocalVariableTable());
-        buf = new StringBuffer(signature);
+        buf = new StringBuilder(signature);
         for (int i = 0; i < attributes_count; i++) {
             Attribute a = attributes[i];
             if (!((a instanceof Code) || (a instanceof ExceptionTable))) {

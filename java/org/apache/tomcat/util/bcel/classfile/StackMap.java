@@ -106,7 +106,7 @@ public final class StackMap extends Attribute {
      */
     @Override
     public final String toString() {
-        StringBuffer buf = new StringBuffer("StackMap(");
+        StringBuilder buf = new StringBuilder("StackMap(");
         for (int i = 0; i < map_length; i++) {
             buf.append(map[i].toString());
             if (i < map_length - 1) {
