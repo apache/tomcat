@@ -77,7 +77,7 @@
       </fix>
       <fix>
         <bug>51972</bug>: Correctly handle protocol relative URLs when used with
-        <code>sendDirect()</code>. (markt)
+        <code>sendRedirect()</code>. (markt)
       </fix>
     </changelog>
   </subsection>
