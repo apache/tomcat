@@ -130,6 +130,4 @@ public abstract class ElementValue
                     "Unexpected element value kind in annotation: " + type);
         }
     }
-
-    
 }

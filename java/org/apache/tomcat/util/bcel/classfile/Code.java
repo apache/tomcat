@@ -193,6 +193,7 @@ public final class Code extends Attribute {
     public final void setCode( byte[] code ) {
         this.code = code;
         code_length = (code == null) ? 0 : code.length;
+        length = calculateLength(); // Adjust length
     }
 
 
@@ -202,6 +203,7 @@ public final class Code extends Attribute {
     public final void setExceptionTable( CodeException[] exception_table ) {
         this.exception_table = exception_table;
         exception_table_length = (exception_table == null) ? 0 : exception_table.length;
+        length = calculateLength(); // Adjust length
     }
 
 
@@ -209,8 +211,7 @@ public final class Code extends Attribute {
      * @return String representation of code chunk.
      */
     public final String toString( boolean verbose ) {
-        StringBuffer buf;
-        buf = new StringBuffer(100);
+        StringBuilder buf = new StringBuilder(100);
         buf.append("Code(max_stack = ").append(max_stack).append(", max_locals = ").append(
                 max_locals).append(", code_length = ").append(code_length).append(")\n").append(
                 Utility.codeToString(code, constant_pool, 0, -1, verbose));

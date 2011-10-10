@@ -55,5 +55,4 @@ public class EnumElementValue extends ElementValue
                 Constants.CONSTANT_Utf8);
         return cu8.getBytes();
     }
-
 }
