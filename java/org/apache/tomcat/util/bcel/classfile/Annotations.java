@@ -82,7 +82,8 @@ public abstract class Annotations extends Attribute {
             return;
         }
         dos.writeShort(annotation_table.length);
-        for (int i = 0; i < annotation_table.length; i++)
+        for (int i = 0; i < annotation_table.length; i++) {
             annotation_table[i].dump(dos);
+        }
     }
 }

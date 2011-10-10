@@ -27,5 +27,4 @@ package org.apache.tomcat.util.bcel.classfile;
  */
 public interface ConstantObject {
 
-    
 }

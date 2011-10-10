@@ -37,8 +37,8 @@ public class AnnotationEntry implements Constants, Serializable {
 
     private static final long serialVersionUID = 1L;
     
-    private int type_index;
-    private ConstantPool constant_pool;
+    private final int type_index;
+    private final ConstantPool constant_pool;
 
     private List<ElementValuePair> element_value_pairs;
     
@@ -47,6 +47,7 @@ public class AnnotationEntry implements Constants, Serializable {
      * 
      * @param file
      * @param constant_pool
+     * @return the entry
      * @throws IOException
      */
     public static AnnotationEntry read(DataInputStream file, ConstantPool constant_pool) throws IOException {
@@ -78,19 +79,17 @@ public class AnnotationEntry implements Constants, Serializable {
      * @return the element value pairs in this annotation entry
      */
     public ElementValuePair[] getElementValuePairs() {
-        // TOFO return List
+        // TODO return List
         return element_value_pairs.toArray(new ElementValuePair[element_value_pairs.size()]);
     }
 
-
-    public void dump(DataOutputStream dos) throws IOException
-    {
-        dos.writeShort(type_index);    // u2 index of type name in cpool
-        dos.writeShort(element_value_pairs.size()); // u2 element_value pair count
-        for (int i = 0 ; i<element_value_pairs.size();i++) {
-            ElementValuePair envp = element_value_pairs.get(i);
+    public void dump(DataOutputStream dos) throws IOException {
+        dos.writeShort(type_index); // u2 index of type name in cpool
+        dos.writeShort(element_value_pairs.size()); // u2 element_value pair
+        // count
+        for (int i = 0; i < element_value_pairs.size(); i++) {
+            final ElementValuePair envp = element_value_pairs.get(i);
             envp.dump(dos);
         }
     }
-
 }

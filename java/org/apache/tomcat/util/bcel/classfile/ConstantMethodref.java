@@ -42,6 +42,4 @@ public final class ConstantMethodref extends ConstantCP {
     ConstantMethodref(DataInputStream file) throws IOException {
         super(Constants.CONSTANT_Methodref, file);
     }
-
-
 }

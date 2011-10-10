@@ -86,6 +86,4 @@ public final class ConstantInteger extends Constant implements ConstantObject {
     public final String toString() {
         return super.toString() + "(bytes = " + bytes + ")";
     }
-
-
 }

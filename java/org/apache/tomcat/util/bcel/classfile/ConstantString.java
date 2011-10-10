@@ -86,6 +86,4 @@ public final class ConstantString extends Constant implements ConstantObject {
     public final String toString() {
         return super.toString() + "(string_index = " + string_index + ")";
     }
-
-
 }

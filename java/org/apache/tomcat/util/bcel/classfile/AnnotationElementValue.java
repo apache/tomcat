@@ -45,9 +45,7 @@ public class AnnotationElementValue extends ElementValue
     @Override
     public String stringifyValue()
     {
-        StringBuffer sb = new StringBuffer();
-        sb.append(annotationEntry.toString());
-        return sb.toString();
+        return annotationEntry.toString();
     }
 
     @Override

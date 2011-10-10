@@ -105,7 +105,7 @@ public final class ExceptionTable extends Attribute {
      */
     @Override
     public final String toString() {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         String str;
         for (int i = 0; i < number_of_exceptions; i++) {
             str = constant_pool.getConstantString(exception_index_table[i],

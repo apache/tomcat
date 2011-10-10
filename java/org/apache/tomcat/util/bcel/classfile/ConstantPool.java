@@ -131,7 +131,7 @@ public class ConstantPool implements Cloneable, Serializable {
 
     private static final String escape( String str ) {
         int len = str.length();
-        StringBuffer buf = new StringBuffer(len + 5);
+        StringBuilder buf = new StringBuilder(len + 5);
         char[] ch = str.toCharArray();
         for (int i = 0; i < len; i++) {
             switch (ch[i]) {
@@ -265,7 +265,7 @@ public class ConstantPool implements Cloneable, Serializable {
      */
     @Override
     public String toString() {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         for (int i = 1; i < constant_pool_count; i++) {
             buf.append(i).append(")").append(constant_pool[i]).append("\n");
         }

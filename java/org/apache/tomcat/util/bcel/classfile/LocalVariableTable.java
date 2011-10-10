@@ -119,7 +119,7 @@ public class LocalVariableTable extends Attribute {
      */
     @Override
     public final String toString() {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         for (int i = 0; i < local_variable_table_length; i++) {
             buf.append(local_variable_table[i].toString());
             if (i < local_variable_table_length - 1) {
@@ -143,6 +143,4 @@ public class LocalVariableTable extends Attribute {
         c.constant_pool = _constant_pool;
         return c;
     }
-
-
 }
