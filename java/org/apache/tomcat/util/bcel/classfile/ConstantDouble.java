@@ -32,7 +32,7 @@ import org.apache.tomcat.util.bcel.Constants;
  * @author  <A HREF="mailto:m.dahm@gmx.de">M. Dahm</A>
  * @see     Constant
  */
-public final class ConstantDouble extends Constant implements ConstantObject {
+public final class ConstantDouble extends Constant {
 
     private static final long serialVersionUID = 3450743772468544760L;
     private double bytes;

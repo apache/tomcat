@@ -32,7 +32,7 @@ import org.apache.tomcat.util.bcel.Constants;
  * @author  <A HREF="mailto:m.dahm@gmx.de">M. Dahm</A>
  * @see     Constant
  */
-public final class ConstantString extends Constant implements ConstantObject {
+public final class ConstantString extends Constant {
 
     private static final long serialVersionUID = 2809338612858801341L;
     private int string_index; // Identical to ConstantClass except for this name
