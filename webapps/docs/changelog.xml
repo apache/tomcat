@@ -70,6 +70,10 @@
         default due to the side-effects of including a body with the response in
         this case. (markt)
       </fix>
+      <fix>
+        <bug>51972</bug>: Correctly handle protocol relative URLs when used with
+        <code>sendDirect()</code>. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
