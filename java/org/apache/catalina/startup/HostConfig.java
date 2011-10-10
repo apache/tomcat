@@ -696,9 +696,7 @@ public class HostConfig
                 if (isServiced(cn.getName()))
                     continue;
                 
-                String file = files[i];
-                
-                deployWAR(cn, dir, file);
+                deployWAR(cn, dir, files[i]);
             }
         }
     }
