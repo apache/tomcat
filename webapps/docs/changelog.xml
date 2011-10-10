@@ -117,6 +117,12 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Other">
+    <changelog>
+      <scode>Remove some unused code from the packaged renamed Commons BCEL.
+      (markt)</scode>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 7.0.22 (markt)" rtext="released 2011-10-01">
   <subsection name="Catalina">
