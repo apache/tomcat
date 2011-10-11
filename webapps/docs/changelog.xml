@@ -79,10 +79,10 @@
         <bug>51972</bug>: Correctly handle protocol relative URLs when used with
         <code>sendRedirect()</code>. (markt)
       </fix>
-      <update>
-        Update the package re-named copy of Commons BCEL (formerly Jakarta BCEL)
-        to the latest code from Commons BCEL trunk. (markt)
-      </update>
+      <scode>
+        Simplify the deployment code and use full paths in log messages to
+        remove any ambiguity in where a context is being deployed from. (markt)  
+      </scode>
     </changelog>
   </subsection>
   <subsection name="Coyote">
@@ -119,6 +119,10 @@
   </subsection>
   <subsection name="Other">
     <changelog>
+      <update>
+        Update the package re-named copy of Commons BCEL (formerly Jakarta BCEL)
+        to the latest code from Commons BCEL trunk. (markt)
+      </update>
       <scode>Remove some unused code from the packaged renamed Commons BCEL.
       (markt)</scode>
     </changelog>
