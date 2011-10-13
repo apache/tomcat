@@ -676,8 +676,8 @@ public class HostConfig
                 continue;
             if (files[i].equalsIgnoreCase("WEB-INF"))
                 continue;
-            File dir = new File(appBase, files[i]);
-            if (files[i].toLowerCase(Locale.ENGLISH).endsWith(".war") && dir.isFile()
+            File war = new File(appBase, files[i]);
+            if (files[i].toLowerCase(Locale.ENGLISH).endsWith(".war") && war.isFile()
                     && !invalidWars.contains(files[i]) ) {
                 
                 ContextName cn = new ContextName(files[i]);
@@ -693,7 +693,7 @@ public class HostConfig
                 if (isServiced(cn.getName()))
                     continue;
                 
-                deployWAR(cn, dir);
+                deployWAR(cn, war);
             }
         }
     }
