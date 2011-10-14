@@ -16,6 +16,9 @@
  */
 package org.apache.catalina.valves;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -27,6 +30,9 @@ import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
 
 public class TesterAccessLogValve extends ValveBase implements AccessLog {
+
+    // Timing tests need a small error margin to prevent failures
+    private static final long ERROR_MARGIN = 10;
 
     private final List<Entry> entries = new ArrayList<Entry>();
 
@@ -59,8 +65,24 @@ public class TesterAccessLogValve extends ValveBase implements AccessLog {
         getNext().invoke(request, response);
     }
 
-    public List<Entry> getEntries() {
-        return entries;
+    public void validateAccessLog(int count, int status, long minTime,
+            long maxTime) throws Exception {
+
+        // Wait (but not too long) until all expected entries appear (access log
+        // entry will be made after response has been returned to user)
+        for (int i = 0; i < 10 && entries.size() < count; i++) {
+            Thread.sleep(100);
+        }
+
+        assertEquals(count, entries.size());
+        for (int j = 0; j < count; j++) {
+            Entry entry = entries.get(j);
+            assertEquals(status, entry.getStatus());
+            assertTrue(entry.toString(),
+                    entry.getTime() >= minTime - ERROR_MARGIN);
+            assertTrue(entry.toString(),
+                    entry.getTime() < maxTime + ERROR_MARGIN);
+        }
     }
 
     public static class Entry {
