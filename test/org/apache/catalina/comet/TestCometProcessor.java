@@ -48,7 +48,7 @@ public class TestCometProcessor extends TomcatBaseTest {
 
     @Test
     public void testAsyncClose() throws Exception {
-        
+
         if (!isCometSupported()) {
             return;
         }
@@ -63,12 +63,12 @@ public class TestCometProcessor extends TomcatBaseTest {
         root.getPipeline().addValve(new AsyncCometCloseValve());
         tomcat.getConnector().setProperty("connectionTimeout", "5000");
         tomcat.start();
-        
+
         // Create connection to Comet servlet
         final Socket socket =
             SocketFactory.getDefault().createSocket("localhost", getPort());
         socket.setSoTimeout(5000);
-        
+
         final OutputStream os = socket.getOutputStream();
         String requestLine = "POST http://localhost:" + getPort() +
                 "/comet HTTP/1.1\r\n";
@@ -79,24 +79,24 @@ public class TestCometProcessor extends TomcatBaseTest {
         InputStream is = socket.getInputStream();
         ResponseReaderThread readThread = new ResponseReaderThread(is);
         readThread.start();
-        
+
         // Wait for the comet request/response to finish
         int count = 0;
         while (count < 10 && !readThread.getResponse().endsWith("0\r\n\r\n")) {
             Thread.sleep(500);
             count++;
         }
-        
+
         if (count == 10) {
             fail("Comet request did not complete");
         }
-        
+
         // Send a standard HTTP request on the same connection
         requestLine = "GET http://localhost:" + getPort() +
                 "/hello HTTP/1.1\r\n";
         os.write(requestLine.getBytes());
         os.write("\r\n".getBytes());
-        
+
         // Check for the expected response
         count = 0;
         while (count < 10 && !readThread.getResponse().contains(
@@ -116,7 +116,7 @@ public class TestCometProcessor extends TomcatBaseTest {
 
     @Test
     public void testSimpleCometClient() throws Exception {
-        
+
         if (!isCometSupported()) {
             return;
         }
@@ -132,17 +132,17 @@ public class TestCometProcessor extends TomcatBaseTest {
         final Socket socket =
             SocketFactory.getDefault().createSocket("localhost", getPort());
         socket.setSoTimeout(60000);
-        
+
         final OutputStream os = socket.getOutputStream();
         String requestLine = "POST http://localhost:" + getPort() +
                 "/ HTTP/1.1\r\n";
         os.write(requestLine.getBytes());
         os.write("transfer-encoding: chunked\r\n".getBytes());
         os.write("\r\n".getBytes());
-        
+
         PingWriterThread writeThread = new PingWriterThread(4, os);
         writeThread.start();
-        
+
         socket.setSoTimeout(25000);
         InputStream is = socket.getInputStream();
         ResponseReaderThread readThread = new ResponseReaderThread(is);
@@ -150,7 +150,7 @@ public class TestCometProcessor extends TomcatBaseTest {
         readThread.join();
         os.close();
         is.close();
-        
+
         // Validate response
         String[] response = readThread.getResponse().split("\r\n");
         assertEquals("HTTP/1.1 200 OK", response[0]);
@@ -182,14 +182,14 @@ public class TestCometProcessor extends TomcatBaseTest {
         // Expect 26 lines
         assertEquals(26, response.length);
     }
-    
+
     /**
      * Tests if the Comet connection is closed if the Tomcat connector is
      * stopped.
      */
     @Test
     public void testCometConnectorStop() throws Exception {
-        
+
         if (!isCometSupported()) {
             return;
         }
@@ -205,24 +205,24 @@ public class TestCometProcessor extends TomcatBaseTest {
         final Socket socket =
             SocketFactory.getDefault().createSocket("localhost", getPort());
         socket.setSoTimeout(10000);
-        
+
         final OutputStream os = socket.getOutputStream();
         String requestLine = "POST http://localhost:" + getPort() +
                 "/ HTTP/1.1\r\n";
         os.write(requestLine.getBytes());
         os.write("transfer-encoding: chunked\r\n".getBytes());
         os.write("\r\n".getBytes());
-        
+
         PingWriterThread writeThread = new PingWriterThread(100, os);
         writeThread.start();
 
         InputStream is = socket.getInputStream();
         ResponseReaderThread readThread = new ResponseReaderThread(is);
         readThread.start();
-        
+
         // Allow the first couple of PING messages to be written
         Thread.sleep(3000);
-        
+
         tomcat.getConnector().stop();
         // Allow the executor a chance to send the end event
         Thread.sleep(100);
@@ -302,9 +302,9 @@ public class TestCometProcessor extends TomcatBaseTest {
     }
 
     private static class PingWriterThread extends Thread {
-        
-        private int pingCount;
-        private OutputStream os;
+
+        private final int pingCount;
+        private final OutputStream os;
         private volatile Exception e = null;
 
         public PingWriterThread(int pingCount, OutputStream os) {
@@ -335,8 +335,8 @@ public class TestCometProcessor extends TomcatBaseTest {
 
     private static class ResponseReaderThread extends Thread {
 
-        private InputStream is;
-        private StringBuilder response = new StringBuilder();
+        private final InputStream is;
+        private final StringBuilder response = new StringBuilder();
 
         public ResponseReaderThread(InputStream is) {
             this.is = is;
@@ -365,26 +365,26 @@ public class TestCometProcessor extends TomcatBaseTest {
         @Override
         public void invoke(Request request, Response response)
                 throws IOException, ServletException {
-            
+
             CometEventImpl event = new CometEventImpl(request, response);
-            
+
             getNext().invoke(request, response);
-            
+
             if (request.isComet()) {
                 Thread t = new AsyncCometCloseThread(event);
                 t.start();
             }
         }
     }
-    
+
     private static class AsyncCometCloseThread extends Thread {
 
-        private CometEvent event;
-        
+        private final CometEvent event;
+
         public AsyncCometCloseThread(CometEvent event) {
             this.event = event;
         }
-        
+
         @Override
         public void run() {
             try {
