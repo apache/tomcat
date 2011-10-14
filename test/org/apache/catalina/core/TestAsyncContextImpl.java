@@ -36,7 +36,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import org.junit.Test;
@@ -47,7 +46,6 @@ import org.apache.catalina.connector.Request;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.catalina.valves.TesterAccessLogValve;
-import org.apache.catalina.valves.TesterAccessLogValve.Entry;
 import org.apache.tomcat.util.buf.ByteChunk;
 
 public class TestAsyncContextImpl extends TomcatBaseTest {
@@ -56,8 +54,6 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
     private static final long REQUEST_TIME = 1000;
     // Timeout thread (where used) checks for timeout every second
     private static final long TIMEOUT_MARGIN = 1000;
-    // Timing tests need a small error margin to prevent failures
-    private static final long ERROR_MARGIN = 10;
     // Default timeout for these tests
     private static final long TIMEOUT = 3000;
 
@@ -95,7 +91,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         assertEquals("1false2true3true4true5false", servlet.getResult());
 
         // Check the access log
-        validateAccessLog(alv, 1, 200, Bug49528Servlet.THREAD_SLEEP_TIME,
+        alv.validateAccessLog(1, 200, Bug49528Servlet.THREAD_SLEEP_TIME,
                 Bug49528Servlet.THREAD_SLEEP_TIME + REQUEST_TIME);
     }
 
@@ -133,7 +129,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         assertEquals("1false2true3true4true5false", servlet.getResult());
 
         // Check the access log
-        validateAccessLog(alv, 1, 200, Bug49567Servlet.THREAD_SLEEP_TIME,
+        alv.validateAccessLog(1, 200, Bug49567Servlet.THREAD_SLEEP_TIME,
                 Bug49567Servlet.THREAD_SLEEP_TIME + REQUEST_TIME);
     }
 
@@ -173,7 +169,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         assertEquals("OK-run2", bc2.toString());
 
         // Check the access log
-        validateAccessLog(alv, 2, 200,
+        alv.validateAccessLog(2, 200,
                 AsyncStartNoCompleteServlet.ASYNC_TIMEOUT,
                 AsyncStartNoCompleteServlet.ASYNC_TIMEOUT + TIMEOUT_MARGIN +
                         REQUEST_TIME);
@@ -205,7 +201,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         assertEquals("OK", bc.toString());
 
         // Check the access log
-        validateAccessLog(alv, 1, 200, 0, REQUEST_TIME);
+        alv.validateAccessLog(1, 200, 0, REQUEST_TIME);
     }
 
     /*
@@ -469,11 +465,11 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         // Check the access log
         if (completeOnTimeout && dispatchUrl != null) {
             if (!isAccessLogEnabled()) {
-                validateAccessLog(alv, 1, 500, 0, TimeoutServlet.ASYNC_TIMEOUT +
+                alv.validateAccessLog(1, 500, 0, TimeoutServlet.ASYNC_TIMEOUT +
                         TIMEOUT_MARGIN + REQUEST_TIME);
             }
         } else {
-            validateAccessLog(alv, 1, 200, TimeoutServlet.ASYNC_TIMEOUT,
+            alv.validateAccessLog(1, 200, TimeoutServlet.ASYNC_TIMEOUT,
                     TimeoutServlet.ASYNC_TIMEOUT + TIMEOUT_MARGIN +
                     REQUEST_TIME);
         }
@@ -585,7 +581,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         assertEquals(expected.toString(), res.toString());
 
         // Check the access log
-        validateAccessLog(alv, 1, 200, 0, REQUEST_TIME);
+        alv.validateAccessLog(1, 200, 0, REQUEST_TIME);
     }
 
     private static class DispatchingServlet extends HttpServlet {
@@ -682,7 +678,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
                 res.toString());
 
         // Check the access log
-        validateAccessLog(alv, 1, 200, TimeoutServlet.ASYNC_TIMEOUT,
+        alv.validateAccessLog(1, 200, TimeoutServlet.ASYNC_TIMEOUT,
                 TimeoutServlet.ASYNC_TIMEOUT + TIMEOUT_MARGIN + REQUEST_TIME);
     }
 
@@ -917,7 +913,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         assertEquals(expected.toString(), res.toString());
 
         // Check the access log
-        validateAccessLog(alv, 1, 200, 0, REQUEST_TIME);
+        alv.validateAccessLog(1, 200, 0, REQUEST_TIME);
     }
 
     private static class ErrorServlet extends HttpServlet {
@@ -966,7 +962,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         assertEquals("Runnable-onComplete-", res.toString());
 
         // Check the access log
-        validateAccessLog(alv, 1, 200, AsyncStartRunnable.THREAD_SLEEP_TIME,
+        alv.validateAccessLog(1, 200, AsyncStartRunnable.THREAD_SLEEP_TIME,
                 AsyncStartRunnable.THREAD_SLEEP_TIME + REQUEST_TIME);
     }
 
@@ -1036,7 +1032,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         assertEquals("xyz",testHeader.get(0));
 
         // Check the access log
-        validateAccessLog(alv, 1, 200, Bug50753Servlet.THREAD_SLEEP_TIME,
+        alv.validateAccessLog(1, 200, Bug50753Servlet.THREAD_SLEEP_TIME,
                 Bug50753Servlet.THREAD_SLEEP_TIME + REQUEST_TIME);
     }
 
@@ -1102,28 +1098,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         Thread.sleep(REQUEST_TIME);
 
         // Check the access log
-        validateAccessLog(alv, 1, 500, 0, REQUEST_TIME);
-    }
-
-    private void validateAccessLog(TesterAccessLogValve alv, int count,
-            int status, long minTime, long maxTime) throws Exception {
-        List<Entry> entries = alv.getEntries();
-
-        // Wait (but not too long) until all expected entries appear (access log
-        // entry will be made after response has been returned to user)
-        for (int i = 0; i < 10 && entries.size() < count; i++) {
-            Thread.sleep(100);
-        }
-
-        assertEquals(count, entries.size());
-        for (int j = 0; j < count; j++) {
-            Entry entry = entries.get(j);
-            assertEquals(status, entry.getStatus());
-            assertTrue(entry.toString(),
-                    entry.getTime() >= minTime - ERROR_MARGIN);
-            assertTrue(entry.toString(),
-                    entry.getTime() < maxTime + ERROR_MARGIN);
-        }
+        alv.validateAccessLog(1, 500, 0, REQUEST_TIME);
     }
 
     @Test
@@ -1162,7 +1137,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         Thread.sleep(REQUEST_TIME);
 
         // Check the access log
-        validateAccessLog(alv, 1, HttpServletResponse.SC_BAD_REQUEST, 0,
+        alv.validateAccessLog(1, HttpServletResponse.SC_BAD_REQUEST, 0,
                 REQUEST_TIME);
 
     }
@@ -1223,7 +1198,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         Thread.sleep(REQUEST_TIME);
 
         // Check the access log
-        validateAccessLog(alv, 1, HttpServletResponse.SC_BAD_REQUEST, TIMEOUT,
+        alv.validateAccessLog(1, HttpServletResponse.SC_BAD_REQUEST, TIMEOUT,
                 TIMEOUT + TIMEOUT_MARGIN + REQUEST_TIME);
 
     }
