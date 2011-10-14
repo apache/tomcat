@@ -1675,7 +1675,7 @@ public class ContextConfig
         try {
             basePath = configBase.getCanonicalPath();
         } catch (IOException e) {
-            log.error(sm.getString("contectConfig.baseError"), e);
+            log.error(sm.getString("contextConfig.baseError"), e);
             return null;
         }
 
