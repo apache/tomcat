@@ -84,8 +84,8 @@
             td#mainBody {width: 100%;}
         </style>
         <style type="text/css">
-            code {color:rgb(0,128,128);padding:0 0.1em;}
-            code.attributeName {color:rgb(0,0,0);}
+            code {background-color:rgb(224,255,255);padding:0 0.1em;}
+            code.attributeName, code.propertyName {background-color:transparent;}
         </style>
     </head>
 
@@ -392,7 +392,7 @@
       <xsl:for-each select="property">
         <tr>
           <td align="left" valign="center">
-            <code><xsl:value-of select="@name"/></code>
+            <code class="propertyName"><xsl:value-of select="@name"/></code>
           </td>
           <td align="left" valign="center">
             <xsl:apply-templates/>
