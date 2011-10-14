@@ -29,6 +29,7 @@ import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.net.JarURLConnection;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
@@ -1367,24 +1368,32 @@ public class ContextConfig
 
         DefaultWebXmlCacheEntry entry = hostWebXmlCache.get(host);
         
-        File globalWebXml = getGlobalWebXml();
-        File hostWebXml = getHostWebXml();
+        InputSource globalWebXml = getGlobalWebXmlSource();
+        InputSource hostWebXml = getHostWebXmlSource();
         
         long globalTimeStamp = 0;
         long hostTimeStamp = 0;
         
         if (globalWebXml != null) {
-            globalTimeStamp = globalWebXml.lastModified();
+            try {
+                File f = new File(new URI(globalWebXml.getSystemId()));
+                globalTimeStamp = f.lastModified();
+            } catch (URISyntaxException e) {
+                globalTimeStamp = -1;
+            }
         }
         
         if (hostWebXml != null) {
-            hostTimeStamp = hostWebXml.lastModified();
+            try {
+                File f = new File(new URI(hostWebXml.getSystemId()));
+                hostTimeStamp = f.lastModified();
+            } catch (URISyntaxException e) {
+                hostTimeStamp = -1;
+            }
         }
         
         if (entry != null && entry.getGlobalTimeStamp() == globalTimeStamp &&
                 entry.getHostTimeStamp() == hostTimeStamp) {
-            addWatchedResource(globalWebXml);
-            addWatchedResource(hostWebXml);
             return entry.getWebXml();
         }
         
@@ -1394,8 +1403,6 @@ public class ContextConfig
             entry = hostWebXmlCache.get(host);
             if (entry != null && entry.getGlobalTimeStamp() == globalTimeStamp &&
                     entry.getHostTimeStamp() == hostTimeStamp) {
-                addWatchedResource(globalWebXml);
-                addWatchedResource(hostWebXml);
                 return entry.getWebXml();
             }
 
@@ -1410,48 +1417,31 @@ public class ContextConfig
             webXmlDefaultFragment.setAlwaysAddWelcomeFiles(false);
 
             // Parse global web.xml if present
-            if (globalWebXml == null || !globalWebXml.isFile()) {
+            if (globalWebXml == null) {
                 // This is unusual enough to log
                 log.info(sm.getString("contextConfig.defaultMissing"));
-                globalTimeStamp = 0;
             } else {
-                parseWebXml(getWebXmlSource(globalWebXml.getName(),
-                                            globalWebXml.getParent()),
-                            webXmlDefaultFragment,
-                            false);
-                globalTimeStamp = globalWebXml.lastModified();
+                parseWebXml(globalWebXml, webXmlDefaultFragment, false);
             }
             
             // Parse host level web.xml if present
             // Additive apart from welcome pages
             webXmlDefaultFragment.setReplaceWelcomeFiles(true);
             
-            if (hostWebXml == null || !hostWebXml.isFile()) {
-                hostTimeStamp = 0;
-            } else {
-                parseWebXml(getWebXmlSource(hostWebXml.getName(),
-                                hostWebXml.getParent()),
-                                webXmlDefaultFragment,
-                                false);
-                hostTimeStamp = hostWebXml.lastModified();
+            parseWebXml(hostWebXml, webXmlDefaultFragment, false);
+            
+            // Don't update the cache if an error occurs
+            if (globalTimeStamp != -1 && hostTimeStamp != -1) {
+                entry = new DefaultWebXmlCacheEntry(webXmlDefaultFragment,
+                        globalTimeStamp, hostTimeStamp);
+                hostWebXmlCache.put(host, entry);
             }
-            
-            entry = new DefaultWebXmlCacheEntry(webXmlDefaultFragment,
-                    globalTimeStamp, hostTimeStamp);
-            
-            hostWebXmlCache.put(host, entry);
 
-            addWatchedResource(globalWebXml);
-            addWatchedResource(hostWebXml);
             return webXmlDefaultFragment;
         }
     }
 
-    private void addWatchedResource(File f) {
-        if (f != null) {
-            context.addWatchedResource(f.getAbsolutePath());
-        }
-    }
+
     private void convertJsps(WebXml webXml) {
         Map<String,String> jspInitParams;
         ServletDef jspServlet = webXml.getServlets().get("jsp");
@@ -1650,9 +1640,10 @@ public class ContextConfig
     
     
     /**
-     * Identify the default web.xml to be used.
+     * Identify the default web.xml to be used and obtain an input source for
+     * it.
      */
-    protected File getGlobalWebXml() {
+    protected InputSource getGlobalWebXmlSource() {
         // Is a default web.xml specified for the Context?
         if (defaultWebXml == null && context instanceof StandardContext) {
             defaultWebXml = ((StandardContext) context).getDefaultWebXml();
@@ -1664,27 +1655,15 @@ public class ContextConfig
         if (Constants.NoDefaultWebXml.equals(defaultWebXml)) {
             return null;
         }
-
-        // In an embedded environment, configBase might not be set
-        File configBase = getConfigBase();
-        if (configBase == null)
-            return null;
-
-        String basePath = null;
-        try {
-            basePath = configBase.getCanonicalPath();
-        } catch (IOException e) {
-            log.error(sm.getString("contextConfig.baseError"), e);
-            return null;
-        }
-
-        return new File(basePath, defaultWebXml);
+        return getWebXmlSource(defaultWebXml, getBaseDir());
     }
     
+    
     /**
-     * Identify the host web.xml to be used.
+     * Identify the host web.xml to be used and obtain an input source for
+     * it.
      */
-    protected File getHostWebXml() {
+    protected InputSource getHostWebXmlSource() {
         String resourceName = getHostConfigPath(Constants.HostWebXml);
         
         // In an embedded environment, configBase might not be set
@@ -1696,11 +1675,11 @@ public class ContextConfig
         try {
             basePath = configBase.getCanonicalPath();
         } catch (IOException e) {
-            log.error(sm.getString("contextConfig.baseError"), e);
+            log.error(sm.getString("contectConfig.baseError"), e);
             return null;
         }
 
-        return new File(basePath, resourceName);
+        return getWebXmlSource(resourceName, basePath);
     }
     
     /**
@@ -1776,11 +1755,12 @@ public class ContextConfig
                 if(stream != null) {
                     source =
                         new InputSource(getClass().getClassLoader().getResource(
-                                filename).toString());
+                                filename).toURI().toString());
                 } 
             } else {
-                source = new InputSource("file://" + file.getAbsolutePath());
+                source = new InputSource(file.getAbsoluteFile().toURI().toString());
                 stream = new FileInputStream(file);
+                context.addWatchedResource(file.getAbsolutePath());
             }
 
             if (stream != null && source != null) {
