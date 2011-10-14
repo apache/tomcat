@@ -249,6 +249,10 @@ public class CoyoteAdapter implements Adapter {
             req.getRequestProcessor().setWorkerThreadName(null);
             // Recycle the wrapper request and response
             if (error || response.isClosed() || !request.isComet()) {
+                ((Context) request.getMappingData().context).logAccess(
+                        request, response,
+                        System.currentTimeMillis() - req.getStartTime(),
+                        false);
                 request.recycle();
                 request.setFilterChain(null);
                 response.recycle();
@@ -430,9 +434,12 @@ public class CoyoteAdapter implements Adapter {
             } else if (!comet) {
                 request.finishRequest();
                 response.finishResponse();
-                if (postParseSuccess) {
+                if (postParseSuccess &&
+                        request.getMappingData().context != null) {
                     // Log only if processing was invoked.
                     // If postParseRequest() failed, it has already logged it.
+                    // If context is null this was the start of a comet request
+                    // that failed and has already been logged.
                     ((Context) request.getMappingData().context).logAccess(
                             request, response,
                             System.currentTimeMillis() - req.getStartTime(),
