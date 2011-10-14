@@ -83,6 +83,10 @@
         Simplify the deployment code and use full paths in log messages to
         remove any ambiguity in where a context is being deployed from. (markt)  
       </scode>
+      <fix>
+        <bug>52009</bug>: Fix a NPE during access log entry recording when an
+        error occurred during the processing of a Comet request. (markt) 
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
@@ -123,8 +127,9 @@
         Update the package re-named copy of Commons BCEL (formerly Jakarta BCEL)
         to the latest code from Commons BCEL trunk. (markt)
       </update>
-      <scode>Remove some unused code from the packaged renamed Commons BCEL.
-      (markt)</scode>
+      <scode>
+        Remove some unused code from the packaged renamed Commons BCEL. (markt)
+      </scode>
     </changelog>
   </subsection>
 </section>
