@@ -16,14 +16,14 @@
  */
 package org.apache.catalina.valves;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.ServletException;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import org.apache.catalina.AccessLog;
 import org.apache.catalina.connector.Request;
