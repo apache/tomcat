@@ -66,6 +66,46 @@ the section about Automatic Application Deployment in the latter reference.
 </p>
 </section>
 
+<section name="DriverManager, the service provider mechanism and memory leaks">
+
+<p><code>java.sql.DriverManager</code> supports the
+<a href="http://download.oracle.com/javase/6/docs/api/index.html">service
+provider</a> mechanism. However, the implementation is fundamentally broken in
+all Java versions for a servlet container environment.
+<code>java.sql.DriverManager</code> will only scan the first web application to
+use it for JDBC drivers using the service provider mechanism. Any JDBC drivers
+present in the web application or any parent class loader will be discovered
+correctly but no further scans will be performed for any other web applications.
+For example, if there are two web applications each using a different JDBC
+driver packaged in WEB-INF/lib, the service provider mechanism will only work
+for the first web application to use DriverManager. The other web application
+will be required to register the Driver manually. Given that web application
+start order is undefined, the service provider mechanism can not be relied upon.
+</p>
+
+<p>The <code>java.sql.DriverManager</code> is also a frequent source of memory
+leaks. Any Drivers registered with the DriverManager by a web application must
+be deregistered when the web application stops. If the service provider
+mechanism registers a JDBC driver, it will never deregister it. Tomcat will
+attempt to automatically deregister and registered JDBC drivers discovered
+when a web application stops. However, it is expected that applications do this
+for themselves via a <code>ServletContextListener</code>.
+</p>
+
+<p>There have been reports that the memory leak prevention code that deregisters
+JDBC drivers can, in unusual circumstances, trigger a memory leak rather than
+fix it. To prevent this, the <a href="config/listeners.html">JRE Memory Leak
+Prevention Listener</a> includes protection for the DriverManager. This
+protection is enabled by default. Note that a side-effect of enabling this
+protection is that the service provider mechanism is always disabled for web
+applications. It is therefore necessary for applications to manually register
+(and deregister) and JDBC drivers they require that are packaged in the
+WEB-INF/lib directory. Given the known issues with the service provider
+implementation for DriverManager, most web applications will probably be doing
+this already.</p>
+
+</section>
+
 <section name="Database Connection Pool (DBCP) Configurations">
 
 <p>DBCP provides support for JDBC 2.0.  On systems using a 1.4 JVM DBCP
