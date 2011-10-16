@@ -119,6 +119,10 @@
         <bug>51630</bug>: Fix bug in async0 example that triggered an
         IllegalStateException in the application log. (markt)
       </fix>
+      <add>
+        <bug>52025</bug>: Add additional information regarding DriverManager,
+        the service provider mechanism and memory leaks. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Other">
