@@ -29,6 +29,7 @@ import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.net.JarURLConnection;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
@@ -43,6 +44,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.servlet.ServletContainerInitializer;
 import javax.servlet.ServletContext;
@@ -170,6 +172,13 @@ public class ContextConfig
      * Deployment count.
      */
     protected static long deploymentCount = 0L;
+
+
+    /**
+     * Cache of default web.xml fragments per Host
+     */
+    protected static final Map<Host,DefaultWebXmlCacheEntry> hostWebXmlCache =
+        new ConcurrentHashMap<Host,DefaultWebXmlCacheEntry>();
 
 
     // ----------------------------------------------------- Instance Variables
@@ -1225,7 +1234,6 @@ public class ContextConfig
      * web.xml file.
      */
     protected void webConfig() {
-        WebXml webXml = createWebXml();
         /* Anything and everything can override the global and host defaults.
          * This is implemented in two parts
          * - Handle as a web fragment that gets added after everything else so
@@ -1233,34 +1241,11 @@ public class ContextConfig
          * - Mark Servlets as overridable so SCI configuration can replace
          *   configuration from the defaults
          */ 
-        WebXml webXmlDefaultFragment = createWebXml();
-        webXmlDefaultFragment.setOverridable(true);
-        // Set to distributable else every app will be prevented from being
-        // distributable when the default fragment is merged with the main
-        // web.xml
-        webXmlDefaultFragment.setDistributable(true);
-        // When merging, the default welcome files are only used if the app has
-        // not defined any welcomes files.
-        webXmlDefaultFragment.setAlwaysAddWelcomeFiles(false);
-
-        // Parse global web.xml if present
-        InputSource globalWebXml = getGlobalWebXmlSource();
-        if (globalWebXml == null) {
-            // This is unusual enough to log
-            log.info(sm.getString("contextConfig.defaultMissing"));
-        } else {
-            parseWebXml(globalWebXml, webXmlDefaultFragment, false);
-        }
-
-        // Parse host level web.xml if present
-        // Additive apart from welcome pages
-        webXmlDefaultFragment.setReplaceWelcomeFiles(true);
-        InputSource hostWebXml = getHostWebXmlSource();
-        parseWebXml(hostWebXml, webXmlDefaultFragment, false);
-        
         Set<WebXml> defaults = new HashSet<WebXml>();
-        defaults.add(webXmlDefaultFragment);
-        
+        defaults.add(getDefaultWebXmlFragment());
+
+        WebXml webXml = createWebXml();
+
         // Parse context level web.xml
         InputSource contextWebXml = getContextWebXmlSource();
         parseWebXml(contextWebXml, webXml, false);
@@ -1390,6 +1375,87 @@ public class ContextConfig
             webXml.configureContext(context);
         }
     }
+
+    private WebXml getDefaultWebXmlFragment() {
+
+        // Host should never be null
+        Host host = (Host) context.getParent();
+
+        DefaultWebXmlCacheEntry entry = hostWebXmlCache.get(host);
+        
+        InputSource globalWebXml = getGlobalWebXmlSource();
+        InputSource hostWebXml = getHostWebXmlSource();
+        
+        long globalTimeStamp = 0;
+        long hostTimeStamp = 0;
+        
+        if (globalWebXml != null) {
+            try {
+                File f = new File(new URI(globalWebXml.getSystemId()));
+                globalTimeStamp = f.lastModified();
+            } catch (URISyntaxException e) {
+                globalTimeStamp = -1;
+            }
+        }
+        
+        if (hostWebXml != null) {
+            try {
+                File f = new File(new URI(hostWebXml.getSystemId()));
+                hostTimeStamp = f.lastModified();
+            } catch (URISyntaxException e) {
+                hostTimeStamp = -1;
+            }
+        }
+        
+        if (entry != null && entry.getGlobalTimeStamp() == globalTimeStamp &&
+                entry.getHostTimeStamp() == hostTimeStamp) {
+            return entry.getWebXml();
+        }
+        
+        // Parsing global web.xml is relatively expensive. Use a sync block to
+        // make sure it only happens once
+        synchronized (host) {
+            entry = hostWebXmlCache.get(host);
+            if (entry != null && entry.getGlobalTimeStamp() == globalTimeStamp &&
+                    entry.getHostTimeStamp() == hostTimeStamp) {
+                return entry.getWebXml();
+            }
+
+            WebXml webXmlDefaultFragment = createWebXml();
+            webXmlDefaultFragment.setOverridable(true);
+            // Set to distributable else every app will be prevented from being
+            // distributable when the default fragment is merged with the main
+            // web.xml
+            webXmlDefaultFragment.setDistributable(true);
+            // When merging, the default welcome files are only used if the app has
+            // not defined any welcomes files.
+            webXmlDefaultFragment.setAlwaysAddWelcomeFiles(false);
+
+            // Parse global web.xml if present
+            if (globalWebXml == null) {
+                // This is unusual enough to log
+                log.info(sm.getString("contextConfig.defaultMissing"));
+            } else {
+                parseWebXml(globalWebXml, webXmlDefaultFragment, false);
+            }
+            
+            // Parse host level web.xml if present
+            // Additive apart from welcome pages
+            webXmlDefaultFragment.setReplaceWelcomeFiles(true);
+            
+            parseWebXml(hostWebXml, webXmlDefaultFragment, false);
+            
+            // Don't update the cache if an error occurs
+            if (globalTimeStamp != -1 && hostTimeStamp != -1) {
+                entry = new DefaultWebXmlCacheEntry(webXmlDefaultFragment,
+                        globalTimeStamp, hostTimeStamp);
+                hostWebXmlCache.put(host, entry);
+            }
+
+            return webXmlDefaultFragment;
+        }
+    }
+
 
     private void convertJsps(WebXml webXml) {
         Map<String,String> jspInitParams;
@@ -1607,6 +1673,7 @@ public class ContextConfig
         return getWebXmlSource(defaultWebXml, getBaseDir());
     }
     
+    
     /**
      * Identify the host web.xml to be used and obtain an input source for
      * it.
@@ -1623,7 +1690,7 @@ public class ContextConfig
         try {
             basePath = configBase.getCanonicalPath();
         } catch (IOException e) {
-            log.error(sm.getString("contectConfig.baseError"), e);
+            log.error(sm.getString("contextConfig.baseError"), e);
             return null;
         }
 
@@ -1703,10 +1770,10 @@ public class ContextConfig
                 if(stream != null) {
                     source =
                         new InputSource(getClass().getClassLoader().getResource(
-                                filename).toString());
+                                filename).toURI().toString());
                 } 
             } else {
-                source = new InputSource("file://" + file.getAbsolutePath());
+                source = new InputSource(file.getAbsoluteFile().toURI().toString());
                 stream = new FileInputStream(file);
                 context.addWatchedResource(file.getAbsolutePath());
             }
@@ -2432,6 +2499,31 @@ public class ContextConfig
         
         public Map<String,WebXml> getFragments() {
             return fragments;
+        }
+    }
+
+    private static class DefaultWebXmlCacheEntry {
+        private final WebXml webXml;
+        private final long globalTimeStamp;
+        private final long hostTimeStamp;
+
+        public DefaultWebXmlCacheEntry(WebXml webXml, long globalTimeStamp,
+                long hostTimeStamp) {
+            this.webXml = webXml;
+            this.globalTimeStamp = globalTimeStamp;
+            this.hostTimeStamp = hostTimeStamp;
+        }
+
+        public WebXml getWebXml() {
+            return webXml;
+        }
+
+        public long getGlobalTimeStamp() {
+            return globalTimeStamp;
+        }
+
+        public long getHostTimeStamp() {
+            return hostTimeStamp;
         }
     }
 }

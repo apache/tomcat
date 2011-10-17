@@ -91,6 +91,10 @@
         In <code>OneLineFormatter</code> log formatter in JULI always use
         the US locale to format the date (esp. the month names). (rjung)
       </fix>
+      <add>
+        Cache the results of parsing the global and host level web.xml files to
+        improve web application start time. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
