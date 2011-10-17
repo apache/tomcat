@@ -75,12 +75,14 @@ all Java versions for a servlet container environment.
 <code>java.sql.DriverManager</code> will only scan the first web application to
 use it for JDBC drivers using the service provider mechanism. Any JDBC drivers
 present in the web application or any parent class loader will be discovered
-correctly but no further scans will be performed for any other web applications.
-For example, if there are two web applications each using a different JDBC
-driver packaged in WEB-INF/lib, the service provider mechanism will only work
-for the first web application to use DriverManager. The other web application
-will be required to register the Driver manually. Given that web application
-start order is undefined, the service provider mechanism can not be relied upon.
+correctly (including those in $CATALINA_BASE/lib) but no further scans will be
+performed for any other web applications. For example, if there are two web
+applications each using a different JDBC driver packaged in WEB-INF/lib, the
+service provider mechanism will only work for the first web application to use
+DriverManager. The other web application will be required to register the Driver
+manually. Given that web application start order is undefined, the service
+provider mechanism can not be relied upon for JDBC Driver implementations
+packaged in WEB-INF/lib.
 </p>
 
 <p>The <code>java.sql.DriverManager</code> is also a frequent source of memory
@@ -97,9 +99,11 @@ JDBC drivers can, in unusual circumstances, trigger a memory leak rather than
 fix it. To prevent this, the <a href="config/listeners.html">JRE Memory Leak
 Prevention Listener</a> includes protection for the DriverManager. This
 protection is enabled by default. Note that a side-effect of enabling this
-protection is that the service provider mechanism is always disabled for web
-applications. It is therefore necessary for applications to manually register
-(and deregister) and JDBC drivers they require that are packaged in the
+protection is that while any JDBC Driver implementations packaged with the JVM
+or located in $CATALINA_BASE/lib will be correctly discovered by the service
+provider mechanism, JDBC Driver implementations packaged in web applications
+will not be discovered. It is therefore necessary for applications to manually
+register (and deregister) and JDBC drivers they require that are packaged in the
 WEB-INF/lib directory. Given the known issues with the service provider
 implementation for DriverManager, most web applications will probably be doing
 this already.</p>
