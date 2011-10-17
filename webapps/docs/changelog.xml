@@ -87,6 +87,10 @@
         <bug>52009</bug>: Fix a NPE during access log entry recording when an
         error occurred during the processing of a Comet request. (markt) 
       </fix>
+      <fix>
+        In <code>OneLineFormatter</code> log formatter in JULI always use
+        the US locale to format the date (esp. the month names). (rjung)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
