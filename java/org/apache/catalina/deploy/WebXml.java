@@ -19,6 +19,7 @@
 package org.apache.catalina.deploy;
 
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -1453,21 +1454,17 @@ public class WebXml {
         // As per 'clarification' from the Servlet EG, filter definitions in the
         // main web.xml override those in fragments and those in fragments
         // override those in annotations
+        List<FilterMap> filterMapsToAdd = new ArrayList<FilterMap>();
         for (WebXml fragment : fragments) {
-            Iterator<FilterMap> iterFilterMaps =
-                fragment.getFilterMappings().iterator();
-            while (iterFilterMaps.hasNext()) {
-                FilterMap filterMap = iterFilterMaps.next();
-                if (filterMappingNames.contains(filterMap.getFilterName())) {
-                    iterFilterMaps.remove();
+            for (FilterMap filterMap : fragment.getFilterMappings()) {
+                if (!filterMappingNames.contains(filterMap.getFilterName())) {
+                    filterMapsToAdd.add(filterMap);
                 }
             }
         }
-        for (WebXml fragment : fragments) {
-            for (FilterMap filterMap : fragment.getFilterMappings()) {
-                // Additive
-                addFilterMapping(filterMap);
-            }
+        for (FilterMap filterMap : filterMapsToAdd) {
+            // Additive
+            addFilterMapping(filterMap);
         }
 
         for (WebXml fragment : fragments) {
@@ -1609,28 +1606,23 @@ public class WebXml {
         // As per 'clarification' from the Servlet EG, servlet definitions and
         // mappings in the main web.xml override those in fragments and those in
         // fragments override those in annotations
-        // Remove servlet definitions and mappings from fragments that are
+        // Skip servlet definitions and mappings from fragments that are
         // defined in web.xml
+        List<Map.Entry<String,String>> servletMappingsToAdd =
+            new ArrayList<Map.Entry<String,String>>();
         for (WebXml fragment : fragments) {
-            Iterator<Map.Entry<String,String>> iterFragmentServletMaps =
-                fragment.getServletMappings().entrySet().iterator();
-            while (iterFragmentServletMaps.hasNext()) {
-                Map.Entry<String,String> servletMap =
-                    iterFragmentServletMaps.next();
-                if (servletMappingNames.contains(servletMap.getValue()) ||
-                        servletMappings.containsKey(servletMap.getKey())) {
-                    iterFragmentServletMaps.remove();
+            for (Map.Entry<String,String> servletMap :
+                    fragment.getServletMappings().entrySet()) {
+                if (!servletMappingNames.contains(servletMap.getValue()) &&
+                        !servletMappings.containsKey(servletMap.getKey())) {
+                    servletMappingsToAdd.add(servletMap);
                 }
             }
         }
         
         // Add fragment mappings
-        for (WebXml fragment : fragments) {
-            for (Map.Entry<String,String> mapping :
-                    fragment.getServletMappings().entrySet()) {
-                // Additive
-                addServletMapping(mapping.getKey(), mapping.getValue());
-            }
+        for (Map.Entry<String,String> mapping : servletMappingsToAdd) {
+            addServletMapping(mapping.getKey(), mapping.getValue());
         }
 
         for (WebXml fragment : fragments) {
