@@ -43,7 +43,9 @@
   <p>A Manager element MAY be nested inside a
   <a href="context.html">Context</a> component.  If it is not included,
   a default Manager configuration will be created automatically, which
-  is sufficient for most requirements.</p>
+  is sufficient for most requirements, &#x2014; see
+  <em>Standard Manager Implementation</em> below for the details
+  of this configuration.</p>
 
 </section>
 
@@ -109,7 +111,7 @@
   <subsection name="Standard Implementation">
 
     <p>Tomcat provides two standard implementations of <strong>Manager</strong>
-    for use - the default one stores active sessions, while the optional one
+    for use &#x2014; the default one stores active sessions, while the optional one
     stores active sessions that have been swapped out (in addition to saving
     sessions across a restart of Tomcat) in a storage location that is selected
     via the use of an appropriate <strong>Store</strong> nested element.</p>
@@ -127,8 +129,9 @@
         <p>Absolute or relative (to the work directory for this Context)
         pathname of the file in which session state will be preserved
         across application restarts, if possible.  The default is
-        "SESSIONS.ser".  See <a href="#Restart Persistence">Restart
-        Persistence</a> for more information. Restart persistence may be 
+        "SESSIONS.ser".<br />See
+        <a href="#Persistence_Across_Restarts">Persistence Across Restarts</a>
+        for more information. This persistence may be 
         disabled by setting this attribute to an empty string.</p>
       </attribute>
 
@@ -449,9 +452,9 @@ create table tomcat_sessions (
 <section name="Special Features">
 
 
-  <subsection name="Restart Persistence">
+  <subsection name="Persistence Across Restarts">
 
-    <p>Whenever Catalina is shut down normally and restarted, or when an
+    <p>Whenever Apache Tomcat is shut down normally and restarted, or when an
     application reload is triggered, the standard Manager implementation
     will attempt to serialize all currently active sessions to a disk
     file located via the <code>pathname</code> attribute.  All such saved
@@ -464,6 +467,17 @@ create table tomcat_sessions (
     including the <code>&lt;distributable&gt;</code> element in your web
     application deployment descriptor (<code>/WEB-INF/web.xml</code>).</p>
 
+  </subsection>
+
+  <subsection name="Disable Session Persistence">
+
+    <p>As documented above, every web application by default has
+    standard manager implementation configured, and it performs session
+    persistence across restarts. To disable this persistence feature, create
+    a <a href="context.html">Context</a> configuration file for your web
+    application and add the following element there:</p>
+
+    <source>&lt;Manager pathname="" /&gt;</source>
   </subsection>
 
 </section>
