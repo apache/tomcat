@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -68,9 +68,9 @@ public class DefaultInstanceManager implements InstanceManager {
     protected final ClassLoader containerClassLoader;
     protected boolean privileged;
     protected boolean ignoreAnnotations;
-    private Properties restrictedFilters = new Properties();
-    private Properties restrictedListeners = new Properties();
-    private Properties restrictedServlets = new Properties();
+    private final Properties restrictedFilters = new Properties();
+    private final Properties restrictedListeners = new Properties();
+    private final Properties restrictedServlets = new Properties();
     private final Map<Class<?>,WeakReference<List<AnnotationCacheEntry>>> annotationCache =
         new WeakHashMap<Class<?>, WeakReference<List<AnnotationCacheEntry>>>();
 
@@ -134,7 +134,7 @@ public class DefaultInstanceManager implements InstanceManager {
     }
 
     @Override
-    public void newInstance(Object o) 
+    public void newInstance(Object o)
             throws IllegalAccessException, InvocationTargetException, NamingException {
         newInstance(o, o.getClass());
     }
@@ -268,7 +268,7 @@ public class DefaultInstanceManager implements InstanceManager {
             }
             if (annotations == null) {
                 annotations = new ArrayList<AnnotationCacheEntry>();
-                
+
                 if (context != null) {
                     // Initialize fields annotations for resource injection if
                     // JNDI is enabled
@@ -321,7 +321,7 @@ public class DefaultInstanceManager implements InstanceManager {
                         }
                     }
                 }
-        
+
                 // Initialize methods annotations
                 Method[] methods = null;
                 if (Globals.IS_SECURITY_ENABLED) {
@@ -393,7 +393,7 @@ public class DefaultInstanceManager implements InstanceManager {
                         }
                         postConstruct = method;
                     }
-                    
+
                     if (method.isAnnotationPresent(PreDestroy.class)) {
                         if ((preDestroy != null ||
                                 method.getParameterTypes().length != 0) ||
@@ -415,7 +415,7 @@ public class DefaultInstanceManager implements InstanceManager {
                             null, AnnotationCacheEntryType.PRE_DESTROY));
                 }
                 if (annotations.size() == 0) {
-                    // Use common empty list to save memory 
+                    // Use common empty list to save memory
                     annotations = Collections.emptyList();
                 }
                 synchronized (annotationCache) {
@@ -453,7 +453,7 @@ public class DefaultInstanceManager implements InstanceManager {
         }
 
         Class<?> clazz = instance.getClass();
-        
+
         while (clazz != null) {
             List<AnnotationCacheEntry> annotations;
             synchronized (annotationCache) {
@@ -528,7 +528,9 @@ public class DefaultInstanceManager implements InstanceManager {
     }
 
     private void checkAccess(Class<?> clazz) {
-        if (privileged) return;
+        if (privileged) {
+            return;
+        }
         if (Filter.class.isAssignableFrom(clazz)) {
             checkAccess(clazz, restrictedFilters);
         } else if (Servlet.class.isAssignableFrom(clazz)) {
@@ -642,7 +644,7 @@ public class DefaultInstanceManager implements InstanceManager {
 
         return name.toString();
     }
-    
+
     private static String normalize(String jndiName){
         if(jndiName != null && jndiName.startsWith("java:comp/env/")){
             return jndiName.substring(14);
