@@ -50,9 +50,9 @@ public class FastRemovalDequeue<T> {
     /** Maximum size of the queue */
     private final int maxSize;
     /** First element of the queue. */
-    private Entry first;
+    protected Entry first;
     /** Last element of the queue. */
-    private Entry last;
+    protected Entry last;
     /** Size of the queue */
     private int size;
 
@@ -137,7 +137,9 @@ public class FastRemovalDequeue<T> {
             Entry element = first;
             first = first.getNext();
             content = element.getContent();
-            if (first != null) {
+            if (first == null) {
+                last =null;
+            } else {
                 first.setPrevious(null);
             }
             size--;
@@ -157,7 +159,9 @@ public class FastRemovalDequeue<T> {
             Entry element = last;
             last = last.getPrevious();
             content = element.getContent();
-            if (last != null) {
+            if (last == null) {
+                first = null;
+            } else {
                 last.setNext(null);
             }
             size--;
