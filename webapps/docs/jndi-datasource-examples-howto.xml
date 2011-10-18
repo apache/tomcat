@@ -334,7 +334,12 @@ select id, foo, bar from testdata
 </source>
 </p>
 
-<p>That JSP page makes use of <a href="http://java.sun.com/products/jsp/jstl">JSTL</a>'s SQL and Core taglibs. You can get it from Sun's <a href="http://java.sun.com/webservices/downloads/webservicespack.html">Java Web Services Developer Pack</a> or <a href="http://jakarta.apache.org/taglibs/doc/standard-doc/intro.html">Jakarta Taglib Standard 1.1</a> project - just make sure you get a 1.1.x release. Once you have JSTL, copy <code>jstl.jar</code> and <code>standard.jar</code> to your web app's <code>WEB-INF/lib</code> directory.
+<p>That JSP page makes use of <a href="http://java.sun.com/products/jsp/jstl">JSTL</a>'s
+SQL and Core taglibs. You can get it from
+<a href="http://tomcat.apache.org/taglibs/standard/">Apache Tomcat Taglibs - Standard Tag Library</a>
+project &#x2014; just make sure you get a 1.1.x release. Once you have JSTL,
+copy <code>jstl.jar</code> and <code>standard.jar</code> to your web app's
+<code>WEB-INF/lib</code> directory.
 
 </p>
 
