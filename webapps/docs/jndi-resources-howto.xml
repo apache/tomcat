@@ -282,7 +282,7 @@ public class MyBean {
     <p><strong>WARNING</strong> - Be sure you respect the element ordering
     that is required by the DTD for web application deployment descriptors!
     See the
-    <a href="http://java.sun.com/products/servlet/download.html">Servlet
+    <a href="http://wiki.apache.org/tomcat/Specifications">Servlet
     Specification</a> for details.</p>
 
   <h3>3.  Code Your Application's Use Of This Resource</h3>
@@ -444,7 +444,7 @@ writer.println("foo = " + bean.getFoo() + ", bar = " +
     <p><strong>WARNING</strong> - Be sure you respect the element ordering
     that is required by the DTD for web application deployment descriptors!
     See the
-    <a href="http://java.sun.com/products/servlet/download.html">Servlet
+    <a href="http://wiki.apache.org/tomcat/Specifications">Servlet
     Specification</a> for details.</p>
 
     <h3>2.  Code Your Application's Use Of This Resource</h3>
@@ -612,7 +612,7 @@ Transport.send(message);
     <p><strong>WARNING</strong> - Be sure you respect the element ordering
     that is required by the DTD for web application deployment descriptors!
     See the
-    <a href="http://java.sun.com/products/servlet/download.html">Servlet
+    <a href="http://wiki.apache.org/tomcat/Specifications">Servlet
     Specification</a> for details.</p>
 
     <h3>3.  Code Your Application's Use Of This Resource</h3>
@@ -914,7 +914,7 @@ public class MyBeanFactory implements ObjectFactory {
     <p><strong>WARNING</strong> - Be sure you respect the element ordering
     that is required by the DTD for web application deployment descriptors!
     See the
-    <a href="http://java.sun.com/products/servlet/download.html">Servlet
+    <a href="http://wiki.apache.org/tomcat/Specifications">Servlet
     Specification</a> for details.</p>
 
   <h3>3.  Code Your Application's Use Of This Resource</h3>
