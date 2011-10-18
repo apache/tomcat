@@ -161,7 +161,7 @@ cvs commit
 
 Note that this is only an example web.xml file.  The full definition
 of the deployment descriptor file is in the
-<a href="http://java.sun.com/products/servlet">Servlet Specification.</a>
+<a href="http://wiki.apache.org/tomcat/Specifications">Servlet Specification.</a>
 
 </subsection>
 

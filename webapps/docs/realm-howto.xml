@@ -47,7 +47,7 @@ to authenticate themselves.  If you are not utilizing these features, you can
 safely skip this document.</p>
 
 <p>For fundamental background information about container managed security,
-see the <a href="http://java.sun.com/products/servlet/download.html">Servlet
+see the <a href="http://wiki.apache.org/tomcat/Specifications">Servlet
 Specification (Version 2.4)</a>, Section 12.</p>
 
 <p>For information about utilizing the <em>Single Sign On</em> feature of
@@ -896,7 +896,7 @@ loads information about all users, and their corresponding roles, from an XML
 document (by default, this document is loaded from
 <code>$CATALINA_BASE/conf/tomcat-users.xml</code>). The users, their passwords
 and their roles may all be editing dynamically, typically via JMX. Changes may
-be saved and will be reflected in the XMl file.</p>
+be saved and will be reflected in the XML file.</p>
 
 <h3>Realm Element Attributes</h3>
 

@@ -35,8 +35,8 @@
 
 <p>This is the top-level entry point of the documentation bundle for the
 <strong>Apache Tomcat</strong> Servlet/JSP container.  Apache Tomcat version 7.0
-implements the
-Servlet 3.0 and JavaServer Pages 2.2 specifications from the
+implements the Servlet 3.0 and JavaServer Pages 2.2
+<a href="http://wiki.apache.org/tomcat/Specifications">specifications</a> from the
 <a href="http://www.jcp.org">Java Community Process</a>, and includes many
 additional features that make it a useful platform for developing and deploying
 web applications and web services.</p>
