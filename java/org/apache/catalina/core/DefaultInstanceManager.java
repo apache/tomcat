@@ -186,8 +186,8 @@ public class DefaultInstanceManager implements InstanceManager {
         for (AnnotationCacheEntry entry : annotations) {
             if (entry.getType() == AnnotationCacheEntryType.POST_CONSTRUCT) {
                 Method postConstruct = (Method) entry.getAccessibleObject();
-                boolean accessibility = postConstruct.isAccessible();
                 synchronized (postConstruct) {
+                    boolean accessibility = postConstruct.isAccessible();
                     postConstruct.setAccessible(true);
                     postConstruct.invoke(instance);
                     postConstruct.setAccessible(accessibility);
@@ -230,8 +230,8 @@ public class DefaultInstanceManager implements InstanceManager {
         for (AnnotationCacheEntry entry : annotations) {
             if (entry.getType() == AnnotationCacheEntryType.PRE_DESTROY) {
                 Method preDestroy = (Method) entry.getAccessibleObject();
-                boolean accessibility = preDestroy.isAccessible();
                 synchronized (preDestroy) {
+                    boolean accessibility = preDestroy.isAccessible();
                     preDestroy.setAccessible(true);
                     preDestroy.invoke(instance);
                     preDestroy.setAccessible(accessibility);
@@ -576,8 +576,8 @@ public class DefaultInstanceManager implements InstanceManager {
                 context.lookup(clazz.getName() + "/" + field.getName());
         }
 
-        accessibility = field.isAccessible();
         synchronized (field) {
+            accessibility = field.isAccessible();
             field.setAccessible(true);
             field.set(instance, lookedupResource);
             field.setAccessible(accessibility);
@@ -620,8 +620,8 @@ public class DefaultInstanceManager implements InstanceManager {
                     clazz.getName() + "/" + getName(method));
         }
 
-        accessibility = method.isAccessible();
         synchronized (method) {
+            accessibility = method.isAccessible();
             method.setAccessible(true);
             method.invoke(instance, lookedupResource);
             method.setAccessible(accessibility);
