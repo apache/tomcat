@@ -110,6 +110,11 @@
         authentication from being lost during the authentication process.
         (markt)
       </fix>
+      <fix>
+        <bug>52055</bug>: Ensure that the input and output buffers are correctly
+        reset between keep-alive requests when using Servlet 3.0 asynchronous
+        request processing. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
