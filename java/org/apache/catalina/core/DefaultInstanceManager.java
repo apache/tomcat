@@ -423,11 +423,6 @@ public class DefaultInstanceManager implements InstanceManager {
                             new WeakReference<List<AnnotationCacheEntry>>(
                                     annotations));
                 }
-            } else {
-                // If the annotations for this class have been cached, the
-                // annotations for all the super classes will have been cachced
-                // as well
-                break;
             }
             clazz = clazz.getSuperclass();
         }
