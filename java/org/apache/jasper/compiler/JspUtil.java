@@ -17,6 +17,7 @@
 
 package org.apache.jasper.compiler;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -685,7 +686,8 @@ public class JspUtil {
             String jarEntryName = fname.substring(1, fname.length());
             ZipEntry jarEntry = jarFile.getEntry(jarEntryName);
             if (jarEntry == null) {
-                err.jspError("jsp.error.file.not.found", fname);
+                throw new FileNotFoundException(Localizer.getMessage(
+                        "jsp.error.file.not.found", fname));
             }
             in = jarFile.getInputStream(jarEntry);
         } else {
@@ -693,7 +695,8 @@ public class JspUtil {
         }
 
         if (in == null) {
-            err.jspError("jsp.error.file.not.found", fname);
+            throw new FileNotFoundException(Localizer.getMessage(
+                    "jsp.error.file.not.found", fname));
         }
 
         return in;
