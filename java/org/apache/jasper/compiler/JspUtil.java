@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -32,7 +32,7 @@ import org.xml.sax.Attributes;
 /**
  * This class has all the utility method(s). Ideally should move all the bean
  * containers here.
- * 
+ *
  * @author Mandar Raje.
  * @author Rajiv Mordani.
  * @author Danno Ferrin
@@ -80,7 +80,7 @@ public class JspUtil {
 
     /**
      * Checks to see if the given scope is valid.
-     * 
+     *
      * @param scope
      *            The scope to be checked
      * @param n
@@ -88,7 +88,7 @@ public class JspUtil {
      *            checked
      * @param err
      *            error dispatcher
-     * 
+     *
      * @throws JasperException
      *             if scope is not null and different from &quot;page&quot;,
      *             &quot;request&quot;, &quot;session&quot;, and
@@ -121,8 +121,9 @@ public class JspUtil {
         for (int i = 0; i < tempLength; i++) {
             @SuppressWarnings("null")  // If attrs==null, tempLength == 0
             String qName = attrs.getQName(i);
-            if ((!qName.equals("xmlns")) && (!qName.startsWith("xmlns:")))
+            if ((!qName.equals("xmlns")) && (!qName.startsWith("xmlns:"))) {
                 temp.addElement(qName);
+            }
         }
 
         // Add names of attributes specified using jsp:attribute
@@ -171,14 +172,16 @@ public class JspUtil {
         }
 
         // If mandatory attribute is missing then the exception is thrown
-        if (!valid)
+        if (!valid) {
             err.jspError(start, "jsp.error.mandatory.attribute", typeOfTag,
                     missingAttribute);
+        }
 
         // Check to see if there are any more attributes for the specified tag.
         int attrLeftLength = temp.size();
-        if (attrLeftLength == 0)
+        if (attrLeftLength == 0) {
             return;
+        }
 
         // Now check to see if the rest of the attributes are valid too.
         String attribute = null;
@@ -192,9 +195,10 @@ public class JspUtil {
                     break;
                 }
             }
-            if (!valid)
+            if (!valid) {
                 err.jspError(start, "jsp.error.invalid.attribute", typeOfTag,
                         attribute);
+            }
         }
         // XXX *could* move EL-syntax validation here... (sb)
     }
@@ -203,8 +207,9 @@ public class JspUtil {
      * Escape the 5 entities defined by XML.
      */
     public static String escapeXml(String s) {
-        if (s == null)
+        if (s == null) {
             return null;
+        }
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < s.length(); i++) {
             char c = s.charAt(i);
@@ -270,7 +275,7 @@ public class JspUtil {
      * Convert a String value to 'boolean'. Besides the standard conversions
      * done by Boolean.valueOf(s).booleanValue(), the value "yes" (ignore case)
      * is also converted to 'true'. If 's' is null, then 'false' is returned.
-     * 
+     *
      * @param s
      *            the string to be converted
      * @return the boolean value associated with the string s
@@ -290,7 +295,7 @@ public class JspUtil {
     /**
      * Returns the <tt>Class</tt> object associated with the class or
      * interface with the given string name.
-     * 
+     *
      * <p>
      * The <tt>Class</tt> object is determined by passing the given string
      * name to the <tt>Class.forName()</tt> method, unless the given string
@@ -306,38 +311,42 @@ public class JspUtil {
         if (i0 > 0) {
             // This is an array. Count the dimensions
             for (int i = 0; i < type.length(); i++) {
-                if (type.charAt(i) == '[')
+                if (type.charAt(i) == '[') {
                     dims++;
+                }
             }
             type = type.substring(0, i0);
         }
 
-        if ("boolean".equals(type))
+        if ("boolean".equals(type)) {
             c = boolean.class;
-        else if ("char".equals(type))
+        } else if ("char".equals(type)) {
             c = char.class;
-        else if ("byte".equals(type))
+        } else if ("byte".equals(type)) {
             c = byte.class;
-        else if ("short".equals(type))
+        } else if ("short".equals(type)) {
             c = short.class;
-        else if ("int".equals(type))
+        } else if ("int".equals(type)) {
             c = int.class;
-        else if ("long".equals(type))
+        } else if ("long".equals(type)) {
             c = long.class;
-        else if ("float".equals(type))
+        } else if ("float".equals(type)) {
             c = float.class;
-        else if ("double".equals(type))
+        } else if ("double".equals(type)) {
             c = double.class;
-        else if ("void".equals(type))
+        } else if ("void".equals(type)) {
             c = void.class;
-        else if (type.indexOf('[') < 0)
+        } else if (type.indexOf('[') < 0) {
             c = loader.loadClass(type);
+        }
 
-        if (dims == 0)
+        if (dims == 0) {
             return c;
+        }
 
-        if (dims == 1)
+        if (dims == 1) {
             return java.lang.reflect.Array.newInstance(c, 1).getClass();
+        }
 
         // Array of more than i dimension
         return java.lang.reflect.Array.newInstance(c, new int[dims]).getClass();
@@ -345,7 +354,7 @@ public class JspUtil {
 
     /**
      * Produces a String representing a call to the EL interpreter.
-     * 
+     *
      * @param expression
      *            a String containing zero or more "${}" expressions
      * @param expectedType
@@ -362,10 +371,11 @@ public class JspUtil {
          * Determine which context object to use.
          */
         String jspCtxt = null;
-        if (isTagFile)
+        if (isTagFile) {
             jspCtxt = "this.getJspContext()";
-        else
+        } else {
             jspCtxt = "_jspx_page_context";
+        }
 
         /*
          * Determine whether to use the expected type's textual name or, if it's
@@ -446,10 +456,11 @@ public class JspUtil {
             return "org.apache.jasper.runtime.JspRuntimeLibrary.coerceToBoolean("
                     + s + ")";
         } else {
-            if (s == null || s.length() == 0)
+            if (s == null || s.length() == 0) {
                 return "false";
-            else
+            } else {
                 return Boolean.valueOf(s).toString();
+            }
         }
     }
 
@@ -473,10 +484,11 @@ public class JspUtil {
             return "org.apache.jasper.runtime.JspRuntimeLibrary.coerceToByte("
                     + s + ")";
         } else {
-            if (s == null || s.length() == 0)
+            if (s == null || s.length() == 0) {
                 return "(byte) 0";
-            else
+            } else {
                 return "((byte)" + Byte.valueOf(s).toString() + ")";
+            }
         }
     }
 
@@ -530,10 +542,11 @@ public class JspUtil {
             return "org.apache.jasper.runtime.JspRuntimeLibrary.coerceToDouble("
                     + s + ")";
         } else {
-            if (s == null || s.length() == 0)
+            if (s == null || s.length() == 0) {
                 return "(double) 0";
-            else
+            } else {
                 return Double.valueOf(s).toString();
+            }
         }
     }
 
@@ -557,10 +570,11 @@ public class JspUtil {
             return "org.apache.jasper.runtime.JspRuntimeLibrary.coerceToFloat("
                     + s + ")";
         } else {
-            if (s == null || s.length() == 0)
+            if (s == null || s.length() == 0) {
                 return "(float) 0";
-            else
+            } else {
                 return Float.valueOf(s).toString() + "f";
+            }
         }
     }
 
@@ -583,10 +597,11 @@ public class JspUtil {
             return "org.apache.jasper.runtime.JspRuntimeLibrary.coerceToInt("
                     + s + ")";
         } else {
-            if (s == null || s.length() == 0)
+            if (s == null || s.length() == 0) {
                 return "0";
-            else
+            } else {
                 return Integer.valueOf(s).toString();
+            }
         }
     }
 
@@ -610,10 +625,11 @@ public class JspUtil {
             return "org.apache.jasper.runtime.JspRuntimeLibrary.coerceToShort("
                     + s + ")";
         } else {
-            if (s == null || s.length() == 0)
+            if (s == null || s.length() == 0) {
                 return "(short) 0";
-            else
+            } else {
                 return "((short) " + Short.valueOf(s).toString() + ")";
+            }
         }
     }
 
@@ -637,10 +653,11 @@ public class JspUtil {
             return "org.apache.jasper.runtime.JspRuntimeLibrary.coerceToLong("
                     + s + ")";
         } else {
-            if (s == null || s.length() == 0)
+            if (s == null || s.length() == 0) {
                 return "(long) 0";
-            else
+            } else {
                 return Long.valueOf(s).toString() + "l";
+            }
         }
     }
 
@@ -685,12 +702,12 @@ public class JspUtil {
     /**
      * Gets the fully-qualified class name of the tag handler corresponding to
      * the given tag file path.
-     * 
+     *
      * @param path
      *            Tag file path
      * @param err
      *            Error dispatcher
-     * 
+     *
      * @return Fully-qualified class name of the tag handler corresponding to
      *         the given tag file path
      */
@@ -747,10 +764,10 @@ public class JspUtil {
 
     /**
      * Converts the given path to a Java package or fully-qualified class name
-     * 
+     *
      * @param path
      *            Path to convert
-     * 
+     *
      * @return Java package corresponding to the given path
      */
     public static final String makeJavaPackage(String path) {
@@ -767,7 +784,7 @@ public class JspUtil {
 
     /**
      * Splits a string into it's components.
-     * 
+     *
      * @param path
      *            String to split
      * @param pat
@@ -798,10 +815,10 @@ public class JspUtil {
 
     /**
      * Converts the given identifier to a legal Java identifier
-     * 
+     *
      * @param identifier
      *            Identifier to convert
-     * 
+     *
      * @return Legal Java identifier corresponding to the given identifier
      */
     public static final String makeJavaIdentifier(String identifier) {
@@ -810,11 +827,11 @@ public class JspUtil {
 
     /**
      * Converts the given identifier to a legal Java identifier
-     * to be used for JSP Tag file attribute names. 
-     * 
+     * to be used for JSP Tag file attribute names.
+     *
      * @param identifier
      *            Identifier to convert
-     * 
+     *
      * @return Legal Java identifier corresponding to the given identifier
      */
     public static final String makeJavaIdentifierForAttribute(String identifier) {
@@ -823,10 +840,10 @@ public class JspUtil {
 
     /**
      * Converts the given identifier to a legal Java identifier.
-     * 
+     *
      * @param identifier
      *            Identifier to convert
-     * 
+     *
      * @return Legal Java identifier corresponding to the given identifier
      */
     private static final String makeJavaIdentifier(String identifier,
@@ -891,7 +908,7 @@ public class JspUtil {
         if (key == null || key.length() == 0) {
             return false;
         }
-        
+
         if (isJavaKeyword(key)) {
             return false;
         }
@@ -907,7 +924,7 @@ public class JspUtil {
                 return false;
             }
         }
-        
+
         return true;
     }
 
@@ -940,7 +957,7 @@ public class JspUtil {
      * Handles taking input from TLDs 'java.lang.Object' ->
      * 'java.lang.Object.class' 'int' -> 'int.class' 'void' -> 'Void.TYPE'
      * 'int[]' -> 'int[].class'
-     * 
+     *
      * @param type
      */
     public static String toJavaSourceTypeFromTld(String type) {
