@@ -62,7 +62,7 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
 
     /*
      * Tracks how many internal filters are in the filter library so they
-     * are skipped when looking for pluggable filters. 
+     * are skipped when looking for pluggable filters.
      */
     private int pluggableFilterIndex = Integer.MAX_VALUE;
 
@@ -252,7 +252,7 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
      */
     protected String server = null;
 
-    
+
     public AbstractHttp11Processor(AbstractEndpoint endpoint) {
         super(endpoint);
     }
@@ -374,8 +374,9 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
         }
         else {
             result = new String[sArray.length + 1];
-            for (int i = 0; i < sArray.length; i++)
+            for (int i = 0; i < sArray.length; i++) {
                 result[i] = sArray[i];
+            }
             result[sArray.length] = value;
         }
         return result;
@@ -389,8 +390,9 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
      * @param value string
      */
     private boolean startsWithStringArray(String sArray[], String value) {
-        if (value == null)
-           return false;
+        if (value == null) {
+            return false;
+        }
         for (int i = 0; i < sArray.length; i++) {
             if (value.startsWith(sArray[i])) {
                 return true;
@@ -537,12 +539,14 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
             response.getMimeHeaders().getValue("Content-Encoding");
 
         if ((contentEncodingMB != null)
-            && (contentEncodingMB.indexOf("gzip") != -1))
+            && (contentEncodingMB.indexOf("gzip") != -1)) {
             return false;
+        }
 
         // If force mode, always compress (test purposes only)
-        if (compressionLevel == 2)
-           return true;
+        if (compressionLevel == 2) {
+            return true;
+        }
 
         // Check if sufficient length to trigger the compression
         long contentLength = response.getContentLengthLong();
@@ -558,7 +562,7 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
         return false;
     }
 
-    
+
     /**
      * Check if compression should be used for this resource. Already checked
      * that the resource could be compressed if the client supports it.
@@ -570,12 +574,14 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
             request.getMimeHeaders().getValue("accept-encoding");
 
         if ((acceptEncodingMB == null)
-            || (acceptEncodingMB.indexOf("gzip") == -1))
+            || (acceptEncodingMB.indexOf("gzip") == -1)) {
             return false;
+        }
 
         // If force mode, always compress (test purposes only)
-        if (compressionLevel == 2)
-           return true;
+        if (compressionLevel == 2) {
+            return true;
+        }
 
         // Check for incompatible Browser
         if (noCompressionUserAgents != null) {
@@ -594,7 +600,7 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
         return true;
     }
 
-    
+
     /**
      * Specialized utility method: find a sequence of lower case bytes inside
      * a ByteChunk.
@@ -610,19 +616,24 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
         int srcEnd = b.length;
 
         for (int i = start; i <= (end - srcEnd); i++) {
-            if (Ascii.toLower(buff[i]) != first) continue;
+            if (Ascii.toLower(buff[i]) != first) {
+                continue;
+            }
             // found first char, now look for a match
             int myPos = i+1;
             for (int srcPos = 1; srcPos < srcEnd;) {
-                if (Ascii.toLower(buff[myPos++]) != b[srcPos++])
+                if (Ascii.toLower(buff[myPos++]) != b[srcPos++]) {
                     break;
-                if (srcPos == srcEnd) return i - start; // found it
+                }
+                if (srcPos == srcEnd) {
+                    return i - start; // found it
+                }
             }
         }
         return -1;
     }
 
-    
+
     /**
      * Determine if we must drop the connection because of the HTTP status
      * code.  Use the same list of codes as Apache/httpd.
@@ -638,7 +649,7 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
                status == 501 /* SC_NOT_IMPLEMENTED */;
     }
 
-    
+
     /**
      * Allows the super class to set the socket wrapper being used.
      */
@@ -647,18 +658,18 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
 
     /**
      * Exposes input buffer to super class to allow better code re-use.
-     * @return  The input buffer used by the processor. 
+     * @return  The input buffer used by the processor.
      */
     protected abstract AbstractInputBuffer<S> getInputBuffer();
 
-    
+
     /**
      * Exposes output buffer to super class to allow better code re-use.
-     * @return  The output buffer used by the processor. 
+     * @return  The output buffer used by the processor.
      */
     protected abstract AbstractOutputBuffer<S> getOutputBuffer();
 
-    
+
     /**
      * Initialize standard input and output filters.
      */
@@ -681,11 +692,11 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
         // Create and add the chunked filters.
         //getInputBuffer().addFilter(new GzipInputFilter());
         getOutputBuffer().addFilter(new GzipOutputFilter());
-        
+
         pluggableFilterIndex = getInputBuffer().getFilters().length;
     }
 
-    
+
     /**
      * Add an input filter to the current request.
      *
@@ -722,7 +733,7 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
      */
     @Override
     public final void action(ActionCode actionCode, Object param) {
-        
+
         if (actionCode == ActionCode.CLOSE) {
             // End the processing of the current request
 
@@ -736,8 +747,9 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
         } else if (actionCode == ActionCode.COMMIT) {
             // Commit current response
 
-            if (response.isCommitted())
+            if (response.isCommitted()) {
                 return;
+            }
 
             // Validate and write response headers
             try {
@@ -752,8 +764,9 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
             // Send a 100 status back if it makes sense (response not committed
             // yet, and client specified an expectation for 100-continue)
 
-            if ((response.isCommitted()) || !expectation)
+            if ((response.isCommitted()) || !expectation) {
                 return;
+            }
 
             getInputBuffer().setSwallowInput(true);
             try {
@@ -786,7 +799,7 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
 
         } else if (actionCode == ActionCode.REQ_SET_BODY_REPLAY) {
             ByteChunk body = (ByteChunk) param;
-            
+
             InputFilter savedBody = new SavedRequestInputFilter(body);
             savedBody.setRequest(request);
 
@@ -817,14 +830,14 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
             actionInternal(actionCode, param);
         }
     }
-    
+
     abstract void actionInternal(ActionCode actionCode, Object param);
-    
+
 
     /**
      * Processors (currently only HTTP BIO) may elect to disable HTTP keep-alive
      * in some circumstances. This method allows the processor implementation to
-     * determine if keep-alive should be disabled or not. 
+     * determine if keep-alive should be disabled or not.
      */
     protected abstract boolean disableKeepAlive();
 
@@ -837,7 +850,7 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
 
     /**
      * Defines how a connector handles an incomplete request line read.
-     * 
+     *
      * @return <code>true</code> if the processor should break out of the
      *         processing loop, otherwise <code>false</code>.
      */
@@ -856,7 +869,7 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
      *
      * @param socketWrapper Socket from which the HTTP requests will be read
      *               and the HTTP responses will be written.
-     *  
+     *
      * @throws IOException error during an I/O operation
      */
     @Override
@@ -893,7 +906,7 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
             // Parsing the request header
             try {
                 setRequestLineReadTimeout();
-                
+
                 if (!getInputBuffer().parseRequestLine(keptAlive)) {
                     if (handleIncompleteRequestLineRead()) {
                         break;
@@ -1063,7 +1076,7 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
         http09 = false;
         contentDelimitation = false;
         expectation = false;
-        
+
         prepareRequestInternal();
 
         if (endpoint.isSSLEnabled()) {
@@ -1116,8 +1129,9 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
         }
 
         MessageBytes expectMB = null;
-        if (http11)
+        if (http11) {
             expectMB = headers.getValue("expect");
+        }
         if ((expectMB != null)
             && (expectMB.indexOfIgnoreCase("100-continue", 0) != -1)) {
             getInputBuffer().setSwallowInput(false);
@@ -1171,8 +1185,9 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
 
         // Parse transfer-encoding header
         MessageBytes transferEncodingValueMB = null;
-        if (http11)
+        if (http11) {
             transferEncodingValueMB = headers.getValue("transfer-encoding");
+        }
         if (transferEncodingValueMB != null) {
             String transferEncodingValue = transferEncodingValueMB.toString();
             // Parse the comma separated list. "identity" codings are ignored
@@ -1229,7 +1244,7 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
         parseHost(valueMB);
 
         if (!contentDelimitation) {
-            // If there's no content length 
+            // If there's no content length
             // (broken HTTP/1.0 or HTTP/1.1), assume
             // the client is not broken and didn't send a body
             getInputBuffer().addActiveFilter
@@ -1242,7 +1257,7 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
             request.setAttribute("org.apache.tomcat.sendfile.support",
                     Boolean.TRUE);
         }
-        
+
         // Advertise comet support through a request attribute
         if (endpoint.getUseComet()) {
             request.setAttribute("org.apache.tomcat.comet.support",
@@ -1253,7 +1268,7 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
             request.setAttribute("org.apache.tomcat.comet.timeout.support",
                     Boolean.TRUE);
         }
-        
+
         if (error) {
             adapter.log(request, response, 0);
         }
@@ -1265,7 +1280,7 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
      * go away in the future.
      */
     protected abstract void prepareRequestInternal();
-    
+
     /**
      * When committing the response, we have to validate the set of headers, as
      * well as setup the response filters.
@@ -1307,7 +1322,7 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
         if (getEndpoint().getUseSendfile()) {
             sendingWithSendfile = prepareSendfile(outputFilters);
         }
-        
+
         // Check for compression
         boolean isCompressable = false;
         boolean useCompression = false;
@@ -1416,7 +1431,7 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
     }
 
     abstract boolean prepareSendfile(OutputFilter[] outputFilters);
-    
+
     /**
      * Parse host.
      */
@@ -1466,7 +1481,7 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
             request.serverName().setChars(hostNameC, 0, valueL);
         } else {
             request.serverName().setChars(hostNameC, 0, colonPos);
-            
+
             int port = 0;
             int mult = 1;
             for (int i = valueL - 1; i > colonPos; i--) {
@@ -1486,7 +1501,7 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
 
     }
 
-    
+
     @Override
     public SocketState asyncDispatch(SocketStatus status) {
 
@@ -1596,6 +1611,6 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
         localPort = -1;
         recycleInternal();
     }
-    
+
     protected abstract void recycleInternal();
 }
