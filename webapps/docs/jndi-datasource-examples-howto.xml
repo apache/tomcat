@@ -154,7 +154,7 @@ if there are no more available connections.</p>
 
 <p>
 There is a solution to this problem.  The Apache Commons DBCP can be
-configured to track and recover these abandoned dB connections.  Not
+configured to track and recover these abandoned database connections.  Not
 only can it recover them, but also generate a stack trace for the code
 which opened these resources and never closed them.</p>
 
@@ -173,7 +173,7 @@ any abandoned database connections it finds. The default is <code>false</code>.
 
 <p>
 Use the <code>removeAbandonedTimeout</code> attribute to set the number
-of seconds a dB connection has been idle before it is considered abandoned.
+of seconds a database connection has been idle before it is considered abandoned.
 </p>
 
 <source>removeAbandonedTimeout="60"</source>
@@ -185,7 +185,7 @@ The default timeout for removing abandoned connections is 300 seconds.
 <p>
 The <code>logAbandoned</code> attribute can be set to <code>true</code>
 if you want DBCP to log a stack trace of the code which abandoned the
-dB connection resources.
+database connection resources.
 </p>
 <source>logAbandoned="true"</source>
 <p>
@@ -256,29 +256,29 @@ resource to your <a href="config/context.html">Context</a>.</p>
 <source>
 &lt;Context&gt;
 
-    &lt;!-- maxActive: Maximum number of dB connections in pool. Make sure you
+    &lt;!-- maxActive: Maximum number of database connections in pool. Make sure you
          configure your mysqld max_connections large enough to handle
          all of your db connections. Set to -1 for no limit.
          --&gt;
 
-    &lt;!-- maxIdle: Maximum number of idle dB connections to retain in pool.
+    &lt;!-- maxIdle: Maximum number of idle database connections to retain in pool.
          Set to -1 for no limit.  See also the DBCP documentation on this
          and the minEvictableIdleTimeMillis configuration parameter.
          --&gt;
 
-    &lt;!-- maxWait: Maximum time to wait for a dB connection to become available
+    &lt;!-- maxWait: Maximum time to wait for a database connection to become available
          in ms, in this example 10 seconds. An Exception is thrown if
          this timeout is exceeded.  Set to -1 to wait indefinitely.
          --&gt;
 
-    &lt;!-- username and password: MySQL dB username and password for dB connections  --&gt;
+    &lt;!-- username and password: MySQL username and password for database connections  --&gt;
 
     &lt;!-- driverClassName: Class name for the old mm.mysql JDBC driver is
          org.gjt.mm.mysql.Driver - we recommend using Connector/J though.
          Class name for the official MySQL Connector/J driver is com.mysql.jdbc.Driver.
          --&gt;
     
-    &lt;!-- url: The JDBC connection url for connecting to your MySQL dB.
+    &lt;!-- url: The JDBC connection url for connecting to your MySQL database.
          --&gt;
 
   &lt;Resource name="jdbc/TestDB" auth="Container" type="javax.sql.DataSource"
