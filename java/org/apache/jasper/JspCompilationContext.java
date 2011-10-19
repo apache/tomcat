@@ -611,6 +611,9 @@ public class JspCompilationContext {
                     jsw.setLastModificationTest(-1);
                 }
                 throw ex;
+            } catch (FileNotFoundException fnfe) {
+                // Re-throw to let caller handle this - will result in a 404
+                throw fnfe;
             } catch (Exception ex) {
                 JasperException je = new JasperException(
                             Localizer.getMessage("jsp.error.unable.compile"),
