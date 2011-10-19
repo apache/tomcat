@@ -97,5 +97,4 @@ public final class RemoteAddrFilter
     protected Log getLogger() {
         return log;
     }
-    
 }
