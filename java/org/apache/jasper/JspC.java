@@ -250,9 +250,8 @@ public class JspC implements Options {
         if (arg.length == 0) {
             System.out.println(Localizer.getMessage("jspc.usage"));
         } else {
-            JspC jspc = null;
+            JspC jspc = new JspC();
             try {
-                jspc = new JspC();
                 jspc.setArgs(arg);
                 if (jspc.helpNeeded) {
                     System.out.println(Localizer.getMessage("jspc.usage"));
@@ -261,7 +260,7 @@ public class JspC implements Options {
                 }
             } catch (JasperException je) {
                 System.err.println(je);
-                if (jspc != null && jspc.dieLevel != NO_DIE_LEVEL) {
+                if (jspc.dieLevel != NO_DIE_LEVEL) {
                     System.exit(jspc.dieLevel);
                 }
             }
