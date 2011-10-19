@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -17,7 +17,7 @@
 package org.apache.jasper.util;
 
 /**
- * 
+ *
  * The FastRemovalDequeue is a Dequeue that supports constant time removal of
  * entries. This is achieved by using a doubly linked list and wrapping any object
  * added to the collection with an Entry type, that is returned to the consumer.
@@ -50,9 +50,9 @@ public class FastRemovalDequeue<T> {
     /** Maximum size of the queue */
     private final int maxSize;
     /** First element of the queue. */
-    private Entry first;
+    protected Entry first;
     /** Last element of the queue. */
-    private Entry last;
+    protected Entry last;
     /** Size of the queue */
     private int size;
 
@@ -71,7 +71,7 @@ public class FastRemovalDequeue<T> {
      * Retrieve the size of the list.
      * This method also needs to be externaly synchronized to
      * ensure correct publication of changes.
-     * 
+     *
      * @return the size of the list.
      * */
     public synchronized int getSize() {
@@ -81,7 +81,7 @@ public class FastRemovalDequeue<T> {
     /**
      * Adds an object to the start of the list and returns the entry created for
      * said object. The entry can later be reused for moving the entry.
-     * 
+     *
      * @param object the object to prepend to the start of the list.
      * @return an entry for use when the object should be moved.
      * */
@@ -105,7 +105,7 @@ public class FastRemovalDequeue<T> {
     /**
      * Adds an object to the end of the list and returns the entry created for
      * said object. The entry can later be reused for moving the entry.
-     * 
+     *
      * @param object the object to append to the end of the list.
      * @return an entry for use when the object should be moved.
      * */
@@ -128,7 +128,7 @@ public class FastRemovalDequeue<T> {
 
     /**
      * Removes the first element of the list and returns its content.
-     * 
+     *
      * @return the content of the first element of the list.
      **/
     public synchronized T unpush() {
@@ -137,7 +137,9 @@ public class FastRemovalDequeue<T> {
             Entry element = first;
             first = first.getNext();
             content = element.getContent();
-            if (first != null) {
+            if (first == null) {
+                last =null;
+            } else {
                 first.setPrevious(null);
             }
             size--;
@@ -148,7 +150,7 @@ public class FastRemovalDequeue<T> {
 
     /**
      * Removes the last element of the list and returns its content.
-     * 
+     *
      * @return the content of the last element of the list.
      **/
     public synchronized T pop() {
@@ -157,7 +159,9 @@ public class FastRemovalDequeue<T> {
             Entry element = last;
             last = last.getPrevious();
             content = element.getContent();
-            if (last != null) {
+            if (last == null) {
+                first = null;
+            } else {
                 last.setNext(null);
             }
             size--;
@@ -194,7 +198,7 @@ public class FastRemovalDequeue<T> {
      *
      * Could also be implemented as remove() and
      * push(), but explicitely coding might be a bit faster.
-     * 
+     *
      * @param element the entry to move in front.
      * */
     public synchronized void moveFirst(final Entry element) {
@@ -220,7 +224,7 @@ public class FastRemovalDequeue<T> {
      *
      * Could also be implemented as remove() and
      * unpop(), but explicitely coding might be a bit faster.
-     * 
+     *
      * @param element the entry to move to the back.
      * */
     public synchronized void moveLast(final Entry element) {
@@ -287,7 +291,7 @@ public class FastRemovalDequeue<T> {
         public final void clearReplaced() {
             this.replaced = null;
         }
-        
+
         private final Entry getNext() {
             return next;
         }
