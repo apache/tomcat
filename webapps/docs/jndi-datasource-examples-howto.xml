@@ -120,10 +120,12 @@ DBCP documentation</a> for a complete list of configuration parameters.
 <subsection name="Installation">
 <p>DBCP uses the Commons Database Connection Pool. It relies on
 number of Commons components:
+</p>
 <ul>
 <li>Commons DBCP</li>
 <li>Commons Pool</li>
 </ul>
+<p>
 These libraries are located in a single JAR at 
 <code>$CATALINA_HOME/lib/tomcat-dbcp.jar</code>. However,
 only the classes needed for connection pooling have been included, and the
@@ -132,45 +134,49 @@ packages have been renamed to avoid interfering with applications.
 
 </subsection>
 
-<subsection name="Preventing dB connection pool leaks">
+<subsection name="Preventing database connection pool leaks">
 
 <p>
 A database connection pool creates and manages a pool of connections
 to a database. Recycling and reusing already existing connections
-to a dB is more efficient than opening a new connection.
+to a database is more efficient than opening a new connection.
 </p>
 
 <p>
 There is one problem with connection pooling.  A web application has
 to explicitly close ResultSet's, Statement's, and Connection's.
 Failure of a web application to close these resources can result in
-them never being available again for reuse, a db connection pool "leak".
-This can eventually result in your web application db connections failing
+them never being available again for reuse, a database connection pool "leak".
+This can eventually result in your web application database connections failing
 if there are no more available connections.</p>
 
 <p>
-There is a solution to this problem.  The Jakarta-Commons DBCP can be
+There is a solution to this problem.  The Apache Commons DBCP can be
 configured to track and recover these abandoned dB connections.  Not
 only can it recover them, but also generate a stack trace for the code
 which opened these resources and never closed them.</p>
 
 <p>
-To configure a DBCP DataSource so that abandoned dB connections are
+To configure a DBCP DataSource so that abandoned database connections are
 removed and recycled add the following attribute to the
 <code>Resource</code> configuration for your DBCP DataSource:
-<source>
-            removeAbandoned="true"
-</source>
-When available db connections run low DBCP will recover and recycle
-any abandoned dB connections it finds. The default is <code>false</code>.
+</p>
+
+<source>removeAbandoned="true"</source>
+
+<p>
+When available database connections run low DBCP will recover and recycle
+any abandoned database connections it finds. The default is <code>false</code>.
 </p>
 
 <p>
 Use the <code>removeAbandonedTimeout</code> attribute to set the number
 of seconds a dB connection has been idle before it is considered abandoned.
-<source>
-            removeAbandonedTimeout="60"
-</source>
+</p>
+
+<source>removeAbandonedTimeout="60"</source>
+
+<p>
 The default timeout for removing abandoned connections is 300 seconds.
 </p>
 
@@ -178,9 +184,9 @@ The default timeout for removing abandoned connections is 300 seconds.
 The <code>logAbandoned</code> attribute can be set to <code>true</code>
 if you want DBCP to log a stack trace of the code which abandoned the
 dB connection resources.
-<source>
-            logAbandoned="true"
-</source>
+</p>
+<source>logAbandoned="true"</source>
+<p>
 The default is <code>false</code>.
 </p>
 
@@ -189,13 +195,14 @@ The default is <code>false</code>.
 <subsection name="MySQL DBCP Example">
 
 <h3>0. Introduction</h3>
-<p>Versions of <a href="http://www.mysql.com/products/mysql/index.html">MySQL</a> and JDBC drivers that have been reported to work:
+<p>Versions of <a href="http://www.mysql.com/products/mysql/index.html">MySQL</a> and JDBC
+drivers that have been reported to work:
+</p>
 <ul>
 <li>MySQL 3.23.47, MySQL 3.23.47 using InnoDB,, MySQL 3.23.58,  MySQL 4.0.1alpha</li>
 <li><a href="http://www.mysql.com/products/connector-j">Connector/J</a> 3.0.11-stable (the official JDBC Driver)</li>
 <li><a href="http://mmmysql.sourceforge.net">mm.mysql</a> 2.0.14 (an old 3rd party JDBC Driver)</li>
 </ul>
-</p>
 
 <p>Before you proceed, don't forget to copy the JDBC Driver's jar into <code>$CATALINA_HOME/lib</code>.</p>
 
@@ -207,6 +214,7 @@ Ensure that you follow these instructions as variations can cause problems.
 <p>Create a new test user, a new database and a single test table.
 Your MySQL user <strong>must</strong> have a password assigned. The driver
 will fail if you try to connect with an empty password.
+</p>
 <source>
 mysql&gt; GRANT ALL PRIVILEGES ON *.* TO javauser@localhost 
     -&gt;   IDENTIFIED BY 'javadude' WITH GRANT OPTION;
@@ -221,9 +229,9 @@ mysql&gt; create table testdata (
 <strong>Note:</strong> the above user should be removed once testing is
 complete!
 </blockquote>
-</p>
 
 <p>Next insert some test data into the testdata table.
+</p>
 <source>
 mysql&gt; insert into testdata values(null, 'hello', 12345);
 Query OK, 1 row affected (0.00 sec)
@@ -238,13 +246,11 @@ mysql> select * from testdata;
 
 mysql&gt;
 </source>
-</p>
 
 <h3>2. Context configuration</h3>
 <p>Configure the JNDI DataSource in Tomcat by adding a declaration for your
 resource to your <a href="config/context.html">Context</a>.</p>
-<p>For example:
-
+<p>For example:</p>
 <source>
 &lt;Context&gt;
 
@@ -280,11 +286,10 @@ resource to your <a href="config/context.html">Context</a>.</p>
 
 &lt;/Context&gt;
 </source>
-</p>
 
 <h3>3. web.xml configuration</h3>
 
-<p>Now create a <code>WEB-INF/web.xml</code> for this test application.
+<p>Now create a <code>WEB-INF/web.xml</code> for this test application.</p>
 <source>
 &lt;web-app xmlns="http://java.sun.com/xml/ns/j2ee"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -300,7 +305,6 @@ http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd"
   &lt;/resource-ref&gt;
 &lt;/web-app&gt;
 </source>
-</p>
 
 <h3>4. Test code</h3>
 <p>Now create a simple <code>test.jsp</code> page for use later.
@@ -375,6 +379,7 @@ not the same as the tnsname). The schema used will be the default schema for the
 user scott.</p>
 
 <p>Use of the OCI driver should simply involve a changing thin to oci in the URL string.
+</p>
 <source>
 &lt;Resource name="jdbc/myoracle" auth="Container"
               type="javax.sql.DataSource" driverClassName="oracle.jdbc.OracleDriver"
@@ -382,7 +387,6 @@ user scott.</p>
               username="scott" password="tiger" maxActive="20" maxIdle="10"
               maxWait="-1"/&gt; 
 </source>
-</p>
 
 <h3>2.    web.xml configuration</h3>
 <p>You should ensure that you respect the element ordering defined by the DTD when you
@@ -610,6 +614,7 @@ connection just returns it to the pool for reuse by another request,
 it doesn't close the connection.  And Tomcat uses multiple threads to
 handle concurrent requests. Here is an example of the sequence
 of events which could cause this error in Tomcat:
+</p>
 <pre>
   Request 1 running in Thread 1 gets a db connection.
 
@@ -629,8 +634,10 @@ of events which could cause this error in Tomcat:
   Request 2 Thread 2 tries to use the db connection but fails
   because Request 1 closed it.
 </pre>
-Here is an example of properly written code to use a db connection
+<p>
+Here is an example of properly written code to use a database connection
 obtained from a connection pool:
+</p>
 <pre>
   Connection conn = null;
   Statement stmt = null;  // Or PreparedStatement if needed
@@ -665,7 +672,6 @@ obtained from a connection pool:
     }
   }
 </pre>
-</p>
 
 </subsection>
 
