@@ -95,6 +95,11 @@
         Cache the results of parsing the global and host level web.xml files to
         improve web application start time. (markt)
       </add>
+      <fix>
+        <bug>52042</bug>: Correct threading issue in annotation caching that
+        could lead to an NPE if multiple threads were processing the same class
+        hierarchy for annotations. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
