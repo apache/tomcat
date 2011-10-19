@@ -108,28 +108,30 @@ a <code>ServletContextListener</code>.
 
 <section name="Database Connection Pool (DBCP) Configurations">
 
-<p>DBCP provides support for JDBC 2.0.  On systems using a 1.4 JVM DBCP
-will support JDBC 3.0. Please let us know if you have used DBCP and its
-JDBC 3.0 features with a 1.4 JVM.
+<p>The default database connection pool implementation in Apache Tomcat
+relies on the libraries from the
+<a href="http://commons.apache.org/">Apache Commons</a> project.
+The following libraries are used:
 </p>
 
-<p>See the <a href="http://commons.apache.org/dbcp/configuration.html">
-DBCP documentation</a> for a complete list of configuration parameters.
-</p>
-
-<subsection name="Installation">
-<p>DBCP uses the Commons Database Connection Pool. It relies on
-number of Commons components:
-</p>
 <ul>
 <li>Commons DBCP</li>
 <li>Commons Pool</li>
 </ul>
+
 <p>
 These libraries are located in a single JAR at 
 <code>$CATALINA_HOME/lib/tomcat-dbcp.jar</code>. However,
 only the classes needed for connection pooling have been included, and the
 packages have been renamed to avoid interfering with applications.
+</p>
+
+<p>DBCP 1.4 provides support for JDBC 4.0.</p>
+
+<subsection name="Installation">
+
+<p>See the <a href="http://commons.apache.org/dbcp/configuration.html">
+DBCP documentation</a> for a complete list of configuration parameters.
 </p>
 
 </subsection>
@@ -582,13 +584,13 @@ Change the database connect string (of the form <code>host:port:SID</code>) with
 <p>Here are some common problems encountered with a web application which
 uses a database and tips for how to solve them.</p>
 
-<subsection name="Intermittent dB Connection Failures">
+<subsection name="Intermittent Database Connection Failures">
 <p>
 Tomcat runs within a JVM.  The JVM periodically performs garbage collection
 (GC) to remove java objects which are no longer being used.  When the JVM
 performs GC execution of code within Tomcat freezes. If the maximum time
-configured for establishment of a dB connection is less than the amount
-of time garbage collection took you can get a db conneciton failure.
+configured for establishment of a database connection is less than the amount
+of time garbage collection took you can get a database connection failure.
 </p>
 
 <p>To collect data on how long garbage collection is taking add the
