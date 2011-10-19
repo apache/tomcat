@@ -186,10 +186,9 @@ public class StandardHost extends ContainerBase implements Host {
      */
     @Override
     public String getAppBase() {
-
         return (this.appBase);
-
     }
+
 
     /**
      * Return the XML root for this Host.  This can be an absolute
@@ -202,6 +201,7 @@ public class StandardHost extends ContainerBase implements Host {
         return (this.xmlBase);
 
     }
+
 
     /**
      * Set the application root for this Host.  This can be an absolute
@@ -218,6 +218,7 @@ public class StandardHost extends ContainerBase implements Host {
 
     }
     
+
     /**
      * Set the Xml root for this Host.  This can be an absolute
      * pathname, a relative pathname, or a URL.
@@ -233,6 +234,7 @@ public class StandardHost extends ContainerBase implements Host {
         support.firePropertyChange("xmlBase", oldXmlBase, this.xmlBase);
 
     }
+
 
     /**
      * Returns true if the Host will attempt to create directories for appBase and xmlBase
