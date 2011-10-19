@@ -70,43 +70,39 @@ the section about Automatic Application Deployment in the latter reference.
 
 <p><code>java.sql.DriverManager</code> supports the
 <a href="http://download.oracle.com/javase/6/docs/api/index.html?java/sql/DriverManager.html">service
-provider</a> mechanism. However, the implementation is fundamentally broken in
-all Java versions for a servlet container environment.
-<code>java.sql.DriverManager</code> will only scan the first web application to
-use it for JDBC drivers using the service provider mechanism. Any JDBC drivers
-present in the web application or any parent class loader will be discovered
-correctly (including those in $CATALINA_BASE/lib) but no further scans will be
-performed for any other web applications. For example, if there are two web
-applications each using a different JDBC driver packaged in WEB-INF/lib, the
-service provider mechanism will only work for the first web application to use
-DriverManager. The other web application will be required to register the Driver
-manually. Given that web application start order is undefined, the service
-provider mechanism can not be relied upon for JDBC Driver implementations
-packaged in WEB-INF/lib.
+provider</a> mechanism. This feature is that all the available JDBC drivers
+that announce themselves by providing a <code>META-INF/services/java.sql.Driver</code>
+file are automatically discovered, loaded and registered,
+relieving you from the need to load the database driver explicitly before
+you create a JDBC connection.
+However, the implementation is fundamentally broken in all Java versions for
+a servlet container environment. The problem is that
+<code>java.sql.DriverManager</code> will scan for the drivers only once.</p>
+
+<p>The <a href="config/listeners.html">JRE Memory Leak Prevention Listener</a>
+that is included with Apache Tomcat solves this by triggering the drivers scan
+during Tomcat startup. This is enabled by default. It means that only
+libraries visible to the listener such as the ones in
+<code>$CATALINA_BASE/lib</code> will be scanned for database drivers.
+If you are considering disabling this feature, note that
+the scan would be triggered by the first web application that is
+using JDBC, leading to failures when this web application is reloaded
+and for other web applications that rely on this feature.
 </p>
 
-<p>The <code>java.sql.DriverManager</code> is also a frequent source of memory
-leaks. Any Drivers registered with the DriverManager by a web application must
-be deregistered when the web application stops. If the service provider
-mechanism registers a JDBC driver, it will never deregister it. Tomcat will
-attempt to automatically deregister and registered JDBC drivers discovered
-when a web application stops. However, it is expected that applications do this
-for themselves via a <code>ServletContextListener</code>.
-</p>
+<p>Thus, the web applications that have database drivers in their
+<code>WEB-INF/lib</code> directory cannot rely on the service provider
+mechanism and should register the drivers explicitly.</p>
 
-<p>There have been reports that the memory leak prevention code that deregisters
-JDBC drivers can, in unusual circumstances, trigger a memory leak rather than
-fix it. To prevent this, the <a href="config/listeners.html">JRE Memory Leak
-Prevention Listener</a> includes protection for the DriverManager. This
-protection is enabled by default. Note that a side-effect of enabling this
-protection is that while any JDBC Driver implementations packaged with the JVM
-or located in $CATALINA_BASE/lib will be correctly discovered by the service
-provider mechanism, JDBC Driver implementations packaged in web applications
-will not be discovered. It is therefore necessary for applications to manually
-register (and deregister) and JDBC drivers they require that are packaged in the
-WEB-INF/lib directory. Given the known issues with the service provider
-implementation for DriverManager, most web applications will probably be doing
-this already.</p>
+<p>The list of drivers in <code>java.sql.DriverManager</code> is also
+a known source of memory leaks. Any Drivers registered
+by a web application must be deregistered when the web application stops.
+Tomcat will attempt to automatically discover and deregister any
+JDBC drivers loaded by the web application class loader when the web
+application stops.
+However, it is expected that applications do this for themselves via
+a <code>ServletContextListener</code>.
+</p>
 
 </section>
 
