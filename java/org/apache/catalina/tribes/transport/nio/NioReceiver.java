@@ -283,7 +283,7 @@ public class NioReceiver extends ReceiverBase implements Runnable {
                 // get an iterator over the set of selected keys
                 Iterator<SelectionKey> it = (selector!=null)?selector.selectedKeys().iterator():null;
                 // look at each key in the selected set
-                while (selector!=null && it.hasNext()) {
+                while (it!=null && it.hasNext()) {
                     SelectionKey key = it.next();
                     // Is a new connection coming in?
                     if (key.isAcceptable()) {
