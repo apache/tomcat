@@ -31,10 +31,11 @@ import java.net.Socket;
  */
 public class DefaultServerSocketFactory implements ServerSocketFactory {
 
-    private AbstractEndpoint endpoint;
-
+    /**
+     * 
+     * @param endpoint  Unused in this implementation.
+     */
     public DefaultServerSocketFactory(AbstractEndpoint endpoint) {
-        this.endpoint = endpoint;
     }
 
     @Override
