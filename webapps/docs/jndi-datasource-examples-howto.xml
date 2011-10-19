@@ -69,7 +69,7 @@ the section about Automatic Application Deployment in the latter reference.
 <section name="DriverManager, the service provider mechanism and memory leaks">
 
 <p><code>java.sql.DriverManager</code> supports the
-<a href="http://download.oracle.com/javase/6/docs/api/index.html">service
+<a href="http://download.oracle.com/javase/6/docs/api/index.html?java/sql/DriverManager.html">service
 provider</a> mechanism. However, the implementation is fundamentally broken in
 all Java versions for a servlet container environment.
 <code>java.sql.DriverManager</code> will only scan the first web application to
