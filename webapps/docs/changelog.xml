@@ -104,6 +104,12 @@
         Correct additional threading and premature clearance issues with the
         annotation cache. (markt)
       </fix>
+      <fix>
+        Correct a regression in the fix for <bug>49779</bug> that prevented
+        parameters POSTed by an unauthenticated user to a page that required
+        authentication from being lost during the authentication process.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
