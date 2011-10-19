@@ -132,6 +132,11 @@
         Correct possible (but very small) memory leak when using maxLoadedJsps
         to limit the number of JSPs loaded at any one time. (markt) 
       </fix>
+      <fix>
+        <bug>52051</bug>: Better handling of missing resource problems with
+        non-standard Servlet mappings so that a 404 response is returned to the
+        client rather than a 500 response. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
