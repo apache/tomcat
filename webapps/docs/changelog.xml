@@ -100,6 +100,10 @@
         could lead to an NPE if multiple threads were processing the same class
         hierarchy for annotations. (markt)
       </fix>
+      <fix>
+        Correct additional threading and premature clearance issues with the
+        annotation cache. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
