@@ -562,7 +562,7 @@ public class FormAuthenticator
 
         // Swallow any request body since we will be replacing it
         byte[] buffer = new byte[4096];
-        InputStream is = request.getInputStream();
+        InputStream is = request.createInputStream();
         while (is.read(buffer) >= 0) {
             // Ignore request body
         }
