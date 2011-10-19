@@ -18,52 +18,51 @@ package org.apache.catalina.authenticator;
 
 import java.io.IOException;
 import java.security.MessageDigest;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.security.NoSuchAlgorithmException;
+
+import javax.servlet.http.HttpServletResponse;
 
 import static org.junit.Assert.assertEquals;
 
+import org.junit.Before;
 import org.junit.Test;
 
 import org.apache.catalina.Context;
+import org.apache.catalina.connector.Request;
+import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.deploy.LoginConfig;
-import org.apache.catalina.deploy.SecurityCollection;
-import org.apache.catalina.deploy.SecurityConstraint;
+import org.apache.catalina.filters.TesterResponse;
 import org.apache.catalina.startup.TestTomcat.MapRealm;
-import org.apache.catalina.startup.TesterServlet;
-import org.apache.catalina.startup.Tomcat;
-import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.catalina.util.MD5Encoder;
-import org.apache.tomcat.util.buf.ByteChunk;
 
-public class TesterDigestAuthenticatorPerformance extends TomcatBaseTest {
+public class TesterDigestAuthenticatorPerformance {
 
     private static String USER = "user";
     private static String PWD = "pwd";
     private static String ROLE = "role";
+    private static String METHOD = "GET";
     private static String URI = "/protected";
     private static String CONTEXT_PATH = "/foo";
     private static String CLIENT_AUTH_HEADER = "authorization";
     private static String REALM = "TestRealm";
     private static String QOP = "auth";
 
+    private DigestAuthenticator authenticator = new DigestAuthenticator();
+    
+    
     @Test
     public void testSimple() throws Exception {
-        doTest(100, 1000);
+        doTest(100, 1000000);
     }
 
     public void doTest(int threadCount, int requestCount) throws Exception {
         
-        getTomcatInstance().start();
-
         TesterRunnable runnables[] = new TesterRunnable[threadCount];
         Thread threads[] = new Thread[threadCount];
         
         // Create the runnables & threads
         for (int i = 0; i < threadCount; i++) {
-            runnables[i] = new TesterRunnable(i, requestCount);
+            runnables[i] = new TesterRunnable(requestCount);
             threads[i] = new Thread(runnables[i]);
         }
 
@@ -98,84 +97,64 @@ public class TesterDigestAuthenticatorPerformance extends TomcatBaseTest {
         assertEquals(requestCount * threadCount, totalSuccess);
     }
 
+    @Before
+    public void setUp() throws Exception {
+
+        // Configure the Realm
+        MapRealm realm = new MapRealm();
+        realm.addUser(USER, PWD);
+        realm.addUserRole(USER, ROLE);
+
+        // Add the Realm to the Context
+        Context context = new StandardContext();
+        context.setName(CONTEXT_PATH);
+        context.setRealm(realm);
+        
+        // Make the Context and Realm visible to the Authenticator
+        authenticator.setContainer(context);
+        
+        // Prevent caching of cnonces so we can the same one for all requests
+        authenticator.setCnonceCacheSize(0);
+        authenticator.start();
+    }
+
+    
     private class TesterRunnable implements Runnable {
 
         // Number of valid requests required
         private int requestCount;
         
-        private String nonce;
-        private String opaque;
-
-        private String cnonce;
-
-        private Map<String,List<String>> reqHeaders;
-        private List<String> authHeader;
-        
-        private MessageDigest digester;
-        private MD5Encoder encoder;
-
-        private String md5a1;
-        private String md5a2;
-
-        private String path;
-
         private int success = 0;
         private long time = 0;
 
+        private TesterDigestRequest request;
+        private HttpServletResponse response;
+        private LoginConfig config;
+        
         // All init code should be in here. run() needs to be quick
-        public TesterRunnable(int id, int requestCount) throws Exception {
+        public TesterRunnable(int requestCount) throws Exception {
             this.requestCount = requestCount;
 
-            path = "http://localhost:" + getPort() + CONTEXT_PATH + URI;
+            request = new TesterDigestRequest();
+            String nonce = authenticator.generateNonce(request);
+            request.setAuthHeader(buildDigestResponse(nonce));
 
-            // Make the first request as we need the Digest challenge to obtain
-            // the server nonce
-            Map<String,List<String>> respHeaders =
-                    new HashMap<String,List<String>>();
-            getUrl(path, new ByteChunk(), respHeaders);
-            
-            nonce = TestDigestAuthenticator.getNonce(respHeaders);
-            opaque = TestDigestAuthenticator.getOpaque(respHeaders);
-            
-            cnonce = "cnonce" + id;
+            response = new TesterResponse();
 
-            reqHeaders = new  HashMap<String,List<String>>();
-            authHeader = new ArrayList<String>();
-            reqHeaders.put(CLIENT_AUTH_HEADER, authHeader);
-            
-            digester = MessageDigest.getInstance("MD5");
-            encoder = new MD5Encoder();
-
-            String a1 = USER + ":" + REALM + ":" + PWD;
-            String a2 = "GET:" + CONTEXT_PATH + URI;
-            
-            md5a1 = encoder.encode(digester.digest(a1.getBytes()));
-            md5a2 = encoder.encode(digester.digest(a2.getBytes()));
+            config = new LoginConfig();
+            config.setRealmName(REALM);
         }
 
         @Override
         public void run() {
-            int rc;
-            int nc = 0;
-            ByteChunk bc = new ByteChunk();
             long start = System.currentTimeMillis();
             for (int i = 0; i < requestCount; i++) {
-                nc++;
-                authHeader.clear();
-                authHeader.add(buildDigestResponse(nc));
-                
-                rc = -1;
-                bc.recycle();
-                bc.reset();
-                
                 try {
-                    rc = getUrl(path, bc, reqHeaders, null);
+                    if (authenticator.authenticate(request, response, config)) {
+                        success++;
+                    }
                 } catch (IOException ioe) {
                     // Ignore
-                }
-             
-                if (rc == 200 && "OK".equals(bc.toString())) {
-                    success++;
                 }
             }
             time = System.currentTimeMillis() - start;
@@ -189,9 +168,20 @@ public class TesterDigestAuthenticatorPerformance extends TomcatBaseTest {
             return time;
         }
 
-        private String buildDigestResponse(int nc) {
+        private String buildDigestResponse(String nonce)
+                throws NoSuchAlgorithmException {
             
-            String ncString = String.format("%1$08x", Integer.valueOf(nc));
+            String ncString = "00000001";
+            String cnonce = "cnonce";
+            
+            String a1 = USER + ":" + REALM + ":" + PWD;
+            String a2 = METHOD + ":" + CONTEXT_PATH + URI;
+            
+            MessageDigest digester = MessageDigest.getInstance("MD5");
+            MD5Encoder encoder = new MD5Encoder();
+
+            String md5a1 = encoder.encode(digester.digest(a1.getBytes()));
+            String md5a2 = encoder.encode(digester.digest(a2.getBytes()));
 
             String response = md5a1 + ":" + nonce + ":" + ncString + ":" +
                     cnonce + ":" + QOP + ":" + md5a2;
@@ -209,7 +199,7 @@ public class TesterDigestAuthenticatorPerformance extends TomcatBaseTest {
             auth.append("\", uri=\"");
             auth.append(CONTEXT_PATH + URI);
             auth.append("\", opaque=\"");
-            auth.append(opaque);
+            auth.append(authenticator.getOpaque());
             auth.append("\", response=\"");
             auth.append(md5response);
             auth.append("\"");
@@ -227,40 +217,43 @@ public class TesterDigestAuthenticatorPerformance extends TomcatBaseTest {
         }
     }
 
-    @Override
-    public void setUp() throws Exception {
-        super.setUp();
+    
+    private static class TesterDigestRequest extends Request {
 
-        // Configure a context with digest auth and a single protected resource
-        Tomcat tomcat = getTomcatInstance();
+        private String authHeader = null;
         
-        // Must have a real docBase - just use temp
-        Context ctxt = tomcat.addContext(CONTEXT_PATH,
-                System.getProperty("java.io.tmpdir"));
+        @Override
+        public String getRemoteAddr() {
+            return "127.0.0.1";
+        }
         
-        // Add protected servlet
-        Tomcat.addServlet(ctxt, "TesterServlet", new TesterServlet());
-        ctxt.addServletMapping(URI, "TesterServlet");
-        SecurityCollection collection = new SecurityCollection();
-        collection.addPattern(URI);
-        SecurityConstraint sc = new SecurityConstraint();
-        sc.addAuthRole(ROLE);
-        sc.addCollection(collection);
-        ctxt.addConstraint(sc);
+        public void setAuthHeader(String authHeader) {
+            this.authHeader = authHeader;
+        }
+
+        @Override
+        public String getHeader(String name) {
+            if (CLIENT_AUTH_HEADER.equalsIgnoreCase(name)) {
+                return authHeader;
+            } else {
+                return super.getHeader(name);
+            }
+        }
+
+        @Override
+        public String getMethod() {
+            return METHOD;
+        }
+
+        @Override
+        public String getQueryString() {
+            return null;
+        }
+
+        @Override
+        public String getRequestURI() {
+            return CONTEXT_PATH + URI;
+        }
         
-        // Configure the Realm
-        MapRealm realm = new MapRealm();
-        realm.addUser(USER, PWD);
-        realm.addUserRole(USER, ROLE);
-        ctxt.setRealm(realm);
-        
-        // Configure the authenticator
-        LoginConfig lc = new LoginConfig();
-        lc.setAuthMethod("DIGEST");
-        lc.setRealmName(REALM);
-        ctxt.setLoginConfig(lc);
-        DigestAuthenticator authenticator = new DigestAuthenticator();
-        authenticator.setCnonceCacheSize(100);
-        ctxt.getPipeline().addValve(authenticator);
     }
 }
