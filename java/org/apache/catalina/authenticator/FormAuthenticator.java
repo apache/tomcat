@@ -530,10 +530,11 @@ public class FormAuthenticator
             request.addCookie(cookies.next());
         }
 
+        String method = saved.getMethod();
         MimeHeaders rmh = request.getCoyoteRequest().getMimeHeaders();
         rmh.recycle();
-        boolean cachable = "GET".equalsIgnoreCase(saved.getMethod()) ||
-                           "HEAD".equalsIgnoreCase(saved.getMethod());
+        boolean cachable = "GET".equalsIgnoreCase(method) ||
+                           "HEAD".equalsIgnoreCase(method);
         Iterator<String> names = saved.getHeaderNames();
         while (names.hasNext()) {
             String name = names.next();
@@ -567,7 +568,6 @@ public class FormAuthenticator
         }
 
         ByteChunk body = saved.getBody();
-        String method = saved.getMethod();
 
         if (body != null) {
             request.getCoyoteRequest().action
