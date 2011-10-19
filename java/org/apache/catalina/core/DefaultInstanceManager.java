@@ -673,7 +673,7 @@ public class DefaultInstanceManager implements InstanceManager {
         } else {
             try {
                 result = clazz.getDeclaredMethod(
-                        entry.getName(), entry.getParamTypes());
+                        entry.getAccessibleObjectName(), entry.getParamTypes());
             } catch (NoSuchMethodException e) {
                 // Should never happen. On that basis don't log it.
             }
@@ -702,7 +702,8 @@ public class DefaultInstanceManager implements InstanceManager {
             });
         } else {
             try {
-                result = clazz.getDeclaredField(entry.getName());
+                result = clazz.getDeclaredField(
+                        entry.getAccessibleObjectName());
             } catch (NoSuchFieldException e) {
                 // Should never happen. On that basis don't log it.
             }
