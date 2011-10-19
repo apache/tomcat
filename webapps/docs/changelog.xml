@@ -126,6 +126,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Jasper">
+    <changelog>
+      <fix>
+        Correct possible (but very small) memory leak when using maxLoadedJsps
+        to limit the number of JSPs loaded at any one time. (markt) 
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Web applications">
     <changelog>
       <add>
