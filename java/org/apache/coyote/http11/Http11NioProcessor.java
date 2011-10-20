@@ -157,7 +157,13 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
         if (error) {
             return SocketState.CLOSED;
         } else if (!comet) {
-            return (keepAlive)?SocketState.OPEN:SocketState.CLOSED;
+            if (keepAlive) {
+                inputBuffer.nextRequest();
+                outputBuffer.nextRequest();
+                return SocketState.OPEN;
+            } else {
+                return SocketState.CLOSED;
+            }
         } else {
             return SocketState.LONG;
         }
