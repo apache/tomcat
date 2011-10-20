@@ -185,6 +185,10 @@
       <scode>
         Remove some unused code from the packaged renamed Commons BCEL. (markt)
       </scode>
+      <fix>
+        <bug>52015</bug>: In jdbc-pool: JdbcInterceptor passes not 'this' but 
+        'proxy' to getNext().invoke. (kfujino)
+      </fix>
     </changelog>
   </subsection>
 </section>
