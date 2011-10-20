@@ -19,6 +19,7 @@ package org.apache.catalina.authenticator;
 import java.io.File;
 
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import org.junit.Test;
 
@@ -123,7 +124,11 @@ public class TestFormAuthenticator extends TomcatBaseTest {
             StringBuilder requestHead = new StringBuilder(128);
             String requestTail;
             requestHead.append(method).append(" ").append(protectedLocation)
-                    .append(protectedPage).append(" HTTP/1.1").append(CRLF);
+                    .append(protectedPage);
+            if ("GET".equals(method)) {
+                requestHead.append("?role=bar");
+            }
+            requestHead.append(" HTTP/1.1").append(CRLF);
             requestHead.append("Host: localhost").append(CRLF);
             requestHead.append("Connection: close").append(CRLF);
             if (getUseContinue()) {
@@ -137,9 +142,9 @@ public class TestFormAuthenticator extends TomcatBaseTest {
                 requestHead.append(
                         "Content-Type: application/x-www-form-urlencoded")
                         .append(CRLF);
-                requestHead.append("Content-length: 7").append(CRLF);
+                requestHead.append("Content-length: 8").append(CRLF);
                 requestHead.append(CRLF);
-                requestTail = "foo=bar";
+                requestTail = "role=bar";
             } else {
                 requestTail = CRLF;
             }
@@ -190,20 +195,32 @@ public class TestFormAuthenticator extends TomcatBaseTest {
 
         @Override
         public boolean isResponseBodyOK() {
-            String expected;
-
             if (requestCount == 1) {
                 // First request should result in the login page
-                expected = "<title>Login Page for Examples</title>";
+                assertContains(getResponseBody(),
+                        "<title>Login Page for Examples</title>");
+                return true;
             } else if (requestCount == 2) {
                 // Second request should result in a redirect
                 return true;
             } else {
                 // Subsequent requests should result in the protected page
-                expected = "<title>Protected Page for Examples</title>";
+                // The role parameter should have reached the page
+                String body = getResponseBody();
+                assertContains(body,
+                        "<title>Protected Page for Examples</title>");
+                assertContains(body,
+                        "<input type=\"text\" name=\"role\" value=\"bar\"");
+                return true;
             }
-            return getResponseBody().contains(expected);
         }
 
+        private void assertContains(String body, String expected) {
+            if (!body.contains(expected)) {
+                fail("Response body check failure.\n"
+                        + "Expected to contain substring: [" + expected
+                        + "]\nActual: [" + body + "]");
+            }
+        }
     }
 }
