@@ -38,7 +38,7 @@ import org.apache.tomcat.util.res.StringManager;
  * This valve allows to detect requests that take a long time to process, which might
  * indicate that the thread that is processing it is stuck.
  * Based on code proposed by TomLu in Bugzilla entry #50306
- * 
+ *
  * @author slaurent
  *
  */
@@ -53,7 +53,7 @@ public class StuckThreadDetectionValve extends ValveBase {
      * Logger
      */
     private static final Log log = LogFactory.getLog(StuckThreadDetectionValve.class);
-    
+
     /**
      * The string manager for this package.
      */
@@ -64,30 +64,30 @@ public class StuckThreadDetectionValve extends ValveBase {
      * Keeps count of the number of stuck threads detected
      */
     private final AtomicInteger stuckCount = new AtomicInteger(0);
-    
+
     /**
      * In seconds. Default 600 (10 minutes).
      */
     private int threshold = 600;
-    
+
     /**
      * The only references we keep to actual running Thread objects are in
      * this Map (which is automatically cleaned in invoke()s finally clause).
      * That way, Threads can be GC'ed, eventhough the Valve still thinks they
      * are stuck (caused by a long monitor interval)
      */
-    private ConcurrentHashMap<Long, MonitoredThread> activeThreads =
+    private final ConcurrentHashMap<Long, MonitoredThread> activeThreads =
             new ConcurrentHashMap<Long, MonitoredThread>();
     /**
      *
      */
-    private Queue<CompletedStuckThread> completedStuckThreadsQueue =
+    private final Queue<CompletedStuckThread> completedStuckThreadsQueue =
             new ConcurrentLinkedQueue<CompletedStuckThread>();
 
     /**
      * Specify the threshold (in seconds) used when checking for stuck threads.
      * If &lt;=0, the detection is disabled. The default is 600 seconds.
-     * 
+     *
      * @param threshold
      *            The new threshold in seconds
      */
@@ -103,7 +103,7 @@ public class StuckThreadDetectionValve extends ValveBase {
         return threshold;
     }
 
-    
+
     /**
      * Required to enable async support.
      */
@@ -166,7 +166,7 @@ public class StuckThreadDetectionValve extends ValveBase {
     @Override
     public void invoke(Request request, Response response)
             throws IOException, ServletException {
-        
+
         if (threshold <= 0) {
             // short-circuit if not monitoring stuck threads
             getNext().invoke(request, response);
@@ -183,7 +183,7 @@ public class StuckThreadDetectionValve extends ValveBase {
             requestUrl.append("?");
             requestUrl.append(request.getQueryString());
         }
-        MonitoredThread monitoredThread = new MonitoredThread(Thread.currentThread(), 
+        MonitoredThread monitoredThread = new MonitoredThread(Thread.currentThread(),
             requestUrl.toString());
         activeThreads.put(key, monitoredThread);
 
@@ -216,7 +216,7 @@ public class StuckThreadDetectionValve extends ValveBase {
             }
         }
         // Check if any threads previously reported as stuck, have finished.
-        for (CompletedStuckThread completedStuckThread = completedStuckThreadsQueue.poll(); 
+        for (CompletedStuckThread completedStuckThread = completedStuckThreadsQueue.poll();
             completedStuckThread != null; completedStuckThread = completedStuckThreadsQueue.poll()) {
 
             int numStuckThreads = stuckCount.decrementAndGet();
@@ -224,7 +224,7 @@ public class StuckThreadDetectionValve extends ValveBase {
                     completedStuckThread.getTotalActiveTime(), numStuckThreads);
         }
     }
-    
+
     public long[] getStuckThreadIds() {
         List<Long> idList = new ArrayList<Long>();
         for (MonitoredThread monitoredThread : activeThreads.values()) {
@@ -282,7 +282,7 @@ public class StuckThreadDetectionValve extends ValveBase {
             int val = this.state.getAndSet(MonitoredThreadState.DONE.ordinal());
             return MonitoredThreadState.values()[val];
         }
-        
+
         boolean isMarkedAsStuck() {
             return this.state.get() == MonitoredThreadState.STUCK.ordinal();
         }
@@ -290,8 +290,8 @@ public class StuckThreadDetectionValve extends ValveBase {
 
     private static class CompletedStuckThread {
 
-        private String threadName;
-        private long totalActiveTime;
+        private final String threadName;
+        private final long totalActiveTime;
 
         public CompletedStuckThread(String threadName, long totalActiveTime) {
             this.threadName = threadName;

@@ -5,17 +5,15 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.catalina.valves;
 
 
@@ -98,7 +96,7 @@ public class ErrorReportValve extends ValveBase {
 
         // Perform the request
         getNext().invoke(request, response);
-        
+
         if (response.isCommitted()) {
             return;
         }
@@ -106,7 +104,7 @@ public class ErrorReportValve extends ValveBase {
         if (request.isAsyncStarted()) {
             return;
         }
-        
+
         Throwable throwable =
             (Throwable) request.getAttribute(RequestDispatcher.ERROR_EXCEPTION);
 
@@ -157,12 +155,14 @@ public class ErrorReportValve extends ValveBase {
 
         // Do nothing on a 1xx, 2xx and 3xx status
         // Do nothing if anything has been written already
-        if ((statusCode < 400) || (response.getContentWritten() > 0))
+        if ((statusCode < 400) || (response.getContentWritten() > 0)) {
             return;
+        }
 
         String message = RequestUtil.filter(response.getMessage());
-        if (message == null)
+        if (message == null) {
             message = "";
+        }
 
         // Do nothing if there is no report for the specified status code
         String report = null;
@@ -171,8 +171,9 @@ public class ErrorReportValve extends ValveBase {
         } catch (Throwable t) {
             ExceptionUtils.handleThrowable(t);
         }
-        if (report == null)
+        if (report == null) {
             return;
+        }
 
         StringBuilder sb = new StringBuilder();
 
@@ -247,8 +248,9 @@ public class ErrorReportValve extends ValveBase {
                 response.setCharacterEncoding("utf-8");
             } catch (Throwable t) {
                 ExceptionUtils.handleThrowable(t);
-                if (container.getLogger().isDebugEnabled())
+                if (container.getLogger().isDebugEnabled()) {
                     container.getLogger().debug("status.setContentType", t);
+                }
             }
             Writer writer = response.getReporter();
             if (writer != null) {
@@ -261,12 +263,12 @@ public class ErrorReportValve extends ValveBase {
         } catch (IllegalStateException e) {
             // Ignore
         }
-        
+
     }
 
 
     /**
-     * Print out a partial servlet stack trace (truncating at the last 
+     * Print out a partial servlet stack trace (truncating at the last
      * occurrence of javax.servlet.).
      */
     protected String getPartialServletStackTrace(Throwable t) {
