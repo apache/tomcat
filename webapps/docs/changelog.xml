@@ -63,7 +63,7 @@
       <fix>
         <bug>51940</bug>: Do not limit saving of request bodies during FORM
         authentication to POST requests since any HTTP method may include a
-        request body. Based on a patch by Nicholas Sushkin. (markt)
+        request body. Based on a patch by Nicholas Sushkin. (markt/kkolinko)
       </fix>
       <fix>
         <bug>51956</bug>: RemoteAddrFilter used getRemoteHost instead of
@@ -105,9 +105,9 @@
         annotation cache. (markt)
       </fix>
       <fix>
-        Correct a regression in the fix for <bug>49779</bug> that prevented
+        Correct a regression in the fix for <bug>49779</bug> that
         parameters POSTed by an unauthenticated user to a page that required
-        authentication from being lost during the authentication process.
+        FORM authentication were lost during the authentication process.
         (markt)
       </fix>
       <fix>
