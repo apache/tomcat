@@ -80,13 +80,13 @@ public abstract class RequestFilterValve extends ValveBase {
     /**
      * The regular expression used to test for allowed requests.
      */
-    protected Pattern allow = null;
+    protected volatile Pattern allow = null;
 
 
     /**
      * The regular expression used to test for denied requests.
      */
-    protected Pattern deny = null;
+    protected volatile Pattern deny = null;
 
 
     // ------------------------------------------------------------- Properties
@@ -97,6 +97,8 @@ public abstract class RequestFilterValve extends ValveBase {
      * Valve, if any; otherwise, return <code>null</code>.
      */
     public String getAllow() {
+        // Use local copies for thread safety
+        Pattern allow = this.allow;
         if (allow == null) {
             return null;
         }
@@ -124,6 +126,8 @@ public abstract class RequestFilterValve extends ValveBase {
      * Valve, if any; otherwise, return <code>null</code>.
      */
     public String getDeny() {
+        // Use local copies for thread safety
+        Pattern deny = this.deny;
         if (deny == null) {
             return null;
         }
@@ -194,6 +198,10 @@ public abstract class RequestFilterValve extends ValveBase {
     protected void process(String property,
                            Request request, Response response)
         throws IOException, ServletException {
+
+        // Use local copies for thread safety
+        Pattern deny = this.deny;
+        Pattern allow = this.allow;
 
         // Check the deny patterns, if any
         if (deny != null && deny.matcher(property).matches()) {
