@@ -391,9 +391,6 @@ public class FormAuthenticator
                     config.getLoginPage(), context.getName()));
         }
 
-        // Always use GET for the login page, regardless of the method used
-        request.getCoyoteRequest().method().setString("GET");
-
         String loginPage = config.getLoginPage();
         if (loginPage == null || loginPage.length() == 0) {
             String msg = sm.getString("formAuthenticator.noLoginPage",
@@ -403,6 +400,10 @@ public class FormAuthenticator
                     msg);
             return;
         }
+
+        // Always use GET for the login page, regardless of the method used
+        String oldMethod = request.getMethod();
+        request.getCoyoteRequest().method().setString("GET");
 
         RequestDispatcher disp =
             context.getServletContext().getRequestDispatcher(loginPage);
@@ -418,6 +419,9 @@ public class FormAuthenticator
             request.setAttribute(RequestDispatcher.ERROR_EXCEPTION, t);
             response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
                     msg);
+        } finally {
+            // Restore original method so that it is written into access log
+            request.getCoyoteRequest().method().setString(oldMethod);
         }
     }
 
