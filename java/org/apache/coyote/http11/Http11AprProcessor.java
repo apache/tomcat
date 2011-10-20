@@ -61,7 +61,7 @@ public class Http11AprProcessor extends AbstractHttp11Processor<Long> {
             int maxTrailerSize) {
 
         super(endpoint);
-        
+
         inputBuffer = new InternalAprInputBuffer(request, headerBufferSize);
         request.setInputBuffer(inputBuffer);
 
@@ -106,7 +106,7 @@ public class Http11AprProcessor extends AbstractHttp11Processor<Long> {
      * provider is used to perform the conversion. For example it is used with
      * the AJP connectors, the HTTP APR connector and with the
      * {@link org.apache.catalina.valves.SSLValve}. If not specified, the
-     * default provider will be used. 
+     * default provider will be used.
      */
     protected String clientCertProvider = null;
     public String getClientCertProvider() { return clientCertProvider; }
@@ -125,9 +125,9 @@ public class Http11AprProcessor extends AbstractHttp11Processor<Long> {
     @Override
     public SocketState event(SocketStatus status)
         throws IOException {
-        
+
         RequestInfo rp = request.getRequestProcessor();
-        
+
         try {
             rp.setStage(org.apache.coyote.Constants.STAGE_SERVICE);
             error = !adapter.event(request, response, status);
@@ -141,7 +141,7 @@ public class Http11AprProcessor extends AbstractHttp11Processor<Long> {
             adapter.log(request, response, 0);
             error = true;
         }
-        
+
         rp.setStage(org.apache.coyote.Constants.STAGE_ENDED);
 
         if (error) {
@@ -156,7 +156,7 @@ public class Http11AprProcessor extends AbstractHttp11Processor<Long> {
             return SocketState.LONG;
         }
     }
-    
+
     @Override
     protected boolean disableKeepAlive() {
         return false;
@@ -170,10 +170,10 @@ public class Http11AprProcessor extends AbstractHttp11Processor<Long> {
 
         // APR uses simulated blocking so if some request line data is present
         // then it must all be presented (with the normal socket timeout).
-        
+
         // When entering the processing loop for the first time there will
         // always be some data to read so the keep-alive timeout is not required
-        
+
         // For the second and subsequent executions of the processing loop, if
         // there is no request line data present then no further data will be
         // read from the socket. If there is request line data present then it
@@ -182,7 +182,7 @@ public class Http11AprProcessor extends AbstractHttp11Processor<Long> {
         // When the socket is created it is given the correct timeout.
         // sendfile may change the timeout but will restore it
         // This processor may change the timeout for uploads but will restore it
-        
+
         // NO-OP
     }
 
@@ -209,8 +209,8 @@ public class Http11AprProcessor extends AbstractHttp11Processor<Long> {
     protected void setSocketTimeout(int timeout) {
         Socket.timeoutSet(socket.getSocket().longValue(), timeout * 1000);
     }
-    
-    
+
+
     @Override
     protected void setCometTimeouts(SocketWrapper<Long> socketWrapper) {
         // NO-OP for APR/native
@@ -257,7 +257,7 @@ public class Http11AprProcessor extends AbstractHttp11Processor<Long> {
         socket = null;
         sendfileData = null;
     }
-    
+
 
     // ----------------------------------------------------- ActionHook Methods
 
@@ -272,7 +272,7 @@ public class Http11AprProcessor extends AbstractHttp11Processor<Long> {
     public void actionInternal(ActionCode actionCode, Object param) {
 
         long socketRef = socket.getSocket().longValue();
-        
+
         if (actionCode == ActionCode.REQ_HOST_ADDR_ATTRIBUTE) {
 
             // Get remote host address
@@ -375,10 +375,10 @@ public class Http11AprProcessor extends AbstractHttp11Processor<Long> {
                         certs = new X509Certificate[certLength + 1];
                         CertificateFactory cf;
                         if (clientCertProvider == null) {
-                            cf = CertificateFactory.getInstance("X.509"); 
+                            cf = CertificateFactory.getInstance("X.509");
                         } else {
                             cf = CertificateFactory.getInstance("X.509",
-                                    clientCertProvider); 
+                                    clientCertProvider);
                         }
                         certs[0] = (X509Certificate) cf.generateCertificate(new ByteArrayInputStream(clientCert));
                         for (int i = 0; i < certLength; i++) {
@@ -422,7 +422,7 @@ public class Http11AprProcessor extends AbstractHttp11Processor<Long> {
                     if (SSLSocket.renegotiate(socketRef) == 0) {
                         // Don't look for certs unless we know renegotiation worked.
                         // Get client certificate and the certificate chain if present
-                        // certLength == -1 indicates an error 
+                        // certLength == -1 indicates an error
                         int certLength = SSLSocket.getInfoI(socketRef,SSL.SSL_INFO_CLIENT_CERT_CHAIN);
                         byte[] clientCert = SSLSocket.getInfoB(socketRef, SSL.SSL_INFO_CLIENT_CERT);
                         X509Certificate[] certs = null;
@@ -461,7 +461,9 @@ public class Http11AprProcessor extends AbstractHttp11Processor<Long> {
                         SocketStatus.OPEN);
             }
         } else if (actionCode == ActionCode.ASYNC_SETTIMEOUT) {
-            if (param==null) return;
+            if (param==null) {
+                return;
+            }
             long timeout = ((Long)param).longValue();
             socket.setTimeout(timeout);
         } else if (actionCode == ActionCode.ASYNC_DISPATCH) {
@@ -470,7 +472,7 @@ public class Http11AprProcessor extends AbstractHttp11Processor<Long> {
                         SocketStatus.OPEN);
             }
         }
-        
+
 
     }
 
