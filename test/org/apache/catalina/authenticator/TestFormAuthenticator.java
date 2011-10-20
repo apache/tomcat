@@ -57,18 +57,17 @@ public class TestFormAuthenticator extends TomcatBaseTest {
         doTest("POST", "POST", true);
     }
 
-
     private void doTest(String resourceMethod, String redirectMethod,
             boolean useContinue) throws Exception {
         FormAuthClient client = new FormAuthClient();
 
-        // First request for authenticated resource 
+        // First request for authenticated resource
         client.setUseContinue(useContinue);
         client.doResourceRequest(resourceMethod);
         assertTrue(client.isResponse200());
         assertTrue(client.isResponseBodyOK());
         client.reset();
-        
+
         // Second request for the login page
         client.setUseContinue(useContinue);
         client.doLoginRequest();
@@ -95,7 +94,6 @@ public class TestFormAuthenticator extends TomcatBaseTest {
         }
     }
 
-
     private final class FormAuthClient extends SimpleHttpClient {
 
         private static final String LOGIN_PAGE = "j_security_check";
@@ -108,9 +106,9 @@ public class TestFormAuthenticator extends TomcatBaseTest {
         private FormAuthClient() throws Exception {
             Tomcat tomcat = getTomcatInstance();
             File appDir = new File(getBuildDirectory(), "webapps/examples");
-            Context ctx =
-                tomcat.addWebapp(null, "/examples", appDir.getAbsolutePath());
-            
+            Context ctx = tomcat.addWebapp(null, "/examples",
+                    appDir.getAbsolutePath());
+
             MapRealm realm = new MapRealm();
             realm.addUser("tomcat", "tomcat");
             realm.addUserRole("tomcat", "tomcat");
@@ -120,61 +118,65 @@ public class TestFormAuthenticator extends TomcatBaseTest {
 
             tomcat.start();
         }
-        
+
         private void doResourceRequest(String method) throws Exception {
-            String request[] = new String[2];
-            request [0] = method + " " + protectedLocation + protectedPage + 
-                    " HTTP/1.1" + CRLF;
-            request[0] = request[0] + 
-                    "Host: localhost" + CRLF +
-                    "Connection: close" + CRLF;
+            StringBuilder requestHead = new StringBuilder(128);
+            String requestTail;
+            requestHead.append(method).append(" ").append(protectedLocation)
+                    .append(protectedPage).append(" HTTP/1.1").append(CRLF);
+            requestHead.append("Host: localhost").append(CRLF);
+            requestHead.append("Connection: close").append(CRLF);
             if (getUseContinue()) {
-                request[0] = request[0] + 
-                        "Expect: 100-continue" + CRLF;
+                requestHead.append("Expect: 100-continue").append(CRLF);
             }
             if (sessionId != null) {
-                request[0] = request[0] +
-                        "Cookie: JSESSIONID=" + sessionId + CRLF;
+                requestHead.append("Cookie: JSESSIONID=").append(sessionId)
+                        .append(CRLF);
             }
             if ("POST".equals(method)) {
-                request[0] = request[0] +
-                        "Content-Type: application/x-www-form-urlencoded" + CRLF +
-                        "Content-length: 7" + CRLF +
-                        CRLF;
-                request[1] = "foo=bar";
+                requestHead.append(
+                        "Content-Type: application/x-www-form-urlencoded")
+                        .append(CRLF);
+                requestHead.append("Content-length: 7").append(CRLF);
+                requestHead.append(CRLF);
+                requestTail = "foo=bar";
             } else {
-                request[1] = CRLF;
+                requestTail = CRLF;
             }
+            String request[] = new String[2];
+            request[0] = requestHead.toString();
+            request[1] = requestTail;
             doRequest(request);
         }
 
         private void doLoginRequest() throws Exception {
-            String request[] = new String[2];
-            request [0] = "POST " + protectedLocation + LOGIN_PAGE + 
-                    " HTTP/1.1" + CRLF;
-            request[0] = request[0] + 
-                    "Host: localhost" + CRLF +
-                    "Connection: close" + CRLF;
+            StringBuilder requestHead = new StringBuilder(128);
+            requestHead.append("POST ").append(protectedLocation)
+                    .append(LOGIN_PAGE).append(" HTTP/1.1").append(CRLF);
+            requestHead.append("Host: localhost").append(CRLF);
+            requestHead.append("Connection: close").append(CRLF);
             if (getUseContinue()) {
-                request[0] = request[0] + 
-                        "Expect: 100-continue" + CRLF;
+                requestHead.append("Expect: 100-continue").append(CRLF);
             }
             if (sessionId != null) {
-                request[0] = request[0] +
-                        "Cookie: JSESSIONID=" + sessionId + CRLF;
+                requestHead.append("Cookie: JSESSIONID=").append(sessionId)
+                        .append(CRLF);
             }
-            request[0] = request[0] +
-                    "Content-Type: application/x-www-form-urlencoded" + CRLF +
-                    "Content-length: 35" + CRLF +
-                    CRLF;
+            requestHead.append(
+                    "Content-Type: application/x-www-form-urlencoded").append(
+                    CRLF);
+            requestHead.append("Content-length: 35").append(CRLF);
+            requestHead.append(CRLF);
+            String request[] = new String[2];
+            request[0] = requestHead.toString();
             request[1] = "j_username=tomcat&j_password=tomcat";
-            
+
             doRequest(request);
         }
 
         private void doRequest(String request[]) throws Exception {
             setRequest(request);
-            
+
             connect();
             processRequest();
             String newSessionId = getSessionId();
@@ -182,14 +184,14 @@ public class TestFormAuthenticator extends TomcatBaseTest {
                 sessionId = newSessionId;
             }
             disconnect();
-            
+
             requestCount++;
         }
 
         @Override
         public boolean isResponseBodyOK() {
             String expected;
-            
+
             if (requestCount == 1) {
                 // First request should result in the login page
                 expected = "<title>Login Page for Examples</title>";
@@ -197,11 +199,11 @@ public class TestFormAuthenticator extends TomcatBaseTest {
                 // Second request should result in a redirect
                 return true;
             } else {
-                // Subsequent requests should result in the protected page 
+                // Subsequent requests should result in the protected page
                 expected = "<title>Protected Page for Examples</title>";
             }
             return getResponseBody().contains(expected);
         }
-        
+
     }
 }
