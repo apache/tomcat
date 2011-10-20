@@ -14,8 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.catalina.startup;
 
 
@@ -71,7 +69,6 @@ import org.xml.sax.SAXParseException;
  * @author Remy Maucherat
  * @version $Id$
  */
-
 public class Catalina {
 
 
@@ -277,8 +274,9 @@ public class Catalina {
     protected File configFile() {
 
         File file = new File(configFile);
-        if (!file.isAbsolute())
+        if (!file.isAbsolute()) {
             file = new File(System.getProperty(Globals.CATALINA_BASE_PROP), configFile);
+        }
         return (file);
 
     }
@@ -383,8 +381,9 @@ public class Catalina {
         digester.addRuleSet(new ClusterRuleSet("Server/Service/Engine/Cluster/"));
 
         long t2=System.currentTimeMillis();
-        if (log.isDebugEnabled())
+        if (log.isDebugEnabled()) {
             log.debug("Digester for server.xml created " + ( t2-t1 ));
+        }
         return (digester);
 
     }
@@ -457,8 +456,9 @@ public class Catalina {
                 Socket socket = new Socket(s.getAddress(), s.getPort());
                 OutputStream stream = socket.getOutputStream();
                 String shutdown = s.getShutdown();
-                for (int i = 0; i < shutdown.length(); i++)
+                for (int i = 0; i < shutdown.length(); i++) {
                     stream.write(shutdown.charAt(i));
+                }
                 stream.flush();
                 stream.close();
                 socket.close();
@@ -572,16 +572,18 @@ public class Catalina {
         try {
             getServer().init();
         } catch (LifecycleException e) {
-            if (Boolean.getBoolean("org.apache.catalina.startup.EXIT_ON_INIT_FAILURE"))
+            if (Boolean.getBoolean("org.apache.catalina.startup.EXIT_ON_INIT_FAILURE")) {
                 throw new java.lang.Error(e);
-            else
+            } else {
                 log.error("Catalina.start", e);
+            }
 
         }
 
         long t2 = System.nanoTime();
-        if(log.isInfoEnabled())
+        if(log.isInfoEnabled()) {
             log.info("Initialization processed in " + ((t2 - t1) / 1000000) + " ms");
+        }
 
     }
 
@@ -592,8 +594,9 @@ public class Catalina {
     public void load(String args[]) {
 
         try {
-            if (arguments(args))
+            if (arguments(args)) {
                 load();
+            }
         } catch (Exception e) {
             e.printStackTrace(System.out);
         }
@@ -624,8 +627,9 @@ public class Catalina {
         }
 
         long t2 = System.nanoTime();
-        if(log.isInfoEnabled())
+        if(log.isInfoEnabled()) {
             log.info("Server startup in " + ((t2 - t1) / 1000000) + " ms");
+        }
 
         try {
             // Register shutdown hook
@@ -807,8 +811,9 @@ public class Catalina {
                 value = value + ":" + oldValue;
             }
             System.setProperty(javax.naming.Context.URL_PKG_PREFIXES, value);
-            if( log.isDebugEnabled() )
+            if( log.isDebugEnabled() ) {
                 log.debug("Setting naming prefix=" + value);
+            }
             value = System.getProperty
                 (javax.naming.Context.INITIAL_CONTEXT_FACTORY);
             if (value == null) {
@@ -889,8 +894,9 @@ final class SetParentClassLoaderRule extends Rule {
     public void begin(String namespace, String name, Attributes attributes)
         throws Exception {
 
-        if (digester.getLogger().isDebugEnabled())
+        if (digester.getLogger().isDebugEnabled()) {
             digester.getLogger().debug("Setting parent class loader");
+        }
 
         Container top = (Container) digester.peek();
         top.setParentClassLoader(parentClassLoader);

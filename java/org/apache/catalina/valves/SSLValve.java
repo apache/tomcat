@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.catalina.valves;
 
 import java.io.ByteArrayInputStream;
@@ -39,10 +38,10 @@ import org.apache.juli.logging.LogFactory;
  * In httpd, mod_headers is used to add the SSL information as HTTP headers. In
  * Tomcat, this valve is used to read the information from the HTTP headers and
  * insert it into the request.<p>
- * 
+ *
  * <b>Note: Ensure that the headers are always set by httpd for all requests to
  * prevent a client spoofing SSL information by sending fake headers. </b><p>
- * 
+ *
  * In httpd.conf add the following:
  * <pre>
  * &lt;IfModule ssl_module&gt;
@@ -52,7 +51,7 @@ import org.apache.juli.logging.LogFactory;
  *   RequestHeader set SSL_CIPHER_USEKEYSIZE "%{SSL_CIPHER_USEKEYSIZE}s"
  * &lt;/IfModule&gt;
  * </pre>
- * 
+ *
  * In server.xml, configure this valve under the Engine element in server.xml:
  * <pre>
  * &lt;Engine ...&gt;
@@ -62,10 +61,10 @@ import org.apache.juli.logging.LogFactory;
  * </pre>
  */
 public class SSLValve extends ValveBase {
-    
+
     private static final Log log = LogFactory.getLog(SSLValve.class);
 
-    
+
     //------------------------------------------------------ Constructor
     public SSLValve() {
         super(true);
@@ -75,13 +74,15 @@ public class SSLValve extends ValveBase {
 
     public String mygetHeader(Request request, String header) {
         String strcert0 = request.getHeader(header);
-        if (strcert0 == null)
+        if (strcert0 == null) {
             return null;
+        }
         /* mod_header writes "(null)" when the ssl variable is no filled */
-        if ("(null)".equals(strcert0))
+        if ("(null)".equals(strcert0)) {
             return null;
+        }
         return strcert0;
-    } 
+    }
     @Override
     public void invoke(Request request, Response response)
         throws IOException, ServletException {
@@ -103,7 +104,7 @@ public class SSLValve extends ValveBase {
             try {
                 CertificateFactory cf;
                 if (providerName == null) {
-                    cf = CertificateFactory.getInstance("X.509");    
+                    cf = CertificateFactory.getInstance("X.509");
                 } else {
                     cf = CertificateFactory.getInstance("X.509", providerName);
                 }

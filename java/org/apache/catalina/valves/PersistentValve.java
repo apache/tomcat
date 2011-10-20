@@ -5,17 +5,15 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.catalina.valves;
 
 
@@ -124,8 +122,9 @@ public class PersistentValve extends ValveBase {
                     if (session != null) {
                         if (!session.isValid() ||
                             isSessionStale(session, System.currentTimeMillis())) {
-                            if (container.getLogger().isDebugEnabled())
+                            if (container.getLogger().isDebugEnabled()) {
                                 container.getLogger().debug("session swapped in is invalid or expired");
+                            }
                             session.expire();
                             store.remove(sessionId);
                         } else {
@@ -140,8 +139,9 @@ public class PersistentValve extends ValveBase {
                 }
             }
         }
-        if (container.getLogger().isDebugEnabled())
+        if (container.getLogger().isDebugEnabled()) {
             container.getLogger().debug("sessionId: " + sessionId);
+        }
 
         // Ask the next valve to process the request.
         getNext().invoke(request, response);
@@ -159,11 +159,13 @@ public class PersistentValve extends ValveBase {
                 hsess = null;
             }
             String newsessionId = null;
-            if (hsess!=null)
+            if (hsess!=null) {
                 newsessionId = hsess.getIdInternal();
-    
-            if (container.getLogger().isDebugEnabled())
+            }
+
+            if (container.getLogger().isDebugEnabled()) {
                 container.getLogger().debug("newsessionId: " + newsessionId);
+            }
             if (newsessionId!=null) {
                 /* store the session and remove it from the manager */
                 if (manager instanceof PersistentManager) {
@@ -177,7 +179,7 @@ public class PersistentValve extends ValveBase {
                         ((PersistentManager) manager).removeSuper(session);
                         session.recycle();
                     } else {
-                        if (container.getLogger().isDebugEnabled())
+                        if (container.getLogger().isDebugEnabled()) {
                             container.getLogger().debug("newsessionId store: " +
                                     store + " session: " + session +
                                     " valid: " +
@@ -185,12 +187,14 @@ public class PersistentValve extends ValveBase {
                                             session.isValid())) +
                                     " stale: " + isSessionStale(session,
                                             System.currentTimeMillis()));
-    
+                        }
+
                     }
                 } else {
-                    if (container.getLogger().isDebugEnabled())
+                    if (container.getLogger().isDebugEnabled()) {
                         container.getLogger().debug("newsessionId Manager: " +
                                 manager);
+                    }
                 }
             }
         }
@@ -203,19 +207,20 @@ public class PersistentValve extends ValveBase {
      * FIXME: Probably belongs in the Session class.
      */
     protected boolean isSessionStale(Session session, long timeNow) {
- 
+
         if (session != null) {
             int maxInactiveInterval = session.getMaxInactiveInterval();
             if (maxInactiveInterval >= 0) {
                 int timeIdle = // Truncate, do not round up
                     (int) ((timeNow - session.getThisAccessedTime()) / 1000L);
-                if (timeIdle >= maxInactiveInterval)
+                if (timeIdle >= maxInactiveInterval) {
                     return true;
+                }
             }
         }
- 
+
         return false;
- 
+
     }
 
 }

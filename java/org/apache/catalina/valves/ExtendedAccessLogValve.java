@@ -14,8 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.catalina.valves;
 
 
@@ -128,7 +126,7 @@ import org.apache.tomcat.util.ExceptionUtils;
  *
  * @author Tim Funk
  * @author Peter Rossbach
- * 
+ *
  * @version $Id$
  */
 
@@ -176,13 +174,15 @@ public class ExtendedAccessLogValve extends AccessLogValve {
     private String wrap(Object value) {
         String svalue;
         // Does the value contain a " ? If so must encode it
-        if (value == null || "-".equals(value))
+        if (value == null || "-".equals(value)) {
             return "-";
+        }
 
         try {
             svalue = value.toString();
-            if ("".equals(svalue))
+            if ("".equals(svalue)) {
                 return "-";
+            }
         } catch (Throwable e) {
             ExceptionUtils.handleThrowable(e);
             /* Log error */
@@ -229,7 +229,7 @@ public class ExtendedAccessLogValve extends AccessLogValve {
     protected static class DateElement implements AccessLogElement {
         // Milli-seconds in 24 hours
         private static final long INTERVAL = (1000 * 60 * 60 * 24);
-        
+
         private static final ThreadLocal<ElementTimestampStruct> currentDate =
                 new ThreadLocal<ElementTimestampStruct>() {
             @Override
@@ -237,7 +237,7 @@ public class ExtendedAccessLogValve extends AccessLogValve {
                 return new ElementTimestampStruct("yyyy-MM-dd");
             }
         };
-                
+
         @Override
         public void addElement(StringBuilder buf, Date date, Request request,
                 Response response, long time) {
@@ -250,14 +250,14 @@ public class ExtendedAccessLogValve extends AccessLogValve {
                 eds.currentTimestampString =
                     eds.currentTimestampFormat.format(eds.currentTimestamp);
             }
-            buf.append(eds.currentTimestampString);            
+            buf.append(eds.currentTimestampString);
         }
     }
-    
+
     protected static class TimeElement implements AccessLogElement {
-        // Milli-seconds in a second 
+        // Milli-seconds in a second
         private static final long INTERVAL = 1000;
-        
+
         private static final ThreadLocal<ElementTimestampStruct> currentTime =
                 new ThreadLocal<ElementTimestampStruct>() {
             @Override
@@ -265,7 +265,7 @@ public class ExtendedAccessLogValve extends AccessLogValve {
                 return new ElementTimestampStruct("HH:mm:ss");
             }
         };
-            
+
         @Override
         public void addElement(StringBuilder buf, Date date, Request request,
                 Response response, long time) {
@@ -278,13 +278,13 @@ public class ExtendedAccessLogValve extends AccessLogValve {
                 eds.currentTimestampString =
                     eds.currentTimestampFormat.format(eds.currentTimestamp);
             }
-            buf.append(eds.currentTimestampString);            
+            buf.append(eds.currentTimestampString);
         }
     }
-    
+
     protected class RequestHeaderElement implements AccessLogElement {
-        private String header;
-        
+        private final String header;
+
         public RequestHeaderElement(String header) {
             this.header = header;
         }
@@ -294,24 +294,24 @@ public class ExtendedAccessLogValve extends AccessLogValve {
             buf.append(wrap(request.getHeader(header)));
         }
     }
-    
+
     protected class ResponseHeaderElement implements AccessLogElement {
-        private String header;
-        
+        private final String header;
+
         public ResponseHeaderElement(String header) {
             this.header = header;
         }
-        
+
         @Override
         public void addElement(StringBuilder buf, Date date, Request request,
                 Response response, long time) {
             buf.append(wrap(response.getHeader(header)));
         }
     }
-    
+
     protected class ServletContextElement implements AccessLogElement {
-        private String attribute;
-        
+        private final String attribute;
+
         public ServletContextElement(String attribute) {
             this.attribute = attribute;
         }
@@ -322,10 +322,10 @@ public class ExtendedAccessLogValve extends AccessLogValve {
                     .getAttribute(attribute)));
         }
     }
-    
+
     protected class CookieElement implements AccessLogElement {
-        private String name;
-        
+        private final String name;
+
         public CookieElement(String name) {
             this.name = name;
         }
@@ -340,17 +340,17 @@ public class ExtendedAccessLogValve extends AccessLogValve {
             }
         }
     }
-    
+
     /**
      * write a specific response header - x-O(xxx)
      */
     protected class ResponseAllHeaderElement implements AccessLogElement {
-        private String header;
+        private final String header;
 
         public ResponseAllHeaderElement(String header) {
             this.header = header;
         }
-        
+
         @Override
         public void addElement(StringBuilder buf, Date date, Request request,
                 Response response, long time) {
@@ -372,24 +372,24 @@ public class ExtendedAccessLogValve extends AccessLogValve {
             buf.append("-");
         }
     }
-    
-    protected class RequestAttributeElement implements AccessLogElement { 
-        private String attribute;
-        
+
+    protected class RequestAttributeElement implements AccessLogElement {
+        private final String attribute;
+
         public RequestAttributeElement(String attribute) {
             this.attribute = attribute;
         }
-        
+
         @Override
         public void addElement(StringBuilder buf, Date date, Request request,
                 Response response, long time) {
             buf.append(wrap(request.getAttribute(attribute)));
-        }        
+        }
     }
-    
+
     protected class SessionAttributeElement implements AccessLogElement {
-        private String attribute;
-        
+        private final String attribute;
+
         public SessionAttributeElement(String attribute) {
             this.attribute = attribute;
         }
@@ -399,15 +399,16 @@ public class ExtendedAccessLogValve extends AccessLogValve {
             HttpSession session = null;
             if (request != null) {
                 session = request.getSession(false);
-                if (session != null)
+                if (session != null) {
                     buf.append(wrap(session.getAttribute(attribute)));
+                }
             }
         }
     }
-    
+
     protected class RequestParameterElement implements AccessLogElement {
-        private String parameter;
-        
+        private final String parameter;
+
         public RequestParameterElement(String parameter) {
             this.parameter = parameter;
         }
@@ -419,42 +420,43 @@ public class ExtendedAccessLogValve extends AccessLogValve {
                 return null;
             }
             return URLEncoder.encode(value);
-        }   
-        
+        }
+
         @Override
         public void addElement(StringBuilder buf, Date date, Request request,
                 Response response, long time) {
             buf.append(wrap(urlEncode(request.getParameter(parameter))));
         }
     }
-    
+
     protected static class PatternTokenizer {
         private StringReader sr = null;
         private StringBuilder buf = new StringBuilder();
         private boolean ended = false;
         private boolean subToken;
         private boolean parameter;
-        
+
         public PatternTokenizer(String str) {
             sr = new StringReader(str);
         }
-        
+
         public boolean hasSubToken() {
             return subToken;
         }
-        
+
         public boolean hasParameter() {
             return parameter;
         }
-        
+
         public String getToken() throws IOException {
-            if(ended)
+            if(ended) {
                 return null ;
-            
+            }
+
             String result = null;
             subToken = false;
             parameter = false;
-            
+
             int c = sr.read();
             while (c != -1) {
                 switch (c) {
@@ -489,7 +491,7 @@ public class ExtendedAccessLogValve extends AccessLogValve {
                 return null;
             }
         }
-        
+
         public String getParameter()throws IOException {
             String result;
             if (!parameter) {
@@ -508,10 +510,11 @@ public class ExtendedAccessLogValve extends AccessLogValve {
             }
             return null;
         }
-        
+
         public String getWhiteSpaces() throws IOException {
-            if(isEnded())
+            if(isEnded()) {
                 return "" ;
+            }
             StringBuilder whiteSpaces = new StringBuilder();
             if (buf.length() > 0) {
                 whiteSpaces.append(buf);
@@ -529,11 +532,11 @@ public class ExtendedAccessLogValve extends AccessLogValve {
             }
             return whiteSpaces.toString();
         }
-        
+
         public boolean isEnded() {
             return ended;
         }
-        
+
         public String getRemains() throws IOException {
             StringBuilder remains = new StringBuilder();
             for(int c = sr.read(); c != -1; c = sr.read()) {
@@ -541,9 +544,9 @@ public class ExtendedAccessLogValve extends AccessLogValve {
             }
             return remains.toString();
         }
-        
+
     }
-    
+
     @Override
     protected AccessLogElement[] createLogElements() {
         if (log.isDebugEnabled()) {
@@ -590,7 +593,7 @@ public class ExtendedAccessLogValve extends AccessLogValve {
             return null;
         }
     }
-    
+
     protected AccessLogElement getLogElement(String token, PatternTokenizer tokenizer) throws IOException {
         if ("date".equals(token)) {
             return new DateElement();
@@ -598,7 +601,7 @@ public class ExtendedAccessLogValve extends AccessLogValve {
             if (tokenizer.hasSubToken()) {
                 String nextToken = tokenizer.getToken();
                 if ("taken".equals(nextToken)) {
-                    return new ElapsedTimeElement(false);                
+                    return new ElapsedTimeElement(false);
                 }
             } else {
                 return new TimeElement();
@@ -647,7 +650,7 @@ public class ExtendedAccessLogValve extends AccessLogValve {
         log.error("unable to decode with rest of chars starting: " + token);
         return null;
     }
-    
+
     protected AccessLogElement getClientToServerElement(
             PatternTokenizer tokenizer) throws IOException {
         if (tokenizer.hasSubToken()) {
@@ -703,7 +706,7 @@ public class ExtendedAccessLogValve extends AccessLogValve {
                 + tokenizer.getRemains());
         return null;
     }
-    
+
     protected AccessLogElement getServerToClientElement(
             PatternTokenizer tokenizer) throws IOException {
         if (tokenizer.hasSubToken()) {
@@ -725,7 +728,7 @@ public class ExtendedAccessLogValve extends AccessLogValve {
                 + tokenizer.getRemains());
         return null;
     }
-    
+
     protected AccessLogElement getProxyElement(PatternTokenizer tokenizer)
         throws IOException {
         String token = null;
@@ -739,7 +742,7 @@ public class ExtendedAccessLogValve extends AccessLogValve {
         log.error("The next characters couldn't be decoded: " + token);
         return null;
     }
-    
+
     protected AccessLogElement getXParameterElement(PatternTokenizer tokenizer)
             throws IOException {
         if (!tokenizer.hasSubToken()) {
@@ -779,7 +782,7 @@ public class ExtendedAccessLogValve extends AccessLogValve {
                 + token);
         return null;
     }
-    
+
     protected AccessLogElement getServletRequestElement(String parameter) {
         if ("authType".equals(parameter)) {
             return new AccessLogElement() {
@@ -877,10 +880,10 @@ public class ExtendedAccessLogValve extends AccessLogValve {
     }
 
     private static class ElementTimestampStruct {
-        private Date currentTimestamp = new Date(0);
-        private SimpleDateFormat currentTimestampFormat;
+        private final Date currentTimestamp = new Date(0);
+        private final SimpleDateFormat currentTimestampFormat;
         private String currentTimestampString;
-        
+
         ElementTimestampStruct(String format) {
             currentTimestampFormat = new SimpleDateFormat(format, Locale.US);
             currentTimestampFormat.setTimeZone(TimeZone.getTimeZone("GMT"));

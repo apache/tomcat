@@ -43,3 +43,7 @@ but possibly 7.1.x).
 8. Review the connector shutdown code for timing and threading issues
    particularly any that may result in a client socket being left open after a
    connector.stop(). 
+
+9. Remove all the static info attributes and associated getters.
+
+10. Remove the svn keywords from all the files. 

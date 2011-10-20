@@ -5,17 +5,15 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.catalina.valves;
 
 
@@ -38,8 +36,8 @@ import org.apache.tomcat.util.ExceptionUtils;
 
 /**
  * <p>
- * This Tomcat extension logs server access directly to a database, and can 
- * be used instead of the regular file-based access log implemented in 
+ * This Tomcat extension logs server access directly to a database, and can
+ * be used instead of the regular file-based access log implemented in
  * AccessLogValve.
  * To use, copy into the server/classes directory of the Tomcat installation
  * and configure in server.xml as:
@@ -57,7 +55,7 @@ import org.apache.tomcat.util.ExceptionUtils;
  * the table name (<code>tableName</code>)
  * and the field names (corresponding to the get/set method names).
  * The same options as AccessLogValve are supported, such as
- * <code>resolveHosts</code> and <code>pattern</code> ("common" or "combined" 
+ * <code>resolveHosts</code> and <code>pattern</code> ("common" or "combined"
  * only).
  * </p>
  * <p>
@@ -65,7 +63,7 @@ import org.apache.tomcat.util.ExceptionUtils;
  * is created and used for all the log activity. When Tomcat is shutdown, the
  * database connection is closed.
  * This logger can be used at the level of the Engine context (being shared
- * by all the defined hosts) or the Host context (one instance of the logger 
+ * by all the defined hosts) or the Host context (one instance of the logger
  * per host, possibly using different databases).
  * </p>
  * <p>
@@ -92,13 +90,13 @@ import org.apache.tomcat.util.ExceptionUtils;
  * INDEX (userAgent)
  * );
  * </pre>
- * <p>Set JDBCAccessLogValve attribute useLongContentLength="true" as you have more then 4GB outputs. 
+ * <p>Set JDBCAccessLogValve attribute useLongContentLength="true" as you have more then 4GB outputs.
  * Please, use long SQL datatype at access.bytes attribute.
  * The datatype of bytes at oracle is <i>number</i> and other databases use <i>bytes BIGINT NOT NULL</i>.
  * </p>
- * 
+ *
  * <p>
- * If the table is created as above, its name and the field names don't need 
+ * If the table is created as above, its name and the field names don't need
  * to be defined.
  * </p>
  * <p>
@@ -108,7 +106,7 @@ import org.apache.tomcat.util.ExceptionUtils;
  * <p>
  * <i>TO DO: provide option for excluding logging of certain MIME types.</i>
  * </p>
- * 
+ *
  * @author Andre de Jesus
  * @author Peter Rossbach
  */
@@ -169,7 +167,7 @@ public final class JDBCAccessLogValve extends ValveBase implements AccessLog {
     * @since 6.0.15
     */
     protected boolean useLongContentLength = false ;
-    
+
    /**
      * The connection username to use when trying to connect to the database.
      */
@@ -218,7 +216,7 @@ public final class JDBCAccessLogValve extends ValveBase implements AccessLog {
     /**
      * The descriptive information about this implementation.
      */
-    protected static final String info = 
+    protected static final String info =
         "org.apache.catalina.valves.JDBCAccessLogValve/1.1";
 
 
@@ -259,7 +257,7 @@ public final class JDBCAccessLogValve extends ValveBase implements AccessLog {
 
     /**
      * Sets the database driver name.
-     * 
+     *
      * @param driverName The complete name of the database driver class.
      */
     public void setDriverName(String driverName) {
@@ -285,7 +283,7 @@ public final class JDBCAccessLogValve extends ValveBase implements AccessLog {
 
     /**
      * Sets the JDBC URL for the database where the log is stored.
-     * 
+     *
      * @param connectionURL The JDBC URL of the database.
      */
     public void setConnectionURL(String connectionURL) {
@@ -295,7 +293,7 @@ public final class JDBCAccessLogValve extends ValveBase implements AccessLog {
 
     /**
      * Sets the name of the table where the logs are stored.
-     * 
+     *
      * @param tableName The name of the table.
      */
     public void setTableName(String tableName) {
@@ -305,7 +303,7 @@ public final class JDBCAccessLogValve extends ValveBase implements AccessLog {
 
     /**
      * Sets the name of the field containing the remote host.
-     * 
+     *
      * @param remoteHostField The name of the remote host field.
      */
     public void setRemoteHostField(String remoteHostField) {
@@ -315,7 +313,7 @@ public final class JDBCAccessLogValve extends ValveBase implements AccessLog {
 
     /**
      * Sets the name of the field containing the remote user name.
-     * 
+     *
      * @param userField The name of the remote user field.
      */
     public void setUserField(String userField) {
@@ -325,7 +323,7 @@ public final class JDBCAccessLogValve extends ValveBase implements AccessLog {
 
     /**
      * Sets the name of the field containing the server-determined timestamp.
-     * 
+     *
      * @param timestampField The name of the server-determined timestamp field.
      */
     public void setTimestampField(String timestampField) {
@@ -334,9 +332,9 @@ public final class JDBCAccessLogValve extends ValveBase implements AccessLog {
 
 
     /**
-     * Sets the name of the field containing the virtual host information 
+     * Sets the name of the field containing the virtual host information
      * (this is in fact the server name).
-     * 
+     *
      * @param virtualHostField The name of the virtual host field.
      */
     public void setVirtualHostField(String virtualHostField) {
@@ -346,7 +344,7 @@ public final class JDBCAccessLogValve extends ValveBase implements AccessLog {
 
     /**
      * Sets the name of the field containing the HTTP request method.
-     * 
+     *
      * @param methodField The name of the HTTP request method field.
      */
     public void setMethodField(String methodField) {
@@ -356,8 +354,8 @@ public final class JDBCAccessLogValve extends ValveBase implements AccessLog {
 
     /**
      * Sets the name of the field containing the URL part of the HTTP query.
-     * 
-     * @param queryField The name of the field containing the URL part of 
+     *
+     * @param queryField The name of the field containing the URL part of
      * the HTTP query.
      */
     public void setQueryField(String queryField) {
@@ -367,9 +365,9 @@ public final class JDBCAccessLogValve extends ValveBase implements AccessLog {
 
   /**
    * Sets the name of the field containing the HTTP response status code.
-   * 
+   *
    * @param statusField The name of the HTTP response status code field.
-   */  
+   */
     public void setStatusField(String statusField) {
         this.statusField = statusField;
     }
@@ -377,7 +375,7 @@ public final class JDBCAccessLogValve extends ValveBase implements AccessLog {
 
     /**
      * Sets the name of the field containing the number of bytes returned.
-     * 
+     *
      * @param bytesField The name of the returned bytes field.
      */
     public void setBytesField(String bytesField) {
@@ -387,7 +385,7 @@ public final class JDBCAccessLogValve extends ValveBase implements AccessLog {
 
     /**
      * Sets the name of the field containing the referer.
-     * 
+     *
      * @param refererField The referer field name.
      */
     public void setRefererField(String refererField) {
@@ -397,7 +395,7 @@ public final class JDBCAccessLogValve extends ValveBase implements AccessLog {
 
     /**
      * Sets the name of the field containing the user agent.
-     * 
+     *
      * @param userAgentField The name of the user agent field.
      */
     public void setUserAgentField(String userAgentField) {
@@ -406,11 +404,11 @@ public final class JDBCAccessLogValve extends ValveBase implements AccessLog {
 
 
     /**
-     * Sets the logging pattern. The patterns supported correspond to the 
-     * file-based "common" and "combined". These are translated into the use 
+     * Sets the logging pattern. The patterns supported correspond to the
+     * file-based "common" and "combined". These are translated into the use
      * of tables containing either set of fields.
      * <P><I>TO DO: more flexible field choices.</I></P>
-     * 
+     *
      * @param pattern The name of the logging pattern.
      */
     public void setPattern(String pattern) {
@@ -420,8 +418,8 @@ public final class JDBCAccessLogValve extends ValveBase implements AccessLog {
 
     /**
      * Determines whether IP host name resolution is done.
-     * 
-     * @param resolveHosts "true" or "false", if host IP resolution 
+     *
+     * @param resolveHosts "true" or "false", if host IP resolution
      * is desired or not.
      */
     public void setResolveHosts(String resolveHosts) {
@@ -434,7 +432,7 @@ public final class JDBCAccessLogValve extends ValveBase implements AccessLog {
     public  boolean getUseLongContentLength() {
         return this.useLongContentLength ;
     }
-    
+
     /**
      * @param useLongContentLength the useLongContentLength to set
      */
@@ -447,12 +445,12 @@ public final class JDBCAccessLogValve extends ValveBase implements AccessLog {
 
     /**
      * This method is invoked by Tomcat on each query.
-     * 
+     *
      * @param request The Request object.
      * @param response The Response object.
      *
      * @exception IOException Should not be thrown.
-     * @exception ServletException Database SQLException is wrapped 
+     * @exception ServletException Database SQLException is wrapped
      * in a ServletException.
      */
     @Override
@@ -469,7 +467,7 @@ public final class JDBCAccessLogValve extends ValveBase implements AccessLog {
         }
 
         final String EMPTY = "" ;
-        
+
         String remoteHost;
         if(resolveHosts) {
             if (requestAttributesEnabled) {
@@ -496,10 +494,11 @@ public final class JDBCAccessLogValve extends ValveBase implements AccessLog {
         }
         String user = request.getRemoteUser();
         String query=request.getRequestURI();
-        
+
         long bytes = response.getBytesWritten(true);
-        if(bytes < 0)
+        if(bytes < 0) {
             bytes = 0;
+        }
         int status = response.getStatus();
         String virtualHost = EMPTY;
         String method = EMPTY;
@@ -517,20 +516,21 @@ public final class JDBCAccessLogValve extends ValveBase implements AccessLog {
           while (numberOfTries>0) {
             try {
                 open();
-    
+
                 ps.setString(1, remoteHost);
                 ps.setString(2, user);
                 ps.setTimestamp(3, new Timestamp(getCurrentTimeMillis()));
                 ps.setString(4, query);
                 ps.setInt(5, status);
-                
+
                 if(useLongContentLength) {
-                    ps.setLong(6, bytes);                
+                    ps.setLong(6, bytes);
                 } else {
-                    if (bytes > Integer.MAX_VALUE)
+                    if (bytes > Integer.MAX_VALUE) {
                         bytes = -1 ;
+                    }
                     ps.setInt(6, (int) bytes);
-                }               
+                }
                 if (logPattern.equals("combined")) {
                       ps.setString(7, virtualHost);
                       ps.setString(8, method);
@@ -544,8 +544,9 @@ public final class JDBCAccessLogValve extends ValveBase implements AccessLog {
                   container.getLogger().error(sm.getString("jdbcAccessLogValve.exception"), e);
 
                 // Close the connection so that it gets reopened next time
-                if (conn != null)
+                if (conn != null) {
                     close();
+                }
               }
               numberOfTries--;
            }
@@ -563,8 +564,9 @@ public final class JDBCAccessLogValve extends ValveBase implements AccessLog {
     protected void open() throws SQLException {
 
         // Do nothing if there is a database connection already open
-        if (conn != null)
+        if (conn != null) {
             return ;
+        }
 
         // Instantiate our database driver if necessary
         if (driver == null) {
@@ -580,26 +582,28 @@ public final class JDBCAccessLogValve extends ValveBase implements AccessLog {
         // Open a new connection
         Properties props = new Properties();
         props.put("autoReconnect", "true");
-        if (connectionName != null)
+        if (connectionName != null) {
             props.put("user", connectionName);
-        if (connectionPassword != null)
+        }
+        if (connectionPassword != null) {
             props.put("password", connectionPassword);
+        }
         conn = driver.connect(connectionURL, props);
         conn.setAutoCommit(true);
         String logPattern = pattern;
         if (logPattern.equals("common")) {
                 ps = conn.prepareStatement
-                    ("INSERT INTO " + tableName + " (" 
+                    ("INSERT INTO " + tableName + " ("
                      + remoteHostField + ", " + userField + ", "
                      + timestampField +", " + queryField + ", "
-                     + statusField + ", " + bytesField 
+                     + statusField + ", " + bytesField
                      + ") VALUES(?, ?, ?, ?, ?, ?)");
         } else if (logPattern.equals("combined")) {
                 ps = conn.prepareStatement
-                    ("INSERT INTO " + tableName + " (" 
+                    ("INSERT INTO " + tableName + " ("
                      + remoteHostField + ", " + userField + ", "
-                     + timestampField + ", " + queryField + ", " 
-                     + statusField + ", " + bytesField + ", " 
+                     + timestampField + ", " + queryField + ", "
+                     + statusField + ", " + bytesField + ", "
                      + virtualHostField + ", " + methodField + ", "
                      + refererField + ", " + userAgentField
                      + ") VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
@@ -612,8 +616,9 @@ public final class JDBCAccessLogValve extends ValveBase implements AccessLog {
     protected void close() {
 
         // Do nothing if the database connection is already closed
-        if (conn == null)
+        if (conn == null) {
             return;
+        }
 
         // Close our prepared statements (if any)
         try {
@@ -629,14 +634,14 @@ public final class JDBCAccessLogValve extends ValveBase implements AccessLog {
         try {
             conn.close();
         } catch (SQLException e) {
-            container.getLogger().error(sm.getString("jdbcAccessLogValeve.close"), e); // Just log it here            
+            container.getLogger().error(sm.getString("jdbcAccessLogValeve.close"), e); // Just log it here
         } finally {
            this.conn = null;
         }
 
     }
-    
-    
+
+
     /**
      * Start this component and implement the requirements
      * of {@link org.apache.catalina.util.LifecycleBase#startInternal()}.
@@ -646,9 +651,9 @@ public final class JDBCAccessLogValve extends ValveBase implements AccessLog {
      */
     @Override
     protected synchronized void startInternal() throws LifecycleException {
-        
+
         try {
-            open() ;        
+            open() ;
         } catch (SQLException e) {
             throw new LifecycleException(e);
         }
@@ -668,7 +673,7 @@ public final class JDBCAccessLogValve extends ValveBase implements AccessLog {
     protected synchronized void stopInternal() throws LifecycleException {
 
         setState(LifecycleState.STOPPING);
-        
+
         close() ;
     }
 
