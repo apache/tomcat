@@ -411,7 +411,7 @@ public class JvmRouteBinderValve extends ValveBase implements ClusterValve {
     protected void sendSessionIDClusterBackup(Request request, String sessionId,
             String newSessionID) {
         CatalinaCluster c = getCluster();
-        if (c != null) {
+        if (c != null && getManager(request) instanceof DeltaManager) {
             SessionIDMessage msg = new SessionIDMessage();
             msg.setOrignalSessionID(sessionId);
             msg.setBackupSessionID(newSessionID);
