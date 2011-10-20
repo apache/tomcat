@@ -631,34 +631,27 @@ public class Catalina {
             log.info("Server startup in " + ((t2 - t1) / 1000000) + " ms");
         }
 
-        try {
-            // Register shutdown hook
-            if (useShutdownHook) {
-                if (shutdownHook == null) {
-                    shutdownHook = new CatalinaShutdownHook();
-                }
-                Runtime.getRuntime().addShutdownHook(shutdownHook);
-
-                // If JULI is being used, disable JULI's shutdown hook since
-                // shutdown hooks run in parallel and log messages may be lost
-                // if JULI's hook completes before the CatalinaShutdownHook()
-                LogManager logManager = LogManager.getLogManager();
-                if (logManager instanceof ClassLoaderLogManager) {
-                    ((ClassLoaderLogManager) logManager).setUseShutdownHook(
-                            false);
-                }
+        // Register shutdown hook
+        if (useShutdownHook) {
+            if (shutdownHook == null) {
+                shutdownHook = new CatalinaShutdownHook();
             }
-        } catch (Throwable t) {
-            ExceptionUtils.handleThrowable(t);
-            // This will fail on JDK 1.2. Ignoring, as Tomcat can run
-            // fine without the shutdown hook.
+            Runtime.getRuntime().addShutdownHook(shutdownHook);
+
+            // If JULI is being used, disable JULI's shutdown hook since
+            // shutdown hooks run in parallel and log messages may be lost
+            // if JULI's hook completes before the CatalinaShutdownHook()
+            LogManager logManager = LogManager.getLogManager();
+            if (logManager instanceof ClassLoaderLogManager) {
+                ((ClassLoaderLogManager) logManager).setUseShutdownHook(
+                        false);
+            }
         }
 
         if (await) {
             await();
             stop();
         }
-
     }
 
 
