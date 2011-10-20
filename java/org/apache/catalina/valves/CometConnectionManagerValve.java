@@ -5,17 +5,15 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.catalina.valves;
 
 
@@ -55,7 +53,7 @@ import org.apache.catalina.connector.Response;
 
 public class CometConnectionManagerValve extends ValveBase
     implements HttpSessionListener, LifecycleListener {
-    
+
     //------------------------------------------------------ Constructor
     public CometConnectionManagerValve() {
         super(false);
@@ -77,7 +75,7 @@ public class CometConnectionManagerValve extends ValveBase
      */
     protected List<Request> cometRequests =
         Collections.synchronizedList(new ArrayList<Request>());
-    
+
 
     /**
      * Name of session attribute used to store list of comet connections.
@@ -121,11 +119,11 @@ public class CometConnectionManagerValve extends ValveBase
         }
     }
 
-    
+
     @Override
     public void lifecycleEvent(LifecycleEvent event) {
         if (Lifecycle.BEFORE_STOP_EVENT.equals(event.getType())) {
-            // The container is getting stopped, close all current connections 
+            // The container is getting stopped, close all current connections
             Iterator<Request> iterator = cometRequests.iterator();
             while (iterator.hasNext()) {
                 Request request = iterator.next();
@@ -180,15 +178,15 @@ public class CometConnectionManagerValve extends ValveBase
         throws IOException, ServletException {
         // Perform the request
         getNext().invoke(request, response);
-        
+
         if (request.isComet() && !response.isClosed()) {
-            // Start tracking this connection, since this is a 
+            // Start tracking this connection, since this is a
             // begin event, and Comet mode is on
             HttpSession session = request.getSession(true);
-            
+
             // Track the connection for webapp reload
             cometRequests.add(request);
-            
+
             // Track the connection for session expiration
             synchronized (session) {
                 Request[] requests = (Request[])
@@ -199,7 +197,7 @@ public class CometConnectionManagerValve extends ValveBase
                     session.setAttribute(cometRequestsAttribute,
                             requests);
                 } else {
-                    Request[] newRequests = 
+                    Request[] newRequests =
                         new Request[requests.length + 1];
                     for (int i = 0; i < requests.length; i++) {
                         newRequests[i] = requests[i];
@@ -209,10 +207,10 @@ public class CometConnectionManagerValve extends ValveBase
                 }
             }
         }
-        
+
     }
 
-    
+
     /**
      * Use events to update the connection state.
      *
@@ -225,22 +223,22 @@ public class CometConnectionManagerValve extends ValveBase
     @Override
     public void event(Request request, Response response, CometEvent event)
         throws IOException, ServletException {
-        
+
         // Perform the request
         boolean ok = false;
         try {
             getNext().event(request, response, event);
             ok = true;
         } finally {
-            if (!ok || response.isClosed() 
+            if (!ok || response.isClosed()
                     || (event.getEventType() == CometEvent.EventType.END)
                     || (event.getEventType() == CometEvent.EventType.ERROR
                             && !(event.getEventSubType() ==
                                 CometEvent.EventSubType.TIMEOUT))) {
-                
+
                 // Remove the connection from webapp reload tracking
                 cometRequests.remove(request);
-                
+
                 // Remove connection from session expiration tracking
                 // Note: can't get the session if it has been invalidated but
                 // OK since session listener will have done clean-up
@@ -262,7 +260,7 @@ public class CometConnectionManagerValve extends ValveBase
                             }
                             if (found) {
                                 if (reqs.length > 1) {
-                                    Request[] newConnectionInfos = 
+                                    Request[] newConnectionInfos =
                                         new Request[reqs.length - 1];
                                     int pos = 0;
                                     for (int i = 0; i < reqs.length; i++) {

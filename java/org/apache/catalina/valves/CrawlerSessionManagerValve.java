@@ -46,9 +46,9 @@ public class CrawlerSessionManagerValve extends ValveBase
     private static final Log log =
         LogFactory.getLog(CrawlerSessionManagerValve.class);
 
-    private Map<String,String> clientIpSessionId =
+    private final Map<String,String> clientIpSessionId =
         new ConcurrentHashMap<String, String>();
-    private Map<String,String> sessionIdClientIp =
+    private final Map<String,String> sessionIdClientIp =
         new ConcurrentHashMap<String, String>();
 
     private String crawlerUserAgents =
@@ -69,7 +69,7 @@ public class CrawlerSessionManagerValve extends ValveBase
      * Specify the regular expression (using {@link Pattern}) that will be used
      * to identify crawlers based in the User-Agent header provided. The default
      * is ".*GoogleBot.*|.*bingbot.*|.*Yahoo! Slurp.*"
-     *  
+     *
      * @param crawlerUserAgents The regular expression using {@link Pattern}
      */
     public void setCrawlerUserAgents(String crawlerUserAgents) {
@@ -83,7 +83,7 @@ public class CrawlerSessionManagerValve extends ValveBase
 
     /**
      * @see #setCrawlerUserAgents(String)
-     * @return  The current regular expression being used to match user agents. 
+     * @return  The current regular expression being used to match user agents.
      */
     public String getCrawlerUserAgents() {
         return crawlerUserAgents;
@@ -93,7 +93,7 @@ public class CrawlerSessionManagerValve extends ValveBase
     /**
      * Specify the session timeout (in seconds) for a crawler's session. This is
      * typically lower than that for a user session. The default is 60 seconds.
-     *  
+     *
      * @param sessionInactiveInterval   The new timeout for crawler sessions
      */
     public void setSessionInactiveInterval(int sessionInactiveInterval) {
@@ -117,7 +117,7 @@ public class CrawlerSessionManagerValve extends ValveBase
     @Override
     protected void initInternal() throws LifecycleException {
         super.initInternal();
-        
+
         uaPattern = Pattern.compile(crawlerUserAgents);
     }
 
@@ -145,24 +145,24 @@ public class CrawlerSessionManagerValve extends ValveBase
             if (uaHeaders.hasMoreElements()) {
                 uaHeader = uaHeaders.nextElement();
             }
-            
+
             // If more than one UA header - assume not a bot
             if (uaHeader != null && !uaHeaders.hasMoreElements()) {
 
                 if (log.isDebugEnabled()) {
                     log.debug(request.hashCode() + ": UserAgent=" + uaHeader);
                 }
-                
+
                 if (uaPattern.matcher(uaHeader).matches()) {
                     isBot = true;
-                    
+
                     if (log.isDebugEnabled()) {
                         log.debug(request.hashCode() +
                                 ": Bot found. UserAgent=" + uaHeader);
                     }
                 }
             }
-            
+
             // If this is a bot, is the session ID known?
             if (isBot) {
                 clientIp = request.getRemoteAddr();
@@ -178,7 +178,7 @@ public class CrawlerSessionManagerValve extends ValveBase
         }
 
         getNext().invoke(request, response);
-        
+
         if (isBot) {
             if (sessionId == null) {
                 // Has bot just created a session, if so make a note of it

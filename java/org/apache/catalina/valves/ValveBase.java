@@ -5,17 +5,15 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.catalina.valves;
 
 
@@ -53,11 +51,11 @@ public abstract class ValveBase extends LifecycleMBeanBase
     implements Contained, Valve {
 
     //------------------------------------------------------ Constructor
-    
+
     public ValveBase() {
         this(false);
     }
-    
+
     public ValveBase(boolean asyncSupported) {
         this.asyncSupported = asyncSupported;
     }
@@ -67,7 +65,7 @@ public abstract class ValveBase extends LifecycleMBeanBase
      * Does this valve support Servlet 3+ async requests?
      */
     protected boolean asyncSupported;
-    
+
     /**
      * The Container whose pipeline this Valve is a component of.
      */
@@ -103,7 +101,7 @@ public abstract class ValveBase extends LifecycleMBeanBase
 
     //-------------------------------------------------------------- Properties
 
-    
+
     /**
      * Return the Container with which this Valve is associated, if any.
      */
@@ -208,7 +206,7 @@ public abstract class ValveBase extends LifecycleMBeanBase
 
     /**
      * Process a Comet event. This method will rarely need to be provided by
-     * a subclass, unless it needs to reassociate a particular object with 
+     * a subclass, unless it needs to reassociate a particular object with
      * the thread that is processing the request.
      *
      * @param request The servlet request to be processed
@@ -230,11 +228,11 @@ public abstract class ValveBase extends LifecycleMBeanBase
     @Override
     protected void initInternal() throws LifecycleException {
         super.initInternal();
-        
+
         containerLog = getContainer().getLogger();
     }
-    
-    
+
+
     /**
      * Start this component and implement the requirements
      * of {@link org.apache.catalina.util.LifecycleBase#startInternal()}.
@@ -244,7 +242,7 @@ public abstract class ValveBase extends LifecycleMBeanBase
      */
     @Override
     protected synchronized void startInternal() throws LifecycleException {
-        
+
         setState(LifecycleState.STARTING);
     }
 
@@ -261,8 +259,8 @@ public abstract class ValveBase extends LifecycleMBeanBase
 
         setState(LifecycleState.STOPPING);
     }
-    
-    
+
+
     /**
      * Return a String rendering of this object.
      */
@@ -284,13 +282,13 @@ public abstract class ValveBase extends LifecycleMBeanBase
     @Override
     public String getObjectNameKeyProperties() {
         StringBuilder name = new StringBuilder("type=Valve");
-        
+
         Container container = getContainer();
 
         name.append(MBeanUtils.getContainerKeyProperties(container));
-        
+
         int seq = 0;
-        
+
         // Pipeline may not be present in unit testing
         Pipeline p = container.getPipeline();
         if (p != null) {
@@ -310,7 +308,7 @@ public abstract class ValveBase extends LifecycleMBeanBase
                 }
             }
         }
-        
+
         if (seq > 0) {
             name.append(",seq=");
             name.append(seq);
@@ -323,7 +321,7 @@ public abstract class ValveBase extends LifecycleMBeanBase
         }
         name.append(",name=");
         name.append(className);
-        
+
         return name.toString();
     }
 
