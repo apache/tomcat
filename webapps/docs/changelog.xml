@@ -189,6 +189,10 @@
         <bug>52015</bug>: In jdbc-pool: JdbcInterceptor passes not 'this' but 
         'proxy' to getNext().invoke. (kfujino)
       </fix>
+      <fix>
+        <bug>52059</bug>: In Windows uninstaller: Do not forget to remove
+        Tomcat keys from 32-bit registry on deinstallation. (kkolinko)
+      </fix>
     </changelog>
   </subsection>
 </section>
