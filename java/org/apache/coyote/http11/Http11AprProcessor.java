@@ -145,8 +145,6 @@ public class Http11AprProcessor extends AbstractHttp11Processor<Long> {
         rp.setStage(org.apache.coyote.Constants.STAGE_ENDED);
 
         if (error) {
-            inputBuffer.nextRequest();
-            outputBuffer.nextRequest();
             return SocketState.CLOSED;
         } else if (!comet) {
             inputBuffer.nextRequest();
