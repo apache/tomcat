@@ -55,24 +55,27 @@
     <p>
       <ul>
         <li><strong>Installation as a service</strong>: Tomcat will be 
-            installed as a Windows
-            NT/2k/XP service no matter what setting is selected. Using the
-            checkbox on the component page sets the service as "auto"
+            installed as a Windows service no matter what setting is selected.
+            Using the checkbox on the component page sets the service as "auto"
             startup, so that Tomcat is automatically started when Windows
             starts. For optimal security, the service should be run as a
             separate user, with reduced permissions (see the Windows Services
             administration tool and its documentation).</li>
-        <li><strong>Java location</strong>: The installer will use the registry
-            or the JAVA_HOME environment variable to determine the base path
-            of a Java SE 6 JRE.
-            </li>
+        <li><strong>Java location</strong>: The installer will provide a default
+            JRE to use to run the service. The installer uses the registry to
+            determine the base path of a Java 6 or later JRE, including the JRE
+            installed as part of the full JDK. When running on a 64-bit
+            operating system, the installer will first look for a 64-bit JRE and
+            only look for a 32-bit JRE if a 64-bit JRE is not found. It is not
+            mandatory to use the default JRE detected by the installer. Any
+            installed Java 6 or later JRE (32-bit or 64-bit) may be used.</li>
         <li><strong>Tray icon</strong>: When Tomcat is run as a service, there
             will not be any tray icon present when Tomcat is running. Note that
             when choosing to run Tomcat at the end of installation, the tray
             icon will be used even if Tomcat was installed as a service.</li>
         <li>Refer to the
             <a href="windows-service-howto.html">Windows Service HOW-TO</a>
-            for information on how to manage Tomcat as Windows NT service.
+            for information on how to manage Tomcat as a Windows service.
             </li>            
       </ul>
     </p>
