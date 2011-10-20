@@ -150,6 +150,16 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Cluster">
+    <changelog>
+      <fix>
+        Avoid an unnecessary session ID change notice. 
+        Notice of changed session ID by JvmRouteBinderValve is unnecessary to 
+        BackupManager. In BackupManager, change of session ID is replicated by 
+        the call of a setId() method. (kfujino)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Web applications">
     <changelog>
       <add>
