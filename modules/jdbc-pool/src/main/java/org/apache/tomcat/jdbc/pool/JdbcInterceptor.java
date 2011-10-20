@@ -92,7 +92,7 @@ public abstract class JdbcInterceptor implements InvocationHandler {
     
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-        if (getNext()!=null) return getNext().invoke(this,method,args);
+        if (getNext()!=null) return getNext().invoke(proxy,method,args);
         else throw new NullPointerException();
     }
 
