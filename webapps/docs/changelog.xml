@@ -115,6 +115,10 @@
         reset between keep-alive requests when using Servlet 3.0 asynchronous
         request processing. (markt)
       </fix>
+      <fix>
+        Ensure changes to the configuration of the RemoteHostValve and the
+        RemoteIpValve via JMX are thread-safe. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
