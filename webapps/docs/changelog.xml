@@ -123,6 +123,10 @@
         Ensure the the memory leak protection for the HttpClient keep-alive
         always operates even if the thread has already stopped. (markt)
       </fix>
+      <scode>
+        Remove the Java 1.2 specific error handling around the adding of the
+        shutdown hook. (markt) 
+      </scode>
     </changelog>
   </subsection>
   <subsection name="Coyote">
