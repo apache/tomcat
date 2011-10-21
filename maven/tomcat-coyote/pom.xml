@@ -44,8 +44,24 @@
   </dependencies>
 
   <build>
+
+    <resources>
+      <resource>
+        <directory>../../java/</directory>
+        <includes>
+          <include>org/apache/coyote/**/LocalStrings.properties</include>
+          <include>org/apache/util/**/LocalStrings.properties</include>
+          <include>org/apache/catalina/util/CharsetMapperDefault.properties</include>
+        </includes>
+        <excludes>
+          <exclude>org/apache/util/file/**</exclude>
+          <exclude>org/apache/util/res/**</exclude>
+          <exclude>org/apache/util/scan/**</exclude>
+        </excludes>
+      </resource>
+    </resources>
+
     <plugins>
-      <!-- See http://maven.apache.org/plugins/maven-antrun-plugin -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-antrun-plugin</artifactId>
