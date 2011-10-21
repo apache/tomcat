@@ -119,6 +119,10 @@
         Ensure changes to the configuration of the RemoteHostValve and the
         RemoteIpValve via JMX are thread-safe. (markt)
       </fix>
+      <fix>
+        Ensure the the memory leak protection for the HttpClient keep-alive
+        always operates even if the thread has already stopped. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
