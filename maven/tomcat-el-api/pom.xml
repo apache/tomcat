@@ -31,6 +31,14 @@
   <description>Expression language package</description>
 
   <build>
+    <resources>
+      <resource>
+        <directory>../../java/</directory>
+        <includes>
+          <include>javax/el/**/LocalStrings.properties</include>
+        </includes>
+      </resource>
+    </resources>
     <plugins>
       <!-- See http://maven.apache.org/plugins/maven-antrun-plugin -->
       <plugin>
@@ -59,4 +67,5 @@
       </plugin>
     </plugins>
   </build>
+
 </project>

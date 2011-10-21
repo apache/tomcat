@@ -75,6 +75,15 @@
   </dependencies>
 
   <build>
+    <resources>
+      <resource>
+        <directory>../../java/</directory>
+        <includes>
+          <include>org/apache/catalina/**/LocalStrings.properties</include>
+          <include>org/apache/naming/**/LocalStrings.properties</include>
+        </includes>
+      </resource>
+    </resources>
     <plugins>
       <!-- See http://maven.apache.org/plugins/maven-antrun-plugin -->
       <plugin>

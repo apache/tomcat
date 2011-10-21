@@ -31,6 +31,14 @@
   <description>javax.servlet package</description>
 
   <build>
+    <resources>
+      <resource>
+        <directory>../../java/</directory>
+        <includes>
+          <include>javax/servlet/**/LocalStrings.properties</include>
+        </includes>
+      </resource>
+    </resources>
     <plugins>
       <!-- See http://maven.apache.org/plugins/maven-antrun-plugin -->
       <plugin>
