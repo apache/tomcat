@@ -40,7 +40,7 @@ import org.apache.tomcat.util.buf.B2CConverter;
 
 /**
  * An implementation of SSIExternalResolver that is used with servlets.
- * 
+ *
  * @author Dan Sandberg
  * @author David Becker
  * @version $Id$
@@ -247,10 +247,10 @@ public class SSIServletExternalResolver implements SSIExternalResolver {
                         // Use default as a last resort
                         String queryStringEncoding =
                             Constants.DEFAULT_CHARACTER_ENCODING;
-                
+
                         String uriEncoding = null;
                         boolean useBodyEncodingForURI = false;
-                
+
                         // Get encoding settings from request / connector if
                         // possible
                         String requestEncoding = req.getCharacterEncoding();
@@ -260,7 +260,7 @@ public class SSIServletExternalResolver implements SSIExternalResolver {
                             useBodyEncodingForURI = ((Request)req)
                                     .getConnector().getUseBodyEncodingForURI();
                         }
-                
+
                         // If valid, apply settings from request / connector
                         if (uriEncoding != null) {
                             queryStringEncoding = uriEncoding;
@@ -269,10 +269,10 @@ public class SSIServletExternalResolver implements SSIExternalResolver {
                                 queryStringEncoding = requestEncoding;
                             }
                         }
-                
+
                         try {
                             retVal = URLDecoder.decode(queryString,
-                                    queryStringEncoding);                       
+                                    queryStringEncoding);
                         } catch (UnsupportedEncodingException e) {
                             retVal = queryString;
                         }

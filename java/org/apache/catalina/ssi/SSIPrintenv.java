@@ -22,7 +22,7 @@ import java.util.Collection;
 import java.util.Iterator;
 /**
  * Implements the Server-side #printenv command
- * 
+ *
  * @author Dan Sandberg
  * @author David Becker
  * @version $Id$

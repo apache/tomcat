@@ -33,7 +33,7 @@ import org.apache.tomcat.util.http.HttpMessages;
 /**
  * Allows the different SSICommand implementations to share data/talk to each
  * other
- * 
+ *
  * @author Bip Thelin
  * @author Amy Roh
  * @author Paul Speed
@@ -211,7 +211,7 @@ public class SSIMediator {
         // If it has no references or HTML entities then no work
         // need to be done
         if (val.indexOf('$') < 0 && val.indexOf('&') < 0) return val;
-        
+
         // HTML decoding
         val = val.replace("&lt;", "<");
         val = val.replace("&gt;", ">");
