@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -102,9 +102,9 @@ public class StandardPipeline extends LifecycleBase
      */
     protected Valve first = null;
 
-    
+
     // --------------------------------------------------------- Public Methods
-    
+
     @Override
     public boolean isAsyncSupported() {
         Valve valve = (first!=null)?first:basic;
@@ -113,7 +113,7 @@ public class StandardPipeline extends LifecycleBase
             supported = supported & valve.isAsyncSupported();
             valve = valve.getNext();
         }
-        return supported; 
+        return supported;
     }
 
 
@@ -149,7 +149,7 @@ public class StandardPipeline extends LifecycleBase
         // NOOP
     }
 
-    
+
     /**
      * Start {@link Valve}s) in this pipeline and implement the requirements
      * of {@link LifecycleBase#startInternal()}.
@@ -199,7 +199,7 @@ public class StandardPipeline extends LifecycleBase
         }
     }
 
-    
+
     @Override
     protected void destroyInternal() {
         Valve[] valves = getValves();
@@ -208,7 +208,7 @@ public class StandardPipeline extends LifecycleBase
         }
     }
 
-    
+
     /**
      * Return a String representation of this component.
      */
@@ -298,7 +298,7 @@ public class StandardPipeline extends LifecycleBase
             }
             current = current.getNext();
         }
-        
+
         this.basic = valve;
 
     }
@@ -325,7 +325,7 @@ public class StandardPipeline extends LifecycleBase
      */
     @Override
     public void addValve(Valve valve) {
-    
+
         // Validate that we can add this Valve
         if (valve instanceof Contained)
             ((Contained) valve).setContainer(this.container);
@@ -356,7 +356,7 @@ public class StandardPipeline extends LifecycleBase
                 current = current.getNext();
             }
         }
-        
+
         container.fireContainerEvent(Container.ADD_VALVE_EVENT, valve);
     }
 
@@ -447,7 +447,7 @@ public class StandardPipeline extends LifecycleBase
         } catch (LifecycleException e) {
             log.error("StandardPipeline.removeValve: destroy: ", e);
         }
-        
+
         container.fireContainerEvent(Container.REMOVE_VALVE_EVENT, valve);
     }
 
@@ -457,7 +457,7 @@ public class StandardPipeline extends LifecycleBase
         if (first != null) {
             return first;
         }
-        
+
         return basic;
     }
 }

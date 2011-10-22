@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -50,14 +50,14 @@ import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.InstanceManager;
 import org.apache.tomcat.util.res.StringManager;
 /**
- * 
+ *
  * @author fhanik
  *
  */
 public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
-    
+
     private static final Log log = LogFactory.getLog(AsyncContextImpl.class);
-    
+
     protected static final StringManager sm =
         StringManager.getManager(Constants.Package);
 
@@ -71,7 +71,7 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
     private AsyncEvent event = null;
     private Request request;
     private volatile InstanceManager instanceManager;
-    
+
     public AsyncContextImpl(Request request) {
         if (log.isDebugEnabled()) {
             logDebug("Constructor");
@@ -103,11 +103,11 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
             }
         }
     }
-    
+
     public boolean timeout() throws IOException {
         AtomicBoolean result = new AtomicBoolean();
         request.getCoyoteRequest().action(ActionCode.ASYNC_TIMEOUT, result);
-        
+
         if (result.get()) {
             boolean listenerInvoked = false;
             List<AsyncListenerWrapper> listenersCopy =
@@ -179,7 +179,7 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
                 }
             }
         };
-        
+
         this.dispatch = run;
         this.request.getCoyoteRequest().action(ActionCode.ASYNC_DISPATCH, null);
     }
@@ -205,7 +205,7 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
         Runnable wrapper = new RunnableWrapper(run, context);
         this.request.getCoyoteRequest().action(ActionCode.ASYNC_RUN, wrapper);
     }
-    
+
     @Override
     public void addListener(AsyncListener listener) {
         check();
@@ -250,7 +250,7 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
         }
         return listener;
     }
-    
+
     public void recycle() {
         if (log.isDebugEnabled()) {
             logDebug("recycle    ");
@@ -276,7 +276,7 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
 
     public void setStarted(Context context, ServletRequest request,
             ServletResponse response, boolean originalRequestResponse) {
-        
+
         this.request.getCoyoteRequest().action(
                 ActionCode.ASYNC_START, this);
 
@@ -285,7 +285,7 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
         this.servletResponse = response;
         this.hasOriginalRequestAndResponse = originalRequestResponse;
         this.event = new AsyncEvent(this, request, response);
-        
+
         List<AsyncListenerWrapper> listenersCopy =
             new ArrayList<AsyncListenerWrapper>();
         listenersCopy.addAll(listeners);
@@ -327,7 +327,7 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
         }
     }
 
-    
+
     @Override
     public long getTimeout() {
         check();
@@ -362,7 +362,7 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
         }
     }
 
-    
+
     private void logDebug(String method) {
         String rHashCode;
         String crHashCode;
@@ -424,7 +424,7 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
                 instanceManager = new DefaultInstanceManager(null,
                         new HashMap<String, Map<String, String>>(),
                         context,
-                        getClass().getClassLoader()); 
+                        getClass().getClassLoader());
             }
         }
         return instanceManager;
@@ -440,12 +440,12 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
     private static class DebugException extends Exception {
         private static final long serialVersionUID = 1L;
     }
-    
+
     private static class RunnableWrapper implements Runnable {
 
         private Runnable wrapped = null;
         private Context context = null;
-        
+
         public RunnableWrapper(Runnable wrapped, Context ctxt) {
             this.wrapped = wrapped;
             this.context = ctxt;
@@ -460,7 +460,7 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
             } else {
                 oldCL = Thread.currentThread().getContextClassLoader();
             }
-            
+
             try {
                 if (Globals.IS_SECURITY_ENABLED) {
                     PrivilegedAction<Void> pa = new PrivilegedSetTccl(
@@ -480,7 +480,7 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
                 }
             }
         }
-        
+
     }
 
 

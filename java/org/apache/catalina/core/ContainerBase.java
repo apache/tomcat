@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -112,9 +112,9 @@ import org.apache.tomcat.util.res.StringManager;
  * </table>
  * Subclasses that fire additional events should document them in the
  * class comments of the implementation class.
- * 
- * TODO: Review synchronisation around background processing. See bug 47024. 
- * 
+ *
+ * TODO: Review synchronisation around background processing. See bug 47024.
+ *
  * @author Craig R. McClanahan
  */
 public abstract class ContainerBase extends LifecycleMBeanBase
@@ -185,7 +185,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase
      * Associated logger name.
      */
     protected String logName = null;
-    
+
 
     /**
      * The Manager implementation with which this Container is associated.
@@ -198,7 +198,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase
      */
     protected Cluster cluster = null;
 
-    
+
     /**
      * The human-readable name of this Container.
      */
@@ -279,10 +279,10 @@ public abstract class ContainerBase extends LifecycleMBeanBase
     /**
      * Get the delay between the invocation of the backgroundProcess method on
      * this container and its children. Child containers will not be invoked
-     * if their delay value is not negative (which would mean they are using 
-     * their own thread). Setting this to a positive value will cause 
-     * a thread to be spawn. After waiting the specified amount of time, 
-     * the thread will invoke the executePeriodic method on this container 
+     * if their delay value is not negative (which would mean they are using
+     * their own thread). Setting this to a positive value will cause
+     * a thread to be spawn. After waiting the specified amount of time,
+     * the thread will invoke the executePeriodic method on this container
      * and all its children.
      */
     @Override
@@ -294,8 +294,8 @@ public abstract class ContainerBase extends LifecycleMBeanBase
     /**
      * Set the delay between the invocation of the execute method on this
      * container and its children.
-     * 
-     * @param delay The delay in seconds between the invocation of 
+     *
+     * @param delay The delay in seconds between the invocation of
      *              backgroundProcess methods
      */
     @Override
@@ -727,8 +727,8 @@ public abstract class ContainerBase extends LifecycleMBeanBase
     @Override
     public synchronized void setResources(DirContext resources) {
         // Called from StandardContext.setResources()
-        //              <- StandardContext.start() 
-        //              <- ContainerBase.addChildInternal() 
+        //              <- StandardContext.start()
+        //              <- ContainerBase.addChildInternal()
 
         // Change components if necessary
         DirContext oldResources = this.resources;
@@ -886,7 +886,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase
     public ContainerListener[] findContainerListeners() {
 
         synchronized (listeners) {
-            ContainerListener[] results = 
+            ContainerListener[] results =
                 new ContainerListener[listeners.size()];
             return listeners.toArray(results);
         }
@@ -930,13 +930,13 @@ public abstract class ContainerBase extends LifecycleMBeanBase
         if (child == null) {
             return;
         }
-        
+
         synchronized(children) {
             if (children.get(child.getName()) == null)
                 return;
             children.remove(child.getName());
         }
-        
+
         try {
             if (child.getState().isAvailable()) {
                 child.stop();
@@ -944,9 +944,9 @@ public abstract class ContainerBase extends LifecycleMBeanBase
         } catch (LifecycleException e) {
             log.error("ContainerBase.removeChild: stop: ", e);
         }
-        
+
         fireContainerEvent(REMOVE_CHILD_EVENT, child);
-        
+
         try {
             // child.destroy() may have already been called which would have
             // triggered this call. If that is the case, no need to destroy the
@@ -1104,7 +1104,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase
         super.destroyInternal();
     }
 
-    
+
     /**
      * Check this container for an access log and if none is found, look to the
      * parent. If there is no parent and still none is found, use the NoOp
@@ -1113,14 +1113,14 @@ public abstract class ContainerBase extends LifecycleMBeanBase
     @Override
     public void logAccess(Request request, Response response, long time,
             boolean useDefault) {
-        
+
         boolean logged = false;
-        
+
         if (getAccessLog() != null) {
             getAccessLog().log(request, response, time);
             logged = true;
         }
-        
+
         if (getParent() != null) {
             // No need to use default logger once request/response has been logged
             // once
@@ -1130,7 +1130,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase
 
     @Override
     public AccessLog getAccessLog() {
-        
+
         if (accessLogScanComplete) {
             return accessLog;
         }
@@ -1186,7 +1186,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase
      */
     @Override
     public void backgroundProcess() {
-        
+
         if (!getState().isAvailable())
             return;
 
@@ -1194,28 +1194,28 @@ public abstract class ContainerBase extends LifecycleMBeanBase
             try {
                 cluster.backgroundProcess();
             } catch (Exception e) {
-                log.warn(sm.getString("containerBase.backgroundProcess.cluster", cluster), e);                
+                log.warn(sm.getString("containerBase.backgroundProcess.cluster", cluster), e);
             }
         }
         if (loader != null) {
             try {
                 loader.backgroundProcess();
             } catch (Exception e) {
-                log.warn(sm.getString("containerBase.backgroundProcess.loader", loader), e);                
+                log.warn(sm.getString("containerBase.backgroundProcess.loader", loader), e);
             }
         }
         if (manager != null) {
             try {
                 manager.backgroundProcess();
             } catch (Exception e) {
-                log.warn(sm.getString("containerBase.backgroundProcess.manager", manager), e);                
+                log.warn(sm.getString("containerBase.backgroundProcess.manager", manager), e);
             }
         }
         if (realm != null) {
             try {
                 realm.backgroundProcess();
             } catch (Exception e) {
-                log.warn(sm.getString("containerBase.backgroundProcess.realm", realm), e);                
+                log.warn(sm.getString("containerBase.backgroundProcess.realm", realm), e);
             }
         }
         Valve current = pipeline.getFirst();
@@ -1223,7 +1223,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase
             try {
                 current.backgroundProcess();
             } catch (Exception e) {
-                log.warn(sm.getString("containerBase.backgroundProcess.valve", current), e);                
+                log.warn(sm.getString("containerBase.backgroundProcess.valve", current), e);
             }
             current = current.getNext();
         }
@@ -1275,16 +1275,16 @@ public abstract class ContainerBase extends LifecycleMBeanBase
             } else if (name.startsWith("##")) {
                 name = "/" + name;
             }
-            loggerName = "[" + name + "]" 
+            loggerName = "[" + name + "]"
                 + ((loggerName != null) ? ("." + loggerName) : "");
             current = current.getParent();
         }
         logName = ContainerBase.class.getName() + "." + loggerName;
         return logName;
-        
+
     }
 
-    
+
     // -------------------- JMX and Registration  --------------------
 
     @Override
@@ -1305,7 +1305,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase
         return result;
     }
 
-    
+
     // -------------------- Background Thread --------------------
 
     /**
@@ -1354,7 +1354,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase
 
 
     /**
-     * Private thread class to invoke the backgroundProcess method 
+     * Private thread class to invoke the backgroundProcess method
      * of this container and its children after a fixed delay.
      */
     protected class ContainerBackgroundProcessor implements Runnable {
@@ -1369,7 +1369,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase
                 }
                 if (!threadDone) {
                     Container parent = (Container) getMappingObject();
-                    ClassLoader cl = 
+                    ClassLoader cl =
                         Thread.currentThread().getContextClassLoader();
                     if (parent.getLoader() != null) {
                         cl = parent.getLoader().getClassLoader();

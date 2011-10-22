@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -55,7 +55,7 @@ public class StandardHost extends ContainerBase implements Host {
 
     private static final org.apache.juli.logging.Log log=
         org.apache.juli.logging.LogFactory.getLog( StandardHost.class );
-    
+
     // ----------------------------------------------------------- Constructors
 
 
@@ -77,7 +77,7 @@ public class StandardHost extends ContainerBase implements Host {
      * The set of aliases for this Host.
      */
     private String[] aliases = new String[0];
-    
+
     private final Object aliasesLock = new Object();
 
 
@@ -134,7 +134,7 @@ public class StandardHost extends ContainerBase implements Host {
 
 
     /**
-     * The Java class name of the default error reporter implementation class 
+     * The Java class name of the default error reporter implementation class
      * for deployed web applications.
      */
     private String errorReportValveClass =
@@ -158,15 +158,15 @@ public class StandardHost extends ContainerBase implements Host {
      */
      private boolean createDirs = true;
 
-     
+
      /**
       * Track the class loaders for the child web applications so memory leaks
       * can be detected.
       */
      private Map<ClassLoader, String> childClassLoaders =
          new WeakHashMap<ClassLoader, String>();
-     
-     
+
+
      /**
       * Any file or directory in {@link #appBase} that this pattern matches will
       * be ignored by the automatic deployment process (both
@@ -193,20 +193,20 @@ public class StandardHost extends ContainerBase implements Host {
      */
     @Override
     public File getAppBaseFile() {
-        
+
         if (appBaseFile != null) {
             return appBaseFile;
         }
 
         File file = new File(getAppBase());
-        
+
         // If not absolute, make it absolute
         if (!file.isAbsolute()) {
             // This system property should always be set
             file = new File(System.getProperty(Globals.CATALINA_BASE_PROP),
                     file.getPath());
         }
-        
+
         // Make it canonical if possible
         try {
             file = file.getCanonicalFile();
@@ -284,7 +284,7 @@ public class StandardHost extends ContainerBase implements Host {
     }
 
     /**
-     * Return the value of the auto deploy flag.  If true, it indicates that 
+     * Return the value of the auto deploy flag.  If true, it indicates that
      * this host's child webapps will be dynamically deployed.
      */
     @Override
@@ -297,7 +297,7 @@ public class StandardHost extends ContainerBase implements Host {
 
     /**
      * Set the auto deploy flag value for this host.
-     * 
+     *
      * @param autoDeploy The new auto deploy flag
      */
     @Override
@@ -305,7 +305,7 @@ public class StandardHost extends ContainerBase implements Host {
 
         boolean oldAutoDeploy = this.autoDeploy;
         this.autoDeploy = autoDeploy;
-        support.firePropertyChange("autoDeploy", oldAutoDeploy, 
+        support.firePropertyChange("autoDeploy", oldAutoDeploy,
                                    this.autoDeploy);
 
     }
@@ -368,8 +368,8 @@ public class StandardHost extends ContainerBase implements Host {
 
 
     /**
-     * Return the value of the deploy on startup flag.  If true, it indicates 
-     * that this host's child webapps should be discovered and automatically 
+     * Return the value of the deploy on startup flag.  If true, it indicates
+     * that this host's child webapps should be discovered and automatically
      * deployed at startup time.
      */
     @Override
@@ -382,7 +382,7 @@ public class StandardHost extends ContainerBase implements Host {
 
     /**
      * Set the deploy on startup flag value for this host.
-     * 
+     *
      * @param deployOnStartup The new deploy on startup flag
      */
     @Override
@@ -390,7 +390,7 @@ public class StandardHost extends ContainerBase implements Host {
 
         boolean oldDeployOnStartup = this.deployOnStartup;
         this.deployOnStartup = deployOnStartup;
-        support.firePropertyChange("deployOnStartup", oldDeployOnStartup, 
+        support.firePropertyChange("deployOnStartup", oldDeployOnStartup,
                                    this.deployOnStartup);
 
     }
@@ -436,8 +436,8 @@ public class StandardHost extends ContainerBase implements Host {
         this.copyXML= copyXML;
 
     }
-    
-    
+
+
     /**
      * Return the Java class name of the error report valve class
      * for new web applications.
@@ -460,12 +460,12 @@ public class StandardHost extends ContainerBase implements Host {
         String oldErrorReportValveClassClass = this.errorReportValveClass;
         this.errorReportValveClass = errorReportValveClass;
         support.firePropertyChange("errorReportValveClass",
-                                   oldErrorReportValveClassClass, 
+                                   oldErrorReportValveClassClass,
                                    this.errorReportValveClass);
 
     }
-    
-    
+
+
     /**
      * Return the canonical, fully qualified, name of the virtual host
      * this Container represents.
@@ -549,7 +549,7 @@ public class StandardHost extends ContainerBase implements Host {
     public String getDeployIgnore() {
         if (deployIgnore == null) {
             return null;
-        } 
+        }
         return this.deployIgnore.toString();
     }
 
@@ -584,7 +584,7 @@ public class StandardHost extends ContainerBase implements Host {
             this.deployIgnore = Pattern.compile(deployIgnore);
         }
         support.firePropertyChange("deployIgnore",
-                                   oldDeployIgnore, 
+                                   oldDeployIgnore,
                                    deployIgnore);
     }
 
@@ -656,8 +656,8 @@ public class StandardHost extends ContainerBase implements Host {
             }
         }
     }
-    
-    
+
+
     /**
      * Attempt to identify the contexts that have a class loader memory leak.
      * This is usually triggered on context reload. Note: This method attempts
@@ -665,11 +665,11 @@ public class StandardHost extends ContainerBase implements Host {
      * caution on a production system.
      */
     public String[] findReloadedContextMemoryLeaks() {
-        
+
         System.gc();
-        
+
         List<String> result = new ArrayList<String>();
-        
+
         for (Map.Entry<ClassLoader, String> entry :
                 childClassLoaders.entrySet()) {
             ClassLoader cl = entry.getKey();
@@ -679,7 +679,7 @@ public class StandardHost extends ContainerBase implements Host {
                 }
             }
         }
-        
+
         return result.toArray(new String[result.size()]);
     }
 
@@ -754,7 +754,7 @@ public class StandardHost extends ContainerBase implements Host {
         return (sb.toString());
 
     }
-    
+
     /**
      * Start this component and implement the requirements
      * of {@link org.apache.catalina.util.LifecycleBase#startInternal()}.
@@ -764,7 +764,7 @@ public class StandardHost extends ContainerBase implements Host {
      */
     @Override
     protected synchronized void startInternal() throws LifecycleException {
-        
+
         // Set error report valve
         String errorValve = getErrorReportValveClass();
         if ((errorValve != null) && (!errorValve.equals(""))) {
@@ -828,5 +828,5 @@ public class StandardHost extends ContainerBase implements Host {
 
         return keyProperties.toString();
     }
-    
+
 }

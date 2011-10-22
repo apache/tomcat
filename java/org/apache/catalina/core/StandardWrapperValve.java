@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -56,7 +56,7 @@ final class StandardWrapperValve
     public StandardWrapperValve() {
         super(true);
     }
-    
+
     // ----------------------------------------------------- Instance Variables
 
 
@@ -103,7 +103,7 @@ final class StandardWrapperValve
         StandardWrapper wrapper = (StandardWrapper) getContainer();
         Servlet servlet = null;
         Context context = (Context) wrapper.getParent();
-        
+
         // Check for the application being marked unavailable
         if (!context.getAvailable()) {
             response.sendError(HttpServletResponse.SC_SERVICE_UNAVAILABLE,
@@ -165,15 +165,15 @@ final class StandardWrapperValve
 
         // Identify if the request is Comet related now that the servlet has been allocated
         boolean comet = false;
-        if (servlet instanceof CometProcessor 
+        if (servlet instanceof CometProcessor
                 && request.getAttribute("org.apache.tomcat.comet.support") == Boolean.TRUE) {
             comet = true;
             request.setComet(true);
         }
-        
+
         MessageBytes requestPathMB = request.getRequestPathMB();
         DispatcherType dispatcherType = DispatcherType.REQUEST;
-        if (request.getDispatcherType()==DispatcherType.ASYNC) dispatcherType = DispatcherType.ASYNC; 
+        if (request.getDispatcherType()==DispatcherType.ASYNC) dispatcherType = DispatcherType.ASYNC;
         request.setAttribute
             (ApplicationFilterFactory.DISPATCHER_TYPE_ATTR,
              dispatcherType);
@@ -185,7 +185,7 @@ final class StandardWrapperValve
             ApplicationFilterFactory.getInstance();
         ApplicationFilterChain filterChain =
             factory.createFilterChain(request, wrapper, servlet);
-        
+
         // Reset comet flag value after creating the filter chain
         request.setComet(false);
 
@@ -199,12 +199,12 @@ final class StandardWrapperValve
                         SystemLogHandler.startCapture();
                         if (request.isAsyncDispatching()) {
                             //TODO SERVLET3 - async
-                            ((AsyncContextImpl)request.getAsyncContext()).doInternalDispatch(); 
+                            ((AsyncContextImpl)request.getAsyncContext()).doInternalDispatch();
                         } else if (comet) {
                             filterChain.doFilterEvent(request.getEvent());
                             request.setComet(true);
                         } else {
-                            filterChain.doFilter(request.getRequest(), 
+                            filterChain.doFilter(request.getRequest(),
                                     response.getResponse());
                         }
                     } finally {
@@ -330,7 +330,7 @@ final class StandardWrapperValve
     /**
      * Process a Comet event. The main differences here are to not use sendError
      * (the response is committed), to avoid creating a new filter chain
-     * (which would work but be pointless), and a few very minor tweaks. 
+     * (which would work but be pointless), and a few very minor tweaks.
      *
      * @param request The servlet request to be processed
      * @param response The servlet response to be created
@@ -343,13 +343,13 @@ final class StandardWrapperValve
     @Override
     public void event(Request request, Response response, CometEvent event)
         throws IOException, ServletException {
-        
+
         // Initialize local variables we may need
         Throwable throwable = null;
         // This should be a Request attribute...
         long t1=System.currentTimeMillis();
         // FIXME: Add a flag to count the total amount of events processed ? requestCount++;
-        
+
         StandardWrapper wrapper = (StandardWrapper) getContainer();
         if (wrapper == null) {
             // Context has been shutdown. Nothing to do here.
@@ -361,7 +361,7 @@ final class StandardWrapperValve
 
         // Check for the application being marked unavailable
         boolean unavailable = !context.getAvailable() || wrapper.isUnavailable();
-        
+
         // Allocate a servlet instance to process this request
         try {
             if (!unavailable) {
@@ -391,7 +391,7 @@ final class StandardWrapperValve
             (ApplicationFilterFactory.DISPATCHER_REQUEST_PATH_ATTR,
              requestPathMB);
         // Get the current (unchanged) filter chain for this request
-        ApplicationFilterChain filterChain = 
+        ApplicationFilterChain filterChain =
             (ApplicationFilterChain) request.getFilterChain();
 
         // Call the filter chain for this request
@@ -556,7 +556,7 @@ final class StandardWrapperValve
     public void setErrorCount(int errorCount) {
         this.errorCount = errorCount;
     }
-    
+
     @Override
     protected void initInternal() throws LifecycleException {
         // NOOP - Don't register this Valve in JMX
