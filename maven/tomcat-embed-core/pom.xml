@@ -88,7 +88,7 @@
             <phase>generate-sources</phase>
             <configuration>
               <tasks>
-                <copy todir="src/main/java" includeEmptyDirs="false">
+                <copy todir="${sourceBasePath}" includeEmptyDirs="false">
                   <fileset dir="../../java/">
                     <include name="org/apache/coyote/**" />
                     <include name="org/apache/tomcat/jni/**" />

@@ -30,6 +30,7 @@
 
   <properties>
     <surefireForkedVmArgs>-Xmx512m -Xms512m -client</surefireForkedVmArgs>
+    <testSourcesPath>target/src/test/java</testSourcesPath>
   </properties>
 
   <dependencies>
@@ -79,6 +80,7 @@
 
 
   <build>
+    <testSourceDirectory>${testSourcesPath}</testSourceDirectory>
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -90,7 +92,7 @@
             <configuration>
               <tasks>
                 <!--delete dir="src/test/java"/-->
-                <copy todir="src/test/java" includeEmptyDirs="false">
+                <copy todir="${testSourcesPath}" includeEmptyDirs="false">
                   <fileset dir="../../test/">
                     <include name="**/**" />
                   </fileset>
