@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -22,14 +22,14 @@ import javax.management.ObjectName;
 import org.apache.tools.ant.BuildException;
 
 /**
- * unregister a MBean at <em>JMX</em> JSR 160 MBeans Server. 
+ * unregister a MBean at <em>JMX</em> JSR 160 MBeans Server.
  * <ul>
  * <li>unregister Mbeans</li>
  * </ul>
  * <p>
  * Examples:
  * <br/>
- * unregister an existing Mbean at jmx.server connection 
+ * unregister an existing Mbean at jmx.server connection
  * <pre>
  *   &lt;jmx:unregister
  *           ref="jmx.server"
@@ -53,12 +53,12 @@ import org.apache.tools.ant.BuildException;
 public class JMXAccessorUnregisterTask extends JMXAccessorTask {
 
     // ------------------------------------------------------ protected Methods
-    
+
     /**
      * Execute the specified command, based on the configured properties. The
      * input stream will be closed upon completion of this task, whether it was
      * executed successfully or not.
-     * 
+     *
      * @exception Exception
      *                if an error occurs
      */

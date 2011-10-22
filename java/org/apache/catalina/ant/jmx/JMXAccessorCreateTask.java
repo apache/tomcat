@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -25,7 +25,7 @@ import javax.management.ObjectName;
 import org.apache.tools.ant.BuildException;
 
 /**
- * Create new MBean at <em>JMX</em> JSR 160 MBeans Server. 
+ * Create new MBean at <em>JMX</em> JSR 160 MBeans Server.
  * <ul>
  * <li>Create Mbeans</li>
  * <li>Create Mbeans with parameter</li>
@@ -34,7 +34,7 @@ import org.apache.tools.ant.BuildException;
  * <p>
  * Examples:
  * <br/>
- * create a new Mbean at jmx.server connection 
+ * create a new Mbean at jmx.server connection
  * <pre>
  *   &lt;jmx:create
  *           ref="jmx.server"
@@ -73,28 +73,28 @@ public class JMXAccessorCreateTask extends JMXAccessorTask {
     public String getClassLoader() {
         return classLoader;
     }
-    
+
     /**
      * @param classLoaderName The classLoader to set.
      */
     public void setClassLoader(String classLoaderName) {
         this.classLoader = classLoaderName;
     }
-    
+
     /**
      * @return Returns the className.
      */
     public String getClassName() {
         return className;
     }
-    
+
     /**
      * @param className The className to set.
      */
     public void setClassName(String className) {
         this.className = className;
     }
-    
+
     public void addArg(Arg arg ) {
         args.add(arg);
     }
@@ -113,12 +113,12 @@ public class JMXAccessorCreateTask extends JMXAccessorTask {
     }
 
     // ------------------------------------------------------ protected Methods
-    
+
     /**
      * Execute the specified command, based on the configured properties. The
      * input stream will be closed upon completion of this task, whether it was
      * executed successfully or not.
-     * 
+     *
      * @exception Exception
      *                if an error occurs
      */
@@ -135,7 +135,7 @@ public class JMXAccessorCreateTask extends JMXAccessorTask {
         }
         return jmxCreate(jmxServerConnection, getName());
      }
-    
+
     /**
      * create new Mbean and when set from ClassLoader Objectname
      * @param jmxServerConnection
@@ -160,7 +160,7 @@ public class JMXAccessorCreateTask extends JMXAccessorTask {
                } else {
                    sigA[i]=arg.getType();
                    argsA[i]=convertStringToType(arg.getValue(),arg.getType());
-               }                
+               }
            }
         }
         if (classLoader != null && !"".equals(classLoader)) {
@@ -172,7 +172,7 @@ public class JMXAccessorCreateTask extends JMXAccessorTask {
                 jmxServerConnection.createMBean(className, new ObjectName(name), new ObjectName(classLoader));
             else
                 jmxServerConnection.createMBean(className, new ObjectName(name), new ObjectName(classLoader),argsA,sigA);
-                
+
         } else {
             if (isEcho()) {
                 handleOutput("create MBean " + name + " from class "
@@ -185,5 +185,5 @@ public class JMXAccessorCreateTask extends JMXAccessorTask {
         }
         return error;
     }
-    
+
 }

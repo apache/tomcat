@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -35,16 +35,16 @@ import org.apache.tools.ant.types.RedirectorElement;
  * Abstract base class to add output redirection support for Catalina
  * Ant tasks. These tasks require Ant 1.5 or later.
  * <br>
- * <strong>WARNING:</strong> due to depends chain, Ant could call a Task 
+ * <strong>WARNING:</strong> due to depends chain, Ant could call a Task
  * more than once and this can affect the output redirection when configured.
  * If you are collecting the output in a property, it will collect the output
  * of only the first run, since Ant properties are immutable and once created
  * they cannot be changed.
  * <br>
  * If you are collecting output in a file the file will be overwritten with the
- * output of the last run, unless you set append="true", in which case each run 
+ * output of the last run, unless you set append="true", in which case each run
  * will append it's output to the file.
- * 
+ *
  *
  * @author Gabriele Garuglieri
  * @version $Id$
@@ -68,7 +68,7 @@ public abstract class BaseRedirectorHelperTask extends Task {
     PrintStream redirectOutPrintStream = null;
     /** The print stream for error output */
     PrintStream redirectErrPrintStream = null;
-        
+
    /**
      * Whether to fail (with a BuildException) if
      * ManagerServlet returns an error. The default behavior is
@@ -77,23 +77,23 @@ public abstract class BaseRedirectorHelperTask extends Task {
      * This flag does not control parameters checking. If the task is called
      * with wrong or invalid parameters, it will throw BuildException
      * independently from the setting of this flag.
-     */    
+     */
     protected boolean failOnError = true;
-    
-    /** 
+
+    /**
       * <code>true</code> true when output redirection is requested for this task .
       * Default is to log on Ant log.
-      */    
+      */
     protected boolean redirectOutput = false;
- 
-    /** 
+
+    /**
       * will be set to <code>true</code> when the configuration of the Redirector is
       * complete.
-      */    
+      */
     protected boolean redirectorConfigured = false;
 
-    /** 
-     * Flag which indicates that, if redirected, output should also be 
+    /**
+     * Flag which indicates that, if redirected, output should also be
      * always sent to the log. Default is that output is sent only to
      * redirected streams.
      */
@@ -115,7 +115,7 @@ public abstract class BaseRedirectorHelperTask extends Task {
     public boolean isFailOnError() {
       return failOnError;
     }
-        
+
 
     /**
      * File the output of the task is redirected to.
@@ -257,7 +257,7 @@ public abstract class BaseRedirectorHelperTask extends Task {
 
     /**
      * Ask redirector to close all the streams. It is necessary to call this method
-     * before leaving the Task to have the Streams flush their contents. If you are 
+     * before leaving the Task to have the Streams flush their contents. If you are
      * collecting output in a property, it will be created only if this method is
      * called, otherwise you'll find it unset.
      */
@@ -272,7 +272,7 @@ public abstract class BaseRedirectorHelperTask extends Task {
         }
         /*
          * Due to depends chain, Ant could call the Task more than once,
-         * this is to prevent that we attempt to reuse the previously 
+         * this is to prevent that we attempt to reuse the previously
          * closed Streams.
          */
         redirectOutStream = null;
@@ -280,7 +280,7 @@ public abstract class BaseRedirectorHelperTask extends Task {
         redirectErrStream = null;
         redirectErrPrintStream = null;
     }
-    
+
     /**
      * Handles output with the INFO priority.
      *
@@ -296,7 +296,7 @@ public abstract class BaseRedirectorHelperTask extends Task {
             if (alwaysLog) {
                 log(output, Project.MSG_INFO);
             }
-        } else { 
+        } else {
             log(output, Project.MSG_INFO);
         }
     }
@@ -328,7 +328,7 @@ public abstract class BaseRedirectorHelperTask extends Task {
             if (alwaysLog) {
                 log(output, Project.MSG_ERR);
             }
-        } else { 
+        } else {
             log(output, Project.MSG_ERR);
         }
     }
@@ -344,7 +344,7 @@ public abstract class BaseRedirectorHelperTask extends Task {
         handleErrorOutput(output);
         redirectErrPrintStream.flush();
     }
-  
+
     /**
      * Handles output with ERR priority to error stream and all other
      * priorities to output stream.
