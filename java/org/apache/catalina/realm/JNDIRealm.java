@@ -228,12 +228,6 @@ public class JNDIRealm extends RealmBase {
      */
     public static final String DEREF_ALIASES = "java.naming.ldap.derefAliases";
 
-    /**
-     * Descriptive information about this Realm implementation.
-     */
-    protected static final String info =
-        "org.apache.catalina.realm.JNDIRealm/1.0";
-
 
     /**
      * Descriptive information about this Realm implementation.
@@ -969,21 +963,8 @@ public class JNDIRealm extends RealmBase {
         this.useDelegatedCredential = useDelegatedCredential;
     }
 
-    /**
-     * Return descriptive information about this Realm implementation and
-     * the corresponding version number, in the format
-     * <code>&lt;description&gt;/&lt;version&gt;</code>.
-     */
-    @Override
-    public String getInfo() {
-
-        return info;
-
-    }
-
 
     // ---------------------------------------------------------- Realm Methods
-
 
     /**
      * Return the Principal associated with the specified username and

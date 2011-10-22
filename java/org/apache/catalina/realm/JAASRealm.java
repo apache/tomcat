@@ -143,13 +143,6 @@ public class JAASRealm
     /**
      * Descriptive information about this <code>Realm</code> implementation.
      */
-    protected static final String info =
-        "org.apache.catalina.realm.JAASRealm/1.0";
-
-
-    /**
-     * Descriptive information about this <code>Realm</code> implementation.
-     */
     protected static final String name = "JAASRealm";
 
 
@@ -305,21 +298,8 @@ public class JAASRealm
         this.userClassNames = userClassNames;
     }
 
-    /**
-     * Return descriptive information about this Realm implementation and
-     * the corresponding version number, in the format
-     * <code>&lt;description&gt;/&lt;version&gt;</code>.
-     */
-    @Override
-    public String getInfo() {
-
-        return info;
-
-    }
-
     
     // --------------------------------------------------------- Public Methods
-
 
     /**
      * Return the <code>Principal</code> associated with the specified username

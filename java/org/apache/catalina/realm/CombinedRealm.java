@@ -63,7 +63,8 @@ public class CombinedRealm extends RealmBase {
         realms.add(theRealm);
         
         if (log.isDebugEnabled()) {
-            sm.getString("combinedRealm.addRealm", theRealm.getInfo(), 
+            sm.getString("combinedRealm.addRealm",
+                    theRealm.getClass().getName(), 
                     Integer.toString(realms.size()));
         }
     }
@@ -105,7 +106,8 @@ public class CombinedRealm extends RealmBase {
         
         for (Realm realm : realms) {
             if (log.isDebugEnabled()) {
-                log.debug(sm.getString("combinedRealm.authStart", username, realm.getInfo()));
+                log.debug(sm.getString("combinedRealm.authStart", username,
+                        realm.getClass().getName()));
             }
 
             authenticatedUser = realm.authenticate(username, clientDigest, nonce,
@@ -113,11 +115,13 @@ public class CombinedRealm extends RealmBase {
 
             if (authenticatedUser == null) {
                 if (log.isDebugEnabled()) {
-                    log.debug(sm.getString("combinedRealm.authFail", username, realm.getInfo()));
+                    log.debug(sm.getString("combinedRealm.authFail", username,
+                            realm.getClass().getName()));
                 }
             } else {
                 if (log.isDebugEnabled()) {
-                    log.debug(sm.getString("combinedRealm.authSuccess", username, realm.getInfo()));
+                    log.debug(sm.getString("combinedRealm.authSuccess",
+                            username, realm.getClass().getName()));
                 }
                 break;
             }
@@ -140,18 +144,21 @@ public class CombinedRealm extends RealmBase {
         
         for (Realm realm : realms) {
             if (log.isDebugEnabled()) {
-                log.debug(sm.getString("combinedRealm.authStart", username, realm.getInfo()));
+                log.debug(sm.getString("combinedRealm.authStart", username,
+                        realm.getClass().getName()));
             }
 
             authenticatedUser = realm.authenticate(username, credentials);
 
             if (authenticatedUser == null) {
                 if (log.isDebugEnabled()) {
-                    log.debug(sm.getString("combinedRealm.authFail", username, realm.getInfo()));
+                    log.debug(sm.getString("combinedRealm.authFail", username,
+                            realm.getClass().getName()));
                 }
             } else {
                 if (log.isDebugEnabled()) {
-                    log.debug(sm.getString("combinedRealm.authSuccess", username, realm.getInfo()));
+                    log.debug(sm.getString("combinedRealm.authSuccess",
+                            username, realm.getClass().getName()));
                 }
                 break;
             }
@@ -203,7 +210,7 @@ public class CombinedRealm extends RealmBase {
                     // If realm doesn't start can't authenticate against it
                     iter.remove();
                     log.error(sm.getString("combinedRealm.realmStartFail",
-                            realm.getInfo()), e);
+                            realm.getClass().getName()), e);
                 }
             }
         }
@@ -248,18 +255,21 @@ public class CombinedRealm extends RealmBase {
         
         for (Realm realm : realms) {
             if (log.isDebugEnabled()) {
-                log.debug(sm.getString("combinedRealm.authStart", username, realm.getInfo()));
+                log.debug(sm.getString("combinedRealm.authStart", username,
+                        realm.getClass().getName()));
             }
 
             authenticatedUser = realm.authenticate(certs);
 
             if (authenticatedUser == null) {
                 if (log.isDebugEnabled()) {
-                    log.debug(sm.getString("combinedRealm.authFail", username, realm.getInfo()));
+                    log.debug(sm.getString("combinedRealm.authFail", username,
+                            realm.getClass().getName()));
                 }
             } else {
                 if (log.isDebugEnabled()) {
-                    log.debug(sm.getString("combinedRealm.authSuccess", username, realm.getInfo()));
+                    log.debug(sm.getString("combinedRealm.authSuccess",
+                            username, realm.getClass().getName()));
                 }
                 break;
             }
@@ -289,7 +299,7 @@ public class CombinedRealm extends RealmBase {
             for (Realm realm : realms) {
                 if (log.isDebugEnabled()) {
                     log.debug(sm.getString("combinedRealm.authStart",
-                            username, realm.getInfo()));
+                            username, realm.getClass().getName()));
                 }
 
                 authenticatedUser = realm.authenticate(gssContext, storeCreds);
@@ -297,12 +307,12 @@ public class CombinedRealm extends RealmBase {
                 if (authenticatedUser == null) {
                     if (log.isDebugEnabled()) {
                         log.debug(sm.getString("combinedRealm.authFail",
-                                username, realm.getInfo()));
+                                username, realm.getClass().getName()));
                     }
                 } else {
                     if (log.isDebugEnabled()) {
                         log.debug(sm.getString("combinedRealm.authSuccess",
-                                username, realm.getInfo()));
+                                username, realm.getClass().getName()));
                     }
                     break;
                 }

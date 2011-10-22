@@ -56,20 +56,12 @@ public class CompressionServletResponseWrapper extends HttpServletResponseWrappe
     /**
      * Original response
      */
-
     protected HttpServletResponse origResponse = null;
-
-    /**
-     * Descriptive information about this Response implementation.
-     */
-
-    protected static final String info = "CompressionServletResponseWrapper";
 
     /**
      * The ServletOutputStream that has been returned by
      * <code>getOutputStream()</code>, if any.
      */
-
     protected ServletOutputStream stream = null;
 
 
@@ -77,7 +69,6 @@ public class CompressionServletResponseWrapper extends HttpServletResponseWrappe
      * The PrintWriter that has been returned by
      * <code>getWriter()</code>, if any.
      */
-
     protected PrintWriter writer = null;
 
     /**

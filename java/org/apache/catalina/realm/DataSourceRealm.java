@@ -14,8 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.catalina.realm;
 
 
@@ -44,9 +42,7 @@ import org.apache.naming.ContextBindings;
 * @author Ignacio Ortega
 * @version $Revision$
 */
-
-public class DataSourceRealm
-    extends RealmBase {
+public class DataSourceRealm extends RealmBase {
 
 
     // ----------------------------------------------------- Instance Variables
@@ -68,13 +64,6 @@ public class DataSourceRealm
      * The name of the JNDI JDBC DataSource
      */
     protected String dataSourceName = null;
-
-
-    /**
-     * Descriptive information about this Realm implementation.
-     */
-    protected static final String info =
-        "org.apache.catalina.realm.DataSourceRealm/1.0";
 
 
     /**
@@ -241,21 +230,8 @@ public class DataSourceRealm
       this.userTable = userTable;
     }
 
-    /**
-     * Return descriptive information about this Realm implementation and
-     * the corresponding version number, in the format
-     * <code>&lt;description&gt;/&lt;version&gt;</code>.
-     */
-    @Override
-    public String getInfo() {
-
-        return info;
-
-    }
-
 
     // --------------------------------------------------------- Public Methods
-
 
     /**
      * Return the Principal associated with the specified username and

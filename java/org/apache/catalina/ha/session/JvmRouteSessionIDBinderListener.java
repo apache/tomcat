@@ -46,12 +46,6 @@ public class JvmRouteSessionIDBinderListener extends ClusterListener {
     private static final StringManager sm =
         StringManager.getManager(Constants.Package);
 
-    /**
-     * The descriptive information about this implementation.
-     */
-    protected static final String info =
-        "org.apache.catalina.ha.session.JvmRouteSessionIDBinderListener/1.1";
-
     //--Instance Variables--------------------------------------
 
 
@@ -69,15 +63,6 @@ public class JvmRouteSessionIDBinderListener extends ClusterListener {
     }
 
     //--Logic---------------------------------------------------
-
-    /**
-     * Return descriptive information about this implementation.
-     */
-    public String getInfo() {
-
-        return (info);
-
-    }
 
     /**
      * @return Returns the numberOfSessions.

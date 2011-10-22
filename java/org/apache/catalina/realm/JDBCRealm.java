@@ -96,13 +96,6 @@ public class JDBCRealm
     /**
      * Descriptive information about this Realm implementation.
      */
-    protected static final String info =
-        "org.apache.catalina.realm.JDBCRealm/1.0";
-
-
-    /**
-     * Descriptive information about this Realm implementation.
-     */
     protected static final String name = "JDBCRealm";
 
 
@@ -304,20 +297,8 @@ public class JDBCRealm
       this.userTable = userTable;
     }
 
-    /**
-     * Return descriptive information about this Realm implementation and
-     * the corresponding version number, in the format
-     * <code>&lt;description&gt;/&lt;version&gt;</code>.
-     */
-    @Override
-    public String getInfo() {
-
-        return info;
-
-    }
 
     // --------------------------------------------------------- Public Methods
-
 
     /**
      * Return the Principal associated with the specified username and

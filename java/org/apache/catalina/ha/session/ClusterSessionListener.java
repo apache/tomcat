@@ -36,11 +36,6 @@ public class ClusterSessionListener extends ClusterListener {
     private static final Log log =
         LogFactory.getLog(ClusterSessionListener.class);
     
-    /**
-     * The descriptive information about this implementation.
-     */
-    protected static final String info = "org.apache.catalina.ha.session.ClusterSessionListener/1.1";
-
     //--Constructor---------------------------------------------
 
     public ClusterSessionListener() {
@@ -48,15 +43,6 @@ public class ClusterSessionListener extends ClusterListener {
     }
 
     //--Logic---------------------------------------------------
-
-    /**
-     * Return descriptive information about this implementation.
-     */
-    public String getInfo() {
-
-        return (info);
-
-    }
 
     /**
      * Callback from the cluster, when a message is received, The cluster will

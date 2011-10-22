@@ -213,12 +213,6 @@ public final class JDBCAccessLogValve extends ValveBase implements AccessLog {
      */
     protected boolean requestAttributesEnabled = true;
 
-    /**
-     * The descriptive information about this implementation.
-     */
-    protected static final String info =
-        "org.apache.catalina.valves.JDBCAccessLogValve/1.1";
-
 
     // ------------------------------------------------------------- Properties
 

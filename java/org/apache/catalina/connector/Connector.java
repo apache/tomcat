@@ -112,13 +112,6 @@ public class Connector extends LifecycleMBeanBase  {
 
 
     /**
-     * Descriptive information about this Connector implementation.
-     */
-    protected static final String info =
-        "org.apache.catalina.connector.Connector/2.1";
-
-
-    /**
      * The port number on which we listen for requests.
      */
     protected int port = 0;
@@ -384,16 +377,6 @@ public class Connector extends LifecycleMBeanBase  {
 
         this.enableLookups = enableLookups;
         setProperty("enableLookups", String.valueOf(enableLookups));
-
-    }
-
-
-    /**
-     * Return descriptive information about this Connector implementation.
-     */
-    public String getInfo() {
-
-        return (info);
 
     }
 
