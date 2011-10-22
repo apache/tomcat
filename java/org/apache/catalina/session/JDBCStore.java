@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -111,7 +111,7 @@ public class JDBCStore extends StoreBase {
      * DataSource to use
      */
     protected DataSource dataSource = null;
-    
+
     // ------------------------------------------------------------- Table & cols
 
     /**
@@ -598,7 +598,7 @@ public class JDBCStore extends StoreBase {
         ObjectInputStream ois = null;
         BufferedInputStream bis = null;
         Container container = manager.getContainer();
- 
+
         synchronized (this) {
             int numberOfTries = 2;
             while (numberOfTries > 0) {
@@ -721,7 +721,7 @@ public class JDBCStore extends StoreBase {
      * Remove the Session with the specified session identifier from
      * this Store, if present.  If no such Session is present, this method
      * takes no action.
-     * 
+     *
      * @param id Session identifier of the Session to be removed
      * @param _conn open connection to be used
      * @throws SQLException if an error occurs while talking to the database
@@ -804,7 +804,7 @@ public class JDBCStore extends StoreBase {
                     // TODO:
                     // * Check if ID exists in database and if so use UPDATE.
                     remove(session.getIdInternal(), _conn);
-                    
+
                     bos = new ByteArrayOutputStream();
                     oos = new ObjectOutputStream(new BufferedOutputStream(bos));
 
@@ -916,7 +916,7 @@ public class JDBCStore extends StoreBase {
                                 this.dataSourceName), e);
            }
         }
-        
+
         if (dataSource != null) {
             return dataSource.getConnection();
         }
@@ -988,7 +988,7 @@ public class JDBCStore extends StoreBase {
         } catch (Throwable f) {
             ExceptionUtils.handleThrowable(f);
         }
-         
+
         try {
             preparedRemoveSql.close();
         } catch (Throwable f) {
@@ -1002,12 +1002,12 @@ public class JDBCStore extends StoreBase {
             ExceptionUtils.handleThrowable(f);
         }
         this.preparedLoadSql = null;
-        
+
         // Commit if autoCommit is false
         try {
             if (!dbConnection.getAutoCommit()) {
                 dbConnection.commit();
-            }            
+            }
         } catch (SQLException e) {
             manager.getContainer().getLogger().error(sm.getString(getStoreName() + ".commitSQLException"), e);
         }
@@ -1031,7 +1031,7 @@ public class JDBCStore extends StoreBase {
      */
     protected void release(Connection conn) {
         if (dataSource != null) {
-            close(conn); 
+            close(conn);
         }
     }
 
@@ -1049,7 +1049,7 @@ public class JDBCStore extends StoreBase {
             // If not using a connection pool, open a connection to the database
             this.dbConnection = getConnection();
         }
-        
+
         super.startInternal();
     }
 
@@ -1062,7 +1062,7 @@ public class JDBCStore extends StoreBase {
      */
     @Override
     protected synchronized void stopInternal() throws LifecycleException {
-        
+
         super.stopInternal();
 
         // Close and release everything associated with our db.

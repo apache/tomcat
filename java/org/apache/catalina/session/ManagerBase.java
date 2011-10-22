@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -120,7 +120,7 @@ public abstract class ManagerBase extends LifecycleMBeanBase
 
     /**
      * The name of the provider to use to create instances of
-     * {@link java.security.SecureRandom} which are used to generate session IDs. 
+     * {@link java.security.SecureRandom} which are used to generate session IDs.
      * If no algorithm is specified the of SHA1PRNG default is used. If an
      * invalid algorithm and/or provider is specified the SecureRandom instances
      * will be created using the defaults. If that fails, the SecureRandom
@@ -206,7 +206,7 @@ public abstract class ManagerBase extends LifecycleMBeanBase
      * The property change support for this component.
      */
     protected PropertyChangeSupport support = new PropertyChangeSupport(this);
-    
+
 
     // ------------------------------------------------------------- Properties
 
@@ -421,7 +421,7 @@ public abstract class ManagerBase extends LifecycleMBeanBase
 
     /**
      * Number of session creations that failed due to maxActiveSessions
-     * 
+     *
      * @return The count
      */
     @Override
@@ -458,7 +458,7 @@ public abstract class ManagerBase extends LifecycleMBeanBase
     public void setProcessingTime(long processingTime) {
         this.processingTime = processingTime;
     }
-    
+
     /**
      * Return the frequency of manager checks.
      */
@@ -507,7 +507,7 @@ public abstract class ManagerBase extends LifecycleMBeanBase
         long timeNow = System.currentTimeMillis();
         Session sessions[] = findSessions();
         int expireHere = 0 ;
-        
+
         if(log.isDebugEnabled())
             log.debug("Start expire sessions " + getName() + " at " + timeNow + " sessioncount " + sessions.length);
         for (int i = 0; i < sessions.length; i++) {
@@ -524,9 +524,9 @@ public abstract class ManagerBase extends LifecycleMBeanBase
 
     @Override
     protected void initInternal() throws LifecycleException {
-        
+
         super.initInternal();
-        
+
         setDistributable(((Context) getContainer()).getDistributable());
     }
 
@@ -599,10 +599,10 @@ public abstract class ManagerBase extends LifecycleMBeanBase
     /**
      * Construct and return a new session object, based on the default
      * settings specified by this Manager's properties.  The session
-     * id specified will be used as the session id.  
-     * If a new session cannot be created for any reason, return 
+     * id specified will be used as the session id.
+     * If a new session cannot be created for any reason, return
      * <code>null</code>.
-     * 
+     *
      * @param sessionId The session id which should be used to create the
      *  new session; if <code>null</code>, a new session id will be
      *  generated
@@ -611,14 +611,14 @@ public abstract class ManagerBase extends LifecycleMBeanBase
      */
     @Override
     public Session createSession(String sessionId) {
-        
+
         if ((maxActiveSessions >= 0) &&
                 (getActiveSessions() >= maxActiveSessions)) {
             rejectedSessions++;
             throw new IllegalStateException(
                     sm.getString("managerBase.createSession.ise"));
         }
-        
+
         // Recycle or create a Session instance
         Session session = createEmptySession();
 
@@ -642,8 +642,8 @@ public abstract class ManagerBase extends LifecycleMBeanBase
         return (session);
 
     }
-    
-    
+
+
     /**
      * Get a session from the recycled ones or create a new empty one.
      * The PersistentManager manager does not need to create session data
@@ -697,7 +697,7 @@ public abstract class ManagerBase extends LifecycleMBeanBase
     public void remove(Session session) {
         remove(session, false);
     }
-    
+
     /**
      * Remove this Session from the active Sessions for this Manager.
      *
@@ -706,7 +706,7 @@ public abstract class ManagerBase extends LifecycleMBeanBase
      */
     @Override
     public void remove(Session session, boolean update) {
-        
+
         // If the session has expired - as opposed to just being removed from
         // the manager because it is being persisted - update the expired stats
         if (update) {
@@ -744,7 +744,7 @@ public abstract class ManagerBase extends LifecycleMBeanBase
     /**
      * Change the session ID of the current session to a new randomly generated
      * session ID.
-     * 
+     *
      * @param session   The session to change the session ID for
      */
     @Override
@@ -755,8 +755,8 @@ public abstract class ManagerBase extends LifecycleMBeanBase
         container.fireContainerEvent(Context.CHANGE_SESSION_ID_EVENT,
                 new String[] {oldId, newId});
     }
-    
-    
+
+
     // ------------------------------------------------------ Protected Methods
 
 
@@ -781,9 +781,9 @@ public abstract class ManagerBase extends LifecycleMBeanBase
             }
 
             result = sessionIdGenerator.generateSessionId();
-            
+
         } while (sessions.containsKey(result));
-        
+
         return result;
     }
 
@@ -826,7 +826,7 @@ public abstract class ManagerBase extends LifecycleMBeanBase
     }
 
 
-    /** 
+    /**
      * Total sessions created by this manager.
      *
      * @return sessions created
@@ -837,7 +837,7 @@ public abstract class ManagerBase extends LifecycleMBeanBase
     }
 
 
-    /** 
+    /**
      * Number of duplicated session IDs generated by the random source.
      * Anything bigger than 0 means problems.
      *
@@ -853,7 +853,7 @@ public abstract class ManagerBase extends LifecycleMBeanBase
     }
 
 
-    /** 
+    /**
      * Returns the number of active sessions
      *
      * @return number of sessions active
@@ -942,8 +942,8 @@ public abstract class ManagerBase extends LifecycleMBeanBase
     /**
      * Updates the sessionMaxAliveTime attribute if the candidate value is
      * larger than the current value.
-     * 
-     * @param sessionAliveTime  The candidate value (in seconds) for the new 
+     *
+     * @param sessionAliveTime  The candidate value (in seconds) for the new
      *                          sessionMaxAliveTime value.
      */
     public void updateSessionMaxAliveTime(int sessionAliveTime) {
@@ -960,7 +960,7 @@ public abstract class ManagerBase extends LifecycleMBeanBase
      * Gets the average time (in seconds) that expired sessions had been
      * alive based on the last 100 sessions to expire. If less than
      * 100 sessions have expired then all available data is used.
-     * 
+     *
      * @return Average time (in seconds) that expired sessions had been
      * alive.
      */
@@ -971,12 +971,12 @@ public abstract class ManagerBase extends LifecycleMBeanBase
         synchronized (sessionExpirationTiming) {
             copy.addAll(sessionExpirationTiming);
         }
-        
+
         // Init
         int counter = 0;
         int result = 0;
         Iterator<SessionTiming> iter = copy.iterator();
-        
+
         // Calculate average
         while (iter.hasNext()) {
             SessionTiming timing = iter.next();
@@ -991,12 +991,12 @@ public abstract class ManagerBase extends LifecycleMBeanBase
         return result;
     }
 
-    
+
     /**
      * Gets the current rate of session creation (in session per minute) based
      * on the creation time of the previous 100 sessions created. If less than
      * 100 sessions have been created then all available data is used.
-     * 
+     *
      * @return  The current rate (in sessions per minute) of session creation
      */
     @Override
@@ -1007,13 +1007,13 @@ public abstract class ManagerBase extends LifecycleMBeanBase
         synchronized (sessionCreationTiming) {
             copy.addAll(sessionCreationTiming);
         }
-        
+
         // Init
         long oldest = now;
         int counter = 0;
         int result = 0;
         Iterator<SessionTiming> iter = copy.iterator();
-        
+
         // Calculate rate
         while (iter.hasNext()) {
             SessionTiming timing = iter.next();
@@ -1033,13 +1033,13 @@ public abstract class ManagerBase extends LifecycleMBeanBase
         }
         return result;
     }
-    
+
 
     /**
      * Gets the current rate of session expiration (in session per minute) based
      * on the expiry time of the previous 100 sessions expired. If less than
      * 100 sessions have expired then all available data is used.
-     * 
+     *
      * @return  The current rate (in sessions per minute) of session expiration
      */
     @Override
@@ -1050,13 +1050,13 @@ public abstract class ManagerBase extends LifecycleMBeanBase
         synchronized (sessionExpirationTiming) {
             copy.addAll(sessionExpirationTiming);
         }
-        
+
         // Init
         long oldest = now;
         int counter = 0;
         int result = 0;
         Iterator<SessionTiming> iter = copy.iterator();
-        
+
         // Calculate rate
         while (iter.hasNext()) {
             SessionTiming timing = iter.next();
@@ -1079,7 +1079,7 @@ public abstract class ManagerBase extends LifecycleMBeanBase
     }
 
 
-    /** 
+    /**
      * For debugging: return a list of all session ids currently active
      *
      */
@@ -1093,7 +1093,7 @@ public abstract class ManagerBase extends LifecycleMBeanBase
     }
 
 
-    /** 
+    /**
      * For debugging: get a session attribute
      *
      * @param sessionId
@@ -1115,12 +1115,12 @@ public abstract class ManagerBase extends LifecycleMBeanBase
 
     /**
      * Returns information about the session with the given session id.
-     * 
-     * <p>The session information is organized as a HashMap, mapping 
+     *
+     * <p>The session information is organized as a HashMap, mapping
      * session attribute names to the String representation of their values.
      *
      * @param sessionId Session id
-     * 
+     *
      * @return HashMap mapping session attribute names to the String
      * representation of their values, or null if no session with the
      * specified id exists, or if the session does not have any attributes
@@ -1210,7 +1210,7 @@ public abstract class ManagerBase extends LifecycleMBeanBase
         return s.getCreationTime();
     }
 
-    
+
     /**
      * Return a String rendering of this object.
      */
@@ -1226,14 +1226,14 @@ public abstract class ManagerBase extends LifecycleMBeanBase
         sb.append(']');
         return sb.toString();
     }
-    
-    
+
+
     // -------------------- JMX and Registration  --------------------
     @Override
     public String getObjectNameKeyProperties() {
-        
+
         StringBuilder name = new StringBuilder("type=Manager");
-        
+
         if (container instanceof Context) {
             name.append(",context=");
             String contextName = container.getName();
@@ -1241,7 +1241,7 @@ public abstract class ManagerBase extends LifecycleMBeanBase
                 name.append('/');
             }
             name.append(contextName);
-            
+
             Context context = (Context) container;
             name.append(",host=");
             name.append(context.getParent().getName());
@@ -1263,7 +1263,7 @@ public abstract class ManagerBase extends LifecycleMBeanBase
 
     /**
      * Process property change events from our associated Context.
-     * 
+     *
      * @param event
      *            The property change event that has occurred
      */
@@ -1273,7 +1273,7 @@ public abstract class ManagerBase extends LifecycleMBeanBase
         // Validate the source of this event
         if (!(event.getSource() instanceof Context))
             return;
-        
+
         // Process a relevant property change
         if (event.getPropertyName().equals("sessionTimeout")) {
             try {
@@ -1285,18 +1285,18 @@ public abstract class ManagerBase extends LifecycleMBeanBase
             }
         }
     }
-    
+
     // ----------------------------------------------------------- Inner classes
-    
+
     protected static final class SessionTiming {
         private long timestamp;
         private int duration;
-        
+
         public SessionTiming(long timestamp, int duration) {
             this.timestamp = timestamp;
             this.duration = duration;
         }
-        
+
         /**
          * Time stamp associated with this piece of timing information in
          * milliseconds.
@@ -1304,7 +1304,7 @@ public abstract class ManagerBase extends LifecycleMBeanBase
         public long getTimestamp() {
             return timestamp;
         }
-        
+
         /**
          * Duration associated with this piece of timing information in seconds.
          */
