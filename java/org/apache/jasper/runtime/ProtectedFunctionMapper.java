@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -31,7 +31,7 @@ import org.apache.jasper.security.SecurityUtil;
 /**
  * Maps EL functions to their Java method counterparts. Keeps the actual Method
  * objects protected so that JSP pages can't indirectly do reflection.
- * 
+ *
  * @author Mark Roth
  * @author Kin-man Chung
  */
@@ -59,7 +59,7 @@ public final class ProtectedFunctionMapper extends javax.el.FunctionMapper
      * retrieve an instance of the ProtectedFunctionMapper. This is necessary
      * since generated code does not have access to create instances of classes
      * in this package.
-     * 
+     *
      * @return A new protected function mapper.
      */
     public static ProtectedFunctionMapper getInstance() {
@@ -82,7 +82,7 @@ public final class ProtectedFunctionMapper extends javax.el.FunctionMapper
     /**
      * Stores a mapping from the given EL function prefix and name to the given
      * Java method.
-     * 
+     *
      * @param fnQName
      *            The EL function qualified name (including prefix)
      * @param c
@@ -128,7 +128,7 @@ public final class ProtectedFunctionMapper extends javax.el.FunctionMapper
      * Creates an instance for this class, and stores the Method for the given
      * EL function prefix and name. This method is used for the case when there
      * is only one function in the EL expression.
-     * 
+     *
      * @param fnQName
      *            The EL function qualified name (including prefix)
      * @param c
@@ -183,7 +183,7 @@ public final class ProtectedFunctionMapper extends javax.el.FunctionMapper
     /**
      * Resolves the specified local name and prefix into a Java.lang.Method.
      * Returns null if the prefix and local name are not found.
-     * 
+     *
      * @param prefix
      *            the prefix of the function
      * @param localName

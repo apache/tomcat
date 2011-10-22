@@ -132,7 +132,7 @@ public class JspC implements Options {
     protected static final int DEFAULT_DIE_LEVEL = 1;
     protected static final int NO_DIE_LEVEL = 0;
     protected static final Set<String> insertBefore = new HashSet<String>();
-    
+
     static {
         insertBefore.add("</web-app>");
         insertBefore.add("<servlet-mapping>");
@@ -269,7 +269,7 @@ public class JspC implements Options {
 
     /**
      * Apply command-line arguments.
-     * 
+     *
      * @param arg
      *            The arguments
      */
@@ -329,7 +329,7 @@ public class JspC implements Options {
                     caching = false;
                 } else {
                     caching = true;
-                }            
+                }
             } else if (tok.equals(SWITCH_CLASSPATH)) {
                 setClassPath(nextArg());
             } else if (tok.startsWith(SWITCH_DIE)) {
@@ -505,7 +505,7 @@ public class JspC implements Options {
 
     /**
      * Sets the option to enable caching.
-     * 
+     *
      * @see Options#isCaching()
      */
     public void setCaching(boolean caching) {
@@ -547,8 +547,8 @@ public class JspC implements Options {
     public boolean getRecompileOnFail() {
         return false;
     }
-    
-    
+
+
     /**
      * In JspC this always returns <code>false</code>.
      * {@inheritDoc}
@@ -583,14 +583,14 @@ public class JspC implements Options {
 
     /**
      * Sets smapDumped flag.
-     * 
+     *
      * @see Options#isSmapDumped()
      */
     public void setSmapDumped(boolean smapDumped) {
         this.smapDumped = smapDumped;
     }
 
-    
+
     /**
      * Determines whether text strings are to be generated as char arrays,
      * which improves performance in some cases.
@@ -613,7 +613,7 @@ public class JspC implements Options {
     /**
      * Sets the class-id value to be sent to Internet Explorer when using
      * &lt;jsp:plugin&gt; tags.
-     * 
+     *
      * @param ieClassId
      *            Class-id value
      */
@@ -647,7 +647,7 @@ public class JspC implements Options {
 
     /**
      * Sets the option to determine what compiler to use.
-     * 
+     *
      * @see Options#getCompiler()
      */
     public void setCompiler(String c) {
@@ -672,7 +672,7 @@ public class JspC implements Options {
 
     /**
      * Sets the compiler target VM.
-     * 
+     *
      * @see Options#getCompilerTargetVM()
      */
     public void setCompilerTargetVM(String vm) {
@@ -689,7 +689,7 @@ public class JspC implements Options {
 
      /**
       * Sets the compiler source VM.
-      * 
+      *
       * @see Options#getCompilerSourceVM()
       */
     public void setCompilerSourceVM(String vm) {
@@ -906,11 +906,11 @@ public class JspC implements Options {
 
     /**
      * Sets the encoding to be used to read and write web.xml files.
-     * 
+     *
      * <p>
      * If not specified, defaults to the platform default encoding.
      * </p>
-     * 
+     *
      * @param encoding
      *            Encoding, e.g. "UTF-8".
      */
@@ -921,7 +921,7 @@ public class JspC implements Options {
     /**
      * Sets the option to merge generated web.xml fragment into the
      * WEB-INF/web.xml file of the web application that we were processing.
-     * 
+     *
      * @param b
      *            <code>true</code> to merge the fragment into the existing
      *            web.xml file of the processed web application
@@ -966,7 +966,7 @@ public class JspC implements Options {
     /**
      * Adds servlet declaration and mapping for the JSP page servlet to the
      * generated web.xml fragment.
-     * 
+     *
      * @param file
      *            Context-relative path to the JSP file, e.g.
      *            <code>/index.jsp</code>
@@ -1097,21 +1097,21 @@ public class JspC implements Options {
         if(!webXml2.delete() && log.isDebugEnabled())
             log.debug(Localizer.getMessage("jspc.delete.fail",
                     webXml2.toString()));
-        
+
         if (!(new File(webxmlFile)).delete() && log.isDebugEnabled())
             log.debug(Localizer.getMessage("jspc.delete.fail", webxmlFile));
 
     }
-    
+
     /*
      * Assumes valid xml
      */
     private String getElement(Reader reader) throws IOException {
         StringBuilder result = new StringBuilder();
         result.append('<');
-        
+
         boolean done = false;
-        
+
         while (!done) {
             int current = reader.read();
             while (current != '>') {
@@ -1122,7 +1122,7 @@ public class JspC implements Options {
                 current = reader.read();
             }
             result.append((char) current);
-            
+
             int len = result.length();
             if (len > 4 && result.substring(0, 4).equals("<!--")) {
                 // This is a comment - make sure we are at the end
@@ -1133,8 +1133,8 @@ public class JspC implements Options {
                 done = true;
             }
         }
-        
-        
+
+
         return result.toString();
     }
 

@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -73,7 +73,7 @@ class ParserController implements TagConstants {
      * Constructor
      */
     public ParserController(JspCompilationContext ctxt, Compiler compiler) {
-        this.ctxt = ctxt; 
+        this.ctxt = ctxt;
         this.compiler = compiler;
         this.err = compiler.getErrorDispatcher();
     }
@@ -94,7 +94,7 @@ class ParserController implements TagConstants {
     public Node.Nodes parse(String inFileName)
     throws FileNotFoundException, JasperException, IOException {
         // If we're parsing a packaged tag file or a resource included by it
-        // (using an include directive), ctxt.getTagFileJar() returns the 
+        // (using an include directive), ctxt.getTagFileJar() returns the
         // JAR file from which to read the tag file or included resource,
         // respectively.
         isTagFile = ctxt.isTagFile();
@@ -111,7 +111,7 @@ class ParserController implements TagConstants {
     public Node.Nodes parseDirectives(String inFileName)
     throws FileNotFoundException, JasperException, IOException {
         // If we're parsing a packaged tag file or a resource included by it
-        // (using an include directive), ctxt.getTagFileJar() returns the 
+        // (using an include directive), ctxt.getTagFileJar() returns the
         // JAR file from which to read the tag file or included resource,
         // respectively.
         isTagFile = ctxt.isTagFile();
@@ -139,7 +139,7 @@ class ParserController implements TagConstants {
     /**
      * Extracts tag file directive information from the given tag file.
      *
-     * This is invoked by the compiler 
+     * This is invoked by the compiler
      *
      * @param inFileName    The name of the tag file to be parsed.
      * @param jarResource The location of the tag file.
@@ -199,7 +199,7 @@ class ParserController implements TagConstants {
                 compiler.getPageInfo().addDependant(
                         jarResource.getEntry(entry).toString(),
                         Long.valueOf(jarFile.getEntry(entry).getTime()));
-                        
+
             }
         }
 
@@ -273,7 +273,7 @@ class ParserController implements TagConstants {
      *
      * @param absFileName The URI to match
      *
-     * @return The value of the <page-encoding> attribute of the 
+     * @return The value of the <page-encoding> attribute of the
      * jsp-property-group with matching URL pattern
      */
     private String getJspConfigPageEncoding(String absFileName)
@@ -354,7 +354,7 @@ class ParserController implements TagConstants {
                  * We need to be careful, because the page may be encoded in
                  * ISO-8859-1 (or something entirely different), and may
                  * contain byte sequences that will cause a UTF-8 converter to
-                 * throw exceptions. 
+                 * throw exceptions.
                  *
                  * It is safe to use a source encoding of ISO-8859-1 in this
                  * case, as there are no invalid byte sequences in ISO-8859-1,
@@ -376,11 +376,11 @@ class ParserController implements TagConstants {
 
         /*
          * At this point, 'isExternal' or 'isXml' is FALSE.
-         * Search for jsp:root action, in order to determine if we're dealing 
-         * with XML or standard syntax (unless we already know what we're 
+         * Search for jsp:root action, in order to determine if we're dealing
+         * with XML or standard syntax (unless we already know what we're
          * dealing with, i.e., when 'isExternal' is TRUE and 'isXml' is FALSE).
          * No check for XML prolog, since nothing prevents a page from
-         * outputting XML and still using JSP syntax (in this case, the 
+         * outputting XML and still using JSP syntax (in this case, the
          * XML prolog is treated as template text).
          */
         JspReader jspReader = null;
@@ -425,7 +425,7 @@ class ParserController implements TagConstants {
                 }
             }
         }
-        
+
     }
 
     /*
@@ -538,9 +538,9 @@ class ParserController implements TagConstants {
     private String resolveFileName(String inFileName) {
         String fileName = inFileName.replace('\\', '/');
         boolean isAbsolute = fileName.startsWith("/");
-        fileName = isAbsolute ? fileName 
+        fileName = isAbsolute ? fileName
                 : baseDirStack.peek() + fileName;
-        String baseDir = 
+        String baseDir =
             fileName.substring(0, fileName.lastIndexOf("/") + 1);
         baseDirStack.push(baseDir);
         return fileName;
@@ -601,7 +601,7 @@ class ParserController implements TagConstants {
                     && Character.isWhitespace(root.charAt(index))) {
                 index++;
             }
-            if (index < root.length() 
+            if (index < root.length()
                 && (root.charAt(index) == '"' || root.charAt(index) == '\'')) {
                 index++;
                 if (root.regionMatches(index, JSP_URI, 0, JSP_URI.length())) {

@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -42,7 +42,7 @@ import org.apache.jasper.servlet.JspServletWrapper;
 /**
  * 1. Processes and extracts the directive info in a tag file. 2. Compiles and
  * loads tag files used in a JSP file.
- * 
+ *
  * @author Kin-man Chung
  */
 
@@ -240,7 +240,7 @@ class TagFileProcessor {
             if (deferredMethod && deferredValue) {
                 err.jspError(n, "jsp.error.deferredmethodandvalue");
             }
-            
+
             String attrName = n.getAttributeValue("name");
             boolean required = JspUtil.booleanValue(n
                     .getAttributeValue("required"));
@@ -267,7 +267,7 @@ class TagFileProcessor {
             } else {
                 if (type == null)
                     type = "java.lang.String";
-                
+
                 if (deferredValue) {
                     type = ValueExpression.class.getName();
                 } else if (deferredMethod) {
@@ -280,7 +280,7 @@ class TagFileProcessor {
                             || deferredValueSpecified || deferredValue)) {
                 err.jspError("jsp.error.invalid.version", path);
             }
-            
+
             TagAttributeInfo tagAttributeInfo = new TagAttributeInfo(attrName,
                     required, type, rtexprvalue, fragment, null, deferredValue,
                     deferredMethod, deferredValueType, deferredMethodSignature);
@@ -407,14 +407,14 @@ class TagFileProcessor {
         /**
          * Reports a translation error if names specified in attributes of
          * directives are not unique in this translation unit.
-         * 
+         *
          * The value of the following attributes must be unique. 1. 'name'
          * attribute of an attribute directive 2. 'name-given' attribute of a
          * variable directive 3. 'alias' attribute of variable directive 4.
          * 'dynamic-attributes' of a tag directive except that
          * 'dynamic-attributes' can (and must) have the same value when it
          * appears in multiple tag directives.
-         * 
+         *
          * Also, 'name-from' attribute of a variable directive cannot have the
          * same value as that from another variable directive.
          */
@@ -475,7 +475,7 @@ class TagFileProcessor {
      * in it. The method is used to obtain the info on the tag file, when the
      * handler that it represents is referenced. The tag file is not compiled
      * here.
-     * 
+     *
      * @param pc
      *            the current ParserController used in this compilation
      * @param name
@@ -483,7 +483,7 @@ class TagFileProcessor {
      * @param path
      *            the path for the tagfile
      * @param jarResource
-     *            the Jar resource containing the tag file 
+     *            the Jar resource containing the tag file
      * @param tagLibInfo
      *            the TagLibraryInfo object associated with this TagInfo
      * @return a TagInfo object assembled from the directives in the tag file.
@@ -520,7 +520,7 @@ class TagFileProcessor {
 
         JarResource tagJarResouce = null;
         if (tagFilePath.startsWith("/META-INF/")) {
-            tagJarResouce = 
+            tagJarResouce =
                 compiler.getCompilationContext().getTldLocation(
                         tagInfo.getTagLibrary().getURI()).getJarResource();
         }
@@ -676,7 +676,7 @@ class TagFileProcessor {
     /**
      * Removed the java and class files for the tag prototype generated from the
      * current compilation.
-     * 
+     *
      * @param classFileName
      *            If non-null, remove only the class file with with this name.
      */

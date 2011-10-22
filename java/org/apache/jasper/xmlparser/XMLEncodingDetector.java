@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -40,7 +40,7 @@ import org.apache.jasper.compiler.JspUtil;
 import org.apache.jasper.compiler.Localizer;
 
 public class XMLEncodingDetector {
-    
+
     private InputStream stream;
     private String encoding;
     private boolean isEncodingSetInProlog;
@@ -48,7 +48,7 @@ public class XMLEncodingDetector {
     private int skip;
     private Boolean isBigEndian;
     private Reader reader;
-    
+
     // org.apache.xerces.impl.XMLEntityManager fields
     public static final int DEFAULT_BUFFER_SIZE = 2048;
     public static final int DEFAULT_XMLDECL_BUFFER_SIZE = 64;
@@ -56,7 +56,7 @@ public class XMLEncodingDetector {
     private SymbolTable fSymbolTable;
     private XMLEncodingDetector fCurrentEntity;
     private int fBufferSize = DEFAULT_BUFFER_SIZE;
-    
+
     // org.apache.xerces.impl.XMLEntityManager.ScannedEntity fields
     private int lineNumber = 1;
     private int columnNumber = 1;
@@ -65,15 +65,15 @@ public class XMLEncodingDetector {
     private int position;
     private int count;
     private boolean mayReadChunks = false;
-    
+
     // org.apache.xerces.impl.XMLScanner fields
-    private XMLString fString = new XMLString();    
+    private XMLString fString = new XMLString();
     private XMLStringBuffer fStringBuffer = new XMLStringBuffer();
     private XMLStringBuffer fStringBuffer2 = new XMLStringBuffer();
     private static final String fVersionSymbol = "version";
     private static final String fEncodingSymbol = "encoding";
     private static final String fStandaloneSymbol = "standalone";
-    
+
     // org.apache.xerces.impl.XMLDocumentFragmentScannerImpl fields
     private int fMarkupDepth = 0;
     private String[] fStrings = new String[3];
@@ -97,7 +97,7 @@ public class XMLEncodingDetector {
      *
      * @return Two-element array, where the first element (of type
      * java.lang.String) contains the name of the (auto)detected encoding, and
-     * the second element (of type java.lang.Boolean) specifies whether the 
+     * the second element (of type java.lang.Boolean) specifies whether the
      * encoding was specified using the 'encoding' attribute of an XML prolog
      * (TRUE) or autodetected (FALSE).
      */
@@ -128,11 +128,11 @@ public class XMLEncodingDetector {
                               Boolean.valueOf(this.isBomPresent),
                               Integer.valueOf(this.skip) };
     }
-    
+
     // stub method
     void endEntity() {
     }
-    
+
     // Adapted from:
     // org.apache.xerces.impl.XMLEntityManager.startEntity()
     private void createInitialReader() throws IOException, JasperException {
@@ -152,7 +152,7 @@ public class XMLEncodingDetector {
                 Object [] encodingDesc = getEncodingName(b4, count);
                 encoding = (String)(encodingDesc[0]);
                 isBigEndian = (Boolean)(encodingDesc[1]);
-        
+
                 if (encodingDesc.length > 3) {
                     isBomPresent = ((Boolean)(encodingDesc[2])).booleanValue();
                     skip = ((Integer)(encodingDesc[3])).intValue();
@@ -388,12 +388,12 @@ public class XMLEncodingDetector {
      * @throws EOFException Thrown on end of file.
      */
     public int peekChar() throws IOException {
-        
+
         // load more characters, if needed
         if (fCurrentEntity.position == fCurrentEntity.count) {
             load(0, true);
         }
-        
+
         // peek at character
         int c = fCurrentEntity.ch[fCurrentEntity.position];
 
@@ -404,9 +404,9 @@ public class XMLEncodingDetector {
         else {
             return c;
         }
-        
+
     } // peekChar():int
-    
+
     // Adapted from:
     // org.apache.xerces.impl.XMLEntityManager.EntityScanner.scanChar
     /**
@@ -446,7 +446,7 @@ public class XMLEncodingDetector {
         // return character that was scanned
         fCurrentEntity.columnNumber++;
         return c;
-        
+
     }
 
     // Adapted from:
@@ -468,12 +468,12 @@ public class XMLEncodingDetector {
      * @see XMLChar#isNameStart
      */
     public String scanName() throws IOException {
-        
+
         // load more characters, if needed
         if (fCurrentEntity.position == fCurrentEntity.count) {
             load(0, true);
         }
-        
+
         // scan name
         int offset = fCurrentEntity.position;
         if (XMLChar.isNameStart(fCurrentEntity.ch[offset])) {
@@ -517,7 +517,7 @@ public class XMLEncodingDetector {
             symbol = fSymbolTable.addSymbol(fCurrentEntity.ch, offset, length);
         }
         return symbol;
-        
+
     }
 
     // Adapted from:
@@ -694,9 +694,9 @@ public class XMLEncodingDetector {
         char charAt0 = delimiter.charAt(0);
         boolean external = fCurrentEntity.isExternal();
         do {
-    
+
             // load more characters, if needed
-    
+
             if (fCurrentEntity.position == fCurrentEntity.count) {
                 load(0, true);
             }
@@ -705,19 +705,19 @@ public class XMLEncodingDetector {
                                  fCurrentEntity.ch, 0, fCurrentEntity.count - fCurrentEntity.position);
                 load(fCurrentEntity.count - fCurrentEntity.position, false);
                 fCurrentEntity.position = 0;
-            } 
+            }
             if (fCurrentEntity.position >= fCurrentEntity.count - delimLen) {
                 // something must be wrong with the input: e.g., file ends an
                 // unterminated comment
                 int length = fCurrentEntity.count - fCurrentEntity.position;
                 buffer.append (fCurrentEntity.ch, fCurrentEntity.position,
-                               length); 
+                               length);
                 fCurrentEntity.columnNumber += fCurrentEntity.count;
                 fCurrentEntity.position = fCurrentEntity.count;
                 load(0,true);
                 return false;
             }
-    
+
             // normalize newlines
             int offset = fCurrentEntity.position;
             int c = fCurrentEntity.ch[offset];
@@ -772,7 +772,7 @@ public class XMLEncodingDetector {
                     return true;
                 }
             }
-    
+
             // iterate over buffer looking for delimiter
         OUTER: while (fCurrentEntity.position < fCurrentEntity.count) {
             c = fCurrentEntity.ch[fCurrentEntity.position++];
@@ -803,7 +803,7 @@ public class XMLEncodingDetector {
                 fCurrentEntity.position--;
                 int length = fCurrentEntity.position - offset;
                 fCurrentEntity.columnNumber += length - newlines;
-                buffer.append(fCurrentEntity.ch, offset, length); 
+                buffer.append(fCurrentEntity.ch, offset, length);
                 return true;
             }
         }
@@ -813,7 +813,7 @@ public class XMLEncodingDetector {
                 length -= delimLen;
             }
             buffer.append (fCurrentEntity.ch, offset, length);
-    
+
             // return true if string was skipped
         } while (!done);
         return !done;
@@ -1243,7 +1243,7 @@ public class XMLEncodingDetector {
             }
         }
     }
-    
+
     // Adapted from:
     // org.apache.xerces.impl.XMLDocumentFragmentScannerImpl.scanXMLDeclOrTextDecl
     /**
@@ -1264,7 +1264,7 @@ public class XMLEncodingDetector {
      *                         be scanned instead of an XML
      *                         declaration.
      */
-    private void scanXMLDeclOrTextDecl(boolean scanningTextDecl) 
+    private void scanXMLDeclOrTextDecl(boolean scanningTextDecl)
         throws IOException, JasperException {
 
         // scan decl
@@ -1308,7 +1308,7 @@ public class XMLEncodingDetector {
      * at the time of calling is lost.
      */
     private void scanXMLDeclOrTextDecl(boolean scanningTextDecl,
-                                       String[] pseudoAttributeValues) 
+                                       String[] pseudoAttributeValues)
                 throws IOException, JasperException {
 
         // pseudo-attribute values
@@ -1419,7 +1419,7 @@ public class XMLEncodingDetector {
         if (scanningTextDecl && state != STATE_DONE) {
             err.jspError("jsp.error.xml.morePseudoAttributes");
         }
-        
+
         // If there is no data in the xml or text decl then we fail to report
         // error for version or encoding info above.
         if (scanningTextDecl) {
@@ -1440,7 +1440,7 @@ public class XMLEncodingDetector {
             err.jspError("jsp.error.xml.xmlDeclUnterminated");
 
         }
-        
+
         // fill in return array
         pseudoAttributeValues[0] = version;
         pseudoAttributeValues[1] = encoding;
@@ -1453,10 +1453,10 @@ public class XMLEncodingDetector {
      * Scans a pseudo attribute.
      *
      * @param scanningTextDecl True if scanning this pseudo-attribute for a
-     *                         TextDecl; false if scanning XMLDecl. This 
+     *                         TextDecl; false if scanning XMLDecl. This
      *                         flag is needed to report the correct type of
      *                         error.
-     * @param value            The string to fill in with the attribute 
+     * @param value            The string to fill in with the attribute
      *                         value.
      *
      * @return The name of the attribute
@@ -1464,8 +1464,8 @@ public class XMLEncodingDetector {
      * <strong>Note:</strong> This method uses fStringBuffer2, anything in it
      * at the time of calling is lost.
      */
-    public String scanPseudoAttribute(boolean scanningTextDecl, 
-                                      XMLString value) 
+    public String scanPseudoAttribute(boolean scanningTextDecl,
+                                      XMLString value)
                 throws IOException, JasperException {
 
         String name = scanName();
@@ -1524,12 +1524,12 @@ public class XMLEncodingDetector {
         return name;
 
     }
-    
+
     // Adapted from:
     // org.apache.xerces.impl.XMLScanner.scanPIData
     /**
      * Scans a processing data. This is needed to handle the situation
-     * where a document starts with a processing instruction whose 
+     * where a document starts with a processing instruction whose
      * target name <em>starts with</em> "xml". (e.g. xmlfoo)
      *
      * <strong>Note:</strong> This method uses fStringBuffer, anything in it
@@ -1538,7 +1538,7 @@ public class XMLEncodingDetector {
      * @param target The PI target
      * @param data The string to fill in with the data
      */
-    private void scanPIData(String target, XMLString data) 
+    private void scanPIData(String target, XMLString data)
         throws IOException, JasperException {
 
         // check target
@@ -1613,7 +1613,7 @@ public class XMLEncodingDetector {
         // supplemental character must be a valid XML character
         if (!XMLChar.isValid(c)) {
             err.jspError("jsp.error.xml.invalidCharInContent",
-                         Integer.toString(c, 16)); 
+                         Integer.toString(c, 16));
             return false;
         }
 

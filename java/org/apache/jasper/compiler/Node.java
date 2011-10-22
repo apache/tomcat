@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -46,7 +46,7 @@ import org.xml.sax.Attributes;
 /**
  * An internal data representation of a JSP page or a JSP document (XML). Also
  * included here is a visitor class for traversing nodes.
- * 
+ *
  * @author Kin-man Chung
  * @author Jan Luehe
  * @author Shawn Bayern
@@ -104,7 +104,7 @@ abstract class Node implements TagConstants {
 
     /**
      * Constructor.
-     * 
+     *
      * @param start
      *            The location of the jsp page
      * @param parent
@@ -118,7 +118,7 @@ abstract class Node implements TagConstants {
 
     /**
      * Constructor for Nodes parsed from standard syntax.
-     * 
+     *
      * @param qName
      *            The action's qualified name
      * @param localName
@@ -142,7 +142,7 @@ abstract class Node implements TagConstants {
 
     /**
      * Constructor for Nodes parsed from XML syntax.
-     * 
+     *
      * @param qName
      *            The action's qualified name
      * @param localName
@@ -174,7 +174,7 @@ abstract class Node implements TagConstants {
 
     /*
      * Constructor.
-     * 
+     *
      * @param qName The action's qualified name @param localName The action's
      * local name @param text The text associated with this node @param start
      * The location of the jsp page @param parent The enclosing node
@@ -199,10 +199,10 @@ abstract class Node implements TagConstants {
 
     /*
      * Gets this Node's attributes.
-     * 
+     *
      * In the case of a Node parsed from standard syntax, this method returns
      * all the Node's attributes.
-     * 
+     *
      * In the case of a Node parsed from XML syntax, this method returns only
      * those attributes whose name does not start with xmlns.
      */
@@ -289,7 +289,7 @@ abstract class Node implements TagConstants {
     /**
      * Searches all subnodes of this node for jsp:attribute standard actions,
      * and returns that set of nodes as a Node.Nodes object.
-     * 
+     *
      * @return Possibly empty Node.Nodes object containing any jsp:attribute
      *         subnodes of this Node
      */
@@ -380,7 +380,7 @@ abstract class Node implements TagConstants {
     /**
      * Selects and invokes a method in the visitor class based on the node type.
      * This is abstract and should be overrode by the extending classes.
-     * 
+     *
      * @param v
      *            The visitor class
      */
@@ -426,7 +426,7 @@ abstract class Node implements TagConstants {
         /*
          * Flag indicating if the default page encoding is being used (only
          * applicable with standard syntax).
-         * 
+         *
          * True if the page does not provide a page directive with a
          * 'contentType' attribute (or the 'contentType' attribute doesn't have
          * a CHARSET value), the page does not provide a page directive with a
@@ -534,7 +534,7 @@ abstract class Node implements TagConstants {
         public Root getParentRoot() {
             return parentRoot;
         }
-        
+
         /**
          * Generates a new temporary variable name.
          */
@@ -544,7 +544,7 @@ abstract class Node implements TagConstants {
             } else {
                 return parentRoot.nextTemporaryVariableName();
             }
-            
+
         }
     }
 
@@ -594,7 +594,7 @@ abstract class Node implements TagConstants {
          * Parses the comma-separated list of class or package names in the
          * given attribute value and adds each component to this PageDirective's
          * vector of imported classes and packages.
-         * 
+         *
          * @param value
          *            A comma-separated string of imports.
          */
@@ -683,7 +683,7 @@ abstract class Node implements TagConstants {
          * Parses the comma-separated list of class or package names in the
          * given attribute value and adds each component to this PageDirective's
          * vector of imported classes and packages.
-         * 
+         *
          * @param value
          *            A comma-separated string of imports.
          */
@@ -834,7 +834,7 @@ abstract class Node implements TagConstants {
          * was stored as a String in the "text" field, whereas when this node
          * was created from a JSP document, its text was stored as one or more
          * TemplateText nodes in its body. This method handles either case.
-         * 
+         *
          * @return The text string
          */
         @Override
@@ -1755,13 +1755,13 @@ abstract class Node implements TagConstants {
         /*
          * Computes this custom tag's custom nesting level, which corresponds to
          * the number of times this custom tag is nested inside itself.
-         * 
+         *
          * Example:
-         * 
+         *
          * <g:h> <a:b> -- nesting level 0 <c:d> <e:f> <a:b> -- nesting level 1
          * <a:b> -- nesting level 2 </a:b> </a:b> <a:b> -- nesting level 1
          * </a:b> </e:f> </c:d> </a:b> </g:h>
-         * 
+         *
          * @return Custom tag's nesting level
          */
         private int makeCustomNestingLevel() {
@@ -1780,7 +1780,7 @@ abstract class Node implements TagConstants {
         /**
          * Returns true if this custom action has an empty body, and false
          * otherwise.
-         * 
+         *
          * A custom action is considered to have an empty body if the following
          * holds true: - getBody() returns null, or - all immediate children are
          * jsp:attribute actions, or - the action's jsp:body is empty.
@@ -1932,7 +1932,7 @@ abstract class Node implements TagConstants {
         public void setOmit(JspAttribute omit) {
             this.omit = omit;
         }
-        
+
         public JspAttribute getOmit() {
             return omit;
         }
@@ -2072,7 +2072,7 @@ abstract class Node implements TagConstants {
 
         /**
          * Add a source to Java line mapping
-         * 
+         *
          * @param srcLine
          *            The position of the source line, relative to the line at
          *            the start of this node. The corresponding java line is
@@ -2096,7 +2096,7 @@ abstract class Node implements TagConstants {
 
     /**
      * Represents attributes that can be request time expressions.
-     * 
+     *
      * Can either be a plain attribute, an attribute that represents a request
      * time expression value, or a named attribute (specified using the
      * jsp:attribute standard action).
@@ -2143,7 +2143,7 @@ abstract class Node implements TagConstants {
 
         /**
          * Allow node to validate itself
-         * 
+         *
          * @param ef
          * @param ctx
          * @throws ELException
@@ -2200,7 +2200,7 @@ abstract class Node implements TagConstants {
         }
 
         /**
-         * 
+         *
          * @return return true if there's TagAttributeInfo meaning we need to
          *         assign a ValueExpression
          */
@@ -2209,7 +2209,7 @@ abstract class Node implements TagConstants {
         }
 
         /**
-         * 
+         *
          * @return return true if there's TagAttributeInfo meaning we need to
          *         assign a MethodExpression
          */
@@ -2233,7 +2233,7 @@ abstract class Node implements TagConstants {
             }
             return "java.lang.Object";
         }
-        
+
         public String[] getParameterTypeNames() {
             if (this.tai != null) {
                 if (this.isDeferredMethodInput()) {
@@ -2257,7 +2257,7 @@ abstract class Node implements TagConstants {
 
         /**
          * Only makes sense if namedAttribute is false.
-         * 
+         *
          * @return the value for the attribute, or the expression string
          *         (stripped of "<%=", "%>", "%=", or "%" but containing "${"
          *         and "}" for EL expressions)
@@ -2268,7 +2268,7 @@ abstract class Node implements TagConstants {
 
         /**
          * Only makes sense if namedAttribute is true.
-         * 
+         *
          * @return the nodes that evaluate to the body of this attribute.
          */
         public NamedAttribute getNamedAttributeNode() {
@@ -2344,7 +2344,7 @@ abstract class Node implements TagConstants {
 
         /**
          * Appends a node to the list
-         * 
+         *
          * @param n
          *            The node to add
          */
@@ -2355,7 +2355,7 @@ abstract class Node implements TagConstants {
 
         /**
          * Removes the given node from the list.
-         * 
+         *
          * @param n
          *            The node to be removed
          */
@@ -2365,7 +2365,7 @@ abstract class Node implements TagConstants {
 
         /**
          * Visit the nodes in the list with the supplied visitor
-         * 
+         *
          * @param v
          *            The visitor used
          */

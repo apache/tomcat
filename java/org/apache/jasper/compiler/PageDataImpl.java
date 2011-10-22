@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -142,7 +142,7 @@ class PageDataImpl extends PageData implements TagConstants {
                      * 'jsp' prefix has been hijacked, that is, bound to a
                      * namespace other than the JSP namespace. This means that
                      * when adding an 'id' attribute to each element, we can't
-                     * use the 'jsp' prefix. Therefore, create a new prefix 
+                     * use the 'jsp' prefix. Therefore, create a new prefix
                      * (one that is unique across the translation unit) for use
                      * by the 'id' attribute, and bind it to the JSP namespace
                      */
@@ -342,7 +342,7 @@ class PageDataImpl extends PageData implements TagConstants {
     public void visit(Node.IncludeAction n) throws JasperException {
             appendTag(n);
         }
-    
+
         @Override
     public void visit(Node.ForwardAction n) throws JasperException {
             appendTag(n);
@@ -377,7 +377,7 @@ class PageDataImpl extends PageData implements TagConstants {
     public void visit(Node.UseBean n) throws JasperException {
             appendTag(n);
         }
-        
+
         @Override
     public void visit(Node.PlugIn n) throws JasperException {
             appendTag(n);
@@ -387,7 +387,7 @@ class PageDataImpl extends PageData implements TagConstants {
         public void visit(Node.NamedAttribute n) throws JasperException {
             appendTag(n);
         }
-        
+
         @Override
         public void visit(Node.JspBody n) throws JasperException {
             appendTag(n);
@@ -436,7 +436,7 @@ class PageDataImpl extends PageData implements TagConstants {
     public void visit(Node.VariableDirective n) throws JasperException {
             appendTag(n);
         }
-        
+
         @Override
     public void visit(Node.TemplateText n) throws JasperException {
             /*
@@ -585,7 +585,7 @@ class PageDataImpl extends PageData implements TagConstants {
             buf.append("  ").append("pageEncoding").append("=\"UTF-8\"\n");
             buf.append("  ").append("contentType").append("=\"");
             buf.append(compiler.getPageInfo().getContentType()).append("\"\n");
-            buf.append("/>\n");            
+            buf.append("/>\n");
         }
 
         /*
@@ -629,7 +629,7 @@ class PageDataImpl extends PageData implements TagConstants {
             buf.append("  ").append(jspIdPrefix).append(":id").append("=\"");
             buf.append(jspId++).append("\"\n");
             buf.append("  ").append("pageEncoding").append("=\"UTF-8\"\n");
-            buf.append("/>\n");            
+            buf.append("/>\n");
         }
 
         private void appendText(String text, boolean createJspTextElement) {
@@ -649,7 +649,7 @@ class PageDataImpl extends PageData implements TagConstants {
                 appendCDATA(text);
             }
         }
-        
+
         /*
          * Appends the given text as a CDATA section to the XML view, unless
          * the text has already been marked as CDATA.

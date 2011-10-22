@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -27,7 +27,7 @@ import org.apache.jasper.compiler.TagPluginManager;
 import org.apache.jasper.compiler.TldLocationsCache;
 
 /**
- * A class to hold all init parameters specific to the JSP engine. 
+ * A class to hold all init parameters specific to the JSP engine.
  *
  * @author Anil K. Vijendran
  * @author Hans Bergsten
@@ -116,7 +116,7 @@ public interface Options {
 
     /**
      * Compiler to use.
-     * 
+     *
      * <p>
      * If <code>null</code> (the default), the java compiler from Eclipse JDT
      * project, bundled with Tomcat, will be used. Otherwise, the
@@ -134,19 +134,19 @@ public interface Options {
     /**
      * The compiler source VM, e.g. 1.3, 1.4, 1.5 or 1.6.
      */
-    public String getCompilerSourceVM();   
+    public String getCompilerSourceVM();
 
     /**
      * Jasper Java compiler class to use.
      */
-    public String getCompilerClassName();   
+    public String getCompilerClassName();
 
     /**
      * The cache for the location of the TLD's
      * for the various tag libraries 'exposed'
      * by the web application.
-     * A tag library is 'exposed' either explicitly in 
-     * web.xml or implicitly via the uri tag in the TLD 
+     * A tag library is 'exposed' either explicitly in
+     * web.xml or implicitly via the uri tag in the TLD
      * of a taglib deployed in a jar file (WEB-INF/lib).
      *
      * @return the instance of the TldLocationsCache
@@ -162,7 +162,7 @@ public interface Options {
 
     /**
      * The boolean flag to tell Ant whether to fork JSP page compilations.
-     * 
+     *
      * <p>
      * Is used only when Jasper uses an external java compiler (wrapped through
      * a <code>javac</code> Apache Ant task).
@@ -170,7 +170,7 @@ public interface Options {
     public boolean getFork();
 
     /**
-     * Obtain JSP configuration information specified in web.xml.  
+     * Obtain JSP configuration information specified in web.xml.
      */
     public JspConfig getJspConfig();
 
@@ -186,48 +186,48 @@ public interface Options {
 
     /**
      * Indicates whether text strings are to be generated as char arrays.
-     * 
+     *
      * @return <code>true</code> if text strings are to be generated as char
      *         arrays, <code>false</code> otherwise
      */
     public boolean genStringAsCharArray();
-    
+
     /**
      * Modification test interval.
      */
     public int getModificationTestInterval();
-    
+
 
     /**
      * Re-compile on failure.
      */
     public boolean getRecompileOnFail();
-    
+
     /**
      * Is caching enabled (used for precompilation).
      */
     public boolean isCaching();
-    
+
     /**
      * The web-application wide cache for the TagLibraryInfo tag library
      * descriptors, used if {@link #isCaching()} returns <code>true</code>.
-     * 
+     *
      * <p>
      * Using this cache avoids the cost of repeating the parsing of a tag
      * library descriptor XML file (performed by TagLibraryInfoImpl.parseTLD).
      * </p>
-     * 
+     *
      * @return the Map(String uri, TagLibraryInfo tld) instance.
      */
     public Map<String, TagLibraryInfo> getCache();
-    
+
     /**
      * The maximum number of loaded jsps per web-application. If there are more
      * jsps loaded, they will be unloaded. If unset or less than 0, no jsps
      * are unloaded.
      */
     public int getMaxLoadedJsps();
-    
+
     /**
      * The idle time in seconds after which a JSP is unloaded.
      * If unset or less or equal than 0, no jsps are unloaded.

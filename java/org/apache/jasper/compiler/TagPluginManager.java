@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -68,7 +68,7 @@ public class TagPluginManager {
         });
 
     }
- 
+
     private void init(ErrorDispatcher err) throws JasperException {
         if (initialized)
             return;
@@ -121,7 +121,7 @@ public class TagPluginManager {
     }
 
     /**
-     * Invoke tag plugin for the given custom tag, if a plugin exists for 
+     * Invoke tag plugin for the given custom tag, if a plugin exists for
      * the custom tag's tag handler.
      *
      * The given custom tag node will be manipulated by the plugin.
@@ -237,7 +237,7 @@ public class TagPluginManager {
 
         @Override
         public void generateBody() {
-            // Since we'll generate the body anyway, this is really a nop, 
+            // Since we'll generate the body anyway, this is really a nop,
             // except for the fact that it lets us put the Java sources the
             // plugins produce in the correct order (w.r.t the body).
             curNodes = node.getAtETag();
