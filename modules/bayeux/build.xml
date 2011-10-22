@@ -109,7 +109,7 @@
       <include name="org/apache/tomcat/bayeux/**" />
       <include name="org/apache/cometd/**" />
     </javac>
-    
+
     <!-- Cometd API JAR File -->
     <jar jarfile="${cometd-api.jar}">
       <fileset dir="${tomcat.classes}">
@@ -138,7 +138,7 @@
       <include name="org/apache/tomcat/bayeux/**" />
       <include name="org/apache/cometd/**" />
     </javac>
-    
+
     <!-- Cometd samples JAR File -->
     <jar jarfile="${tomcat-bayeux-samples.jar}">
       <fileset dir="${tomcat.classes}">
@@ -147,7 +147,7 @@
         <include name="org/apache/cometd/bayeux/samples/**" />
       </fileset>
     </jar>
-    
+
     <!-- build samples webapplication /cometd -->
   	<property name="cometd-app" value="${base.path}/cometd"/>
   	<mkdir dir="${cometd-app}"/>
@@ -178,10 +178,10 @@
     <checksum file="${cometd.war}" forceOverwrite="yes" fileext=".md5" />
     <checksum file="${tomcat.extras}/${json-lib.jar}" forceOverwrite="yes" fileext=".md5" />
   	
-  	<!-- print out how to --> 
+  	<!-- print out how to -->
     <echo>You've built the Tomcat Bayeux libraries, simply add the following libraries to your CATALINA_HOME/lib directory:
           ${cometd-api.jar}
-          ${tomcat-bayeux.jar} 
+          ${tomcat-bayeux.jar}
           ${tomcat.extras}/${json-lib.jar}
 To run the sample application, copy the following applications into your CATALINA_BASE/webapps directory
           ${cometd.war}

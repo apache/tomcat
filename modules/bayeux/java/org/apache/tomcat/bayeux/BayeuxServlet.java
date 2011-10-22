@@ -34,7 +34,7 @@ import org.json.JSONObject;
 import org.apache.cometd.bayeux.Bayeux;
 
 /**
- * 
+ *
  * @author Filip Hanik
  * @author Guy Molinari
  * @version 1.0
@@ -45,7 +45,7 @@ public class BayeuxServlet implements CometProcessor {
      * Attribute to hold the TomcatBayeux object in the servlet context
      */
     public static final String TOMCAT_BAYEUX_ATTR = Bayeux.DOJOX_COMETD_BAYEUX;
-    
+
     /**
      * Logger object
      */
@@ -55,14 +55,14 @@ public class BayeuxServlet implements CometProcessor {
      * Servlet config - for future use
      */
     protected ServletConfig servletConfig;
-    
+
     /**
      * Reference to the global TomcatBayeux object
      */
     protected TomcatBayeux tb;
-    
+
     /**
-     * Upon servlet destruction, the servlet will clean up the 
+     * Upon servlet destruction, the servlet will clean up the
      * TomcatBayeux object and terminate any outstanding events.
      */
     public void destroy() {
@@ -70,9 +70,9 @@ public class BayeuxServlet implements CometProcessor {
         //to do, close all outstanding comet events
         //tb.destroy();
         tb = null;//TO DO, close everything down
-        
+
     }
-    
+
     /**
      * Returns the preconfigured connection timeout.
      * If no timeout has been configured as a servlet init parameter named <code>timeout</code>
@@ -89,7 +89,7 @@ public class BayeuxServlet implements CometProcessor {
         }
         return timeout;
     }
-    
+
     protected int getReconnectInterval() {
         String rs = servletConfig.getInitParameter("reconnectInterval");
         int rct = 1000; //1 seconds
@@ -121,12 +121,12 @@ public class BayeuxServlet implements CometProcessor {
                 tb.remove(cometEvent);
                 cometEvent.close();
             }//end if
-            
+
         }//synchronized
     }//event
 
     /**
-     * 
+     *
      * @param cometEvent CometEvent
      * @return boolean - true if we comet event stays open
      * @throws IOException
@@ -134,7 +134,7 @@ public class BayeuxServlet implements CometProcessor {
      */
     protected void checkBayeux(CometEvent cometEvent) throws IOException, UnsupportedOperationException {
         //we actually have data.
-        //data can be text/json or 
+        //data can be text/json or
         if (Bayeux.JSON_CONTENT_TYPE.equals(cometEvent.getHttpServletRequest().getContentType())) {
             //read and decode the bytes according to content length
             log.warn("["+Thread.currentThread().getName()+"] JSON encoding not supported, will throw an exception and abort the request.");
@@ -161,7 +161,7 @@ public class BayeuxServlet implements CometProcessor {
             }
         }
     }
-    
+
     protected int handleBayeux(String message, CometEvent event) throws IOException, ServletException {
         int result = 0;
         if (message==null || message.length()==0) return result;
@@ -171,7 +171,7 @@ public class BayeuxServlet implements CometProcessor {
             JSONArray jsArray = new JSONArray(message);
             for (int i = 0; i < jsArray.length(); i++) {
                 JSONObject msg = jsArray.getJSONObject(i);
-                
+
                 if (log.isDebugEnabled()) {
                     log.debug("["+Thread.currentThread().getName()+"] Processing bayeux message:"+msg);
                 }
@@ -197,7 +197,7 @@ public class BayeuxServlet implements CometProcessor {
                     log.debug("["+Thread.currentThread().getName()+"] Done bayeux message, delivered to client");
                 }
             }
-            
+
         }catch (JSONException x) {
             log.error(x);//to do impl error handling
             result = -1;
@@ -217,7 +217,7 @@ public class BayeuxServlet implements CometProcessor {
     }
 
     public void init(ServletConfig servletConfig) throws ServletException {
-        
+
         this.servletConfig = servletConfig;
         ServletContext ctx = servletConfig.getServletContext();
         if (ctx.getAttribute(TOMCAT_BAYEUX_ATTR)==null)

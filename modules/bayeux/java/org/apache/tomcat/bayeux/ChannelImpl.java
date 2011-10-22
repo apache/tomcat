@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -28,34 +28,34 @@ import java.util.Iterator;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 /**
- * 
+ *
  * @author Filip Hanik
  * @version 1.0
  */
 public class ChannelImpl implements Channel {
-    
+
     private static final Log log = LogFactory.getLog(ChannelImpl.class);
-    
+
     /**
      * The unique id of this channel
      */
     protected String id = null;
-    
+
     /**
      * A list of the current subscribers
      */
     protected LinkedList<Client> subscribers = new LinkedList<Client>();
-    
+
     /**
      * A list of the current filters
      */
     protected LinkedList<DataFilter> filters = new LinkedList<DataFilter>();
-    
+
     /**
      * Is this channel persistent, default value is true
      */
-    protected boolean persistent = true; 
-    
+    protected boolean persistent = true;
+
     /**
      * Creates a new channel
      * @param id String - the id of the channel, can not be null
@@ -72,7 +72,7 @@ public class ChannelImpl implements Channel {
     public String getId() {
         return id;
     }
-    
+
     /**
      * Returns true if this channel matches the pattern to its id.
      * The channel pattern can be a complete name like <code>/service/mychannel</code>
@@ -92,7 +92,7 @@ public class ChannelImpl implements Channel {
         String leadSubstring = pattern.substring(0, wildcardPos);
         if (leadSubstring == null)
             return false;
-        if (multiSegment) 
+        if (multiSegment)
             return getId().startsWith(leadSubstring);
         else {
             if (getId().length() <= wildcardPos + 2)
@@ -116,7 +116,7 @@ public class ChannelImpl implements Channel {
     public boolean isPersistent() {
         return persistent;
     }
-    
+
     public void publish(Message msg) {
         publish(new Message[] {msg});
     }
@@ -127,7 +127,7 @@ public class ChannelImpl implements Channel {
         for (int i=0; msgs!=null && i<msgs.length; i++) {
             Message data = msgs[i];
 
-            if (!(data instanceof MessageImpl)) 
+            if (!(data instanceof MessageImpl))
                 throw new IllegalArgumentException("Invalid message class, you can only publish messages "+
                                                    "created through the Bayeux.newMessage() method");
             if (log.isDebugEnabled()) {
@@ -148,7 +148,7 @@ public class ChannelImpl implements Channel {
             ClientImpl c = (ClientImpl)it.next();
             c.deliverInternal(this,imsgs);
         }
-        
+
     }
 
     public void setPersistent(boolean persistent) {
@@ -156,7 +156,7 @@ public class ChannelImpl implements Channel {
     }
 
     public void subscribe(Client subscriber) {
-        if (!subscribers.contains((subscriber))) { 
+        if (!subscribers.contains((subscriber))) {
             subscribers.addLast(subscriber);
             ((ClientImpl)subscriber).subscribed(this);
         }
@@ -169,9 +169,9 @@ public class ChannelImpl implements Channel {
         } else
             return null;
     }
-    
+
     public void addFilter(DataFilter filter) {
-        if (!filters.contains(filter)) 
+        if (!filters.contains(filter))
             filters.addLast(filter);
     }
 
@@ -179,7 +179,7 @@ public class ChannelImpl implements Channel {
         if ( filters.remove(filter) ) return filter;
         else return null;
     }
-    
+
     public String toString() {
         StringBuilder buf = new StringBuilder(super.toString());
         buf.append("; channelId=").append(getId());

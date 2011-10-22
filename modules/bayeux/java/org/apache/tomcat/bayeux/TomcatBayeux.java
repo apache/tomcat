@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -30,24 +30,24 @@ import org.apache.cometd.bayeux.Listener;
 import org.apache.cometd.bayeux.Message;
 import org.apache.cometd.bayeux.SecurityPolicy;
 /**
- * 
+ *
  * @author Filip Hanik
  * @version 1.0
  */
 public class TomcatBayeux implements Bayeux {
-    
+
 
     protected int reconnectInterval = 5000;
     /**
      * a list of all active clients
      */
     protected HashMap<String,Client> clients = new HashMap<String,Client>();
-    
+
     /**
      * a list of all active channels
      */
     protected LinkedHashMap<String, Channel> channels = new LinkedHashMap<String,Channel>();
-    
+
     /**
      * security policy to be used.
      */
@@ -56,7 +56,7 @@ public class TomcatBayeux implements Bayeux {
      * default client to use when we need to send an error message but don't have a client valid reference
      */
     protected static ClientImpl errorClient = new ClientImpl("error-no-client",false);
-    
+
     /**
      * returns the default error client
      * @return ClientImpl
@@ -64,10 +64,10 @@ public class TomcatBayeux implements Bayeux {
     public static ClientImpl getErrorClient() {
         return errorClient;
     }
-    
+
     protected TomcatBayeux() {
     }
-    
+
     /**
      * should be invoked when the servlet is destroyed or when the context shuts down
      */
@@ -83,11 +83,11 @@ public class TomcatBayeux implements Bayeux {
         }
         return result;
     }
-    
+
     public Channel remove(Channel channel) {
         return channels.remove(channel.getId());
     }
-    
+
     public Client remove(Client client) {
         if (client==null) return null;
         for (Channel ch : getChannels()) {
@@ -99,11 +99,11 @@ public class TomcatBayeux implements Bayeux {
     public Client getClient(String clientId) {
         return clients.get(clientId);
     }
-    
+
     public boolean hasClient(String clientId) {
         return clients.containsKey(clientId);
     }
-    
+
     public List<Client> getClients() {
         return java.util.Arrays.asList(clients.values().toArray(new Client[0]));
     }
@@ -112,7 +112,7 @@ public class TomcatBayeux implements Bayeux {
         return securityPolicy;
     }
 
-    public int getReconnectInterval() { 
+    public int getReconnectInterval() {
         return reconnectInterval;
     }
 
@@ -134,11 +134,11 @@ public class TomcatBayeux implements Bayeux {
         //the JVM, this is a local client
         return newClient(idprefix,listener,true, null);
     }
-    
+
     protected ClientImpl getClientImpl(CometEvent event) {
         return (ClientImpl)event.getHttpServletRequest().getAttribute(ClientImpl.COMET_EVENT_ATTR);
     }
-    
+
     protected void remove(CometEvent event) {
         ClientImpl client = getClientImpl(event);
         if (client!=null) {
@@ -150,7 +150,7 @@ public class TomcatBayeux implements Bayeux {
         if (idprefix==null) idprefix="";
         return idprefix + Arrays.toString(UUIDGenerator.randomUUID(false));
     }
-    
+
     public List<Channel> getChannels() {
         return java.util.Arrays.asList(channels.entrySet().toArray(new Channel[0]));
     }

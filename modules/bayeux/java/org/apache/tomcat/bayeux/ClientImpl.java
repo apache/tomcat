@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -35,12 +35,12 @@ import java.util.HashMap;
 import java.util.ArrayList;
 
 public class ClientImpl implements Client {
-    
+
     public static final int SUPPORT_CALLBACK_POLL = 0x1;
-    public static final int SUPPORT_LONG_POLL = 0x2; 
+    public static final int SUPPORT_LONG_POLL = 0x2;
 
     public static final String COMET_EVENT_ATTR = "org.apache.cometd.bayeux.client";
-    
+
     private static final Log log = LogFactory.getLog(ClientImpl.class);
 
     protected static LinkedList<Message> EMPTY_LIST = new LinkedList<Message>();
@@ -48,50 +48,50 @@ public class ClientImpl implements Client {
      * queued message for remote clients.
      */
     protected LinkedList<Message> messages = null;
-    
+
     /**
-     * 
+     *
      */
     protected Queue<CometEvent> events = new LinkedList<CometEvent>();
-    
+
     /**
      * Unique id representing this client
      */
     protected String id;
-    
+
     /**
      * supported connection types, defaults to long-polling
      */
     protected int supportedConnTypes = SUPPORT_LONG_POLL | SUPPORT_CALLBACK_POLL;
-    
+
     /**
      * The desired connection type
      */
     protected int desirectConnType = SUPPORT_LONG_POLL;
-    
+
     /**
      * Does this client use json-comment-filtered messages
      */
     protected boolean useJsonFiltered = false;
-    
+
     /**
      * Same JVM clients, get local=true
      */
     protected boolean local;
-    
+
     /**
      * The callback object for local clients
      */
     protected Listener listener;
-    
+
     protected AtomicInteger nrofsubscriptions = new AtomicInteger(0);
-    
+
     protected ClientImpl(String id, boolean local) {
         this.id = id;
         this.local = local;
         if (!local) messages = new LinkedList<Message>();
     }
-    
+
     protected ClientImpl(String id, CometEvent event) {
         this(id,false);
         events = new ConcurrentLinkedQueue<CometEvent>();
@@ -101,7 +101,7 @@ public class ClientImpl implements Client {
     public synchronized void deliver(Message message) {
         deliverInternal(null,new MessageImpl[] {(MessageImpl)message});
     }
-    
+
     public synchronized void deliver(Message[] message) {
         deliverInternal(null,message);
     }
@@ -124,7 +124,7 @@ public class ClientImpl implements Client {
         } else {
             for (int i=0; msgs!=null && i<msgs.length; i++) {
                 MessageImpl message = (MessageImpl)msgs[i];
-                if (this==message.getClient()) { 
+                if (this==message.getClient()) {
                     //dont deliver to ourself
                     continue;
                 }
@@ -159,7 +159,7 @@ public class ClientImpl implements Client {
                             }
                         }
                     }
-                } 
+                }
                 if (!delivered) {
                     if (log.isDebugEnabled()) {
                         log.debug("Message added to queue for remote client["+this+"] message:"+message);
@@ -233,17 +233,17 @@ public class ClientImpl implements Client {
         messages.clear();
         return result;
     }
-    
+
     public String toString() {
         StringBuilder buf = new StringBuilder(super.toString());
         buf.append(" id=").append(getId());
         return buf.toString();
     }
-    
+
     public boolean isSubscribed() {
         return nrofsubscriptions.get()>0;
     }
-    
+
     protected synchronized boolean addCometEvent(CometEvent event) {
         boolean result = false;
         if (!events.contains(event)) {
@@ -253,27 +253,27 @@ public class ClientImpl implements Client {
         event.getHttpServletRequest().setAttribute(COMET_EVENT_ATTR,this);
         return result;
     }
-    
+
     protected synchronized boolean removeCometEvent(CometEvent event) {
         boolean result = events.remove(event);
         event.getHttpServletRequest().removeAttribute(COMET_EVENT_ATTR);
         return result;
     }
-    
-    
+
+
     protected void subscribed(ChannelImpl ch) {
         nrofsubscriptions.addAndGet(1);
     }
-    
+
     protected void unsubscribed(ChannelImpl ch) {
         nrofsubscriptions.addAndGet(-1);
     }
-    
+
     public void startBatch(){
         //noop until improved
     }
     public void endBatch() {
         //noop until improved
     }
-        
+
 }

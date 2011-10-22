@@ -15,13 +15,13 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 -->
-<web-app 
-   xmlns="http://java.sun.com/xml/ns/javaee" 
+<web-app
+   xmlns="http://java.sun.com/xml/ns/javaee"
    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
    xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
-   version="2.5"> 
+   version="2.5">
   <display-name>Cometd Test WebApp</display-name>
-  
+
   <servlet>
     <servlet-name>cometd</servlet-name>
     <servlet-class>org.apache.tomcat.bayeux.BayeuxServlet</servlet-class>
@@ -40,14 +40,14 @@
     <servlet-name>cometd</servlet-name>
     <url-pattern>/cometd/*</url-pattern>
   </servlet-mapping>
-  
+
   <listener>
     <listener-class>org.apache.cometd.bayeux.samples.EchoChatClient</listener-class>
   </listener>
   <listener>
     <listener-class>org.apache.cometd.bayeux.samples.BayeuxStockTicker</listener-class>
   </listener>
-  
+
 </web-app>
 
 

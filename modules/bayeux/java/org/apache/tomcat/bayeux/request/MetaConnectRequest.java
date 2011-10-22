@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -64,7 +64,7 @@ public class MetaConnectRequest extends RequestBase implements BayeuxRequest {
      *  2) The clientId returned by the server after handshake.
      *  3) The desired connectionType (must be one of the server's supported
      *     types returned by handshake response.
-     *  
+     *
      * @return HttpError This method returns null if no errors were found
      */
     public HttpError validate() {
@@ -108,13 +108,13 @@ public class MetaConnectRequest extends RequestBase implements BayeuxRequest {
         } catch (IOException x) {
             throw new BayeuxException(x);
         }
-        
+
         //return immediately if there is no subscriptions
         //so that we can process the next message
-        int result = client.isSubscribed()?1:0; 
+        int result = client.isSubscribed()?1:0;
 
         if (success && client!=null && client.hasMessages()) {
-            //send out messages 
+            //send out messages
             flushMessages(client);
             result = 0; //flush out the messages
         }

@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -40,12 +40,12 @@ import java.util.List;
  * <br/>
  * A <code>Bayeux session</code> is active as long as the webapp hosting the Bayeux object is active.<br/>
  * When the webapplication shuts down, the Bayeux object will unsubscribe all clients and remove all the active channels.
- * 
+ *
  * @author Greg Wilkins
  * @author Filip Hanik
  */
 public interface Bayeux {
-    
+
     /**Meta definitions for channels*/
     public static final String META="/meta";
     /**Meta definitions for channels*/
@@ -156,14 +156,14 @@ public interface Bayeux {
      * @return Client-null if the client doesn't exist.returns the client if it does.
      */
     public Client getClient(String clientid);
-    
+
     /**
      * Returns a non modifiable list of all the clients that are currently active
      * in this Bayeux session
      * @return List<Client> - a list containing all clients. The List can not be modified.
      */
     public List<Client> getClients();
-    
+
     /**
      * Returns true if a client with the given id exists.<br/>
      * Same as executing <code>getClient(id)!=null</code>.
@@ -171,7 +171,7 @@ public interface Bayeux {
      * @return boolean - true if the client exists
      */
     public boolean hasClient(String clientId);
-    
+
     /**
      * Removes the client all together.
      * This will unsubscribe the client to any channels it may be subscribed to
@@ -181,7 +181,7 @@ public interface Bayeux {
      */
     public Client remove(Client client);
 
-    
+
     /*--Channel---------------------------------------------------------- */
     /**
      * Returns the channel for a given channel id.
@@ -190,11 +190,11 @@ public interface Bayeux {
      * if <code>create</code> is set to false, and the channel doesn't exist, null will be returned.
      * @param channelId String - the id of the channel to be retrieved or created
      * @param create boolean - true if the Bayeux impl should create the channel
-     * @return Channel - null if <code>create</code> is set to false and the channel doesn't exist, 
+     * @return Channel - null if <code>create</code> is set to false and the channel doesn't exist,
      * otherwise it returns a channel object.
      */
     public Channel getChannel(String channelId, boolean create);
-    
+
     /**
      * Returns a list of currently active channels in this Bayeux session.
      * @return List<Channel>
@@ -232,7 +232,7 @@ public interface Bayeux {
      * @return SecurityPolicy
      */
     public SecurityPolicy getSecurityPolicy();
-   
+
     /**
      * Sets the security policy to be used in this Bayeux session
      * @param securityPolicy SecurityPolicy

@@ -29,7 +29,7 @@ import org.apache.cometd.bayeux.Message;
 import org.apache.cometd.bayeux.Channel;
 
 public class EchoChatClient implements ServletContextListener, ServletContextAttributeListener, Listener {
-    
+
     static AtomicInteger counter = new AtomicInteger(0);
     protected int id;
     protected Bayeux b;
@@ -93,7 +93,7 @@ public class EchoChatClient implements ServletContextListener, ServletContextAtt
         public TimestampThread() {
             setDaemon(true);
         }
-        
+
         public void run() {
             while (alive) {
                 try {
