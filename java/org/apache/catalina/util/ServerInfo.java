@@ -74,7 +74,7 @@ public class ServerInfo {
             serverBuilt = "unknown";
         if (serverNumber == null)
             serverNumber = "7.0.x";
-        
+
     }
 
 
@@ -121,7 +121,7 @@ public class ServerInfo {
         System.out.println("JVM Version:    " +
                            System.getProperty("java.runtime.version"));
         System.out.println("JVM Vendor:     " +
-                           System.getProperty("java.vm.vendor"));                        
+                           System.getProperty("java.vm.vendor"));
     }
 
 }
