@@ -24,7 +24,7 @@ $Id$
 This subproject contains the source code for Tomcat @VERSION_MAJOR_MINOR@, a container that
 implements the Servlet 3.0 and JSP 2.1 specifications from the Java
 Community Process <http://www.jcp.org/>.  In order to build a binary
-distribution version of the container from a source distribution, 
+distribution version of the container from a source distribution,
 do the following:
 
 
@@ -75,8 +75,8 @@ do the following:
   http://tomcat.apache.org/download-@VERSION_MAJOR@0.cgi
 
 * Checkout the source using SVN, selecting the desired version or
-  branch (current development source is at 
-  http://svn.apache.org/repos/asf/tomcat/tc@VERSION_MAJOR_MINOR@.x/trunk/), or 
+  branch (current development source is at
+  http://svn.apache.org/repos/asf/tomcat/tc@VERSION_MAJOR_MINOR@.x/trunk/), or
   unpack the source package. The location where the source has been
   placed will be referred as ${tomcat.source}.
 
@@ -90,9 +90,9 @@ do the following:
 * NOTE: Users accessing the Internet through a proxy must use a properties
   file to indicate to Ant the proxy configuration. Read below.
 
-* WARNING: Running this command will download binaries to the /usr/share/java 
-  directory. Make sure this is appropriate to do on your computer. On Windows, 
-  this usually corresponds to the "C:\usr\share\java" directory, unless Cygwin 
+* WARNING: Running this command will download binaries to the /usr/share/java
+  directory. Make sure this is appropriate to do on your computer. On Windows,
+  this usually corresponds to the "C:\usr\share\java" directory, unless Cygwin
   is used. Read below to customize the directory used to download the binaries.
 
 * The build can be controlled by creating a ${tomcat.source}/build.properties
