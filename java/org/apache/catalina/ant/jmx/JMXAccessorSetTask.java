@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -29,7 +29,7 @@ import org.apache.tools.ant.BuildException;
 
 
 /**
- * Access <em>JMX</em> JSR 160 MBeans Server. 
+ * Access <em>JMX</em> JSR 160 MBeans Server.
  * <ul>
  * <li>Get Mbeans attributes</li>
  * <li>Show Get result as Ant console log</li>
@@ -38,13 +38,13 @@ import org.apache.tools.ant.BuildException;
  * <p>
  * Examples:
  * Set a Mbean Manager attribute maxActiveSessions.
- * Set this attribute with fresh jmx connection without save reference 
+ * Set this attribute with fresh jmx connection without save reference
  * <pre>
  *   &lt;jmx:set
  *           host="127.0.0.1"
  *           port="9014"
  *           ref=""
- *           name="Catalina:type=Manager,context="/ClusterTest",host=localhost" 
+ *           name="Catalina:type=Manager,context="/ClusterTest",host=localhost"
  *           attribute="maxActiveSessions"
  *           value="100"
  *           type="int"
@@ -70,23 +70,23 @@ public class JMXAccessorSetTask extends JMXAccessorTask {
     private String value;
     private String type;
     private boolean convert = false ;
-    
+
     // ------------------------------------------------------------- Properties
-    
+
     /**
      * @return Returns the attribute.
      */
     public String getAttribute() {
         return attribute;
     }
-    
+
     /**
      * @param attribute The attribute to set.
      */
     public void setAttribute(String attribute) {
         this.attribute = attribute;
     }
-    
+
     /**
      * @return Returns the value.
      */
@@ -99,23 +99,23 @@ public class JMXAccessorSetTask extends JMXAccessorTask {
     public void setValue(String value) {
         this.value = value;
     }
-    
-    
+
+
     /**
      * @return Returns the type.
      */
     public String getType() {
         return type;
     }
-    
+
     /**
      * @param valueType The type to set.
      */
     public void setType(String valueType) {
         this.type = valueType;
     }
- 
- 
+
+
     /**
      * @return Returns the convert.
      */
@@ -129,12 +129,12 @@ public class JMXAccessorSetTask extends JMXAccessorTask {
         this.convert = convert;
     }
     // ------------------------------------------------------ protected Methods
-    
+
     /**
      * Execute the specified command, based on the configured properties. The
      * input stream will be closed upon completion of this task, whether it was
      * executed successfully or not.
-     * 
+     *
      * @exception Exception
      *                if an error occurs
      */

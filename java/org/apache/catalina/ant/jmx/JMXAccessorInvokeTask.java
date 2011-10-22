@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -29,7 +29,7 @@ import org.apache.tools.ant.BuildException;
 
 
 /**
- * Access <em>JMX</em> JSR 160 MBeans Server. 
+ * Access <em>JMX</em> JSR 160 MBeans Server.
  * <ul>
  * <li>open more then one JSR 160 rmi connection</li>
  * <li>Get/Set Mbeans attributes</li>
@@ -43,11 +43,11 @@ import org.apache.tools.ant.BuildException;
  * Examples:
  * <ul>
  * <li>
- * Get a session attribute hello from session with ref <em>${sessionid.0}</em> form 
- * app <em>Catalina:type=Manager,context=/ClusterTest,host=localhost</em> 
+ * Get a session attribute hello from session with ref <em>${sessionid.0}</em> form
+ * app <em>Catalina:type=Manager,context=/ClusterTest,host=localhost</em>
  * <pre>
  *   &lt;jmx:invoke
- *           name="Catalina:type=Manager,context=/ClusterTest,host=localhost" 
+ *           name="Catalina:type=Manager,context=/ClusterTest,host=localhost"
  *           operation="getSessionAttribute"
  *           resultproperty="hello"&gt;
  *         &lt;arg value="${sessionid.0}"/&gt;
@@ -56,10 +56,10 @@ import org.apache.tools.ant.BuildException;
  * </pre>
  * </li>
  * <li>
- * Create new AccessLogger at localhost 
+ * Create new AccessLogger at localhost
  * <code>
  *   &lt;jmx:invoke
- *           name="Catalina:type=MBeanFactory" 
+ *           name="Catalina:type=MBeanFactory"
  *           operation="createAccessLoggerValve"
  *           resultproperty="accessLoggerObjectName"
  *       &gt;
@@ -69,10 +69,10 @@ import org.apache.tools.ant.BuildException;
  * </code>
  * </li>
  * <li>
- * Remove existing AccessLogger at localhost 
+ * Remove existing AccessLogger at localhost
  * <code>
  *   &lt;jmx:invoke
- *           name="Catalina:type=MBeanFactory" 
+ *           name="Catalina:type=MBeanFactory"
  *           operation="removeValve"
  *       &gt;
  *         &lt;arg value="Catalina:type=Valve,name=AccessLogValve,host=localhost"/&gt;
@@ -100,7 +100,7 @@ public class JMXAccessorInvokeTask extends JMXAccessorTask {
     private List<Arg> args=new ArrayList<Arg>();
 
     // ------------------------------------------------------------- Properties
-    
+
     /**
      * @return Returns the operation.
      */
@@ -130,14 +130,14 @@ public class JMXAccessorInvokeTask extends JMXAccessorTask {
     public void setArgs(List<Arg> args) {
         this.args = args;
     }
-    
+
     // ------------------------------------------------------ protected Methods
-    
+
     /**
      * Execute the specified command, based on the configured properties. The
      * input stream will be closed upon completion of this task, whether it was
      * executed successfully or not.
-     * 
+     *
      * @exception BuildException
      *                if an error occurs
      */
@@ -176,7 +176,7 @@ public class JMXAccessorInvokeTask extends JMXAccessorTask {
                 } else {
                     sigA[i]=arg.getType();
                     argsA[i]=convertStringToType(arg.getValue(),arg.getType());
-                }                
+                }
             }
             result = jmxServerConnection.invoke(new ObjectName(name), operation, argsA, sigA);
         }
