@@ -5,15 +5,15 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */ 
+ */
 
 
 package org.apache.naming;
@@ -33,7 +33,7 @@ import javax.naming.NamingException;
  * @version $Id$
  */
 
-public class NamingContextBindingsEnumeration 
+public class NamingContextBindingsEnumeration
     implements NamingEnumeration<Binding> {
 
 
@@ -54,7 +54,7 @@ public class NamingContextBindingsEnumeration
      */
     protected Iterator<NamingEntry> iterator;
 
-    
+
     /**
      * The context for which this enumeration is being generated.
      */
@@ -107,11 +107,11 @@ public class NamingContextBindingsEnumeration
             throw new RuntimeException(e.getMessage(), e);
         }
     }
-    
+
     private Binding nextElementInternal() throws NamingException {
         NamingEntry entry = iterator.next();
         Object value;
-        
+
         // If the entry is a reference, resolve it
         if (entry.type == NamingEntry.REFERENCE
                 || entry.type == NamingEntry.LINK_REF) {
@@ -127,7 +127,7 @@ public class NamingContextBindingsEnumeration
         } else {
             value = entry.value;
         }
-        
+
         return new Binding(entry.name, value.getClass().getName(), value, true);
     }
 }

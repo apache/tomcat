@@ -5,15 +5,15 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */ 
+ */
 
 package org.apache.naming.resources;
 
@@ -23,21 +23,21 @@ import java.util.Random;
 
 /**
  * Implements a special purpose cache.
- * 
+ *
  * @author <a href="mailto:remm@apache.org">Remy Maucherat</a>
  * @version $Revision$
  */
 public class ResourceCache {
-    
-    
+
+
     // ----------------------------------------------------------- Constructors
-    
-    
+
+
     public ResourceCache() {
         // NO-OP
     }
-    
-    
+
+
     // ----------------------------------------------------- Instance Variables
 
 
@@ -109,7 +109,7 @@ public class ResourceCache {
 
     /**
      * Return the access count.
-     * Note: Update is not synced, so the number may not be completely 
+     * Note: Update is not synced, so the number may not be completely
      * accurate.
      */
     public long getAccessCount() {
@@ -159,7 +159,7 @@ public class ResourceCache {
 
     /**
      * Return the number of cache hits.
-     * Note: Update is not synced, so the number may not be completely 
+     * Note: Update is not synced, so the number may not be completely
      * accurate.
      */
     public long getHitsCount() {
@@ -248,7 +248,7 @@ public class ResourceCache {
                         }
                     }
                 }
-                long entryAccessRatio = 
+                long entryAccessRatio =
                     ((cache[entryPos].accessCount * 100) / accessCount);
                 if (entryAccessRatio < desiredEntryAccessRatio) {
                     toRemove[entriesFound] = entryPos;
@@ -413,7 +413,7 @@ public class ResourceCache {
         if ((pos != -1) && (name.equals(oldCache[pos].name))) {
             CacheEntry[] newCache = new CacheEntry[cache.length - 1];
             System.arraycopy(oldCache, 0, newCache, 0, pos);
-            System.arraycopy(oldCache, pos + 1, newCache, pos, 
+            System.arraycopy(oldCache, pos + 1, newCache, pos,
                              oldCache.length - pos - 1);
             cache = newCache;
             return oldCache[pos];
