@@ -23,7 +23,7 @@ import org.apache.catalina.tribes.ChannelException;
 import org.apache.catalina.tribes.Member;
 
 /**
- * All-to-all replication for a hash map implementation. Each node in the cluster will carry an identical 
+ * All-to-all replication for a hash map implementation. Each node in the cluster will carry an identical
  * copy of the map.<br><br>
  * This map implementation doesn't have a background thread running to replicate changes.
  * If you do have changes without invoking put/remove then you need to invoke one of the following methods:
@@ -42,7 +42,7 @@ import org.apache.catalina.tribes.Member;
  * TODO implement periodic sync/transfer thread
  * @author Filip Hanik
  * @version 1.0
- * 
+ *
  * TODO memberDisappeared, should do nothing except change map membership
  *       by default it relocates the primary objects
  */
@@ -93,7 +93,7 @@ public class ReplicatedMap extends AbstractReplicatedMap {
     protected int getStateMessageType() {
         return AbstractReplicatedMap.MapMessage.MSG_STATE_COPY;
     }
-    
+
     /**
      * publish info about a map pair (key/value) to other nodes in the cluster
      * @param key Object

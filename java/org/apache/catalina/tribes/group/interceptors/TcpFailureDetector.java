@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -51,38 +51,38 @@ import org.apache.catalina.tribes.membership.Membership;
  * <p>
  * The TcpFailureDetector works in two ways. <br>
  * 1. It intercepts memberDisappeared events
- * 2. It catches send errors 
+ * 2. It catches send errors
  * </p>
  *
  * @author Filip Hanik
  * @version 1.0
  */
 public class TcpFailureDetector extends ChannelInterceptorBase {
-    
+
     private static final org.apache.juli.logging.Log log = org.apache.juli.logging.LogFactory.getLog( TcpFailureDetector.class );
-    
+
     protected static byte[] TCP_FAIL_DETECT = new byte[] {
         79, -89, 115, 72, 121, -126, 67, -55, -97, 111, -119, -128, -95, 91, 7, 20,
         125, -39, 82, 91, -21, -15, 67, -102, -73, 126, -66, -113, -127, 103, 30, -74,
         55, 21, -66, -121, 69, 126, 76, -88, -65, 10, 77, 19, 83, 56, 21, 50,
-        85, -10, -108, -73, 58, -6, 64, 120, -111, 4, 125, -41, 114, -124, -64, -43};      
-    
+        85, -10, -108, -73, 58, -6, 64, 120, -111, 4, 125, -41, 114, -124, -64, -43};
+
     protected boolean performConnectTest = true;
 
     protected long connectTimeout = 1000;//1 second default
-    
+
     protected boolean performSendTest = true;
 
     protected boolean performReadTest = false;
-    
+
     protected long readTestTimeout = 5000;//5 seconds
-    
+
     protected Membership membership = null;
-    
+
     protected HashMap<Member, Long> removeSuspects = new HashMap<Member, Long>();
-    
+
     protected HashMap<Member, Long> addSuspects = new HashMap<Member, Long>();
-    
+
     @Override
     public void sendMessage(Member[] destination, ChannelMessage msg, InterceptorPayload payload) throws ChannelException {
         try {
@@ -90,7 +90,7 @@ public class TcpFailureDetector extends ChannelInterceptorBase {
         }catch ( ChannelException cx ) {
             FaultyMember[] mbrs = cx.getFaultyMembers();
             for ( int i=0; i<mbrs.length; i++ ) {
-                if ( mbrs[i].getCause()!=null &&  
+                if ( mbrs[i].getCause()!=null &&
                      (!(mbrs[i].getCause() instanceof RemoteProcessException)) ) {//RemoteProcessException's are ok
                     this.memberDisappeared(mbrs[i].getMember());
                 }//end if
@@ -101,20 +101,20 @@ public class TcpFailureDetector extends ChannelInterceptorBase {
 
     @Override
     public void messageReceived(ChannelMessage msg) {
-        //catch incoming 
+        //catch incoming
         boolean process = true;
         if ( okToProcess(msg.getOptions()) ) {
             //check to see if it is a testMessage, if so, process = false
             process = ( (msg.getMessage().getLength() != TCP_FAIL_DETECT.length) ||
                         (!Arrays.equals(TCP_FAIL_DETECT,msg.getMessage().getBytes()) ) );
         }//end if
-            
+
         //ignore the message, it doesnt have the flag set
         if ( process ) super.messageReceived(msg);
         else if ( log.isDebugEnabled() ) log.debug("Received a failure detector packet:"+msg);
     }//messageReceived
-    
-    
+
+
     @Override
     public void memberAdded(Member member) {
         if ( membership == null ) setupMembership();
@@ -142,7 +142,7 @@ public class TcpFailureDetector extends ChannelInterceptorBase {
         if ( membership == null ) setupMembership();
         boolean notify = false;
         boolean shutdown = Arrays.equals(member.getCommand(),Member.SHUTDOWN_PAYLOAD);
-        if ( !shutdown ) 
+        if ( !shutdown )
             if(log.isInfoEnabled())
                 log.info("Received memberDisappeared["+member+"] message. Will verify.");
         synchronized (membership) {
@@ -173,7 +173,7 @@ public class TcpFailureDetector extends ChannelInterceptorBase {
 
         }
     }
-    
+
     @Override
     public boolean hasMembers() {
         if ( membership == null ) setupMembership();
@@ -196,14 +196,14 @@ public class TcpFailureDetector extends ChannelInterceptorBase {
     public Member getLocalMember(boolean incAlive) {
         return super.getLocalMember(incAlive);
     }
-    
+
     @Override
     public void heartbeat() {
         super.heartbeat();
         checkMembers(false);
     }
     public void checkMembers(boolean checkAll) {
-        
+
         try {
             if (membership == null) setupMembership();
             synchronized (membership) {
@@ -213,10 +213,10 @@ public class TcpFailureDetector extends ChannelInterceptorBase {
         }catch ( Exception x ) {
             log.warn("Unable to perform heartbeat on the TcpFailureDetector.",x);
         } finally {
-            
+
         }
     }
-    
+
     protected void performForcedCheck() {
         //update all alive times
         Member[] members = super.getMembers();
@@ -278,26 +278,26 @@ public class TcpFailureDetector extends ChannelInterceptorBase {
             } //end if
         }
     }
-    
+
     protected synchronized void setupMembership() {
         if ( membership == null ) {
             membership = new Membership((MemberImpl)super.getLocalMember(true));
         }
-        
+
     }
-    
+
     protected boolean memberAlive(Member mbr) {
         return memberAlive(mbr,TCP_FAIL_DETECT,performSendTest,performReadTest,readTestTimeout,connectTimeout,getOptionFlag());
     }
-    
-    protected static boolean memberAlive(Member mbr, byte[] msgData, 
+
+    protected static boolean memberAlive(Member mbr, byte[] msgData,
                                          boolean sendTest, boolean readTest,
                                          long readTimeout, long conTimeout,
                                          int optionFlag) {
         //could be a shutdown notification
         if ( Arrays.equals(mbr.getCommand(),Member.SHUTDOWN_PAYLOAD) ) return false;
-        
-        Socket socket = new Socket();        
+
+        Socket socket = new Socket();
         try {
             InetAddress ia = InetAddress.getByAddress(mbr.getHost());
             InetSocketAddress addr = new InetSocketAddress(ia, mbr.getPort());

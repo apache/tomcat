@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -34,9 +34,9 @@ import org.apache.juli.logging.LogFactory;
  * The message dispatcher is a way to enable asynchronous communication
  * through a channel. The dispatcher will look for the <code>Channel.SEND_OPTIONS_ASYNCHRONOUS</code>
  * flag to be set, if it is, it will queue the message for delivery and immediately return to the sender.
- * 
- * 
- * 
+ *
+ *
+ *
  * @author Filip Hanik
  * @version 1.0
  */
@@ -77,15 +77,15 @@ public class MessageDispatchInterceptor extends ChannelInterceptorBase implement
             super.sendMessage(destination, msg, payload);
         }
     }
-    
+
     public boolean addToQueue(ChannelMessage msg, Member[] destination, InterceptorPayload payload) {
         return queue.add(msg,destination,payload);
     }
-    
+
     public LinkObject removeFromQueue() {
         return queue.remove();
     }
-    
+
     public void startQueue() {
         msgDispatchThread = new Thread(this);
         msgDispatchThread.setName("MessageDispatchInterceptor.MessageDispatchThread");
@@ -95,15 +95,15 @@ public class MessageDispatchInterceptor extends ChannelInterceptorBase implement
         run = true;
         msgDispatchThread.start();
     }
-    
+
     public void stopQueue() {
         run = false;
         msgDispatchThread.interrupt();
         queue.setEnabled(false);
         setAndGetCurrentSize(0);
     }
-    
-    
+
+
     @Override
     public void setOptionFlag(int flag) {
         if ( flag != Channel.SEND_OPTIONS_ASYNCHRONOUS ) log.warn("Warning, you are overriding the asynchronous option flag, this will disable the Channel.SEND_OPTIONS_ASYNCHRONOUS that other apps might use.");
@@ -125,16 +125,16 @@ public class MessageDispatchInterceptor extends ChannelInterceptorBase implement
     public boolean getUseDeepClone() {
         return useDeepClone;
     }
-    
+
     public long getCurrentSize() {
         return currentSize;
     }
-    
+
     public synchronized long addAndGetCurrentSize(long inc) {
         currentSize += inc;
         return currentSize;
     }
-    
+
     public synchronized long setAndGetCurrentSize(long value) {
         currentSize = value;
         return value;
@@ -153,7 +153,7 @@ public class MessageDispatchInterceptor extends ChannelInterceptorBase implement
         super.start(svc);
     }
 
-    
+
     @Override
     public void stop(int svc) throws ChannelException {
         //stop the thread
@@ -185,7 +185,7 @@ public class MessageDispatchInterceptor extends ChannelInterceptorBase implement
         try {
             super.sendMessage(destination,msg,null);
             try {
-                if ( link.getHandler() != null ) link.getHandler().handleCompletion(new UniqueId(msg.getUniqueId())); 
+                if ( link.getHandler() != null ) link.getHandler().handleCompletion(new UniqueId(msg.getUniqueId()));
             } catch ( Exception ex ) {
                 log.error("Unable to report back completed message.",ex);
             }

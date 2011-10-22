@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -18,17 +18,17 @@ package org.apache.catalina.tribes;
 
 import java.io.Serializable;
 /**
- * 
- * <p>Title: ChannelListener</p> 
- * 
- * <p>Description: An interface to listens to incoming messages from a channel </p> 
+ *
+ * <p>Title: ChannelListener</p>
+ *
+ * <p>Description: An interface to listens to incoming messages from a channel </p>
  * When a message is received, the Channel will invoke the channel listener in a conditional sequence.
  * <code>if ( listener.accept(msg,sender) ) listener.messageReceived(msg,sender);</code><br>
  * A ChannelListener implementation MUST NOT return true on <code>accept(Serializable, Member)</code>
  * if it doesn't intend to process the message. The channel can this way track whether a message
  * was processed by an above application or if it was just received and forgot about, a feature required
  * to support message-response(RPC) calls<br>
- * 
+ *
  * @author Filip Hanik
  * @version 1.0
  */
@@ -51,7 +51,7 @@ public interface ChannelListener {
     public boolean accept(Serializable msg, Member sender);
 
     /**
-     * 
+     *
      * @param listener Object
      * @return boolean
      * @see Object#equals(Object)
@@ -60,7 +60,7 @@ public interface ChannelListener {
     public boolean equals(Object listener);
 
     /**
-     * 
+     *
      * @return int
      * @see Object#hashCode()
      */

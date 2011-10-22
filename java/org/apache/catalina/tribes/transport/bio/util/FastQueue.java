@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -26,7 +26,7 @@ import org.apache.catalina.tribes.group.InterceptorPayload;
 /**
  * A fast queue that remover thread lock the adder thread. <br/>Limit the queue
  * length when you have strange producer thread problems.
- * 
+ *
  * FIXME add i18n support to log messages
  * @author Rainer Jung
  * @author Peter Rossbach
@@ -61,7 +61,7 @@ public class FastQueue {
      */
     private boolean checkLock = false;
 
-    
+
     private boolean inAdd = false;
 
     private boolean inRemove = false;
@@ -78,7 +78,7 @@ public class FastQueue {
      */
     private long addWaitTimeout = 10000L;
 
-    
+
     /**
      * removeWaitTimeout for consumer
      */
@@ -106,7 +106,7 @@ public class FastQueue {
 
     /**
      * get current add wait timeout
-     * 
+     *
      * @return current wait timeout
      */
     public long getAddWaitTimeout() {
@@ -116,7 +116,7 @@ public class FastQueue {
 
     /**
      * Set add wait timeout (default 10000 msec)
-     * 
+     *
      * @param timeout
      */
     public void setAddWaitTimeout(long timeout) {
@@ -126,7 +126,7 @@ public class FastQueue {
 
     /**
      * get current remove wait timeout
-     * 
+     *
      * @return The timeout
      */
     public long getRemoveWaitTimeout() {
@@ -136,7 +136,7 @@ public class FastQueue {
 
     /**
      * set remove wait timeout ( default 30000 msec)
-     * 
+     *
      * @param timeout
      */
     public void setRemoveWaitTimeout(long timeout) {
@@ -178,7 +178,7 @@ public class FastQueue {
         this.checkLock = checkLock;
     }
 
-    
+
     /**
      * @return The max size
      */
@@ -193,16 +193,16 @@ public class FastQueue {
         maxSize = size;
     }
 
-    
+
     /**
-     * unlock queue for next add 
+     * unlock queue for next add
      */
     public void unlockAdd() {
         lock.unlockAdd(size > 0 ? true : false);
     }
 
     /**
-     * unlock queue for next remove 
+     * unlock queue for next remove
      */
     public void unlockRemove() {
         lock.unlockRemove();
@@ -232,7 +232,7 @@ public class FastQueue {
 
     /**
      * Add new data to the queue.
-     * 
+     *
      * FIXME extract some method
      */
     public boolean add(ChannelMessage msg, Member[] destination, InterceptorPayload payload) {

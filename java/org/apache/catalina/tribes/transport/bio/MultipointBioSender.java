@@ -40,8 +40,8 @@ public class MultipointBioSender extends AbstractSender implements MultiPointSen
     public MultipointBioSender() {
         // NO-OP
     }
-    
-    protected long selectTimeout = 1000; 
+
+    protected long selectTimeout = 1000;
     protected HashMap<Member, BioSender> bioSenders =
         new HashMap<Member, BioSender>();
 

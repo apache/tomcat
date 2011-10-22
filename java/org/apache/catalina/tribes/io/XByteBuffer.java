@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -47,39 +47,39 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class XByteBuffer
 {
-    
+
     private static final org.apache.juli.logging.Log log =
         org.apache.juli.logging.LogFactory.getLog( XByteBuffer.class );
-    
+
     /**
      * This is a package header, 7 bytes (FLT2002)
      */
     private static final byte[] START_DATA = {70,76,84,50,48,48,50};
-    
+
     /**
      * This is the package footer, 7 bytes (TLF2003)
      */
     private static final byte[] END_DATA = {84,76,70,50,48,48,51};
- 
+
     /**
      * Variable to hold the data
      */
     protected byte[] buf = null;
-    
+
     /**
      * Current length of data in the buffer
      */
     protected int bufSize = 0;
-    
+
     /**
      * Flag for discarding invalid packages
      * If this flag is set to true, and append(byte[],...) is called,
-     * the data added will be inspected, and if it doesn't start with 
+     * the data added will be inspected, and if it doesn't start with
      * <code>START_DATA</code> it will be thrown away.
-     * 
+     *
      */
     protected boolean discard = true;
-    
+
     /**
      * Constructs a new XByteBuffer
      * @param size - the initial size of the byte buffer
@@ -89,11 +89,11 @@ public class XByteBuffer
         buf = new byte[size];
         this.discard = discard;
     }
-    
+
     public XByteBuffer(byte[] data,boolean discard) {
         this(data,data.length+128,discard);
     }
-    
+
     public XByteBuffer(byte[] data, int size,boolean discard) {
         int length = Math.max(data.length,size);
         buf = new byte[length];
@@ -101,7 +101,7 @@ public class XByteBuffer
         bufSize = data.length;
         this.discard = discard;
     }
-    
+
     public int getLength() {
         return bufSize;
     }
@@ -110,17 +110,17 @@ public class XByteBuffer
         if ( size > buf.length ) throw new ArrayIndexOutOfBoundsException("Size is larger than existing buffer.");
         bufSize = size;
     }
-    
+
     public void trim(int length) {
-        if ( (bufSize - length) < 0 ) 
+        if ( (bufSize - length) < 0 )
             throw new ArrayIndexOutOfBoundsException("Can't trim more bytes than are available. length:"+bufSize+" trim:"+length);
         bufSize -= length;
     }
-    
+
     public void reset() {
         bufSize = 0;
     }
-            
+
     public byte[] getBytesDirect() {
         return this.buf;
     }
@@ -154,9 +154,9 @@ public class XByteBuffer
             expand(newcount);
         }
         b.get(buf,bufSize,len);
-        
+
         bufSize = newcount;
-        
+
         if ( discard ) {
             if (bufSize > START_DATA.length && (firstIndexOf(buf, 0, START_DATA) == -1)) {
                 bufSize = 0;
@@ -167,7 +167,7 @@ public class XByteBuffer
         return true;
 
     }
-    
+
     public boolean append(byte i) {
         int newcount = bufSize + 1;
         if (newcount > buf.length) {
@@ -198,7 +198,7 @@ public class XByteBuffer
         bufSize = newcount;
         return true;
     }
-    
+
     public boolean append(int i) {
         int newcount = bufSize + 4;
         if (newcount > buf.length) {
@@ -240,7 +240,7 @@ public class XByteBuffer
         System.arraycopy(buf, 0, newbuf, 0, bufSize);
         buf = newbuf;
     }
-    
+
     public int getCapacity() {
         return buf.length;
     }
@@ -320,13 +320,13 @@ public class XByteBuffer
         return xbuf;
 
     }
-    
+
     public ChannelData extractPackage(boolean clearFromBuffer) {
         XByteBuffer xbuf = extractDataPackage(clearFromBuffer);
         ChannelData cdata = ChannelData.getDataFromPackage(xbuf);
         return cdata;
     }
-    
+
     /**
      * Creates a complete data package
      * @param cdata - the message data to be contained within the package
@@ -349,7 +349,7 @@ public class XByteBuffer
         offset += END_DATA.length;
         return data;
     }
-    
+
     public static byte[] createDataPackage(byte[] data, int doff, int dlength, byte[] buffer, int bufoff) {
         if ( (buffer.length-bufoff) > getDataPackageLength(dlength) ) {
             throw new ArrayIndexOutOfBoundsException("Unable to create data package, buffer is too small.");
@@ -361,9 +361,9 @@ public class XByteBuffer
         return buffer;
     }
 
-    
+
     public static int getDataPackageLength(int datalength) {
-        int length = 
+        int length =
             START_DATA.length + //header length
             4 + //data length indicator
             datalength + //actual data length
@@ -371,7 +371,7 @@ public class XByteBuffer
         return length;
 
     }
-    
+
     public static byte[] createDataPackage(byte[] data) {
         int length = getDataPackageLength(data.length);
         byte[] result = new byte[length];
@@ -417,7 +417,7 @@ public class XByteBuffer
             ( ( ( (long) b[off+0]) & 0xFF) << 56);
     }
 
-    
+
     /**
      * Converts a boolean to a 1-byte array
      * @param bool - the integer
@@ -430,12 +430,12 @@ public class XByteBuffer
         return toBytes(bool,b,0);
 
     }
-    
+
     public static byte[] toBytes(boolean bool, byte[] data, int offset) {
         data[offset] = (byte)(bool?1:0);
         return data;
     }
-    
+
     /**
      * Converts a byte array entry to boolean
      * @param b byte array
@@ -446,7 +446,7 @@ public class XByteBuffer
         return b[offset] != 0;
     }
 
-    
+
     /**
      * Converts an integer to four bytes
      * @param n - the integer
@@ -543,20 +543,20 @@ public class XByteBuffer
         return result;
     }
 
-    
-    public static Serializable deserialize(byte[] data) 
+
+    public static Serializable deserialize(byte[] data)
         throws IOException, ClassNotFoundException, ClassCastException {
         return deserialize(data,0,data.length);
     }
-    
-    public static Serializable deserialize(byte[] data, int offset, int length)  
+
+    public static Serializable deserialize(byte[] data, int offset, int length)
         throws IOException, ClassNotFoundException, ClassCastException {
-        return deserialize(data,offset,length,null);     
+        return deserialize(data,offset,length,null);
     }
-    
+
     private static AtomicInteger invokecount = new AtomicInteger(0);
-    
-    public static Serializable deserialize(byte[] data, int offset, int length, ClassLoader[] cls) 
+
+    public static Serializable deserialize(byte[] data, int offset, int length, ClassLoader[] cls)
         throws IOException, ClassNotFoundException, ClassCastException {
         invokecount.addAndGet(1);
         Object message = null;
@@ -581,7 +581,7 @@ public class XByteBuffer
     /**
      * Serializes a message into cluster data
      * @param msg ClusterMessage
-     * @return serialized content as byte[] array 
+     * @return serialized content as byte[] array
      * @throws IOException
      */
     public static byte[] serialize(Serializable msg) throws IOException {

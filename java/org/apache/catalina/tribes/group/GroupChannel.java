@@ -292,7 +292,7 @@ public class GroupChannel extends ChannelInterceptorBase implements ManagedChann
             }
 
         } catch ( Exception x ) {
-            //this could be the channel listener throwing an exception, we should log it 
+            //this could be the channel listener throwing an exception, we should log it
             //as a warning.
             if ( log.isWarnEnabled() ) log.warn("Error receiving message:",x);
             throw new RemoteProcessException("Exception:"+x.getMessage(),x);
