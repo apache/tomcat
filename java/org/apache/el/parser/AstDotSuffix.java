@@ -39,7 +39,7 @@ public final class AstDotSuffix extends SimpleNode {
             throws ELException {
         return this.image;
     }
-    
+
     @Override
     public void setImage(String image) {
         if (!Validation.isIdentifier(image)) {

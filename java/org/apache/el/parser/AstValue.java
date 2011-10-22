@@ -46,7 +46,7 @@ public final class AstValue extends SimpleNode {
         (System.getSecurityManager() != null);
 
     protected static final boolean COERCE_TO_ZERO;
-    
+
     static {
         if (IS_SECURITY_ENABLED) {
             COERCE_TO_ZERO = AccessController.doPrivileged(
@@ -84,7 +84,7 @@ public final class AstValue extends SimpleNode {
         Class<?> result = ctx.getELResolver().getType(ctx, t.base, t.property);
         if (!ctx.isPropertyResolved()) {
             throw new PropertyNotFoundException(MessageFactory.get(
-                    "error.resolver.unhandled", t.base, t.property));            
+                    "error.resolver.unhandled", t.base, t.property));
         }
         return result;
     }
@@ -102,10 +102,10 @@ public final class AstValue extends SimpleNode {
         // set up our start/end
         Object property = null;
         int propCount = this.jjtGetNumChildren();
-        
+
         if (propCount > 2 &&
                 this.jjtGetChild(propCount - 1) instanceof AstMethodParameters) {
-            // Method call with paramaters. 
+            // Method call with paramaters.
             propCount-=2;
         } else {
             propCount--;
@@ -164,7 +164,7 @@ public final class AstValue extends SimpleNode {
                 if (suffix == null) {
                     return null;
                 }
-                
+
                 ctx.setPropertyResolved(false);
                 base = resolver.getValue(ctx, base, suffix);
                 i++;
@@ -172,7 +172,7 @@ public final class AstValue extends SimpleNode {
         }
         if (!ctx.isPropertyResolved()) {
             throw new PropertyNotFoundException(MessageFactory.get(
-                    "error.resolver.unhandled", base, suffix));            
+                    "error.resolver.unhandled", base, suffix));
         }
         return base;
     }
@@ -185,7 +185,7 @@ public final class AstValue extends SimpleNode {
             ctx.getELResolver().isReadOnly(ctx, t.base, t.property);
         if (!ctx.isPropertyResolved()) {
             throw new PropertyNotFoundException(MessageFactory.get(
-                    "error.resolver.unhandled", t.base, t.property));            
+                    "error.resolver.unhandled", t.base, t.property));
         }
         return result;
     }
@@ -208,7 +208,7 @@ public final class AstValue extends SimpleNode {
         }
         if (!ctx.isPropertyResolved()) {
             throw new PropertyNotFoundException(MessageFactory.get(
-                    "error.resolver.unhandled", t.base, t.property));            
+                    "error.resolver.unhandled", t.base, t.property));
         }
     }
 
@@ -226,7 +226,7 @@ public final class AstValue extends SimpleNode {
 
     @Override
     // Interface el.parser.Node uses raw types (and is auto-generated)
-    public MethodInfo getMethodInfo(EvaluationContext ctx, 
+    public MethodInfo getMethodInfo(EvaluationContext ctx,
             @SuppressWarnings("rawtypes") Class[] paramTypes)
             throws ELException {
         Target t = getTarget(ctx);
@@ -237,10 +237,10 @@ public final class AstValue extends SimpleNode {
 
     @Override
     // Interface el.parser.Node uses a raw type (and is auto-generated)
-    public Object invoke(EvaluationContext ctx, 
+    public Object invoke(EvaluationContext ctx,
             @SuppressWarnings("rawtypes") Class[] paramTypes,
             Object[] paramValues) throws ELException {
-        
+
         Target t = getTarget(ctx);
         Method m = null;
         Object[] values = null;
@@ -272,7 +272,7 @@ public final class AstValue extends SimpleNode {
 
     private Object[] toVarArgs(Object[] src, Method m) {
         int paramCount = m.getParameterTypes().length;
-        
+
         Object[] dest = new Object[paramCount];
         Object[] varArgs = (Object[]) Array.newInstance(
                 m.getParameterTypes()[paramCount - 1].getComponentType(),
@@ -283,12 +283,12 @@ public final class AstValue extends SimpleNode {
         dest[paramCount - 1] = varArgs;
         return dest;
     }
-    
+
     private Class<?>[] getTypesFromValues(Object[] values) {
         if (values == null) {
             return null;
         }
-        
+
         Class<?> result[] = new Class<?>[values.length];
         for (int i = 0; i < values.length; i++) {
             if (values[i] == null) {
@@ -300,7 +300,7 @@ public final class AstValue extends SimpleNode {
         return result;
     }
 
-    
+
     /**
      * @since EL 2.2
      */
@@ -316,7 +316,7 @@ public final class AstValue extends SimpleNode {
         return new ValueReference(t.base, t.property);
     }
 
-    
+
     /**
      * @since EL 2.2
      */

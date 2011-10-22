@@ -32,7 +32,7 @@ public class Validation {
         "static", "strictfp", "super", "switch", "synchronized", "this",
         "throw", "throws", "transient", "true", "try", "void", "volatile",
         "while" };
-    
+
     private static final boolean IS_SECURITY_ENABLED =
             (System.getSecurityManager() != null);
 
@@ -56,17 +56,17 @@ public class Validation {
             "false")).booleanValue();
         }
     }
-    
-    
+
+
     private Validation() {
         // Utility class. Hide default constructor
     }
-    
+
     /**
      * Test whether the argument is a Java identifier.
      */
     public static boolean isIdentifier(String key) {
-        
+
         if (SKIP_IDENTIFIER_CHECK) {
             return true;
         }
@@ -75,7 +75,7 @@ public class Validation {
         if (key == null || key.length() == 0) {
             return false;
         }
-        
+
         // Check the list of known invalid values
         int i = 0;
         int j = invalidIdentifiers.length;
@@ -103,7 +103,7 @@ public class Validation {
                 return false;
             }
         }
-        
+
         return true;
     }
 }
