@@ -42,7 +42,7 @@ This page provides an overview of the Tomcat server architecture.
 <p>
 In the Tomcat world, a
 <a href="../config/server.html">Server</a> represents the whole container.
-Tomcat provides a default implementation of the 
+Tomcat provides a default implementation of the
 <a href="../api/org/apache/catalina/Server.html">Server interface</a>
 which is rarely customized by users.
 </p>
@@ -81,7 +81,7 @@ e.g. www.yourcompany.com, to the Tomcat server.  An Engine may contain
 multiple hosts, and the Host element also supports network aliases such as
 yourcompany.com and abc.yourcompany.com.  Users rarely create custom
 <a href="../api/org/apache/catalina/Host.html">Hosts</a>
-because the 
+because the
 <a href="../api/org/apache/catalina/core/StandardHost.html">StandardHost
 implementation</a> provides significant additional functionality.
 </p>
@@ -92,7 +92,7 @@ implementation</a> provides significant additional functionality.
 A Connector handles communications with the client.  There are multiple
 connectors available with Tomcat. These include the
 <a href="../config/http.html">HTTP connector</a> which is used for
-most HTTP traffic, especially when running Tomcat as a standalone server, 
+most HTTP traffic, especially when running Tomcat as a standalone server,
 and the <a href="../config/ajp.html">AJP connector</a> which implements
 the AJP procotol used when connecting Tomcat to a web server such as
 Apache HTTPD server. Creating a customized connector is a significant

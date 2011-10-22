@@ -22,7 +22,7 @@
   <body>
     <h1>JSP 2.0 Examples - Dynamic Attributes</h1>
     <hr>
-    <p>This JSP page invokes a custom tag that accepts a dynamic set 
+    <p>This JSP page invokes a custom tag that accepts a dynamic set
     of attributes.  The tag echoes the name and value of all attributes
     passed to it.</p>
     <hr>
@@ -36,8 +36,8 @@
     </ul>
     <h2>Invocation 3 (three attributes)</h2>
     <ul>
-      <my:echoAttributes dogName="Scruffy" 
-                         catName="Fluffy" 
+      <my:echoAttributes dogName="Scruffy"
+                         catName="Fluffy"
                          blowfishName="Puffy"/>
     </ul>
   </body>

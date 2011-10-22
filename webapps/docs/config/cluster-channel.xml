@@ -39,7 +39,7 @@
   This framework is then used internally by the components that need to send messages between different Tomcat instances.
   <br/>
   A few examples of these components would be the SimpleTcpCluster that does the messaging for the DeltaManager,
-  or the BackupManager that uses a different replication strategy. The ReplicatedContext object does also 
+  or the BackupManager that uses a different replication strategy. The ReplicatedContext object does also
   use the channel object to communicate context attribute changes.
 </section>
 <section name="Nested Components">
@@ -47,12 +47,12 @@
     The Membership component is responsible for auto discovering new nodes in the cluster
     and also to provide for notifications for any nodes that have not responded with a heartbeat.
     The default implementation uses multicast.<br/>
-    In the membership component you configure how your nodes, aka. members, are to be discovered and/or 
-    divided up. 
+    In the membership component you configure how your nodes, aka. members, are to be discovered and/or
+    divided up.
     You can always find out more about <a href="../tribes/introduction.html">Apache Tribes</a>
   </p>
   <p><b><a href="cluster-sender.html">Channel/Sender</a>:</b> <br/>
-    The Sender component manages all outbound connections and data messages that are sent 
+    The Sender component manages all outbound connections and data messages that are sent
     over the network from one node to another.
     This component allows messages to be sent in parallel.
     The default implementation uses TCP client sockets, and socket tuning for outgoing messages are
@@ -72,7 +72,7 @@
     You can always find out more about <a href="../tribes/introduction.html">Apache Tribes</a>
   </p>
   <p><b><a href="cluster-interceptor.html">Channel/Interceptor</a>:</b> <br/>
-    The channel will send messages through an interceptor stack. Because of this, you have the ability to 
+    The channel will send messages through an interceptor stack. Because of this, you have the ability to
     customize the way messages are sent and received, and even how membership is handled.<br/>
     You can always find out more about <a href="../tribes/introduction.html">Apache Tribes</a>
   </p>
@@ -84,7 +84,7 @@
   <subsection name="Common Attributes">
 
   <attributes>
- 
+
     <attribute name="className" required="true">
        The default value here is <code>org.apache.catalina.tribes.group.GroupChannel</code> and is
        currently the only implementation available.

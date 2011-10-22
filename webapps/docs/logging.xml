@@ -343,7 +343,7 @@ org.apache.catalina.core.ContainerBase.[Catalina].[localhost].[/manager].handler
 #org.apache.catalina.util.LifecycleBase.level = FINE
 </source>
     </p>
-    
+
     <p>
       Example logging.properties for the servlet-examples web application to be
       placed in WEB-INF/classes inside the web application:
@@ -420,7 +420,7 @@ java.util.logging.ConsoleHandler.formatter = java.util.logging.SimpleFormatter
     </p>
 
     <ol>
-        <li>Create a file called <code>log4j.properties</code> with the 
+        <li>Create a file called <code>log4j.properties</code> with the
         following content and save it into <code>$CATALINA_BASE/lib</code></li>
     </ol>
     <source>
@@ -473,7 +473,7 @@ log4j.logger.org.apache.catalina.core.ContainerBase.[Catalina].[localhost].[/hos
   INFO, HOST-MANAGER
 </source>
     <ol start="2">
-        <li><a href="http://logging.apache.org/log4j">Download Log4J</a> 
+        <li><a href="http://logging.apache.org/log4j">Download Log4J</a>
         (v1.2 or later).</li>
 
         <li><p>Download or build <code>tomcat-juli.jar</code> and
@@ -529,10 +529,10 @@ log4j.logger.org.apache.catalina.core.ContainerBase.[Catalina].[localhost].[/hos
     </p>
 
     <p>
-      You can (and should) be more picky about which packages to include 
+      You can (and should) be more picky about which packages to include
       in the logging. Tomcat defines loggers by Engine and Host names.
       For example, for a more detailed Catalina localhost log, add this to the
-      end of the log4j.properties above. Note that there are known issues with 
+      end of the log4j.properties above. Note that there are known issues with
       using this naming convention (with square brackets) in log4j XML based
       configuration files, so we recommend you use a properties file as
       described until a future version of log4j allows this convention.
@@ -550,12 +550,12 @@ log4j.logger.org.apache.catalina.session=DEBUG<br />
     </p>
 
     <p>
-      Your web applications should certainly use their own log4j configuration. 
+      Your web applications should certainly use their own log4j configuration.
       This is valid <i>with</i> the above configuration.  You would place a
       similar log4j.properties file in your web application's WEB-INF/classes
       directory, and log4jx.y.z.jar into WEB-INF/lib. Then specify your package
       level logging. This is a basic setup of log4j which does *not* require
-      Commons-Logging, and you should consult the 
+      Commons-Logging, and you should consult the
       <a href="http://logging.apache.org/log4j/docs/documentation.html">log4j
       documentation</a> for more options. This page is intended only as a
       bootstrapping guide.

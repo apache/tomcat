@@ -29,7 +29,7 @@ import jsp2.examples.BookBean;
  */
 public class FindBookSimpleTag extends SimpleTagSupport {
     private String var;
-    
+
     private static final String BOOK_TITLE = "The Lord of the Rings";
     private static final String BOOK_AUTHOR = "J. R. R. Tolkein";
     private static final String BOOK_ISBN = "0618002251";

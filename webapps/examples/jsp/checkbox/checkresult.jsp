@@ -23,7 +23,7 @@
 <jsp:setProperty name="foo" property="fruit" param="fruit" />
 <hr>
 The checked fruits (got using request) are: <br>
-<% 
+<%
     fruits = request.getParameterValues("fruit");
 %>
 <ul>
@@ -43,7 +43,7 @@ The checked fruits (got using request) are: <br>
 
 The checked fruits (got using beans) are <br>
 
-<% 
+<%
         fruits = foo.getFruit();
 %>
 <ul>

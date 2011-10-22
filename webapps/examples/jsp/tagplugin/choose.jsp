@@ -34,7 +34,7 @@
     <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 
     <c:forEach var="index" begin="0" end="4">
-      # ${index}: 
+      # ${index}:
       <c:choose>
         <c:when test="${index == 1}">
           One!<br/>
@@ -51,4 +51,4 @@
       </c:choose>
     </c:forEach>
   </body>
-</html> 
+</html>

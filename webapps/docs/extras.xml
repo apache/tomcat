@@ -36,7 +36,7 @@
   <section name="Introduction">
   <p>
     A number of additional components may be used with Apache Tomcat. These
-    components may be built by users should they need them or they can be 
+    components may be built by users should they need them or they can be
     downloaded from one of the mirrors.
   </p>
 
@@ -46,10 +46,10 @@
   <p>
     To download the extras components open the Tomcat download page and
     select "browse" from the Quick Navigation Links. The extras components can be
-    found in bin/extras. 
+    found in bin/extras.
   </p>
   </section>
-  
+
   <section name="Building">
 
     <p>
@@ -57,9 +57,9 @@
       of the standard Tomcat Ant script which is present in the source bundle of
       Tomcat.
     </p>
-    
+
     <p>The build process is the following:</p>
-    
+
     <ul>
     <li>Follow the <a href="building.html">build instructions</a> to build a
         Tomcat binary from the source bundle (note: it will be used by the build

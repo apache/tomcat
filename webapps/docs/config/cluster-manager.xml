@@ -34,7 +34,7 @@
 </section>
 
 <section name="Introduction">
-  <p>A cluster manager is an extension to Tomcat's session manager interface, 
+  <p>A cluster manager is an extension to Tomcat's session manager interface,
   <code>org.apache.catalina.Manager</code>.
   A cluster manager must implement the
   <code>org.apache.catalina.ha.ClusterManager</code> and is solely  responsible
@@ -59,7 +59,7 @@
   implementation on a per web application basis, by putting the
   <code>&lt;Manager&gt;</code> inside the <code>&lt;Context&gt;</code> element
   either in the <code><a href="context.html">context.xml</a></code> file or the
-  <code><a href="index.html">server.xml</a></code> file.</p> 
+  <code><a href="index.html">server.xml</a></code> file.</p>
 </section>
 
 <section name="Attributes">
@@ -93,7 +93,7 @@
         <code>sessionHistory</code>.
       </attribute>
     </attributes>
-  </subsection> 
+  </subsection>
   <subsection name="org.apache.catalina.ha.session.DeltaManager Attributes">
     <attributes>
       <attribute name="expireSessionsOnShutdown" required="false">
@@ -142,7 +142,7 @@
         considered active sessions.
       </attribute>
       <attribute name="rpcTimeout" required="false">
-        Timeout for RPC message used for broadcast and transfer state from 
+        Timeout for RPC message used for broadcast and transfer state from
         another map.
         Default value is <code>15000</code> milliseconds.
       </attribute>

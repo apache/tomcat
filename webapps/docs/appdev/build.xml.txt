@@ -474,7 +474,7 @@
 
   NOTE: The /WEB-INF/web.xml web application configuration file is not reread
   on a reload. If you have made changes to your web.xml file you must stop
-  then start the web application. 
+  then start the web application.
 
 -->
 

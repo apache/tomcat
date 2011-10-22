@@ -61,12 +61,12 @@
     This may be exploited by an attacker to perform an XSS attack. Internet
     Explorer has this behaviour by default. Other browsers have an option to
     enable it.</p>
-    
+
     <p>This filter prevents the attack by explicitly setting a character set.
     Unless the provided character set is explicitly overridden by the user the
     browser will adhere to the explicitly set character set, thus preventing the
     XSS attack.</p>
-    
+
   </subsection>
 
   <subsection name="Filter Class Name">
@@ -85,8 +85,8 @@
     <attributes>
 
       <attribute name="encoding" required="false">
-        <p>Name of the character set which should be set, if no other character set 
-        was set explicitly by a Servlet. This parameter has two special values 
+        <p>Name of the character set which should be set, if no other character set
+        was set explicitly by a Servlet. This parameter has two special values
         <code>default</code> and <code>system</code>. A value of <code>system</code>
         uses the JVM wide default character set, which is usually set by locale.
         A value of <code>default</code> will use <strong>ISO-8859-1</strong>.</p>
@@ -108,12 +108,12 @@
     returned to the client are encoded via a call to
     <code>HttpServletResponse#encodeRedirectURL(String)</code> or
     <code>HttpServletResponse#encodeURL(String)</code>.</p>
-    
+
     <p>This filter prevents CSRF by generating a nonce and storing it in the
     session. URLs are also encoded with the same nonce. When the next request is
     received the nonce in the request is compared to the nonce in the session
     and only if they are the same is the request allowed to continue.</p>
-    
+
   </subsection>
 
   <subsection name="Filter Class Name">
@@ -138,7 +138,7 @@
         Entry points will be limited to HTTP GET requests and should not trigger
         any security sensitive actions.</p>
       </attribute>
-      
+
       <attribute name="nonceCacheSize" required="false">
         <p>The number of previously issued nonces that will be cached on a LRU
         basis to support parallel requests, limited use of the refresh and back
@@ -146,15 +146,15 @@
         of a previous nonce rather than the current one. If not set, the default
         value of 5 will be used.</p>
       </attribute>
-      
+
       <attribute name="randomClass" required="false">
         <p>The name of the class to use to generate nonces. The class must be an
         instance of <code>java.util.Random</code>. If not set, the default value
         of <code>java.security.SecureRandom</code> will be used.</p>
       </attribute>
-      
+
     </attributes>
-    
+
   </subsection>
 
 </section>
@@ -172,7 +172,7 @@
     server responses. The expiration date can set to be relative to either the
     time the source file was last modified, or to the time of the client access.
     </p>
-    
+
     <p>
     These HTTP headers are an instruction to the client about the document&#x27;s
     validity and persistence. If cached, the document may be fetched from the
@@ -187,12 +187,12 @@
     href="http://httpd.apache.org/docs/2.2/mod/mod_headers.html" >Apache Httpd
     mod_headers</a> module.
     </p>
-        
+
   </subsection>
 
   <subsection name="Basic configuration sample">
     <p>
-    Basic configuration to add '<code>Expires</code>' and '<code>Cache-Control: max-age=</code>' 
+    Basic configuration to add '<code>Expires</code>' and '<code>Cache-Control: max-age=</code>'
     headers to images, css and javascript.
     </p>
 
@@ -221,15 +221,15 @@
 &lt;/filter-mapping&gt;
 
     </source>
-    
+
   </subsection>
-  
+
   <subsection name="Alternate Syntax">
     <p>
     The <code>ExpiresDefault</code> and <code>ExpiresByType</code> directives can also be
     defined in a more readable syntax of the form:
     </p>
-    
+
     <source>
 &lt;init-param&gt;
  &lt;param-name&gt;ExpiresDefault&lt;/param-name&gt;
@@ -270,7 +270,7 @@
     For example, any of the following directives can be used to make documents
     expire 1 month after being accessed, by default:
     </p>
-    
+
     <source>
 &lt;init-param&gt;
  &lt;param-name&gt;ExpiresDefault&lt;/param-name&gt;
@@ -308,9 +308,9 @@ The expiry time can be fine-tuned by adding several &#x27;
     header will <strong>not</strong> be added to content that does not come from
     a file on disk. This is due to the fact that there is no modification time
     for such content.
-    </p>  
+    </p>
   </subsection>
-  
+
   <subsection name="Expiration headers generation eligibility">
     <p>
     A response is eligible to be enriched by <code>ExpiresFilter</code> if :
@@ -331,7 +331,7 @@ The expiry time can be fine-tuned by adding several &#x27;
     </p>
 
   </subsection>
-  
+
   <subsection name="Expiration configuration selection">
     <p>
     The expiration configuration if elected according to the following algorithm:
@@ -358,7 +358,7 @@ The expiry time can be fine-tuned by adding several &#x27;
     </strong>.</p>
 
   </subsection>
-  
+
   <subsection name="Initialisation parameters">
 
     <p>The <strong>Expires Filter</strong> supports the following
@@ -383,7 +383,7 @@ The expiry time can be fine-tuned by adding several &#x27;
          <p>
          <i>Sample : exclude response status codes 302, 500 and 503</i>
          </p>
-         
+
          <source>
 &lt;init-param&gt;
  &lt;param-name&gt;ExpiresExcludedResponseStatusCodes&lt;/param-name&gt;
@@ -423,22 +423,22 @@ The expiry time can be fine-tuned by adding several &#x27;
          accessed repeatedly within a relatively short timespan).
          </p>
          <p>
-         <strong>Note:</strong> When the content type includes a charset (e.g. 
-         <code>'ExpiresByType text/xml;charset=utf-8'</code>), Tomcat removes blank chars 
-         between the '<code>;</code>' and the '<code>charset</code>' keyword. Due to this, 
-         configuration of an expiration with a charset must <strong>not</strong> include 
-         such a space character. 
+         <strong>Note:</strong> When the content type includes a charset (e.g.
+         <code>'ExpiresByType text/xml;charset=utf-8'</code>), Tomcat removes blank chars
+         between the '<code>;</code>' and the '<code>charset</code>' keyword. Due to this,
+         configuration of an expiration with a charset must <strong>not</strong> include
+         such a space character.
          </p>
          <p>
          <i>Sample:</i>
          </p>
-         
+
          <source>
 &lt;init-param&gt;
    &lt;param-name&gt;ExpiresByType text/html&lt;/param-name&gt;
    &lt;param-value&gt;access plus 1 month 15   days 2 hours&lt;/param-value&gt;
 &lt;/init-param&gt;
- 
+
 &lt;init-param&gt;
    &lt;!-- 2592000 seconds = 30 days --&gt;
    &lt;param-name&gt;ExpiresByType image/gif&lt;/param-name&gt;
@@ -468,7 +468,7 @@ The expiry time can be fine-tuned by adding several &#x27;
     </attributes>
 
   </subsection>
-  
+
   <subsection name="Troubleshooting">
     <p>
     To troubleshoot, enable logging on the
@@ -477,29 +477,29 @@ The expiry time can be fine-tuned by adding several &#x27;
     <p>
     Extract of logging.properties
     </p>
-    
+
     <source>
 org.apache.catalina.filters.ExpiresFilter.level = FINE
     </source>
     <p>
     Sample of initialization log message:
     </p>
-    
+
     <source>
 Mar 26, 2010 2:01:41 PM org.apache.catalina.filters.ExpiresFilter init
 FINE: Filter initialized with configuration ExpiresFilter[
- excludedResponseStatusCode=[304], 
- default=null, 
+ excludedResponseStatusCode=[304],
+ default=null,
  byType={
-    image=ExpiresConfiguration[startingPoint=ACCESS_TIME, duration=[10 MINUTE]], 
-    text/css=ExpiresConfiguration[startingPoint=ACCESS_TIME, duration=[10 MINUTE]], 
+    image=ExpiresConfiguration[startingPoint=ACCESS_TIME, duration=[10 MINUTE]],
+    text/css=ExpiresConfiguration[startingPoint=ACCESS_TIME, duration=[10 MINUTE]],
     text/javascript=ExpiresConfiguration[startingPoint=ACCESS_TIME, duration=[10 MINUTE]]}]
     </source>
     <p>
     Sample of per-request log message where <code>ExpiresFilter</code> adds an
     expiration date:
     </p>
-    
+
     <source>
 Mar 26, 2010 2:09:47 PM org.apache.catalina.filters.ExpiresFilter onBeforeWriteResponseBody
 FINE: Request "/tomcat.gif" with response status "200" content-type "image/gif", set expiration date 3/26/10 2:19 PM
@@ -508,7 +508,7 @@ FINE: Request "/tomcat.gif" with response status "200" content-type "image/gif",
     Sample of per-request log message where <code>ExpiresFilter</code> does not add
     an expiration date:
     </p>
-    
+
     <source>
 Mar 26, 2010 2:10:27 PM org.apache.catalina.filters.ExpiresFilter onBeforeWriteResponseBody
 FINE: Request "/docs/config/manager.html" with response status "200" content-type "text/html", no expiration configured
@@ -666,14 +666,14 @@ FINE: Request "/docs/config/manager.html" with response status "200" content-typ
     via a request headers (e.g. &quot;X-Forwarded-For&quot;).</p>
 
     <p>Another feature of this filter is to replace the apparent scheme
-    (http/https), server port and <code>request.secure</code> with the scheme presented 
-    by a proxy or a load balancer via a request header 
+    (http/https), server port and <code>request.secure</code> with the scheme presented
+    by a proxy or a load balancer via a request header
     (e.g. &quot;X-Forwarded-Proto&quot;).</p>
- 
+
     <p>If used in conjunction with Remote Address/Host filters then this filter
     should be defined first to ensure that the correct client IP address is
     presented to the Remote Address/Host filters.</p>
-   
+
   </subsection>
 
   <subsection name="Filter Class Name">
@@ -693,7 +693,7 @@ FINE: Request "/docs/config/manager.html" with response status "200" content-typ
         &lt;filter-name&gt;RemoteIpFilter&lt;/filter-name&gt;
         &lt;filter-class&gt;org.apache.catalina.filters.RemoteIpFilter&lt;/filter-class&gt;
       &lt;/filter&gt;
-      
+
       &lt;filter-mapping&gt;
         &lt;filter-name&gt;RemoteIpFilter&lt;/filter-name&gt;
         &lt;url-pattern&gt;/*&lt;/url-pattern&gt;
@@ -701,13 +701,13 @@ FINE: Request "/docs/config/manager.html" with response status "200" content-typ
       &lt;/filter-mapping&gt;
     </source>
   </subsection>
-    
+
   <subsection name="Basic configuration to handle &#x27;x-forwarded-for&#x27; and &#x27;x-forwarded-proto&#x27;">
-  
+
     <p>
-    The filter will process <code>x-forwarded-for</code> and 
+    The filter will process <code>x-forwarded-for</code> and
     <code>x-forwarded-proto</code> http headers. Expected value for the
-    <code>x-forwarded-proto</code> header in case of SSL connections is 
+    <code>x-forwarded-proto</code> header in case of SSL connections is
     <code>https</code> (case insensitive). </p>
     <source>
       &lt;filter&gt;
@@ -718,7 +718,7 @@ FINE: Request "/docs/config/manager.html" with response status "200" content-typ
           &lt;param-value&gt;x-forwarded-proto&lt;/param-value&gt;
         &lt;/init-param&gt;
       &lt;/filter&gt;
-      
+
       &lt;filter-mapping&gt;
         &lt;filter-name&gt;RemoteIpFilter&lt;/filter-name&gt;
         &lt;url-pattern&gt;/*&lt;/url-pattern&gt;
@@ -726,7 +726,7 @@ FINE: Request "/docs/config/manager.html" with response status "200" content-typ
       &lt;/filter-mapping&gt;
     </source>
   </subsection>
-    
+
   <subsection name="Advanced configuration with internal proxies">
     <p>RemoteIpFilter configuration: </p>
     <source>
@@ -751,59 +751,59 @@ FINE: Request "/docs/config/manager.html" with response status "200" content-typ
        &lt;/init-param&gt;
      &lt;/filter&gt;
     </source>
-    <p>Request values: 
+    <p>Request values:
     <table border="1" cellpadding="5">
       <tr>
         <th bgcolor="#023264"><font color="#ffffff">Property</font></th>
         <th bgcolor="#023264"><font color="#ffffff">Value Before RemoteIpFilter</font></th>
         <th bgcolor="#023264"><font color="#ffffff">Value After RemoteIpFilter</font></th>
-      </tr> 
+      </tr>
       <tr>
         <td> request.remoteAddr </td>
         <td> 192.168.0.10 </td>
         <td> 140.211.11.130 </td>
-      </tr> 
+      </tr>
       <tr>
         <td> request.header<code>[</code>&#x27;x-forwarded-for&#x27;<code>]</code> </td>
         <td> 140.211.11.130, 192.168.0.10 </td>
         <td> null </td>
-      </tr> 
+      </tr>
       <tr>
         <td> request.header<code>[</code>&#x27;x-forwarded-by&#x27;<code>]</code> </td>
         <td> null </td>
         <td> null </td>
-      </tr> 
+      </tr>
       <tr>
         <td> request.header<code>[</code>&#x27;x-forwarded-proto&#x27;<code>]</code> </td>
         <td> https </td>
         <td> https </td>
-      </tr> 
+      </tr>
       <tr>
         <td> request.scheme </td>
         <td> http </td>
         <td> https </td>
-      </tr> 
+      </tr>
       <tr>
         <td> request.secure </td>
         <td> false </td>
         <td> true </td>
-      </tr> 
+      </tr>
       <tr>
         <td> request.serverPort </td>
         <td> 80 </td>
         <td> 443 </td>
-      </tr> 
+      </tr>
     </table>
     </p>
     <p>
-    Note : <code>x-forwarded-by</code> header is <code>null</code> because only 
-    internal proxies has been traversed by the request. 
-    <code>x-forwarded-for</code> is <code>null</code> because all the proxies are 
-    trusted or internal. 
+    Note : <code>x-forwarded-by</code> header is <code>null</code> because only
+    internal proxies has been traversed by the request.
+    <code>x-forwarded-for</code> is <code>null</code> because all the proxies are
+    trusted or internal.
     </p>
   </subsection>
-    
-    
+
+
   <subsection name="Advanced configuration with trusted proxies">
     <p>RemoteIpFilter configuration: </p>
     <source>
@@ -833,32 +833,32 @@ FINE: Request "/docs/config/manager.html" with response status "200" content-typ
         <th bgcolor="#023264"><font color="#ffffff">Property</font></th>
         <th bgcolor="#023264"><font color="#ffffff">Value Before RemoteIpFilter</font></th>
         <th bgcolor="#023264"><font color="#ffffff">Value After RemoteIpFilter</font></th>
-      </tr> 
+      </tr>
       <tr>
         <td> request.remoteAddr </td>
         <td> 192.168.0.10 </td>
         <td> 140.211.11.130 </td>
-      </tr> 
+      </tr>
       <tr>
         <td> request.header<code>[</code>&#x27;x-forwarded-for&#x27;<code>]</code> </td>
         <td> 140.211.11.130, proxy1, proxy2 </td>
         <td> null </td>
-      </tr> 
+      </tr>
       <tr>
         <td> request.header<code>[</code>&#x27;x-forwarded-by&#x27;<code>]</code> </td>
         <td> null </td>
         <td> proxy1, proxy2 </td>
-      </tr> 
+      </tr>
     </table>
     </p>
     <p>
-    Note : <code>proxy1</code> and <code>proxy2</code> are both trusted proxies that 
-    come in <code>x-forwarded-for</code> header, they both are migrated in 
-    <code>x-forwarded-by</code> header. <code>x-forwarded-for</code> is <code>null</code> 
+    Note : <code>proxy1</code> and <code>proxy2</code> are both trusted proxies that
+    come in <code>x-forwarded-for</code> header, they both are migrated in
+    <code>x-forwarded-by</code> header. <code>x-forwarded-for</code> is <code>null</code>
     because all the proxies are trusted or internal.
     </p>
   </subsection>
-    
+
   <subsection name="Advanced configuration with internal and trusted proxies">
     <p>RemoteIpFilter configuration: </p>
     <source>
@@ -888,36 +888,36 @@ FINE: Request "/docs/config/manager.html" with response status "200" content-typ
         <th bgcolor="#023264"><font color="#ffffff">Property</font></th>
         <th bgcolor="#023264"><font color="#ffffff">Value Before RemoteIpFilter</font></th>
         <th bgcolor="#023264"><font color="#ffffff">Value After RemoteIpFilter</font></th>
-      </tr> 
+      </tr>
       <tr>
         <td> request.remoteAddr </td>
         <td> 192.168.0.10 </td>
         <td> 140.211.11.130 </td>
-      </tr> 
+      </tr>
       <tr>
         <td> request.header<code>[</code>&#x27;x-forwarded-for&#x27;<code>]</code> </td>
         <td> 140.211.11.130, proxy1, proxy2, 192.168.0.10 </td>
         <td> null </td>
-      </tr> 
+      </tr>
       <tr>
         <td> request.header<code>[</code>&#x27;x-forwarded-by&#x27;<code>]</code> </td>
         <td> null </td>
         <td> proxy1, proxy2 </td>
-      </tr> 
+      </tr>
     </table>
     </p>
     <p>
-    Note : <code>proxy1</code> and <code>proxy2</code> are both trusted proxies that 
-    come in <code>x-forwarded-for</code> header, they both are migrated in 
-    <code>x-forwarded-by</code> header. As <code>192.168.0.10</code> is an internal 
-    proxy, it does not appear in <code>x-forwarded-by</code>. 
-    <code>x-forwarded-for</code> is <code>null</code> because all the proxies are 
+    Note : <code>proxy1</code> and <code>proxy2</code> are both trusted proxies that
+    come in <code>x-forwarded-for</code> header, they both are migrated in
+    <code>x-forwarded-by</code> header. As <code>192.168.0.10</code> is an internal
+    proxy, it does not appear in <code>x-forwarded-by</code>.
+    <code>x-forwarded-for</code> is <code>null</code> because all the proxies are
     trusted or internal.
     </p>
   </subsection>
-    
+
   <subsection name="Advanced configuration with an untrusted proxy">
-    
+
     <p>RemoteIpFilter configuration: </p>
     <source>
      &lt;filter&gt;
@@ -946,36 +946,36 @@ FINE: Request "/docs/config/manager.html" with response status "200" content-typ
         <th bgcolor="#023264"><font color="#ffffff">Property</font></th>
         <th bgcolor="#023264"><font color="#ffffff">Value Before RemoteIpFilter</font></th>
         <th bgcolor="#023264"><font color="#ffffff">Value After RemoteIpFilter</font></th>
-      </tr> 
+      </tr>
       <tr>
         <td> request.remoteAddr </td>
         <td> 192.168.0.10 </td>
         <td> untrusted-proxy </td>
-      </tr> 
+      </tr>
       <tr>
         <td> request.header<code>[</code>&#x27;x-forwarded-for&#x27;<code>]</code> </td>
         <td> 140.211.11.130, untrusted-proxy, proxy1 </td>
         <td> 140.211.11.130 </td>
-      </tr> 
+      </tr>
       <tr>
         <td> request.header<code>[</code>&#x27;x-forwarded-by&#x27;<code>]</code> </td>
         <td> null </td>
         <td> proxy1 </td>
-      </tr> 
+      </tr>
     </table>
     </p>
     <p>
-    Note : <code>x-forwarded-by</code> holds the trusted proxy <code>proxy1</code>. 
-    <code>x-forwarded-by</code> holds <code>140.211.11.130</code> because 
-    <code>untrusted-proxy</code> is not trusted and thus, we can not trust that 
-    <code>untrusted-proxy</code> is the actual remote ip. 
-    <code>request.remoteAddr</code> is <code>untrusted-proxy</code> that is an IP 
-    verified by <code>proxy1</code>. 
+    Note : <code>x-forwarded-by</code> holds the trusted proxy <code>proxy1</code>.
+    <code>x-forwarded-by</code> holds <code>140.211.11.130</code> because
+    <code>untrusted-proxy</code> is not trusted and thus, we can not trust that
+    <code>untrusted-proxy</code> is the actual remote ip.
+    <code>request.remoteAddr</code> is <code>untrusted-proxy</code> that is an IP
+    verified by <code>proxy1</code>.
     </p>
   </subsection>
 
   <subsection name="Initialisation parameters">
-  
+
     <p>The <strong>Remote IP Filter</strong> supports the
     following initialisation parameters:</p>
 
@@ -1031,15 +1031,15 @@ FINE: Request "/docs/config/manager.html" with response status "200" content-typ
       </attribute>
 
       <attribute name="httpServerPort" required="false">
-        <p>Value returned by <code>ServletRequest.getServerPort()</code> 
-        when the <strong>protocolHeader</strong> indicates <code>http</code> 
+        <p>Value returned by <code>ServletRequest.getServerPort()</code>
+        when the <strong>protocolHeader</strong> indicates <code>http</code>
         protocol and no <strong>portHeader</strong> is present. If not
         specified, the default of <code>80</code> is used.</p>
       </attribute>
 
       <attribute name="httpsServerPort" required="false">
-        <p>Value returned by <code>ServletRequest.getServerPort()</code> 
-        when the <strong>protocolHeader</strong> indicates <code>https</code> 
+        <p>Value returned by <code>ServletRequest.getServerPort()</code>
+        when the <strong>protocolHeader</strong> indicates <code>https</code>
         protocol and no <strong>portHeader</strong> is present. If not
         specified, the default of <code>443</code> is used.</p>
       </attribute>
@@ -1075,7 +1075,7 @@ FINE: Request "/docs/config/manager.html" with response status "200" content-typ
     The parameters will be decoded using the default platform encoding. Any
     subsequent calls to <code>request.setCharacterEncoding()</code> within
     the web application will have no effect.</p>
-    
+
   </subsection>
 
   <subsection name="Filter Class Name">
@@ -1094,7 +1094,7 @@ FINE: Request "/docs/config/manager.html" with response status "200" content-typ
   </subsection>
 
   <subsection name="Sample Configuration">
-  
+
     <p>The following entries in a web application's web.xml would enable the
     Request Dumper filter for all requests for that web application. If the
     entries were added to <code>CATALINA_BASE/conf/web.xml</code>, the Request
@@ -1111,7 +1111,7 @@ FINE: Request "/docs/config/manager.html" with response status "200" content-typ
     &lt;url-pattern&gt;*&lt;/url-pattern&gt;
 &lt;/filter-mapping&gt;
     </source>
-    
+
     <p>The following entries in CATALINA_BASE/conf/logging.properties would
     create a separate log file for the Request Dumper Filter output.</p>
     <source>
@@ -1137,7 +1137,7 @@ org.apache.catalina.filters.RequestDumperFilter.handlers = 1request-dumper.org.a
     ISO-8859-1 or the platform default encoding may be used. This is not always
     desirable. This filter provides options for setting that encoding or forcing
     it to a particular value.</p>
-        
+
   </subsection>
 
   <subsection name="Filter Class Name">
@@ -1183,7 +1183,7 @@ org.apache.catalina.filters.RequestDumperFilter.handlers = 1request-dumper.org.a
     communicate with the Tomcat WebDAV Servlet. This Filter provides a fix for
     this by forcing the use of the WebDAV implementation that works, even when
     connecting via port 80.</p>
-    
+
   </subsection>
 
   <subsection name="Filter Class Name">

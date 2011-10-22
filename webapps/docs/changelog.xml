@@ -42,7 +42,7 @@
   Other fixed issues are added to the end of the list, chronologically.
   They eventually become mixed with the numbered issues. (I.e., numbered
   issues to not "pop up" wrt. others).
-  
+
   Until the first Tomcat 8.0.0 release, only changes not back-ported to 7.0.x
   should be listed here.
 -->

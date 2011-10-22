@@ -36,7 +36,7 @@
     <validator-class>validators.DebugValidator</validator-class>
   </validator>
 
-  <!-- This is a dummy tag solely to satisfy DTD requirements -->  
+  <!-- This is a dummy tag solely to satisfy DTD requirements -->
   <tag>
     <name>log</name>
     <tag-class>examples.LogTag</tag-class>
@@ -49,6 +49,6 @@
         <required>false</required>
     </attribute>
   </tag>
-  
+
 
 </taglib>

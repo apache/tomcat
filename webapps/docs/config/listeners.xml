@@ -38,7 +38,7 @@
   actions when specific events occur, usually Tomcat starting or Tomcat
   stopping.</p>
 
-  <p>Listeners may be nested inside a <a href="server.html">Server</a>, 
+  <p>Listeners may be nested inside a <a href="server.html">Server</a>,
   <a href="engine.html">Engine</a>, <a href="host.html">Host</a> or
   <a href="context.html">Context</a>. Some Listeners are only intended to be
   nested inside specific elements. These constraints are noted in the
@@ -156,7 +156,7 @@
     this listener starts as Tomcat's common class loader is the context class
     loader at that time. It also provides work-arounds for known issues that
     can result in locked JAR files.</p>
-    
+
     <p>This listener must only be nested within <a href="server.html">Server</a>
     elements.</p>
 
@@ -182,12 +182,12 @@
       </attribute>
 
       <attribute name="classesToInitialize" required="false">
-        <p>List of comma-separated fully qualified class names to load and initialize 
-        during the startup of this Listener. This allows to pre-load classes that are 
-        known to provoke classloader leaks if they are loaded during a request 
-        processing. Non-JRE classes may be referenced, like 
+        <p>List of comma-separated fully qualified class names to load and initialize
+        during the startup of this Listener. This allows to pre-load classes that are
+        known to provoke classloader leaks if they are loaded during a request
+        processing. Non-JRE classes may be referenced, like
         <code>oracle.jdbc.driver.OracleTimeoutThreadPerVM</code>.
-        The default value is empty, but specific JRE classes are loaded by other leak 
+        The default value is empty, but specific JRE classes are loaded by other leak
         protection features managed by other attributes of this Listener.</p>
       </attribute>
 
@@ -218,24 +218,24 @@
 
       <attribute name="ldapPoolProtection" required="false">
         <p>Enables protection so that the PoolCleaner thread started by
-        <code>com.sun.jndi.ldap.LdapPoolManager</code> does not result in a 
-        memory leak. The thread is started the first time the 
-        <code>LdapPoolManager</code> class is used if the system property 
+        <code>com.sun.jndi.ldap.LdapPoolManager</code> does not result in a
+        memory leak. The thread is started the first time the
+        <code>LdapPoolManager</code> class is used if the system property
         <code>com.sun.jndi.ldap.connect.pool.timeout</code> is set to a value
-        greater than 0. Without this protection, if a web application uses this 
-        class the PoolCleaner thread will be configured with the thread's 
-        context class loader set to the web application class loader which in 
-        turn will trigger a memory leak on reload. Defaults to 
+        greater than 0. Without this protection, if a web application uses this
+        class the PoolCleaner thread will be configured with the thread's
+        context class loader set to the web application class loader which in
+        turn will trigger a memory leak on reload. Defaults to
         <code>true</code>.</p>
       </attribute>
 
       <attribute name="securityLoginConfigurationProtection" required="false">
         <p>Enables protection so that usage of the
-        <code>javax.security.auth.login.Configuration</code> class by a web 
-        application does not provoke a memory leak. The first access of this 
-        class will trigger the initializer that will retain a static reference 
-        to the context class loader. The protection loads the class with the 
-        system class loader to ensure that the static initializer is not 
+        <code>javax.security.auth.login.Configuration</code> class by a web
+        application does not provoke a memory leak. The first access of this
+        class will trigger the initializer that will retain a static reference
+        to the context class loader. The protection loads the class with the
+        system class loader to ensure that the static initializer is not
         triggered by a web application. Defaults to <code>true</code>.</p>
       </attribute>
 
@@ -379,7 +379,7 @@
       </attribute>
 
     </attributes>
-    
+
     <h3>Using file-based Authentication and Authorisation</h3>
 
     <p>If this listener was configured in server.xml as:
@@ -438,7 +438,7 @@
   </source>
     then we would need to provide LDAP credentials instead.
     </p>
-    
+
     <p><strong>Note that the examples above do not use SSL. JMX access should
     be considered equivalent to administrative access and secured accordingly.
     </strong></p>

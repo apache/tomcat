@@ -73,7 +73,7 @@
   support the following attributes:</p>
 
   <attributes>
- 
+
     <attribute name="allowTrace" required="false">
       <p>A boolean value which can be used to enable or disable the TRACE
       HTTP method. If not specified, this attribute is set to false.</p>
@@ -198,7 +198,7 @@
       <p>Set this attribute to <code>true</code> if you wish to have
       calls to <code>request.isSecure()</code> to return <code>true</code>
       for requests received by this Connector. You would want this on an
-      SSL Connector or a non SSL connector that is receiving data from a 
+      SSL Connector or a non SSL connector that is receiving data from a
       SSL accelerator, like a crypto card, a SSL appliance or even a webserver.
       The default value is <code>false</code>.</p>
     </attribute>
@@ -322,7 +322,7 @@
       server.xml that ships with Tomcat sets this to 20000 (i.e. 20 seconds).
       </p>
     </attribute>
-    
+
     <attribute name="connectionUploadTimeout" required="false">
       <p>Specifies the timeout, in milliseconds, to use while a data upload is
       in progress. This only takes effect if
@@ -387,7 +387,7 @@
       by this <strong>Connector</strong>, which therefore determines the
       maximum number of simultaneous requests that can be handled.  If
       not specified, this attribute is set to 200. If an executor is associated
-      with this connector, this attribute is ignored as the connector will 
+      with this connector, this attribute is ignored as the connector will
       execute tasks using the executor rather than an internal thread pool.</p>
     </attribute>
 
@@ -421,7 +421,7 @@
       good default is to use the larger of maxThreads and the maximum number of
       expected concurrent requests (synchronous and asynchronous).</p>
     </attribute>
-      
+
     <attribute name="restrictedUserAgents" required="false">
       <p>The value is a regular expression (using <code>java.util.regex</code>) matching
       matching the <code>user-agent</code> header of HTTP clients for which
@@ -451,9 +451,9 @@
       To turn on SSL handshake/encryption/decryption on a connector
       set this value to <code>true</code>.
       The default value is <code>false</code>.
-      When turning this value <code>true</code> you will want to set the 
+      When turning this value <code>true</code> you will want to set the
       <code>scheme</code> and the <code>secure</code> attributes as well
-      to pass the correct <code>request.getScheme()</code> and 
+      to pass the correct <code>request.getScheme()</code> and
       <code>request.isSecure()</code> values to the servlets
       See <a href="#SSL Support">SSL Support</a> for more information.
       </p>
@@ -474,15 +474,15 @@
     </attribute>
 
   </attributes>
-  
+
   </subsection>
-  
+
   <subsection name="Java TCP socket attributes">
-  
+
     <p>The BIO and NIO implementation support the following Java TCP socket
     attributes in addition to the common Connector and HTTP attributes listed
     above.</p>
-  
+
     <attributes>
       <attribute name="socket.rxBufSize" required="false">
         <p>(int)The socket receive buffer (SO_RCVBUF) size in bytes. JVM default
@@ -527,7 +527,7 @@
       <attribute name="socket.soTimeout" required="false">
         <p>This is equivalent to standard attribute
         <strong>connectionTimeout</strong>.</p>
-      </attribute>      
+      </attribute>
       <attribute name="socket.soTrafficClass" required="false">
         <p>(byte)Value between <code>0</code> and <code>255</code> for the
         traffic class on the socket. JVM default used if not set.</p>
@@ -535,36 +535,36 @@
         <strong>soTrafficClass</strong> causes a problem. A work around for this
         is to add the <code>-Djava.net.preferIPv4Stack=true</code> value to your
         JVM options.</p>
-      </attribute>      
+      </attribute>
       <attribute name="socket.performanceConnectionTime" required="false">
         <p>(int)The first value for the performance settings. See
         <a href="http://download.oracle.com/javase/6/docs/api/java/net/Socket.html#setPerformancePreferences(int,%20int,%20int)">Socket Performance Options</a>
         All three performance attributes must be set else the JVM defaults will
         be used for all three.</p>
-      </attribute>      
+      </attribute>
       <attribute name="socket.performanceLatency" required="false">
         <p>(int)The second value for the performance settings. See
         <a href="http://download.oracle.com/javase/6/docs/api/java/net/Socket.html#setPerformancePreferences(int,%20int,%20int)">Socket Performance Options</a>
         All three performance attributes must be set else the JVM defaults will
         be used for all three.</p>
-      </attribute>      
+      </attribute>
       <attribute name="socket.performanceBandwidth" required="false">
         <p>(int)The third value for the performance settings. See
         <a href="http://download.oracle.com/javase/6/docs/api/java/net/Socket.html#setPerformancePreferences(int,%20int,%20int)">Socket Performance Options</a>
         All three performance attributes must be set else the JVM defaults will
         be used for all three.</p>
-      </attribute> 
+      </attribute>
       <attribute name="socket.unlockTimeout" required="false">
         <p>(int) The timeout for a socket unlock. When a connector is stopped, it will try to release the acceptor thread by opening a connector to itself.
            The default value is <code>250</code> and the value is in milliseconds</p>
-      </attribute> 
+      </attribute>
     </attributes>
   </subsection>
-  
+
   <subsection name="BIO specific configuration">
-    
+
     <p>The following attributes are specific to the BIO connector.</p>
-    
+
     <attributes>
 
       <attribute name="disableKeepAlivePercentage" required="false">
@@ -578,7 +578,7 @@
     </attributes>
 
   </subsection>
-  
+
   <subsection name="NIO specific configuration">
 
     <p>The following attributes are specific to the NIO connector.</p>
@@ -597,7 +597,7 @@
         Default value is <code>1</code> per processor. Can't see a reason to go
         above that. But experiment and find your own results.</p>
       </attribute>
-      
+
       <attribute name="pollerThreadPriority" required="false">
         <p>(int)The priority of the poller threads. The default value is
         <code>java.lang.Thread#NORM_PRIORITY</code>. See the JavaDoc for the
@@ -629,7 +629,7 @@
         that would be something like <code>-XX:MaxDirectMemorySize=256m</code>.
         </p>
       </attribute>
-      
+
       <attribute name="socket.appReadBufSize" required="false">
         <p>(int)Each connection that is opened up in Tomcat get associated with
         a read ByteBuffer. This attribute controls the size of this buffer. By
@@ -713,7 +713,7 @@
         <code>-Dorg.apache.tomcat.util.net.NioSelectorShared=true|false</code>
         - default is <code>true</code>. Set this value to <code>false</code> if you wish to
         use a selector for each thread. When you set it to <code>false</code>, you can
-        control the size of the pool of selectors by using the 
+        control the size of the pool of selectors by using the
         <strong>selectorPool.maxSelectors</strong> attribute.</p>
       </attribute>
 
@@ -733,7 +733,7 @@
   </subsection>
 
   <subsection name="APR/native specific configuration">
-    
+
     <p>The following attributes are specific to the APR/native connector.</p>
 
     <attributes>
@@ -744,7 +744,7 @@
         <code>TCP_DEFER_ACCEPT</code> is supported by the operating system,
         otherwise it is <code>false</code>.</p>
       </attribute>
-    
+
       <attribute name="pollerSize" required="false">
         <p>Amount of sockets that the poller responsible for polling kept alive
         connections can hold at a given time. Extra connections will be closed
@@ -783,7 +783,7 @@
         less than 1024. For Linux the default is 1. Changing the default on
         Windows is likely to have a negative performance impact.</p>
       </attribute>
-      
+
       <attribute name="threadPriority" required="false">
         <p>(int)The priority of the acceptor and poller threads. The default
         value is <code>java.lang.Thread#NORM_PRIORITY</code>. See the JavaDoc
@@ -802,7 +802,7 @@
       </attribute>
 
     </attributes>
-    
+
   </subsection>
 
 </section>
@@ -898,7 +898,7 @@
     </attribute>
 
     <attribute name="ciphers" required="false">
-      <p>The comma separated list of encryption ciphers that this socket is 
+      <p>The comma separated list of encryption ciphers that this socket is
       allowed to use. By default, the default ciphers for the JVM will be used.
       Note that this usually means that the weak export grade ciphers will be
       included in the list of available ciphers. The ciphers are specified using
@@ -978,7 +978,7 @@
       specify an unlimited cache size. If not specified, a default of 0 is
       used.</p>
     </attribute>
-    
+
     <attribute name="sessionTimeout" required="false">
       <p>The time, in seconds, after the creation of an SSL session that it will
       timeout. Use 0 to specify an unlimited timeout. If not specified, a
@@ -1009,7 +1009,7 @@
       attribute is set, the trust store attributes may be ignored.
       </p>
     </attribute>
-    
+
     <attribute name="trustMaxCertLength" required="false">
       <p>The maximum number of intermediate certificates that will be allowed
       when validating client certificates. If not specified, the default value
@@ -1075,12 +1075,12 @@
   </p>
 
   <attributes>
-  
+
     <attribute name="SSLCACertificateFile" required="false">
       <p>See <a href="http://httpd.apache.org/docs/2.2/mod/mod_ssl.html#sslcacertificatefile">
       the mod_ssl documentation</a>.</p>
     </attribute>
-    
+
     <attribute name="SSLCACertificatePath" required="false">
       <p>See <a href="http://httpd.apache.org/docs/2.2/mod/mod_ssl.html#sslcacertificatepath">
       the mod_ssl documentation</a>.</p>
@@ -1171,9 +1171,9 @@
       <p>Maximum verification depth for client certificates. The default is
       "10".</p>
     </attribute>
-  
+
   </attributes>
-  
+
   <p>For more information, see the
   <a href="../ssl-howto.html">SSL Configuration HOW-TO</a>.</p>
 
@@ -1195,8 +1195,8 @@
     SSL Support               Java SSL                    Java SSL                   OpenSSL
     SSL Handshake             Blocking                  Non blocking                 Blocking
     Max Connections        maxConnections              maxConnections             maxConnections
-    
-    
+
+
     </source>
 
   </subsection>

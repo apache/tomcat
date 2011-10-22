@@ -22,7 +22,7 @@
     <h1>JSP 2.0 Expression Language - Basic Arithmetic</h1>
     <hr>
     This example illustrates basic Expression Language arithmetic.
-    Addition (+), subtraction (-), multiplication (*), division (/ or div), 
+    Addition (+), subtraction (-), multiplication (*), division (/ or div),
     and modulus (% or mod) are all supported.  Error conditions, like
     division by zero, are handled gracefully.
     <br>

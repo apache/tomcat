@@ -22,7 +22,7 @@
   <body>
     <h1>JSP 2.0 Examples - Display Products Tag File</h1>
     <hr>
-    <p>This JSP page invokes a tag file that displays a listing of 
+    <p>This JSP page invokes a tag file that displays a listing of
     products.  The custom tag accepts two fragments that enable
     customization of appearance.  One for when the product is on sale
     and one for normal price.</p>

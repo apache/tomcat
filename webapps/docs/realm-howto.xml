@@ -128,7 +128,7 @@ configuration file, that looks something like this:</p>
        ... other attributes for this implementation .../&gt;
 </source>
 
-<p>The <code>&lt;Realm&gt;</code> element can be nested inside any one of 
+<p>The <code>&lt;Realm&gt;</code> element can be nested inside any one of
 of the following <code>Container</code> elements.  The location of the
 Realm element has a direct impact on the "scope" of that Realm
 (i.e. which web applications will share the same authentication information):
@@ -204,7 +204,7 @@ techniques are supported:</p>
 
 <p>If using digested passwords with DIGEST authentication, the cleartext used
    to generate the digest is different. In the examples above
-   <code>{cleartext-password}</code> must be replaced with 
+   <code>{cleartext-password}</code> must be replaced with
    <code>{username}:{realm}:{cleartext-password}</code>. For example, in a
    development environment this might take the form
    <code>testUser:Authentication required:testPassword</code>. The value for
@@ -402,7 +402,7 @@ as your database structure conforms to the following requirements:</p>
     <li>Password to be recognized by Tomcat when the user logs in.
         This value may in cleartext or digested - see below for more
         information.</li>
-    </ul></li>    
+    </ul></li>
 <li>There must be a table, referenced below as the <em>user roles</em> table,
     that contains one row for every valid role that is assigned to a
     particular user.  It is legal for a user to have zero, one, or more than
@@ -417,9 +417,9 @@ as your database structure conforms to the following requirements:</p>
 </ul>
 
 <h3>Quick Start</h3>
-                  
+
 <p>To set up Tomcat to use DataSourceRealm, you will need to follow these steps:</p>
-<ol>              
+<ol>
 <li>If you have not yet done so, create tables and columns in your database
     that conform to the requirements described above.</li>
 <li>Configure a database username and password for use by Tomcat, that has
@@ -1038,10 +1038,10 @@ integration with the CMA as implemented by Tomcat.
  you will need to follow these steps:</p>
         <ol>
           <li>Write your own LoginModule, User and Role classes based
-on JAAS (see 
+on JAAS (see
 <a href="http://download.oracle.com/javase/1.4.2/docs/guide/security/jaas/tutorials/GeneralAcnOnly.html">the
-JAAS Authentication Tutorial</a> and 
-<a href="http://download.oracle.com/javase/1.4.2/docs/guide/security/jaas/JAASLMDevGuide.html">the JAAS Login Module 
+JAAS Authentication Tutorial</a> and
+<a href="http://download.oracle.com/javase/1.4.2/docs/guide/security/jaas/JAASLMDevGuide.html">the JAAS Login Module
 Developer's Guide</a>) to be managed by the JAAS Login
 Context (<code>javax.security.auth.login.LoginContext</code>)
 When developing your LoginModule, note that JAASRealm's built-in <code>CallbackHandler</code>
@@ -1068,7 +1068,7 @@ the resources you want to protect</li>
         </ol>
         <h3>Realm Element Attributes</h3>
         <p>To configure JAASRealm as for step 6 above, you create
-a <code>&lt;Realm&gt;</code> element and nest it in your 
+a <code>&lt;Realm&gt;</code> element and nest it in your
 <code>$CATALINA_BASE/conf/server.xml</code>
 file within your <code>&lt;Engine&gt;</code> node. The attributes for the
 JAASRealm are defined in the <a href="config/realm.html">Realm</a>
@@ -1079,25 +1079,25 @@ configuration documentation.</p>
 <p>Here is an example of how your server.xml snippet should look.</p>
 
 <source>
-&lt;Realm className="org.apache.catalina.realm.JAASRealm"                 
-                appName="MyFooRealm"       
-    userClassNames="org.foobar.realm.FooUser"       
+&lt;Realm className="org.apache.catalina.realm.JAASRealm"
+                appName="MyFooRealm"
+    userClassNames="org.foobar.realm.FooUser"
      roleClassNames="org.foobar.realm.FooRole"/&gt;
 </source>
 
-<p>It is the responsibility of your login module to create and save User and 
-Role objects representing Principals for the user 
-(<code>javax.security.auth.Subject</code>). If your login module doesn't 
-create a user object but also doesn't throw a login exception, then the 
-Tomcat CMA will break and you will be left at the 
-http://localhost:8080/myapp/j_security_check URI or at some other 
+<p>It is the responsibility of your login module to create and save User and
+Role objects representing Principals for the user
+(<code>javax.security.auth.Subject</code>). If your login module doesn't
+create a user object but also doesn't throw a login exception, then the
+Tomcat CMA will break and you will be left at the
+http://localhost:8080/myapp/j_security_check URI or at some other
 unspecified location.</p>
 
         <p>The flexibility of the JAAS approach is two-fold: </p>
         <ul>
           <li>you can carry out whatever processing you require behind
 the scenes in your own login module.</li>
-          <li>you can plug in a completely different LoginModule by changing the configuration 
+          <li>you can plug in a completely different LoginModule by changing the configuration
 and restarting the server, without any code changes to your application.</li>
         </ul>
 
@@ -1118,7 +1118,7 @@ and restarting the server, without any code changes to your application.</li>
           <li>As with other <code>Realm</code> implementations, digested passwords
               are supported if the <code>&lt;Realm&gt;</code> element in <code>server.xml</code>
               contains a <code>digest</code> attribute; JAASRealm's <code>CallbackHandler</code>
-              will digest the password prior to passing it back to the <code>LoginModule</code></li>  
+              will digest the password prior to passing it back to the <code>LoginModule</code></li>
         </ul>
 
 </subsection>
@@ -1149,7 +1149,7 @@ and restarting the server, without any code changes to your application.</li>
     file within your <code>&lt;Engine&gt;</code> or <code>&lt;Host&gt;</code>.
     You can also nest inside a <code>&lt;Context&gt;</code> node in a
     <code>context.xml</code> file.</p>
-    
+
 <h3>Example</h3>
 
 <p>Here is an example of how your server.xml snippet should look to use a
@@ -1176,10 +1176,10 @@ UserDatabase Realm and a DataSource Realm.</p>
     <code>Realm</code> interface that extends the CombinedRealm to provide lock
     out functionality to provide a user lock out mechanism if there are too many
     failed authentication attempts in a given period of time.</p>
-    
+
     <p>To ensure correct operation, there is a reasonable degree of
     synchronisation in this Realm.</p>
-    
+
     <p>This Realm does not require modification to the underlying Realms or the
     associated user storage mecahisms. It achieves this by recording all failed
     logins, including those for users that do not exist. To prevent a DOS by
@@ -1201,7 +1201,7 @@ UserDatabase Realm and a DataSource Realm.</p>
     <code>context.xml</code> file. The attributes for the
     LockOutRealm are defined in the <a href="config/realm.html">Realm</a>
     configuration documentation.</p>
-    
+
 <h3>Example</h3>
 
 <p>Here is an example of how your server.xml snippet should look to add lock out

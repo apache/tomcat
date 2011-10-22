@@ -35,10 +35,10 @@
 
 <section name="Using Tomcat libraries With Maven">
     <subsection name="Tomcat Snapshots">
-      Tomcat snapshots are located in the 
+      Tomcat snapshots are located in the
       <a href="http://people.apache.org/repo/m2-snapshot-repository/org/apache/tomcat/">Apache Snapshot Repository</a>.
       The official URL is <source>http://people.apache.org/repo/m2-snapshot-repository/org/apache/tomcat/</source>
-      Snapshots are done periodically, not on a regular basis, but when changes happen and the Tomcat team deems a new snapshot might 
+      Snapshots are done periodically, not on a regular basis, but when changes happen and the Tomcat team deems a new snapshot might
       useful.
     </subsection>
     <subsection name="Tomcat Releases">

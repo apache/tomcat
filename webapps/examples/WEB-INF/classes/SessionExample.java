@@ -43,7 +43,7 @@ public class SessionExample extends HttpServlet {
     private static final long serialVersionUID = 1L;
 
     private static final ResourceBundle RB = ResourceBundle.getBundle("LocalStrings");
-    
+
     @Override
     public void doGet(HttpServletRequest request,
                       HttpServletResponse response)
@@ -66,8 +66,8 @@ public class SessionExample extends HttpServlet {
 
         // XXX
         // making these absolute till we work out the
-        // addition of a PathInfo issue 
-        
+        // addition of a PathInfo issue
+
         out.println("<a href=\"../sessions.html\">");
         out.println("<img src=\"../images/code.gif\" height=24 " +
                     "width=24 align=right border=0 alt=\"view code\"></a>");
@@ -95,9 +95,9 @@ public class SessionExample extends HttpServlet {
         out.println(RB.getString("sessions.data") + "<br>");
         Enumeration<String> names = session.getAttributeNames();
         while (names.hasMoreElements()) {
-            String name = names.nextElement(); 
+            String name = names.nextElement();
             String value = session.getAttribute(name).toString();
-            out.println(HTMLFilter.filter(name) + " = " 
+            out.println(HTMLFilter.filter(name) + " = "
                         + HTMLFilter.filter(value) + "<br>");
         }
 
@@ -132,10 +132,10 @@ public class SessionExample extends HttpServlet {
         out.print("<p><a href=\"");
         out.print(response.encodeURL("SessionExample?dataname=foo&datavalue=bar"));
         out.println("\" >URL encoded </a>");
-        
+
         out.println("</body>");
         out.println("</html>");
-        
+
         out.println("</body>");
         out.println("</html>");
     }

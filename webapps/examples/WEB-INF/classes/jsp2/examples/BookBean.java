@@ -22,7 +22,7 @@ public class BookBean {
     private String title;
     private String author;
     private String isbn;
-    
+
     public BookBean( String title, String author, String isbn ) {
         this.title = title;
         this.author = author;
@@ -32,13 +32,13 @@ public class BookBean {
     public String getTitle() {
         return this.title;
     }
-    
+
     public String getAuthor() {
         return this.author;
     }
-    
+
     public String getIsbn() {
         return this.isbn;
     }
-    
+
 }

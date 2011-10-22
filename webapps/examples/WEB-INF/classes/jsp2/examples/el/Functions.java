@@ -20,7 +20,7 @@ import java.util.Locale;
 
 /**
  * Defines the functions for the jsp2 example tag library.
- * 
+ *
  * <p>Each function is defined as a static method.</p>
  */
 public class Functions {

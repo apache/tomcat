@@ -14,7 +14,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 -->
-<!-- 
+<!--
   - This example is based off the textRotate.svg example that comes
   - with Batik.  The original example was written by Bill Haneman.
   - This version by Mark Roth.
@@ -38,14 +38,14 @@
         <jsp:text>
           <![CDATA[<g opacity="0.95" transform="scale(1.05) rotate(15)">]]>
         </jsp:text>
-        <text x="0" y="0" transform="scale(1.6, 1.6)" fill="DarkSlateBlue" 
-              text-anchor="middle" font-size="40" font-family="Serif" 
+        <text x="0" y="0" transform="scale(1.6, 1.6)" fill="DarkSlateBlue"
+              text-anchor="middle" font-size="40" font-family="Serif"
               id="words">${name}</text>
       </c:forEach>
       <c:forEach var="i" begin="1" end="24">
         <jsp:text><![CDATA[</g>]]></jsp:text>
       </c:forEach>
-      <text style="font-size:75;font-family:Serif;fill:white" 
+      <text style="font-size:75;font-family:Serif;fill:white"
             text-anchor="middle">${name}</text>
     </g>
   </g>

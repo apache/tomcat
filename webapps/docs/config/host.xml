@@ -98,7 +98,7 @@
         deployment of web applications. If not specified, the default of
         <code>webapps</code> will be used.</p>
       </attribute>
-      
+
       <attribute name="xmlBase" required="false">
         <p>The <em>XML Base</em> directory for this virtual host.
         This is the pathname of a directory that may contain context XML
@@ -110,7 +110,7 @@
         deployment of web applications. If not specified the default of
         <code>[engine_name]/[host_name]</code> will be used.</p>
       </attribute>
-      
+
       <attribute name="createDirs" required="false">
         <p>If set to true, Tomcat will attempt to create the directories defined
         by the  attributes <code>appBase</code> and <code>xmlBase</code> during
@@ -132,18 +132,18 @@
       </attribute>
 
       <attribute name="backgroundProcessorDelay" required="false">
-        <p>This value represents the delay in seconds between the 
-        invocation of the backgroundProcess method on this host and 
-        its child containers, including all contexts. 
-        Child containers will not be invoked if their delay value is not 
-        negative (which would mean they are using their own processing 
-        thread). Setting this to a positive value will cause 
-        a thread to be spawn. After waiting the specified amount of time, 
-        the thread will invoke the backgroundProcess method on this host 
+        <p>This value represents the delay in seconds between the
+        invocation of the backgroundProcess method on this host and
+        its child containers, including all contexts.
+        Child containers will not be invoked if their delay value is not
+        negative (which would mean they are using their own processing
+        thread). Setting this to a positive value will cause
+        a thread to be spawn. After waiting the specified amount of time,
+        the thread will invoke the backgroundProcess method on this host
         and all its child containers. A host will use background processing to
-        perform live web application deployment related tasks. If not 
-        specified, the default value for this attribute is -1, which means 
-        the host will rely on the background processing thread of its parent 
+        perform live web application deployment related tasks. If not
+        specified, the default value for this attribute is -1, which means
+        the host will rely on the background processing thread of its parent
         engine.</p>
       </attribute>
 
@@ -294,7 +294,7 @@
 
   <subsection name="Logging">
 
-    <p>A host is associated with the 
+    <p>A host is associated with the
        <code>org.apache.catalina.core.ContainerBase.[engine_name].[host_name]</code>
        log category.  Note that the brackets are part of the name,
        don't omit them.</p>
@@ -375,7 +375,7 @@
         application archive file will be expanded to a directory of the same
         name (without the ".war" extension".<br/>
         Note: If you re-deploy an updated WAR file while Tomcat is stopped, be
-        sure to delete the associated expanded directory before restarting 
+        sure to delete the associated expanded directory before restarting
         Tomcat, so that the updated WAR file will be re-expanded when Tomcat
         restarts.<br/>
         If <code>copyXml</code> is <code>true</code> (it is <code>false</code>
@@ -407,7 +407,7 @@
 
     <p>In addition to the automatic deployment that occurs at startup time,
     you can also request that new XML configuration files, WAR files, or
-    sub-directories that are dropped in to the <code>appBase</code> (or 
+    sub-directories that are dropped in to the <code>appBase</code> (or
     <code>xmlBase</code> in the case of an XML configuration file) directory
     while Tomcat is running will be automatically deployed, according to the
     rules described above. The  auto deployer will also track web applications
