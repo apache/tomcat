@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -26,7 +26,7 @@ public class ApplicationSessionCookieConfig implements SessionCookieConfig {
 
     private static final String DEFAULT_SESSION_COOKIE_NAME = "JSESSIONID";
     private static final String DEFAULT_SESSION_PARAMETER_NAME = "jsessionid";
-    
+
     private boolean httpOnly;
     private boolean secure;
     private int maxAge = -1;
@@ -34,7 +34,7 @@ public class ApplicationSessionCookieConfig implements SessionCookieConfig {
     private String domain;
     private String name;
     private String path;
-    
+
     @Override
     public String getComment() {
         return comment;
@@ -125,11 +125,11 @@ public class ApplicationSessionCookieConfig implements SessionCookieConfig {
         //       3. Defaults
 
         Cookie cookie = new Cookie(getSessionCookieName(context), sessionId);
-       
+
         // Just apply the defaults.
         cookie.setMaxAge(scc.getMaxAge());
         cookie.setComment(scc.getComment());
-       
+
         if (context.getSessionCookieDomain() == null) {
             // Avoid possible NPE
             if (scc.getDomain() != null) {
@@ -148,7 +148,7 @@ public class ApplicationSessionCookieConfig implements SessionCookieConfig {
         if (scc.isHttpOnly() || context.getUseHttpOnly()) {
             cookie.setHttpOnly(true);
         }
-       
+
         String contextPath = context.getSessionCookiePath();
         if (contextPath == null || contextPath.length() == 0) {
             contextPath = scc.getPath();
@@ -175,10 +175,10 @@ public class ApplicationSessionCookieConfig implements SessionCookieConfig {
 
         return cookie;
     }
-    
-    
+
+
     private static String getConfiguredSessionCookieName(Context context) {
-        
+
         // Priority is:
         // 1. Cookie name defined in context
         // 2. Cookie name configured for app
@@ -188,7 +188,7 @@ public class ApplicationSessionCookieConfig implements SessionCookieConfig {
             if (cookieName != null && cookieName.length() > 0) {
                 return cookieName;
             }
-            
+
             SessionCookieConfig scc =
                 context.getServletContext().getSessionCookieConfig();
             cookieName = scc.getName();
@@ -199,37 +199,37 @@ public class ApplicationSessionCookieConfig implements SessionCookieConfig {
 
         return null;
     }
-    
-    
+
+
     /**
      * Determine the name to use for the session cookie for the provided
      * context.
      * @param context
      */
     public static String getSessionCookieName(Context context) {
-    
+
         String result = getConfiguredSessionCookieName(context);
-        
+
         if (result == null) {
-            result = DEFAULT_SESSION_COOKIE_NAME; 
+            result = DEFAULT_SESSION_COOKIE_NAME;
         }
-        
-        return result; 
+
+        return result;
     }
-    
+
     /**
      * Determine the name to use for the session cookie for the provided
      * context.
      * @param context
      */
     public static String getSessionUriParamName(Context context) {
-        
+
         String result = getConfiguredSessionCookieName(context);
-        
+
         if (result == null) {
-            result = DEFAULT_SESSION_PARAMETER_NAME; 
+            result = DEFAULT_SESSION_PARAMETER_NAME;
         }
-        
-        return result; 
+
+        return result;
     }
 }

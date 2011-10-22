@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -122,7 +122,7 @@ public class StandardEngine extends ContainerBase implements Engine {
     public Realm getRealm() {
         Realm configured=super.getRealm();
         // If no set realm has been called - default to JAAS
-        // This can be overridden at engine, context and host level  
+        // This can be overridden at engine, context and host level
         if( configured==null ) {
             configured=new JAASRealm();
             this.setRealm( configured );
@@ -160,7 +160,7 @@ public class StandardEngine extends ContainerBase implements Engine {
                                    this.defaultHost);
 
     }
-    
+
 
     /**
      * Set the cluster-wide unique identifier for this Engine.
@@ -263,7 +263,7 @@ public class StandardEngine extends ContainerBase implements Engine {
      */
     @Override
     protected synchronized void startInternal() throws LifecycleException {
-        
+
         // Log our server identification information
         if(log.isInfoEnabled())
             log.info( "Starting Servlet Engine: " + ServerInfo.getServerInfo());
@@ -272,7 +272,7 @@ public class StandardEngine extends ContainerBase implements Engine {
         super.startInternal();
     }
 
-    
+
     /**
      * Return a String representation of this component.
      */
@@ -297,7 +297,7 @@ public class StandardEngine extends ContainerBase implements Engine {
             boolean useDefault) {
 
         boolean logged = false;
-        
+
         if (getAccessLog() != null) {
             accessLog.log(request, response, time);
             logged = true;
@@ -386,7 +386,7 @@ public class StandardEngine extends ContainerBase implements Engine {
         public void setRequestAttributesEnabled(
                 boolean requestAttributesEnabled) {
             // NOOP
-            
+
         }
 
         @Override
@@ -395,7 +395,7 @@ public class StandardEngine extends ContainerBase implements Engine {
             return false;
         }
     }
-    
+
     protected static final class AccessLogListener
             implements PropertyChangeListener, LifecycleListener,
             ContainerListener {

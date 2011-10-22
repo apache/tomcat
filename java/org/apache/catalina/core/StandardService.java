@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -51,7 +51,7 @@ import org.apache.tomcat.util.res.StringManager;
 public class StandardService extends LifecycleMBeanBase implements Service {
 
     private static final Log log = LogFactory.getLog(StandardService.class);
-   
+
 
     // ----------------------------------------------------- Instance Variables
 
@@ -82,9 +82,9 @@ public class StandardService extends LifecycleMBeanBase implements Service {
      * The set of Connectors associated with this Service.
      */
     protected Connector connectors[] = new Connector[0];
-    
+
     /**
-     * 
+     *
      */
     protected ArrayList<Executor> executors = new ArrayList<Executor>();
 
@@ -518,7 +518,7 @@ public class StandardService extends LifecycleMBeanBase implements Service {
     protected void initInternal() throws LifecycleException {
 
         super.initInternal();
-        
+
         if (container != null) {
             container.init();
         }
@@ -547,7 +547,7 @@ public class StandardService extends LifecycleMBeanBase implements Service {
             }
         }
     }
-    
+
     @Override
     protected void destroyInternal() throws LifecycleException {
         // Destroy our defined Connectors
@@ -602,7 +602,7 @@ public class StandardService extends LifecycleMBeanBase implements Service {
     }
     @Override
     protected String getDomainInternal() {
-        
+
         return MBeanUtils.getDomain(this);
     }
 

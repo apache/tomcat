@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -99,7 +99,7 @@ public class ApplicationContext
 
     static {
         STRICT_SERVLET_COMPLIANCE = Globals.STRICT_SERVLET_COMPLIANCE;
-        
+
         String requireSlash = System.getProperty(
                 "org.apache.catalina.core.ApplicationContext.GET_RESOURCE_REQUIRE_SLASH");
         if (requireSlash == null) {
@@ -122,7 +122,7 @@ public class ApplicationContext
     public ApplicationContext(StandardContext context) {
         super();
         this.context = context;
-        
+
         // Populate session tracking modes
         populateSessionTrackingModes();
     }
@@ -194,7 +194,7 @@ public class ApplicationContext
      */
     private SessionCookieConfig sessionCookieConfig =
         new ApplicationSessionCookieConfig();
-    
+
     /**
      * Session tracking modes
      */
@@ -303,7 +303,7 @@ public class ApplicationContext
         }
     }
 
-    
+
     /**
      * Return the main path associated with this context.
      */
@@ -311,7 +311,7 @@ public class ApplicationContext
     public String getContextPath() {
         return context.getPath();
     }
-    
+
 
     /**
      * Return the value of the specified initialization parameter, or
@@ -396,7 +396,7 @@ public class ApplicationContext
         Wrapper wrapper = (Wrapper) context.findChild(name);
         if (wrapper == null)
             return (null);
-        
+
         return new ApplicationDispatcher(wrapper, null, null, null, null, name);
 
     }
@@ -445,7 +445,7 @@ public class ApplicationContext
         if (normalizedPath == null)
             return (null);
 
-        pos = normalizedPath.length(); 
+        pos = normalizedPath.length();
 
         // Use the thread local URI and mapping data
         DispatchData dd = dispatchData.get();
@@ -496,10 +496,10 @@ public class ApplicationContext
         String pathInfo = mappingData.pathInfo.toString();
 
         mappingData.recycle();
-        
+
         // Construct a RequestDispatcher to process this request
         return new ApplicationDispatcher
-            (wrapper, uriCC.toString(), wrapperPath, pathInfo, 
+            (wrapper, uriCC.toString(), wrapperPath, pathInfo,
              queryString, null);
 
     }
@@ -524,7 +524,7 @@ public class ApplicationContext
                 !path.startsWith("/") && GET_RESOURCE_REQUIRE_SLASH)
             throw new MalformedURLException(sm.getString(
                     "applicationContext.requestDispatcher.iae", path));
-        
+
         String normPath = RequestUtil.normalize(path);
         if (normPath == null)
             return (null);
@@ -724,7 +724,7 @@ public class ApplicationContext
     @Override
     @Deprecated
     public void log(Exception exception, String message) {
-        
+
         context.getLogger().error(message, exception);
 
     }
@@ -738,7 +738,7 @@ public class ApplicationContext
      */
     @Override
     public void log(String message, Throwable throwable) {
-        
+
         context.getLogger().error(message, throwable);
 
     }
@@ -896,11 +896,11 @@ public class ApplicationContext
     @Override
     public FilterRegistration.Dynamic addFilter(String filterName,
             String filterClass) throws IllegalStateException {
-        
+
         return addFilter(filterName, filterClass, null);
     }
 
-    
+
     /**
      * Add filter to context.
      * @param   filterName  Name of filter to add
@@ -918,11 +918,11 @@ public class ApplicationContext
     @Override
     public FilterRegistration.Dynamic addFilter(String filterName,
             Filter filter) throws IllegalStateException {
-        
+
         return addFilter(filterName, null, filter);
     }
 
-    
+
     /**
      * Add filter to context.
      * @param   filterName  Name of filter to add
@@ -940,13 +940,13 @@ public class ApplicationContext
     @Override
     public FilterRegistration.Dynamic addFilter(String filterName,
             Class<? extends Filter> filterClass) throws IllegalStateException {
-        
+
         return addFilter(filterName, filterClass.getName(), null);
     }
 
     private FilterRegistration.Dynamic addFilter(String filterName,
             String filterClass, Filter filter) throws IllegalStateException {
-        
+
         if (!context.getState().equals(LifecycleState.STARTING_PREP)) {
             //TODO Spec breaking enhancement to ignore this restriction
             throw new IllegalStateException(
@@ -962,7 +962,7 @@ public class ApplicationContext
         // {@link javax.servlet.annotation.WebListener}.
 
         FilterDef filterDef = context.findFilterDef(filterName);
-        
+
         // Assume a 'complete' FilterRegistration is one that has a class and
         // a name
         if (filterDef == null) {
@@ -982,10 +982,10 @@ public class ApplicationContext
             filterDef.setFilterClass(filter.getClass().getName());
             filterDef.setFilter(filter);
         }
-        
+
         return new ApplicationFilterRegistration(filterDef, context);
-    } 
-    
+    }
+
     @Override
     public <T extends Filter> T createFilter(Class<T> c)
     throws ServletException {
@@ -1016,7 +1016,7 @@ public class ApplicationContext
         return new ApplicationFilterRegistration(filterDef, context);
     }
 
-    
+
     /**
      * Add servlet to context.
      * @param   servletName  Name of servlet to add
@@ -1034,7 +1034,7 @@ public class ApplicationContext
     @Override
     public ServletRegistration.Dynamic addServlet(String servletName,
             String servletClass) throws IllegalStateException {
-        
+
         return addServlet(servletName, servletClass, null);
     }
 
@@ -1060,7 +1060,7 @@ public class ApplicationContext
         return addServlet(servletName, null, servlet);
     }
 
-    
+
     /**
      * Add servlet to context.
      * @param   servletName  Name of servlet to add
@@ -1085,14 +1085,14 @@ public class ApplicationContext
 
     private ServletRegistration.Dynamic addServlet(String servletName,
             String servletClass, Servlet servlet) throws IllegalStateException {
-        
+
         if (!context.getState().equals(LifecycleState.STARTING_PREP)) {
             //TODO Spec breaking enhancement to ignore this restriction
             throw new IllegalStateException(
                     sm.getString("applicationContext.addServlet.ise",
                             getContextPath()));
         }
-        
+
         // TODO SERVLET3
         // throw UnsupportedOperationException - if this context was passed to the
         // {@link ServletContextListener#contextInitialized(javax.servlet.ServletContextEvent)}
@@ -1101,7 +1101,7 @@ public class ApplicationContext
         // {@link javax.servlet.annotation.WebListener}.
 
         Wrapper wrapper = (Wrapper) context.findChild(servletName);
-        
+
         // Assume a 'complete' ServletRegistration is one that has a class and
         // a name
         if (wrapper == null) {
@@ -1158,10 +1158,10 @@ public class ApplicationContext
         if (wrapper == null) {
             return null;
         }
-        
+
         return new ApplicationServletRegistration(wrapper, context);
     }
-    
+
 
     /**
      * By default {@link SessionTrackingMode#URL} is always supported, {@link
@@ -1178,15 +1178,15 @@ public class ApplicationContext
 
     private void populateSessionTrackingModes() {
         // URL re-writing is always enabled by default
-        defaultSessionTrackingModes = EnumSet.of(SessionTrackingMode.URL); 
+        defaultSessionTrackingModes = EnumSet.of(SessionTrackingMode.URL);
         supportedSessionTrackingModes = EnumSet.of(SessionTrackingMode.URL);
-        
+
         if (context.getCookies()) {
             defaultSessionTrackingModes.add(SessionTrackingMode.COOKIE);
             supportedSessionTrackingModes.add(SessionTrackingMode.COOKIE);
         }
 
-        // SSL not enabled by default as it can only used on its own 
+        // SSL not enabled by default as it can only used on its own
         // Context > Host > Engine > Service
         Service s = ((Engine) context.getParent().getParent()).getService();
         Connector[] connectors = s.findConnectors();
@@ -1196,7 +1196,7 @@ public class ApplicationContext
                 supportedSessionTrackingModes.add(SessionTrackingMode.SSL);
                 break;
             }
-        } 
+        }
     }
 
     /**
@@ -1233,7 +1233,7 @@ public class ApplicationContext
                     sm.getString("applicationContext.setSessionTracking.ise",
                             getContextPath()));
         }
-        
+
         // Check that only supported tracking modes have been requested
         for (SessionTrackingMode sessionTrackingMode : sessionTrackingModes) {
             if (!supportedSessionTrackingModes.contains(sessionTrackingMode)) {
@@ -1251,7 +1251,7 @@ public class ApplicationContext
                         getContextPath()));
             }
         }
-        
+
         this.sessionTrackingModes = sessionTrackingModes;
     }
 
@@ -1261,12 +1261,12 @@ public class ApplicationContext
         if (parameters.containsKey(name)) {
             return false;
         }
-        
+
         parameters.put(name, value);
         return true;
     }
-    
-    
+
+
     @Override
     public void addListener(Class<? extends EventListener> listenerClass) {
         EventListener listener;
@@ -1283,7 +1283,7 @@ public class ApplicationContext
 
     @Override
     public void addListener(String className) {
-        
+
         try {
             Object obj = context.getInstanceManager().newInstance(className);
 
@@ -1316,7 +1316,7 @@ public class ApplicationContext
                     "applicationContext.addListener.iae.cnfe", className),
                     e);
         }
-        
+
     }
 
 
@@ -1334,7 +1334,7 @@ public class ApplicationContext
         // method of a {@link ServletContextListener} that was not declared
         // in web.xml, a web-fragment or annotated with
         // {@link javax.servlet.annotation.WebListener}.
-        
+
         boolean match = false;
         if (t instanceof ServletContextAttributeListener ||
                 t instanceof ServletRequestListener ||
@@ -1343,16 +1343,16 @@ public class ApplicationContext
             context.addApplicationEventListener(t);
             match = true;
         }
-        
+
         if (t instanceof HttpSessionListener
                 || (t instanceof ServletContextListener &&
                         newServletContextListenerAllowed)) {
             context.addApplicationLifecycleListener(t);
             match = true;
         }
-        
+
         if (match) return;
-        
+
         if (t instanceof ServletContextListener) {
             throw new IllegalArgumentException(sm.getString(
                     "applicationContext.addListener.iae.sclNotAllowed",
@@ -1398,20 +1398,20 @@ public class ApplicationContext
 
     @Override
     public void declareRoles(String... roleNames) {
-        
+
         if (!context.getState().equals(LifecycleState.STARTING_PREP)) {
             //TODO Spec breaking enhancement to ignore this restriction
             throw new IllegalStateException(
                     sm.getString("applicationContext.addRole.ise",
                             getContextPath()));
         }
-        
+
         if (roleNames == null) {
             throw new IllegalArgumentException(
                     sm.getString("applicationContext.roles.iae",
                             getContextPath()));
         }
-        
+
         for (String role : roleNames) {
             if (role == null || "".equals(role)) {
                 throw new IllegalArgumentException(
@@ -1440,7 +1440,7 @@ public class ApplicationContext
                         new RuntimePermission("getClassLoader"));
             }
         }
-        
+
         return result;
     }
 
@@ -1461,7 +1461,7 @@ public class ApplicationContext
     public Map<String, ? extends FilterRegistration> getFilterRegistrations() {
         Map<String, ApplicationFilterRegistration> result =
             new HashMap<String, ApplicationFilterRegistration>();
-        
+
         FilterDef[] filterDefs = context.findFilterDefs();
         for (FilterDef filterDef : filterDefs) {
             result.put(filterDef.getFilterName(),
@@ -1482,7 +1482,7 @@ public class ApplicationContext
     public Map<String, ? extends ServletRegistration> getServletRegistrations() {
         Map<String, ApplicationServletRegistration> result =
             new HashMap<String, ApplicationServletRegistration>();
-        
+
         Container[] wrappers = context.findChildren();
         for (Container wrapper : wrappers) {
             result.put(((Wrapper) wrapper).getName(),
@@ -1493,12 +1493,12 @@ public class ApplicationContext
         return result;
     }
 
-    
+
     // -------------------------------------------------------- Package Methods
     protected StandardContext getContext() {
         return this.context;
     }
-    
+
     protected Map<String,String> getReadonlyAttributes() {
         return this.readOnlyAttributes;
     }
@@ -1521,10 +1521,10 @@ public class ApplicationContext
             String key = keys.next();
             removeAttribute(key);
         }
-        
+
     }
-    
-    
+
+
     /**
      * Return the facade associated with this ApplicationContext.
      */
@@ -1549,7 +1549,7 @@ public class ApplicationContext
     protected void setNewServletContextListenerAllowed(boolean allowed) {
         this.newServletContextListenerAllowed = allowed;
     }
-    
+
     /**
      * List resource paths (recursively), and store all of them in the given
      * Set.
@@ -1580,13 +1580,13 @@ public class ApplicationContext
      */
     private static String getJNDIUri(String hostName, String path) {
         String result;
-        
+
         if (path.startsWith("/")) {
             result = "/" + hostName + path;
         } else {
             result = "/" + hostName + "/" + path;
         }
-        
+
         return result;
     }
 

@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -41,15 +41,15 @@ public class ApplicationServletRegistration
      */
     private static final StringManager sm =
       StringManager.getManager(Constants.Package);
-    
+
     private Wrapper wrapper;
     private Context context;
-    
+
     public ApplicationServletRegistration(Wrapper wrapper,
             Context context) {
         this.wrapper = wrapper;
         this.context = context;
-        
+
     }
 
     @Override
@@ -65,9 +65,9 @@ public class ApplicationServletRegistration
     @Override
     public Map<String, String> getInitParameters() {
         ParameterMap<String,String> result = new ParameterMap<String,String>();
-        
+
         String[] parameterNames = wrapper.findInitParameters();
-        
+
         for (String parameterName : parameterNames) {
             result.put(parameterName, wrapper.findInitParameter(parameterName));
         }
@@ -91,7 +91,7 @@ public class ApplicationServletRegistration
         if (getInitParameter(name) != null) {
             return false;
         }
-        
+
         wrapper.addInitParameter(name, value);
 
         return true;
@@ -99,9 +99,9 @@ public class ApplicationServletRegistration
 
     @Override
     public Set<String> setInitParameters(Map<String, String> initParameters) {
-        
+
         Set<String> conflicts = new HashSet<String>();
-        
+
         for (Map.Entry<String, String> entry : initParameters.entrySet()) {
             if (entry.getKey() == null || entry.getValue() == null) {
                 throw new IllegalArgumentException(sm.getString(
@@ -151,7 +151,7 @@ public class ApplicationServletRegistration
                     "applicationServletRegistration.setServletSecurity.iae",
                     getName(), context.getName()));
         }
-        
+
         if (!context.getState().equals(LifecycleState.STARTING_PREP)) {
             throw new IllegalStateException(sm.getString(
                     "applicationServletRegistration.setServletSecurity.ise",
@@ -167,9 +167,9 @@ public class ApplicationServletRegistration
         if (urlPatterns == null) {
             return Collections.emptySet();
         }
-        
+
         Set<String> conflicts = new HashSet<String>();
-        
+
         for (String urlPattern : urlPatterns) {
             String wrapperName = context.findServletMapping(urlPattern);
             if (wrapperName != null) {
@@ -187,7 +187,7 @@ public class ApplicationServletRegistration
         if (!conflicts.isEmpty()) {
             return conflicts;
         }
-        
+
         for (String urlPattern : urlPatterns) {
             context.addServletMapping(urlPattern, wrapper.getName());
         }
@@ -199,7 +199,7 @@ public class ApplicationServletRegistration
 
         Set<String> result = new HashSet<String>();
         String servletName = wrapper.getName();
-        
+
         String[] urlPatterns = context.findServletMappings();
         for (String urlPattern : urlPatterns) {
             String name = context.findServletMapping(urlPattern);
@@ -214,5 +214,5 @@ public class ApplicationServletRegistration
     public String getRunAsRole() {
         return wrapper.getRunAs();
     }
-    
+
 }
