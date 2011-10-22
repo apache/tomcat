@@ -54,13 +54,6 @@ public interface Service extends Lifecycle {
     public void setContainer(Container container);
 
     /**
-     * Return descriptive information about this Service implementation and
-     * the corresponding version number, in the format
-     * <code>&lt;description&gt;/&lt;version&gt;</code>.
-     */
-    public String getInfo();
-
-    /**
      * Return the name of this Service.
      */
     public String getName();

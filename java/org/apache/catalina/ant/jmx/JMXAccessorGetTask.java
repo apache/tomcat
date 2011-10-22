@@ -63,25 +63,6 @@ public class JMXAccessorGetTask extends JMXAccessorTask {
 
     private String attribute;
 
-    // ----------------------------------------------------- Instance Info
-
-    /**
-     * Descriptive information describing this implementation.
-     */
-    private static final String info = "org.apache.catalina.ant.JMXAccessorGetTask/1.0";
-
-    /**
-     * Return descriptive information about this implementation and the
-     * corresponding version number, in the format
-     * <code>&lt;description&gt;/&lt;version&gt;</code>.
-     */
-    @Override
-    public String getInfo() {
-
-        return (info);
-
-    }
-
     // ------------------------------------------------------------- Properties
     
     /**

@@ -227,13 +227,6 @@ final class ApplicationDispatcher
 
 
     /**
-     * Descriptive information about this implementation.
-     */
-    private static final String info =
-        "org.apache.catalina.core.ApplicationDispatcher/1.0";
-
-
-    /**
      * The servlet name for a named dispatcher.
      */
     private String name = null;
@@ -282,19 +275,6 @@ final class ApplicationDispatcher
      * or included.
      */
     private Wrapper wrapper = null;
-
-
-    // ------------------------------------------------------------- Properties
-
-
-    /**
-     * Return the descriptive information about this implementation.
-     */
-    public String getInfo() {
-
-        return (info);
-
-    }
 
 
     // --------------------------------------------------------- Public Methods

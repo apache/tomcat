@@ -78,11 +78,6 @@ public class DeltaManager extends ClusterManagerBase{
     // ----------------------------------------------------- Instance Variables
 
     /**
-     * The descriptive information about this implementation.
-     */
-    private static final String info = "DeltaManager/2.1";
-
-    /**
      * The descriptive name of this Manager implementation (for logging).
      */
     protected static String managerName = "DeltaManager";
@@ -139,16 +134,6 @@ public class DeltaManager extends ClusterManagerBase{
 
     // ------------------------------------------------------------- Properties
     
-    /**
-     * Return descriptive information about this Manager implementation and the
-     * corresponding version number, in the format
-     * <code>&lt;description&gt;/&lt;version&gt;</code>.
-     */
-    @Override
-    public String getInfo() {
-        return info;
-    }
-
     @Override
     public void setName(String name) {
         this.name = name;

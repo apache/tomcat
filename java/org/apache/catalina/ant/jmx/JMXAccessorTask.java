@@ -125,24 +125,6 @@ public class JMXAccessorTask extends BaseRedirectorHelperTask {
 
     private Properties properties = new Properties();
 
-    // ----------------------------------------------------- Instance Info
-
-    /**
-     * Descriptive information describing this implementation.
-     */
-    private static final String info = "org.apache.catalina.ant.JMXAccessorTask/1.1";
-
-    /**
-     * Return descriptive information about this implementation and the
-     * corresponding version number, in the format
-     * <code>&lt;description&gt;/&lt;version&gt;</code>.
-     */
-    public String getInfo() {
-
-        return (info);
-
-    }
-
     // ------------------------------------------------------------- Properties
 
     /**

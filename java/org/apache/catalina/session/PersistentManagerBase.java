@@ -129,13 +129,6 @@ public abstract class PersistentManagerBase extends ManagerBase {
 
     // ----------------------------------------------------- Instance Variables
 
-
-    /**
-     * The descriptive information about this implementation.
-     */
-    private static final String info = "PersistentManagerBase/1.1";
-
-
     /**
      * The descriptive name of this Manager implementation (for logging).
      */
@@ -286,19 +279,6 @@ public abstract class PersistentManagerBase extends ManagerBase {
         support.firePropertyChange("minIdleSwap",
                                    Integer.valueOf(oldMinIdleSwap),
                                    Integer.valueOf(this.minIdleSwap));
-
-    }
-
-
-    /**
-     * Return descriptive information about this Manager implementation and
-     * the corresponding version number, in the format
-     * <code>&lt;description&gt;/&lt;version&gt;</code>.
-     */
-    @Override
-    public String getInfo() {
-
-        return (info);
 
     }
 

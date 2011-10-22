@@ -164,13 +164,6 @@ public class Embedded  extends StandardService {
 
 
     /**
-     * Descriptive information about this server implementation.
-     */
-    protected static final String info =
-        "org.apache.catalina.startup.Embedded/1.0";
-
-
-    /**
      * The default realm to be used by all containers associated with
      * this component.
      */
@@ -331,7 +324,7 @@ public class Embedded  extends StandardService {
     public synchronized void addEngine(Engine engine) {
 
         if( log.isDebugEnabled() )
-            log.debug("Adding engine (" + engine.getInfo() + ")");
+            log.debug("Adding engine (" + engine.getClass().getName() + ")");
 
         // Add this Engine to our set of defined Engines
         Engine results[] = new Engine[engines.length + 1];
@@ -566,18 +559,6 @@ public class Embedded  extends StandardService {
     }
 
 
-    /**
-     * Return descriptive information about this Server implementation and
-     * the corresponding version number, in the format
-     * <code>&lt;description&gt;/&lt;version&gt;</code>.
-     */
-    @Override
-    public String getInfo() {
-
-        return (info);
-
-    }
-
 
     /**
      * Remove the specified Context from the set of defined Contexts for its
@@ -630,7 +611,7 @@ public class Embedded  extends StandardService {
     public synchronized void removeEngine(Engine engine) {
 
         if( log.isDebugEnabled() )
-            log.debug("Removing engine (" + engine.getInfo() + ")");
+            log.debug("Removing engine (" + engine.getClass().getName() + ")");
 
         // Is the specified Engine actually defined?
         int j = -1;

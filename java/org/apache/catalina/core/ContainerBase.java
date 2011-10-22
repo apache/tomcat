@@ -306,17 +306,6 @@ public abstract class ContainerBase extends LifecycleMBeanBase
 
 
     /**
-     * Return descriptive information about this Container implementation and
-     * the corresponding version number, in the format
-     * <code>&lt;description&gt;/&lt;version&gt;</code>.
-     */
-    @Override
-    public String getInfo() {
-        return this.getClass().getName();
-    }
-
-
-    /**
      * Return the Loader with which this Container is associated.  If there is
      * no associated Loader, return the Loader associated with our parent
      * Container (if any); otherwise, return <code>null</code>.

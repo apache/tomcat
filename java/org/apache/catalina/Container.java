@@ -133,15 +133,6 @@ public interface Container extends Lifecycle {
 
     // ------------------------------------------------------------- Properties
 
-
-    /**
-     * Return descriptive information about this Container implementation and
-     * the corresponding version number, in the format
-     * <code>&lt;description&gt;/&lt;version&gt;</code>.
-     */
-    public String getInfo();
-
-
     /**
      * Return the Loader with which this Container is associated.  If there is
      * no associated Loader, return the Loader associated with our parent

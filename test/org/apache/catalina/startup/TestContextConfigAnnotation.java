@@ -334,8 +334,6 @@ public class TestContextConfigAnnotation {
         @Override
         public void setDelegate(boolean delegate) {}
         @Override
-        public String getInfo() { return null; }
-        @Override
         public boolean getReloadable() { return false; }
         @Override
         public void setReloadable(boolean reloadable) {}

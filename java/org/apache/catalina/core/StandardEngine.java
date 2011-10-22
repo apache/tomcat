@@ -89,13 +89,6 @@ public class StandardEngine extends ContainerBase implements Engine {
 
 
     /**
-     * The descriptive information string for this implementation.
-     */
-    private static final String info =
-        "org.apache.catalina.core.StandardEngine/1.0";
-
-
-    /**
      * The <code>Service</code> that owns this Engine, if any.
      */
     private Service service = null;
@@ -245,18 +238,6 @@ public class StandardEngine extends ContainerBase implements Engine {
 
     }
 
-
-    /**
-     * Return descriptive information about this Container implementation and
-     * the corresponding version number, in the format
-     * <code>&lt;description&gt;/&lt;version&gt;</code>.
-     */
-    @Override
-    public String getInfo() {
-
-        return (info);
-
-    }
 
     /**
      * Disallow any attempt to set a parent for this Container, since an

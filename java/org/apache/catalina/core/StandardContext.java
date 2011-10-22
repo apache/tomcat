@@ -160,13 +160,6 @@ public class StandardContext extends ContainerBase
 
 
     /**
-     * The descriptive information string for this implementation.
-     */
-    private static final String info =
-        "org.apache.catalina.core.StandardContext/1.0";
-
-
-    /**
      * Array containing the safe characters set.
      */
     protected static URLEncoder urlEncoder;
@@ -1871,18 +1864,6 @@ public class StandardContext extends ContainerBase
     public void setDocBase(String docBase) {
 
         this.docBase = docBase;
-
-    }
-
-    /**
-     * Return descriptive information about this Container implementation and
-     * the corresponding version number, in the format
-     * <code>&lt;description&gt;/&lt;version&gt;</code>.
-     */
-    @Override
-    public String getInfo() {
-
-        return (info);
 
     }
 

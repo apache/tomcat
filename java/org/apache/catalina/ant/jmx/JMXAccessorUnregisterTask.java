@@ -52,25 +52,6 @@ import org.apache.tools.ant.BuildException;
  */
 public class JMXAccessorUnregisterTask extends JMXAccessorTask {
 
-    // ----------------------------------------------------- Instance Info
-
-    /**
-     * Descriptive information describing this implementation.
-     */
-    private static final String info = "org.apache.catalina.ant.JMXAccessorUnregisterTask/1.0";
-
-    /**
-     * Return descriptive information about this implementation and the
-     * corresponding version number, in the format
-     * <code>&lt;description&gt;/&lt;version&gt;</code>.
-     * @return Returns the class info.
-     */
-    @Override
-    public String getInfo() {
-
-        return (info);
-
-    }
     // ------------------------------------------------------ protected Methods
     
     /**

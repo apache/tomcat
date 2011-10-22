@@ -140,12 +140,6 @@ public class StandardHost extends ContainerBase implements Host {
     private String errorReportValveClass =
         "org.apache.catalina.valves.ErrorReportValve";
 
-    /**
-     * The descriptive information string for this implementation.
-     */
-    private static final String info =
-        "org.apache.catalina.core.StandardHost/1.0";
-
 
     /**
      * Unpack WARs property.
@@ -699,19 +693,6 @@ public class StandardHost extends ContainerBase implements Host {
         synchronized (aliasesLock) {
             return (this.aliases);
         }
-
-    }
-
-
-    /**
-     * Return descriptive information about this Container implementation and
-     * the corresponding version number, in the format
-     * <code>&lt;description&gt;/&lt;version&gt;</code>.
-     */
-    @Override
-    public String getInfo() {
-
-        return (info);
 
     }
 

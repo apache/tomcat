@@ -104,14 +104,6 @@ public interface Loader {
 
 
     /**
-     * Return descriptive information about this Loader implementation and
-     * the corresponding version number, in the format
-     * <code>&lt;description&gt;/&lt;version&gt;</code>.
-     */
-    public String getInfo();
-
-
-    /**
      * Return the reloadable flag for this Loader.
      */
     public boolean getReloadable();

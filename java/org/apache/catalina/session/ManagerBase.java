@@ -80,12 +80,6 @@ public abstract class ManagerBase extends LifecycleMBeanBase
 
 
     /**
-     * The descriptive information string for this implementation.
-     */
-    private static final String info = "ManagerBase/1.0";
-
-
-    /**
      * The descriptive name of this Manager implementation (for logging).
      */
     private static final String name = "ManagerBase";
@@ -287,19 +281,6 @@ public abstract class ManagerBase extends LifecycleMBeanBase
         support.firePropertyChange("distributable",
                                    Boolean.valueOf(oldDistributable),
                                    Boolean.valueOf(this.distributable));
-    }
-
-
-    /**
-     * Return descriptive information about this Manager implementation and
-     * the corresponding version number, in the format
-     * <code>&lt;description&gt;/&lt;version&gt;</code>.
-     */
-    @Override
-    public String getInfo() {
-
-        return (info);
-
     }
 
 
