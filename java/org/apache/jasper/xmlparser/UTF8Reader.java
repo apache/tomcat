@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -34,7 +34,7 @@ public class UTF8Reader
 
     private final org.apache.juli.logging.Log log=
         org.apache.juli.logging.LogFactory.getLog( UTF8Reader.class );
-    
+
     // debugging
 
     /** Debug read. */
@@ -60,8 +60,8 @@ public class UTF8Reader
     // Constructors
     //
 
-    /** 
-     * Constructs a UTF-8 reader from the specified input stream, 
+    /**
+     * Constructs a UTF-8 reader from the specified input stream,
      * buffer size and MessageFormatter.
      *
      * @param inputStream The input stream.
@@ -100,7 +100,7 @@ public class UTF8Reader
             int index = 0;
 
             // get first byte
-            int b0 = index == fOffset 
+            int b0 = index == fOffset
                    ? fInputStream.read() : fBuffer[index++] & 0x00FF;
             if (b0 == -1) {
                 return -1;
@@ -115,7 +115,7 @@ public class UTF8Reader
             // UTF-8:   [110y yyyy] [10xx xxxx]
             // Unicode: [0000 0yyy] [yyxx xxxx]
             else if ((b0 & 0xE0) == 0xC0) {
-                int b1 = index == fOffset 
+                int b1 = index == fOffset
                        ? fInputStream.read() : fBuffer[index++] & 0x00FF;
                 if (b1 == -1) {
                     expectedByte(2, 2);
@@ -137,7 +137,7 @@ public class UTF8Reader
                 if ((b1 & 0xC0) != 0x80) {
                     invalidByte(2, 3);
                 }
-                int b2 = index == fOffset 
+                int b2 = index == fOffset
                        ? fInputStream.read() : fBuffer[index++] & 0x00FF;
                 if (b2 == -1) {
                     expectedByte(3, 3);
@@ -154,7 +154,7 @@ public class UTF8Reader
             //          [1101 11yy] [yyxx xxxx] (low surrogate)
             //          * uuuuu = wwww + 1
             else if ((b0 & 0xF8) == 0xF0) {
-                int b1 = index == fOffset 
+                int b1 = index == fOffset
                        ? fInputStream.read() : fBuffer[index++] & 0x00FF;
                 if (b1 == -1) {
                     expectedByte(2, 4);
@@ -162,7 +162,7 @@ public class UTF8Reader
                 if ((b1 & 0xC0) != 0x80) {
                     invalidByte(2, 3);
                 }
-                int b2 = index == fOffset 
+                int b2 = index == fOffset
                        ? fInputStream.read() : fBuffer[index++] & 0x00FF;
                 if (b2 == -1) {
                     expectedByte(3, 4);
@@ -170,7 +170,7 @@ public class UTF8Reader
                 if ((b2 & 0xC0) != 0x80) {
                     invalidByte(3, 3);
                 }
-                int b3 = index == fOffset 
+                int b3 = index == fOffset
                        ? fInputStream.read() : fBuffer[index++] & 0x00FF;
                 if (b3 == -1) {
                     expectedByte(4, 4);
@@ -183,8 +183,8 @@ public class UTF8Reader
                     invalidSurrogate(uuuuu);
                 }
                 int wwww = uuuuu - 1;
-                int hs = 0xD800 | 
-                         ((wwww << 6) & 0x03C0) | ((b1 << 2) & 0x003C) | 
+                int hs = 0xD800 |
+                         ((wwww << 6) & 0x03C0) | ((b1 << 2) & 0x003C) |
                          ((b2 >> 4) & 0x0003);
                 int ls = 0xDC00 | ((b2 << 6) & 0x03C0) | (b3 & 0x003F);
                 c = hs;
@@ -256,7 +256,7 @@ public class UTF8Reader
         // skip read; last character was in error
         // NOTE: Having an offset value other than zero means that there was
         //       an error in the last character read. In this case, we have
-        //       skipped the read so we don't consume any bytes past the 
+        //       skipped the read so we don't consume any bytes past the
         //       error. By signaling the error on the next block read we
         //       allow the method to return the most valid characters that
         //       it can on the previous block read. -Ac
@@ -281,8 +281,8 @@ public class UTF8Reader
             // Unicode: [0000 0yyy] [yyxx xxxx]
             if ((b0 & 0xE0) == 0xC0) {
                 int b1 = -1;
-                if (++in < total) { 
-                    b1 = fBuffer[in] & 0x00FF; 
+                if (++in < total) {
+                    b1 = fBuffer[in] & 0x00FF;
                 }
                 else {
                     b1 = fInputStream.read();
@@ -315,8 +315,8 @@ public class UTF8Reader
             // Unicode: [zzzz yyyy] [yyxx xxxx]
             if ((b0 & 0xF0) == 0xE0) {
                 int b1 = -1;
-                if (++in < total) { 
-                    b1 = fBuffer[in] & 0x00FF; 
+                if (++in < total) {
+                    b1 = fBuffer[in] & 0x00FF;
                 }
                 else {
                     b1 = fInputStream.read();
@@ -340,8 +340,8 @@ public class UTF8Reader
                     invalidByte(2, 3);
                 }
                 int b2 = -1;
-                if (++in < total) { 
-                    b2 = fBuffer[in] & 0x00FF; 
+                if (++in < total) {
+                    b2 = fBuffer[in] & 0x00FF;
                 }
                 else {
                     b2 = fInputStream.read();
@@ -379,8 +379,8 @@ public class UTF8Reader
             //          * uuuuu = wwww + 1
             if ((b0 & 0xF8) == 0xF0) {
                 int b1 = -1;
-                if (++in < total) { 
-                    b1 = fBuffer[in] & 0x00FF; 
+                if (++in < total) {
+                    b1 = fBuffer[in] & 0x00FF;
                 }
                 else {
                     b1 = fInputStream.read();
@@ -404,8 +404,8 @@ public class UTF8Reader
                     invalidByte(2, 4);
                 }
                 int b2 = -1;
-                if (++in < total) { 
-                    b2 = fBuffer[in] & 0x00FF; 
+                if (++in < total) {
+                    b2 = fBuffer[in] & 0x00FF;
                 }
                 else {
                     b2 = fInputStream.read();
@@ -431,8 +431,8 @@ public class UTF8Reader
                     invalidByte(3, 4);
                 }
                 int b3 = -1;
-                if (++in < total) { 
-                    b3 = fBuffer[in] & 0x00FF; 
+                if (++in < total) {
+                    b3 = fBuffer[in] & 0x00FF;
                 }
                 else {
                     b3 = fInputStream.read();
@@ -617,7 +617,7 @@ public class UTF8Reader
     }
 
     /** Throws an exception for invalid byte. */
-    private void invalidByte(int position, int count) 
+    private void invalidByte(int position, int count)
         throws UTFDataFormatException {
 
         throw new UTFDataFormatException(
@@ -628,7 +628,7 @@ public class UTF8Reader
 
     /** Throws an exception for invalid surrogate bits. */
     private void invalidSurrogate(int uuuuu) throws UTFDataFormatException {
-        
+
         throw new UTFDataFormatException(
                 Localizer.getMessage("jsp.error.xml.invalidHighSurrogate",
                                      Integer.toHexString(uuuuu)));

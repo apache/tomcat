@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -133,28 +133,28 @@ class Dumper {
             dumpBody(n);
             printString("</jsp:useBean>");
         }
-        
+
         @Override
         public void visit(Node.PlugIn n) throws JasperException {
             printAttributes("<jsp:plugin", n.getAttributes(), ">");
             dumpBody(n);
             printString("</jsp:plugin>");
         }
-        
+
         @Override
         public void visit(Node.ParamsAction n) throws JasperException {
             printAttributes("<jsp:params", n.getAttributes(), ">");
             dumpBody(n);
             printString("</jsp:params>");
         }
-        
+
         @Override
         public void visit(Node.ParamAction n) throws JasperException {
             printAttributes("<jsp:param", n.getAttributes(), ">");
             dumpBody(n);
             printString("</jsp:param>");
         }
-        
+
         @Override
         public void visit(Node.NamedAttribute n) throws JasperException {
             printAttributes("<jsp:attribute", n.getAttributes(), ">");
@@ -168,7 +168,7 @@ class Dumper {
             dumpBody(n);
             printString("</jsp:body>");
         }
-        
+
         @Override
         public void visit(Node.ELExpression n) throws JasperException {
             printString( "${" + n.getText() + "}" );
@@ -203,7 +203,7 @@ class Dumper {
 
     public static void dump(Node n) {
         try {
-            n.accept(new DumpVisitor());        
+            n.accept(new DumpVisitor());
         } catch (JasperException e) {
             e.printStackTrace();
         }

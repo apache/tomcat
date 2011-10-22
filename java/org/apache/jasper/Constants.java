@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -31,19 +31,19 @@ import java.util.List;
  * @author Mark Roth
  */
 public class Constants {
-    
+
     /**
-     * The base class of the generated servlets. 
+     * The base class of the generated servlets.
      */
-    public static final String JSP_SERVLET_BASE = 
+    public static final String JSP_SERVLET_BASE =
         System.getProperty("org.apache.jasper.Constants.JSP_SERVLET_BASE", "org.apache.jasper.runtime.HttpJspBase");
 
     /**
-     * _jspService is the name of the method that is called by 
+     * _jspService is the name of the method that is called by
      * HttpJspBase.service(). This is where most of the code generated
      * from JSPs go.
      */
-    public static final String SERVICE_METHOD_NAME = 
+    public static final String SERVICE_METHOD_NAME =
         System.getProperty("org.apache.jasper.Constants.SERVICE_METHOD_NAME", "_jspService");
 
     /**
@@ -53,22 +53,22 @@ public class Constants {
 
     /**
      * These classes/packages are automatically imported by the
-     * generated code. 
+     * generated code.
      */
-    private static final String[] PRIVATE_STANDARD_IMPORTS = { 
-        "javax.servlet.*", 
-        "javax.servlet.http.*", 
+    private static final String[] PRIVATE_STANDARD_IMPORTS = {
+        "javax.servlet.*",
+        "javax.servlet.http.*",
         "javax.servlet.jsp.*"
     };
     public static final List<String> STANDARD_IMPORTS =
         Collections.unmodifiableList(Arrays.asList(PRIVATE_STANDARD_IMPORTS));
 
     /**
-     * ServletContext attribute for classpath. This is tomcat specific. 
-     * Other servlet engines may choose to support this attribute if they 
-     * want to have this JSP engine running on them. 
+     * ServletContext attribute for classpath. This is tomcat specific.
+     * Other servlet engines may choose to support this attribute if they
+     * want to have this JSP engine running on them.
      */
-    public static final String SERVLET_CLASSPATH = 
+    public static final String SERVLET_CLASSPATH =
         System.getProperty("org.apache.jasper.Constants.SERVLET_CLASSPATH", "org.apache.catalina.jsp_classpath");
 
     /**
@@ -77,7 +77,7 @@ public class Constants {
      * value returned by <code>request.getServletPath()</code> to select
      * the JSP page to be executed.
      */
-    public static final String JSP_FILE = 
+    public static final String JSP_FILE =
         System.getProperty("org.apache.jasper.Constants.JSP_FILE", "org.apache.catalina.jsp_file");
 
 
@@ -103,56 +103,56 @@ public class Constants {
 
     /**
      * The query parameter that causes the JSP engine to just
-     * pregenerated the servlet but not invoke it. 
+     * pregenerated the servlet but not invoke it.
      */
-    public static final String PRECOMPILE = 
+    public static final String PRECOMPILE =
         System.getProperty("org.apache.jasper.Constants.PRECOMPILE", "jsp_precompile");
 
     /**
      * The default package name for compiled jsp pages.
      */
-    public static final String JSP_PACKAGE_NAME = 
+    public static final String JSP_PACKAGE_NAME =
         System.getProperty("org.apache.jasper.Constants.JSP_PACKAGE_NAME", "org.apache.jsp");
 
     /**
      * The default package name for tag handlers generated from tag files
      */
-    public static final String TAG_FILE_PACKAGE_NAME = 
+    public static final String TAG_FILE_PACKAGE_NAME =
         System.getProperty("org.apache.jasper.Constants.TAG_FILE_PACKAGE_NAME", "org.apache.jsp.tag");
 
     // Must be kept in sync with org/apache/catalina/Globals.java
-    public static final String ALT_DD_ATTR = 
+    public static final String ALT_DD_ATTR =
         System.getProperty("org.apache.jasper.Constants.ALT_DD_ATTR", "org.apache.catalina.deploy.alt_dd");
 
     /**
-     * Public Id and the Resource path (of the cached copy) 
-     * of the DTDs for tag library descriptors. 
+     * Public Id and the Resource path (of the cached copy)
+     * of the DTDs for tag library descriptors.
      */
-    public static final String TAGLIB_DTD_PUBLIC_ID_11 = 
+    public static final String TAGLIB_DTD_PUBLIC_ID_11 =
         "-//Sun Microsystems, Inc.//DTD JSP Tag Library 1.1//EN";
-    public static final String TAGLIB_DTD_RESOURCE_PATH_11 = 
+    public static final String TAGLIB_DTD_RESOURCE_PATH_11 =
         "/javax/servlet/jsp/resources/web-jsptaglibrary_1_1.dtd";
-    public static final String TAGLIB_DTD_PUBLIC_ID_12 = 
+    public static final String TAGLIB_DTD_PUBLIC_ID_12 =
         "-//Sun Microsystems, Inc.//DTD JSP Tag Library 1.2//EN";
-    public static final String TAGLIB_DTD_RESOURCE_PATH_12 = 
+    public static final String TAGLIB_DTD_RESOURCE_PATH_12 =
         "/javax/servlet/jsp/resources/web-jsptaglibrary_1_2.dtd";
 
     /**
-     * Public Id and the Resource path (of the cached copy) 
+     * Public Id and the Resource path (of the cached copy)
      * of the DTDs for web application deployment descriptors
      */
-    public static final String WEBAPP_DTD_PUBLIC_ID_22 = 
+    public static final String WEBAPP_DTD_PUBLIC_ID_22 =
         "-//Sun Microsystems, Inc.//DTD Web Application 2.2//EN";
-    public static final String WEBAPP_DTD_RESOURCE_PATH_22 = 
+    public static final String WEBAPP_DTD_RESOURCE_PATH_22 =
         "/javax/servlet/resources/web-app_2_2.dtd";
-    public static final String WEBAPP_DTD_PUBLIC_ID_23 = 
+    public static final String WEBAPP_DTD_PUBLIC_ID_23 =
         "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN";
-    public static final String WEBAPP_DTD_RESOURCE_PATH_23 = 
+    public static final String WEBAPP_DTD_RESOURCE_PATH_23 =
         "/javax/servlet/resources/web-app_2_3.dtd";
 
     /**
      * List of the Public IDs that we cache, and their
-     * associated location. This is used by 
+     * associated location. This is used by
      * an EntityResolver to return the location of the
      * cached copy of a DTD.
      */
@@ -175,14 +175,14 @@ public class Constants {
     public static final List<String> CACHED_DTD_RESOURCE_PATHS =
         Collections.unmodifiableList(
                 Arrays.asList(PRIVATE_CACHED_DTD_RESOURCE_PATHS));
-    
+
     /**
      * Default URLs to download the plugin for Netscape and IE.
      */
-    public static final String NS_PLUGIN_URL = 
+    public static final String NS_PLUGIN_URL =
         "http://java.sun.com/products/plugin/";
 
-    public static final String IE_PLUGIN_URL = 
+    public static final String IE_PLUGIN_URL =
         "http://java.sun.com/products/plugin/1.2.2/jinstall-1_2_2-win.cab#Version=1,2,2,0";
 
     /**
@@ -194,7 +194,7 @@ public class Constants {
     /**
      * Has security been turned on?
      */
-    public static final boolean IS_SECURITY_ENABLED = 
+    public static final boolean IS_SECURITY_ENABLED =
         (System.getSecurityManager() != null);
 
     public static final boolean USE_INSTANCE_MANAGER_FOR_TAGS =

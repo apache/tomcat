@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -33,9 +33,9 @@ import org.xml.sax.SAXException;
  *
  * This class is also responsible for localizing any error codes before they
  * are passed on to the configured error handler.
- * 
+ *
  * In the case of a Java compilation error, the compiler error message is
- * parsed into an array of JavacErrorDetail instances, which is passed on to 
+ * parsed into an array of JavacErrorDetail instances, which is passed on to
  * the configured error handler.
  *
  * @author Jan Luehe
@@ -435,9 +435,9 @@ public class ErrorDispatcher {
         StringBuilder errMsgBuf = null;
         int lineNum = -1;
         JavacErrorDetail javacError = null;
-        
+
         BufferedReader reader = new BufferedReader(new StringReader(errMsg));
-        
+
         /*
          * Parse compilation errors. Each compilation error consists of a file
          * path and error line number, followed by a number of lines describing
@@ -445,52 +445,52 @@ public class ErrorDispatcher {
          */
         String line = null;
         while ((line = reader.readLine()) != null) {
-            
+
             /*
              * Error line number is delimited by set of colons.
              * Ignore colon following drive letter on Windows (fromIndex = 2).
              * XXX Handle deprecation warnings that don't have line info
              */
-            int beginColon = line.indexOf(':', 2); 
+            int beginColon = line.indexOf(':', 2);
             int endColon = line.indexOf(':', beginColon + 1);
             if ((beginColon >= 0) && (endColon >= 0)) {
                 if (javacError != null) {
                     // add previous error to error vector
                     errors.add(javacError);
                 }
-                
+
                 String lineNumStr = line.substring(beginColon + 1, endColon);
                 try {
                     lineNum = Integer.parseInt(lineNumStr);
                 } catch (NumberFormatException e) {
                     lineNum = -1;
                 }
-                
+
                 errMsgBuf = new StringBuilder();
-                
+
                 javacError = createJavacError(fname, page, errMsgBuf, lineNum);
             }
-            
+
             // Ignore messages preceding first error
             if (errMsgBuf != null) {
                 errMsgBuf.append(line);
                 errMsgBuf.append(Constants.NEWLINE);
             }
         }
-        
+
         // Add last error to error vector
         if (javacError != null) {
             errors.add(javacError);
-        } 
-        
+        }
+
         reader.close();
-        
+
         JavacErrorDetail[] errDetails = null;
         if (errors.size() > 0) {
             errDetails = new JavacErrorDetail[errors.size()];
             errors.toArray(errDetails);
         }
-        
+
         return errDetails;
     }
 
@@ -508,8 +508,8 @@ public class ErrorDispatcher {
     throws JasperException {
         return createJavacError(fname, page, errMsgBuf, lineNum, null);
     }
-    
-    
+
+
     /**
      * @param fname
      * @param page
@@ -551,7 +551,7 @@ public class ErrorDispatcher {
         } else {
             /*
              * javac error line number cannot be mapped to JSP page
-             * line number. For example, this is the case if a 
+             * line number. For example, this is the case if a
              * scriptlet is missing a closing brace, which causes
              * havoc with the try-catch-finally block that the code
              * generator places around all generated code: As a result

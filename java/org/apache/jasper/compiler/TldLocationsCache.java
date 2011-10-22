@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -45,7 +45,7 @@ import org.apache.tomcat.util.scan.JarFactory;
 /**
  * A container for all tag libraries that are defined "globally"
  * for the web application.
- * 
+ *
  * Tag Libraries can be defined globally in one of two ways:
  *   1. Via <taglib> elements in web.xml:
  *      the uri and location of the tag-library are specified in
@@ -112,9 +112,9 @@ public class TldLocationsCache {
     private volatile boolean initialized;
     private ServletContext ctxt;
 
-    /** Constructor. 
+    /** Constructor.
      *
-     * @param ctxt the servlet context of the web application in which Jasper 
+     * @param ctxt the servlet context of the web application in which Jasper
      * is running
      */
     public TldLocationsCache(ServletContext ctxt) {
@@ -126,8 +126,8 @@ public class TldLocationsCache {
     /**
      * Sets the list of JARs that are known not to contain any TLDs.
      *
-     * @param jarNames List of comma-separated names of JAR files that are 
-     * known not to contain any TLDs 
+     * @param jarNames List of comma-separated names of JAR files that are
+     * known not to contain any TLDs
      */
     public static void setNoTldJars(String jarNames) {
         if (jarNames == null) {
@@ -170,7 +170,7 @@ public class TldLocationsCache {
      * in the web application. A tag library is 'exposed' either explicitly in
      * web.xml or implicitly via the uri tag in the TLD of a taglib deployed
      * in a jar file (WEB-INF/lib).
-     * 
+     *
      * @param uri The taglib uri
      *
      * @return An array of two Strings: The first element denotes the real
@@ -186,7 +186,7 @@ public class TldLocationsCache {
         return mappings.get(uri);
     }
 
-    /** 
+    /**
      * Returns the type of a URI:
      *     ABS_URI
      *     ROOT_REL_URI
@@ -207,7 +207,7 @@ public class TldLocationsCache {
      *
      * This supports a Tomcat-specific extension to the TLD search
      * order defined in the JSP spec. It allows tag libraries packaged as JAR
-     * files to be shared by web applications by simply dropping them in a 
+     * files to be shared by web applications by simply dropping them in a
      * location that all web applications have access to (e.g.,
      * <CATALINA_HOME>/lib). It also supports some of the weird and
      * wonderful arrangements present when Tomcat gets embedded.
@@ -218,7 +218,7 @@ public class TldLocationsCache {
         try {
             tldScanWebXml();
             tldScanResourcePaths(WEB_INF);
-            
+
             JarScanner jarScanner = JarScannerFactory.getJarScanner(ctxt);
             if (jarScanner != null) {
                 jarScanner.scan(ctxt,
@@ -251,11 +251,11 @@ public class TldLocationsCache {
 
     /*
      * Populates taglib map described in web.xml.
-     * 
+     *
      * This is not kept in sync with o.a.c.startup.TldConfig as the Jasper only
      * needs the URI to TLD mappings from scan web.xml whereas TldConfig needs
      * to scan the actual TLD files.
-     */    
+     */
     private void tldScanWebXml() throws Exception {
 
         WebXml webXml = null;
@@ -317,7 +317,7 @@ public class TldLocationsCache {
      * Initially, rootPath equals /WEB-INF/. The /WEB-INF/classes and
      * /WEB-INF/lib sub-directories are excluded from the search, as per the
      * JSP 2.0 spec.
-     * 
+     *
      * Keep code in sync with o.a.c.startup.TldConfig
      */
     private void tldScanResourcePaths(String startPath)
@@ -397,7 +397,7 @@ public class TldLocationsCache {
      * map for any TLD that has a <uri> element.
      *
      * @param jarConn The JarURLConnection to the JAR file to scan
-     * 
+     *
      * Keep in sync with o.a.c.startup.TldConfig
      */
     private void tldScanJar(JarURLConnection jarConn) throws IOException {
@@ -405,13 +405,13 @@ public class TldLocationsCache {
         Jar jar = null;
         InputStream is;
         boolean foundTld = false;
-        
+
         URL resourceURL = jarConn.getJarFileURL();
         String resourcePath = resourceURL.toString();
-        
+
         try {
             jar = JarFactory.newInstance(jarConn.getURL());
-            
+
             jar.nextEntry();
             String entryName = jar.getEntryName();
             while (entryName != null) {
@@ -457,7 +457,7 @@ public class TldLocationsCache {
     /*
      * Scan the TLD contents in the specified input stream and add any new URIs
      * to the map.
-     * 
+     *
      * @param resourcePath  Path of the resource
      * @param entryName     If the resource is a JAR file, the name of the entry
      *                      in the JAR file

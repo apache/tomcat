@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -48,7 +48,7 @@ public final class SecurityClassLoad {
                 "runtime.JspRuntimeLibrary");
             loader.loadClass( basePackage +
                 "runtime.JspRuntimeLibrary$PrivilegedIntrospectHelper");
-            
+
             loader.loadClass( basePackage +
                 "runtime.ServletResponseWrapperInclude");
             loader.loadClass( basePackage +
@@ -61,47 +61,47 @@ public final class SecurityClassLoad {
             loader.loadClass( basePackage +
                 "runtime.ProtectedFunctionMapper$1");
             loader.loadClass( basePackage +
-                "runtime.ProtectedFunctionMapper$2"); 
+                "runtime.ProtectedFunctionMapper$2");
             loader.loadClass( basePackage +
                 "runtime.ProtectedFunctionMapper$3");
             loader.loadClass( basePackage +
-                "runtime.ProtectedFunctionMapper$4"); 
+                "runtime.ProtectedFunctionMapper$4");
 
             loader.loadClass( basePackage +
-                "runtime.PageContextImpl");      
+                "runtime.PageContextImpl");
             loader.loadClass( basePackage +
-                "runtime.PageContextImpl$1");      
+                "runtime.PageContextImpl$1");
             loader.loadClass( basePackage +
-                "runtime.PageContextImpl$2");      
+                "runtime.PageContextImpl$2");
             loader.loadClass( basePackage +
-                "runtime.PageContextImpl$3");      
+                "runtime.PageContextImpl$3");
             loader.loadClass( basePackage +
-                "runtime.PageContextImpl$4");      
+                "runtime.PageContextImpl$4");
             loader.loadClass( basePackage +
-                "runtime.PageContextImpl$5");      
+                "runtime.PageContextImpl$5");
             loader.loadClass( basePackage +
-                "runtime.PageContextImpl$6");      
+                "runtime.PageContextImpl$6");
             loader.loadClass( basePackage +
-                "runtime.PageContextImpl$7");      
+                "runtime.PageContextImpl$7");
             loader.loadClass( basePackage +
-                "runtime.PageContextImpl$8");      
+                "runtime.PageContextImpl$8");
             loader.loadClass( basePackage +
-                "runtime.PageContextImpl$9");      
+                "runtime.PageContextImpl$9");
             loader.loadClass( basePackage +
-                "runtime.PageContextImpl$10");      
+                "runtime.PageContextImpl$10");
             loader.loadClass( basePackage +
-                "runtime.PageContextImpl$11");      
+                "runtime.PageContextImpl$11");
             loader.loadClass( basePackage +
-                "runtime.PageContextImpl$12");      
+                "runtime.PageContextImpl$12");
             loader.loadClass( basePackage +
-                "runtime.PageContextImpl$13");      
+                "runtime.PageContextImpl$13");
 
             loader.loadClass( basePackage +
-                "runtime.JspContextWrapper");   
+                "runtime.JspContextWrapper");
 
             // Trigger loading of class and reading of property
             SecurityUtil.isPackageProtectionEnabled();
-            
+
             loader.loadClass( basePackage +
                 "servlet.JspServletWrapper");
 

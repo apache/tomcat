@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -76,7 +76,7 @@ public class JspConfig {
 
         try {
             webXml = new WebXml(ctxt);
-            
+
             TreeNode webApp = null;
             if (webXml.getInputSource() != null) {
                 ParserUtils pu = new ParserUtils();
@@ -233,7 +233,7 @@ public class JspConfig {
                             defaultIsELIgnored,
                             defaultIsScriptingInvalid,
                             null, null, null,
-                            defaultDeferedSyntaxAllowedAsLiteral, 
+                            defaultDeferedSyntaxAllowedAsLiteral,
                             defaultTrimDirectiveWhitespaces,
                             defaultDefaultContentType,
                             defaultBuffer,
@@ -439,7 +439,7 @@ public class JspConfig {
         }
 
         return new JspProperty(isXml, isELIgnored, isScriptingInvalid,
-                pageEncoding, includePreludes, includeCodas, 
+                pageEncoding, includePreludes, includeCodas,
                 isDeferedSyntaxAllowedAsLiteral, isTrimDirectiveWhitespaces,
                 defaultContentType, buffer, errorOnUndelcaredNamespace);
     }
@@ -532,7 +532,7 @@ public class JspConfig {
         public JspProperty(String isXml, String elIgnored,
                 String scriptingInvalid, String pageEncoding,
                 Vector<String> includePrelude, Vector<String> includeCoda,
-                String deferedSyntaxAllowedAsLiteral, 
+                String deferedSyntaxAllowedAsLiteral,
                 String trimDirectiveWhitespaces,
                 String defaultContentType,
                 String buffer,
@@ -574,23 +574,23 @@ public class JspConfig {
         public Vector<String> getIncludeCoda() {
             return includeCoda;
         }
-        
+
         public String isDeferedSyntaxAllowedAsLiteral() {
             return deferedSyntaxAllowedAsLiteral;
         }
-        
+
         public String isTrimDirectiveWhitespaces() {
             return trimDirectiveWhitespaces;
         }
-        
+
         public String getDefaultContentType() {
             return defaultContentType;
         }
-        
+
         public String getBuffer() {
             return buffer;
         }
-        
+
         public String isErrorOnUndeclaredNamespace() {
             return errorOnUndeclaredNamespace;
         }

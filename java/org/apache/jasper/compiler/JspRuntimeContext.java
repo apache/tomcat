@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -154,12 +154,12 @@ public final class JspRuntimeContext {
 
         // If this web application context is running from a
         // directory, start the background compilation thread
-        String appBase = context.getRealPath("/");         
+        String appBase = context.getRealPath("/");
         if (!options.getDevelopment()
                 && appBase != null
                 && options.getCheckInterval() > 0) {
             lastCompileCheck = System.currentTimeMillis();
-        }                                            
+        }
 
         if (options.getMaxLoadedJsps() > 0) {
             jspQueue = new FastRemovalDequeue<JspServletWrapper>(options.getMaxLoadedJsps());
@@ -182,7 +182,7 @@ public final class JspRuntimeContext {
     private final Options options;
     private final ClassLoader parentClassLoader;
     private final PermissionCollection permissionCollection;
-    private final CodeSource codeSource;                    
+    private final CodeSource codeSource;
     private final String classpath;
     private volatile long lastCompileCheck = -1L;
     private volatile long lastJspQueueUpdate = System.currentTimeMillis();
@@ -195,7 +195,7 @@ public final class JspRuntimeContext {
     private Map<String, JspServletWrapper> jsps = new ConcurrentHashMap<String, JspServletWrapper>();
 
     /**
-     * Keeps JSP pages ordered by last access. 
+     * Keeps JSP pages ordered by last access.
      */
     private FastRemovalDequeue<JspServletWrapper> jspQueue = null;
 
@@ -254,7 +254,7 @@ public final class JspRuntimeContext {
         }
         return entry;
     }
-    
+
     /**
      * Push unloadHandle for JspServletWrapper to front of the queue.
      *
@@ -268,7 +268,7 @@ public final class JspRuntimeContext {
         }
         jspQueue.moveFirst(unloadHandle);
     }
-    
+
     /**
      * Returns the number of JSPs for which JspServletWrappers exist, i.e.,
      * the number of JSPs that have been loaded into the webapp.
@@ -310,7 +310,7 @@ public final class JspRuntimeContext {
 
     /**
      * Process a "destroy" event for this web application context.
-     */                                                        
+     */
     public void destroy() {
         Iterator<JspServletWrapper> servlets = jsps.values().iterator();
         while (servlets.hasNext()) {
@@ -390,7 +390,7 @@ public final class JspRuntimeContext {
         } else {
             return;
         }
-        
+
         Object [] wrappers = jsps.values().toArray();
         for (int i = 0; i < wrappers.length; i++ ) {
             JspServletWrapper jsw = (JspServletWrapper)wrappers[i];
@@ -440,13 +440,13 @@ public final class JspRuntimeContext {
 
         if (parentClassLoader instanceof URLClassLoader) {
             URL [] urls = ((URLClassLoader)parentClassLoader).getURLs();
-    
+
             for(int i = 0; i < urls.length; i++) {
                 // Tomcat 4 can use URL's other than file URL's,
                 // a protocol other than file: will generate a
                 // bad file system path, so only add file:
                 // protocol URL's to the classpath.
-                
+
                 if( urls[i].getProtocol().equals("file") ) {
                     cpath.append(urls[i].getFile()+sep);
                 }
@@ -490,7 +490,7 @@ public final class JspRuntimeContext {
         CodeSource source = null;
         PermissionCollection permissions = null;
         if( policy != null ) {
-            try {          
+            try {
                 // Get the permissions for the web app context
                 String docBase = context.getRealPath("/");
                 if( docBase == null ) {

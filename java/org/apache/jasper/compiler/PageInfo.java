@@ -69,10 +69,10 @@ class PageInfo {
 
     private boolean scriptless = false;
     private boolean scriptingInvalid = false;
-    
+
     private String isELIgnoredValue;
     private boolean isELIgnored = false;
-    
+
     // JSP 2.1
     private String deferredSyntaxAllowedAsLiteralValue;
     private boolean deferredSyntaxAllowedAsLiteral = false;
@@ -80,7 +80,7 @@ class PageInfo {
         ExpressionFactory.newInstance();
     private String trimDirectiveWhitespacesValue;
     private boolean trimDirectiveWhitespaces = false;
-    
+
     private String omitXmlDecl = null;
     private String doctypeName = null;
     private String doctypePublic = null;
@@ -632,7 +632,7 @@ class PageInfo {
 
         isELIgnoredValue = value;
     }
-    
+
     /*
      * deferredSyntaxAllowedAsLiteral
      */
@@ -653,7 +653,7 @@ class PageInfo {
 
         deferredSyntaxAllowedAsLiteralValue = value;
     }
-    
+
     /*
      * trimDirectiveWhitespaces
      */
@@ -694,7 +694,7 @@ class PageInfo {
     public Mark getNonCustomTagPrefix(String prefix) {
         return nonCustomTagPrefixMap.get(prefix);
     }
-    
+
     public String getDeferredSyntaxAllowedAsLiteral() {
         return deferredSyntaxAllowedAsLiteralValue;
     }
@@ -726,13 +726,13 @@ class PageInfo {
     public Set<String> getVarInfoNames() {
         return varInfoNames;
     }
-    
+
     public boolean isErrorOnUndeclaredNamespace() {
         return errorOnUndeclaredNamepsace;
     }
-    
+
     public void setErrorOnUndeclaredNamespace(
             boolean errorOnUndeclaredNamespace) {
-        this.errorOnUndeclaredNamepsace = errorOnUndeclaredNamespace; 
+        this.errorOnUndeclaredNamepsace = errorOnUndeclaredNamespace;
     }
 }

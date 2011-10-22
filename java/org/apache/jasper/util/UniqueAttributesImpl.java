@@ -31,7 +31,7 @@ public class UniqueAttributesImpl extends AttributesImpl {
 
     private static final String IMPORT = "import";
     private static final String PAGE_ENCODING = "pageEncoding";
-    
+
     private final boolean pageDirective;
     private final Set<String> qNames = new HashSet<String>();
 

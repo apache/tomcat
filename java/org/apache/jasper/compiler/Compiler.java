@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -39,7 +39,7 @@ import org.apache.juli.logging.LogFactory;
 
 /**
  * Main JSP compiler class. This class uses Ant for compiling.
- * 
+ *
  * @author Anil K. Vijendran
  * @author Mandar Raje
  * @author Pierre Delisle
@@ -48,7 +48,7 @@ import org.apache.juli.logging.LogFactory;
  * @author Mark Roth
  */
 public abstract class Compiler {
-    
+
     private final Log log = LogFactory.getLog(Compiler.class); // must not be static
 
     // ----------------------------------------------------- Instance Variables
@@ -90,7 +90,7 @@ public abstract class Compiler {
 
     /**
      * Compile the jsp file into equivalent servlet in .java file
-     * 
+     *
      * @return a smap for the current JSP page, if one is generated, null
      *         otherwise
      */
@@ -184,16 +184,16 @@ public abstract class Compiler {
              * solutions. We now use two passes to parse the translation unit.
              * The first just parses the directives and the second parses the
              * whole translation unit once we know how isELIgnored has been set.
-             * TODO There are some possible optimisations of this process.  
-             */ 
+             * TODO There are some possible optimisations of this process.
+             */
             // Parse the file
             ParserController parserCtl = new ParserController(ctxt, this);
-            
+
             // Pass 1 - the directives
             Node.Nodes directives =
                 parserCtl.parseDirectives(ctxt.getJspFile());
             Validator.validateDirectives(this, directives);
-            
+
             // Pass 2 - the whole translation unit
             pageNodes = parserCtl.parse(ctxt.getJspFile());
 
@@ -343,7 +343,7 @@ public abstract class Compiler {
     /**
      * Compile the jsp file from the current engine context. As an side- effect,
      * tag files that are referenced by this page are also compiled.
-     * 
+     *
      * @param compileClass
      *            If true, generate both .java and .class file If false,
      *            generate only .java file
@@ -356,7 +356,7 @@ public abstract class Compiler {
     /**
      * Compile the jsp file from the current engine context. As an side- effect,
      * tag files that are referenced by this page are also compiled.
-     * 
+     *
      * @param compileClass
      *            If true, generate both .java and .class file If false,
      *            generate only .java file
@@ -430,7 +430,7 @@ public abstract class Compiler {
      * JSP page with that of the corresponding .class or .java file. If the page
      * has dependencies, the check is also extended to its dependents, and so
      * on. This method can by overridden by a subclasses of Compiler.
-     * 
+     *
      * @param checkClass
      *            If true, check against .class file, if false, check against
      *            .java file.

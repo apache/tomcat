@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -71,7 +71,7 @@ class JspDocumentParser
      * Outermost (in the nesting hierarchy) node whose body is declared to be
      * scriptless. If a node's body is declared to be scriptless, all its
      * nested nodes must be scriptless, too.
-     */ 
+     */
     private Node scriptlessBodyNode;
 
     private Locator locator;
@@ -242,7 +242,7 @@ class JspDocumentParser
      * Receives notification of the start of an element.
      *
      * This method assigns the given tag attributes to one of 3 buckets:
-     * 
+     *
      * - "xmlns" attributes that represent (standard or custom) tag libraries.
      * - "xmlns" attributes that do not represent tag libraries.
      * - all remaining attributes.
@@ -273,7 +273,7 @@ class JspDocumentParser
         }
 
         String currentPrefix = getPrefix(current.getQName());
-        
+
         // jsp:text must not have any subelements
         if (JSP_URI.equals(uri) && TEXT_ACTION.equals(current.getLocalName())
                 && "jsp".equals(currentPrefix)) {
@@ -288,7 +288,7 @@ class JspDocumentParser
         if (attrs != null) {
             /*
              * Notice that due to a bug in the underlying SAX parser, the
-             * attributes must be enumerated in descending order. 
+             * attributes must be enumerated in descending order.
              */
             boolean isTaglib = false;
             for (int i = attrs.getLength() - 1; i >= 0; i--) {
@@ -437,7 +437,7 @@ class JspDocumentParser
      * invoke this method with chunks of it.  This is a problem when we try
      * to determine if the text contains only whitespaces, or when we are
      * looking for an EL expression string.  Therefore it is necessary to
-     * buffer and concatenate the chunks and process the concatenated text 
+     * buffer and concatenate the chunks and process the concatenated text
      * later (at beginTag and endTag)
      *
      * @param buf The characters
@@ -669,7 +669,7 @@ class JspDocumentParser
                         if (!(child instanceof Node.NamedAttribute)) {
                             throw new SAXParseException(Localizer.getMessage(
                                     "jasper.error.emptybodycontent.nonempty",
-                                    current.qName), locator); 
+                                    current.qName), locator);
                         }
                     }
                 }
@@ -784,7 +784,7 @@ class JspDocumentParser
     }
 
     /*
-     * Receives notification of the start of a Namespace mapping. 
+     * Receives notification of the start of a Namespace mapping.
      */
     @Override
     public void startPrefixMapping(String prefix, String uri)
@@ -794,7 +794,7 @@ class JspDocumentParser
         if (directivesOnly && !(JSP_URI.equals(uri))) {
             return;
         }
-        
+
         try {
             taglibInfo = getTaglibInfo(prefix, uri);
         } catch (JasperException je) {
@@ -815,7 +815,7 @@ class JspDocumentParser
     }
 
     /*
-     * Receives notification of the end of a Namespace mapping. 
+     * Receives notification of the end of a Namespace mapping.
      */
     @Override
     public void endPrefixMapping(String prefix) throws SAXException {
@@ -1433,7 +1433,7 @@ class JspDocumentParser
         //factory.setFeature(
         //    "http://xml.org/sax/features/validation",
         //    validating);
-        
+
         // Configure the parser
         SAXParser saxParser = factory.newSAXParser();
         XMLReader xmlReader = saxParser.getXMLReader();

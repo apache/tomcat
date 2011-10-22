@@ -89,7 +89,7 @@ class Generator {
     /* System property that controls if the requirement to have the object
      * used in jsp:getProperty action to be previously "introduced"
      * to the JSP processor (see JSP.5.3) is enforced.
-     */ 
+     */
     private static final boolean STRICT_GET_PROPERTY = Boolean.valueOf(
             System.getProperty(
                     "org.apache.jasper.compiler.Generator.STRICT_GET_PROPERTY",
@@ -104,7 +104,7 @@ class Generator {
     private ErrorDispatcher err;
 
     private BeanRepository beanInfo;
-    
+
     private Set<String> varInfoNames;
 
     private JspCompilationContext ctxt;
@@ -122,7 +122,7 @@ class Generator {
     private Vector<String> tagHandlerPoolNames;
 
     private GenBuffer charArrayBuffer;
-    
+
     private DateFormat timestampFormat;
 
     /**
@@ -297,7 +297,7 @@ class Generator {
 
                 if (!n.implementsSimpleTag()) {
                     String name = createTagHandlerPoolName(n.getPrefix(), n
-                            .getLocalName(), n.getAttributes(), 
+                            .getLocalName(), n.getAttributes(),
                             n.getNamedAttributeNodes(), n.hasEmptyBody());
                     n.setTagHandlerPoolName(name);
                     if (!names.contains(name)) {
@@ -1100,7 +1100,7 @@ class Generator {
                 msg.append(name);
                 msg.append(
                         "'. Name was not previously introduced as per JSP.5.3");
-                
+
                 throw new JasperException(msg.toString());
             }
 
@@ -1742,8 +1742,8 @@ class Generator {
                     }
                 }
             }
-            
-            
+
+
             if (n.implementsSimpleTag()) {
                 generateCustomDoTag(n, handlerInfo, tagHandlerVar);
             } else {
@@ -1794,7 +1794,7 @@ class Generator {
                 // restore previous writer
                 out = outSave;
             }
-            
+
         }
 
         private static final String DOUBLE_QUOTE = "\\\"";
@@ -2011,11 +2011,11 @@ class Generator {
                         caOut.print(quote(output));
                         caOut.println(".toCharArray();");
                     }
-    
+
                     n.setBeginJavaLine(out.getJavaLine());
                     out.printil("out.write(" + charArrayName + ");");
                     n.setEndJavaLine(out.getJavaLine());
-                    
+
                     textIndex = textIndex + len;
                 }
                 return;
