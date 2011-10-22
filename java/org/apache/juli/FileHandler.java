@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -42,13 +42,13 @@ import java.util.logging.SimpleFormatter;
  * named {prefix}{date}{suffix} in a configured directory.
  *
  * <p>The following configuration properties are available:</p>
- * 
+ *
  * <ul>
  *   <li><code>directory</code> - The directory where to create the log file.
  *    If the path is not absolute, it is relative to the current working
  *    directory of the application. The Apache Tomcat configuration files usually
  *    specify an absolute path for this property,
- *    <code>${catalina.base}/logs</code> 
+ *    <code>${catalina.base}/logs</code>
  *    Default value: <code>logs</code></li>
  *   <li><code>rotatable</code> - If <code>true</code>, the log file will be
  *    rotated on the first write past midnight and the filename will be
@@ -85,12 +85,12 @@ public class FileHandler
 
     // ------------------------------------------------------------ Constructor
 
-    
+
     public FileHandler() {
         this(null, null, null);
     }
-    
-    
+
+
     public FileHandler(String directory, String prefix, String suffix) {
         this.directory = directory;
         this.prefix = prefix;
@@ -98,7 +98,7 @@ public class FileHandler
         configure();
         openWriter();
     }
-    
+
 
     // ----------------------------------------------------- Instance Variables
 
@@ -180,7 +180,7 @@ public class FileHandler
                     // Update to writeLock before we switch
                     writerLock.readLock().unlock();
                     writerLock.writeLock().lock();
-    
+
                     // Make sure another thread hasn't already done this
                     if (!date.equals(tsDate)) {
                         closeWriter();
@@ -220,8 +220,8 @@ public class FileHandler
             writerLock.readLock().unlock();
         }
     }
-    
-    
+
+
     // -------------------------------------------------------- Private Methods
 
 
@@ -234,7 +234,7 @@ public class FileHandler
     }
 
     protected void closeWriter() {
-        
+
         writerLock.writeLock().lock();
         try {
             if (writer == null)
@@ -268,10 +268,10 @@ public class FileHandler
         } finally {
             writerLock.readLock().unlock();
         }
-        
+
     }
-    
-    
+
+
     /**
      * Configure from <code>LogManager</code> properties.
      */
@@ -282,9 +282,9 @@ public class FileHandler
         date = tsString.substring(0, 10);
 
         String className = this.getClass().getName(); //allow classes to override
-        
+
         ClassLoader cl = Thread.currentThread().getContextClassLoader();
-        
+
         // Retrieve configuration of logging file name
         rotatable = Boolean.parseBoolean(getProperty(className + ".rotatable", "true"));
         if (directory == null)
@@ -334,13 +334,13 @@ public class FileHandler
         } else {
             setFormatter(new SimpleFormatter());
         }
-        
+
         // Set error manager
         setErrorManager(new ErrorManager());
-        
+
     }
 
-    
+
     private String getProperty(String name, String defaultValue) {
         String value = LogManager.getLogManager().getProperty(name);
         if (value == null) {
@@ -350,15 +350,15 @@ public class FileHandler
         }
         return value;
     }
-    
-    
+
+
     /**
      * Open the new log file for the date specified by <code>date</code>.
      */
     protected void open() {
         openWriter();
     }
-    
+
     protected void openWriter() {
 
         // Create the directory if necessary
