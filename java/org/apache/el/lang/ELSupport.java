@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -29,7 +29,7 @@ import org.apache.el.util.MessageFactory;
 
 /**
  * A helper class that implements the EL Specification
- * 
+ *
  * @author Jacob Hookom [jacob@hookom.net]
  * @version $Id$
  */
@@ -39,27 +39,27 @@ public class ELSupport {
 
     /**
      * Compare two objects, after coercing to the same type if appropriate.
-     * 
-     * If the objects are identical, or they are equal according to 
+     *
+     * If the objects are identical, or they are equal according to
      * {@link #equals(Object, Object)} then return 0.
-     * 
+     *
      * If either object is a BigDecimal, then coerce both to BigDecimal first.
      * Similarly for Double(Float), BigInteger, and Long(Integer, Char, Short, Byte).
-     *  
+     *
      * Otherwise, check that the first object is an instance of Comparable, and compare
      * against the second object. If that is null, return 1, otherwise
      * return the result of comparing against the second object.
-     * 
+     *
      * Similarly, if the second object is Comparable, if the first is null, return -1,
      * else return the result of comparing against the first object.
-     * 
+     *
      * A null object is considered as:
      * <ul>
      * <li>ZERO when compared with Numbers</li>
      * <li>the empty string for String compares</li>
      * <li>Otherwise null is considered to be lower than anything else.</li>
      * </ul>
-     * 
+     *
      * @param obj0 first object
      * @param obj1 second object
      * @return -1, 0, or 1 if this object is less than, equal to, or greater than val.
@@ -109,13 +109,13 @@ public class ELSupport {
 
     /**
      * Compare two objects for equality, after coercing to the same type if appropriate.
-     * 
+     *
      * If the objects are identical (including both null) return true.
      * If either object is null, return false.
      * If either object is Boolean, coerce both to Boolean and check equality.
      * Similarly for Enum, String, BigDecimal, Double(Float), Long(Integer, Short, Byte, Character)
      * Otherwise default to using Object.equals().
-     * 
+     *
      * @param obj0 the first object
      * @param obj1 the second object
      * @return true if the objects are equal
@@ -173,7 +173,7 @@ public class ELSupport {
         if (type.isAssignableFrom(obj.getClass())) {
             return (Enum<?>) obj;
         }
-        
+
         if (!(obj instanceof String)) {
             throw new ELException(MessageFactory.get("error.convert",
                     obj, obj.getClass(), type));
@@ -473,7 +473,7 @@ public class ELSupport {
     }
 
     /**
-     * 
+     *
      */
     public ELSupport() {
         super();

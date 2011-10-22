@@ -61,9 +61,9 @@ public final class AstFunction extends SimpleNode {
     @Override
     public Class<?> getType(EvaluationContext ctx)
             throws ELException {
-        
+
         FunctionMapper fnMapper = ctx.getFunctionMapper();
-        
+
         // quickly validate again for this request
         if (fnMapper == null) {
             throw new ELException(MessageFactory.get("error.fnMapper.null"));
@@ -79,9 +79,9 @@ public final class AstFunction extends SimpleNode {
     @Override
     public Object getValue(EvaluationContext ctx)
             throws ELException {
-        
+
         FunctionMapper fnMapper = ctx.getFunctionMapper();
-        
+
         // quickly validate again for this request
         if (fnMapper == null) {
             throw new ELException(MessageFactory.get("error.fnMapper.null"));
@@ -127,8 +127,8 @@ public final class AstFunction extends SimpleNode {
     public void setPrefix(String prefix) {
         this.prefix = prefix;
     }
-    
-    
+
+
     @Override
     public String toString()
     {

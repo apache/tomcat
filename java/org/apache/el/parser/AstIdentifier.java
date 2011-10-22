@@ -118,7 +118,7 @@ public final class AstIdentifier extends SimpleNode {
             Object[] paramValues) throws ELException {
         return this.getMethodExpression(ctx).invoke(ctx.getELContext(), paramValues);
     }
-    
+
 
     @Override
     public MethodInfo getMethodInfo(EvaluationContext ctx,
