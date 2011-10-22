@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -37,13 +37,13 @@ import org.apache.juli.logging.LogFactory;
  * based on the remote client's host name.
  *
  * @author Craig R. McClanahan
- * 
+ *
  */
 
 public final class RemoteHostFilter
     extends RequestFilter {
 
-    
+
     // ----------------------------------------------------- Instance Variables
     private static final Log log = LogFactory.getLog(RemoteHostFilter.class);
 
@@ -71,11 +71,11 @@ public final class RemoteHostFilter
     @Override
     public void doFilter(ServletRequest request, ServletResponse response,
             FilterChain chain) throws IOException, ServletException {
-        
+
         process(request.getRemoteHost(), request, response, chain);
 
     }
-    
+
     /**
      * Extract the desired request property, and pass it (along with the comet
      * event and filter chain) to the protected <code>process()</code> method
@@ -91,7 +91,7 @@ public final class RemoteHostFilter
     public void doFilterEvent(CometEvent event, CometFilterChain chain)
             throws IOException, ServletException {
         processCometEvent(event.getHttpServletRequest().getRemoteHost(),
-                event, chain);        
+                event, chain);
     }
 
     @Override
