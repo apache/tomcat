@@ -58,7 +58,7 @@ public class JspPropertyGroup {
         this.pageEncoding = pageEncoding;
     }
     public String getPageEncoding() { return this.pageEncoding; }
-    
+
     private Boolean scriptingInvalid = null;
     public void setScriptingInvalid(String scriptingInvalid) {
         this.scriptingInvalid = Boolean.valueOf(scriptingInvalid);
@@ -76,19 +76,19 @@ public class JspPropertyGroup {
         this.urlPattern = urlPattern;
     }
     public String getUrlPattern() { return this.urlPattern; }
-    
+
     private String defaultContentType = null;
     public void setDefaultContentType(String defaultContentType) {
         this.defaultContentType = defaultContentType;
     }
     public String getDefaultContentType() { return this.defaultContentType; }
-    
+
     private Integer buffer = null;
     public void setBuffer(String buffer) {
         this.buffer = Integer.valueOf(buffer);
     }
     public Integer getBuffer() { return this.buffer; }
-    
+
     private Boolean errorOnUndeclaredNamespace = null;
     public void setErrorOnUndeclaredNamespace(
             String errorOnUndeclaredNamespace) {
@@ -98,5 +98,5 @@ public class JspPropertyGroup {
     public Boolean getErrorOnUndeclaredNamespace() {
         return this.errorOnUndeclaredNamespace;
     }
-    
+
 }
