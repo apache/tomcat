@@ -15,32 +15,32 @@ import java.util.Map;
 
 /**
  * Converts chars to bytes, and associated encoding.
- * 
- * Replaces C2B from old tomcat. 
- * 
+ *
+ * Replaces C2B from old tomcat.
+ *
  * @author Costin Manolache
  */
 public class IOWriter extends Writer {
-    
+
     IOBuffer iob;
     Map<String, CharsetEncoder> encoders = new HashMap<String, CharsetEncoder>();
     CharsetEncoder encoder;
-    
+
     private static boolean REUSE = true;
     String enc;
     private boolean closed;
     IOChannel ioCh;
-    
+
     public IOWriter(IOChannel iob) {
         this.ioCh = iob;
         if (iob != null) {
             this.iob = iob.getOut();
         }
     }
-    
+
     public void setEncoding(String charset) {
         if (charset == null) {
-            charset = "UTF-8"; 
+            charset = "UTF-8";
         }
         enc = charset;
         encoder = getEncoder(charset);
@@ -53,10 +53,10 @@ public class IOWriter extends Writer {
             }
         }
     }
-    
+
     CharsetEncoder getEncoder(String charset) {
         if (charset == null) {
-            charset = "UTF-8"; 
+            charset = "UTF-8";
         }
         encoder = REUSE ? encoders.get(charset) : null;
         if (encoder == null) {
@@ -69,11 +69,11 @@ public class IOWriter extends Writer {
         }
         return encoder;
     }
-    
+
     public String getEncoding() {
         return enc;
     }
-    
+
     public void recycle() {
         if (encoder != null) {
             encoder.reset();
@@ -81,12 +81,12 @@ public class IOWriter extends Writer {
         closed = false;
         enc = null;
     }
-    
-    
+
+
     private void checkClosed() throws IOException {
         if (closed) throw new IOException("closed");
     }
-    
+
     @Override
     public void close() throws IOException {
         closed = true;
@@ -94,16 +94,16 @@ public class IOWriter extends Writer {
         ByteBuffer out = iob.getWriteBuffer();
         encoder.flush(out);
         iob.releaseWriteBuffer(1);
-        
+
         iob.close();
     }
-    
-    /** 
+
+    /**
      * Used if a bucket ends on a char boundary
      */
     CBuffer underFlowBuffer = CBuffer.newInstance();
 
-    public void encode1(CBuffer cc, 
+    public void encode1(CBuffer cc,
             BBuffer bb, CharsetEncoder encoder, boolean eof) {
         CharBuffer c = cc.getNioBuffer();
         ByteBuffer b = bb.getWriteByteBuffer(c.remaining() * 2);
@@ -112,41 +112,41 @@ public class IOWriter extends Writer {
         bb.limit(b.position());
     }
 
-    /** 
-     * 
+    /**
+     *
      * @param cc
      * @return
      */
-    public void encode1(CharBuffer c, 
+    public void encode1(CharBuffer c,
             ByteBuffer b, CharsetEncoder encoder, boolean eof) {
-        
+
         // TODO: buffer growth in caller
-        
+
         CoderResult res = encoder.encode(c, b, eof);
         if (res == CoderResult.OVERFLOW) {
-            // bb is full - next call will get a larger buffer ( it 
+            // bb is full - next call will get a larger buffer ( it
             // grows ) or maybe will be flushed.
         }
         if (res == CoderResult.UNDERFLOW && c.remaining() > 0 && !eof) {
             // TODO: if eof -> exception ?
             // cc has remaining chars - for example a surrogate start.
             underFlowBuffer.put(c);
-        } 
-        
+        }
+
     }
 
-    public void encodeAll(CBuffer cc, 
+    public void encodeAll(CBuffer cc,
             BBuffer bb, CharsetEncoder encoder, boolean eof) {
         while (cc.length() > 0) {
             encode1(cc, bb, encoder, eof);
         }
-    }    
+    }
 
-    public void encodeAll(CBuffer cc, 
+    public void encodeAll(CBuffer cc,
             BBuffer bb, String cs) {
         encodeAll(cc, bb, getEncoder(cs), true);
-    }    
-    
+    }
+
     @Override
     public void flush() throws IOException {
         if (ioCh != null) {
@@ -182,31 +182,31 @@ public class IOWriter extends Writer {
             return 4;
         }
 
-        
+
         return i;
     }
 
 
     /**
      * Just send the chars to the byte[], without flushing down.
-     * 
+     *
      * @throws IOException
      */
     public void push() throws IOException {
         // we don't cache here.
     }
-    
+
     @Override
     public void write(char[] cbuf, int off, int len) throws IOException {
         checkClosed();
         CharBuffer cb = CharBuffer.wrap(cbuf, off, len);
-        
+
         while (cb.remaining() > 0) {
             ByteBuffer wb = iob.getWriteBuffer();
             encode1(cb, wb, encoder, false);
             iob.releaseWriteBuffer(1);
         }
     }
-    
-    
+
+
 }

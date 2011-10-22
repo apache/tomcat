@@ -8,15 +8,15 @@ import java.io.IOException;
 
 /**
  * Catalina uses JNDI to abstract filesystem - this is both heavy and
- * a bit complex. 
- * 
- * This is also a bit complex - but hopefully we can implement it as 
+ * a bit complex.
+ *
+ * This is also a bit complex - but hopefully we can implement it as
  * non-blocking and without much copy.
- * 
+ *
  */
 public class FileConnectorJavaIo extends FileConnector {
     File base;
-    
+
     public FileConnectorJavaIo(File file) {
         this.base = file;
     }
@@ -34,11 +34,11 @@ public class FileConnectorJavaIo extends FileConnector {
     }
 
     @Override
-    public void acceptor(ConnectedCallback sc, 
-            CharSequence port, 
+    public void acceptor(ConnectedCallback sc,
+            CharSequence port,
             Object extra) throws IOException {
         // TODO: unix domain socket impl.
-        // Maybe: detect new files in the filesystem ? 
+        // Maybe: detect new files in the filesystem ?
     }
 
     @Override

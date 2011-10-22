@@ -30,7 +30,7 @@ import org.apache.tomcat.lite.io.IOBuffer;
  */
 public class EchoCallback implements HttpService {
     Logger log = Logger.getLogger("coyote.static");
-    
+
     String contentType = "text/plain";
 
 
@@ -42,20 +42,20 @@ public class EchoCallback implements HttpService {
         HttpChannel sproc = req.getHttpChannel();
         res.setStatus(200);
         res.setContentType(contentType);
-        
+
         IOBuffer tmp = new IOBuffer(null);
         Http11Connection.serialize(req, tmp);
-        
+
         sproc.getOut().append("REQ HEAD:\n");
         sproc.getOut().append(tmp.readAll(null));
         IOBuffer reqBuf = sproc.getOut();
-        
+
         reqBuf.append("\nCONTENT_LENGTH:")
             .append(Long.toString(req.getContentLength()))
             .append("\n");
-//      
+//
 //        sproc.release();
     }
 
-    
+
 }

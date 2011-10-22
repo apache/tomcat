@@ -16,7 +16,7 @@ public class MicroTest extends TestCase {
         MappingData mappingData = new MappingData();
         CBuffer host = CBuffer.newInstance();
         host.set("test1.com");
-        
+
         CBuffer uri = CBuffer.newInstance();
         uri.set("/foo/bar/blah/bobou/foo");
 
@@ -45,6 +45,6 @@ public class MicroTest extends TestCase {
             mapper.map(host, uri, mappingData);
         }
         // TODO: asserts
-        //System.out.println("Elapsed:" + (System.currentTimeMillis() - time));        
+        //System.out.println("Elapsed:" + (System.currentTimeMillis() - time));
     }
 }

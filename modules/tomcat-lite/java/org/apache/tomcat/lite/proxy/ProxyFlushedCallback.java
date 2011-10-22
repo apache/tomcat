@@ -9,7 +9,7 @@ import org.apache.tomcat.lite.io.IOConnector;
 
 public final class ProxyFlushedCallback implements IOConnector.DataFlushedCallback {
     IOChannel peerCh;
-    
+
     public ProxyFlushedCallback(IOChannel ch2, IOChannel clientChannel2) {
         peerCh = ch2;
     }

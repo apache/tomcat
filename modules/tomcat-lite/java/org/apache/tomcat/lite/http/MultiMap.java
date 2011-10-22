@@ -29,32 +29,32 @@ import org.apache.tomcat.lite.io.CBucket;
 import org.apache.tomcat.lite.io.CBuffer;
 
 /**
- * Map used to represent headers and parameters ( could be used 
+ * Map used to represent headers and parameters ( could be used
  * for cookies too )
- * 
- * It'll avoid garbage collection, like original tomcat classes, 
+ *
+ * It'll avoid garbage collection, like original tomcat classes,
  * by converting to chars and strings late.
- * 
+ *
  * Not thread safe.
  */
 public class MultiMap {
 
     public static class Entry {
         // Wrappers from the head message bytes.
-        BBuffer nameB; 
+        BBuffer nameB;
         BBuffer valueB;
-        
+
         CBuffer key = CBuffer.newInstance();
         private CBuffer value = CBuffer.newInstance();
-        
-        /** 
+
+        /**
          * For the first entry with a given name: list of all
          * other entries, including this one, with same name.
-         * 
+         *
          * For second or more: empty list
          */
-        public List<Entry> values = new ArrayList<Entry>(); 
-    
+        public List<Entry> values = new ArrayList<Entry>();
+
         public void recycle() {
             key.recycle();
             value.recycle();
@@ -63,14 +63,14 @@ public class MultiMap {
             valueB = null;
             values.clear();
         }
-    
+
         public CBuffer getName() {
             if (key.length() == 0 && nameB != null) {
                 key.set(nameB);
             }
             return key;
         }
-    
+
         public CBuffer getValue() {
             if (value.length() == 0 && valueB != null) {
                 value.set(valueB);
@@ -78,13 +78,13 @@ public class MultiMap {
             return value;
         }
 
-        /** Important - used by values iterator, returns strings 
+        /** Important - used by values iterator, returns strings
          * from each entry
          */
         public String toString() {
             return getValue().toString();
         }
-        
+
     }
 
     // active entries
@@ -92,15 +92,15 @@ public class MultiMap {
 
     // The key will be converted to lower case
     boolean toLower = false;
-    
+
     // Some may be inactive - up to count.
     protected List<Entry> entries = new ArrayList<Entry>();
-    
+
     // 2 options: convert all header/param names to String
     // or use a temp CBuffer to map
-    Map<CBuffer, Entry> map = 
+    Map<CBuffer, Entry> map =
         new HashMap<CBuffer, Entry>();
-    
+
     public void recycle() {
         for (int i = 0; i < count; i++) {
             Entry entry = entries.get(i);
@@ -115,7 +115,7 @@ public class MultiMap {
     protected Entry newEntry()  {
         return new Entry();
     }
-    
+
     /**
      * Adds a partially constructed field entry.
      * Updates count - but will not affect the map.
@@ -131,7 +131,7 @@ public class MultiMap {
         count++;
         return entry;
     }
-    
+
 
     /** Create a new named header , return the CBuffer
      *  container for the new value
@@ -154,18 +154,18 @@ public class MultiMap {
        mh.nameB = name;
        if (toLower) {
            mh.getName().toLower();
-       }       
+       }
        updateMap(mh);
-       
+
        return mh;
    }
 
    private void updateMap(Entry mh) {
        Entry topEntry = map.get(mh.getName());
-       
+
        if (topEntry == null) {
            map.put(mh.getName(), mh);
-           mh.values.add(mh);            
+           mh.values.add(mh);
        } else {
            topEntry.values.add(mh);
        }
@@ -178,7 +178,7 @@ public class MultiMap {
         Entry entry = getEntry(ckey);
         if (entry != null) {
             map.remove(ckey);
-            
+
             for (int i = count - 1; i >= 0; i--) {
                 entry = entries.get(i);
                 if (entry.getName().equals(key)) {
@@ -187,12 +187,12 @@ public class MultiMap {
                     count--;
                 }
             }
-        }            
+        }
     }
 
     // --------------- Key-based access --------------
     CBuffer tmpKey = CBuffer.newInstance();
-    
+
     /**
      * Finds and returns a header field with the given name.  If no such
      * field exists, null is returned.  If more than one such field is
@@ -218,10 +218,10 @@ public class MultiMap {
         tmpKey.append(key);
         if (toLower) {
             tmpKey.toLower();
-        }        
+        }
         return tmpKey;
     }
-    
+
     public Entry getEntry(CharSequence key) {
         Entry entry = map.get(key(key));
         return entry;
@@ -235,13 +235,13 @@ public class MultiMap {
 
     public Enumeration<String> names() {
         return new IteratorEnumerator(map.keySet().iterator());
-    }    
+    }
 
     // ----------- Index access --------------
-    
+
     /**
      *  Number of entries ( including those with same key
-     * 
+     *
      * @return
      */
     public int size() {
@@ -278,7 +278,7 @@ public class MultiMap {
         Entry mh = addEntry(key);
         mh.value.append(value);
     }
-    
+
     /** Create a new named header , return the CBuffer
      * container for the new value
      */
@@ -295,7 +295,7 @@ public class MultiMap {
          remove(key);
          add(key, value);
      }
-     
+
      public CBuffer setValue( String name ) {
          remove(name);
          return addValue(name);
@@ -310,30 +310,30 @@ public class MultiMap {
          Entry entry = getEntry(key);
          return (entry == null) ? null : entry.value.toString();
      }
-     
-    
+
+
     // -------------- support classes ----------------
-    
+
     public static class IteratorEnumerator implements Enumeration<String> {
         private final Iterator keyI;
-    
+
         public IteratorEnumerator(Iterator iterator) {
             this.keyI = iterator;
         }
-    
-        
+
+
         public boolean hasMoreElements() {
             return keyI.hasNext();
         }
-    
-        
+
+
         public String nextElement() {
             return keyI.next().toString();
         }
 
     }
 
-    public static final Enumeration<String> EMPTY = 
+    public static final Enumeration<String> EMPTY =
         new Enumeration<String>() {
 
             @Override
@@ -345,7 +345,7 @@ public class MultiMap {
             public String nextElement() {
                 return null;
             }
-        
+
     };
 
     public MultiMap insensitive() {
@@ -353,5 +353,5 @@ public class MultiMap {
         return this;
     }
 
-    
+
 }

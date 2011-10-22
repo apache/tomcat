@@ -18,19 +18,19 @@ public class LiveHttp5Test extends LiveHttp1Test {
         }
         return s;
     }
-    
+
     public void test100() throws Exception {
         for (int i = 0; i < 100; i++) {
             testSimpleRequest();
-            tearDown(); 
+            tearDown();
             setUp();
-            
+
             notFound();
-            tearDown(); 
+            tearDown();
             setUp();
 
             testSimpleRequest();
-            tearDown(); 
+            tearDown();
             setUp();
         }
     }

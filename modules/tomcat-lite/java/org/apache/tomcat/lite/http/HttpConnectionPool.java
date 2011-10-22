@@ -20,52 +20,52 @@ import org.apache.tomcat.lite.io.IOConnector;
 
 /**
  * - Holds references to all active and kept-alive connections.
- * - makes decisions on accepting more connections, closing old 
+ * - makes decisions on accepting more connections, closing old
  * connections, etc
- * 
+ *
  */
 public class HttpConnectionPool {
-    // TODO: add timeouts, limits per host/total, expire old entries 
-   
+    // TODO: add timeouts, limits per host/total, expire old entries
+
     public static interface HttpConnectionPoolEvents {
         public void newTarget(RemoteServer host);
 
         public void targetRemoved(RemoteServer host);
-        
+
         public void newConnection(RemoteServer host, HttpConnection con);
         public void closedConnection(RemoteServer host, HttpConnection con);
     }
-    
-    /** 
+
+    /**
      * Connections for one remote host.
      * This should't be restricted by IP:port or even hostname,
-     * for example if a server has multiple IPs or LB replicas - any would work.   
+     * for example if a server has multiple IPs or LB replicas - any would work.
      */
     public static class RemoteServer {
         // all access sync on RemoteServer
         private SpdyConnection spdy;
-        
+
         // all access sync on RemoteServer
-        private ArrayList<Http11Connection> connections 
+        private ArrayList<Http11Connection> connections
             = new ArrayList<Http11Connection>();
-        
+
         Queue<HttpChannel> pending = new LinkedList<HttpChannel>();
-        
-        
+
+
         // TODO: setter, default from connector
         private int maxConnections = 20;
-        
+
         AtomicInteger activeRequests = new AtomicInteger();
         AtomicInteger totalRequests = new AtomicInteger();
         private volatile long lastActivity;
 
         public String target;
-        
-        public synchronized List<HttpConnector.HttpConnection> getConnections() 
+
+        public synchronized List<HttpConnector.HttpConnection> getConnections()
         {
             return new ArrayList<HttpConnection>(connections);
         }
-        
+
         public synchronized Collection<HttpChannel> getActives() {
             ArrayList<HttpChannel> actives = new ArrayList();
             for (Http11Connection con: connections) {
@@ -76,7 +76,7 @@ public class HttpConnectionPool {
             if (spdy != null) {
                 actives.addAll(spdy.getActives());
             }
-            
+
             return actives;
         }
 
@@ -86,14 +86,14 @@ public class HttpConnectionPool {
     }
 
     private HttpConnectionPoolEvents poolEvents;
-    
+
     private static Logger log = Logger.getLogger("HttpConnector");
 
-    // visible for debugging - will be made private, with accessor 
+    // visible for debugging - will be made private, with accessor
     /**
      * Map from client names to socket pools.
      */
-    public Map<CharSequence, HttpConnectionPool.RemoteServer> hosts = new HashMap<CharSequence, 
+    public Map<CharSequence, HttpConnectionPool.RemoteServer> hosts = new HashMap<CharSequence,
         HttpConnectionPool.RemoteServer>();
 
     // Statistics
@@ -103,12 +103,12 @@ public class HttpConnectionPool {
     public AtomicInteger hits = new AtomicInteger();
     public AtomicInteger misses = new AtomicInteger();
     public AtomicInteger queued = new AtomicInteger();
-    
+
     public AtomicInteger activeRequests = new AtomicInteger();
-    
+
     private static boolean debug = false;
     HttpConnector httpConnector;
-    
+
     public HttpConnectionPool(HttpConnector httpConnector) {
         this.httpConnector = httpConnector;
     }
@@ -128,7 +128,7 @@ public class HttpConnectionPool {
     public Set<CharSequence> getKeepAliveTargets() {
         return hosts.keySet();
     }
-    
+
     public List<RemoteServer> getServers() {
         return new ArrayList<RemoteServer>(hosts.values());
     }
@@ -136,7 +136,7 @@ public class HttpConnectionPool {
     public void setEvents(HttpConnectionPoolEvents events) {
         this.poolEvents = events;
     }
-    /** 
+    /**
      * Stop all cached connections.
      */
     public void clear() throws IOException {
@@ -161,16 +161,16 @@ public class HttpConnectionPool {
                         }
                     }
                     if (hostActive != rs.activeRequests.get()) {
-                        log.warning("Active missmatch " + rs.target + " " + 
-                                hostActive + " " 
+                        log.warning("Active missmatch " + rs.target + " " +
+                                hostActive + " "
                                 + rs.activeRequests.get());
-                        rs.activeRequests.set(hostActive);                        
+                        rs.activeRequests.set(hostActive);
                     }
                     active += hostActive;
                 }
             }
             if (active != this.activeRequests.get()) {
-                log.warning("Active missmatch " + active + " " 
+                log.warning("Active missmatch " + active + " "
                         + activeRequests.get());
                 activeRequests.set(active);
             }
@@ -179,28 +179,28 @@ public class HttpConnectionPool {
 
     /**
      * Stop all active and cached connections
-     * @throws IOException 
+     * @throws IOException
      */
     public void abort() throws IOException {
         // TODO
         clear();
         hosts.clear();
     }
-    
-    /** 
+
+    /**
      * @param key host:port, or some other key if multiple hosts:ips
-     * are connected to equivalent servers ( LB ) 
-     * @param httpCh 
-     * @throws IOException 
+     * are connected to equivalent servers ( LB )
+     * @param httpCh
+     * @throws IOException
      */
-    public void send(HttpChannel httpCh) 
+    public void send(HttpChannel httpCh)
             throws IOException {
         String target = httpCh.getTarget();
         HttpConnection con = null;
-        // TODO: check ssl on connection - now if a second request 
+        // TODO: check ssl on connection - now if a second request
         // is received on a ssl connection - we just send it
         boolean ssl = httpCh.getRequest().isSecure();
-        
+
         HttpConnectionPool.RemoteServer remoteServer = null;
         synchronized (hosts) {
             remoteServer = hosts.get(target);
@@ -210,20 +210,20 @@ public class HttpConnectionPool {
                 hosts.put(target, remoteServer);
             }
         }
-        
+
         // TODO: remove old servers and connections
 
         // Temp magic - until a better negotiation is defined
-        boolean forceSpdy = "SPDY/1.0".equals(httpCh.getRequest().getProtocol()); 
+        boolean forceSpdy = "SPDY/1.0".equals(httpCh.getRequest().getProtocol());
         if (forceSpdy) {
             // switch back the protocol
             httpCh.getRequest().setProtocol("HTTP/1.1");
         }
-        
+
         activeRequests.incrementAndGet();
         remoteServer.activeRequests.incrementAndGet();
-        
-        // if we already have a spdy connection or explicitely 
+
+        // if we already have a spdy connection or explicitely
         // requested.
         if (forceSpdy || remoteServer.spdy != null) {
             synchronized (remoteServer) {
@@ -233,8 +233,8 @@ public class HttpConnectionPool {
                 }
                 con = remoteServer.spdy;
             }
-            
-            // Will be queued - multiple threads may try to send 
+
+            // Will be queued - multiple threads may try to send
             // at the same time, and we need to queue anyways.
             con.sendRequest(httpCh);
         } else {
@@ -244,7 +244,7 @@ public class HttpConnectionPool {
                     hcon = (Http11Connection) remoteServer.connections.get(i);
                     if (hcon != null && hcon.activeHttp == null) {
                         hcon.beforeRequest(); // recycle
-                        
+
                         hcon.activeHttp = httpCh;
                         con = hcon;
                         break;
@@ -271,7 +271,7 @@ public class HttpConnectionPool {
 
             // we got a connection - make sure we're connected
             http11ConnectOrSend(httpCh, target, con, ssl);
-        }        
+        }
     }
 
     private void http11ConnectOrSend(HttpChannel httpCh, String target,
@@ -289,12 +289,12 @@ public class HttpConnectionPool {
             if (debug) {
                 log.info("HTTP_CONNECT: Start connection " + target + " " + this);
             }
-            httpConnect(httpCh, target, ssl, 
+            httpConnect(httpCh, target, ssl,
                     (Http11Connection) con);
         }
     }
 
-    void httpConnect(HttpChannel httpCh, String target, 
+    void httpConnect(HttpChannel httpCh, String target,
             boolean ssl, IOConnector.ConnectedCallback cb)
             throws IOException {
         if (debug) {
@@ -311,7 +311,7 @@ public class HttpConnectionPool {
                 cb);
     }
 
-    public void afterRequest(HttpChannel http, HttpConnection con, 
+    public void afterRequest(HttpChannel http, HttpConnection con,
             boolean keepAlive)
                 throws IOException {
         activeRequests.decrementAndGet();
@@ -325,16 +325,16 @@ public class HttpConnectionPool {
             afterClientRequest(con);
         }
     }
-    
-    private void afterClientRequest(HttpConnection con) 
+
+    private void afterClientRequest(HttpConnection con)
             throws IOException {
         RemoteServer remoteServer = con.remoteHost;
         HttpChannel req = null;
-        
+
         // If we have pending requests ( because too many active limit ), pick
-        // one and send it. 
+        // one and send it.
         synchronized (remoteServer) {
-            // If closed - we can remove the object - or 
+            // If closed - we can remove the object - or
             // let a background thread do it, in case it's needed
             // again.
             if (remoteServer.pending.size() == 0) {
@@ -347,14 +347,14 @@ public class HttpConnectionPool {
                 log.info("After request: send pending " + remoteServer.pending.size());
             }
         }
-        
-        http11ConnectOrSend(req, con.getTarget().toString(), 
+
+        http11ConnectOrSend(req, con.getTarget().toString(),
                 con, req.getRequest().isSecure());
     }
 
     RemoteServer serverPool = new RemoteServer();
-    
-    public void afterServerRequest(HttpConnection con, boolean keepAlive) 
+
+    public void afterServerRequest(HttpConnection con, boolean keepAlive)
             throws IOException {
         con.activeHttp = null;
         if (!keepAlive) {
@@ -363,8 +363,8 @@ public class HttpConnectionPool {
                 serverPool.connections.remove(con);
             }
         }
-    }   
-    
+    }
+
     public HttpConnection accepted(IOChannel accepted) {
         Http11Connection con = new Http11Connection(httpConnector);
         con.remoteHost = serverPool;
@@ -374,7 +374,7 @@ public class HttpConnectionPool {
         return con;
     }
 
-    
+
     // Called by handleClosed
     void stopKeepAlive(IOChannel schannel) {
         CharSequence target = schannel.getTarget();
@@ -386,7 +386,7 @@ public class HttpConnectionPool {
             }
         }
         synchronized (remoteServer) {
-            if (remoteServer.connections.remove(schannel)) {      
+            if (remoteServer.connections.remove(schannel)) {
                 waitingSockets.decrementAndGet();
                 if (remoteServer.connections.size() == 0) {
                     hosts.remove(target);

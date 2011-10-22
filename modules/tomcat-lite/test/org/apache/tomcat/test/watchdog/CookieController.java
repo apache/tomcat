@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -31,13 +31,13 @@ import java.util.Vector;
 
 
 /**
- * Represents a collection of Cookie instances. 
+ * Represents a collection of Cookie instances.
  * <p>
  * Fires events when the cookies have been changed internally. Deals
  * with management of cookies in terms of saving and loading them,
  * and disabling them.
  *
- * @author	Ramesh.Mandava 
+ * @author	Ramesh.Mandava
  */
 public class CookieController {
 
@@ -64,10 +64,10 @@ public class CookieController {
 	}	
 	try {
 	/*
-        Properties properties = new Properties(); 
+        Properties properties = new Properties();
 	FileInputStream fin = new FileInputStream("ServerAutoRun.properties");
 	properties.load(fin);
-      
+
 	String cookiepolicy = properties.getProperty("cookie.acceptpolicy");
 	if (cookiepolicy == null || cookiepolicy.equals("none")) {
 	    return;
@@ -155,7 +155,7 @@ public class CookieController {
 	    return;
 	}
 	synchronized (cookieJar) {
-	    
+	
 	    String domain = cookie.getDomain().toLowerCase();
 
 	    Vector cookieList = (Vector)cookieJar.get(domain);
@@ -165,7 +165,7 @@ public class CookieController {
 
 	    addOrReplaceCookie(cookieList, cookie);
 	    cookieJar.put(domain, cookieList);
-	    
+	
 	}
 
     }
@@ -210,8 +210,8 @@ public class CookieController {
 	}
 	
 	
-	// Do the replace - if cookie has already expired, remove 
-	// the replaced cookie. 
+	// Do the replace - if cookie has already expired, remove
+	// the replaced cookie.
 	if (replaced != null) {
 	    if (cookie.isSaveableInMemory()) {
 		cookies.setElementAt(cookie, replacedIndex);
@@ -226,7 +226,7 @@ public class CookieController {
 	    if (cookie.isSaveableInMemory()) {
 		cookies.addElement(cookie);
 		//System.out.println("RECORDED new cookie " + cookie);
-	    } 
+	    }
 
 	}
 
@@ -236,7 +236,7 @@ public class CookieController {
 
        try {	
 		/*
-		Properties properties = new Properties(); 
+		Properties properties = new Properties();
 		FileInputStream fin = new FileInputStream("ServerAutoRun.properties");
 		properties.load(fin);
 		// check current accept policy instead enableCookies
@@ -259,7 +259,7 @@ public class CookieController {
 
     }
 
-    
+
    /**
      * Host may be a FQDN, or a partial domain name starting with a dot.
      * Adds any cookies which match the host and path to the
@@ -279,12 +279,12 @@ public class CookieController {
 		    cookieString = cookieString + "; " + cookie.getNameValue();
 		}
 	    }
-	    
+	
 	 /*
 
 	    if( cookieString != null ) {
 		httpConn.setRequestProperty("Cookie", cookieString);
-	 
+	
 //		System.out.println("Returned cookie string: " + cookieString + " for HOST = " + host);
 	     }
 
@@ -307,7 +307,7 @@ public class CookieController {
 	while ((index = host.indexOf('.', 1)) >= 0) {
 	    // trim off everything up to, and including the dot.
 	    host = host.substring(index+1);
-	    
+	
             // add onto cookieVector
 	    tempVector = getSubsetRelevantCookies(host,url);
 	    if (tempVector != null ) {
@@ -334,13 +334,13 @@ public class CookieController {
 	    if (cookieList == null) {
 		cookieList = new Vector(10);
 	    }
-	    Enumeration cookies = cookiePortList.elements(); 
+	    Enumeration cookies = cookiePortList.elements();
 	    while (cookies.hasMoreElements()) {
 		cookieList.addElement(cookies.nextElement());
-	    }  
+	    }
 	}
 	
-	    
+	
 	if (cookieList == null) {
 	    return null;
 	}
@@ -460,15 +460,15 @@ public class CookieController {
 		if (cookie.getExpirationDate() != null) {
 		    if (cookie.isSaveable()) {
 			pw.println(cookie);
-		    } else { // the cookie must have expired, 
+		    } else { // the cookie must have expired,
 			//remove from Vector cookieList
 			cookieList.removeElement(cookie);
 		    }
-		 
-		}   
+		
+		}
 	    }
 	}
-        // Must print something to the printwriter in the case that 
+        // Must print something to the printwriter in the case that
 	// the cookieJar has been cleared - otherwise the old cookie
 	// file will continue to exist.
 	pw.print("");
@@ -495,7 +495,7 @@ public class CookieController {
     public void loadCookieJarFromFile(String cookieFileName) {
 	try {
 	    FileReader fr = new FileReader(cookieFileName);
-	    
+	
 	    BufferedReader in = new BufferedReader(fr);
 
 	    try {
@@ -511,13 +511,13 @@ public class CookieController {
 		in.close();
 	    }
 
-	    
+	
 	} catch (IOException e) {
 	    // do nothing; it's not an error not to have persistent cookies
 	}
 
     }
-    
+
     /* saves the cookies to the given file specified by fname */
     public void saveCookieJarToFile(String cookieFileName) {
 	try {
@@ -554,7 +554,7 @@ public class CookieController {
 		for (int i = 0; i < v.size(); i++) {
 		    HttpCookie hc = (HttpCookie) v.elementAt(i);
 		    result.addElement(hc);
-		    
+		
 		}
 		
 	    }
@@ -584,7 +584,7 @@ public class CookieController {
 	    cookieArr[i++] = (HttpCookie)e.nextElement();
 //	    System.out.println("cookieArr["+(i-1)+"] = " +cookieArr[i-1].toString());
 	}
-	    
+	
 	return cookieArr;
     }
 
@@ -611,7 +611,7 @@ public class CookieController {
 	
     }
 
-    /* 
+    /*
      * purges any expired cookies in the Cookie hashtable.
      */
     public void purgeExpiredCookies() {
@@ -627,7 +627,7 @@ public class CookieController {
 		
 		if (cookie.hasExpired()) {
 		    cookieList.removeElement(cookie);
-		}   
+		}
 	    }
 	}
 

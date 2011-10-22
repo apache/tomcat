@@ -17,29 +17,29 @@ public class CompressFilter {
     // 1CMF 1FLG [4DICTID] DATA 4ADLER
     // CMF:  CINFO + CM (compression method). == x8
     // 78 == deflate with 32k window, i.e. max window
-    
+
     // FLG: 2bit level, 1 bit FDICT, 5 bit FCHECK
     // Cx, Dx - no dict; Fx, Ex - dict ( for BEST_COMPRESSION )
-    
+
     // Overhead: 6 bytes without dict, 10 with dict
     // data is encoded in blocks - there is a 'block end' marker and
     // 'last block'.
-    
+
     // Flush: http://www.bolet.org/~pornin/deflate-flush.html
-    // inflater needs about 9 bits 
+    // inflater needs about 9 bits
     // Z_SYNC_FLUSH: send empty block, 00 00 FF FF - seems recomended
     // PPP can skip this - there is a record format on top
     // Z_PARTIAL_FLUSH: standard for SSH
 
     ZStream cStream;
     ZStream dStream;
-    
+
     byte[] dict;
     long dictId;
-    
+
     public CompressFilter() {
     }
-    
+
     public void recycle() {
         if (cStream == null) {
             return;
@@ -49,7 +49,7 @@ public class CompressFilter {
         dStream.free();
         dStream = null;
     }
-    
+
     public void init() {
         if (cStream != null) {
             return;
@@ -59,12 +59,12 @@ public class CompressFilter {
         // BEST_COMRESSION results in 256Kb per Deflate
         // 15 == default = 32k window
         cStream.deflateInit(JZlib.Z_BEST_SPEED, 10);
-        
+
         dStream = new ZStream();
         dStream.inflateInit();
 
     }
-    
+
     CompressFilter setDictionary(byte[] dict, long id) {
         init();
         this.dict = dict;
@@ -76,7 +76,7 @@ public class CompressFilter {
     void compress(IOBuffer in, IOBuffer out) throws IOException {
         init();
         BBucket bb = in.popFirst();
-        
+
         while (bb != null) {
             // TODO: only the last one needs flush
 
@@ -84,12 +84,12 @@ public class CompressFilter {
             compress(bb, out, false);
             bb = in.popFirst();
         }
-        
+
         if (in.isClosedAndEmpty()) {
             compressEnd(out);
         }
     }
-    
+
     void compress(BBucket bb, IOBuffer out, boolean last) throws IOException {
         // TODO: only the last one needs flush
 
@@ -115,7 +115,7 @@ public class CompressFilter {
                 break;
             }
         }
-        
+
         if (last) {
             compressEnd(out);
         }
@@ -125,12 +125,12 @@ public class CompressFilter {
         while (true) {
             ByteBuffer outB = out.getWriteBuffer();
             cStream.next_out = outB.array();
-        
+
             cStream.next_out_index = outB.position();
             cStream.avail_out = outB.remaining();
             cStream.deflate(JZlib.Z_FINISH);
             cStream.deflateEnd();
-            
+
             outB.position(cStream.next_out_index);
             out.releaseWriteBuffer(1);
             if (cStream.avail_out > 0) {
@@ -142,11 +142,11 @@ public class CompressFilter {
     void decompress(IOBuffer in, IOBuffer out) throws IOException {
         decompress(in, out, in.available());
     }
-    
+
     void decompress(IOBuffer in, IOBuffer out, int len) throws IOException {
         init();
         BBucket bb = in.peekFirst();
-        
+
         while (bb != null && len > 0) {
             dStream.next_in = bb.array();
             dStream.next_in_index = bb.position();
@@ -155,11 +155,11 @@ public class CompressFilter {
 
             while (true) {
                 ByteBuffer outB = out.getWriteBuffer();
-                
+
                 dStream.next_out = outB.array();
                 dStream.next_out_index = outB.position();
                 dStream.avail_out = outB.remaining();
-                
+
                 int err = dStream.inflate(JZlib.Z_SYNC_FLUSH);
                 if (err == JZlib.Z_NEED_DICT && dict != null) {
                     // dStream.adler has the dict id - not sure how to check
@@ -190,12 +190,12 @@ public class CompressFilter {
                     break;
                 }
             }
-            
-            in.advance(rd); // consummed 
+
+            in.advance(rd); // consummed
             len -= rd;
             bb = in.peekFirst();
         }
-        
+
         if (in.isClosedAndEmpty()) {
             // Shouldn't happen - input was not properly closed..
             // This should throw an exception, inflateEnd will check the CRC
@@ -205,13 +205,13 @@ public class CompressFilter {
             out.close();
         }
     }
-    
+
     private void check(int err, ZStream stream) throws IOException {
         if (err != JZlib.Z_OK) {
             throw new IOException(err + " " + stream.msg);
         }
     }
-    
+
     boolean isCompressed(HttpMessage http) {
         return false;
     }
@@ -219,7 +219,7 @@ public class CompressFilter {
     boolean needsCompression(HttpMessage in, HttpMessage out) {
         return false;
     }
-    
-    
+
+
 }
 

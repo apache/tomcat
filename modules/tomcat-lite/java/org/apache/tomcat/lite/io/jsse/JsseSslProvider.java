@@ -54,68 +54,68 @@ public class JsseSslProvider implements SslProvider {
 
     /**
      * TODO: option to require validation.
-     * TODO: remember cert signature. This is needed to support self-signed 
-     * certs, like those used by the test. 
-     * 
+     * TODO: remember cert signature. This is needed to support self-signed
+     * certs, like those used by the test.
+     *
      */
     public static class BasicTrustManager implements X509TrustManager {
-    
+
         private X509Certificate[] chain;
-        
+
         public void checkClientTrusted(X509Certificate[] chain, String authType)
                 throws CertificateException {
             this.chain = chain;
         }
-    
+
         public void checkServerTrusted(X509Certificate[] chain, String authType)
                 throws CertificateException {
             this.chain = chain;
         }
-    
+
         public X509Certificate[] getAcceptedIssuers() {
             return new X509Certificate[0];
         }
     }
 
-    public static TrustManager[] trustAllCerts = new TrustManager[] { 
-        new BasicTrustManager() }; 
+    public static TrustManager[] trustAllCerts = new TrustManager[] {
+        new BasicTrustManager() };
 
     static String[] enabledCiphers;
 
     static final boolean debug = false;
-    
+
     IOConnector net;
-    private KeyManager[] keyManager; 
+    private KeyManager[] keyManager;
     SSLContext sslCtx;
     boolean server;
     private TrustManager[] trustManagers;
-    
+
     public AtomicInteger handshakeCount = new AtomicInteger();
     public AtomicInteger handshakeOk = new AtomicInteger();
     public AtomicInteger handshakeErr = new AtomicInteger();
     public AtomicInteger handshakeTime = new AtomicInteger();
-    
+
     Executor handshakeExecutor = Executors.newCachedThreadPool();
     static int id = 0;
-    
+
     public JsseSslProvider() {
     }
-    
+
     public static void setEnabledCiphers(String[] enabled) {
         enabledCiphers = enabled;
     }
-    
+
     public void start() {
-        
+
     }
-    
+
     SSLContext getSSLContext() {
         if (sslCtx == null) {
             try {
                 sslCtx = SSLContext.getInstance("TLS");
                 if (trustManagers == null) {
-                    trustManagers = 
-                        new TrustManager[] {new BasicTrustManager()}; 
+                    trustManagers =
+                        new TrustManager[] {new BasicTrustManager()};
 
                 }
                 sslCtx.init(keyManager, trustManagers, null);
@@ -128,7 +128,7 @@ public class JsseSslProvider implements SslProvider {
         }
         return sslCtx;
     }
-    
+
     public IOConnector getNet() {
         if (net == null) {
             getSSLContext();
@@ -136,7 +136,7 @@ public class JsseSslProvider implements SslProvider {
         }
         return net;
     }
-    
+
     @Override
     public IOChannel channel(IOChannel net, String host, int port) throws IOException {
       if (debug) {
@@ -158,8 +158,8 @@ public class JsseSslProvider implements SslProvider {
         ch.setSink(net);
         return ch;
     }
-    
-    public void acceptor(final ConnectedCallback sc, CharSequence port, Object extra) 
+
+    public void acceptor(final ConnectedCallback sc, CharSequence port, Object extra)
             throws IOException {
         getNet().acceptor(new ConnectedCallback() {
             @Override
@@ -168,7 +168,7 @@ public class JsseSslProvider implements SslProvider {
                 if (debug) {
                     first = DumpChannel.wrap("S-ENC-" + id, ch);
                 }
-                
+
                 IOChannel sslch = serverChannel(first);
                 sslch.setSink(first);
                 first.setHead(sslch);
@@ -177,12 +177,12 @@ public class JsseSslProvider implements SslProvider {
                     sslch = DumpChannel.wrap("S-CLR-" + id, sslch);
                     id++;
                 }
-                
+
                 sc.handleConnected(sslch);
             }
         }, port, extra);
     }
-    
+
     public void connect(final String host, final int port, final ConnectedCallback sc)
             throws IOException {
         getNet().connect(host, port, new ConnectedCallback() {
@@ -193,7 +193,7 @@ public class JsseSslProvider implements SslProvider {
                 if (debug) {
                     first = DumpChannel.wrap("ENC-" + id, first);
                 }
-                
+
                 IOChannel sslch = channel(first, host, port);
 //                first.setHead(sslch);
 
@@ -201,10 +201,10 @@ public class JsseSslProvider implements SslProvider {
                     sslch = DumpChannel.wrap("CLR-" + id, sslch);
                     id++;
                 }
-                
+
                 sc.handleConnected(sslch);
             }
-            
+
         });
     }
 
@@ -212,16 +212,16 @@ public class JsseSslProvider implements SslProvider {
         this.keyManager = kms;
         return this;
     }
-    
+
     public JsseSslProvider setKeystoreFile(String file, String pass) throws IOException {
         return setKeystore(new FileInputStream(file), pass);
     }
 
     public JsseSslProvider setKeystoreResource(String res, String pass) throws IOException {
-        return setKeystore(this.getClass().getClassLoader().getResourceAsStream(res), 
+        return setKeystore(this.getClass().getClassLoader().getResourceAsStream(res),
                 pass);
     }
-    
+
     public JsseSslProvider setKeystore(InputStream file, String pass) {
         char[] passphrase = pass.toCharArray();
         KeyStore ks;
@@ -232,14 +232,14 @@ public class JsseSslProvider implements SslProvider {
             // Android: BKS
             ks = KeyStore.getInstance(type);
             ks.load(file, passphrase);
-            KeyManagerFactory kmf = 
+            KeyManagerFactory kmf =
                 KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
             kmf.init(ks, passphrase);
-            
-            TrustManagerFactory tmf = 
+
+            TrustManagerFactory tmf =
                 TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
             tmf.init(ks);
-            
+
             keyManager = kmf.getKeyManagers();
             trustManagers = tmf.getTrustManagers();
         } catch (KeyStoreException e) {
@@ -261,38 +261,38 @@ public class JsseSslProvider implements SslProvider {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-                
+
         return this;
     }
-    
+
     public JsseSslProvider setKeys(X509Certificate cert, PrivateKey privKey) {
         keyManager = new KeyManager[] {
                 new TestKeyManager(cert, privKey)
         };
         return this;
     }
-    
-    public JsseSslProvider setKeyFiles(String certPem, String keyFile) 
+
+    public JsseSslProvider setKeyFiles(String certPem, String keyFile)
             throws IOException {
-        
+
 
         return this;
     }
-    
-    public JsseSslProvider setKeyRes(String certPem, String keyFile) 
+
+    public JsseSslProvider setKeyRes(String certPem, String keyFile)
             throws IOException {
         setKeys(this.getClass().getClassLoader().getResourceAsStream(certPem),
                 this.getClass().getClassLoader().getResourceAsStream(keyFile));
         return this;
     }
-    
+
     private void setKeys(InputStream certPem,
             InputStream keyDer) throws IOException {
         BBuffer keyB = BBuffer.allocate(2048);
         keyB.readAll(keyDer);
         byte[] key = new byte[keyB.remaining()];
         keyB.getByteBuffer().get(key);
-        
+
         setKeys(certPem, key);
     }
 
@@ -300,19 +300,19 @@ public class JsseSslProvider implements SslProvider {
         InputStream is = new ByteArrayInputStream(certPem.getBytes());
         return setKeys(is, keyBytes);
     }
-    
+
     /**
      * Initialize using a PEM certificate and key bytes.
      * ( TODO: base64 dep to set the key as PEM )
-     * 
+     *
      *  openssl genrsa 1024 > host.key
-     *  openssl pkcs8 -topk8 -nocrypt -in host.key -inform PEM 
+     *  openssl pkcs8 -topk8 -nocrypt -in host.key -inform PEM
      *     -out host.der -outform DER
      *  openssl req -new -x509 -nodes -sha1 -days 365 -key host.key > host.cert
-     * 
+     *
      */
     public JsseSslProvider setKeys(InputStream certPem, byte[] keyBytes) throws IOException{
-        // convert key 
+        // convert key
         try {
             KeyFactory kf = KeyFactory.getInstance("RSA");
             PKCS8EncodedKeySpec keysp = new PKCS8EncodedKeySpec(keyBytes);
@@ -332,22 +332,22 @@ public class JsseSslProvider implements SslProvider {
     public class TestKeyManager extends X509ExtendedKeyManager {
         X509Certificate cert;
         PrivateKey privKey;
-        
+
         public TestKeyManager(X509Certificate cert2, PrivateKey privKey2) {
             cert = cert2;
             privKey = privKey2;
         }
 
-        public String chooseEngineClientAlias(String[] keyType, 
+        public String chooseEngineClientAlias(String[] keyType,
                 java.security.Principal[] issuers, javax.net.ssl.SSLEngine engine) {
             return "client";
         }
-        
-        public String chooseEngineServerAlias(String keyType, 
+
+        public String chooseEngineServerAlias(String keyType,
                 java.security.Principal[] issuers, javax.net.ssl.SSLEngine engine) {
             return "server";
         }
-        
+
         public String chooseClientAlias(String[] keyType,
                                         Principal[] issuers, Socket socket) {
             return "client";
@@ -367,8 +367,8 @@ public class JsseSslProvider implements SslProvider {
         }
 
         public PrivateKey getPrivateKey(String alias) {
-            
-            return privKey; 
+
+            return privKey;
         }
 
         public String[] getServerAliases(String keyType, Principal[] issuers) {
@@ -377,8 +377,8 @@ public class JsseSslProvider implements SslProvider {
     }
 
     // TODO: add a mode that trust a defined list of certs, like SSH
-    
-    /** 
+
+    /**
      * Make URLConnection accept all certificates.
      * Use only for testing !
      */
@@ -386,7 +386,7 @@ public class JsseSslProvider implements SslProvider {
         try {
             SSLContext sc = SSLContext.getInstance("TLS");
             sc.init(null, JsseSslProvider.trustAllCerts, null);
-            
+
             javax.net.ssl.HttpsURLConnection.setDefaultSSLSocketFactory(
                     sc.getSocketFactory());
             javax.net.ssl.HttpsURLConnection.setDefaultHostnameVerifier(
@@ -404,16 +404,16 @@ public class JsseSslProvider implements SslProvider {
                             }
                             return true;
                         }
-                        
+
                     });
-            
+
         } catch (Exception e) {
             e.printStackTrace();
-        } 
+        }
     }
 
     // Utilities
-    public static byte[] getPrivateKeyFromStore(String file, String pass) 
+    public static byte[] getPrivateKeyFromStore(String file, String pass)
             throws Exception {
         KeyStore store = KeyStore.getInstance("JKS");
         store.load(new FileInputStream(file), pass.toCharArray());
@@ -423,7 +423,7 @@ public class JsseSslProvider implements SslProvider {
         return encoded;
     }
 
-    public static byte[] getCertificateFromStore(String file, String pass) 
+    public static byte[] getCertificateFromStore(String file, String pass)
             throws Exception {
         KeyStore store = KeyStore.getInstance("JKS");
         store.load(new FileInputStream(file), pass.toCharArray());
@@ -431,7 +431,7 @@ public class JsseSslProvider implements SslProvider {
 
         return certificate.getEncoded();
     }
-    
+
     public static KeyPair generateRsaOrDsa(boolean rsa) throws Exception {
         if (rsa) {
             KeyPairGenerator keyPairGen =
@@ -455,7 +455,7 @@ public class JsseSslProvider implements SslProvider {
             return pair;
         }
     }
-    
+
     /**
      * I know 2 ways to generate certs:
      *  - keytool

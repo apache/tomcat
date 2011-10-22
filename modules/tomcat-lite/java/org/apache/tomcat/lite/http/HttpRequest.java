@@ -21,12 +21,12 @@ import org.apache.tomcat.lite.io.UrlEncoding;
 public class HttpRequest extends HttpMessage {
     public static final String DEFAULT_CHARACTER_ENCODING="ISO-8859-1";
 
-    protected CBuffer schemeMB;    
+    protected CBuffer schemeMB;
     protected CBuffer methodMB;
     protected CBuffer remoteAddrMB;
     protected CBuffer remoteHostMB;
     protected int remotePort;
-    
+
     protected CBuffer localNameMB;
     protected CBuffer localAddrMB;
     protected int localPort = -1;
@@ -34,19 +34,19 @@ public class HttpRequest extends HttpMessage {
     // Host: header, or default:80
     protected CBuffer serverNameMB;
     protected int serverPort = -1;
-    
-    
+
+
     // ==== Derived fields, computed after request is received ===
-    
+
     protected CBuffer requestURI;
     protected CBuffer queryMB;
-    
+
     protected BBuffer decodedUri = BBuffer.allocate();
     protected CBuffer decodedUriMB;
-    
+
     // Decoded query
     protected MultiMap parameters;
-    
+
     boolean parametersParsed = false;
 
     protected IOWriter charEncoder = new IOWriter(null);
@@ -57,13 +57,13 @@ public class HttpRequest extends HttpMessage {
     // will not be recycled
     public Object nativeRequest;
     public Object wrapperRequest;
-    
+
     boolean ssl = false;
-    
+
     boolean async = false;
 
     CBuffer requestURL = CBuffer.newInstance();
-    
+
     private Map<String, Object> attributes = new HashMap<String, Object>();
 
     /**
@@ -78,22 +78,22 @@ public class HttpRequest extends HttpMessage {
         requestURI = CBuffer.newInstance();
         queryMB = CBuffer.newInstance();
         serverNameMB = CBuffer.newInstance();
-        
+
         parameters = new MultiMap();
-        
-        schemeMB = 
+
+        schemeMB =
             CBuffer.newInstance();
         methodMB = CBuffer.newInstance();
         initRemote();
     }
-   
+
     protected void initRemote() {
         remoteAddrMB = CBuffer.newInstance();
         localNameMB = CBuffer.newInstance();
         remoteHostMB = CBuffer.newInstance();
         localAddrMB = CBuffer.newInstance();
     }
-    
+
     public void recycle() {
         super.recycle();
         schemeMB.recycle();
@@ -102,7 +102,7 @@ public class HttpRequest extends HttpMessage {
         requestURL.recycle();
         queryMB.recycle();
         decodedUriMB.recycle();
-        
+
         parameters.recycle();
         remoteAddrMB.recycle();
         remoteHostMB.recycle();
@@ -111,18 +111,18 @@ public class HttpRequest extends HttpMessage {
         async = false;
         asyncTimeout = -1;
         charEncoder.recycle();
-        
+
         localPort = -1;
         remotePort = -1;
         localAddrMB.recycle();
         localNameMB.recycle();
-        
+
         serverPort = -1;
         serverNameMB.recycle();
         decodedUri.recycle();
         decodedQuery.recycle();
     }
-    
+
     public Object getAttribute(String name) {
         return attributes.get(name);
     }
@@ -135,7 +135,7 @@ public class HttpRequest extends HttpMessage {
         }
     }
     // getAttributeNames not supported
-    
+
     public Map<String, Object> attributes() {
         return attributes;
     }
@@ -144,19 +144,19 @@ public class HttpRequest extends HttpMessage {
     public CBuffer method() {
         return methodMB;
     }
-    
+
     public String getMethod() {
         return methodMB.toString();
     }
-    
+
     public void setMethod(String method) {
         methodMB.set(method);
     }
-    
+
     public CBuffer scheme() {
         return schemeMB;
     }
-    
+
     public String getScheme() {
         String scheme = schemeMB.toString();
         if (scheme == null) {
@@ -164,15 +164,15 @@ public class HttpRequest extends HttpMessage {
         }
         return scheme;
     }
-    
+
     public void setScheme(String s) {
         schemeMB.set(s);
     }
-    
+
     public MappingData getMappingData() {
         return (mappingData);
     }
-    
+
     /**
      * Return the portion of the request URI used to select the Context
      * of the Request.
@@ -196,28 +196,28 @@ public class HttpRequest extends HttpMessage {
     public String getServletPath() {
         return (getMappingData().wrapperPath.toString());
     }
-    
-    /** 
-     * Parse query parameters - but not POST body. 
-     * 
-     * If you don't call this method, getParameters() will 
-     * also read the body for POST with x-www-url-encoded 
-     * mime type. 
+
+    /**
+     * Parse query parameters - but not POST body.
+     *
+     * If you don't call this method, getParameters() will
+     * also read the body for POST with x-www-url-encoded
+     * mime type.
      */
     public void parseQueryParameters() {
         parseQuery();
     }
 
     /**
-     * Explicitely parse the body, adding the parameters to 
+     * Explicitely parse the body, adding the parameters to
      * those from the query ( if already parsed ).
-     * 
+     *
      * By default servlet mode ( both query and body ) is used.
      */
     public void parsePostParameters() {
         parseBody();
     }
-    
+
     MultiMap getParameters() {
         if (!parametersParsed) {
             parseQuery();
@@ -225,13 +225,13 @@ public class HttpRequest extends HttpMessage {
         }
         return parameters;
     }
-    
+
     public Enumeration<String> getParameterNames() {
         return getParameters().names();
     }
-    
-    /** 
-     * Expensive, creates a copy on each call. 
+
+    /**
+     * Expensive, creates a copy on each call.
      * @param name
      * @return
      */
@@ -246,10 +246,10 @@ public class HttpRequest extends HttpMessage {
         }
         return values;
     }
-    
+
     // Inefficient - we convert from a different representation.
     public Map<String, String[]> getParameterMap() {
-        // we could allow 'locking' - I don't think this is 
+        // we could allow 'locking' - I don't think this is
         // a very useful optimization
         Map<String, String[]> map = new HashMap();
         for (int i = 0; i < getParameters().size(); i++) {
@@ -269,7 +269,7 @@ public class HttpRequest extends HttpMessage {
         }
         return map;
     }
-    
+
     public String getParameter(String name) {
         CharSequence value = getParameters().get(name);
         if (value == null) {
@@ -277,11 +277,11 @@ public class HttpRequest extends HttpMessage {
         }
         return value.toString();
     }
-    
+
     public void setParameter(String name, String value) {
         getParameters().set(name, value);
     }
-    
+
     public void addParameter(String name, String values) {
         getParameters().add(name, values);
     }
@@ -309,13 +309,13 @@ public class HttpRequest extends HttpMessage {
             }
         }
     }
-    
+
     public void setURI(CharSequence encoded) {
         decodedUriMB.recycle();
         decodedUriMB.append(encoded);
         // TODO: generate % encoding ( reverse of decodeRequest )
     }
-    
+
     public CBuffer decodedURI() {
         return decodedUriMB;
     }
@@ -323,11 +323,11 @@ public class HttpRequest extends HttpMessage {
     public CBuffer requestURI() {
         return requestURI;
     }
-    
+
     public CBuffer requestURL() {
         CBuffer url = requestURL;
         url.recycle();
-        
+
         String scheme = getScheme();
         int port = getServerPort();
         if (port < 0)
@@ -348,7 +348,7 @@ public class HttpRequest extends HttpMessage {
 
     }
 
-    /** 
+    /**
      * Not decoded - %xx as in original.
      * @return
      */
@@ -368,7 +368,7 @@ public class HttpRequest extends HttpMessage {
         return header;
     }
 
-    /** 
+    /**
      * Set the Host header of the request.
      * @param target
      */
@@ -376,7 +376,7 @@ public class HttpRequest extends HttpMessage {
         serverNameMB.recycle();
         getOrAdd("Host").set(target);
     }
-    
+
     // XXX
     public CBuffer serverName() {
         if (serverNameMB.length() == 0) {
@@ -388,16 +388,16 @@ public class HttpRequest extends HttpMessage {
     public String getServerName() {
         return serverName().toString();
     }
-    
+
     public void setServerName(String name)  {
         serverName().set(name);
     }
-    
+
     public int getServerPort() {
         serverName();
         return serverPort;
     }
-    
+
     public void setServerPort(int serverPort ) {
         this.serverPort=serverPort;
     }
@@ -406,7 +406,7 @@ public class HttpRequest extends HttpMessage {
         if (remoteAddrMB.length() == 0) {
             HttpChannel asyncHttp = getHttpChannel();
             IOChannel iochannel = asyncHttp.getNet().getFirst();
-            remoteAddrMB.set((String) 
+            remoteAddrMB.set((String)
                     iochannel.getAttribute(IOChannel.ATT_REMOTE_ADDRESS));
         }
         return remoteAddrMB;
@@ -416,7 +416,7 @@ public class HttpRequest extends HttpMessage {
         if (remoteHostMB.length() == 0) {
             HttpChannel asyncHttp = getHttpChannel();
             IOChannel iochannel = asyncHttp.getNet().getFirst();
-            remoteHostMB.set((String) 
+            remoteHostMB.set((String)
                     iochannel.getAttribute(IOChannel.ATT_REMOTE_HOSTNAME));
         }
         return remoteHostMB;
@@ -424,12 +424,12 @@ public class HttpRequest extends HttpMessage {
 
     public CBuffer localName() {
         return localNameMB;
-    }    
+    }
 
     public CBuffer localAddr() {
         return localAddrMB;
     }
-    
+
     public int getRemotePort(){
         if (remotePort == -1) {
             HttpChannel asyncHttp = getHttpChannel();
@@ -438,11 +438,11 @@ public class HttpRequest extends HttpMessage {
         }
         return remotePort;
     }
-        
+
     public void setRemotePort(int port){
         this.remotePort = port;
     }
-    
+
     public int getLocalPort(){
         if (localPort == -1) {
             HttpChannel asyncHttp = getHttpChannel();
@@ -451,11 +451,11 @@ public class HttpRequest extends HttpMessage {
         }
         return localPort;
     }
-        
+
     public void setLocalPort(int port){
         this.localPort = port;
     }
-    
+
     public HttpResponse waitResponse() throws IOException {
         return waitResponse(httpCh.ioTimeout);
     }
@@ -467,7 +467,7 @@ public class HttpRequest extends HttpMessage {
 
         httpCh.send();
     }
-    
+
     public void send(HttpService headersCallback) throws IOException {
         send(headersCallback, httpCh.ioTimeout);
     }
@@ -475,20 +475,20 @@ public class HttpRequest extends HttpMessage {
     public void send() throws IOException {
         send(null, httpCh.ioTimeout);
     }
-    
+
     public HttpResponse waitResponse(long timeout) throws IOException {
         // TODO: close out if post
         httpCh.send();
-        
+
         httpCh.headersReceivedLock.waitSignal(timeout);
-        
+
         return httpCh.getResponse();
     }
 
     /**
      * Parse host.
-     * @param serverNameMB2 
-     * @throws IOException 
+     * @param serverNameMB2
+     * @throws IOException
      */
     boolean parseHost()  {
         MultiMap.Entry hostHF = getMimeHeaders().getEntry("Host");
@@ -507,9 +507,9 @@ public class HttpRequest extends HttpMessage {
         byte[] valueB = valueBC.array();
         int valueL = valueBC.getLength();
         int valueS = valueBC.getStart();
-        
+
         int colonPos = valueBC.indexOf(':', 0);
-        
+
         serverNameMB.recycle();
 
         boolean ipv6 = (valueB[valueS] == '[');
@@ -525,7 +525,7 @@ public class HttpRequest extends HttpMessage {
             serverNameMB.append(b);
             if (b == ']') {
                 bracketClosed = true;
-            } 
+            }
         }
 
         if (colonPos < 0) {
@@ -551,7 +551,7 @@ public class HttpRequest extends HttpMessage {
         }
         return true;
     }
-    
+
     // TODO: this is from coyote - MUST be rewritten !!!
     // - cleaner
     // - chunked encoding for body
@@ -560,11 +560,11 @@ public class HttpRequest extends HttpMessage {
      * Post data buffer.
      */
     public final static int CACHED_POST_LEN = 8192;
-    
+
     public  byte[] postData = null;
 
     private long asyncTimeout = -1;
-    
+
     /**
      * Parse request parameters.
      */
@@ -595,7 +595,7 @@ public class HttpRequest extends HttpMessage {
 
     // Copy - will be modified by decoding
     BBuffer decodedQuery = BBuffer.allocate(1024);
-    
+
     CBuffer tmpNameC = CBuffer.newInstance();
     BBuffer tmpName = BBuffer.wrapper();
     BBuffer tmpValue = BBuffer.wrapper();
@@ -603,23 +603,23 @@ public class HttpRequest extends HttpMessage {
     CBuffer tmpNameCB = CBuffer.newInstance();
     CBuffer tmpValueCB = CBuffer.newInstance();
 
-    /** 
+    /**
      * Process the query string into parameters
      */
     public void handleQueryParameters() {
         if( queryMB.length() == 0) {
             return;
         }
-        
+
         decodedQuery.recycle();
         decodedQuery.append(getMsgBytes().query());
         // TODO: option 'useBodyEncodingForUri' - versus UTF or ASCII
         String queryStringEncoding = getEncoding();
         processParameters( decodedQuery, queryStringEncoding );
     }
-    
+
     public void processParameters( BBuffer bc, String encoding ) {
-        if( bc.isNull()) 
+        if( bc.isNull())
             return;
         if (bc.remaining() ==0) {
             return;
@@ -627,8 +627,8 @@ public class HttpRequest extends HttpMessage {
         processParameters( bc.array(), bc.getOffset(),
                            bc.getLength(), encoding);
     }
-    
-    public void processParameters( byte bytes[], int start, int len, 
+
+    public void processParameters( byte bytes[], int start, int len,
             String enc ) {
         int end=start+len;
         int pos=start;
@@ -649,7 +649,7 @@ public class HttpRequest extends HttpMessage {
                 valStart=nameEnd;
                 valEnd=nameEnd;
             }
-            if( nameEnd== -1 ) 
+            if( nameEnd== -1 )
                 nameEnd=end;
 
             if( ! noEq ) {
@@ -664,13 +664,13 @@ public class HttpRequest extends HttpMessage {
                 // No name eg ...&=xx&... will trigger this
                 continue;
             }
-            
+
             // TODO: use CBuffer, recycle
             tmpName.setBytes( bytes, nameStart, nameEnd-nameStart );
             tmpValue.setBytes( bytes, valStart, valEnd-valStart );
-            
+
             try {
-                parameters.add(urlDecode(tmpName, enc), 
+                parameters.add(urlDecode(tmpName, enc),
                         urlDecode(tmpValue, enc));
             } catch (IOException e) {
                 // ignored
@@ -678,7 +678,7 @@ public class HttpRequest extends HttpMessage {
         } while( pos<end );
     }
 
-//    public void processParameters(char bytes[], int start, int len, 
+//    public void processParameters(char bytes[], int start, int len,
 //            String enc ) {
 //        int end=start+len;
 //        int pos=start;
@@ -699,7 +699,7 @@ public class HttpRequest extends HttpMessage {
 //                valStart=nameEnd;
 //                valEnd=nameEnd;
 //            }
-//            if( nameEnd== -1 ) 
+//            if( nameEnd== -1 )
 //                nameEnd=end;
 //
 //            if( ! noEq ) {
@@ -714,37 +714,37 @@ public class HttpRequest extends HttpMessage {
 //                // No name eg ...&=xx&... will trigger this
 //                continue;
 //            }
-//            
+//
 //            // TODO: use CBuffer, recycle
 //            tmpNameCB.recycle();
 //            tmpValueCB.recycle();
-//            
+//
 //            tmpNameCB.wrap( bytes, nameStart, nameEnd );
 //            tmpValueCB.wrap( bytes, valStart, valEnd );
-//            
+//
 //            //CharChunk name = new CharChunk();
 //            //CharChunk value = new CharChunk();
 //            // TODO:
 //            try {
-//                parameters.add(urlDecode(tmpName, enc), 
+//                parameters.add(urlDecode(tmpName, enc),
 //                        urlDecode(tmpValue, enc));
 //            } catch (IOException e) {
 //                // ignored
 //            }
 //        } while( pos<end );
 //    }
-    
+
     private String urlDecode(BBuffer bc, String enc)
             throws IOException {
         // Replace %xx
         urlDecoder.urlDecode(bc, true);
-        
+
         String result = null;
         if (enc != null) {
             result = bc.toString(enc);
         } else {
             // Ascii
-            
+
             CBuffer cc = tmpNameC;
             cc.recycle();
             int length = bc.getLength();
@@ -760,7 +760,7 @@ public class HttpRequest extends HttpMessage {
     private void processParameters( byte bytes[], int start, int len ) {
         processParameters(bytes, start, len, getEncoding());
     }
-    
+
     protected void parseBody() {
 
         parametersParsed = true;
@@ -770,7 +770,7 @@ public class HttpRequest extends HttpMessage {
 //      return;
         if (!getMethod().equalsIgnoreCase("POST"))
             return;
-        
+
         String contentType = getContentType();
         if (contentType == null)
             contentType = "";
@@ -823,10 +823,10 @@ public class HttpRequest extends HttpMessage {
         return len;
 
     }
-    
-    // Async support - a subset of servlet spec, the fancy stuff is in the 
+
+    // Async support - a subset of servlet spec, the fancy stuff is in the
     // facade.
-    
+
     public boolean isAsyncStarted() {
         return async;
     }
@@ -838,8 +838,8 @@ public class HttpRequest extends HttpMessage {
     public void setAsyncTimeout(long timeout) {
         this.asyncTimeout  = timeout;
     }
-    
-    /** 
+
+    /**
      * Server mode, request just received.
      */
     protected void processReceivedHeaders() throws IOException {
@@ -849,57 +849,57 @@ public class HttpRequest extends HttpMessage {
         }
         if (url.get(0) == 'h') {
             int firstSlash = url.indexOf('/', 0);
-            schemeMB.appendAscii(url.array(), 
+            schemeMB.appendAscii(url.array(),
                     url.getStart(), firstSlash + 2);
-            if (!schemeMB.equals("http://") && 
+            if (!schemeMB.equals("http://") &&
                     !schemeMB.equals("https://")) {
                 httpCh.getResponse().setStatus(400);
-                httpCh.abort("Error normalizing url " + 
+                httpCh.abort("Error normalizing url " +
                         getMsgBytes().url());
-                return;                                
+                return;
             }
-            
+
             int urlStart = url.indexOf('/', firstSlash + 2);
             serverNameMB.recycle();
-            serverNameMB.appendAscii(url.array(), 
+            serverNameMB.appendAscii(url.array(),
                     url.getStart() + firstSlash + 2, urlStart - firstSlash - 2);
-            
+
             url.position(url.getStart() + urlStart);
         }
         if (!httpCh.normalize(getMsgBytes().url())) {
             httpCh.getResponse().setStatus(400);
-            httpCh.abort("Error normalizing url " + 
+            httpCh.abort("Error normalizing url " +
                     getMsgBytes().url());
-            return;                
+            return;
         }
-        
-        method().set(getMsgBytes().method()); 
+
+        method().set(getMsgBytes().method());
         requestURI().set(getMsgBytes().url());
         queryString().set(getMsgBytes().query());
         protocol().set(getMsgBytes().protocol());
-        
+
         processMimeHeaders();
 
         // URL decode and normalize
         decodedUri.append(getMsgBytes().url());
-        
-        getURLDecoder().urlDecode(decodedUri, false); 
-        
+
+        getURLDecoder().urlDecode(decodedUri, false);
+
         // Need to normalize again - %decoding may decode /
         if (!httpCh.normalize(decodedUri)) {
             httpCh.getResponse().setStatus(400);
             httpCh.abort("Invalid decoded uri " + decodedUri);
-            return;                
+            return;
         }
         decodedURI().set(decodedUri);
 
         // default response protocol
-        httpCh.getResponse().protocol().set(getMsgBytes().protocol());            
+        httpCh.getResponse().protocol().set(getMsgBytes().protocol());
     }
 
-    
+
     public boolean hasBody() {
-        return chunked || contentLength >= 0; 
+        return chunked || contentLength >= 0;
     }
 
     /**
@@ -925,7 +925,7 @@ public class HttpRequest extends HttpMessage {
             String name = serverName().toString();
             int port = getServerPort();
 
-            cb.append(scheme);                
+            cb.append(scheme);
             cb.append("://", 0, 3);
             cb.append(name);
             if ((scheme.equals("http") && port != 80)
@@ -951,8 +951,8 @@ public class HttpRequest extends HttpMessage {
             cb.append(location);
         }
 
-    }    
-    
+    }
+
     /**
      * Determine if a URI string has a <code>scheme</code> component.
      */
@@ -977,7 +977,7 @@ public class HttpRequest extends HttpMessage {
         return Character.isLetterOrDigit(c) ||
             c == '+' || c == '-' || c == '.';
     }
-    
+
     public IOWriter getCharEncoder() {
         return charEncoder;
     }
@@ -985,11 +985,11 @@ public class HttpRequest extends HttpMessage {
     public IOReader getCharDecoder() {
         return charDecoder;
     }
-    
+
     public UrlEncoding getUrlEncoding() {
         return urlEncoding;
     }
-    
+
     public BBuffer toBytes(CBuffer cb, BBuffer bb) {
         if (bb == null) {
             bb = BBuffer.allocate(cb.length());
@@ -1007,11 +1007,11 @@ public class HttpRequest extends HttpMessage {
             return "Invalid request";
         }
     }
-    
+
     public boolean isSecure() {
         return ssl;
     }
-    
+
     public HttpRequest setSecure(boolean ssl) {
         this.ssl = ssl;
         return this;

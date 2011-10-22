@@ -1,11 +1,11 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  
+
   <groupId>org.apache.tomcat.lite</groupId>
   <artifactId>lite</artifactId>
-  
+
   <version>0.0.1-SNAPSHOT</version>
-  
+
   <dependencies>
         <dependency>
                 <groupId>com.jcraft</groupId>
@@ -53,7 +53,7 @@
                 <version>6.0.20</version>
                 <type>jar</type>
                 <scope>compile</scope>
-        </dependency>  
+        </dependency>
         <dependency>
                 <groupId>asm</groupId>
                 <artifactId>asm</artifactId>
@@ -79,11 +79,11 @@
         	<version>1.7.1</version>
         </dependency>
   </dependencies>
-   
+
    <build>
-  
+
     <sourceDirectory>java</sourceDirectory>
-    
+
     <testSourceDirectory>test</testSourceDirectory>
 
     <plugins>

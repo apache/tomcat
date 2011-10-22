@@ -40,18 +40,18 @@ import org.apache.tomcat.lite.io.CBuffer;
  *  and the facade will convert it to the external representation.
  */
 public class ServerCookie implements Serializable {
-    
+
     // Version 0 (Netscape) attributes
     private BBuffer name = BBuffer.allocate();
     private BBuffer value = BBuffer.allocate();
-    
+
     private CBuffer nameC = CBuffer.newInstance();
 
     // Expires - Not stored explicitly. Generated from Max-Age (see V1)
     private BBuffer path = BBuffer.allocate();
     private BBuffer domain = BBuffer.allocate();
     private boolean secure;
-    
+
     // Version 1 (RFC2109) attributes
     private BBuffer comment = BBuffer.allocate();
     private int maxAge = -1;
@@ -69,7 +69,7 @@ public class ServerCookie implements Serializable {
             return df;
         }
     };
-    
+
     private static final String ancientDate;
 
 
@@ -100,7 +100,7 @@ public class ServerCookie implements Serializable {
     public ServerCookie() {
     }
 
-    public void recycle() {        
+    public void recycle() {
         path.recycle();
         name.recycle();
         value.recycle();
@@ -163,7 +163,7 @@ public class ServerCookie implements Serializable {
         return "Cookie " + getName() + "=" + getValue() + " ; "
             + getVersion() + " " + getPath() + " " + getDomain();
     }
-    
+
     private static final String tspecials = ",; ";
     private static final String tspecials2 = "()<>@,;:\\\"/[]?={} \t";
     private static final String tspecials2NoSlash = "()<>@,;:\\\"[]?={} \t";
@@ -180,7 +180,7 @@ public class ServerCookie implements Serializable {
     public static boolean isToken(String value) {
         return isToken(value,null);
     }
-    
+
     public static boolean isToken(String value, String literals) {
         String tspecials = (literals==null?ServerCookie.tspecials:literals);
         if( value==null) return true;
@@ -228,7 +228,7 @@ public class ServerCookie implements Serializable {
 
     // -------------------- Cookie parsing tools
 
-    
+
     /**
      * Return the header name to set the cookie, based on cookie version.
      */
@@ -246,7 +246,7 @@ public class ServerCookie implements Serializable {
             // XXX RFC2965 not referenced in Servlet Spec
             // Set-Cookie2 is not supported by Netscape 4, 6, IE 3, 5
             // Set-Cookie2 is supported by Lynx and Opera
-            // Need to check on later IE and FF releases but for now... 
+            // Need to check on later IE and FF releases but for now...
             // RFC2109
             return "Set-Cookie";
             // return "Set-Cookie2";
@@ -273,7 +273,7 @@ public class ServerCookie implements Serializable {
         buf.append( name );
         buf.append("=");
         // Servlet implementation does not check anything else
-        
+
         version = maybeQuote2(version, buf, value,true);
 
         // Add version 1 specific information
@@ -287,7 +287,7 @@ public class ServerCookie implements Serializable {
                 maybeQuote2(version, buf, comment);
             }
         }
-        
+
         // Add domain information, if present
         if (domain!=null) {
             buf.append("; Domain=");
@@ -331,7 +331,7 @@ public class ServerCookie implements Serializable {
         if (isSecure) {
           buf.append ("; Secure");
         }
-        
+
         // HttpOnly
         if (isHttpOnly) {
             buf.append("; HttpOnly");
@@ -343,7 +343,7 @@ public class ServerCookie implements Serializable {
         if (value==null || value.length()==0) return false;
         return (value.charAt(0)=='\"' && value.charAt(value.length()-1)=='\"');
     }
-    
+
     /**
      * Quotes values using rules that vary depending on Cookie version.
      * @param version
@@ -361,7 +361,7 @@ public class ServerCookie implements Serializable {
     public static int maybeQuote2 (int version, StringBuffer buf, String value, String literals, boolean allowVersionSwitch) {
         if (value==null || value.length()==0) {
             buf.append("\"\"");
-        }else if (containsCTL(value,version)) 
+        }else if (containsCTL(value,version))
             throw new IllegalArgumentException("Control character in cookie value, consider BASE64 encoding your value");
         else if (alreadyQuoted(value)) {
             buf.append('"');
@@ -433,7 +433,7 @@ public class ServerCookie implements Serializable {
         int end = bc.getEnd();
         int dest = src;
         byte[] buffer = bc.array();
-        
+
         while (src < end) {
             if (buffer[src] == '\\' && src < end && buffer[src+1]  == '"') {
                 src++;
@@ -444,16 +444,16 @@ public class ServerCookie implements Serializable {
         }
         bc.setEnd(dest);
     }
-    
+
     /*
     List of Separator Characters (see isSeparator())
-    Excluding the '/' char violates the RFC, but 
+    Excluding the '/' char violates the RFC, but
     it looks like a lot of people put '/'
-    in unquoted values: '/': ; //47 
-    '\t':9 ' ':32 '\"':34 '\'':39 '(':40 ')':41 ',':44 ':':58 ';':59 '<':60 
+    in unquoted values: '/': ; //47
+    '\t':9 ' ':32 '\"':34 '\'':39 '(':40 ')':41 ',':44 ':':58 ';':59 '<':60
     '=':61 '>':62 '?':63 '@':64 '[':91 '\\':92 ']':93 '{':123 '}':125
     */
-    public static final char SEPARATORS[] = { '\t', ' ', '\"', '\'', '(', ')', ',', 
+    public static final char SEPARATORS[] = { '\t', ' ', '\"', '\'', '(', ')', ',',
         ':', ';', '<', '=', '>', '?', '@', '[', '\\', ']', '{', '}' };
 
     protected static final boolean separators[] = new boolean[128];
@@ -471,7 +471,7 @@ public class ServerCookie implements Serializable {
     public  static void processCookies(List<ServerCookie> cookies,
             List<ServerCookie> cookiesCache,
             HttpMessage.HttpMessageBytes msgBytes ) {
-        
+
         // process each "cookie" header
         for (int i = 0; i < msgBytes.headerCount; i++) {
             if (msgBytes.getHeaderName(i).equalsIgnoreCase("Cookie")) {
@@ -483,12 +483,12 @@ public class ServerCookie implements Serializable {
                         bc.array(),
                         bc.getOffset(),
                         bc.getLength());
-                
+
             }
 
         }
     }
-    
+
     /**
      * Returns true if the byte is a separator character as
      * defined in RFC2619. Since this is called often, this
@@ -502,7 +502,7 @@ public class ServerCookie implements Serializable {
          else
              return false;
     }
-    
+
     /**
      * Returns true if the byte is a whitespace character as
      * defined in RFC2619
@@ -512,7 +512,7 @@ public class ServerCookie implements Serializable {
         // This switch statement is slightly slower
         // for my vm than the if statement.
         // Java(TM) 2 Runtime Environment, Standard Edition (build 1.5.0_07-164)
-        /* 
+        /*
         switch (c) {
         case ' ':;
         case '\t':;
@@ -557,9 +557,9 @@ public class ServerCookie implements Serializable {
             isQuoted = false;
 
             // Skip whitespace and non-token characters (separators)
-            while (pos < end && 
-                   (isSeparator(bytes[pos]) || isWhiteSpace(bytes[pos]))) 
-                {pos++; } 
+            while (pos < end &&
+                   (isSeparator(bytes[pos]) || isWhiteSpace(bytes[pos])))
+                {pos++; }
 
             if (pos >= end)
                 return;
@@ -570,24 +570,24 @@ public class ServerCookie implements Serializable {
                 pos++;
             }
 
-            // Get the cookie name. This must be a token            
-            valueEnd = valueStart = nameStart = pos; 
+            // Get the cookie name. This must be a token
+            valueEnd = valueStart = nameStart = pos;
             pos = nameEnd = getTokenEndPosition(bytes,pos,end);
 
             // Skip whitespace
-            while (pos < end && isWhiteSpace(bytes[pos])) {pos++; } 
-         
+            while (pos < end && isWhiteSpace(bytes[pos])) {pos++; }
+
 
             // Check for an '=' -- This could also be a name-only
             // cookie at the end of the cookie header, so if we
             // are past the end of the header, but we have a name
             // skip to the name-only part.
-            if (pos < end && bytes[pos] == '=') {                
+            if (pos < end && bytes[pos] == '=') {
 
                 // Skip whitespace
                 do {
                     pos++;
-                } while (pos < end && isWhiteSpace(bytes[pos])); 
+                } while (pos < end && isWhiteSpace(bytes[pos]));
 
                 if (pos >= end)
                     return;
@@ -598,15 +598,15 @@ public class ServerCookie implements Serializable {
                 case '"': // Quoted Value
                     isQuoted = true;
                     valueStart=pos + 1; // strip "
-                    // getQuotedValue returns the position before 
+                    // getQuotedValue returns the position before
                     // at the last qoute. This must be dealt with
                     // when the bytes are copied into the cookie
-                    valueEnd=getQuotedValueEndPosition(bytes, 
+                    valueEnd=getQuotedValueEndPosition(bytes,
                                                        valueStart, end);
                     // We need pos to advance
-                    pos = valueEnd; 
-                    // Handles cases where the quoted value is 
-                    // unterminated and at the end of the header, 
+                    pos = valueEnd;
+                    // Handles cases where the quoted value is
+                    // unterminated and at the end of the header,
                     // e.g. [myname="value]
                     if (pos >= end)
                         return;
@@ -632,15 +632,15 @@ public class ServerCookie implements Serializable {
                         // The starting character of the cookie value was
                         // not valid.
                         //log("Invalid cookie. Value not a token or quoted value");
-                        while (pos < end && bytes[pos] != ';' && 
-                               bytes[pos] != ',') 
+                        while (pos < end && bytes[pos] != ';' &&
+                               bytes[pos] != ',')
                             {pos++; }
                         pos++;
-                        // Make sure no special avpairs can be attributed to 
+                        // Make sure no special avpairs can be attributed to
                         // the previous cookie by setting the current cookie
                         // to null
                         sc = null;
-                        continue;                        
+                        continue;
                     }
                 }
             } else {
@@ -649,21 +649,21 @@ public class ServerCookie implements Serializable {
                 pos = nameEnd;
 
             }
-          
+
             // We should have an avpair or name-only cookie at this
             // point. Perform some basic checks to make sure we are
             // in a good state.
-  
+
             // Skip whitespace
             while (pos < end && isWhiteSpace(bytes[pos])) {pos++; }
 
 
             // Make sure that after the cookie we have a separator. This
             // is only important if this is not the last cookie pair
-            while (pos < end && bytes[pos] != ';' && bytes[pos] != ',') { 
+            while (pos < end && bytes[pos] != ';' && bytes[pos] != ',') {
                 pos++;
             }
-            
+
             pos++;
 
             /*
@@ -672,10 +672,10 @@ public class ServerCookie implements Serializable {
                 // of having two ';' characters in a row.
                 // log("Cookie name/value does not conform to RFC 2965");
                 // Advance to next delimiter (ignoring everything else)
-                while (pos < end && bytes[pos] != ';' && bytes[pos] != ',') 
+                while (pos < end && bytes[pos] != ';' && bytes[pos] != ',')
                     { pos++; };
                 pos++;
-                // Make sure no special cookies can be attributed to 
+                // Make sure no special cookies can be attributed to
                 // the previous cookie by setting the current cookie
                 // to null
                 sc = null;
@@ -683,13 +683,13 @@ public class ServerCookie implements Serializable {
             }
             */
 
-            // All checks passed. Add the cookie, start with the 
+            // All checks passed. Add the cookie, start with the
             // special avpairs first
             if (isSpecial) {
                 isSpecial = false;
                 // $Version must be the first avpair in the cookie header
                 // (sc must be null)
-                if (equals( "Version", bytes, nameStart, nameEnd) && 
+                if (equals( "Version", bytes, nameStart, nameEnd) &&
                     sc == null) {
                     // Set version
                     if( bytes[valueStart] =='1' && valueEnd == (valueStart+1)) {
@@ -698,8 +698,8 @@ public class ServerCookie implements Serializable {
                         // unknown version (Versioning is not very strict)
                     }
                     continue;
-                } 
-                
+                }
+
                 // We need an active cookie for Path/Port/etc.
                 if (sc == null) {
                     continue;
@@ -711,14 +711,14 @@ public class ServerCookie implements Serializable {
                                            valueStart,
                                            valueEnd-valueStart);
                     continue;
-                } 
+                }
 
                 if (equals( "Path", bytes, nameStart, nameEnd)) {
                     sc.getPath().setBytes( bytes,
                                            valueStart,
                                            valueEnd-valueStart);
                     continue;
-                } 
+                }
 
 
                 if (equals( "Port", bytes, nameStart, nameEnd)) {
@@ -727,13 +727,13 @@ public class ServerCookie implements Serializable {
                     //                        valueStart,
                     //                        valueEnd-valueStart );
                     continue;
-                } 
+                }
 
                 // Unknown cookie, complain
                 //log("Unknown Special Cookie");
 
             } else { // Normal Cookie
-                // use a previous value from cache, if any (to avoid GC - tomcat 
+                // use a previous value from cache, if any (to avoid GC - tomcat
                 // legacy )
                 if (cookiesCache.size() > cookies.size()) {
                     sc = cookiesCache.get(cookies.size());
@@ -746,7 +746,7 @@ public class ServerCookie implements Serializable {
                 sc.setVersion( version );
                 sc.getName().append( bytes, nameStart,
                                        nameEnd-nameStart);
-                
+
                 if (valueStart != -1) { // Normal AVPair
                     sc.getValue().append( bytes, valueStart,
                             valueEnd-valueStart);
@@ -757,7 +757,7 @@ public class ServerCookie implements Serializable {
                     }
                 } else {
                     // Name Only
-                    sc.getValue().recycle(); 
+                    sc.getValue().recycle();
                 }
                 sc.nameC.recycle();
                 sc.nameC.append(sc.getName());
@@ -774,13 +774,13 @@ public class ServerCookie implements Serializable {
     private static final int getTokenEndPosition(byte bytes[], int off, int end){
         int pos = off;
         while (pos < end && !isSeparator(bytes[pos])) {pos++; }
-        
+
         if (pos > end)
             return end;
         return pos;
     }
 
-    /** 
+    /**
      * Given a starting position after an initial quote chracter, this gets
      * the position of the end quote. This escapes anything after a '\' char
      * JVK RFC 2616
@@ -789,7 +789,7 @@ public class ServerCookie implements Serializable {
         int pos = off;
         while (pos < end) {
             if (bytes[pos] == '"') {
-                return pos;                
+                return pos;
             } else if (bytes[pos] == '\\' && pos < (end - 1)) {
                 pos+=2;
             } else {
@@ -799,8 +799,8 @@ public class ServerCookie implements Serializable {
         // Error, we have reached the end of the header w/o a end quote
         return end;
     }
-    
-    
+
+
     public static boolean equals( String s, byte b[], int start, int end) {
         int blen = end-start;
         if (b == null || blen != s.length()) {
@@ -814,6 +814,6 @@ public class ServerCookie implements Serializable {
         }
         return true;
     }
-    
+
 }
 

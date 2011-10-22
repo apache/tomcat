@@ -42,36 +42,36 @@ import java.nio.charset.Charset;
 /**
  * This class is used to represent a chunk of bytes, and utilities to manipulate
  * byte[].
- * 
+ *
  * The buffer can be modified and used for both input and output.
- * 
+ *
  * There are 2 modes: The chunk can be associated with a sink - ByteInputChannel
  * or ByteOutputChannel, which will be used when the buffer is empty ( on input
  * ) or filled ( on output ). For output, it can also grow. This operating mode
  * is selected by calling setLimit() or allocate(initial, limit) with limit !=
  * -1.
- * 
+ *
  * Various search and append method are defined - similar with String and
  * StringBuffer, but operating on bytes.
- * 
+ *
  * This is important because it allows processing the http headers directly on
  * the received bytes, without converting to chars and Strings until the strings
  * are needed. In addition, the charset is determined later, from headers or
  * user code.
- * 
- * 
+ *
+ *
  * @author dac@sun.com
  * @author James Todd [gonzo@sun.com]
  * @author Costin Manolache
  * @author Remy Maucherat
  */
-public class BBuffer implements Cloneable, Serializable, 
+public class BBuffer implements Cloneable, Serializable,
     BBucket {
-    
+
     /**
      * Default encoding used to convert to strings. It should be UTF8, but:
      * - the servlet API requires 8859_1 as default
-     * -  
+     * -
      */
     public static final String DEFAULT_CHARACTER_ENCODING = "ISO-8859-1";
 
@@ -108,10 +108,10 @@ public class BBuffer implements Cloneable, Serializable,
      * CR.
      */
     public static final byte CR = (byte) '\r';
-    
+
     //private int useCount;
-    
-    
+
+
     private static final boolean[] isDigit = new boolean[256];
 
     static Charset UTF8;
@@ -141,7 +141,7 @@ public class BBuffer implements Cloneable, Serializable,
     static {
         for (int d = '0'; d <= '9'; d++) {
             isDigit[d] = true;
-        }        
+        }
         UTF8 = Charset.forName("UTF-8");
     }
 
@@ -153,7 +153,7 @@ public class BBuffer implements Cloneable, Serializable,
         return new BBuffer().makeSpace(initial);
     }
 
-    
+
     public static BBuffer allocate(String msg) {
         BBuffer bc = allocate();
         byte[] data = msg.getBytes();
@@ -183,7 +183,7 @@ public class BBuffer implements Cloneable, Serializable,
         res.setBytes(b, off, len);
         return res;
     }
-    
+
     public static BBuffer wrapper(BBucket bb, int start, int len) {
         BBuffer res = new IOBucketWrap();
         res.setBytes(bb.array(), bb.position() + start, len);
@@ -216,7 +216,7 @@ public class BBuffer implements Cloneable, Serializable,
     // -------------------- Adding data to the buffer --------------------
     /**
      * Append a char, by casting it to byte. This IS NOT intended for unicode.
-     * 
+     *
      * @param c
      */
     public void append(char c) {
@@ -232,7 +232,7 @@ public class BBuffer implements Cloneable, Serializable,
     public byte[] array() {
         return buff;
     }
-    
+
     public int capacity() {
         return buff.length;
     }
@@ -285,7 +285,7 @@ public class BBuffer implements Cloneable, Serializable,
 
     /**
      * Compares the message bytes to the specified String object.
-     * 
+     *
      * @param s
      *            the String to compare
      * @return true if the comparison succeeded, false otherwise
@@ -307,10 +307,10 @@ public class BBuffer implements Cloneable, Serializable,
         }
         return true;
     }
-    
+
     /**
      * Compares the message bytes to the specified String object.
-     * 
+     *
      * @param s
      *            the String to compare
      * @return true if the comparison succeeded, false otherwise
@@ -337,7 +337,7 @@ public class BBuffer implements Cloneable, Serializable,
         return buff[start + off] & 0xFF;
     }
 
-    /** 
+    /**
      * Return a byte buffer. Changes in the ByteBuffer position will
      * not be reflected in the IOBucket
      * @return
@@ -360,7 +360,7 @@ public class BBuffer implements Cloneable, Serializable,
             return null;
         }
     }
-    
+
     public int getEnd() {
         return end;
     }
@@ -374,7 +374,7 @@ public class BBuffer implements Cloneable, Serializable,
     public int getLength() {
         return end - start;
     }
-    
+
     public long getLong() {
         return parseLong(buff, start, end - start);
     }
@@ -422,7 +422,7 @@ public class BBuffer implements Cloneable, Serializable,
 
     /**
      * Returns true if the message bytes starts with the specified string.
-     * 
+     *
      * @param s
      *            the string
      */
@@ -462,7 +462,7 @@ public class BBuffer implements Cloneable, Serializable,
 
     /**
      * Returns true if the message bytes starts with the specified string.
-     * 
+     *
      * @param c
      *            the character
      * @param starting
@@ -475,7 +475,7 @@ public class BBuffer implements Cloneable, Serializable,
 
     /**
      * Returns true if the message bytes starts with the specified string.
-     * 
+     *
      * @param s
      *            the string
      * @param pos
@@ -498,7 +498,7 @@ public class BBuffer implements Cloneable, Serializable,
     public int indexOf(String src) {
         return indexOf(src, 0, src.length(), 0);
     }
-    
+
     public int indexOf(String src, int srcOff, int srcLen, int myOff) {
         if ("".equals(src)) {
             return myOff;
@@ -552,7 +552,7 @@ public class BBuffer implements Cloneable, Serializable,
     }
 
     /**
-     * Make space for len chars. 
+     * Make space for len chars.
      * If len is small, allocate a reserve space too.
      */
     public BBuffer makeSpace(int count) {
@@ -594,7 +594,7 @@ public class BBuffer implements Cloneable, Serializable,
 
 //    /**
 //     * Find a character, no side effects.
-//     * 
+//     *
 //     * @return index of char if found, -1 if not
 //     */
 //    public static int findChars(byte buf[], int start, int end, byte c[]) {
@@ -612,7 +612,7 @@ public class BBuffer implements Cloneable, Serializable,
 
 //    /**
 //     * Find the first character != c
-//     * 
+//     *
 //     * @return index of char if found, -1 if not
 //     */
 //    public static int findNotChars(byte buf[], int start, int end, byte c[]) {
@@ -666,10 +666,10 @@ public class BBuffer implements Cloneable, Serializable,
         return res.remaining();
     }
 
-    /** 
+    /**
      * Read a chunk from is.
-     * 
-     * You don't need to use buffered input stream, we do the 
+     *
+     * You don't need to use buffered input stream, we do the
      * buffering.
      */
     public int read(InputStream is) throws IOException {
@@ -701,11 +701,11 @@ public class BBuffer implements Cloneable, Serializable,
 
 
     /**
-     *  Read a line - excluding the line terminator, which is consummed as 
+     *  Read a line - excluding the line terminator, which is consummed as
      *  well but not included in the response.
-     *  
+     *
      *  Line can end with CR, LF or CR/LF
-     * 
+     *
      * @param res
      * @return number of bytes read, or -1 if line ending not found in buffer.
      */
@@ -729,11 +729,11 @@ public class BBuffer implements Cloneable, Serializable,
         start = cstart;
         return -1;
     }
-    /** 
+    /**
      * Consume up to but not including delim.
-     * 
+     *
      */
-    public final int readToDelimOrSpace(byte delim, 
+    public final int readToDelimOrSpace(byte delim,
             BBuffer res) {
         int resStart = start;
         while (true) {
@@ -751,10 +751,10 @@ public class BBuffer implements Cloneable, Serializable,
     }
 
 
-    /** 
+    /**
      * Consume all up to the first space or \t, which will be the
      * first character in the buffer.
-     * 
+     *
      * Consumed data is wrapped in res.
      */
     public int readToSpace(BBuffer res) {
@@ -763,7 +763,7 @@ public class BBuffer implements Cloneable, Serializable,
           if (start >= end) {
               break;
           }
-          if (buff[start] == SP 
+          if (buff[start] == SP
                   || buff[start] == HT) {
               break;
           }
@@ -780,7 +780,7 @@ public class BBuffer implements Cloneable, Serializable,
         end = 0;
     }
     @Override
-    public void release() { 
+    public void release() {
 //        synchronized (this) {
 //            useCount--;
 //            if (useCount == -1) {
@@ -796,11 +796,11 @@ public class BBuffer implements Cloneable, Serializable,
     public void reset() {
         buff = null;
     }
-    
+
     // -------------------- Setup --------------------
     /**
      * Sets the message bytes to the specified subarray of bytes.
-     * 
+     *
      * @param b
      *            the ascii bytes
      * @param off
@@ -811,7 +811,7 @@ public class BBuffer implements Cloneable, Serializable,
     public void setBytes(byte[] b, int off, int len) {
         throw new RuntimeException("Can't setBytes on allocated buffer");
     }
-    
+
     public void wrap(BBucket b) {
         setBytes(b.array(), b.position(), b.remaining());
     }
@@ -819,13 +819,13 @@ public class BBuffer implements Cloneable, Serializable,
     public void wrap(ByteBuffer b) {
         setBytes(b.array(), b.position(), b.remaining());
     }
-    
+
     protected void setBytesInternal(byte[] b, int off, int len) {
         buff = b;
         start = off;
         end = start + len;
     }
-    
+
 //    public final void lowerCase() {
 //        while (start < end) {
 //            byte chr = buff[start];
@@ -839,7 +839,7 @@ public class BBuffer implements Cloneable, Serializable,
     public void setEnd(int i) {
         end = i;
     }
-    
+
     /**
      * The old code from MessageBytes, used for setContentLength
      * and setStatus.
@@ -879,14 +879,14 @@ public class BBuffer implements Cloneable, Serializable,
             end--;
         }
     }
-    
+
     public void setOffset(int off) {
         if (end < off)
             end = off;
         start = off;
     }
-    
-    
+
+
     public int skipEmptyLines() {
         int resStart = start;
         while (buff[start] == CR || buff[start] == LF) {
@@ -897,7 +897,7 @@ public class BBuffer implements Cloneable, Serializable,
         }
         return start - resStart;
     }
-    
+
     public int skipSpace() {
         int cstart = start;
         while (true) {
@@ -932,7 +932,7 @@ public class BBuffer implements Cloneable, Serializable,
         return len;
 
     }
-    
+
     public int substract(byte src[], int off, int len)  {
 
         if ((end - start) == 0) {
@@ -948,7 +948,7 @@ public class BBuffer implements Cloneable, Serializable,
         return n;
 
     }
-    
+
     public String toString() {
         return toString(DEFAULT_CHARACTER_ENCODING);
     }
@@ -959,23 +959,23 @@ public class BBuffer implements Cloneable, Serializable,
         } else if (end == start) {
             return "";
         }
-        
+
         String strValue = null;
         try {
             if (enc == null) {
                 enc = DEFAULT_CHARACTER_ENCODING;
             }
-            
+
             strValue = new String(buff, start, end - start, enc);
             /*
              * Does not improve the speed too much on most systems, it's safer
              * to use the "clasical" new String().
-             * 
+             *
              * Most overhead is in creating char[] and copying, the internal
              * implementation of new String() is very close to what we do. The
              * decoder is nice for large buffers and if we don't go to String (
              * so we can take advantage of reduced GC)
-             * 
+             *
              * // Method is commented out, in: return B2CConverter.decodeString(
              * enc );
              */
@@ -994,7 +994,7 @@ public class BBuffer implements Cloneable, Serializable,
     /**
      * Convert specified String to a byte array. This ONLY WORKS for ascii, UTF
      * chars will be truncated.
-     * 
+     *
      * @param value
      *            to convert to byte array
      * @return the byte array value
@@ -1006,10 +1006,10 @@ public class BBuffer implements Cloneable, Serializable,
         }
         return result;
     }
-    
+
     /**
      * Find a character, no side effects.
-     * 
+     *
      * @return index of char if found, -1 if not
      */
     public static int findChar(byte buf[], int start, int end, char c) {
@@ -1038,7 +1038,7 @@ public class BBuffer implements Cloneable, Serializable,
         int pos = bucket.position();
         int lastValid = bucket.limit();
         byte[] buf = bucket.array();
-        
+
         for (int i = pos; i < lastValid; i++) {
             byte chr = buf[i];
             if (chr == LF) {
@@ -1062,7 +1062,7 @@ public class BBuffer implements Cloneable, Serializable,
                         return true;
                     }
                 }
-                
+
             }
         }
         return false;
@@ -1133,7 +1133,7 @@ public class BBuffer implements Cloneable, Serializable,
 
         long n = c - '0';
         long m;
-        
+
         while (--len > 0) {
             if (!isDigit(c = b[off++])) {
                 throw new NumberFormatException();
@@ -1171,25 +1171,25 @@ public class BBuffer implements Cloneable, Serializable,
 
     /**
      * A slice of a bucket, holding reference to a parent bucket.
-     * 
+     *
      * This is used when a filter splits a bucket - the original
      * will be replaced with 1 or more slices. When all slices are
      * released, the parent will also be released.
-     * 
+     *
      * It is not possible to add data.
-     * 
+     *
      * @author Costin Manolache
      */
     static class IOBucketWrap extends BBuffer {
         //IOBucket parent;
-        
-        
+
+
         public BBuffer makeSpace(int count) {
             throw new RuntimeException("Attempting to change buffer " +
             		"on a wrapped BBuffer");
         }
 
-        public void release() { 
+        public void release() {
 //            if (parent != null) {
 //                parent.release();
 //            }
@@ -1200,5 +1200,5 @@ public class BBuffer implements Cloneable, Serializable,
         }
     }
 
-    
+
 }

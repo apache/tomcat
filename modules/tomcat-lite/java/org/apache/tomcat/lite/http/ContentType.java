@@ -20,7 +20,7 @@ package org.apache.tomcat.lite.http;
 
 /**
  * Usefull methods for Content-Type processing
- * 
+ *
  * @author James Duncan Davidson [duncan@eng.sun.com]
  * @author James Todd [gonzo@eng.sun.com]
  * @author Jason Hunter [jch@eng.sun.com]

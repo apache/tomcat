@@ -29,7 +29,7 @@ import org.apache.tomcat.lite.io.BBucket;
 /**
  * Mapper, which implements the servlet API mapping rules (which are derived
  * from the HTTP rules).
- * 
+ *
  * This class doesn't use JNDI.
  */
 public class BaseMapper {
@@ -39,18 +39,18 @@ public class BaseMapper {
 
     // TODO:
     /**
-     * Mapping should be done on bytes - as received from net, before 
+     * Mapping should be done on bytes - as received from net, before
      * translation to chars. This would allow setting the default charset
-     * for the context - or even executing the servlet and letting it specify 
+     * for the context - or even executing the servlet and letting it specify
      * the charset to use for further decoding.
-     * 
+     *
      */
     public static interface Mapper {
         public void map(BBucket host, BBucket url, MappingData md);
     }
 
-    
-    /** 
+
+    /**
      * Like BaseMapper, for a Context.
      */
     public static class ServiceMapper extends BaseMapper {
@@ -117,10 +117,10 @@ public class BaseMapper {
      * Array containing the virtual hosts definitions.
      */
     Host[] hosts = new Host[0];
-    
-    /** 
-     * If no other host is found. 
-     * For single-host servers ( most common ) this is the only one 
+
+    /**
+     * If no other host is found.
+     * For single-host servers ( most common ) this is the only one
      * used.
      */
     Host defaultHost = new Host();
@@ -139,7 +139,7 @@ public class BaseMapper {
         Host newHost = new Host();
         newHost.name = name;
         newHost.contextList = new ContextList();
-        
+
         if (insertMap(hosts, newHosts, newHost)) {
             hosts = newHosts;
         }
@@ -187,7 +187,7 @@ public class BaseMapper {
             return;
         }
         Host realHost = hosts[pos];
-        
+
         Host[] newHosts = new Host[hosts.length + 1];
         Host newHost = new Host();
         newHost.name = alias;
@@ -201,14 +201,14 @@ public class BaseMapper {
     private Host getHost(String host) {
         return getHost(CBuffer.newInstance().append(host));
     }
-    
+
     private Host getHost(CBuffer host) {
-        if (hosts == null || hosts.length <= 1 || host == null 
+        if (hosts == null || hosts.length <= 1 || host == null
                 || host.length() == 0 || host.equals("")) {
             return defaultHost;
         } else {
             Host[] hosts = this.hosts;
-            // TODO: if hosts.length == 1 or defaultHost ? 
+            // TODO: if hosts.length == 1 or defaultHost ?
             int pos = findIgnoreCase(hosts, host);
             if ((pos != -1) && (host.equalsIgnoreCase(hosts[pos].name))) {
                 return hosts[pos];
@@ -236,18 +236,18 @@ public class BaseMapper {
      * @param context Context object
      * @param welcomeResources Welcome files defined for this context
      * @param resources Static resources of the context
-     * @param ctxService 
+     * @param ctxService
      */
     public BaseMapper.Context addContext(String hostName, String path, Object context,
-            String[] welcomeResources, FileConnector resources, 
+            String[] welcomeResources, FileConnector resources,
             HttpChannel.HttpService ctxService) {
 
         if (path == null) {
             path = "/";
         }
-        
+
         Host host = getOrCreateHost(hostName);
-        
+
         int slashCount = slashCount(path);
         synchronized (host) {
             BaseMapper.Context[] contexts = host.contextList.contexts;
@@ -408,7 +408,7 @@ public class BaseMapper {
      * @param contextPath Context path this wrapper belongs to
      * @param path Wrapper mapping
      */
-    public void removeWrapper(String hostName, String contextPath, 
+    public void removeWrapper(String hostName, String contextPath,
                               String path) {
         Host host = getHost(hostName);
         BaseMapper.Context[] contexts = host.contextList.contexts;
@@ -478,7 +478,7 @@ public class BaseMapper {
                     MappingData mappingData)
         throws Exception {
 
-        internalMap(host.length() == 0 ? null : 
+        internalMap(host.length() == 0 ? null :
             host, uri, mappingData);
     }
 
@@ -498,7 +498,7 @@ public class BaseMapper {
         int nesting = 0;
 
         // Virtual host mapping
-        Host mappedHost = getHost(host); 
+        Host mappedHost = getHost(host);
         contexts = mappedHost.contextList.contexts;
         nesting = mappedHost.contextList.nesting;
 
@@ -506,7 +506,7 @@ public class BaseMapper {
         if (contexts.length == 0) {
             return;
         }
-        
+
         if (mappingData.context == null) {
             if (nesting < 1 || contexts.length == 1 && "".equals(contexts[0].name)) {
                 // if 1 context (default) -> fast return
@@ -533,7 +533,7 @@ public class BaseMapper {
                     boolean found = false;
                     CBuffer tmp = mappingData.tmpPrefix;
                     tmp.wrap(uri, 0, uri.length());
-                    
+
                     while (pos >= 0) {
                         if (tmp.startsWith(contexts[pos].name)) {
                             length = contexts[pos].name.length();
@@ -563,7 +563,7 @@ public class BaseMapper {
                     }
                 }
             }
-            
+
             if (context != null) {
                 mappingData.context = context.object;
                 mappingData.contextPath.set(context.name);
@@ -582,20 +582,20 @@ public class BaseMapper {
      * Wrapper mapping, using servlet rules.
      */
     protected final void internalMapWrapper(
-            BaseMapper.Context context, 
+            BaseMapper.Context context,
             CBuffer url,
             MappingData mappingData)
                 throws Exception {
 
         boolean noServletPath = false;
         if (url.length() < context.name.length()) {
-            throw new IOException("Invalid mapping " + context.name + " " + 
+            throw new IOException("Invalid mapping " + context.name + " " +
                     url);
         }
 
         try {
             // Set the servlet path.
-            mappingData.tmpServletPath.set(url, 
+            mappingData.tmpServletPath.set(url,
                     context.name.length(),
                     url.length() - context.name.length());
 
@@ -607,16 +607,16 @@ public class BaseMapper {
                 }
             }
 
-            mapAfterContext(context, url, mappingData.tmpServletPath, mappingData, 
+            mapAfterContext(context, url, mappingData.tmpServletPath, mappingData,
                     noServletPath);
         } catch (ArrayIndexOutOfBoundsException ex) {
             System.err.println(1);
         }
     }
 
-    void mapAfterContext(BaseMapper.Context context, 
-            CBuffer url, CBuffer urlNoContext, 
-            MappingData mappingData, boolean noServletPath) 
+    void mapAfterContext(BaseMapper.Context context,
+            CBuffer url, CBuffer urlNoContext,
+            MappingData mappingData, boolean noServletPath)
         throws Exception {
 
 
@@ -629,10 +629,10 @@ public class BaseMapper {
         BaseMapper.ServiceMapping[] wildcardWrappers = context.wildcardWrappers;
         if (mappingData.getServiceObject() == null) {
 
-            internalMapWildcardWrapper(wildcardWrappers, context.nesting, 
+            internalMapWildcardWrapper(wildcardWrappers, context.nesting,
                                        urlNoContext, mappingData);
-            
-            if (mappingData.getServiceObject() != null 
+
+            if (mappingData.getServiceObject() != null
                     && mappingData.service.jspWildCard) {
                 if (urlNoContext.lastChar() == '/') {
                     /*
@@ -642,7 +642,7 @@ public class BaseMapper {
                      * Force the context's welcome files, which are interpreted
                      * as JSP files (since they match the url-pattern), to be
                      * considered. See Bugzilla 27664.
-                     */ 
+                     */
                     mappingData.service = null;
                     checkJspWelcomeFiles = true;
                 } else {
@@ -675,7 +675,7 @@ public class BaseMapper {
             if (checkWelcomeFiles) {
                 for (int i = 0; (i < context.welcomeResources.length)
                          && (mappingData.getServiceObject() == null); i++) {
-                    
+
                     CBuffer wpath = mappingData.tmpWelcome;
                     wpath.set(urlNoContext);
                     wpath.append(context.welcomeResources[i]);
@@ -686,7 +686,7 @@ public class BaseMapper {
                     // Rule 4b -- Welcome resources processing for prefix match
                     if (mappingData.getServiceObject() == null) {
                         internalMapWildcardWrapper
-                            (wildcardWrappers, context.nesting, 
+                            (wildcardWrappers, context.nesting,
                              urlNoContext, mappingData);
                     }
 
@@ -695,14 +695,14 @@ public class BaseMapper {
                     if (mappingData.getServiceObject() == null
                         && context.resources != null) {
                         String pathStr = urlNoContext.toString();
-                        
+
                         mapWelcomResource(context, urlNoContext, mappingData,
                                 extensionWrappers, pathStr);
-                        
+
                     }
                 }
             }
-                                        
+
         }
 
 
@@ -716,25 +716,25 @@ public class BaseMapper {
             // Redirection to a folder
             if (context.resources != null && urlNoContext.lastChar() != '/') {
                 String pathStr = urlNoContext.toString();
-                mapDefaultServlet(context, urlNoContext, mappingData, 
+                mapDefaultServlet(context, urlNoContext, mappingData,
                         url,
                         pathStr);
             }
         }
     }
 
-    /** 
+    /**
      * Filesystem-dependent method:
-     *  if pathStr corresponds to a directory, we'll need to redirect with / 
-     *  at end. 
+     *  if pathStr corresponds to a directory, we'll need to redirect with /
+     *  at end.
      */
-    protected void mapDefaultServlet(BaseMapper.Context context, 
+    protected void mapDefaultServlet(BaseMapper.Context context,
             CBuffer path,
-            MappingData mappingData, 
+            MappingData mappingData,
             CBuffer url,
             String pathStr) throws IOException {
-        
-        if (context.resources != null 
+
+        if (context.resources != null
                 && context.resources.isDirectory(pathStr)) {
             mappingData.redirectPath.set(url);
             mappingData.redirectPath.append("/");
@@ -746,13 +746,13 @@ public class BaseMapper {
 
 
     /**
-     * Filesystem dependent method: 
-     *  check if a resource exists in filesystem. 
+     * Filesystem dependent method:
+     *  check if a resource exists in filesystem.
      */
     protected void mapWelcomResource(BaseMapper.Context context, CBuffer path,
                                MappingData mappingData,
                                BaseMapper.ServiceMapping[] extensionWrappers, String pathStr) {
-        
+
         if (context.resources != null &&
                 context.resources.isFile(pathStr)) {
             internalMapExtensionWrapper(extensionWrappers,
@@ -786,15 +786,15 @@ public class BaseMapper {
      * Prefix mapping. ( /foo/* )
      */
     private final void internalMapWildcardWrapper
-        (BaseMapper.ServiceMapping[] wrappers, int nesting, CBuffer path, 
+        (BaseMapper.ServiceMapping[] wrappers, int nesting, CBuffer path,
          MappingData mappingData) {
 
         int lastSlash = -1;
         int length = -1;
-        
+
         CBuffer tmp = mappingData.tmpPrefix;
         tmp.wrap(path, 0, path.length());
-        
+
         int pos = find(wrappers, tmp);
         if (pos != -1) {
             boolean found = false;
@@ -810,7 +810,7 @@ public class BaseMapper {
                     }
                 }
                 if (lastSlash == -1) {
-                    lastSlash = tmp.nthSlash(nesting + 1); 
+                    lastSlash = tmp.nthSlash(nesting + 1);
                 } else {
                     lastSlash = tmp.lastIndexOf('/');
                 }
@@ -819,7 +819,7 @@ public class BaseMapper {
             }
             if (found) {
                 mappingData.wrapperPath.set(wrappers[pos].name);
-                
+
                 if (path.length() > length) {
                     mappingData.pathInfo.set
                         (path, length, path.length() - length);
@@ -830,21 +830,21 @@ public class BaseMapper {
             }
         }
     }
-    
+
 
     /**
      * Extension mappings.
      */
     protected final void internalMapExtensionWrapper
         (BaseMapper.ServiceMapping[] wrappers, CBuffer path, MappingData mappingData) {
-        
+
         int dot = path.getExtension(mappingData.ext, '/', '.');
         if (dot >= 0) {
             int pos = find(wrappers, mappingData.ext);
-                
+
             if ((pos != -1)
                     && (mappingData.ext.equals(wrappers[pos].name))) {
-                    
+
                 mappingData.wrapperPath.set(path);
                 mappingData.requestPath.set(path);
 
@@ -868,10 +868,10 @@ public class BaseMapper {
         if (b == -1) {
             return -1;
         }
-        
+
         if (name.compare(map[0].name) < 0 ) {
             return -1;
-        }         
+        }
         if (b == 0) {
             return 0;
         }
@@ -904,7 +904,7 @@ public class BaseMapper {
      * This will return the index for the closest inferior or equal item in the
      * given array.
      */
-    private static final int findIgnoreCase(BaseMapper.Mapping[] map, 
+    private static final int findIgnoreCase(BaseMapper.Mapping[] map,
             CBuffer name) {
         int a = 0;
         int b = map.length - 1;
@@ -915,7 +915,7 @@ public class BaseMapper {
         }
         if (name.compareIgnoreCase(map[0].name) < 0 ) {
             return -1;
-        }         
+        }
         if (b == 0) {
             return 0;
         }
@@ -958,10 +958,10 @@ public class BaseMapper {
         if (b == -1) {
             return -1;
         }
-        
+
         if (name.compareTo(map[0].name) < 0) {
             return -1;
-        } 
+        }
         if (b == 0) {
             return 0;
         }
@@ -1062,21 +1062,21 @@ public class BaseMapper {
 
 
     public static final class Context extends BaseMapper.Mapping {
-    
+
         Context(BaseMapper mapper) {
             this.mapper = mapper;
         }
         public BaseMapper mapper;
         public String[] welcomeResources = new String[0];
         public FileConnector resources = null;
-        
+
         public BaseMapper.ServiceMapping defaultWrapper = null;
-        
+
         public BaseMapper.ServiceMapping[] exactWrappers = new BaseMapper.ServiceMapping[0];
         public BaseMapper.ServiceMapping[] wildcardWrappers = new BaseMapper.ServiceMapping[0];
         public BaseMapper.ServiceMapping[] extensionWrappers = new BaseMapper.ServiceMapping[0];
         public int nesting = 0;
-    
+
         public void addWrapper(String path, HttpService service) {
             mapper.addWrapper(this, path, service);
         }
@@ -1086,17 +1086,17 @@ public class BaseMapper {
 
     public static class ServiceMapping extends BaseMapper.Mapping {
         public boolean jspWildCard = false;
-        // If set, the service will run in the selector thread ( should 
+        // If set, the service will run in the selector thread ( should
         // be non-blocking )
         public boolean selectorThread = false;
-        
+
     }
 
 
-    protected static abstract class Mapping {    
+    protected static abstract class Mapping {
         public String name = null;
         public Object object = null;
-    
+
         public String toString() {
             if (name == null || "".equals(name)) {
                 return "DEFAULT";

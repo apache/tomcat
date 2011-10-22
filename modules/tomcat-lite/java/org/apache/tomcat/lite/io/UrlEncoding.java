@@ -25,12 +25,12 @@ import java.util.BitSet;
 
 /**
  * Support for %xx URL encoding.
- * 
+ *
  * @author Costin Manolache
  */
 public final class UrlEncoding {
 
-    protected static final boolean ALLOW_ENCODED_SLASH = 
+    protected static final boolean ALLOW_ENCODED_SLASH =
         Boolean.valueOf(
                 System.getProperty(
                         "org.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH",
@@ -44,10 +44,10 @@ public final class UrlEncoding {
     static BitSet SAFE_CHARS = new BitSet(128);
     BBuffer tmpBuffer = BBuffer.allocate(1024);
     CBuffer tmpCharBuffer = CBuffer.newInstance();
-    
+
     public void urlEncode(CBuffer url, CBuffer encoded, IOWriter enc) {
         tmpBuffer.recycle();
-        urlEncode(url, tmpBuffer, encoded, enc.getEncoder("UTF-8"), 
+        urlEncode(url, tmpBuffer, encoded, enc.getEncoder("UTF-8"),
                 SAFE_CHARS_URL, true, enc);
     }
 
@@ -56,9 +56,9 @@ public final class UrlEncoding {
         tmpCharBuffer.append(url);
         urlEncode(tmpCharBuffer, encoded, enc);
     }
-    
+
     /** Only works for UTF-8 or charsets preserving ascii.
-     * 
+     *
      * @param url
      * @param tmpBuffer
      * @param encoded
@@ -72,7 +72,7 @@ public final class UrlEncoding {
             BitSet safeChars, boolean last, IOWriter enc) {
         // tomcat charset-encoded each character first. I don't think
         // this is needed.
-        
+
         // TODO: space to +
         enc.encodeAll(url, tmpBuffer, utf8Enc, last);
         byte[] array = tmpBuffer.array();
@@ -89,13 +89,13 @@ public final class UrlEncoding {
             }
         }
     }
-    
+
     static {
         initSafeChars(SAFE_CHARS);
         initSafeChars(SAFE_CHARS_URL);
         SAFE_CHARS_URL.set('/');
     }
-    
+
     private static void initSafeChars(BitSet safeChars) {
         int i;
         for (i = 'a'; i <= 'z'; i++) {
@@ -121,12 +121,12 @@ public final class UrlEncoding {
         safeChars.set('$'); // ?
         safeChars.set('!'); // ?
         safeChars.set('\''); // ?
-        safeChars.set('('); // ? 
-        safeChars.set(')'); // ? 
-        safeChars.set(','); // ? 
+        safeChars.set('('); // ?
+        safeChars.set(')'); // ?
+        safeChars.set(','); // ?
     }
-    
-    public void urlDecode(BBuffer bb, CBuffer dest, boolean q, 
+
+    public void urlDecode(BBuffer bb, CBuffer dest, boolean q,
             IOReader charDec) throws IOException {
         // Replace %xx
         tmpBuffer.append(bb);
@@ -134,8 +134,8 @@ public final class UrlEncoding {
         charDec.decodeAll(bb, dest);
     }
 
-    
-    public void urlDecode(BBuffer bb, CBuffer dest,  
+
+    public void urlDecode(BBuffer bb, CBuffer dest,
             IOReader charDec) throws IOException {
         // Replace %xx
         tmpBuffer.append(bb);
@@ -143,11 +143,11 @@ public final class UrlEncoding {
         charDec.decodeAll(bb, dest);
     }
 
-    
+
     /**
-     * URLDecode, will modify the source. This is only at byte level - 
-     * it needs conversion to chars using the right charset. 
-     * 
+     * URLDecode, will modify the source. This is only at byte level -
+     * it needs conversion to chars using the right charset.
+     *
      * @param query Converts '+' to ' ' and allow '/'
      */
     public void urlDecode(BBuffer mb, boolean query) throws IOException {

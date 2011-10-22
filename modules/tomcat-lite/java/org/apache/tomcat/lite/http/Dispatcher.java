@@ -31,9 +31,9 @@ import org.apache.tomcat.lite.io.FileConnector;
  * - decide if the request should be run in the selector thread
  * or in a thread pool
  * - finalizes the request ( close / flush )
- * - detects if the request is complete or set callbacks 
+ * - detects if the request is complete or set callbacks
  * for receive/flush/done.
- *  
+ *
  */
 public class Dispatcher implements HttpService {
 
@@ -45,15 +45,15 @@ public class Dispatcher implements HttpService {
     public Dispatcher() {
         init();
     }
-    
+
     protected void init() {
-        mapper = new BaseMapper();        
+        mapper = new BaseMapper();
     }
 
     public void runService(HttpChannel ch) {
         runService(ch, true);
     }
-    
+
     public void runService(HttpChannel ch, boolean recycle) {
         MappingData mapRes = ch.getRequest().getMappingData();
         HttpService h = (HttpService) mapRes.getServiceObject();
@@ -73,38 +73,38 @@ public class Dispatcher implements HttpService {
             t.printStackTrace();
         }
     }
-    
+
     @Override
     public void service(HttpRequest httpReq, HttpResponse httpRes) throws IOException {
         service(httpReq, httpRes, false, true);
     }
 
-    /** 
+    /**
      * Process the request/response in the current thread, without
      * release ( recycle ) at the end.
-     * 
+     *
      * For use by tests and/or in-memory running of servlets.
-     * 
-     * If no connection is associated with the request - the 
+     *
+     * If no connection is associated with the request - the
      * output will remain in the out buffer.
      */
     public void run(HttpRequest httpReq, HttpResponse httpRes) throws IOException {
         service(httpReq, httpRes, true, false);
     }
 
-    
-    public void service(HttpRequest httpReq, HttpResponse httpRes, boolean noThread, boolean recycle) 
+
+    public void service(HttpRequest httpReq, HttpResponse httpRes, boolean noThread, boolean recycle)
             throws IOException {
         long t0 = System.currentTimeMillis();
         HttpChannel http = httpReq.getHttpChannel();
-        
+
         http.setCompletedCallback(doneCallback);
-        
+
         try {
           // compute decodedURI - not done by connector
             MappingData mapRes = httpReq.getMappingData();
             mapRes.recycle();
-          
+
             mapper.map(httpReq.serverName(),
                   httpReq.decodedURI(), mapRes);
 
@@ -112,24 +112,24 @@ public class Dispatcher implements HttpService {
 
           if (h != null) {
               if (debug) {
-                  log.info(">>>>>>>> START: " + http.getRequest().method() + " " + 
-                      http.getRequest().decodedURI() + " " + 
+                  log.info(">>>>>>>> START: " + http.getRequest().method() + " " +
+                      http.getRequest().decodedURI() + " " +
                       h.getClass().getSimpleName());
               }
-              
+
               if (mapRes.service.selectorThread || noThread) {
                   runService(http, recycle);
               } else {
                   tp.execute(httpReq.getHttpChannel().dispatcherRunnable);
               }
-              
+
           } else {
               httpRes.setStatus(404);
               http.complete();
           }
-          
+
         } catch (IOException ex) {
-            if ("Broken pipe".equals(ex.getMessage())) { 
+            if ("Broken pipe".equals(ex.getMessage())) {
                 log.warning("Connection interrupted while writting");
             }
             throw ex;
@@ -144,26 +144,26 @@ public class Dispatcher implements HttpService {
         @Override
         public void handle(HttpChannel client, Object extraData) throws IOException {
             if (debug) {
-                log.info("<<<<<<<< DONE: " + client.getRequest().method() + " " + 
-                        client.getRequest().decodedURI() + " " + 
-                        client.getResponse().getStatus() + " "  
+                log.info("<<<<<<<< DONE: " + client.getRequest().method() + " " +
+                        client.getRequest().decodedURI() + " " +
+                        client.getResponse().getStatus() + " "
                         );
             }
         }
     };
-    
+
     public BaseMapper.Context addContext(String hostname, String ctxPath,
             Object ctx, String[] welcomeResources, FileConnector resources,
             HttpService ctxService) {
-        return mapper.addContext(hostname, ctxPath, ctx, welcomeResources, resources, 
+        return mapper.addContext(hostname, ctxPath, ctx, welcomeResources, resources,
                 ctxService);
     }
 
     public BaseMapper.Context addContext(String ctxPath) {
-        return mapper.addContext(null, ctxPath, null, null, null, 
+        return mapper.addContext(null, ctxPath, null, null, null,
                 null);
     }
-    
+
     public void map(CBuffer hostMB, CBuffer urlMB, MappingData md) {
         try {
             mapper.map(hostMB, urlMB, md);
@@ -187,10 +187,10 @@ public class Dispatcher implements HttpService {
             HttpService service) {
         mapper.addWrapper(ctx, path, service);
     }
-    
-    
+
+
     public void setDefaultService(HttpService service) {
-        BaseMapper.Context mCtx = 
+        BaseMapper.Context mCtx =
             mapper.addContext(null, "/", null, null, null, null);
         mapper.addWrapper(mCtx, "/", service);
     }

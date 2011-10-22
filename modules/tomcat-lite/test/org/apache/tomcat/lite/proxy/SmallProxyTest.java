@@ -13,14 +13,14 @@ import org.apache.tomcat.lite.io.MemoryIOConnector;
 import org.apache.tomcat.lite.io.MemoryIOConnector.MemoryIOChannel;
 
 public class SmallProxyTest extends TestCase {
-    
-    MemoryIOConnector memoryServerConnector = 
+
+    MemoryIOConnector memoryServerConnector =
         new MemoryIOConnector();
-    
-    MemoryIOConnector memoryClientConnector = 
+
+    MemoryIOConnector memoryClientConnector =
         new MemoryIOConnector().withServer(memoryServerConnector);
 
-    
+
     HttpConnector httpCon = new HttpConnector(memoryServerConnector) {
         @Override
         public HttpChannel get(CharSequence target) throws IOException {
@@ -45,12 +45,12 @@ public class SmallProxyTest extends TestCase {
             lastClient = new HttpChannel();
             lastClient.setConnector(this);
             return lastClient;
-        }        
+        }
         public HttpChannel getServer() {
             throw new RuntimeException();
         }
     };
-    
+
     HttpChannel lastServer;
     HttpChannel lastClient;
 
@@ -59,20 +59,20 @@ public class SmallProxyTest extends TestCase {
     boolean bodySentDone = false;
     boolean headersDone = false;
     boolean allDone = false;
-    
-    
-    //MemoryIOChannel clientNet = new MemoryIOChannel(); 
-    
+
+
+    //MemoryIOChannel clientNet = new MemoryIOChannel();
+
     MemoryIOConnector.MemoryIOChannel net = new MemoryIOChannel();
     HttpChannel http;
 
     HttpConnection serverConnection;
-    
+
     public void setUp() throws IOException {
         http = httpCon.getServer();
         serverConnection = httpCon.handleAccepted(net);
     }
- 
+
     /**
      * More complicated test..
      * @throws IOException
@@ -85,25 +85,25 @@ public class SmallProxyTest extends TestCase {
         net.getIn().append("GET http://www.apache.org/ HTTP/1.0\n" +
                 "Connection: Close\n\n");
         net.getIn().close();
-        
+
         // lastClient.rawSendBuffers has the request sent by proxy
         lastClient.getNet().getIn()
             .append("HTTP/1.0 200 OK\n\nHi\n");
         lastClient.getNet().getIn()
             .append("world\n");
-        
+
         // TODO: check what the proxy sent
         // lastClient.getOut();
-    
-        // will also trigger 'release' - both sides are closed. 
-        lastClient.getNet().getIn().close(); 
-        
-        // wait response... 
+
+        // will also trigger 'release' - both sides are closed.
+        lastClient.getNet().getIn().close();
+
+        // wait response...
         // http.sendBody.close();
         String res = net.out.toString();
         assertTrue(res.indexOf("Hi\nworld\n") > 0);
         assertTrue(res.indexOf("HTTP/1.0 200 OK") == 0);
         assertTrue(res.indexOf("tomcatproxy") > 0);
-        
-    }    
+
+    }
 }

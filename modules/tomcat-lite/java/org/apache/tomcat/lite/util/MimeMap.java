@@ -32,7 +32,7 @@ public class MimeMap implements FileNameMap {
 
     // Defaults - all of them are "well-known" types,
     // you can add using normal web.xml.
-    
+
     public static Hashtable<String,String> defaultMap =
         new Hashtable<String,String>(101);
     static {
@@ -121,11 +121,11 @@ public class MimeMap implements FileNameMap {
         defaultMap.put("avx", "video/x-rad-screenplay");
         defaultMap.put("wrl", "x-world/x-vrml");
         defaultMap.put("mpv2", "video/mpeg2");
-        
+
         /* Add XML related MIMEs */
-        
+
         defaultMap.put("xml", "text/xml");
-        defaultMap.put("xsl", "text/xml");        
+        defaultMap.put("xsl", "text/xml");
         defaultMap.put("svg", "image/svg+xml");
         defaultMap.put("svgz", "image/svg+xml");
         defaultMap.put("wbmp", "image/vnd.wap.wbmp");
@@ -134,7 +134,7 @@ public class MimeMap implements FileNameMap {
         defaultMap.put("wmls", "text/vnd.wap.wmlscript");
         defaultMap.put("wmlscriptc", "application/vnd.wap.wmlscriptc");
     }
-    
+
 
     private Hashtable<String,String> map = new Hashtable<String,String>();
 
@@ -149,7 +149,7 @@ public class MimeMap implements FileNameMap {
     public String getMimeType(String ext) {
         return getContentTypeFor(ext);
     }
-    
+
     public String getContentType(String extn) {
         String type = (String)map.get(extn.toLowerCase());
         if( type == null ) type=(String)defaultMap.get( extn );
@@ -166,7 +166,7 @@ public class MimeMap implements FileNameMap {
         // play it safe and get rid of any fragment id
         // that might be there
         int length=fileName.length();
-        
+
         int newEnd = fileName.lastIndexOf('#');
         if( newEnd== -1 ) newEnd=length;
         // Instead of creating a new string.
@@ -181,7 +181,7 @@ public class MimeMap implements FileNameMap {
             return null;
         }
     }
-    
+
     public String getContentTypeFor(String fileName) {
         String extn=getExtension( fileName );
         if (extn!=null) {

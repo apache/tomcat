@@ -21,40 +21,40 @@ import org.apache.tomcat.lite.io.IOChannel;
 import org.apache.tomcat.lite.io.IOConnector;
 
 /*
- * TODO: expectations ? 
+ * TODO: expectations ?
  * Fix docs - order matters
  * Crashes in chrome
- * 
+ *
  * Test with unit tests or:
- *  google-chrome --use-flip=no-ssl 
- *    --user-data-dir=/home/$USER/.config/google-chrome/Test 
+ *  google-chrome --use-flip=no-ssl
+ *    --user-data-dir=/home/$USER/.config/google-chrome/Test
  *    http://localhost:8802/hello
  */
 
-public class SpdyConnection extends HttpConnector.HttpConnection 
+public class SpdyConnection extends HttpConnector.HttpConnection
         implements IOConnector.ConnectedCallback {
-    
-    
+
+
     /** Use compression for headers. Will magically turn to false
      * if the first request doesn't have x8xx ( i.e. compress header )
      */
     boolean headerCompression = true;
     boolean firstFrame = true;
-    
+
     public static long DICT_ID = 3751956914L;
-    private static String SPDY_DICT_S = 
+    private static String SPDY_DICT_S =
         "optionsgetheadpostputdeletetraceacceptaccept-charsetaccept-encodingaccept-" +
         "languageauthorizationexpectfromhostif-modified-sinceif-matchif-none-matchi" +
-        "f-rangeif-unmodifiedsincemax-forwardsproxy-authorizationrangerefererteuser" + 
-        "-agent10010120020120220320420520630030130230330430530630740040140240340440" + 
-        "5406407408409410411412413414415416417500501502503504505accept-rangesageeta" + 
-        "glocationproxy-authenticatepublicretry-afterservervarywarningwww-authentic" + 
-        "ateallowcontent-basecontent-encodingcache-controlconnectiondatetrailertran" + 
-        "sfer-encodingupgradeviawarningcontent-languagecontent-lengthcontent-locati" + 
-        "oncontent-md5content-rangecontent-typeetagexpireslast-modifiedset-cookieMo" + 
-        "ndayTuesdayWednesdayThursdayFridaySaturdaySundayJanFebMarAprMayJunJulAugSe" + 
-        "pOctNovDecchunkedtext/htmlimage/pngimage/jpgimage/gifapplication/xmlapplic" + 
-        "ation/xhtmltext/plainpublicmax-agecharset=iso-8859-1utf-8gzipdeflateHTTP/1" + 
+        "f-rangeif-unmodifiedsincemax-forwardsproxy-authorizationrangerefererteuser" +
+        "-agent10010120020120220320420520630030130230330430530630740040140240340440" +
+        "5406407408409410411412413414415416417500501502503504505accept-rangesageeta" +
+        "glocationproxy-authenticatepublicretry-afterservervarywarningwww-authentic" +
+        "ateallowcontent-basecontent-encodingcache-controlconnectiondatetrailertran" +
+        "sfer-encodingupgradeviawarningcontent-languagecontent-lengthcontent-locati" +
+        "oncontent-md5content-rangecontent-typeetagexpireslast-modifiedset-cookieMo" +
+        "ndayTuesdayWednesdayThursdayFridaySaturdaySundayJanFebMarAprMayJunJulAugSe" +
+        "pOctNovDecchunkedtext/htmlimage/pngimage/jpgimage/gifapplication/xmlapplic" +
+        "ation/xhtmltext/plainpublicmax-agecharset=iso-8859-1utf-8gzipdeflateHTTP/1" +
         ".1statusversionurl ";
     public static byte[] SPDY_DICT = SPDY_DICT_S.getBytes();
     // C code uses this - not in the spec
@@ -64,10 +64,10 @@ public class SpdyConnection extends HttpConnector.HttpConnection
 
 
     protected static Logger log = Logger.getLogger("SpdyConnection");
-    
+
     /**
      * @param spdyConnector
-     * @param remoteServer 
+     * @param remoteServer
      */
     SpdyConnection(HttpConnector spdyConnector, RemoteServer remoteServer) {
         this.httpConnector = spdyConnector;
@@ -76,7 +76,7 @@ public class SpdyConnection extends HttpConnector.HttpConnection
     }
 
     AtomicInteger streamErrors = new AtomicInteger();
-    
+
     AtomicInteger lastInStream = new AtomicInteger();
     AtomicInteger lastOutStream = new AtomicInteger();
 
@@ -91,13 +91,13 @@ public class SpdyConnection extends HttpConnector.HttpConnection
     BBuffer inFrameBuffer = BBuffer.allocate();
 
     BBuffer headW = BBuffer.wrapper();
-    
+
     CompressFilter headCompressIn = new CompressFilter()
         .setDictionary(SPDY_DICT, DICT_ID);
-    
+
     CompressFilter headCompressOut = new CompressFilter()
         .setDictionary(SPDY_DICT, DICT_ID);
-    
+
     IOBuffer headerCompressBuffer = new IOBuffer();
     IOBuffer headerDeCompressBuffer = new IOBuffer();
 
@@ -109,8 +109,8 @@ public class SpdyConnection extends HttpConnector.HttpConnection
     AtomicInteger outFrames = new AtomicInteger();
     AtomicInteger outDataFrames = new AtomicInteger();
     AtomicInteger outBytes = new AtomicInteger();
-    
-        
+
+
     volatile boolean connecting = false;
     volatile boolean connected = false;
 
@@ -120,7 +120,7 @@ public class SpdyConnection extends HttpConnector.HttpConnection
     public void withExtraBuffer(BBuffer received) {
         inFrameBuffer = received;
     }
-    
+
     @Override
     public void dataReceived(IOBuffer iob) throws IOException {
         // Only one thread doing receive at a time.
@@ -157,7 +157,7 @@ public class SpdyConnection extends HttpConnector.HttpConnection
 
     /**
      * Frame received. Must consume all data for the frame.
-     * 
+     *
      * @param iob
      * @throws IOException
      */
@@ -166,7 +166,7 @@ public class SpdyConnection extends HttpConnector.HttpConnection
         lastFrame = currentInFrame;
         inFrames.incrementAndGet();
         inBytes.addAndGet(currentInFrame.length + 8);
-        
+
         if (currentInFrame.c) {
             if (currentInFrame.type == SpdyConnection.Frame.TYPE_HELO) {
                 // receivedHello = currentInFrame;
@@ -184,7 +184,7 @@ public class SpdyConnection extends HttpConnector.HttpConnection
                 }
 
                 synchronized (channels) {
-                        channels.put(ch.channelId, ch);                    
+                        channels.put(ch.channelId, ch);
                 }
 
                 try {
@@ -218,9 +218,9 @@ public class SpdyConnection extends HttpConnector.HttpConnection
                 }
                 try {
                     SpdyConnection.readShort(iob);
-        
+
                     HttpMessageBytes resBytes = ch.getResponse().getMsgBytes();
-                
+
                     BBuffer head = processHeaders(iob, ch, resBytes);
                 } catch (Throwable t) {
                     log.log(Level.SEVERE, "Error parsing head", t);
@@ -271,14 +271,14 @@ public class SpdyConnection extends HttpConnector.HttpConnection
                 }
             }
             ch.sendHandleReceivedCallback();
-            
+
             if ((currentInFrame.flags & SpdyConnection.Frame.FLAG_HALF_CLOSE) != 0) {
                 ch.handleEndReceive();
             }
         }
         firstFrame = false;
     }
-    
+
     /**
      * On frame error.
      */
@@ -306,9 +306,9 @@ public class SpdyConnection extends HttpConnector.HttpConnection
             // 0x800 headers seems a bit too much - assume compressed.
             // I wish this was a flag...
             headerDeCompressBuffer.recycle();
-            // stream id ( 4 ) + unused ( 2 ) 
+            // stream id ( 4 ) + unused ( 2 )
             // nvCount is compressed in impl - spec is different
-            headCompressIn.decompress(iob, headerDeCompressBuffer, 
+            headCompressIn.decompress(iob, headerDeCompressBuffer,
                     currentInFrame.length - 6);
             headerDeCompressBuffer.copyAll(headRecvBuf);
             headerDeCompressBuffer.recycle();
@@ -324,7 +324,7 @@ public class SpdyConnection extends HttpConnector.HttpConnection
         }
         // Wrapper - so we don't change position in head
         headRecvBuf.wrapTo(headW);
-        
+
         BBuffer nameBuf = BBuffer.wrapper();
         BBuffer valBuf = BBuffer.wrapper();
 
@@ -378,15 +378,15 @@ public class SpdyConnection extends HttpConnector.HttpConnection
         BBuffer headBuf = BBuffer.allocate();
         SpdyConnection.appendShort(headBuf, mimeHeaders.size() + 3);
         serializeMime(mimeHeaders, headBuf);
-        
+
         // TODO: url - with host prefix , method
         // optimize...
         SpdyConnection.appendAsciiHead(headBuf, "version");
         SpdyConnection.appendAsciiHead(headBuf, "HTTP/1.1");
-        
+
         SpdyConnection.appendAsciiHead(headBuf, "method");
         SpdyConnection.appendAsciiHead(headBuf, http.getRequest().getMethod());
-        
+
         SpdyConnection.appendAsciiHead(headBuf, "url");
         // TODO: url
         SpdyConnection.appendAsciiHead(headBuf, http.getRequest().requestURL());
@@ -400,44 +400,44 @@ public class SpdyConnection extends HttpConnector.HttpConnection
 
         // Frame head - 8
         BBuffer out = BBuffer.allocate();
-        // Syn-reply 
-        out.putByte(0x80); 
-        out.putByte(0x01); 
-        out.putByte(0x00); 
+        // Syn-reply
+        out.putByte(0x80);
         out.putByte(0x01);
-        
+        out.putByte(0x00);
+        out.putByte(0x01);
+
         CBuffer method = http.getRequest().method();
         if (method.equals("GET") || method.equals("HEAD")) {
             http.getOut().close();
         }
-        
+
         if (http.getOut().isAppendClosed()) {
             out.putByte(0x01); // closed
         } else {
-            out.putByte(0x00); 
+            out.putByte(0x00);
         }
-        
-        // Length, channel id (4) + unused (2) - headBuf has header count 
+
+        // Length, channel id (4) + unused (2) - headBuf has header count
         // and headers
         SpdyConnection.append24(out, headBuf.remaining() + 6);
-        
+
         if (serverMode) {
             http.channelId = 2 * lastOutStream.incrementAndGet();
         } else {
-            http.channelId = 2 * lastOutStream.incrementAndGet() + 1;            
+            http.channelId = 2 * lastOutStream.incrementAndGet() + 1;
         }
         SpdyConnection.appendInt(out, http.channelId);
-        
+
         http.setConnection(this);
 
         synchronized (channels) {
-            channels.put(http.channelId, http);            
+            channels.put(http.channelId, http);
         }
-        
-        out.putByte(0x00); // no priority 
-        out.putByte(0x00); 
-        
-        sendFrame(out, headBuf); 
+
+        out.putByte(0x00); // no priority
+        out.putByte(0x00);
+
+        sendFrame(out, headBuf);
 
         if (http.outMessage.state == HttpMessage.State.HEAD) {
             http.outMessage.state = HttpMessage.State.BODY_DATA;
@@ -450,13 +450,13 @@ public class SpdyConnection extends HttpConnector.HttpConnection
         //sendData(http);
     }
 
-    
+
     public synchronized Collection<HttpChannel> getActives() {
         synchronized(channels) {
             return channels.values();
         }
     }
-    
+
     @Override
     protected synchronized void sendResponseHeaders(HttpChannel http) throws IOException {
         if (!serverMode) {
@@ -464,7 +464,7 @@ public class SpdyConnection extends HttpConnector.HttpConnection
         }
 
         if (http.getResponse().isCommitted()) {
-            return; 
+            return;
         }
         http.getResponse().setCommitted(true);
 
@@ -482,14 +482,14 @@ public class SpdyConnection extends HttpConnector.HttpConnection
         //SpdyConnection.appendInt(headers, http.channelId);
         //headers.putByte(0);
         //headers.putByte(0);
-        SpdyConnection.appendShort(headers, mimeHeaders.size() + 2);        
-        
+        SpdyConnection.appendShort(headers, mimeHeaders.size() + 2);
+
         // chrome will crash if we don't send the header
         serializeMime(mimeHeaders, headers);
 
         // Must be at the end
         SpdyConnection.appendAsciiHead(headers, "status");
-        SpdyConnection.appendAsciiHead(headers, 
+        SpdyConnection.appendAsciiHead(headers,
                 Integer.toString(http.getResponse().getStatus()));
 
         SpdyConnection.appendAsciiHead(headers, "version");
@@ -501,16 +501,16 @@ public class SpdyConnection extends HttpConnector.HttpConnection
             headerCompressBuffer.copyAll(headBuf);
             headerCompressBuffer.recycle();
         }
-        
+
         BBuffer frameHead = BBuffer.allocate();
-        // Syn-reply 
+        // Syn-reply
         frameHead.putByte(0x80); // Control
         frameHead.putByte(0x01); // version
         frameHead.putByte(0x00); // 00 02 - SYN_REPLY
         frameHead.putByte(0x02);
-        
+
         // It seems piggibacking data is not allowed
-        frameHead.putByte(0x00); 
+        frameHead.putByte(0x00);
 
         int len = headBuf.remaining() + 6;
         SpdyConnection.append24(frameHead, len);
@@ -522,17 +522,17 @@ public class SpdyConnection extends HttpConnector.HttpConnection
 
         sendFrame(frameHead, headBuf);
     }
-    
-    
+
+
     public void startSending(HttpChannel http) throws IOException {
         http.send(); // if needed
-        
+
         if (net != null) {
             sendData(http);
             net.startSending();
         }
     }
-    
+
     private void sendData(HttpChannel http) throws IOException {
         int avail = http.getOut().available();
         boolean closed = http.getOut().isAppendClosed();
@@ -548,7 +548,7 @@ public class SpdyConnection extends HttpConnector.HttpConnection
         }
     }
 
-    private BBuffer serializeMime(MultiMap mimeHeaders, BBuffer headBuf) 
+    private BBuffer serializeMime(MultiMap mimeHeaders, BBuffer headBuf)
             throws IOException {
 
         // TODO: duplicated headers not allowed
@@ -605,7 +605,7 @@ public class SpdyConnection extends HttpConnector.HttpConnection
             net.getOut().append(out2, avail);
         }
         net.startSending();
-        outDataFrames.incrementAndGet();        
+        outDataFrames.incrementAndGet();
     }
 
     static void appendInt(BBuffer headBuf, int length) throws IOException {
@@ -664,30 +664,30 @@ public class SpdyConnection extends HttpConnector.HttpConnection
 
     public static class Frame {
         int flags;
-    
+
         int length;
-    
+
         boolean c; // for control
-    
+
         int version;
-    
+
         int type;
-    
+
         int streamId; // for data
-    
+
         static int TYPE_HELO = 4;
-    
+
         static int TYPE_SYN_STREAM = 1;
 
         static int TYPE_SYN_REPLY = 2;
-    
+
         static int FLAG_HALF_CLOSE = 1;
-    
+
         public void parse(SpdyConnection spdyConnection,
                 BBuffer iob) throws IOException {
             int b0 = iob.read();
             if (b0 < 128) {
-                // data frame 
+                // data frame
                 c = false;
                 streamId = b0;
                 for (int i = 0; i < 3; i++) {
@@ -705,18 +705,18 @@ public class SpdyConnection extends HttpConnector.HttpConnection
                 b0 = iob.read();
                 type = ((b0 << 8) | iob.read());
             }
-    
+
             flags = iob.read();
             for (int i = 0; i < 3; i++) {
                 b0 = iob.read();
                 length = length << 8 | b0;
             }
-            
+
             iob.recycle();
         }
-    
+
     }
-    
+
     @Override
     protected void endSendReceive(HttpChannel http) throws IOException {
         synchronized (channels) {
@@ -727,31 +727,31 @@ public class SpdyConnection extends HttpConnector.HttpConnection
         }
         httpConnector.cpool.afterRequest(http, this, true);
     }
-    
-    /** 
+
+    /**
      * Framing error, client interrupt, etc.
      */
     public void abort(HttpChannel http, String t) throws IOException {
         // TODO: send interrupt signal
-        
+
     }
-    
-    
+
+
     private boolean checkConnection(HttpChannel http) throws IOException {
         synchronized(this) {
             if (net == null || !isOpen()) {
                 connected = false;
             }
-        
+
             if (!connected) {
                 if (!connecting) {
-                    // TODO: secure set at start ? 
+                    // TODO: secure set at start ?
                     connecting = true;
-                    httpConnector.cpool.httpConnect(http, 
-                            target.toString(), 
+                    httpConnector.cpool.httpConnect(http,
+                            target.toString(),
                             http.getRequest().isSecure(), this);
                 }
-                
+
                 synchronized (remoteHost) {
                     remoteHost.pending.add(http);
                     httpConnector.cpool.queued.incrementAndGet();
@@ -775,7 +775,7 @@ public class SpdyConnection extends HttpConnector.HttpConnection
                     httpCh = remoteHost.pending.remove();
                 }
                 httpCh.abort("Can't connect");
-            }            
+            }
         }
 
         synchronized (remoteHost) {
@@ -789,23 +789,23 @@ public class SpdyConnection extends HttpConnector.HttpConnection
                 }
                 String[] hostPort = httpCh.getTarget().split(":");
 
-                IOChannel ch1 = httpConnector.sslProvider.channel(net, 
+                IOChannel ch1 = httpConnector.sslProvider.channel(net,
                         hostPort[0], Integer.parseInt(hostPort[1]));
                 //net.setHead(ch1);
                 net = ch1;
             }
-        }        
+        }
         if (httpConnector.debugHttp) {
             net = DumpChannel.wrap("SPDY", net);
         }
-        
+
         setSink(net);
-        
+
         synchronized(this) {
             connecting = false;
             connected = true;
         }
- 
+
         while (true) {
             synchronized (remoteHost) {
                 if (remoteHost.pending.size() == 0) {

@@ -31,15 +31,15 @@ public class DispatcherTest extends TestCase {
         mapper.addContext("asdf.com", "", "context0", new String[0], null, null);
 
         MappingData mappingData = new MappingData();
-        
+
         CBuffer host = CBuffer.newInstance();
         host.set("test1.com");
-        
+
         CBuffer uri = CBuffer.newInstance();
         uri.set("/foo/bar/blah/bobou/foo");
 
         mapper.map(host, uri, mappingData);
-        
+
         assertEquals("context2", mappingData.context.toString());
         assertEquals("/foo/bar", mappingData.contextPath.toString());
     }

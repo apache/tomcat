@@ -58,9 +58,9 @@ public final class Hex {
     /**
      * Table for DEC to HEX byte translation.
      */
-    public static final byte[] HEX = 
-    { (byte) '0', (byte) '1', (byte) '2', (byte) '3', (byte) '4', (byte) '5', 
-      (byte) '6', (byte) '7', (byte) '8', (byte) '9', (byte) 'a', (byte) 'b', 
+    public static final byte[] HEX =
+    { (byte) '0', (byte) '1', (byte) '2', (byte) '3', (byte) '4', (byte) '5',
+      (byte) '6', (byte) '7', (byte) '8', (byte) '9', (byte) 'a', (byte) 'b',
       (byte) 'c', (byte) 'd', (byte) 'e', (byte) 'f' };
 
 
@@ -129,7 +129,7 @@ public final class Hex {
 
     }
 
-    
+
     /**
      * Convert 4 hex digits to an int, and return the number of converted
      * bytes.
@@ -141,7 +141,7 @@ public final class Hex {
      */
     public static int convert2Int( byte[] hex ) {
 	// Code from Ajp11, from Apache's JServ
-    
+
 	// assert b.length==4
 	// assert valid data
 	int len;
@@ -167,7 +167,7 @@ public final class Hex {
 
 
     /**
-     * Provide a mechanism for ensuring this class is loaded. 
+     * Provide a mechanism for ensuring this class is loaded.
      */
     public static void load() {
         // Nothing to do
@@ -192,13 +192,13 @@ public final class Hex {
     /**
      * <code>getHexValue</code> displays a formatted hex
      * representation of the passed byte array.  It also
-     * allows for only a specified offset and length of 
+     * allows for only a specified offset and length of
      * a particular array to be returned.
      *
      * @param bytes <code>byte[]</code> array to process.
      * @param pos offset to begin processing.
      * @param len number of bytes to process.
-     * @return <code>String</code> formatted hex representation of processed 
+     * @return <code>String</code> formatted hex representation of processed
      *         array.
      */
     public static String getHexDump(byte[] bytes, int pos, int len,
@@ -208,11 +208,11 @@ public final class Hex {
         for (int j = 0; j < len; j += 16) {
             hexLine(out, bytes, pos + j, pos + len, displayOffset);
         }
-     
+
         return out.toString();
     }
-    
-    private static void hexLine(StringBuffer out, 
+
+    private static void hexLine(StringBuffer out,
                                 byte[] bytes, int start, int end,
                                 boolean displayOffset) {
 
@@ -229,13 +229,13 @@ public final class Hex {
                 out.append(convertDigit((int) (bytes[i] >> 4)));
                 out.append(convertDigit(bytes[i] & 0x0F));
                 out.append(" ");
-            } else { 
+            } else {
                 out.append("   ");
             }
         }
-        
+
         out.append(" | ");
-        
+
         for (int i = start; i < start + 16 && i < end; i++) {
             if( ! Character.isISOControl( (char)bytes[i] )) {
                 out.append( new Character((char)bytes[i]) );
@@ -243,7 +243,7 @@ public final class Hex {
                 out.append( "." );
             }
         }
-        
+
         out.append("\n");
     }
 }

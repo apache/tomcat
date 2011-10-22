@@ -12,12 +12,12 @@ public class DefaultHttpConnector {
 
     public synchronized static HttpConnector get() {
         if (DefaultHttpConnector.socketConnector == null) {
-            socketConnector = 
+            socketConnector =
                 new SocketConnector();
         }
         return new HttpConnector(socketConnector);
     }
-    
+
     private static SocketConnector socketConnector;
 
 }

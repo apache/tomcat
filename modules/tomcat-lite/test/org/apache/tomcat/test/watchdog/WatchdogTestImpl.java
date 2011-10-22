@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -136,7 +136,7 @@ public class WatchdogTestImpl {
 
     /**
      * Creates a new <code>GTest</code> instance.
-     * 
+     *
      */
     public WatchdogTestImpl() {
     }
@@ -144,7 +144,7 @@ public class WatchdogTestImpl {
     /**
      * <code>setTestSession</code> adds a CookieController for the value of
      * sessionName
-     * 
+     *
      * @param sessionName
      *            a <code>String</code> value
      */
@@ -160,7 +160,7 @@ public class WatchdogTestImpl {
 
     /**
      * <code>setTestName</code> sets the current test name.
-     * 
+     *
      * @param tn
      *            current testname.
      */
@@ -170,7 +170,7 @@ public class WatchdogTestImpl {
 
     /**
      * <code>setAssertion</code> sets the assertion text for the current test.
-     * 
+     *
      * @param assertion
      *            assertion text
      */
@@ -180,7 +180,7 @@ public class WatchdogTestImpl {
 
     /**
      * <code>setTestStrategy</code> sets the test strategy for the current test.
-     * 
+     *
      * @param strategy
      *            test strategy text
      */
@@ -190,7 +190,7 @@ public class WatchdogTestImpl {
 
     /**
      * <code>getTestName</code> returns the current test name.
-     * 
+     *
      * @return a <code>String</code> value
      */
     public String getTestName() {
@@ -199,7 +199,7 @@ public class WatchdogTestImpl {
 
     /**
      * <code>getAssertion</code> returns the current assertion text.
-     * 
+     *
      * @return a <code>String</code> value
      */
     public String getAssertion() {
@@ -208,7 +208,7 @@ public class WatchdogTestImpl {
 
     /**
      * <code>getTestStrategy</code> returns the current test strategy test.
-     * 
+     *
      * @return a <code>String</code> value
      */
     public String getTestStrategy() {
@@ -218,7 +218,7 @@ public class WatchdogTestImpl {
     /**
      * <code>setFirstTask</code> denotes that current task being executed is the
      * first task within the list.
-     * 
+     *
      * @param a
      *            <code>boolean</code> value
      */
@@ -229,7 +229,7 @@ public class WatchdogTestImpl {
     /**
      * <code>setLastTask</code> denotes that the current task being executed is
      * the last task within the list.
-     * 
+     *
      * @param a
      *            <code>boolean</code> value
      */
@@ -239,7 +239,7 @@ public class WatchdogTestImpl {
 
     /**
      * <code>setPrefix</code> sets the protocol prefix. Defaults to "http"
-     * 
+     *
      * @param prefix
      *            Either http or https
      */
@@ -250,7 +250,7 @@ public class WatchdogTestImpl {
     /**
      * <code>setHost</code> sets hostname where the target server is running.
      * Defaults to "localhost"
-     * 
+     *
      * @param h
      *            a <code>String</code> value
      */
@@ -261,7 +261,7 @@ public class WatchdogTestImpl {
     /**
      * <code>setPort</code> sets the port that the target server is listening
      * on. Defaults to "8080"
-     * 
+     *
      * @param portS
      *            a <code>String</code> value
      */
@@ -274,7 +274,7 @@ public class WatchdogTestImpl {
      * made of the server's response and the test's goldenFile, or if a token
      * comparison is made. By default, only a token comparison is made
      * ("false").
-     * 
+     *
      * @param exact
      *            a <code>String</code> value
      */
@@ -285,7 +285,7 @@ public class WatchdogTestImpl {
     /**
      * <code>setContent</code> String value upon which the request header
      * Content-Length is based upon.
-     * 
+     *
      * @param s
      *            a <code>String</code> value
      */
@@ -296,7 +296,7 @@ public class WatchdogTestImpl {
     /**
      * <code>setDebug</code> enables debug output. By default, this is disabled
      * ( value of "0" ).
-     * 
+     *
      * @param debugS
      *            a <code>String</code> value
      */
@@ -307,7 +307,7 @@ public class WatchdogTestImpl {
     /**
      * <code>setMagnitude</code> Expected return value of the test execution.
      * Defaults to "true"
-     * 
+     *
      * @param magnitudeS
      *            a <code>String</code> value
      */
@@ -318,7 +318,7 @@ public class WatchdogTestImpl {
     /**
      * <code>setGoldenFile</code> Sets the goldenfile that will be used to
      * validate the server's response.
-     * 
+     *
      * @param s
      *            fully qualified path and filename
      */
@@ -329,7 +329,7 @@ public class WatchdogTestImpl {
     /**
      * <code>setExpectResponseBody</code> sets a flag to indicate if a response
      * body is expected from the server or not
-     * 
+     *
      * @param b
      *            a <code>boolean</code> value
      */
@@ -340,7 +340,7 @@ public class WatchdogTestImpl {
     /**
      * <code>setExpectHeaders</code> Configures GTest to look for the header
      * passed in the server's response.
-     * 
+     *
      * @param s
      *            a <code>String</code> value in the format of
      *            <header-field>:<header-value>
@@ -357,7 +357,7 @@ public class WatchdogTestImpl {
     /**
      * <code>setUnexpectedHeaders</code> Configures GTest to look for the header
      * passed to validate that it doesn't exist in the server's response.
-     * 
+     *
      * @param s
      *            a <code>String</code> value in the format of
      *            <header-field>:<header-value>
@@ -374,7 +374,7 @@ public class WatchdogTestImpl {
     /**
      * <code>setResponseMatch</code> Match the passed value in the server's
      * response.
-     * 
+     *
      * @param s
      *            a <code>String</code> value
      */
@@ -385,7 +385,7 @@ public class WatchdogTestImpl {
     /**
      * <code>setRequest</code> Sets the HTTP/HTTPS request to be sent to the
      * target server Ex. GET /servlet_path/val HTTP/1.0
-     * 
+     *
      * @param s
      *            a <code>String</code> value in the form of METHOD PATH
      *            HTTP_VERSION
@@ -397,7 +397,7 @@ public class WatchdogTestImpl {
     /**
      * <code>setReturnCode</code> Sets the expected return code from the
      * server's response.
-     * 
+     *
      * @param code
      *            a valid HTTP response status code
      */
@@ -408,7 +408,7 @@ public class WatchdogTestImpl {
     /**
      * Describe <code>setReturnCodeMsg</code> Sets the expected return message
      * to be found in the server's response.
-     * 
+     *
      * @param code
      *            a valid HTTP resonse status code
      * @param message
@@ -421,7 +421,7 @@ public class WatchdogTestImpl {
     /**
      * <code>setRequestHeaders</code> Configures the request headers GTest
      * should send to the target server.
-     * 
+     *
      * @param s
      *            a <code>String</code> value in for format of
      *            <field-name>:<field-value>
@@ -448,7 +448,7 @@ public class WatchdogTestImpl {
 
     /**
      * <code>execute</code> Executes the test.
-     * 
+     *
      * @exception BuildException
      *                if an error occurs
      */
@@ -512,7 +512,7 @@ public class WatchdogTestImpl {
      * <li>return codes and messages in the Status-Line
      * <li>response body comparison againt a goldenfile
      * </ul>
-     * 
+     *
      * @param testCondition
      *            a <code>boolean</code> value
      * @return a <code>boolean</code> value
@@ -830,7 +830,7 @@ public class WatchdogTestImpl {
     /**
      * Replaces any |client.ip| and |client.host| parameter marks with the host
      * and IP values of the host upon which Watchdog is running.
-     * 
+     *
      * @param request
      *            An HTTP request.
      */
@@ -868,7 +868,7 @@ public class WatchdogTestImpl {
     /**
      * <code>getExpectedResult</code> returns a byte array containing the
      * content of the configured goldenfile
-     * 
+     *
      * @return goldenfile as a byte[]
      * @exception IOException
      *                if an error occurs
@@ -891,7 +891,7 @@ public class WatchdogTestImpl {
      * <code>compare</code> compares the two byte arrays passed in to verify
      * that the lengths of the arrays are equal, and that the content of the two
      * arrays, byte for byte are equal.
-     * 
+     *
      * @param fromServer
      *            a <code>byte[]</code> value
      * @param fromGoldenFile
@@ -948,7 +948,7 @@ public class WatchdogTestImpl {
     /**
      * <code>compareWeak</code> creates new Strings from the passed arrays and
      * then uses a StringTokenizer to compare non-whitespace tokens.
-     * 
+     *
      * @param fromServer
      *            a <code>byte[]</code> value
      * @param fromGoldenFile
@@ -1005,7 +1005,7 @@ public class WatchdogTestImpl {
     /**
      * <code>readBody</code> reads the body of the response from the
      * InputStream.
-     * 
+     *
      * @param input
      *            an <code>InputStream</code>
      * @return a <code>byte[]</code> representation of the response
@@ -1035,7 +1035,7 @@ public class WatchdogTestImpl {
     /**
      * <code>setHeaderDetails</code> Wrapper method for parseHeader. Allows easy
      * addition of headers to the specified HashMap
-     * 
+     *
      * @param line
      *            a <code>String</code> value
      * @param headerMap
@@ -1058,7 +1058,7 @@ public class WatchdogTestImpl {
      * The parsed header field-name will be used as a key in the passed HashMap
      * object, and the values found will be stored in an ArrayList associated
      * with the field-name key.
-     * 
+     *
      * @param line
      *            String representation of an HTTP header line.
      * @param headers
@@ -1113,7 +1113,7 @@ public class WatchdogTestImpl {
     /**
      * <code>dumpHex</code> helper method to dump formatted hex output of the
      * server response and the goldenfile.
-     * 
+     *
      * @param serverResponse
      *            a <code>byte[]</code> value
      * @param goldenFile
@@ -1144,7 +1144,7 @@ public class WatchdogTestImpl {
     /**
      * <code>cloneHeaders</code> returns a "cloned" HashMap of the map passed
      * in.
-     * 
+     *
      * @param map
      *            a <code>HashMap</code> value
      * @return a <code>HashMap</code> value

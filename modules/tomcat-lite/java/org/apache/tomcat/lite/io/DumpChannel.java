@@ -12,29 +12,29 @@ import java.io.OutputStream;
  * For debug - will print all bytes that go trough the channel
  */
 public class DumpChannel extends IOChannel {
-    
+
     IOBuffer in = new IOBuffer(this);
     IOBuffer out = new IOBuffer(this);
     static final boolean dumpToFile = false;
     static int idCnt = 0;
-    
+
     DumpChannel(String id) {
         this.id = id + idCnt++;
     }
-    
+
     public static IOChannel wrap(String id, IOChannel net) throws IOException {
-        if (id == null) { 
+        if (id == null) {
             id = "";
         }
         DumpChannel dmp = new DumpChannel(id + idCnt++);
         net.setHead(dmp);
         return dmp;
     }
-    
+
     public String toString() {
         return "Dump-" + id + "-" + net.toString();
     }
-    
+
     @Override
     public void handleReceived(IOChannel ch) throws IOException {
         processInput(ch.getIn());
@@ -71,7 +71,7 @@ public class DumpChannel extends IOChannel {
                     out("OUT", first, true);
                     net.getOut().close();
                 }
-                
+
                 net.startSending();
                 return;
             }
@@ -80,22 +80,22 @@ public class DumpChannel extends IOChannel {
             net.getOut().queue(first);
         }
     }
-    
+
     static int did = 0;
-    
+
     protected void out(String dir, BBucket first, boolean closed) {
         // Dump
         if (first != null) {
-            String hd = Hex.getHexDump(first.array(), first.position(), 
+            String hd = Hex.getHexDump(first.array(), first.position(),
                     first.remaining(), true);
             System.err.println("\n" + dir + ": " + id + " " +
                     (closed ? "CLS" : "") +
-                    + first.remaining() + "\n" + 
+                    + first.remaining() + "\n" +
                     hd);
         } else {
             System.err.println("\n" + dir + ": " + id + " " +
                     (closed ? "CLS " : "") +
-                     "END\n"); 
+                     "END\n");
         }
         if (dumpToFile && first != null) {
             try {
@@ -104,10 +104,10 @@ public class DumpChannel extends IOChannel {
                 os.close();
             } catch (IOException e) {
                 e.printStackTrace();
-            } 
+            }
         }
     }
-    
+
     @Override
     public IOBuffer getIn() {
         return in;

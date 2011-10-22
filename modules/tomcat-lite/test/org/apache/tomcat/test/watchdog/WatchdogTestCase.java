@@ -20,11 +20,11 @@ public class WatchdogTestCase implements Test {
     private Properties props;
 
     private WatchdogClient wc;
-    
+
     public WatchdogTestCase() {
-        
+
     }
-    
+
     public WatchdogTestCase(Element watchE, Properties props, String testName) {
         this.testName = testName;
         this.watchE = watchE;
@@ -42,10 +42,10 @@ public class WatchdogTestCase implements Test {
     public String toString() {
         return getName();
     }
-    
+
     public void testDummy() {
     }
-    
+
     public void run(TestResult res) {
         if (watchE == null) {
             res.endTest(this);
@@ -60,7 +60,7 @@ public class WatchdogTestCase implements Test {
             String value = n.getNodeValue();
             value = AntProperties.replaceProperties(value, props, null);
             try {
-                new DynamicObject(test.getClass()).setProperty(test, 
+                new DynamicObject(test.getClass()).setProperty(test,
                         name, value);
             } catch (Exception e) {
                 // TODO Auto-generated catch block

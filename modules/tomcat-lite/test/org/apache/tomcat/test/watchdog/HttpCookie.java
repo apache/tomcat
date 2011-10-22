@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -151,22 +151,22 @@ public class HttpCookie {
 	}
 
 	// commented the following out, b/c ok to have no expirationDate
-	// that means that the cookie should last only for that particular 
+	// that means that the cookie should last only for that particular
 	// session.
 	//	if (expirationDate == null) {
 	//     	    expirationDate = getDefaultExpiration();
 	//	}
     }
-    
+
     /* Returns the default expiration, which is the current time + default
        expiration as specified in the properties file.
-       This uses reflection to get at the properties file, since Globals is 
-       not in the utils/ directory 
+       This uses reflection to get at the properties file, since Globals is
+       not in the utils/ directory
        */
     private Date getDefaultExpiration() {
 	if (defaultSet == false) {
 	    Properties props = new Properties();
-	    
+	
 	    try {
 		FileInputStream fin = new FileInputStream("ServerAutoRun.properties");
 		props.load( fin );
@@ -177,13 +177,13 @@ public class HttpCookie {
 	    } catch (IOException ex) {
 		System.out.println("HttpCookie getDefaultExpiration : ServerAutoRun.properties not found!" + ex);
 	    }
-	    
+	
 		 // defExprTime = props.getProperty("cookies.default.expiration");
 		 defExprTime = Long.parseLong( props.getProperty("cookies.default.expiration") );
 
 	    }
 	    defaultSet = true;
-	  
+	
 	return (new Date(System.currentTimeMillis() + defExprTime));
 	
     }
