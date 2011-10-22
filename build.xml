@@ -34,7 +34,7 @@
 
   <!-- Project Name -->
   <property name="project"               value="apache-tomcat" />
-    
+
   <!-- Version numbers -->
   <property name="version"               value="${version.major}.${version.minor}.${version.build}${version.suffix}" />
   <property name="version.number"        value="${version.major}.${version.minor}.${version.build}.${version.patch}" />
@@ -69,7 +69,7 @@
   <property name="test.classes"          value="${tomcat.output}/testclasses"/>
   <property name="test.temp"             value="${tomcat.output}/test-tmp"/>
   <property name="test.apr.loc"          value="${tomcat.build}/bin/native"/>
-  <!-- base directory for jdbc-pool --> 
+  <!-- base directory for jdbc-pool -->
   <property name="tomcat.jdbc.dir"       value="${basedir}/modules/jdbc-pool"/>
 
   <!-- Servlet 3.0 spec requires 1.6+ -->
@@ -146,12 +146,12 @@
   <!-- jdbc-pool JARs & source JARs -->
   <property name="tomcat-jdbc.jar" value="${tomcat.jdbc.dir}/output/tomcat-jdbc.jar"/>
   <property name="tomcat-jdbc-src.jar" value="${tomcat.jdbc.dir}/output/tomcat-jdbc-src.jar"/>
-  
-  
+
+
   <!-- Tests To Run -->
   <property name="test.name" value="**/Test*.java"/>
   <property name="test.formatter" value="-Dorg.apache.juli.formatter=java.util.logging.SimpleFormatter"/>
-  
+
   <!-- Classpaths -->
   <path id="compile.classpath">
     <pathelement location="${jdt.jar}"/>
@@ -425,7 +425,7 @@
         <include name="*.notice" />
       </srcfiles>
     </uptodate>
-    
+
   </target>
 
   <target name="validate" depends="download-validate" if="${execute.validate}">
@@ -508,8 +508,8 @@
     </copy>
 
   </target>
-  
-  
+
+
 
   <target name="build-manifests" unless="manifests.uptodate"
           depends="build-prepare">
@@ -864,7 +864,7 @@
     <copy file="${tomcat-jdbc.jar}" todir="${tomcat.build}/lib"/>
 
   </target>
-  
+
   <target name="examples-sources" description="Create examples sources"
           unless="examples.sources.skip" >
     <taskdef name="txt2html"
@@ -1058,26 +1058,26 @@
     <fail if="test.result.error" message='Some tests completed with an Error. See ${tomcat.build}/logs for details, search for "FAILED".' />
     <fail if="test.result.failure" message='Some tests completed with a Failure. See ${tomcat.build}/logs for details, search for "FAILED".' />
   </target>
-  
+
   <target name="test-bio" description="Runs the JUnit test cases for BIO. Does not stop on errors."
           depends="test-compile,deploy" if="${execute.test.bio}">
     <runtests protocol="org.apache.coyote.http11.Http11Protocol"
               extension=".BIO.txt" />
   </target>
-  
+
   <target name="test-nio" description="Runs the JUnit test cases for NIO. Does not stop on errors."
           depends="test-compile,deploy" if="${execute.test.nio}">
     <runtests protocol="org.apache.coyote.http11.Http11NioProtocol"
               extension=".NIO.txt" />
   </target>
-  
+
   <target name="test-apr" description="Runs the JUnit test cases for APR. Does not stop on errors."
           depends="test-compile,deploy,test-apr-exists"
           if="${apr.exists}">
     <runtests protocol="org.apache.coyote.http11.Http11AprProtocol"
               extension=".APR.txt" />
   </target>
-  
+
   <target name="test-apr-exists" description="Checks for APR lib"
           if="${execute.test.apr}">
     <available file="${test.apr.loc}" property="apr.exists" />
@@ -1246,7 +1246,7 @@
     <antcall target="md5sum">
       <param name="file" value="${tomcat-juli-adapters.jar}" />
     </antcall>
-    
+
     <!-- Source JARs -->
     <jar jarfile="${tomcat-juli-extras-src.jar}"
          manifest="${tomcat.manifests}/default.manifest" >
@@ -1323,7 +1323,7 @@
     <antcall target="md5sum">
       <param name="file" value="${catalina-ws.jar}" />
     </antcall>
-    
+
     <jarIt jarfile="${catalina-ws-src.jar}"
       filesDir="java"
       filesId="files.tomcat-extras-ws" />
@@ -1376,7 +1376,7 @@
       <zipfileset file="${tomcat.manifests}/default.license"
         fullpath="META-INF/LICENSE" />
     </jar>
-    
+
     <jar jarfile="${tomcat-embed-log4j-src.jar}"
          manifest="${tomcat.manifests}/default.manifest" >
       <fileset dir="${tomcat.extras}/logging/commons-logging-${commons-logging.version}-src/src/java">
@@ -1482,7 +1482,7 @@ Apache Tomcat ${version} native binaries for Win64 IA64 platform.
     <echo append="false" file="${tomcat.dist}/bin/x64/README">
 Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
     </echo>
-    
+
   </target>
 
   <target name="javadoc" depends="dist-source,extras-webservices-prepare"
@@ -1634,7 +1634,7 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
         <exclude name="build.properties"/>
       </fileset>
     </copy>
-    <!--jdbc-pool sources --> 
+    <!--jdbc-pool sources -->
     <copy todir="${tomcat.dist}/src">
       <fileset dir="${basedir}" defaultexcludes="true">
         <include name="modules/jdbc-pool/LICENSE"/>
@@ -2151,7 +2151,7 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
     <delete file="webapps/docs/jdbc-pool.xml"/>
   </target>
 
-    
+
   <!-- ================ Download and dependency building =================== -->
 
   <target name="download-validate"
