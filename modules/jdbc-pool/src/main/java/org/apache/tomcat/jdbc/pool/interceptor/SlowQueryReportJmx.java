@@ -49,7 +49,7 @@ import org.apache.tomcat.jdbc.pool.ConnectionPool;
 import org.apache.tomcat.jdbc.pool.PooledConnection;
 import org.apache.tomcat.jdbc.pool.PoolProperties.InterceptorProperty;
 /**
- * Publishes data to JMX and provides notifications 
+ * Publishes data to JMX and provides notifications
  * when failures happen.
  * @author fhanik
  *
@@ -58,15 +58,15 @@ public class SlowQueryReportJmx extends SlowQueryReport implements NotificationE
     public static final String SLOW_QUERY_NOTIFICATION = "SLOW QUERY";
     public static final String FAILED_QUERY_NOTIFICATION = "FAILED QUERY";
 
-    protected static CompositeType SLOW_QUERY_TYPE; 
-        
+    protected static CompositeType SLOW_QUERY_TYPE;
+
     private static final Log log = LogFactory.getLog(SlowQueryReportJmx.class);
-    
-    
-    protected static ConcurrentHashMap<String,SlowQueryReportJmxMBean> mbeans = 
-        new ConcurrentHashMap<String,SlowQueryReportJmxMBean>(); 
-    
-    
+
+
+    protected static ConcurrentHashMap<String,SlowQueryReportJmxMBean> mbeans =
+        new ConcurrentHashMap<String,SlowQueryReportJmxMBean>();
+
+
     //==============================JMX STUFF========================
     protected volatile NotificationBroadcasterSupport notifier = new NotificationBroadcasterSupport();
 
@@ -75,7 +75,7 @@ public class SlowQueryReportJmx extends SlowQueryReport implements NotificationE
         notifier.addNotificationListener(listener, filter, handback);
     }
 
-    
+
     @Override
     public MBeanNotificationInfo[] getNotificationInfo() {
         return notifier.getNotificationInfo();
@@ -84,26 +84,26 @@ public class SlowQueryReportJmx extends SlowQueryReport implements NotificationE
     @Override
     public void removeNotificationListener(NotificationListener listener) throws ListenerNotFoundException {
         notifier.removeNotificationListener(listener);
-        
+
     }
 
     @Override
     public void removeNotificationListener(NotificationListener listener, NotificationFilter filter, Object handback) throws ListenerNotFoundException {
         notifier.removeNotificationListener(listener, filter, handback);
-        
+
     }
 
 
-    //==============================JMX STUFF========================    
-    
+    //==============================JMX STUFF========================
+
     protected String poolName = null;
-    
+
     protected static AtomicLong notifySequence = new AtomicLong(0);
-    
+
     protected boolean notifyPool = true;
-    
+
     protected ConnectionPool pool = null;
-    
+
     protected static CompositeType getCompositeType() {
         if (SLOW_QUERY_TYPE==null) {
             try {
@@ -119,7 +119,7 @@ public class SlowQueryReportJmx extends SlowQueryReport implements NotificationE
         }
         return SLOW_QUERY_TYPE;
     }
-    
+
     @Override
     public void reset(ConnectionPool parent, PooledConnection con) {
         // TODO Auto-generated method stub
@@ -156,20 +156,20 @@ public class SlowQueryReportJmx extends SlowQueryReport implements NotificationE
     protected void notifyJmx(String query, String type) {
         try {
             long sequence = notifySequence.incrementAndGet();
-            
+
             if (isNotifyPool()) {
                 if (this.pool!=null && this.pool.getJmxPool()!=null) {
                     this.pool.getJmxPool().notify(type, query);
                 }
             } else {
                 if (notifier!=null) {
-                    Notification notification = 
-                        new Notification(type, 
-                                         this, 
-                                         sequence, 
+                    Notification notification =
+                        new Notification(type,
+                                         this,
+                                         sequence,
                                          System.currentTimeMillis(),
                                          query);
-                    
+
                     notifier.sendNotification(notification);
                 }
             }
@@ -223,7 +223,7 @@ public class SlowQueryReportJmx extends SlowQueryReport implements NotificationE
             while (it.hasNext()) it.remove();
         }
     }
-    
+
     /**
      * JMX operation - returns all the queries we have collected.
      * @return - the slow query report as composite data.
@@ -247,7 +247,7 @@ public class SlowQueryReportJmx extends SlowQueryReport implements NotificationE
         }
         return result;
     }
-    
+
     protected void deregisterJmx() {
         try {
             if (mbeans.remove(poolName)!=null) {
@@ -263,7 +263,7 @@ public class SlowQueryReportJmx extends SlowQueryReport implements NotificationE
         } catch (RuntimeOperationsException e) {
             log.warn("Jmx deregistration failed.",e);
         }
-        
+
     }
 
 
@@ -271,12 +271,12 @@ public class SlowQueryReportJmx extends SlowQueryReport implements NotificationE
         ObjectName oname = new ObjectName(ConnectionPool.POOL_JMX_TYPE_PREFIX+clazz.getName()+",name=" + poolName);
         return oname;
     }
-    
+
     protected void registerJmx() {
         try {
             //only if we notify the pool itself
             if (isNotifyPool()) {
-                
+
             } else if (getCompositeType()!=null) {
                 ObjectName oname = getObjectName(getClass(),poolName);
                 if (mbeans.putIfAbsent(poolName, this)==null) {
@@ -297,7 +297,7 @@ public class SlowQueryReportJmx extends SlowQueryReport implements NotificationE
             log.error("Jmx registration failed, no JMX data will be exposed for the query stats.",e);
         }
     }
-    
+
     @Override
     public void setProperties(Map<String, InterceptorProperty> properties) {
         super.setProperties(properties);

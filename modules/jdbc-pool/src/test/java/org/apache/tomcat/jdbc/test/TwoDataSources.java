@@ -24,7 +24,7 @@ public class TwoDataSources extends DefaultTestCase {
     public TwoDataSources(String name) {
         super(name);
     }
-    
+
     public void testTwoDataSources() throws Exception {
         org.apache.tomcat.jdbc.pool.DataSource d1 = this.createDefaultDataSource();
         org.apache.tomcat.jdbc.pool.DataSource d2 = this.createDefaultDataSource();

@@ -27,7 +27,7 @@ public class TestSuspectTimeout extends DefaultTestCase {
     public TestSuspectTimeout(String name) {
         super(name);
     }
-    
+
     public void testSuspect() throws Exception {
         this.init();
         this.datasource.setMaxActive(100);

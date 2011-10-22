@@ -17,7 +17,7 @@
 -->
 <mbeans-descriptors>
 
-  <mbean description="Reports " domain="tomcat.jdbc" group="jdbc-pool" name="SlowQueryReportJmx" 
+  <mbean description="Reports " domain="tomcat.jdbc" group="jdbc-pool" name="SlowQueryReportJmx"
          type="org.apache.tomcat.jdbc.pool.interceptor.SlowQueryReportJmx">
 
     <attribute description="The name of the connection pool this Jmx bean is representing" name="poolName" type="java.lang.String" writeable="false"/>
@@ -28,7 +28,7 @@
     <notification description="Notification sent out by the slow query report when a query exceeds the threshhold" name="slow-query">
       <notification-type>Slow query</notification-type>
     </notification>
-    
+
     <notification description="Notification sent out by the slow query report when a query fails execution" name="failed-query">
       <notification-type>Failed query execution</notification-type>
     </notification>

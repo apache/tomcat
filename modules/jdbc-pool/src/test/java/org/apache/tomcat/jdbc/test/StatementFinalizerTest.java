@@ -27,7 +27,7 @@ public class StatementFinalizerTest extends DefaultTestCase {
     public StatementFinalizerTest(String name) {
         super(name);
     }
-    
+
     public void testStatementFinalization() throws Exception {
         this.init();
         datasource.setJdbcInterceptors(StatementFinalizer.class.getName());

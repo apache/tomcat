@@ -32,7 +32,7 @@ public class Driver implements java.sql.Driver {
         connectCount.set(0);
         disconnectCount.set(0);
     }
-    
+
     static {
         try {
             DriverManager.registerDriver(new Driver());
@@ -41,10 +41,10 @@ public class Driver implements java.sql.Driver {
             throw new RuntimeException(x);
         }
     }
-    
+
     public Driver() {
     }
-    
+
     @Override
     public boolean acceptsURL(String url) throws SQLException {
         return url!=null && url.equals(Driver.url);

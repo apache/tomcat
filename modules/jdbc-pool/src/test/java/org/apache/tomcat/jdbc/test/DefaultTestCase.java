@@ -43,7 +43,7 @@ public class DefaultTestCase extends TestCase {
     public DefaultTestCase(String name) {
         super(name);
     }
-    
+
     @Override
     public void setUp() throws Exception {
         init();
@@ -71,7 +71,7 @@ public class DefaultTestCase extends TestCase {
         datasource.setPoolProperties(p);
         return datasource;
     }
-    
+
     protected void init() throws Exception {
         this.datasource = createDefaultDataSource();
     }
@@ -104,13 +104,13 @@ public class DefaultTestCase extends TestCase {
             x.printStackTrace();
         }
     }
-    
+
     protected void transferPropertiesToC3P0() throws Exception {
 //        System.setProperty("com.mchange.v2.log.FallbackMLog.DEFAULT_CUTOFF_LEVEL", "WARNING");
 //        MLog.getLogger().setLevel(MLevel.WARNING);
 //        MLog.getLogger("com").setLevel(MLevel.WARNING);
 //        //http://www.mchange.com/projects/c3p0/index.html#automaticTestTable
-//        ComboPooledDataSource c3p0 = new ComboPooledDataSource();  
+//        ComboPooledDataSource c3p0 = new ComboPooledDataSource();
 //        c3p0.setAcquireIncrement(1);
 //        c3p0.setAcquireRetryAttempts(2);
 //        c3p0.setAcquireRetryDelay(datasource.getPoolProperties().getMaxWait());
@@ -132,7 +132,7 @@ public class DefaultTestCase extends TestCase {
 //        c3p0.setJdbcUrl(datasource.getPoolProperties().getUrl());
 //        c3p0.setDriverClass(datasource.getPoolProperties().getDriverClassName());
 //        this.c3p0Datasource = c3p0;
-        
+
       /**
         acquireIncrement
         acquireRetryAttempts

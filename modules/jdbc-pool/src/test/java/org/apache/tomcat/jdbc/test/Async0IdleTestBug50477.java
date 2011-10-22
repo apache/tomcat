@@ -30,8 +30,8 @@ public class Async0IdleTestBug50477 extends DefaultTestCase {
     public Async0IdleTestBug50477(String name) {
         super(name);
     }
-    
- 
+
+
     public void testAsync0Idle0Size() throws Exception {
         System.out.println("[testPoolThreads20Connections10FairAsync] Starting fairness - Tomcat JDBC - Fair - Async");
         init();

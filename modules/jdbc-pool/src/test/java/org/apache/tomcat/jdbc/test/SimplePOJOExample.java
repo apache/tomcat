@@ -49,10 +49,10 @@ public class SimplePOJOExample {
         p.setLogAbandoned(true);
         p.setRemoveAbandoned(true);
         DataSource datasource = new DataSource();
-        datasource.setPoolProperties(p); 
-        
+        datasource.setPoolProperties(p);
+
         Connection con = null;
-        try {            
+        try {
           con = datasource.getConnection();
           Statement st = con.createStatement();
           ResultSet rs = st.executeQuery("select * from user");
@@ -64,7 +64,7 @@ public class SimplePOJOExample {
           st.close();
         } finally {
           if (con!=null) try {con.close();}catch (Exception ignore) {}
-        }  
+        }
     }
 
 }

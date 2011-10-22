@@ -24,7 +24,7 @@ public class TestGCClose extends DefaultTestCase {
     public TestGCClose(String name) {
         super(name);
     }
-    
+
     public void testGCStop() throws Exception {
         init();
         datasource.getConnection();
@@ -32,7 +32,7 @@ public class TestGCClose extends DefaultTestCase {
         tearDown();
         Thread.sleep(20000);
     }
-    
+
     public void testClose() throws Exception {
         init();
         datasource.getConnection();

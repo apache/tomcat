@@ -26,13 +26,13 @@ import org.apache.tomcat.jdbc.test.driver.Driver;
 public class TestConcurrency extends DefaultTestCase {
 
     public static final  boolean debug = Boolean.getBoolean("jdbc.debug");
-    
+
     protected volatile DataSource ds = null;
-    
+
     public TestConcurrency(String name) {
         super(name);
     }
-    
+
     @Override
     public void setUp() {
         // TODO Auto-generated method stub
@@ -57,7 +57,7 @@ public class TestConcurrency extends DefaultTestCase {
         Driver.reset();
         super.tearDown();
     }
-    
+
     public void testSimple() throws Exception {
         ds.getConnection().close();
         final int iter = 1000 * 10;
@@ -106,9 +106,9 @@ public class TestConcurrency extends DefaultTestCase {
         assertEquals("Idle comparison:",10, ds.getPool().getIdle());
         assertEquals("Used comparison:",0, ds.getPool().getActive());
         assertEquals("Connect count",10,Driver.connectCount.get());
-            
+
     }
-    
+
     public void testBrutal() throws Exception {
         ds.getPoolProperties().setRemoveAbandoned(false);
         ds.getPoolProperties().setRemoveAbandonedTimeout(1);
@@ -210,5 +210,5 @@ public class TestConcurrency extends DefaultTestCase {
         assertEquals("Used comparison:",0, ds.getPool().getActive());
         assertEquals("Connect count",10,Driver.connectCount.get());
     }
-    
+
 }

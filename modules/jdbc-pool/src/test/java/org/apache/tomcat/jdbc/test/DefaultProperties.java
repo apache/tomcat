@@ -28,22 +28,22 @@ import org.apache.tomcat.jdbc.pool.PoolProperties;
 public class DefaultProperties extends PoolProperties {
     public DefaultProperties() {
         dbProperties = new Properties();
-        
+
         //mysql
-        //url = System.getProperty("url","jdbc:mysql://localhost:3306/mysql?autoReconnect=true"); 
+        //url = System.getProperty("url","jdbc:mysql://localhost:3306/mysql?autoReconnect=true");
         //driverClassName = System.getProperty("driverClassName","com.mysql.jdbc.Driver");
-        
+
         //derby
         //url = System.getProperty("url","jdbc:derby:derbyDB;create=true");
         //driverClassName = System.getProperty("driverClassName","org.apache.derby.jdbc.EmbeddedDriver");
-        
+
         url = System.getProperty("url","jdbc:h2:~/.h2/test;QUERY_TIMEOUT=0;DB_CLOSE_ON_EXIT=FALSE");
         driverClassName = System.getProperty("driverClassName","org.h2.Driver");
         System.setProperty("h2.serverCachedObjects", "10000");
-        
+
         password = System.getProperty("password","password");
         username = System.getProperty("username","root");
-        
+
         validationQuery = System.getProperty("validationQuery","SELECT 1");
         defaultAutoCommit = Boolean.TRUE;
         defaultReadOnly = Boolean.FALSE;
@@ -55,7 +55,7 @@ public class DefaultProperties extends PoolProperties {
         maxIdle = initialSize;
         minIdle = initialSize;
         maxWait = 10000;
-        
+
         testOnBorrow = true;
         testOnReturn = false;
         testWhileIdle = true;

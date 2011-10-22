@@ -19,11 +19,11 @@ package org.apache.tomcat.jdbc.test;
 import org.apache.tomcat.jdbc.pool.interceptor.ConnectionState;
 
 public class Bug50571 extends DefaultTestCase{
-    
+
     public Bug50571(String name) {
         super(name);
     }
-    
+
     @Override
     public void setUp() throws Exception {
         super.setUp();
@@ -32,7 +32,7 @@ public class Bug50571 extends DefaultTestCase{
         this.datasource.setDefaultTransactionIsolation(-55);
         this.datasource.setInitialSize(1);
     }
-    
+
     public void testBug50571() throws Exception {
         this.datasource.getConnection().close();
     }

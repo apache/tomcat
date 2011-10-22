@@ -25,7 +25,7 @@
            description="Fully qualified class name of the managed object"
                   type="java.lang.String"
              writeable="false"/>
-             
+
     <attribute    name="size"
            description="The number of established connections in the pool, idle and in use"
                   type="java.lang.Integer"
@@ -45,7 +45,7 @@
            description="The number of established connections in the pool that are in use"
                   type="java.lang.Integer"
              writeable="false"/>
-    
+
     <attribute    name="numActive"
            description="Same as the active attribute"
                   type="java.lang.Integer"
@@ -108,12 +108,12 @@
            description="The max number of idle connections"
                   type="java.lang.Integer"
              writeable="false"/>
-    
+
     <attribute    name="minIdle"
            description="The minimum number of open connections"
                   type="java.lang.Integer"
              writeable="false"/>
-    
+
     <attribute    name="maxWait"
            description="The time to wait in milliseconds before a SQLException is thrown when a connection is requested"
                   type="java.lang.Integer"
@@ -190,12 +190,12 @@
            description="The name of the connection pool, will be used in the ObjectName of the actual pool"
                   type="java.lang.String"
              writeable="false"/>
-    
+
     <attribute    name="password"
            description="For security purposes,this doesn't return anything"
                   type="java.lang.String"
              writeable="false"/>
-    
+
     <attribute    name="username"
            description="The username used to open connections"
                   type="java.lang.String"
@@ -222,19 +222,19 @@
                   type="java.lang.String"
              writeable="false"/>
 
-    <operation    name="checkIdle" 
-                  description="forces a check of idle connections" 
-                  impact="ACTION" 
+    <operation    name="checkIdle"
+                  description="forces a check of idle connections"
+                  impact="ACTION"
                   returnType="void" />
-                  
-    <operation    name="checkAbandoned" 
-                  description="forces a check of abandoned connections" 
-                  impact="ACTION" 
+
+    <operation    name="checkAbandoned"
+                  description="forces a check of abandoned connections"
+                  impact="ACTION"
                   returnType="void" />
-    
-    <operation    name="testIdle" 
-                  description="forces a validation of abandoned connections" 
-                  impact="ACTION" 
+
+    <operation    name="testIdle"
+                  description="forces a validation of abandoned connections"
+                  impact="ACTION"
                   returnType="void" />
   </mbean>
 

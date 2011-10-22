@@ -5,17 +5,17 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- 
- 
+
+
 package org.apache.tomcat.jdbc.pool.interceptor;
 
 import java.lang.reflect.Constructor;
@@ -61,7 +61,7 @@ public class StatementDecoratorInterceptor extends AbstractCreateStatementInterc
 
     /**
      * Creates a constructor for a proxy class, if one doesn't already exist
-     * 
+     *
      * @param idx
      *            - the index of the constructor
      * @param clazz
@@ -119,8 +119,8 @@ public class StatementDecoratorInterceptor extends AbstractCreateStatementInterc
         return statement;
     }
 
-    protected Object createDecorator(Object proxy, Method method, Object[] args, 
-                                     Object statement, Constructor<?> constructor, String sql) 
+    protected Object createDecorator(Object proxy, Method method, Object[] args,
+                                     Object statement, Constructor<?> constructor, String sql)
     throws InstantiationException, IllegalAccessException, InvocationTargetException {
         Object result = null;
         StatementProxy<Statement> statementProxy =
@@ -142,12 +142,12 @@ public class StatementDecoratorInterceptor extends AbstractCreateStatementInterc
 
     /**
      * Class to measure query execute time
-     * 
+     *
      * @author fhanik
-     * 
+     *
      */
     protected class StatementProxy<T extends java.sql.Statement> implements InvocationHandler {
-        
+
         protected boolean closed = false;
         protected T delegate;
         private Object actualProxy;
@@ -162,13 +162,13 @@ public class StatementDecoratorInterceptor extends AbstractCreateStatementInterc
         public T getDelegate() {
             return this.delegate;
         }
-        
+
         public String getSql() {
             return sql;
         }
 
         public void setConnection(Object proxy) {
-            this.connection = proxy;            
+            this.connection = proxy;
         }
         public Object getConnection() {
             return this.connection;
@@ -180,8 +180,8 @@ public class StatementDecoratorInterceptor extends AbstractCreateStatementInterc
         public Object getActualProxy() {
             return this.actualProxy;
         }
-        
-        
+
+
         public Constructor getConstructor() {
             return constructor;
         }
@@ -198,7 +198,7 @@ public class StatementDecoratorInterceptor extends AbstractCreateStatementInterc
             closed = true;
             delegate = null;
         }
-        
+
         @Override
         public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
             if (compare(TOSTRING_VAL,method)) {
@@ -244,7 +244,7 @@ public class StatementDecoratorInterceptor extends AbstractCreateStatementInterc
             }
             return result;
         }
-        
+
         @Override
         public String toString() {
             StringBuffer buf = new StringBuffer(StatementProxy.class.getName());

@@ -38,8 +38,8 @@ public class TestAsyncQueue extends TestCase {
         this.queue = null;
         super.tearDown();
     }
-    
-    
+
+
     public void testAsyncPoll1() throws Exception {
         Object item = new Object();
         queue.offer(item);

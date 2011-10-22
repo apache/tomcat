@@ -26,7 +26,7 @@ public class TestInterceptorShortName extends DefaultTestCase {
     public TestInterceptorShortName(String name) {
         super(name);
     }
-    
+
     public void testShortInterceptor() throws Exception {
         this.datasource = this.createDefaultDataSource();
         this.datasource.setJdbcInterceptors("TestInterceptor");

@@ -37,7 +37,7 @@ public class TestSlowQueryReport extends DefaultTestCase {
     public TestSlowQueryReport(String name) {
         super(name);
     }
-    
+
     public void testSlowSql() throws Exception {
         int count = 3;
         this.init();
@@ -57,7 +57,7 @@ public class TestSlowQueryReport extends DefaultTestCase {
         String key = map.keySet().iterator().next();
         SlowQueryReport.QueryStats stats = map.get(key);
         System.out.println("Stats:"+stats);
-        
+
         for (int i=0; i<count; i++) {
             PreparedStatement st = con.prepareStatement(slowSql);
             ResultSet rs = st.executeQuery();
@@ -65,7 +65,7 @@ public class TestSlowQueryReport extends DefaultTestCase {
             st.close();
         }
         System.out.println("Stats:"+stats);
-        
+
         for (int i=0; i<count; i++) {
             CallableStatement st = con.prepareCall(slowSql);
             ResultSet rs = st.executeQuery();
@@ -102,11 +102,11 @@ public class TestSlowQueryReport extends DefaultTestCase {
         ClientListener listener = new ClientListener();
         ConnectionPool pool = datasource.getPool();
         ManagementFactory.getPlatformMBeanServer().addNotificationListener(
-                SlowQueryReportJmx.getObjectName(SlowQueryReportJmx.class, pool.getName()), 
+                SlowQueryReportJmx.getObjectName(SlowQueryReportJmx.class, pool.getName()),
                 listener,
                 null,
                 null);
-        
+
         for (int i=0; i<count; i++) {
             PreparedStatement st = con.prepareStatement(slowSql);
             ResultSet rs = st.executeQuery();
@@ -114,7 +114,7 @@ public class TestSlowQueryReport extends DefaultTestCase {
             st.close();
         }
         System.out.println("Stats:"+stats);
-        
+
         for (int i=0; i<count; i++) {
             CallableStatement st = con.prepareCall(slowSql);
             ResultSet rs = st.executeQuery();
@@ -129,7 +129,7 @@ public class TestSlowQueryReport extends DefaultTestCase {
         assertNull(SlowQueryReport.getPoolStats(pool.getName()));
     }
 
-    
+
     public void testFastSql() throws Exception {
         int count = 3;
         this.init();
@@ -150,8 +150,8 @@ public class TestSlowQueryReport extends DefaultTestCase {
         con.close();
         tearDown();
         assertNull(SlowQueryReport.getPoolStats(pool.getName()));
-    }    
-    
+    }
+
     public void testFailedSql() throws Exception {
         int count = 3;
         this.init();
@@ -168,7 +168,7 @@ public class TestSlowQueryReport extends DefaultTestCase {
                 // NO-OP
             }
             st.close();
-            
+
         }
         Map<String,SlowQueryReport.QueryStats> map = SlowQueryReport.getPoolStats(datasource.getPool().getName());
         assertNotNull(map);
@@ -180,9 +180,9 @@ public class TestSlowQueryReport extends DefaultTestCase {
         con.close();
         tearDown();
         assertNull(SlowQueryReport.getPoolStats(pool.getName()));
-    }   
-    
-    
+    }
+
+
     public class ClientListener implements NotificationListener {
         volatile int notificationCount = 0;
         @Override

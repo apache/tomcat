@@ -27,7 +27,7 @@ public class TestException extends DefaultTestCase {
     public TestException(String name) {
         super(name);
     }
-    
+
     public void testException() throws Exception {
         init();
         datasource.getPoolProperties().setJdbcInterceptors(TestInterceptor.class.getName());
@@ -35,20 +35,20 @@ public class TestException extends DefaultTestCase {
         try {
             con.createStatement();
         }catch (Exception x) {
-            
+
         }
     }
-    
-    
+
+
     public static class TestInterceptor extends JdbcInterceptor {
 
         @Override
         public void reset(ConnectionPool parent, PooledConnection con) {
             // TODO Auto-generated method stub
-            
+
         }
 
-    
+
     }
 
 }

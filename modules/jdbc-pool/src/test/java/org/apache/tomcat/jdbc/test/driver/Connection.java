@@ -37,19 +37,19 @@ import org.apache.tomcat.jdbc.pool.PooledConnection;
 
 public class Connection implements java.sql.Connection {
     Properties info;
-    
+
     public Connection(Properties info) {
         this.info = info;
     }
-    
+
     public String getUsername() {
         return info.getProperty(PooledConnection.PROP_USER);
     }
-    
+
     public String getPassword() {
         return info.getProperty(PooledConnection.PROP_PASSWORD);
     }
-    
+
     @Override
     public void clearWarnings() throws SQLException {
     }
@@ -198,7 +198,7 @@ public class Connection implements java.sql.Connection {
         return new org.apache.tomcat.jdbc.test.driver.Statement();
     }
 
-    
+
     @Override
     public PreparedStatement prepareStatement(String sql, int[] columnIndexes) throws SQLException {
         return new org.apache.tomcat.jdbc.test.driver.Statement();
@@ -214,7 +214,7 @@ public class Connection implements java.sql.Connection {
         return new org.apache.tomcat.jdbc.test.driver.Statement();
     }
 
-    
+
     @Override
     public PreparedStatement prepareStatement(String sql, int resultSetType, int resultSetConcurrency, int resultSetHoldability) throws SQLException {
         return new org.apache.tomcat.jdbc.test.driver.Statement();

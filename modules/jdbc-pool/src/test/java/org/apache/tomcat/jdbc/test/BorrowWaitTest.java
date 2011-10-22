@@ -25,7 +25,7 @@ public class BorrowWaitTest extends DefaultTestCase {
     public BorrowWaitTest(String name) {
         super(name);
     }
-    
+
     public void testWaitTime() throws Exception {
         int wait = 10000;
         this.init();
@@ -45,7 +45,7 @@ public class BorrowWaitTest extends DefaultTestCase {
         }
         con.close();
     }
-    
+
     public void testWaitTimeInfinite() throws Exception {
         if(true){
             System.err.println("testWaitTimeInfinite() test is disabled.");

@@ -42,9 +42,9 @@ public class PooledConnection {
     private static final Log log = LogFactory.getLog(PooledConnection.class);
 
     public static final String PROP_USER = PoolUtilities.PROP_USER;
-    
+
     public static final String PROP_PASSWORD = PoolUtilities.PROP_PASSWORD;
-    
+
     /**
      * Validate when connection is borrowed flag
      */
@@ -69,7 +69,7 @@ public class PooledConnection {
      * The underlying database connection
      */
     private volatile java.sql.Connection connection;
-    
+
     /**
      * If using a XAConnection underneath.
      */
@@ -102,7 +102,7 @@ public class PooledConnection {
      * The parent
      */
     protected ConnectionPool parent;
-    
+
     private HashMap<Object, Object> attributes = new HashMap<Object, Object>();
 
     /**
@@ -111,13 +111,13 @@ public class PooledConnection {
      * the connection
      */
     private volatile JdbcInterceptor handler = null;
-    
+
     private AtomicBoolean released = new AtomicBoolean(false);
-    
+
     private volatile boolean suspect = false;
-    
+
     private java.sql.Driver driver = null;
-    
+
     /**
      * Constructor
      * @param prop - pool properties
@@ -130,32 +130,32 @@ public class PooledConnection {
 
     public boolean checkUser(String username, String password) {
         if (!getPoolProperties().isAlternateUsernameAllowed()) return true;
-        
+
         if (username==null) username = poolProperties.getUsername();
         if (password==null) password = poolProperties.getPassword();
-        
+
         String storedUsr = (String)getAttributes().get(PROP_USER);
         String storedPwd = (String)getAttributes().get(PROP_PASSWORD);
-        
+
         boolean result = (username==null && storedUsr==null);
         result = (result || (username!=null && username.equals(storedUsr)));
-                
+
         result = result && ((password==null && storedPwd==null) || (password!=null && password.equals(storedPwd)));
-        
+
         if (username==null)  getAttributes().remove(PROP_USER); else getAttributes().put(PROP_USER, username);
         if (password==null)  getAttributes().remove(PROP_PASSWORD); else getAttributes().put(PROP_PASSWORD, password);
-        
+
         return result;
     }
-    
+
     /**
      * Connects the underlying connection to the database.
      * @throws SQLException if the method {@link #release()} has been called.
      * @throws SQLException if driver instantiation fails
      * @throws SQLException if a call to {@link java.sql.Driver#connect(String, java.util.Properties)} fails.
-     * @throws SQLException if default properties are configured and a call to 
-     * {@link java.sql.Connection#setAutoCommit(boolean)}, {@link java.sql.Connection#setCatalog(String)}, 
-     * {@link java.sql.Connection#setTransactionIsolation(int)} or {@link java.sql.Connection#setReadOnly(boolean)} fails.  
+     * @throws SQLException if default properties are configured and a call to
+     * {@link java.sql.Connection#setAutoCommit(boolean)}, {@link java.sql.Connection#setCatalog(String)},
+     * {@link java.sql.Connection#setTransactionIsolation(int)} or {@link java.sql.Connection#setReadOnly(boolean)} fails.
      */
     public void connect() throws SQLException {
         if (released.get()) throw new SQLException("A connection once released, can't be reestablished.");
@@ -169,24 +169,24 @@ public class PooledConnection {
         if (poolProperties.getDataSource()==null && poolProperties.getDataSourceJNDI()!=null) {
             //TODO lookup JNDI name
         }
-        
+
         if (poolProperties.getDataSource()!=null) {
             connectUsingDataSource();
         } else {
             connectUsingDriver();
         }
-        
+
         //set up the default state, unless we expect the interceptor to do it
         if (poolProperties.getJdbcInterceptors()==null || poolProperties.getJdbcInterceptors().indexOf(ConnectionState.class.getName())<0) {
             if (poolProperties.getDefaultTransactionIsolation()!=DataSourceFactory.UNKNOWN_TRANSACTIONISOLATION) connection.setTransactionIsolation(poolProperties.getDefaultTransactionIsolation());
             if (poolProperties.getDefaultReadOnly()!=null) connection.setReadOnly(poolProperties.getDefaultReadOnly().booleanValue());
             if (poolProperties.getDefaultAutoCommit()!=null) connection.setAutoCommit(poolProperties.getDefaultAutoCommit().booleanValue());
             if (poolProperties.getDefaultCatalog()!=null) connection.setCatalog(poolProperties.getDefaultCatalog());
-        }        
+        }
         this.discarded = false;
         this.lastConnected = System.currentTimeMillis();
     }
-    
+
     protected void connectUsingDataSource() throws SQLException {
         String usr = null;
         String pwd = null;
@@ -230,7 +230,7 @@ public class PooledConnection {
         }
     }
     protected void connectUsingDriver() throws SQLException {
-        
+
         try {
             if (driver==null)
                 driver = (java.sql.Driver) Class.forName(poolProperties.getDriverClassName(),
@@ -285,9 +285,9 @@ public class PooledConnection {
             throw new SQLException("Driver:"+driver+" returned null for URL:"+driverURL);
         }
     }
-    
+
     /**
-     * 
+     *
      * @return true if connect() was called successfully and disconnect has not yet been called
      */
     public boolean isInitialized() {
@@ -295,7 +295,7 @@ public class PooledConnection {
     }
 
     /**
-     * Issues a call to {@link #disconnect(boolean)} with the argument false followed by a call to 
+     * Issues a call to {@link #disconnect(boolean)} with the argument false followed by a call to
      * {@link #connect()}
      * @throws SQLException if the call to {@link #connect()} fails.
      */
@@ -335,7 +335,7 @@ public class PooledConnection {
 
 
 //============================================================================
-//             
+//
 //============================================================================
 
     /**
@@ -351,7 +351,7 @@ public class PooledConnection {
     }
 
     /**
-     * Returns true if the connection pool is configured 
+     * Returns true if the connection pool is configured
      * to do validation for a certain action.
      * @param action
      * @return
@@ -385,23 +385,23 @@ public class PooledConnection {
     }
 
     /**
-     * Validates a connection. 
-     * @param validateAction the action used. One of {@link #VALIDATE_BORROW}, {@link #VALIDATE_IDLE}, 
+     * Validates a connection.
+     * @param validateAction the action used. One of {@link #VALIDATE_BORROW}, {@link #VALIDATE_IDLE},
      * {@link #VALIDATE_INIT} or {@link #VALIDATE_RETURN}
-     * @param sql the SQL to be used during validation. If the {@link PoolConfiguration#setInitSQL(String)} has been called with a non null 
+     * @param sql the SQL to be used during validation. If the {@link PoolConfiguration#setInitSQL(String)} has been called with a non null
      * value and the action is {@link #VALIDATE_INIT} the init SQL will be used for validation.
-     *  
-     * @return true if the connection was validated successfully. It returns true even if validation was not performed, such as when 
-     * {@link PoolConfiguration#setValidationInterval(long)} has been called with a positive value. 
+     *
+     * @return true if the connection was validated successfully. It returns true even if validation was not performed, such as when
+     * {@link PoolConfiguration#setValidationInterval(long)} has been called with a positive value.
      * <p>
-     * false if the validation failed. The caller should close the connection if false is returned since a session could have been left in 
+     * false if the validation failed. The caller should close the connection if false is returned since a session could have been left in
      * an unknown state during initialization.
      */
     public boolean validate(int validateAction,String sql) {
         if (this.isDiscarded()) {
             return false;
         }
-        
+
         if (!doValidate(validateAction)) {
             //no validation required, no init sql and props not set
             return true;
@@ -424,9 +424,9 @@ public class PooledConnection {
                 return false;
             }
         }
-        
+
         String query = sql;
-        
+
         if (validateAction == VALIDATE_INIT && poolProperties.getInitSQL() != null) {
             query = poolProperties.getInitSQL();
         }
@@ -434,7 +434,7 @@ public class PooledConnection {
         if (query == null) {
             query = poolProperties.getValidationQuery();
         }
-        
+
         Statement stmt = null;
         try {
             stmt = connection.createStatement();
@@ -530,7 +530,7 @@ public class PooledConnection {
     /**
      * Set the timestamp the connection was last validated.
      * This flag is used to keep track when we are using a {@link PoolConfiguration#setValidationInterval(long) validation-interval}.
-     * @param lastValidated a timestamp as defined by {@link System#currentTimeMillis()} 
+     * @param lastValidated a timestamp as defined by {@link System#currentTimeMillis()}
      */
     public void setLastValidated(long lastValidated) {
         this.lastValidated = lastValidated;
@@ -546,9 +546,9 @@ public class PooledConnection {
     }
 
     /**
-     * Return the timestamps of last pool action. Timestamps are typically set when connections 
+     * Return the timestamps of last pool action. Timestamps are typically set when connections
      * are borrowed from the pool. It is used to keep track of {@link PoolConfiguration#setRemoveAbandonedTimeout(int) abandon-timeouts}.
-     * This timestamp can also be reset by the {@link org.apache.tomcat.jdbc.pool.interceptor.ResetAbandonedTimer#invoke(Object, java.lang.reflect.Method, Object[])}   
+     * This timestamp can also be reset by the {@link org.apache.tomcat.jdbc.pool.interceptor.ResetAbandonedTimer#invoke(Object, java.lang.reflect.Method, Object[])}
      * @return the timestamp of the last pool action as defined by {@link System#currentTimeMillis()}
      */
     public long getTimestamp() {
@@ -557,7 +557,7 @@ public class PooledConnection {
 
     /**
      * Returns the discarded flag.
-     * @return the discarded flag. If the value is true, 
+     * @return the discarded flag. If the value is true,
      * either {@link #disconnect(boolean)} has been called or it will be called when the connection is returned to the pool.
      */
     public boolean isDiscarded() {
@@ -565,7 +565,7 @@ public class PooledConnection {
     }
 
     /**
-     * Returns the timestamp of the last successful validation query execution. 
+     * Returns the timestamp of the last successful validation query execution.
      * @return the timestamp of the last successful validation query execution as defined by {@link System#currentTimeMillis()}
      */
     public long getLastValidated() {
@@ -581,9 +581,9 @@ public class PooledConnection {
     }
 
     /**
-     * Locks the connection only if either {@link PoolConfiguration#isPoolSweeperEnabled()} or 
+     * Locks the connection only if either {@link PoolConfiguration#isPoolSweeperEnabled()} or
      * {@link PoolConfiguration#getUseLock()} return true. The per connection lock ensures thread safety is
-     * multiple threads are performing operations on the connection. 
+     * multiple threads are performing operations on the connection.
      * Otherwise this is a noop for performance
      */
     public void lock() {
@@ -612,7 +612,7 @@ public class PooledConnection {
     public java.sql.Connection getConnection() {
         return this.connection;
     }
-    
+
     /**
      * Returns the underlying XA connection
      * @return the underlying XA connection as it was returned from the Datasource
@@ -620,8 +620,8 @@ public class PooledConnection {
     public javax.sql.XAConnection getXAConnection() {
         return this.xaConnection;
     }
-    
-    
+
+
     /**
      * Returns the timestamp of when the connection was last connected to the database.
      * ie, a successful call to {@link java.sql.Driver#connect(String, java.util.Properties)}.
@@ -645,16 +645,16 @@ public class PooledConnection {
             while (interceptor!=null) {
                 interceptor.reset(null, null);
                 interceptor = interceptor.getNext();
-            }//while 
+            }//while
         }//end if
         this.handler = handler;
     }
-    
+
     @Override
     public String toString() {
         return "PooledConnection["+(connection!=null?connection.toString():"null")+"]";
     }
-    
+
     /**
      * Returns true if this connection has been released and wont be reused.
      * @return true if the method {@link #release()} has been called
@@ -662,7 +662,7 @@ public class PooledConnection {
     public boolean isReleased() {
         return released.get();
     }
-    
+
     public HashMap<Object,Object> getAttributes() {
         return attributes;
     }

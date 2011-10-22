@@ -52,7 +52,7 @@
   <property name="tomcat.classes"    value="${tomcat.pool}/classes"/>
   <property name="tomcat.api"    value="${tomcat.pool}/api"/>
   <property name="tomcat.testclasses"    value="${tomcat.pool}/testclasses"/>
-  
+
   <!-- JAR Artifacts -->
   <property name="tomcat-jdbc.jar" value="${tomcat.pool}/tomcat-jdbc.jar"/>
   <property name="tomcat-jdbc-src.jar" value="${tomcat.pool}/tomcat-jdbc-src.jar"/>
@@ -64,7 +64,7 @@
     <pathelement location="${tomcat.classes}"/>
     <pathelement location="${tomcat.juli.jar}"/>
   </path>
-  
+
   <path id="test.classpath">
     <pathelement location="${tomcat-jdbc.jar}"/>
     <pathelement location="${tomcat.testclasses}"/>
@@ -75,12 +75,12 @@
     <pathelement location="${derby.jar}"/>
     <pathelement location="${h2.jar}"/>
   </path>
-  
+
   <fileset id="license.notice" dir="${basedir}">
     <include name="NOTICE"/>
     <include name="LICENSE"/>
   </fileset>
-  
+
   <!-- Version info filter set -->
   <tstamp>
     <format property="TODAY" pattern="MMM d yyyy" locale="en"/>
@@ -112,7 +112,7 @@
   </target>
 
   <target name="javadoc" depends="prepare">
-  
+
      <xslt basedir="${tomcat.pool}/doc"
           destdir="${basedir}/src/main/java/org/apache/tomcat/jdbc/pool"
           extension=".html"
@@ -135,7 +135,7 @@
     </jar>
     <delete file="${basedir}/src/main/java/org/apache/tomcat/jdbc/pool/package.html"/>
   </target>
-  
+
   <target name="build" depends="prepare,download">
     <mkdir dir="${tomcat.pool}"/>
     <!-- compile org.apache.tomcat.jdbc-->
@@ -205,7 +205,7 @@
   </target>
 
 
-  <target name="clean"> 
+  <target name="clean">
       <mkdir dir="${tomcat.pool}"/>
       <delete file="${tomcat-jdbc.jar}" />
       <delete file="${tomcat-jdbc-src.jar}"/>
@@ -226,7 +226,7 @@
       <delete dir="${tomcat.pool}/build"/>
       <delete dir="${tomcat.api}"/>
   </target>
-  
+
   <target name="docs" depends="prepare">
     <xslt basedir="${tomcat.pool}/doc"
           destdir="${tomcat.pool}/"
@@ -236,9 +236,9 @@
           includes="*.xml">
       <param name="relative-path" expression="http://tomcat.apache.org/tomcat-6.0-doc"/>
       <param name="apache-logo" expression="/images/asf-logo.gif"/>
-    </xslt>  
+    </xslt>
   </target>
-  
+
   <target name="dist" depends="clean, build, build-test, docs, javadoc">
     <property name="destdir" value="${tomcat.pool}/release/v${version}"/>
     <mkdir dir="${destdir}"/>
@@ -255,7 +255,7 @@
       </fileset>
       <fileset dir="${tomcat.home}/bin">
         <include name="tomcat-juli.jar"/>
-      </fileset>  
+      </fileset>
     </zip>
     <tar destfile="${destdir}/apache-tomcat-jdbc-${version}-bin.tar">
       <fileset dir="${tomcat.pool}">
@@ -270,7 +270,7 @@
       </fileset>
       <fileset dir="${tomcat.home}/bin">
         <include name="tomcat-juli.jar"/>
-      </fileset>  
+      </fileset>
     </tar>
     <gzip src="${destdir}/apache-tomcat-jdbc-${version}-bin.tar"
           destfile="${destdir}/apache-tomcat-jdbc-${version}-bin.tar.gz"/>
@@ -304,18 +304,18 @@
     </tar>
     <gzip src="${destdir}/apache-tomcat-jdbc-${version}-src.tar"
           destfile="${destdir}/apache-tomcat-jdbc-${version}-src.tar.gz"/>
-    
+
     <delete file="${destdir}/apache-tomcat-jdbc-${version}-src.tar"/>
     <echo message="Options +Indexes" file="${destdir}/.htaccess"/>
-    
+
     <checksum file="${destdir}/apache-tomcat-jdbc-${version}-bin.tar.gz" forceOverwrite="yes" fileext=".md5" />
     <checksum file="${destdir}/apache-tomcat-jdbc-${version}-bin.zip" forceOverwrite="yes" fileext=".md5" />
     <checksum file="${destdir}/apache-tomcat-jdbc-${version}-src.tar.gz" forceOverwrite="yes" fileext=".md5" />
     <checksum file="${destdir}/apache-tomcat-jdbc-${version}-src.zip" forceOverwrite="yes" fileext=".md5" />
-    
-    
+
+
   </target>
-    
+
   <!-- Download and dependency building -->
   <target name="proxyflags">
     <!-- check proxy parameters. -->
@@ -342,7 +342,7 @@
     <mkdir dir="${destdir}" />
     <get src="${sourcefile}" dest="${destfile}" />
   </target>
-  
+
   <target name="downloadgz" unless="exist" depends="setproxy,testexist">
     <!-- Download and extract the package -->
     <get src="${sourcefile}" dest="${base.path}/file.tar.gz" />
@@ -351,7 +351,7 @@
     <delete file="${base.path}/file.tar"/>
     <delete file="${base.path}/file.tar.gz"/>
   </target>
-  
+
   <target name="downloadzip" unless="exist" depends="setproxy,testexist">
     <!-- Download and extract the package -->
     <get src="${sourcefile}" dest="${base.path}/file.zip" />
@@ -359,16 +359,16 @@
     <unzip src="${base.path}/file.zip" dest="${destdir}"/>
     <delete file="${base.path}/file.zip"/>
   </target>
-  
+
   <target name="download" unless="skip.download">
     <mkdir dir="${base.path}"/>
-<!-- 
+<!--
     <antcall target="downloadzip">
       <param name="sourcefile" value="${dbcp.loc}"/>
       <param name="destfile" value="${dbcp.jar}"/>
       <param name="destdir" value="${base.path}"/>
     </antcall>
- -->    
+ -->
     <antcall target="downloadzip">
       <param name="sourcefile" value="${tomcat.loc}"/>
       <param name="destfile" value="${tomcat.juli.jar}"/>
@@ -401,10 +401,10 @@
       <param name="destfile" value="${junit.jar}"/>
       <param name="destdir" value="${base.path}"/>
     </antcall>
-    
+
   </target>
 
-  <target name="download-test" depends="prepare">  
+  <target name="download-test" depends="prepare">
     <mkdir dir="${base.path}"/>
     <!-- Derby database
     <antcall target="downloadgz">
@@ -424,7 +424,7 @@
       <param name="destdir" value="${base.path}"/>
     </antcall>
   </target>
-  
+
   <!-- Extract the testdb.* properties and remove the leading testdb. -->
   <propertyset dynamic="false" id="testdb">
   	<propertyref prefix="testdb"/>
@@ -434,7 +434,7 @@
   <target name="test" depends="build,build-test">
     <echo/>
     <echo>Creating test table for test purposes.</echo>
- 
+
     <junit printsummary="withOutAndErr" showoutput="on">
       <syspropertyset refid="testdb"/>
       <formatter type="brief" usefile="no"/>
@@ -446,7 +446,7 @@
         </fileset>
       </batchtest>
     </junit>
- 
+
     <echo/>
     <echo>Performance and fairness tests.</echo>
     <junit printsummary="withOutAndErr" showoutput="on">
@@ -487,9 +487,9 @@
 
   <target name="simplebuild" depends="build"/>
   <target name="clean-and-build" depends="clean,build"/>
-  
+
   <target name="onetest" depends="build,build-test">
-    
+
     <echo>Testing:${test}</echo>
     <junit printsummary="withOutAndErr" showoutput="on">
       <syspropertyset refid="testdb"/>
@@ -506,6 +506,6 @@
     </junit>
 
   </target>
-    
+
 </project>
 

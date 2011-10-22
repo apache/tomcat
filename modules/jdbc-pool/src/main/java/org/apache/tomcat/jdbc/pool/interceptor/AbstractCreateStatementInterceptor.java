@@ -39,7 +39,7 @@ public abstract class  AbstractCreateStatementInterceptor extends JdbcIntercepto
 
     protected static final String[] STATEMENT_TYPES = {CREATE_STATEMENT, PREPARE_STATEMENT, PREPARE_CALL};
     protected static final int    STATEMENT_TYPE_COUNT = STATEMENT_TYPES.length;
-    
+
     protected static final String EXECUTE        = "execute";
     protected static final String EXECUTE_QUERY  = "executeQuery";
     protected static final String EXECUTE_UPDATE = "executeUpdate";
@@ -50,7 +50,7 @@ public abstract class  AbstractCreateStatementInterceptor extends JdbcIntercepto
     public  AbstractCreateStatementInterceptor() {
         super();
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -72,7 +72,7 @@ public abstract class  AbstractCreateStatementInterceptor extends JdbcIntercepto
             }
         }
     }
-    
+
     /**
      * This method will be invoked after a successful statement creation. This method can choose to return a wrapper
      * around the statement or return the statement itself.
@@ -85,15 +85,15 @@ public abstract class  AbstractCreateStatementInterceptor extends JdbcIntercepto
      * @return a {@link java.sql.Statement} object
      */
     public abstract Object createStatement(Object proxy, Method method, Object[] args, Object statement, long time);
-    
+
     /**
-     * Method invoked when the operation {@link java.sql.Connection#close()} is invoked. 
+     * Method invoked when the operation {@link java.sql.Connection#close()} is invoked.
      */
     public abstract void closeInvoked();
 
     /**
      * Returns true if the method that is being invoked matches one of the statement types.
-     * 
+     *
      * @param method the method being invoked on the proxy
      * @param process boolean result used for recursion
      * @return returns true if the method name matched
@@ -104,7 +104,7 @@ public abstract class  AbstractCreateStatementInterceptor extends JdbcIntercepto
 
     /**
      * Returns true if the method that is being invoked matches one of the execute types.
-     * 
+     *
      * @param method the method being invoked on the proxy
      * @param process boolean result used for recursion
      * @return returns true if the method name matched
@@ -127,7 +127,7 @@ public abstract class  AbstractCreateStatementInterceptor extends JdbcIntercepto
         }
         return process;
     }
-    
+
     /**
      * no-op for this interceptor. no state is stored.
      */

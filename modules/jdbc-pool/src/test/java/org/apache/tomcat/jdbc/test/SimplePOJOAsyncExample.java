@@ -50,10 +50,10 @@ public class SimplePOJOAsyncExample {
         p.setRemoveAbandoned(true);
         p.setJdbcInterceptors("org.apache.tomcat.jdbc.pool.interceptor.ConnectionState;org.apache.tomcat.jdbc.pool.interceptor.StatementFinalizer");
         DataSource datasource = new DataSource();
-        datasource.setPoolProperties(p); 
-        
+        datasource.setPoolProperties(p);
+
         Connection con = null;
-        try {            
+        try {
           Future<Connection> future = datasource.getConnectionAsync();
           while (!future.isDone()) {
               System.out.println("Connection is not yet available. Do some background work");
@@ -63,7 +63,7 @@ public class SimplePOJOAsyncExample {
                   Thread.interrupted();
               }
           }
-          con = future.get(); //should return instantly 
+          con = future.get(); //should return instantly
           Statement st = con.createStatement();
           ResultSet rs = st.executeQuery("select * from user");
           int cnt = 1;
@@ -74,7 +74,7 @@ public class SimplePOJOAsyncExample {
           st.close();
         } finally {
           if (con!=null) try {con.close();}catch (Exception ignore) {}
-        }  
+        }
     }
 
 }

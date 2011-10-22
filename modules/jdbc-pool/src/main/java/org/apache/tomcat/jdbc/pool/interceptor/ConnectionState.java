@@ -30,11 +30,11 @@ import org.apache.tomcat.jdbc.pool.PooledConnection;
 /**
  * Interceptor that keep track of connection state to avoid roundtrips to the database.
  * The {@link org.apache.tomcat.jdbc.pool.ConnectionPool} is optimized to do as little work as possible.
- * The pool itself doesn't remember settings like {@link java.sql.Connection#setAutoCommit(boolean)}, 
+ * The pool itself doesn't remember settings like {@link java.sql.Connection#setAutoCommit(boolean)},
  * {@link java.sql.Connection#setReadOnly(boolean)}, {@link java.sql.Connection#setCatalog(String)} or
- * {@link java.sql.Connection#setTransactionIsolation(int)}. It relies on the application to remember how and when 
+ * {@link java.sql.Connection#setTransactionIsolation(int)}. It relies on the application to remember how and when
  * these settings have been applied.
- * In the cases where the application code doesn't know or want to keep track of the state, this interceptor helps cache the 
+ * In the cases where the application code doesn't know or want to keep track of the state, this interceptor helps cache the
  * state, and it also avoids roundtrips to the database asking for it.
  * @author fhanik
  *
@@ -42,7 +42,7 @@ import org.apache.tomcat.jdbc.pool.PooledConnection;
 
 public class ConnectionState extends JdbcInterceptor  {
     private static final Log log = LogFactory.getLog(ConnectionState.class);
-    
+
     protected final String[] readState = {"getAutoCommit","getTransactionIsolation","isReadOnly","getCatalog"};
     protected final String[] writeState = {"setAutoCommit","setTransactionIsolation","setReadOnly","setCatalog"};
 
@@ -50,8 +50,8 @@ public class ConnectionState extends JdbcInterceptor  {
     protected Integer transactionIsolation = null;
     protected Boolean readOnly = null;
     protected String catalog = null;
-    
-    
+
+
     @Override
     public void reset(ConnectionPool parent, PooledConnection con) {
         if (parent==null || con==null) {
@@ -107,7 +107,7 @@ public class ConnectionState extends JdbcInterceptor  {
                 log.error("Unable to reset default catalog state to connection.",x);
             }
         }
-        
+
     }
 
     @Override

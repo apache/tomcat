@@ -45,7 +45,7 @@ public class DataSource extends DataSourceProxy implements javax.sql.DataSource,
     public DataSource() {
         super();
     }
-    
+
     /**
      * Constructs a DataSource object wrapping a connection
      * @param poolProperties
@@ -53,10 +53,10 @@ public class DataSource extends DataSourceProxy implements javax.sql.DataSource,
     public DataSource(PoolConfiguration poolProperties) {
         super(poolProperties);
     }
-    
-    
-    
-    
+
+
+
+
 
 //===============================================================================
 //  JMX Operations - Register the actual pool itself under the tomcat.jdbc domain
@@ -103,9 +103,9 @@ public class DataSource extends DataSourceProxy implements javax.sql.DataSource,
         }catch (MalformedObjectNameException x) {
             log.error("Unable to create object name for JDBC pool.",x);
         }
-        return name;   
+        return name;
     }
-    
+
     /**
      * Creates the ObjectName for the ConnectionPoolMBean object to be registered
      * @param original the ObjectName for the DataSource
@@ -124,7 +124,7 @@ public class DataSource extends DataSourceProxy implements javax.sql.DataSource,
         ObjectName name = new ObjectName(domain,properties);
         return name;
     }
-    
+
     /**
      * Registers the ConnectionPoolMBean under a unique name based on the ObjectName for the DataSource
      */
@@ -138,9 +138,9 @@ public class DataSource extends DataSourceProxy implements javax.sql.DataSource,
             log.error("Unable to register JDBC pool with JMX",e);
         }
     }
-    
+
     /**
-     * 
+     *
      */
     protected void unregisterJmx() {
         try {

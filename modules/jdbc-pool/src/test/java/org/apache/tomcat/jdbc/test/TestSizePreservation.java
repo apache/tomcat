@@ -25,7 +25,7 @@ import org.apache.tomcat.jdbc.pool.DataSource;
 import org.apache.tomcat.jdbc.pool.PoolConfiguration;
 import org.apache.tomcat.jdbc.test.driver.Driver;
 /**
- * 
+ *
  * @author Jeremy Norris
  * https://issues.apache.org/bugzilla/show_bug.cgi?id=50613
  *
