@@ -72,7 +72,7 @@ import java.io.IOException;
  * without a flush. If autoflush="false" then all the I/O operations on this
  * class shall throw an IOException if performing the current operation would
  * result in a buffer overflow condition.
- * 
+ *
  * @see java.io.Writer
  * @see java.io.BufferedWriter
  * @see java.io.PrintWriter
@@ -98,7 +98,7 @@ public abstract class JspWriter extends java.io.Writer {
 
     /**
      * Protected constructor.
-     * 
+     *
      * @param bufferSize
      *            the size of the buffer to be used by the JspWriter
      * @param autoFlush
@@ -113,7 +113,7 @@ public abstract class JspWriter extends java.io.Writer {
      * Write a line separator. The line separator string is defined by the
      * system property <tt>line.separator</tt>, and is not necessarily a single
      * newline ('\n') character.
-     * 
+     *
      * @exception IOException
      *                If an I/O error occurs
      */
@@ -124,7 +124,7 @@ public abstract class JspWriter extends java.io.Writer {
      * java.lang.String#valueOf(boolean)}</code>
      * is written to the JspWriter's buffer or, if no buffer is used, directly
      * to the underlying writer.
-     * 
+     *
      * @param b
      *            The <code>boolean</code> to be printed
      * @throws java.io.IOException
@@ -135,7 +135,7 @@ public abstract class JspWriter extends java.io.Writer {
     /**
      * Print a character. The character is written to the JspWriter's buffer or,
      * if no buffer is used, directly to the underlying writer.
-     * 
+     *
      * @param c
      *            The <code>char</code> to be printed
      * @throws java.io.IOException
@@ -148,7 +148,7 @@ public abstract class JspWriter extends java.io.Writer {
      * java.lang.String#valueOf(int)}</code>
      * is written to the JspWriter's buffer or, if no buffer is used, directly
      * to the underlying writer.
-     * 
+     *
      * @param i
      *            The <code>int</code> to be printed
      * @see java.lang.Integer#toString(int)
@@ -162,7 +162,7 @@ public abstract class JspWriter extends java.io.Writer {
      * java.lang.String#valueOf(long)}</code>
      * is written to the JspWriter's buffer or, if no buffer is used, directly
      * to the underlying writer.
-     * 
+     *
      * @param l
      *            The <code>long</code> to be printed
      * @see java.lang.Long#toString(long)
@@ -176,7 +176,7 @@ public abstract class JspWriter extends java.io.Writer {
      * java.lang.String#valueOf(float)}</code>
      * is written to the JspWriter's buffer or, if no buffer is used, directly
      * to the underlying writer.
-     * 
+     *
      * @param f
      *            The <code>float</code> to be printed
      * @see java.lang.Float#toString(float)
@@ -190,7 +190,7 @@ public abstract class JspWriter extends java.io.Writer {
      * <code>{@link java.lang.String#valueOf(double)}</code> is written to the
      * JspWriter's buffer or, if no buffer is used, directly to the underlying
      * writer.
-     * 
+     *
      * @param d
      *            The <code>double</code> to be printed
      * @see java.lang.Double#toString(double)
@@ -203,7 +203,7 @@ public abstract class JspWriter extends java.io.Writer {
      * Print an array of characters. The characters are written to the
      * JspWriter's buffer or, if no buffer is used, directly to the underlying
      * writer.
-     * 
+     *
      * @param s
      *            The array of chars to be printed
      * @throws NullPointerException
@@ -218,7 +218,7 @@ public abstract class JspWriter extends java.io.Writer {
      * <code>"null"</code> is printed. Otherwise, the string's characters are
      * written to the JspWriter's buffer or, if no buffer is used, directly to
      * the underlying writer.
-     * 
+     *
      * @param s
      *            The <code>String</code> to be printed
      * @throws java.io.IOException
@@ -231,7 +231,7 @@ public abstract class JspWriter extends java.io.Writer {
      * java.lang.String#valueOf(Object)}</code>
      * method is written to the JspWriter's buffer or, if no buffer is used,
      * directly to the underlying writer.
-     * 
+     *
      * @param obj
      *            The <code>Object</code> to be printed
      * @see java.lang.Object#toString()
@@ -245,7 +245,7 @@ public abstract class JspWriter extends java.io.Writer {
      * separator string is defined by the system property
      * <code>line.separator</code>, and is not necessarily a single newline
      * character (<code>'\n'</code>).
-     * 
+     *
      * @throws java.io.IOException
      *             If an error occurred while writing
      */
@@ -255,7 +255,7 @@ public abstract class JspWriter extends java.io.Writer {
      * Print a boolean value and then terminate the line. This method behaves as
      * though it invokes <code>{@link #print(boolean)}</code> and then
      * <code>{@link #println()}</code>.
-     * 
+     *
      * @param x
      *            the boolean to write
      * @throws java.io.IOException
@@ -268,7 +268,7 @@ public abstract class JspWriter extends java.io.Writer {
      * though it invokes <code>{@link #print(char)}</code> and then <code>{@link
      * #println()}</code>
      * .
-     * 
+     *
      * @param x
      *            the char to write
      * @throws java.io.IOException
@@ -281,7 +281,7 @@ public abstract class JspWriter extends java.io.Writer {
      * though it invokes <code>{@link #print(int)}</code> and then <code>{@link
      * #println()}</code>
      * .
-     * 
+     *
      * @param x
      *            the int to write
      * @throws java.io.IOException
@@ -293,7 +293,7 @@ public abstract class JspWriter extends java.io.Writer {
      * Print a long integer and then terminate the line. This method behaves as
      * though it invokes <code>{@link #print(long)}</code> and then
      * <code>{@link #println()}</code>.
-     * 
+     *
      * @param x
      *            the long to write
      * @throws java.io.IOException
@@ -305,7 +305,7 @@ public abstract class JspWriter extends java.io.Writer {
      * Print a floating-point number and then terminate the line. This method
      * behaves as though it invokes <code>{@link #print(float)}</code> and then
      * <code>{@link #println()}</code>.
-     * 
+     *
      * @param x
      *            the float to write
      * @throws java.io.IOException
@@ -318,7 +318,7 @@ public abstract class JspWriter extends java.io.Writer {
      * line. This method behaves as though it invokes <code>{@link
      * #print(double)}</code> and
      * then <code>{@link #println()}</code>.
-     * 
+     *
      * @param x
      *            the double to write
      * @throws java.io.IOException
@@ -330,7 +330,7 @@ public abstract class JspWriter extends java.io.Writer {
      * Print an array of characters and then terminate the line. This method
      * behaves as though it invokes <code>print(char[])</code> and then
      * <code>println()</code>.
-     * 
+     *
      * @param x
      *            the char[] to write
      * @throws java.io.IOException
@@ -342,7 +342,7 @@ public abstract class JspWriter extends java.io.Writer {
      * Print a String and then terminate the line. This method behaves as though
      * it invokes <code>{@link #print(String)}</code> and then
      * <code>{@link #println()}</code>.
-     * 
+     *
      * @param x
      *            the String to write
      * @throws java.io.IOException
@@ -354,7 +354,7 @@ public abstract class JspWriter extends java.io.Writer {
      * Print an Object and then terminate the line. This method behaves as
      * though it invokes <code>{@link #print(Object)}</code> and then
      * <code>{@link #println()}</code>.
-     * 
+     *
      * @param x
      *            the Object to write
      * @throws java.io.IOException
@@ -367,7 +367,7 @@ public abstract class JspWriter extends java.io.Writer {
      * flushed then the clear operation shall throw an IOException to signal the
      * fact that some data has already been irrevocably written to the client
      * response stream.
-     * 
+     *
      * @throws IOException
      *             If an I/O error occurs
      */
@@ -377,7 +377,7 @@ public abstract class JspWriter extends java.io.Writer {
      * Clears the current contents of the buffer. Unlike clear(), this method
      * will not throw an IOException if the buffer has already been flushed. It
      * merely clears the current content of the buffer and returns.
-     * 
+     *
      * @throws IOException
      *             If an I/O error occurs
      */
@@ -394,7 +394,7 @@ public abstract class JspWriter extends java.io.Writer {
      * <p>
      * Once a stream has been closed, further write() or flush() invocations
      * will cause an IOException to be thrown.
-     * 
+     *
      * @exception IOException
      *                If an I/O error occurs
      */
@@ -409,7 +409,7 @@ public abstract class JspWriter extends java.io.Writer {
      * to close().
      * <p>
      * Closing a previously-closed stream, unlike flush(), has no effect.
-     * 
+     *
      * @exception IOException
      *                If an I/O error occurs
      */
@@ -418,7 +418,7 @@ public abstract class JspWriter extends java.io.Writer {
 
     /**
      * This method returns the size of the buffer used by the JspWriter.
-     * 
+     *
      * @return the size of the buffer in bytes, or 0 is unbuffered.
      */
     public int getBufferSize() {
@@ -427,14 +427,14 @@ public abstract class JspWriter extends java.io.Writer {
 
     /**
      * This method returns the number of unused bytes in the buffer.
-     * 
+     *
      * @return the number of bytes unused in the buffer
      */
     public abstract int getRemaining();
 
     /**
      * This method indicates whether the JspWriter is autoFlushing.
-     * 
+     *
      * @return if this JspWriter is auto flushing or throwing IOExceptions on
      *         buffer overflow conditions
      */

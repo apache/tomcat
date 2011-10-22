@@ -24,9 +24,9 @@ import java.util.EnumSet;
  * TODO SERVLET3 - Add comments
  */
 public interface FilterRegistration extends Registration {
-    
+
     /**
-     * 
+     *
      * @param dispatcherTypes
      * @param isMatchAfter
      * @param servletNames
@@ -37,13 +37,13 @@ public interface FilterRegistration extends Registration {
             EnumSet<DispatcherType> dispatcherTypes,
             boolean isMatchAfter, String... servletNames);
     /**
-     * 
+     *
      * @return TODO
      */
     public Collection<String> getServletNameMappings();
-    
+
     /**
-     * 
+     *
      * @param dispatcherTypes
      * @param isMatchAfter
      * @param urlPatterns
@@ -55,11 +55,11 @@ public interface FilterRegistration extends Registration {
             boolean isMatchAfter, String... urlPatterns);
 
     /**
-     * 
+     *
      * @return TODO
      */
     public Collection<String> getUrlPatternMappings();
-    
+
     public static interface Dynamic
     extends FilterRegistration, Registration.Dynamic {
         // No additional methods

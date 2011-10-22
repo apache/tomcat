@@ -34,7 +34,7 @@ import javax.servlet.jsp.PageContext;
  * facilitate coordination among cooperating tags.
  *
  * <p> Many tag handlers will extend TagSupport and only redefine a
- * few methods. 
+ * few methods.
  */
 public class TagSupport implements IterationTag, Serializable {
 
@@ -66,7 +66,7 @@ public class TagSupport implements IterationTag, Serializable {
      * should adhere to that constraint.  Specifically, the Class
      * passed to findAncestorWithClass should be a subtype of the
      * observable type.
-     * 
+     *
      *
      * @param from The instance from where to start looking.
      * @param klass The subclass of Tag or interface to be matched

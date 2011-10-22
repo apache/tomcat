@@ -26,7 +26,7 @@ import javax.servlet.ServletResponseWrapper;
  * that can be subclassed by developers wishing to adapt the response from a
  * Servlet. This class implements the Wrapper or Decorator pattern. Methods
  * default to calling through to the wrapped response object.
- * 
+ *
  * @author Various
  * @version $Version$
  * @since v 2.3
@@ -37,7 +37,7 @@ public class HttpServletResponseWrapper extends ServletResponseWrapper
 
     /**
      * Constructs a response adaptor wrapping the given response.
-     * 
+     *
      * @throws java.lang.IllegalArgumentException
      *             if the response is null
      */
@@ -88,7 +88,7 @@ public class HttpServletResponseWrapper extends ServletResponseWrapper
     /**
      * The default behavior of this method is to call encodeUrl(String url) on
      * the wrapped response object.
-     * 
+     *
      * @deprecated As of Version 3.0 of the Java Servlet API
      */
     @Override
@@ -101,7 +101,7 @@ public class HttpServletResponseWrapper extends ServletResponseWrapper
     /**
      * The default behavior of this method is to return encodeRedirectUrl(String
      * url) on the wrapped response object.
-     * 
+     *
      * @deprecated As of Version 3.0 of the Java Servlet API
      */
     @Override
@@ -204,7 +204,7 @@ public class HttpServletResponseWrapper extends ServletResponseWrapper
     /**
      * The default behavior of this method is to call setStatus(int sc, String
      * sm) on the wrapped response object.
-     * 
+     *
      * @deprecated As of Version 3.0 of the Java Servlet API
      */
     @Override

@@ -21,7 +21,7 @@ package javax.servlet.jsp;
  * contained in this instance is meaningless if not used in the context of an
  * error page. To indicate a JSP is an error page, the page author must set the
  * isErrorPage attribute of the page directive to "true".
- * 
+ *
  * @see PageContext#getErrorData
  * @since 2.0
  */
@@ -34,7 +34,7 @@ public final class ErrorData {
 
     /**
      * Creates a new ErrorData object.
-     * 
+     *
      * @param throwable
      *            The Throwable that is the cause of the error
      * @param statusCode
@@ -54,7 +54,7 @@ public final class ErrorData {
 
     /**
      * Returns the Throwable that caused the error.
-     * 
+     *
      * @return The Throwable that caused the error
      */
     public Throwable getThrowable() {
@@ -63,7 +63,7 @@ public final class ErrorData {
 
     /**
      * Returns the status code of the error.
-     * 
+     *
      * @return The status code of the error
      */
     public int getStatusCode() {
@@ -72,7 +72,7 @@ public final class ErrorData {
 
     /**
      * Returns the request URI.
-     * 
+     *
      * @return The request URI
      */
     public String getRequestURI() {
@@ -81,7 +81,7 @@ public final class ErrorData {
 
     /**
      * Returns the name of the servlet invoked.
-     * 
+     *
      * @return The name of the servlet invoked
      */
     public String getServletName() {

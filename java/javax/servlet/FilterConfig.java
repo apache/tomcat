@@ -20,10 +20,10 @@ package javax.servlet;
 import java.util.Enumeration;
 
 /**
- * 
+ *
  * A filter configuration object used by a servlet container to pass information
  * to a filter during initialization.
- * 
+ *
  * @see Filter
  * @since Servlet 2.3
  */
@@ -38,10 +38,10 @@ public interface FilterConfig {
     /**
      * Returns a reference to the {@link ServletContext} in which the caller is
      * executing.
-     * 
+     *
      * @return {@link ServletContext} object, used by the caller to interact
      *         with its servlet container
-     * 
+     *
      * @see ServletContext
      */
     public ServletContext getServletContext();
@@ -50,11 +50,11 @@ public interface FilterConfig {
      * Returns a <code>String</code> containing the value of the named
      * initialization parameter, or <code>null</code> if the parameter does not
      * exist.
-     * 
+     *
      * @param name
      *            <code>String</code> specifying the name of the initialization
      *            parameter
-     * 
+     *
      * @return <code>String</code> containing the value of the initialization
      *         parameter
      */
@@ -64,7 +64,7 @@ public interface FilterConfig {
      * Returns the names of the filter's initialization parameters as an
      * <code>Enumeration</code> of <code>String</code> objects, or an empty
      * <code>Enumeration</code> if the filter has no initialization parameters.
-     * 
+     *
      * @return <code>Enumeration</code> of <code>String</code> objects
      *         containing the names of the filter's initialization parameters
      */

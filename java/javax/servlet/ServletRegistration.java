@@ -25,9 +25,9 @@ import java.util.Set;
  * TODO SERVLET3 - Add comments
  */
 public interface ServletRegistration extends Registration {
-    
+
     /**
-     * 
+     *
      * @param urlPatterns
      * @return TODO
      * @throws IllegalArgumentException if urlPattern is null or empty
@@ -35,11 +35,11 @@ public interface ServletRegistration extends Registration {
      *                                  already been initialised
      */
     public Set<String> addMapping(String... urlPatterns);
-    
+
     public Collection<String> getMappings();
-    
+
     public String getRunAsRole();
-    
+
     public static interface Dynamic
     extends ServletRegistration, Registration.Dynamic {
         public void setLoadOnStartup(int loadOnStartup);

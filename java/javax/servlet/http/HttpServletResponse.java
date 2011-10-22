@@ -28,7 +28,7 @@ import javax.servlet.ServletResponse;
  * <p>
  * The servlet container creates an <code>HttpServletResponse</code> object and
  * passes it as an argument to the servlet's service methods (<code>doGet</code>, <code>doPost</code>, etc).
- * 
+ *
  * @author Various
  * @version $Version$
  * @see javax.servlet.ServletResponse
@@ -38,7 +38,7 @@ public interface HttpServletResponse extends ServletResponse {
     /**
      * Adds the specified cookie to the response. This method can be called
      * multiple times to set more than one cookie.
-     * 
+     *
      * @param cookie
      *            the Cookie to return to the client
      */
@@ -47,7 +47,7 @@ public interface HttpServletResponse extends ServletResponse {
     /**
      * Returns a boolean indicating whether the named response header has
      * already been set.
-     * 
+     *
      * @param name
      *            the header name
      * @return <code>true</code> if the named response header has already been
@@ -65,7 +65,7 @@ public interface HttpServletResponse extends ServletResponse {
      * For robust session tracking, all URLs emitted by a servlet should be run
      * through this method. Otherwise, URL rewriting cannot be used with
      * browsers which do not support cookies.
-     * 
+     *
      * @param url
      *            the url to be encoded.
      * @return the encoded URL if encoding is needed; the unchanged URL
@@ -85,7 +85,7 @@ public interface HttpServletResponse extends ServletResponse {
      * All URLs sent to the <code>HttpServletResponse.sendRedirect</code> method
      * should be run through this method. Otherwise, URL rewriting cannot be
      * used with browsers which do not support cookies.
-     * 
+     *
      * @param url
      *            the url to be encoded.
      * @return the encoded URL if encoding is needed; the unchanged URL
@@ -129,7 +129,7 @@ public interface HttpServletResponse extends ServletResponse {
      * If the response has already been committed, this method throws an
      * IllegalStateException. After using this method, the response should be
      * considered to be committed and should not be written to.
-     * 
+     *
      * @param sc
      *            the error status code
      * @param msg
@@ -148,7 +148,7 @@ public interface HttpServletResponse extends ServletResponse {
      * If the response has already been committed, this method throws an
      * IllegalStateException. After using this method, the response should be
      * considered to be committed and should not be written to.
-     * 
+     *
      * @param sc
      *            the error status code
      * @exception IOException
@@ -170,7 +170,7 @@ public interface HttpServletResponse extends ServletResponse {
      * If the response has already been committed, this method throws an
      * IllegalStateException. After using this method, the response should be
      * considered to be committed and should not be written to.
-     * 
+     *
      * @param location
      *            the redirect location URL
      * @exception IOException
@@ -187,7 +187,7 @@ public interface HttpServletResponse extends ServletResponse {
      * already been set, the new value overwrites the previous one. The
      * <code>containsHeader</code> method can be used to test for the presence
      * of a header before setting its value.
-     * 
+     *
      * @param name
      *            the name of the header to set
      * @param date
@@ -201,7 +201,7 @@ public interface HttpServletResponse extends ServletResponse {
      * Adds a response header with the given name and date-value. The date is
      * specified in terms of milliseconds since the epoch. This method allows
      * response headers to have multiple values.
-     * 
+     *
      * @param name
      *            the name of the header to set
      * @param date
@@ -215,7 +215,7 @@ public interface HttpServletResponse extends ServletResponse {
      * already been set, the new value overwrites the previous one. The
      * <code>containsHeader</code> method can be used to test for the presence
      * of a header before setting its value.
-     * 
+     *
      * @param name
      *            the name of the header
      * @param value
@@ -230,7 +230,7 @@ public interface HttpServletResponse extends ServletResponse {
     /**
      * Adds a response header with the given name and value. This method allows
      * response headers to have multiple values.
-     * 
+     *
      * @param name
      *            the name of the header
      * @param value
@@ -246,7 +246,7 @@ public interface HttpServletResponse extends ServletResponse {
      * header had already been set, the new value overwrites the previous one.
      * The <code>containsHeader</code> method can be used to test for the
      * presence of a header before setting its value.
-     * 
+     *
      * @param name
      *            the name of the header
      * @param value
@@ -259,7 +259,7 @@ public interface HttpServletResponse extends ServletResponse {
     /**
      * Adds a response header with the given name and integer value. This method
      * allows response headers to have multiple values.
-     * 
+     *
      * @param name
      *            the name of the header
      * @param value
@@ -277,7 +277,7 @@ public interface HttpServletResponse extends ServletResponse {
      * <p>
      * The container clears the buffer and sets the Location header, preserving
      * cookies and other headers.
-     * 
+     *
      * @param sc
      *            the status code
      * @see #sendError
@@ -286,7 +286,7 @@ public interface HttpServletResponse extends ServletResponse {
 
     /**
      * Sets the status code and message for this response.
-     * 
+     *
      * @param sc
      *            the status code
      * @param sm

@@ -23,13 +23,13 @@ import java.util.EventListener;
  * servlet context of the web application they are part of. To receive
  * notification events, the implementation class must be configured in the
  * deployment descriptor for the web application.
- * 
+ *
  * @see ServletContextEvent
  * @since v 2.3
  */
 
 public interface ServletContextListener extends EventListener {
-    
+
     /**
      ** Notification that the web application initialization process is starting.
      * All ServletContextListeners are notified of context initialization before

@@ -20,7 +20,7 @@ package javax.servlet.jsp.tagext;
 /**
  * Information on the attributes of a Tag, available at translation time. This
  * class is instantiated from the Tag Library Descriptor file (TLD).
- * 
+ *
  * <p>
  * Only the information needed to generate code is included here. Other
  * information like SCHEMA for validation belongs elsewhere.
@@ -38,7 +38,7 @@ public class TagAttributeInfo {
      * Constructor for TagAttributeInfo. This class is to be instantiated only
      * from the TagLibrary code under request from some JSP code that is parsing
      * a TLD (Tag Library Descriptor).
-     * 
+     *
      * @param name
      *            The name of the attribute.
      * @param required
@@ -58,7 +58,7 @@ public class TagAttributeInfo {
      * JSP 2.0 Constructor for TagAttributeInfo. This class is to be
      * instantiated only from the TagLibrary code under request from some JSP
      * code that is parsing a TLD (Tag Library Descriptor).
-     * 
+     *
      * @param name
      *            The name of the attribute.
      * @param required
@@ -69,7 +69,7 @@ public class TagAttributeInfo {
      *            Whether this attribute holds a request-time Attribute.
      * @param fragment
      *            Whether this attribute is of type JspFragment
-     * 
+     *
      * @since 2.0
      */
 
@@ -99,7 +99,7 @@ public class TagAttributeInfo {
 
     /**
      * The name of this attribute.
-     * 
+     *
      * @return the name of the attribute
      */
 
@@ -109,7 +109,7 @@ public class TagAttributeInfo {
 
     /**
      * The type (as a String) of this attribute.
-     * 
+     *
      * @return the type of the attribute
      */
 
@@ -119,7 +119,7 @@ public class TagAttributeInfo {
 
     /**
      * Whether this attribute can hold a request-time value.
-     * 
+     *
      * @return if the attribute can hold a request-time value.
      */
 
@@ -129,7 +129,7 @@ public class TagAttributeInfo {
 
     /**
      * Whether this attribute is required.
-     * 
+     *
      * @return if the attribute is required.
      */
     public boolean isRequired() {
@@ -139,7 +139,7 @@ public class TagAttributeInfo {
     /**
      * Convenience static method that goes through an array of TagAttributeInfo
      * objects and looks for "id".
-     * 
+     *
      * @param a
      *            An array of TagAttributeInfo
      * @return The TagAttributeInfo reference with name "id"
@@ -155,9 +155,9 @@ public class TagAttributeInfo {
 
     /**
      * Whether this attribute is of type JspFragment.
-     * 
+     *
      * @return if the attribute is of type JspFragment
-     * 
+     *
      * @since 2.0
      */
     public boolean isFragment() {
@@ -167,7 +167,7 @@ public class TagAttributeInfo {
     /**
      * Returns a String representation of this TagAttributeInfo, suitable for
      * debugging purposes.
-     * 
+     *
      * @return a String representation of this TagAttributeInfo
      */
     @Override

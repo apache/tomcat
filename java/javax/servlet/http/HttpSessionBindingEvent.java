@@ -27,7 +27,7 @@ package javax.servlet.http;
  * The session binds the object by a call to
  * <code>HttpSession.setAttribute</code> and unbinds the object by a call to
  * <code>HttpSession.removeAttribute</code>.
- * 
+ *
  * @author Various
  * @version $Version$
  * @see HttpSession
@@ -48,7 +48,7 @@ public class HttpSessionBindingEvent extends HttpSessionEvent {
      * Constructs an event that notifies an object that it has been bound to or
      * unbound from a session. To receive the event, the object must implement
      * {@link HttpSessionBindingListener}.
-     * 
+     *
      * @param session
      *            the session to which the object is bound or unbound
      * @param name
@@ -66,7 +66,7 @@ public class HttpSessionBindingEvent extends HttpSessionEvent {
      * Constructs an event that notifies an object that it has been bound to or
      * unbound from a session. To receive the event, the object must implement
      * {@link HttpSessionBindingListener}.
-     * 
+     *
      * @param session
      *            the session to which the object is bound or unbound
      * @param name
@@ -90,7 +90,7 @@ public class HttpSessionBindingEvent extends HttpSessionEvent {
     /**
      * Returns the name with which the attribute is bound to or unbound from the
      * session.
-     * 
+     *
      * @return a string specifying the name with which the object is bound to or
      *         unbound from the session
      */
@@ -104,7 +104,7 @@ public class HttpSessionBindingEvent extends HttpSessionEvent {
      * attribute. If the attribute was removed (or unbound), this is the value
      * of the removed attribute. If the attribute was replaced, this is the old
      * value of the attribute.
-     * 
+     *
      * @since 2.3
      */
     public Object getValue() {

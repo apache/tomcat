@@ -24,11 +24,11 @@
   **  XSD.
 -->
 
-<xsd:schema targetNamespace="http://java.sun.com/xml/ns/javaee" 
-            xmlns:javaee="http://java.sun.com/xml/ns/javaee" 
-            xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
-            elementFormDefault="qualified" 
-            attributeFormDefault="unqualified" 
+<xsd:schema targetNamespace="http://java.sun.com/xml/ns/javaee"
+            xmlns:javaee="http://java.sun.com/xml/ns/javaee"
+            xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            elementFormDefault="qualified"
+            attributeFormDefault="unqualified"
             version="2.1">
 
     <xsd:include schemaLocation="javaee_5.xsd" />

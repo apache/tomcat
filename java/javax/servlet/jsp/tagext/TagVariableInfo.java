@@ -26,7 +26,7 @@ public class TagVariableInfo {
 
     /**
      * Constructor for TagVariableInfo.
-     * 
+     *
      * @param nameGiven
      *            value of &lt;name-given&gt;
      * @param nameFromAttribute
@@ -49,7 +49,7 @@ public class TagVariableInfo {
 
     /**
      * The body of the &lt;name-given&gt; element.
-     * 
+     *
      * @return The variable name as a constant
      */
     public String getNameGiven() {
@@ -61,7 +61,7 @@ public class TagVariableInfo {
      * an attribute whose (translation-time) value will give the name of the
      * variable. One of &lt;name-given&gt; or &lt;name-from-attribute&gt; is
      * required.
-     * 
+     *
      * @return The attribute whose value defines the variable name
      */
     public String getNameFromAttribute() {
@@ -70,7 +70,7 @@ public class TagVariableInfo {
 
     /**
      * The body of the &lt;variable-class&gt; element.
-     * 
+     *
      * @return The name of the class of the variable or 'java.lang.String' if
      *         not defined in the TLD.
      */
@@ -80,7 +80,7 @@ public class TagVariableInfo {
 
     /**
      * The body of the &lt;declare&gt; element.
-     * 
+     *
      * @return Whether the variable is to be declared or not. If not defined in
      *         the TLD, 'true' will be returned.
      */
@@ -90,7 +90,7 @@ public class TagVariableInfo {
 
     /**
      * The body of the &lt;scope&gt; element.
-     * 
+     *
      * @return The scope to give the variable. NESTED scope will be returned if
      *         not defined in the TLD.
      */

@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -37,7 +37,7 @@ public class ResourceBundleELResolver extends ELResolver {
         if (context == null) {
             throw new NullPointerException();
         }
-        
+
         if (base instanceof ResourceBundle) {
             if (property != null) {
                 try {
@@ -60,11 +60,11 @@ public class ResourceBundleELResolver extends ELResolver {
         if (context == null) {
             throw new NullPointerException();
         }
-        
+
         if (base instanceof ResourceBundle) {
             context.setPropertyResolved(true);
         }
-        
+
         return null;
     }
 
@@ -76,7 +76,7 @@ public class ResourceBundleELResolver extends ELResolver {
         if (context == null) {
             throw new NullPointerException();
         }
-        
+
         if (base instanceof ResourceBundle) {
             context.setPropertyResolved(true);
             throw new PropertyNotWritableException(message(context,
@@ -91,18 +91,18 @@ public class ResourceBundleELResolver extends ELResolver {
         if (context == null) {
             throw new NullPointerException();
         }
-        
+
         if (base instanceof ResourceBundle) {
             context.setPropertyResolved(true);
         }
-        
+
         return true;
     }
 
     @Override
     // Can't use Iterator<FeatureDescriptor> because API needs to match
     // specification
-    @SuppressWarnings({ "unchecked", "rawtypes" }) 
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     public Iterator getFeatureDescriptors(
             ELContext context, Object base) {
         if (base instanceof ResourceBundle) {

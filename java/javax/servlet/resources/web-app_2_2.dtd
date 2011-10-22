@@ -461,7 +461,7 @@ java.lang.Double, java.lang.Float.
 
 <!--
 The ejb-ref element is used to declare a reference to an
-enterprise bean. 
+enterprise bean.
 -->
 
 <!ELEMENT ejb-ref (description?, ejb-ref-name, ejb-ref-type, home, remote,

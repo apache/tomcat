@@ -35,42 +35,42 @@ import javax.servlet.jsp.JspException;
 public class SimpleTagSupport implements SimpleTag {
     /** Reference to the enclosing tag. */
     private JspTag parentTag;
-    
+
     /** The JSP context for the upcoming tag invocation. */
     private JspContext jspContext;
-    
+
     /** The body of the tag. */
     private JspFragment jspBody;
-    
+
     /**
-     * Sole constructor. (For invocation by subclass constructors, 
+     * Sole constructor. (For invocation by subclass constructors,
      * typically implicit.)
      */
     public SimpleTagSupport() {
         // NOOP by default
     }
-    
-    /** 
+
+    /**
      * Default processing of the tag does nothing.
      *
      * @throws JspException Subclasses can throw JspException to indicate
      *     an error occurred while processing this tag.
      * @throws javax.servlet.jsp.SkipPageException If the page that
      *     (either directly or indirectly) invoked this tag is to
-     *     cease evaluation.  A Simple Tag Handler generated from a 
-     *     tag file must throw this exception if an invoked Classic 
+     *     cease evaluation.  A Simple Tag Handler generated from a
+     *     tag file must throw this exception if an invoked Classic
      *     Tag Handler returned SKIP_PAGE or if an invoked Simple
      *     Tag Handler threw SkipPageException or if an invoked Jsp Fragment
      *     threw a SkipPageException.
      * @throws IOException Subclasses can throw IOException if there was
      *     an error writing to the output stream
      * @see SimpleTag#doTag()
-     */ 
+     */
     @Override
     public void doTag() throws JspException, IOException {
         // NOOP by default
     }
-    
+
     /**
      * Sets the parent of this tag, for collaboration purposes.
      * <p>
@@ -83,22 +83,22 @@ public class SimpleTagSupport implements SimpleTag {
     public void setParent( JspTag parent ) {
         this.parentTag = parent;
     }
-    
+
     /**
      * Returns the parent of this tag, for collaboration purposes.
      *
      * @return the parent of this tag
-     */ 
+     */
     @Override
     public JspTag getParent() {
         return this.parentTag;
     }
-    
+
     /**
      * Stores the provided JSP context in the private jspContext field.
-     * Subclasses can access the <code>JspContext</code> via 
+     * Subclasses can access the <code>JspContext</code> via
      * <code>getJspContext()</code>.
-     * 
+     *
      * @param pc the page context for this invocation
      * @see SimpleTag#setJspContext
      */
@@ -106,9 +106,9 @@ public class SimpleTagSupport implements SimpleTag {
     public void setJspContext( JspContext pc ) {
         this.jspContext = pc;
     }
-    
+
     /**
-     * Returns the page context passed in by the container via 
+     * Returns the page context passed in by the container via
      * setJspContext.
      *
      * @return the page context for this invocation
@@ -116,20 +116,20 @@ public class SimpleTagSupport implements SimpleTag {
     protected JspContext getJspContext() {
         return this.jspContext;
     }
-                
-    /** 
+
+    /**
      * Stores the provided JspFragment.
      *
      * @param jspBody The fragment encapsulating the body of this tag.
-     *     If the action element is empty in the page, this method is 
+     *     If the action element is empty in the page, this method is
      *     not called at all.
      * @see SimpleTag#setJspBody
-     */ 
+     */
     @Override
     public void setJspBody( JspFragment jspBody ) {
         this.jspBody = jspBody;
     }
-    
+
     /**
      * Returns the body passed in by the container via setJspBody.
      *
@@ -144,7 +144,7 @@ public class SimpleTagSupport implements SimpleTag {
      * Find the instance of a given class type that is closest to a given
      * instance.
      * This method uses the getParent method from the Tag and/or SimpleTag
-     * interfaces.  This method is used for coordination among 
+     * interfaces.  This method is used for coordination among
      * cooperating tags.
      *
      * <p> For every instance of TagAdapter
@@ -172,7 +172,7 @@ public class SimpleTagSupport implements SimpleTag {
      * should adhere to that constraint.  Specifically, the Class
      * passed to findAncestorWithClass should be a subtype of the
      * observable type.
-     * 
+     *
      *
      * @param from The instance from where to start looking.
      * @param klass The subclass of JspTag or interface to be matched
@@ -180,7 +180,7 @@ public class SimpleTagSupport implements SimpleTag {
      * or is an instance of the class specified
      */
     public static final JspTag findAncestorWithClass(
-        JspTag from, Class<?> klass) 
+        JspTag from, Class<?> klass)
     {
         boolean isInterface = false;
 
@@ -213,5 +213,5 @@ public class SimpleTagSupport implements SimpleTag {
 
             from = parent;
         }
-    }    
+    }
 }

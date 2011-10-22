@@ -27,7 +27,7 @@ public abstract class TagLibraryInfo {
     /**
      * Constructor. This will invoke the constructors for TagInfo, and
      * TagAttributeInfo after parsing the TLD file.
-     * 
+     *
      * @param prefix
      *            the prefix actually used by the taglib directive
      * @param uri
@@ -43,7 +43,7 @@ public abstract class TagLibraryInfo {
     /**
      * The value of the uri attribute from the taglib directive for this
      * library.
-     * 
+     *
      * @return the value of the uri attribute
      */
     public String getURI() {
@@ -52,7 +52,7 @@ public abstract class TagLibraryInfo {
 
     /**
      * The prefix assigned to this taglib from the taglib directive
-     * 
+     *
      * @return the prefix assigned to this taglib from the taglib directive
      */
     public String getPrefixString() {
@@ -65,7 +65,7 @@ public abstract class TagLibraryInfo {
      * The preferred short name (prefix) as indicated in the TLD. This may be
      * used by authoring tools as the preferred prefix to use when creating an
      * taglib directive for this library.
-     * 
+     *
      * @return the preferred short name for the library
      */
     public String getShortName() {
@@ -76,7 +76,7 @@ public abstract class TagLibraryInfo {
      * The "reliable" URN indicated in the TLD (the uri element). This may be
      * used by authoring tools as a global identifier to use when creating a
      * taglib directive for this library.
-     * 
+     *
      * @return a reliable URN to a TLD like this
      */
     public String getReliableURN() {
@@ -85,7 +85,7 @@ public abstract class TagLibraryInfo {
 
     /**
      * Information (documentation) for this TLD.
-     * 
+     *
      * @return the info string for this tag lib
      */
     public String getInfoString() {
@@ -94,7 +94,7 @@ public abstract class TagLibraryInfo {
 
     /**
      * A string describing the required version of the JSP container.
-     * 
+     *
      * @return the (minimal) required version of the JSP container.
      * @see javax.servlet.jsp.JspEngineInfo
      */
@@ -104,7 +104,7 @@ public abstract class TagLibraryInfo {
 
     /**
      * An array describing the tags that are defined in this tag library.
-     * 
+     *
      * @return the TagInfo objects corresponding to the tags defined by this tag
      *         library, or a zero length array if this tag library defines no
      *         tags
@@ -115,7 +115,7 @@ public abstract class TagLibraryInfo {
 
     /**
      * An array describing the tag files that are defined in this tag library.
-     * 
+     *
      * @return the TagFileInfo objects corresponding to the tag files defined by
      *         this tag library, or a zero length array if this tag library
      *         defines no tags files
@@ -128,7 +128,7 @@ public abstract class TagLibraryInfo {
     /**
      * Get the TagInfo for a given tag name, looking through all the tags in
      * this tag library.
-     * 
+     *
      * @param shortname
      *            The short name (no prefix) of the tag
      * @return the TagInfo for the tag with the specified short name, or null if
@@ -152,7 +152,7 @@ public abstract class TagLibraryInfo {
     /**
      * Get the TagFileInfo for a given tag name, looking through all the tag
      * files in this tag library.
-     * 
+     *
      * @param shortname
      *            The short name (no prefix) of the tag
      * @return the TagFileInfo for the specified Tag file, or null if no Tag
@@ -176,7 +176,7 @@ public abstract class TagLibraryInfo {
 
     /**
      * An array describing the functions that are defined in this tag library.
-     * 
+     *
      * @return the functions defined in this tag library, or a zero length array
      *         if the tag library defines no functions.
      * @since 2.0
@@ -188,7 +188,7 @@ public abstract class TagLibraryInfo {
     /**
      * Get the FunctionInfo for a given function name, looking through all the
      * functions in this tag library.
-     * 
+     *
      * @param name
      *            The name (no prefix) of the function
      * @return the FunctionInfo for the function with the given name, or null if
@@ -216,7 +216,7 @@ public abstract class TagLibraryInfo {
      * If a tag library is imported more than once and bound to different
      * prefixes, only the TagLibraryInfo bound to the first prefix must be
      * included in the returned array.
-     * 
+     *
      * @return Array of TagLibraryInfo objects representing the entire set of
      *         tag libraries (including this TagLibraryInfo) imported by taglib
      *         directives in the translation unit that references this
@@ -245,14 +245,14 @@ public abstract class TagLibraryInfo {
 
     /**
      * An array describing the tag files that are defined in this tag library.
-     * 
+     *
      * @since 2.0
      */
     protected TagFileInfo[] tagFiles;
 
     /**
      * An array describing the functions that are defined in this tag library.
-     * 
+     *
      * @since 2.0
      */
     protected FunctionInfo[] functions;
