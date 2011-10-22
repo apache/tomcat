@@ -100,7 +100,7 @@ public final class JSSEKeyManager extends X509ExtendedKeyManager {
      */
     @Override
     public X509Certificate[] getCertificateChain(String alias) {
-        return delegate.getCertificateChain(alias); 
+        return delegate.getCertificateChain(alias);
     }
 
     /**

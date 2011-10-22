@@ -23,9 +23,9 @@ import java.io.IOException;
 
 import org.apache.tomcat.util.bcel.Constants;
 
-/** 
- * This class is derived from the abstract 
- * <A HREF="org.apache.tomcat.util.bcel.classfile.Constant.html">Constant</A> class 
+/**
+ * This class is derived from the abstract
+ * <A HREF="org.apache.tomcat.util.bcel.classfile.Constant.html">Constant</A> class
  * and represents a reference to a float object.
  *
  * @version $Id$
@@ -38,7 +38,7 @@ public final class ConstantFloat extends Constant {
     private float bytes;
 
 
-    /** 
+    /**
      * @param bytes Data
      */
     public ConstantFloat(float bytes) {
@@ -47,7 +47,7 @@ public final class ConstantFloat extends Constant {
     }
 
 
-    /** 
+    /**
      * Initialize instance from file data.
      *
      * @param file Input stream
@@ -57,7 +57,7 @@ public final class ConstantFloat extends Constant {
         this(file.readFloat());
     }
 
-    
+
     /**
      * Dump constant float to file stream in binary format.
      *

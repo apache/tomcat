@@ -23,24 +23,24 @@ import java.io.IOException;
 import org.apache.tomcat.util.bcel.Constants;
 
 /**
- * This attribute exists for local or 
+ * This attribute exists for local or
  * anonymous classes and ... there can be only one.
  */
 public class EnclosingMethod extends Attribute {
-    
+
     private static final long serialVersionUID = 6755214228300933233L;
 
-    // Pointer to the CONSTANT_Class_info structure representing the 
+    // Pointer to the CONSTANT_Class_info structure representing the
     // innermost class that encloses the declaration of the current class.
     private int classIndex;
-    
-    // If the current class is not immediately enclosed by a method or 
-    // constructor, then the value of the method_index item must be zero.  
-    // Otherwise, the value of the  method_index item must point to a 
-    // CONSTANT_NameAndType_info structure representing the name and the 
-    // type of a method in the class referenced by the class we point 
-    // to in the class_index.  *It is the compiler responsibility* to 
-    // ensure that the method identified by this index is the closest 
+
+    // If the current class is not immediately enclosed by a method or
+    // constructor, then the value of the method_index item must be zero.
+    // Otherwise, the value of the  method_index item must point to a
+    // CONSTANT_NameAndType_info structure representing the name and the
+    // type of a method in the class referenced by the class we point
+    // to in the class_index.  *It is the compiler responsibility* to
+    // ensure that the method identified by this index is the closest
     // lexically enclosing method that includes the local/anonymous class.
     private int methodIndex;
 
@@ -61,11 +61,11 @@ public class EnclosingMethod extends Attribute {
         // is this next line sufficient?
         // return (EnclosingMethod)clone();
     }
-    
+
     @Override
     public final void dump(DataOutputStream file) throws IOException {
         super.dump(file);
         file.writeShort(classIndex);
         file.writeShort(methodIndex);
-    }    
+    }
 }

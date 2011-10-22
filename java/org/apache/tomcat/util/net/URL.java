@@ -49,7 +49,7 @@ public final class URL implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    
+
     // ----------------------------------------------------------- Constructors
 
     /**
@@ -109,7 +109,7 @@ public final class URL implements Serializable {
             }
 
             // Parse out the new protocol
-            for (i = start; !aRef && (i < limit) ; i++) { 
+            for (i = start; !aRef && (i < limit) ; i++) {
                 c = spec.charAt(i);
                 if (c == ':') {
                     String s = spec.substring(start, i).toLowerCase(Locale.ENGLISH);
@@ -684,7 +684,7 @@ public final class URL implements Serializable {
                         at = ipv6-1;
                     }
                 }
-                                                        
+
                 int colon = authority.indexOf(':', at+1);
                 if (colon >= 0) {
                     try {

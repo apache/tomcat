@@ -70,7 +70,7 @@ import org.apache.tomcat.util.res.StringManager;
  * JSSE.<br/>
  * keytool -genkey -alias tomcat -keyalg RSA</br>
  * Use "changeit" as password (this is the default we use).
- * 
+ *
  * @author Harish Prabandham
  * @author Costin Manolache
  * @author Stefan Freyr Stefansson
@@ -96,7 +96,7 @@ public class JSSESocketFactory implements ServerSocketFactory, SSLUtil {
     private static final int defaultSessionTimeout = 86400;
     private static final String ALLOW_ALL_SUPPORTED_CIPHERS = "ALL";
     public static final String DEFAULT_KEY_PASS = "changeit";
-    
+
     static {
         boolean result = false;
         SSLContext context;
@@ -150,7 +150,7 @@ public class JSSESocketFactory implements ServerSocketFactory, SSLUtil {
         initServerSocket(socket);
         return socket;
     }
-    
+
     @Override
     public ServerSocket createSocket (int port, int backlog)
         throws IOException
@@ -160,19 +160,19 @@ public class JSSESocketFactory implements ServerSocketFactory, SSLUtil {
         initServerSocket(socket);
         return socket;
     }
-    
+
     @Override
     public ServerSocket createSocket (int port, int backlog,
                                       InetAddress ifAddress)
         throws IOException
-    {   
+    {
         init();
         ServerSocket socket = sslProxy.createServerSocket(port, backlog,
                                                           ifAddress);
         initServerSocket(socket);
         return socket;
     }
-    
+
     @Override
     public Socket acceptSocket(ServerSocket socket)
         throws IOException
@@ -185,7 +185,7 @@ public class JSSESocketFactory implements ServerSocketFactory, SSLUtil {
         }
         return asock;
     }
-    
+
     @Override
     public void handshake(Socket sock) throws IOException {
         // We do getSession instead of startHandshake() so we can call this multiple times
@@ -266,7 +266,7 @@ public class JSSESocketFactory implements ServerSocketFactory, SSLUtil {
                         }
                     }
                 }
-            }           
+            }
 
             if (vec != null) {
                 result = new String[vec.size()];
@@ -278,7 +278,7 @@ public class JSSESocketFactory implements ServerSocketFactory, SSLUtil {
 
         return result;
     }
-     
+
     /*
      * Gets the SSL server's keystore password.
      */
@@ -399,10 +399,10 @@ public class JSSESocketFactory implements ServerSocketFactory, SSLUtil {
                 }
                 istream = new FileInputStream(keyStoreFile);
             }
-            
+
             char[] storePass = null;
             if (pass != null && !"".equals(pass)) {
-                storePass = pass.toCharArray(); 
+                storePass = pass.toCharArray();
             }
             ks.load(istream, storePass);
         } catch (FileNotFoundException fnfe) {
@@ -465,7 +465,7 @@ public class JSSESocketFactory implements ServerSocketFactory, SSLUtil {
 
             allowUnsafeLegacyRenegotiation = "true".equals(
                     endpoint.getAllowUnsafeLegacyRenegotiation());
-            
+
             // Check the SSL config is OK
             checkConfig();
 
@@ -485,11 +485,11 @@ public class JSSESocketFactory implements ServerSocketFactory, SSLUtil {
             protocol = defaultProtocol;
         }
 
-        SSLContext context = SSLContext.getInstance(protocol); 
+        SSLContext context = SSLContext.getInstance(protocol);
 
         return context;
     }
-    
+
     @Override
     public KeyManager[] getKeyManagers() throws Exception {
         String keystoreType = endpoint.getKeystoreType();
@@ -518,7 +518,7 @@ public class JSSESocketFactory implements ServerSocketFactory, SSLUtil {
         if (truststoreType == null) {
             truststoreType = defaultKeystoreType;
         }
-        
+
         String algorithm = endpoint.getTruststoreAlgorithm();
         if (algorithm == null) {
             algorithm = TrustManagerFactory.getDefaultAlgorithm();
@@ -537,7 +537,7 @@ public class JSSESocketFactory implements ServerSocketFactory, SSLUtil {
         } else {
             sessionCacheSize = defaultSessionCacheSize;
         }
-        
+
         int sessionTimeout;
         if (endpoint.getSessionTimeout() != null) {
             sessionTimeout = Integer.parseInt(endpoint.getSessionTimeout());
@@ -596,7 +596,7 @@ public class JSSESocketFactory implements ServerSocketFactory, SSLUtil {
             String keystoreProvider, String algorithm)
         throws Exception {
         String crlf = endpoint.getCrlFile();
-        
+
         String className = endpoint.getTrustManagerClassName();
         if(className != null && className.length() > 0) {
              ClassLoader classLoader = getClass().getClassLoader();
@@ -608,10 +608,10 @@ public class JSSESocketFactory implements ServerSocketFactory, SSLUtil {
              Object trustManagerObject = clazz.newInstance();
              TrustManager trustManager = (TrustManager) trustManagerObject;
              return new TrustManager[]{ trustManager };
-        }    
+        }
 
         TrustManager[] tms = null;
-        
+
         KeyStore trustStore = getTrustStore(keystoreType, keystoreProvider);
         if (trustStore != null || endpoint.getTrustManagerClassName() != null) {
             if (crlf == null) {
@@ -630,21 +630,21 @@ public class JSSESocketFactory implements ServerSocketFactory, SSLUtil {
                 tms = tmf.getTrustManagers();
             }
         }
-        
+
         return tms;
     }
 
     /**
      * Return the initialization parameters for the TrustManager.
      * Currently, only the default <code>PKIX</code> is supported.
-     * 
+     *
      * @param algorithm The algorithm to get parameters for.
      * @param crlf The path to the CRL file.
      * @param trustStore The configured TrustStore.
      * @return The parameters including the CRLs and TrustStore.
      */
-    protected CertPathParameters getParameters(String algorithm, 
-                                                String crlf, 
+    protected CertPathParameters getParameters(String algorithm,
+                                                String crlf,
                                                 KeyStore trustStore)
         throws Exception {
         CertPathParameters params = null;
@@ -675,9 +675,9 @@ public class JSSESocketFactory implements ServerSocketFactory, SSLUtil {
 
     /**
      * Load the collection of CRLs.
-     * 
+     *
      */
-    protected Collection<? extends CRL> getCRLs(String crlf) 
+    protected Collection<? extends CRL> getCRLs(String crlf)
         throws IOException, CRLException, CertificateException {
 
         File crlFile = new File(crlf);
@@ -697,7 +697,7 @@ public class JSSESocketFactory implements ServerSocketFactory, SSLUtil {
             throw crle;
         } catch(CertificateException ce) {
             throw ce;
-        } finally { 
+        } finally {
             if(is != null) {
                 try{
                     is.close();
@@ -792,7 +792,7 @@ public class JSSESocketFactory implements ServerSocketFactory, SSLUtil {
         }
 
         String[] requestedProtocols = endpoint.getSslEnabledProtocolsArray();
-        setEnabledProtocols(socket, getEnabledProtocols(socket, 
+        setEnabledProtocols(socket, getEnabledProtocols(socket,
                                                          requestedProtocols));
 
         // we don't know if client auth is needed -
@@ -812,7 +812,7 @@ public class JSSESocketFactory implements ServerSocketFactory, SSLUtil {
 
         try {
             // Set the timeout to 1ms as all we care about is if it throws an
-            // SSLException on accept. 
+            // SSLException on accept.
             socket.setSoTimeout(1);
 
             socket.accept();
@@ -840,6 +840,6 @@ public class JSSESocketFactory implements ServerSocketFactory, SSLUtil {
                 socket.close();
             }
         }
-        
+
     }
 }

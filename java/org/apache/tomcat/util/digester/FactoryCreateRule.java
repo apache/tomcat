@@ -5,15 +5,15 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */ 
+ */
 
 
 package org.apache.tomcat.util.digester;
@@ -35,7 +35,7 @@ import org.xml.sax.Attributes;
 public class FactoryCreateRule extends Rule {
 
     // ----------------------------------------------------------- Fields
-    
+
     /** Should exceptions thrown by the factory be ignored? */
     private boolean ignoreCreateExceptions;
     /** Stock to manage */
@@ -127,7 +127,7 @@ public class FactoryCreateRule extends Rule {
         this(creationFactory, false);
 
     }
-    
+
     /**
      * Construct a factory create rule that will use the specified
      * class name to create an {@link ObjectCreationFactory} which will
@@ -175,7 +175,7 @@ public class FactoryCreateRule extends Rule {
      *  creation factory will be ignored.
      */
     public FactoryCreateRule(
-                                String className, 
+                                String className,
                                 String attributeName,
                                 boolean ignoreCreateExceptions) {
 
@@ -199,7 +199,7 @@ public class FactoryCreateRule extends Rule {
      *  creation factory will be ignored.
      */
     public FactoryCreateRule(
-                                Class<?> clazz, 
+                                Class<?> clazz,
                                 String attributeName,
                                 boolean ignoreCreateExceptions) {
 
@@ -217,7 +217,7 @@ public class FactoryCreateRule extends Rule {
      *  creation factory will be ignored.
      */
     public FactoryCreateRule(
-                            ObjectCreationFactory creationFactory, 
+                            ObjectCreationFactory creationFactory,
                             boolean ignoreCreateExceptions) {
 
         this.creationFactory = creationFactory;
@@ -258,23 +258,23 @@ public class FactoryCreateRule extends Rule {
      */
     @Override
     public void begin(String namespace, String name, Attributes attributes) throws Exception {
-        
+
         if (ignoreCreateExceptions) {
-        
+
             if (exceptionIgnoredStack == null) {
                 exceptionIgnoredStack = new ArrayStack<Boolean>();
             }
-            
+
             try {
                 Object instance = getFactory(attributes).createObject(attributes);
-                
+
                 if (digester.log.isDebugEnabled()) {
                     digester.log.debug("[FactoryCreateRule]{" + digester.match +
                             "} New " + instance.getClass().getName());
                 }
                 digester.push(instance);
                 exceptionIgnoredStack.push(Boolean.FALSE);
-                
+
             } catch (Exception e) {
                 // log message and error
                 if (digester.log.isInfoEnabled()) {
@@ -286,10 +286,10 @@ public class FactoryCreateRule extends Rule {
                 }
                 exceptionIgnoredStack.push(Boolean.TRUE);
             }
-            
+
         } else {
             Object instance = getFactory(attributes).createObject(attributes);
-            
+
             if (digester.log.isDebugEnabled()) {
                 digester.log.debug("[FactoryCreateRule]{" + digester.match +
                         "} New " + instance.getClass().getName());
@@ -304,14 +304,14 @@ public class FactoryCreateRule extends Rule {
      */
     @Override
     public void end(String namespace, String name) throws Exception {
-        
-        // check if object was created 
+
+        // check if object was created
         // this only happens if an exception was thrown and we're ignoring them
         if (
                 ignoreCreateExceptions &&
                 exceptionIgnoredStack != null &&
                 !(exceptionIgnoredStack.empty())) {
-                
+
             if ((exceptionIgnoredStack.pop()).booleanValue()) {
                 // creation exception was ignored
                 // nothing was put onto the stack
@@ -320,7 +320,7 @@ public class FactoryCreateRule extends Rule {
                 }
                 return;
             }
-        } 
+        }
 
         Object top = digester.pop();
         if (digester.log.isDebugEnabled()) {
@@ -398,5 +398,5 @@ public class FactoryCreateRule extends Rule {
         }
         return (creationFactory);
 
-    }    
+    }
 }

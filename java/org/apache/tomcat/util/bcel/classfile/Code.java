@@ -23,7 +23,7 @@ import java.io.IOException;
 
 import org.apache.tomcat.util.bcel.Constants;
 
-/** 
+/**
  * This class represents a chunk of Java byte code contained in a
  * method. It is instantiated by the
  * <em>Attribute.readAttribute()</em> method. A <em>Code</em>
@@ -32,7 +32,7 @@ import org.apache.tomcat.util.bcel.Constants;
  * method.
  *
  * This attribute has attributes itself, namely <em>LineNumberTable</em> which
- * is used for debugging purposes and <em>LocalVariableTable</em> which 
+ * is used for debugging purposes and <em>LocalVariableTable</em> which
  * contains information about the local variables.
  *
  * @version $Id$
@@ -152,7 +152,7 @@ public final class Code extends Attribute {
 
 
     /**
-     * @return the internal length of this code attribute (minus the first 6 bytes) 
+     * @return the internal length of this code attribute (minus the first 6 bytes)
      * and excluding all its attributes
      */
     private final int getInternalLength() {
@@ -242,7 +242,7 @@ public final class Code extends Attribute {
 
     /**
      * @return deep copy of this attribute
-     * 
+     *
      * @param _constant_pool the constant pool to duplicate
      */
     @Override

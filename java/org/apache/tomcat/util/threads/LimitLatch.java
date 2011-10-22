@@ -56,7 +56,7 @@ public class LimitLatch {
     private final AtomicLong count;
     private volatile long limit;
     private volatile boolean released = false;
-    
+
     /**
      * Instantiates a LimitLatch object with an initial limit.
      * @param limit - maximum number of concurrent acquisitions of this latch
@@ -83,7 +83,7 @@ public class LimitLatch {
      * the new limit. If the limit is increased, threads currently in the queue
      * may not be issued one of the newly available shares until the next
      * request is made for a latch.
-     * 
+     *
      * @param limit The new limit
      */
     public void setLimit(long limit) {
@@ -107,7 +107,7 @@ public class LimitLatch {
         sync.releaseShared(0);
         return count.get();
     }
-    
+
     /**
      * Releases all waiting threads and causes the {@link #limit} to be ignored
      * until {@link #reset()} is called.
@@ -116,7 +116,7 @@ public class LimitLatch {
         released = true;
         return sync.releaseShared(0);
     }
-    
+
     /**
      * Resets the latch and initializes the shared acquisition counter to zero.
      * @see #releaseAll()
@@ -125,7 +125,7 @@ public class LimitLatch {
         this.count.set(0);
         released = false;
     }
-    
+
     /**
      * Returns <code>true</code> if there is at least one thread waiting to
      * acquire the shared lock, otherwise returns <code>false</code>.

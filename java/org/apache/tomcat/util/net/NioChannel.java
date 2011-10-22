@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -30,11 +30,11 @@ import org.apache.tomcat.util.net.NioEndpoint.Poller;
 import org.apache.tomcat.util.net.SecureNioChannel.ApplicationBufferHandler;
 
 /**
- * 
+ *
  * Base class for a SocketChannel wrapper used by the endpoint.
  * This way, logic for a SSL socket channel remains the same as for
  * a non SSL, making sure we don't need to code for any exception cases.
- * 
+ *
  * @author Filip Hanik
  * @version 1.0
  */
@@ -47,7 +47,7 @@ public class NioChannel implements ByteChannel{
     protected ApplicationBufferHandler bufHandler;
 
     protected Poller poller;
-    
+
     protected boolean sendFile = false;
 
     public NioChannel(SocketChannel channel, ApplicationBufferHandler bufHandler) throws IOException {
@@ -60,7 +60,7 @@ public class NioChannel implements ByteChannel{
         bufHandler.getWriteBuffer().clear();
         this.sendFile = false;
     }
-    
+
     public int getBufferSize() {
         if ( bufHandler == null ) return 0;
         int size = 0;
@@ -70,7 +70,7 @@ public class NioChannel implements ByteChannel{
     }
 
     /**
-     * returns true if the network buffer has 
+     * returns true if the network buffer has
      * been flushed out and is empty
      * @return boolean
      */
@@ -198,11 +198,11 @@ public class NioChannel implements ByteChannel{
     public String toString() {
         return super.toString()+":"+this.sc.toString();
     }
-    
+
     public int getOutboundRemaining() {
         return 0;
     }
-    
+
     /**
      * Return true if the buffer wrote data
      * @throws IOException
@@ -210,14 +210,14 @@ public class NioChannel implements ByteChannel{
     public boolean flushOutbound() throws IOException {
         return false;
     }
-    
+
     public boolean isSendFile() {
         return sendFile;
     }
-    
+
     public void setSendFile(boolean s) {
         this.sendFile = s;
     }
-    
+
 
 }

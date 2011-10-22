@@ -22,7 +22,7 @@ import java.io.IOException;
 
 import org.apache.tomcat.util.bcel.Constants;
 
-/** 
+/**
  * This class represents a constant pool reference to a field.
  *
  * @version $Id$

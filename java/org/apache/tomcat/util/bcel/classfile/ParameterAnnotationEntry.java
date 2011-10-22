@@ -24,7 +24,7 @@ import org.apache.tomcat.util.bcel.Constants;
 
 /**
  * represents one parameter annotation in the parameter annotation table
- * 
+ *
  * @version $Id: ParameterAnnotationEntry
  * @author  <A HREF="mailto:dbrosius@qis.net">D. Brosius</A>
  * @since 5.3
@@ -47,5 +47,5 @@ public class ParameterAnnotationEntry implements Constants {
             annotation_table[i] = AnnotationEntry.read(file, constant_pool);
         }
     }
-    
+
 }

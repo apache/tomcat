@@ -23,7 +23,7 @@ import java.io.IOException;
 
 import org.apache.tomcat.util.bcel.Constants;
 
-/** 
+/**
  * This class represents the table of exceptions that are thrown by a
  * method. This attribute may be used once per method.  The name of
  * this class is <em>ExceptionTable</em> for historical reasons; The

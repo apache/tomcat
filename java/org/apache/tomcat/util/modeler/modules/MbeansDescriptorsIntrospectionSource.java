@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -120,7 +120,7 @@ public class MbeansDescriptorsIntrospectionSource extends ModelerSource
         Integer.TYPE,
         Long.class,
         Long.TYPE,
-        Float.class, 
+        Float.class,
         Float.TYPE,
         Double.class,
         Double.TYPE,
@@ -132,14 +132,14 @@ public class MbeansDescriptorsIntrospectionSource extends ModelerSource
         objNameArray.getClass(),
         java.io.File.class,
     };
-    
+
     /**
      * Check if this class is one of the supported types.
      * If the class is supported, returns true.  Otherwise,
      * returns false.
      * @param ret The class to check
      * @return boolean True if class is supported
-     */ 
+     */
     private boolean supportedType(Class<?> ret) {
         for (int i = 0; i < supportedTypes.length; i++) {
             if (ret == supportedTypes[i]) {
@@ -167,7 +167,7 @@ public class MbeansDescriptorsIntrospectionSource extends ModelerSource
 
         // Anything in the java or javax package that
         // does not have a defined mapping is excluded.
-        if (javaType.getName().startsWith("java.") || 
+        if (javaType.getName().startsWith("java.") ||
             javaType.getName().startsWith("javax.")) {
             return false;
         }
@@ -180,9 +180,9 @@ public class MbeansDescriptorsIntrospectionSource extends ModelerSource
 
         // Make sure superclass is compatible
         Class<?> superClass = javaType.getSuperclass();
-        if (superClass != null && 
-            superClass != java.lang.Object.class && 
-            superClass != java.lang.Exception.class && 
+        if (superClass != null &&
+            superClass != java.lang.Object.class &&
+            superClass != java.lang.Exception.class &&
             superClass != java.lang.Throwable.class) {
             if (!isBeanCompatible(superClass)) {
                 return false;
@@ -190,8 +190,8 @@ public class MbeansDescriptorsIntrospectionSource extends ModelerSource
         }
         return true;
     }
-    
-    /** 
+
+    /**
      * Process the methods and extract 'attributes', methods, etc
      *
      * @param realClass The class to process
@@ -386,7 +386,7 @@ public class MbeansDescriptorsIntrospectionSource extends ModelerSource
                 mbean.addConstructor(info);
             }
             */
-            
+
             if( log.isDebugEnabled())
                 log.debug("Setting name: " + type );
             mbean.setName( type );

@@ -78,8 +78,8 @@ public class SSLSocket {
      * @param level Type of Client Certificate verification.
      */
     public static native void setVerify(long sock, int level, int depth);
-    
-    /**    
+
+    /**
      * Return SSL Info parameter as byte array.
      *
      * @param sock The socket to read the data from.

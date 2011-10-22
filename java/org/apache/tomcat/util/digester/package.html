@@ -81,7 +81,7 @@ the developer to focus on the processing to be performed.</p>
     the processing rules.</li>
 </ul>
 
-<p>For example code, see <a href="#doc.Usage"> the usage 
+<p>For example code, see <a href="#doc.Usage"> the usage
 examples</a>, and <a href="#doc.FAQ.Examples"> the FAQ </a>. </p>
 
 <a name="doc.Properties"></a>
@@ -307,10 +307,10 @@ the pattern for more than one registered processing rule will be matched
 matching pattern, or because one more more exact pattern matches and wildcard
 pattern matches are satisfied by the same element.</p>
 
-<p>When this occurs, the corresponding processing rules will all be fired in order. 
-<code>begin</code> (and <code>body</code>) method calls are executed in the 
-order that the <code>Rules</code> where initially registered with the 
-<code>Digester</code>, whilst <code>end</code> method calls are execute in 
+<p>When this occurs, the corresponding processing rules will all be fired in order.
+<code>begin</code> (and <code>body</code>) method calls are executed in the
+order that the <code>Rules</code> where initially registered with the
+<code>Digester</code>, whilst <code>end</code> method calls are execute in
 reverse order. In other words - the order is first in, last out.</p>
 
 <a name="doc.Rules"></a>
@@ -732,8 +732,8 @@ behavior of <code>Digester</code>, as described above, is generally sufficient.
 However, if the document you are processing uses namespaces, it is often
 convenient to have sets of <code>Rule</code> instances that are <em>only</em>
 matched on elements that use the prefix of a particular namespace.  This
-approach, for example, makes it possible to deal with element names that are 
-the same in different namespaces, but where you want to perform different 
+approach, for example, makes it possible to deal with element names that are
+the same in different namespaces, but where you want to perform different
 processing for each namespace. </p>
 
 <p>Digester does not provide full support for namespaces, but does provide
@@ -796,9 +796,9 @@ with a particular namespace, in more than one application context.</p>
 
 <h4>Using Namespace Prefixes In Pattern Matching</h4>
 
-<p>Using rules with namespaces is very useful when you have orthogonal rulesets. 
+<p>Using rules with namespaces is very useful when you have orthogonal rulesets.
 One ruleset applies to a namespace and is independent of other rulesets applying
-to other namespaces. However, if your rule logic requires mixed namespaces, then 
+to other namespaces. However, if your rule logic requires mixed namespaces, then
 matching namespace prefix patterns might be a better strategy.</p>
 
 <p>When you set the <code>NamespaceAware</code> property to false, digester uses
@@ -809,7 +809,7 @@ create namespace-aware rules, create pattern matches including the namespace
 prefixes.</p>
 
 <p>For example, (with <code>NamespaceAware</code> false), the pattern <code>
-'foo:bar'</code> will match a top level element named <code>'bar'</code> in the 
+'foo:bar'</code> will match a top level element named <code>'bar'</code> in the
 namespace with (local) prefix <code>'foo'</code>.</p>
 
 <h4>Limitations of Digester Namespace support</h4>
@@ -862,10 +862,10 @@ following as part of your Digester initialization:</p>
 </pre>
 
 <h4>RegexRules</h4>
-<p><a href="RegexRules.html">RegexRules</a> is an advanced <code>Rules</code> 
+<p><a href="RegexRules.html">RegexRules</a> is an advanced <code>Rules</code>
 implementation which does not build on the default pattern matching rules.
-It uses a pluggable <a href="RegexMatcher.html">RegexMatcher</a> implementation to test 
-if a path matches the pattern for a Rule. All matching rules are returned 
+It uses a pluggable <a href="RegexMatcher.html">RegexMatcher</a> implementation to test
+if a path matches the pattern for a Rule. All matching rules are returned
 (note that this behaviour differs from longest matching rule of the default
  pattern matching rules). See the Java Docs for more details.
 </p>
@@ -886,11 +886,11 @@ implementation: <a href='SimpleRegexMatcher.html'>SimpleRegexMatcher</a>.
 This implementation is unsophisticated and lacks many good features
 lacking in more power Regex libraries. There are some good reasons
 why this approach was adopted. The first is that <code>SimpleRegexMatcher</code>
-is simple, it is easy to write and runs quickly. The second has to do with 
+is simple, it is easy to write and runs quickly. The second has to do with
 the way that <code>RegexRules</code> is intended to be used.
 </p>
 <p>
-There are many good regex libraries available. (For example 
+There are many good regex libraries available. (For example
 <a href='http://jakarta.apache.org/oro/index.html'>Jakarta ORO</a>,
 <a href='http://jakarta.apache.org/regexp/index.html'>Jakarta Regex</a>,
 <a href='http://www.cacas.org/java/gnu/regexp/'>GNU Regex</a> and
@@ -911,11 +911,11 @@ to be kept to a minimum).
 
 <h4>WithDefaultsRulesWrapper</h4>
 <p>
-<a href="WithDefaultsRulesWrapper.html"> WithDefaultsRulesWrapper</a> allows 
-default <code>Rule</code> instances to be added to any existing 
-<code>Rules</code> implementation. These default <code>Rule</code> instances 
-will be returned for any match for which the wrapped implementation does not 
-return any matches. 
+<a href="WithDefaultsRulesWrapper.html"> WithDefaultsRulesWrapper</a> allows
+default <code>Rule</code> instances to be added to any existing
+<code>Rules</code> implementation. These default <code>Rule</code> instances
+will be returned for any match for which the wrapped implementation does not
+return any matches.
 </p>
 <p>
 For example,
@@ -1004,29 +1004,29 @@ public class MyRuleSet extends RuleSetBase {
 <a name="doc.NamedStacks"></a>
 <h3>Using Named Stacks For Inter-Rule Communication</h3>
 <p>
-<code>Digester</code> is based on <code>Rule</code> instances working together 
-to process xml. For anything other than the most trival processing, 
+<code>Digester</code> is based on <code>Rule</code> instances working together
+to process xml. For anything other than the most trival processing,
 communication between <code>Rule</code> instances is necessary. Since <code>Rule</code>
-instances are processed in sequence, this usually means storing an Object 
+instances are processed in sequence, this usually means storing an Object
 somewhere where later instances can retrieve it.
 </p>
 <p>
-<code>Digester</code> is based on SAX. The most natural data structure to use with 
+<code>Digester</code> is based on SAX. The most natural data structure to use with
 SAX based xml processing is the stack. This allows more powerful processes to be
-specified more simply since the pushing and popping of objects can mimic the 
-nested structure of the xml. 
+specified more simply since the pushing and popping of objects can mimic the
+nested structure of the xml.
 </p>
 <p>
-<code>Digester</code> uses two basic stacks: one for the main beans and the other 
-for parameters for method calls. These are inadequate for complex processing 
-where many different <code>Rule</code> instances need to communicate through 
+<code>Digester</code> uses two basic stacks: one for the main beans and the other
+for parameters for method calls. These are inadequate for complex processing
+where many different <code>Rule</code> instances need to communicate through
 different channels.
 </p>
 <p>
 In this case, it is recommended that named stacks are used. In addition to the
 two basic stacks, <code>Digester</code> allows rules to use an unlimited number
 of other stacks referred two by an identifying string (the name). (That's where
-the term <em>named stack</em> comes from.) These stacks are 
+the term <em>named stack</em> comes from.) These stacks are
 accessed through calls to:
 </p>
 <ul>
@@ -1057,12 +1057,12 @@ with other <code>Rule</code> implementations.
 The <code><em>system-identifier</em></code> is an URI from which the resource can be obtained
 (either directly or indirectly). Many valid URIs may identify the same resource.
 The <code><em>public-identifier</em></code> is an additional free identifier which may be used
-(by the parser) to locate the resource. 
+(by the parser) to locate the resource.
 </p>
 <p>
 In practice, the weakness with a <code><em>system-identifier</em></code> is that most parsers
 will attempt to interprete this URI as an URL, try to download the resource directly
-from the URL and stop the parsing if this download fails. So, this means that 
+from the URL and stop the parsing if this download fails. So, this means that
 almost always the URI will have to be an URL from which the declaration
 can be downloaded.
 </p>
@@ -1073,26 +1073,26 @@ to allow the xml to be parsed). This is usually unsatisfactory and so a universa
 accessable URL is preferred. This usually means an internet URL.
 </p>
 <p>
-To recap, in practice the <code><em>system-identifier</em></code> will (most likely) be an 
+To recap, in practice the <code><em>system-identifier</em></code> will (most likely) be an
 internet URL. Unfortunately downloading from an internet URL is not only slow
-but unreliable (since successfully downloading a document from the internet 
+but unreliable (since successfully downloading a document from the internet
 relies on the client being connect to the internet and the server being
 able to satisfy the request).
 </p>
 <p>
-The <code><em>public-identifier</em></code> is a freely defined name but (in practice) it is 
+The <code><em>public-identifier</em></code> is a freely defined name but (in practice) it is
 strongly recommended that a unique, readable and open format is used (for reasons
 that should become clear later). A Formal Public Identifier (FPI) is a very
 common choice. This public identifier is often used to provide a unique and location
-independent key which can be used to subsistute local resources for remote ones 
+independent key which can be used to subsistute local resources for remote ones
 (hint: this is why ;).
 </p>
 <p>
 By using the second (<code>PUBLIC</code>) form combined with some form of local
 catalog (which matches <code><em>public-identifiers</em></code> to local resources) and where
-the <code><em>public-identifier</em></code> is a unique name and the <code><em>system-identifier</em></code> 
-is an internet URL, the practical disadvantages of specifying just a 
-<code><em>system-identifier</em></code> can be avoided. Those external entities which have been 
+the <code><em>public-identifier</em></code> is a unique name and the <code><em>system-identifier</em></code>
+is an internet URL, the practical disadvantages of specifying just a
+<code><em>system-identifier</em></code> can be avoided. Those external entities which have been
 store locally (on the machine parsing the document) can be identified and used.
 Only when no local copy exists is it necessary to download the document
 from the internet URL. This naming scheme is recommended when using <code>Digester</code>.
@@ -1101,22 +1101,22 @@ from the internet URL. This naming scheme is recommended when using <code>Digest
 <h4>External Entity Resolution Using Digester</h4>
 <p>
 SAX factors out the resolution of external entities into an <code>EntityResolver</code>.
-<code>Digester</code> supports the use of custom <code>EntityResolver</code> 
+<code>Digester</code> supports the use of custom <code>EntityResolver</code>
 but ships with a simple internal implementation. This implementation allows local URLs
-to be easily associated with <code><em>public-identifiers</em></code>. 
+to be easily associated with <code><em>public-identifiers</em></code>.
 </p>
 <p>For example:</p>
 <code><pre>
     digester.register("-//Example Dot Com //DTD Sample Example//EN", "assets/sample.dtd");
 </pre></code>
 <p>
-will make digester return the relative file path <code>assets/sample.dtd</code> 
-whenever an external entity with public id 
+will make digester return the relative file path <code>assets/sample.dtd</code>
+whenever an external entity with public id
 <code>-//Example Dot Com //DTD Sample Example//EN</code> is needed.
 </p>
-<p><strong>Note:</strong> This is a simple (but useful) implementation. 
+<p><strong>Note:</strong> This is a simple (but useful) implementation.
 Greater sophistication requires a custom <code>EntityResolver</code>.</p>
-    
+
 <a name="doc.troubleshooting"></a>
 <h3>Troubleshooting</h3>
 <h4>Debugging Exceptions</h4>
@@ -1131,8 +1131,8 @@ Digestion throws two kinds of <code>Exception</code>:
 <p>
 The first is rarely thrown and indicates the kind of fundemental IO exception
 that developers know all about. The second is thrown by SAX parsers when the processing
-of the XML cannot be completed. So, to diagnose the cause a certain familiarity with 
-the way that SAX error handling works is very useful. 
+of the XML cannot be completed. So, to diagnose the cause a certain familiarity with
+the way that SAX error handling works is very useful.
 </p>
 <h5>Diagnosing SAX Exceptions</h5>
 <p>
@@ -1140,8 +1140,8 @@ This is a short, potted guide to SAX error handling strategies. It's not intende
 proper guide to error handling in SAX.
 </p>
 <p>
-When a SAX parser encounters a problem with the xml (well, ok - sometime after it 
-encounters a problem) it will throw a 
+When a SAX parser encounters a problem with the xml (well, ok - sometime after it
+encounters a problem) it will throw a
 <a href='http://www.saxproject.org/apidoc/org/xml/sax/SAXParseException.html'>
 SAXParseException</a>. This is a subclass of <code>SAXException</code> and contains
 a bit of extra information about what exactly when wrong - and more importantly,
@@ -1153,7 +1153,7 @@ to help with diagnosing the reason for the failure.
 <p>
 General <a href='http://www.saxproject.org/apidoc/org/xml/sax/SAXException.html'>
 SAXException</a> instances may wrap a causal exception. When exceptions are
-throw by <code>Digester</code> each of these will be wrapped into a 
+throw by <code>Digester</code> each of these will be wrapped into a
 <code>SAXException</code> and rethrown. So, catch these and examine the wrapped
 exception to diagnose what went wrong.
 </p>
@@ -1180,21 +1180,21 @@ but it's not infallible.
 You might need to grab an instance, configure it and pass it to Digester.
 </p>
 <p>
-If you want to support more than one parser in a portable manner, 
-then you'll probably want to take a look at the 
+If you want to support more than one parser in a portable manner,
+then you'll probably want to take a look at the
 <code>org.apache.commons.digester.parsers</code> package
 and add a new class to support the particular parser that's causing problems.
 </p>
 </li>
-<li><strong>Help! 
+<li><strong>Help!
 I'm Validating Against Schema But Digester Ignores Errors!</strong>
 <p>
 Digester is based on <a href='http://www.saxproject.org'>SAX</a>. The convention for
-SAX parsers is that all errors are reported (to any registered 
-<code>ErrorHandler</code>) but processing continues. Digester (by default) 
-registers its own <code>ErrorHandler</code> implementation. This logs details 
-but does not stop the processing (following the usual convention for SAX 
-based processors). 
+SAX parsers is that all errors are reported (to any registered
+<code>ErrorHandler</code>) but processing continues. Digester (by default)
+registers its own <code>ErrorHandler</code> implementation. This logs details
+but does not stop the processing (following the usual convention for SAX
+based processors).
 </p>
 <p>
 This means that the errors reported by the validation of the schema will appear in the
@@ -1204,16 +1204,16 @@ Digester logs but the processing will continue. To change this behaviour, call
 
 <li><strong>Where Can I Find Example Code?</strong>
 <a name="doc.FAQ.Examples">
-<p>Digester ships with a sample application: a mapping for the <em>Rich Site 
-Summary</em> format used by many newsfeeds. Download the source distribution 
+<p>Digester ships with a sample application: a mapping for the <em>Rich Site
+Summary</em> format used by many newsfeeds. Download the source distribution
 to see how it works.</p>
-<p>Digester also ships with a set of examples demonstrating most of the 
-features described in this document. See the "src/examples" subdirectory 
+<p>Digester also ships with a set of examples demonstrating most of the
+features described in this document. See the "src/examples" subdirectory
 of the source distribution.</p>
 </li>
 <li><strong>When Are You Going To Support <em>Rich Site Summary</em> Version x.y.z?</strong>
 <p>
-The <em>Rich Site Summary</em> application is intended to be a sample application. 
+The <em>Rich Site Summary</em> application is intended to be a sample application.
 It works but we have no plans to add support for other versions of the format.
 </p>
 <p>
@@ -1231,14 +1231,14 @@ commons dev mailing list</a>
 Reflection locates these methods fine and correctly assigns them as public.
 However, an <code>IllegalAccessException</code> is thrown if the method is invoked.</p>
 
-<p><code>MethodUtils</code> contains a workaround for this situation. 
+<p><code>MethodUtils</code> contains a workaround for this situation.
 It will attempt to call <code>setAccessible</code> on this method.
 If this call succeeds, then the method can be invoked as normal.
-This call will only succeed when the application has sufficient security privilages. 
+This call will only succeed when the application has sufficient security privilages.
 If this call fails then a warning will be logged and the method may fail.</p>
 
 <p><code>Digester</code> uses <code>MethodUtils</code> and so there may be an issue accessing methods
-of this kind from a high security environment. If you think that you might be experiencing this 
+of this kind from a high security environment. If you think that you might be experiencing this
 problem, please ask on the mailing list.</p>
 </body>
 </html>

@@ -57,7 +57,7 @@ public class StandardJarScanner implements JarScanner {
     private static final Log log = LogFactory.getLog(StandardJarScanner.class);
 
     private static final Set<String> defaultJarsToSkip = new HashSet<String>();
-    
+
     /**
      * The string resources for this package.
      */
@@ -111,7 +111,7 @@ public class StandardJarScanner implements JarScanner {
     /**
      * Scan the provided ServletContext and classloader for JAR files. Each JAR
      * file found will be passed to the callback handler to be processed.
-     *  
+     *
      * @param context       The ServletContext - used to locate and access
      *                      WEB-INF/lib
      * @param classloader   The classloader - used to access JARs not in
@@ -119,7 +119,7 @@ public class StandardJarScanner implements JarScanner {
      * @param callback      The handler to process any JARs found
      * @param jarsToSkip    List of JARs to ignore. If this list is null, a
      *                      default list will be read from the system property
-     *                      defined by {@link Constants#SKIP_JARS_PROPERTY} 
+     *                      defined by {@link Constants#SKIP_JARS_PROPERTY}
      */
     @Override
     public void scan(ServletContext context, ClassLoader classloader,
@@ -174,23 +174,23 @@ public class StandardJarScanner implements JarScanner {
                 }
             }
         }
-        
+
         // Scan the classpath
         if (scanClassPath) {
             if (log.isTraceEnabled()) {
                 log.trace(sm.getString("jarScan.classloaderStart"));
             }
 
-            ClassLoader loader = 
+            ClassLoader loader =
                 Thread.currentThread().getContextClassLoader();
-            
+
             while (loader != null) {
                 if (loader instanceof URLClassLoader) {
                     URL[] urls = ((URLClassLoader) loader).getURLs();
                     for (int i=0; i<urls.length; i++) {
                         // Extract the jarName if there is one to be found
                         String jarName = getJarName(urls[i]);
-                        
+
                         // Skip JARs known not to be interesting and JARs
                         // in WEB-INF/lib we have already scanned
                         if (jarName != null &&
@@ -263,16 +263,16 @@ public class StandardJarScanner implements JarScanner {
                 }
             }
         }
-        
+
     }
 
     /*
      * Extract the JAR name, if present, from a URL
      */
     private String getJarName(URL url) {
-        
+
         String name = null;
-        
+
         String path = url.getPath();
         int end = path.indexOf(Constants.JAR_EXT);
         if (end != -1) {
@@ -282,7 +282,7 @@ public class StandardJarScanner implements JarScanner {
             int start = path.lastIndexOf('/');
             name = path.substring(start + 1);
         }
-        
+
         return name;
     }
 

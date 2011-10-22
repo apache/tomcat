@@ -53,7 +53,7 @@ public final class StackMapTableEntry implements Cloneable, Serializable {
      */
     StackMapTableEntry(DataInputStream file, ConstantPool constant_pool) throws IOException {
         this(file.read(), -1, -1, null, -1, null);
-        
+
         if (frame_type >= Constants.SAME_FRAME && frame_type <= Constants.SAME_FRAME_MAX) {
             byte_code_offset_delta = frame_type - Constants.SAME_FRAME;
         } else if (frame_type >= Constants.SAME_LOCALS_1_STACK_ITEM_FRAME && frame_type <= Constants.SAME_LOCALS_1_STACK_ITEM_FRAME_MAX) {
@@ -76,8 +76,8 @@ public final class StackMapTableEntry implements Cloneable, Serializable {
             types_of_locals = new StackMapType[number_of_locals];
             for (int i = 0; i < number_of_locals; i++) {
                 types_of_locals[i] = new StackMapType(file, constant_pool);
-            }            
-        } else if (frame_type == Constants.FULL_FRAME) {        
+            }
+        } else if (frame_type == Constants.FULL_FRAME) {
             byte_code_offset_delta = file.readShort();
             number_of_locals = file.readShort();
             types_of_locals = new StackMapType[number_of_locals];
@@ -132,7 +132,7 @@ public final class StackMapTableEntry implements Cloneable, Serializable {
             for (int i = 0; i < number_of_locals; i++) {
                 types_of_locals[i].dump(file);
             }
-        } else if (frame_type == Constants.FULL_FRAME) {        
+        } else if (frame_type == Constants.FULL_FRAME) {
             file.writeShort(byte_code_offset_delta);
             file.writeShort(number_of_locals);
             for (int i = 0; i < number_of_locals; i++) {
@@ -168,7 +168,7 @@ public final class StackMapTableEntry implements Cloneable, Serializable {
             buf.append("SAME_EXTENDED");
         } else if (frame_type >= Constants.APPEND_FRAME && frame_type <= Constants.APPEND_FRAME_MAX) {
             buf.append("APPEND "+(frame_type-251));
-        } else if (frame_type == Constants.FULL_FRAME) {        
+        } else if (frame_type == Constants.FULL_FRAME) {
             buf.append("FULL");
         } else {
             buf.append("UNKNOWN");

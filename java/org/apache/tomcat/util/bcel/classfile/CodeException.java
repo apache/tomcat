@@ -64,8 +64,8 @@ public final class CodeException implements Cloneable, Constants, Serializable {
      * @param end_pc is exclusive
      * @param handler_pc Starting address of exception handler, i.e.,
      * an offset from start of code.
-     * @param catch_type If zero the handler catches any 
-     * exception, otherwise it points to the exception class which is 
+     * @param catch_type If zero the handler catches any
+     * exception, otherwise it points to the exception class which is
      * to be caught.
      */
     public CodeException(int start_pc, int end_pc, int handler_pc, int catch_type) {

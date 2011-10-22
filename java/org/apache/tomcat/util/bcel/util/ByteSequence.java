@@ -22,7 +22,7 @@ import java.io.DataInputStream;
 
 /**
  * Utility class that implements a sequence of bytes which can be read
- * via the `readByte()' method. This is used to implement a wrapper for the 
+ * via the `readByte()' method. This is used to implement a wrapper for the
  * Java byte code stream to gain some more readability.
  *
  * @version $Id$

@@ -97,7 +97,7 @@ public interface Constants {
     "CONSTANT_Class", "CONSTANT_String", "CONSTANT_Fieldref",
     "CONSTANT_Methodref", "CONSTANT_InterfaceMethodref",
     "CONSTANT_NameAndType" };
-  
+
   /** Java VM opcode.
    * @see <a href="http://java.sun.com/docs/books/jvms/second_edition/html/Instructions2.doc.html">Opcode definitions in The Java Virtual Machine Specification</a> */
   public static final short LDC              = 18;
@@ -138,11 +138,11 @@ public interface Constants {
   /** Java VM opcode.
    * @see <a href="http://java.sun.com/docs/books/jvms/second_edition/html/Instructions2.doc.html">Opcode definitions in The Java Virtual Machine Specification</a> */
   public static final short ASTORE           = 58;
-  
+
   /** Java VM opcode.
    * @see <a href="http://java.sun.com/docs/books/jvms/second_edition/html/Instructions2.doc.html">Opcode definitions in The Java Virtual Machine Specification</a> */
   public static final short IINC             = 132;
-  
+
   /** Java VM opcode.
    * @see <a href="http://java.sun.com/docs/books/jvms/second_edition/html/Instructions2.doc.html">Opcode definitions in The Java Virtual Machine Specification</a> */
   public static final short IFEQ             = 153;
@@ -218,14 +218,14 @@ public interface Constants {
   /** Java VM opcode.
    * @see <a href="http://java.sun.com/docs/books/jvms/second_edition/html/Instructions2.doc.html">Opcode definitions in The Java Virtual Machine Specification</a> */
   public static final short INVOKESPECIAL    = 183;
-  
+
   /** Java VM opcode.
    * @see <a href="http://java.sun.com/docs/books/jvms/second_edition/html/Instructions2.doc.html">Opcode definitions in The Java Virtual Machine Specification</a> */
   public static final short INVOKESTATIC     = 184;
   /** Java VM opcode.
    * @see <a href="http://java.sun.com/docs/books/jvms/second_edition/html/Instructions2.doc.html">Opcode definitions in The Java Virtual Machine Specification</a> */
   public static final short INVOKEINTERFACE  = 185;
-  
+
   /** Java VM opcode.
    * @see <a href="http://java.sun.com/docs/books/jvms/second_edition/html/Instructions2.doc.html">Opcode definitions in The Java Virtual Machine Specification</a> */
   public static final short NEW              = 187;
@@ -235,14 +235,14 @@ public interface Constants {
   /** Java VM opcode.
    * @see <a href="http://java.sun.com/docs/books/jvms/second_edition/html/Instructions2.doc.html">Opcode definitions in The Java Virtual Machine Specification</a> */
   public static final short ANEWARRAY        = 189;
-  
+
   /** Java VM opcode.
    * @see <a href="http://java.sun.com/docs/books/jvms/second_edition/html/Instructions2.doc.html">Opcode definitions in The Java Virtual Machine Specification</a> */
   public static final short CHECKCAST        = 192;
   /** Java VM opcode.
    * @see <a href="http://java.sun.com/docs/books/jvms/second_edition/html/Instructions2.doc.html">Opcode definitions in The Java Virtual Machine Specification</a> */
   public static final short INSTANCEOF       = 193;
-  
+
   /** Java VM opcode.
    * @see <a href="http://java.sun.com/docs/books/jvms/second_edition/html/Instructions2.doc.html">Opcode definitions in The Java Virtual Machine Specification</a> */
   public static final short WIDE             = 196;
@@ -279,8 +279,8 @@ public interface Constants {
   public static final byte T_SHORT   = 9;
   /** Int data type. */
   public static final byte T_INT     = 10;
-  
-  
+
+
   /** Unknown data type. */
   public static final byte T_UNKNOWN   = 15;
 
@@ -431,7 +431,7 @@ public interface Constants {
 
   /**
    * Names of opcodes.  Indexed by opcode.  OPCODE_NAMES[ALOAD] = "aload".
-   */ 
+   */
   public static final String[] OPCODE_NAMES = {
     "nop", "aconst_null", "iconst_m1", "iconst_0", "iconst_1",
     "iconst_2", "iconst_3", "iconst_4", "iconst_5", "lconst_0",
@@ -513,7 +513,7 @@ public interface Constants {
     "SourceFile", "ConstantValue", "Code", "Exceptions",
     "LineNumberTable", "LocalVariableTable",
     "InnerClasses", "Synthetic", "Deprecated",
-    "PMGClass", "Signature", "StackMap", 
+    "PMGClass", "Signature", "StackMap",
     "RuntimeVisibleAnnotations", "RuntimeInvisibleAnnotations",
     "RuntimeVisibleParameterAnnotations", "RuntimeInvisibleParameterAnnotations",
     "AnnotationDefault", "LocalVariableTypeTable", "EnclosingMethod", "StackMapTable"
@@ -527,25 +527,25 @@ public interface Constants {
 
   public static final String[] ITEM_NAMES = {
     "Bogus", "Integer", "Float", "Double", "Long",
-    "Null", "InitObject", "Object", "NewObject" 
+    "Null", "InitObject", "Object", "NewObject"
   };
-  
+
   /** Constants used to identify StackMapEntry types.
-   * 
-   * For those types which can specify a range, the 
+   *
+   * For those types which can specify a range, the
    * constant names the lowest value.
    */
-  public static final int SAME_FRAME = 0; 
-  public static final int SAME_LOCALS_1_STACK_ITEM_FRAME = 64; 
-  public static final int SAME_LOCALS_1_STACK_ITEM_FRAME_EXTENDED = 247; 
-  public static final int CHOP_FRAME = 248; 
-  public static final int SAME_FRAME_EXTENDED = 251; 
-  public static final int APPEND_FRAME = 252; 
-  public static final int FULL_FRAME = 255; 
-  
-  /** Constants that define the maximum value of 
+  public static final int SAME_FRAME = 0;
+  public static final int SAME_LOCALS_1_STACK_ITEM_FRAME = 64;
+  public static final int SAME_LOCALS_1_STACK_ITEM_FRAME_EXTENDED = 247;
+  public static final int CHOP_FRAME = 248;
+  public static final int SAME_FRAME_EXTENDED = 251;
+  public static final int APPEND_FRAME = 252;
+  public static final int FULL_FRAME = 255;
+
+  /** Constants that define the maximum value of
    * those constants which store ranges. */
-  
+
   public static final int SAME_FRAME_MAX = 63;
   public static final int SAME_LOCALS_1_STACK_ITEM_FRAME_MAX = 127;
   public static final int CHOP_FRAME_MAX = 250;

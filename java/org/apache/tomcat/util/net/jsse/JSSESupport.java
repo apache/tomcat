@@ -48,15 +48,15 @@ import org.apache.tomcat.util.res.StringManager;
    @author EKR
    @author Craig R. McClanahan
    @author Filip Hanik
-   Parts cribbed from JSSECertCompat       
+   Parts cribbed from JSSECertCompat
    Parts cribbed from CertificatesValve
 */
 
 class JSSESupport implements SSLSupport, SSLSessionManager {
-    
+
     private static final org.apache.juli.logging.Log log =
         org.apache.juli.logging.LogFactory.getLog(JSSESupport.class);
-    
+
     private static final StringManager sm =
         StringManager.getManager("org.apache.tomcat.util.net.jsse.res");
 
@@ -73,7 +73,7 @@ class JSSESupport implements SSLSupport, SSLSessionManager {
         session = sock.getSession();
         sock.addHandshakeCompletedListener(listener);
     }
-    
+
     JSSESupport(SSLSession session) {
         this.session = session;
     }
@@ -87,7 +87,7 @@ class JSSESupport implements SSLSupport, SSLSessionManager {
     }
 
     @Override
-    public Object[] getPeerCertificateChain() 
+    public Object[] getPeerCertificateChain()
         throws IOException {
         return getPeerCertificateChain(false);
     }
@@ -102,8 +102,8 @@ class JSSESupport implements SSLSupport, SSLSessionManager {
             return null;
         }
         if( certs==null ) return null;
-        
-        java.security.cert.X509Certificate [] x509Certs = 
+
+        java.security.cert.X509Certificate [] x509Certs =
             new java.security.cert.X509Certificate[certs.length];
         for(int i=0; i < certs.length; i++) {
             if (certs[i] instanceof java.security.cert.X509Certificate ) {
@@ -118,7 +118,7 @@ class JSSESupport implements SSLSupport, SSLSessionManager {
                         new ByteArrayInputStream(buffer);
                     x509Certs[i] = (java.security.cert.X509Certificate)
                             cf.generateCertificate(stream);
-                } catch(Exception ex) { 
+                } catch(Exception ex) {
                     log.info(sm.getString(
                             "jseeSupport.certTranslationError", certs[i]), ex);
                     return null;
@@ -212,18 +212,18 @@ class JSSESupport implements SSLSupport, SSLSessionManager {
      * Copied from <code>org.apache.catalina.valves.CertificateValve</code>
      */
     @Override
-    public Integer getKeySize() 
+    public Integer getKeySize()
         throws IOException {
         // Look up the current SSLSession
         SSLSupport.CipherData c_aux[]=ciphers;
         if (session == null)
             return null;
-        
+
         Integer keySize = null;
         synchronized(keySizeCache) {
             keySize = keySizeCache.get(session);
         }
-        
+
         if (keySize == null) {
             int size = 0;
             String cipherSuite = session.getCipherSuite();
@@ -249,7 +249,7 @@ class JSSESupport implements SSLSupport, SSLSessionManager {
             return null;
         // Expose ssl_session (getId)
         byte [] ssl_session = session.getId();
-        if ( ssl_session == null) 
+        if ( ssl_session == null)
             return null;
         StringBuilder buf=new StringBuilder();
         for(int x=0; x<ssl_session.length; x++) {

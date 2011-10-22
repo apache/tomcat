@@ -55,7 +55,7 @@ public class JavaClass extends AccessFlags
 
     //  Annotations are collected from certain attributes, don't do it more than necessary!
     private boolean annotationsOutOfDate = true;
-    
+
     private static BCELComparator _cmp = new BCELComparator() {
 
         @Override
@@ -124,7 +124,7 @@ public class JavaClass extends AccessFlags
             }
         }
         /* According to the specification the following entries must be of type
-         * `ConstantClass' but we check that anyway via the 
+         * `ConstantClass' but we check that anyway via the
          * `ConstPool.getConstant' method.
          */
         class_name = constant_pool.getConstantString(class_name_index, Constants.CONSTANT_Class);
@@ -151,9 +151,9 @@ public class JavaClass extends AccessFlags
     public Attribute[] getAttributes() {
         return attributes;
     }
-    
+
     public AnnotationEntry[] getAnnotationEntries() {
-        if (annotationsOutOfDate) { 
+        if (annotationsOutOfDate) {
             // Find attributes that contain annotation data
             Attribute[] attrs = getAttributes();
             List<AnnotationEntry> accumulatedAnnotations = new ArrayList<AnnotationEntry>();
@@ -216,7 +216,7 @@ public class JavaClass extends AccessFlags
         AnnotationEntry[] annotations = getAnnotationEntries();
         if (annotations!=null && annotations.length>0) {
             buf.append("\nAnnotation(s):\n");
-            for (int i=0; i<annotations.length; i++) 
+            for (int i=0; i<annotations.length; i++)
                 buf.append(indent(annotations[i]));
         }
         if (fields.length > 0) {
@@ -253,7 +253,7 @@ public class JavaClass extends AccessFlags
      * Return value as defined by given BCELComparator strategy.
      * By default two JavaClass objects are said to be equal when
      * their class names are equal.
-     * 
+     *
      * @see java.lang.Object#equals(java.lang.Object)
      */
     @Override
@@ -275,7 +275,7 @@ public class JavaClass extends AccessFlags
     /**
      * Return value as defined by given BCELComparator strategy.
      * By default return the hashcode of the class name.
-     * 
+     *
      * @see java.lang.Object#hashCode()
      */
     @Override

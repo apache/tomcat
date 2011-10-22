@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -24,7 +24,7 @@ import java.util.jar.JarInputStream;
  * When using a {@link JarInputStream} with an XML parser, the stream will be
  * closed by the parser. This causes problems if multiple entries from the JAR
  * need to be parsed. This implementation makes {{@link #close()} a NO-OP and
- * adds {@link #reallyClose()} that will close the stream. 
+ * adds {@link #reallyClose()} that will close the stream.
  */
 public class NonClosingJarInputStream extends JarInputStream {
 

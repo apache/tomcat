@@ -33,7 +33,7 @@ import org.apache.tomcat.util.bcel.Constants;
  * <em>LocalVariableTable</em>, <em>InnerClasses</em> and
  * <em>Synthetic</em> attributes are supported. The <em>Unknown</em>
  * attribute stands for non-standard-attributes.
- * 
+ *
  * @version $Id$
  * @author <A HREF="mailto:m.dahm@gmx.de">M. Dahm</A>
  * @see ConstantValue
@@ -71,7 +71,7 @@ public abstract class Attribute implements Cloneable, Serializable
 
     /**
      * Dump attribute to file stream in binary format.
-     * 
+     *
      * @param file
      *            Output file stream
      * @throws IOException
@@ -89,7 +89,7 @@ public abstract class Attribute implements Cloneable, Serializable
      * Class method reads one attribute from the input data stream. This method
      * must not be accessible from the outside. It is called by the Field and
      * Method constructor methods.
-     * 
+     *
      * @see Field
      * @see Method @param file Input stream @param constant_pool Array of
      *      constants @return Attribute @throws IOException @throws
@@ -208,7 +208,7 @@ public abstract class Attribute implements Cloneable, Serializable
     /**
      * Use copy() if you want to have a deep copy(), i.e., with all references
      * copied correctly.
-     * 
+     *
      * @return shallow copy of this attribute
      */
     @Override
