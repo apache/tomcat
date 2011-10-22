@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -50,7 +50,7 @@ public class StatusTransformer {
     // --------------------------------------------------------- Public Methods
 
 
-    public static void setContentType(HttpServletResponse response, 
+    public static void setContentType(HttpServletResponse response,
                                       int mode) {
         if (mode == 0){
             response.setContentType("text/html;charset="+Constants.CHARSET);
@@ -84,10 +84,10 @@ public class StatusTransformer {
     /**
      * Write the header body. XML output doesn't bother
      * to output this stuff, since it's just title.
-     * 
+     *
      * @param writer The output writer
      * @param args What to write
-     * @param mode 0 means write 
+     * @param mode 0 means write
      */
     public static void writeBody(PrintWriter writer, Object[] args, int mode) {
         if (mode == 0){
@@ -99,12 +99,12 @@ public class StatusTransformer {
 
     /**
      * Write the manager webapp information.
-     * 
+     *
      * @param writer The output writer
      * @param args What to write
      * @param mode 0 means write
      */
-    public static void writeManager(PrintWriter writer, Object[] args, 
+    public static void writeManager(PrintWriter writer, Object[] args,
                                     int mode) {
         if (mode == 0){
             writer.print(MessageFormat.format(Constants.MANAGER_SECTION, args));
@@ -112,7 +112,7 @@ public class StatusTransformer {
     }
 
 
-    public static void writePageHeading(PrintWriter writer, Object[] args, 
+    public static void writePageHeading(PrintWriter writer, Object[] args,
                                         int mode) {
         if (mode == 0){
             writer.print(MessageFormat.format
@@ -121,7 +121,7 @@ public class StatusTransformer {
     }
 
 
-    public static void writeServerInfo(PrintWriter writer, Object[] args, 
+    public static void writeServerInfo(PrintWriter writer, Object[] args,
                                        int mode){
         if (mode == 0){
             writer.print(MessageFormat.format(Constants.SERVER_ROW_SECTION, args));
@@ -130,7 +130,7 @@ public class StatusTransformer {
 
 
     /**
-     * 
+     *
      */
     public static void writeFooter(PrintWriter writer, int mode) {
         if (mode == 0){
@@ -162,7 +162,7 @@ public class StatusTransformer {
         } catch (Throwable t) {
             ExceptionUtils.handleThrowable(t);
         }
-        
+
         if (ok) {
             if (mode == 0){
                 writer.print("<h1>OS</h1>");
@@ -188,10 +188,10 @@ public class StatusTransformer {
                 // NO-OP
             }
         }
-        
+
     }
-    
-    
+
+
     /**
      * Write the VM state. Mode 0 will generate HTML.
      * Mode 1 will generate XML.
@@ -254,7 +254,7 @@ public class StatusTransformer {
             } catch (Exception e) {
                 // Ignore
             }
-            
+
             writer.print("<br>");
 
             ObjectName grpName = null;
@@ -358,13 +358,13 @@ public class StatusTransformer {
     /**
      * Write processor state.
      */
-    protected static void writeProcessorState(PrintWriter writer, 
+    protected static void writeProcessorState(PrintWriter writer,
                                               ObjectName pName,
-                                              MBeanServer mBeanServer, 
+                                              MBeanServer mBeanServer,
                                               int mode)
         throws Exception {
 
-        Integer stageValue = 
+        Integer stageValue =
             (Integer) mBeanServer.getAttribute(pName, "stage");
         int stage = stageValue.intValue();
         boolean fullStatus = true;
@@ -431,7 +431,7 @@ public class StatusTransformer {
                 writer.write("<td>");
                 if (showRequest) {
                     writer.print(formatSize(mBeanServer.getAttribute
-                                            (pName, "requestBytesReceived"), 
+                                            (pName, "requestBytesReceived"),
                                             false));
                 } else {
                     writer.write("?");
@@ -473,7 +473,7 @@ public class StatusTransformer {
             writer.write(" stage=\"" + stageStr + "\"");
 
             if (fullStatus) {
-                writer.write(" requestProcessingTime=\"" 
+                writer.write(" requestProcessingTime=\""
                              + mBeanServer.getAttribute
                              (pName, "requestProcessingTime") + "\"");
                 writer.write(" requestBytesSent=\"");
@@ -492,30 +492,30 @@ public class StatusTransformer {
                     writer.write("0");
                 }
                 writer.write("\"");
-                writer.write(" remoteAddr=\"" 
+                writer.write(" remoteAddr=\""
                              + filter(mBeanServer.getAttribute
                                       (pName, "remoteAddr")) + "\"");
-                writer.write(" virtualHost=\"" 
+                writer.write(" virtualHost=\""
                              + filter(mBeanServer.getAttribute
                                       (pName, "virtualHost")) + "\"");
 
                 if (showRequest) {
-                    writer.write(" method=\"" 
+                    writer.write(" method=\""
                                  + filter(mBeanServer.getAttribute
                                           (pName, "method")) + "\"");
-                    writer.write(" currentUri=\"" 
+                    writer.write(" currentUri=\""
                                  + filter(mBeanServer.getAttribute
                                           (pName, "currentUri")) + "\"");
 
                     String queryString = (String) mBeanServer.getAttribute
                         (pName, "currentQueryString");
                     if ((queryString != null) && (!queryString.equals(""))) {
-                        writer.write(" currentQueryString=\"" 
+                        writer.write(" currentQueryString=\""
                                      + RequestUtil.filter(queryString) + "\"");
                     } else {
                         writer.write(" currentQueryString=\"&#63;\"");
                     }
-                    writer.write(" protocol=\"" 
+                    writer.write(" protocol=\""
                                  + filter(mBeanServer.getAttribute
                                           (pName, "protocol")) + "\"");
                 } else {
@@ -587,7 +587,7 @@ public class StatusTransformer {
             iterator = hostsON.iterator();
             while (iterator.hasNext()) {
                 ObjectName contextON = iterator.next();
-                writer.print("<a class=\"A.name\" name=\"" 
+                writer.print("<a class=\"A.name\" name=\""
                              + (count++) + ".0\">");
                 writeContext(writer, contextON, mBeanServer, mode);
             }
@@ -602,7 +602,7 @@ public class StatusTransformer {
     /**
      * Write context state.
      */
-    protected static void writeContext(PrintWriter writer, 
+    protected static void writeContext(PrintWriter writer,
                                        ObjectName objectName,
                                        MBeanServer mBeanServer, int mode)
         throws Exception {
@@ -613,7 +613,7 @@ public class StatusTransformer {
             if (name == null) {
                 return;
             }
-            
+
             String hostName = null;
             String contextName = null;
             if (name.startsWith("//")) {
@@ -628,7 +628,7 @@ public class StatusTransformer {
             }
 
             ObjectName queryManager = new ObjectName
-                (objectName.getDomain() + ":type=Manager,context=" + contextName 
+                (objectName.getDomain() + ":type=Manager,context=" + contextName
                  + ",host=" + hostName + ",*");
             Set<ObjectName> managersON =
                 mBeanServer.queryNames(queryManager, null);
@@ -673,7 +673,7 @@ public class StatusTransformer {
             }
             writer.print("</p>");
 
-            String onStr = objectName.getDomain() 
+            String onStr = objectName.getDomain()
                 + ":j2eeType=Servlet,WebModule=" + webModuleName + ",*";
             ObjectName servletObjectName = new ObjectName(onStr);
             Set<ObjectInstance> set =
@@ -774,10 +774,10 @@ public class StatusTransformer {
 
         if (mode == 0) {
             String servletName = objectName.getKeyProperty("name");
-            
-            String[] mappings = (String[]) 
+
+            String[] mappings = (String[])
                 mBeanServer.invoke(objectName, "findMappings", null, null);
-            
+
             writer.print("<h2>");
             writer.print(filter(servletName));
             if ((mappings != null) && (mappings.length > 0)) {
@@ -791,7 +791,7 @@ public class StatusTransformer {
                 writer.print(" ] ");
             }
             writer.print("</h2>");
-            
+
             writer.print("<p>");
             writer.print(" Processing time: ");
             writer.print(formatTime(mBeanServer.getAttribute
@@ -878,7 +878,7 @@ public class StatusTransformer {
                 bytes = -bytes;
             }
             long mbytes = bytes / (1024 * 1024);
-            long rest = 
+            long rest =
                 ((bytes - (mbytes * (1024 * 1024))) * 100) / (1024 * 1024);
             buff.append(mbytes).append('.');
             if (rest < 10) {

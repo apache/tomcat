@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -86,10 +86,10 @@ public final class HTMLManagerServlet extends ManagerServlet {
 
     private static final long serialVersionUID = 1L;
 
-    protected static final URLEncoder URL_ENCODER; 
+    protected static final URLEncoder URL_ENCODER;
     protected static final String APPLICATION_MESSAGE = "message";
     protected static final String APPLICATION_ERROR = "error";
-    
+
     protected static final String sessionsListJspPath  = "/WEB-INF/jsp/sessionsList.jsp";
     protected static final String sessionDetailJspPath = "/WEB-INF/jsp/sessionDetail.jsp";
 
@@ -98,9 +98,9 @@ public final class HTMLManagerServlet extends ManagerServlet {
         // '/' should not be encoded in context paths
         URL_ENCODER.addSafeCharacter('/');
     }
-    
+
     private final Random randomSource = new Random();
-    
+
     private boolean showProxySessions = false;
 
     // --------------------------------------------------------- Public Methods
@@ -120,7 +120,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
         throws IOException, ServletException {
 
         StringManager smClient = getStringManager(request);
-        
+
         // Identify the request parameters that we need
         // By obtaining the command from the pathInfo, per-command security can
         // be configured in web.xml
@@ -194,7 +194,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
         ContextName deployCn = null;
         if (deployPath != null) {
             deployCn = new ContextName(deployPath,
-                    request.getParameter("deployVersion")); 
+                    request.getParameter("deployVersion"));
         }
         String deployConfig = request.getParameter("deployConfig");
         String deployWar = request.getParameter("deployWar");
@@ -237,7 +237,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
      * Generate a once time token (nonce) for authenticating subsequent
      * requests. This will also add the token to the session. The nonce
      * generation is a simplified version of ManagerBase.generateSessionId().
-     * 
+     *
      */
     protected String generateNonce() {
         byte random[] = new byte[16];
@@ -246,7 +246,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
         StringBuilder buffer = new StringBuilder();
 
         randomSource.nextBytes(random);
-       
+
         for (int j = 0; j < random.length; j++) {
             byte b1 = (byte) ((random[j] & 0xf0) >> 4);
             byte b2 = (byte) (random[j] & 0x0f);
@@ -272,7 +272,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
 
         Collection<Part> parts = request.getParts();
         Iterator<Part> iter = parts.iterator();
-        
+
         try {
             while (iter.hasNext()) {
                 Part part = iter.next();
@@ -315,7 +315,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
                             filename);
                     break;
                 }
-                
+
                 ContextName cn = new ContextName(filename);
                 String name = cn.getName();
 
@@ -476,7 +476,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
             contextNames[i] = children[i].getName();
 
         Arrays.sort(contextNames);
-        
+
         String appsStart = smClient.getString("htmlManagerServlet.appsStart");
         String appsStop = smClient.getString("htmlManagerServlet.appsStop");
         String appsReload = smClient.getString("htmlManagerServlet.appsReload");
@@ -492,7 +492,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
 
         for (String contextName : contextNames) {
             Context ctxt = (Context) host.findChild(contextName);
-            
+
             if (ctxt != null) {
                 // Bugzilla 34818, alternating row colors
                 isHighlighted = !isHighlighted;
@@ -523,7 +523,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
                     // Assume false on failure for safety
                     isDeployed = false;
                 }
-                
+
                 args = new Object[7];
                 args[0] = "<a href=\"" + URL_ENCODER.encode(displayPath)
                         + "\">" + RequestUtil.filter(displayPath) + "</a>";
@@ -540,7 +540,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
                 args[3] = Boolean.valueOf(ctxt.getAvailable());
                 args[4] = RequestUtil.filter(response.encodeURL(request.getContextPath() +
                      "/html/sessions?" + pathVersion));
-                Manager manager = ctxt.getManager(); 
+                Manager manager = ctxt.getManager();
                 if (manager instanceof DistributedManager && showProxySessions) {
                     args[5] = Integer.valueOf(
                             ((DistributedManager)manager).getActiveSessionsFull());
@@ -582,7 +582,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
                 }
                 args[12] = smClient.getString("htmlManagerServlet.expire.unit");
                 args[13] = highlightColor;
-                
+
                 if (ctxt.getName().equals(this.context.getName())) {
                     writer.print(MessageFormat.format(
                         MANAGER_APP_ROW_BUTTON_SECTION, args));
@@ -771,8 +771,8 @@ public final class HTMLManagerServlet extends ManagerServlet {
     /**
      * Find potential memory leaks caused by web application reload.
      *
-     * @see ManagerServlet#findleaks(boolean, PrintWriter, StringManager) 
-     * 
+     * @see ManagerServlet#findleaks(boolean, PrintWriter, StringManager)
+     *
      * @param smClient  StringManager for the client's locale
      *
      * @return message String
@@ -797,38 +797,38 @@ public final class HTMLManagerServlet extends ManagerServlet {
         } else {
             msg.append(smClient.getString("htmlManagerServlet.findleaksNone"));
         }
-        
+
         return msg.toString();
     }
-    
-    
+
+
     /**
      * @see javax.servlet.Servlet#getServletInfo()
      */
     @Override
     public String getServletInfo() {
         return "HTMLManagerServlet, Copyright (c) 1999-2011, The Apache Software Foundation";
-    }   
-    
+    }
+
     /**
      * @see javax.servlet.GenericServlet#init()
      */
     @Override
     public void init() throws ServletException {
         super.init();
-        
+
         // Set our properties from the initialization parameters
         String value = null;
         value = getServletConfig().getInitParameter("showProxySessions");
         showProxySessions = Boolean.parseBoolean(value);
-    }   
+    }
 
     // ------------------------------------------------ Sessions administration
 
     /**
      *
      * Extract the expiration request parameter
-     * 
+     *
      * @param cn Name of the application from which to expire sessions
      * @param req
      * @param smClient  StringManager for the client's locale
@@ -848,12 +848,12 @@ public final class HTMLManagerServlet extends ManagerServlet {
     }
 
     /**
-     * 
+     *
      * @param req
      * @param resp
      * @param smClient  StringManager for the client's locale
      * @throws ServletException
-     * @throws IOException 
+     * @throws IOException
      */
     protected void doSessions(ContextName cn, HttpServletRequest req,
             HttpServletResponse resp, StringManager smClient)
@@ -938,7 +938,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
     }
 
     /**
-     * 
+     *
      * @param cn Name of the application for which the sessions will be listed
      * @param req
      * @param resp
@@ -987,7 +987,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
     }
 
     /**
-     * 
+     *
      * @param req
      * @param resp
      * @param smClient  StringManager for the client's locale
@@ -1015,7 +1015,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
      * @param sessionIds
      * @param smClient  StringManager for the client's locale
      * @return number of invalidated sessions
-     * @throws IOException 
+     * @throws IOException
      */
     protected int invalidateSessions(ContextName cn, String[] sessionIds,
             StringManager smClient) throws IOException {
@@ -1057,7 +1057,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
      * @param attributeName
      * @param smClient  StringManager for the client's locale
      * @return true if there was an attribute removed, false otherwise
-     * @throws IOException 
+     * @throws IOException
      */
     protected boolean removeSessionAttribute(ContextName cn, String sessionId,
             String attributeName, StringManager smClient) throws IOException {

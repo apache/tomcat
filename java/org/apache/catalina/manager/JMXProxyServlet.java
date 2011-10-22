@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -45,7 +45,7 @@ import org.apache.tomcat.util.modeler.Registry;
  * @author Costin Manolache
  */
 public class JMXProxyServlet extends HttpServlet  {
-    
+
     private static final long serialVersionUID = 1L;
 
     // ----------------------------------------------------- Instance Variables
@@ -104,7 +104,7 @@ public class JMXProxyServlet extends HttpServlet  {
             String name=request.getParameter("att");
             getAttribute( writer, qry, name );
             return;
-        }        
+        }
         qry=request.getParameter("qry");
         if( qry == null ) {
             qry = "*:*";
@@ -179,7 +179,7 @@ public class JMXProxyServlet extends HttpServlet  {
                             attName.indexOf( " ") >=0 ) {
                         continue;
                     }
-            
+
                     try {
                         value=mBeanServer.getAttribute(oname, attName);
                     } catch( Throwable t) {
@@ -271,7 +271,7 @@ public class JMXProxyServlet extends HttpServlet  {
 
     /**
      * Determines if a type is supported by the {@link JMXProxyServlet}.
-     * 
+     *
      * @param type  The type to check
      * @return      Always returns <code>true</code>
      */
