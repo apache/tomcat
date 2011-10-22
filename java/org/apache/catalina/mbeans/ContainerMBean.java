@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -52,28 +52,28 @@ public class ContainerMBean extends BaseModelMBean {
      * @exception RuntimeOperationsException if an IllegalArgumentException
      *  occurs
      */
-    public ContainerMBean() 
+    public ContainerMBean()
         throws MBeanException, RuntimeOperationsException {
-        
+
         super();
     }
-    
+
     /**
      * Add a new child Container to those associated with this Container,
      * if supported. Won't start the child yet. Has to be started with a call to
      * Start method after necessary configurations are done.
-     * 
+     *
      * @param type ClassName of the child to be added
      * @param name Name of the child to be added
-     * 
+     *
      * @exception MBeanException if the child cannot be added
      */
-    public void addChild(String type, String name) throws MBeanException{ 
+    public void addChild(String type, String name) throws MBeanException{
         Container contained = null;
         try {
             contained = (Container)Class.forName(type).newInstance();
             contained.setName(name);
-            
+
             if(contained instanceof StandardHost){
                 HostConfig config = new HostConfig();
                 contained.addLifecycleListener(config);
@@ -89,9 +89,9 @@ public class ContainerMBean extends BaseModelMBean {
         } catch (ClassNotFoundException e) {
             throw new MBeanException(e);
         }
-        
+
         boolean oldValue= true;
-        
+
         ContainerBase container = null;
         try {
             container = (ContainerBase)getManagedResource();
@@ -113,7 +113,7 @@ public class ContainerMBean extends BaseModelMBean {
             }
         }
     }
-    
+
     /**
      * Remove an existing child Container from association with this parent
      * Container.
@@ -135,15 +135,15 @@ public class ContainerMBean extends BaseModelMBean {
             }
         }
     }
-    
+
     /**
      * Adds a valve to this Container instance.
      *
      * @param valveType ClassName of the valve to be added
-     * 
+     *
      * @exception MBeanException if a component cannot be removed
      */
-    public String addValve(String valveType) throws MBeanException{ 
+    public String addValve(String valveType) throws MBeanException{
         Valve valve = null;
         try {
             valve = (Valve)Class.forName(valveType).newInstance();
@@ -154,11 +154,11 @@ public class ContainerMBean extends BaseModelMBean {
         } catch (ClassNotFoundException e) {
             throw new MBeanException(e);
         }
-        
+
         if (valve == null) {
             return null;
         }
-            
+
         try {
             ContainerBase container = (ContainerBase)getManagedResource();
             container.addValve(valve);
@@ -169,10 +169,10 @@ public class ContainerMBean extends BaseModelMBean {
         } catch (InvalidTargetObjectTypeException e) {
             throw new MBeanException(e);
         }
-        
+
         return ((LifecycleMBeanBase)valve).getObjectName().toString();
     }
-    
+
     /**
      * Remove an existing Valve.
      *
@@ -191,7 +191,7 @@ public class ContainerMBean extends BaseModelMBean {
         } catch (InvalidTargetObjectTypeException e) {
             throw new MBeanException(e);
         }
-        
+
         ObjectName oname;
         try {
             oname = new ObjectName(valveName);
@@ -200,7 +200,7 @@ public class ContainerMBean extends BaseModelMBean {
         } catch (NullPointerException e) {
             throw new MBeanException(e);
         }
-        
+
         if(container != null){
             Valve[] valves = container.getPipeline().getValves();
             for (int i = 0; i < valves.length; i++) {
@@ -211,7 +211,7 @@ public class ContainerMBean extends BaseModelMBean {
             }
         }
     }
-    
+
     /**
      * Add a LifecycleEvent listener to this component.
      *
@@ -228,7 +228,7 @@ public class ContainerMBean extends BaseModelMBean {
         } catch (ClassNotFoundException e) {
             throw new MBeanException(e);
         }
-        
+
         if(listener != null){
             try {
                 ContainerBase container = (ContainerBase)getManagedResource();
@@ -242,12 +242,12 @@ public class ContainerMBean extends BaseModelMBean {
             }
         }
     }
-    
+
     /**
      * Remove a LifecycleEvent listeners from this component.
      *
-     * @param type The ClassName of the listeners to be removed. 
-     * Note that all the listeners having given ClassName will be removed. 
+     * @param type The ClassName of the listeners to be removed.
+     * Note that all the listeners having given ClassName will be removed.
      */
     public void removeLifeCycleListeners(String type) throws MBeanException{
         ContainerBase container=null;
@@ -260,7 +260,7 @@ public class ContainerMBean extends BaseModelMBean {
         } catch (InvalidTargetObjectTypeException e) {
             throw new MBeanException(e);
         }
-        
+
         LifecycleListener[] listeners = container.findLifecycleListeners();
         for(LifecycleListener listener: listeners){
             if(listener.getClass().getName().equals(type)){
@@ -269,7 +269,7 @@ public class ContainerMBean extends BaseModelMBean {
         }
     }
 
-    
+
     /**
      * List the class name of each of the lifecycle listeners added to this
      * container.
@@ -296,7 +296,7 @@ public class ContainerMBean extends BaseModelMBean {
         return result.toArray(new String[result.size()]);
     }
 
-    
+
     /**
      * List the class name of each of the container listeners added to this
      * container.
