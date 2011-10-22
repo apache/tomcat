@@ -67,7 +67,7 @@ grant codeBase "file:${catalina.home}/bin/commons-daemon.jar" {
 //  grant codeBase "file:${catalina.base}/bin/tomcat-juli.jar" {..}
 grant codeBase "file:${catalina.home}/bin/tomcat-juli.jar" {
         permission java.io.FilePermission
-         "${java.home}${file.separator}lib${file.separator}logging.properties", "read"; 
+         "${java.home}${file.separator}lib${file.separator}logging.properties", "read";
 
         permission java.io.FilePermission
          "${catalina.base}${file.separator}conf${file.separator}logging.properties", "read";
