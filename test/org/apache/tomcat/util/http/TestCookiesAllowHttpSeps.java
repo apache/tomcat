@@ -46,7 +46,7 @@ public class TestCookiesAllowHttpSeps extends TomcatBaseTest {
         TestCookieHttpSepClient client = new TestCookieHttpSepClient();
         client.doRequest();
     }
-    
+
     private class TestCookieHttpSepClient extends SimpleHttpClient {
 
 
@@ -55,12 +55,12 @@ public class TestCookiesAllowHttpSeps extends TomcatBaseTest {
             Context root = tomcat.addContext("", TEMP_DIR);
             Tomcat.addServlet(root, "Simple", new SimpleServlet());
             root.addServletMapping("/test", "Simple");
-            
+
             tomcat.start();
             // Open connection
             setPort(tomcat.getConnector().getPort());
             connect();
-            
+
             String[] request = new String[1];
             request[0] =
                 "GET /test HTTP/1.0" + CRLF +
@@ -68,22 +68,22 @@ public class TestCookiesAllowHttpSeps extends TomcatBaseTest {
             setRequest(request);
             processRequest(true); // blocks until response has been read
             String response = getResponseBody();
-            
+
             // Close the connection
             disconnect();
             reset();
             tomcat.stop();
             assertEquals(COOKIE_WITH_SEPS, response);
         }
-        
+
         @Override
         public boolean isResponseBodyOK() {
             return true;
         }
-        
+
     }
-    
-    
+
+
     private static class SimpleServlet extends HttpServlet {
 
         private static final long serialVersionUID = 1L;
@@ -98,7 +98,7 @@ public class TestCookiesAllowHttpSeps extends TomcatBaseTest {
             }
             resp.flushBuffer();
         }
-        
+
     }
-    
+
 }

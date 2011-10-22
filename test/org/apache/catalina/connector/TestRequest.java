@@ -46,13 +46,13 @@ import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.util.buf.ByteChunk;
 
 /**
- * Test case for {@link Request}. 
+ * Test case for {@link Request}.
  */
 public class TestRequest extends TomcatBaseTest {
 
     /**
      * Test case for https://issues.apache.org/bugzilla/show_bug.cgi?id=37794
-     * POST parameters are not returned from a call to 
+     * POST parameters are not returned from a call to
      * any of the {@link HttpServletRequest} getParameterXXX() methods if the
      * request is chunked.
      */
@@ -72,9 +72,9 @@ public class TestRequest extends TomcatBaseTest {
         client.reset();
         client.doRequest(1, false); // 1 byte - too small should fail
         assertTrue(client.isResponse500());
-        
+
         client.reset();
-        
+
         // Edge cases around actual content length
         client.reset();
         client.doRequest(6, false); // Too small should fail
@@ -87,7 +87,7 @@ public class TestRequest extends TomcatBaseTest {
         client.doRequest(8, false); // 1 extra - should pass
         assertTrue(client.isResponse200());
         assertTrue(client.isResponseBodyOK());
-        
+
         // Much larger
         client.reset();
         client.doRequest(8096, false); // Plenty of space - should pass
@@ -100,9 +100,9 @@ public class TestRequest extends TomcatBaseTest {
         assertTrue(client.isResponse200());
         assertTrue(client.isResponseBodyOK());
     }
-    
+
     private static class Bug37794Servlet extends HttpServlet {
-        
+
         private static final long serialVersionUID = 1L;
 
         /**
@@ -113,9 +113,9 @@ public class TestRequest extends TomcatBaseTest {
                 throws ServletException, IOException {
             // Just echo the parameters and values back as plain text
             resp.setContentType("text/plain");
-            
+
             PrintWriter out = resp.getWriter();
-            
+
             // Assume one value per attribute
             Enumeration<String> names = req.getParameterNames();
             while (names.hasMoreElements()) {
@@ -124,36 +124,36 @@ public class TestRequest extends TomcatBaseTest {
             }
         }
     }
-    
+
     /**
      * Bug 37794 test client.
      */
     private class Bug37794Client extends SimpleHttpClient {
-        
+
         private boolean init;
-        
+
         private synchronized void init() throws Exception {
             if (init) return;
-            
+
             Tomcat tomcat = getTomcatInstance();
             Context root = tomcat.addContext("", TEMP_DIR);
             Tomcat.addServlet(root, "Bug37794", new Bug37794Servlet());
             root.addServletMapping("/test", "Bug37794");
             tomcat.start();
-            
+
             init = true;
         }
-        
+
         private Exception doRequest(int postLimit, boolean ucChunkedHead) {
             Tomcat tomcat = getTomcatInstance();
-            
+
             try {
                 init();
                 tomcat.getConnector().setMaxPostSize(postLimit);
-                
+
                 // Open connection
                 connect();
-                
+
                 // Send request in two parts
                 String[] request = new String[2];
                 if (ucChunkedHead) {
@@ -180,10 +180,10 @@ public class TestRequest extends TomcatBaseTest {
                     "&b=2" + CRLF +
                     "0" + CRLF +
                     CRLF;
-                
+
                 setRequest(request);
                 processRequest(); // blocks until response has been read
-                
+
                 // Close the connection
                 disconnect();
             } catch (Exception e) {
@@ -205,7 +205,7 @@ public class TestRequest extends TomcatBaseTest {
             }
             return true;
         }
-        
+
     }
 
     /**
@@ -217,21 +217,21 @@ public class TestRequest extends TomcatBaseTest {
     public void testBug38113() throws Exception {
         // Setup Tomcat instance
         Tomcat tomcat = getTomcatInstance();
-        
+
         // Must have a real docBase - just use temp
-        Context ctx = 
+        Context ctx =
             tomcat.addContext("", System.getProperty("java.io.tmpdir"));
 
         // Add the Servlet
         Tomcat.addServlet(ctx, "servlet", new EchoQueryStringServlet());
         ctx.addServletMapping("/", "servlet");
-        
+
         tomcat.start();
 
         // No query string
         ByteChunk res = getUrl("http://localhost:" + getPort() + "/");
         assertEquals("QueryString=null", res.toString());
-        
+
         // Query string
         res = getUrl("http://localhost:" + getPort() + "/?a=b");
         assertEquals("QueryString=a=b", res.toString());
@@ -240,7 +240,7 @@ public class TestRequest extends TomcatBaseTest {
         res = getUrl("http://localhost:" + getPort() + "/?");
         assertEquals("QueryString=", res.toString());
     }
-    
+
     private static final class EchoQueryStringServlet extends HttpServlet {
 
         private static final long serialVersionUID = 1L;
@@ -262,56 +262,56 @@ public class TestRequest extends TomcatBaseTest {
     public void testLoginLogout() throws Exception{
         // Setup Tomcat instance
         Tomcat tomcat = getTomcatInstance();
-        
+
         // Must have a real docBase - just use temp
-        Context ctx = 
+        Context ctx =
             tomcat.addContext("", System.getProperty("java.io.tmpdir"));
 
         LoginConfig config = new LoginConfig();
         config.setAuthMethod("BASIC");
         ctx.setLoginConfig(config);
         ctx.getPipeline().addValve(new BasicAuthenticator());
-        
+
         Tomcat.addServlet(ctx, "servlet", new LoginLogoutServlet());
         ctx.addServletMapping("/", "servlet");
-        
+
         MapRealm realm = new MapRealm();
         realm.addUser(LoginLogoutServlet.USER, LoginLogoutServlet.PWD);
         ctx.setRealm(realm);
-        
+
         tomcat.start();
-        
+
         ByteChunk res = getUrl("http://localhost:" + getPort() + "/");
         assertEquals(LoginLogoutServlet.OK, res.toString());
     }
-    
+
     private static final class LoginLogoutServlet extends HttpServlet {
         private static final long serialVersionUID = 1L;
         private static final String USER = "user";
         private static final String PWD = "pwd";
         private static final String OK = "OK";
-        
+
         @Override
         protected void doGet(HttpServletRequest req, HttpServletResponse resp)
                 throws ServletException, IOException {
-            
+
             req.login(USER, PWD);
-            
+
             if (!req.getRemoteUser().equals(USER))
                 throw new ServletException();
             if (!req.getUserPrincipal().getName().equals(USER))
                 throw new ServletException();
-            
+
             req.logout();
-            
+
             if (req.getRemoteUser() != null)
                 throw new ServletException();
             if (req.getUserPrincipal() != null)
                 throw new ServletException();
-            
+
             resp.getWriter().write(OK);
         }
-        
+
     }
 
     @Test
@@ -336,7 +336,7 @@ public class TestRequest extends TomcatBaseTest {
         Tomcat.addServlet(root, "Bug37794", new Bug37794Servlet());
         root.addServletMapping("/", "Bug37794");
         tomcat.start();
-        
+
         HttpURLConnection conn = getConnection();
         conn.setChunkedStreamingMode(8 * 1024);
         InputStream is = conn.getInputStream();
@@ -425,7 +425,7 @@ public class TestRequest extends TomcatBaseTest {
      *
      */
     private static class EchoParametersServlet extends HttpServlet {
-        
+
         private static final long serialVersionUID = 1L;
 
         /**
@@ -440,11 +440,11 @@ public class TestRequest extends TomcatBaseTest {
             resp.setCharacterEncoding("UTF-8");
 
             PrintWriter out = resp.getWriter();
-            
+
             TreeMap<String,String[]> parameters = new TreeMap<String,String[]>(req.getParameterMap());
 
             boolean first = true;
-            
+
             for(String name: parameters.keySet()) {
                 String[] values = req.getParameterValues(name);
 
@@ -469,26 +469,26 @@ public class TestRequest extends TomcatBaseTest {
     private class Bug48692Client extends SimpleHttpClient {
 
         private boolean init;
-        
+
         private synchronized void init() throws Exception {
             if (init) return;
-            
+
             Tomcat tomcat = getTomcatInstance();
             Context root = tomcat.addContext("", TEMP_DIR);
             Tomcat.addServlet(root, "EchoParameters", new EchoParametersServlet());
             root.addServletMapping("/echo", "EchoParameters");
             tomcat.start();
-            
+
             init = true;
         }
-        
+
         private Exception doRequest(String method,
                                     String queryString,
                                     String contentType,
                                     String requestBody,
                                     boolean allowBody) {
             Tomcat tomcat = getTomcatInstance();
-            
+
             try {
                 init();
                 if(allowBody)
@@ -521,7 +521,7 @@ public class TestRequest extends TomcatBaseTest {
 
                 setRequest(request);
                 processRequest(); // blocks until response has been read
-                
+
                 // Close the connection
                 disconnect();
             } catch (Exception e) {

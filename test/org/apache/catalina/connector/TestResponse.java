@@ -40,7 +40,7 @@ import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.util.buf.ByteChunk;
 
 /**
- * Test case for {@link Request}. 
+ * Test case for {@link Request}.
  */
 public class TestResponse extends TomcatBaseTest {
 
@@ -48,7 +48,7 @@ public class TestResponse extends TomcatBaseTest {
     public void testBug49598() throws Exception {
         // Setup Tomcat instance
         Tomcat tomcat = getTomcatInstance();
-        
+
         // Must have a real docBase - just use temp
         File docBase = new File(System.getProperty("java.io.tmpdir"));
         Context ctx = tomcat.addContext("", docBase.getAbsolutePath());
@@ -57,10 +57,10 @@ public class TestResponse extends TomcatBaseTest {
         ctx.addServletMapping("/", "servlet");
 
         tomcat.start();
-        
+
         Map<String,List<String>> headers = new HashMap<String,List<String>>();
         getUrl("http://localhost:" + getPort() + "/", new ByteChunk(), headers);
-        
+
         // Check for headers without a name
         for (Map.Entry<String,List<String>> header : headers.entrySet()) {
             if (header.getKey() == null) {
@@ -73,7 +73,7 @@ public class TestResponse extends TomcatBaseTest {
                 fail("Null header name detected for value " + values);
             }
         }
-        
+
         // Check for exactly one Set-Cookie header
         int count = 0;
         for (String headerName : headers.keySet()) {
@@ -83,7 +83,7 @@ public class TestResponse extends TomcatBaseTest {
         }
         assertEquals(1, count);
     }
-    
+
     private static final class Bug49598Servlet extends HttpServlet {
         private static final long serialVersionUID = 1L;
 
@@ -94,6 +94,6 @@ public class TestResponse extends TomcatBaseTest {
             session.invalidate();
             req.getSession(true);
         }
-        
+
     }
 }

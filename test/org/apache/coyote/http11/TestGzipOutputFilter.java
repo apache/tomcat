@@ -45,7 +45,7 @@ public class TestGzipOutputFilter {
      * to GZIPOutputStream and close it (to force flushing) 6. Compare the size
      * of the two arrays, they should be close (instead of one being much
      * shorter than the other one)
-     * 
+     *
      * @throws Exception
      */
     @Test

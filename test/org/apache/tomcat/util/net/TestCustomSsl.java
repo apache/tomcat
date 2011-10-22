@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -54,19 +54,19 @@ public class TestCustomSsl extends TomcatBaseTest {
             return;
         }
 
-        connector.setProperty("sslImplementationName", 
+        connector.setProperty("sslImplementationName",
                 "org.apache.tomcat.util.net.jsse.TesterBug50640SslImpl");
         connector.setProperty(TesterBug50640SslImpl.PROPERTY_NAME,
                 TesterBug50640SslImpl.PROPERTY_VALUE);
-        
+
         connector.setProperty("sslProtocol", "tls");
-        
+
         File keystoreFile =
             new File("test/org/apache/tomcat/util/net/localhost.jks");
         connector.setAttribute(
                 "keystoreFile", keystoreFile.getAbsolutePath());
 
-        connector.setSecure(true);            
+        connector.setSecure(true);
         connector.setProperty("SSLEnabled", "true");
 
         File appDir = new File(getBuildDirectory(), "webapps/examples");
@@ -87,10 +87,10 @@ public class TestCustomSsl extends TomcatBaseTest {
     public void testCustomTrustManager2() throws Exception {
         doTestCustomTrustManager(true);
     }
-    
+
     private void doTestCustomTrustManager(boolean serverTrustAll)
             throws Exception {
-        
+
         if (!TesterSupport.RFC_5746_SUPPORTED) {
             // Make sure SSL renegotiation is not disabled in the JVM
             System.setProperty("sun.security.ssl.allowUnsafeRenegotiation",
@@ -104,7 +104,7 @@ public class TestCustomSsl extends TomcatBaseTest {
         }
 
         TesterSupport.configureClientCertContext(tomcat);
-        
+
         // Override the defaults
         ProtocolHandler handler = tomcat.getConnector().getProtocolHandler();
         if (handler instanceof AbstractHttp11JsseProtocol) {
@@ -117,17 +117,17 @@ public class TestCustomSsl extends TomcatBaseTest {
             tomcat.getConnector().setAttribute("trustManagerClassName",
                     "org.apache.tomcat.util.net.TesterSupport$TrustAllCerts");
         }
-        
+
         // Start Tomcat
         tomcat.start();
-        
+
         TesterSupport.configureClientSsl();
 
         // Unprotected resource
         ByteChunk res =
                 getUrl("https://localhost:" + getPort() + "/unprotected");
         assertEquals("OK", res.toString());
-        
+
         // Protected resource
         res.recycle();
         int rc = -1;

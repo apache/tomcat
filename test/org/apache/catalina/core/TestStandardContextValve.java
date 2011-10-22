@@ -49,7 +49,7 @@ public class TestStandardContextValve extends TomcatBaseTest {
 
         // Traces order of events across multiple components
         StringBuilder trace = new StringBuilder();
-        
+
         //Add the error page
         Tomcat.addServlet(ctx, "errorPage", new Bug51653ErrorPage(trace));
         ctx.addServletMapping("/error", "errorPage");
@@ -96,7 +96,7 @@ public class TestStandardContextValve extends TomcatBaseTest {
 
         // Traces order of events across multiple components
         StringBuilder trace = new StringBuilder();
-        
+
         // Add the page that generates the error
         Tomcat.addServlet(ctx, "test", new Bug51653ErrorTrigger());
         ctx.addServletMapping("/test", "test");
@@ -159,7 +159,7 @@ public class TestStandardContextValve extends TomcatBaseTest {
         protected void doGet(HttpServletRequest req, HttpServletResponse resp)
                 throws ServletException, IOException {
             sb.append("Error");
-            
+
             resp.setContentType("text/plain");
             resp.getWriter().write("Error");
         }
@@ -178,7 +178,7 @@ public class TestStandardContextValve extends TomcatBaseTest {
         public void requestInitialized(ServletRequestEvent sre) {
             sb.append("Init");
         }
-        
+
         @Override
         public void requestDestroyed(ServletRequestEvent sre) {
             sb.append("Destroy");

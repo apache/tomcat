@@ -46,23 +46,23 @@ import org.apache.catalina.tribes.MembershipListener;
 import org.apache.catalina.tribes.tipis.LazyReplicatedMap;
 
 /**
- * Example of how the lazy replicated map works, also shows how the BackupManager 
+ * Example of how the lazy replicated map works, also shows how the BackupManager
  * works in a Tomcat cluster
  * @author fhanik
  * @version 1.1
  */
 public class MapDemo implements ChannelListener, MembershipListener{
-    
+
     /**
      * The Map containing the replicated data
      */
     protected LazyReplicatedMap map;
-    
+
     /**
      * Table to be displayed in Swing
      */
     protected SimpleTableDemo table;
-    
+
     /**
      * Constructs a map demo object.
      * @param channel - the Tribes channel object to be used for communication
@@ -80,10 +80,10 @@ public class MapDemo implements ChannelListener, MembershipListener{
         //initialize the map by receiving a fake message
         this.messageReceived(null,null);
     }
-    
+
     /**
      * Decides if the messageReceived should be invoked
-     * will always return false since we rely on the 
+     * will always return false since we rely on the
      * lazy map to do all the messaging for us
      */
     @Override
@@ -92,7 +92,7 @@ public class MapDemo implements ChannelListener, MembershipListener{
         table.dataModel.getValueAt(-1,-1);
         return false;
     }
-    
+
     /**
      * Invoked if accept returns true.
      * No op for now
@@ -103,7 +103,7 @@ public class MapDemo implements ChannelListener, MembershipListener{
     public void messageReceived(Serializable msg, Member source) {
         // NOOP
     }
-    
+
     /**
      * Invoked when a member is added to the group
      */
@@ -111,7 +111,7 @@ public class MapDemo implements ChannelListener, MembershipListener{
     public void memberAdded(Member member) {
         // NOOP
     }
-    
+
     /**
      * Invoked when a member leaves the group
      */
@@ -120,13 +120,13 @@ public class MapDemo implements ChannelListener, MembershipListener{
         //just refresh the table model
         table.dataModel.getValueAt(-1,-1);
     }
-    
+
     /**
      * Prints usage
      */
     public static void usage() {
         System.out.println("Tribes MapDemo.");
-        System.out.println("Usage:\n\t" + 
+        System.out.println("Usage:\n\t" +
                            "java MapDemo [channel options] mapName\n\t" +
                            "\tChannel options:" +
                            ChannelCreator.usage());
@@ -153,7 +153,7 @@ public class MapDemo implements ChannelListener, MembershipListener{
         Runtime.getRuntime().addShutdownHook(new Shutdown(channel));
         //create a map demo object
         new MapDemo(channel,mapName);
-        
+
         //put the main thread to sleep until we are done
         System.out.println("System test complete, time to start="+(System.currentTimeMillis()-start)+" ms. Sleeping to let threads finish.");
         Thread.sleep(60 * 1000 * 60);
@@ -165,12 +165,12 @@ public class MapDemo implements ChannelListener, MembershipListener{
     public static class Shutdown extends Thread {
         //the channel running in this demo
         ManagedChannel channel = null;
-        
+
         public Shutdown(ManagedChannel channel) {
             this.channel = channel;
         }
 
-        
+
         @Override
         public void run() {
             System.out.println("Shutting down...");
@@ -211,12 +211,12 @@ public class MapDemo implements ChannelListener, MembershipListener{
         private static final long serialVersionUID = 1L;
 
         private static int WIDTH = 550;
-        
+
         private LazyReplicatedMap map;
         private boolean DEBUG = false;
         AbstractTableModel dataModel = new AbstractTableModel() {
-            
-            
+
+
             private static final long serialVersionUID = 1L;
             String[] columnNames = {
                                    "Rownum",
@@ -230,10 +230,10 @@ public class MapDemo implements ChannelListener, MembershipListener{
 
             @Override
             public int getColumnCount() { return columnNames.length; }
-    
+
             @Override
             public int getRowCount() {return map.sizeFull() +1; }
-            
+
             public StringBuilder getMemberNames(Member[] members){
                 StringBuilder buf = new StringBuilder();
                 if ( members!=null ) {
@@ -244,7 +244,7 @@ public class MapDemo implements ChannelListener, MembershipListener{
                 }
                 return buf;
             }
-            
+
             @Override
             public Object getValueAt(int row, int col) {
                 if ( row==-1 ) {
@@ -266,25 +266,25 @@ public class MapDemo implements ChannelListener, MembershipListener{
                     case 7: return Boolean.valueOf(entry.isBackup());
                     default: return "";
                 }
-                
+
             }
-            
+
             public void update() {
                 fireTableDataChanged();
             }
         };
-        
+
         JTextField txtAddKey = new JTextField(20);
         JTextField txtAddValue = new JTextField(20);
         JTextField txtRemoveKey = new JTextField(20);
         JTextField txtChangeKey = new JTextField(20);
         JTextField txtChangeValue = new JTextField(20);
-        
+
         JTable table = null;
         public SimpleTableDemo(LazyReplicatedMap map) {
             super();
             this.map = map;
-            
+
             this.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
 
             //final JTable table = new JTable(data, columnNames);
@@ -305,7 +305,7 @@ public class MapDemo implements ChannelListener, MembershipListener{
                     }
                 });
             }
-            
+
             //setLayout(new GridLayout(5, 0));
             setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
@@ -314,7 +314,7 @@ public class MapDemo implements ChannelListener, MembershipListener{
 
             //Add the scroll pane to this panel.
             add(scrollPane);
-            
+
             //create a add value button
             JPanel addpanel = new JPanel();
             addpanel.setPreferredSize(new Dimension(WIDTH,30));
@@ -323,7 +323,7 @@ public class MapDemo implements ChannelListener, MembershipListener{
             addpanel.add(txtAddValue);
             addpanel.setMaximumSize(new Dimension(WIDTH,30));
             add(addpanel);
-            
+
             //create a remove value button
             JPanel removepanel = new JPanel( );
             removepanel.setPreferredSize(new Dimension(WIDTH,30));
@@ -353,14 +353,14 @@ public class MapDemo implements ChannelListener, MembershipListener{
 
 
         }
-        
+
         public JButton createButton(String text, String command) {
             JButton button = new JButton(text);
             button.setActionCommand(command);
             button.addActionListener(this);
             return button;
         }
-        
+
         @Override
         public void actionPerformed(ActionEvent e) {
             System.out.println(e.getActionCommand());
@@ -408,7 +408,7 @@ public class MapDemo implements ChannelListener, MembershipListener{
                 };
                 t.start();
             }
-            
+
             if ( "replicate".equals(e.getActionCommand()) ) {
                 System.out.println("Replicating out to the other nodes.");
                 map.replicate(true);
@@ -432,10 +432,10 @@ public class MapDemo implements ChannelListener, MembershipListener{
                     end = Integer.MAX_VALUE;
                 }
             }
-    
+
             char[] buffer = new char[count];
             int gap = end - start;
-    
+
             while (count-- != 0) {
                 char ch;
                 if (chars == null) {
@@ -445,7 +445,7 @@ public class MapDemo implements ChannelListener, MembershipListener{
                 }
                 if ((letters && Character.isLetter(ch))
                     || (numbers && Character.isDigit(ch))
-                    || (!letters && !numbers)) 
+                    || (!letters && !numbers))
                 {
                     if(ch >= 56320 && ch <= 57343) {
                         if(count == 0) {
@@ -520,9 +520,9 @@ public class MapDemo implements ChannelListener, MembershipListener{
             return newContentPane;
         }
     }
-    
+
     static class ColorRenderer extends DefaultTableCellRenderer {
-        
+
         private static final long serialVersionUID = 1L;
 
         public ColorRenderer() {
@@ -548,8 +548,8 @@ public class MapDemo implements ChannelListener, MembershipListener{
             }
             return cell;
         }
-        
-        
+
+
     }
 
 

@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -43,7 +43,7 @@ public class TestClientCert extends TomcatBaseTest {
         ByteChunk res =
                 getUrl("https://localhost:" + getPort() + "/unprotected");
         assertEquals("OK", res.toString());
-        
+
         // Protected resource
         res = getUrl("https://localhost:" + getPort() + "/protected");
         assertEquals("OK", res.toString());
@@ -52,21 +52,21 @@ public class TestClientCert extends TomcatBaseTest {
     @Test
     public void testClientCertPostSmaller() throws Exception {
         Tomcat tomcat = getTomcatInstance();
-        int bodySize = tomcat.getConnector().getMaxSavePostSize() / 2; 
+        int bodySize = tomcat.getConnector().getMaxSavePostSize() / 2;
         doTestClientCertPost(bodySize, false);
     }
 
     @Test
     public void testClientCertPostSame() throws Exception {
         Tomcat tomcat = getTomcatInstance();
-        int bodySize = tomcat.getConnector().getMaxSavePostSize(); 
+        int bodySize = tomcat.getConnector().getMaxSavePostSize();
         doTestClientCertPost(bodySize, false);
     }
 
     @Test
     public void testClientCertPostLarger() throws Exception {
         Tomcat tomcat = getTomcatInstance();
-        int bodySize = tomcat.getConnector().getMaxSavePostSize() * 2; 
+        int bodySize = tomcat.getConnector().getMaxSavePostSize() * 2;
         doTestClientCertPost(bodySize, true);
     }
 
@@ -83,7 +83,7 @@ public class TestClientCert extends TomcatBaseTest {
         ByteChunk res = postUrl(body,
                 "https://localhost:" + getPort() + "/unprotected");
         assertEquals("OK-" + bodySize, res.toString());
-        
+
         // Protected resource
         res.recycle();
         int rc = postUrl(body, "https://localhost:" + getPort() + "/protected",
@@ -107,10 +107,10 @@ public class TestClientCert extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
 
         TesterSupport.configureClientCertContext(tomcat);
-        
+
         // Start Tomcat
         tomcat.start();
-        
+
         TesterSupport.configureClientSsl();
     }
 }

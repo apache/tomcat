@@ -145,7 +145,7 @@ public class TestStandardContextResources extends TomcatBaseTest {
         "<p>resourceB.jsp in resources.jar</p>");
 
         ctx.stop();
-        
+
         LifecycleListener[] listener1 = ctx.findLifecycleListeners();
         // change ordering and reload
         ContextConfig config1 = new ContextConfig() {
@@ -167,12 +167,12 @@ public class TestStandardContextResources extends TomcatBaseTest {
         ctx.addServletMapping("/getresource", "getresource");
 
         ctx.start();
-        
+
         assertPageContains("/test/getresource?path=/resourceF.jsp",
         "<p>resourceF.jsp in resources2.jar</p>");
         assertPageContains("/test/getresource?path=/resourceB.jsp",
         "<p>resourceB.jsp in resources2.jar</p>");
- 
+
     }
 
     @Test
@@ -183,7 +183,7 @@ public class TestStandardContextResources extends TomcatBaseTest {
         // app dir is relative to server home
         StandardContext ctx = (StandardContext) tomcat.addWebapp(null, "/test",
                 appDir.getAbsolutePath());
-        
+
         Tomcat.addServlet(ctx, "getresource", new GetResourceServlet());
         ctx.addServletMapping("/getresource", "getresource");
 
@@ -252,7 +252,7 @@ public class TestStandardContextResources extends TomcatBaseTest {
         int sc = getUrl("http://localhost:" + getPort() + pageUrl, res, null);
 
         assertEquals(expectedStatus, sc);
-        
+
         if (expectedStatus == 200) {
             String result = res.toString();
             assertTrue(result, result.indexOf(expectedBody) > 0);

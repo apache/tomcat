@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -77,7 +77,7 @@ public abstract class TomcatBaseTest {
     public int getPort() {
         return port;
     }
-    
+
     /**
      * Sub-classes may want to add connectors on a new port
      */
@@ -89,7 +89,7 @@ public abstract class TomcatBaseTest {
     /**
      * Helper method that returns the path of the temporary directory used by
      * the test runs. The directory is configured during {@link #setUp()}.
-     * 
+     *
      * <p>
      * It is used as <code>${catalina.base}</code> for the instance of Tomcat
      * that is being started, but can be used to store other temporary files as
@@ -122,7 +122,7 @@ public abstract class TomcatBaseTest {
     /**
      * Schedule the given file or directory to be deleted during after-test
      * cleanup.
-     * 
+     *
      * @param file
      *            File or directory
      */
@@ -142,16 +142,16 @@ public abstract class TomcatBaseTest {
         if (!tempDir.mkdirs() && !tempDir.isDirectory()) {
             fail("Unable to create temporary directory for test");
         }
-        
+
         System.setProperty("catalina.base", tempDir.getAbsolutePath());
         // Trigger loading of catalina.properties
         CatalinaProperties.getProperty("foo");
-        
+
         File appBase = new File(tempDir, "webapps");
         if (!appBase.exists() && !appBase.mkdir()) {
             fail("Unable to create appBase for test");
         }
-        
+
         tomcat = new TomcatWithFastSessionIDs();
 
         String protocol = getProtocol();
@@ -172,7 +172,7 @@ public abstract class TomcatBaseTest {
             server.addLifecycleListener(listener);
             connector.setAttribute("pollerThreadCount", Integer.valueOf(1));
         }
-        
+
         tomcat.setBaseDir(tempDir.getAbsolutePath());
         tomcat.getHost().setAppBase(appBase.getAbsolutePath());
 
@@ -185,11 +185,11 @@ public abstract class TomcatBaseTest {
             tomcat.getHost().getPipeline().addValve(alv);
         }
     }
-    
+
     protected String getProtocol() {
         // Has a protocol been specified
         String protocol = System.getProperty("tomcat.test.protocol");
-        
+
         // Use BIO by default
         if (protocol == null) {
             protocol = "org.apache.coyote.http11.Http11Protocol";
@@ -220,7 +220,7 @@ public abstract class TomcatBaseTest {
         }
         deleteOnTearDown.clear();
     }
-    
+
     /**
      * Simple Hello World servlet for use by test cases
      */
@@ -238,7 +238,7 @@ public abstract class TomcatBaseTest {
             out.print(RESPONSE_TEXT);
         }
     }
-    
+
 
     /**
      *  Wrapper for getting the response.
@@ -259,13 +259,13 @@ public abstract class TomcatBaseTest {
             Map<String, List<String>> resHead) throws IOException {
         return getUrl(path, out, 1000000, reqHead, resHead);
     }
-    
+
     public static int getUrl(String path, ByteChunk out, int readTimeout,
             Map<String, List<String>> reqHead,
             Map<String, List<String>> resHead) throws IOException {
 
         URL url = new URL(path);
-        HttpURLConnection connection = 
+        HttpURLConnection connection =
             (HttpURLConnection) url.openConnection();
         connection.setUseCaches(false);
         connection.setReadTimeout(readTimeout);
@@ -310,7 +310,7 @@ public abstract class TomcatBaseTest {
         }
         return rc;
     }
-    
+
     public static ByteChunk postUrl(byte[] body, String path)
             throws IOException {
         ByteChunk out = new ByteChunk();
@@ -322,13 +322,13 @@ public abstract class TomcatBaseTest {
             Map<String, List<String>> resHead) throws IOException {
         return postUrl(body, path, out, null, resHead);
     }
-    
+
     public static int postUrl(byte[] body, String path, ByteChunk out,
             Map<String, List<String>> reqHead,
             Map<String, List<String>> resHead) throws IOException {
 
         URL url = new URL(path);
-        HttpURLConnection connection = 
+        HttpURLConnection connection =
             (HttpURLConnection) url.openConnection();
         connection.setDoOutput(true);
         connection.setReadTimeout(1000000);
@@ -346,7 +346,7 @@ public abstract class TomcatBaseTest {
             }
         }
         connection.connect();
-        
+
         // Write the request body
         OutputStream os = null;
         try {

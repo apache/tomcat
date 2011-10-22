@@ -45,16 +45,16 @@ public class TestKeepAliveCount extends TomcatBaseTest {
         TestKeepAliveClient client = new TestKeepAliveClient();
         client.doHttp11Request();
     }
- 
-    
+
+
     private class TestKeepAliveClient extends SimpleHttpClient {
 
 
         private boolean init;
-        
+
         private synchronized void init() {
             if (init) return;
-            
+
             Tomcat tomcat = getTomcatInstance();
             Context root = tomcat.addContext("", TEMP_DIR);
             Tomcat.addServlet(root, "Simple", new SimpleServlet());
@@ -65,14 +65,14 @@ public class TestKeepAliveCount extends TomcatBaseTest {
             tomcat.getConnector().setProperty("port", "8080");
             init = true;
         }
-        
+
         private void doHttp10Request() throws Exception {
             Tomcat tomcat = getTomcatInstance();
             init();
             tomcat.start();
             // Open connection
             connect();
-            
+
             // Send request in two parts
             String[] request = new String[1];
             request[0] =
@@ -86,24 +86,24 @@ public class TestKeepAliveCount extends TomcatBaseTest {
             tomcat.stop();
             assertTrue(passed);
         }
-        
+
         private void doHttp11Request() throws Exception {
             Tomcat tomcat = getTomcatInstance();
             init();
             tomcat.start();
             // Open connection
             connect();
-            
+
             // Send request in two parts
             String[] request = new String[1];
             request[0] =
-                "GET /test HTTP/1.1" + CRLF + 
+                "GET /test HTTP/1.1" + CRLF +
                 "Host: localhost" + CRLF +
                 "Connection: Keep-Alive" + CRLF+
                 "Keep-Alive: 300"+ CRLF+ CRLF;
-            
+
             setRequest(request);
-            
+
             for (int i=0; i<5; i++) {
                 processRequest(false); // blocks until response has been read
                 assertTrue(getResponseLine()!=null && getResponseLine().trim().startsWith("HTTP/1.1 200"));
@@ -115,15 +115,15 @@ public class TestKeepAliveCount extends TomcatBaseTest {
             tomcat.stop();
             assertTrue(passed);
         }
-        
+
         @Override
         public boolean isResponseBodyOK() {
             return true;
         }
-        
+
     }
-    
-    
+
+
     private static class SimpleServlet extends HttpServlet {
 
         private static final long serialVersionUID = 1L;
@@ -133,7 +133,7 @@ public class TestKeepAliveCount extends TomcatBaseTest {
             resp.setContentLength(0);
             resp.flushBuffer();
         }
-        
+
     }
-    
+
 }

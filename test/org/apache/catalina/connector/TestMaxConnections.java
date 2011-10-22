@@ -58,7 +58,7 @@ public class TestMaxConnections extends TomcatBaseTest {
             if (t[i].passed) passcount++;
             if (t[i].connectfailed) connectfail++;
         }
-        
+
         assertTrue("The number of successful requests should have been 4-5, actual "+passcount,4==passcount || 5==passcount);
         System.out.println("There were [" + connectfail + "] connection failures");
     }
@@ -79,7 +79,7 @@ public class TestMaxConnections extends TomcatBaseTest {
         }
     }
 
-    
+
     private synchronized void init() throws Exception {
         Tomcat tomcat = getTomcatInstance();
         Context root = tomcat.addContext("", SimpleHttpClient.TEMP_DIR);
@@ -98,11 +98,11 @@ public class TestMaxConnections extends TomcatBaseTest {
     private static class TestClient extends SimpleHttpClient {
 
         private void doHttp10Request() throws Exception {
-            
+
             long start = System.currentTimeMillis();
             // Open connection
             connect(connectTimeout,soTimeout);
-            
+
             // Send request in two parts
             String[] request = new String[1];
             request[0] =
@@ -118,15 +118,15 @@ public class TestMaxConnections extends TomcatBaseTest {
             reset();
             assertTrue(passed);
         }
-        
+
         @Override
         public boolean isResponseBodyOK() {
             return true;
         }
-        
+
     }
-    
-    
+
+
     private static class SimpleServlet extends HttpServlet {
 
         private static final long serialVersionUID = 1L;
@@ -136,12 +136,12 @@ public class TestMaxConnections extends TomcatBaseTest {
             try {
                 Thread.sleep(TestMaxConnections.soTimeout*4/5);
             }catch (InterruptedException x) {
-                
+
             }
             resp.setContentLength(0);
             resp.flushBuffer();
         }
-        
+
     }
-    
+
 }

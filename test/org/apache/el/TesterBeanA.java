@@ -40,11 +40,11 @@ public class TesterBeanA {
     public void setName(String name) {
         this.name = name;
     }
-    
+
     public long getValLong() {
         return valLong;
     }
-    
+
     public void setValLong(long valLong) {
         this.valLong = valLong;
     }

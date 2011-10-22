@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -47,7 +47,7 @@ import org.apache.catalina.deploy.WebXml;
 /**
  * Check Servlet 3.0 Spec 8.2.3.3: Override annotation parameter from web.xml or
  * fragment.
- * 
+ *
  * @author Peter Rossbach
  * @version $Revision$
  */
@@ -191,7 +191,7 @@ public class TestContextConfigAnnotation {
         assertNotNull(fdef);
         assertEquals("Servlet says: ",fdef.getParameterMap().get("message"));
     }
-    
+
     @Test
     public void testOverwriteFilterMapping() throws Exception {
         WebXml webxml = new WebXml();
@@ -204,14 +204,14 @@ public class TestContextConfigAnnotation {
         filterDef.setLargeIcon("LargeIcon");
         filterDef.setSmallIcon("SmallIcon");
         filterDef.setAsyncSupported("true");
- 
+
 
         webxml.addFilter(filterDef);
         FilterMap filterMap = new FilterMap();
         filterMap.addURLPattern("/param1");
         filterMap.setFilterName("paramFilter");
         webxml.addFilterMapping(filterMap);
- 
+
         ContextConfig config = new ContextConfig();
         File sFile = paramClassResource(
                 "org/apache/catalina/startup/ParamServlet");
@@ -239,12 +239,12 @@ public class TestContextConfigAnnotation {
         assertEquals("SmallIcon", fdef.getSmallIcon());
         // FIXME: Strange why servletDef is Boolean and FilterDef is String?
         assertEquals("true", fdef.getAsyncSupported());
-        
+
         String[] dis = filterMap.getDispatcherNames();
         assertEquals(2, dis.length);
         assertEquals(DispatcherType.ERROR.toString(),dis[0]);
         assertEquals(DispatcherType.ASYNC.toString(),dis[1]);
-        
+
     }
 
     @Test
@@ -267,7 +267,7 @@ public class TestContextConfigAnnotation {
     @Test
     public void testCheckHandleTypes() throws Exception {
         ContextConfig config = new ContextConfig();
-        
+
         // Need a Context, Loader and ClassLoader for checkHandleTypes
         StandardContext context = new StandardContext();
         context.setLoader(new TesterLoader());
@@ -276,14 +276,14 @@ public class TestContextConfigAnnotation {
         // Add an SCI that has no interest in any type
         SCI sciNone = new SCI();
         config.initializerClassMap.put(sciNone, new HashSet<Class<?>>());
-        
+
         // Add an SCI with an interest in Servlets
         SCI sciServlet = new SCI();
         config.initializerClassMap.put(sciServlet, new HashSet<Class<?>>());
         config.typeInitializerMap.put(Servlet.class,
                 new HashSet<ServletContainerInitializer>());
         config.typeInitializerMap.get(Servlet.class).add(sciServlet);
-        
+
         // Add an SCI with an interest in Objects - i.e. everything
         SCI sciObject = new SCI();
         config.initializerClassMap.put(sciObject, new HashSet<Class<?>>());
@@ -302,7 +302,7 @@ public class TestContextConfigAnnotation {
         config.processAnnotationsFile(file, ignore);
         file = paramClassResource("org/apache/catalina/startup/TestListener");
         config.processAnnotationsFile(file, ignore);
-        
+
         // Check right number of classes were noted to be handled
         assertEquals(0, config.initializerClassMap.get(sciNone).size());
         assertEquals(2, config.initializerClassMap.get(sciServlet).size());
@@ -316,7 +316,7 @@ public class TestContextConfigAnnotation {
             // NO-OP. Just need a class that implements SCI.
         }
     }
-    
+
     private static final class TesterLoader implements Loader {
 
         @Override
@@ -352,7 +352,7 @@ public class TestContextConfigAnnotation {
 
     /**
      * Find compiled test class
-     * 
+     *
      * @param className
      * @return File Resource
      */

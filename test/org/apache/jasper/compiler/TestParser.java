@@ -40,16 +40,16 @@ public class TestParser extends TomcatBaseTest {
     public void testBug48627() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
-        File appDir = 
+        File appDir =
             new File("test/webapp-3.0");
         // app dir is relative to server home
         tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());
-        
+
         tomcat.start();
 
         ByteChunk res = getUrl("http://localhost:" + getPort() +
                 "/test/bug48nnn/bug48627.jsp");
-        
+
         String result = res.toString();
         // Beware of the differences between escaping in JSP attributes and
         // in Java Strings
@@ -61,11 +61,11 @@ public class TestParser extends TomcatBaseTest {
     public void testBug48668a() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
-        File appDir = 
+        File appDir =
             new File("test/webapp-3.0");
         // app dir is relative to server home
         tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());
-        
+
         tomcat.start();
 
         ByteChunk res = getUrl("http://localhost:" + getPort() +
@@ -110,7 +110,7 @@ public class TestParser extends TomcatBaseTest {
         File appDir = new File("test/webapp-3.0");
         // app dir is relative to server home
         tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());
-        
+
         tomcat.start();
 
         ByteChunk res = getUrl("http://localhost:" + getPort() +
@@ -127,7 +127,7 @@ public class TestParser extends TomcatBaseTest {
         File appDir = new File("test/webapp-3.0");
         // app dir is relative to server home
         tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());
-        
+
         tomcat.start();
 
         int sc = getUrl("http://localhost:" + getPort() +
@@ -144,7 +144,7 @@ public class TestParser extends TomcatBaseTest {
         File appDir = new File("test/webapp-3.0");
         // app dir is relative to server home
         tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());
-        
+
         tomcat.start();
 
         int sc = getUrl("http://localhost:" + getPort() +
@@ -162,7 +162,7 @@ public class TestParser extends TomcatBaseTest {
         File appDir = new File("test/webapp-3.0");
         // app dir is relative to server home
         tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());
-        
+
         tomcat.start();
 
         ByteChunk res = new ByteChunk();
@@ -182,7 +182,7 @@ public class TestParser extends TomcatBaseTest {
         File appDir = new File("test/webapp-3.0");
         // app dir is relative to server home
         tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());
-        
+
         tomcat.start();
 
         ByteChunk res = new ByteChunk();
@@ -202,7 +202,7 @@ public class TestParser extends TomcatBaseTest {
         File appDir = new File("test/webapp-3.0");
         // app dir is relative to server home
         tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());
-        
+
         tomcat.start();
 
         ByteChunk res = new ByteChunk();
@@ -221,7 +221,7 @@ public class TestParser extends TomcatBaseTest {
         File appDir = new File("test/webapp-3.0");
         // app dir is relative to server home
         tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());
-        
+
         tomcat.start();
 
         ByteChunk res = new ByteChunk();
@@ -240,7 +240,7 @@ public class TestParser extends TomcatBaseTest {
         File appDir = new File("test/webapp-3.0");
         // app dir is relative to server home
         tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());
-        
+
         tomcat.start();
 
         ByteChunk res = new ByteChunk();
@@ -259,7 +259,7 @@ public class TestParser extends TomcatBaseTest {
         File appDir = new File("test/webapp-3.0");
         // app dir is relative to server home
         tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());
-        
+
         tomcat.start();
 
         ByteChunk res = new ByteChunk();
@@ -278,7 +278,7 @@ public class TestParser extends TomcatBaseTest {
         File appDir = new File("test/webapp-3.0");
         // app dir is relative to server home
         tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());
-        
+
         tomcat.start();
 
         ByteChunk res = new ByteChunk();

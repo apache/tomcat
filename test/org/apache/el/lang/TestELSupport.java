@@ -117,7 +117,7 @@ public class TestELSupport {
     private static void testIsSame(Object value) {
         assertEquals(value, ELSupport.coerceToNumber(value, value.getClass()));
     }
-    
+
     private static enum TestEnumA {
         VALA1,
         VALA2

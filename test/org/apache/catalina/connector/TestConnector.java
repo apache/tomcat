@@ -30,14 +30,14 @@ import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.util.buf.ByteChunk;
 
 /**
- * Test cases for {@link Connector}. 
+ * Test cases for {@link Connector}.
  */
 public class TestConnector extends TomcatBaseTest {
 
     @Test
     public void testStop() throws Exception {
         Tomcat tomcat = getTomcatInstance();
-        
+
         Context root = tomcat.addContext("", TEMP_DIR);
         Wrapper w =
             Tomcat.addServlet(root, "tester", new TesterServlet());
@@ -45,15 +45,15 @@ public class TestConnector extends TomcatBaseTest {
         root.addServletMapping("/", "tester");
 
         Connector connector = tomcat.getConnector();
-        
+
         tomcat.start();
 
         ByteChunk bc = new ByteChunk();
         int rc = getUrl("http://localhost:" + getPort() + "/", bc, null, null);
-        
+
         assertEquals(200, rc);
         assertEquals("OK", bc.toString());
-        
+
         rc = -1;
         bc.recycle();
 

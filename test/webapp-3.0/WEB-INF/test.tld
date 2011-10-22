@@ -23,7 +23,7 @@
   <tlib-version>1.0</tlib-version>
   <short-name>TesterFunctions</short-name>
   <uri>http://tomcat.apache.org/testerFunctions</uri>
-  
+
   <function>
     <name>trim</name>
     <function-class>org.apache.el.TesterFunctions</function-class>

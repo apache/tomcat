@@ -44,7 +44,7 @@ import org.apache.tomcat.util.buf.ByteChunk;
  */
 public class TestBug49158 extends CookiesBaseTest {
     public static final String path = "49158";
-    
+
     @Override
     @Test
     public void testCookiesInstance() throws Exception {
@@ -52,22 +52,22 @@ public class TestBug49158 extends CookiesBaseTest {
         addServlets(tomcat);
         tomcat.start();
         Map<String,List<String>> headers = new HashMap<String,List<String>>();
-        ByteChunk res = new ByteChunk(); 
+        ByteChunk res = new ByteChunk();
         getUrl("http://localhost:" + getPort() + "/"+path, res, headers);
         List<String> cookieHeaders = headers.get("Set-Cookie");
         assertEquals("There should only be one Set-Cookie header in this test",
                 1, cookieHeaders.size());
     }
-    
+
     public static void addServlets(Tomcat tomcat) {
         // Must have a real docBase - just use temp
-        Context ctx = 
+        Context ctx =
             tomcat.addContext("", System.getProperty("java.io.tmpdir"));
 
         Tomcat.addServlet(ctx, path, new TestBug49158Servlet());
         ctx.addServletMapping("/"+path, path);
     }
-    
+
     public static class TestBug49158Servlet extends HttpServlet {
 
         private static final long serialVersionUID = 2725990508758127399L;
@@ -81,7 +81,7 @@ public class TestBug49158 extends CookiesBaseTest {
             session.invalidate();
             req.getSession();
         }
-        
+
     }
-        
+
 }

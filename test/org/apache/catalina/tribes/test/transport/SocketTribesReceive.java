@@ -35,7 +35,7 @@ public class SocketTribesReceive {
     static BigDecimal total = new BigDecimal((double)0);
     static BigDecimal bytes = new BigDecimal((double)32871);
 
-    
+
     public static void main(String[] args) throws Exception {
         int size = 43800;
         if (args.length > 0 ) try {size=Integer.parseInt(args[0]);}catch(Exception x){ /* Ignore */ }
@@ -78,7 +78,7 @@ public class SocketTribesReceive {
                 printStats(start, mb, count, df, total);
             }
         }
-        
+
     }
 
     private static void printStats(long start, double mb, int count, DecimalFormat df, BigDecimal total) {

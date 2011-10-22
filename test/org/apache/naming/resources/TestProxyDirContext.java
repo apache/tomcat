@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -39,13 +39,13 @@ public class TestProxyDirContext extends TomcatBaseTest {
     @Test
     public void testLookupException() throws Exception {
         Tomcat tomcat = getTomcatInstance();
-        
+
         // Must have a real docBase - just use temp
         StandardContext ctx = (StandardContext)
             tomcat.addContext("", System.getProperty("java.io.tmpdir"));
         ctx.setCacheTTL(500);
         tomcat.start();
-        
+
         try {
             ctx.getResources().lookup("/WEB-INF/web.xml");
             fail();

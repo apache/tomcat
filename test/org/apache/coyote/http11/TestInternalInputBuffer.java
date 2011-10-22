@@ -37,31 +37,31 @@ import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 
 public class TestInternalInputBuffer extends TomcatBaseTest {
-    
+
     /**
      * Test case for https://issues.apache.org/bugzilla/show_bug.cgi?id=48839
      */
     @Test
     public void testBug48839() {
-        
+
         Bug48839Client client = new Bug48839Client();
         client.setPort(getPort());
-        
+
         client.doRequest();
         assertTrue(client.isResponse200());
         assertTrue(client.isResponseBodyOK());
     }
 
-    
+
     /**
      * Bug 48839 test client.
      */
     private class Bug48839Client extends SimpleHttpClient {
-                
+
         private Exception doRequest() {
-        
+
             Tomcat tomcat = getTomcatInstance();
-            
+
             Context root = tomcat.addContext("", TEMP_DIR);
             Tomcat.addServlet(root, "Bug48839", new Bug48839Servlet());
             root.addServletMapping("/test", "Bug48839");
@@ -71,7 +71,7 @@ public class TestInternalInputBuffer extends TomcatBaseTest {
 
                 // Open connection
                 connect();
-                
+
                 String[] request = new String[1];
                 request[0] =
                     "GET http://localhost:8080/test HTTP/1.1" + CRLF +
@@ -79,10 +79,10 @@ public class TestInternalInputBuffer extends TomcatBaseTest {
                     "\tefgh" + CRLF +
                     "Connection: close" + CRLF +
                     CRLF;
-                
+
                 setRequest(request);
                 processRequest(); // blocks until response has been read
-                
+
                 // Close the connection
                 disconnect();
             } catch (Exception e) {
@@ -101,11 +101,11 @@ public class TestInternalInputBuffer extends TomcatBaseTest {
             }
             return true;
         }
-        
+
     }
 
     private static class Bug48839Servlet extends HttpServlet {
-        
+
         private static final long serialVersionUID = 1L;
 
         /**
@@ -116,9 +116,9 @@ public class TestInternalInputBuffer extends TomcatBaseTest {
                 throws ServletException, IOException {
             // Just echo the header value back as plain text
             resp.setContentType("text/plain");
-            
+
             PrintWriter out = resp.getWriter();
-            
+
             Enumeration<String> values = req.getHeaders("X-Bug48839");
             while (values.hasMoreElements()) {
                 out.println(values.nextElement());
@@ -129,23 +129,23 @@ public class TestInternalInputBuffer extends TomcatBaseTest {
 
     @Test
     public void testBug51557NoColon() {
-        
+
         Bug51557Client client = new Bug51557Client("X-Bug51557NoColon");
         client.setPort(getPort());
-        
+
         client.doRequest();
         assertTrue(client.isResponse200());
         assertEquals("abcd", client.getResponseBody());
         assertTrue(client.isResponseBodyOK());
     }
 
-    
+
     @Test
     public void testBug51557Separators() throws Exception {
         char httpSeparators[] = new char[] {
                 '\t', ' ', '\"', '(', ')', ',', '/', ':', ';', '<',
                 '=', '>', '?', '@', '[', '\\', ']', '{', '}' };
-        
+
         for (char s : httpSeparators) {
             doTestBug51557Char(s);
             tearDown();
@@ -167,46 +167,46 @@ public class TestInternalInputBuffer extends TomcatBaseTest {
 
     @Test
     public void testBug51557Continuation() {
-        
+
         Bug51557Client client = new Bug51557Client("X-Bug=51557NoColon",
                 "foo" + SimpleHttpClient.CRLF + " bar");
         client.setPort(getPort());
-        
+
         client.doRequest();
         assertTrue(client.isResponse200());
         assertEquals("abcd", client.getResponseBody());
         assertTrue(client.isResponseBodyOK());
     }
 
-    
+
     @Test
     public void testBug51557BoundaryStart() {
-        
+
         Bug51557Client client = new Bug51557Client("=X-Bug51557",
                 "invalid");
         client.setPort(getPort());
-        
+
         client.doRequest();
         assertTrue(client.isResponse200());
         assertEquals("abcd", client.getResponseBody());
         assertTrue(client.isResponseBodyOK());
     }
 
-    
+
     @Test
     public void testBug51557BoundaryEnd() {
-        
+
         Bug51557Client client = new Bug51557Client("X-Bug51557=",
                 "invalid");
         client.setPort(getPort());
-        
+
         client.doRequest();
         assertTrue(client.isResponse200());
         assertEquals("abcd", client.getResponseBody());
         assertTrue(client.isResponseBodyOK());
     }
 
-    
+
     private void doTestBug51557Char(char s) {
         Bug51557Client client =
             new Bug51557Client("X-Bug" + s + "51557", "invalid");
@@ -217,7 +217,7 @@ public class TestInternalInputBuffer extends TomcatBaseTest {
         assertEquals("abcd", client.getResponseBody());
         assertTrue(client.isResponseBodyOK());
     }
-    
+
     /**
      * Bug 51557 test client.
      */
@@ -237,9 +237,9 @@ public class TestInternalInputBuffer extends TomcatBaseTest {
         }
 
         private Exception doRequest() {
-        
+
             Tomcat tomcat = getTomcatInstance();
-            
+
             Context root = tomcat.addContext("", TEMP_DIR);
             Tomcat.addServlet(root, "Bug51557",
                     new Bug51557Servlet(headerName));
@@ -250,7 +250,7 @@ public class TestInternalInputBuffer extends TomcatBaseTest {
 
                 // Open connection
                 connect();
-                
+
                 String[] request = new String[1];
                 request[0] =
                     "GET http://localhost:8080/test HTTP/1.1" + CRLF +
@@ -258,10 +258,10 @@ public class TestInternalInputBuffer extends TomcatBaseTest {
                     "X-Bug51557: abcd" + CRLF +
                     "Connection: close" + CRLF +
                     CRLF;
-                
+
                 setRequest(request);
                 processRequest(); // blocks until response has been read
-                
+
                 // Close the connection
                 disconnect();
             } catch (Exception e) {
@@ -280,11 +280,11 @@ public class TestInternalInputBuffer extends TomcatBaseTest {
             }
             return true;
         }
-        
+
     }
 
     private static class Bug51557Servlet extends HttpServlet {
-        
+
         private static final long serialVersionUID = 1L;
 
         private String invalidHeaderName;
@@ -305,13 +305,13 @@ public class TestInternalInputBuffer extends TomcatBaseTest {
                 throws ServletException, IOException {
             // Just echo the header value back as plain text
             resp.setContentType("text/plain");
-            
+
             PrintWriter out = resp.getWriter();
-            
+
             processHeaders(invalidHeaderName, req, out);
             processHeaders("X-Bug51557", req, out);
         }
-        
+
         private void processHeaders(String header, HttpServletRequest req,
                 PrintWriter out) {
             Enumeration<String> values = req.getHeaders(header);

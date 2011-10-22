@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -59,7 +59,7 @@ public class TestTomcat extends TomcatBaseTest {
         private static final long serialVersionUID = 1L;
 
         @Override
-        public void doGet(HttpServletRequest req, HttpServletResponse res) 
+        public void doGet(HttpServletRequest req, HttpServletResponse res)
                 throws IOException {
             res.getWriter().write("Hello world");
         }
@@ -73,7 +73,7 @@ public class TestTomcat extends TomcatBaseTest {
         private static final long serialVersionUID = 1L;
 
         @Override
-        public void doGet(HttpServletRequest req, HttpServletResponse res) 
+        public void doGet(HttpServletRequest req, HttpServletResponse res)
                 throws IOException {
             HttpSession s = req.getSession(true);
             s.getId();
@@ -82,20 +82,20 @@ public class TestTomcat extends TomcatBaseTest {
     }
 
     /**
-     * Simple servlet to test JNDI 
+     * Simple servlet to test JNDI
      */
     public static class HelloWorldJndi extends HttpServlet {
 
         private static final long serialVersionUID = 1L;
 
         private static final String JNDI_ENV_NAME = "test";
-        
+
         @Override
-        public void doGet(HttpServletRequest req, HttpServletResponse res) 
+        public void doGet(HttpServletRequest req, HttpServletResponse res)
                 throws IOException {
-            
+
             String name = null;
-            
+
             try {
                 Context initCtx = new InitialContext();
                 Context envCtx = (Context) initCtx.lookup("java:comp/env");
@@ -103,7 +103,7 @@ public class TestTomcat extends TomcatBaseTest {
             } catch (NamingException e) {
                 throw new IOException(e);
             }
-            
+
             res.getWriter().write("Hello, " + name);
         }
     }
@@ -112,14 +112,14 @@ public class TestTomcat extends TomcatBaseTest {
      * Servlet that tries to obtain a URL for WEB-INF/web.xml
      */
     public static class GetResource extends HttpServlet {
-        
+
         private static final long serialVersionUID = 1L;
-        
+
         @Override
-        public void doGet(HttpServletRequest req, HttpServletResponse res) 
+        public void doGet(HttpServletRequest req, HttpServletResponse res)
         throws IOException {
             URL url = req.getServletContext().getResource("/WEB-INF/web.xml");
-         
+
             res.getWriter().write("The URL obtained for /WEB-INF/web.xml was ");
             if (url == null) {
                 res.getWriter().write("null");
@@ -129,7 +129,7 @@ public class TestTomcat extends TomcatBaseTest {
 
                 // Read some content from the resource
                 URLConnection conn = url.openConnection();
-                
+
                 InputStream is = null;
                 Reader reader = null;
                 char cbuf[] = new char[20];
@@ -150,14 +150,14 @@ public class TestTomcat extends TomcatBaseTest {
                         try { is.close(); } catch(IOException ioe) {/*Ignore*/}
                     }
                 }
-                
-                
+
+
             }
-            
-            
+
+
         }
     }
-    
+
     /**
      * Simple Realm that uses a configurable {@link Map} to link user names and
      * passwords.
@@ -166,7 +166,7 @@ public class TestTomcat extends TomcatBaseTest {
         private Map<String,String> users = new HashMap<String,String>();
         private Map<String,List<String>> roles =
             new HashMap<String,List<String>>();
-        
+
         public void addUser(String username, String password) {
             users.put(username, password);
         }
@@ -195,31 +195,31 @@ public class TestTomcat extends TomcatBaseTest {
             return new GenericPrincipal(username, getPassword(username),
                     roles.get(username));
         }
-        
+
     }
 
-    /** 
-     * Start tomcat with a single context and one 
-     * servlet - all programmatic, no server.xml or 
+    /**
+     * Start tomcat with a single context and one
+     * servlet - all programmatic, no server.xml or
      * web.xml used.
-     * 
-     * @throws Exception 
+     *
+     * @throws Exception
      */
     @Test
     public void testProgrammatic() throws Exception {
         Tomcat tomcat = getTomcatInstance();
-        
+
         // Must have a real docBase - just use temp
-        org.apache.catalina.Context ctx = 
+        org.apache.catalina.Context ctx =
             tomcat.addContext("", System.getProperty("java.io.tmpdir"));
-        // You can customize the context by calling 
+        // You can customize the context by calling
         // its API
-        
+
         Tomcat.addServlet(ctx, "myServlet", new HelloWorld());
         ctx.addServletMapping("/", "myServlet");
-        
+
         tomcat.start();
-        
+
         ByteChunk res = getUrl("http://localhost:" + getPort() + "/");
         assertEquals("Hello world", res.toString());
     }
@@ -231,7 +231,7 @@ public class TestTomcat extends TomcatBaseTest {
         File appDir = new File(getBuildDirectory(), "webapps/examples");
         // app dir is relative to server home
         tomcat.addWebapp(null, "/examples", appDir.getAbsolutePath());
-        
+
         tomcat.start();
 
         ByteChunk res = getUrl("http://localhost:" + getPort() +
@@ -246,7 +246,7 @@ public class TestTomcat extends TomcatBaseTest {
         File appDir = new File(getBuildDirectory(), "webapps/examples");
         // app dir is relative to server home
         tomcat.addWebapp(null, "/examples", appDir.getAbsolutePath());
-        
+
         tomcat.start();
 
         ByteChunk res = getUrl("http://localhost:" + getPort() +
@@ -257,18 +257,18 @@ public class TestTomcat extends TomcatBaseTest {
     @Test
     public void testSession() throws Exception {
         Tomcat tomcat = getTomcatInstance();
-        
+
         // Must have a real docBase - just use temp
-        org.apache.catalina.Context ctx = 
+        org.apache.catalina.Context ctx =
             tomcat.addContext("", System.getProperty("java.io.tmpdir"));
-        // You can customize the context by calling 
+        // You can customize the context by calling
         // its API
-        
+
         Tomcat.addServlet(ctx, "myServlet", new HelloWorldSession());
         ctx.addServletMapping("/", "myServlet");
-        
+
         tomcat.start();
-        
+
         ByteChunk res = getUrl("http://localhost:" + getPort() + "/");
         assertEquals("Hello world", res.toString());
     }
@@ -279,24 +279,24 @@ public class TestTomcat extends TomcatBaseTest {
         long t0 = System.currentTimeMillis();
         tomcat.addContext(null, "/", ".");
         tomcat.start();
-        System.err.println("Test time: " + 
+        System.err.println("Test time: " +
                 (System.currentTimeMillis() - t0));
      }
 
-    
-    /** 
+
+    /**
      * Test for enabling JNDI.
      */
     @Test
     public void testEnableNaming() throws Exception {
         Tomcat tomcat = getTomcatInstance();
-        
+
         // Must have a real docBase - just use temp
-        org.apache.catalina.Context ctx = 
+        org.apache.catalina.Context ctx =
             tomcat.addContext("", System.getProperty("java.io.tmpdir"));
-        
+
         // You can customise the context by calling its API
-        
+
         // Enable JNDI - it is disabled by default
         tomcat.enableNaming();
 
@@ -305,29 +305,29 @@ public class TestTomcat extends TomcatBaseTest {
         environment.setName(HelloWorldJndi.JNDI_ENV_NAME);
         environment.setValue("Tomcat User");
         ctx.getNamingResources().addEnvironment(environment);
-        
+
         Tomcat.addServlet(ctx, "jndiServlet", new HelloWorldJndi());
         ctx.addServletMapping("/", "jndiServlet");
-        
+
         tomcat.start();
-        
+
         ByteChunk res = getUrl("http://localhost:" + getPort() + "/");
         assertEquals("Hello, Tomcat User", res.toString());
     }
 
-    /** 
+    /**
      * Test for enabling JNDI and using global resources.
      */
     @Test
     public void testEnableNamingGlobal() throws Exception {
         Tomcat tomcat = getTomcatInstance();
-        
+
         // Must have a real docBase - just use temp
-        org.apache.catalina.Context ctx = 
+        org.apache.catalina.Context ctx =
             tomcat.addContext("", System.getProperty("java.io.tmpdir"));
-        
+
         // You can customise the context by calling its API
-        
+
         // Enable JNDI - it is disabled by default
         tomcat.enableNaming();
 
@@ -336,17 +336,17 @@ public class TestTomcat extends TomcatBaseTest {
         environment.setName("globalTest");
         environment.setValue("Tomcat User");
         tomcat.getServer().getGlobalNamingResources().addEnvironment(environment);
-        
+
         ContextResourceLink link = new ContextResourceLink();
         link.setGlobal("globalTest");
         link.setName(HelloWorldJndi.JNDI_ENV_NAME);
         ctx.getNamingResources().addResourceLink(link);
-        
+
         Tomcat.addServlet(ctx, "jndiServlet", new HelloWorldJndi());
         ctx.addServletMapping("/", "jndiServlet");
-        
+
         tomcat.start();
-        
+
         ByteChunk res = getUrl("http://localhost:" + getPort() + "/");
         assertEquals("Hello, Tomcat User", res.toString());
     }
@@ -358,21 +358,21 @@ public class TestTomcat extends TomcatBaseTest {
     @Test
     public void testGetResource() throws Exception {
         Tomcat tomcat = getTomcatInstance();
-        
+
         String contextPath = "/examples";
-        
+
         File appDir = new File(getBuildDirectory(), "webapps" + contextPath);
         // app dir is relative to server home
         org.apache.catalina.Context ctx =
             tomcat.addWebapp(null, "/examples", appDir.getAbsolutePath());
-        
+
         Tomcat.addServlet(ctx, "testGetResource", new GetResource());
         ctx.addServletMapping("/testGetResource", "testGetResource");
-        
+
         tomcat.start();
-        
+
         ByteChunk res = new ByteChunk();
-        
+
         int rc =getUrl("http://localhost:" + getPort() + contextPath +
                 "/testGetResource", res, null);
         assertEquals(HttpServletResponse.SC_OK, rc);
@@ -383,7 +383,7 @@ public class TestTomcat extends TomcatBaseTest {
     public void testBug50826() throws Exception {
         Tomcat tomcat = getTomcatInstance();
         String contextPath = "/examples";
-        
+
         File appDir = new File(getBuildDirectory(), "webapps" + contextPath);
         // app dir is relative to server home
         tomcat.addWebapp(null, "/examples", appDir.getAbsolutePath());

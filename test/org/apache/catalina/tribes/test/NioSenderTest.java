@@ -45,17 +45,17 @@ public class NioSenderTest {
     public NioSenderTest()  {
         // Default constructor
     }
-    
+
     public synchronized int inc() {
         return ++counter;
     }
-    
+
     public synchronized ChannelData getMessage(Member mbr) {
         String msg = "Thread-"+Thread.currentThread().getName()+" Message:"+inc();
         ChannelData data = new ChannelData(true);
         data.setMessage(new XByteBuffer(msg.getBytes(),false));
         data.setAddress(mbr);
-        
+
         return data;
     }
 
@@ -102,7 +102,7 @@ public class NioSenderTest {
                         sender.reset();
                         sender.setMessage(XByteBuffer.createDataPackage(getMessage(mbr)));
                     }
-                    
+
 
                 } catch (Throwable t) {
                     t.printStackTrace();

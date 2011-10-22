@@ -93,19 +93,19 @@ public class TestLimitLatch {
     }
 
     private static class TestThread extends Thread {
-        
+
         private int holdTime;
         private LimitLatch latch;
 
         public TestThread(LimitLatch latch) {
             this(latch, 100);
         }
-        
+
         public TestThread(LimitLatch latch, int holdTime) {
             this.latch = latch;
             this.holdTime = holdTime;
         }
- 
+
         @Override
         public void run() {
             try {

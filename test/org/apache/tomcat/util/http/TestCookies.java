@@ -15,7 +15,7 @@
  *  limitations under the License.
  */
 
-package org.apache.tomcat.util.http; 
+package org.apache.tomcat.util.http;
 
 import org.junit.Test;
 
@@ -30,8 +30,8 @@ public class TestCookies {
         test("foo=bar;a=b; ;", "foo", "bar", "a", "b");
         test("foo=;a=b; ;",  "a", "b");
         test("foo;a=b; ;", "a", "b");
-        // v1 
-        test("$Version=1; foo=bar;a=b", "foo", "bar", "a", "b"); 
+        // v1
+        test("$Version=1; foo=bar;a=b", "foo", "bar", "a", "b");
 
         // OK
         test("$Version=1;foo=bar;a=b; ; ",  "foo", "bar", "a", "b");
@@ -59,10 +59,10 @@ public class TestCookies {
         // Last character is an escape character
         test("$Version=1;foo=b'ar;$Domain=\"apache.org\";$Port=8080;a=\"b\\\"", "foo", "b'ar");
         test("$Version=1;foo=b'ar;$Domain=\"apache.org\";$Port=8080;a=\"b\\",  "foo", "b'ar");
-        
+
         // A token cannot be quoted with ' chars - they should be treated as part of the value
         test("$Version=\"1\"; foo='bar'; $Path=/path; $Domain=\"localhost\"", "foo", "'bar'");
-    
+
         // wrong, path should not have '/' JVK
         test("$Version=1;foo=\"bar\";$Path=/examples;a=b; ; ", "foo", "bar", "a", "b");
 
@@ -76,7 +76,7 @@ public class TestCookies {
         test("foo;a=b;bar ;", "a", "b");
 
         // Multiple delimiters next to each other
- 
+
         // BUG -- the ' ' needs to be skipped.
         test("foo;a=b; ;bar", "a", "b");
         // BUG -- ';' needs skipping
@@ -88,7 +88,7 @@ public class TestCookies {
         // '#' is a valid cookie name (not a separator)
         test("foo;a=b;;#;bar=rab","a", "b", "bar", "rab");
 
-        
+
         test("foo;a=b;;\\;bar=rab", "a", "b", "bar", "rab");
 
         // Try all the separators of version1 in version0 cookie.
