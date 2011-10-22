@@ -56,11 +56,6 @@ public class McastService implements MembershipService,MembershipListener,Messag
     protected static final StringManager sm = StringManager.getManager(Constants.Package);
 
     /**
-     * The descriptive information about this implementation.
-     */
-    private static final String info = "McastService/2.1";
-
-    /**
      * The implementation specific properties
      */
     protected Properties properties = new Properties();
@@ -97,15 +92,6 @@ public class McastService implements MembershipService,MembershipListener,Messag
         properties.setProperty("memberDropTime","3000");
         properties.setProperty("mcastFrequency","500");
 
-    }
-
-    /**
-     * Return descriptive information about this implementation and the
-     * corresponding version number, in the format
-     * <code>&lt;description&gt;/&lt;version&gt;</code>.
-     */
-    public String getInfo() {
-        return (info);
     }
 
     /**

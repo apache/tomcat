@@ -66,25 +66,6 @@ public class JMXAccessorQueryTask extends JMXAccessorTask {
 
     private boolean attributebinding = false;
 
-    // ----------------------------------------------------- Instance Info
-
-    /**
-     * Descriptive information describing this implementation.
-     */
-    private static final String info = "org.apache.catalina.ant.JMXAccessorQueryTask/1.0";
-
-    /**
-     * Return descriptive information about this implementation and the
-     * corresponding version number, in the format
-     * <code>&lt;description&gt;/&lt;version&gt;</code>.
-     */
-    @Override
-    public String getInfo() {
-
-        return (info);
-
-    }
-
     // ------------------------------------------------------------- Properties
     
     /**

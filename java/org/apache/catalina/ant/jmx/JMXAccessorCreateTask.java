@@ -65,26 +65,6 @@ public class JMXAccessorCreateTask extends JMXAccessorTask {
     private String classLoader;
     private List<Arg> args=new ArrayList<Arg>();
 
-    // ----------------------------------------------------- Instance Info
-
-    /**
-     * Descriptive information describing this implementation.
-     */
-    private static final String info = "org.apache.catalina.ant.JMXAccessorCreateTask/1.0";
-
-    /**
-     * Return descriptive information about this implementation and the
-     * corresponding version number, in the format
-     * <code>&lt;description&gt;/&lt;version&gt;</code>.
-     * @return Returns the class info.
-     */
-    @Override
-    public String getInfo() {
-
-        return (info);
-
-    }
-
     // ------------------------------------------------------------- Properties
 
     /**

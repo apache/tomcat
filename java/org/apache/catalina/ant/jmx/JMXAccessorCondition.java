@@ -107,23 +107,6 @@ public class JMXAccessorCondition extends ProjectComponent implements Condition 
     private String unlessCondition;
     private String ifCondition;
      
-    // ----------------------------------------------------- Instance Info
-
-    /**
-     * Descriptive information describing this implementation.
-     */
-    private static final String info = "org.apache.catalina.ant.JMXAccessorCondition/1.1";
-
-    /**
-     * Return descriptive information about this implementation and the
-     * corresponding version number, in the format
-     * <code>&lt;description&gt;/&lt;version&gt;</code>.
-     */
-    public String getInfo() {
-
-        return (info);
-
-    }
     // ----------------------------------------------------- Properties
 
     /**

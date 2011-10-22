@@ -48,17 +48,7 @@ import org.apache.catalina.startup.Catalina;
 
 public interface Server extends Lifecycle {
 
-
     // ------------------------------------------------------------- Properties
-
-
-    /**
-     * Return descriptive information about this Server implementation and
-     * the corresponding version number, in the format
-     * <code>&lt;description&gt;/&lt;version&gt;</code>.
-     */
-    public String getInfo();
-
 
     /**
      * Return the global naming resources.

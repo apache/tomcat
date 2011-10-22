@@ -35,11 +35,6 @@ import org.apache.catalina.tribes.util.StringManager;
 public class ReplicationTransmitter implements ChannelSender {
 
     /**
-     * The descriptive information about this implementation.
-     */
-    private static final String info = "ReplicationTransmitter/3.0";
-
-    /**
      * The string manager for this package.
      */
     protected static final StringManager sm = StringManager.getManager(Constants.Package);
@@ -49,15 +44,6 @@ public class ReplicationTransmitter implements ChannelSender {
     }
 
     private MultiPointSender transport = new PooledParallelSender();
-
-    /**
-     * Return descriptive information about this implementation and the
-     * corresponding version number, in the format
-     * <code>&lt;description&gt;/&lt;version&gt;</code>.
-     */
-    public String getInfo() {
-        return (info);
-    }
 
     public MultiPointSender getTransport() {
         return transport;

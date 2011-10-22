@@ -138,13 +138,6 @@ public class WebappLoader extends LifecycleMBeanBase
 
 
     /**
-     * The descriptive information about this Loader implementation.
-     */
-    private static final String info =
-        "org.apache.catalina.loader.WebappLoader/1.0";
-
-
-    /**
      * The Java class name of the ClassLoader implementation to be used.
      * This class should extend WebappClassLoader, otherwise, a different 
      * loader implementation must be used.
@@ -278,19 +271,6 @@ public class WebappLoader extends LifecycleMBeanBase
         this.delegate = delegate;
         support.firePropertyChange("delegate", Boolean.valueOf(oldDelegate),
                                    Boolean.valueOf(this.delegate));
-
-    }
-
-
-    /**
-     * Return descriptive information about this Loader implementation and
-     * the corresponding version number, in the format
-     * <code>&lt;description&gt;/&lt;version&gt;</code>.
-     */
-    @Override
-    public String getInfo() {
-
-        return (info);
 
     }
 

@@ -81,14 +81,6 @@ public interface Manager {
 
 
     /**
-     * Return descriptive information about this Manager implementation and
-     * the corresponding version number, in the format
-     * <code>&lt;description&gt;/&lt;version&gt;</code>.
-     */
-    public String getInfo();
-
-
-    /**
      * Return the default maximum inactive interval (in seconds)
      * for Sessions created by this Manager.
      */

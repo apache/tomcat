@@ -53,33 +53,14 @@ public class NioReceiver extends ReceiverBase implements Runnable {
      */
     protected static final StringManager sm = StringManager.getManager(Constants.Package);
 
-    /**
-     * The descriptive information about this implementation.
-     */
-    private static final String info = "NioReceiver/1.0";
-
     private Selector selector = null;
     private ServerSocketChannel serverChannel = null;
     private DatagramChannel datagramChannel = null;
 
     protected LinkedList<Runnable> events = new LinkedList<Runnable>();
-//    private Object interestOpsMutex = new Object();
 
     public NioReceiver() {
     }
-
-    /**
-     * Return descriptive information about this implementation and the
-     * corresponding version number, in the format
-     * <code>&lt;description&gt;/&lt;version&gt;</code>.
-     */
-    public String getInfo() {
-        return (info);
-    }
-
-//    public Object getInterestOpsMutex() {
-//        return interestOpsMutex;
-//    }
 
     @Override
     public void stop() {

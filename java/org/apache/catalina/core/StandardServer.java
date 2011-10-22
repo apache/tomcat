@@ -97,13 +97,6 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
 
 
     /**
-     * Descriptive information about this Server implementation.
-     */
-    private static final String info =
-        "org.apache.catalina.core.StandardServer/1.0";
-
-
-    /**
      * The naming context listener for this web application.
      */
     private NamingContextListener namingContextListener = null;
@@ -224,18 +217,6 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
 
     }
 
-
-    /**
-     * Return descriptive information about this Server implementation and
-     * the corresponding version number, in the format
-     * <code>&lt;description&gt;/&lt;version&gt;</code>.
-     */
-    @Override
-    public String getInfo() {
-
-        return (info);
-
-    }
 
     /**
      * Report the current Tomcat Server Release number

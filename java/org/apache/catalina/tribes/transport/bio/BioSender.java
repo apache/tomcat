@@ -52,12 +52,6 @@ public class BioSender extends AbstractSender {
     // ----------------------------------------------------- Instance Variables
 
     /**
-     * The descriptive information about this implementation.
-     */
-    private static final String info = "DataSender/3.0";
-
-    
-    /**
      * current sender socket
      */
     private Socket socket = null;
@@ -73,17 +67,6 @@ public class BioSender extends AbstractSender {
         // NO-OP
     }
 
-
-    // ------------------------------------------------------------- Properties
-
-    /**
-     * Return descriptive information about this implementation and the
-     * corresponding version number, in the format
-     * <code>&lt;description&gt;/&lt;version&gt;</code>.
-     */
-    public String getInfo() {
-        return (info);
-    }
 
     // --------------------------------------------------------- Public Methods
 

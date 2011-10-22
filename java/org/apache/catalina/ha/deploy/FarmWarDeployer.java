@@ -67,11 +67,6 @@ public class FarmWarDeployer extends ClusterListener
     private static final StringManager sm =
         StringManager.getManager(Constants.Package);
 
-    /**
-     * The descriptive information about this implementation.
-     */
-    private static final String info = "FarmWarDeployer/1.2";
-
     /*--Instance Variables--------------------------------------*/
     protected boolean started = false; //default 5 seconds
 
@@ -127,17 +122,6 @@ public class FarmWarDeployer extends ClusterListener
 
     /*--Constructor---------------------------------------------*/
     public FarmWarDeployer() {
-    }
-
-    /**
-     * Return descriptive information about this deployer implementation and the
-     * corresponding version number, in the format
-     * <code>&lt;description&gt;/&lt;version&gt;</code>.
-     */
-    public String getInfo() {
-
-        return (info);
-
     }
 
     /*--Logic---------------------------------------------------*/

@@ -55,14 +55,6 @@ public class StandardService extends LifecycleMBeanBase implements Service {
 
     // ----------------------------------------------------- Instance Variables
 
-
-    /**
-     * Descriptive information about this component implementation.
-     */
-    private static final String info =
-        "org.apache.catalina.core.StandardService/1.0";
-
-
     /**
      * The name of this service.
      */
@@ -152,19 +144,6 @@ public class StandardService extends LifecycleMBeanBase implements Service {
 
         // Report this property change to interested listeners
         support.firePropertyChange("container", oldContainer, this.container);
-
-    }
-
-
-    /**
-     * Return descriptive information about this Service implementation and
-     * the corresponding version number, in the format
-     * <code>&lt;description&gt;/&lt;version&gt;</code>.
-     */
-    @Override
-    public String getInfo() {
-
-        return (info);
 
     }
 

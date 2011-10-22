@@ -31,10 +31,7 @@ import org.apache.catalina.LifecycleException;
 import org.apache.catalina.tribes.ChannelListener;
 
 public interface ClusterDeployer extends ChannelListener {
-    /**
-     * Descriptive information about this component implementation.
-     */
-    public String info = "ClusterDeployer/1.0";
+
     /**
      * Start the cluster deployer, the owning container will invoke this
      * @throws Exception - if failure to start cluster

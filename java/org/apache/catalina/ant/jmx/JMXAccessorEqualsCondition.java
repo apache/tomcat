@@ -81,23 +81,7 @@ public class JMXAccessorEqualsCondition  extends ProjectComponent  implements Co
     private String attribute;
     private String value;
     private String ref = "jmx.server" ;
-    // ----------------------------------------------------- Instance Info
 
-    /**
-     * Descriptive information describing this implementation.
-     */
-    private static final String info = "org.apache.catalina.ant.JMXAccessorEqualsCondition/1.1";
-
-    /**
-     * Return descriptive information about this implementation and the
-     * corresponding version number, in the format
-     * <code>&lt;description&gt;/&lt;version&gt;</code>.
-     */
-    public String getInfo() {
-
-        return (info);
-
-    }
     // ----------------------------------------------------- Properties
 
     /**
