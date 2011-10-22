@@ -30,9 +30,10 @@ import java.util.Locale;
  */
 
 public class Clock2 extends Applet implements Runnable {
+    private static final long serialVersionUID = 1L;
     Thread timer;                // The thread that displays clock
     int lastxs, lastys, lastxm,
-        lastym, lastxh, lastyh;  // Dimensions used to draw hands 
+        lastym, lastxh, lastyh;  // Dimensions used to draw hands
     SimpleDateFormat formatter;  // Formats the date displayed
     String lastdate;             // String to hold date displayed
     Font clockFaceFont;          // Font for number display on clock
@@ -40,8 +41,8 @@ public class Clock2 extends Applet implements Runnable {
     Color handColor;             // Color of main hands and dial
     Color numberColor;           // Color of second hand and numbers
 
+    @Override
     public void init() {
-        int x,y;
         lastxs = lastys = lastxm = lastym = lastxh = lastyh = 0;
         formatter = new SimpleDateFormat ("EEE MMM dd hh:mm:ss yyyy", Locale.getDefault());
         currentDate = new Date();
@@ -99,6 +100,7 @@ public class Clock2 extends Applet implements Runnable {
     }
 
     // Paint is the main part of the program
+    @Override
     public void paint(Graphics g) {
         int xh, yh, xm, ym, xs, ys, s = 0, m = 10, h = 10, xcenter, ycenter;
         String today;
@@ -115,7 +117,7 @@ public class Clock2 extends Applet implements Runnable {
             m = Integer.parseInt(formatter.format(currentDate));
         } catch (NumberFormatException n) {
             m = 10;
-        }    
+        }
         formatter.applyPattern("h");
         try {
             h = Integer.parseInt(formatter.format(currentDate));
@@ -126,30 +128,30 @@ public class Clock2 extends Applet implements Runnable {
         today = formatter.format(currentDate);
         xcenter=80;
         ycenter=55;
-    
+
     // a= s* pi/2 - pi/2 (to switch 0,0 from 3:00 to 12:00)
     // x = r(cos a) + xcenter, y = r(sin a) + ycenter
-    
+
         xs = (int)(Math.cos(s * 3.14f/30 - 3.14f/2) * 45 + xcenter);
         ys = (int)(Math.sin(s * 3.14f/30 - 3.14f/2) * 45 + ycenter);
         xm = (int)(Math.cos(m * 3.14f/30 - 3.14f/2) * 40 + xcenter);
         ym = (int)(Math.sin(m * 3.14f/30 - 3.14f/2) * 40 + ycenter);
         xh = (int)(Math.cos((h*30 + m/2) * 3.14f/180 - 3.14f/2) * 30 + xcenter);
         yh = (int)(Math.sin((h*30 + m/2) * 3.14f/180 - 3.14f/2) * 30 + ycenter);
-    
+
     // Draw the circle and numbers
-    
+
         g.setFont(clockFaceFont);
         g.setColor(handColor);
         circle(xcenter,ycenter,50,g);
         g.setColor(numberColor);
-        g.drawString("9",xcenter-45,ycenter+3); 
+        g.drawString("9",xcenter-45,ycenter+3);
         g.drawString("3",xcenter+40,ycenter+3);
         g.drawString("12",xcenter-5,ycenter-37);
         g.drawString("6",xcenter-3,ycenter+45);
 
     // Erase if necessary, and redraw
-    
+
         g.setColor(getBackground());
         if (xs != lastxs || ys != lastys) {
             g.drawLine(xcenter, ycenter, lastxs, lastys);
@@ -163,7 +165,7 @@ public class Clock2 extends Applet implements Runnable {
             g.drawLine(xcenter-1, ycenter, lastxh, lastyh); }
         g.setColor(numberColor);
         g.drawString("", 5, 125);
-        g.drawString(today, 5, 125);    
+        g.drawString(today, 5, 125);
         g.drawLine(xcenter, ycenter, xs, ys);
         g.setColor(handColor);
         g.drawLine(xcenter, ycenter-1, xm, ym);
@@ -177,34 +179,40 @@ public class Clock2 extends Applet implements Runnable {
         currentDate=null;
     }
 
+    @Override
     public void start() {
         timer = new Thread(this);
         timer.start();
     }
 
+    @Override
     public void stop() {
         timer = null;
     }
 
+    @Override
     public void run() {
         Thread me = Thread.currentThread();
         while (timer == me) {
             try {
-                Thread.currentThread().sleep(100);
+                Thread.sleep(100);
             } catch (InterruptedException e) {
             }
             repaint();
         }
     }
 
+    @Override
     public void update(Graphics g) {
         paint(g);
     }
 
+    @Override
     public String getAppletInfo() {
         return "Title: A Clock \nAuthor: Rachel Gollub, 1995 \nAn analog clock.";
     }
-  
+
+    @Override
     public String[][] getParameterInfo() {
         String[][] info = {
             {"bgcolor", "hexadecimal RGB number", "The background color. Default is the color of your browser."},
