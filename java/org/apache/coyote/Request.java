@@ -39,13 +39,6 @@ import org.apache.tomcat.util.http.Parameters;
  * access the information using a facade, which provides the high-level view
  * of the request.
  *
- * For lazy evaluation, the request uses the getInfo() hook. The following ids
- * are defined:
- * <ul>
- *  <li>req.encoding - returns the request encoding
- *  <li>req.attribute - returns a module-specific attribute ( like SSL keys, etc ).
- * </ul>
- *
  * Tomcat defines a number of attributes:
  * <ul>
  *   <li>"org.apache.tomcat.request" - allows access to the low-level

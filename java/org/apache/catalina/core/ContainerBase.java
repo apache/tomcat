@@ -60,8 +60,7 @@ import org.apache.tomcat.util.res.StringManager;
 /**
  * Abstract implementation of the <b>Container</b> interface, providing common
  * functionality required by nearly every implementation.  Classes extending
- * this base class must implement <code>getInfo()</code>, and may implement
- * a replacement for <code>invoke()</code>.
+ * this base class must may implement a replacement for <code>invoke()</code>.
  * <p>
  * All subclasses of this abstract base class will include support for a
  * Pipeline object that defines the processing to be performed for each request
