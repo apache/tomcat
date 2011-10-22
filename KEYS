@@ -3,7 +3,7 @@ Please don't use them for email unless you have to. Their main
 purpose is code signing.
 
 Apache users: pgp < KEYS
-Apache developers: 
+Apache developers:
         (pgpk -ll <your name> && pgpk -xa <your name>) >> this file.
       or
         (gpg --fingerprint --list-sigs <your name>
