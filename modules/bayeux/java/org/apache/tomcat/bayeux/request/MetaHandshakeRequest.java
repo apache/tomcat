@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -42,7 +42,7 @@ import org.apache.tomcat.bayeux.*;
 public class MetaHandshakeRequest extends RequestBase implements BayeuxRequest {
 
     protected static HashMap<String,Object> responseTemplate = new HashMap<String,Object>();
-    
+
     static {
         responseTemplate.put(Bayeux.CHANNEL_FIELD,Bayeux.META_HANDSHAKE);
         responseTemplate.put(Bayeux.VERSION_FIELD,"1.0");
@@ -54,7 +54,7 @@ public class MetaHandshakeRequest extends RequestBase implements BayeuxRequest {
     public MetaHandshakeRequest(TomcatBayeux tomcatBayeux, CometEvent event, JSONObject jsReq) throws JSONException {
         super(tomcatBayeux, event, jsReq);
     }
-    
+
 
     public String getVersion() { return version; }
     public String getMinimumVersion() { return minVersion; }
@@ -67,7 +67,7 @@ public class MetaHandshakeRequest extends RequestBase implements BayeuxRequest {
      *  1) The "/meta/handshake" channel identifier.
      *  2) The version of the protocol supported by the client
      *  3) The client's supported connection types.
-     *  
+     *
      * @return HttpError This method returns null if no errors were found
      */
     public HttpError validate() {

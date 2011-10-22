@@ -103,15 +103,15 @@ public class BayeuxStockTicker implements ServletContextListener,
 
         public void run() {
             try {
-                
-                Stock[] stocks = new Stock[] { 
+
+                Stock[] stocks = new Stock[] {
                         new Stock("GOOG", 435.43),
-                        new Stock("YHOO", 27.88), 
+                        new Stock("YHOO", 27.88),
                         new Stock("ASF", 1015.55), };
                 for (Stock s : stocks) {
                     Channel ch = b.getChannel("/stock/"+s.getSymbol(), true);
                     ch.subscribe(c);
-                    
+
                 }
                 Random r = new Random(System.currentTimeMillis());
                 while (run) {
@@ -207,7 +207,7 @@ public class BayeuxStockTicker implements ServletContextListener,
                 return false;
             }
         }
-        
+
         public String toString(){
             StringBuilder buf = new StringBuilder("STOCK#");
             buf.append(getSymbol());
@@ -218,7 +218,7 @@ public class BayeuxStockTicker implements ServletContextListener,
             buf.append("#");
             buf.append(String.valueOf(getCnt()));
             return buf.toString();
-         
+
         }
 
         public Object clone() {

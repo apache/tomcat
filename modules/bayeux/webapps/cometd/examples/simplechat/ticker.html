@@ -90,14 +90,14 @@ function onMsgEvent(event) {
    pricenode.appendChild(pricelabel);
    changenode.appendChild(changelabel);
 
-   var table = dojo.byId("stocktable");  
-   var rows = table.getElementsByTagName("tr");  
+   var table = dojo.byId("stocktable");
+   var rows = table.getElementsByTagName("tr");
    for(i = 0; i < rows.length; i++){
 	   if (rows[i].bgColor != "gray") {
-	       rows[i].bgColor = "white"; 
+	       rows[i].bgColor = "white";
 	   }
-   }          
-   //manipulate rows 
+   }
+   //manipulate rows
    var rowCurrent = dojo.byId("row."+symbol);
    if (pricechange<=0) {
        rowCurrent.bgColor = "red";

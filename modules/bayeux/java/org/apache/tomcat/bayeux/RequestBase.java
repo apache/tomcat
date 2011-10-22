@@ -48,7 +48,7 @@ import org.apache.cometd.bayeux.Message;
  *
  */
 public abstract class RequestBase implements BayeuxRequest {
-    
+
     protected static final SimpleDateFormat timestampFmt =
         new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
     static {
@@ -69,15 +69,15 @@ public abstract class RequestBase implements BayeuxRequest {
     protected String conType = null;
     protected LinkedHashMap<String, Object> ext = new LinkedHashMap<String, Object> ();
 
-    
+
     protected CometEvent event;
-    
+
     protected HashMap<String, Object> response = null;
-    
+
     private static final Log log = LogFactory.getLog(RequestBase.class);
-    
+
     protected int reconnectInterval = 1000;
-    
+
     protected RequestBase(TomcatBayeux tb, CometEvent event, JSONObject jsReq) throws JSONException {
         this.tomcatBayeux = tb;
         this.event = event;
@@ -97,7 +97,7 @@ public abstract class RequestBase implements BayeuxRequest {
                 ext.put(key, jext.get(key));
             }//for
         }//end if
-        
+
         if (jsReq.has(Bayeux.SUPP_CONNECTION_TYPE_FIELD)) {
             JSONArray types = jsReq.getJSONArray(Bayeux.SUPP_CONNECTION_TYPE_FIELD);
             suppConnTypes = new String[types.length()];
@@ -116,7 +116,7 @@ public abstract class RequestBase implements BayeuxRequest {
             else if (Bayeux.TRANSPORT_LONG_POLL.equals(conType))
                 desiredConnTypeFlag = ClientImpl.SUPPORT_LONG_POLL;
         }//end if
-        
+
         //due to the fact that the javascript doesn't send up a required field
         //we have to fake it
         suppConnTypesFlag = ClientImpl.SUPPORT_CALLBACK_POLL | ClientImpl.SUPPORT_LONG_POLL;
@@ -154,7 +154,7 @@ public abstract class RequestBase implements BayeuxRequest {
     public CometEvent getEvent() {
         return event;
     }
-    
+
     protected static void deliver(CometEvent event, ClientImpl to) throws IOException, ServletException, BayeuxException {
         JSONArray jarray = getJSONArray(event,true);
         if ( jarray == null ) throw new BayeuxException("No message to send!");
@@ -194,11 +194,11 @@ public abstract class RequestBase implements BayeuxRequest {
                 out.print("*/");
         } else if ( (to.getDesirectConnType() == 0 && to.supportsCallbackPoll()) || to.getDesirectConnType() == ClientImpl.SUPPORT_CALLBACK_POLL) {
             out.print(");");
-        } 
+        }
         out.flush();
         event.getHttpServletResponse().flushBuffer();
 
-        
+
     }
 
     protected static JSONArray getJSONArray(CometEvent event, boolean nullok) {
@@ -221,7 +221,7 @@ public abstract class RequestBase implements BayeuxRequest {
             getJSONArray().put(msg);
         }
     }
-    
+
     protected void flushMessages(ClientImpl client) throws BayeuxException {
         List<Message> msgs = client.takeMessages();
         synchronized (event) {
@@ -242,12 +242,12 @@ public abstract class RequestBase implements BayeuxRequest {
             }
         }
     }
-    
+
     public int process(int prevops) throws BayeuxException {
         event.getHttpServletRequest().setAttribute(CURRENT_REQ_ATTR,this);
         return prevops;
     }
-    
+
     public int getReconnectInterval() {
         return reconnectInterval;
     }

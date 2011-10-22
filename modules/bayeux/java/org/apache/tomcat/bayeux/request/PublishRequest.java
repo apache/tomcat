@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -45,7 +45,7 @@ import org.apache.juli.logging.LogFactory;
 public class PublishRequest extends RequestBase {
 
     private static final Log log = LogFactory.getLog(PublishRequest.class);
-    
+
     protected static HashMap<String,Object> responseTemplate = new HashMap<String,Object>();
 
     static {
@@ -66,7 +66,7 @@ public class PublishRequest extends RequestBase {
      * Per section 5.1.1 of the Bayuex spec a connect request must contain:
      *  1) The channel identifier of the channel for publication.
      *  2) The data to send.
-     *  
+     *
      * @return HttpError This method returns null if no errors were found
      */
     @Override
@@ -99,7 +99,7 @@ public class PublishRequest extends RequestBase {
         if (error == null) {
             ChannelImpl chimpl = (ChannelImpl)getTomcatBayeux().getChannel(channel,false);
             MessageImpl mimpl = (MessageImpl)getTomcatBayeux().newMessage(client);
-            
+
             try {
                 String[] keys = JSONObject.getNames(msgData);
                 for (int i = 0; i < keys.length; i++) {
@@ -130,9 +130,9 @@ public class PublishRequest extends RequestBase {
         } catch (IOException x) {
             throw new BayeuxException(x);
         }
-        
+
         if (success && client!=null && client.hasMessages()) {
-            //send out messages 
+            //send out messages
             flushMessages(client);
         }
 
