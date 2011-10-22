@@ -34,8 +34,8 @@ public class TestConcurrency extends DefaultTestCase {
     }
 
     @Override
-    public void setUp() {
-        // TODO Auto-generated method stub
+    public void setUp() throws Exception {
+        super.setUp();
         ds = createDefaultDataSource();
         ds.getPoolProperties().setDriverClassName(Driver.class.getName());
         ds.getPoolProperties().setUrl(Driver.url);
