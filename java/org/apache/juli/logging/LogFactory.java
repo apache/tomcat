@@ -5,15 +5,15 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */ 
+ */
 
 package org.apache.juli.logging;
 
@@ -27,38 +27,38 @@ import java.util.logging.LogManager;
  * If you like a different logging implementation - use either the discovery-based
  * commons-logging, or better - another implementation hardcoded to your favourite
  * logging impl.
- * 
- * Why ? Each application and deployment can choose a logging implementation - 
+ *
+ * Why ? Each application and deployment can choose a logging implementation -
  * that involves configuration, installing the logger jar and optional plugins, etc.
  * As part of this process - they can as well install the commons-logging implementation
  * that corresponds to their logger of choice. This completely avoids any discovery
- * problem, while still allowing the user to switch. 
- * 
+ * problem, while still allowing the user to switch.
+ *
  * Note that this implementation is not just a wrapper around JDK logging ( like
  * the original commons-logging impl ). It adds 2 features - a simpler configuration
- * ( which is in fact a subset of log4j.properties ) and a formatter that is 
- * less ugly.   
- * 
+ * ( which is in fact a subset of log4j.properties ) and a formatter that is
+ * less ugly.
+ *
  * The removal of 'abstract' preserves binary backward compatibility. It is possible
- * to preserve the abstract - and introduce another ( hardcoded ) factory - but I 
- * see no benefit. 
- * 
+ * to preserve the abstract - and introduce another ( hardcoded ) factory - but I
+ * see no benefit.
+ *
  * Since this class is not intended to be extended - and provides
  * no plugin for other LogFactory implementation - all protected methods are removed.
  * This can be changed - but again, there is little value in keeping dead code.
- * Just take a quick look at the removed code ( and it's complexity)  
- * 
+ * Just take a quick look at the removed code ( and it's complexity)
+ *
  * --------------
- * 
+ *
  * Original comment:
  * <p>Factory for creating {@link Log} instances, with discovery and
  * configuration features similar to that employed by standard Java APIs
  * such as JAXP.</p>
- * 
+ *
  * <p><strong>IMPLEMENTATION NOTE</strong> - This implementation is heavily
  * based on the SAXParserFactory and DocumentBuilderFactory implementations
  * (corresponding to the JAXP pluggability APIs) found in Apache Xerces.</p>
- * 
+ *
  *
  * @author Craig R. McClanahan
  * @author Costin Manolache
@@ -88,7 +88,7 @@ public /* abstract */ class LogFactory {
      */
     public static final String FACTORY_PROPERTIES =
         "commons-logging.properties";
-    
+
     /**
      * <p>Setting this system property value allows the <code>Hashtable</code> used to store
      * classloaders to be substituted by an alternative implementation.
@@ -102,13 +102,13 @@ public /* abstract */ class LogFactory {
      * </p>
      * <p>
      * <strong>Usage:</strong> Set this property when Java is invoked
-     * and <code>LogFactory</code> will attempt to load a new instance 
+     * and <code>LogFactory</code> will attempt to load a new instance
      * of the given implementation class.
      * For example, running the following ant scriptlet:
      * <code><pre>
      *  &lt;java classname="${test.runner}" fork="yes" failonerror="${test.failonerror}"&gt;
      *     ...
-     *     &lt;sysproperty 
+     *     &lt;sysproperty
      *        key="org.apache.commons.logging.LogFactory.HashtableImpl"
      *        value="org.apache.commons.logging.AltHashtable"/&gt;
      *  &lt;/java&gt;
@@ -125,11 +125,11 @@ public /* abstract */ class LogFactory {
      */
     public static final String HASHTABLE_IMPLEMENTATION_PROPERTY =
         "org.apache.commons.logging.LogFactory.HashtableImpl";
-    
+
     private static LogFactory singleton=new LogFactory();
 
     Properties logConfig;
-    
+
     // ----------------------------------------------------------- Constructors
 
 
@@ -139,7 +139,7 @@ public /* abstract */ class LogFactory {
     private LogFactory() {
         logConfig=new Properties();
     }
-    
+
     // hook for syserr logger - class level
     void setLogConfig( Properties p ) {
         this.logConfig=p;
@@ -147,7 +147,7 @@ public /* abstract */ class LogFactory {
     // --------------------------------------------------------- Public Methods
 
     // only those 2 methods need to change to use a different direct logger.
-    
+
     /**
      * <p>Construct (if necessary) and return a <code>Log</code> instance,
      * using the factory's current set of configuration attributes.</p>
@@ -211,7 +211,7 @@ public /* abstract */ class LogFactory {
      */
     public void removeAttribute(String name) {
         logConfig.remove(name);
-     }   
+     }
 
 
     /**
@@ -351,7 +351,7 @@ public /* abstract */ class LogFactory {
      * The returned string is of form "classname@hashcode", ie is the same as
      * the return value of the Object.toString() method, but works even when
      * the specified object's class has overridden the toString method.
-     * 
+     *
      * @param o may be null.
      * @return a string of form classname@hashcode, or "null" if param o is null.
      */
