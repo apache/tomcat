@@ -336,7 +336,7 @@ Section -post
   ${Else}
     WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Run" "ApacheTomcatMonitor@VERSION_MAJOR_MINOR@_$TomcatServiceName" '"$INSTDIR\bin\$TomcatServiceManagerFileName" //MS//$TomcatServiceName'
   ${EndIf}
-  
+
   ${If} $TomcatMenuEntriesEnable == "1"
     Call createShortcuts
   ${EndIf}
@@ -456,7 +456,7 @@ Function pageComponentsLeave
       StrCpy $TomcatAdminRoles "admin-gui"
     ${EndIf}
   ${EndIf}
-  
+
   SectionGetFlags ${SecMenu} $0
   IntOp $0 $0 & ${SF_SELECTED}
   ${If} $0 <> 0
@@ -578,7 +578,7 @@ Function pageConfigurationLeave
   Push $TomcatServiceName
   Call validateServiceName
   Pop $0
-  
+
   IntCmp $0 1 exit
   MessageBox MB_ICONEXCLAMATION|MB_OK 'The Service Name may not contain a space or any of the following characters: <>:"/\:|?*'
   Abort "Config not right"
@@ -598,7 +598,7 @@ Function validateServiceName
   StrLen $1 $0
   StrCpy $3 '<>:"/\:|?* '
   StrLen $4 $3
-  
+
   loopInput:
     IntOp $1 $1 - 1
     IntCmp $1 -1 valid
@@ -615,7 +615,7 @@ Function validateServiceName
   invalid:
   Push 0
   Goto exit
-  
+
   valid:
   Push 1
   exit:
@@ -817,7 +817,7 @@ Function findJavaHome
     IfErrors 0 +2
     StrCpy $1 ""
     ClearErrors
-    
+
     ; If using 64-bit, go back to using 64-bit registry
     ${If} $0 != "%PROGRAMW6432%"
       SetRegView 64
@@ -917,7 +917,7 @@ Function configure
   Call copyFile
   FileClose $R9
   Delete "$INSTDIR\conf\server.xml.new"
-  
+
   DetailPrint 'Server shutdown listener configured on port "$TomcatPortShutdown"'
   DetailPrint 'HTTP/1.1 Connector configured on port "$TomcatPortHttp"'
   DetailPrint 'AJP/1.3 Connector configured on port "$TomcatPortAjp"'
@@ -1026,7 +1026,7 @@ Function createShortcuts
   ${If} $TomcatShortcutAllUsers == ${BST_CHECKED}
     SetShellVarContext all
   ${EndIf}
-  
+
   SetOutPath "$SMPROGRAMS\Apache Tomcat @VERSION_MAJOR_MINOR@ $TomcatServiceName"
 
   CreateShortCut "$SMPROGRAMS\Apache Tomcat @VERSION_MAJOR_MINOR@ $TomcatServiceName\Tomcat Home Page.lnk" \
@@ -1094,7 +1094,7 @@ Section Uninstall
          the command line with -ServiceName=$\"<name of service>$\"."
     Quit
   ${EndIf}
-  
+
   Delete "$INSTDIR\Uninstall.exe"
 
   ; Stop Tomcat service monitor if running
