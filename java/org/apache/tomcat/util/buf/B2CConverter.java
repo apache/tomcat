@@ -14,8 +14,6 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
-
 package org.apache.tomcat.util.buf;
 
 import java.io.IOException;
@@ -30,7 +28,7 @@ import java.util.Map;
 import org.apache.tomcat.util.res.StringManager;
 
 /** Efficient conversion of bytes  to character .
- *  
+ *
  *  This uses the standard JDK mechanism - a reader - but provides mechanisms
  *  to recycle all the objects that are used. It is compatible with JDK1.1
  *  and up,
@@ -41,11 +39,11 @@ import org.apache.tomcat.util.res.StringManager;
  *  be used in a later version or after the remaining optimizations.
  */
 public class B2CConverter {
-    
-    
+
+
     private static final org.apache.juli.logging.Log log=
         org.apache.juli.logging.LogFactory.getLog( B2CConverter.class );
-    
+
     private static final StringManager sm =
         StringManager.getManager(Constants.Package);
 
@@ -70,7 +68,7 @@ public class B2CConverter {
         String lowerCaseEnc = enc.toLowerCase(Locale.US);
 
         Charset charset = encodingToCharsetCache.get(lowerCaseEnc);
-        
+
         if (charset == null) {
             // Pre-population of the cache means this must be invalid
             throw new UnsupportedEncodingException(
@@ -78,14 +76,14 @@ public class B2CConverter {
         }
         return charset;
     }
-    
+
     private IntermediateInputStream iis;
     private ReadConvertor conv;
     private String encoding;
 
     protected B2CConverter() {
     }
-    
+
     /** Create a converter, with bytes going to a byte buffer
      */
     public B2CConverter(String encoding)
@@ -95,7 +93,7 @@ public class B2CConverter {
         reset();
     }
 
-    
+
     /** Reset the internal state, empty the buffers.
      *  The encoding remain in effect, the internal buffers remain allocated.
      */
@@ -106,7 +104,7 @@ public class B2CConverter {
     static final int BUFFER_SIZE=8192;
     char result[]=new char[BUFFER_SIZE];
 
-    public void convert( ByteChunk bb, CharChunk cb, int limit) 
+    public void convert( ByteChunk bb, CharChunk cb, int limit)
         throws IOException
     {
         iis.setByteChunk( bb );
@@ -119,19 +117,22 @@ public class B2CConverter {
                 int cnt=conv.read( result, 0, size );
                 if( cnt <= 0 ) {
                     // End of stream ! - we may be in a bad state
-                    if(log.isDebugEnabled())
+                    if(log.isDebugEnabled()) {
                         log.debug("B2CConverter: EOF");
+                    }
                     return;
                 }
-                if(log.isDebugEnabled())
+                if(log.isDebugEnabled()) {
                     log.debug("B2CConverter: Converted: " +
                             new String(result, 0, cnt));
+                }
                 cb.append( result, 0, cnt );
                 limit = limit - (bbLengthBeforeRead - bb.getLength());
             }
         } catch( IOException ex) {
-            if(log.isDebugEnabled())
+            if(log.isDebugEnabled()) {
                 log.debug("B2CConverter: Reseting the converter " + ex.toString());
+            }
             reset();
             throw ex;
         }
@@ -153,16 +154,16 @@ public class B2CConverter {
 
 
 /**
- * 
+ *
  */
 final class  ReadConvertor extends InputStreamReader {
-    
+
     /** Create a converter.
      */
     public ReadConvertor(IntermediateInputStream in, Charset charset) {
         super(in, charset);
     }
-    
+
     /** Overridden - will do nothing but reset internal state.
      */
     @Override
@@ -170,7 +171,7 @@ final class  ReadConvertor extends InputStreamReader {
         // NOTHING
         // Calling super.close() would reset out and cb.
     }
-    
+
     @Override
     public  final int read(char cbuf[], int off, int len)
         throws IOException
@@ -178,7 +179,7 @@ final class  ReadConvertor extends InputStreamReader {
         // will do the conversion and call write on the output stream
         return super.read( cbuf, off, len );
     }
-    
+
     /** Reset the buffer
      */
     public  final void recycle() {
@@ -196,27 +197,27 @@ final class  ReadConvertor extends InputStreamReader {
 
 /** Special output stream where close() is overridden, so super.close()
     is never called.
-    
+
     This allows recycling. It can also be disabled, so callbacks will
     not be called if recycling the converter and if data was not flushed.
 */
 final class IntermediateInputStream extends InputStream {
     ByteChunk bc = null;
-    
+
     public IntermediateInputStream() {
     }
-    
+
     @Override
     public  final void close() throws IOException {
         // shouldn't be called - we filter it out in writer
         throw new IOException("close() called - shouldn't happen ");
     }
-    
+
     @Override
     public  final  int read(byte cbuf[], int off, int len) throws IOException {
         return bc.substract(cbuf, off, len);
     }
-    
+
     @Override
     public  final int read() throws IOException {
         return bc.substract();

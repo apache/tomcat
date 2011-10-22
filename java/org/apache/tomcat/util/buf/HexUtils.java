@@ -14,7 +14,6 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package org.apache.tomcat.util.buf;
 
 /**
@@ -57,9 +56,9 @@ public final class HexUtils {
     /**
      * Table for DEC to HEX byte translation.
      */
-    private static final byte[] HEX = 
-    { (byte) '0', (byte) '1', (byte) '2', (byte) '3', (byte) '4', (byte) '5', 
-      (byte) '6', (byte) '7', (byte) '8', (byte) '9', (byte) 'a', (byte) 'b', 
+    private static final byte[] HEX =
+    { (byte) '0', (byte) '1', (byte) '2', (byte) '3', (byte) '4', (byte) '5',
+      (byte) '6', (byte) '7', (byte) '8', (byte) '9', (byte) 'a', (byte) 'b',
       (byte) 'c', (byte) 'd', (byte) 'e', (byte) 'f' };
 
 
@@ -72,7 +71,7 @@ public final class HexUtils {
 
 
     /**
-     * Provide a mechanism for ensuring this class is loaded. 
+     * Provide a mechanism for ensuring this class is loaded.
      */
     public static void load() {
         // Nothing to do
@@ -88,14 +87,17 @@ public final class HexUtils {
 
     public static String toHexString(byte[] bytes)
     {
-        if(null == bytes) return null;
+        if(null == bytes) {
+            return null;
+        }
 
         StringBuilder sb = new StringBuilder(bytes.length << 1);
 
-        for(int i=0; i<bytes.length; ++i)
+        for(int i=0; i<bytes.length; ++i) {
             sb.append(hex[(bytes[i] & 0xf0) >> 4])
                 .append(hex[(bytes[i] & 0x0f)])
                 ;
+        }
 
         return sb.toString();
     }

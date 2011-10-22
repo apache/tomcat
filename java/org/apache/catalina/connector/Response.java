@@ -5,17 +5,15 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.catalina.connector;
 
 
@@ -159,7 +157,7 @@ public class Response
 
     /**
      * Set the Coyote response.
-     * 
+     *
      * @param coyoteResponse The Coyote response
      */
     public void setCoyoteResponse(org.apache.coyote.Response coyoteResponse) {
@@ -224,12 +222,12 @@ public class Response
      */
     protected boolean included = false;
 
-    
+
     /**
      * The characterEncoding flag
      */
     private boolean isCharacterEncodingSet = false;
-    
+
     /**
      * The error flag.
      */
@@ -276,7 +274,7 @@ public class Response
         included = false;
         error = false;
         isCharacterEncodingSet = false;
-        
+
         if (Globals.IS_SECURITY_ENABLED || Connector.RECYCLE_FACADES) {
             if (facade != null) {
                 facade.clear();
@@ -303,7 +301,7 @@ public class Response
     public void clearEncoders() {
         outputBuffer.clearEncoders();
     }
-    
+
 
     // ------------------------------------------------------- Response Methods
 
@@ -335,7 +333,7 @@ public class Response
 
     /**
      * Set the application commit flag.
-     * 
+     *
      * @param appCommitted The new application committed flag value
      */
     public void setAppCommitted(boolean appCommitted) {
@@ -348,7 +346,7 @@ public class Response
      */
     public boolean isAppCommitted() {
         return (this.appCommitted || isCommitted() || isSuspended()
-                || ((getContentLength() > 0) 
+                || ((getContentLength() > 0)
                     && (getContentWritten() >= getContentLength())));
     }
 
@@ -434,7 +432,7 @@ public class Response
 
     /**
      * Set the suspended flag.
-     * 
+     *
      * @param suspended The new suspended flag value
      */
     public void setSuspended(boolean suspended) {
@@ -480,7 +478,7 @@ public class Response
      *
      * @exception IOException if an input/output error occurs
      */
-    public ServletOutputStream createOutputStream() 
+    public ServletOutputStream createOutputStream()
         throws IOException {
         // Probably useless
         if (outputStream == null) {
@@ -496,7 +494,7 @@ public class Response
      *
      * @exception IOException if an input/output error occurs
      */
-    public void finishResponse() 
+    public void finishResponse()
         throws IOException {
         // Writing leftover bytes
         outputBuffer.close();
@@ -555,7 +553,7 @@ public class Response
      * @exception IOException if an input/output error occurs
      */
     @Override
-    public void flushBuffer() 
+    public void flushBuffer()
         throws IOException {
         outputBuffer.flush();
     }
@@ -587,12 +585,13 @@ public class Response
      * @exception IOException if an input/output error occurs
      */
     @Override
-    public ServletOutputStream getOutputStream() 
+    public ServletOutputStream getOutputStream()
         throws IOException {
 
-        if (usingWriter)
+        if (usingWriter) {
             throw new IllegalStateException
                 (sm.getString("coyoteResponse.getOutputStream.ise"));
+        }
 
         usingOutputStream = true;
         if (outputStream == null) {
@@ -620,12 +619,13 @@ public class Response
      * @exception IOException if an input/output error occurs
      */
     @Override
-    public PrintWriter getWriter() 
+    public PrintWriter getWriter()
         throws IOException {
 
-        if (usingOutputStream)
+        if (usingOutputStream) {
             throw new IllegalStateException
                 (sm.getString("coyoteResponse.getWriter.ise"));
+        }
 
         if (ENFORCE_ENCODING_IN_GET_WRITER) {
             /*
@@ -672,7 +672,9 @@ public class Response
     public void reset() {
 
         if (included)
+         {
             return;     // Ignore any call from an included servlet
+        }
 
         coyoteResponse.reset();
         outputBuffer.reset();
@@ -693,7 +695,7 @@ public class Response
         resetBuffer(false);
     }
 
-    
+
     /**
      * Reset the data buffer and the using Writer/Stream flags but not any
      * status or header information.
@@ -701,18 +703,19 @@ public class Response
      * @param resetWriterStreamFlags <code>true</code> if the internal
      *        <code>usingWriter</code>, <code>usingOutputStream</code>,
      *        <code>isCharacterEncodingSet</code> flags should also be reset
-     * 
+     *
      * @exception IllegalStateException if the response has already
      *  been committed
      */
     public void resetBuffer(boolean resetWriterStreamFlags) {
 
-        if (isCommitted())
+        if (isCommitted()) {
             throw new IllegalStateException
                 (sm.getString("coyoteResponse.resetBuffer.ise"));
+        }
 
         outputBuffer.reset();
-        
+
         if(resetWriterStreamFlags) {
             usingOutputStream = false;
             usingWriter = false;
@@ -721,7 +724,7 @@ public class Response
 
     }
 
-    
+
     /**
      * Set the buffer size to be used for this Response.
      *
@@ -733,9 +736,10 @@ public class Response
     @Override
     public void setBufferSize(int size) {
 
-        if (isCommitted() || !outputBuffer.isNew())
+        if (isCommitted() || !outputBuffer.isNew()) {
             throw new IllegalStateException
                 (sm.getString("coyoteResponse.setBufferSize.ise"));
+        }
 
         outputBuffer.setBufferSize(size);
 
@@ -750,13 +754,15 @@ public class Response
     @Override
     public void setContentLength(int length) {
 
-        if (isCommitted())
+        if (isCommitted()) {
             return;
+        }
 
         // Ignore any call from an included servlet
-        if (included)
+        if (included) {
             return;
-        
+        }
+
         coyoteResponse.setContentLength(length);
 
     }
@@ -771,12 +777,14 @@ public class Response
     @SuppressWarnings("deprecation") // isSpace (deprecated) cannot be replaced by isWhiteSpace
     public void setContentType(String type) {
 
-        if (isCommitted())
+        if (isCommitted()) {
             return;
+        }
 
         // Ignore any call from an included servlet
-        if (included)
+        if (included) {
             return;
+        }
 
         // Ignore charset if getWriter() has already been called
         if (usingWriter) {
@@ -826,17 +834,20 @@ public class Response
     @Override
     public void setCharacterEncoding(String charset) {
 
-        if (isCommitted())
+        if (isCommitted()) {
             return;
-        
+        }
+
         // Ignore any call from an included servlet
-        if (included)
-            return;     
-        
+        if (included) {
+            return;
+        }
+
         // Ignore any call made after the getWriter has been invoked
         // The default should be used
-        if (usingWriter)
+        if (usingWriter) {
             return;
+        }
 
         coyoteResponse.setCharacterEncoding(charset);
         isCharacterEncodingSet = true;
@@ -852,19 +863,22 @@ public class Response
     @Override
     public void setLocale(Locale locale) {
 
-        if (isCommitted())
+        if (isCommitted()) {
             return;
+        }
 
         // Ignore any call from an included servlet
-        if (included)
+        if (included) {
             return;
+        }
 
         coyoteResponse.setLocale(locale);
 
         // Ignore any call made after the getWriter has been invoked.
         // The default should be used
-        if (usingWriter)
+        if (usingWriter) {
             return;
+        }
 
         if (isCharacterEncodingSet) {
             return;
@@ -976,8 +990,9 @@ public class Response
     public void addCookie(final Cookie cookie) {
 
         // Ignore any call from an included servlet
-        if (included || isCommitted())
+        if (included || isCommitted()) {
             return;
+        }
 
         final StringBuffer sb = generateCookieString(cookie);
         //if we reached here, no exception, cookie is valid
@@ -988,14 +1003,15 @@ public class Response
     }
 
     /**
-     * Special method for adding a session cookie as we should be overriding 
-     * any previous 
+     * Special method for adding a session cookie as we should be overriding
+     * any previous
      * @param cookie
      */
     public void addSessionCookieInternal(final Cookie cookie) {
-        if (isCommitted())
+        if (isCommitted()) {
             return;
-        
+        }
+
         String name = cookie.getName();
         final String headername = "Set-Cookie";
         final String startsWith = name + "=";
@@ -1014,22 +1030,22 @@ public class Response
         if (!set) {
             addHeader(headername, sb.toString());
         }
-        
-        
+
+
     }
 
     public StringBuffer generateCookieString(final Cookie cookie) {
         final StringBuffer sb = new StringBuffer();
-        //web application code can receive a IllegalArgumentException 
+        //web application code can receive a IllegalArgumentException
         //from the appendCookieValue invocation
         if (SecurityUtil.isPackageProtectionEnabled()) {
             AccessController.doPrivileged(new PrivilegedAction<Void>() {
                 @Override
                 public Void run(){
                     ServerCookie.appendCookieValue
-                        (sb, cookie.getVersion(), cookie.getName(), 
-                         cookie.getValue(), cookie.getPath(), 
-                         cookie.getDomain(), cookie.getComment(), 
+                        (sb, cookie.getVersion(), cookie.getName(),
+                         cookie.getValue(), cookie.getPath(),
+                         cookie.getDomain(), cookie.getComment(),
                          cookie.getMaxAge(), cookie.getSecure(),
                          cookie.isHttpOnly());
                     return null;
@@ -1038,7 +1054,7 @@ public class Response
         } else {
             ServerCookie.appendCookieValue
                 (sb, cookie.getVersion(), cookie.getName(), cookie.getValue(),
-                     cookie.getPath(), cookie.getDomain(), cookie.getComment(), 
+                     cookie.getPath(), cookie.getDomain(), cookie.getComment(),
                      cookie.getMaxAge(), cookie.getSecure(),
                      cookie.isHttpOnly());
         }
@@ -1059,8 +1075,9 @@ public class Response
             return;
         }
 
-        if (isCommitted())
+        if (isCommitted()) {
             return;
+        }
 
         // Ignore any call from an included servlet
         if (included) {
@@ -1091,12 +1108,14 @@ public class Response
             return;
         }
 
-        if (isCommitted())
+        if (isCommitted()) {
             return;
+        }
 
         // Ignore any call from an included servlet
-        if (included)
+        if (included) {
             return;
+        }
 
         coyoteResponse.addHeader(name, value);
 
@@ -1116,12 +1135,14 @@ public class Response
             return;
         }
 
-        if (isCommitted())
+        if (isCommitted()) {
             return;
+        }
 
         // Ignore any call from an included servlet
-        if (included)
+        if (included) {
             return;
+        }
 
         addHeader(name, "" + value);
 
@@ -1195,10 +1216,10 @@ public class Response
      */
     @Override
     public String encodeURL(String url) {
-        
+
         String absolute = toAbsolute(url);
         if (isEncodeable(absolute)) {
-            // W3c spec clearly said 
+            // W3c spec clearly said
             if (url.equalsIgnoreCase("")) {
                 url = absolute;
             } else if (url.equals(absolute) && !hasPath(url)) {
@@ -1230,18 +1251,20 @@ public class Response
 
     /**
      * Send an acknowledgment of a request.
-     * 
+     *
      * @exception IOException if an input/output error occurs
      */
     public void sendAcknowledgement()
         throws IOException {
 
-        if (isCommitted())
+        if (isCommitted()) {
             return;
+        }
 
         // Ignore any call from an included servlet
-        if (included)
-            return; 
+        if (included) {
+            return;
+        }
 
         coyoteResponse.acknowledge();
 
@@ -1259,7 +1282,7 @@ public class Response
      * @exception IOException if an input/output error occurs
      */
     @Override
-    public void sendError(int status) 
+    public void sendError(int status)
         throws IOException {
         sendError(status, null);
     }
@@ -1276,21 +1299,23 @@ public class Response
      * @exception IOException if an input/output error occurs
      */
     @Override
-    public void sendError(int status, String message) 
+    public void sendError(int status, String message)
         throws IOException {
 
-        if (isCommitted())
+        if (isCommitted()) {
             throw new IllegalStateException
                 (sm.getString("coyoteResponse.sendError.ise"));
+        }
 
         // Ignore any call from an included servlet
-        if (included)
-            return; 
+        if (included) {
+            return;
+        }
 
         Wrapper wrapper = getRequest().getWrapper();
         if (wrapper != null) {
             wrapper.incrementErrorCount();
-        } 
+        }
 
         setError();
 
@@ -1316,16 +1341,18 @@ public class Response
      * @exception IOException if an input/output error occurs
      */
     @Override
-    public void sendRedirect(String location) 
+    public void sendRedirect(String location)
         throws IOException {
 
-        if (isCommitted())
+        if (isCommitted()) {
             throw new IllegalStateException
                 (sm.getString("coyoteResponse.sendRedirect.ise"));
+        }
 
         // Ignore any call from an included servlet
-        if (included)
-            return; 
+        if (included) {
+            return;
+        }
 
         // Clear any data content that has been buffered
         resetBuffer(true);
@@ -1364,8 +1391,9 @@ public class Response
             return;
         }
 
-        if (isCommitted())
+        if (isCommitted()) {
             return;
+        }
 
         // Ignore any call from an included servlet
         if (included) {
@@ -1396,12 +1424,14 @@ public class Response
             return;
         }
 
-        if (isCommitted())
+        if (isCommitted()) {
             return;
+        }
 
         // Ignore any call from an included servlet
-        if (included)
+        if (included) {
             return;
+        }
 
         coyoteResponse.setHeader(name, value);
 
@@ -1421,12 +1451,14 @@ public class Response
             return;
         }
 
-        if (isCommitted())
+        if (isCommitted()) {
             return;
+        }
 
         // Ignore any call from an included servlet
-        if (included)
+        if (included) {
             return;
+        }
 
         setHeader(name, "" + value);
 
@@ -1458,12 +1490,14 @@ public class Response
     @Deprecated
     public void setStatus(int status, String message) {
 
-        if (isCommitted())
+        if (isCommitted()) {
             return;
+        }
 
         // Ignore any call from an included servlet
-        if (included)
+        if (included) {
             return;
+        }
 
         coyoteResponse.setStatus(status);
         coyoteResponse.setMessage(message);
@@ -1489,25 +1523,30 @@ public class Response
      */
     protected boolean isEncodeable(final String location) {
 
-        if (location == null)
+        if (location == null) {
             return (false);
+        }
 
         // Is this an intra-document reference?
-        if (location.startsWith("#"))
+        if (location.startsWith("#")) {
             return (false);
+        }
 
         // Are we in a valid session that is not using cookies?
         final Request hreq = request;
         final Session session = hreq.getSessionInternal(false);
-        if (session == null)
+        if (session == null) {
             return (false);
-        if (hreq.isRequestedSessionIdFromCookie())
+        }
+        if (hreq.isRequestedSessionIdFromCookie()) {
             return (false);
-        
+        }
+
         // Is URL encoding permitted
         if (!hreq.getServletContext().getEffectiveSessionTrackingModes().
-                contains(SessionTrackingMode.URL))
+                contains(SessionTrackingMode.URL)) {
             return false;
+        }
 
         if (SecurityUtil.isPackageProtectionEnabled()) {
             return (
@@ -1523,7 +1562,7 @@ public class Response
         }
     }
 
-    private boolean doIsEncodeable(Request hreq, Session session, 
+    private boolean doIsEncodeable(Request hreq, Session session,
                                    String location) {
         // Is this a valid absolute URL?
         URL url = null;
@@ -1534,38 +1573,45 @@ public class Response
         }
 
         // Does this URL match down to (and including) the context path?
-        if (!hreq.getScheme().equalsIgnoreCase(url.getProtocol()))
+        if (!hreq.getScheme().equalsIgnoreCase(url.getProtocol())) {
             return (false);
-        if (!hreq.getServerName().equalsIgnoreCase(url.getHost()))
+        }
+        if (!hreq.getServerName().equalsIgnoreCase(url.getHost())) {
             return (false);
+        }
         int serverPort = hreq.getServerPort();
         if (serverPort == -1) {
-            if ("https".equals(hreq.getScheme()))
+            if ("https".equals(hreq.getScheme())) {
                 serverPort = 443;
-            else
+            } else {
                 serverPort = 80;
+            }
         }
         int urlPort = url.getPort();
         if (urlPort == -1) {
-            if ("https".equals(url.getProtocol()))
+            if ("https".equals(url.getProtocol())) {
                 urlPort = 443;
-            else
+            } else {
                 urlPort = 80;
+            }
         }
-        if (serverPort != urlPort)
+        if (serverPort != urlPort) {
             return (false);
+        }
 
         String contextPath = getContext().getPath();
         if (contextPath != null) {
             String file = url.getFile();
-            if ((file == null) || !file.startsWith(contextPath))
+            if ((file == null) || !file.startsWith(contextPath)) {
                 return (false);
+            }
             String tok = ";" +
                     ApplicationSessionCookieConfig.getSessionUriParamName(
                                 request.getContext()) +
                     "=" + session.getIdInternal();
-            if( file.indexOf(tok, contextPath.length()) >= 0 )
+            if( file.indexOf(tok, contextPath.length()) >= 0 ) {
                 return (false);
+            }
         }
 
         // This URL belongs to our web application, so it is encodeable
@@ -1586,8 +1632,9 @@ public class Response
      */
     protected String toAbsolute(String location) {
 
-        if (location == null)
+        if (location == null) {
             return (location);
+        }
 
         boolean leadingSlash = location.startsWith("/");
 
@@ -1630,18 +1677,18 @@ public class Response
                     String relativePath = request.getDecodedRequestURI();
                     int pos = relativePath.lastIndexOf('/');
                     relativePath = relativePath.substring(0, pos);
-                    
+
                     String encodedURI = null;
                     final String frelativePath = relativePath;
                     if (SecurityUtil.isPackageProtectionEnabled() ){
                         try{
-                            encodedURI = AccessController.doPrivileged( 
-                                new PrivilegedExceptionAction<String>(){                                
+                            encodedURI = AccessController.doPrivileged(
+                                new PrivilegedExceptionAction<String>(){
                                     @Override
                                     public String run() throws IOException{
                                         return urlEncoder.encodeURL(frelativePath);
                                     }
-                           });   
+                           });
                         } catch (PrivilegedActionException pae){
                             IllegalArgumentException iae =
                                 new IllegalArgumentException(location);
@@ -1713,8 +1760,9 @@ public class Response
      */
     protected String toEncoded(String url, String sessionId) {
 
-        if ((url == null) || (sessionId == null))
+        if ((url == null) || (sessionId == null)) {
             return (url);
+        }
 
         String path = url;
         String query = "";

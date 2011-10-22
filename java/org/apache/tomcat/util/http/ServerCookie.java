@@ -14,7 +14,6 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package org.apache.tomcat.util.http;
 
 import java.io.Serializable;
@@ -38,19 +37,19 @@ import org.apache.tomcat.util.buf.MessageBytes;
  *  and the facade will convert it to the external representation.
  */
 public class ServerCookie implements Serializable {
-    
+
     private static final long serialVersionUID = 1L;
-    
+
     // Version 0 (Netscape) attributes
-    private MessageBytes name=MessageBytes.newInstance();
-    private MessageBytes value=MessageBytes.newInstance();
+    private final MessageBytes name=MessageBytes.newInstance();
+    private final MessageBytes value=MessageBytes.newInstance();
     // Expires - Not stored explicitly. Generated from Max-Age (see V1)
-    private MessageBytes path=MessageBytes.newInstance();
-    private MessageBytes domain=MessageBytes.newInstance();
+    private final MessageBytes path=MessageBytes.newInstance();
+    private final MessageBytes domain=MessageBytes.newInstance();
     private boolean secure;
-    
+
     // Version 1 (RFC2109) attributes
-    private MessageBytes comment=MessageBytes.newInstance();
+    private final MessageBytes comment=MessageBytes.newInstance();
     private int maxAge = -1;
     private int version = 0;
 
@@ -150,10 +149,10 @@ public class ServerCookie implements Serializable {
         return "Cookie " + getName() + "=" + getValue() + " ; "
             + getVersion() + " " + getPath() + " " + getDomain();
     }
-    
+
     // -------------------- Cookie parsing tools
 
-    
+
     public static void appendCookieValue( StringBuffer headerBuf,
                                           int version,
                                           String name,
@@ -170,19 +169,19 @@ public class ServerCookie implements Serializable {
         buf.append( name );
         buf.append("=");
         // Servlet implementation does not check anything else
-        
+
         /*
          * The spec allows some latitude on when to send the version attribute
          * with a Set-Cookie header. To be nice to clients, we'll make sure the
          * version attribute is first. That means checking the various things
          * that can cause us to switch to a v1 cookie first.
-         * 
+         *
          * Note that by checking for tokens we will also throw an exception if a
          * control character is encountered.
          */
         // Start by using the version we were asked for
         int newVersion = version;
-        
+
         // If it is v0, check if we need to switch
         if (newVersion == 0 &&
                 (!CookieSupport.ALLOW_HTTP_SEPARATORS_IN_V0 &&
@@ -192,7 +191,7 @@ public class ServerCookie implements Serializable {
             // HTTP token in value - need to use v1
             newVersion = 1;
         }
-        
+
         if (newVersion == 0 && comment != null) {
             // Using a comment makes it a v1 cookie
            newVersion = 1;
@@ -230,7 +229,7 @@ public class ServerCookie implements Serializable {
                 maybeQuote(buf, comment);
             }
         }
-        
+
         // Add domain information, if present
         if (domain!=null) {
             buf.append("; Domain=");
@@ -249,13 +248,14 @@ public class ServerCookie implements Serializable {
                 // Wdy, DD-Mon-YY HH:MM:SS GMT ( Expires Netscape format )
                 buf.append ("; Expires=");
                 // To expire immediately we need to set the time in past
-                if (maxAge == 0)
+                if (maxAge == 0) {
                     buf.append( ancientDate );
-                else
+                } else {
                     OLD_COOKIE_FORMAT.get().format(
                             new Date(System.currentTimeMillis() +
                                     maxAge*1000L),
                             buf, new FieldPosition(0));
+                }
             }
         }
 
@@ -269,7 +269,7 @@ public class ServerCookie implements Serializable {
         if (isSecure) {
           buf.append ("; Secure");
         }
-        
+
         // HttpOnly
         if (isHttpOnly) {
             buf.append("; HttpOnly");
@@ -322,12 +322,15 @@ public class ServerCookie implements Serializable {
             if (c == '\\' ) {
                 b.append(c);
                 //ignore the character after an escape, just append it
-                if (++i>=endIndex) throw new IllegalArgumentException("Invalid escape character in cookie value.");
+                if (++i>=endIndex) {
+                    throw new IllegalArgumentException("Invalid escape character in cookie value.");
+                }
                 b.append(s.charAt(i));
-            } else if (c == '"')
+            } else if (c == '"') {
                 b.append('\\').append('"');
-            else
+            } else {
                 b.append(c);
+            }
         }
 
         return b.toString();

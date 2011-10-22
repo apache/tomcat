@@ -14,7 +14,6 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package org.apache.tomcat.util.buf;
 
 import java.io.CharArrayWriter;
@@ -26,7 +25,7 @@ import java.util.BitSet;
  *  This class is not thread safe - you need one encoder per thread.
  *  The encoder will save and recycle the internal objects, avoiding
  *  garbage.
- * 
+ *
  *  You can add extra characters that you want preserved, for example
  *  while encoding a URL you can add "/".
  *
@@ -36,7 +35,7 @@ public final class UEncoder {
 
     private static final org.apache.juli.logging.Log log=
         org.apache.juli.logging.LogFactory.getLog(UEncoder.class );
-    
+
     // Not static - the set may differ ( it's better than adding
     // an extra check for "/", "+", etc
     private BitSet safeChars=null;
@@ -44,7 +43,7 @@ public final class UEncoder {
     private ByteChunk bb=null;
 
     private String encoding="UTF8";
-    
+
     public UEncoder() {
         initSafeChars();
     }
@@ -74,22 +73,25 @@ public final class UEncoder {
         for (int i = 0; i < s.length(); i++) {
             int c = s.charAt(i);
             if( safeChars.get( c ) ) {
-                if(log.isDebugEnabled())
+                if(log.isDebugEnabled()) {
                     log.debug("Encoder: Safe: " + (char)c);
+                }
                 buf.write((char)c);
             } else {
-                if(log.isDebugEnabled())
+                if(log.isDebugEnabled()) {
                     log.debug("Encoder: Unsafe:  " + (char)c);
+                }
                 c2b.convert( (char)c );
-                
+
                 // "surrogate" - UTF is _not_ 16 bit, but 21 !!!!
                 // ( while UCS is 31 ). Amazing...
                 if (c >= 0xD800 && c <= 0xDBFF) {
                     if ( (i+1) < s.length()) {
                         int d = s.charAt(i+1);
                         if (d >= 0xDC00 && d <= 0xDFFF) {
-                            if(log.isDebugEnabled())
+                            if(log.isDebugEnabled()) {
                                 log.debug("Encoder: Unsafe:  " + c);
+                            }
                             c2b.convert( (char)d);
                             i++;
                         }
@@ -97,7 +99,7 @@ public final class UEncoder {
                 }
 
                 c2b.flushBuffer();
-                
+
                 urlEncode( buf, bb.getBuffer(), bb.getOffset(),
                            bb.getLength() );
                 bb.recycle();
@@ -112,16 +114,18 @@ public final class UEncoder {
         for( int j=off; j< len; j++ ) {
             buf.write( '%' );
             char ch = Character.forDigit((bytes[j] >> 4) & 0xF, 16);
-            if(log.isDebugEnabled())
+            if(log.isDebugEnabled()) {
                 log.debug("Encoder: Encode:  " + ch);
+            }
             buf.write(ch);
             ch = Character.forDigit(bytes[j] & 0xF, 16);
-            if(log.isDebugEnabled())
+            if(log.isDebugEnabled()) {
                 log.debug("Encoder: Encode:  " + ch);
+            }
             buf.write(ch);
         }
     }
-    
+
     /**
      * Utility function to re-encode the URL.
      * Still has problems with charset, since UEncoder mostly
@@ -138,10 +142,10 @@ public final class UEncoder {
         }
         return outUri;
     }
-    
+
 
     // -------------------- Internal implementation --------------------
-    
+
     private void initSafeChars() {
         safeChars=new BitSet(128);
         int i;

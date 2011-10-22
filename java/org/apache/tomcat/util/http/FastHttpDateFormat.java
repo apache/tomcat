@@ -14,7 +14,6 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package org.apache.tomcat.util.http;
 
 import java.text.DateFormat;
@@ -27,7 +26,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Utility class to generate HTTP dates.
- * 
+ *
  * @author Remy Maucherat
  */
 public final class FastHttpDateFormat {
@@ -36,14 +35,14 @@ public final class FastHttpDateFormat {
     // -------------------------------------------------------------- Variables
 
 
-    private static final int CACHE_SIZE = 
+    private static final int CACHE_SIZE =
         Integer.parseInt(System.getProperty("org.apache.tomcat.util.http.FastHttpDateFormat.CACHE_SIZE", "1000"));
 
-    
+
     /**
      * HTTP date format.
      */
-    private static final SimpleDateFormat format = 
+    private static final SimpleDateFormat format =
         new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz", Locale.US);
 
 
@@ -89,14 +88,14 @@ public final class FastHttpDateFormat {
     /**
      * Formatter cache.
      */
-    private static final ConcurrentHashMap<Long, String> formatCache = 
+    private static final ConcurrentHashMap<Long, String> formatCache =
         new ConcurrentHashMap<Long, String>(CACHE_SIZE);
 
 
     /**
      * Parser cache.
      */
-    private static final ConcurrentHashMap<String, Long> parseCache = 
+    private static final ConcurrentHashMap<String, Long> parseCache =
         new ConcurrentHashMap<String, Long>(CACHE_SIZE);
 
 
@@ -130,8 +129,9 @@ public final class FastHttpDateFormat {
 
         Long longValue = new Long(value);
         String cachedDate = formatCache.get(longValue);
-        if (cachedDate != null)
+        if (cachedDate != null) {
             return cachedDate;
+        }
 
         String newDate = null;
         Date dateValue = new Date(value);
@@ -154,12 +154,13 @@ public final class FastHttpDateFormat {
     /**
      * Try to parse the given date as a HTTP date.
      */
-    public static final long parseDate(String value, 
+    public static final long parseDate(String value,
                                        DateFormat[] threadLocalformats) {
 
         Long cachedDate = parseCache.get(value);
-        if (cachedDate != null)
+        if (cachedDate != null) {
             return cachedDate.longValue();
+        }
 
         Long date = null;
         if (threadLocalformats != null) {

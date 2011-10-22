@@ -14,7 +14,6 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package org.apache.tomcat.util.buf;
 
 /**
@@ -197,7 +196,7 @@ public final class Ascii {
 
         long n = c - '0';
         long m;
-        
+
         while (--len > 0) {
             if (!isDigit(c = b[off++])) {
                 throw new NumberFormatException();

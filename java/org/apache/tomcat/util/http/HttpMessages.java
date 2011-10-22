@@ -14,14 +14,13 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package org.apache.tomcat.util.http;
 
 import org.apache.tomcat.util.res.StringManager;
 
 /**
  * Handle (internationalized) HTTP messages.
- * 
+ *
  * @author James Duncan Davidson [duncan@eng.sun.com]
  * @author James Todd [gonzo@eng.sun.com]
  * @author Jason Hunter [jch@eng.sun.com]
@@ -32,12 +31,12 @@ public class HttpMessages {
     // XXX move message resources in this package
     protected static final StringManager sm =
         StringManager.getManager("org.apache.tomcat.util.http.res");
-        
+
     static String st_200=null;
     static String st_302=null;
     static String st_400=null;
     static String st_404=null;
-    
+
     /** Get the status string associated with a status code.
      *  No I18N - return the messages defined in the HTTP spec.
      *  ( the user isn't supposed to see them, this is the last
@@ -48,21 +47,29 @@ public class HttpMessages {
      */
     public static String getMessage( int status ) {
         // method from Response.
-        
+
         // Does HTTP requires/allow international messages or
         // are pre-defined? The user doesn't see them most of the time
         switch( status ) {
         case 200:
-            if( st_200==null ) st_200=sm.getString( "sc.200");
+            if( st_200==null ) {
+                st_200=sm.getString( "sc.200");
+            }
             return st_200;
         case 302:
-            if( st_302==null ) st_302=sm.getString( "sc.302");
+            if( st_302==null ) {
+                st_302=sm.getString( "sc.302");
+            }
             return st_302;
         case 400:
-            if( st_400==null ) st_400=sm.getString( "sc.400");
+            if( st_400==null ) {
+                st_400=sm.getString( "sc.400");
+            }
             return st_400;
         case 404:
-            if( st_404==null ) st_404=sm.getString( "sc.404");
+            if( st_404==null ) {
+                st_404=sm.getString( "sc.404");
+            }
             return st_404;
         }
         return sm.getString("sc."+ status);
@@ -77,8 +84,9 @@ public class HttpMessages {
      */
     public static String filter(String message) {
 
-        if (message == null)
+        if (message == null) {
             return (null);
+        }
 
         char content[] = new char[message.length()];
         message.getChars(0, message.length(), content, 0);
@@ -107,7 +115,7 @@ public class HttpMessages {
     /**
      * Is the provided message safe to use in an HTTP header. Safe messages must
      * meet the requirements of RFC2616 - i.e. must consist only of TEXT.
-     * 
+     *
      * @param msg   The message to test
      * @return      <code>true</code> if the message is safe to use in an HTTP
      *              header else <code>false</code>
