@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -127,7 +127,7 @@ public class MBeanUtils {
 
     }
 
-    
+
     /**
      * Create, register, and return an MBean for this
      * <code>ContextEnvironment</code> object.
@@ -218,8 +218,8 @@ public class MBeanUtils {
         mserver.registerMBean(mbean, oname);
         return (mbean);
 
-    }    
- 
+    }
+
 
     /**
      * Create, register, and return an MBean for this
@@ -345,7 +345,7 @@ public class MBeanUtils {
 
     }
 
-    
+
     /**
      * Create, register, and return an MBean for this
      * <code>Role</code> object.
@@ -454,7 +454,7 @@ public class MBeanUtils {
 
         ObjectName name = null;
         try {
-            Object addressObj = IntrospectionUtils.getProperty(connector, "address");            
+            Object addressObj = IntrospectionUtils.getProperty(connector, "address");
             Integer port = (Integer)
                 IntrospectionUtils.getProperty(connector, "port");
 
@@ -500,12 +500,12 @@ public class MBeanUtils {
         name = new ObjectName(domain + ":j2eeType=WebModule,name=//" +
                               host.getName()+ cn.getDisplayName() +
                               ",J2EEApplication=none,J2EEServer=none");
-    
+
         return (name);
 
     }
 
-    
+
     /**
      * Create an <code>ObjectName</code> for this
      * <code>Service</code> object.
@@ -520,25 +520,25 @@ public class MBeanUtils {
         throws MalformedObjectNameException {
 
         ObjectName name = null;
-        Object container = 
+        Object container =
                 environment.getNamingResources().getContainer();
         if (container instanceof Server) {
-            name = new ObjectName(domain + ":type=Environment" + 
+            name = new ObjectName(domain + ":type=Environment" +
                         ",resourcetype=Global,name=" + environment.getName());
-        } else if (container instanceof Context) {        
+        } else if (container instanceof Context) {
             Context context = ((Context)container);
             ContextName cn = new ContextName(context.getName());
             Container host = context.getParent();
-            name = new ObjectName(domain + ":type=Environment" + 
-                        ",resourcetype=Context,context=" + cn.getDisplayName() + 
+            name = new ObjectName(domain + ":type=Environment" +
+                        ",resourcetype=Context,context=" + cn.getDisplayName() +
                         ",host=" + host.getName() +
                         ",name=" + environment.getName());
-        }        
+        }
         return (name);
 
     }
-    
-    
+
+
     /**
      * Create an <code>ObjectName</code> for this
      * <code>ContextResource</code> object.
@@ -554,28 +554,28 @@ public class MBeanUtils {
 
         ObjectName name = null;
         String quotedResourceName = ObjectName.quote(resource.getName());
-        Object container = 
+        Object container =
                 resource.getNamingResources().getContainer();
-        if (container instanceof Server) {        
+        if (container instanceof Server) {
             name = new ObjectName(domain + ":type=Resource" +
-                        ",resourcetype=Global,class=" + resource.getType() + 
+                        ",resourcetype=Global,class=" + resource.getType() +
                         ",name=" + quotedResourceName);
-        } else if (container instanceof Context) {                    
+        } else if (container instanceof Context) {
             Context context = ((Context)container);
             ContextName cn = new ContextName(context.getName());
             Container host = context.getParent();
             name = new ObjectName(domain + ":type=Resource" +
-                        ",resourcetype=Context,context=" + cn.getDisplayName() + 
+                        ",resourcetype=Context,context=" + cn.getDisplayName() +
                         ",host=" + host.getName() +
                         ",class=" + resource.getType() +
                         ",name=" + quotedResourceName);
         }
-        
+
         return (name);
 
     }
-  
-    
+
+
      /**
      * Create an <code>ObjectName</code> for this
      * <code>ContextResourceLink</code> object.
@@ -591,23 +591,23 @@ public class MBeanUtils {
 
         ObjectName name = null;
         String quotedResourceLinkName
-                = ObjectName.quote(resourceLink.getName());        
-        Object container = 
+                = ObjectName.quote(resourceLink.getName());
+        Object container =
                 resourceLink.getNamingResources().getContainer();
-        if (container instanceof Server) {        
+        if (container instanceof Server) {
             name = new ObjectName(domain + ":type=ResourceLink" +
-                        ",resourcetype=Global" + 
+                        ",resourcetype=Global" +
                         ",name=" + quotedResourceLinkName);
-        } else if (container instanceof Context) {                    
+        } else if (container instanceof Context) {
             Context context = ((Context)container);
             ContextName cn = new ContextName(context.getName());
             Container host = context.getParent();
             name = new ObjectName(domain + ":type=ResourceLink" +
-                        ",resourcetype=Context,context=" + cn.getDisplayName() + 
+                        ",resourcetype=Context,context=" + cn.getDisplayName() +
                         ",host=" + host.getName() +
                         ",name=" + quotedResourceLinkName);
         }
-        
+
         return (name);
 
     }
@@ -741,8 +741,8 @@ public class MBeanUtils {
         return (name);
 
     }
-    
-    
+
+
     /**
      * Create an <code>ObjectName</code> for this
      * <code>Server</code> object.
@@ -757,19 +757,19 @@ public class MBeanUtils {
         throws MalformedObjectNameException {
 
         ObjectName name = null;
-        Object container = resources.getContainer();        
-        if (container instanceof Server) {        
-            name = new ObjectName(domain + ":type=NamingResources" + 
+        Object container = resources.getContainer();
+        if (container instanceof Server) {
+            name = new ObjectName(domain + ":type=NamingResources" +
                         ",resourcetype=Global");
-        } else if (container instanceof Context) {        
+        } else if (container instanceof Context) {
             Context context = ((Context)container);
             ContextName cn = new ContextName(context.getName());
             Container host = context.getParent();
-            name = new ObjectName(domain + ":type=NamingResources" + 
-                        ",resourcetype=Context,context=" + cn.getDisplayName() + 
+            name = new ObjectName(domain + ":type=NamingResources" +
+                        ",resourcetype=Context,context=" + cn.getDisplayName() +
                         ",host=" + host.getName());
         }
-        
+
         return (name);
 
     }
@@ -793,7 +793,7 @@ public class MBeanUtils {
 
     }
 
-    
+
     /**
      * Create an <code>ObjectName</code> for this
      * <code>Realm</code> object.
@@ -883,7 +883,7 @@ public class MBeanUtils {
         throws MalformedObjectNameException {
 
         ObjectName name = null;
-        name = new ObjectName(domain + ":type=Service,serviceName=" + 
+        name = new ObjectName(domain + ":type=Service,serviceName=" +
                             service.getName());
         return (name);
 
@@ -964,7 +964,7 @@ public class MBeanUtils {
             throw new MalformedObjectNameException(
                                "Cannot create mbean for non-contained valve " +
                                valve);
-        }        
+        }
         if (container instanceof Engine) {
             String local="";
             int seq = getSeq(local);
@@ -972,7 +972,7 @@ public class MBeanUtils {
             if( seq > 0 ) {
                 ext=",seq=" + seq;
             }
-            name = new ObjectName(domain + ":type=Valve,name=" + className + 
+            name = new ObjectName(domain + ":type=Valve,name=" + className +
                                     ext + local );
         } else if (container instanceof Host) {
             String local=",host=" +container.getName();
@@ -981,7 +981,7 @@ public class MBeanUtils {
             if( seq > 0 ) {
                 ext=",seq=" + seq;
             }
-            name = new ObjectName(domain + ":type=Valve,name=" + className + 
+            name = new ObjectName(domain + ":type=Valve,name=" + className +
                                     ext + local );
         } else if (container instanceof Context) {
             Context context = ((Context)container);
@@ -994,7 +994,7 @@ public class MBeanUtils {
             if( seq > 0 ) {
                 ext=",seq=" + seq;
             }
-            name = new ObjectName(domain + ":type=Valve,name=" + className + 
+            name = new ObjectName(domain + ":type=Valve,name=" + className +
                                     ext + local );
         }
 
@@ -1122,7 +1122,7 @@ public class MBeanUtils {
 
     }
 
-    
+
     /**
      * Deregister the MBean for this
      * <code>ContextEnvironment</code> object.
@@ -1147,8 +1147,8 @@ public class MBeanUtils {
             mserver.unregisterMBean(oname);
 
     }
-    
-    
+
+
     /**
      * Deregister the MBean for this
      * <code>ContextResource</code> object.
@@ -1179,8 +1179,8 @@ public class MBeanUtils {
             mserver.unregisterMBean(oname);
 
     }
-     
-    
+
+
     /**
      * Deregister the MBean for this
      * <code>ContextResourceLink</code> object.
@@ -1204,8 +1204,8 @@ public class MBeanUtils {
         if( mserver.isRegistered(oname) )
             mserver.unregisterMBean(oname);
 
-    }   
-    
+    }
+
     /**
      * Deregister the MBean for this
      * <code>Engine</code> object.
@@ -1323,8 +1323,8 @@ public class MBeanUtils {
             mserver.unregisterMBean(oname);
 
     }
-    
-    
+
+
    /**
      * Deregister the MBean for this
      * <code>NamingResources</code> object.
@@ -1349,8 +1349,8 @@ public class MBeanUtils {
             mserver.unregisterMBean(oname);
 
     }
-    
-    
+
+
     /**
      * Deregister the MBean for this
      * <code>Realm</code> object.
@@ -1425,7 +1425,7 @@ public class MBeanUtils {
         ObjectName oname = createObjectName(domain, server);
         if( mserver.isRegistered(oname) )
             mserver.unregisterMBean(oname);
-        
+
         // Global String cache - fixed name
         oname = new ObjectName("Catalina:type=StringCache");
         if( mserver.isRegistered(oname) )
@@ -1530,7 +1530,7 @@ public class MBeanUtils {
 
         ObjectName query = null;
         Set<ObjectName> results = null;
-        
+
         // Groups
         query = new ObjectName(
                 "Users:type=Group,database=" + userDatabase + ",*");
@@ -1538,7 +1538,7 @@ public class MBeanUtils {
         for(ObjectName result : results) {
             mserver.unregisterMBean(result);
         }
-        
+
         // Roles
         query = new ObjectName(
                 "Users:type=Role,database=" + userDatabase + ",*");
@@ -1546,7 +1546,7 @@ public class MBeanUtils {
         for(ObjectName result : results) {
             mserver.unregisterMBean(result);
         }
-        
+
         // Users
         query = new ObjectName(
                 "Users:type=User,database=" + userDatabase + ",*");
@@ -1594,76 +1594,76 @@ public class MBeanUtils {
 
     }
 
-    
+
     /**
      * Determine the name of the domain to register MBeans for from a given
      * Service.
-     * 
-     * @param service 
+     *
+     * @param service
      */
     public static String getDomain(Service service) {
-        
+
         // Null service -> return null
         if (service == null) {
             return null;
         }
-        
+
         String domain = null;
-        
+
         Container engine = service.getContainer();
-        
+
         // Use the engine name first
         if (engine != null) {
             domain = engine.getName();
         }
-        
-        // No engine or no engine name, use the service name 
+
+        // No engine or no engine name, use the service name
         if (domain == null) {
             domain = service.getName();
         }
-        
+
         // No service name, use null
         return domain;
     }
-    
+
 
     /**
      * Determine the name of the domain to register MBeans for from a given
      * Container.
-     * 
+     *
      * @param container
      */
     public static String getDomain(Container container) {
-        
+
         String domain = null;
-        
+
         Container c = container;
-        
+
         while (!(c instanceof Engine) && c != null) {
             c = c.getParent();
         }
-        
+
         if (c != null) {
             domain = c.getName();
         }
-        
+
         return domain;
     }
 
-    
+
     /**
      * Calculate the key properties string to be added to an object's
      * {@link ObjectName} to indicate that it is associated with that container.
-     * 
-     * @param container The container the object is associated with 
+     *
+     * @param container The container the object is associated with
      * @return          A string suitable for appending to the ObjectName
      */
     public static String getContainerKeyProperties(Container container) {
-        
+
         Container c = container;
         StringBuilder keyProperties = new StringBuilder();
         int containerCount = 0;
-        
+
         // Work up container hierarchy, add a component to the name for
         // each container
         while (!(c instanceof Engine)) {
