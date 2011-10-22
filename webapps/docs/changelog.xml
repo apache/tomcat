@@ -60,6 +60,10 @@
       <scode>
         Remove unused, deprecated code. (markt)
       </scode>
+      <scode>
+        Remove static info String and associated getInfo() method where present.
+        (markt)
+      </scode>
     </changelog>
   </subsection>
 </section>
