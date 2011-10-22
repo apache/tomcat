@@ -5,11 +5,11 @@ package org.apache.tomcat.test.watchdog;
 import java.util.Hashtable;
 
 /**
- * Extracted from IntrospectionHelper - a simple utility class to 
+ * Extracted from IntrospectionHelper - a simple utility class to
  * do ant style ${property} replacements on a string, using a map
- * holding properties. Also allows a hook for dynamic, on-demand 
+ * holding properties. Also allows a hook for dynamic, on-demand
  * properties.
- * 
+ *
  * @author Costin Manolache
  */
 public class AntProperties {

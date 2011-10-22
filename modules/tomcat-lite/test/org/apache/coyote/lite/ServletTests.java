@@ -12,17 +12,17 @@ import org.apache.tomcat.test.watchdog.WatchdogClient;
 
 import junit.framework.Test;
 
-/** 
+/**
  * Wrapper to run watchdog.
- * 
+ *
  */
 public class ServletTests extends WatchdogClient {
 
-    
+
     public ServletTests() {
         super();
         goldenDir = getWatchdogdir() + "/src/clients/org/apache/jcheck/servlet/client/";
-        testMatch = 
+        testMatch =
             //"HttpServletResponseWrapperSetStatusMsgTest";
             //"ServletContextAttributeAddedEventTest";
             null;
@@ -40,7 +40,7 @@ public class ServletTests extends WatchdogClient {
                 "ServletToJSPError502PageTest",
         };
     }
-    
+
     public ServletTests(String name) {
        this();
        super.single = name;
@@ -51,7 +51,7 @@ public class ServletTests extends WatchdogClient {
         // required for the tests
         System.setProperty("org.apache.coyote.USE_CUSTOM_STATUS_MSG_IN_HEADER",
                 "true");
-        
+
         try {
             initServerWithWatchdog(getWatchdogdir());
         } catch (ServletException e) {
@@ -62,24 +62,24 @@ public class ServletTests extends WatchdogClient {
             e.printStackTrace();
         }
     }
-    
-    public void initServerWithWatchdog(String wdDir) throws ServletException, 
+
+    public void initServerWithWatchdog(String wdDir) throws ServletException,
             IOException {
         Tomcat tomcat = new Tomcat();
         tomcat.setPort(port);
-        
+
         File f = new File(wdDir + "/build/webapps");
         tomcat.setBaseDir(f.getAbsolutePath());
-        
-        for (String s : new String[] {      
-                "servlet-compat", 
+
+        for (String s : new String[] {
+                "servlet-compat",
                 "servlet-tests",
                 "jsp-tests"} ) {
             tomcat.addWebapp("/" + s, f.getCanonicalPath() + "/" + s);
         }
-        
+
         TomcatStandaloneMain.setUp(tomcat, port);
-        
+
         try {
             tomcat.start();
         } catch (LifecycleException e) {
@@ -89,8 +89,8 @@ public class ServletTests extends WatchdogClient {
         System.err.println("Init done");
     }
 
-    /** 
-     * Magic JUnit method 
+    /**
+     * Magic JUnit method
      */
     public static Test suite() {
         return new ServletTests().getSuite();

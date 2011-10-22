@@ -10,14 +10,14 @@ import org.apache.tomcat.lite.io.IOWriter;
 
 /**
  * Implement character translation and buffering.
- * 
- * The actual buffering happens in the IOBuffer - we translate the 
- * chars as soon as we get them. 
- * 
+ *
+ * The actual buffering happens in the IOBuffer - we translate the
+ * chars as soon as we get them.
+ *
  * For servlet compat you can set a buffer size and a flush() will happen
- * when the number of chars have been written. Note that writes at a lower 
- * layer can be done and are not counted. 
- * 
+ * when the number of chars have been written. Note that writes at a lower
+ * layer can be done and are not counted.
+ *
  * @author Costin Manolache
  */
 public class HttpWriter extends Writer {
@@ -34,7 +34,7 @@ public class HttpWriter extends Writer {
     protected IOOutputStream bb;
 
     int bufferSize = DEFAULT_BUFFER_SIZE;
-    
+
     /**
      * Number of chars written.
      */
@@ -47,7 +47,7 @@ public class HttpWriter extends Writer {
     protected boolean closed = false;
 
     /**
-     * Encoding to use. 
+     * Encoding to use.
      * TODO: isn't it redundant ? enc, gotEnc, conv plus the enc in the bb
      */
     protected String enc;
@@ -60,7 +60,7 @@ public class HttpWriter extends Writer {
 
 
     /**
-     * List of encoders. The writer is reused - the encoder mapping 
+     * List of encoders. The writer is reused - the encoder mapping
      * avoids creating expensive objects. In future it'll contain nio.Charsets
      */
     //protected Map<String, C2BConverter> encoders = new HashMap();
@@ -82,7 +82,7 @@ public class HttpWriter extends Writer {
 
     /**
      * Default constructor. Allocate the buffer with the default buffer size.
-     * @param out 
+     * @param out
      */
     public HttpWriter(HttpMessage message, IOOutputStream out,
             IOWriter conv) {
@@ -96,7 +96,7 @@ public class HttpWriter extends Writer {
 
     /**
      * Is the response output suspended ?
-     * 
+     *
      * @return suspended flag value
      */
     public boolean isSuspended() {
@@ -106,7 +106,7 @@ public class HttpWriter extends Writer {
 
     /**
      * Set the suspended flag.
-     * 
+     *
      * @param suspended New suspended flag value
      */
     public void setSuspended(boolean suspended) {
@@ -122,14 +122,14 @@ public class HttpWriter extends Writer {
      */
     public void recycle() {
         wSinceFlush = 0;
-        bb.recycle(); 
+        bb.recycle();
         closed = false;
         suspended = false;
-        
+
 //        if (conv != null) {
 //            conv.recycle();
 //        }
-        
+
         gotEnc = false;
         enc = null;
     }
@@ -144,14 +144,14 @@ public class HttpWriter extends Writer {
 
         push();
         closed = true;
-        
+
         bb.close();
     }
 
 
     /**
      * Flush bytes or chars contained in the buffer.
-     * 
+     *
      * @throws IOException An underlying IOException occurred
      */
     public void flush()
@@ -170,7 +170,7 @@ public class HttpWriter extends Writer {
         if (suspended)
             return;
         getConv().push();
-        
+
     }
 
 
@@ -234,7 +234,7 @@ public class HttpWriter extends Writer {
         if (s==null)
             s="null";
         write(s, 0, s.length());
-    } 
+    }
 
     public void println() throws IOException {
         write("\n");
@@ -249,7 +249,7 @@ public class HttpWriter extends Writer {
         write(s);
     }
 
-    public void checkConverter() 
+    public void checkConverter()
             throws IOException {
 //        if (gotEnc) {
 //            return;
@@ -262,9 +262,9 @@ public class HttpWriter extends Writer {
 //        if (enc == null)
 //            enc = DEFAULT_ENCODING;
 //        conv = (C2BConverter) encoders.get(enc);
-//        
+//
 //        if (conv == null) {
-//            conv = C2BConverter.newConverter(message.getBodyOutputStream(), 
+//            conv = C2BConverter.newConverter(message.getBodyOutputStream(),
 //                    enc);
 //            encoders.put(enc, conv);
 //
@@ -286,7 +286,7 @@ public class HttpWriter extends Writer {
      *  Clear any data that was buffered.
      */
     public void reset() {
-        if (conv != null) { 
+        if (conv != null) {
             conv.recycle();
         }
         wSinceFlush = 0;

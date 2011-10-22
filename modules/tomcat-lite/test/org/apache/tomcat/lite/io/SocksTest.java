@@ -20,7 +20,7 @@ import junit.framework.TestCase;
 
 public class SocksTest extends TestCase {
 
-    public void setUp() { 
+    public void setUp() {
 //        SocksServer socks = new SocksServer();
 //        try {
 //            socks.initServer();
@@ -28,7 +28,7 @@ public class SocksTest extends TestCase {
 //            // TODO Auto-generated catch block
 //            e1.printStackTrace();
 //        }
-//        
+//
 //        ProxySelector.setDefault(new ProxySelector() {
 //
 //            @Override
@@ -37,10 +37,10 @@ public class SocksTest extends TestCase {
 //
 //            @Override
 //            public List<Proxy> select(URI uri) {
-//                
+//
 //                List<Proxy> res = new ArrayList<Proxy>();
 //                try {
-//                    res.add(new Proxy(Proxy.Type.SOCKS, 
+//                    res.add(new Proxy(Proxy.Type.SOCKS,
 //                            new InetSocketAddress(InetAddress.getLocalHost(), 1080)));
 //                } catch (UnknownHostException e) {
 //                    // TODO Auto-generated catch block
@@ -48,11 +48,11 @@ public class SocksTest extends TestCase {
 //                }
 //                return res;
 //            }
-//            
+//
 //        });
     }
-    
+
     public void testSocks() {
-        
+
     }
 }

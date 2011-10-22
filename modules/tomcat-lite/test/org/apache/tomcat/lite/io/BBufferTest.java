@@ -25,7 +25,7 @@ public class BBufferTest extends TestCase {
     BBuffer l10 = BBuffer.wrapper("GET /a?b HTTP/1.0\n");
     BBuffer l11 = BBuffer.wrapper("GET /a?b HTTP/1.0\na:b");
     BBuffer l12 = BBuffer.wrapper("GET /a?b HTTP/1.0\na:b\n");
-    
+
     BBuffer f1 = BBuffer.wrapper("GET /a?b HTTP/1.0\na:b\n\n");
     BBuffer f2 = BBuffer.wrapper("GET /a?b HTTP/1.0\na:b\r\n\r\n");
     BBuffer f3 = BBuffer.wrapper("GET /a?b HTTP/1.0\na:b\r\r");
@@ -43,7 +43,7 @@ public class BBufferTest extends TestCase {
     public void hashTest(String s) {
         assertEquals(s.hashCode(), BBuffer.wrapper(s).hashCode());
     }
-    
+
     public void testHash() {
         hashTest("");
         hashTest("a");
@@ -51,31 +51,31 @@ public class BBufferTest extends TestCase {
         hashTest("123abc\0");
         // Fails for UTF chars - only ascii hashTest("123abc\u12345;");
     }
-    
+
     public void testReadToSpace() {
         assertEquals(3, l8.readToSpace(res));
         assertEquals("GET", res.toString());
-        assertEquals(" /\n", l8.toString());        
+        assertEquals(" /\n", l8.toString());
 
         assertEquals(0, l1.readToSpace(res));
         assertEquals("", res.toString());
-        assertEquals("", l1.toString());        
+        assertEquals("", l1.toString());
     }
-    
+
     public void testReadToDelim() {
         assertEquals(1, h1.readToDelimOrSpace((byte)'?', res));
         assertEquals("a", res.toString());
-        assertEquals("", h1.toString());        
-        
+        assertEquals("", h1.toString());
+
         assertEquals(1, h2.readToDelimOrSpace((byte)'?', res));
         assertEquals("a", res.toString());
-        assertEquals("?b", h2.toString());        
-        
+        assertEquals("?b", h2.toString());
+
         assertEquals(1, h3.readToDelimOrSpace((byte)'?', res));
         assertEquals("a", res.toString());
-        assertEquals(" b", h3.toString());        
+        assertEquals(" b", h3.toString());
     }
-    
+
     public void testGet() {
         assertEquals(0x20, s1.get(0));
         assertEquals(0x0a, s1.get(1));
@@ -86,24 +86,24 @@ public class BBufferTest extends TestCase {
         }
         fail("Exception");
     }
-    
+
     public void testSkipSpace() {
         assertEquals(1, s1.skipSpace());
-        assertEquals("\n", s1.toString());        
+        assertEquals("\n", s1.toString());
 
         assertEquals(1, s2.skipSpace());
-        assertEquals("a", s2.toString());        
-        
+        assertEquals("a", s2.toString());
+
         assertEquals(2, s3.skipSpace());
-        assertEquals("", s3.toString());        
+        assertEquals("", s3.toString());
 
         assertEquals(3, s4.skipSpace());
-        assertEquals("a", s4.toString());        
-        
+        assertEquals("a", s4.toString());
+
         assertEquals(0, l1.skipSpace());
-        assertEquals("", l1.toString());        
+        assertEquals("", l1.toString());
     }
-    
+
     public void testLFLF() {
         assertTrue(f1.hasLFLF());
         assertTrue(f2.hasLFLF());
@@ -118,21 +118,21 @@ public class BBufferTest extends TestCase {
         assertFalse(l11.hasLFLF());
         assertFalse(l12.hasLFLF());
     }
-        
+
     public void testReadLine() {
         assertEquals(-1, l1.readLine(res));
         assertEquals("", res.toString());
-        assertEquals("", l1.toString());        
-        
+        assertEquals("", l1.toString());
+
         assertEquals(-1, l1a.readLine(res));
         assertEquals("", res.toString());
-        assertEquals("a", l1a.toString());        
-        
+        assertEquals("a", l1a.toString());
+
         assertEquals(0, l2.readLine(res));
-        assertEquals("", l2.toString());        
+        assertEquals("", l2.toString());
         assertEquals("", res.toString());
         assertEquals(0, l3.readLine(res));
-        assertEquals("", l3.toString());        
+        assertEquals("", l3.toString());
         assertEquals("", res.toString());
         assertEquals(0, l4.readLine(res));
         assertEquals("", res.toString());
@@ -146,7 +146,7 @@ public class BBufferTest extends TestCase {
         assertEquals(0, l5_a.readLine(res));
         assertEquals("", res.toString());
         assertEquals("a", l5_a.toString());
-        
+
         assertEquals(1, l6.readLine(res));
         assertEquals("a", res.toString());
 

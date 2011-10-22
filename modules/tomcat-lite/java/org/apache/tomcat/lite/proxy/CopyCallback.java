@@ -11,12 +11,12 @@ import org.apache.tomcat.lite.io.IOChannel;
 import org.apache.tomcat.lite.io.IOConnector;
 
 /**
- *  Used by socks and http proxy. Will copy received data to a different 
+ *  Used by socks and http proxy. Will copy received data to a different
  *  channel.
  */
 public class CopyCallback implements IOConnector.DataReceivedCallback {
         IOChannel mOutBuffer;
-        
+
         public CopyCallback(IOChannel sc) {
             mOutBuffer = sc;
         }
@@ -27,7 +27,7 @@ public class CopyCallback implements IOConnector.DataReceivedCallback {
             IOChannel outBuffer = mOutBuffer;
             if (outBuffer == null &&
                     ch instanceof HttpChannel) {
-                outBuffer = 
+                outBuffer =
                     (IOChannel) ((HttpChannel)ch).getRequest().getAttribute("P");
             }
             // body.
@@ -52,6 +52,6 @@ public class CopyCallback implements IOConnector.DataReceivedCallback {
                     outBuffer.startSending();
                     return;
                 }
-            }            
+            }
         }
     }

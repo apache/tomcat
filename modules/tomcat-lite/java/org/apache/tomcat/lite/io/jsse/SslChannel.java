@@ -27,17 +27,17 @@ class SslChannel extends IOChannel implements Runnable {
     static Logger log = Logger.getLogger("SSL");
 
     static ByteBuffer EMPTY = ByteBuffer.allocate(0);
-    
+
 
     SSLEngine sslEngine;
     // Last result
     SSLEngineResult unwrapR;
-    
+
     boolean handshakeDone = false;
     boolean handshakeInProgress = false;
     Object handshakeSync = new Object();
     boolean flushing = false;
-    
+
     IOBuffer in = new IOBuffer(this);
     IOBuffer out = new IOBuffer(this);
 
@@ -45,15 +45,15 @@ class SslChannel extends IOChannel implements Runnable {
     // Used for session reuse
     String host;
     int port;
-    
+
     ByteBuffer myAppOutData;
-    ByteBuffer myNetOutData; 
+    ByteBuffer myNetOutData;
     private static boolean debugWrap = false;
 
     /*
      * Special: SSL works in packet mode, and we may receive an incomplete
      * packet. This should be in compacted write mode (i.e. data from 0 to pos,
-     * limit at end )  
+     * limit at end )
      */
     ByteBuffer myNetInData;
     ByteBuffer myAppInData;
@@ -62,15 +62,15 @@ class SslChannel extends IOChannel implements Runnable {
     private SSLContext sslCtx;
 
     private boolean closeHandshake = false;
-    
+
     public SslChannel() {
     }
-    
+
     /**
-     * Setting the host/port enables clients to reuse SSL session - 
-     * less traffic and encryption overhead at startup, assuming the 
+     * Setting the host/port enables clients to reuse SSL session -
+     * less traffic and encryption overhead at startup, assuming the
      * server caches the session ( i.e. single server or distributed cache ).
-     * 
+     *
      * SSL ticket extension is another possibility.
      */
     public SslChannel setTarget(String host, int port) {
@@ -78,13 +78,13 @@ class SslChannel extends IOChannel implements Runnable {
         this.port = port;
         return this;
     }
-    
+
     private synchronized void initSsl() throws GeneralSecurityException {
         if (sslEngine != null) {
             log.severe("Double initSsl");
             return;
         }
-        
+
         if (client) {
             if (port > 0) {
                 sslEngine = sslCtx.createSSLEngine(host, port);
@@ -95,16 +95,16 @@ class SslChannel extends IOChannel implements Runnable {
         } else {
             sslEngine = sslCtx.createSSLEngine();
             sslEngine.setUseClientMode(false);
-            
+
         }
 
         // Some VMs have broken ciphers.
         if (JsseSslProvider.enabledCiphers != null) {
             sslEngine.setEnabledCipherSuites(JsseSslProvider.enabledCiphers);
         }
-        
+
         SSLSession session = sslEngine.getSession();
-    
+
         int packetBuffer = session.getPacketBufferSize();
         myAppOutData = ByteBuffer.allocate(session.getApplicationBufferSize());
         myNetOutData = ByteBuffer.allocate(packetBuffer);
@@ -115,13 +115,13 @@ class SslChannel extends IOChannel implements Runnable {
         myAppInData.flip();
         myAppOutData.flip();
     }
-    
+
     public SslChannel withServer() {
         client = false;
         return this;
     }
-    
-    
+
+
     @Override
     public synchronized void setSink(IOChannel net) throws IOException {
         try {
@@ -133,7 +133,7 @@ class SslChannel extends IOChannel implements Runnable {
             log.log(Level.SEVERE, "Error initializing ", e);
         }
     }
-    
+
     @Override
     public IOBuffer getIn() {
         return in;
@@ -143,14 +143,14 @@ class SslChannel extends IOChannel implements Runnable {
     public IOBuffer getOut() {
         return out;
     }
-    
+
     /**
      * Typically called when a dataReceived callback is passed up.
-     * It's up to the higher layer to decide if it can handle more data 
+     * It's up to the higher layer to decide if it can handle more data
      * and disable read interest and manage its buffers.
-     * 
+     *
      * We have to use one buffer.
-     * @throws IOException 
+     * @throws IOException
      */
     public int processInput(IOBuffer netIn, IOBuffer appIn) throws IOException {
         if (log.isLoggable(Level.FINEST)) {
@@ -160,15 +160,15 @@ class SslChannel extends IOChannel implements Runnable {
             if (!handshakeDone && !handshakeInProgress) {
                 handshakeInProgress = true;
                 handleHandshking();
-                return 0; 
-            }            
+                return 0;
+            }
             if (handshakeInProgress) {
                 return 0; // leave it there
             }
         }
         return processRealInput(netIn, appIn);
     }
-    
+
     private synchronized int processRealInput(IOBuffer netIn, IOBuffer appIn) throws IOException {
         int rd = 0;
         boolean needsMore = true;
@@ -187,7 +187,7 @@ class SslChannel extends IOChannel implements Runnable {
             } finally {
                 myNetInData.flip();
             }
-            if (rdNow == 0 && (myNetInData.remaining() == 0 || 
+            if (rdNow == 0 && (myNetInData.remaining() == 0 ||
                     notEnough)) {
                 return rd;
             }
@@ -221,14 +221,14 @@ class SslChannel extends IOChannel implements Runnable {
                             closeHandshake  = true;
                         }
                         handleHandshking();
-                        
+
                         startSending();
                     }
                     break;
                 }
-                
+
                 if (unwrapR.getHandshakeStatus() == HandshakeStatus.NEED_TASK) {
-                    tasks();                    
+                    tasks();
                 }
                 if (unwrapR.getStatus() == Status.BUFFER_OVERFLOW) {
                     log.severe("Unhandled overflow " + unwrapR);
@@ -241,8 +241,8 @@ class SslChannel extends IOChannel implements Runnable {
                 }
             }
             sendHandleReceivedCallback();
-            
-            
+
+
         }
         return rd;
     }
@@ -256,7 +256,7 @@ class SslChannel extends IOChannel implements Runnable {
     }
 
     public void startSending() throws IOException {
-        
+
         flushing = true;
         boolean needHandshake = false;
         synchronized(handshakeSync) {
@@ -270,12 +270,12 @@ class SslChannel extends IOChannel implements Runnable {
         }
         if (needHandshake) {
             handleHandshking();
-            return; // can't write yet.            
+            return; // can't write yet.
         }
-        
+
         startRealSending();
     }
-    
+
     public void close() throws IOException {
         if (net.getOut().isAppendClosed()) {
             return;
@@ -303,16 +303,16 @@ class SslChannel extends IOChannel implements Runnable {
         // clean close handshake
         super.close();
     }
-    
+
     private Object sendLock = new Object();
 
     private JsseSslProvider sslProvider;
-    
+
     private void startRealSending() throws IOException {
         // Only one thread at a time
         synchronized (sendLock) {
             while (true) {
-                
+
                 myAppOutData.compact();
                 int rd;
                 try {
@@ -332,7 +332,7 @@ class SslChannel extends IOChannel implements Runnable {
                 synchronized(myNetOutData) {
                     myNetOutData.compact();
                     try {
-                        wrap = sslEngine.wrap(myAppOutData, 
+                        wrap = sslEngine.wrap(myAppOutData,
                                 myNetOutData);
                     } finally {
                         myNetOutData.flip();
@@ -354,33 +354,33 @@ class SslChannel extends IOChannel implements Runnable {
                 }
             }
         }
-        
+
         net.startSending();
     }
 
 
-    // SSL handshake require slow tasks - that will need to be executed in a 
-    // thread anyways. Better to keep it simple ( the code is very complex ) - 
+    // SSL handshake require slow tasks - that will need to be executed in a
+    // thread anyways. Better to keep it simple ( the code is very complex ) -
     // and do the initial handshake in a thread, not in the IO thread.
     // We'll need to unregister and register again from the selector.
-    private void handleHandshking() { 
+    private void handleHandshking() {
         if (log.isLoggable(Level.FINEST)) {
             log.info("Starting handshake");
         }
         synchronized(handshakeSync) {
-            handshakeInProgress = true;            
+            handshakeInProgress = true;
         }
 
         sslProvider.handshakeExecutor.execute(this);
     }
-    
+
     private void endHandshake() throws IOException {
         if (log.isLoggable(Level.FINEST)) {
             log.info("Handshake done " + net.getIn().available());
         }
         synchronized(handshakeSync) {
             handshakeDone = true;
-            handshakeInProgress = false;            
+            handshakeInProgress = false;
         }
         if (flushing) {
             flushing = false;
@@ -401,16 +401,16 @@ class SslChannel extends IOChannel implements Runnable {
             SSLEngineResult wrap = null;
 
             HandshakeStatus hstatus = sslEngine.getHandshakeStatus();
-            if (!closeHandshake && 
+            if (!closeHandshake &&
                     (hstatus == HandshakeStatus.NOT_HANDSHAKING || initial)) {
                 sslEngine.beginHandshake();
                 hstatus = sslEngine.getHandshakeStatus();
             }
-            
+
             long t0 = System.currentTimeMillis();
-            
-            while (hstatus != HandshakeStatus.NOT_HANDSHAKING 
-                    && hstatus != HandshakeStatus.FINISHED 
+
+            while (hstatus != HandshakeStatus.NOT_HANDSHAKING
+                    && hstatus != HandshakeStatus.FINISHED
                     && !net.getIn().isAppendClosed()) {
                 if (System.currentTimeMillis() - t0 > handshakeTimeout) {
                     throw new TimeoutException();
@@ -422,7 +422,7 @@ class SslChannel extends IOChannel implements Runnable {
                     log.info("-->doHandshake() loop: status = " + hstatus + " " +
                             sslEngine.getHandshakeStatus());
                 }
-                
+
                 if (hstatus == HandshakeStatus.NEED_WRAP) {
                     // || initial - for client
                     initial = false;
@@ -463,8 +463,8 @@ class SslChannel extends IOChannel implements Runnable {
                                 break;
                             }
                         }
-                        // Still need unwrap 
-                        if (wrap == null 
+                        // Still need unwrap
+                        if (wrap == null
                                 || wrap.getStatus() == Status.BUFFER_UNDERFLOW
                                 || (hstatus == HandshakeStatus.NEED_UNWRAP && myNetInData.remaining() == 0)) {
                             myNetInData.compact();
@@ -494,12 +494,12 @@ class SslChannel extends IOChannel implements Runnable {
                             }
                         }
                         if (log.isLoggable(Level.FINEST)) {
-                            log.info("Unwrap chunk done " + hstatus + " " + wrap 
+                            log.info("Unwrap chunk done " + hstatus + " " + wrap
                                 + " " + sslEngine.getHandshakeStatus());
                         }
 
                     }
-                    
+
                     // rd may have some input bytes.
                 } else if (hstatus == HandshakeStatus.NEED_TASK) {
                     long t0task = System.currentTimeMillis();
@@ -513,7 +513,7 @@ class SslChannel extends IOChannel implements Runnable {
                         log.info("Tasks done in " + (t1task - t0task) + " new status " +
                                 hstatus);
                     }
-                    
+
                 }
                 if (hstatus == HandshakeStatus.NOT_HANDSHAKING) {
                     //log.warning("NOT HANDSHAKING " + this);
@@ -529,7 +529,7 @@ class SslChannel extends IOChannel implements Runnable {
                 net.close();
                 sendHandleReceivedCallback();
             } catch (IOException ex) {
-                log.log(Level.SEVERE, "Error closing", ex);                
+                log.log(Level.SEVERE, "Error closing", ex);
             }
         }
     }
@@ -546,12 +546,12 @@ class SslChannel extends IOChannel implements Runnable {
         this.sslCtx = sslCtx;
         return this;
     }
-    
+
     SslChannel setSslProvider(JsseSslProvider con) {
         this.sslProvider = con;
         return this;
     }
-    
+
     public Object getAttribute(String name) {
         if (SslProvider.ATT_SSL_CERT.equals(name)) {
             try {
@@ -576,7 +576,7 @@ class SslChannel extends IOChannel implements Runnable {
             return size;
         } else if (SslProvider.ATT_SSL_SESSION_ID.equals(name)) {
             byte [] ssl_session = sslEngine.getSession().getId();
-            if ( ssl_session == null) 
+            if ( ssl_session == null)
                 return null;
             StringBuilder buf=new StringBuilder();
             for(int x=0; x<ssl_session.length; x++) {
@@ -587,14 +587,14 @@ class SslChannel extends IOChannel implements Runnable {
             }
             return buf.toString();
         }
-        
+
         if (net != null) {
             return net.getAttribute(name);
         }
-        return null;        
+        return null;
     }
-    
-    
+
+
      /**
       * Simple data class that represents the cipher being used, along with the
       * corresponding effective key size.  The specified phrase must appear in the
@@ -613,8 +613,8 @@ class SslChannel extends IOChannel implements Runnable {
          }
 
      }
-     
-    
+
+
      /**
       * A mapping table to determine the number of effective bits in the key
       * when using a cipher suite containing the specified cipher name.  The
@@ -632,5 +632,5 @@ class SslChannel extends IOChannel implements Runnable {
          new CipherData("_WITH_AES_128_CBC_", 128),
          new CipherData("_WITH_AES_256_CBC_", 256)
      };
-          
+
 }

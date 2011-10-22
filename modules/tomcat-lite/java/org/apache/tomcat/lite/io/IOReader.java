@@ -19,32 +19,32 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Conversion from Bytes to Chars and support for decoding.
- * 
- * Replaces tomcat B2CConverter with NIO equivalent. B2CConverter was a hack 
- * (re)using an dummy InputStream backed by a ByteChunk. 
- * 
+ *
+ * Replaces tomcat B2CConverter with NIO equivalent. B2CConverter was a hack
+ * (re)using an dummy InputStream backed by a ByteChunk.
+ *
  * @author Costin Manolache
  */
 public class IOReader extends Reader {
-    
+
     IOBuffer iob;
     Map<String, CharsetDecoder> decoders = new HashMap<String, CharsetDecoder>();
     CharsetDecoder decoder;
-    
+
     private static boolean REUSE = true;
     String enc;
     private boolean closed;
     public static final String DEFAULT_ENCODING = "ISO-8859-1";
     long timeout = 0;
-    
+
     public IOReader(IOBuffer iob) {
         this.iob = iob;
     }
-    
+
     public void setTimeout(long to) {
         timeout = to;
     }
-    
+
     public void setEncoding(String charset) {
         enc = charset;
         if (enc == null) {
@@ -60,11 +60,11 @@ public class IOReader extends Reader {
             }
         }
     }
-    
+
     public String getEncoding() {
         return enc;
     }
-    
+
     public void recycle() {
         if (decoder != null) {
             decoder.reset();
@@ -72,11 +72,11 @@ public class IOReader extends Reader {
         closed = false;
         enc = null;
     }
-    
+
     private void checkClosed() throws IOException {
         if (closed) throw new IOException("closed");
     }
-    
+
     public boolean ready() {
         return iob.peekFirst() != null;
     }
@@ -97,14 +97,14 @@ public class IOReader extends Reader {
         else
             return cb[0];
     }
-    
+
     @Override
     public void close() throws IOException {
         closed = true;
         iob.close();
     }
-    
-    /** 
+
+    /**
      * Used if a bucket ends on a char boundary
      */
     BBuffer underFlowBuffer = BBuffer.allocate(10);
@@ -114,7 +114,7 @@ public class IOReader extends Reader {
      * Decode all bytes - for example a URL or header.
      */
     public void decodeAll(BBucket bb, CBuffer c) {
-        
+
         while (bb.hasRemaining()) {
             CharBuffer charBuffer = c.getAppendCharBuffer();
             CoderResult res = decode1(bb, charBuffer, true);
@@ -122,15 +122,15 @@ public class IOReader extends Reader {
             if (res != CoderResult.OVERFLOW) {
                 if (res == CoderResult.UNDERFLOW || bb.hasRemaining()) {
                     System.err.println("Ignored trailing bytes " + bb.remaining());
-                } 
+                }
                 return;
             }
         }
-        
+
     }
-    
-    /** 
-     * Do one decode pass.  
+
+    /**
+     * Do one decode pass.
      */
     public CoderResult decode1(BBucket bb, CharBuffer c, boolean eof) {
         ByteBuffer b = bb.getByteBuffer();
@@ -155,33 +155,33 @@ public class IOReader extends Reader {
                 		"10 bytes");
             }
         }
-        
+
         CoderResult res = decoder.decode(b, c, eof);
         bb.position(b.position());
-        
+
         if (res == CoderResult.UNDERFLOW && bb.hasRemaining()) {
             // b ends on a boundary
             underFlowBuffer.append(bb.array(), bb.position(), bb.remaining());
             bb.position(bb.limit());
-        } 
+        }
         return res;
     }
-    
+
     @Override
     public int read(char[] cbuf, int offset, int length) throws IOException {
         checkClosed();
         if (length == 0) {
             return 0;
         }
-        // we can either allocate a new CharBuffer or use a 
+        // we can either allocate a new CharBuffer or use a
         // static one and copy. Seems simpler this way - needs some
         // load test, but InputStreamReader seems to do the same.
         CharBuffer out = CharBuffer.wrap(cbuf, offset, length);
-        
+
         CoderResult result = CoderResult.UNDERFLOW;
 
         BBucket bucket = iob.peekFirst();
-        
+
         // Consume as much as possible without blocking
         while (result == CoderResult.UNDERFLOW) {
             // fill the buffer if needed
@@ -199,7 +199,7 @@ public class IOReader extends Reader {
                         break;
                     }
                 }
-                
+
                 if (bucket == null) {
                     // eof
                     break;
@@ -211,7 +211,7 @@ public class IOReader extends Reader {
 
         if (result == CoderResult.UNDERFLOW && iob.isClosedAndEmpty()) {
             // Flush out any remaining data
-            ByteBuffer bytes = bucket == null ? 
+            ByteBuffer bytes = bucket == null ?
                     underFlowBuffer.getByteBuffer() : bucket.getByteBuffer();
             result = decoder.decode(bytes, out, true);
             if (bucket == null) {

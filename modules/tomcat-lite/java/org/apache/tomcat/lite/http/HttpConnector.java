@@ -21,56 +21,56 @@ import org.apache.tomcat.lite.io.IOConnector.DataReceivedCallback;
 
 /**
  * Manages HttpChannels and associated socket pool.
- * 
- * 
+ *
+ *
  * @author Costin Manolache
  */
 public class HttpConnector {
-    
+
     public static interface HttpChannelEvents {
         /** HttpChannel object created. It'll be used many times.
-         * @throws IOException 
+         * @throws IOException
          */
         public void onCreate(HttpChannel ch, HttpConnector con) throws IOException;
-        
-        /** 
+
+        /**
          * HttpChannel object no longer needed, out of pool.
-         * @throws IOException 
+         * @throws IOException
          */
         public void onDestroy(HttpChannel ch, HttpConnector con) throws IOException;
     }
-    
+
     private static Logger log = Logger.getLogger("HttpConnector");
-    
-    /** 
+
+    /**
      * Cache HttpChannel/request/buffers
      */
     private int maxHttpPoolSize = 50;
-    
-    /** 
-     * Max number of connections to keep alive. 
+
+    /**
+     * Max number of connections to keep alive.
      * Each connection holds a header buffer and the socket.
      * ( we could skip the header buffer )
      */
     private int maxSocketPoolSize = 500; // 10000;
-    
+
     private int keepAliveTimeMs = 300000;
-    
+
     private List<HttpChannel> httpChannelPool = new ArrayList<HttpChannel>();
 
     protected IOConnector ioConnector;
-    
+
     // for https connections
     protected SslProvider sslProvider;
-    
+
     boolean debugHttp = false;
     boolean debug = false;
-    
+
     boolean clientKeepAlive = true;
     boolean serverKeepAlive = true;
 
     HttpChannelEvents httpEvents;
-    
+
     public AtomicInteger inUse = new AtomicInteger();
     public AtomicInteger newHttpChannel = new AtomicInteger();
     public AtomicInteger totalHttpChannel = new AtomicInteger();
@@ -79,7 +79,7 @@ public class HttpConnector {
     public AtomicInteger reusedChannels = new AtomicInteger();
 
     public HttpConnectionPool cpool = new HttpConnectionPool(this);
-        
+
     // Host + context mapper.
     Dispatcher dispatcher;
     protected HttpService defaultService;
@@ -88,11 +88,11 @@ public class HttpConnector {
     private Timer timer;
 
     boolean compression = true;
-    
+
     boolean serverSSL = false;
 
     private static Timer defaultTimer = new Timer(true);
-    
+
     public HttpConnector(IOConnector ioConnector) {
         this.ioConnector = ioConnector;
         dispatcher = new Dispatcher();
@@ -108,20 +108,20 @@ public class HttpConnector {
     protected HttpConnector() {
         this(null);
     }
-    
+
     public Dispatcher getDispatcher() {
         return dispatcher;
     }
-    
+
     public HttpConnectionPool getConnectionPool() {
         return cpool;
     }
-    
+
     public HttpConnector withIOConnector(IOConnector selectors) {
         ioConnector = selectors;
         return this;
     }
-    
+
     public void setDebug(boolean b) {
         this.debug = b;
     }
@@ -129,22 +129,22 @@ public class HttpConnector {
     public void setDebugHttp(boolean b) {
         this.debugHttp  = b;
     }
-    
+
     public HttpConnector withSsl(SslProvider ssl) {
         sslProvider = ssl;
         return this;
     }
-    
+
     HttpConnector setServerSsl(boolean b) {
         serverSSL = b;
         return this;
     }
-    
+
     public SslProvider getSslProvider() {
         return sslProvider;
     }
-    
-    /** 
+
+    /**
      * Allow or disable compression for this connector.
      * Compression is enabled by default.
      */
@@ -160,7 +160,7 @@ public class HttpConnector {
     public void setServerKeepAlive(boolean b) {
         this.serverKeepAlive = b;
     }
-    
+
     public boolean isDebug() {
         return debug;
     }
@@ -180,7 +180,7 @@ public class HttpConnector {
     public int getMaxHttpPoolSize() {
         return maxHttpPoolSize;
     }
-    
+
     public void setMaxHttpPoolSize(int maxHttpPoolSize) {
         this.maxHttpPoolSize = maxHttpPoolSize;
     }
@@ -188,12 +188,12 @@ public class HttpConnector {
     public void setOnCreate(HttpChannelEvents callback) {
         httpEvents = callback;
     }
-    
+
     /**
      *  Override to create customized client/server connections.
-     * 
+     *
      * @return
-     * @throws IOException 
+     * @throws IOException
      */
     protected HttpChannel create() throws IOException {
         HttpChannel res = new HttpChannel();
@@ -213,7 +213,7 @@ public class HttpConnector {
         http.setTarget(host + ":" + port);
         return http;
     }
-    
+
     public HttpChannel getServer() {
         try {
             return get(true);
@@ -228,25 +228,25 @@ public class HttpConnector {
         HttpChannel http = get(false);
         http.setTarget(host + ":" + port);
         return http.getRequest();
-        
+
     }
 
     public HttpRequest request(CharSequence urlString) throws IOException {
         return get(urlString).getRequest();
     }
-    
+
     /**
-     * Get an existing AsyncHttp object. Since it uses many buffers and 
-     * objects - it's more efficient to pool it. 
-     * 
+     * Get an existing AsyncHttp object. Since it uses many buffers and
+     * objects - it's more efficient to pool it.
+     *
      * release will return the object to the pool.
-     * @throws IOException 
+     * @throws IOException
      */
     public HttpChannel get(CharSequence urlString) throws IOException {
         URL url = new URL(urlString.toString());
         String host = url.getHost();
         int port = url.getPort();
-        boolean secure = "http".equals(url.getAuthority()); 
+        boolean secure = "http".equals(url.getAuthority());
         if (port == -1) {
             port = secure ? 443: 80;
         }
@@ -258,7 +258,7 @@ public class HttpConnector {
         http.getRequest().requestURI().set(path);
         return http;
     }
-    
+
     protected HttpChannel get(boolean server) throws IOException {
         HttpChannel processor = null;
         synchronized (httpChannelPool) {
@@ -283,11 +283,11 @@ public class HttpConnector {
         if (debug) {
             log.info((reuse ? "REUSE ": "Create ") +
                     (server? " S" : "")
-                    + " id=" + processor.ser + 
+                    + " id=" + processor.ser +
                     " " + processor +
                     " size=" + httpChannelPool.size());
         }
-        
+
         processor.setConnector(this);
         inUse.incrementAndGet();
         return processor;
@@ -298,11 +298,11 @@ public class HttpConnector {
         recycledChannels.incrementAndGet();
         int size = 0;
         boolean pool = false;
-        
+
         http.recycle();
         http.setConnection(null);
         http.setConnector(null);
-        
+
         // No more data - release the object
         synchronized (httpChannelPool) {
             size = httpChannelPool.size();
@@ -313,7 +313,7 @@ public class HttpConnector {
                 pool = true;
             }
         }
-        
+
         if (!pool && httpEvents != null) {
             httpEvents.onDestroy(http, this);
         }
@@ -323,40 +323,40 @@ public class HttpConnector {
                     http + " size=" + size);
         }
     }
-    
-    
+
+
     public IOConnector getIOConnector() {
         return ioConnector;
     }
-    
-    
+
+
     public void setHttpService(HttpService s) {
         defaultService = s;
     }
-    
+
     public void start() throws IOException {
         if (ioConnector != null) {
-            ioConnector.acceptor(new AcceptorCallback(), 
+            ioConnector.acceptor(new AcceptorCallback(),
                     Integer.toString(port), null);
         }
     }
-    
-    /** 
-     * 
-     * TODO: only clean our state and sockets we listen on. 
-     *  
+
+    /**
+     *
+     * TODO: only clean our state and sockets we listen on.
+     *
      */
     public void stop() {
         if (ioConnector != null) {
             ioConnector.stop();
         }
     }
-    
+
     protected void connectAndSend(HttpChannel httpCh) throws IOException {
         cpool.send(httpCh);
 
     }
-    
+
     private class AcceptorCallback implements IOConnector.ConnectedCallback {
         @Override
         public void handleConnected(IOChannel accepted) throws IOException {
@@ -368,10 +368,10 @@ public class HttpConnector {
         // TODO: reuse
         HttpConnection shttp = cpool.accepted(accepted);
         shttp.serverMode = true;
-        
+
         IOChannel head = accepted;
         IOChannel ch;
-        
+
         String id = null;
         if (debugHttp) {
             id = port + "-" + accepted.getFirst().getAttribute(IOChannel.ATT_REMOTE_PORT);
@@ -384,14 +384,14 @@ public class HttpConnector {
             ch = sslProvider.serverChannel(head);
             head.setHead(ch);
             head = ch;
-            
+
             if (debugHttp) {
                 head = DumpChannel.wrap("CLEAR-" + id, head);
             }
         }
-        
+
         shttp.setSink(head);
-        
+
         // Will read any data in the channel, notify data available up
         accepted.handleReceived(accepted);
         return shttp;
@@ -401,10 +401,10 @@ public class HttpConnector {
         this.port = port2;
         return this;
     }
-    
+
     /**
-     * Actual HTTP/1.1 wire protocol. 
-     *  
+     * Actual HTTP/1.1 wire protocol.
+     *
      */
     public static abstract class HttpConnection extends IOChannel
         implements DataReceivedCallback
@@ -414,9 +414,9 @@ public class HttpConnector {
 
         protected BBuffer headRecvBuf = BBuffer.allocate(8192);
         protected CompressFilter compress = new CompressFilter();
-        
+
         protected boolean secure = false;
-        
+
         protected HttpConnectionPool.RemoteServer remoteHost;
         // If set, the connection is in use ( active )
         // null == keep alive. Changes synchronized on remoteHost
@@ -432,9 +432,9 @@ public class HttpConnector {
         protected HttpChannel checkHttpChannel() throws IOException {
             return null;
         }
-        
-        /** 
-         * Called before a new request is sent, on a channel that is 
+
+        /**
+         * Called before a new request is sent, on a channel that is
          * reused.
          */
         public void beforeRequest() {
@@ -449,22 +449,22 @@ public class HttpConnector {
         }
 
 
-        /** 
+        /**
          * Incoming data.
          */
         public abstract void dataReceived(IOBuffer iob) throws IOException;
-        
-        /** 
+
+        /**
          * Framing error, client interrupt, etc.
          */
         public void abort(HttpChannel http, String t) throws IOException {
         }
-        
-        protected void sendRequest(HttpChannel http) 
+
+        protected void sendRequest(HttpChannel http)
             throws IOException {
         }
-        
-        protected void sendResponseHeaders(HttpChannel http) 
+
+        protected void sendResponseHeaders(HttpChannel http)
             throws IOException {
         }
 
@@ -484,31 +484,31 @@ public class HttpConnector {
         @Override
         public void startSending() throws IOException {
         }
-        
+
         /** Called when the outgoing stream is closed:
          * - by an explicit call to close()
-         * - when all content has been sent. 
+         * - when all content has been sent.
          */
         protected void outClosed(HttpChannel http) throws IOException {
         }
 
         /**
-         * Called by HttpChannel when both input and output are fully 
+         * Called by HttpChannel when both input and output are fully
          * sent/received. When this happens the request is no longer associated
-         * with the Connection, and the connection can be re-used. 
-         * 
+         * with the Connection, and the connection can be re-used.
+         *
          * The channel can still be used to access the retrieved data that may
          * still be buffered until HttpChannel.release() is called.
-         * 
+         *
          * This method will be called only once, for both succesful and aborted
-         * requests. 
+         * requests.
          */
         protected abstract void endSendReceive(HttpChannel httpChannel) throws IOException;
 
         public void withExtraBuffer(BBuffer received) {
             return;
         }
-        
+
     }
 
 }

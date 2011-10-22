@@ -9,12 +9,12 @@ public class ThreadRunner {
     int rCount = 100;
     Thread[] threads;
     int[] ok;
-    
+
     int sleepTime = 0;
-    
+
     long time;
     protected AtomicInteger errors = new AtomicInteger();
-    
+
     public ThreadRunner(int threads, int count) {
         tCount = threads;
         rCount = count;
@@ -33,7 +33,7 @@ public class ThreadRunner {
           });
           threads[i].start();
         }
-        
+
         int res = 0;
         for (int i = 0; i < tCount; i++) {
           try {
@@ -46,7 +46,7 @@ public class ThreadRunner {
         long t1 = System.currentTimeMillis();
         time = t1 - t0;
     }
-    
+
     public void makeRequests(int cnt) {
         for (int i = 0; i < rCount ; i++) {
             try {
@@ -57,8 +57,8 @@ public class ThreadRunner {
             }
           }
     }
-    
+
     public void makeRequest(int i) throws Exception {
-        
+
     }
 }

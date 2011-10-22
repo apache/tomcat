@@ -24,13 +24,13 @@ public class IOStatus implements HttpService {
     public IOStatus(HttpConnectionPool pool) {
         this.pool = pool;
     }
-    
+
     @Override
     public void service(HttpRequest httpReq, HttpResponse httpRes)
             throws IOException {
         HttpConnectionPool sc = pool;
         HttpWriter out = httpRes.getBodyWriter();
-        
+
         httpRes.setContentType("text/plain");
         // TODO: use JMX/DynamicObject to get all public info
         out.println("hosts=" + sc.getTargetCount());
@@ -45,7 +45,7 @@ public class IOStatus implements HttpService {
             out.println(Integer.toString(connections.size()));
 
             for (IOChannel ch: connections) {
-                out.println(ch.getId() + 
+                out.println(ch.getId() +
                         " " + ch.toString());
             }
             out.println();

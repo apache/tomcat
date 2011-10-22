@@ -27,7 +27,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Utility class to generate HTTP dates.
- * 
+ *
  * @author Remy Maucherat
  */
 public final class FastHttpDateFormat {
@@ -36,14 +36,14 @@ public final class FastHttpDateFormat {
     // -------------------------------------------------------------- Variables
 
 
-    protected static final int CACHE_SIZE = 
+    protected static final int CACHE_SIZE =
         Integer.parseInt(System.getProperty("org.apache.tomcat.util.http.FastHttpDateFormat.CACHE_SIZE", "1000"));
 
-    
+
     /**
      * HTTP date format.
      */
-    protected static final SimpleDateFormat format = 
+    protected static final SimpleDateFormat format =
         new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz", Locale.US);
 
 
@@ -89,14 +89,14 @@ public final class FastHttpDateFormat {
     /**
      * Formatter cache.
      */
-    protected static final ConcurrentHashMap<Long, String> formatCache = 
+    protected static final ConcurrentHashMap<Long, String> formatCache =
         new ConcurrentHashMap<Long, String>(CACHE_SIZE);
 
 
     /**
      * Parser cache.
      */
-    protected static final ConcurrentHashMap<String, Long> parseCache = 
+    protected static final ConcurrentHashMap<String, Long> parseCache =
         new ConcurrentHashMap<String, Long>(CACHE_SIZE);
 
 
@@ -154,7 +154,7 @@ public final class FastHttpDateFormat {
     /**
      * Try to parse the given date as a HTTP date.
      */
-    public static final long parseDate(String value, 
+    public static final long parseDate(String value,
                                        DateFormat[] threadLocalformats) {
 
         Long cachedDate = parseCache.get(value);

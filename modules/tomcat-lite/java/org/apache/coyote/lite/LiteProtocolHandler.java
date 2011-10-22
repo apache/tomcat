@@ -37,27 +37,27 @@ import org.apache.tomcat.util.modeler.Registry;
 
 /**
  * Work in progress - use the refactored http as a coyote connector.
- * Just basic requests work right now - need to implement all the 
+ * Just basic requests work right now - need to implement all the
  * methods of coyote.
- * 
- * 
+ *
+ *
  * @author Costin Manolache
  */
 public class LiteProtocolHandler implements ProtocolHandler {
 
     Adapter adapter;
     Map<String, Object> attributes = new HashMap<String, Object>();
-    
-    
+
+
     HttpConnector httpConnServer;
     int port = 8999;
-    
+
     // Tomcat JMX integration
     Registry registry;
-    
+
     public LiteProtocolHandler() {
     }
-    
+
     @Override
     public void destroy() throws Exception {
     }
@@ -99,9 +99,9 @@ public class LiteProtocolHandler implements ProtocolHandler {
         while (io != null) {
             bind("IOConnector-" + (ioLevel++) + "-" + base, io);
             if (io instanceof SocketConnector) {
-                bind("NioThread-" + base, 
+                bind("NioThread-" + base,
                         ((SocketConnector) io).getSelector());
-                
+
             }
             io = io.getNet();
         }
@@ -126,9 +126,9 @@ public class LiteProtocolHandler implements ProtocolHandler {
             public void targetRemoved(RemoteServer host) {
                 unbind("AsyncHttp-" + base + "-" + host.target);
             }
-            
+
         });
-        
+
         httpConnServer.setOnCreate(new HttpChannelEvents() {
             @Override
             public void onCreate(HttpChannel data, HttpConnector extraData)
@@ -141,11 +141,11 @@ public class LiteProtocolHandler implements ProtocolHandler {
                 unbind("AsyncHttp-" + base + "-" + data.getId());
             }
         });
-        
+
         // TODO: process attributes via registry !!
-        
+
     }
-    
+
     private void bind(String name, Object o) {
         try {
             registry.registerComponent(o, "TomcatLite:name=" + name, null);
@@ -169,19 +169,19 @@ public class LiteProtocolHandler implements ProtocolHandler {
     @Override
     public void setAdapter(Adapter adapter) {
         this.adapter = adapter;
-        
+
     }
-    
+
     @Override
     public void setAttribute(String name, Object value) {
         attributes.put(name, value);
     }
-    
+
     @Override
     public void start() throws Exception {
         httpConnServer.start();
     }
-    
+
     public void setPort(int port) {
         this.port = port;
     }
@@ -190,7 +190,7 @@ public class LiteProtocolHandler implements ProtocolHandler {
      * Wrap old tomcat buffer to lite buffer.
      */
     private void wrap(MessageBytes dest, CBuffer buffer) {
-        dest.setChars(buffer.array(), buffer.position(), 
+        dest.setChars(buffer.array(), buffer.position(),
                 buffer.length());
     }
 
@@ -201,7 +201,7 @@ public class LiteProtocolHandler implements ProtocolHandler {
         // TODO: reuse, per req
         RequestData rc = new RequestData();
         rc.init(httpReq, httpRes);
-        
+
         try {
             adapter.service(rc.req, rc.res);
         } catch (Exception e) {
@@ -209,8 +209,8 @@ public class LiteProtocolHandler implements ProtocolHandler {
             e.printStackTrace();
         }
     }
-    
-    /** 
+
+    /**
      * ActionHook implementation, include coyote request/response objects.
      */
     public class RequestData implements ActionHook {
@@ -231,14 +231,14 @@ public class LiteProtocolHandler implements ProtocolHandler {
         Response res = new Response();
         HttpResponse httpRes;
         HttpRequest httpReq;
-        
+
         InputBuffer inputBuffer = new InputBuffer() {
             @Override
             public int doRead(ByteChunk bchunk, Request request)
                     throws IOException {
                 httpReq.getBody().waitData(httpReq.getHttpChannel().getIOTimeout());
-                int rd = 
-                    httpReq.getBody().read(bchunk.getBytes(), 
+                int rd =
+                    httpReq.getBody().read(bchunk.getBytes(),
                         bchunk.getStart(), bchunk.getBytes().length);
                 if (rd > 0) {
                     bchunk.setEnd(bchunk.getEnd() + rd);
@@ -246,7 +246,7 @@ public class LiteProtocolHandler implements ProtocolHandler {
                 return rd;
             }
         };
-        
+
         public RequestData() {
             req.setInputBuffer(inputBuffer);
             res.setOutputBuffer(outputBuffer);
@@ -254,27 +254,27 @@ public class LiteProtocolHandler implements ProtocolHandler {
             res.setRequest(req);
             res.setHook(this);
         }
-        
+
         public void init(HttpRequest httpReq, HttpResponse httpRes) {
             this.httpRes = httpRes;
             this.httpReq = httpReq;
-            // TODO: turn http request into a coyote request - copy all fields, 
+            // TODO: turn http request into a coyote request - copy all fields,
             // add hooks where needed.
-            
+
             wrap(req.decodedURI(), httpReq.decodedURI());
             wrap(req.method(), httpReq.method());
             wrap(req.protocol(), httpReq.protocol());
             wrap(req.requestURI(), httpReq.requestURI());
             wrap(req.queryString(), httpReq.queryString());
-           
+
             req.setServerPort(httpReq.getServerPort());
             req.serverName().setString(req.localName().toString());
-            
+
             MultiMap mimeHeaders = httpReq.getMimeHeaders();
             MimeHeaders coyoteHeaders = req.getMimeHeaders();
             for (int i = 0; i < mimeHeaders.size(); i++ ) {
                 Entry entry = mimeHeaders.getEntry(i);
-                MessageBytes val = 
+                MessageBytes val =
                     coyoteHeaders.addValue(entry.getName().toString());
                 val.setString(entry.getValue().toString());
             }
@@ -289,7 +289,7 @@ public class LiteProtocolHandler implements ProtocolHandler {
         public void action(ActionCode actionCode, Object param) {
 
             if (actionCode == ActionCode.ACTION_POST_REQUEST) {
-                commit(); // make sure it's sent - on errors 
+                commit(); // make sure it's sent - on errors
             } else if (actionCode == ActionCode.ACTION_COMMIT) {
                 commit();
             } else if (actionCode == ActionCode.ACTION_ACK) {
@@ -341,7 +341,7 @@ public class LiteProtocolHandler implements ProtocolHandler {
 
                 Object sslAtt = httpReq.getHttpChannel().getNet().getAttribute(SslProvider.ATT_SSL_CIPHER);
                 req.setAttribute("javax.servlet.request.cipher_suite", sslAtt);
-                
+
                 sslAtt = httpReq.getHttpChannel().getNet().getAttribute(SslProvider.ATT_SSL_KEY_SIZE);
                 req.setAttribute("javax.servlet.request.key_size", sslAtt);
 
@@ -386,7 +386,7 @@ public class LiteProtocolHandler implements ProtocolHandler {
         private void commit() {
             if (res.isCommitted())
                 return;
-            
+
             // TODO: copy headers, fields
             httpRes.setStatus(res.getStatus());
             httpRes.setMessage(res.getMessage());
@@ -414,7 +414,7 @@ public class LiteProtocolHandler implements ProtocolHandler {
             if (lang != null) {
                 httpRes.setHeader("Content-Language", lang);
             }
-            
+
             try {
                 httpReq.send();
             } catch (IOException e) {

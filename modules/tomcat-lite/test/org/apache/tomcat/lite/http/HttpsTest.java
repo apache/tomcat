@@ -23,39 +23,39 @@ import org.apache.tomcat.lite.TestMain;
 import org.apache.tomcat.lite.io.BBuffer;
 
 public class HttpsTest extends TestCase {
-    
+
     static int port = 8443;
-    
+
     public void testSimpleClient() throws Exception {
         final HttpConnector httpClient = TestMain.shared().getClient();
         checkResponse(httpClient);
     }
-    
+
     public void testSimpleServer() throws Exception {
         final HttpConnector httpClient = TestMain.shared().getClient();
         BBuffer res = TestMain.getUrl("https://localhost:8443/hello");
         assertTrue(res.toString().indexOf("Hello") >= 0);
-    }       
+    }
 
-    
+
     private void checkResponse(HttpConnector httpCon) throws Exception {
         HttpRequest ch = httpCon.request("localhost", port).setSecure(true);
-        
+
         ch.setRequestURI("/hello");
         ch.setProtocol("HTTP/1.0"); // to force close
         ch.send();
         BBuffer res = ch.readAll();
-        
+
         assertTrue(res.toString().indexOf("Hello") >= 0);
-    }    
-    
+    }
+
     public void testSimpleClient20() throws Exception {
         final HttpConnector httpClient = TestMain.shared().getClient();
         for (int i = 0; i < 10; i++) {
             checkResponse(httpClient);
         }
     }
-    
+
     public void testSimpleRequestGoogle() throws Exception {
         for (int i = 0; i < 40; i++) {
         final HttpConnector httpClient = TestMain.shared().getClient();
@@ -64,11 +64,11 @@ public class HttpsTest extends TestCase {
         client.getHttpChannel().setIOTimeout(2000000);
         client.setRequestURI("/accounts/ServiceLogin");
         client.send();
-        
+
         BBuffer res = client.readAll();
         assertTrue(res.toString().indexOf("<title>Google Accounts</title>") > 0);
         }
     }
-        
+
 
 }

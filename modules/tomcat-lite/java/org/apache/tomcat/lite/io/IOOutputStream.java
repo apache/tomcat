@@ -10,21 +10,21 @@ import java.text.MessageFormat;
 
 /**
  * Same methods with ServletOutputStream.
- * 
- * There is no restriction in using the Writer and InputStream at the 
- * same time - the servlet layer will impose it for compat. You can also use 
- * IOBuffer directly. 
- * 
+ *
+ * There is no restriction in using the Writer and InputStream at the
+ * same time - the servlet layer will impose it for compat. You can also use
+ * IOBuffer directly.
+ *
  * If you mix stream and writer:
  *  - call BufferWriter.push() to make sure all chars are sent down
- *  - the BufferOutputStream doesn't cache any data, all goes to the 
+ *  - the BufferOutputStream doesn't cache any data, all goes to the
  *   IOBuffer.
  *  - flush() on BufferOutputStream and BufferWriter will send the data
  *  to the network and block until it gets to the socket ( so it can
- *  throw exception ). 
+ *  throw exception ).
  *  - You can also use non-blocking flush methods in IOBuffer, and a
  *  callback  if you want to know when the write was completed.
- *    
+ *
  * @author Costin Manolache
  */
 public class IOOutputStream extends OutputStream {
@@ -32,9 +32,9 @@ public class IOOutputStream extends OutputStream {
     IOBuffer bb;
     IOChannel ch;
     int bufferSize = 8 * 1024;
-    
+
     int wSinceFlush = 0;
-    
+
     public IOOutputStream(IOBuffer out, IOChannel httpMessage) {
         this.bb = out;
         ch = httpMessage;
@@ -44,7 +44,7 @@ public class IOOutputStream extends OutputStream {
         wSinceFlush = 0;
         bufferSize = 8 * 1024;
     }
-    
+
     public void reset() {
         wSinceFlush = 0;
         bb.clear();
@@ -71,28 +71,28 @@ public class IOOutputStream extends OutputStream {
             flush();
         }
     }
-    
+
     @Override
     public void write(int b) throws IOException {
         bb.append((char) b);
         updateSize(1);
     }
-    
+
     @Override
     public void write(byte data[]) throws IOException {
       write(data, 0, data.length);
-    }    
+    }
 
     @Override
     public void write(byte data[], int start, int len) throws IOException {
         bb.append(data, start, len);
         updateSize(len);
-    }    
-    
+    }
+
     public void flush() throws IOException {
         if (ch != null) {
             ch.startSending();
-            
+
             ch.waitFlush(Long.MAX_VALUE);
         }
         wSinceFlush = 0;
@@ -102,13 +102,13 @@ public class IOOutputStream extends OutputStream {
         flush();
         bb.close();
     }
-    
+
 
     public void write(ByteBuffer source) throws IOException {
         write(source.array(), source.position(), source.remaining());
         source.position(source.limit());
     }
-    
+
     public void print(String s) throws IOException {
         if (s==null) s="null";
         int len = s.length();

@@ -28,7 +28,7 @@ import org.apache.tomcat.lite.io.CBuffer;
 public class MappingData {
 
     public Object context = null; // ServletContextImpl
-    
+
     public BaseMapper.Context contextMap;
 
     public BaseMapper.ServiceMapping service = null;
@@ -43,7 +43,7 @@ public class MappingData {
     // Extension
     CBuffer ext = CBuffer.newInstance();
     CBuffer tmpPrefix = CBuffer.newInstance();
-    
+
     // Excluding context path, with a '/' added if needed
     CBuffer tmpServletPath = CBuffer.newInstance();
 
@@ -51,7 +51,7 @@ public class MappingData {
     CBuffer tmpWelcome = CBuffer.newInstance();
 
     public void recycle() {
-        service = null; 
+        service = null;
         context = null;
         pathInfo.recycle();
         requestPath.recycle();

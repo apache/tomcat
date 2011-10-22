@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -39,32 +39,32 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 public class WatchdogClient {
-        
-  protected String goldenDir; 
+
+  protected String goldenDir;
   protected String testMatch;
   protected String file;
   protected String[] exclude = null;
-  protected String[] slow = 
-  { 
-      "SingleModelTest" // slow  
-  };  
+  protected String[] slow =
+  {
+      "SingleModelTest" // slow
+  };
 
   protected String targetMatch;
-  
+
   protected int port;
-  
+
   Properties props = new Properties();
-  
+
   protected void beforeSuite() {
   }
-  
+
   protected void afterSuite(TestResult res) {
   }
-  
+
   public Test getSuite() {
       return getSuite(port);
   }
-  
+
   public static class NullResolver implements EntityResolver {
       public InputSource resolveEntity (String publicId,
                                                  String systemId)
@@ -73,7 +73,7 @@ public class WatchdogClient {
           return new InputSource(new StringReader(""));
       }
   }
-  
+
   /** Read XML as DOM.
    */
   public static Document readXml(InputStream is)
@@ -89,10 +89,10 @@ public class WatchdogClient {
       Document doc = db.parse(is);
       return doc;
   }
-  
-  /** 
-   * Return a test suite for running a watchdog-like 
-   * test file. 
+
+  /**
+   * Return a test suite for running a watchdog-like
+   * test file.
    *
    * @param base base dir for the watchdog dir
    * @param testMatch Prefix of tests to be run
@@ -101,13 +101,13 @@ public class WatchdogClient {
   public Test getSuite(int port) {
     TestSuite tests = new WatchdogTests();
     tests.setName(this.getClass().getSimpleName());
-    
+
     props.setProperty("port", Integer.toString(port));
     props.setProperty("host", "localhost");
-    props.setProperty("wgdir", 
+    props.setProperty("wgdir",
         goldenDir);
-    
-    
+
+
     try {
       Document doc = readXml(new FileInputStream(file));
       Element docE = doc.getDocumentElement();
@@ -118,10 +118,10 @@ public class WatchdogClient {
         if (targetMatch != null && !targetName.equals(targetMatch)) {
             continue;
         }
-        
+
         // Tests are duplicated
         //TestSuite targetSuite = new TestSuite(targetName);
-        
+
         NodeList watchDogL = target.getElementsByTagName("watchdog");
         for (int j = 0; j < watchDogL.getLength(); j++) {
           Element watchE = (Element) watchDogL.item(j);
@@ -138,7 +138,7 @@ public class WatchdogClient {
               boolean found = false;
               for (String e: exclude) {
                   if (e.equals(testName)) {
-                      found = true; 
+                      found = true;
                       break;
                   }
               }
@@ -155,7 +155,7 @@ public class WatchdogClient {
           }
         }
       }
-      
+
     } catch (IOException e) {
         e.printStackTrace();
     } catch (SAXException e) {
@@ -165,7 +165,7 @@ public class WatchdogClient {
     }
     return tests;
   }
-  
+
   // --------- Inner classes -------------
 
   protected String getWatchdogdir() {
@@ -193,10 +193,10 @@ public class WatchdogClient {
   }
 
   // Support for running a single test in the suite
-  
+
   protected String single;
   WatchdogTestCase singleTest;
-  
+
   public int countTestCases() {
       return 1;
   }

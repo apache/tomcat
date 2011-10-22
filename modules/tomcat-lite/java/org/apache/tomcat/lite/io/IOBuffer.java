@@ -10,26 +10,26 @@ import java.util.logging.Logger;
 
 
 // TODO: append() will trigger callbacks - do it explicitely !!!
-// TODO: queue() shouldn't modify the buffer 
+// TODO: queue() shouldn't modify the buffer
 
 
-/** 
+/**
  * A list of data buckets.
- * 
+ *
  * @author Costin Manolache
  */
 public class IOBuffer {
     static Logger log = Logger.getLogger("IOBrigade");
-    
+
     static int ALLOC_SIZE = 8192;
     long defaultTimeout = Long.MAX_VALUE;
-    
+
     private LinkedList<BBucket> buffers = new LinkedList<BBucket>();
-    
+
     // close() has been called for out,
     // or EOF/FIN received for in. It may still have data.
-    boolean closeQueued; 
-    
+    boolean closeQueued;
+
     // Will be signalled (open) when there is data in the buffer.
     // also used to sync on.
     FutureCallbacks<IOBuffer> hasDataLock = new FutureCallbacks<IOBuffer>() {
@@ -40,41 +40,41 @@ public class IOBuffer {
 
     // may be null
     protected IOChannel ch;
-    
+
     // Support for appending - needs improvements.
-    // appendable buffer is part of the buffer list if it has 
+    // appendable buffer is part of the buffer list if it has
     // data, and kept here if empty.
     BBuffer appendable;
     boolean appending = false;
     ByteBuffer writeBuffer;
-    
+
 
     public IOBuffer() {
     }
-    
+
     public IOBuffer(IOChannel ch) {
         this.ch = ch;
     }
-    
+
     public IOChannel getChannel() {
         return ch;
     }
-    
+
     // ===== Buffer access =====
-    
-    
+
+
     /**
      * Return first non-empty buffer.
-     * 
+     *
      * The append buffer is part of the buffer list, and is left alone and
      * empty.
-     * 
+     *
      * @return
      */
     public BBucket peekFirst() {
         synchronized (buffers) {
             BBucket o = (buffers.size() == 0) ? null : buffers.getFirst();
-            
+
             while (true) {
                 boolean empty = o == null || isEmpty(o);
                 if (o == null) {
@@ -84,20 +84,20 @@ public class IOBuffer {
                 // o != null
                 if (empty) {
                     buffers.removeFirst();
-                    o = (buffers.size() == 0) ? null : buffers.getFirst();                    
+                    o = (buffers.size() == 0) ? null : buffers.getFirst();
                 } else {
                     return o;
                 }
             }
         }
     }
-    
+
     public BBucket peekBucket(int idx) {
         synchronized (buffers) {
             return buffers.get(idx);
         }
     }
-    
+
 
     public void advance(int len) {
         while (len > 0) {
@@ -109,7 +109,7 @@ public class IOBuffer {
                 len -= first.remaining();
                 first.position(first.limit());
             } else {
-                first.position(first.position() + len);                
+                first.position(first.position() + len);
                 len = 0;
             }
         }
@@ -120,15 +120,15 @@ public class IOBuffer {
         byte[] bytes = s.getBytes("UTF8");
         queueInternal(BBuffer.wrapper(bytes, 0, bytes.length));
     }
-    
+
     public void queue(BBuffer bc) throws IOException {
         queueInternal(bc);
     }
-    
+
     public void queue(Object bb) throws IOException {
         queueInternal(bb);
     }
-    
+
     private void queueInternal(Object bb) throws IOException {
         if (closeQueued) {
             throw new IOException("Closed");
@@ -143,22 +143,22 @@ public class IOBuffer {
             //log.info("QUEUED: " + add.remaining() + " " + this);
             notifyDataAvailable(add);
         }
-        
+
     }
-    
+
     public int getBufferCount() {
         peekFirst();
         synchronized (buffers) {
             return buffers.size();
         }
     }
-    
+
     public void clear() {
         synchronized (buffers) {
             buffers.clear();
         }
     }
-    
+
     public void recycle() {
         closeQueued = false;
         clear();
@@ -168,7 +168,7 @@ public class IOBuffer {
         appending = false;
         appendable = null;
     }
-    
+
     // ===================
     /**
      * Closed for append. It may still have data.
@@ -178,8 +178,8 @@ public class IOBuffer {
         return closeQueued && 0 == getBufferCount();
     }
 
-    
-    /** 
+
+    /**
      * Mark as closed - but will not send data.
      */
     public void close() throws IOException {
@@ -189,16 +189,16 @@ public class IOBuffer {
         closeQueued = true;
         notifyDataAvailable(null);
     }
-    
-    
+
+
     private boolean isEmpty(BBucket o) {
-        if (o instanceof BBucket && 
+        if (o instanceof BBucket &&
                 ((BBucket) o).remaining() == 0) {
             return true;
-        }        
+        }
         return false;
     }
-    
+
     private BBucket wrap(Object src) {
         if (src instanceof byte[]) {
             return BBuffer.wrapper((byte[]) src, 0, ((byte[]) src).length);
@@ -206,26 +206,26 @@ public class IOBuffer {
         if (src instanceof ByteBuffer) {
             //return src;
             ByteBuffer bb = (ByteBuffer) src;
-            return BBuffer.wrapper(bb.array(), bb.position(), 
-                        bb.remaining());            
+            return BBuffer.wrapper(bb.array(), bb.position(),
+                        bb.remaining());
         }
         if (src instanceof byte[]) {
             byte[] bb = (byte[]) src;
-            return BBuffer.wrapper(bb, 0, bb.length); 
+            return BBuffer.wrapper(bb, 0, bb.length);
         }
         return (BBucket) src;
     }
-    
+
     protected void notifyDataAvailable(Object bb) throws IOException {
         synchronized (hasDataLock) {
             hasDataLock.signal(this); // or bb ?
         }
     }
-    
+
     public boolean hasData() {
-        return closeQueued || peekFirst() != null; 
+        return closeQueued || peekFirst() != null;
     }
-    
+
     public void waitData(long timeMs) throws IOException {
         if (timeMs == 0) {
             timeMs = defaultTimeout;
@@ -248,7 +248,7 @@ public class IOBuffer {
 
     /**
      * Non-blocking read.
-     * 
+     *
      * @return -1 if EOF, -2 if no data available, or 0..255 for normal read.
      */
     public int read() throws IOException {
@@ -263,7 +263,7 @@ public class IOBuffer {
         bucket.position(bucket.position() + 1);
         return res & 0xFF;
     }
-    
+
     public int peek() throws IOException {
         BBucket bucket = peekFirst();
         if (bucket == null) {
@@ -272,7 +272,7 @@ public class IOBuffer {
         int res = bucket.array()[bucket.position()];
         return res;
     }
-    
+
     public int find(char c) {
         int pos = 0;
         for (int i = 0; i < buffers.size(); i++) {
@@ -283,20 +283,20 @@ public class IOBuffer {
             int found= BBuffer.findChar(bucket.array(), bucket.position(),
                     bucket.limit(), c);
             if (found >= 0) {
-                return pos + found; 
+                return pos + found;
             }
             pos += bucket.remaining();
         }
         return -1;
     }
-    
+
     public int readLine(BBuffer bc) throws IOException {
         return readToDelim(bc, '\n');
     }
-    
+
     /**
-     * Copy up to and including "delim". 
-     * 
+     * Copy up to and including "delim".
+     *
      * @return number of bytes read, or -1 for end of stream.
      */
     int readToDelim(BBuffer bc, int delim) throws IOException {
@@ -314,7 +314,7 @@ public class IOBuffer {
                 bc.put(chr);
                 if (chr == delim) {
                     bucket.position(i + 1);
-                    len += (i - start + 1); 
+                    len += (i - start + 1);
                     return len;
                 }
             }
@@ -325,8 +325,8 @@ public class IOBuffer {
         }
         return len;
     }
-    
-    
+
+
     public int write(ByteBuffer bb) throws IOException {
         int len = bb.remaining();
         int pos = bb.position();
@@ -337,7 +337,7 @@ public class IOBuffer {
         bb.position(pos + len);
         return len;
     }
-    
+
     public int read(byte[] buf, int off, int len) throws IOException {
         if (isClosedAndEmpty()) {
             return -1;
@@ -349,7 +349,7 @@ public class IOBuffer {
                 return rd;
             }
             int toCopy = Math.min(len, bucket.remaining());
-            System.arraycopy(bucket.array(), bucket.position(), 
+            System.arraycopy(bucket.array(), bucket.position(),
                     buf, off + rd, toCopy);
             bucket.position(bucket.position() + toCopy);
             rd += toCopy;
@@ -358,7 +358,7 @@ public class IOBuffer {
                 return rd;
             }
         }
-        
+
     }
 
     public int read(BBuffer bb, int len) throws IOException {
@@ -370,7 +370,7 @@ public class IOBuffer {
         bb.limit(bb.limit() + rd);
         return rd;
     }
-    
+
     /**
      * Non-blocking read.
      */
@@ -397,9 +397,9 @@ public class IOBuffer {
             iob.position(iob.position() + space);
             iob.release();
             len += space;
-        }        
+        }
     }
-    
+
 
     public BBuffer readAll(BBuffer chunk) throws IOException {
         if (chunk == null) {
@@ -417,13 +417,13 @@ public class IOBuffer {
             chunk.append(iob.array(), iob.position(), iob.remaining());
             iob.position(iob.position() + iob.remaining());
             iob.release();
-    
+
         }
     }
 
     private BBuffer allocate() {
         int size = 0;
-        for (int i = 0; i < getBufferCount(); i++) { 
+        for (int i = 0; i < getBufferCount(); i++) {
             BBucket first = peekBucket(i);
             if (first != null) {
                 size += first.remaining();
@@ -431,12 +431,12 @@ public class IOBuffer {
         }
         return BBuffer.allocate(size);
     }
-    
+
     public BBuffer copyAll(BBuffer chunk) throws IOException {
         if (chunk == null) {
             chunk = allocate();
         }
-        for (int i = 0; i < getBufferCount(); i++) { 
+        for (int i = 0; i < getBufferCount(); i++) {
             BBucket iob = peekBucket(i);
             chunk.append(iob.array(), iob.position(), iob.remaining());
         }
@@ -462,20 +462,20 @@ public class IOBuffer {
     public IOBuffer append(byte[] data) throws IOException {
         return append(data, 0, data.length);
     }
-    
+
     public IOBuffer append(byte[] data, int start, int len) throws IOException {
         if (closeQueued) {
             throw new IOException("Closed");
         }
         ByteBuffer bb = getWriteBuffer();
-        
+
         int i = start;
         int end = start + len;
         while (i < end) {
-            int rem = Math.min(end - i, bb.remaining()); 
+            int rem = Math.min(end - i, bb.remaining());
             // to write
             bb.put(data, i, rem);
-            i += rem; 
+            i += rem;
             if (bb.remaining() < 8) {
                 releaseWriteBuffer(1);
                 bb = getWriteBuffer();
@@ -483,9 +483,9 @@ public class IOBuffer {
         }
 
         releaseWriteBuffer(1);
-        return this;        
+        return this;
     }
-    
+
     public IOBuffer append(int data) throws IOException {
         if (closeQueued) {
             throw new IOException("Closed");
@@ -493,14 +493,14 @@ public class IOBuffer {
         ByteBuffer bb = getWriteBuffer();
         bb.put((byte) data);
         releaseWriteBuffer(1);
-        return this;        
+        return this;
     }
-    
+
     public IOBuffer append(ByteBuffer cs) throws IOException {
-        return append(cs.array(), cs.position() + cs.arrayOffset(), 
+        return append(cs.array(), cs.position() + cs.arrayOffset(),
                 cs.remaining());
     }
-    
+
     /**
      *  Append a buffer. The buffer will not be modified.
      */
@@ -523,7 +523,7 @@ public class IOBuffer {
             append(o);
         }
 
-        return this;        
+        return this;
     }
 
     public IOBuffer append(IOBuffer cs, int len) throws IOException {
@@ -532,9 +532,9 @@ public class IOBuffer {
             append(o);
         }
 
-        return this;        
+        return this;
     }
-    
+
     public IOBuffer append(CharSequence cs) throws IOException {
         byte[] data = cs.toString().getBytes();
         append(data, 0, data.length);
@@ -545,11 +545,11 @@ public class IOBuffer {
         ByteBuffer bb = getWriteBuffer();
         bb.put((byte) c);
         releaseWriteBuffer(1);
-        return this;        
+        return this;
     }
-    
+
     /**
-     * All operations that iterate over buffers must be 
+     * All operations that iterate over buffers must be
      * sync
      * @return
      */
@@ -561,7 +561,7 @@ public class IOBuffer {
         }
         return a;
     }
-    
+
     public String toString() {
         return "IOB:{c:" + getBufferCount() +
           ", b:" + available() +
@@ -578,7 +578,7 @@ public class IOBuffer {
         o.position(o.position() + lenToConsume);
         return sb;
     }
-    
+
     public BBucket popFirst() {
         BBucket o = peekFirst(); // skip empty
         if (o == null) {
@@ -587,9 +587,9 @@ public class IOBuffer {
         if (o == appendable) {
             synchronized (buffers) {
                     // TODO: concurrency ???
-                    BBucket sb = 
+                    BBucket sb =
                         BBuffer.wrapper(appendable.array(),
-                                appendable.position(), 
+                                appendable.position(),
                                 appendable.limit() - appendable.position());
                     appendable.position(appendable.limit());
                     return sb;
@@ -599,22 +599,22 @@ public class IOBuffer {
         }
         return o;
     }
-    
+
 
     public ByteBuffer getWriteBuffer() throws IOException {
         synchronized (buffers) {
             if (closeQueued) {
                 throw new IOException("Closed");
             }
-            BBucket last = (buffers.size() == 0) ? 
+            BBucket last = (buffers.size() == 0) ?
                     null : buffers.getLast();
             if (last == null || last != appendable ||
                     last.array().length - last.limit() < 16) {
                 last = BBuffer.allocate(ALLOC_SIZE);
             }
             appending = true;
-            appendable = (BBuffer) last;            
-            
+            appendable = (BBuffer) last;
+
             if (writeBuffer == null || writeBuffer.array() != appendable.array()) {
                 writeBuffer = ByteBuffer.wrap(appendable.array());
             }
@@ -622,8 +622,8 @@ public class IOBuffer {
             writeBuffer.limit(appendable.array().length);
             return writeBuffer;
         }
-    }        
-    
+    }
+
     public void releaseWriteBuffer(int read) throws IOException {
         synchronized (buffers) {
             if (!appending) {
@@ -633,11 +633,11 @@ public class IOBuffer {
                 if (appendable.limit() != writeBuffer.position()) {
                     appendable.limit(writeBuffer.position());
                     // We have some more data.
-                    if (buffers.size() == 0 || 
+                    if (buffers.size() == 0 ||
                             buffers.getLast() != appendable) {
                         buffers.add(appendable);
                     }
-                    notifyDataAvailable(appendable);                
+                    notifyDataAvailable(appendable);
                 }
             }
             appending = false;
@@ -659,7 +659,7 @@ public class IOBuffer {
 //}
 
 //public final int readToDelimAndLowerCase(ByteBuffer bb,
-//                                         byte delim, 
+//                                         byte delim,
 //                                         boolean lower) {
 //  boolean space = false;
 //  byte chr = 0;
@@ -672,7 +672,7 @@ public class IOBuffer {
 //      space = true;
 //    }
 //    if (lower && (chr >= HttpParser.A) && (chr <= HttpParser.Z)) {
-//      bb.put(bb.position() - 1, 
+//      bb.put(bb.position() - 1,
 //          (byte) (chr - HttpParser.LC_OFFSET));
 //    }
 //  }

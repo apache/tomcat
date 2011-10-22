@@ -21,16 +21,16 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.StringTokenizer;
 
-/** 
- * Utils to process HTTP/1.1 ranges. Used by default servlet, could 
+/**
+ * Utils to process HTTP/1.1 ranges. Used by default servlet, could
  * be used by any servlet that needs to deal with ranges.
- * 
+ *
  * It is very good to support ranges if you have large content. In most
  * cases supporting one range is enough - getting multiple ranges doesn't
  * seem very common, and it's complex (multipart response).
- * 
+ *
  * @author Costin Manolache
- * @author Remy Maucherat 
+ * @author Remy Maucherat
  * @author - see DefaultServlet in Catalin for other contributors
  */
 public class Range {
@@ -54,12 +54,12 @@ public class Range {
         end = 0;
         length = 0;
     }
-    
-    /** Parse ranges. 
-     * 
+
+    /** Parse ranges.
+     *
      * @return null if the range is invalid or can't be parsed
      */
-    public static ArrayList parseRanges(long fileLength, 
+    public static ArrayList parseRanges(long fileLength,
                                         String rangeHeader) throws IOException {
         ArrayList result = new ArrayList();
         StringTokenizer commaTokenizer = new StringTokenizer(rangeHeader, ",");
@@ -112,7 +112,7 @@ public class Range {
 
     /**
      * Parse the Content-Range header. Used with PUT or in response.
-     * 
+     *
      * @return Range
      */
     public static Range parseContentRange(String rangeHeader)

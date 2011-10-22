@@ -21,17 +21,17 @@ import junit.framework.TestCase;
 
 public class UEncoderTest extends TestCase {
     URLEncoder enc=new URLEncoder();
-    
+
     /*
-     * 
+     *
      * Test method for 'org.apache.tomcat.util.buf.UEncoder.encodeURL(String)'
-     * TODO: find the relevant rfc and apache tests and add more 
+     * TODO: find the relevant rfc and apache tests and add more
      */
     public void testEncodeURL() {
 
         String eurl1=enc.encodeURL("test");
         assertEquals("test", eurl1);
-        
+
         eurl1=enc.encodeURL("/test");
         assertEquals("/test", eurl1);
 
@@ -45,7 +45,7 @@ public class UEncoderTest extends TestCase {
         eurl1=enc.encodeURL("//test");
         assertEquals("//test", eurl1);
 
-        
+
     }
 
 }

@@ -20,7 +20,7 @@ package org.apache.tomcat.lite.util;
 public class UrlUtils {
 
     /** Used by webdav.
-     * 
+     *
      * Return a context-relative path, beginning with a "/", that represents
      * the canonical version of the specified path after ".." and "." elements
      * are resolved out.  If the specified path attempts to go outside the
@@ -43,7 +43,7 @@ public class UrlUtils {
         // Normalize the slashes and add leading slash if necessary
         if (normalized.indexOf('\\') >= 0)
             normalized = normalized.replace('\\', '/');
-        
+
         if (!normalized.startsWith("/"))
             normalized = "/" + normalized;
 

@@ -10,7 +10,7 @@ public class MultiMapTest extends TestCase {
 
     MultiMap map = new MultiMap();
     MultiMap lmap = new MultiMap().insensitive();
-    
+
     public void testAdd() {
         map.add("foo", "bar");
         assertEquals("bar", map.get("foo").toString());
@@ -43,7 +43,7 @@ public class MultiMapTest extends TestCase {
         lmap.add("B", "bar4");
         assertEquals(4, lmap.count);
         assertEquals(3, lmap.map.size());
-        
+
         assertEquals("bar3", lmap.getString("a"));
         assertEquals("bar3", lmap.getString("A"));
         assertEquals("bar1", lmap.getString("Foo"));

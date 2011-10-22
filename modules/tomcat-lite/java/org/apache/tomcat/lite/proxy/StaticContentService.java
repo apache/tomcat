@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -28,22 +28,22 @@ import org.apache.tomcat.lite.io.BBucket;
 import org.apache.tomcat.lite.io.IOBuffer;
 
 /*
- * 
- * Serve static content, from memory. 
+ *
+ * Serve static content, from memory.
  */
 public class StaticContentService implements HttpService  {
     protected Logger log = Logger.getLogger("coyote.static");
     protected BBucket mb;
-    
+
     protected boolean chunked = false;
     int code = 200;
-    
+
     protected String contentType = "text/plain";
 
 
     public StaticContentService() {
     }
-    
+
     /**
      * Used for testing chunked encoding.
      * @return
@@ -56,8 +56,8 @@ public class StaticContentService implements HttpService  {
     public StaticContentService setData(byte[] data) {
         mb = BBuffer.wrapper(data, 0, data.length);
         return this;
-    }    
-    
+    }
+
     public StaticContentService setStatus(int status) {
         this.code = status;
         return this;
@@ -71,7 +71,7 @@ public class StaticContentService implements HttpService  {
         mb = BBuffer.wrapper(data, 0, data.length);
         return this;
       }
-      
+
 
     public StaticContentService setData(CharSequence data) {
       try {
@@ -81,18 +81,18 @@ public class StaticContentService implements HttpService  {
       } catch (IOException e) {
       }
       return this;
-    }    
+    }
 
     public StaticContentService setContentType(String ct) {
       this.contentType = ct;
       return this;
     }
-    
+
     public void setFile(String path) {
       try {
         FileInputStream fis = new FileInputStream(path);
         BBuffer bc = BBuffer.allocate(4096);
-        
+
         byte b[] = new byte[4096];
         int rd = 0;
         while ((rd = fis.read(b)) > 0) {
@@ -103,20 +103,20 @@ public class StaticContentService implements HttpService  {
         throw new RuntimeException(e);
       }
     }
-    
+
     @Override
     public void service(HttpRequest httpReq, HttpResponse res) throws IOException {
-       
+
         res.setStatus(code);
-      
+
           if (!chunked) {
             res.setContentLength(mb.remaining());
           }
           res.setContentType(contentType);
-      
+
           int len = mb.remaining();
           int first = 0;
-          
+
           if (chunked) {
               first = len / 2;
               res.getBody()

@@ -6,12 +6,12 @@ import java.io.Serializable;
 import java.nio.CharBuffer;
 
 /**
- * Wraps a char[]. 
- * 
+ * Wraps a char[].
+ *
  * Doesn't provide any mutation methods. Classes in this package
- * have access to the buffer, for conversions. 
- * 
- * 
+ * have access to the buffer, for conversions.
+ *
+ *
  * @author Costin Manolache
  */
 public class CBucket implements CharSequence, Comparable, Serializable {
@@ -23,7 +23,7 @@ public class CBucket implements CharSequence, Comparable, Serializable {
 
     // Reused.
     protected CharBuffer cb;
-    
+
     // cache
     protected String strValue;
     protected int hash;
@@ -31,7 +31,7 @@ public class CBucket implements CharSequence, Comparable, Serializable {
     public CBucket() {
     }
 
-    /** 
+    /**
      * Used by IOWriter for conversion. Will not modify the content.
      */
     CharBuffer getNioBuffer() {
@@ -43,7 +43,7 @@ public class CBucket implements CharSequence, Comparable, Serializable {
         }
         return cb;
     }
-    
+
     public void recycle() {
         start = 0;
         end = 0;
@@ -51,7 +51,7 @@ public class CBucket implements CharSequence, Comparable, Serializable {
         strValue = null;
         hash = 0;
     }
-    
+
     public String toString() {
         if (null == value) {
             return null;
@@ -65,7 +65,7 @@ public class CBucket implements CharSequence, Comparable, Serializable {
     }
 
     /**
-     * Same as String 
+     * Same as String
      */
     public int hashCode() {
         int h = hash;
@@ -80,7 +80,7 @@ public class CBucket implements CharSequence, Comparable, Serializable {
         }
         return h;
     }
-    
+
     public long getLong() {
         return parseLong(value, start, end - start);
     }
@@ -143,7 +143,7 @@ public class CBucket implements CharSequence, Comparable, Serializable {
 
     /**
      * Compares the message bytes to the specified String object.
-     * 
+     *
      * @param s
      *            the String to compare
      * @return true if the comparison succeeded, false otherwise
@@ -165,7 +165,7 @@ public class CBucket implements CharSequence, Comparable, Serializable {
 
     /**
      * Compares the message bytes to the specified String object.
-     * 
+     *
      * @param s
      *            the String to compare
      * @return true if the comparison succeeded, false otherwise
@@ -232,10 +232,10 @@ public class CBucket implements CharSequence, Comparable, Serializable {
         return true;
     }
 
-    
+
     /**
      * Returns true if the message bytes starts with the specified string.
-     * 
+     *
      * @param s
      *            the string
      */
@@ -256,7 +256,7 @@ public class CBucket implements CharSequence, Comparable, Serializable {
 
     /**
      * Returns true if the message bytes starts with the specified string.
-     * 
+     *
      * @param s
      *            the string
      */
@@ -278,12 +278,12 @@ public class CBucket implements CharSequence, Comparable, Serializable {
     public int indexOf(char c) {
         return indexOf(c, start);
     }
-    
+
     public int lastIndexOf(char c) {
         return lastIndexOf(c, 0, end - start);
     }
 
-    /** 
+    /**
      */
     public int lastIndexOf(char c, int off, int len) {
         char[] buf = value;
@@ -296,10 +296,10 @@ public class CBucket implements CharSequence, Comparable, Serializable {
         }
         return slash;
     }
-    
+
     /**
      * Returns true if the message bytes starts with the specified string.
-     * 
+     *
      * @param c
      *            the character
      */
@@ -321,7 +321,7 @@ public class CBucket implements CharSequence, Comparable, Serializable {
     public int indexOf(String src) {
         return indexOf(src, 0, src.length(), 0);
     }
-    
+
     public int indexOf(String src, int srcOff, int srcLen, int myOff) {
         char first = src.charAt(srcOff);
 
@@ -342,7 +342,7 @@ public class CBucket implements CharSequence, Comparable, Serializable {
         }
         return -1;
     }
-    
+
     public char lastChar() {
         return value[end - 1];
     }
@@ -350,7 +350,7 @@ public class CBucket implements CharSequence, Comparable, Serializable {
     public char charAt(int index) {
         return value[index + start];
     }
-    
+
     public void wrap(char[] buff, int start, int end) {
         if (value != null) {
             throw new RuntimeException("Can wrap only once");
@@ -359,13 +359,13 @@ public class CBucket implements CharSequence, Comparable, Serializable {
         this.start = start;
         this.end = end;
     }
-    
+
     public CharSequence subSequence(int sstart, int send) {
         CBucket seq = new CBucket();
         seq.wrap(this.value, start + sstart, start + send);
         return seq;
     }
-    
+
     public int length() {
         return end - start;
     }
@@ -387,13 +387,13 @@ public class CBucket implements CharSequence, Comparable, Serializable {
                 }
             }
             return len - destLen;
-            
+
         } else if (o instanceof CharSequence) {
             CharSequence dest = (CharSequence) o;
             int o1 = start, o2 = 0, result;
             int len = end - start;
             int destLen = dest.length();
-            int fin = (len < destLen ? 
+            int fin = (len < destLen ?
                     end : start + destLen);
             while (o1 < fin) {
                 if ((result = value[o1++] - dest.charAt(o2++)) != 0) {
@@ -401,7 +401,7 @@ public class CBucket implements CharSequence, Comparable, Serializable {
                 }
             }
             return len - destLen;
-            
+
         } else {
             throw new RuntimeException("CompareTo not supported " + o);
         }
@@ -462,7 +462,7 @@ public class CBucket implements CharSequence, Comparable, Serializable {
         }
         return result;
     }
-    
+
     public int getExtension(CBuffer ext, char slashC, char dotC) {
         int slash = lastIndexOf(slashC);
         if (slash < 0) {
@@ -483,17 +483,17 @@ public class CBucket implements CharSequence, Comparable, Serializable {
         char[] c = value;
         int pos = start;
         int count = 0;
-    
+
         while (pos < end) {
             if ((c[pos++] == '/') && ((++count) == n)) {
                 pos--;
                 break;
             }
         }
-    
+
         return pos - start;
     }
-    
+
 
     public boolean hasUpper() {
         for (int i = start; i < end; i++) {
@@ -504,5 +504,5 @@ public class CBucket implements CharSequence, Comparable, Serializable {
         }
         return false;
     }
-    
+
 }

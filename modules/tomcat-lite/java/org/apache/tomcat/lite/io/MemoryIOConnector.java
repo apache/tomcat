@@ -15,15 +15,15 @@ public class MemoryIOConnector extends IOConnector {
             }
         };
         IOBuffer netOut = new IOBuffer(this);
-        
+
         /**
          * All flushed output will be saved to 'out'.
          */
         public BBuffer out = BBuffer.allocate(4096);
-        
+
         public MemoryIOChannel() {
         }
-        
+
         public void startSending() throws IOException {
             //
             IOBuffer bb = netOut;
@@ -43,7 +43,7 @@ public class MemoryIOConnector extends IOConnector {
 
             handleFlushed(this);
         }
-        
+
         @Override
         public IOBuffer getIn() {
             return netIn;
@@ -52,23 +52,23 @@ public class MemoryIOConnector extends IOConnector {
         public IOBuffer getOut() {
             return netOut;
         }
-    } 
- 
+    }
+
     // TODO: in-process communication without sockets for testing
     ConnectedCallback acceptor;
     MemoryIOConnector server;
-    
+
     public MemoryIOConnector() {
         timer = new Timer(true);
     }
-    
+
     public MemoryIOConnector withServer(MemoryIOConnector server) {
         this.server = server;
         return server;
     }
-    
+
     @Override
-    public void acceptor(ConnectedCallback sc, CharSequence port, Object extra) 
+    public void acceptor(ConnectedCallback sc, CharSequence port, Object extra)
             throws IOException {
         this.acceptor = sc;
     }
@@ -84,5 +84,5 @@ public class MemoryIOConnector extends IOConnector {
         }
         sc.handleConnected(ch);
     }
-    
+
 }

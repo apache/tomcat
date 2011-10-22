@@ -11,18 +11,18 @@ import org.apache.tomcat.lite.TestMain;
 /**
  * Startup tomcat + coyote lite connector.
  * No config files used.
- * 
+ *
  * @author Costin Manolache
  */
 public class TomcatStandaloneMain {
-    
+
     public static Tomcat setUp(int port) {
         try {
             Tomcat tomcat = new Tomcat();
 
             tomcat.setPort(port);
             String base = TestMain.findDir("/output/build");
-            tomcat.setBaseDir(base);               
+            tomcat.setBaseDir(base);
             // Absolute path - tomcat6 and 7 are different,
             // 7 adds webapps.
             tomcat.addWebapp("/", base + "/webapps/ROOT");
@@ -40,7 +40,7 @@ public class TomcatStandaloneMain {
         }
         return null;
     }
-    
+
     public static LiteProtocolHandler setUp(Tomcat tomcat, int port) {
         Connector connector;
         try {
@@ -48,7 +48,7 @@ public class TomcatStandaloneMain {
             tomcat.getService().addConnector(connector);
             connector.setPort(port);
             tomcat.setConnector(connector);
-            LiteProtocolHandler ph = 
+            LiteProtocolHandler ph =
                 (LiteProtocolHandler) connector.getProtocolHandler();
             return ph;
         } catch (Exception e) {

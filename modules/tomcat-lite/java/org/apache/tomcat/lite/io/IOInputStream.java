@@ -9,21 +9,21 @@ import java.io.InputStream;
 /**
  * Similar with ServletInputStream - adds readLine(byte[]..), using
  * a IOBuffer.
- * 
- * 
- * 
+ *
+ *
+ *
  * @author Costin Manolache
  */
 public class IOInputStream extends InputStream {
 
     IOBuffer bb;
     long timeout;
-    
+
     public IOInputStream(IOChannel httpCh, long to) {
         bb = httpCh.getIn();
         this.timeout = to;
     }
-    
+
     @Override
     public int read() throws IOException {
         // getReadableBucket/peekFirst returns a buffer with at least
@@ -35,10 +35,10 @@ public class IOInputStream extends InputStream {
         if (bb.isClosedAndEmpty()) {
             return -1;
         }
-        
+
         return bb.read();
     }
-    
+
     public int read(byte[] buf, int off, int len) throws IOException {
         if (bb.isClosedAndEmpty()) {
             return -1;

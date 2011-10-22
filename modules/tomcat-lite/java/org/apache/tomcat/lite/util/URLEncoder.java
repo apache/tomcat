@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -26,7 +26,7 @@ import java.util.BitSet;
  *
  * This class is very similar to the java.net.URLEncoder class.
  *
- * Unfortunately, with java.net.URLEncoder there is no way to specify to the 
+ * Unfortunately, with java.net.URLEncoder there is no way to specify to the
  * java.net.URLEncoder which characters should NOT be encoded.
  *
  * This code was moved from DefaultServlet.java
@@ -80,7 +80,7 @@ public class URLEncoder {
 
     public String encodeURL(String path, String enc, boolean allowSlash) {
         int maxBytesPerChar = 10;
-        
+
         StringBuffer rewrittenPath = new StringBuffer(path.length());
         ByteArrayOutputStream buf = new ByteArrayOutputStream(maxBytesPerChar);
         OutputStreamWriter writer = null;
@@ -89,7 +89,7 @@ public class URLEncoder {
         } catch (UnsupportedEncodingException e1) {
             // shouldn't happen.
         }
-        
+
         for (int i = 0; i < path.length(); i++) {
             int c = (int) path.charAt(i);
             if (c < 128 && safeChars.get(c) || allowSlash && c == '/') {
@@ -127,7 +127,7 @@ public class URLEncoder {
         }
         return rewrittenPath.toString();
     }
-    
+
     /**
      * Decode and return the specified URL-encoded String.
      *
@@ -156,8 +156,8 @@ public class URLEncoder {
         return URLDecode(bytes, enc);
 
     }
-    
-    
+
+
     /**
      * Decode and return the specified URL-encoded String.
      * When the byte array is converted to a string, the system default
@@ -174,7 +174,7 @@ public class URLEncoder {
         return URLDecode(str, null);
 
     }
-    
+
     /**
      * Decode and return the specified URL-encoded byte array.
      *
@@ -211,7 +211,7 @@ public class URLEncoder {
         return new String(bytes, 0, ox);
 
     }
-    
+
     /**
      * Convert a byte character value to hexidecimal digit value.
      *
@@ -223,5 +223,5 @@ public class URLEncoder {
         if ((b >= 'A') && (b <= 'F')) return (byte)(b - 'A' + 10);
         return 0;
     }
-    
+
 }

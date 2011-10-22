@@ -22,22 +22,22 @@ import java.nio.CharBuffer;
 
 
 /**
- * Similar with StringBuilder or StringBuffer, but with access to the 
+ * Similar with StringBuilder or StringBuffer, but with access to the
  * raw buffer - this avoids copying the data.
- * 
+ *
  * Utilities to manipluate char chunks. While String is the easiest way to
  * manipulate chars ( search, substrings, etc), it is known to not be the most
  * efficient solution - Strings are designed as imutable and secure objects.
- * 
+ *
  * @author dac@sun.com
  * @author James Todd [gonzo@sun.com]
  * @author Costin Manolache
  * @author Remy Maucherat
  */
-public class CBuffer extends CBucket implements Cloneable,   
+public class CBuffer extends CBucket implements Cloneable,
         Appendable {
 
-    
+
     /**
      * Creates a new, uninitialized CharChunk object.
      */
@@ -56,15 +56,15 @@ public class CBuffer extends CBucket implements Cloneable,
         start = 0;
         end = 0;
     }
-    
+
     /**
-     * Same as String 
+     * Same as String
      */
     public int hashCode() {
         int h = 0;
         int off = start;
         char val[] = value;
-        
+
         for (int i = start; i < end; i++) {
             h = 31*h + val[off++];
         }
@@ -93,18 +93,18 @@ public class CBuffer extends CBucket implements Cloneable,
         this.start = buff.start + off;
         this.end = this.start + srcEnd - off;
     }
-    
-    
+
+
     // ----------- Used for IOWriter / conversion ---------
-    
+
     public char[] array() {
         return value;
     }
-    
+
     public int position() {
         return start;
     }
-    
+
     CharBuffer getAppendCharBuffer() {
         makeSpace(16);
         if (cb == null || cb.array() != value) {
@@ -113,24 +113,24 @@ public class CBuffer extends CBucket implements Cloneable,
             cb.position(end);
             cb.limit(value.length);
         }
-        return cb;        
+        return cb;
     }
 
     void returnNioBuffer(CharBuffer c) {
         dirty();
         start = c.position();
     }
-    
+
     void returnAppendCharBuffer(CharBuffer c) {
         dirty();
         end = c.position();
     }
 
     // -------- Delete / replace ---------------
-    
-    /** 
+
+    /**
      * 'Delete' all chars after offset.
-     * 
+     *
      * @param offset
      */
     public void delete(int offset) {
@@ -148,7 +148,7 @@ public class CBuffer extends CBucket implements Cloneable,
     public CBuffer append(CharSequence csq, int astart, int aend)
             throws IOException {
         makeSpace(aend - astart);
-        
+
         for (int i = astart; i < aend; i++) {
             value[end++] = csq.charAt(i);
         }
@@ -232,8 +232,8 @@ public class CBuffer extends CBucket implements Cloneable,
         append(Integer.toString(i));
         return this;
     }
-    
-    
+
+
     public Appendable append(CharSequence cs) {
         if (cs instanceof CBuffer) {
             CBuffer src = (CBuffer) cs;
@@ -253,7 +253,7 @@ public class CBuffer extends CBucket implements Cloneable,
         return  this;
     }
 
-    
+
     public CBuffer append(BBucket bb) {
         byte[] bbuf = bb.array();
         int start = bb.position();
@@ -270,7 +270,7 @@ public class CBuffer extends CBucket implements Cloneable,
         end += len;
         return this;
     }
-    
+
 
     public void toAscii(BBuffer bb) {
         for (int i = start; i < end; i++) {
@@ -280,7 +280,7 @@ public class CBuffer extends CBucket implements Cloneable,
 
     /**
      *  Append and advance CharBuffer.
-     * 
+     *
      * @param c
      */
     public CBuffer put(CharBuffer c) {
@@ -291,7 +291,7 @@ public class CBuffer extends CBucket implements Cloneable,
 
     // ------------- 'set' methods ---------------
     // equivalent with clean + append
-    
+
     public CBuffer set(CBuffer csq, int off, int len) {
         recycle();
         append(csq.value, csq.start + off, csq.start + off + len);
@@ -303,7 +303,7 @@ public class CBuffer extends CBucket implements Cloneable,
         append(c, off, off + len);
         return this;
     }
-    
+
     public CBuffer set(BBucket bb) {
         recycle();
         byte[] bbuf = bb.array();
@@ -329,12 +329,12 @@ public class CBuffer extends CBucket implements Cloneable,
         append(csq);
         return this;
     }
-    
+
     private void dirty() {
         hash = 0;
         strValue = null;
     }
-    
+
     /**
      * Make space for len chars. If len is small, allocate a reserve space too.
      * Never grow bigger than limit.
@@ -378,10 +378,10 @@ public class CBuffer extends CBucket implements Cloneable,
                 if (BBuffer.isUpper(c)) {
                     value[i] = (char) BBuffer.toLower(c);
                 }
-                
+
             }
         }
     }
 
-    
+
 }

@@ -29,13 +29,13 @@ import org.apache.tomcat.lite.io.IOConnector;
 
 /**
  * HTTP async client and server, based on tomcat NIO/APR connectors
- * 
- * 'Input', 'read', 'Recv' refers to information we get from the remote side - 
+ *
+ * 'Input', 'read', 'Recv' refers to information we get from the remote side -
  * the request body for server-mode or response body for client.
- * 
- * 'Output', 'write', 'Send' is for info we send - the post in client mode 
+ *
+ * 'Output', 'write', 'Send' is for info we send - the post in client mode
  * and the response body for server mode.
- * 
+ *
  * @author Costin Manolache
  */
 public class HttpChannel extends IOChannel {
@@ -47,85 +47,85 @@ public class HttpChannel extends IOChannel {
     public static final String CONTENT_LENGTH= "Content-Length";
 
     public static final String HTTP_10 = "HTTP/1.0";
-    
+
     public static final String HTTP_11 = "HTTP/1.1";
-    
+
     /**
      * SEMI_COLON.
      */
     public static final byte SEMI_COLON = (byte) ';';
-    
+
     public static final byte QUESTION = (byte) '?';
-    
-    
+
+
     protected static Logger log = Logger.getLogger("HttpChannel");
 
-    
+
     boolean debug = false;
-    
-    // ---- Callbacks and locks 
-    
+
+    // ---- Callbacks and locks
+
     FutureCallbacks<HttpChannel> doneLock = new FutureCallbacks<HttpChannel>();
-    FutureCallbacks<HttpChannel> headersReceivedLock = 
+    FutureCallbacks<HttpChannel> headersReceivedLock =
             new FutureCallbacks<HttpChannel>();
     /**
      * Called when the incoming headers have been received.
      * ( response for client mode, request for server mode )
-     * @throws IOException 
+     * @throws IOException
      */
     protected HttpService httpService;
-    /** 
+    /**
      * Called when:
      *  - body sent
      *  - body received
-     *  - release() called - either service() done or client done with the 
-     *  buffers. 
-     *  
+     *  - release() called - either service() done or client done with the
+     *  buffers.
+     *
      *  After this callback:
      *  - socket closed if closeOnEndSend, or put in keep-alive
      *  - AsyncHttp.recycle()
      *  - returned to the pool.
      */
     private RequestCompleted doneAllCallback;
-    protected boolean sendReceiveDone = false; 
-    
-    // Will be signalled (open) when the buffer is empty. 
+    protected boolean sendReceiveDone = false;
+
+    // Will be signalled (open) when the buffer is empty.
     FutureCallbacks<IOChannel> flushLock = new FutureCallbacks<IOChannel>();
-    
+
     FutureCallbacks<HttpChannel> doneFuture;
     boolean doneCallbackCalled = false;
 
 
-    // ---------- 
-    
+    // ----------
+
     // Set if Exect: 100-continue was set on reqest.
     // If this is the case - body won't be sent until
     // server responds ( client ) and server will only
-    // read body after ack() - or skip to next request 
+    // read body after ack() - or skip to next request
     // without swallowing the body.
     protected boolean expectation = false;
-    
+
     /** Ready for recycle, if send/receive are done */
     protected boolean release = false;
-    
-    // ----------- 
-    
+
+    // -----------
+
     protected boolean headersDone = false;
     protected boolean error = false;
     protected boolean abortDone = false;
-    
-    
+
+
     protected int ser; // id - for jmx registration and logs
     protected int channelId;
 
-    /** 
+    /**
      * Null after endSendReceive and before sending the request
      */
     HttpConnection conn;
 
     HttpConnector httpConnector;
 
-    // Different ways to point to request response (server/client) 
+    // Different ways to point to request response (server/client)
     HttpRequest httpReq;
     HttpResponse httpRes;
     HttpMessage inMessage;
@@ -141,16 +141,16 @@ public class HttpChannel extends IOChannel {
             }
             super.close();
             outClosed();
-        }        
+        }
     };
-    
 
-    // Server side only 
+
+    // Server side only
     protected String serverHeader = "TomcatLite";
-    
-    long ioTimeout = 30 * 60000; // 30 min seems high enough 
 
-        
+    long ioTimeout = 30 * 60000; // 30 min seems high enough
+
+
     public HttpChannel() {
         ser = serCnt.incrementAndGet();
         httpReq = new HttpRequest(this);
@@ -158,19 +158,19 @@ public class HttpChannel extends IOChannel {
         init();
         serverMode(false);
     }
-    
-    /** 
-     * Close the connection, return to pool. Called if a 
+
+    /**
+     * Close the connection, return to pool. Called if a
      * framing error happens, or if we want to force the connection
      * to close, without waiting for all data to be sent/received.
-     * @param t 
-     * 
+     * @param t
+     *
      * @throws IOException
      */
     public void abort(Throwable t) {
         abort(t.toString());
     }
-    
+
     public void abort(String t)  {
         synchronized (this) {
             if (abortDone) {
@@ -193,7 +193,7 @@ public class HttpChannel extends IOChannel {
             log.severe("Exception in abort " + ex);
         }
     }
-    
+
     /**
      * If release was called - throw exception, you shouldn't use
      * the object again.
@@ -202,9 +202,9 @@ public class HttpChannel extends IOChannel {
     private void checkRelease() throws IOException {
         if (release && sendReceiveDone) {
             throw new IOException("Object released");
-        }        
+        }
     }
-    
+
     public IOChannel getSink() {
         if (conn == null) {
             return null;
@@ -212,15 +212,15 @@ public class HttpChannel extends IOChannel {
         return conn.getSink();
     }
 
-    
+
     /**
      * Called when the request is done. Need to send remaining byte.
-     * 
+     *
      */
     public void complete() throws IOException {
         checkRelease();
         if (!getOut().isAppendClosed()) {
-            getOut().close();            
+            getOut().close();
         }
         if (!getIn().isAppendClosed()) {
             getIn().close();
@@ -228,7 +228,7 @@ public class HttpChannel extends IOChannel {
 
         startSending();
    }
-    
+
     public int doRead(BBuffer chunk)
             throws IOException {
         checkRelease();
@@ -243,13 +243,13 @@ public class HttpChannel extends IOChannel {
             } else {
                 System.err.println("Spurious waitData signal, no data");
             }
-        } 
+        }
         chunk.append(next.array(), next.position(), next.remaining());
         int read =  next.remaining();
         next.release();
         return read;
     }
-    
+
     public HttpConnector getConnector() {
         return httpConnector;
     }
@@ -257,9 +257,9 @@ public class HttpChannel extends IOChannel {
     public boolean getError() {
         return error;
     }
-    
-    // ---------------- Writting ------------------------------- 
-    
+
+    // ---------------- Writting -------------------------------
+
     public String getId() {
         return Integer.toString(ser);
     }
@@ -267,8 +267,8 @@ public class HttpChannel extends IOChannel {
     public IOBuffer getIn() {
         return receiveBody;
     }
-    
-    
+
+
     public long getIOTimeout() {
         return ioTimeout;
     }
@@ -280,8 +280,8 @@ public class HttpChannel extends IOChannel {
         }
         return conn.getSink();
     }
-    
-    
+
+
     public IOBuffer getOut() {
         return sendBody;
     }
@@ -289,23 +289,23 @@ public class HttpChannel extends IOChannel {
     public HttpRequest getRequest() {
         return httpReq;
     }
-    
-    
+
+
     public HttpResponse getResponse() {
         return httpRes;
     }
-    
-      
+
+
     public String getState() {
         return
-            conn + 
-            "RCV=[" + inMessage.state.toString() + " " + 
-            receiveBody.toString()  
-            + "] SND=[" + outMessage.state.toString() 
+            conn +
+            "RCV=[" + inMessage.state.toString() + " " +
+            receiveBody.toString()
+            + "] SND=[" + outMessage.state.toString()
             + " " + sendBody.toString() + "]";
     }
 
-    
+
     public String getStatus() {
         return getResponse().getStatus() + " " + getResponse().getMessage();
     }
@@ -313,16 +313,16 @@ public class HttpChannel extends IOChannel {
 
     public String getTarget() {
         if (target == null) {
-            return ":0"; // server mode ? 
+            return ":0"; // server mode ?
         }
         return target.toString();
     }
 
 
     /**
-     * Called from IO thread, after the request body 
+     * Called from IO thread, after the request body
      * is completed ( or if there is no req body )
-     * @throws IOException 
+     * @throws IOException
      */
     protected void handleEndReceive() throws IOException {
         if (inMessage.state == HttpMessage.State.DONE) {
@@ -340,54 +340,54 @@ public class HttpChannel extends IOChannel {
     /*
      * Called when sending, receiving and processing is done.
      * Can be called:
-     *  - from IO thread, if this is a result of a read/write event that 
+     *  - from IO thread, if this is a result of a read/write event that
      *  finished the send/recev pair.
      *  - from an arbitrary thread, if read was complete and the last write
      *  was a success and done in that thread ( write is not bound to IO thr)
-     * 
+     *
      */
     protected void handleEndSendReceive() throws IOException {
         // make sure the callback was called ( needed for abort )
         handleHeadersReceived(inMessage);
-        
+
         this.doneLock.signal(this);
         synchronized (this) {
             if (doneCallbackCalled) {
                 return;
             }
-            if (outMessage.state != HttpMessage.State.DONE || 
+            if (outMessage.state != HttpMessage.State.DONE ||
                     inMessage.state != HttpMessage.State.DONE) {
                 return;
             }
             doneCallbackCalled = true;
         }
-        
+
         getIn().close();
-        
+
         if (doneAllCallback != null) {
             doneAllCallback.handle(this, error ? new Throwable() : null);
         }
-        
+
         if (conn != null) {
             conn.endSendReceive(this);
         }
-        
+
         conn = null;
-        
+
         if (debug) {
-            trace("END_SEND_RECEIVE" 
+            trace("END_SEND_RECEIVE"
                     + (release ? " REL" : ""));
         }
-            
+
         synchronized(this) {
             sendReceiveDone = true;
             maybeRelease();
         }
     }
-    
-    /** 
+
+    /**
      * called from IO thread OR servlet thread when last block has been sent.
-     * If not using the socket ( net.getOut().flushCallback ) - this must 
+     * If not using the socket ( net.getOut().flushCallback ) - this must
      * be called explicitely after flushing the body.
      */
     void handleEndSent() throws IOException {
@@ -401,14 +401,14 @@ public class HttpChannel extends IOChannel {
         outMessage.state = HttpMessage.State.DONE;
 
         getOut().close();
-        
+
         // Make sure the send/receive callback is called once
         if (debug) {
             trace("END_SEND");
         }
         handleEndSendReceive();
     }
-    
+
     // ----- End Selector thread callbacks ----
     public void handleError(String type) {
         System.err.println("Error " + type + " " + outMessage.state);
@@ -427,49 +427,49 @@ public class HttpChannel extends IOChannel {
                 }
             }
         }
-    }   
+    }
 
 
     private void init() {
         headersDone = false;
         sendReceiveDone = false;
-        
+
         receiveBody.recycle();
         sendBody.recycle();
         expectation = false;
-        
+
         error = false;
         abortDone = false;
-       
-        
+
+
         getRequest().recycle();
         getResponse().recycle();
         target = null;
-        
+
         doneLock.recycle();
         headersReceivedLock.recycle();
         flushLock.recycle();
-        
+
         doneCallbackCalled = false;
         // Will be set again after pool
         setHttpService(null);
         doneAllCallback = null;
         release = false;
     }
-    
+
     public boolean isDone() {
         return outMessage.state == HttpMessage.State.DONE && inMessage.state == HttpMessage.State.DONE;
     }
-    
+
     /**
      * Called when all done:
      *  - service finished ( endService was called )
      *  - output written
      *  - input read
-     *  
-     * or by abort(). 
-     *  
-     * @throws IOException 
+     *
+     * or by abort().
+     *
+     * @throws IOException
      */
     private void maybeRelease() throws IOException {
         synchronized (this) {
@@ -488,20 +488,20 @@ public class HttpChannel extends IOChannel {
 
 
     /*
-    The field-content does not include any leading or trailing LWS: 
-    linear white space occurring before the first non-whitespace 
+    The field-content does not include any leading or trailing LWS:
+    linear white space occurring before the first non-whitespace
     character of the field-value or after the last non-whitespace
-     character of the field-value. Such leading or trailing LWS MAY 
-     be removed without changing the semantics of the field value. 
-     Any LWS that occurs between field-content MAY be replaced with 
-     a single Http11Parser.SP before interpreting the field value or forwarding 
+     character of the field-value. Such leading or trailing LWS MAY
+     be removed without changing the semantics of the field value.
+     Any LWS that occurs between field-content MAY be replaced with
+     a single Http11Parser.SP before interpreting the field value or forwarding
      the message downstream.
      */
     int normalizeHeader(BBuffer value) {
         byte[] buf = value.array();
         int cstart = value.position();
         int end = value.limit();
-        
+
         int realPos = cstart;
         int lastChar = cstart;
         byte chr = 0;
@@ -527,32 +527,32 @@ public class HttpChannel extends IOChannel {
             }
         }
         realPos = lastChar;
-        
+
         // so buffer is clean
         for (int i = realPos; i < end; i++) {
             buf[i] = BBuffer.SP;
         }
         value.setEnd(realPos);
         return realPos;
-    }  
-    
-    
+    }
+
+
     protected void recycle() {
-        if (debug) { 
+        if (debug) {
             trace("RECYCLE");
         }
         init();
     }
 
-    /** 
-     * Finalize sending and receiving. 
+    /**
+     * Finalize sending and receiving.
      * Indicates client is no longer interested, some IO may still be in flight.
      * If in a POST and you're not interested in the body - it may be
      * better to call abort().
-     *  
+     *
      * MUST be called to allow connection reuse and pooling.
-     * 
-     * @throws IOException 
+     *
+     * @throws IOException
      */
     public void release() throws IOException {
         synchronized(this) {
@@ -569,22 +569,22 @@ public class HttpChannel extends IOChannel {
     public void send() throws IOException {
         checkRelease();
         if (httpReq == inMessage) {
-            conn.sendResponseHeaders(this);   
+            conn.sendResponseHeaders(this);
         } else {
             if (getRequest().isCommitted()) {
                 return;
             }
             getRequest().setCommitted(true);
-            
+
             outMessage.state = HttpMessage.State.HEAD;
-            
+
             getConnector().connectAndSend(this);
         }
     }
-    
+
     /** Called when the outgoing stream is closed:
      * - by an explicit call to close()
-     * - when all content has been sent. 
+     * - when all content has been sent.
      */
     protected void outClosed() throws IOException {
         if (conn != null) {
@@ -608,8 +608,8 @@ public class HttpChannel extends IOChannel {
         }
         return this;
     }
-    
-    public void setCompletedCallback(RequestCompleted doneAllCallback) 
+
+    public void setCompletedCallback(RequestCompleted doneAllCallback)
             throws IOException {
         this.doneAllCallback = doneAllCallback;
         synchronized (this) {
@@ -638,18 +638,18 @@ public class HttpChannel extends IOChannel {
         ioTimeout = timeout;
     }
 
-    
+
     public void setTarget(String host) {
         this.target = host;
     }
-    
+
     public void startSending() throws IOException {
         checkRelease();
         if (conn != null) {
             conn.startSending(this);
         }
     }
-    
+
     public String toString() {
         StringBuffer sb = new StringBuffer();
         sb.append("id=").append(ser)
@@ -657,14 +657,14 @@ public class HttpChannel extends IOChannel {
             .append(")");
         return sb.toString();
     }
-    
+
 
     void trace(String msg) {
         if(debug) {
             log.info(this.toString() + " " + msg + " done=" + doneCallbackCalled);
         }
     }
- 
+
     @Override
     public void waitFlush(long timeMs) throws IOException {
         if (getOut().getBufferCount() == 0) {
@@ -672,19 +672,19 @@ public class HttpChannel extends IOChannel {
         }
         flushLock.waitSignal(timeMs);
     }
- 
+
     public HttpChannel setConnection(HttpConnection conn) {
         this.conn = conn;
         return this;
     }
-    
+
     /**
      * Normalize URI.
      * <p>
      * This method normalizes "\", "//", "/./" and "/../". This method will
      * return false when trying to go above the root, or if the URI contains
      * a null byte.
-     * 
+     *
      * @param uriMB URI to be normalized, will be modified
      */
     public static boolean normalize(BBuffer uriBC) {
@@ -701,7 +701,7 @@ public class HttpChannel extends IOChannel {
             // TODO: http://.... URLs
             return true;
         }
-        
+
         int pos = 0;
         int index = 0;
 
@@ -733,8 +733,8 @@ public class HttpChannel extends IOChannel {
         // Note: It is possible to extend the URI by 1 without any side effect
         // as the next character is a non-significant WS.
         if (((end - start) >= 2) && (b[end - 1] == (byte) '.')) {
-            if ((b[end - 2] == (byte) '/') 
-                    || ((b[end - 2] == (byte) '.') 
+            if ((b[end - 2] == (byte) '/')
+                    || ((b[end - 2] == (byte) '.')
                             && (b[end - 3] == (byte) '/'))) {
                 b[end] = (byte) '/';
                 end++;
@@ -750,7 +750,7 @@ public class HttpChannel extends IOChannel {
             index = uriBC.indexOf("/./", 0, 3, index);
             if (index < 0)
                 break;
-            copyBytes(b, start + index, start + index + 2, 
+            copyBytes(b, start + index, start + index + 2,
                     end - start - index - 2);
             end = end - 2;
             uriBC.setEnd(end);
@@ -786,7 +786,7 @@ public class HttpChannel extends IOChannel {
     }
 
     /**
-     * Copy an array of bytes to a different position. Used during 
+     * Copy an array of bytes to a different position. Used during
      * normalization.
      */
     private static void copyBytes(byte[] b, int dest, int src, int len) {
@@ -794,26 +794,26 @@ public class HttpChannel extends IOChannel {
             b[pos + dest] = b[pos + src];
         }
     }
-    
-    
+
+
     /**
-     * This method will be called when the http headers have been received - 
-     * the body may or may not be available. 
-     * 
-     * In server mode this is equivalent with a servlet request. 
+     * This method will be called when the http headers have been received -
+     * the body may or may not be available.
+     *
+     * In server mode this is equivalent with a servlet request.
      * This is also called for http client, when the response headers
-     * are received. 
-     *  
+     * are received.
+     *
      * TODO: rename it to HttMessageReceived or something similar.
      */
     public static interface HttpService {
         void service(HttpRequest httpReq, HttpResponse httpRes) throws IOException;
     }
-    
-    /** 
+
+    /**
      * Called when both request and response bodies have been sent/
      * received. After this call the HttpChannel will be disconnected
-     * from the http connection, which can be used for other requests. 
+     * from the http connection, which can be used for other requests.
      */
     public static interface RequestCompleted {
         void handle(HttpChannel data, Object extraData) throws IOException;
@@ -825,6 +825,6 @@ public class HttpChannel extends IOChannel {
             getConnector().getDispatcher().runService(HttpChannel.this);
         }
     };
-    
+
 
 }

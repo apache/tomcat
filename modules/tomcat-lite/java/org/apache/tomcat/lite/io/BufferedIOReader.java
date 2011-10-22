@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -25,7 +25,7 @@ import java.nio.CharBuffer;
 /**
  * Cut&pasted from Harmony buffered reader ( apache license ).
  * Changes:
- * - additional method to recycle to avoid re-allocating on 
+ * - additional method to recycle to avoid re-allocating on
  * each request.
  */
 public class BufferedIOReader extends BufferedReader {
@@ -45,9 +45,9 @@ public class BufferedIOReader extends BufferedReader {
     private int pos;
 
     public BufferedIOReader(IOReader realReader) {
-        // we're not using super - we override all methods, but need the 
-        // signature 
-        super(DUMMY_READER, 1); 
+        // we're not using super - we override all methods, but need the
+        // signature
+        super(DUMMY_READER, 1);
         this.in = realReader;
         buf = new char[8192];
     }
@@ -55,7 +55,7 @@ public class BufferedIOReader extends BufferedReader {
     public void recycle() {
         enc = null;
         closed = false;
-        
+
         if (in != null) {
             in.recycle();
         }
@@ -68,7 +68,7 @@ public class BufferedIOReader extends BufferedReader {
     private void checkClosed() throws IOException {
         if (closed) throw new IOException("closed");
     }
-    
+
     public int read(CharBuffer target) throws IOException {
         checkClosed();
         int len = target.remaining();
@@ -88,7 +88,7 @@ public class BufferedIOReader extends BufferedReader {
      * Closes this reader. This implementation closes the buffered source reader
      * and releases the buffer. Nothing is done if this reader has already been
      * closed.
-     * 
+     *
      * @throws IOException
      *             if an error occurs while closing this reader.
      */
@@ -230,7 +230,7 @@ public class BufferedIOReader extends BufferedReader {
      * represented by zero or more characters followed by {@code '\n'},
      * {@code '\r'}, {@code "\r\n"} or the end of the reader. The string does
      * not include the newline sequence.
-     * 
+     *
      * @return the contents of the line or {@code null} if no characters were
      *         read before the end of the reader has been reached.
      * @throws IOException
@@ -312,7 +312,7 @@ public class BufferedIOReader extends BufferedReader {
 
     }
 
-    
+
     @Override
     public boolean ready() throws IOException {
         synchronized (lock) {
@@ -364,7 +364,7 @@ public class BufferedIOReader extends BufferedReader {
             return amount;
         }
     }
-    
+
     private static Reader DUMMY_READER = new Reader() {
         @Override
         public void close() throws IOException {

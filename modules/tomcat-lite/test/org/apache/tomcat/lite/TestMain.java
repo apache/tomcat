@@ -30,9 +30,9 @@ import org.apache.tomcat.lite.service.IOStatus;
 
 /**
  * Laucher for tomcat-lite standalone, configured with test handlers.
- * 
+ *
  * Used in tests - one is running for the entire suite.
- * 
+ *
  * @author Costin Manolache
  */
 public class TestMain {
@@ -42,9 +42,9 @@ public class TestMain {
     }
 
     static TestMain defaultServer;
-    
+
     private boolean init = false;
-    
+
     HttpConnector testClient;
     HttpConnector testServer;
     HttpConnector testProxy;
@@ -58,7 +58,7 @@ public class TestMain {
     protected void init() {
         testClient = HttpClient.newClient();
     }
-    
+
     /**
      * A single instance used for all tests.
      */
@@ -69,7 +69,7 @@ public class TestMain {
         }
         return defaultServer;
     }
-    
+
     public static HttpConnector getTestServer() {
         return shared().testServer;
     }
@@ -80,7 +80,7 @@ public class TestMain {
 
     public static BaseMapper.Context initTestContext(Dispatcher d) throws IOException {
         BaseMapper.Context mCtx = d.addContext(null, "", null, null, null, null);
-        
+
         mCtx.addWrapper("/", new StaticContentService()
             .setContentType("text/html")
             .setData("<a href='/proc/cpool/client'>Client pool</a><br/>" +
@@ -88,7 +88,7 @@ public class TestMain {
                     "<a href='/proc/cpool/proxy'>Proxy pool</a><br/>" +
                     ""));
 
-        mCtx.addWrapper("/favicon.ico", 
+        mCtx.addWrapper("/favicon.ico",
                 new StaticContentService().setStatus(404).setData("Not found"));
 
         mCtx.addWrapper("/hello", new StaticContentService().setData("Hello world"));
@@ -118,7 +118,7 @@ public class TestMain {
         mCtx.addWrapper("/proc/cpool/proxy", new IOStatus(testProxy.cpool));
         mCtx.addWrapper("/proc/cpool/server", new IOStatus(testServer.cpool));
     }
-    
+
     public void run() {
         try {
             startAll();
@@ -134,8 +134,8 @@ public class TestMain {
         } catch (Throwable t) {
             t.printStackTrace();
         }
-    } 
-    
+    }
+
     public static String findDir(String dir) {
         String path = ".";
         for (int i = 0; i < 5; i++) {
@@ -151,7 +151,7 @@ public class TestMain {
         }
         return null;
     }
-    
+
     public int getServerPort() {
         return 8802;
     }
@@ -163,8 +163,8 @@ public class TestMain {
     public int getSslServerPort() {
         return 8443;
     }
-    
-    static String PRIVATE_KEY = 
+
+    static String PRIVATE_KEY =
     "MIICdgIBADANBgkqhkiG9w0BAQEFAASCAmAwggJcAgEAAoGBALsz2milZGHliWte61TfMTSwpAdq" +
 "9uJkMTqgpSVtwxxOe8kT84QtIzhdAsQYjRz9ZtQn9DYWhJQs/cs/R3wWsjWwgiFHLzGalvsmMYJ3" +
 "vBO8VMj762fAWu7GjUApIXcxMJoK4sQUpZKbqTuXpwzVUeeqBcspsIDgOLCo233G7/fBAgMBAAEC" +
@@ -196,7 +196,7 @@ public class TestMain {
 "c82iSbM0LseFeHwxAfeNXosSShMFtQzKt2wKZLLQB/Oqrea32m4hU//NP8rNbTux" +
 "dcAHeNQEDB5EUUSewAlh+fUE6HB6c8j0\n" +
 "-----END CERTIFICATE-----\n\n";
-    
+
     protected synchronized void startAll() throws IOException {
         if (init) {
             System.err.println("2x init ???");
@@ -204,13 +204,13 @@ public class TestMain {
             init = true;
             boolean debug = false;
             if (debug) {
-                System.setProperty("javax.net.debug", "ssl");            
-                System.setProperty("jsse", "conn_state,alert,engine,record,ssocket,socket,prf");            
+                System.setProperty("javax.net.debug", "ssl");
+                System.setProperty("jsse", "conn_state,alert,engine,record,ssocket,socket,prf");
                 Logger.getLogger("SSL").setLevel(Level.FINEST);
                 testClient.setDebug(true);
                 testClient.setDebugHttp(true);
             }
-            
+
             proxy = new HttpProxyService()
                 .withHttpClient(testClient);
             testProxy = HttpServer.newServer(getProxyPort());
@@ -219,7 +219,7 @@ public class TestMain {
                 testProxy.setDebugHttp(true);
                 testProxy.setDebug(true);
             }
-            
+
             // dispatcher rejects 'http://'
             testProxy.setHttpService(proxy);
             try {
@@ -227,7 +227,7 @@ public class TestMain {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            
+
             testServer = HttpServer.newServer(getServerPort());
             if (debug) {
                 testServer.setDebugHttp(true);
@@ -245,20 +245,20 @@ public class TestMain {
 //            byte[] keyBytes = b64.decode(PRIVATE_KEY);
 
             sslServer = HttpServer.newSslServer(getSslServerPort());
-            
+
             if (debug) {
                 sslServer.setDebug(true);
                 sslServer.setDebugHttp(true);
             }
             JsseSslProvider sslCon = (JsseSslProvider) sslServer.getSslProvider();
-            
+
             sslCon = sslCon
-                .setKeyRes("org/apache/tomcat/lite/http/genrsa_512.cert", 
+                .setKeyRes("org/apache/tomcat/lite/http/genrsa_512.cert",
                         "org/apache/tomcat/lite/http/genrsa_512.der");
-            initTestCallback(sslServer.getDispatcher());            
+            initTestCallback(sslServer.getDispatcher());
             sslServer.start();
-        }   
-        
+        }
+
         Runtime.getRuntime().addShutdownHook(new Thread() {
             public void run() {
                 System.err.println("Done");
@@ -268,7 +268,7 @@ public class TestMain {
             }
         });
     }
-    
+
     /**
      * Blocking get, returns when the body has been read.
      */
@@ -278,23 +278,23 @@ public class TestMain {
 
         HttpRequest aclient = HttpClient.newClient().request(url);
         aclient.send();
-        aclient.readAll(out, 
+        aclient.readAll(out,
                 //Long.MAX_VALUE);//
                 2000000);
         aclient.release(); // return connection to pool
         return out;
     }
-    
+
     public static BBuffer getUrl(String path) throws IOException {
         BBuffer out = BBuffer.allocate();
         getUrl(path, out);
         return out;
     }
 
-    public static HttpURLConnection getUrl(String path, 
+    public static HttpURLConnection getUrl(String path,
                              BBuffer out) throws IOException {
         URL url = new URL(path);
-        HttpURLConnection connection = 
+        HttpURLConnection connection =
             (HttpURLConnection) url.openConnection();
         connection.setReadTimeout(10000);
         connection.connect();
@@ -308,6 +308,6 @@ public class TestMain {
         }
         return connection;
     }
-    
-    
+
+
 }

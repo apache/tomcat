@@ -14,10 +14,10 @@ import org.apache.tomcat.lite.io.NioChannel.NioChannelCallback;
 public class SocketIOChannel extends IOChannel implements NioChannelCallback {
     IOBuffer out;
     IOBuffer in;
-    
+
     NioChannel ch;
-        
-    SocketIOChannel(IOConnector connector, NioChannel data, 
+
+    SocketIOChannel(IOConnector connector, NioChannel data,
             String target)
             throws IOException {
         this.connector = connector;
@@ -35,8 +35,8 @@ public class SocketIOChannel extends IOChannel implements NioChannelCallback {
             ch.callback = this;
         }
     }
-    
-    
+
+
     @Override
     public IOBuffer getIn() {
         return in;
@@ -46,15 +46,15 @@ public class SocketIOChannel extends IOChannel implements NioChannelCallback {
     public IOBuffer getOut() {
         return out;
     }
-    
-    /** 
+
+    /**
      * Both in and out open
      */
     public boolean isOpen() {
         if (ch == null) {
             return false;
         }
-        return ch.isOpen() && ch.channel != null && 
+        return ch.isOpen() && ch.channel != null &&
             ch.channel.isOpen() && !getIn().isAppendClosed() &&
             !getOut().isAppendClosed();
     }
@@ -66,16 +66,16 @@ public class SocketIOChannel extends IOChannel implements NioChannelCallback {
     public String toString() {
         return ch.toString();
     }
-    
+
     public void setOutBuffer(IOBuffer out) {
         this.out = out;
     }
-    
+
     ByteBuffer flushBuffer;
 
     /**
-     * Send as much as possible. 
-     * 
+     * Send as much as possible.
+     *
      * Adjust write interest so we can send more when possible.
      */
     private void flush(NioChannel ch) throws IOException {
@@ -91,13 +91,13 @@ public class SocketIOChannel extends IOChannel implements NioChannelCallback {
                     ch.shutdownOutput();
                     break;
                 }
-                BBucket bb = out.peekFirst(); 
+                BBucket bb = out.peekFirst();
                 if (bb == null) {
                     break;
                 }
                 flushBuffer = getReadableBuffer(flushBuffer, bb);
                 int before = flushBuffer.position();
-                
+
                 int done = 0;
                 while (flushBuffer.remaining() > 0) {
                     try {
@@ -126,19 +126,19 @@ public class SocketIOChannel extends IOChannel implements NioChannelCallback {
 
         }
     }
-    
+
     /**
      * Data available for read, called from IO thread.
      * You MUST read all data ( i.e. until read() returns 0).
-     *  
-     * OP_READ remain active - call readInterest(false) to disable - 
+     *
+     * OP_READ remain active - call readInterest(false) to disable -
      * for example to suspend reading if buffer is full.
      */
     public void handleReceived(IOChannel net) throws IOException {
         // All data will go to currentReceiveBuffer, until it's full.
         // Then a new buffer will be allocated/pooled.
-        
-        // When we fill the buffers or finish this round of reading - 
+
+        // When we fill the buffers or finish this round of reading -
         // we place the Buckets in the queue, as 'readable' buffers.
         boolean newData = false;
         try {
@@ -153,15 +153,15 @@ public class SocketIOChannel extends IOChannel implements NioChannelCallback {
                         newData = true;
                         break;
                     }
-                    
+
                     ByteBuffer bb = in.getWriteBuffer();
                     read = ch.read(bb);
                     in.releaseWriteBuffer(read);
-    
+
                     if (in == null) { // Detached.
                         break;
                     }
-                    
+
                     if (read < 0) {
                         // mark the in buffer as closed
                         in.close();
@@ -179,7 +179,7 @@ public class SocketIOChannel extends IOChannel implements NioChannelCallback {
             if (newData) {
                 super.sendHandleReceivedCallback();
             }
-            
+
         } catch (Throwable t) {
             close();
             if (t instanceof IOException) {
@@ -198,7 +198,7 @@ public class SocketIOChannel extends IOChannel implements NioChannelCallback {
         orig.limit(bucket.limit());
         return orig;
     }
-    
+
     public static final void releaseReadableBuffer(ByteBuffer bb, BBucket bucket) {
         bucket.position(bb.position());
     }
@@ -207,7 +207,7 @@ public class SocketIOChannel extends IOChannel implements NioChannelCallback {
     public void readInterest(boolean b) throws IOException {
         ch.readInterest(b);
     }
-    
+
     public InetAddress getAddress(boolean remote) {
         return ch.getAddress(remote);
     }
@@ -215,19 +215,19 @@ public class SocketIOChannel extends IOChannel implements NioChannelCallback {
     @Override
     public Object getAttribute(String name) {
         if (ATT_REMOTE_HOSTNAME.equals(name)) {
-            return getAddress(true).getHostName();                        
+            return getAddress(true).getHostName();
         } else if (ATT_LOCAL_HOSTNAME.equals(name)) {
-            return getAddress(false).getHostName();                        
+            return getAddress(false).getHostName();
         } else if (ATT_REMOTE_ADDRESS.equals(name)) {
-            return getAddress(true).getHostAddress();                        
+            return getAddress(true).getHostAddress();
         } else if (ATT_LOCAL_ADDRESS.equals(name)) {
-            return getAddress(false).getHostAddress();                        
+            return getAddress(false).getHostAddress();
         } else if (ATT_REMOTE_PORT.equals(name)) {
             return ch.getPort(true);
         } else if (ATT_LOCAL_PORT.equals(name)) {
             return ch.getPort(false);
         }
-        return null;        
+        return null;
     }
 
     public void startSending() throws IOException {
@@ -240,19 +240,19 @@ public class SocketIOChannel extends IOChannel implements NioChannelCallback {
             startSending();
         }
     }
-    
+
     @Override
     public void handleClosed(NioChannel ch) throws IOException {
         lastException = ch.lastException;
         closed(); // our callback.
     }
-    
+
     public void closed() throws IOException {
         getIn().close();
         sendHandleReceivedCallback();
         //super.closed();
     }
-    
+
     @Override
     public void handleConnected(NioChannel ch) throws IOException {
         setChannel(ch);

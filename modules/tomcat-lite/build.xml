@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<project name="Tomcat Lite" default="tomcat-lite.jar" 
+<project name="Tomcat Lite" default="tomcat-lite.jar"
          xmlns:ivy="antlib:org.apache.ivy.ant"
          basedir=".">
 
@@ -19,7 +19,7 @@
     <property name="MAIN" value="org.apache.tomcat.integration.simple.Main"/>
     <property name="compile.source" value="1.6"/>
     <property name="compile.debug" value="true"/>
- 
+
     <!-- All Ivy downloads -->
     <path id='lite-classpath'>
         <fileset dir='target/lib' includes="*.jar" />
@@ -28,14 +28,14 @@
     <path id='head-classpath'>
         <pathelement location="${tomcat.build}/../classes" />
         <pathelement location="target/lib/asm.jar" />
-        <pathelement location="target/lib/asm-tree.jar" />                
+        <pathelement location="target/lib/asm-tree.jar" />
         <pathelement location="target/lib/junit.jar"/>
         <pathelement location="target/lib/commons-codec.jar"/>
     </path>
 
     <target name="http" depends="http.compile,http.test,http.pack"/>
-    
-    <target name="http.compile" 
+
+    <target name="http.compile"
            description="Compile only the HTTP connector classes, no servlets">
         <mkdir dir="${classes}"/>
         <javac destdir="${classes}"
@@ -51,12 +51,12 @@
             <exclude name="org/apache/tomcat/lite/servlet/**"/>
         </javac>
         <copy todir="${classes}">
-            <fileset dir="${tomcat.lite.src}/java" 
+            <fileset dir="${tomcat.lite.src}/java"
                 includes="**/*.properties **/*.xml" />
         </copy>
     </target>
-     
-    <target name="http.test.compile" 
+
+    <target name="http.test.compile"
            description="Test only the HTTP connector classes, no servlets">
         <mkdir dir="${http.test-classes}"/>
         <javac destdir="${http.test-classes}"
@@ -75,11 +75,11 @@
             <exclude name="org/apache/tomcat/test/watchdog/**"/>
          </javac>
         <copy todir="${http.test-classes}">
-            <fileset dir="${tomcat.lite.src}/test" 
+            <fileset dir="${tomcat.lite.src}/test"
                 includes="**/*.properties **/*.xml  **/*.bin **/*.keystore **/*.cert **/*.der" />
         </copy>
    </target>
-        
+
       <target name="http.test" depends="http.test.compile" >
           <!-- also: perTest(default) -->
           <junit printsummary="on" fork="once"
@@ -107,9 +107,9 @@
                      <exclude name="org/apache/tomcat/test/watchdog/**"/>
               </fileset>
              </batchtest>
-              </junit>        
+              </junit>
     </target>
-    
+
     <target name="runtest" depends="http.test.compile">
         <junit printsummary="withOutAndErr" fork="no" dir="${tomcat.base}">
             <sysproperty key="tests" value="${tests}"/>
@@ -125,15 +125,15 @@
                 <include name="**/${test}.java" />
             </fileset>
            </batchtest>
-            </junit>        
-        
+            </junit>
+
      </target>
-    
-    <target name="http.pack" 
+
+    <target name="http.pack"
            description="Pack the HTTP client and connector">
     </target>
-     
-    <target name="compile" 
+
+    <target name="compile"
            description="Build all classes against tomcat head.">
         <mkdir dir="${classes}"/>
         <javac destdir="${classes}"
@@ -148,12 +148,12 @@
             <exclude name="**/ServletApi25.java"/>
         </javac>
         <copy todir="${classes}">
-            <fileset dir="${tomcat.lite.src}/java" 
+            <fileset dir="${tomcat.lite.src}/java"
                 includes="**/*.properties **/*.xml" />
         </copy>
     </target>
-    
-    <target name="compile25" 
+
+    <target name="compile25"
         description="Build against 2.5 servlet API, similar with the maven">
         <mkdir dir="${classes}" />
         <javac destdir="${classes}"
@@ -168,7 +168,7 @@
             <exclude name="org/apache/tomcat/coyote/servlet/*.java"/>
         </javac>
         <copy todir="${classes}">
-            <fileset dir="${tomcat.lite.src}/java" 
+            <fileset dir="${tomcat.lite.src}/java"
                 includes="**/*.properties **/*.xml" />
         </copy>
     </target>
@@ -190,11 +190,11 @@
             <src path="${tomcat.lite.src}/test" />
         </javac>
         <copy todir="${test-classes}">
-            <fileset dir="${tomcat.lite.src}/test" 
+            <fileset dir="${tomcat.lite.src}/test"
                 includes="**/*.properties **/*.xml  **/*.keystore" />
         </copy>
 
-        <!-- Need to run it in tomcat to find output/build/webapps --> 
+        <!-- Need to run it in tomcat to find output/build/webapps -->
         <junit printsummary="yes" fork="yes" dir="${tomcat.base}"
             >
             <classpath refid="lite-classpath" />
@@ -217,7 +217,7 @@
            </batchtest>
             </junit>
     </target>
-    
+
     <target name="test25" depends="compile25">
         <mkdir dir="${test-classes}"/>
         <javac destdir="${test-classes}"
@@ -235,7 +235,7 @@
             <exclude name="org/apache/coyote/**"/>
         </javac>
         <copy todir="${test-classes}">
-            <fileset dir="${tomcat.lite.src}/test" 
+            <fileset dir="${tomcat.lite.src}/test"
                 includes="**/*.properties **/*.xml **/*.keystore" />
         </copy>
 
@@ -299,7 +299,7 @@
 
     <target name="download-ivy" unless="ivy.exist">
         <mkdir dir="${ivy.jar.dir}"/>
-        <get src="http://repo2.maven.org/maven2/org/apache/ivy/ivy/${ivy.install.version}/ivy-${ivy.install.version}.jar" 
+        <get src="http://repo2.maven.org/maven2/org/apache/ivy/ivy/${ivy.install.version}/ivy-${ivy.install.version}.jar"
                  dest="${ivy.jar.file}" usetimestamp="true"/>
     </target>
 

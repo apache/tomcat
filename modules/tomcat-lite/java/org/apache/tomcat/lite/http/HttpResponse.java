@@ -10,7 +10,7 @@ import org.apache.tomcat.lite.io.BBuffer;
 import org.apache.tomcat.lite.io.CBuffer;
 
 public class HttpResponse extends HttpMessage {
-    
+
     /*
      * Server status codes; see RFC 2068.
      */
@@ -21,7 +21,7 @@ public class HttpResponse extends HttpMessage {
 
     public static final int SC_CONTINUE = 100;
 
-    
+
     /**
      * Status code (101) indicating the server is switching protocols
      * according to Upgrade header.
@@ -76,14 +76,14 @@ public class HttpResponse extends HttpMessage {
      */
 
     public static final int SC_PARTIAL_CONTENT = 206;
-    
+
     /**
      * Used by Webdav.
      */
     public static final int SC_MULTI_STATUS = 207;
     // This one collides with HTTP 1.1
     // "207 Partial Update OK"
-    
+
     /**
      * Status code (300) indicating that the requested resource
      * corresponds to any one of a set of representations, each with
@@ -144,9 +144,9 @@ public class HttpResponse extends HttpMessage {
     public static final int SC_USE_PROXY = 305;
 
      /**
-     * Status code (307) indicating that the requested resource 
+     * Status code (307) indicating that the requested resource
      * resides temporarily under a different URI. The temporary URI
-     * <em>SHOULD</em> be given by the <code><em>Location</em></code> 
+     * <em>SHOULD</em> be given by the <code><em>Location</em></code>
      * field in the response.
      */
 
@@ -343,7 +343,7 @@ public class HttpResponse extends HttpMessage {
     public Object nativeResponse;
 
     protected CBuffer message = CBuffer.newInstance();
-    
+
     int status = -1;
 
     HttpResponse(HttpChannel httpCh) {
@@ -355,33 +355,33 @@ public class HttpResponse extends HttpMessage {
         message.recycle();
         status = -1;
     }
-    
+
     public void setMessage(String s) {
         message.set(filter(s));
     }
-    
+
     public String getMessage() {
         return message.toString();
     }
-    
+
     public CBuffer getMessageBuffer() {
         return message;
     }
-    
+
     byte[] S_200 = new byte[] { '2', '0', '0' };
-    
+
     public void setStatus(int i) {
         status = i;
     }
-    
+
     public void sendError(int status) {
         this.status = status;
     }
-    
+
     public void sendError(int status, String msg) {
         message.set(msg);
     }
-    
+
     public int getStatus() {
         if (status >= 0) {
             return status;
@@ -402,10 +402,10 @@ public class HttpResponse extends HttpMessage {
     public HttpRequest getRequest() {
         return getHttpChannel().getRequest();
     }
-    
+
     // Http client mode.
     protected void processReceivedHeaders() throws IOException {
-        protocol().set(getMsgBytes().protocol());                
+        protocol().set(getMsgBytes().protocol());
         message.set(getMsgBytes().message());
         processMimeHeaders();
         // TODO: if protocol == 1.0 and we requested 1.1, downgrade getHttpChannel().pro
@@ -417,11 +417,11 @@ public class HttpResponse extends HttpMessage {
     }
 
     /**
-     * All responses to the HEAD request method MUST NOT include a 
+     * All responses to the HEAD request method MUST NOT include a
      * message-body, even though the presence of entity- header fields might
      *  lead one to believe they do. All 1xx (informational), 204 (no content)
-     *  , and 304 (not modified) responses MUST NOT include a message-body. All 
-     *  other responses do include a message-body, although it MAY be of zero 
+     *  , and 304 (not modified) responses MUST NOT include a message-body. All
+     *  other responses do include a message-body, although it MAY be of zero
      *  length.
      */
     public boolean hasBody() {
@@ -432,13 +432,13 @@ public class HttpResponse extends HttpMessage {
             return false;
         }
         // what about (status == 205) ?
-        if ((status == 204) 
+        if ((status == 204)
                 || (status == 304)) {
             return false;
         }
         return true;
     }
-    
+
     /** Get the status string associated with a status code.
      *  No I18N - return the messages defined in the HTTP spec.
      *  ( the user isn't supposed to see them, this is the last
@@ -468,11 +468,11 @@ public class HttpResponse extends HttpMessage {
         }
         return bb;
     }
-    
+
     public static String getStatusText(int code) {
         return getMessage(code).toString();
     }
-    
+
     static BBucket st_unknown = BBuffer.wrapper("No Message");
     static BBucket st_200 = BBuffer.wrapper("OK");
     static BBucket st_302= BBuffer.wrapper("Moved Temporarily");
@@ -483,7 +483,7 @@ public class HttpResponse extends HttpMessage {
     private static void addStatus(int stat, String msg) {
         stats.put(stat, BBuffer.wrapper(msg));
     }
-    
+
     static {
         addStatus(100, "Continue");
         addStatus(101, "Switching Protocols");
@@ -532,9 +532,9 @@ public class HttpResponse extends HttpMessage {
         addStatus(507, "Insufficient Storage");
         addStatus(SC_LOCKED, "Locked");
 
-        
+
     }
-    
+
     /**
      * Filter the specified message string for characters that are sensitive
      * in HTML.  This avoids potential attacks caused by including JavaScript
@@ -552,7 +552,7 @@ public class HttpResponse extends HttpMessage {
                 message.indexOf('"') < 0) {
             return message;
         }
-        
+
         char content[] = new char[message.length()];
         message.getChars(0, message.length(), content, 0);
 
@@ -577,5 +577,5 @@ public class HttpResponse extends HttpMessage {
         }
         return (result.toString());
     }
-    
+
 }

@@ -15,37 +15,37 @@ import java.util.concurrent.locks.AbstractQueuedSynchronizer;
 
 /**
  * Support for blocking calls and callbacks.
- * 
- * Unlike FutureTask, it is possible to reuse this and hopefully 
- * easier to extends. Also has callbacks.  
- * 
+ *
+ * Unlike FutureTask, it is possible to reuse this and hopefully
+ * easier to extends. Also has callbacks.
+ *
  * @author Costin Manolache
  */
 public class FutureCallbacks<V> implements Future<V> {
 
-    // Other options: ReentrantLock uses AbstractQueueSynchronizer, 
+    // Other options: ReentrantLock uses AbstractQueueSynchronizer,
     // more complex. Same for CountDownLatch
     // FutureTask - uses Sync as well, ugly interface with
     // Callable, can't be recycled.
     // Mina: simple object lock, doesn't extend java.util.concurent.Future
-    
-    private Sync sync = new Sync(); 
+
+    private Sync sync = new Sync();
 
     private V value;
 
     public static interface Callback<V> {
         public void run(V param);
     }
-    
+
     private List<Callback<V>> callbacks = new ArrayList();
-    
+
     public FutureCallbacks() {
     }
 
-    /** 
+    /**
      * Unlocks the object if it was locked. Should be called
      * when the object is reused.
-     * 
+     *
      * Callbacks will not be invoked.
      */
     public void reset() {
@@ -58,23 +58,23 @@ public class FutureCallbacks<V> implements Future<V> {
         sync.releaseShared(0);
         sync.reset();
     }
-    
+
     /**
      * Unlocks object and calls the callbacks.
-     * @param v 
-     * 
+     * @param v
+     *
      * @throws IOException
      */
     public void signal(V v) throws IOException {
         sync.releaseShared(0);
         onSignal(v);
     }
-    
+
     protected boolean isSignaled() {
         return true;
     }
-    
-    /** 
+
+    /**
      * Override to call specific callbacks
      */
     protected void onSignal(V v) {
@@ -88,9 +88,9 @@ public class FutureCallbacks<V> implements Future<V> {
     /**
      * Set the response. Will cause the callback to be called and lock to be
      * released.
-     * 
+     *
      * @param value
-     * @throws IOException 
+     * @throws IOException
      */
     public void setValue(V value) throws IOException {
         synchronized (this) {
@@ -108,7 +108,7 @@ public class FutureCallbacks<V> implements Future<V> {
             throw new WrappedException(e1);
         } catch (ExecutionException e) {
             throw new WrappedException(e);
-        }                
+        }
     }
 
     @Override
@@ -143,12 +143,12 @@ public class FutureCallbacks<V> implements Future<V> {
     }
 
     private class Sync extends AbstractQueuedSynchronizer {
-        
+
         static final int DONE = 1;
         static final int BLOCKED = 0;
         Object result;
         Throwable t;
-        
+
         @Override
         protected int tryAcquireShared(int ignore) {
             return getState() == DONE ? 1 : -1;
@@ -157,15 +157,15 @@ public class FutureCallbacks<V> implements Future<V> {
         @Override
         protected boolean tryReleaseShared(int ignore) {
             setState(DONE);
-            return true; 
+            return true;
         }
 
         public void reset() {
             setState(BLOCKED);
         }
-        
+
         boolean isSignaled() {
             return getState() == DONE;
         }
-    }    
+    }
 }

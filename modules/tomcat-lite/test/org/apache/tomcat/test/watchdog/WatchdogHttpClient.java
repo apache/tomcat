@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -33,16 +33,16 @@ import java.util.Vector;
 public class WatchdogHttpClient {
     private static final String CRLF         = "\r\n";
     private static final int LINE_FEED       = 10;
-    
+
     static int debug = 0;
-    
+
     public static void dispatch(WatchdogTestImpl client) throws Exception {
         HashMap requestHeaders = client.requestHeaders;
         String host = client.host;
         int port = client.port;
         String content = client.content;
         String request = client.request;
-        
+
         // XXX headers are ignored
         Socket socket;
         try {
@@ -52,7 +52,7 @@ public class WatchdogHttpClient {
             return;
         }
         socket.setSoTimeout(10000);
-        
+
         //socket obtained, rebuild the request.
         rebuildRequest(client, client.request, socket);
 
@@ -61,7 +61,7 @@ public class WatchdogHttpClient {
         // Write the request
         socket.setSoLinger( true, 1000 );
 
-        OutputStream out = new BufferedOutputStream( 
+        OutputStream out = new BufferedOutputStream(
                                socket.getOutputStream() );
         StringBuffer reqbuf = new StringBuffer( 128 );
 
@@ -93,10 +93,10 @@ public class WatchdogHttpClient {
         }
         reqbuf.append( client.request ).append( CRLF );
 
-        // append all request headers 
+        // append all request headers
         if ( !requestHeaders.isEmpty() ) {
             Iterator iter = requestHeaders.keySet().iterator();
-                        
+
             while ( iter.hasNext() ) {
                 StringBuffer tmpBuf = new StringBuffer(32);
                 String headerKey = ( String ) iter.next();
@@ -131,12 +131,12 @@ public class WatchdogHttpClient {
             reqbuf.append( "" ).append( CRLF );
         }
 
-        // append request content 
+        // append request content
         if ( content != null ) {
             reqbuf.append( content );
             // XXX no CRLF at the end -see HTTP specs!
         }
-        
+
         byte[] reqbytes = reqbuf.toString().getBytes();
 
         try {
@@ -153,7 +153,7 @@ public class WatchdogHttpClient {
 
         // read the response
         try {
-  
+
                 client.responseLine = read( in );
 
                 if ( debug > 0 ) {
@@ -161,7 +161,7 @@ public class WatchdogHttpClient {
                 }
 
                 client.headers = parseHeaders( client, in );
-           
+
             byte[] result = readBody( in );
 
             if ( result != null ) {
@@ -170,7 +170,7 @@ public class WatchdogHttpClient {
                             System.out.println( " RESPONSE BODY:\n" + new String( client.responseBody ) );
                         }
                 }
-                
+
         } catch ( SocketException ex ) {
             System.out.println( " Socket Exception: " + ex );
         } finally {
@@ -180,9 +180,9 @@ public class WatchdogHttpClient {
                 socket.close();
                 socket = null;
             }
-        
+
     }
-    
+
     /**
      * <code>readBody</code> reads the body of the response
      * from the InputStream.
@@ -204,7 +204,7 @@ public class WatchdogHttpClient {
                     }
                 }
                 sb.append( ( char ) ch );
-                 
+
             } catch ( IOException ex ) {
                 return null;
             }
@@ -259,7 +259,7 @@ public class WatchdogHttpClient {
         return  sb.toString();
     }
 
-    
+
     // ==================== Code from JSERV !!! ====================
     /**
      * Parse the incoming HTTP request headers, and set the corresponding
@@ -323,14 +323,14 @@ public class WatchdogHttpClient {
 
     /**
      * <code>CRBufferedInputStream</code> is a modified version of
-     * the java.io.BufferedInputStream class.  The fill code is 
+     * the java.io.BufferedInputStream class.  The fill code is
      * the same, but the read is modified in that if a carriage return
-     * is found in the response stream from the target server, 
+     * is found in the response stream from the target server,
      * it will skip that byte and return the next in the stream.
      */
     private static class CRBufferedInputStream extends BufferedInputStream {
         private static final int CARRIAGE_RETURN = 13;
-        
+
         private static final int DEFAULT_BUFFER = 2048;
 
         /**
@@ -401,11 +401,11 @@ public class WatchdogHttpClient {
                 }
             }
             count = pos;
-            int n = in.read(buf, pos, buf.length - pos); 
+            int n = in.read(buf, pos, buf.length - pos);
             if (n > 0) {
                 count = n + pos;
             }
         }
     }
-    
+
 }

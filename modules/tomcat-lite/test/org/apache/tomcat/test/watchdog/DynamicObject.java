@@ -20,11 +20,11 @@ import java.util.logging.Logger;
 
 /**
  * Refactoring of IntrospectionUtils and modeler dynamic bean.
- * 
+ *
  * Unlike IntrospectionUtils, the method informations can be cached.
- * Also I hope this class will be simpler to use. 
+ * Also I hope this class will be simpler to use.
  * There is no static cache.
- * 
+ *
  * @author Costin Manolache
  */
 public class DynamicObject {
@@ -45,7 +45,7 @@ public class DynamicObject {
             BigDecimal.class, BigInteger.class, AtomicInteger.class,
             AtomicLong.class, java.io.File.class, };
 
-    
+
     private Class realClass;
 
     // Method or Field
@@ -99,7 +99,7 @@ public class DynamicObject {
                 getAttMap.put(fields[j].getName(), fields[j]);
             }
         }
-        
+
     }
 
     public List<String> attributeNames() {
@@ -148,11 +148,11 @@ public class DynamicObject {
         }
     }
 
-    /** 
+    /**
      * Set an object-type attribute.
-     * 
-     * Use setProperty to use a string value and convert it to the 
-     * specific (primitive) type. 
+     *
+     * Use setProperty to use a string value and convert it to the
+     * specific (primitive) type.
      */
     public boolean setAttribute(Object proxy, String name, Object value) {
         // TODO: use the cache...
@@ -188,7 +188,7 @@ public class DynamicObject {
 
         try {
             Method methods[] = proxy.getClass().getMethods();
-            
+
             Method setPropertyMethod = null;
 
             // First, the ideal case - a setFoo( String ) method
@@ -213,7 +213,7 @@ public class DynamicObject {
                     }
                 }
                 // save "setProperty" for later
-                if ("setProperty".equals(methods[i].getName()) && 
+                if ("setProperty".equals(methods[i].getName()) &&
                         paramT.length == 2 &&
                         paramT[0] == String.class &&
                         paramT[1] == String.class) {
@@ -251,7 +251,7 @@ public class DynamicObject {
     }
 
     // ----------- Helpers ------------------
-    
+
     static Object convert(String object, Class<?> paramType) {
         Object result = null;
         if ("java.lang.String".equals(paramType.getName())) {
@@ -285,7 +285,7 @@ public class DynamicObject {
 
     /**
      * Converts the first character of the given String into lower-case.
-     * 
+     *
      * @param name
      *            The string to convert
      * @return String
@@ -302,7 +302,7 @@ public class DynamicObject {
     /**
      * Check if this class is one of the supported types. If the class is
      * supported, returns true. Otherwise, returns false.
-     * 
+     *
      * @param ret
      *            The class to check
      * @return boolean True if class is supported
@@ -322,7 +322,7 @@ public class DynamicObject {
     /**
      * Check if this class conforms to JavaBeans specifications. If the class is
      * conformant, returns true.
-     * 
+     *
      * @param javaType
      *            The class to check
      * @return boolean True if the class is compatible.
@@ -357,7 +357,7 @@ public class DynamicObject {
         }
         return true;
     }
-    
+
     /**
      * Reverse of Introspector.decapitalize
      */
@@ -380,6 +380,6 @@ public class DynamicObject {
             return true;
         return false;
     }
-    
-    
+
+
 }
