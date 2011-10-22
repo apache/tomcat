@@ -5,15 +5,15 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */ 
+ */
 
 
 package org.apache.tomcat.util.digester;
@@ -27,7 +27,7 @@ import org.apache.tomcat.util.IntrospectionUtils;
  * object, passing the (top-1) (parent) object as an argument.</p>
  *
  * <p>This rule now supports more flexible method matching by default.
- * It is possible that this may break (some) code 
+ * It is possible that this may break (some) code
  * written against release 1.1.1 or earlier.
  * See {@link #isExactMatch()} for more details.</p>
  */
@@ -46,7 +46,7 @@ public class SetTopRule extends Rule {
      * @param digester The associated Digester
      * @param methodName Method name of the "set parent" method to call
      *
-     * @deprecated The digester instance is now set in the {@link Digester#addRule} method. 
+     * @deprecated The digester instance is now set in the {@link Digester#addRule} method.
      * Use {@link #SetTopRule(String methodName)} instead.
      */
     @Deprecated
@@ -67,7 +67,7 @@ public class SetTopRule extends Rule {
      *  Java wrapper class instead, such as <code>java.lang.Boolean</code>
      *  for a <code>boolean</code> parameter)
      *
-     * @deprecated The digester instance is now set in the {@link Digester#addRule} method. 
+     * @deprecated The digester instance is now set in the {@link Digester#addRule} method.
      * Use {@link #SetTopRule(String methodName, String paramType)} instead.
      */
     @Deprecated
@@ -123,7 +123,7 @@ public class SetTopRule extends Rule {
      * The Java class name of the parameter type expected by the method.
      */
     protected String paramType = null;
-    
+
     /**
      * Should we use exact matching. Default is no.
      */
@@ -135,15 +135,15 @@ public class SetTopRule extends Rule {
     /**
      * <p>Is exact matching being used.</p>
      *
-     * <p>This rule uses <code>org.apache.commons.beanutils.MethodUtils</code> 
+     * <p>This rule uses <code>org.apache.commons.beanutils.MethodUtils</code>
      * to introspect the relevant objects so that the right method can be called.
      * Originally, <code>MethodUtils.invokeExactMethod</code> was used.
-     * This matches methods very strictly 
+     * This matches methods very strictly
      * and so may not find a matching method when one exists.
      * This is still the behaviour when exact matching is enabled.</p>
      *
      * <p>When exact matching is disabled, <code>MethodUtils.invokeMethod</code> is used.
-     * This method finds more methods but is less precise when there are several methods 
+     * This method finds more methods but is less precise when there are several methods
      * with correct signatures.
      * So, if you want to choose an exact signature you might need to enable this property.</p>
      *
@@ -153,10 +153,10 @@ public class SetTopRule extends Rule {
      * @since Digester Release 1.1.1
      */
     public boolean isExactMatch() {
-    
+
         return useExactMatch;
     }
-    
+
     /**
      * <p>Set whether exact matching is enabled.</p>
      *
@@ -169,14 +169,14 @@ public class SetTopRule extends Rule {
 
         this.useExactMatch = useExactMatch;
     }
-    
+
     /**
      * Process the end of this element.
-     * 
-     * @param namespace the namespace URI of the matching element, or an 
+     *
+     * @param namespace the namespace URI of the matching element, or an
      *   empty string if the parser is not namespace aware or the element has
      *   no namespace
-     * @param name the local name if the parser is namespace aware, or just 
+     * @param name the local name if the parser is namespace aware, or just
      *   the element name otherwise
      */
     @Override
@@ -185,7 +185,7 @@ public class SetTopRule extends Rule {
         // Identify the objects to be used
         Object child = digester.peek(0);
         Object parent = digester.peek(1);
-        
+
         if (digester.log.isDebugEnabled()) {
             if (child == null) {
                 digester.log.debug("[SetTopRule]{" + digester.match +

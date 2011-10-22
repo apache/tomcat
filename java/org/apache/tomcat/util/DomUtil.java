@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -101,15 +101,15 @@ public class DomUtil {
         attNode.setNodeValue( val );
         attributes.setNamedItem(attNode);
     }
-    
+
     public static void removeAttribute( Node node, String attName ) {
         NamedNodeMap attributes=node.getAttributes();
-        attributes.removeNamedItem(attName);                
+        attributes.removeNamedItem(attName);
     }
-    
-    
-    /** Set or replace the text value 
-     */ 
+
+
+    /** Set or replace the text value
+     */
     public static void setText(Node node, String val) {
         Node chld=DomUtil.getChild(node, Node.TEXT_NODE);
         if( chld == null ) {
@@ -118,35 +118,35 @@ public class DomUtil {
             return;
         }
         // change the value
-        chld.setNodeValue(val);           
+        chld.setNodeValue(val);
     }
 
     /** Find the first direct child with a given attribute.
      * @param parent
-     * @param elemName name of the element, or null for any 
+     * @param elemName name of the element, or null for any
      * @param attName attribute we're looking for
      * @param attVal attribute value or null if we just want any
-     */ 
+     */
     public static Node findChildWithAtt(Node parent, String elemName,
                                         String attName, String attVal) {
-        
+
         Node child=DomUtil.getChild(parent, Node.ELEMENT_NODE);
         if( attVal== null ) {
             while( child!= null &&
-                    ( elemName==null || elemName.equals( child.getNodeName())) && 
+                    ( elemName==null || elemName.equals( child.getNodeName())) &&
                     DomUtil.getAttribute(child, attName) != null ) {
                 child=getNext(child, elemName, Node.ELEMENT_NODE );
             }
         } else {
-            while( child!= null && 
-                    ( elemName==null || elemName.equals( child.getNodeName())) && 
+            while( child!= null &&
+                    ( elemName==null || elemName.equals( child.getNodeName())) &&
                     ! attVal.equals( DomUtil.getAttribute(child, attName)) ) {
                 child=getNext(child, elemName, Node.ELEMENT_NODE );
             }
         }
-        return child;        
-    }    
-    
+        return child;
+    }
+
 
     /** Get the first child's content ( ie it's included TEXT node ).
      */
@@ -183,14 +183,14 @@ public class DomUtil {
     }
 
     /** Return the next sibling with a given name and type
-     */ 
+     */
     public static Node getNext( Node current, String name, int type) {
         Node first=current.getNextSibling();
         if( first==null ) return null;
 
         for (Node node = first; node != null;
              node = node.getNextSibling()) {
-            
+
             if( type >= 0 && node.getNodeType() != type ) continue;
             //System.out.println("getNode: " + name + " " + node.getNodeName());
             if( name==null )

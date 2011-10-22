@@ -22,7 +22,7 @@ import java.io.IOException;
 
 import org.apache.tomcat.util.bcel.Constants;
 
-/** 
+/**
  * Abstract super class for fields and methods.
  *
  * @version $Id$
@@ -31,11 +31,11 @@ import org.apache.tomcat.util.bcel.Constants;
 public abstract class FieldOrMethod extends AccessFlags implements Cloneable {
 
     private static final long serialVersionUID = -3383525930205542157L;
-    protected int name_index; // Points to field name in constant pool 
+    protected int name_index; // Points to field name in constant pool
     protected int signature_index; // Points to encoded signature
     protected int attributes_count; // No. of attributes
     protected Attribute[] attributes; // Collection of attributes
-    
+
     protected ConstantPool constant_pool;
 
     FieldOrMethod() {
@@ -85,7 +85,7 @@ public abstract class FieldOrMethod extends AccessFlags implements Cloneable {
         attributes_count = (attributes == null) ? 0 : attributes.length;
     }
 
-    
+
     /**
      * @return Name of object, i.e., method name or field name
      */

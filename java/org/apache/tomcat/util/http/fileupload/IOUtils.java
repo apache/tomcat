@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -111,7 +111,7 @@ public class IOUtils {
      * <code>-1</code> after the copy has completed since the correct
      * number of bytes cannot be returned as an int. For large streams
      * use the <code>copyLarge(InputStream, OutputStream)</code> method.
-     * 
+     *
      * @param input  the <code>InputStream</code> to read from
      * @param output  the <code>OutputStream</code> to write to
      * @return the number of bytes copied
@@ -134,7 +134,7 @@ public class IOUtils {
      * <p>
      * This method buffers the input internally, so there is no need to use a
      * <code>BufferedInputStream</code>.
-     * 
+     *
      * @param input  the <code>InputStream</code> to read from
      * @param output  the <code>OutputStream</code> to write to
      * @return the number of bytes copied

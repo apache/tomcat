@@ -34,30 +34,30 @@ public class ModelerSource {
     protected Object source;
     protected String location;
 
-    /** Load data, returns a list of items. 
-     * 
+    /** Load data, returns a list of items.
+     *
      * @param registry
      * @param location
      * @param type
      * @param source Introspected object or some other source
      * @throws Exception
-     */ 
+     */
     public List<ObjectName> loadDescriptors( Registry registry, String location,
             String type, Object source) throws Exception {
         // TODO
         return null;
     }
-    
+
     /** Callback from the BaseMBean to notify that an attribute has changed.
      * Can be used to implement persistence.
-     * 
+     *
      * @param oname
      * @param name
      * @param value
-     */ 
-    public void updateField( ObjectName oname, String name, 
+     */
+    public void updateField( ObjectName oname, String name,
                              Object value ) {
-        // nothing by default 
+        // nothing by default
     }
 
     public void store() {
@@ -71,13 +71,13 @@ public class ModelerSource {
             return url.openStream();
         } else if( source instanceof File ) {
             location=((File)source).getAbsolutePath();
-            return new FileInputStream((File)source);            
+            return new FileInputStream((File)source);
         } else if( source instanceof String) {
             location=(String)source;
-            return new FileInputStream((String)source);            
+            return new FileInputStream((String)source);
         } else if( source instanceof InputStream ) {
             return (InputStream)source;
-        } 
+        }
         return null;
     }
 

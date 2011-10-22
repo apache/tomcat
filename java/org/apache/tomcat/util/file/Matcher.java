@@ -58,11 +58,11 @@ public final class Matcher {
     /**
      * Tests whether or not a given path matches any pattern in the given set.
      *
-     * If you need to call this method multiple times with the same 
+     * If you need to call this method multiple times with the same
      * pattern you should rather pre parse the pattern using tokenizePathAsArray.
      *
      * @see #tokenizePathAsArray
-     * 
+     *
      * @param patternSet The pattern set to match against. Must not be
      *                <code>null</code>.
      * @param str     The path to match, as a String. Must not be
@@ -83,11 +83,11 @@ public final class Matcher {
     /**
      * Tests whether or not a given path matches a given pattern.
      *
-     * If you need to call this method multiple times with the same 
+     * If you need to call this method multiple times with the same
      * pattern you should rather pre parse the pattern using tokenizePathAsArray.
      *
      * @see #tokenizePathAsArray
-     * 
+     *
      * @param pattern The pattern to match against. Must not be
      *                <code>null</code>.
      * @param str     The path to match, as a String. Must not be
@@ -103,12 +103,12 @@ public final class Matcher {
 
     /**
      * Tests whether or not a given path matches a given pattern.
-     * 
-     * If you need to call this method multiple times with the same 
+     *
+     * If you need to call this method multiple times with the same
      * pattern you should rather pre parse the pattern using tokenizePathAsArray.
      *
      * @see #tokenizePathAsArray
-     * 
+     *
      * @param pattern The pattern to match against. Must not be
      *                <code>null</code>.
      * @param str     The path to match, as a String. Must not be

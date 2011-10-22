@@ -22,9 +22,9 @@ import java.io.IOException;
 
 import org.apache.tomcat.util.bcel.Constants;
 
-/** 
- * This class is derived from the abstract 
- * <A HREF="org.apache.tomcat.util.bcel.classfile.Constant.html">Constant</A> class 
+/**
+ * This class is derived from the abstract
+ * <A HREF="org.apache.tomcat.util.bcel.classfile.Constant.html">Constant</A> class
  * and represents a reference to a Utf8 encoded string.
  *
  * @version $Id$

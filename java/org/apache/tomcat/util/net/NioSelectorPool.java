@@ -39,19 +39,19 @@ import org.apache.tomcat.util.MutableInteger;
  */
 
 public class NioSelectorPool {
-    
+
     public NioSelectorPool() {
     }
-    
+
     private static final Log log = LogFactory.getLog(NioSelectorPool.class);
 
     protected static final boolean SHARED =
         Boolean.valueOf(System.getProperty("org.apache.tomcat.util.net.NioSelectorShared", "true")).booleanValue();
-    
+
     protected NioBlockingSelector blockingSelector;
-    
+
     protected volatile Selector SHARED_SELECTOR;
-    
+
     protected int maxSelectors = 200;
     protected long sharedSelectorTimeout = 30000;
     protected int maxSpareSelectors = -1;
@@ -148,8 +148,8 @@ public class NioSelectorPool {
     public int write(ByteBuffer buf, NioChannel socket, Selector selector, long writeTimeout) throws IOException {
         return write(buf,socket,selector,writeTimeout,true,null);
     }
-    
-    public int write(ByteBuffer buf, NioChannel socket, Selector selector, 
+
+    public int write(ByteBuffer buf, NioChannel socket, Selector selector,
                      long writeTimeout, boolean block,MutableInteger lastWrite) throws IOException {
         if ( SHARED && block ) {
             return blockingSelector.write(buf,socket,writeTimeout,lastWrite);
@@ -166,7 +166,7 @@ public class NioSelectorPool {
                     cnt = socket.write(buf); //write the data
                     if (lastWrite!=null) lastWrite.set(cnt);
                     if (cnt == -1) throw new EOFException();
-                    
+
                     written += cnt;
                     if (cnt > 0) {
                         time = System.currentTimeMillis(); //reset our timeout timer
@@ -209,7 +209,7 @@ public class NioSelectorPool {
         return read(buf,socket,selector,readTimeout,true);
     }
     /**
-     * Performs a read using the bytebuffer for data to be read and a selector to register for events should 
+     * Performs a read using the bytebuffer for data to be read and a selector to register for events should
      * you have the block=true.
      * If the <code>selector</code> parameter is null, then it will perform a busy read that could
      * take up a lot of CPU cycles.
@@ -241,7 +241,7 @@ public class NioSelectorPool {
                     read += cnt;
                     if (cnt > 0) continue; //read some more
                     if (cnt==0 && (read>0 || (!block) ) ) break; //we are done reading
-                } 
+                }
                 if ( selector != null ) {//perform a blocking read
                     //register OP_WRITE to the selector
                     if (key==null) key = socket.getIOChannel().register(selector, SelectionKey.OP_READ);

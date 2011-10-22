@@ -36,7 +36,7 @@ public final class Mapper {
 
     private static final org.apache.juli.logging.Log log =
         org.apache.juli.logging.LogFactory.getLog(Mapper.class);
-    
+
     protected static final StringManager sm =
         StringManager.getManager(Mapper.class.getPackage().getName());
 
@@ -142,7 +142,7 @@ public final class Mapper {
             return;
         }
         Host realHost = hosts[pos];
-        
+
         Host[] newHosts = new Host[hosts.length + 1];
         Host newHost = new Host();
         newHost.name = alias;
@@ -229,9 +229,9 @@ public final class Mapper {
                     }
                     pos2 = find(newContexts, path);
                 }
-                
+
                 Context mappedContext = mappedHost.contextList.contexts[pos2];
-                
+
                 ContextVersion[] contextVersions = mappedContext.versions;
                 ContextVersion[] newContextVersions =
                     new ContextVersion[contextVersions.length + 1];
@@ -271,19 +271,19 @@ public final class Mapper {
                 if (contexts.length == 0 ){
                     return;
                 }
-                
+
                 int pos2 = find(contexts, path);
                 if (pos2 < 0 || !path.equals(contexts[pos2].name)) {
                     return;
                 }
                 Context context = contexts[pos2];
-                
+
                 ContextVersion[] contextVersions = context.versions;
                 ContextVersion[] newContextVersions =
                     new ContextVersion[contextVersions.length - 1];
                 if (removeMap(contextVersions, newContextVersions, version)) {
                     context.versions = newContextVersions;
-                    
+
                     if (context.versions.length == 0) {
                         // Remove the context
                         Context[] newContexts = new Context[contexts.length -1];
@@ -452,7 +452,7 @@ public final class Mapper {
     }
 
     protected void removeWrapper(ContextVersion context, String path) {
-        
+
         if (log.isDebugEnabled()) {
             log.debug(sm.getString("mapper.removeWrapper", context.name, path));
         }
@@ -512,7 +512,7 @@ public final class Mapper {
 
     /**
      * Add a welcome file to the given context.
-     * 
+     *
      * @param hostName
      * @param contextPath
      * @param welcomeFile
@@ -553,11 +553,11 @@ public final class Mapper {
             }
         }
     }
-    
-    
+
+
     /**
      * Remove a welcome file from the given context.
-     * 
+     *
      * @param hostName
      * @param contextPath
      * @param welcomeFile
@@ -610,11 +610,11 @@ public final class Mapper {
             }
         }
     }
-    
-    
+
+
     /**
      * Clear the welcome files for the given context.
-     * 
+     *
      * @param hostName
      * @param contextPath
      */
@@ -649,8 +649,8 @@ public final class Mapper {
             }
         }
     }
-    
-    
+
+
     /**
      * Map the specified host name and URI, mutating the given mapping data.
      *
@@ -707,7 +707,7 @@ public final class Mapper {
         Context[] contexts = null;
         Context context = null;
         ContextVersion contextVersion = null;
-        
+
         int nesting = 0;
 
         // Virtual host mapping
@@ -787,7 +787,7 @@ public final class Mapper {
                 }
                 mappingData.contexts = contextObjects;
             }
-            
+
             if (version == null) {
                 // Return the latest version
                 contextVersion = contextVersions[versionCount - 1];
@@ -845,7 +845,7 @@ public final class Mapper {
         boolean checkJspWelcomeFiles = false;
         Wrapper[] wildcardWrappers = contextVersion.wildcardWrappers;
         if (mappingData.wrapper == null) {
-            internalMapWildcardWrapper(wildcardWrappers, contextVersion.nesting, 
+            internalMapWildcardWrapper(wildcardWrappers, contextVersion.nesting,
                                        path, mappingData);
             if (mappingData.wrapper != null && mappingData.jspWildCard) {
                 char[] buf = path.getBuffer();
@@ -857,7 +857,7 @@ public final class Mapper {
                      * Force the context's welcome files, which are interpreted
                      * as JSP files (since they match the url-pattern), to be
                      * considered. See Bugzilla 27664.
-                     */ 
+                     */
                     mappingData.wrapper = null;
                     checkJspWelcomeFiles = true;
                 } else {
@@ -906,7 +906,7 @@ public final class Mapper {
                     // Rule 4b -- Welcome resources processing for prefix match
                     if (mappingData.wrapper == null) {
                         internalMapWildcardWrapper
-                            (wildcardWrappers, contextVersion.nesting, 
+                            (wildcardWrappers, contextVersion.nesting,
                              path, mappingData);
                     }
 
@@ -929,10 +929,10 @@ public final class Mapper {
                                 mappingData.wrapper =
                                     contextVersion.defaultWrapper.object;
                                 mappingData.requestPath.setChars
-                                    (path.getBuffer(), path.getStart(), 
+                                    (path.getBuffer(), path.getStart(),
                                      path.getLength());
                                 mappingData.wrapperPath.setChars
-                                    (path.getBuffer(), path.getStart(), 
+                                    (path.getBuffer(), path.getStart(),
                                      path.getLength());
                                 mappingData.requestPath.setString(pathStr);
                                 mappingData.wrapperPath.setString(pathStr);
@@ -944,13 +944,13 @@ public final class Mapper {
                 path.setOffset(servletPath);
                 path.setEnd(pathEnd);
             }
-                                        
+
         }
 
         /* welcome file processing - take 2
          * Now that we have looked for welcome files with a physical
          * backing, now look for an extension mapping listed
-         * but may not have a physical backing to it. This is for 
+         * but may not have a physical backing to it. This is for
          * the case of index.jsf, index.do, etc.
          * A watered down version of rule 4
          */
@@ -998,8 +998,8 @@ public final class Mapper {
                     // Swallow, since someone else handles the 404
                 }
                 if (file != null && file instanceof DirContext) {
-                    // Note: this mutates the path: do not do any processing 
-                    // after this (since we set the redirectPath, there 
+                    // Note: this mutates the path: do not do any processing
+                    // after this (since we set the redirectPath, there
                     // shouldn't be any)
                     path.setOffset(pathOffset);
                     path.append('/');
@@ -1036,7 +1036,7 @@ public final class Mapper {
      * Wildcard mapping.
      */
     private final void internalMapWildcardWrapper
-        (Wrapper[] wrappers, int nesting, CharChunk path, 
+        (Wrapper[] wrappers, int nesting, CharChunk path,
          MappingData mappingData) {
 
         int pathEnd = path.getEnd();
@@ -1085,7 +1085,7 @@ public final class Mapper {
 
     /**
      * Extension mappings.
-     * 
+     *
      * @param wrappers          Set of wrappers to check for matches
      * @param path              Path to map
      * @param mappingData       Mapping data for result
@@ -1155,10 +1155,10 @@ public final class Mapper {
         if (b == -1) {
             return -1;
         }
-        
+
         if (compare(name, start, end, map[0].name) < 0 ) {
             return -1;
-        }         
+        }
         if (b == 0) {
             return 0;
         }
@@ -1213,7 +1213,7 @@ public final class Mapper {
         }
         if (compareIgnoreCase(name, start, end, map[0].name) < 0 ) {
             return -1;
-        }         
+        }
         if (b == 0) {
             return 0;
         }
@@ -1256,10 +1256,10 @@ public final class Mapper {
         if (b == -1) {
             return -1;
         }
-        
+
         if (name.compareTo(map[0].name) < 0) {
             return -1;
-        } 
+        }
         if (b == 0) {
             return 0;
         }

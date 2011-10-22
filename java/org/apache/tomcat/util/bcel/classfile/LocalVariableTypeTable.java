@@ -40,7 +40,7 @@ import org.apache.tomcat.util.bcel.Constants;
 //    u2 attribute_name_index;
 //    u4 attribute_length;
 //    u2 local_variable_type_table_length;
-//    { 
+//    {
 //      u2 start_pc;
 //      u2 length;
 //      u2 name_index;
@@ -60,7 +60,7 @@ private int             local_variable_type_table_length; // Table of local
   {
     super(Constants.ATTR_LOCAL_VARIABLE_TYPE_TABLE, name_index, length, constant_pool);
     setLocalVariableTable(local_variable_table);
-  }    
+  }
 
   LocalVariableTypeTable(int nameIdx, int len, DataInputStream dis,ConstantPool cpool) throws IOException {
     this(nameIdx, len, (LocalVariable[])null, cpool);
@@ -90,7 +90,7 @@ private int             local_variable_type_table_length; // Table of local
 
   /**
    * @return String representation.
-   */ 
+   */
   @Override
   public final String toString() {
       StringBuilder buf = new StringBuilder();

@@ -21,7 +21,7 @@ import java.io.DataInput;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-/** 
+/**
  * Abstract super class for Fieldref and Methodref constants.
  *
  * @version $Id$
@@ -61,7 +61,7 @@ public abstract class ConstantCP extends Constant {
     }
 
 
-    /** 
+    /**
      * Dump constant field reference to file stream in binary format.
      *
      * @param file Output file stream

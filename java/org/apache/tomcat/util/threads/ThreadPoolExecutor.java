@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -83,7 +83,7 @@ public class ThreadPoolExecutor extends java.util.concurrent.ThreadPoolExecutor 
     public ThreadPoolExecutor(int corePoolSize, int maximumPoolSize, long keepAliveTime, TimeUnit unit, BlockingQueue<Runnable> workQueue) {
         super(corePoolSize, maximumPoolSize, keepAliveTime, unit, workQueue, new RejectHandler());
     }
-    
+
     public long getThreadRenewalDelay() {
         return threadRenewalDelay;
     }
@@ -131,12 +131,12 @@ public class ThreadPoolExecutor extends java.util.concurrent.ThreadPoolExecutor 
             }
         }
     }
-    
+
     protected boolean currentThreadShouldBeStopped() {
         if (threadRenewalDelay >= 0
             && Thread.currentThread() instanceof TaskThread) {
             TaskThread currentTaskThread = (TaskThread) Thread.currentThread();
-            if (currentTaskThread.getCreationTime() < 
+            if (currentTaskThread.getCreationTime() <
                     this.lastContextStoppedTime.longValue()) {
                 return true;
             }
@@ -147,7 +147,7 @@ public class ThreadPoolExecutor extends java.util.concurrent.ThreadPoolExecutor 
     public int getSubmittedCount() {
         return submittedCount.get();
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -155,14 +155,14 @@ public class ThreadPoolExecutor extends java.util.concurrent.ThreadPoolExecutor 
     public void execute(Runnable command) {
         execute(command,0,TimeUnit.MILLISECONDS);
     }
-    
+
     /**
      * Executes the given command at some time in the future.  The command
      * may execute in a new thread, in a pooled thread, or in the calling
      * thread, at the discretion of the <tt>Executor</tt> implementation.
      * If no threads are available, it will be added to the work queue.
-     * If the work queue is full, the system will wait for the specified 
-     * time and it throw a RejectedExecutionException if the queue is still 
+     * If the work queue is full, the system will wait for the specified
+     * time and it throw a RejectedExecutionException if the queue is still
      * full after that.
      *
      * @param command the runnable task
@@ -191,7 +191,7 @@ public class ThreadPoolExecutor extends java.util.concurrent.ThreadPoolExecutor 
                 submittedCount.decrementAndGet();
                 throw rx;
             }
-            
+
         }
     }
 
@@ -218,7 +218,7 @@ public class ThreadPoolExecutor extends java.util.concurrent.ThreadPoolExecutor 
         // queue.take())
         // even if we did not wait enough, TaskQueue.take() takes care of timing
         // out, so that we are sure that all threads of the pool are renewed in
-        // a limited time, something like 
+        // a limited time, something like
         // (threadKeepAlive + longest request time)
         try {
             Thread.sleep(200L);
@@ -232,14 +232,14 @@ public class ThreadPoolExecutor extends java.util.concurrent.ThreadPoolExecutor 
         }
         this.setCorePoolSize(savedCorePoolSize);
     }
-    
+
     private static class RejectHandler implements RejectedExecutionHandler {
         @Override
         public void rejectedExecution(Runnable r,
                 java.util.concurrent.ThreadPoolExecutor executor) {
             throw new RejectedExecutionException();
         }
-        
+
     }
 
 

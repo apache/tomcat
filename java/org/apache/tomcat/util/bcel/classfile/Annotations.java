@@ -23,7 +23,7 @@ import java.io.IOException;
 
 /**
  * base class for annotations
- * 
+ *
  * @version $Id: Annotations
  * @author  <A HREF="mailto:dbrosius@qis.net">D. Brosius</A>
  * @since 5.3
@@ -31,9 +31,9 @@ import java.io.IOException;
 public abstract class Annotations extends Attribute {
 
     private static final long serialVersionUID = 1L;
-    
+
     private AnnotationEntry[] annotation_table;
-    
+
     /**
      * @param annotation_type the subclass type of the annotation
      * @param name_index Index pointing to the name <em>Code</em>

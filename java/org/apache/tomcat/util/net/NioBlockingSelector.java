@@ -38,18 +38,18 @@ import org.apache.tomcat.util.MutableInteger;
 import org.apache.tomcat.util.net.NioEndpoint.KeyAttachment;
 
 public class NioBlockingSelector {
-    
+
     private static final Log log = LogFactory.getLog(NioBlockingSelector.class);
-    
+
     private static int threadCounter = 0;
-    
+
     protected Selector sharedSelector;
-    
+
     protected BlockPoller poller;
     public NioBlockingSelector() {
-        
+
     }
-    
+
     public void open(Selector selector) {
         sharedSelector = selector;
         poller = new BlockPoller();
@@ -58,7 +58,7 @@ public class NioBlockingSelector {
         poller.setName("NioBlockingSelector.BlockPoller-"+(++threadCounter));
         poller.start();
     }
-    
+
     public void close() {
         if (poller!=null) {
             poller.disable();
@@ -120,7 +120,7 @@ public class NioBlockingSelector {
                 if (writeTimeout > 0 && (keycount == 0))
                     timedout = (System.currentTimeMillis() - time) >= writeTimeout;
             } //while
-            if (timedout) 
+            if (timedout)
                 throw new SocketTimeoutException();
         } finally {
             poller.remove(att,SelectionKey.OP_WRITE);
@@ -197,7 +197,7 @@ public class NioBlockingSelector {
         return read;
     }
 
-    
+
     protected static class BlockPoller extends Thread {
         protected volatile boolean run = true;
         protected Selector selector = null;
@@ -227,7 +227,7 @@ public class NioBlockingSelector {
                 if (SelectionKey.OP_READ==(ops&SelectionKey.OP_READ))countDown(key.getReadLatch());
             }
         }
-        
+
         public void add(final KeyAttachment key, final int ops, final KeyReference ref) {
             Runnable r = new Runnable() {
                 @Override
@@ -257,7 +257,7 @@ public class NioBlockingSelector {
             events.offer(r);
             wakeup();
         }
-        
+
         public void remove(final KeyAttachment key, final int ops) {
             Runnable r = new Runnable() {
                 @Override
@@ -318,7 +318,7 @@ public class NioBlockingSelector {
                     int keyCount = 0;
                     try {
                         int i = wakeupCounter.get();
-                        if (i>0) 
+                        if (i>0)
                             keyCount = selector.selectNow();
                         else {
                             wakeupCounter.set(-1);
@@ -380,16 +380,16 @@ public class NioBlockingSelector {
                 if (log.isDebugEnabled())log.debug("",ignore);
             }
         }
-        
+
         public void countDown(CountDownLatch latch) {
             if ( latch == null ) return;
             latch.countDown();
         }
     }
-    
+
     public static class KeyReference {
         SelectionKey key = null;
-        
+
         @Override
         public void finalize() {
             if (key!=null && key.isValid()) {

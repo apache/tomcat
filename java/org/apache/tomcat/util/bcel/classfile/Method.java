@@ -24,7 +24,7 @@ import org.apache.tomcat.util.bcel.Constants;
 import org.apache.tomcat.util.bcel.util.BCELComparator;
 
 /**
- * This class represents the method info structure, i.e., the representation 
+ * This class represents the method info structure, i.e., the representation
  * for a method in the class. See JVM specification for details.
  * A method has access flags, a name, a signature and a number of attributes.
  *
@@ -153,7 +153,7 @@ public final class Method extends FieldOrMethod {
      * Return value as defined by given BCELComparator strategy.
      * By default two method objects are said to be equal when
      * their names and signatures are equal.
-     * 
+     *
      * @see java.lang.Object#equals(java.lang.Object)
      */
     @Override
@@ -165,7 +165,7 @@ public final class Method extends FieldOrMethod {
     /**
      * Return value as defined by given BCELComparator strategy.
      * By default return the hashcode of the method's name XOR signature.
-     * 
+     *
      * @see java.lang.Object#hashCode()
      */
     @Override

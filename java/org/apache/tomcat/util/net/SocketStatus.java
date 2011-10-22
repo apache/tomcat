@@ -18,8 +18,8 @@
 package org.apache.tomcat.util.net;
 
 /**
- * Someone, please change the enum name. 
- * 
+ * Someone, please change the enum name.
+ *
  * @author remm
  */
 public enum SocketStatus {

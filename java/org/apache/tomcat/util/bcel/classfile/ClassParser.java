@@ -40,7 +40,7 @@ import org.apache.tomcat.util.bcel.Constants;
  * further details about the structure of a bytecode file.
  *
  * @version $Id$
- * @author <A HREF="mailto:m.dahm@gmx.de">M. Dahm</A> 
+ * @author <A HREF="mailto:m.dahm@gmx.de">M. Dahm</A>
  */
 public final class ClassParser {
 
@@ -97,11 +97,11 @@ public final class ClassParser {
                 if (is_zip) {
                     zip = new ZipFile(zip_file);
                     ZipEntry entry = zip.getEntry(file_name);
-                    
+
                     if (entry == null) {
                         throw new IOException("File " + file_name + " not found");
                     }
-                    
+
                     file = new DataInputStream(new BufferedInputStream(zip.getInputStream(entry),
                             BUFSIZE));
                 } else {

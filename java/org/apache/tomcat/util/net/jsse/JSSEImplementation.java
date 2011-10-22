@@ -34,18 +34,18 @@ import org.apache.tomcat.util.net.ServerSocketFactory;
 
    @author EKR
 */
-        
+
 public class JSSEImplementation extends SSLImplementation {
 
     @Override
     public String getImplementationName(){
         return "JSSE";
     }
-      
+
     @Override
     public ServerSocketFactory getServerSocketFactory(AbstractEndpoint endpoint)  {
         return new JSSESocketFactory(endpoint);
-    } 
+    }
 
     @Override
     public SSLSupport getSSLSupport(Socket s) {

@@ -23,9 +23,9 @@ import java.io.IOException;
 
 import org.apache.tomcat.util.bcel.Constants;
 
-/** 
- * This class is derived from the abstract 
- * <A HREF="org.apache.tomcat.util.bcel.classfile.Constant.html">Constant</A> class 
+/**
+ * This class is derived from the abstract
+ * <A HREF="org.apache.tomcat.util.bcel.classfile.Constant.html">Constant</A> class
  * and represents a reference to a Double object.
  *
  * @version $Id$
@@ -38,7 +38,7 @@ public final class ConstantDouble extends Constant {
     private double bytes;
 
 
-    /** 
+    /**
      * @param bytes Data
      */
     public ConstantDouble(double bytes) {
@@ -47,7 +47,7 @@ public final class ConstantDouble extends Constant {
     }
 
 
-    /** 
+    /**
      * Initialize instance from file data.
      *
      * @param file Input stream

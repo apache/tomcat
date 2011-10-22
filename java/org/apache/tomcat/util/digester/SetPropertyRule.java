@@ -5,15 +5,15 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */ 
+ */
 
 
 package org.apache.tomcat.util.digester;
@@ -44,7 +44,7 @@ public class SetPropertyRule extends Rule {
      * @param value Name of the attribute that will contain the value to which
      *  the property should be set
      *
-     * @deprecated The digester instance is now set in the {@link Digester#addRule} method. 
+     * @deprecated The digester instance is now set in the {@link Digester#addRule} method.
      * Use {@link #SetPropertyRule(String name, String value)} instead.
      */
     @Deprecated
@@ -91,13 +91,13 @@ public class SetPropertyRule extends Rule {
     /**
      * Process the beginning of this element.
      *
-     * @param namespace the namespace URI of the matching element, or an 
+     * @param namespace the namespace URI of the matching element, or an
      *   empty string if the parser is not namespace aware or the element has
      *   no namespace
-     * @param theName the local name if the parser is namespace aware, or just 
+     * @param theName the local name if the parser is namespace aware, or just
      *   the element name otherwise
      * @param attributes The attribute list for this element
-     * 
+     *
      * @exception NoSuchMethodException if the bean does not
      *  have a writable property of the specified name
      */
@@ -132,8 +132,8 @@ public class SetPropertyRule extends Rule {
         }
 
         // Set the property (with conversion as necessary)
-        if (!digester.isFakeAttribute(top, actualName) 
-                && !IntrospectionUtils.setProperty(top, actualName, actualValue) 
+        if (!digester.isFakeAttribute(top, actualName)
+                && !IntrospectionUtils.setProperty(top, actualName, actualValue)
                 && digester.getRulesValidation()) {
             digester.log.warn("[SetPropertyRule]{" + digester.match +
                     "} Setting property '" + name + "' to '" +

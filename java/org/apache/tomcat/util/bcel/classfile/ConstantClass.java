@@ -23,9 +23,9 @@ import java.io.IOException;
 
 import org.apache.tomcat.util.bcel.Constants;
 
-/** 
- * This class is derived from the abstract 
- * <A HREF="org.apache.tomcat.util.bcel.classfile.Constant.html">Constant</A> class 
+/**
+ * This class is derived from the abstract
+ * <A HREF="org.apache.tomcat.util.bcel.classfile.Constant.html">Constant</A> class
  * and represents a reference to a (external) class.
  *
  * @version $Id$
@@ -59,7 +59,7 @@ public final class ConstantClass extends Constant {
     }
 
 
-    /** 
+    /**
      * Dump constant class to file stream in binary format.
      *
      * @param file Output file stream
