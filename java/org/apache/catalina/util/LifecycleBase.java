@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -35,7 +35,7 @@ import org.apache.tomcat.util.res.StringManager;
 public abstract class LifecycleBase implements Lifecycle {
 
     private static Log log = LogFactory.getLog(LifecycleBase.class);
-    
+
     private static StringManager sm =
         StringManager.getManager("org.apache.catalina.util");
 
@@ -79,10 +79,10 @@ public abstract class LifecycleBase implements Lifecycle {
         lifecycle.removeLifecycleListener(listener);
     }
 
-    
+
     /**
      * Allow sub classes to fire {@link Lifecycle} events.
-     * 
+     *
      * @param type  Event type
      * @param data  Data associated with event.
      */
@@ -90,7 +90,7 @@ public abstract class LifecycleBase implements Lifecycle {
         lifecycle.fireLifecycleEvent(type, data);
     }
 
-    
+
     @Override
     public final synchronized void init() throws LifecycleException {
         if (!state.equals(LifecycleState.NEW)) {
@@ -109,20 +109,20 @@ public abstract class LifecycleBase implements Lifecycle {
 
         setStateInternal(LifecycleState.INITIALIZED, null, false);
     }
-    
-    
+
+
     protected abstract void initInternal() throws LifecycleException;
-    
+
     /**
      * {@inheritDoc}
      */
     @Override
     public final synchronized void start() throws LifecycleException {
-        
+
         if (LifecycleState.STARTING_PREP.equals(state) ||
                 LifecycleState.STARTING.equals(state) ||
                 LifecycleState.STARTED.equals(state)) {
-            
+
             if (log.isDebugEnabled()) {
                 Exception e = new LifecycleException();
                 log.debug(sm.getString("lifecycleBase.alreadyStarted",
@@ -131,10 +131,10 @@ public abstract class LifecycleBase implements Lifecycle {
                 log.info(sm.getString("lifecycleBase.alreadyStarted",
                         toString()));
             }
-            
+
             return;
         }
-        
+
         if (state.equals(LifecycleState.NEW)) {
             init();
         } else if (!state.equals(LifecycleState.INITIALIZED) &&
@@ -162,7 +162,7 @@ public abstract class LifecycleBase implements Lifecycle {
             if (!state.equals(LifecycleState.STARTING)) {
                 invalidTransition(Lifecycle.AFTER_START_EVENT);
             }
-            
+
             setStateInternal(LifecycleState.STARTED, null, false);
         }
     }
@@ -172,13 +172,13 @@ public abstract class LifecycleBase implements Lifecycle {
      * Sub-classes must ensure that the state is changed to
      * {@link LifecycleState#STARTING} during the execution of this method.
      * Changing state will trigger the {@link Lifecycle#START_EVENT} event.
-     * 
+     *
      * If a component fails to start it may either throw a
      * {@link LifecycleException} which will cause it's parent to fail to start
      * or it can place itself in the error state in which case {@link #stop()}
      * will be called on the failed component but the parent component will
      * continue to start normally.
-     * 
+     *
      * @throws LifecycleException
      */
     protected abstract void startInternal() throws LifecycleException;
@@ -202,10 +202,10 @@ public abstract class LifecycleBase implements Lifecycle {
                 log.info(sm.getString("lifecycleBase.alreadyStopped",
                         toString()));
             }
-            
+
             return;
         }
-        
+
         if (state.equals(LifecycleState.NEW)) {
             state = LifecycleState.STOPPED;
             return;
@@ -216,7 +216,7 @@ public abstract class LifecycleBase implements Lifecycle {
                 !state.equals(LifecycleState.MUST_STOP)) {
             invalidTransition(Lifecycle.BEFORE_STOP_EVENT);
         }
-        
+
         if (state.equals(LifecycleState.FAILED)) {
             // Don't transition to STOPPING_PREP as that would briefly mark the
             // component as available but do ensure the BEFORE_STOP_EVENT is
@@ -256,7 +256,7 @@ public abstract class LifecycleBase implements Lifecycle {
      * Sub-classes must ensure that the state is changed to
      * {@link LifecycleState#STOPPING} during the execution of this method.
      * Changing state will trigger the {@link Lifecycle#STOP_EVENT} event.
-     * 
+     *
      * @throws LifecycleException
      */
     protected abstract void stopInternal() throws LifecycleException;
@@ -275,10 +275,10 @@ public abstract class LifecycleBase implements Lifecycle {
                 log.info(sm.getString("lifecycleBase.alreadyDestroyed",
                         toString()));
             }
-            
+
             return;
         }
-        
+
         if (!state.equals(LifecycleState.STOPPED) &&
                 !state.equals(LifecycleState.FAILED) &&
                 !state.equals(LifecycleState.NEW) &&
@@ -287,7 +287,7 @@ public abstract class LifecycleBase implements Lifecycle {
         }
 
         setStateInternal(LifecycleState.DESTROYING, null, false);
-        
+
         try {
             destroyInternal();
         } catch (Throwable t) {
@@ -296,13 +296,13 @@ public abstract class LifecycleBase implements Lifecycle {
             throw new LifecycleException(
                     sm.getString("lifecycleBase.destroyFail",toString()), t);
         }
-        
+
         setStateInternal(LifecycleState.DESTROYED, null, false);
     }
-    
-    
+
+
     protected abstract void destroyInternal() throws LifecycleException;
-    
+
     /**
      * {@inheritDoc}
      */
@@ -326,21 +326,21 @@ public abstract class LifecycleBase implements Lifecycle {
      * Calling this method will automatically fire any associated
      * {@link Lifecycle} event. It will also check that any attempted state
      * transition is valid for a sub-class.
-     * 
+     *
      * @param state The new state for this component
      */
     protected synchronized void setState(LifecycleState state)
             throws LifecycleException {
         setStateInternal(state, null, true);
     }
-    
-    
+
+
     /**
      * Provides a mechanism for sub-classes to update the component state.
      * Calling this method will automatically fire any associated
      * {@link Lifecycle} event. It will also check that any attempted state
      * transition is valid for a sub-class.
-     * 
+     *
      * @param state The new state for this component
      * @param data  The data to pass to the associated {@link Lifecycle} event
      */
@@ -351,11 +351,11 @@ public abstract class LifecycleBase implements Lifecycle {
 
     private synchronized void setStateInternal(LifecycleState state,
             Object data, boolean check) throws LifecycleException {
-        
+
         if (log.isDebugEnabled()) {
             log.debug(sm.getString("lifecycleBase.setState", this, state));
         }
-        
+
         if (check) {
             // Must have been triggered by one of the abstract methods (assume
             // code in this class is correct)
@@ -366,7 +366,7 @@ public abstract class LifecycleBase implements Lifecycle {
                 // a possible NPE further down the method
                 return;
             }
-            
+
             // Any method can transition to failed
             // startInternal() permits STARTING_PREP to STARTING
             // stopInternal() permits STOPPING_PREP to STOPPING and FAILED to
@@ -382,7 +382,7 @@ public abstract class LifecycleBase implements Lifecycle {
                 invalidTransition(state.name());
             }
         }
-        
+
         this.state = state;
         String lifecycleEvent = state.getLifecycleEvent();
         if (lifecycleEvent != null) {
