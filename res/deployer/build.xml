@@ -55,11 +55,11 @@
       <fileset dir="${webapp}" />
     </copy>
 
-    <jasper validateXml="false" 
-             uriroot="${webapp.path}" 
+    <jasper validateXml="false"
+             uriroot="${webapp.path}"
              webXmlFragment="${webapp.path}/WEB-INF/generated_web.xml"
              addWebXmlMappings="true"
-             outputDir="${webapp.path}/WEB-INF/classes" /> 
+             outputDir="${webapp.path}/WEB-INF/classes" />
 
     <validator path="${webapp.path}" />
 

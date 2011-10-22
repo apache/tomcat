@@ -203,11 +203,11 @@
 
 
 
-APACHE TOMCAT SUBCOMPONENTS: 
+APACHE TOMCAT SUBCOMPONENTS:
 
 Apache Tomcat includes a number of subcomponents with separate copyright notices
 and license terms. Your use of these subcomponents is subject to the terms and
-conditions of the following licenses. 
+conditions of the following licenses.
 
 
 For the following XML Schemas for Java EE Deployment Descriptors:
