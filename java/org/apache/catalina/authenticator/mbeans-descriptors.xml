@@ -22,61 +22,11 @@
          domain="Catalina"
          group="Valve"
          type="org.apache.catalina.authenticator.BasicAuthenticator">
-    
+
     <attribute name="alwaysUseSession"
                description="Should a session always be used once a user is authenticated?"
                type="boolean"/>
-      
-    <attribute name="cache"
-               description="Should we cache authenticated Principals if the request is part of an HTTP session?"
-               type="boolean"/>
-      
-    <attribute name="changeSessionIdOnAuthentication"
-               description="Controls if the session ID is changed if a session exists at the point where users are authenticated"
-               type="boolean"/>
-      
-    <attribute name="className"
-               description="Fully qualified class name of the managed object"
-               type="java.lang.String"
-               writeable="false"/>
-      
-    <attribute name="disableProxyCaching"
-               description="Controls the caching of pages that are protected by security constraints"
-               type="boolean"/>
-      
-    <attribute name="securePagesWithPragma"
-               description="Controls the caching of pages that are protected by security constraints"
-               type="boolean"/>
-      
-    <attribute name="secureRandomAlgorithm"
-               description="The name of the algorithm to use for SSO session ID generation"
-               type="java.lang.String"/>
-      
-    <attribute name="secureRandomClass"
-               description="The name of the class to use for SSO session ID generation"
-               type="java.lang.String"/>
-      
-    <attribute name="secureRandomProvider"
-               description="The name of the provider to use for SSO session ID generation"
-               type="java.lang.String"/>
-      
-    <attribute name="stateName"
-               description="The name of the LifecycleState that this component is currently in"
-               type="java.lang.String"
-               writeable="false"/>
-  </mbean>
-  
-  
-  <mbean name="DigestAuthenticator"
-         description="An Authenticator and Valve implementation of HTTP DIGEST Authentication"
-         domain="Catalina"
-         group="Valve"
-         type="org.apache.catalina.authenticator.DigestAuthenticator">
-    
-    <attribute name="alwaysUseSession"
-               description="Should a session always be used once a user is authenticated?"
-               type="boolean"/>
-      
+
     <attribute name="cache"
                description="Should we cache authenticated Principals if the request is part of an HTTP session?"
                type="boolean"/>
@@ -84,24 +34,74 @@
     <attribute name="changeSessionIdOnAuthentication"
                description="Controls if the session ID is changed if a session exists at the point where users are authenticated"
                type="boolean"/>
-      
+
     <attribute name="className"
                description="Fully qualified class name of the managed object"
                type="java.lang.String"
                writeable="false"/>
-      
-    <attribute name="cnonceCacheSize"
-               description="The size of the cnonce cache used to prevent replay attacks"
-               type="int"/>
-      
+
     <attribute name="disableProxyCaching"
                description="Controls the caching of pages that are protected by security constraints"
                type="boolean"/>
-      
+
+    <attribute name="securePagesWithPragma"
+               description="Controls the caching of pages that are protected by security constraints"
+               type="boolean"/>
+
+    <attribute name="secureRandomAlgorithm"
+               description="The name of the algorithm to use for SSO session ID generation"
+               type="java.lang.String"/>
+
+    <attribute name="secureRandomClass"
+               description="The name of the class to use for SSO session ID generation"
+               type="java.lang.String"/>
+
+    <attribute name="secureRandomProvider"
+               description="The name of the provider to use for SSO session ID generation"
+               type="java.lang.String"/>
+
+    <attribute name="stateName"
+               description="The name of the LifecycleState that this component is currently in"
+               type="java.lang.String"
+               writeable="false"/>
+  </mbean>
+
+
+  <mbean name="DigestAuthenticator"
+         description="An Authenticator and Valve implementation of HTTP DIGEST Authentication"
+         domain="Catalina"
+         group="Valve"
+         type="org.apache.catalina.authenticator.DigestAuthenticator">
+
+    <attribute name="alwaysUseSession"
+               description="Should a session always be used once a user is authenticated?"
+               type="boolean"/>
+
+    <attribute name="cache"
+               description="Should we cache authenticated Principals if the request is part of an HTTP session?"
+               type="boolean"/>
+
+    <attribute name="changeSessionIdOnAuthentication"
+               description="Controls if the session ID is changed if a session exists at the point where users are authenticated"
+               type="boolean"/>
+
+    <attribute name="className"
+               description="Fully qualified class name of the managed object"
+               type="java.lang.String"
+               writeable="false"/>
+
+    <attribute name="cnonceCacheSize"
+               description="The size of the cnonce cache used to prevent replay attacks"
+               type="int"/>
+
+    <attribute name="disableProxyCaching"
+               description="Controls the caching of pages that are protected by security constraints"
+               type="boolean"/>
+
     <attribute name="key"
                description="The secret key used by digest authentication"
                type="java.lang.String"/>
-      
+
     <attribute name="nonceValidity"
                description="The time, in milliseconds, for which a server issued nonce will be valid"
                type="long"/>
@@ -109,23 +109,23 @@
     <attribute name="opaque"
                description="The opaque server string used by digest authentication"
                type="java.lang.String"/>
-      
+
     <attribute name="securePagesWithPragma"
                description="Controls the caching of pages that are protected by security constraints"
                type="boolean"/>
-      
+
     <attribute name="secureRandomAlgorithm"
                description="The name of the algorithm to use for SSO session ID generation"
                type="java.lang.String"/>
-      
+
     <attribute name="secureRandomClass"
                description="The name of the class to use for SSO session ID generation"
                type="java.lang.String"/>
-      
+
     <attribute name="secureRandomProvider"
                description="The name of the provider to use for SSO session ID generation"
                type="java.lang.String"/>
-      
+
     <attribute name="stateName"
                description="The name of the LifecycleState that this component is currently in"
                type="java.lang.String"
@@ -135,13 +135,13 @@
                description="Should the uri be validated as required by RFC2617?"
                type="boolean"/>
   </mbean>
-  
+
   <mbean name="FormAuthenticator"
          description="An Authenticator and Valve implementation of FORM BASED Authentication"
          domain="Catalina"
          group="Valve"
          type="org.apache.catalina.authenticator.FormAuthenticator">
-    
+
     <attribute name="changeSessionIdOnAuthentication"
                description="Controls if the session ID is changed if a session exists at the point where users are authenticated"
                type="boolean"/>
@@ -158,7 +158,7 @@
     <attribute name="disableProxyCaching"
                description="Controls the caching of pages that are protected by security constraints"
                type="boolean"/>
-      
+
     <attribute name="landingPage"
                description="Controls the behavior of the FORM authentication process if the process is misused, for example by directly requesting the login page or delaying logging in for so long that the session expires"
                type="java.lang.String"/>
@@ -166,35 +166,35 @@
     <attribute name="securePagesWithPragma"
                description="Controls the caching of pages that are protected by security constraints"
                type="boolean"/>
-      
+
     <attribute name="secureRandomAlgorithm"
                description="The name of the algorithm to use for SSO session ID generation"
                type="java.lang.String"/>
-      
+
     <attribute name="secureRandomClass"
                description="The name of the class to use for SSO session ID generation"
                type="java.lang.String"/>
-      
+
     <attribute name="secureRandomProvider"
                description="The name of the provider to use for SSO session ID generation"
                type="java.lang.String"/>
-      
+
     <attribute name="stateName"
                description="The name of the LifecycleState that this component is currently in"
                type="java.lang.String"
                writeable="false"/>
   </mbean>
-  
+
   <mbean name="NonLoginAuthenticator"
          description="An Authenticator and Valve implementation that checks only security constraints not involving user authentication"
          domain="Catalina"
          group="Valve"
          type="org.apache.catalina.authenticator.NonLoginAuthenticator">
-    
+
     <attribute name="cache"
                description="Should we cache authenticated Principals if the request is part of an HTTP session?"
                type="boolean"/>
-      
+
     <attribute name="changeSessionIdOnAuthentication"
                description="Controls if the session ID is changed if a session exists at the point where users are authenticated"
                type="boolean"/>
@@ -207,29 +207,29 @@
     <attribute name="disableProxyCaching"
                description="Controls the caching of pages that are protected by security constraints"
                type="boolean"/>
-      
+
     <attribute name="securePagesWithPragma"
                description="Controls the caching of pages that are protected by security constraints"
                type="boolean"/>
-      
+
     <attribute name="stateName"
                description="The name of the LifecycleState that this component is currently in"
                type="java.lang.String"
                writeable="false"/>
   </mbean>
-  
-  
+
+
   <mbean name="SingleSignOn"
          description="A Valve that supports a 'single signon' user experience"
          domain="Catalina"
          group="Valve"
          type="org.apache.catalina.authenticator.SingleSignOn">
-    
+
     <attribute name="className"
                description="Fully qualified class name of the managed object"
                type="java.lang.String"
                writeable="false"/>
-      
+
     <attribute name="requireReauthentication"
                description="Should we attempt to reauthenticate each request against the security Realm?"
                type="boolean"/>
@@ -267,27 +267,27 @@
     <attribute name="disableProxyCaching"
                description="Controls the caching of pages that are protected by security constraints"
                type="boolean"/>
-      
+
     <attribute name="securePagesWithPragma"
                description="Controls the caching of pages that are protected by security constraints"
                type="boolean"/>
-      
+
     <attribute name="secureRandomAlgorithm"
                description="The name of the algorithm to use for SSO session ID generation"
                type="java.lang.String"/>
-      
+
     <attribute name="secureRandomClass"
                description="The name of the class to use for SSO session ID generation"
                type="java.lang.String"/>
-      
+
     <attribute name="secureRandomProvider"
                description="The name of the provider to use for SSO session ID generation"
                type="java.lang.String"/>
-      
+
     <attribute name="stateName"
                description="The name of the LifecycleState that this component is currently in"
                type="java.lang.String"
                writeable="false"/>
   </mbean>
-  
+
 </mbeans-descriptors>
