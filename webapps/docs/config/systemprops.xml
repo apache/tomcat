@@ -40,15 +40,15 @@
 <section name="Property replacements">
   <properties>
     <property name="org.apache.tomcat.util.digester. PROPERTY_SOURCE">
-      <p>Set this to a fully qualified name of a class that implements 
+      <p>Set this to a fully qualified name of a class that implements
          <code>org.apache.tomcat.util.IntrospectionUtils.PropertySource</code>.
          Required to have a public constructor with no arguments.</p>
       <p>Use this to add a property source, that will be invoked when <code>${parameter}</code>
          denoted parameters are found in the XML files that Tomcat parses.</p>
     </property>
   </properties>
-  
-</section>  
+
+</section>
 
 <section name="Clustering">
   <properties>
@@ -336,7 +336,7 @@
       <code>true</code>, the default of this setting will be <code>true</code>,
       else the default value will be <code>false</code>.</p>
     </property>
-    
+
     <property
     name="org.apache.tomcat.util.http. ServerCookie.ALLOW_EQUALS_IN_VALUE">
       <p>If this is <code>true</code> Tomcat will allow '<code>=</code>'
@@ -406,12 +406,12 @@
 
   <properties>
 
-    <property name="org.apache.catalina.authenticator. 
+    <property name="org.apache.catalina.authenticator.
                     Constants.SSO_SESSION_COOKIE_NAME">
       <p>An alternative name for the single sign on session cookie. Defaults to
       <code>JSESSIONIDSSO</code>.</p>
     </property>
-    
+
     <property name="org.apache.catalina.core. StandardHostValve.ACCESS_SESSION">
       <p>If this is <code>true</code>, every request that is associated with a
       session will cause the session's last accessed time to be updated
@@ -420,7 +420,7 @@
       <code>true</code>, the default of this setting will be <code>true</code>,
       else the default value will be <code>false</code>.</p>
     </property>
-    
+
     <property
     name="org.apache.catalina.session. StandardSession.ACTIVITY_CHECK">
       <p>If this is <code>true</code>, Tomcat will track the number of active
@@ -454,9 +454,9 @@
     <property name="org.apache.juli.formatter">
       <p>If no logging configuration file is specified and no logging configuration class is specified
          using the <code>java.util.logging.config.class</code> and <code>java.util.logging.config.file</code>
-         properties the default logging framework <code>org.apache.juli</code> will use the default 
-         <code>java.util.logging.SimpleFormatter</code> for all console output. 
-         To simply override the console output formatter, one can use the described property. Example: 
+         properties the default logging framework <code>org.apache.juli</code> will use the default
+         <code>java.util.logging.SimpleFormatter</code> for all console output.
+         To simply override the console output formatter, one can use the described property. Example:
          <code>-Dorg.apache.juli.formatter=org.apache.juli.OneLineFormatter</code></p>
     </property>
     <property name="org.apache.juli.AsyncOverflowDropType">
@@ -473,7 +473,7 @@
     </property>
 
     <property name="org.apache.juli.AsyncMaxRecordCount">
-      <p>The max number of log records that the async logger will keep in memory. When this limit is reached and a new record is being logged by the 
+      <p>The max number of log records that the async logger will keep in memory. When this limit is reached and a new record is being logged by the
          JULI framework the system will take an action based on the <code>org.apache.juli.AsyncOverflowDropType</code> setting.</p>
       <p>The default value is <code>10000</code> records.
          This number represents the global number of records, not on a per handler basis.
@@ -571,13 +571,13 @@
       <p>If <code>true</code>, use a shared selector for servlet write/read.</p>
       <p>If not specified, the default value of <code>true</code> will be used.</p>
     </property>
-    
+
     <property name="org.apache.catalina.startup. EXIT_ON_INIT_FAILURE">
       <p>If <code>true</code>, the server will exit if an exception happens
          during the server initialization phase.</p>
       <p>If not specified, the default value of <code>false</code> will be used.</p>
     </property>
-    
+
 
   </properties>
 

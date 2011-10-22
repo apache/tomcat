@@ -137,7 +137,7 @@ ProxyPassReverse  /myapp  http://localhost:8081/myapp
 <p>When requests are proxied in this manner, <strong>all</strong> requests
 for the configured web applications will be processed by Tomcat (including
 requests for static content).  You can improve performance by using the
-<code>mod_jk</code> web connector instead of <code>mod_proxy</code>. 
+<code>mod_jk</code> web connector instead of <code>mod_proxy</code>.
 <code>mod_jk</code> can be configured so that the web server serves static
 content that is not processed by filters or security constraints defined
 within the web application's deployment descriptor

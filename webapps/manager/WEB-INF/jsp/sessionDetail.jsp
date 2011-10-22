@@ -21,7 +21,7 @@
 <%@page import="org.apache.catalina.Session" %>
 <%@page import="org.apache.catalina.manager.JspHelper" %>
 <%@page import="org.apache.catalina.util.ContextName" %>
-<!DOCTYPE html 
+<!DOCTYPE html
      PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
      "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <%--!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
@@ -99,7 +99,7 @@
        <td><%= JspHelper.getDisplayTTLForSession(currentSession) %></td>
      </tr>
    </table>
-   
+
    <form method="post" action="<%= submitUrl %>">
      <div>
        <input type="hidden" name="sessionId" value="<%= currentSessionId %>" />
@@ -113,10 +113,10 @@
        %>    <input type="submit" value="Refresh" />
      </div>
    </form>
-    
+
    <div class="error"><%= JspHelper.escapeXml(request.getAttribute("error")) %></div>
    <div class="message"><%= JspHelper.escapeXml(request.getAttribute("message")) %></div>
-   
+
    <table style="text-align: left;" border="1" cellpadding="2" cellspacing="2">
    <% int nAttributes = 0;
       Enumeration attributeNamesEnumeration = currentHttpSession.getAttributeNames();

@@ -211,7 +211,7 @@ Apache Introduction to SSI</a> for more information on using SSI directives.</p>
 <tr>
 <td>CONTENT_LENGTH</td>
 <td>
-  The length of the data (in bytes or the number of 
+  The length of the data (in bytes or the number of
   characters) passed from a form.</td>
 </tr>
 
@@ -246,7 +246,7 @@ Virtual path to the file</td>
 <tr>
 <td>GATEWAY_INTERFACE</td>
 <td>
-  The revision of the Common Gateway Interface that the 
+  The revision of the Common Gateway Interface that the
   server uses if enabled: &quot;CGI/1.1&quot;.</td>
 </tr>
 
@@ -313,7 +313,7 @@ The query string that follows the &quot;?&quot; in the URL.
 <tr>
 <td>QUERY_STRING_UNESCAPED</td>
 <td>
-Undecoded query string with all shell metacharacters escaped 
+Undecoded query string with all shell metacharacters escaped
 with &quot;\&quot;</td>
 </tr>
 <tr>
@@ -380,7 +380,7 @@ with &quot;\&quot;</td>
 <tr>
 <td>SERVER_SOFTWARE</td>
 <td>
-  The name and version of the server software that is 
+  The name and version of the server software that is
   answering the client request.</td>
 </tr>
 <tr>

@@ -49,7 +49,7 @@
    container or the <code>&lt;Host&gt;</code> container.<br/>
    Placing it in the engine, means that you will support clustering in all virtual hosts of Tomcat,
    and share the messaging component. When you place the <code>&lt;Cluster&gt;</code> inside the <code>&lt;Engine&gt;</code>
-   element, the cluster will append the host name of each session manager to the managers name so that two contexts with 
+   element, the cluster will append the host name of each session manager to the managers name so that two contexts with
    the same name but sitting inside two different hosts will be distinguishable.
   </p>
 </section>
@@ -70,7 +70,7 @@
     are/could be loosely coupled and don't rely on the <code>SimpleTcpCluster</code> for its data replication.
   </p>
   <p><b><a href="cluster-channel.html">Channel</a>:</b> <br/>
-    The Channel and its sub components are all part of the IO layer 
+    The Channel and its sub components are all part of the IO layer
     for the cluster group, and is a module in it's own that we have nick named &quot;Tribes&quot;
     <br/>
     Any configuring and tuning of the network layer, the messaging and the membership logic
@@ -96,7 +96,7 @@
   <p>
     <b>Deprecated settings:</b> In the previous version of Tomcat you were able to control session
        manager settings using manager.&lt;property&gt;=value.
-       This has been discontinued, as the way it was written interferes with 
+       This has been discontinued, as the way it was written interferes with
        the ability to support multiple different manager classes under one cluster implementation,
        as the same properties might have the different effect on different managers.
   </p>
@@ -112,12 +112,12 @@
     </attribute>
     <attribute name="channelSendOptions" required="true">
       <p>The Tribes channel send options, default is <code>8</code>.<br/>
-         This option is used to set the flag that all messages sent through the 
+         This option is used to set the flag that all messages sent through the
          SimpleTcpCluster uses. The flag decides how the messages are sent, and is a simple logical OR.<br/>
-         
+
       <source>
-        int options= Channel.SEND_OPTIONS_ASYNCHRONOUS | 
-                     Channel.SEND_OPTIONS_SYNCHRONIZED_ACK | 
+        int options= Channel.SEND_OPTIONS_ASYNCHRONOUS |
+                     Channel.SEND_OPTIONS_SYNCHRONIZED_ACK |
                      Channel.SEND_OPTIONS_USE_ACK;
       </source>
       Some of the values are:<br/>
@@ -132,7 +132,7 @@
     </attribute>
     <attribute name="channelStartOptions" required="false">
       <p>Sets the start and stop flags for the &lt;Channel&gt; object used by the cluster.
-         The default is <code>Channel.DEFAULT</code> which starts all the channel services, such as 
+         The default is <code>Channel.DEFAULT</code> which starts all the channel services, such as
          sender, receiver, multicast sender and multicast receiver.
          The following flags are available today:
          <source>
@@ -147,7 +147,7 @@
       <p>Enable this flag don't forget to disable the channel heartbeat thread.
       </p>
     </attribute>
- 
+
     <attribute name="doClusterLog" required="false">
       <p><b>Deprecated since 6.0.0</b></p>
       <p>Possible values are <code>true</code> or <code>false</code><br/>

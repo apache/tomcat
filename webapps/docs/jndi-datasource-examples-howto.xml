@@ -58,9 +58,9 @@ to make them work in Tomcat 7.x.x.
 </p>
 
 <p>
-Also, please note that JNDI DataSource configuration in general, and this 
-tutorial in particular, assumes that you have read and understood the 
-<a href="config/context.html">Context</a> and 
+Also, please note that JNDI DataSource configuration in general, and this
+tutorial in particular, assumes that you have read and understood the
+<a href="config/context.html">Context</a> and
 <a href="config/host.html">Host</a> configuration references, including
 the section about Automatic Application Deployment in the latter reference.
 </p>
@@ -120,7 +120,7 @@ The following libraries are used:
 </ul>
 
 <p>
-These libraries are located in a single JAR at 
+These libraries are located in a single JAR at
 <code>$CATALINA_HOME/lib/tomcat-dbcp.jar</code>. However,
 only the classes needed for connection pooling have been included, and the
 packages have been renamed to avoid interfering with applications.
@@ -218,13 +218,13 @@ Your MySQL user <strong>must</strong> have a password assigned. The driver
 will fail if you try to connect with an empty password.
 </p>
 <source>
-mysql&gt; GRANT ALL PRIVILEGES ON *.* TO javauser@localhost 
+mysql&gt; GRANT ALL PRIVILEGES ON *.* TO javauser@localhost
     -&gt;   IDENTIFIED BY 'javadude' WITH GRANT OPTION;
 mysql&gt; create database javatest;
 mysql&gt; use javatest;
 mysql&gt; create table testdata (
     -&gt;   id int not null auto_increment primary key,
-    -&gt;   foo varchar(25), 
+    -&gt;   foo varchar(25),
     -&gt;   bar int);
 </source>
 <blockquote>
@@ -277,7 +277,7 @@ resource to your <a href="config/context.html">Context</a>.</p>
          org.gjt.mm.mysql.Driver - we recommend using Connector/J though.
          Class name for the official MySQL Connector/J driver is com.mysql.jdbc.Driver.
          --&gt;
-    
+
     &lt;!-- url: The JDBC connection url for connecting to your MySQL database.
          --&gt;
 
@@ -325,7 +325,7 @@ select id, foo, bar from testdata
   &lt;body&gt;
 
   &lt;h2&gt;Results&lt;/h2&gt;
-  
+
 &lt;c:forEach var="row" items="${rs.rows}"&gt;
     Foo ${row.foo}&lt;br/&gt;
     Bar ${row.bar}&lt;br/&gt;
@@ -387,7 +387,7 @@ user scott.</p>
               type="javax.sql.DataSource" driverClassName="oracle.jdbc.OracleDriver"
               url="jdbc:oracle:thin:@127.0.0.1:1521:mysid"
               username="scott" password="tiger" maxActive="20" maxIdle="10"
-              maxWait="-1"/&gt; 
+              maxWait="-1"/&gt;
 </source>
 
 <h3>2.    web.xml configuration</h3>
@@ -519,11 +519,11 @@ Oracle and DBCP solution above.</p>
 <p>
 In order to use OCI driver, you should have an Oracle client installed. You should have installed
 Oracle8i(8.1.7) client from cd,  and download the suitable JDBC/OCI
-driver(Oracle8i 8.1.7.1 JDBC/OCI Driver) from <a href="http://otn.oracle.com/">otn.oracle.com</a>. 
+driver(Oracle8i 8.1.7.1 JDBC/OCI Driver) from <a href="http://otn.oracle.com/">otn.oracle.com</a>.
 </p>
 <p>
 After renaming <code>classes12.zip</code> file to <code>classes12.jar</code>
-for Tomcat, copy it into <code>$CATALINA_HOME/lib</code>. 
+for Tomcat, copy it into <code>$CATALINA_HOME/lib</code>.
 You may also have to remove the <code>javax.sql.*</code> classes
 from this file depending upon the version of Tomcat and JDK you are using.
 </p>
@@ -532,7 +532,7 @@ from this file depending upon the version of Tomcat and JDK you are using.
 <subsection name="Putting it all together">
 <p>
 Ensure that you have the <code>ocijdbc8.dll</code> or <code>.so</code> in your <code>$PATH</code> or <code>LD_LIBRARY_PATH</code>
- (possibly in <code>$ORAHOME\bin</code>) and also confirm that the native library can be loaded by a simple test program 
+ (possibly in <code>$ORAHOME\bin</code>) and also confirm that the native library can be loaded by a simple test program
 using <code>System.loadLibrary("ocijdbc8");</code>
 </p>
 <p>
@@ -546,12 +546,12 @@ conn =
 DriverManager.getConnection("jdbc:oracle:oci8:@database","username","password");
 </source>
 <p>
-where database is of the form <code>host:port:SID</code> Now if you try to access the URL of your 
-test servlet/jsp and what you get is a 
+where database is of the form <code>host:port:SID</code> Now if you try to access the URL of your
+test servlet/jsp and what you get is a
 <code>ServletException</code> with a root cause of <code>java.lang.UnsatisfiedLinkError:get_env_handle</code>.
 </p>
 <p>
-First, the <code>UnsatisfiedLinkError</code> indicates that you have 
+First, the <code>UnsatisfiedLinkError</code> indicates that you have
 <ul>
 <li>a mismatch between your JDBC classes file and
 your Oracle client version. The giveaway here is the message stating that a needed library file cannot be
@@ -559,7 +559,7 @@ found. For example, you may be using a classes12.zip file from Oracle Version 8.
 Oracle client. The classeXXXs.zip file and Oracle client software versions must match.
 </li>
 <li>A <code>$PATH</code>, <code>LD_LIBRARY_PATH</code> problem.</li>
-<li>It has been reported that ignoring the driver you have downloded from otn and using 
+<li>It has been reported that ignoring the driver you have downloded from otn and using
 the classes12.zip file from the directory <code>$ORAHOME\jdbc\lib</code> will also work.
 </li>
 </ul>
@@ -680,7 +680,7 @@ obtained from a connection pool:
 <subsection name="Context versus GlobalNamingResources">
 <p>
   Please note that although the above instructions place the JNDI declarations in a Context
-  element, it is possible and sometimes desirable to place these declarations in the 
+  element, it is possible and sometimes desirable to place these declarations in the
   <a href="config/globalresources.html">GlobalNamingResources</a> section of the server
   configuration file.  A resource placed in the GlobalNamingResources section will be shared
   among the Contexts of the server.
@@ -693,7 +693,7 @@ obtained from a connection pool:
   defined in the &lt;GlobalNamingResources&gt; or &lt;Context&gt; section, not a datasource as renamed
   using &lt;ResourceLink&gt;.
 </p>
-</subsection> 
+</subsection>
 
 </section>
 

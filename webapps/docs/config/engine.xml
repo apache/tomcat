@@ -59,14 +59,14 @@
     <attributes>
 
       <attribute name="backgroundProcessorDelay" required="false">
-        <p>This value represents the delay in seconds between the 
-        invocation of the backgroundProcess method on this engine and 
-        its child containers, including all hosts and contexts. 
-        Child containers will not be invoked if their delay value is not 
-        negative (which would mean they are using their own processing 
-        thread). Setting this to a positive value will cause 
-        a thread to be spawn. After waiting the specified amount of time, 
-        the thread will invoke the backgroundProcess method on this engine 
+        <p>This value represents the delay in seconds between the
+        invocation of the backgroundProcess method on this engine and
+        its child containers, including all hosts and contexts.
+        Child containers will not be invoked if their delay value is not
+        negative (which would mean they are using their own processing
+        thread). Setting this to a positive value will cause
+        a thread to be spawn. After waiting the specified amount of time,
+        the thread will invoke the backgroundProcess method on this engine
         and all its child containers. If not specified, the default value for
         this attribute is 10, which represent a 10 seconds delay.</p>
       </attribute>
@@ -153,7 +153,7 @@
 
   <subsection name="Logging">
 
-    <p>An engine is associated with the 
+    <p>An engine is associated with the
        <code>org.apache.catalina.core.ContainerBase.[enginename]</code>
        log category.  Note that the brackets are actually part of the name,
        don't omit them.</p>

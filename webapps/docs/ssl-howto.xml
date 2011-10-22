@@ -60,7 +60,7 @@ $JAVA_HOME/bin/keytool -genkey -alias tomcat -keyalg RSA
 <p></p>
     and specify a password value of "changeit".</li><br/><br/>
 <li>Uncomment the "SSL HTTP/1.1 Connector" entry in
-    <code>$CATALINA_BASE/conf/server.xml</code> and modify as described in 
+    <code>$CATALINA_BASE/conf/server.xml</code> and modify as described in
     the <a href="#Configuration">Configuration section</a> below.</li>
     <br/><br/>
 </ol>
@@ -212,7 +212,7 @@ Note that OpenSSL often adds readable comments before the key,
 <code>keytool</code>does not support that, so remove the OpenSSL comments if
 they exist before importing the key using <code>keytool</code>.
 </p>
-<p>To import an existing certificate signed by your own CA into a PKCS12 
+<p>To import an existing certificate signed by your own CA into a PKCS12
 keystore using OpenSSL you would execute a command like:
 <source>openssl pkcs12 -export -in mycert.crt -inkey mykey.key \
                         -out mycert.p12 -name tomcat -CAfile myCA.crt \
@@ -287,13 +287,13 @@ Tomcat can use two different implementations of SSL:
 </ul>
 The exact configuration details depend on which implementation is being used.
 The implementation used by Tomcat is chosen automatically unless it is overriden as described below.
-If the installation uses <a href="apr.html">APR</a> 
+If the installation uses <a href="apr.html">APR</a>
 - i.e. you have installed the Tomcat native library -
-then it will use the APR SSL implementation, otherwise it will use the Java JSSE implementation.  
+then it will use the APR SSL implementation, otherwise it will use the Java JSSE implementation.
 </p>
 
 <p>
-  To avoid auto configuration you can define which implementation to use by specifying a classname 
+  To avoid auto configuration you can define which implementation to use by specifying a classname
   in the <b>protocol</b> attribute of the Connector.<br/>
   To define a Java (JSSE) connector, regardless of whether the APR library is loaded or not do:
 <source>
@@ -347,7 +347,7 @@ file installed with Tomcat.  For JSSE, it should look something like this:</p>
 <source>
 &lt;-- Define a SSL Coyote HTTP/1.1 Connector on port 8443 --&gt;
 &lt;!--
-&lt;Connector 
+&lt;Connector
            port="8443" maxThreads="200"
            scheme="https" secure="true" SSLEnabled="true"
            keystoreFile="${user.home}/.keystore" keystorePass="changeit"
@@ -356,15 +356,15 @@ file installed with Tomcat.  For JSSE, it should look something like this:</p>
 </source>
 <p>
   The example above will throw an error if you have the APR and the Tomcat Native libraries in your path,
-  as Tomcat will try to use the APR connector. The APR connector uses different attributes for 
+  as Tomcat will try to use the APR connector. The APR connector uses different attributes for
   SSL keys and certificates. An example of an APR configuration is:
 <source>
 &lt;-- Define a SSL Coyote HTTP/1.1 Connector on port 8443 --&gt;
 &lt;!--
-&lt;Connector 
+&lt;Connector
            port="8443" maxThreads="200"
            scheme="https" secure="true" SSLEnabled="true"
-           SSLCertificateFile="/usr/local/ssl/server.crt" 
+           SSLCertificateFile="/usr/local/ssl/server.crt"
            SSLCertificateKeyFile="/usr/local/ssl/server.pem"
            clientAuth="optional" SSLProtocol="TLSv1"/&gt;
 --&gt;
@@ -412,20 +412,20 @@ contains some troubleshooting tips.</p>
 </section>
 
 <section name="Installing a Certificate from a Certificate Authority">
-<p>To obtain and install a Certificate from a Certificate Authority (like verisign.com, thawte.com 
+<p>To obtain and install a Certificate from a Certificate Authority (like verisign.com, thawte.com
 or trustcenter.de), read the previous section and then follow these instructions:</p>
 
 <subsection name="Create a local Certificate Signing Request (CSR)">
-<p>In order to obtain a Certificate from the Certificate Authority of your choice 
-you have to create a so called Certificate Signing Request (CSR). That CSR will be used 
-by the Certificate Authority to create a Certificate that will identify your website 
+<p>In order to obtain a Certificate from the Certificate Authority of your choice
+you have to create a so called Certificate Signing Request (CSR). That CSR will be used
+by the Certificate Authority to create a Certificate that will identify your website
 as "secure". To create a CSR follow these steps:</p>
 <ul>
 <li>Create a local Certificate (as described in the previous section):
     <source>keytool -genkey -alias tomcat -keyalg RSA \
     -keystore &lt;your_keystore_filename&gt;</source>
     Note: In some cases you will have to enter the domain of your website (i.e. <code>www.myside.org</code>)
-    in the field "first- and lastname" in order to create a working Certificate. 
+    in the field "first- and lastname" in order to create a working Certificate.
 </li>
 <li>The CSR is then created with:
     <source>keytool -certreq -keyalg RSA -alias tomcat -file certreq.csr \
@@ -437,8 +437,8 @@ documentation of the Certificate Authority website on how to do this). In return
 </subsection>
 
 <subsection name="Importing the Certificate">
-<p>Now that you have your Certificate you can import it into you local keystore. 
-First of all you have to import a so called Chain Certificate or Root Certificate into your keystore. 
+<p>Now that you have your Certificate you can import it into you local keystore.
+First of all you have to import a so called Chain Certificate or Root Certificate into your keystore.
 After that you can proceed with importing your Certificate.</p>
 
 <ul>
@@ -565,7 +565,7 @@ public class SessionTrackingModeListener implements ServletContextListener {
         ServletContext context = event.getServletContext();
         EnumSet&lt;SessionTrackingMode&gt; modes =
             EnumSet.of(SessionTrackingMode.SSL);
-        
+
         context.setSessionTrackingModes(modes);
     }
 
@@ -574,7 +574,7 @@ public class SessionTrackingModeListener implements ServletContextListener {
   </p>
   <p>Note: SSL session tracking is implemented for the BIO and NIO connectors.
      It is not yet implemented for the APR connector.</p>
-     
+
 </section>
 
 <section name="Miscellaneous Tips and Bits">

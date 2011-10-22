@@ -23,7 +23,7 @@
   <body>
     <h1>JSP 2.0 Examples - jsp:attribute and jsp:body</h1>
     <hr>
-    <p>The new &lt;jsp:attribute&gt; and &lt;jsp:body&gt; 
+    <p>The new &lt;jsp:attribute&gt; and &lt;jsp:body&gt;
     standard actions can be used to specify the value of any standard
     action or custom action attribute.</p>
     <p>This example uses the &lt;jsp:attribute&gt;

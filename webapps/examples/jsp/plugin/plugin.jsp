@@ -25,7 +25,7 @@
 </jsp:plugin>
 <p>
 <h4>
-<font color=red> 
+<font color=red>
 The above applet is loaded using the Java Plugin from a jsp page using the
 plugin tag.
 </font>

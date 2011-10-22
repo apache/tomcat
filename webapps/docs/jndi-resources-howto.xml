@@ -37,9 +37,9 @@
 <section name="Introduction">
 
 <p>Tomcat provides a JNDI <strong>InitialContext</strong> implementation
-instance for each web application running under it, in a manner that is 
-compatible with those provided by a 
-<a href="http://java.sun.com/j2ee">Java Enterprise Edition</a> application 
+instance for each web application running under it, in a manner that is
+compatible with those provided by a
+<a href="http://java.sun.com/j2ee">Java Enterprise Edition</a> application
 server. The Java EE standard provides a standard set of elements in the
 <code>/WEB-INF/web.xml</code> file to reference/define resources.</p>
 
@@ -108,13 +108,13 @@ element:</p>
     <code>&lt;resource-ref&gt;</code> element in the web application
     deployment descriptor).</li>
 <li><a href="config/context.html#Resource Links">&lt;ResourceLink&gt;</a> -
-    Add a link to a resource defined in the global JNDI context. Use resource 
-    links to give a web application access to a resource defined in 
+    Add a link to a resource defined in the global JNDI context. Use resource
+    links to give a web application access to a resource defined in
     the<a href="config/globalresources.html">&lt;GlobalNamingResources&gt;</a>
     child element of the <a href="config/server.html">&lt;Server&gt;</a>
     element.</li>
 <li><a href="config/context.html#Transaction">&lt;Transaction&gt;</a> -
-    Add a resource factory for instantiating the UserTransaction object 
+    Add a resource factory for instantiating the UserTransaction object
     instance that is available at <code>java:comp/UserTransaction</code>.</li>
 
 </ul>
@@ -143,16 +143,16 @@ attribute to "true").</p>
 
 <section name="Global configuration">
 
-<p>Tomcat maintains a separate namespace of global resources for the 
-entire server.  These are configured in the 
+<p>Tomcat maintains a separate namespace of global resources for the
+entire server.  These are configured in the
 <a href="config/globalresources.html">
-<code><strong>&lt;GlobalNamingResources&gt;</strong></code></a> element of 
-<code>$CATALINA_BASE/conf/server.xml</code>. You may expose these resources to 
-web applications by using a 
+<code><strong>&lt;GlobalNamingResources&gt;</strong></code></a> element of
+<code>$CATALINA_BASE/conf/server.xml</code>. You may expose these resources to
+web applications by using a
 <a href="config/context.html#Resource Links">&lt;ResourceLink&gt;</a> to
 include it in the per-web-application context.</p>
 
-<p>If a resource has been defined using a 
+<p>If a resource has been defined using a
 <a href="config/context.html#Resource Links">&lt;ResourceLink&gt;</a>, it is not
 necessary for that resource to be defined in <code>/WEB-INF/web.xml</code>.
 However, it is recommended to keep the entry in <code>/WEB-INF/web.xml</code>
@@ -376,7 +376,7 @@ writer.println("foo = " + bean.getFoo() + ", bar = " +
 
     <p>The <code>pathname</code> attribute can be absolute or relative. If
     relative, it is relative to <code>$CATALINA_BASE</code>.</p>
-    
+
     <p>The <code>readonly</code> attribute is optional and defaults to
     <code>true</code> if not supplied. If the XML is writeable then it will be
     written to when Tomcat starts. <strong>WARNING:</strong> When the file is
@@ -513,7 +513,7 @@ Transport.send(message);
     </p>
 
     <h3>5.  Restart Tomcat</h3>
-    
+
     <p>For the additional JAR to be visible to Tomcat, it is necessary for the
     Tomcat instance to be restarted.</p>
 

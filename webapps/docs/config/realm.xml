@@ -50,8 +50,8 @@
   containers, unless explicitly overridden.</p>
 
   <p>For more in-depth information about container managed security in web
-  applications, as well as more information on configuring and using the 
-  standard realm component implementations, please see the 
+  applications, as well as more information on configuring and using the
+  standard realm component implementations, please see the
   <a href="../realm-howto.html">Container-Managed Security Guide</a>.
   </p>
 
@@ -140,7 +140,7 @@
         to encode user passwords stored in the database.  If not specified,
         user passwords are assumed to be stored in clear-text.</p>
       </attribute>
-   
+
       <attribute name="digestEncoding" required="false">
         <p>The charset for encoding digests.  If not specified, the platform
         default will be used.</p>
@@ -245,12 +245,12 @@
       </attribute>
 
       <attribute name="localDataSource" required="false">
-        <p>When the realm is nested inside a Context element, this allows the 
+        <p>When the realm is nested inside a Context element, this allows the
         realm to use a DataSource defined for the Context rather than a global
-        DataSource.  If not specified, the default is <code>false</code>: use a 
+        DataSource.  If not specified, the default is <code>false</code>: use a
         global DataSource.</p>
       </attribute>
-    
+
       <attribute name="roleNameCol" required="true">
         <p>Name of the column, in the "user roles" table, which contains
         a role name assigned to the corresponding user.</p>
@@ -736,17 +736,17 @@
 
       <attribute name="appName" required="true">
        <p>The name of the application as configured in your login configuration
-       file 
+       file
        (<a href="http://download.oracle.com/javase/1.4.2/docs/guide/security/jaas/tutorials/LoginConfigFile.html">JAAS LoginConfig</a>).</p>
       </attribute>
 
       <attribute name="userClassNames" required="true">
-        <p>A comma-separated list of the names of the classes that you have made 
+        <p>A comma-separated list of the names of the classes that you have made
         for your user <code>Principals</code>.</p>
       </attribute>
 
       <attribute name="roleClassNames" required="false">
-        <p>A comma-separated list of the names of the classes that you have made 
+        <p>A comma-separated list of the names of the classes that you have made
         for your role <code>Principals</code>.</p>
       </attribute>
 
@@ -801,10 +801,10 @@
     <code>Realm</code> interface that extends the CombinedRealm to provide lock
     out functionality to provide a user lock out mechanism if there are too many
     failed authentication attempts in a given period of time.</p>
-    
+
     <p>To ensure correct operation, there is a reasonable degree of
     synchronization in this Realm.</p>
-    
+
     <p>This Realm does not require modification to the underlying Realms or the
     associated user storage mechanisms. It achieves this by recording all failed
     logins, including those for users that do not exist. To prevent a DOS by
@@ -866,7 +866,7 @@
   <strong>&lt;Realm&gt;</strong> elements may be nested inside it.</p>
 
   <h3>Other Realm Implementations</h3>
-  
+
   <p>No other Realm implementation supports nested components.</p>
 
 </section>

@@ -82,7 +82,7 @@ public class ColorGameBean {
     public boolean getSuccess() {
         if (background.equalsIgnoreCase("black") ||
             background.equalsIgnoreCase("cyan")) {
-        
+
             if (foreground.equalsIgnoreCase("black") ||
                 foreground.equalsIgnoreCase("cyan")) {
                 return true;

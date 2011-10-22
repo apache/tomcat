@@ -42,9 +42,9 @@
 <p>
     <b>Tomcat7w</b> is a GUI application for monitoring and configuring Tomcat
     services.
-</p>    
+</p>
     <p>The available command line options are:</p>
-<p> 
+<p>
     <table>
     <tr><th>//ES//</th>
         <td>Edit service configuration</td>
@@ -63,7 +63,7 @@
     Each command line directive is in the form of <b>//XX//ServiceName</b>
 </p>
     <p>The available command line options are:</p>
-<p> 
+<p>
     <table>
     <tr><th>//TS//</th>
         <td>Run the service as console application</td>
@@ -90,9 +90,9 @@
     <tr><th>//DS//</th>
         <td>Delete service</td>
         <td>Stops the service if running</td>
-    </tr>        
+    </tr>
     </table>
-</p> 
+</p>
 </section>
 <section name="Command line parameters">
 <p>
@@ -103,7 +103,7 @@
     prefixed with <code>PR_</code> exists it will take precedence.
     For example:
 <source>set PR_CLASSPATH=xx.jar</source>
-</p>    
+</p>
 <p>is equivalent to providing
 <source>--Classpath=xx.jar</source>
 </p>
@@ -112,13 +112,13 @@
     PR_JVMMS, PR_JVMMX, PR_JVMSS, PR_STARTPARAMS, PR_STOPPARAMS and
     PR_STOPTIMEOUT will not work until this bug is fixed:
     <a href="http://issues.apache.org/jira/browse/DAEMON-49">DAEMON-49</a></p>
-<p> 
+<p>
     <table>
     <tr>
     <th>ParameterName</th>
     <th>Default</th>
     <th>Description</th>
-    </tr> 
+    </tr>
     <tr>
     <td>--Description</td>
     <td></td>
@@ -298,9 +298,9 @@
     <td>--StdError</td>
     <td></td>
     <td>Redirected stderr filename</td>
-    </tr>    
+    </tr>
     </table>
-</p> 
+</p>
 </section>
 <section name="Installing services">
 <p>
@@ -314,7 +314,7 @@ a user to use for the installation of the service.
 Account Control (UAC) you must either disable UAC or right-click on cmd.exe and
 select "Run as administrator" in order to run this script. If UAC is enabled
 neither being logged on with an Administrator account, nor using the
-<code>/user</code> switch is sufficient.  
+<code>/user</code> switch is sufficient.
 </p>
 <p>
 <source>
@@ -378,4 +378,4 @@ C:\> tomcat7
 </p>
 </section>
 </body>
-</document> 
+</document>

@@ -83,7 +83,7 @@
   </ul>
   </p>
   </subsection>
-  
+
   <subsection name="Naming">
   <p>When autoDeploy or deployOnStartup is used then there is a close
   relationship between the <em>context name</em>, <em>context path</em>,
@@ -101,7 +101,7 @@
   When a version is specified, <code>##version</code> is added to the contextName and base
   name. To help clarify these rules, some examples are given in the following
   table.</p>
-  
+
   <table class="detail-table">
     <tr><th>Context Path</th><th>Context Version</th><th>Context Name</th><th>Base filename</th></tr>
     <tr><td>/foo</td><td><i>None</i></td><td>/foo</td><td>foo</td></tr>
@@ -111,7 +111,7 @@
     <tr><td>/foo/bar</td><td>42</td><td>/foo/bar##42</td><td>foo#bar##42</td></tr>
     <tr><td><i>Empty String</i></td><td>42</td><td>##42</td><td>ROOT##42</td></tr>
   </table>
-  
+
   <p>The version component is treated as a <code>String</code> both for
   performance reasons and to allow flexibility in versioning schemes. String
   comparisons are used to determine version order. If version is not specified,
@@ -124,7 +124,7 @@
   recommended that zero padding is used so that <code>foo##002.war</code> is
   treated as an earlier version than <code>foo##011.war</code>.
   </p>
-  
+
   <p>If you want to deploy a WAR file or a directory using a context path that
   is not related to the base file name then one of the following options must
   be used to prevent double-deployment:
@@ -169,9 +169,9 @@
   <strong>Context</strong> to which the default applies. They will <b>not</b> be
   shared between <strong>Context</strong> elements.
   <ul>
-  <li>In the <code>$CATALINA_BASE/conf/context.xml</code> file: 
+  <li>In the <code>$CATALINA_BASE/conf/context.xml</code> file:
   the Context element information will be loaded by all webapps.</li>
-  <li>In the 
+  <li>In the
   <code>$CATALINA_BASE/conf/[enginename]/[hostname]/context.xml.default</code>
   file: the Context element information will be loaded by all webapps of that
   host.</li>
@@ -188,7 +188,7 @@
   Automatic Application Deployment</a> and
   <a href="host.html#User Web Applications">User Web Applications</a>
   for more information.</p>
-  
+
   <p>To define multiple <Strong>Context</Strong>s that use a single WAR file or
   directory, use one of the options described above for creating a
   <Strong>Context</Strong> that has a path that is not related to the base file
@@ -219,18 +219,18 @@
       </attribute>
 
       <attribute name="backgroundProcessorDelay" required="false">
-        <p>This value represents the delay in seconds between the 
-        invocation of the backgroundProcess method on this context and 
-        its child containers, including all wrappers. 
-        Child containers will not be invoked if their delay value is not 
-        negative (which would mean they are using their own processing 
-        thread). Setting this to a positive value will cause 
-        a thread to be spawn. After waiting the specified amount of time, 
-        the thread will invoke the backgroundProcess method on this host 
-        and all its child containers. A context will use background 
+        <p>This value represents the delay in seconds between the
+        invocation of the backgroundProcess method on this context and
+        its child containers, including all wrappers.
+        Child containers will not be invoked if their delay value is not
+        negative (which would mean they are using their own processing
+        thread). Setting this to a positive value will cause
+        a thread to be spawn. After waiting the specified amount of time,
+        the thread will invoke the backgroundProcess method on this host
+        and all its child containers. A context will use background
         processing to perform session expiration and class monitoring for
-        reloading. If not specified, the default value for this attribute is 
-        -1, which means the context will rely on the background processing 
+        reloading. If not specified, the default value for this attribute is
+        -1, which means the context will rely on the background processing
         thread of its parent host.</p>
       </attribute>
 
@@ -372,14 +372,14 @@
         may cause problems for some application component such as compression
         filters.</p>
       </attribute>
-      
+
       <attribute name="sessionCookieDomain" required="false">
         <p>The domain to be used for all session cookies created for this
         context. If set, this overrides any domain set by the web application.
         If not set, the value specified by the web application, if any, will be
         used.</p>
       </attribute>
-      
+
       <attribute name="sessionCookieName" required="false">
         <p>The name to be used for all session cookies created for this
         context. If set, this overrides any name set by the web application.
@@ -387,7 +387,7 @@
         used, or the name <code>JSESSIONID</code> if the web application does
         not explicitly set one.</p>
       </attribute>
-      
+
       <attribute name="sessionCookiePath" required="false">
         <p>The path to be used for all session cookies created for this
         context. If set, this overrides any path set by the web application.
@@ -398,7 +398,7 @@
         <code>/</code> in the global <code>CATALINA_BASE/conf/context.xml</code>
         file.</p>
       </attribute>
-      
+
       <attribute name="sessionCookiePathUsesTrailingSlash" required="false">
         <p>Some browsers, such as IE, will send a session cookie for a context
         with a path of /foo with a request to /foobar. To prevent this, Tomcat
@@ -468,13 +468,13 @@
           side script from accessing the session ID? Defaults to
           <code>true</code>.</p>
       </attribute>
-      
+
       <attribute name="wrapperClass" required="false">
         <p>Java class name of the <code>org.apache.catalina.Wrapper</code>
         implementation class that will be used for servlets managed by this
         Context.  If not specified, a standard default value will be used.</p>
       </attribute>
-      
+
       <attribute name="xmlNamespaceAware" required="false">
         <p>If the value of this flag is <code>true</code>, the validation of
         XML files will be namespace-aware.  If you turn this flag on,
@@ -567,11 +567,11 @@
 
       <attribute name="antiResourceLocking" required="false">
         <p>If true, Tomcat will prevent any file locking.
-        This will significantly impact startup time of applications, 
-        but allows full webapp hot deploy and undeploy on platforms 
+        This will significantly impact startup time of applications,
+        but allows full webapp hot deploy and undeploy on platforms
         or configurations where file locking can occur.
         If not specified, the default value is <code>false</code>.</p>
-   
+
         <p><code>antiJARLocking</code> is a subset of
         <code>antiResourceLocking</code> and therefore, to prevent duplicate
         work and possible issues, only one of these attributes should be set
@@ -591,7 +591,7 @@
       </attribute>
 
       <attribute name="cacheMaxSize" required="false">
-        <p>Maximum size of the static resource cache in kilobytes. 
+        <p>Maximum size of the static resource cache in kilobytes.
         If not specified, the default value is <code>10240</code>
         (10 megabytes).</p>
       </attribute>
@@ -606,7 +606,7 @@
 
       <attribute name="cacheTTL" required="false">
         <p>Amount of time in milliseconds between cache entries revalidation.
-        If not specified, the default value is <code>5000</code> 
+        If not specified, the default value is <code>5000</code>
         (5 seconds).</p>
       </attribute>
 
@@ -666,10 +666,10 @@
       <attribute name="renewThreadsWhenStoppingContext" required="false">
         <p>If <code>true</code>, when this context is stopped, Tomcat renews all
         the threads from the thread pool that was used to serve this context.
-        This also requires that the 
-        <code>ThreadLocalLeakPreventionListener</code> be configured in 
+        This also requires that the
+        <code>ThreadLocalLeakPreventionListener</code> be configured in
         <code>server.xml</code> and that the <code>threadRenewalDelay</code>
-        property of the <code>Executor</code> be &gt;=0. If not specified, the 
+        property of the <code>Executor</code> be &gt;=0. If not specified, the
         default value of <code>true</code> will be used.</p>
       </attribute>
 
@@ -739,7 +739,7 @@
       Configure the resource manager that will be used to access the static
       resources associated with this web application.  Normally, the
       default configuration of the resource manager will be sufficient.</li>
-  <li><strong>WatchedResource</strong> - The auto deployer will monitor the 
+  <li><strong>WatchedResource</strong> - The auto deployer will monitor the
       specified static resource of the web application for updates, and will
       reload the web application if is is updated. The content of this element
       must be a string.</li>
@@ -753,7 +753,7 @@
 
   <subsection name="Logging">
 
-    <p>A context is associated with the 
+    <p>A context is associated with the
        <code>org.apache.catalina.core.ContainerBase.[enginename].[hostname].[path]</code>
        log category.  Note that the brackets are actually part of the name, don't omit them.</p>
 
@@ -797,7 +797,7 @@
     the following configuration steps occur automatically when Catalina
     is started, or whenever this web application is reloaded.  No special
     configuration is required to enable this feature.</p>
-    
+
     <ul>
     <li>If you have not declared your own <a href="loader.html">Loader</a>
        element, a standard web application class loader will be configured.
@@ -959,8 +959,8 @@
     nesting a <strong>Listener</strong> element inside this element.  The
     class name you specify must implement the
     <code>org.apache.catalina.LifecycleListener</code> interface, and
-    the class must be packaged in a jar and placed in the 
-    <code>$CATALINA_HOME/lib</code> directory. 
+    the class must be packaged in a jar and placed in the
+    <code>$CATALINA_HOME/lib</code> directory.
     It will be notified about the occurrence of the corresponding
     lifecycle events.  Configuration of such a listener looks like this:</p>
 
@@ -1016,8 +1016,8 @@
     to be returned for JNDI lookups of <code>&lt;resource-ref&gt;</code> and
     <code>&lt;resource-env-ref&gt;</code> elements in the web application
     deployment descriptor.  You <strong>MUST</strong> also define
-    the needed resource parameters as attributes of the <code>Resource</code> 
-    element, to configure the object factory to be used (if not known to Tomcat 
+    the needed resource parameters as attributes of the <code>Resource</code>
+    element, to configure the object factory to be used (if not known to Tomcat
     already), and the properties used to configure that object factory.</p>
 
     <p>For example, you can create a resource definition like this:</p>
@@ -1114,7 +1114,7 @@
   <subsection name="Resource Links">
 
      <p>This element is used to create a link to a global JNDI resource. Doing
-     a JNDI lookup on the link name will then return the linked global 
+     a JNDI lookup on the link name will then return the linked global
      resource.</p>
 
     <p>For example, you can create a resource link like this:</p>
@@ -1134,7 +1134,7 @@
     <attributes>
 
       <attribute name="global" required="true">
-        <p>The name of the linked global resource in the 
+        <p>The name of the linked global resource in the
         global JNDI context.</p>
       </attribute>
 
@@ -1153,7 +1153,7 @@
         This class should implement the <code>javax.naming.spi.ObjectFactory</code> interface.</p>
       </attribute>
     </attributes>
-    
+
     <p>When the attribute <code>factory=&quot;org.apache.naming.factory.DataSourceLinkFactory&quot;</code> the resource link can be used with
        two additional attributes to allow a shared data source to be used with different credentials.
        When these two additional attributes are used in combination with the <code>javax.sql.DataSource</code>
@@ -1161,7 +1161,7 @@
        Under the hood, what happens is that a call to <a href="http://download.oracle.com/javase/6/docs/api/javax/sql/DataSource.html#getConnection()"><code>getConnection()</code></a>
        is simply translated to a call <a href="http://download.oracle.com/javase/6/docs/api/javax/sql/DataSource.html#getConnection(java.lang.String,%20java.lang.String)">
        <code>getConnection(username, password)</code></a> on the global data source. This is an easy way to get code to be transparent to what schemas are being used,
-       yet be able to control connections (or pools) in the global configuration. 
+       yet be able to control connections (or pools) in the global configuration.
     </p>
     <attributes>
 
@@ -1187,14 +1187,14 @@
             type=&quot;javax.sql.DataSource&quot;
             username=&quot;bar&quot;
             password=&quot;barpass&quot;
-            
+
             ...
   ...
 &lt;/GlobalNamingResources&gt;
 
 &lt;Context path=&quot;/foo&quot;...&gt;
   ...
-  &lt;ResourceLink 
+  &lt;ResourceLink
             name=&quot;appDataSource&quot;
             global=&quot;sharedDataSource&quot;
             type=&quot;javax.sql.DataSource&quot;
@@ -1205,13 +1205,13 @@
 &lt;/Context&gt;
 &lt;Context path=&quot;/bar&quot;...&gt;
   ...
-  &lt;ResourceLink 
+  &lt;ResourceLink
             name=&quot;appDataSource&quot;
             global=&quot;sharedDataSource&quot;
             type=&quot;javax.sql.DataSource&quot;
   ...
 &lt;/Context&gt;
-</source>    
+</source>
     <p>When a request for <code>getConnection()</code> is made in the <code>/foo</code> context, the request is translated into
        <code>getConnection(&quot;foo&quot;,&quot;foopass&quot;)</code>, while a request in the <code>/bar</code> gets passed straight through.</p>
   </subsection>
@@ -1219,10 +1219,10 @@
   <subsection name="Transaction">
 
     <p>You can declare the characteristics of the UserTransaction
-    to be returned for JNDI lookup for <code>java:comp/UserTransaction</code>. 
+    to be returned for JNDI lookup for <code>java:comp/UserTransaction</code>.
     You <strong>MUST</strong> define an object factory class to instantiate
-    this object as well as the needed resource parameters as attributes of the 
-    <code>Transaction</code> 
+    this object as well as the needed resource parameters as attributes of the
+    <code>Transaction</code>
     element, and the properties used to configure that object factory.</p>
 
     <p>The valid attributes for the <code>&lt;Transaction&gt;</code> element

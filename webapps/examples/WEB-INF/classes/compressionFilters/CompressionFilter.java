@@ -182,8 +182,8 @@ public class CompressionFilter implements Filter{
             }
             chain.doFilter(request, response);
             return;
-        } 
-        
+        }
+
         if (response instanceof HttpServletResponse) {
             CompressionServletResponseWrapper wrappedResponse =
                 new CompressionServletResponseWrapper((HttpServletResponse)response);

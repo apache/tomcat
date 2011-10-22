@@ -26,7 +26,7 @@
     <hr>
     An upgrade from the JSTL expression language, the JSP 2.0 EL also
     allows for simple function invocation.  Functions are defined
-    by tag libraries and are implemented by a Java programmer as 
+    by tag libraries and are implemented by a Java programmer as
     static methods.
 
     <blockquote>

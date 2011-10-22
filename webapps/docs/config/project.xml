@@ -24,7 +24,7 @@
     The Apache Tomcat Servlet/JSP Container
   </logo>
 
-    
+
   <body>
 
     <menu name="Links">
@@ -59,7 +59,7 @@
         <item name="JarScanner"            href="jar-scanner.html"/>
         <item name="Listeners"             href="listeners.html"/>
         <item name="Loader"                href="loader.html"/>
-        <item name="Manager"               href="manager.html"/> 
+        <item name="Manager"               href="manager.html"/>
         <item name="Realm"                 href="realm.html"/>
         <item name="Resources"             href="resources.html"/>
         <item name="Valve"                 href="valve.html"/>
@@ -68,7 +68,7 @@
     <menu name="Cluster Elements">
         <item name="Cluster"               href="cluster.html"/>
         <item name="Manager"               href="cluster-manager.html"/>
-        <item name="Channel"               href="cluster-channel.html"/> 
+        <item name="Channel"               href="cluster-channel.html"/>
         <item name="Channel/Membership"    href="cluster-membership.html"/>
         <item name="Channel/Sender"        href="cluster-sender.html"/>
         <item name="Channel/Receiver"      href="cluster-receiver.html"/>

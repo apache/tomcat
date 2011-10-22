@@ -231,7 +231,7 @@ public class CompressionServletResponseWrapper extends HttpServletResponseWrappe
         } else {
             writer = new PrintWriter(stream);
         }
-        
+
         return (writer);
 
     }

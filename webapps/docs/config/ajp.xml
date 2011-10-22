@@ -46,7 +46,7 @@
   processing.</p>
 
   <p>This connector supports load balancing when used in conjunction with
-  the <code>jvmRoute</code> attribute of the 
+  the <code>jvmRoute</code> attribute of the
   <a href="engine.html">Engine</a>.</p>
 
   <p>The native connectors supported with this Tomcat release are:
@@ -199,7 +199,7 @@
       <p>Set this attribute to <code>true</code> if you wish to have
       calls to <code>request.isSecure()</code> to return <code>true</code>
       for requests received by this Connector. You would want this on an
-      SSL Connector or a non SSL connector that is receiving data from a 
+      SSL Connector or a non SSL connector that is receiving data from a
       SSL accelerator, like a crypto card, a SSL appliance or even a webserver.
       The default value is <code>false</code>.</p>
     </attribute>
@@ -243,10 +243,10 @@
   <p>The standard AJP connectors (BIO, NIO and APR/native) all support the
   following attributes in addition to the common Connector attributes listed
   above.</p>
-  
+
   <p><strong><font color="red">WARNING</font></strong>: The NIO connector for
   AJP is experimental.</p>
-  
+
   <attributes>
 
     <attribute name="acceptCount" required="false">
@@ -302,7 +302,7 @@
       after accepting a connection, for the request URI line to be
       presented.  The default value is 60000 (i.e. 60 seconds).</p>
     </attribute>
-    
+
     <attribute name="executor" required="false">
       <p>A reference to the name in an <a href="executor.html">Executor</a>
       element. If this attribute is set, and the named executor exists, the
@@ -338,7 +338,7 @@
       by this <strong>Connector</strong>, which therefore determines the
       maximum number of simultaneous requests that can be handled.  If
       not specified, this attribute is set to 200. If an executor is associated
-      with this connector, this attribute is ignored as the connector will 
+      with this connector, this attribute is ignored as the connector will
       execute tasks using the executor rather than an internal thread pool.</p>
     </attribute>
 
@@ -366,7 +366,7 @@
       good default is to use the larger of maxThreads and the maximum number of
       expected concurrent requests (synchronous and asynchronous).</p>
     </attribute>
-      
+
     <attribute name="requiredSecret" required="false">
       <p>Only requests from workers with this secret keyword will be accepted.
       </p>
@@ -387,9 +387,9 @@
     </attribute>
 
     <attribute name="tomcatAuthentication" required="false">
-      <p>If set to <code>true</code>, the authentication will be done in Tomcat. 
+      <p>If set to <code>true</code>, the authentication will be done in Tomcat.
       Otherwise, the authenticated principal will be propagated from the native
-      webserver and used for authorization in Tomcat.  
+      webserver and used for authorization in Tomcat.
       The default value is <code>true</code>.</p>
     </attribute>
 
@@ -398,11 +398,11 @@
   </subsection>
 
   <subsection name="Java TCP socket attributes">
-  
+
     <p>The BIO and NIO implementation support the following Java TCP socket
     attributes in addition to the common Connector and HTTP attributes listed
     above.</p>
-  
+
     <attributes>
       <attribute name="socket.rxBufSize" required="false">
         <p>(int)The socket receive buffer (SO_RCVBUF) size in bytes. JVM default
@@ -495,7 +495,7 @@
         that would be something like <code>-XX:MaxDirectMemorySize=256m</code>.
         </p>
       </attribute>
-      
+
       <attribute name="socket.appReadBufSize" required="false">
         <p>(int)Each connection that is opened up in Tomcat get associated with
         a read ByteBuffer. This attribute controls the size of this buffer. By
@@ -579,7 +579,7 @@
         <code>-Dorg.apache.tomcat.util.net.NioSelectorShared=true|false</code>
         - default is <code>true</code>. Set this value to <code>false</code> if you wish to
         use a selector for each thread. When you set it to <code>false</code>, you can
-        control the size of the pool of selectors by using the 
+        control the size of the pool of selectors by using the
         <strong>selectorPool.maxSelectors</strong> attribute.</p>
       </attribute>
 
@@ -587,10 +587,10 @@
   </subsection>
 
   <subsection name="APR/native specific configuration">
-  
+
     <p>The APR/native implementation supports the following attributes in
     addition to the common Connector and AJP attributes listed above.</p>
-  
+
     <attributes>
       <attribute name="pollTime" required="false">
         <p>Duration of a poll call in microseconds. Lowering this value will
@@ -606,7 +606,7 @@
       right away. The default value is 8192, corresponding to 8192 keep-alive
       connections.</p>
     </attribute>
-    
+
     </attributes>
 
   </subsection>
@@ -658,7 +658,7 @@
     </source>
 
   </subsection>
-  
+
 </section>
 
 </body>

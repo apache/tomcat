@@ -33,7 +33,7 @@ public class JspCalendar {
     public int getYear() {
         return calendar.get(Calendar.YEAR);
     }
-    
+
     public String getMonth() {
         int m = getMonthInt();
         String[] months = new String [] { "January", "February", "March",
@@ -42,14 +42,14 @@ public class JspCalendar {
                                         "October", "November", "December" };
         if (m > 12)
             return "Unknown to Man";
-        
+
         return months[m - 1];
 
     }
 
     public String getDay() {
         int x = getDayOfWeek();
-        String[] days = new String[] {"Sunday", "Monday", "Tuesday", "Wednesday", 
+        String[] days = new String[] {"Sunday", "Monday", "Tuesday", "Wednesday",
                                       "Thursday", "Friday", "Saturday"};
 
         if (x > 7)
@@ -58,7 +58,7 @@ public class JspCalendar {
         return days[x - 1];
 
     }
-    
+
     public int getMonthInt() {
         return 1 + calendar.get(Calendar.MONTH);
     }
@@ -107,11 +107,11 @@ public class JspCalendar {
     public int getDayOfWeek() {
         return calendar.get(Calendar.DAY_OF_WEEK);
     }
-     
+
     public int getHour() {
         return calendar.get(Calendar.HOUR_OF_DAY);
     }
-    
+
     public int getMinute() {
         return calendar.get(Calendar.MINUTE);
     }
@@ -121,7 +121,7 @@ public class JspCalendar {
         return calendar.get(Calendar.SECOND);
     }
 
-  
+
     public int getEra() {
         return calendar.get(Calendar.ERA);
     }
@@ -129,7 +129,7 @@ public class JspCalendar {
     public String getUSTimeZone() {
         String[] zones = new String[] {"Hawaii", "Alaskan", "Pacific",
                                        "Mountain", "Central", "Eastern"};
-        
+
         return zones[10 + getZoneOffset()];
     }
 
@@ -142,7 +142,7 @@ public class JspCalendar {
         return calendar.get(Calendar.DST_OFFSET)/(60*60*1000);
     }
 
-    
+
     public int getAMPM() {
         return calendar.get(Calendar.AM_PM);
     }

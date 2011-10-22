@@ -44,7 +44,7 @@ Remote address: <%= util.HTMLFilter.filter(request.getRemoteAddr()) %>
 <br>
 Remote host: <%= util.HTMLFilter.filter(request.getRemoteHost()) %>
 <br>
-Authorization scheme: <%= util.HTMLFilter.filter(request.getAuthType()) %> 
+Authorization scheme: <%= util.HTMLFilter.filter(request.getAuthType()) %>
 <br>
 Locale: <%= request.getLocale() %>
 <hr>

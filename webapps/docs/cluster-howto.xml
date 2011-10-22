@@ -46,7 +46,7 @@
   </p>
   <p>
     Using the above configuration will enable all-to-all session replication
-    using the <code>DeltaManager</code> to replicate session deltas. By all-to-all we mean that the session gets replicated to all the other 
+    using the <code>DeltaManager</code> to replicate session deltas. By all-to-all we mean that the session gets replicated to all the other
     nodes in the cluster. This works great for smaller cluster but we don't recommend it for larger clusters(a lot of tomcat nodes).
     Also when using the delta manager it will replicate to all nodes, even nodes that don't have the application deployed.<br/>
     To get around this problem, you'll want to use the BackupManager. This manager only replicates the session data to one backup
@@ -100,7 +100,7 @@
 
           &lt;ClusterListener className=&quot;org.apache.catalina.ha.session.JvmRouteSessionIDBinderListener&quot;/&gt;
           &lt;ClusterListener className=&quot;org.apache.catalina.ha.session.ClusterSessionListener&quot;/&gt;
-        &lt;/Cluster&gt;    
+        &lt;/Cluster&gt;
     </source>
   </p>
   <p>Will cover this section in more detail later in this document.</p>
@@ -128,7 +128,7 @@ should be completed:</p>
 <p>Note: Remember that your session state is tracked by a cookie, so your URL must look the same from the out
    side otherwise, a new session will be created.</p>
 <p>Note: Clustering support currently requires the JDK version 1.5 or later.</p>
-<p>The Cluster module uses the Tomcat JULI logging framework, so you can configure logging 
+<p>The Cluster module uses the Tomcat JULI logging framework, so you can configure logging
    through the regular logging.properties file. To track messages, you can enable logging on the key:<code>org.apache.catalina.tribes.MESSAGES</code></p>
 </section>
 
@@ -142,9 +142,9 @@ should be completed:</p>
   <li>Using in-memory-replication, using the SimpleTcpCluster that ships with Tomcat (lib/catalina-tribes.jar + lib/catalina-ha.jar)</li>
 </ol>
 
-<p>In this release of session replication, Tomcat can perform an all-to-all replication of session state using the <code>DeltaManager</code> or 
+<p>In this release of session replication, Tomcat can perform an all-to-all replication of session state using the <code>DeltaManager</code> or
    perform backup replication to only one node using the <code>BackupManager</code>.
-   The all-to-all replication is an algorithm that is only efficient when the clusters are small. For larger clusters,  to use 
+   The all-to-all replication is an algorithm that is only efficient when the clusters are small. For larger clusters,  to use
    a primary-secondary session replication where the session will only be stored at one backup server simply setup the BackupManager. <br/>
    Currently you can use the domain worker attribute (mod_jk &gt; 1.2.8) to build cluster partitions
    with the potential of having a more scaleable cluster solution with the DeltaManager(you'll need to configure the domain interceptor for this).
@@ -172,12 +172,12 @@ should be completed:</p>
 </section>
 
 <section name="Cluster Information">
-<p>Membership is established using multicast heartbeats. 
-   Hence, if you wish to subdivide your clusters, you can do this by 
+<p>Membership is established using multicast heartbeats.
+   Hence, if you wish to subdivide your clusters, you can do this by
    changing the multicast IP address or port in the <code>&lt;Membership&gt;</code> element.
 </p>
 <p>
-   The heartbeat contains the IP address of the Tomcat node and the TCP port that 
+   The heartbeat contains the IP address of the Tomcat node and the TCP port that
    Tomcat listens to for replication traffic. All data communication happens over TCP.
 </p>
 <p>
@@ -191,7 +191,7 @@ should be completed:</p>
     sent over the wire and reinstantiated on all the other cluster nodes.
     Synchronous vs. asynchronous is configured using the <code>channelSendOptions</code>
     flag and is an integer value. The default value for the <code>SimpleTcpCluster/DeltaManager</code> combo is
-    8, which is asynchronous. You can read more on the <a href="tribes/introduction.html">send flag(overview)</a> or the 
+    8, which is asynchronous. You can read more on the <a href="tribes/introduction.html">send flag(overview)</a> or the
     <a href="http://tomcat.apache.org/tomcat-7.0-doc/api/org/apache/catalina/tribes/Channel.html">send flag(javadoc)</a>.
     During async replication, the request is returned before the data has been replicated. async replication yields shorter
     request times, and synchronous replication guarantees the session to be replicated before the request returns.
@@ -200,12 +200,12 @@ should be completed:</p>
 
 <section name="Bind session after crash to failover node">
 <p>
-    If you are using mod_jk and not using sticky sessions or for some reasons sticky session don't 
-    work, or you are simply failing over, the session id will need to be modified as it previously contained 
+    If you are using mod_jk and not using sticky sessions or for some reasons sticky session don't
+    work, or you are simply failing over, the session id will need to be modified as it previously contained
     the worker id of the previous tomcat (as defined by jvmRoute in the Engine element).
     To solve this, we will use the JvmRouteBinderValve.
 </p>
-<p> 
+<p>
     The JvmRouteBinderValve rewrites the session id to ensure that the next request will remain sticky
     (and not fall back to go to random nodes since the worker is no longer available) after a fail over.
     The valve rewrites the JSESSIONID value in the cookie with the same name.
@@ -213,7 +213,7 @@ should be completed:</p>
 </p>
 <p>
     By default, if no valves are configured, the JvmRouteBinderValve is added on.
-    The cluster message listener called JvmRouteSessionIDBinderListener is also defined by default and is used to actually rewrite the 
+    The cluster message listener called JvmRouteSessionIDBinderListener is also defined by default and is used to actually rewrite the
     session id on the other nodes in the cluster once a fail over has occurred.
     Remember, if you are adding your own valves or cluster listeners in server.xml then the defaults are no longer valid,
     make sure that you add in all the appropriate valves and listeners as defined by the default.
@@ -226,8 +226,8 @@ should be completed:</p>
 <p>
     <b>Trick:</b><br/>
     You can enable this mod_jk turnover mode via JMX before you drop a node to all backup nodes!
-    Set enable true on all JvmRouteBinderValve backups, disable worker at mod_jk 
-    and then drop node and restart it! Then enable mod_jk Worker and disable JvmRouteBinderValves again. 
+    Set enable true on all JvmRouteBinderValve backups, disable worker at mod_jk
+    and then drop node and restart it! Then enable mod_jk Worker and disable JvmRouteBinderValves again.
     This use case means that only requested session are migrated.
 </p>
 
@@ -247,7 +247,7 @@ should be completed:</p>
           &lt;Manager className=&quot;org.apache.catalina.ha.session.DeltaManager&quot;
                    expireSessionsOnShutdown=&quot;false&quot;
                    notifyListenersOnReplication=&quot;true&quot;/&gt;
-          --&gt;        
+          --&gt;
           &lt;Channel className=&quot;org.apache.catalina.tribes.group.GroupChannel&quot;&gt;
             &lt;Membership className=&quot;org.apache.catalina.tribes.membership.McastService&quot;
                         address=&quot;228.0.0.4&quot;
@@ -306,14 +306,14 @@ should be completed:</p>
           &lt;Manager className=&quot;org.apache.catalina.ha.session.DeltaManager&quot;
                    expireSessionsOnShutdown=&quot;false&quot;
                    notifyListenersOnReplication=&quot;true&quot;/&gt;
-          --&gt;        
+          --&gt;
     </source>
     <p>
         This is a template for the manager configuration that will be used if no manager is defined in the &lt;Context&gt;
         element. In Tomcat 5.x each webapp marked distributable had to use the same manager, this is no longer the case
         since Tomcat you can define a manager class for each webapp, so that you can mix managers in your cluster.
         Obviously the managers on one node's application has to correspond with the same manager on the same application on the other node.
-        If no manager has been specified for the webapp, and the webapp is marked &lt;distributable/&gt; Tomcat will take this manager configuration 
+        If no manager has been specified for the webapp, and the webapp is marked &lt;distributable/&gt; Tomcat will take this manager configuration
         and create a manager instance cloning this configuration.
         <br/>For more info, Please visit the <a href="config/cluster-manager.html">reference documentation</a>
     </p>
@@ -333,13 +333,13 @@ should be completed:</p>
                         dropTime=&quot;3000&quot;/&gt;
     </source>
     <p>
-        Membership is done using multicasting. Please note that Tribes also supports static memberships using the 
+        Membership is done using multicasting. Please note that Tribes also supports static memberships using the
         <code>StaticMembershipInterceptor</code> if you want to extend your membership to points beyond multicasting.
         The address attribute is the multicast address used and the port is the multicast port. These two together
         create the cluster separation. If you want a QA cluster and a production cluster, the easiest config is to
         have the QA cluster be on a separate multicast address/port combination the the production cluster.<br/>
         The membership component broadcasts TCP adress/port of itselt to the other nodes so that communication between
-        nodes can be done over TCP. Please note that the address being broadcasted is the one of the 
+        nodes can be done over TCP. Please note that the address being broadcasted is the one of the
         <code>Receiver.address</code> attribute.
         <br/>For more info, Please visit the <a href="config/cluster-membership.html">reference documentation</a>
     </p>
@@ -365,7 +365,7 @@ should be completed:</p>
     </source>
     <p>
         The sender component, as the name indicates is responsible for sending messages to other nodes.
-        The sender has a shell component, the <code>ReplicationTransmitter</code> but the real stuff done is done in the 
+        The sender has a shell component, the <code>ReplicationTransmitter</code> but the real stuff done is done in the
         sub component, <code>Transport</code>.
         Tribes support having a pool of senders, so that messages can be sent in parallel and if using the NIO sender,
         you can send messages concurrently as well.<br/>
@@ -380,14 +380,14 @@ should be completed:</p>
           &lt;/Channel&gt;
     </source>
     <p>
-        Tribes uses a stack to send messages through. Each element in the stack is called an interceptor, and works much like the valves do 
+        Tribes uses a stack to send messages through. Each element in the stack is called an interceptor, and works much like the valves do
         in the Tomcat servlet container.
         Using interceptors, logic can be broken into more managable pieces of code. The interceptors configured above are:<br/>
         TcpFailureDetector - verifies crashed members through TCP, if multicast packets get dropped, this interceptor protects against false positives,
         ie the node marked as crashed even though it still is alive and running.<br/>
         MessageDispatch15Interceptor - dispatches messages to a thread (thread pool) to send message asynchrously.<br/>
         ThroughputInterceptor - prints out simple stats on message traffic.<br/>
-        Please note that the order of interceptors is important. the way they are defined in server.xml is the way they are represented in the 
+        Please note that the order of interceptors is important. the way they are defined in server.xml is the way they are represented in the
         channel stack. Think of it as a linked list, with the head being the first most interceptor and the tail the last.
         <br/>For more info, Please visit the <a href="config/cluster-interceptor.html">reference documentation</a>
     </p>
@@ -410,8 +410,8 @@ should be completed:</p>
     </source>
     <p>
         The default tomcat cluster supports farmed deployment, ie, the cluster can deploy and undeploy applications on the other nodes.
-        The state of this component is currently in flux but will be addressed soon. There was a change in the deployment algorithm 
-        between Tomcat 5.0 and 5.5 and at that point, the logic of this component changed to where the deploy dir has to match the 
+        The state of this component is currently in flux but will be addressed soon. There was a change in the deployment algorithm
+        between Tomcat 5.0 and 5.5 and at that point, the logic of this component changed to where the deploy dir has to match the
         webapps directory.
         <br/>For more info, Please visit the <a href="config/cluster-deployer.html">reference documentation</a>
     </p>
@@ -420,12 +420,12 @@ should be completed:</p>
         &lt;/Cluster&gt;
     </source>
     <p>
-        Since the SimpleTcpCluster itself is a sender and receiver of the Channel object, components can register themselves as listeners to 
+        Since the SimpleTcpCluster itself is a sender and receiver of the Channel object, components can register themselves as listeners to
         the SimpleTcpCluster. The listener above <code>ClusterSessionListener</code> listens for DeltaManager replication messages
         and applies the deltas to the manager that in turn applies it to the session.
         <br/>For more info, Please visit the <a href="config/cluster-listener.html">reference documentation</a>
     </p>
-    
+
 </section>
 
 <section name="Cluster Architecture">
@@ -437,14 +437,14 @@ should be completed:</p>
          Service
            |
          Engine
-           |  \ 
+           |  \
            |  --- Cluster --*
            |
          Host
            |
          ------
         /      \
-     Cluster    Context(1-N)                 
+     Cluster    Context(1-N)
         |             \
         |             -- Manager
         |                   \
@@ -465,20 +465,20 @@ should be completed:</p>
                                          -- Valve
                                          |      \
                                          |       -- ReplicationValve
-                                         |       -- JvmRouteBinderValve 
+                                         |       -- JvmRouteBinderValve
                                          |
-                                         -- LifecycleListener 
+                                         -- LifecycleListener
                                          |
-                                         -- ClusterListener 
+                                         -- ClusterListener
                                          |      \
                                          |       -- ClusterSessionListener
                                          |       -- JvmRouteSessionIDBinderListener
                                          |
-                                         -- Deployer 
+                                         -- Deployer
                                                 \
                                                  -- FarmWarDeployer
-      
-      
+
+
 </source>
 </p>
 
@@ -633,11 +633,11 @@ set CATALINA_OPTS=\
 <li>Install the mx4j-tools.jar at common/lib (use the same mx4j version as your tomcat release)</li>
 <li>Configure a MX4J JMX HTTP Adaptor at your AJP Connector<p></p>
 <source>
-&lt;Connector port="${AJP.PORT}" 
+&lt;Connector port="${AJP.PORT}"
    handler.list="mx"
-   mx.enabled="true" 
-   mx.httpHost="${JMX.HOST}" 
-   mx.httpPort="${JMX.PORT}" 
+   mx.enabled="true"
+   mx.httpHost="${JMX.HOST}"
+   mx.httpPort="${JMX.PORT}"
    protocol="AJP/1.3" /&gt;
 </source>
 </li>
@@ -662,7 +662,7 @@ List of Cluster Mbeans<br/>
     <td><code>type=Cluster</code></td>
     <td><code>type=Cluster,host=${HOST}</code></td>
   </tr>
- 
+
   <tr>
     <td>DeltaManager</td>
     <td>This manager control the sessions and handle session replication </td>

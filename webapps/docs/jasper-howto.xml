@@ -97,7 +97,7 @@ classpath is created dynamically based on the current web application.</li>
 
 <li><strong>compiler</strong> - Which compiler Ant should use to compile JSP
 pages.  See the Ant documentation for more information. If the value is not set,
-then the default Eclipse JDT Java compiler will be used instead of using Ant. 
+then the default Eclipse JDT Java compiler will be used instead of using Ant.
 No default value.</li>
 
 <li><strong>compilerSourceVM</strong> - What JDK version are the source files
@@ -153,7 +153,7 @@ java source files. Default <code>UTF8</code>.</li>
 code for each page instead of deleting it? <code>true</code> or
 <code>false</code>, default <code>true</code>.</li>
 
-<li><strong>mappedfile</strong> - Should we generate static content with one 
+<li><strong>mappedfile</strong> - Should we generate static content with one
 print statement per input line, to ease debugging?
 <code>true</code> or <code>false</code>, default <code>true</code>.</li>
 
@@ -185,7 +185,7 @@ application.</li>
 <li><strong>suppressSmap</strong> - Should the generation of SMAP info for JSR45
 debugging be suppressed? <code>true</code> or <code>false</code>, default
 <code>false</code>.</li>
- 
+
 <li><strong>trimSpaces</strong> - Should white spaces in template text between
 actions or directives be trimmed ?, default <code>false</code>.</li>
 
@@ -239,7 +239,7 @@ the following changes from the default configuration.
 <ul>
 <li><strong>development</strong> - To disable on access checks for JSP
 pages compilation set this to <code>false</code>.</li>
-<li><strong>genStringAsCharArray</strong> - To generate slightly more efficient 
+<li><strong>genStringAsCharArray</strong> - To generate slightly more efficient
 char arrays, set this to <code>true</code>.</li>
 <li><strong>modificationTestInterval</strong> - If development has to be set to
 <code>true</code> for any reason (such as dynamic generation of JSPs), setting
@@ -254,27 +254,27 @@ set this to <code>true</code>.</li>
 <section name="Web Application Compilation">
 
 <p>Using Ant is the preferred way to compile web applications using JSPC. Note
-that when pre-compiling JSPs, SMAP information will only be included in the 
+that when pre-compiling JSPs, SMAP information will only be included in the
 final classes if suppressSmap is false and compile is true.
-Use the script given below (a similar script is included in the "deployer" 
+Use the script given below (a similar script is included in the "deployer"
 download) to precompile a webapp:
 </p>
 
 <p>
 <source>
-&lt;project name="Webapp Precompilation" default="all" basedir="."&gt; 
+&lt;project name="Webapp Precompilation" default="all" basedir="."&gt;
 
    &lt;import file="${tomcat.home}/bin/catalina-tasks.xml"/&gt;
-  
-   &lt;target name="jspc"&gt; 
 
-    &lt;jasper 
-             validateXml="false" 
-             uriroot="${webapp.path}" 
-             webXmlFragment="${webapp.path}/WEB-INF/generated_web.xml" 
-             outputDir="${webapp.path}/WEB-INF/src" /&gt; 
+   &lt;target name="jspc"&gt;
 
-  &lt;/target&gt; 
+    &lt;jasper
+             validateXml="false"
+             uriroot="${webapp.path}"
+             webXmlFragment="${webapp.path}/WEB-INF/generated_web.xml"
+             outputDir="${webapp.path}/WEB-INF/src" /&gt;
+
+  &lt;/target&gt;
 
   &lt;target name="compile"&gt;
 
@@ -284,7 +284,7 @@ download) to precompile a webapp:
     &lt;javac destdir="${webapp.path}/WEB-INF/classes"
            optimize="off"
            debug="on" failonerror="false"
-           srcdir="${webapp.path}/WEB-INF/src" 
+           srcdir="${webapp.path}/WEB-INF/src"
            excludes="**/*.smap"&gt;
       &lt;classpath&gt;
         &lt;pathelement location="${webapp.path}/WEB-INF/classes"/&gt;
@@ -295,9 +295,9 @@ download) to precompile a webapp:
         &lt;fileset dir="${tomcat.home}/lib"&gt;
           &lt;include name="*.jar"/&gt;
         &lt;/fileset&gt;
-        &lt;fileset dir="${tomcat.home}/bin"&gt; 
-          &lt;include name="*.jar"/&gt; 
-        &lt;/fileset&gt; 
+        &lt;fileset dir="${tomcat.home}/bin"&gt;
+          &lt;include name="*.jar"/&gt;
+        &lt;/fileset&gt;
       &lt;/classpath&gt;
       &lt;include name="**" /&gt;
       &lt;exclude name="tags/**" /&gt;
@@ -321,7 +321,7 @@ download) to precompile a webapp:
 
 <p>
 The following command line can be used to run the script
-(replacing the tokens with the Tomcat base path and the path to the webapp 
+(replacing the tokens with the Tomcat base path and the path to the webapp
 which should be precompiled):<br/>
 <source>
 $ANT_HOME/bin/ant -Dtomcat.home=&lt;$TOMCAT_HOME&gt; -Dwebapp.path=&lt;$WEBAPP_PATH&gt;
@@ -329,20 +329,20 @@ $ANT_HOME/bin/ant -Dtomcat.home=&lt;$TOMCAT_HOME&gt; -Dwebapp.path=&lt;$WEBAPP_P
 </p>
 
 <p>
-Then, the declarations and mappings for the servlets which were generated 
+Then, the declarations and mappings for the servlets which were generated
 during the precompilation must be added to the web application deployment
 descriptor. Insert the <code>${webapp.path}/WEB-INF/generated_web.xml</code>
 at the right place inside the <code>${webapp.path}/WEB-INF/web.xml</code> file.
-Restart the web application (using the manager) and test it to verify it is 
+Restart the web application (using the manager) and test it to verify it is
 running fine with precompiled servlets. An appropriate token placed in the
 web application deployment descriptor may also be used to automatically
-insert the generated servlet declarations and mappings using Ant filtering 
-capabilities. This is actually how all the webapps distributed with Tomcat 
+insert the generated servlet declarations and mappings using Ant filtering
+capabilities. This is actually how all the webapps distributed with Tomcat
 are automatically compiled as part of the build process.
 </p>
 
 <p>
-At the jasper2 task you can use the option <code>addWebXmlMappings</code> for 
+At the jasper2 task you can use the option <code>addWebXmlMappings</code> for
 automatic merge the <code>${webapp.path}/WEB-INF/generated_web.xml</code>
 with the current web application deployment descriptor at
 <code>${webapp.path}/WEB-INF/web.xml</code>. When you want to use Java 6
@@ -353,7 +353,7 @@ without debug info <code>debug=&quot;off&quot;</code>.
 </p>
 
 <p>
-When you don't want to stop the jsp generation at first jsp syntax error, use   
+When you don't want to stop the jsp generation at first jsp syntax error, use
 <code>failOnError=&quot;false&quot;</code>and with
 <code>showSuccess=&quot;true&quot;</code> all successfull <i>jsp to java</i>
 generation are printed out. Sometimes it is very helpfull, when you cleanup the

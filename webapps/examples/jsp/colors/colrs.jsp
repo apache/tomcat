@@ -28,7 +28,7 @@
 <p>
 
 <% if (cb.getHint()==true) { %>
-    
+
     <p> Hint #1: Vampires prey at night!
     <p>  <p> Hint #2: Nancy without the n.
 
@@ -38,7 +38,7 @@
 
     <p> CONGRATULATIONS!!
     <% if  (cb.getHintTaken()==true) { %>
-    
+
         <p> ( although I know you cheated and peeked into the hints)
 
     <% } %>

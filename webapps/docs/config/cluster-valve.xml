@@ -66,7 +66,7 @@
       <attribute name="primaryIndicator" required="false">
         Boolean value, so to true, and the replication valve will insert a request attribute with the name
         defined by the <code>primaryIndicatorName</code> attribute.
-        The value inserted into the request attribute is either <code>Boolean.TRUE</code> or 
+        The value inserted into the request attribute is either <code>Boolean.TRUE</code> or
         <code>Boolean.FALSE</code>
       </attribute>
       <attribute name="primaryIndicatorName" required="false">
@@ -83,7 +83,7 @@
 </section>
 
 <section name="org.apache.catalina.ha.session.JvmRouteBinderValve">
-  In case of a mod_jk failover, the <code>JvmRouteBinderValve</code> will replace the 
+  In case of a mod_jk failover, the <code>JvmRouteBinderValve</code> will replace the
   <code>jvmWorker</code> attribute in the session Id, to make future requests stick to this
   node. If you want failback capability, don't enable this valve, but if you want your failover to stick,
   and for mod_jk not to have to keep probing the node that went down, you use this valve.
@@ -96,7 +96,7 @@
         Default value is <code>true</code>
         Runtime attribute to turn on and off turn over of the session's jvmRoute value.
       </attribute>
-      
+
     </attributes>
   </subsection>
 </section>

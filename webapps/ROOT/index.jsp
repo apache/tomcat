@@ -110,7 +110,7 @@ request.setAttribute("tomcat7ExamplesUrl", "/examples/");
                         <p>For security, access to the <a href="/manager/html">manager webapp</a> is restricted.
                         Users are defined in:</p>
                         <pre>$CATALINA_HOME/conf/tomcat-users.xml</pre>
-                        <p>In Tomcat 7.0 access to the manager application is split between 
+                        <p>In Tomcat 7.0 access to the manager application is split between
                            different users. &nbsp; <a href="${tomcat7DocUrl}manager-howto.html">Read more...</a></p>
                         <br />
                         <h4><a href="${tomcat7DocUrl}RELEASE-NOTES.txt">Release Notes</a></h4>

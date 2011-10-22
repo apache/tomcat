@@ -29,7 +29,7 @@
     <!ENTITY ns_svg "http://www.w3.org/2000/svg">
     <!ENTITY ns_xlink "http://www.w3.org/1999/xlink">
 ]>
-<svg 
+<svg
      xmlns:x="&ns_extend;" xmlns:i="&ns_ai;" xmlns:graph="&ns_graphs;" i:viewOrigin="176.7139 486.707" i:rulerOrigin="-156 -296" i:pageBounds="156 496 456 296"
      xmlns="&ns_svg;" xmlns:xlink="&ns_xlink;" xmlns:a="http://ns.adobe.com/AdobeSVGViewerExtensions/3.0/"
      width="260.162" height="184.413" viewBox="0 0 260.162 184.413" overflow="visible" enable-background="new 0 0 260.162 184.413"
@@ -112,10 +112,10 @@
                         c-48.118-23.977-57.183-84.71-48.977-117.289c2.283,12.454,6.424,20.266,15.394,24.098c19.533-5.591,46.423-6.033,66.231-0.57
                         c8.255-6.001,11.456-15.169,13.204-23.18C236.029,15.921,235.777,36.055,235.784,36.059z"/>
                     <g>
-                        <rect x="133.209" y="90.51" i:knockout="Off" width="26.245" height="3.239"/> 
-                        <rect x="133.209" y="82.732" i:knockout="Off" width="26.245" height="3.24"/> 
-                        <rect x="213.35" y="90.51" i:knockout="Off" width="26.244" height="3.239"/> 
-                        <rect x="213.35" y="82.732" i:knockout="Off" width="26.244" height="3.24"/> 
+                        <rect x="133.209" y="90.51" i:knockout="Off" width="26.245" height="3.239"/>
+                        <rect x="133.209" y="82.732" i:knockout="Off" width="26.245" height="3.24"/>
+                        <rect x="213.35" y="90.51" i:knockout="Off" width="26.244" height="3.239"/>
+                        <rect x="213.35" y="82.732" i:knockout="Off" width="26.244" height="3.24"/>
                         <g>
                             <path i:knockout="Off" d="M204.1,63.524h-27.188h-3.021h-12.561v-2.917h13.31c1.639-7.018,1.963-13.725-0.014-17.125
                                 c-0.844-1.446-2.01-2.121-3.674-2.121c-7.609,0-10.753,8.046-10.884,8.389l0.002-0.003l-2.73-1.024
