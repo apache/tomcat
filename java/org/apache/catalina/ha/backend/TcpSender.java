@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -101,20 +101,20 @@ public class TcpSender
                         connections[i].bind(addrs);
                         addrs = new InetSocketAddress(proxies[i].address, proxies[i].port);
                         connections[i].connect(addrs);
-                    } else 
+                    } else
                         connections[i] = new Socket(proxies[i].address, proxies[i].port);
                     connectionReaders[i] = new BufferedReader(new InputStreamReader(connections[i].getInputStream()));
                     connectionWriters[i] = new BufferedWriter(new OutputStreamWriter(connections[i].getOutputStream()));
                 } catch (Exception ex) {
                     log.error("Unable to connect to proxy: " + ex);
                     close(i);
-                } 
+                }
             }
             if (connections[i] == null)
                 continue; // try next proxy in the list
             BufferedWriter writer = connectionWriters[i];
             try {
-                writer.write(requestLine); 
+                writer.write(requestLine);
                 writer.write("\r\n");
                 writer.write("Content-Length: " + mess.length() + "\r\n");
                 writer.write("User-Agent: HeartbeatListener/1.0\r\n");
@@ -126,10 +126,10 @@ public class TcpSender
             } catch (Exception ex) {
                 log.error("Unable to send collected load information to proxy: " + ex);
                 close(i);
-            } 
+            }
             if (connections[i] == null)
                 continue; // try next proxy in the list
-            
+
             /* Read httpd answer */
             String responseStatus = connectionReaders[i].readLine();
             if (responseStatus == null) {
@@ -172,7 +172,7 @@ public class TcpSender
                    }
                 }
             }
-               
+
         }
 
         return 0;

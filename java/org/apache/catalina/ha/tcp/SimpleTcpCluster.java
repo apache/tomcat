@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -63,10 +63,10 @@ import org.apache.tomcat.util.res.StringManager;
  * A <b>Cluster </b> implementation using simple multicast. Responsible for
  * setting up a cluster and provides callers with a valid multicast
  * receiver/sender.
- * 
+ *
  * FIXME remove install/remove/start/stop context dummys
- * FIXME wrote testcases 
- * 
+ * FIXME wrote testcases
+ *
  * @author Filip Hanik
  * @author Remy Maucherat
  * @author Peter Rossbach
@@ -99,7 +99,7 @@ public class SimpleTcpCluster extends LifecycleBase
     public static final String SEND_MESSAGE_FAILURE_EVENT = "send_message_failure";
 
     public static final String RECEIVE_MESSAGE_FAILURE_EVENT = "receive_message_failure";
-    
+
     /**
      * Group channel.
      */
@@ -126,7 +126,7 @@ public class SimpleTcpCluster extends LifecycleBase
      * @see org.apache.catalina.tribes.group.GroupChannel#heartbeat()
      */
     protected boolean heartbeatBackgroundEnabled =false ;
-    
+
     /**
      * The Container associated with this Cluster.
      */
@@ -163,9 +163,9 @@ public class SimpleTcpCluster extends LifecycleBase
      * dynamic sender <code>properties</code>
      */
     private Map<String, Object> properties = new HashMap<String, Object>();
-    
+
     private int channelSendOptions = Channel.SEND_OPTIONS_ASYNCHRONOUS;
-    
+
     private int channelStartOptions = Channel.DEFAULT;
 
     // ------------------------------------------------------------- Properties
@@ -193,7 +193,7 @@ public class SimpleTcpCluster extends LifecycleBase
     /**
      * Set the name of the cluster to join, if no cluster with this name is
      * present create one.
-     * 
+     *
      * @param clusterName
      *            The clustername to join
      */
@@ -205,7 +205,7 @@ public class SimpleTcpCluster extends LifecycleBase
     /**
      * Return the name of the cluster that this Server is currently configured
      * to operate within.
-     * 
+     *
      * @return The name of the cluster associated with this server
      */
     @Override
@@ -217,7 +217,7 @@ public class SimpleTcpCluster extends LifecycleBase
 
     /**
      * Set the Container associated with our Cluster
-     * 
+     *
      * @param container
      *            The Container to use
      */
@@ -230,7 +230,7 @@ public class SimpleTcpCluster extends LifecycleBase
 
     /**
      * Get the Container associated with our Cluster
-     * 
+     *
      * @return The Container associated with our Cluster
      */
     @Override
@@ -259,7 +259,7 @@ public class SimpleTcpCluster extends LifecycleBase
     }
 
     /**
-     * Add cluster valve 
+     * Add cluster valve
      * Cluster Valves are only add to container when cluster is started!
      * @param valve The new cluster Valve.
      */
@@ -294,7 +294,7 @@ public class SimpleTcpCluster extends LifecycleBase
 
     /**
      * Add cluster message listener and register cluster to this listener.
-     * 
+     *
      * @see org.apache.catalina.ha.CatalinaCluster#addClusterListener(org.apache.catalina.ha.ClusterListener)
      */
     @Override
@@ -307,7 +307,7 @@ public class SimpleTcpCluster extends LifecycleBase
 
     /**
      * Remove message listener and deregister Cluster from listener.
-     * 
+     *
      * @see org.apache.catalina.ha.CatalinaCluster#removeClusterListener(org.apache.catalina.ha.ClusterListener)
      */
     @Override
@@ -356,10 +356,10 @@ public class SimpleTcpCluster extends LifecycleBase
     public boolean hasMembers() {
         return hasMembers;
     }
-    
+
     /**
      * Get all current cluster members
-     * @return all members or empty array 
+     * @return all members or empty array
      */
     @Override
     public Member[] getMembers() {
@@ -368,7 +368,7 @@ public class SimpleTcpCluster extends LifecycleBase
 
     /**
      * Return the member that represents this node.
-     * 
+     *
      * @return Member
      */
     @Override
@@ -381,7 +381,7 @@ public class SimpleTcpCluster extends LifecycleBase
 
     /**
      * JMX hack to direct use at jconsole
-     * 
+     *
      * @param name
      * @param value
      */
@@ -391,7 +391,7 @@ public class SimpleTcpCluster extends LifecycleBase
 
     /**
      * set config attributes with reflect and propagate to all managers
-     * 
+     *
      * @param name
      * @param value
      */
@@ -409,7 +409,7 @@ public class SimpleTcpCluster extends LifecycleBase
 
     /**
      * get current config
-     * 
+     *
      * @param key
      * @return The property
      */
@@ -422,7 +422,7 @@ public class SimpleTcpCluster extends LifecycleBase
 
     /**
      * Get all properties keys
-     * 
+     *
      * @return An iterator over the property names.
      */
     @Override
@@ -432,7 +432,7 @@ public class SimpleTcpCluster extends LifecycleBase
 
     /**
      * remove a configured property.
-     * 
+     *
      * @param key
      */
     @Override
@@ -483,7 +483,7 @@ public class SimpleTcpCluster extends LifecycleBase
 
     /**
      * Create new Manager without add to cluster (comes with start the manager)
-     * 
+     *
      * @param name
      *            Context Name of this manager
      * @see org.apache.catalina.Cluster#createManager(java.lang.String)
@@ -507,10 +507,10 @@ public class SimpleTcpCluster extends LifecycleBase
         }
         return manager;
     }
-    
+
     @Override
     public void registerManager(Manager manager) {
-    
+
         if (! (manager instanceof ClusterManager)) {
             log.warn("Manager [ " + manager + "] does not implement ClusterManager, addition to cluster has been aborted.");
             return;
@@ -522,15 +522,15 @@ public class SimpleTcpCluster extends LifecycleBase
         String clusterName = getManagerName(cmanager.getName(), manager);
         cmanager.setName(clusterName);
         cmanager.setCluster(this);
-    
+
         managers.put(clusterName, cmanager);
         // Notify our interested LifecycleListeners
-        fireLifecycleEvent(AFTER_MANAGERREGISTER_EVENT, manager);    
+        fireLifecycleEvent(AFTER_MANAGERREGISTER_EVENT, manager);
     }
 
     /**
      * Remove an application from cluster replication bus.
-     * 
+     *
      * @see org.apache.catalina.Cluster#removeManager(Manager)
      */
     @Override
@@ -559,7 +559,7 @@ public class SimpleTcpCluster extends LifecycleBase
             Container context = manager.getContainer() ;
             if(context != null && context instanceof Context) {
                 Container host = ((Context)context).getParent();
-                if(host != null && host instanceof Host && clusterName!=null && 
+                if(host != null && host instanceof Host && clusterName!=null &&
                         !(clusterName.startsWith(host.getName() +"#"))) {
                     clusterName = host.getName() +"#" + clusterName ;
                 }
@@ -570,14 +570,14 @@ public class SimpleTcpCluster extends LifecycleBase
 
     /*
      * Get Manager
-     * 
+     *
      * @see org.apache.catalina.ha.CatalinaCluster#getManager(java.lang.String)
      */
     @Override
     public Manager getManager(String name) {
         return managers.get(name);
     }
-    
+
     // ------------------------------------------------------ Lifecycle Methods
 
     /**
@@ -587,13 +587,13 @@ public class SimpleTcpCluster extends LifecycleBase
      * @see org.apache.catalina.ha.deploy.FarmWarDeployer#backgroundProcess()
      * @see org.apache.catalina.tribes.group.GroupChannel#heartbeat()
      * @see org.apache.catalina.tribes.group.GroupChannel.HeartbeatThread#run()
-     * 
+     *
      */
     @Override
     public void backgroundProcess() {
         if (clusterDeployer != null) clusterDeployer.backgroundProcess();
-       
-        //send a heartbeat through the channel        
+
+        //send a heartbeat through the channel
         if ( isHeartbeatBackgroundEnabled() && channel !=null ) channel.heartbeat();
     }
 
@@ -601,7 +601,7 @@ public class SimpleTcpCluster extends LifecycleBase
     /**
      * Use as base to handle start/stop/periodic Events from host. Currently
      * only log the messages as trace level.
-     * 
+     *
      * @see org.apache.catalina.LifecycleListener#lifecycleEvent(org.apache.catalina.LifecycleEvent)
      */
     @Override
@@ -616,8 +616,8 @@ public class SimpleTcpCluster extends LifecycleBase
     protected void initInternal() {
         // NOOP
     }
-    
-    
+
+
     /**
      * Start Cluster and implement the requirements
      * of {@link LifecycleBase#startInternal()}.
@@ -644,13 +644,13 @@ public class SimpleTcpCluster extends LifecycleBase
             log.error("Unable to start cluster.", x);
             throw new LifecycleException(x);
         }
-        
+
         setState(LifecycleState.STARTING);
     }
 
     protected void checkDefaults() {
         if ( clusterListeners.size() == 0 ) {
-            addClusterListener(new JvmRouteSessionIDBinderListener()); 
+            addClusterListener(new JvmRouteSessionIDBinderListener());
             addClusterListener(new ClusterSessionListener());
         }
         if ( valves.size() == 0 ) {
@@ -708,7 +708,7 @@ public class SimpleTcpCluster extends LifecycleBase
         }
     }
 
-    
+
     /**
      * Stop Cluster and implement the requirements
      * of {@link LifecycleBase#startInternal()}.
@@ -737,13 +737,13 @@ public class SimpleTcpCluster extends LifecycleBase
         }
     }
 
-    
+
     @Override
     protected void destroyInternal() {
         // NOOP
     }
 
-    
+
     /**
      * Return a String rendering of this object.
      */
@@ -759,22 +759,22 @@ public class SimpleTcpCluster extends LifecycleBase
         sb.append(']');
         return sb.toString();
     }
-    
+
 
     /**
      * send message to all cluster members
      * @param msg message to transfer
-     * 
+     *
      * @see org.apache.catalina.ha.CatalinaCluster#send(org.apache.catalina.ha.ClusterMessage)
      */
     @Override
     public void send(ClusterMessage msg) {
         send(msg, null);
     }
-    
+
     /**
      * send a cluster message to one member
-     * 
+     *
      * @param msg message to transfer
      * @param dest Receiver member
      * @see org.apache.catalina.ha.CatalinaCluster#send(org.apache.catalina.ha.ClusterMessage,
@@ -793,7 +793,7 @@ public class SimpleTcpCluster extends LifecycleBase
                 Member[] destmembers = channel.getMembers();
                 if (destmembers.length>0)
                     channel.send(destmembers,msg,channelSendOptions);
-                else if (log.isDebugEnabled()) 
+                else if (log.isDebugEnabled())
                     log.debug("No members in cluster, ignoring message:"+msg);
             }
         } catch (Exception x) {
@@ -803,7 +803,7 @@ public class SimpleTcpCluster extends LifecycleBase
 
     /**
      * New cluster member is registered
-     * 
+     *
      * @see org.apache.catalina.tribes.MembershipListener#memberAdded(org.apache.catalina.tribes.Member)
      */
     @Override
@@ -823,13 +823,13 @@ public class SimpleTcpCluster extends LifecycleBase
 
     /**
      * Cluster member is gone
-     * 
+     *
      * @see org.apache.catalina.tribes.MembershipListener#memberDisappeared(org.apache.catalina.tribes.Member)
      */
     @Override
     public void memberDisappeared(Member member) {
         try {
-            hasMembers = channel.hasMembers();            
+            hasMembers = channel.hasMembers();
             if (log.isInfoEnabled()) log.info("Received member disappeared:" + member);
             // Notify our interested LifecycleListeners
             fireLifecycleEvent(BEFORE_MEMBERUNREGISTER_EVENT, member);
@@ -846,7 +846,7 @@ public class SimpleTcpCluster extends LifecycleBase
     /**
      * notify all listeners from receiving a new message is not ClusterMessage
      * emit Failure Event to LifecylceListener
-     * 
+     *
      * @param msg
      *            received Message
      */
@@ -854,8 +854,8 @@ public class SimpleTcpCluster extends LifecycleBase
     public boolean accept(Serializable msg, Member sender) {
         return (msg instanceof ClusterMessage);
     }
-    
-    
+
+
     @Override
     public void messageReceived(Serializable message, Member sender) {
         ClusterMessage fwd = (ClusterMessage)message;
@@ -908,7 +908,7 @@ public class SimpleTcpCluster extends LifecycleBase
     // ------------------------------------------------------------- deprecated
 
     /**
-     * 
+     *
      * @see org.apache.catalina.Cluster#setProtocol(java.lang.String)
      */
     @Override

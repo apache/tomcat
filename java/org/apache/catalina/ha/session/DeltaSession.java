@@ -328,7 +328,7 @@ public class DeltaSession extends StandardSession implements Externalizable,Clus
     }
 
     public void setPrincipal(Principal principal, boolean addDeltaRequest) {
-        try { 
+        try {
             lock();
             super.setPrincipal(principal);
             if (addDeltaRequest && (deltaRequest != null))
@@ -350,7 +350,7 @@ public class DeltaSession extends StandardSession implements Externalizable,Clus
     }
 
     public void setAuthType(String authType, boolean addDeltaRequest) {
-        try { 
+        try {
             lock();
             super.setAuthType(authType);
             if (addDeltaRequest && (deltaRequest != null))
@@ -409,7 +409,7 @@ public class DeltaSession extends StandardSession implements Externalizable,Clus
             ((DeltaManager)manager).registerSessionAtReplicationValve(this);
         }
     }
-    
+
     // ------------------------------------------------- Session Public Methods
 
     /**
@@ -444,8 +444,8 @@ public class DeltaSession extends StandardSession implements Externalizable,Clus
         if (notifyCluster) {
             if (log.isDebugEnabled())
                 log.debug(sm.getString("deltaSession.notifying",
-                                       ((ClusterManager)manager).getName(), 
-                                       Boolean.valueOf(isPrimarySession()), 
+                                       ((ClusterManager)manager).getName(),
+                                       Boolean.valueOf(isPrimarySession()),
                                        expiredId));
             if ( manager instanceof DeltaManager ) {
                 ( (DeltaManager) manager).sessionExpired(expiredId);
@@ -770,7 +770,7 @@ public class DeltaSession extends StandardSession implements Externalizable,Clus
     protected void writeObject(ObjectOutputStream stream) throws IOException {
         writeObject((ObjectOutput)stream);
     }
-    
+
     private void writeObject(ObjectOutput stream) throws IOException {
         // Write the scalar instance variables (except Manager)
         stream.writeObject(Long.valueOf(creationTime));

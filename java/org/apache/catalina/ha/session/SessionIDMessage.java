@@ -20,9 +20,9 @@ import org.apache.catalina.ha.ClusterMessageBase;
 
 /**
  * Session id change cluster message
- * 
+ *
  * @author Peter Rossbach
- * 
+ *
  * @version $Id$
  */
 public class SessionIDMessage extends ClusterMessageBase {
@@ -65,7 +65,7 @@ public class SessionIDMessage extends ClusterMessageBase {
     public void setHost(String host) {
         this.host = host;
     }
-    
+
     /**
      * @return Returns the context name.
      */
@@ -93,7 +93,7 @@ public class SessionIDMessage extends ClusterMessageBase {
         this.messageNumber = messageNumber;
     }
 
-    
+
     /**
      * @return Returns the backupSessionID.
      */

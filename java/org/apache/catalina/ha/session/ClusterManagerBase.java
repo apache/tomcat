@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -29,7 +29,7 @@ import org.apache.catalina.session.ManagerBase;
 import org.apache.catalina.tribes.io.ReplicationStream;
 
 /**
- * 
+ *
  * @author Filip Hanik
  * @version $Id$
  */
@@ -61,7 +61,7 @@ public abstract class ClusterManagerBase extends ManagerBase
      */
     private Pattern sessionAttributePattern = null;
 
-    /* 
+    /*
      * @see org.apache.catalina.ha.ClusterManager#getCluster()
      */
     @Override
@@ -147,7 +147,7 @@ public abstract class ClusterManagerBase extends ManagerBase
     /**
      * Open Stream and use correct ClassLoader (Container) Switch
      * ThreadClassLoader
-     * 
+     *
      * @param data
      * @return The object input stream
      * @throws IOException
@@ -161,7 +161,7 @@ public abstract class ClusterManagerBase extends ManagerBase
     public ReplicationStream getReplicationStream(byte[] data, int offset, int length) throws IOException {
         ByteArrayInputStream fis = new ByteArrayInputStream(data, offset, length);
         return new ReplicationStream(fis, getClassLoaders());
-    }    
+    }
 
 
     //  ---------------------------------------------------- persistence handler
@@ -172,7 +172,7 @@ public abstract class ClusterManagerBase extends ManagerBase
      */
     @Override
     public void load() {
-        // NOOP 
+        // NOOP
     }
 
     @Override
