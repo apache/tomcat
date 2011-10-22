@@ -22,7 +22,7 @@ import java.sql.SQLException;
 
 import javax.sql.XAConnection;
 /**
- * A ProxyConnection object is the bottom most interceptor that wraps an object of type 
+ * A ProxyConnection object is the bottom most interceptor that wraps an object of type
  * {@link PooledConnection}. The ProxyConnection intercepts three methods:
  * <ul>
  *   <li>{@link java.sql.Connection#close()} - returns the connection to the pool. May be called multiple times.</li>
@@ -124,7 +124,7 @@ public class ProxyConnection extends JdbcInterceptor {
         try {
             PooledConnection poolc = connection;
             if (poolc!=null) {
-                return method.invoke(poolc.getConnection(),args);    
+                return method.invoke(poolc.getConnection(),args);
             } else {
                 throw new SQLException("Connection has already been closed.");
             }
@@ -137,7 +137,7 @@ public class ProxyConnection extends JdbcInterceptor {
             }
         }
     }
-    
+
     public boolean isClosed() {
         return connection==null || connection.isDiscarded();
     }
@@ -149,7 +149,7 @@ public class ProxyConnection extends JdbcInterceptor {
     public ConnectionPool getParentPool() {
         return pool;
     }
-    
+
     @Override
     public String toString() {
         return "ProxyConnection["+(connection!=null?connection.toString():"null")+"]";

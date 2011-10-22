@@ -40,7 +40,7 @@ import java.util.Map;
 
 public class ResultSet implements java.sql.ResultSet {
     boolean hasNext = true;
-    
+
     @Override
     public boolean absolute(int row) throws SQLException {
         return false;

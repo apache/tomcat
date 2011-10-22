@@ -33,9 +33,9 @@ import org.apache.tomcat.jdbc.pool.PooledConnection;
  */
 public class StatementFinalizer extends AbstractCreateStatementInterceptor {
     private static final Log log = LogFactory.getLog(StatementFinalizer.class);
-    
+
     protected ArrayList<WeakReference<Statement>> statements = new ArrayList<WeakReference<Statement>>();
-    
+
     @Override
     public Object createStatement(Object proxy, Method method, Object[] args, Object statement, long time) {
         // TODO Auto-generated method stub
@@ -47,7 +47,7 @@ public class StatementFinalizer extends AbstractCreateStatementInterceptor {
         }
         return statement;
     }
-    
+
     @Override
     public void closeInvoked() {
         while (statements.size()>0) {
@@ -70,6 +70,6 @@ public class StatementFinalizer extends AbstractCreateStatementInterceptor {
         statements.clear();
         super.reset(parent, con);
     }
-    
-    
+
+
 }

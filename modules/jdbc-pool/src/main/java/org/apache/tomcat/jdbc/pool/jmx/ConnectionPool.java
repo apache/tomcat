@@ -47,11 +47,11 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
      * sequence for JMX notifications
      */
     protected AtomicInteger sequence = new AtomicInteger(0);
-    
+
     /**
      * Listeners that are local and interested in our notifications, no need for JMX
      */
-    protected ConcurrentLinkedQueue<NotificationListener> listeners = new ConcurrentLinkedQueue<NotificationListener>(); 
+    protected ConcurrentLinkedQueue<NotificationListener> listeners = new ConcurrentLinkedQueue<NotificationListener>();
 
     public ConnectionPool(org.apache.tomcat.jdbc.pool.ConnectionPool pool) {
         super();
@@ -61,11 +61,11 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
     public org.apache.tomcat.jdbc.pool.ConnectionPool getPool() {
         return pool;
     }
-    
+
     public PoolConfiguration getPoolProperties() {
         return pool.getPoolProperties();
     }
-    
+
     //=================================================================
     //       NOTIFICATION INFO
     //=================================================================
@@ -77,23 +77,23 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
     public static final String SUSPECT_ABANDONED_NOTIFICATION = "SUSPECT CONNETION ABANDONED";
 
     @Override
-    public MBeanNotificationInfo[] getNotificationInfo() { 
+    public MBeanNotificationInfo[] getNotificationInfo() {
         MBeanNotificationInfo[] pres = super.getNotificationInfo();
         MBeanNotificationInfo[] loc = getDefaultNotificationInfo();
         MBeanNotificationInfo[] aug = new MBeanNotificationInfo[pres.length + loc.length];
         if (pres.length>0) System.arraycopy(pres, 0, aug, 0, pres.length);
-        if (loc.length >0) System.arraycopy(loc, 0, aug, pres.length, loc.length);    
-        return aug; 
-    } 
-    
+        if (loc.length >0) System.arraycopy(loc, 0, aug, pres.length, loc.length);
+        return aug;
+    }
+
     public static MBeanNotificationInfo[] getDefaultNotificationInfo() {
-        String[] types = new String[] {NOTIFY_INIT, NOTIFY_CONNECT, NOTIFY_ABANDON, SLOW_QUERY_NOTIFICATION, FAILED_QUERY_NOTIFICATION, SUSPECT_ABANDONED_NOTIFICATION}; 
-        String name = Notification.class.getName(); 
-        String description = "A connection pool error condition was met."; 
-        MBeanNotificationInfo info = new MBeanNotificationInfo(types, name, description); 
+        String[] types = new String[] {NOTIFY_INIT, NOTIFY_CONNECT, NOTIFY_ABANDON, SLOW_QUERY_NOTIFICATION, FAILED_QUERY_NOTIFICATION, SUSPECT_ABANDONED_NOTIFICATION};
+        String name = Notification.class.getName();
+        String description = "A connection pool error condition was met.";
+        MBeanNotificationInfo info = new MBeanNotificationInfo(types, name, description);
         return new MBeanNotificationInfo[] {info};
     }
-    
+
     /**
      * Return true if the notification was sent successfully, false otherwise.
      * @param type
@@ -119,17 +119,17 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
             }
             return false;
         }
-        
+
     }
-    
+
     public void addListener(NotificationListener list) {
         listeners.add(list);
     }
-    
+
     public boolean removeListener(NotificationListener list) {
         return listeners.remove(list);
     }
-    
+
     //=================================================================
     //       POOL STATS
     //=================================================================
@@ -148,17 +148,17 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
     public int getActive() {
         return pool.getActive();
     }
-    
+
     @Override
     public int getNumIdle() {
         return getIdle();
     }
-    
+
     @Override
     public int getNumActive() {
         return getActive();
     }
-    
+
     @Override
     public int getWaitCount() {
         return pool.getWaitCount();
@@ -186,7 +186,7 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
     //=================================================================
     //=========================================================
     //  PROPERTIES / CONFIGURATION
-    //=========================================================    
+    //=========================================================
 
 
     @Override
@@ -254,11 +254,11 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
     public int getMinIdle() {
         return getPoolProperties().getMinIdle();
     }
-    
+
     @Override
     public long getMaxAge() {
         return getPoolProperties().getMaxAge();
-    }    
+    }
 
     @Override
     public String getName() {
@@ -312,7 +312,7 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
     /**
      * {@inheritDoc}
      */
-    
+
     @Override
     public String getValidatorClassName() {
         return getPoolProperties().getValidatorClassName();
@@ -321,7 +321,7 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
     /**
      * {@inheritDoc}
      */
-    
+
     @Override
     public Validator getValidator() {
         return getPoolProperties().getValidator();
@@ -452,12 +452,12 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
     public String getPoolName() {
         return getPoolProperties().getName();
     }
-    
+
 
     @Override
     public void setConnectionProperties(String connectionProperties) {
         getPoolProperties().setConnectionProperties(connectionProperties);
-        
+
     }
 
     @Override
@@ -479,192 +479,192 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
     public void setDriverClassName(String driverClassName) {
         getPoolProperties().setDriverClassName(driverClassName);
     }
-    
-    
+
+
     @Override
     public void setFairQueue(boolean fairQueue) {
         getPoolProperties().setFairQueue(fairQueue);
     }
 
-    
+
     @Override
     public void setInitialSize(int initialSize) {
         // TODO Auto-generated method stub
-        
+
     }
 
-    
+
     @Override
     public void setInitSQL(String initSQL) {
         // TODO Auto-generated method stub
-        
+
     }
 
-    
+
     @Override
     public void setJdbcInterceptors(String jdbcInterceptors) {
         // TODO Auto-generated method stub
-        
+
     }
 
-    
+
     @Override
     public void setJmxEnabled(boolean jmxEnabled) {
         // TODO Auto-generated method stub
-        
+
     }
 
-    
+
     @Override
     public void setLogAbandoned(boolean logAbandoned) {
         // TODO Auto-generated method stub
-        
+
     }
 
-    
+
     @Override
     public void setMaxActive(int maxActive) {
         // TODO Auto-generated method stub
-        
+
     }
 
-     
+
     @Override
     public void setMaxIdle(int maxIdle) {
         // TODO Auto-generated method stub
-        
+
     }
 
-    
+
     @Override
     public void setMaxWait(int maxWait) {
         // TODO Auto-generated method stub
-        
+
     }
 
-    
+
     @Override
     public void setMinEvictableIdleTimeMillis(int minEvictableIdleTimeMillis) {
         // TODO Auto-generated method stub
-        
+
     }
 
-    
+
     @Override
     public void setMinIdle(int minIdle) {
         // TODO Auto-generated method stub
-        
+
     }
 
-    
+
     @Override
     public void setNumTestsPerEvictionRun(int numTestsPerEvictionRun) {
         // TODO Auto-generated method stub
-        
+
     }
 
-    
+
     @Override
     public void setPassword(String password) {
         // TODO Auto-generated method stub
-        
+
     }
 
-    
+
     @Override
     public void setRemoveAbandoned(boolean removeAbandoned) {
         // TODO Auto-generated method stub
-        
+
     }
 
-    
+
     @Override
     public void setRemoveAbandonedTimeout(int removeAbandonedTimeout) {
         // TODO Auto-generated method stub
-        
+
     }
 
-    
+
     @Override
     public void setTestOnBorrow(boolean testOnBorrow) {
         // TODO Auto-generated method stub
-        
+
     }
 
-    
+
     @Override
     public void setTestOnConnect(boolean testOnConnect) {
         // TODO Auto-generated method stub
-        
+
     }
 
-    
+
     @Override
     public void setTestOnReturn(boolean testOnReturn) {
         // TODO Auto-generated method stub
-        
+
     }
 
-    
+
     @Override
     public void setTestWhileIdle(boolean testWhileIdle) {
         // TODO Auto-generated method stub
-        
+
     }
 
-    
+
     @Override
     public void setTimeBetweenEvictionRunsMillis(int timeBetweenEvictionRunsMillis) {
         // TODO Auto-generated method stub
-        
+
     }
 
-    
+
     @Override
     public void setUrl(String url) {
         // TODO Auto-generated method stub
-        
+
     }
 
-    
+
     @Override
     public void setUseEquals(boolean useEquals) {
         // TODO Auto-generated method stub
-        
+
     }
 
-    
+
     @Override
     public void setUseLock(boolean useLock) {
         // TODO Auto-generated method stub
-        
+
     }
 
-    
+
     @Override
     public void setUsername(String username) {
         // TODO Auto-generated method stub
-        
+
     }
 
-    
+
     @Override
     public void setValidationInterval(long validationInterval) {
         // TODO Auto-generated method stub
-        
+
     }
 
-    
+
     @Override
     public void setValidationQuery(String validationQuery) {
         // TODO Auto-generated method stub
-        
+
     }
-    
+
     /**
      * {@inheritDoc}
      */
-    
+
     @Override
     public void setValidatorClassName(String className) {
         getPoolProperties().setValidatorClassName(className);
@@ -673,22 +673,22 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
     /**
      * {@inheritDoc}
      */
-    
+
     @Override
     public int getSuspectTimeout() {
-        return getPoolProperties().getSuspectTimeout(); 
+        return getPoolProperties().getSuspectTimeout();
     }
 
     /**
      * {@inheritDoc}
      */
-    
+
     @Override
     public void setSuspectTimeout(int seconds) {
         //no op
     }
 
-    /** 
+    /**
      * {@inheritDoc}
      */
     @Override
@@ -696,7 +696,7 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
         getPoolProperties().setDataSource(ds);
     }
 
-    /** 
+    /**
      * {@inheritDoc}
      */
     @Override
@@ -705,7 +705,7 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
     }
 
 
-    /** 
+    /**
      * {@inheritDoc}
      */
     @Override
@@ -713,23 +713,23 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
         //noop
     }
 
-    /** 
+    /**
      * {@inheritDoc}
      */
     @Override
     public String getDataSourceJNDI() {
         return getPoolProperties().getDataSourceJNDI();
     }
-    
-    /** 
+
+    /**
      * {@inheritDoc}
      */
     @Override
     public boolean isAlternateUsernameAllowed() {
         return getPoolProperties().isAlternateUsernameAllowed();
     }
-    
-    /** 
+
+    /**
      * {@inheritDoc}
      */
     @Override
@@ -737,14 +737,14 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
         //noop
     }
 
-    /** 
+    /**
      * {@inheritDoc}
      */
     @Override
     public void setValidator(Validator validator) {
         //noop
     }
-    
-    
+
+
 
 }

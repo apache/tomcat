@@ -44,7 +44,7 @@ public class TestConnectionState extends DefaultTestCase {
         d1.close(true);
         assertTrue("Connection should be closed",c1.isClosed());
     }
-    
+
     public void testAutoCommitTrue() throws Exception {
         DataSourceProxy d1 = this.createDefaultDataSource();
         d1.setMaxActive(1);
@@ -59,7 +59,7 @@ public class TestConnectionState extends DefaultTestCase {
         c1 = d1.getConnection();
         assertTrue("Auto commit should be true for a reused connection",c1.getAutoCommit());
     }
-    
+
     public void testDefaultCatalog() throws Exception {
         DataSourceProxy d1 = this.createDefaultDataSource();
         d1.setMaxActive(1);

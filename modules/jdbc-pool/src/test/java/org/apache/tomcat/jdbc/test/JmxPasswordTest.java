@@ -33,11 +33,11 @@ public class JmxPasswordTest extends DefaultTestCase{
     public static final String password = "password";
     public static final String username = "username";
     public static ObjectName oname = null;
-    
+
     public JmxPasswordTest(String s) {
         super(s);
     }
-    
+
     @Override
     public void setUp() throws Exception {
         super.setUp();
@@ -55,9 +55,9 @@ public class JmxPasswordTest extends DefaultTestCase{
         ConnectionPool pool = datasource.createPool();
         org.apache.tomcat.jdbc.pool.jmx.ConnectionPool jmxPool = new org.apache.tomcat.jdbc.pool.jmx.ConnectionPool(pool);
         mbs.registerMBean(jmxPool, oname);
-        
+
     }
-    
+
     public void testPassword() throws Exception {
         assertEquals("Passwords should match when not using JMX.",password,datasource.getPoolProperties().getPassword());
         MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
@@ -67,5 +67,5 @@ public class JmxPasswordTest extends DefaultTestCase{
         assertFalse("Passwords should not match.", password.equals(jmxPassword));
         assertFalse("Password property should be missing", jmxProperties.containsKey(PoolUtilities.PROP_PASSWORD));
     }
-    
+
 }

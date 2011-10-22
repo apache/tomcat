@@ -43,11 +43,11 @@ import org.apache.juli.logging.LogFactory;
  *              serverName=&quot;localhost&quot;
  *              port=&quot;1527&quot;/&gt;
  * </code></pre>
- * 
+ *
  */
 public class GenericNamingResourcesFactory implements ObjectFactory {
     private static final Log log = LogFactory.getLog(GenericNamingResourcesFactory.class);
-    
+
     @Override
     public Object getObjectInstance(Object obj, Name name, Context nameCtx, Hashtable<?, ?> environment) throws Exception {
         if ((obj == null) || !(obj instanceof Reference)) {
@@ -55,10 +55,10 @@ public class GenericNamingResourcesFactory implements ObjectFactory {
         }
         Reference ref = (Reference) obj;
         Enumeration<RefAddr> refs = ref.getAll();
-        
+
         String type = ref.getClassName();
         Object o = Class.forName(type).newInstance();
-        
+
         while (refs.hasMoreElements()) {
             RefAddr addr = refs.nextElement();
             String param = addr.getType();
@@ -67,7 +67,7 @@ public class GenericNamingResourcesFactory implements ObjectFactory {
                 value = addr.getContent().toString();
             }
             if (setProperty(o, param, value,false)) {
-                
+
             } else {
                 log.debug("Property not configured["+param+"]. No setter found on["+o+"].");
             }
@@ -159,9 +159,9 @@ public class GenericNamingResourcesFactory implements ObjectFactory {
                     if (methods[i].getReturnType()==Boolean.TYPE){
                         setPropertyMethodBool = methods[i];
                     }else {
-                        setPropertyMethodVoid = methods[i];    
+                        setPropertyMethodVoid = methods[i];
                     }
-                    
+
                 }
             }
 
@@ -205,8 +205,8 @@ public class GenericNamingResourcesFactory implements ObjectFactory {
                         o.getClass() + " " + name + "=" + value + ")", ie);
         }
         return false;
-    } 
-    
+    }
+
     public static String capitalize(String name) {
         if (name == null || name.length() == 0) {
             return name;

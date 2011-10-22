@@ -43,25 +43,25 @@ public abstract class AbstractQueryReport extends AbstractCreateStatementInterce
      * The threshold in milliseconds. If the query is faster than this, we don't measure it
      */
     protected long threshold = 1000; //don't report queries less than this
-    
+
     /**
-     * the constructors that are used to create statement proxies 
+     * the constructors that are used to create statement proxies
      */
     protected static final Constructor<?>[] constructors =
         new Constructor[AbstractCreateStatementInterceptor.STATEMENT_TYPE_COUNT];
 
-    
+
     public AbstractQueryReport() {
         super();
     }
-    
+
     /**
      * Invoked when prepareStatement has been called and completed.
      * @param sql - the string used to prepare the statement with
      * @param time - the time it took to invoke prepare
      */
     protected abstract void prepareStatement(String sql, long time);
-    
+
     /**
      * Invoked when prepareCall has been called and completed.
      * @param query - the string used to prepare the statement with
@@ -76,7 +76,7 @@ public abstract class AbstractQueryReport extends AbstractCreateStatementInterce
      * @param name the name of the method used to execute {@link AbstractCreateStatementInterceptor#isExecute(Method, boolean)}
      * @param start the time the query execution started
      * @param t the exception that happened
-     * @return - the SQL that was executed or the string &quot;batch&quot; if it was a batch execution 
+     * @return - the SQL that was executed or the string &quot;batch&quot; if it was a batch execution
      */
     protected String reportFailedQuery(String query, Object[] args, final String name, long start, Throwable t) {
         //extract the query string
@@ -95,7 +95,7 @@ public abstract class AbstractQueryReport extends AbstractCreateStatementInterce
      * @param name the name of the method used to execute {@link AbstractCreateStatementInterceptor#isExecute(Method, boolean)}
      * @param start the time the query execution started
      * @param delta the time the execution took
-     * @return - the SQL that was executed or the string &quot;batch&quot; if it was a batch execution 
+     * @return - the SQL that was executed or the string &quot;batch&quot; if it was a batch execution
      */
     protected String reportQuery(String query, Object[] args, final String name, long start, long delta) {
         //extract the query string
@@ -114,7 +114,7 @@ public abstract class AbstractQueryReport extends AbstractCreateStatementInterce
      * @param name the name of the method used to execute {@link AbstractCreateStatementInterceptor#isExecute(Method, boolean)}
      * @param start the time the query execution started
      * @param delta the time the execution took
-     * @return - the SQL that was executed or the string &quot;batch&quot; if it was a batch execution 
+     * @return - the SQL that was executed or the string &quot;batch&quot; if it was a batch execution
      */
     protected String reportSlowQuery(String query, Object[] args, final String name, long start, long delta) {
         //extract the query string
@@ -125,7 +125,7 @@ public abstract class AbstractQueryReport extends AbstractCreateStatementInterce
         }
         return sql;
     }
-    
+
     /**
      * returns the query measure threshold.
      * This value is in milliseconds. If the query is faster than this threshold than it wont be accounted for
@@ -211,7 +211,7 @@ public abstract class AbstractQueryReport extends AbstractCreateStatementInterce
             this.delegate = parent;
             this.query = query;
         }
-        
+
         @Override
         public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
             //get the name of the method for comparison
@@ -219,7 +219,7 @@ public abstract class AbstractQueryReport extends AbstractCreateStatementInterce
             //was close invoked?
             boolean close = compare(JdbcInterceptor.CLOSE_VAL,name);
             //allow close to be called multiple times
-            if (close && closed) return null; 
+            if (close && closed) return null;
             //are we calling isClosed?
             if (compare(JdbcInterceptor.ISCLOSED_VAL,name)) return Boolean.valueOf(closed);
             //if we are calling anything else, bail out
@@ -262,6 +262,6 @@ public abstract class AbstractQueryReport extends AbstractCreateStatementInterce
             }
             return result;
         }
-    }    
+    }
 
 }

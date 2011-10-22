@@ -46,7 +46,7 @@ public class TestInterceptor extends JdbcInterceptor {
     @Override
     public void reset(ConnectionPool parent, PooledConnection con) {
         // TODO Auto-generated method stub
-        
+
     }
 
     @Override

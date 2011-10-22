@@ -26,9 +26,9 @@ import java.sql.ResultSet;
 import org.apache.tomcat.jdbc.pool.interceptor.ResetAbandonedTimer;
 
 public class CreateTestTable extends DefaultTestCase {
-    
+
     public static volatile boolean recreate = Boolean.getBoolean("recreate");
-    
+
     public CreateTestTable(String name) {
         super(name);
     }
@@ -43,7 +43,7 @@ public class CreateTestTable extends DefaultTestCase {
         st.close();
         con.close();
     }
-    
+
     public int testCheckData() throws Exception {
         int count = 0;
         String check = "select count (*) from test";
@@ -52,7 +52,7 @@ public class CreateTestTable extends DefaultTestCase {
         Statement st = con.createStatement();
         try {
             ResultSet rs = st.executeQuery(check);
-            
+
             if (rs.next())
                 count = rs.getInt(1);
             rs.close();
@@ -62,7 +62,7 @@ public class CreateTestTable extends DefaultTestCase {
         con.close();
         return count;
     }
-    
+
     public void testPopulateData() throws Exception {
         int count = 100000;
         int actual = testCheckData();
@@ -70,13 +70,13 @@ public class CreateTestTable extends DefaultTestCase {
             System.out.println("Test tables has "+actual+" rows of data. No need to populate.");
             return;
         }
-        
+
         datasource.setJdbcInterceptors(ResetAbandonedTimer.class.getName());
         String insert = "insert into test values (?,?,?,?,?)";
         this.init();
         this.datasource.setRemoveAbandoned(false);
         Connection con = datasource.getConnection();
-        
+
         boolean commit = con.getAutoCommit();
         con.setAutoCommit(false);
         if (recreate) {
@@ -87,8 +87,8 @@ public class CreateTestTable extends DefaultTestCase {
             st.execute("create table test(id int not null, val1 varchar(255), val2 varchar(255), val3 varchar(255), val4 varchar(255))");
             st.close();
         }
-        
-        
+
+
         PreparedStatement ps = con.prepareStatement(insert);
         ps.setQueryTimeout(0);
         for (int i=actual; i<count; i++) {
@@ -117,7 +117,7 @@ public class CreateTestTable extends DefaultTestCase {
         con.setAutoCommit(commit);
         con.close();
     }
-    
+
     public static Random random = new Random(System.currentTimeMillis());
     public static String getRandom() {
         StringBuilder s = new StringBuilder(256);
@@ -128,7 +128,7 @@ public class CreateTestTable extends DefaultTestCase {
         }
         return s.toString();
     }
-    
+
     public static void main(String[] args) throws Exception {
         recreate = true;
         CreateTestTable test = new CreateTestTable("CreateTestTable");

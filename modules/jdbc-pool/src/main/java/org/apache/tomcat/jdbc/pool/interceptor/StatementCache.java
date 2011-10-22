@@ -28,11 +28,11 @@ import org.apache.tomcat.jdbc.pool.PooledConnection;
 import org.apache.tomcat.jdbc.pool.PoolProperties.InterceptorProperty;
 
 public class StatementCache extends StatementDecoratorInterceptor {
-    protected static final String[] ALL_TYPES = new String[] {PREPARE_STATEMENT,PREPARE_CALL}; 
-    protected static final String[] CALLABLE_TYPE = new String[] {PREPARE_CALL}; 
-    protected static final String[] PREPARED_TYPE = new String[] {PREPARE_STATEMENT}; 
+    protected static final String[] ALL_TYPES = new String[] {PREPARE_STATEMENT,PREPARE_CALL};
+    protected static final String[] CALLABLE_TYPE = new String[] {PREPARE_CALL};
+    protected static final String[] PREPARED_TYPE = new String[] {PREPARE_STATEMENT};
     protected static final String[] NO_TYPE = new String[] {};
-    
+
     protected static final String STATEMENT_CACHE_ATTR = StatementCache.class.getName() + ".cache";
 
     /*begin properties for the statement cache*/
@@ -41,8 +41,8 @@ public class StatementCache extends StatementDecoratorInterceptor {
     private int maxCacheSize = 50;
     private PooledConnection pcon;
     private String[] types;
-    
-    
+
+
     public boolean isCachePrepared() {
         return cachePrepared;
     }
@@ -81,14 +81,14 @@ public class StatementCache extends StatementDecoratorInterceptor {
         } else {
             this.types = NO_TYPE;
         }
-    
+
     }
     /*end properties for the statement cache*/
-    
+
     /*begin the cache size*/
-    private static ConcurrentHashMap<ConnectionPool,AtomicInteger> cacheSizeMap = 
+    private static ConcurrentHashMap<ConnectionPool,AtomicInteger> cacheSizeMap =
         new ConcurrentHashMap<ConnectionPool,AtomicInteger>();
-    
+
     private AtomicInteger cacheSize;
 
     @Override
@@ -96,14 +96,14 @@ public class StatementCache extends StatementDecoratorInterceptor {
         cacheSizeMap.putIfAbsent(pool, new AtomicInteger(0));
         super.poolStarted(pool);
     }
-    
+
     @Override
     public void poolClosed(ConnectionPool pool) {
         cacheSizeMap.remove(pool);
         super.poolClosed(pool);
     }
     /*end the cache size*/
-    
+
     /*begin the actual statement cache*/
     @Override
     public void reset(ConnectionPool parent, PooledConnection con) {
@@ -120,30 +120,30 @@ public class StatementCache extends StatementDecoratorInterceptor {
             }
         }
     }
-    
+
     @Override
     public void disconnected(ConnectionPool parent, PooledConnection con, boolean finalizing) {
-        ConcurrentHashMap<String,CachedStatement> statements = 
+        ConcurrentHashMap<String,CachedStatement> statements =
             (ConcurrentHashMap<String,CachedStatement>)con.getAttributes().get(STATEMENT_CACHE_ATTR);
-        
+
         if (statements!=null) {
             for (Map.Entry<String, CachedStatement> p : statements.entrySet()) {
                 closeStatement(p.getValue());
             }
             statements.clear();
         }
-        
+
         super.disconnected(parent, con, finalizing);
     }
-    
+
     public void closeStatement(CachedStatement st) {
         if (st==null) return;
         st.forceClose();
     }
-    
+
     @Override
-    protected Object createDecorator(Object proxy, Method method, Object[] args, 
-                                     Object statement, Constructor<?> constructor, String sql) 
+    protected Object createDecorator(Object proxy, Method method, Object[] args,
+                                     Object statement, Constructor<?> constructor, String sql)
     throws InstantiationException, IllegalAccessException, InvocationTargetException {
         boolean process = process(this.types, method, false);
         if (process) {
@@ -175,15 +175,15 @@ public class StatementCache extends StatementDecoratorInterceptor {
             return super.invoke(proxy,method,args);
         }
     }
-    
+
     public CachedStatement isCached(String sql) {
-        ConcurrentHashMap<String,CachedStatement> cache = 
+        ConcurrentHashMap<String,CachedStatement> cache =
             (ConcurrentHashMap<String,CachedStatement>)pcon.getAttributes().get(STATEMENT_CACHE_ATTR);
         return cache.get(sql);
     }
-    
+
     public boolean cacheStatement(CachedStatement proxy) {
-        ConcurrentHashMap<String,CachedStatement> cache = 
+        ConcurrentHashMap<String,CachedStatement> cache =
             (ConcurrentHashMap<String,CachedStatement>)pcon.getAttributes().get(STATEMENT_CACHE_ATTR);
         if (proxy.getSql()==null) {
             return false;
@@ -202,7 +202,7 @@ public class StatementCache extends StatementDecoratorInterceptor {
     }
 
     public boolean removeStatement(CachedStatement proxy) {
-        ConcurrentHashMap<String,CachedStatement> cache = 
+        ConcurrentHashMap<String,CachedStatement> cache =
             (ConcurrentHashMap<String,CachedStatement>)pcon.getAttributes().get(STATEMENT_CACHE_ATTR);
         if (cache.remove(proxy.getSql()) != null) {
             cacheSize.decrementAndGet();
@@ -213,13 +213,13 @@ public class StatementCache extends StatementDecoratorInterceptor {
     }
     /*end the actual statement cache*/
 
-    
+
     protected class CachedStatement extends StatementDecoratorInterceptor.StatementProxy<Statement> {
         boolean cached = false;
         public CachedStatement(Statement parent, String sql) {
             super(parent, sql);
         }
-        
+
         @Override
         public void closeInvoked() {
             //should we cache it
@@ -240,22 +240,22 @@ public class StatementCache extends StatementDecoratorInterceptor {
                 } catch (Exception x) {
                     removeStatement(proxy);
                 }
-            } 
+            }
             closed = true;
             delegate = null;
             if (shouldClose) {
                 super.closeInvoked();
             }
-           
+
         }
-        
+
         public void forceClose() {
             removeStatement(this);
             super.closeInvoked();
         }
-        
+
     }
-    
+
 }
 
 

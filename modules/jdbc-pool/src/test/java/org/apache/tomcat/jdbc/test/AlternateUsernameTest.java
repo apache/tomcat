@@ -40,7 +40,7 @@ public class AlternateUsernameTest extends DefaultTestCase {
     public void testUsernameCompare() throws Exception {
         testUsername(true);
     }
-    
+
     private void testUsername(boolean allowUsernameChange) throws Exception {
         long start = System.currentTimeMillis();
         int withoutuser =10;
@@ -51,7 +51,7 @@ public class AlternateUsernameTest extends DefaultTestCase {
         this.datasource.setUrl("jdbc:tomcat:test");
         this.datasource.setAlternateUsernameAllowed(allowUsernameChange);
         this.datasource.getConnection().close();
-        
+
         TestRunner[] runners = new TestRunner[withuser+withoutuser];
         for (int i=0; i<withuser; i++) {
             TestRunner with = new TestRunner("foo","bar",datasource.getPoolProperties().getUsername(),datasource.getPoolProperties().getPassword());
@@ -78,34 +78,34 @@ public class AlternateUsernameTest extends DefaultTestCase {
         System.out.println("Nr of iterations:"+total+" over "+(stop-start)+ " ms.");
 
     }
-    
+
     public void testUsernameCompareAgain() throws Exception {
         testUsernameCompare();
     }
-    
+
     public void testUsernameCompareNotAllowed() throws Exception {
         testUsername(false);
     }
-    
+
     public static class TestResult {
         public int iterations;
         public int failures;
         public String lastMessage;
     }
-    
+
     public class TestRunner implements Callable<TestResult> {
         String username;
         String password;
         volatile boolean done = false;
         TestResult result = null;
         boolean useuser = true;
-        
+
         public TestRunner(String user, String pass, String guser, String gpass) {
             username = user==null?guser : user;
             password = pass==null?gpass : pass;
             useuser = user!=null;
         }
-        
+
         @Override
         public TestResult call() {
             TestResult test = new TestResult();
@@ -113,13 +113,13 @@ public class AlternateUsernameTest extends DefaultTestCase {
             for (int i=0; (!done) && (i<iterations); i++) {
                 test.iterations = i+1;
                 try {
-                    
-                    
+
+
                     pcon = useuser ? (PooledConnection)AlternateUsernameTest.this.datasource.getConnection(username, password) :
                                      (PooledConnection)AlternateUsernameTest.this.datasource.getConnection();
-                    
+
                     Connection con = (Connection)pcon.getConnection();
-                    
+
                     assertTrue("Username mismatch: Requested User:"+username+" Actual user:"+con.getUsername(), con.getUsername().equals(username));
                     assertTrue("Password mismatch: Requested Password:"+password+" Actual password:"+con.getPassword(), con.getPassword().equals(password));
                 }catch (SQLException x) {

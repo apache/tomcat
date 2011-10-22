@@ -7,7 +7,7 @@
     <artifactId>apache</artifactId>
     <version>9</version>
   </parent>
-  
+
   <groupId>org.apache.tomcat</groupId>
   <artifactId>jdbc-pool</artifactId>
   <version>1.2-SNAPSHOT</version>
@@ -15,11 +15,11 @@
 
   <name>jdbc-pool</name>
   <url>http://people.apache.org/~fhanik/jdbc-pool/</url>
-  
+
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
-  
+
   <mailingLists>
     <mailingList>
       <name>Development List</name>
@@ -34,12 +34,12 @@
       <post>users@tomcat.apache.org</post>
     </mailingList>
   </mailingLists>
-  
+
   <scm>
     <connection>scm:svn:https://svn.apache.org/repos/asf/tomcat/trunk/modules/jdbc-pool</connection>
     <developerConnection>scm:svn:https://svn.apache.org/repos/asf/tomcat/trunk/modules/jdbc-pool</developerConnection>
     <url>http://svn.apache.org/viewvc/tomcat/trunk/modules/jdbc-pool</url>
-  </scm>  
+  </scm>
 
   <dependencies>
     <dependency>
@@ -86,8 +86,8 @@
         <configuration>
         </configuration>
       </plugin>
-      
-      
+
+
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-gpg-plugin</artifactId>
@@ -122,7 +122,7 @@
             </goals>
           </execution>
         </executions>
-      </plugin>      
+      </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
@@ -134,7 +134,7 @@
             </goals>
           </execution>
         </executions>
-      </plugin>      
-    </plugins>    
-  </build>  
+      </plugin>
+    </plugins>
+  </build>
 </project>

@@ -62,7 +62,7 @@ public class DataSourceFactory implements ObjectFactory {
     protected final static String PROP_DEFAULTREADONLY = "defaultReadOnly";
     protected final static String PROP_DEFAULTTRANSACTIONISOLATION = "defaultTransactionIsolation";
     protected final static String PROP_DEFAULTCATALOG = "defaultCatalog";
-    
+
     protected final static String PROP_DRIVERCLASSNAME = "driverClassName";
     protected final static String PROP_PASSWORD = "password";
     protected final static String PROP_URL = "url";
@@ -74,48 +74,48 @@ public class DataSourceFactory implements ObjectFactory {
     protected final static String PROP_INITIALSIZE = "initialSize";
     protected final static String PROP_MAXWAIT = "maxWait";
     protected final static String PROP_MAXAGE = "maxAge";
-    
+
     protected final static String PROP_TESTONBORROW = "testOnBorrow";
     protected final static String PROP_TESTONRETURN = "testOnReturn";
     protected final static String PROP_TESTWHILEIDLE = "testWhileIdle";
     protected final static String PROP_TESTONCONNECT = "testOnConnect";
     protected final static String PROP_VALIDATIONQUERY = "validationQuery";
     protected final static String PROP_VALIDATOR_CLASS_NAME = "validatorClassName";
-    
+
     protected final static String PROP_TIMEBETWEENEVICTIONRUNSMILLIS = "timeBetweenEvictionRunsMillis";
     protected final static String PROP_NUMTESTSPEREVICTIONRUN = "numTestsPerEvictionRun";
     protected final static String PROP_MINEVICTABLEIDLETIMEMILLIS = "minEvictableIdleTimeMillis";
-    
+
     protected final static String PROP_ACCESSTOUNDERLYINGCONNECTIONALLOWED = "accessToUnderlyingConnectionAllowed";
-    
+
     protected final static String PROP_REMOVEABANDONED = "removeAbandoned";
     protected final static String PROP_REMOVEABANDONEDTIMEOUT = "removeAbandonedTimeout";
     protected final static String PROP_LOGABANDONED = "logAbandoned";
     protected final static String PROP_ABANDONWHENPERCENTAGEFULL = "abandonWhenPercentageFull";
-    
+
     protected final static String PROP_POOLPREPAREDSTATEMENTS = "poolPreparedStatements";
     protected final static String PROP_MAXOPENPREPAREDSTATEMENTS = "maxOpenPreparedStatements";
     protected final static String PROP_CONNECTIONPROPERTIES = "connectionProperties";
-    
+
     protected final static String PROP_INITSQL = "initSQL";
     protected final static String PROP_INTERCEPTORS = "jdbcInterceptors";
     protected final static String PROP_VALIDATIONINTERVAL = "validationInterval";
     protected final static String PROP_JMX_ENABLED = "jmxEnabled";
     protected final static String PROP_FAIR_QUEUE = "fairQueue";
-    
+
     protected static final String PROP_USE_EQUALS = "useEquals";
     protected static final String PROP_USE_CON_LOCK = "useLock";
-    
+
     protected static final String PROP_DATASOURCE= "dataSource";
     protected static final String PROP_DATASOURCE_JNDI = "dataSourceJNDI";
-    
+
     protected static final String PROP_SUSPECT_TIMEOUT = "suspectTimeout";
-    
+
     protected static final String PROP_ALTERNATE_USERNAME_ALLOWED = "alternateUsernameAllowed";
-    
-    
+
+
     public static final int UNKNOWN_TRANSACTIONISOLATION = -1;
-    
+
     public static final String OBJECT_NAME = "object_name";
 
 
@@ -204,12 +204,12 @@ public class DataSourceFactory implements ObjectFactory {
         if (org.apache.tomcat.jdbc.pool.DataSource.class.getName().equals(ref.getClassName())) {
             ok = true;
         }
-        
+
         if (!ok) {
             log.warn(ref.getClassName()+" is not a valid class name/type for this JNDI factory.");
             return null;
         }
-        
+
 
         Properties properties = new Properties();
         for (int i = 0; i < ALL_PROPERTIES.length; i++) {
@@ -223,7 +223,7 @@ public class DataSourceFactory implements ObjectFactory {
 
         return createDataSource(properties,nameCtx,XA);
     }
-    
+
     public static PoolConfiguration parsePoolProperties(Properties properties) {
         PoolConfiguration poolProperties = new PoolProperties();
         String value = null;
@@ -353,7 +353,7 @@ public class DataSourceFactory implements ObjectFactory {
         if (value != null) {
             poolProperties.setValidationQuery(value);
         }
-        
+
         value = properties.getProperty(PROP_VALIDATOR_CLASS_NAME);
         if (value != null) {
             poolProperties.setValidatorClassName(value);
@@ -423,12 +423,12 @@ public class DataSourceFactory implements ObjectFactory {
         if (value != null) {
             poolProperties.setJmxEnabled(Boolean.parseBoolean(value));
         }
-        
+
         value = properties.getProperty(PROP_FAIR_QUEUE);
         if (value != null) {
             poolProperties.setFairQueue(Boolean.parseBoolean(value));
         }
-        
+
         value = properties.getProperty(PROP_USE_EQUALS);
         if (value != null) {
             poolProperties.setUseEquals(Boolean.parseBoolean(value));
@@ -438,29 +438,29 @@ public class DataSourceFactory implements ObjectFactory {
         if (value != null) {
             poolProperties.setName(ObjectName.quote(value));
         }
-        
+
         value = properties.getProperty(PROP_ABANDONWHENPERCENTAGEFULL);
         if (value != null) {
             poolProperties.setAbandonWhenPercentageFull(Integer.parseInt(value));
         }
-        
+
         value = properties.getProperty(PROP_MAXAGE);
         if (value != null) {
             poolProperties.setMaxAge(Long.parseLong(value));
         }
-        
+
         value = properties.getProperty(PROP_USE_CON_LOCK);
         if (value != null) {
             poolProperties.setUseLock(Boolean.parseBoolean(value));
         }
-        
+
         value = properties.getProperty(PROP_DATASOURCE);
         if (value != null) {
             //this should never happen
             throw new IllegalArgumentException("Can't set dataSource property as a string, this must be a javax.sql.DataSource object.");
-            
+
         }
-        
+
         value = properties.getProperty(PROP_DATASOURCE_JNDI);
         if (value != null) {
             poolProperties.setDataSourceJNDI(value);
@@ -470,12 +470,12 @@ public class DataSourceFactory implements ObjectFactory {
         if (value != null) {
             poolProperties.setSuspectTimeout(Integer.parseInt(value));
         }
-        
+
         value = properties.getProperty(PROP_ALTERNATE_USERNAME_ALLOWED);
         if (value != null) {
             poolProperties.setAlternateUsernameAllowed(Boolean.parseBoolean(value));
         }
-        
+
         return poolProperties;
     }
 
@@ -526,7 +526,7 @@ public class DataSourceFactory implements ObjectFactory {
             poolProperties.setDataSource(jndiDS);
         }
     }
-    
+
     /**
      * <p>Parse properties from the string. Format of the string must be [propertyName=property;]*<p>
      * @param propText

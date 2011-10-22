@@ -198,7 +198,7 @@ public class CheckOutThreadTest extends DefaultTestCase {
 //        System.out.println("[testC3P0Threads20Connections10]Test complete:"+delta+" ms. Iterations:"+(threadcount*this.iterations));
 //        tearDown();
 //    }
-    
+
     public void testDBCPThreads10Connections10Validate() throws Exception {
         init();
         this.datasource.getPoolProperties().setMaxActive(10);
@@ -241,7 +241,7 @@ public class CheckOutThreadTest extends DefaultTestCase {
         System.out.println("[testPoolThreads10Connections10Validate]Test complete:"+delta+" ms. Iterations:"+(threadcount*this.iterations));
         tearDown();
     }
-    
+
     public void testPoolThreads10Connections10ValidateFair() throws Exception {
         init();
         this.datasource.getPoolProperties().setMaxActive(10);
@@ -327,7 +327,7 @@ public class CheckOutThreadTest extends DefaultTestCase {
         System.out.println("[testPoolThreads20Connections10Validate]Test complete:"+delta+" ms. Iterations:"+(threadcount*this.iterations));
         tearDown();
     }
-    
+
     public void testPoolThreads10Connections20ValidateFair() throws Exception {
         init();
         this.datasource.getPoolProperties().setMaxActive(10);
@@ -349,7 +349,7 @@ public class CheckOutThreadTest extends DefaultTestCase {
         System.out.println("[testPoolThreads20Connections10ValidateFair]Test complete:"+delta+" ms. Iterations:"+(threadcount*this.iterations));
         tearDown();
     }
-    
+
 //    public void testC3P0Threads10Connections20Validate() throws Exception {
 //        init();
 //        this.datasource.getPoolProperties().setMaxActive(10);

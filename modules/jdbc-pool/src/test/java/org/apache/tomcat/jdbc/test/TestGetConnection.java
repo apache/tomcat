@@ -26,7 +26,7 @@ public class TestGetConnection extends DefaultTestCase {
     public TestGetConnection(String name) {
         super(name);
     }
-    
+
     public void testGetConnection() throws Exception {
         this.init();
         Connection con = this.datasource.getConnection();
@@ -34,7 +34,7 @@ public class TestGetConnection extends DefaultTestCase {
         Connection actual = ((PooledConnection)con).getConnection();
         assertNotNull("Connection delegate should not be null.",actual);
         System.out.println("Actual connection:"+actual.getClass().getName());
-        
+
     }
 
 }

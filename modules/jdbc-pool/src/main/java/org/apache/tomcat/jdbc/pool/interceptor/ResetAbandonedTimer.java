@@ -24,7 +24,7 @@ import org.apache.tomcat.jdbc.pool.PooledConnection;
 import org.apache.tomcat.jdbc.pool.ProxyConnection;
 
 /**
- * Class that resets the abandoned timer on any activity on the 
+ * Class that resets the abandoned timer on any activity on the
  * Connection or any successful query executions.
  * This interceptor is useful for when you have a {@link org.apache.tomcat.jdbc.pool.PoolConfiguration#setRemoveAbandonedTimeout(int)}
  * that is fairly low, and you want to reset the abandoned time each time any operation on the connection is performed
@@ -37,7 +37,7 @@ public class ResetAbandonedTimer extends AbstractQueryReport {
     public ResetAbandonedTimer() {
         // TODO Auto-generated constructor stub
     }
-    
+
     public boolean resetTimer() {
         boolean result = false;
         JdbcInterceptor interceptor = this.getNext();

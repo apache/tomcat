@@ -23,14 +23,14 @@ import org.apache.tomcat.jdbc.pool.interceptor.StatementCache;
 
 public class TestStatementCache extends DefaultTestCase {
 
-    
+
     public TestStatementCache(String name) {
         super(name);
     }
-    
+
     private static volatile TestStatementCacheInterceptor interceptor = null;
-    
-    
+
+
     @Override
     protected void tearDown() throws Exception {
         interceptor = null;
@@ -42,14 +42,14 @@ public class TestStatementCache extends DefaultTestCase {
         datasource.getPoolProperties().setJdbcInterceptors(TestStatementCacheInterceptor.class.getName()+
                 "(prepared="+cachePrepared+",callable="+cacheCallable+",max="+max+")");
     }
-    
+
     public void testIsCacheEnabled() throws Exception {
         init();
         config(true,true,50);
         datasource.getConnection().close();
         assertNotNull("Interceptor was not created.", interceptor);
     }
-    
+
     public void testCacheProperties() throws Exception {
         init();
         config(true,true,50);
@@ -58,7 +58,7 @@ public class TestStatementCache extends DefaultTestCase {
         assertEquals(true, interceptor.isCachePrepared());
         assertEquals(50,interceptor.getMaxCacheSize());
     }
-    
+
     public void testCacheProperties2() throws Exception {
         init();
         config(false,false,100);
@@ -122,7 +122,7 @@ public class TestStatementCache extends DefaultTestCase {
         assertEquals(100,interceptor.getCacheSize().get());
     }
 
-    
+
     public static class TestStatementCacheInterceptor extends StatementCache {
         public TestStatementCacheInterceptor() {
             TestStatementCache.interceptor = this;

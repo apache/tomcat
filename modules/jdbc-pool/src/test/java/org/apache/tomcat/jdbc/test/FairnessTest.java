@@ -35,7 +35,7 @@ public class FairnessTest extends DefaultTestCase {
     public FairnessTest(String name) {
         super(name);
     }
-    
+
     protected boolean run = true;
     protected long sleep = Long.getLong("sleep", 10).longValue();
     protected long complete = Long.getLong("complete",20000).longValue();
@@ -59,10 +59,10 @@ public class FairnessTest extends DefaultTestCase {
                            (((float)totalfetch))/(float)threads.length);
         System.out.println("["+name+"] Max wait:"+maxwait/1000000f+"ms. Min wait:"+minwait/1000000f+"ms. Average wait:"+(((((float)totalwait))/(float)totalfetch)/1000000f)+" ms.");
         System.out.println("["+name+"] Max active:"+active+" Expected Active:"+expected);
-        
-        
+
+
     }
-    
+
     public void testDBCPThreads20Connections10() throws Exception {
         System.out.println("[testDBCPThreads20Connections10] Starting fairness - DBCP");
         init();
@@ -77,7 +77,7 @@ public class FairnessTest extends DefaultTestCase {
             threads[i] = new TestThread();
             threads[i].setName("tomcat-dbcp-"+i);
             threads[i].d = this.tDatasource;
-            
+
         }
         for (int i=0; i<threadcount; i++) {
             threads[i].start();
@@ -107,7 +107,7 @@ public class FairnessTest extends DefaultTestCase {
             threads[i] = new TestThread();
             threads[i].setName("tomcat-pool-"+i);
             threads[i].d = this.datasource;
-            
+
         }
         for (int i=0; i<threadcount; i++) {
             threads[i].start();
@@ -137,7 +137,7 @@ public class FairnessTest extends DefaultTestCase {
             threads[i] = new TestThread();
             threads[i].setName("tomcat-pool-"+i);
             threads[i].d = this.datasource;
-            
+
         }
         for (int i=0; i<threadcount; i++) {
             threads[i].start();
@@ -151,7 +151,7 @@ public class FairnessTest extends DefaultTestCase {
         System.out.println("Test completed in: " + delta + "ms.");
         tearDown();
     }
- 
+
     public void testPoolThreads20Connections10FairAsync() throws Exception {
         System.out.println("[testPoolThreads20Connections10FairAsync] Starting fairness - Tomcat JDBC - Fair - Async");
         init();
@@ -168,7 +168,7 @@ public class FairnessTest extends DefaultTestCase {
             threads[i].setName("tomcat-pool-"+i);
             threads[i].async = true;
             threads[i].d = this.datasource;
-            
+
         }
         for (int i=0; i<threadcount; i++) {
             threads[i].start();
@@ -182,7 +182,7 @@ public class FairnessTest extends DefaultTestCase {
         System.out.println("Test completed in: " + delta + "ms.");
         tearDown();
     }
-    
+
 //    public void testC3P0Threads20Connections10() throws Exception {
 //        System.out.println("[testC3P0Threads20Connections10] Starting fairness - C3P0");
 //        init();
@@ -198,7 +198,7 @@ public class FairnessTest extends DefaultTestCase {
 //            threads[i] = new TestThread();
 //            threads[i].setName("tomcat-pool-"+i);
 //            threads[i].d = this.c3p0Datasource;
-//            
+//
 //        }
 //        for (int i=0; i<threadcount; i++) {
 //            threads[i].start();
@@ -213,7 +213,7 @@ public class FairnessTest extends DefaultTestCase {
 //
 //    }
 
-    
+
     public class TestThread extends Thread {
         protected DataSource d;
         protected String query = null;
@@ -248,8 +248,8 @@ public class FairnessTest extends DefaultTestCase {
                             rs.close();
                             st.close();
                         }
-                        try { 
-                            if (FairnessTest.this.sleep>0) sleep(FairnessTest.this.sleep); 
+                        try {
+                            if (FairnessTest.this.sleep>0) sleep(FairnessTest.this.sleep);
                         } catch (InterruptedException x) {
                             interrupted();
                         }

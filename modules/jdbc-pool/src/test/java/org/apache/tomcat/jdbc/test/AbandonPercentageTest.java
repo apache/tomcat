@@ -25,7 +25,7 @@ public class AbandonPercentageTest extends DefaultTestCase {
     public AbandonPercentageTest(String name) {
         super(name);
     }
-    
+
     public void testDefaultAbandon() throws Exception {
         this.init();
         this.datasource.setMaxActive(100);
@@ -41,7 +41,7 @@ public class AbandonPercentageTest extends DefaultTestCase {
         assertEquals("Number of connections active/busy should be 0",0,datasource.getPool().getActive());
         con.close();
     }
-    
+
     public void testMaxedOutAbandon() throws Exception {
         int size = 100;
         this.init();
