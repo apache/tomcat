@@ -110,7 +110,7 @@ import org.apache.tomcat.util.res.StringManager;
  * </pre>
  * <p>
  * Then a request to <code>/context/static/images/tomcat.jpg</code> will succeed
- * while a request to <code>/context/images/tomcat2.jpg</code> will fail. 
+ * while a request to <code>/context/images/tomcat2.jpg</code> will fail.
  * </p>
  * @author Craig R. McClanahan
  * @author Remy Maucherat
@@ -171,8 +171,8 @@ public class DefaultServlet
      * Allow customized directory listing per context.
      */
     protected String contextXsltFile = null;
-    
-    
+
+
     /**
      * Allow customized directory listing per instance.
      */
@@ -196,13 +196,13 @@ public class DefaultServlet
      * the platform default is used.
      */
     protected String fileEncoding = null;
-    
-    
+
+
     /**
      * Minimum size for sendfile usage in bytes.
      */
     protected int sendfileSize = 48 * 1024;
-    
+
     /**
      * Should the Accept-Ranges: bytes header be send with static resources?
      */
@@ -212,8 +212,8 @@ public class DefaultServlet
      * Full range marker.
      */
     protected static ArrayList<Range> FULL = new ArrayList<Range>();
-    
-    
+
+
     // ----------------------------------------------------- Static Initializer
 
 
@@ -288,7 +288,7 @@ public class DefaultServlet
             readOnly = Boolean.parseBoolean(getServletConfig().getInitParameter("readonly"));
 
         if (getServletConfig().getInitParameter("sendfileSize") != null)
-            sendfileSize = 
+            sendfileSize =
                 Integer.parseInt(getServletConfig().getInitParameter("sendfileSize")) * 1024;
 
         fileEncoding = getServletConfig().getInitParameter("fileEncoding");
@@ -383,7 +383,7 @@ public class DefaultServlet
 
     /**
      * Determines the appropriate path to prepend resources with
-     * when generating directory listings. Depending on the behaviour of 
+     * when generating directory listings. Depending on the behaviour of
      * {@link #getRelativePath(HttpServletRequest)} this will change.
      * @param request the request to determine the path for
      * @return the prefix to apply to all resources in the listing.
@@ -443,7 +443,7 @@ public class DefaultServlet
      *
      * @param resp  the {@link HttpServletResponse} object that
      *                  contains the response the servlet returns
-     *                  to the client                                
+     *                  to the client
      *
      * @exception IOException   if an input or output error occurs
      *                              while the servlet is handling the
@@ -472,11 +472,11 @@ public class DefaultServlet
         }
         // Always allow options
         allow.append(", OPTIONS");
-        
+
         resp.setHeader("Allow", allow.toString());
     }
-    
-    
+
+
     /**
      * Process a POST request for the specified resource.
      *
@@ -746,7 +746,7 @@ public class DefaultServlet
         throws IOException, ServletException {
 
         boolean serveContent = content;
-        
+
         // Identify the requested resource path
         String path = getRelativePath(request);
         if (debug > 0) {
@@ -761,7 +761,7 @@ public class DefaultServlet
         CacheEntry cacheEntry = resources.lookupCache(path);
 
         if (!cacheEntry.exists) {
-            // Check if we're included so we can return the appropriate 
+            // Check if we're included so we can return the appropriate
             // missing resource name in the error
             String requestUri = (String) request.getAttribute(
                     RequestDispatcher.INCLUDE_REQUEST_URI);
@@ -784,7 +784,7 @@ public class DefaultServlet
         // ends with "/" or "\", return NOT FOUND
         if (cacheEntry.context == null) {
             if (path.endsWith("/") || (path.endsWith("\\"))) {
-                // Check if we're included so we can return the appropriate 
+                // Check if we're included so we can return the appropriate
                 // missing resource name in the error
                 String requestUri = (String) request.getAttribute(
                         RequestDispatcher.INCLUDE_REQUEST_URI);
@@ -841,13 +841,13 @@ public class DefaultServlet
                     // Accept ranges header
                     response.setHeader("Accept-Ranges", "bytes");
                 }
-    
+
                 // Parse range specifier
                 ranges = parseRange(request, response, cacheEntry.attributes);
-    
+
                 // ETag header
                 response.setHeader("ETag", cacheEntry.attributes.getETag());
-    
+
                 // Last-Modified header
                 response.setHeader("Last-Modified",
                         cacheEntry.attributes.getLastModifiedHttp());
@@ -903,7 +903,7 @@ public class DefaultServlet
         if (contentWritten > 0) {
             ranges = FULL;
         }
-        
+
         if ( (cacheEntry.context != null)
                 || isError
                 || ( ((ranges == null) || (ranges.isEmpty()))
@@ -1247,7 +1247,7 @@ public class DefaultServlet
             return renderHtml(contextPath, cacheEntry);
         }
         return renderXml(contextPath, cacheEntry, xsltInputStream);
-        
+
     }
 
     /**
@@ -1282,7 +1282,7 @@ public class DefaultServlet
             // Render the directory entries within this directory
             NamingEnumeration<NameClassPair> enumeration =
                 resources.list(cacheEntry.name);
-            
+
             // rewriteUrl(contextPath) is expensive. cache result for later reuse
             String rewrittenContextPath =  rewriteUrl(contextPath);
 
@@ -1385,7 +1385,7 @@ public class DefaultServlet
         PrintWriter writer = new PrintWriter(osWriter);
 
         StringBuilder sb = new StringBuilder();
-        
+
         // rewriteUrl(contextPath) is expensive. cache result for later reuse
         String rewrittenContextPath =  rewriteUrl(contextPath);
 
@@ -1656,8 +1656,8 @@ public class DefaultServlet
         }
         return false;
     }
-    
-    
+
+
     /**
      * Check if the if-match condition is satisfied.
      *
@@ -1838,7 +1838,7 @@ public class DefaultServlet
      * (even in the face of an exception).
      *
      * @param cacheEntry The cache entry for the source resource
-     * @param is The input stream to read the source resource from   
+     * @param is The input stream to read the source resource from
      * @param ostream The output stream to write to
      *
      * @exception IOException if an input/output error occurs
@@ -1885,7 +1885,7 @@ public class DefaultServlet
      * (even in the face of an exception).
      *
      * @param cacheEntry The cache entry for the source resource
-     * @param is The input stream to read the source resource from   
+     * @param is The input stream to read the source resource from
      * @param writer The writer to write to
      *
      * @exception IOException if an input/output error occurs
@@ -2100,7 +2100,7 @@ public class DefaultServlet
             return new IOException(sm.getString("defaultservlet.skipfail",
                     Long.valueOf(skipped), Long.valueOf(start)));
         }
-        
+
         IOException exception = null;
         long bytesToRead = end - start + 1;
 

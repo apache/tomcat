@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -114,7 +114,7 @@ public interface Manager {
     public void setSessionIdLength(int idLength);
 
 
-    /** 
+    /**
      * Returns the total number of sessions created by this manager.
      *
      * @return Total number of sessions created by this manager.
@@ -122,7 +122,7 @@ public interface Manager {
     public long getSessionCounter();
 
 
-    /** 
+    /**
      * Sets the total number of sessions created by this manager.
      *
      * @param sessionCounter Total number of sessions created by this manager.
@@ -150,7 +150,7 @@ public interface Manager {
     public void setMaxActive(int maxActive);
 
 
-    /** 
+    /**
      * Gets the number of currently active sessions.
      *
      * @return Number of currently active sessions
@@ -206,26 +206,26 @@ public interface Manager {
     /**
      * Gets the average time (in seconds) that expired sessions had been
      * alive. This may be based on sample data.
-     * 
+     *
      * @return Average time (in seconds) that expired sessions had been
      * alive.
      */
     public int getSessionAverageAliveTime();
 
-    
+
     /**
      * Gets the current rate of session creation (in session per minute). This
      * may be based on sample data.
-     * 
+     *
      * @return  The current rate (in sessions per minute) of session creation
      */
     public int getSessionCreateRate();
-    
+
 
     /**
      * Gets the current rate of session expiration (in session per minute). This
      * may be based on sample data
-     * 
+     *
      * @return  The current rate (in sessions per minute) of session expiration
      */
     public int getSessionExpireRate();
@@ -251,17 +251,17 @@ public interface Manager {
     /**
      * Change the session ID of the current session to a new randomly generated
      * session ID.
-     * 
+     *
      * @param session   The session to change the session ID for
      */
     public void changeSessionId(Session session);
-    
-    
+
+
     /**
      * Get a session from the recycled ones or create a new empty one.
      * The PersistentManager manager does not need to create session data
      * because it reads it from the Store.
-     */                                                                         
+     */
     public Session createEmptySession();
 
 
@@ -269,9 +269,9 @@ public interface Manager {
      * Construct and return a new session object, based on the default
      * settings specified by this Manager's properties.  The session
      * id specified will be used as the session id.
-     * If a new session cannot be created for any reason, return 
+     * If a new session cannot be created for any reason, return
      * <code>null</code>.
-     * 
+     *
      * @param sessionId The session id which should be used to create the
      *  new session; if <code>null</code>, the session
      *  id will be assigned by this method, and available via the getId()
@@ -348,7 +348,7 @@ public interface Manager {
      * @exception IOException if an input/output error occurs
      */
     public void unload() throws IOException;
-    
+
      /**
       * This method will be invoked by the context/container on a periodic
       * basis and allows the manager to implement

@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -178,11 +178,11 @@ public interface Container extends Lifecycle {
      */
     public Object getMappingObject();
 
-    
+
     /**
      * Return the JMX name associated with this container.
      */
-    public ObjectName getObjectName();    
+    public ObjectName getObjectName();
 
     /**
      * Return the Pipeline object that manages the Valves associated with
@@ -210,10 +210,10 @@ public interface Container extends Lifecycle {
     /**
      * Get the delay between the invocation of the backgroundProcess method on
      * this container and its children. Child containers will not be invoked
-     * if their delay value is not negative (which would mean they are using 
-     * their own thread). Setting this to a positive value will cause 
-     * a thread to be spawn. After waiting the specified amount of time, 
-     * the thread will invoke the executePeriodic method on this container 
+     * if their delay value is not negative (which would mean they are using
+     * their own thread). Setting this to a positive value will cause
+     * a thread to be spawn. After waiting the specified amount of time,
+     * the thread will invoke the executePeriodic method on this container
      * and all its children.
      */
     public int getBackgroundProcessorDelay();
@@ -222,8 +222,8 @@ public interface Container extends Lifecycle {
     /**
      * Set the delay between the invocation of the execute method on this
      * container and its children.
-     * 
-     * @param delay The delay in seconds between the invocation of 
+     *
+     * @param delay The delay in seconds between the invocation of
      *              backgroundProcess methods
      */
     public void setBackgroundProcessorDelay(int delay);
@@ -444,8 +444,8 @@ public interface Container extends Lifecycle {
      * @param data Event data
      */
     public void fireContainerEvent(String type, Object data);
-    
-    
+
+
     /**
      * Log a request/response that was destined for this container but has been
      * handled earlier in the processing chain so that the request/response
@@ -453,14 +453,14 @@ public interface Container extends Lifecycle {
      * @param request       Request (associated with the response) to log
      * @param response      Response (associated with the request) to log
      * @param time          Time taken to process the request/response in
-     *                      milliseconds (use 0 if not known) 
+     *                      milliseconds (use 0 if not known)
      * @param   useDefault  Flag that indicates that the request/response should
      *                      be logged in the engine's default access log
      */
     public void logAccess(Request request, Response response, long time,
             boolean useDefault);
-    
-    
+
+
     /**
      * Identify the AccessLog to use to log a request/response that was destined
      * for this container but was handled earlier in the processing chain so

@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -36,7 +36,7 @@ public final class SecurityClassLoad {
         if( System.getSecurityManager() == null ){
             return;
         }
-        
+
         loadCorePackage(loader);
         loadCoyotePackage(loader);
         loadLoaderPackage(loader);
@@ -44,11 +44,11 @@ public final class SecurityClassLoad {
         loadSessionPackage(loader);
         loadUtilPackage(loader);
         loadJavaxPackage(loader);
-        loadConnectorPackage(loader);        
+        loadConnectorPackage(loader);
         loadTomcatPackage(loader);
     }
-    
-    
+
+
     private static final void loadCorePackage(ClassLoader loader)
         throws Exception {
         final String basePackage = "org.apache.catalina.core.";
@@ -95,8 +95,8 @@ public final class SecurityClassLoad {
             (basePackage +
              "ApplicationHttpRequest$AttributeNamesEnumerator");
     }
-    
-    
+
+
     private static final void loadLoaderPackage(ClassLoader loader)
         throws Exception {
         final String basePackage = "org.apache.catalina.loader.";
@@ -104,8 +104,8 @@ public final class SecurityClassLoad {
             (basePackage +
              "WebappClassLoader$PrivilegedFindResourceByName");
     }
-    
-    
+
+
     private static final void loadRealmPackage(ClassLoader loader)
             throws Exception {
         final String basePackage = "org.apache.catalina.realm.";
@@ -126,16 +126,16 @@ public final class SecurityClassLoad {
         loader.loadClass
             (basePackage + "StandardManager$PrivilegedDoUnload");
     }
-    
-    
+
+
     private static final void loadUtilPackage(ClassLoader loader)
         throws Exception {
         final String basePackage = "org.apache.catalina.util.";
         loader.loadClass(basePackage + "Enumerator");
         loader.loadClass(basePackage + "ParameterMap");
     }
-    
-    
+
+
     private static final void loadCoyotePackage(ClassLoader loader)
             throws Exception {
         final String basePackage = "org.apache.coyote.";
@@ -151,7 +151,7 @@ public final class SecurityClassLoad {
         throws Exception {
         loader.loadClass("javax.servlet.http.Cookie");
     }
-    
+
 
     private static final void loadConnectorPackage(ClassLoader loader)
         throws Exception {
@@ -182,7 +182,7 @@ public final class SecurityClassLoad {
              "RequestFacade$GetHeadersPrivilegedAction");
         loader.loadClass
             (basePackage +
-             "RequestFacade$GetHeaderNamesPrivilegedAction");  
+             "RequestFacade$GetHeaderNamesPrivilegedAction");
         loader.loadClass
             (basePackage +
              "RequestFacade$GetCookiesPrivilegedAction");
@@ -196,7 +196,7 @@ public final class SecurityClassLoad {
             (basePackage +
              "ResponseFacade$SetContentTypePrivilegedAction");
         loader.loadClass
-            (basePackage + 
+            (basePackage +
              "ResponseFacade$DateHeaderPrivilegedAction");
         loader.loadClass
             (basePackage +

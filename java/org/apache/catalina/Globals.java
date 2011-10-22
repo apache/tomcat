@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -30,9 +30,9 @@ public final class Globals {
 
     /**
      * The servlet context attribute under which we store the alternate
-     * deployment descriptor for this web application 
+     * deployment descriptor for this web application
      */
-    public static final String ALT_DD_ATTR = 
+    public static final String ALT_DD_ATTR =
         "org.apache.catalina.deploy.alt_dd";
 
 
@@ -57,14 +57,14 @@ public final class Globals {
     /**
      * Request dispatcher state.
      */
-    public static final String DISPATCHER_TYPE_ATTR = 
+    public static final String DISPATCHER_TYPE_ATTR =
         "org.apache.catalina.core.DISPATCHER_TYPE";
 
 
     /**
      * Request dispatcher path.
      */
-    public static final String DISPATCHER_REQUEST_PATH_ATTR = 
+    public static final String DISPATCHER_REQUEST_PATH_ATTR =
         "org.apache.catalina.core.DISPATCHER_REQUEST_PATH";
 
 
@@ -150,13 +150,13 @@ public final class Globals {
     public static final String SUBJECT_ATTR =
         "javax.security.auth.subject";
 
-    
+
     public static final String GSS_CREDENTIAL_ATTR =
         "org.apache.catalina.realm.GSS_CREDENTIAL";
 
 
     /**
-     * The master flag which controls strict servlet specification 
+     * The master flag which controls strict servlet specification
      * compliance.
      */
     public static final boolean STRICT_SERVLET_COMPLIANCE =
@@ -168,14 +168,14 @@ public final class Globals {
      */
     public static final boolean IS_SECURITY_ENABLED =
         (System.getSecurityManager() != null);
-    
+
     /**
-     * 
+     *
      */
-    public static final String ASYNC_SUPPORTED_ATTR = 
+    public static final String ASYNC_SUPPORTED_ATTR =
         "org.apache.catalina.ASYNC_SUPPORTED";
 
-    
+
     /**
      * Default domain for MBeans if none can be determined
      */

@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -74,7 +74,7 @@ public interface Host extends Container {
      * ${catalina.base}/conf/&lt;engine name&gt;/&lt;host name&gt; directory
      */
     public String getXmlBase();
-    
+
     /**
      * Set the Xml root for this Host.  This can be an absolute
      * pathname, a relative pathname, or a URL.
@@ -109,8 +109,8 @@ public interface Host extends Container {
 
 
     /**
-     * Return the value of the auto deploy flag.  If true, it indicates that 
-     * this host's child webapps should be discovered and automatically 
+     * Return the value of the auto deploy flag.  If true, it indicates that
+     * this host's child webapps should be discovered and automatically
      * deployed dynamically.
      */
     public boolean getAutoDeploy();
@@ -118,7 +118,7 @@ public interface Host extends Container {
 
     /**
      * Set the auto deploy flag value for this host.
-     * 
+     *
      * @param autoDeploy The new auto deploy flag
      */
     public void setAutoDeploy(boolean autoDeploy);
@@ -130,7 +130,7 @@ public interface Host extends Container {
      */
     public String getConfigClass();
 
-    
+
     /**
      * Set the Java class name of the context configuration class
      * for new web applications.
@@ -139,10 +139,10 @@ public interface Host extends Container {
      */
     public void setConfigClass(String configClass);
 
-        
+
     /**
-     * Return the value of the deploy on startup flag.  If true, it indicates 
-     * that this host's child webapps should be discovered and automatically 
+     * Return the value of the deploy on startup flag.  If true, it indicates
+     * that this host's child webapps should be discovered and automatically
      * deployed.
      */
     public boolean getDeployOnStartup();
@@ -150,7 +150,7 @@ public interface Host extends Container {
 
     /**
      * Set the deploy on startup flag value for this host.
-     * 
+     *
      * @param deployOnStartup The new deploy on startup flag
      */
     public void setDeployOnStartup(boolean deployOnStartup);

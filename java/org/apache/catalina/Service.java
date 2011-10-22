@@ -134,7 +134,7 @@ public interface Service extends Lifecycle {
      * @return Executor
      */
     public Executor getExecutor(String name);
-    
+
     /**
      * Removes an executor from the service
      * @param ex Executor

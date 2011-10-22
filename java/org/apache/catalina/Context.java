@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -76,7 +76,7 @@ public interface Context extends Container {
      * Container event for adding a welcome file.
      */
     public static final String ADD_WELCOME_FILE_EVENT = "addWelcomeFile";
-    
+
     /**
      * Container event for removing a wrapper.
      */
@@ -222,29 +222,29 @@ public interface Context extends Container {
      */
     public void setCookies(boolean cookies);
 
-    
+
     /**
      * Gets the name to use for session cookies. Overrides any setting that
      * may be specified by the application.
-     * 
+     *
      * @return  The value of the default session cookie name or null if not
      *          specified
      */
     public String getSessionCookieName();
-    
-    
+
+
     /**
      * Sets the name to use for session cookies. Overrides any setting that
      * may be specified by the application.
-     * 
+     *
      * @param sessionCookieName   The name to use
      */
     public void setSessionCookieName(String sessionCookieName);
 
-    
+
     /**
      * Gets the value of the use HttpOnly cookies for session cookies flag.
-     * 
+     *
      * @return <code>true</code> if the HttpOnly flag should be set on session
      *         cookies
      */
@@ -253,93 +253,93 @@ public interface Context extends Container {
 
     /**
      * Sets the use HttpOnly cookies for session cookies flag.
-     * 
+     *
      * @param useHttpOnly   Set to <code>true</code> to use HttpOnly cookies
      *                          for session cookies
      */
     public void setUseHttpOnly(boolean useHttpOnly);
-    
-    
+
+
     /**
      * Gets the domain to use for session cookies. Overrides any setting that
      * may be specified by the application.
-     * 
+     *
      * @return  The value of the default session cookie domain or null if not
      *          specified
      */
     public String getSessionCookieDomain();
-    
-    
+
+
     /**
      * Sets the domain to use for session cookies. Overrides any setting that
      * may be specified by the application.
-     * 
+     *
      * @param sessionCookieDomain   The domain to use
      */
     public void setSessionCookieDomain(String sessionCookieDomain);
 
-    
+
     /**
      * Gets the path to use for session cookies. Overrides any setting that
      * may be specified by the application.
-     * 
+     *
      * @return  The value of the default session cookie path or null if not
      *          specified
      */
     public String getSessionCookiePath();
-    
-    
+
+
     /**
      * Sets the path to use for session cookies. Overrides any setting that
      * may be specified by the application.
-     * 
+     *
      * @param sessionCookiePath   The path to use
      */
     public void setSessionCookiePath(String sessionCookiePath);
 
-    
+
     /**
      * Is a / added to the end of the session cookie path to ensure browsers,
      * particularly IE, don't send a session cookie for context /foo with
      * requests intended for context /foobar.
-     * 
+     *
      * @return <code>true</code> if the slash is added, otherwise
-     *         <code>false</code>  
+     *         <code>false</code>
      */
     public boolean getSessionCookiePathUsesTrailingSlash();
-    
-    
+
+
     /**
      * Configures if a / is added to the end of the session cookie path to
      * ensure browsers, particularly IE, don't send a session cookie for context
      * /foo with requests intended for context /foobar.
-     * 
+     *
      * @param sessionCookiePathUsesTrailingSlash   <code>true</code> if the
      *                                             slash is should be added,
-     *                                             otherwise <code>false</code>  
+     *                                             otherwise <code>false</code>
      */
     public void setSessionCookiePathUsesTrailingSlash(
             boolean sessionCookiePathUsesTrailingSlash);
 
-    
+
     /**
      * Return the "allow crossing servlet contexts" flag.
      */
     public boolean getCrossContext();
 
-    
+
     /**
      * Return the alternate Deployment Descriptor name.
      */
     public String getAltDDName();
-    
-    
+
+
     /**
      * Set an alternate Deployment Descriptor name.
      */
     public void setAltDDName(String altDDName) ;
-    
-    
+
+
     /**
      * Set the "allow crossing servlet contexts" flag.
      *
@@ -402,17 +402,17 @@ public interface Context extends Container {
      * Return the boolean on the annotations parsing.
      */
     public boolean getIgnoreAnnotations();
-    
-    
+
+
     /**
-     * Set the boolean on the annotations parsing for this web 
+     * Set the boolean on the annotations parsing for this web
      * application.
-     * 
+     *
      * @param ignoreAnnotations The boolean on the annotations parsing
      */
     public void setIgnoreAnnotations(boolean ignoreAnnotations);
-    
-    
+
+
     /**
      * Return the login configuration descriptor for this web application.
      */
@@ -626,11 +626,11 @@ public interface Context extends Container {
      * Get the server.xml <context> attribute's xmlValidation.
      * @return true if validation is enabled.
      */
-     
+
 
     /**
      * Set the validation feature of the XML parser used when
-     * parsing tlds files. 
+     * parsing tlds files.
      * @param tldValidation true to enable xml instance validation
      */
     public void setTldValidation(boolean tldValidation);
@@ -677,18 +677,18 @@ public interface Context extends Container {
      * <code>null</code> if none is used.
      */
     public Authenticator getAuthenticator();
-    
+
     /**
      * Set whether or not the effective web.xml for this context should be
      * logged on context start.
      */
     public void setLogEffectiveWebXml(boolean logEffectiveWebXml);
-    
+
     /**
      * Should the effective web.xml for this context be logged on context start?
      */
     public boolean getLogEffectiveWebXml();
-    
+
     // --------------------------------------------------------- Public Methods
 
 
@@ -831,11 +831,11 @@ public interface Context extends Container {
     /**
      * Add a resource which will be watched for reloading by the host auto
      * deployer. Note: this will not be used in embedded mode.
-     * 
+     *
      * @param name Path to the resource, relative to docBase
      */
     public void addWatchedResource(String name);
-    
+
 
     /**
      * Add a new welcome file to the set recognized by this Context.
@@ -1039,11 +1039,11 @@ public interface Context extends Container {
 
 
     /**
-     * Return the set of watched resources for this Context. If none are 
+     * Return the set of watched resources for this Context. If none are
      * defined, a zero length array will be returned.
      */
     public String[] findWatchedResources();
-    
+
 
     /**
      * Return <code>true</code> if the specified welcome file is defined
@@ -1053,7 +1053,7 @@ public interface Context extends Container {
      */
     public boolean findWelcomeFile(String name);
 
-    
+
     /**
      * Return the set of welcome files defined for this Context.  If none are
      * defined, a zero-length array is returned.
@@ -1207,11 +1207,11 @@ public interface Context extends Container {
     /**
      * Remove the specified watched resource name from the list associated
      * with this Context.
-     * 
+     *
      * @param name Name of the watched resource to be removed
      */
     public void removeWatchedResource(String name);
-    
+
 
     /**
      * Remove the specified welcome file name from the list recognized
@@ -1247,66 +1247,66 @@ public interface Context extends Container {
      * @param path The path to the desired resource
      */
     public String getRealPath(String path);
-    
-    
+
+
     /**
      * Return the effective major version of the Servlet spec used by this
      * context.
      */
     public int getEffectiveMajorVersion();
-    
-    
+
+
     /**
      * Set the effective major version of the Servlet spec used by this
      * context.
      */
     public void setEffectiveMajorVersion(int major);
-    
-    
+
+
     /**
      * Return the effective minor version of the Servlet spec used by this
      * context.
      */
     public int getEffectiveMinorVersion();
-    
-    
+
+
     /**
      * Set the effective minor version of the Servlet spec used by this
      * context.
      */
     public void setEffectiveMinorVersion(int minor);
-    
-    
+
+
     /**
      * Obtain the JSP configuration for this context.
      */
     public JspConfigDescriptor getJspConfigDescriptor();
 
-    
+
     /**
      * Add a URL for a JAR that contains static resources in a
      * META-INF/resources directory that should be included in the static
      * resources for this context.
      */
     public void addResourceJarUrl(URL url);
-    
-    
+
+
     /**
      * Add a ServletContainerInitializer instance to this web application.
-     * 
+     *
      * @param sci       The instance to add
      * @param classes   The classes in which the initializer expressed an
      *                  interest
      */
     public void addServletContainerInitializer(
             ServletContainerInitializer sci, Set<Class<?>> classes);
-    
+
     /**
      * Is this Context paused whilst it is reloaded?
      */
     public boolean getPaused();
 
-    
+
     /**
      * Is this context using version 2.2 of the Servlet spec?
      */
@@ -1322,36 +1322,36 @@ public interface Context extends Container {
      */
     Set<String> addServletSecurity(ApplicationServletRegistration registration,
             ServletSecurityElement servletSecurityElement);
-    
+
     /**
      * Sets the (comma separated) list of Servlets that expect a resource to be
      * present. Used to ensure that welcome files associated with Servlets that
-     * expect a resource to be present are not mapped when there is no resource. 
+     * expect a resource to be present are not mapped when there is no resource.
      */
     public void setResourceOnlyServlets(String resourceOnlyServlets);
-    
+
     /**
      * Obtains the list of Servlets that expect a resource to be present.
-     * 
+     *
      * @return  A comma separated list of Servlet names as used in web.xml
      */
     public String getResourceOnlyServlets();
 
     /**
      * Checks the named Servlet to see if it expects a resource to be present.
-     * 
+     *
      * @param servletName   Name of the Servlet (as per web.xml) to check
      * @return              <code>true</code> if the Servlet expects a resource,
      *                      otherwise <code>false</code>
      */
     public boolean isResourceOnlyServlet(String servletName);
-    
+
     /**
      * Return the base name to use for WARs, directories or context.xml files
      * for this context.
      */
     public String getBaseName();
-     
+
     /**
      * Set the version of this web application - used to differentiate
      * different versions of the same web application when using parallel
@@ -1365,7 +1365,7 @@ public interface Context extends Container {
      * deployment. If not specified, defaults to the empty string.
      */
     public String getWebappVersion();
-    
+
     /**
      * Configure whether or not requests listeners will be fired on forwards for
      * this Context.
@@ -1377,7 +1377,7 @@ public interface Context extends Container {
      * this Context.
      */
     public boolean getFireRequestListenersOnForwards();
-    
+
     /**
      * Configures if a user presents authentication credentials, whether the
      * context will process them when the request is for a non-protected
@@ -1397,7 +1397,7 @@ public interface Context extends Container {
      * sent to the client.
      */
     public void setSendRedirectBody(boolean enable);
-    
+
     /**
      * Dtermines if the context is configured to included a response body as
      * part of a redirect response.

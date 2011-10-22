@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -60,26 +60,26 @@ public interface AccessLog {
      */
     public static final String SERVER_PORT_ATTRIBUTE =
         "org.apache.catalina.AccessLog.ServerPort";
-    
+
 
     /**
      * Add the request/response to the access log using the specified processing
      * time.
-     * 
+     *
      * @param request   Request (associated with the response) to log
      * @param response  Response (associated with the request) to log
      * @param time      Time taken to process the request/response in
-     *                  milliseconds (use 0 if not known) 
+     *                  milliseconds (use 0 if not known)
      */
     public void log(Request request, Response response, long time);
-    
+
     /**
      * Should this valve set request attributes for IP address, Hostname,
      * protocol and port used for the request? This are typically used in
      * conjunction with the {@link org.apache.catalina.valves.AccessLogValve}
      * which will otherwise log the original values.
      * Default is <code>true</code>.
-     * 
+     *
      * The attributes set are:
      * <ul>
      * <li>org.apache.catalina.RemoteAddr</li>
@@ -87,13 +87,13 @@ public interface AccessLog {
      * <li>org.apache.catalina.Protocol</li>
      * <li>org.apache.catalina.ServerPost</li>
      * </ul>
-     * 
+     *
      * @param requestAttributesEnabled  <code>true</code> causes the attributes
      *                                  to be set, <code>false</code> disables
-     *                                  the setting of the attributes. 
+     *                                  the setting of the attributes.
      */
     public void setRequestAttributesEnabled(boolean requestAttributesEnabled);
-    
+
     /**
      * @see #setRequestAttributesEnabled(boolean)
      * @return <code>true</code> if the attributes will be logged, otherwise

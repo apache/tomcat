@@ -34,12 +34,12 @@
     <attribute   name="acceptCount"
           description="The accept count for this Connector"
                  type="int"/>
-    
+
     <!-- Common -->
     <attribute   name="address"
           description="The IP address on which to bind"
                  type="java.lang.String"/>
-                 
+
     <attribute   name="allowTrace"
           description="Allow disabling TRACE method"
                  type="boolean"/>
@@ -48,7 +48,7 @@
           description="Fully qualified class name of the managed object"
                  type="java.lang.String"
             writeable="false"/>
-    
+
     <!-- Common -->
     <attribute   name="connectionLinger"
           description="Linger value on the incoming connection"
@@ -58,7 +58,7 @@
     <attribute   name="connectionTimeout"
           description="Timeout value on the incoming connection"
                  type="int"/>
-                 
+
     <attribute   name="emptySessionPath"
           description="The 'empty session path' flag for this Connector"
                  type="boolean"/>
@@ -84,10 +84,10 @@
     <attribute   name="maxPostSize"
           description="Maximum size in bytes of a POST which will be handled by the servlet API provided features"
                  type="int"/>
-                 
+
     <attribute   name="maxSavePostSize"
           description="Maximum size of a POST which will be saved by the container during authentication"
-                 type="int"/>                
+                 type="int"/>
 
     <!-- Common -->
     <attribute   name="maxThreads"
@@ -102,15 +102,15 @@
     <attribute   name="packetSize"
           description="The ajp packet size."
                  type="int"/>
-                 
+
     <attribute   name="port"
           description="The port number on which we listen for ajp13 requests"
                 type="int"/>
-    
-    <!-- Common -->            
+
+    <!-- Common -->
     <attribute   name="processorCache"
           description="The processor cache size."
-                 type="int"/>    
+                 type="int"/>
 
     <attribute   name="protocol"
           description="Coyote protocol handler in use"
@@ -139,17 +139,17 @@
 
     <attribute   name="secret"
           description="Authentication secret (I guess ... not in Javadocs)"
-            readable = "false" 
+            readable = "false"
                  type="java.lang.String"/>
 
     <attribute   name="secure"
           description="Is this a secure (SSL) Connector?"
                  type="boolean"/>
-                 
+
     <attribute   name="sslProtocols"
           description="Comma-separated list of SSL protocol variants to be enabled"
                  type="java.lang.String"/>
-                 
+
     <attribute   name="stateName"
           description="The name of the LifecycleState that this component is currently in"
                  type="java.lang.String"
@@ -159,12 +159,12 @@
     <attribute   name="tcpNoDelay"
           description="Should we use TCP no delay?"
                  type="boolean"/>
-    
+
     <!-- Common -->
     <attribute    name="threadPriority"
            description="The thread priority for processors"
                   type="int"/>
-                  
+
     <attribute   name="URIEncoding"
           description="Character encoding used to decode the URI"
                  type="java.lang.String"/>
@@ -172,7 +172,7 @@
     <attribute   name="useBodyEncodingForURI"
           description="Should the body encoding be used for URI query parameters"
                  type="boolean"/>
-                 
+
     <attribute   name="useIPVHosts"
           description="Should IP-based virtual hosting be used? "
                  type="boolean"/>
