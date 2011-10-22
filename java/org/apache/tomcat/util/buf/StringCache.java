@@ -14,7 +14,6 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package org.apache.tomcat.util.buf;
 
 import java.util.ArrayList;
@@ -32,33 +31,33 @@ public class StringCache {
 
     private static final org.apache.juli.logging.Log log=
         org.apache.juli.logging.LogFactory.getLog( StringCache.class );
-    
-    
+
+
     // ------------------------------------------------------- Static Variables
 
-    
+
     /**
      * Enabled ?
      */
     protected static boolean byteEnabled = ("true".equals(System.getProperty(
             "tomcat.util.buf.StringCache.byte.enabled", "false")));
 
-    
+
     protected static boolean charEnabled = ("true".equals(System.getProperty(
             "tomcat.util.buf.StringCache.char.enabled", "false")));
 
-    
+
     protected static int trainThreshold = Integer.parseInt(System.getProperty(
             "tomcat.util.buf.StringCache.trainThreshold", "20000"));
-    
+
 
     protected static int cacheSize = Integer.parseInt(System.getProperty(
             "tomcat.util.buf.StringCache.cacheSize", "200"));
-    
+
 
     protected static int maxStringSize = Integer.parseInt(System.getProperty(
             "tomcat.util.buf.StringCache.maxStringSize", "128"));
-    
+
 
    /**
      * Statistics hash map for byte chunk.
@@ -66,18 +65,18 @@ public class StringCache {
     protected static HashMap<ByteEntry,int[]> bcStats =
         new HashMap<ByteEntry,int[]>(cacheSize);
 
-    
+
     /**
      * toString count for byte chunk.
      */
     protected static int bcCount = 0;
-    
-    
+
+
     /**
      * Cache for byte chunk.
      */
     protected static ByteEntry[] bcCache = null;
-    
+
 
     /**
      * Statistics hash map for char chunk.
@@ -89,38 +88,38 @@ public class StringCache {
     /**
      * toString count for char chunk.
      */
-    protected static int ccCount = 0; 
-    
+    protected static int ccCount = 0;
+
 
     /**
      * Cache for char chunk.
      */
     protected static CharEntry[] ccCache = null;
 
-    
+
     /**
      * Access count.
      */
     protected static int accessCount = 0;
-    
+
 
     /**
      * Hit count.
      */
     protected static int hitCount = 0;
-    
+
 
     // ------------------------------------------------------------ Properties
 
-    
+
     /**
      * @return Returns the cacheSize.
      */
     public int getCacheSize() {
         return cacheSize;
     }
-    
-    
+
+
     /**
      * @param cacheSize The cacheSize to set.
      */
@@ -128,47 +127,47 @@ public class StringCache {
         StringCache.cacheSize = cacheSize;
     }
 
-    
+
     /**
      * @return Returns the enabled.
      */
     public boolean getByteEnabled() {
         return byteEnabled;
     }
-    
-    
+
+
     /**
      * @param byteEnabled The enabled to set.
      */
     public void setByteEnabled(boolean byteEnabled) {
         StringCache.byteEnabled = byteEnabled;
     }
-    
-    
+
+
     /**
      * @return Returns the enabled.
      */
     public boolean getCharEnabled() {
         return charEnabled;
     }
-    
-    
+
+
     /**
      * @param charEnabled The enabled to set.
      */
     public void setCharEnabled(boolean charEnabled) {
         StringCache.charEnabled = charEnabled;
     }
-    
-    
+
+
     /**
      * @return Returns the trainThreshold.
      */
     public int getTrainThreshold() {
         return trainThreshold;
     }
-    
-    
+
+
     /**
      * @param trainThreshold The trainThreshold to set.
      */
@@ -176,15 +175,15 @@ public class StringCache {
         StringCache.trainThreshold = trainThreshold;
     }
 
-    
+
     /**
      * @return Returns the accessCount.
      */
     public int getAccessCount() {
         return accessCount;
     }
-    
-    
+
+
     /**
      * @return Returns the hitCount.
      */
@@ -192,10 +191,10 @@ public class StringCache {
         return hitCount;
     }
 
-    
+
     // -------------------------------------------------- Public Static Methods
 
-    
+
     public void reset() {
         hitCount = 0;
         accessCount = 0;
@@ -208,8 +207,8 @@ public class StringCache {
             ccCount = 0;
         }
     }
-    
-    
+
+
     public static String toString(ByteChunk bc) {
 
         // If the cache is null, then either caching is disabled, or we're
@@ -300,7 +299,7 @@ public class StringCache {
                                     0, end - start);
                             // Set encoding
                             entry.enc = bc.getEncoding();
-                            // Initialize occurrence count to one 
+                            // Initialize occurrence count to one
                             count = new int[1];
                             count[0] = 1;
                             // Set in the stats hash map
@@ -323,12 +322,12 @@ public class StringCache {
             hitCount++;
             return result;
         }
-        
+
     }
 
 
     public static String toString(CharChunk cc) {
-        
+
         // If the cache is null, then either caching is disabled, or we're
         // still training
         if (ccCache == null) {
@@ -415,7 +414,7 @@ public class StringCache {
                             entry.name = new char[cc.getLength()];
                             System.arraycopy(cc.getBuffer(), start, entry.name,
                                     0, end - start);
-                            // Initialize occurrence count to one 
+                            // Initialize occurrence count to one
                             count = new int[1];
                             count[0] = 1;
                             // Set in the stats hash map
@@ -438,10 +437,10 @@ public class StringCache {
             hitCount++;
             return result;
         }
-        
+
     }
-    
-    
+
+
     // ----------------------------------------------------- Protected Methods
 
 
@@ -477,7 +476,7 @@ public class StringCache {
         return result;
     }
 
-    
+
     /**
      * Find an entry given its name in the cache and return the associated
      * String.
@@ -492,7 +491,7 @@ public class StringCache {
         }
     }
 
-    
+
     /**
      * Find an entry given its name in a sorted array of map elements.
      * This will return the index for the closest inferior or equal item in the
@@ -508,10 +507,10 @@ public class StringCache {
         if (b == -1) {
             return -1;
         }
-        
+
         if (compare(name, array[0].name) < 0) {
             return -1;
-        }         
+        }
         if (b == 0) {
             return 0;
         }
@@ -572,7 +571,7 @@ public class StringCache {
         return result;
     }
 
-    
+
     /**
      * Find an entry given its name in the cache and return the associated
      * String.
@@ -586,7 +585,7 @@ public class StringCache {
         }
     }
 
-    
+
     /**
      * Find an entry given its name in a sorted array of map elements.
      * This will return the index for the closest inferior or equal item in the
@@ -602,10 +601,10 @@ public class StringCache {
         if (b == -1) {
             return -1;
         }
-        
+
         if (compare(name, array[0].name) < 0 ) {
             return -1;
-        }         
+        }
         if (b == 0) {
             return 0;
         }
@@ -658,7 +657,7 @@ public class StringCache {
             }
             return false;
         }
-        
+
     }
 
 
@@ -685,7 +684,7 @@ public class StringCache {
             }
             return false;
         }
-        
+
     }
 
 

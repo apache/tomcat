@@ -5,15 +5,15 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */ 
+ */
 package org.apache.catalina.connector;
 
 import org.apache.catalina.Container;
@@ -53,7 +53,7 @@ public class MapperListener extends LifecycleMBeanBase
      * Associated mapper.
      */
     private Mapper mapper = null;
-    
+
     /**
      * Associated connector
      */
@@ -69,7 +69,7 @@ public class MapperListener extends LifecycleMBeanBase
     /**
      * The domain (effectively the engine) this mapper is associated with
      */
-    private String domain = null;
+    private final String domain = null;
 
     // ----------------------------------------------------------- Constructors
 
@@ -89,7 +89,7 @@ public class MapperListener extends LifecycleMBeanBase
         return this.connector.toString();
     }
 
-    
+
     // ------------------------------------------------------- Lifecycle Methods
 
     @Override
@@ -101,10 +101,10 @@ public class MapperListener extends LifecycleMBeanBase
         // MBean listener won't be notified as those components will have
         // already registered their MBeans
         findDefaultHost();
-        
+
         Engine engine = (Engine) connector.getService().getContainer();
         addListeners(engine);
-        
+
         Container[] conHosts = engine.findChildren();
         for (Container conHost : conHosts) {
             Host host = (Host) conHost;
@@ -114,7 +114,7 @@ public class MapperListener extends LifecycleMBeanBase
             }
         }
     }
-        
+
 
     @Override
     public void stopInternal() throws LifecycleException {
@@ -194,55 +194,55 @@ public class MapperListener extends LifecycleMBeanBase
             String hostName = wrapper.getParent().getParent().getName();
 
             String mapping = (String) event.getData();
-            
+
             mapper.removeWrapper(hostName, contextPath, version, mapping);
         } else if (Context.ADD_WELCOME_FILE_EVENT.equals(event.getType())) {
             // Handle dynamically adding welcome files
             Context context = (Context) event.getSource();
-            
+
             String hostName = context.getParent().getName();
 
             String contextPath = context.getPath();
             if ("/".equals(contextPath)) {
                 contextPath = "";
             }
-            
+
             String welcomeFile = (String) event.getData();
-            
+
             mapper.addWelcomeFile(hostName, contextPath,
                     context.getWebappVersion(), welcomeFile);
         } else if (Context.REMOVE_WELCOME_FILE_EVENT.equals(event.getType())) {
             // Handle dynamically removing welcome files
             Context context = (Context) event.getSource();
-            
+
             String hostName = context.getParent().getName();
 
             String contextPath = context.getPath();
             if ("/".equals(contextPath)) {
                 contextPath = "";
             }
-            
+
             String welcomeFile = (String) event.getData();
-            
+
             mapper.removeWelcomeFile(hostName, contextPath,
                     context.getWebappVersion(), welcomeFile);
         } else if (Context.CLEAR_WELCOME_FILES_EVENT.equals(event.getType())) {
             // Handle dynamically clearing welcome files
             Context context = (Context) event.getSource();
-            
+
             String hostName = context.getParent().getName();
 
             String contextPath = context.getPath();
             if ("/".equals(contextPath)) {
                 contextPath = "";
             }
-            
+
             mapper.clearWelcomeFiles(hostName, contextPath,
                     context.getWebappVersion());
         }
     }
 
-    
+
     // ------------------------------------------------------ Protected Methods
 
     private void findDefaultHost() {
@@ -254,14 +254,14 @@ public class MapperListener extends LifecycleMBeanBase
 
         if (defaultHost != null && defaultHost.length() >0) {
             Container[] containers = engine.findChildren();
-            
+
             for (Container container : containers) {
                 Host host = (Host) container;
                 if (defaultHost.equalsIgnoreCase(host.getName())) {
                     found = true;
                     break;
                 }
-                
+
                 String[] aliases = host.findAliases();
                 for (String alias : aliases) {
                     if (defaultHost.equalsIgnoreCase(alias)) {
@@ -280,15 +280,15 @@ public class MapperListener extends LifecycleMBeanBase
         }
     }
 
-    
+
     /**
      * Register host.
      */
     private void registerHost(Host host) {
-        
+
         String[] aliases = host.findAliases();
         mapper.addHost(host.getName(), aliases, host);
-        
+
         for (Container container : host.findChildren()) {
             if (container.getState().isAvailable()) {
                 registerContext((Context) container);
@@ -307,15 +307,16 @@ public class MapperListener extends LifecycleMBeanBase
     private void unregisterHost(Host host) {
 
         String hostname = host.getName();
-        
+
         mapper.removeHost(hostname);
 
-        if(log.isDebugEnabled())
+        if(log.isDebugEnabled()) {
             log.debug(sm.getString("mapperListener.unregisterHost", hostname,
                     domain, connector));
+        }
     }
 
-    
+
     /**
      * Unregister wrapper.
      */
@@ -331,18 +332,18 @@ public class MapperListener extends LifecycleMBeanBase
         String hostName = wrapper.getParent().getParent().getName();
 
         String[] mappings = wrapper.findMappings();
-        
+
         for (String mapping : mappings) {
             mapper.removeWrapper(hostName, contextPath, version,  mapping);
         }
-        
+
         if(log.isDebugEnabled()) {
             log.debug(sm.getString("mapperListener.unregisterWrapper",
                     wrapperName, contextPath, connector));
         }
     }
 
-    
+
     /**
      * Register context.
      */
@@ -353,7 +354,7 @@ public class MapperListener extends LifecycleMBeanBase
             contextPath = "";
         }
         Container host = context.getParent();
-        
+
         javax.naming.Context resources = context.getResources();
         String[] welcomeFiles = context.findWelcomeFiles();
 
@@ -387,9 +388,10 @@ public class MapperListener extends LifecycleMBeanBase
         }
         String hostName = context.getParent().getName();
 
-        if(log.isDebugEnabled())
+        if(log.isDebugEnabled()) {
             log.debug(sm.getString("mapperListener.unregisterContext",
                     contextPath, connector));
+        }
 
         mapper.removeContextVersion(hostName, contextPath,
                 context.getWebappVersion());
@@ -409,7 +411,7 @@ public class MapperListener extends LifecycleMBeanBase
         }
         String version = ((Context) wrapper.getParent()).getWebappVersion();
         String hostName = context.getParent().getName();
-        
+
         String[] mappings = wrapper.findMappings();
 
         for (String mapping : mappings) {
@@ -452,7 +454,7 @@ public class MapperListener extends LifecycleMBeanBase
 
     /**
      * Add this mapper to the container and all child containers
-     * 
+     *
      * @param container
      */
     private void addListeners(Container container) {
@@ -466,7 +468,7 @@ public class MapperListener extends LifecycleMBeanBase
 
     /**
      * Remove this mapper from the container and all child containers
-     * 
+     *
      * @param container
      */
     private void removeListeners(Container container) {

@@ -5,17 +5,15 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.catalina.connector;
 
 import java.io.IOException;
@@ -45,7 +43,7 @@ public class CometEventImpl implements CometEvent {
 
     // ----------------------------------------------------- Instance Variables
 
-    
+
     /**
      * Associated request.
      */
@@ -57,18 +55,18 @@ public class CometEventImpl implements CometEvent {
      */
     protected Response response = null;
 
-    
+
     /**
      * Event type.
      */
     protected EventType eventType = EventType.BEGIN;
-    
+
 
     /**
      * Event sub type.
      */
     protected EventSubType eventSubType = null;
-    
+
 
     // --------------------------------------------------------- Public Methods
 
@@ -83,11 +81,11 @@ public class CometEventImpl implements CometEvent {
     public void setEventType(EventType eventType) {
         this.eventType = eventType;
     }
-    
+
     public void setEventSubType(EventSubType eventSubType) {
         this.eventSubType = eventSubType;
     }
-    
+
     @Override
     public void close() throws IOException {
         if (request == null) {
@@ -125,12 +123,14 @@ public class CometEventImpl implements CometEvent {
             UnsupportedOperationException {
         if (request.getAttribute("org.apache.tomcat.comet.timeout.support") == Boolean.TRUE) {
             request.setAttribute("org.apache.tomcat.comet.timeout", Integer.valueOf(timeout));
-            if (request.isComet()) request.setCometTimeout(timeout);
+            if (request.isComet()) {
+                request.setCometTimeout(timeout);
+            }
         } else {
             throw new UnsupportedOperationException();
         }
     }
-    
+
     @Override
     public String toString() {
         StringBuilder buf = new StringBuilder();

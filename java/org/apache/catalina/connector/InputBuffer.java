@@ -5,16 +5,15 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */ 
-
+ */
 package org.apache.catalina.connector;
 
 import java.io.IOException;
@@ -35,7 +34,7 @@ import org.apache.tomcat.util.res.StringManager;
 
 /**
  * The buffer used by Tomcat request. This is a derivative of the Tomcat 3.3
- * OutputBuffer, adapted to handle input instead of output. This allows 
+ * OutputBuffer, adapted to handle input instead of output. This allows
  * complete recycling of the facade objects (the ServletInputStream and the
  * BufferedReader).
  *
@@ -55,7 +54,7 @@ public class InputBuffer extends Reader
     // -------------------------------------------------------------- Constants
 
 
-    public static final String DEFAULT_ENCODING = 
+    public static final String DEFAULT_ENCODING =
         org.apache.coyote.Constants.DEFAULT_CHARACTER_ENCODING;
     public static final int DEFAULT_BUFFER_SIZE = 8*1024;
 
@@ -71,7 +70,7 @@ public class InputBuffer extends Reader
     /**
      * The byte buffer.
      */
-    private ByteChunk bb;
+    private final ByteChunk bb;
 
 
     /**
@@ -150,7 +149,7 @@ public class InputBuffer extends Reader
 
     /**
      * Alternate constructor which allows specifying the initial buffer size.
-     * 
+     *
      * @param size Buffer size to use
      */
     public InputBuffer(int size) {
@@ -173,7 +172,7 @@ public class InputBuffer extends Reader
 
     /**
      * Associated Coyote request.
-     * 
+     *
      * @param coyoteRequest Associated Coyote request
      */
     public void setRequest(Request coyoteRequest) {
@@ -183,7 +182,7 @@ public class InputBuffer extends Reader
 
     /**
      * Get associated Coyote request.
-     * 
+     *
      * @return the associated Coyote request
      */
     public Request getRequest() {
@@ -198,9 +197,9 @@ public class InputBuffer extends Reader
      * Recycle the output buffer.
      */
     public void recycle() {
-        
+
         state = INITIAL_STATE;
-        
+
         // If usage of mark made the buffer too big, reallocate it
         if (cb.getChars().length > size) {
             cb = new CharChunk(size);
@@ -212,16 +211,16 @@ public class InputBuffer extends Reader
             cb.recycle();
         }
         markPos = -1;
-        bb.recycle(); 
+        bb.recycle();
         closed = false;
-        
+
         if (conv != null) {
             conv.recycle();
         }
-        
+
         gotEnc = false;
         enc = null;
-        
+
     }
 
 
@@ -231,11 +230,11 @@ public class InputBuffer extends Reader
     public void clearEncoders() {
         encoders.clear();
     }
-    
-    
+
+
     /**
      * Close the input buffer.
-     * 
+     *
      * @throws IOException An underlying IOException occurred
      */
     @Override
@@ -263,26 +262,29 @@ public class InputBuffer extends Reader
     // ------------------------------------------------- Bytes Handling Methods
 
 
-    /** 
+    /**
      * Reads new bytes in the byte chunk.
-     * 
+     *
      * @param cbuf Byte buffer to be written to the response
      * @param off Offset
      * @param len Length
-     * 
+     *
      * @throws IOException An underlying IOException occurred
      */
     @Override
     public int realReadBytes(byte cbuf[], int off, int len)
             throws IOException {
 
-        if (closed)
+        if (closed) {
             return -1;
-        if (coyoteRequest == null)
+        }
+        if (coyoteRequest == null) {
             return -1;
+        }
 
-        if(state == INITIAL_STATE)
+        if(state == INITIAL_STATE) {
             state = BYTE_STATE;
+        }
 
         int result = coyoteRequest.doRead(bb);
 
@@ -294,8 +296,9 @@ public class InputBuffer extends Reader
     public int readByte()
         throws IOException {
 
-        if (closed)
+        if (closed) {
             throw new IOException(sm.getString("inputBuffer.streamClosed"));
+        }
 
         return bb.substract();
     }
@@ -304,8 +307,9 @@ public class InputBuffer extends Reader
     public int read(byte[] b, int off, int len)
         throws IOException {
 
-        if (closed)
+        if (closed) {
             throw new IOException(sm.getString("inputBuffer.streamClosed"));
+        }
 
         return bb.substract(b, off, len);
     }
@@ -321,7 +325,7 @@ public class InputBuffer extends Reader
      * mark is lost.
      */
     @Override
-    public void realWriteChars(char c[], int off, int len) 
+    public void realWriteChars(char c[], int off, int len)
         throws IOException {
         markPos = -1;
         cb.setOffset(0);
@@ -338,8 +342,9 @@ public class InputBuffer extends Reader
     public int realReadChars(char cbuf[], int off, int len)
         throws IOException {
 
-        if (!gotEnc)
+        if (!gotEnc) {
             setConverter();
+        }
 
         if (bb.getLength() <= 0) {
             int nRead = realReadBytes(bb.getBytes(), 0, bb.getBytes().length);
@@ -353,8 +358,9 @@ public class InputBuffer extends Reader
             cb.setEnd(0);
         }
         int limit = bb.getLength()+cb.getStart();
-        if ( cb.getLimit() < limit )
+        if ( cb.getLimit() < limit ) {
             cb.setLimit(limit);
+        }
         state = CHAR_STATE;
         conv.convert(bb, cb, bb.getLength());
         bb.setOffset(bb.getEnd());
@@ -368,8 +374,9 @@ public class InputBuffer extends Reader
     public int read()
         throws IOException {
 
-        if (closed)
+        if (closed) {
             throw new IOException(sm.getString("inputBuffer.streamClosed"));
+        }
 
         return cb.substract();
     }
@@ -379,8 +386,9 @@ public class InputBuffer extends Reader
     public int read(char[] cbuf)
         throws IOException {
 
-        if (closed)
+        if (closed) {
             throw new IOException(sm.getString("inputBuffer.streamClosed"));
+        }
 
         return read(cbuf, 0, cbuf.length);
     }
@@ -390,8 +398,9 @@ public class InputBuffer extends Reader
     public int read(char[] cbuf, int off, int len)
         throws IOException {
 
-        if (closed)
+        if (closed) {
             throw new IOException(sm.getString("inputBuffer.streamClosed"));
+        }
 
         return cb.substract(cbuf, off, len);
     }
@@ -402,8 +411,9 @@ public class InputBuffer extends Reader
         throws IOException {
 
 
-        if (closed)
+        if (closed) {
             throw new IOException(sm.getString("inputBuffer.streamClosed"));
+        }
 
         if (n < 0) {
             throw new IllegalArgumentException();
@@ -424,8 +434,9 @@ public class InputBuffer extends Reader
                     toRead = (int) (n - nRead);
                 }
                 int nb = realReadChars(cb.getChars(), 0, toRead);
-                if (nb < 0)
+                if (nb < 0) {
                     break;
+                }
             }
         }
 
@@ -438,8 +449,9 @@ public class InputBuffer extends Reader
     public boolean ready()
         throws IOException {
 
-        if (closed)
+        if (closed) {
             throw new IOException(sm.getString("inputBuffer.streamClosed"));
+        }
 
         return (available() > 0);
     }
@@ -455,16 +467,17 @@ public class InputBuffer extends Reader
     public void mark(int readAheadLimit)
         throws IOException {
 
-        if (closed)
+        if (closed) {
             throw new IOException(sm.getString("inputBuffer.streamClosed"));
+        }
 
         if (cb.getLength() <= 0) {
             cb.setOffset(0);
             cb.setEnd(0);
         } else {
-            if ((cb.getBuffer().length > (2 * size)) 
+            if ((cb.getBuffer().length > (2 * size))
                 && (cb.getLength()) < (cb.getStart())) {
-                System.arraycopy(cb.getBuffer(), cb.getStart(), 
+                System.arraycopy(cb.getBuffer(), cb.getStart(),
                                  cb.getBuffer(), 0, cb.getLength());
                 cb.setEnd(cb.getLength());
                 cb.setOffset(0);
@@ -479,8 +492,9 @@ public class InputBuffer extends Reader
     public void reset()
         throws IOException {
 
-        if (closed)
+        if (closed) {
             throw new IOException(sm.getString("inputBuffer.streamClosed"));
+        }
 
         if (state == CHAR_STATE) {
             if (markPos < 0) {
@@ -496,11 +510,12 @@ public class InputBuffer extends Reader
     }
 
 
-    public void checkConverter() 
+    public void checkConverter()
         throws IOException {
 
-        if (!gotEnc)
+        if (!gotEnc) {
             setConverter();
+        }
 
     }
 
@@ -508,12 +523,14 @@ public class InputBuffer extends Reader
     protected void setConverter()
         throws IOException {
 
-        if (coyoteRequest != null)
+        if (coyoteRequest != null) {
             enc = coyoteRequest.getCharacterEncoding();
+        }
 
         gotEnc = true;
-        if (enc == null)
+        if (enc == null) {
             enc = DEFAULT_ENCODING;
+        }
         conv = encoders.get(enc);
         if (conv == null) {
             if (SecurityUtil.isPackageProtectionEnabled()){
@@ -527,11 +544,12 @@ public class InputBuffer extends Reader
                                 }
 
                             }
-                    );              
+                    );
                 }catch(PrivilegedActionException ex){
                     Exception e = ex.getException();
-                    if (e instanceof IOException)
-                        throw (IOException)e; 
+                    if (e instanceof IOException) {
+                        throw (IOException)e;
+                    }
                 }
             } else {
                 conv = new B2CConverter(enc);

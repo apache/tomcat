@@ -14,7 +14,6 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package org.apache.tomcat.util.http;
 
 import java.io.IOException;
@@ -28,22 +27,22 @@ import org.apache.tomcat.util.buf.MessageBytes;
 import org.apache.tomcat.util.buf.UDecoder;
 
 /**
- * 
+ *
  * @author Costin Manolache
  */
 public final class Parameters {
 
-    
+
     private static final org.apache.juli.logging.Log log=
         org.apache.juli.logging.LogFactory.getLog(Parameters.class );
-    
+
     // Transition: we'll use the same Hashtable( String->String[] )
     // for the beginning. When we are sure all accesses happen through
     // this class - we can switch to MultiMap
-    private Hashtable<String,String[]> paramHashStringArray =
+    private final Hashtable<String,String[]> paramHashStringArray =
         new Hashtable<String,String[]>();
     private boolean didQueryParameters=false;
-    
+
     MessageBytes queryMB;
 
     UDecoder urlDec;
@@ -51,7 +50,7 @@ public final class Parameters {
 
     String encoding=null;
     String queryStringEncoding=null;
-    
+
     public Parameters() {
         // NO-OP
     }
@@ -84,15 +83,17 @@ public final class Parameters {
         encoding=null;
         decodedQuery.recycle();
     }
-    
+
     // -------------------- Data access --------------------
     // Access to the current name/values, no side effect ( processing ).
     // You must explicitly call handleQueryParameters and the post methods.
-    
+
     // This is the original data representation ( hash of String->String[])
 
     public void addParameterValues( String key, String[] newValues) {
-        if ( key==null ) return;
+        if ( key==null ) {
+            return;
+        }
         String values[];
         if (paramHashStringArray.containsKey(key)) {
             String oldValues[] = paramHashStringArray.get(key);
@@ -116,7 +117,7 @@ public final class Parameters {
         String values[] = paramHashStringArray.get(name);
         return values;
     }
- 
+
     public Enumeration<String> getParameterNames() {
         handleQueryParameters();
         return paramHashStringArray.keys();
@@ -126,7 +127,9 @@ public final class Parameters {
     public String getParameter(String name ) {
         String[] values = getParameterValues(name);
         if (values != null) {
-            if( values.length==0 ) return "";
+            if( values.length==0 ) {
+                return "";
+            }
             return values[0];
         } else {
             return null;
@@ -136,13 +139,16 @@ public final class Parameters {
     /** Process the query string into parameters
      */
     public void handleQueryParameters() {
-        if( didQueryParameters ) return;
+        if( didQueryParameters ) {
+            return;
+        }
 
         didQueryParameters=true;
 
-        if( queryMB==null || queryMB.isNull() )
+        if( queryMB==null || queryMB.isNull() ) {
             return;
-        
+        }
+
         if(log.isDebugEnabled()) {
             log.debug("Decoding query " + decodedQuery + " " +
                     queryStringEncoding);
@@ -160,7 +166,9 @@ public final class Parameters {
     // incredibly inefficient data representation for parameters,
     // until we test the new one
     private void addParam( String key, String value ) {
-        if( key==null ) return;
+        if( key==null ) {
+            return;
+        }
         String values[];
         if (paramHashStringArray.containsKey(key)) {
             String oldValues[] = paramHashStringArray.get(key);
@@ -173,8 +181,8 @@ public final class Parameters {
             values = new String[1];
             values[0] = value;
         }
-        
-        
+
+
         paramHashStringArray.put(key, values);
     }
 
@@ -187,23 +195,23 @@ public final class Parameters {
     // if needed
     ByteChunk tmpName=new ByteChunk();
     ByteChunk tmpValue=new ByteChunk();
-    private ByteChunk origName=new ByteChunk();
-    private ByteChunk origValue=new ByteChunk();
+    private final ByteChunk origName=new ByteChunk();
+    private final ByteChunk origValue=new ByteChunk();
     CharChunk tmpNameC=new CharChunk(1024);
     public static final String DEFAULT_ENCODING = "ISO-8859-1";
     public static final Charset DEFAULT_CHARSET =
         Charset.forName(DEFAULT_ENCODING);
-    
-    
+
+
     public void processParameters( byte bytes[], int start, int len ) {
         processParameters(bytes, start, len, encoding);
     }
 
-    public void processParameters( byte bytes[], int start, int len, 
+    public void processParameters( byte bytes[], int start, int len,
                                    String enc ) {
         int end=start+len;
         int pos=start;
-        
+
         if(log.isDebugEnabled()) {
             log.debug("Bytes: " +
                     new String(bytes, start, len, DEFAULT_CHARSET));
@@ -213,7 +221,7 @@ public final class Parameters {
             boolean noEq=false;
             int valStart=-1;
             int valEnd=-1;
-            
+
             int nameStart=pos;
             int nameEnd=ByteChunk.indexOf(bytes, nameStart, end, '=' );
             // Workaround for a&b&c encoding
@@ -230,17 +238,20 @@ public final class Parameters {
                                         DEFAULT_CHARSET));
                 }
             }
-            if( nameEnd== -1 ) 
+            if( nameEnd== -1 ) {
                 nameEnd=end;
+            }
 
             if( ! noEq ) {
                 valStart= (nameEnd < end) ? nameEnd+1 : end;
                 valEnd=ByteChunk.indexOf(bytes, valStart, end, '&');
-                if( valEnd== -1 ) valEnd = (valStart < end) ? end : valStart;
+                if( valEnd== -1 ) {
+                    valEnd = (valStart < end) ? end : valStart;
+                }
             }
-            
+
             pos=valEnd+1;
-            
+
             if( nameEnd<=nameStart ) {
                 if (log.isInfoEnabled()) {
                     StringBuilder msg = new StringBuilder("Parameters: Invalid chunk ");
@@ -259,7 +270,7 @@ public final class Parameters {
             }
             tmpName.setBytes( bytes, nameStart, nameEnd-nameStart );
             tmpValue.setBytes( bytes, valStart, valEnd-valStart );
-            
+
             // Take copies as if anything goes wrong originals will be
             // corrupted. This means original values can be logged.
             // For performance - only done for debug
@@ -272,7 +283,7 @@ public final class Parameters {
                     log.error("Error copying parameters", ioe);
                 }
             }
-            
+
             try {
                 addParam( urlDecode(tmpName, enc), urlDecode(tmpValue, enc) );
             } catch (IOException e) {
@@ -310,7 +321,7 @@ public final class Parameters {
     private String urlDecode(ByteChunk bc, String enc)
         throws IOException {
         if( urlDec==null ) {
-            urlDec=new UDecoder();   
+            urlDec=new UDecoder();
         }
         urlDec.convert(bc);
         String result = null;
@@ -336,7 +347,9 @@ public final class Parameters {
     }
 
     public void processParameters( MessageBytes data, String encoding ) {
-        if( data==null || data.isNull() || data.getLength() <= 0 ) return;
+        if( data==null || data.isNull() || data.getLength() <= 0 ) {
+            return;
+        }
 
         if( data.getType() != MessageBytes.T_BYTES ) {
             data.toBytes();
@@ -355,8 +368,9 @@ public final class Parameters {
             String k = en.nextElement();
             sb.append( k ).append("=");
             String v[] = paramHashStringArray.get( k );
-            for( int i=0; i<v.length; i++ )
+            for( int i=0; i<v.length; i++ ) {
                 sb.append( v[i] ).append(",");
+            }
             sb.append("\n");
         }
         return sb.toString();
