@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -145,12 +145,12 @@ public final class SavedRequest {
         this.requestURI = requestURI;
     }
 
-    
+
     /**
      * The body of this request.
      */
     private ByteChunk body = null;
-    
+
     public ByteChunk getBody() {
         return (this.body);
     }
@@ -158,16 +158,16 @@ public final class SavedRequest {
     public void setBody(ByteChunk body) {
         this.body = body;
     }
-    
+
     /**
      * The content type of the request, used if this is a POST.
      */
     private String contentType = null;
-    
+
     public String getContentType() {
         return (this.contentType);
     }
-    
+
     public void setContentType(String contentType) {
         this.contentType = contentType;
     }
