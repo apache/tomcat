@@ -62,7 +62,6 @@
             <phase>generate-sources</phase>
             <configuration>
               <tasks>
-                <delete dir="src/main/java"/>
                 <copy todir="src/main/java" includeEmptyDirs="false">
                   <fileset dir="../../java/">
                     <include name="org/apache/catalina/mbeans/JmxRemote*" />

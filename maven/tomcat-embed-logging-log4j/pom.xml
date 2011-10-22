@@ -119,7 +119,6 @@
                 <move todir="${basedir}/src/main/java/org/apache/juli">
                   <fileset dir="${commons-logging-sources}/src/java/org/apache/commons" />
                 </move>
-
               </tasks>
             </configuration>
             <goals>
