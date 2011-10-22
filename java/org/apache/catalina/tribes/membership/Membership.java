@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -41,25 +41,25 @@ import org.apache.catalina.tribes.Member;
 public class Membership implements Cloneable {
 
     protected static final MemberImpl[] EMPTY_MEMBERS = new MemberImpl[0];
-    
+
     private final Object membersLock = new Object();
-    
+
     /**
      * The name of this membership, has to be the same as the name for the local
      * member
      */
     protected MemberImpl local;
-    
+
     /**
      * A map of all the members in the cluster.
      */
     protected HashMap<MemberImpl, MbrEntry> map = new HashMap<MemberImpl, MbrEntry>();
-    
+
     /**
      * A list of all the members in the cluster.
      */
     protected MemberImpl[] members = EMPTY_MEMBERS;
-    
+
     /**
       * sort members by alive time
       */
@@ -159,10 +159,10 @@ public class Membership implements Cloneable {
           return entry;
       }
     }
-    
+
     /**
      * Remove a member from this component.
-     * 
+     *
      * @param member The member to remove
      */
     public void removeMember(MemberImpl member) {
@@ -185,7 +185,7 @@ public class Membership implements Cloneable {
             members = results;
         }
     }
-    
+
     /**
      * Runs a refresh cycle and returns a list of members that has expired.
      * This also removes the members from the membership, in such a way that
@@ -196,7 +196,7 @@ public class Membership implements Cloneable {
     public synchronized MemberImpl[] expire(long maxtime) {
         if(!hasMembers() )
            return EMPTY_MEMBERS;
-       
+
         ArrayList<MemberImpl> list = null;
         Iterator<MbrEntry> i = map.values().iterator();
         while(i.hasNext()) {
@@ -207,7 +207,7 @@ public class Membership implements Cloneable {
                 list.add(entry.getMember());
             }
         }
-        
+
         if(list != null) {
             MemberImpl[] result = new MemberImpl[list.size()];
             list.toArray(result);
@@ -226,8 +226,8 @@ public class Membership implements Cloneable {
     public boolean hasMembers() {
         return members.length > 0 ;
     }
-    
-    
+
+
     public MemberImpl getMember(Member mbr) {
         if(hasMembers()) {
             MemberImpl result = null;
@@ -239,11 +239,11 @@ public class Membership implements Cloneable {
             return null;
         }
     }
-    
-    public boolean contains(Member mbr) { 
+
+    public boolean contains(Member mbr) {
         return getMember(mbr)!=null;
     }
- 
+
     /**
      * Returning a list of all the members in the membership
      * We not need a copy: add and remove generate new arrays.
@@ -268,7 +268,7 @@ public class Membership implements Cloneable {
             result[pos++] = i.next().getValue();
         return result;
     }
-    
+
     // --------------------------------------------- Inner Class
 
     private static class MemberComparator implements Comparator<Member>,
@@ -288,7 +288,7 @@ public class Membership implements Cloneable {
                 return 1;
         }
     }
-    
+
     /**
      * Inner class that represents a member entry
      */

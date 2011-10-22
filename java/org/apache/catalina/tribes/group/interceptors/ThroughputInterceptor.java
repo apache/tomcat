@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -66,7 +66,7 @@ public class ThroughputInterceptor extends ChannelInterceptorBase {
             msgTxErr.addAndGet(1);
             if ( access.get() == 1 ) access.addAndGet(-1);
             throw x;
-        } 
+        }
         mbTx += (bytes*destination.length)/(1024d*1024d);
         mbAppTx += bytes/(1024d*1024d);
         if ( access.addAndGet(-1) == 0 ) {
@@ -88,9 +88,9 @@ public class ThroughputInterceptor extends ChannelInterceptorBase {
         msgRxCnt.addAndGet(1);
         if ( msgRxCnt.get() % interval == 0 ) report(timeTx);
         super.messageReceived(msg);
-        
+
     }
-    
+
     public void report(double timeTx) {
         StringBuilder buf = new StringBuilder("ThroughputInterceptor Report[\n\tTx Msg:");
         buf.append(msgTxCnt).append(" messages\n\tSent:");
@@ -112,7 +112,7 @@ public class ThroughputInterceptor extends ChannelInterceptorBase {
         buf.append(df.format(mbRx)).append(" MB]\n");
         if ( log.isInfoEnabled() ) log.info(buf);
     }
-    
+
     public void setInterval(int interval) {
         this.interval = interval;
     }

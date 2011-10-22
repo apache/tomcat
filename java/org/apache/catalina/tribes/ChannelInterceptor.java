@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -19,7 +19,7 @@ package org.apache.catalina.tribes;
 import org.apache.catalina.tribes.group.InterceptorPayload;
 
 /**
- * A ChannelInterceptor is an interceptor that intercepts 
+ * A ChannelInterceptor is an interceptor that intercepts
  * messages and membership messages in the channel stack.
  * This allows interceptors to modify the message or perform
  * other actions when a message is sent or received.<br>
@@ -27,12 +27,12 @@ import org.apache.catalina.tribes.group.InterceptorPayload;
  * @see org.apache.catalina.tribes.group.ChannelInterceptorBase
  * @author Filip Hanik
  * @version $Id$
- */   
+ */
 
 public interface ChannelInterceptor extends MembershipListener, Heartbeat {
 
     /**
-     * An interceptor can react to a message based on a set bit on the 
+     * An interceptor can react to a message based on a set bit on the
      * message options. <br>
      * When a message is sent, the options can be retrieved from ChannelMessage.getOptions()
      * and if the bit is set, this interceptor will react to it.<br>
@@ -44,7 +44,7 @@ public interface ChannelInterceptor extends MembershipListener, Heartbeat {
      * @see ChannelMessage#getOptions()
      */
     public int getOptionFlag();
-    
+
     /**
      * Sets the option flag
      * @param flag int
@@ -80,11 +80,11 @@ public interface ChannelInterceptor extends MembershipListener, Heartbeat {
      * The <code>sendMessage</code> method is called when a message is being sent to one more destinations.
      * The interceptor can modify any of the parameters and then pass on the message down the stack by
      * invoking <code>getNext().sendMessage(destination,msg,payload)</code><br>
-     * Alternatively the interceptor can stop the message from being sent by not invoking 
+     * Alternatively the interceptor can stop the message from being sent by not invoking
      * <code>getNext().sendMessage(destination,msg,payload)</code><br>
-     * If the message is to be sent asynchronous the application can be notified of completion and 
+     * If the message is to be sent asynchronous the application can be notified of completion and
      * errors by passing in an error handler attached to a payload object.<br>
-     * The ChannelMessage.getAddress contains Channel.getLocalMember, and can be overwritten 
+     * The ChannelMessage.getAddress contains Channel.getLocalMember, and can be overwritten
      * to simulate a message sent from another node.<br>
      * @param destination Member[] - the destination for this message
      * @param msg ChannelMessage - the message to be sent
@@ -94,7 +94,7 @@ public interface ChannelInterceptor extends MembershipListener, Heartbeat {
      * @see InterceptorPayload
      */
     public void sendMessage(Member[] destination, ChannelMessage msg, InterceptorPayload payload) throws ChannelException;
-    
+
     /**
      * the <code>messageReceived</code> is invoked when a message is received.
      * <code>ChannelMessage.getAddress()</code> is the sender, or the reply-to address
@@ -102,15 +102,15 @@ public interface ChannelInterceptor extends MembershipListener, Heartbeat {
      * @param data ChannelMessage
      */
     public void messageReceived(ChannelMessage data);
-    
+
     /**
      * The <code>heartbeat()</code> method gets invoked periodically
-     * to allow interceptors to clean up resources, time out object and 
+     * to allow interceptors to clean up resources, time out object and
      * perform actions that are unrelated to sending/receiving data.
      */
     @Override
     public void heartbeat();
-    
+
     /**
      * Intercepts the <code>Channel.hasMembers()</code> method
      * @return boolean - if the channel has members in its membership group
@@ -140,7 +140,7 @@ public interface ChannelInterceptor extends MembershipListener, Heartbeat {
      * @see Channel#getMember(Member)
      */
     public Member getMember(Member mbr);
-    
+
     /**
      * Starts up the channel. This can be called multiple times for individual services to start
      * The svc parameter can be the logical or value of any constants
@@ -168,7 +168,7 @@ public interface ChannelInterceptor extends MembershipListener, Heartbeat {
      * @see Channel
      */
     public void stop(int svc) throws ChannelException;
-    
+
     public void fireInterceptorEvent(InterceptorEvent event);
 
     interface InterceptorEvent {
@@ -176,6 +176,6 @@ public interface ChannelInterceptor extends MembershipListener, Heartbeat {
         String getEventTypeDesc();
         ChannelInterceptor getInterceptor();
     }
-    
+
 
 }

@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -23,7 +23,7 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
 /**
- * simple generation of a UUID 
+ * simple generation of a UUID
  * @author Filip Hanik
  * @version 1.0
  */
@@ -36,10 +36,10 @@ public class UUIDGenerator {
     public static final int UUID_VERSION = 4;
     public static final int BYTES_PER_INT = 4;
     public static final int BITS_PER_BYTE = 8;
-    
+
     protected static SecureRandom secrand = null;
     protected static Random rand = new Random();
-    
+
     static {
         long start = System.currentTimeMillis();
         secrand = new SecureRandom();
@@ -51,7 +51,7 @@ public class UUIDGenerator {
                     secrand.getAlgorithm(), Long.valueOf(time)));
         }
     }
-    
+
     public static byte[] randomUUID(boolean secure) {
         byte[] result = new byte[UUID_LENGTH];
         return randomUUID(secure,result,0);
@@ -68,7 +68,7 @@ public class UUIDGenerator {
         into[8+offset] |= 0x80; //1000 0000
         return into;
     }
-    
+
     /**
      * Same as java.util.Random.nextBytes except this one we dont have to allocate a new byte array
      * @param into byte[]

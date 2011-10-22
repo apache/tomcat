@@ -20,7 +20,7 @@ import java.io.IOException;
 import java.io.Serializable;
 
 /**
- * 
+ *
  * For smarter replication, an object can implement this interface to replicate diffs<br>
  * The replication logic will call the methods in the following order:<br>
  * <code>
@@ -42,35 +42,35 @@ import java.io.Serializable;
  * 2. if ( isBackup(entry)||isPrimary(entry) ) entry.setOwner(owner); <br>
  * </code>
  * <br>
- * 
- * 
+ *
+ *
  * @author Filip Hanik
  * @version 1.0
  */
 public interface ReplicatedMapEntry extends Serializable {
-    
+
     /**
      * Has the object changed since last replication
      * and is not in a locked state
      * @return boolean
      */
     public boolean isDirty();
-    
+
     /**
      * If this returns true, the map will extract the diff using getDiff()
      * Otherwise it will serialize the entire object.
      * @return boolean
      */
     public boolean isDiffable();
-    
+
     /**
      * Returns a diff and sets the dirty map to false
      * @return byte[]
      * @throws IOException
      */
     public byte[] getDiff() throws IOException;
-    
-    
+
+
     /**
      * Applies a diff to an existing object.
      * @param diff byte[]
@@ -79,31 +79,31 @@ public interface ReplicatedMapEntry extends Serializable {
      * @throws IOException
      */
     public void applyDiff(byte[] diff, int offset, int length) throws IOException, ClassNotFoundException;
-    
+
     /**
      * Resets the current diff state and resets the dirty flag
      */
     public void resetDiff();
-    
+
     /**
      * Lock during serialization
      */
     public void lock();
-    
+
     /**
      * Unlock after serialization
      */
     public void unlock();
-    
+
     /**
-     * This method is called after the object has been 
+     * This method is called after the object has been
      * created on a remote map. On this method,
-     * the object can initialize itself for any data that wasn't 
-     * 
+     * the object can initialize itself for any data that wasn't
+     *
      * @param owner Object
      */
     public void setOwner(Object owner);
-    
+
     /**
      * For accuracy checking, a serialized attribute can contain a version number
      * This number increases as modifications are made to the data.
@@ -111,7 +111,7 @@ public interface ReplicatedMapEntry extends Serializable {
      * @return long - the version number or -1 if the data is not versioned
      */
     public long getVersion();
-    
+
     /**
      * Forces a certain version to a replicated map entry<br>
      * @param version long
