@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -99,7 +99,7 @@ import org.apache.tomcat.util.res.StringManager;
  *
  * @author Craig R. McClanahan
  * @version $Id$
- * 
+ *
  * @deprecated Use {@link Tomcat} instead.
  */
 
@@ -131,7 +131,7 @@ public class Embedded  extends StandardService {
         super();
         setRealm(realm);
         setSecurityProtection();
-        
+
     }
 
 
@@ -422,14 +422,14 @@ public class Embedded  extends StandardService {
             }
 
             if (address != null) {
-                IntrospectionUtils.setProperty(connector, "address", 
+                IntrospectionUtils.setProperty(connector, "address",
                                                "" + address);
             }
             IntrospectionUtils.setProperty(connector, "port", "" + port);
 
         } catch (Exception e) {
             log.error("Couldn't create connector.");
-        } 
+        }
 
         return (connector);
 
@@ -858,7 +858,7 @@ public class Embedded  extends StandardService {
                 }
             }
         }
-        // last resort - for minimal/embedded cases. 
+        // last resort - for minimal/embedded cases.
         if(catalinaHome==null) {
             catalinaHome=System.getProperty("user.dir");
         }
@@ -889,7 +889,7 @@ public class Embedded  extends StandardService {
             }
             System.setProperty(Globals.CATALINA_BASE_PROP, catalinaBase);
         }
-        
+
         String temp = System.getProperty("java.io.tmpdir");
         if (temp == null || (!(new File(temp)).exists())
                 || (!(new File(temp)).isDirectory())) {
@@ -898,7 +898,7 @@ public class Embedded  extends StandardService {
 
     }
 
-    
+
     protected void initStreams() {
         if (redirectStreams) {
             // Replace System.out and System.err with a custom PrintStream
@@ -906,7 +906,7 @@ public class Embedded  extends StandardService {
             System.setErr(new SystemLogHandler(System.err));
         }
     }
-    
+
 
     // -------------------------------------------------------- Private Methods
 

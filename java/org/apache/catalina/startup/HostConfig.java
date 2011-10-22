@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -71,7 +71,7 @@ import org.apache.tomcat.util.res.StringManager;
  */
 public class HostConfig
     implements LifecycleListener {
-    
+
     private static final Log log = LogFactory.getLog( HostConfig.class );
 
     // ----------------------------------------------------- Instance Variables
@@ -100,12 +100,12 @@ public class HostConfig
      */
     protected Host host = null;
 
-    
+
     /**
      * The JMX ObjectName of this component.
      */
     protected ObjectName oname = null;
-    
+
 
     /**
      * The string resources for this package.
@@ -126,8 +126,8 @@ public class HostConfig
      * default when a web application is deployed?
      */
     protected boolean copyXML = false;
-    
-    
+
+
     /**
      * Should we unpack WAR files when auto-deploying applications in the
      * <code>appBase</code> directory?
@@ -141,13 +141,13 @@ public class HostConfig
     protected HashMap<String, DeployedApplication> deployed =
         new HashMap<String, DeployedApplication>();
 
-    
+
     /**
-     * List of applications which are being serviced, and shouldn't be 
+     * List of applications which are being serviced, and shouldn't be
      * deployed/undeployed/redeployed at the moment.
      */
     protected ArrayList<String> serviced = new ArrayList<String>();
-    
+
 
     /**
      * The <code>Digester</code> instance used to parse context descriptors.
@@ -271,8 +271,8 @@ public class HostConfig
         this.unpackWARs = unpackWARs;
 
     }
-    
-    
+
+
     // --------------------------------------------------------- Public Methods
 
 
@@ -308,15 +308,15 @@ public class HostConfig
 
     }
 
-    
+
     /**
      * Add a serviced application to the list.
      */
     public synchronized void addServiced(String name) {
         serviced.add(name);
     }
-    
-    
+
+
     /**
      * Is application serviced ?
      * @return state of the application
@@ -324,7 +324,7 @@ public class HostConfig
     public synchronized boolean isServiced(String name) {
         return (serviced.contains(name));
     }
-    
+
 
     /**
      * Removed a serviced application from the list.
@@ -333,7 +333,7 @@ public class HostConfig
         serviced.remove(name);
     }
 
-    
+
     /**
      * Get the instant where an application was deployed.
      * @return 0L if no application with that name is deployed, or the instant
@@ -344,11 +344,11 @@ public class HostConfig
         if (app == null) {
             return 0L;
         }
-        
+
         return app.timestamp;
     }
-    
-    
+
+
     /**
      * Has the specified application been deployed? Note applications defined
      * in server.xml will not have been deployed.
@@ -361,14 +361,14 @@ public class HostConfig
         if (app == null) {
             return false;
         }
-        
+
         return true;
     }
-    
-    
+
+
     // ------------------------------------------------------ Protected Methods
 
-    
+
     /**
      * Create the digester which will be used to parse context config files.
      */
@@ -378,12 +378,12 @@ public class HostConfig
         // Add object creation rule
         digester.addObjectCreate("Context", "org.apache.catalina.core.StandardContext",
             "className");
-        // Set the properties on that object (it doesn't matter if extra 
+        // Set the properties on that object (it doesn't matter if extra
         // properties are set)
         digester.addSetProperties("Context");
         return (digester);
     }
-    
+
     protected File returnCanonicalPath(String path) {
         File file = new File(path);
         File base = new File(System.getProperty(Globals.CATALINA_BASE_PROP));
@@ -395,7 +395,7 @@ public class HostConfig
             return file;
         }
     }
-    
+
 
     /**
      * Return a File object representing the "configuration root" directory
@@ -406,7 +406,7 @@ public class HostConfig
         if (configBase != null) {
             return configBase;
         }
-        
+
         if (host.getXmlBase()!=null) {
             configBase = returnCanonicalPath(host.getXmlBase());
         } else {
@@ -448,16 +448,16 @@ public class HostConfig
         deployWARs(appBase, filteredAppPaths);
         // Deploy expanded folders
         deployDirectories(appBase, filteredAppPaths);
-        
+
     }
 
 
     /**
      * Filter the list of application file paths to remove those that match
      * the regular expression defined by {@link Host#getDeployIgnore()}.
-     *  
+     *
      * @param unfilteredAppPaths    The list of application paths to filtert
-     * 
+     *
      * @return  The filtered list of application paths
      */
     protected String[] filterAppPaths(String[] unfilteredAppPaths) {
@@ -496,7 +496,7 @@ public class HostConfig
         File configBase = configBase();
         ContextName cn = new ContextName(name);
         String baseName = cn.getBaseName();
-        
+
         // Deploy XML descriptors from configBase
         File xml = new File(configBase, baseName + ".xml");
         if (xml.exists())
@@ -519,7 +519,7 @@ public class HostConfig
 
         if (files == null)
             return;
-        
+
         for (int i = 0; i < files.length; i++) {
             File contextXml = new File(configBase, files[i]);
 
@@ -529,7 +529,7 @@ public class HostConfig
 
                 if (isServiced(name))
                     continue;
-                
+
                 deployDescriptor(cn, contextXml);
             }
         }
@@ -544,7 +544,7 @@ public class HostConfig
         if (deploymentExists(cn.getName())) {
             return;
         }
-        
+
         DeployedApplication deployedApp = new DeployedApplication(cn.getName());
 
         // Assume this is a configuration descriptor and deploy it
@@ -638,7 +638,7 @@ public class HostConfig
                 if (expandedDocBase.exists()) {
                     deployedApp.redeployResources.put(expandedDocBase.getAbsolutePath(),
                             Long.valueOf(expandedDocBase.lastModified()));
-                    addWatchedResources(deployedApp, 
+                    addWatchedResources(deployedApp,
                             expandedDocBase.getAbsolutePath(), context);
                 } else {
                     addWatchedResources(deployedApp, null, context);
@@ -666,12 +666,12 @@ public class HostConfig
      * Deploy WAR files.
      */
     protected void deployWARs(File appBase, String[] files) {
-        
+
         if (files == null)
             return;
-        
+
         for (int i = 0; i < files.length; i++) {
-            
+
             if (files[i].equalsIgnoreCase("META-INF"))
                 continue;
             if (files[i].equalsIgnoreCase("WEB-INF"))
@@ -679,9 +679,9 @@ public class HostConfig
             File war = new File(appBase, files[i]);
             if (files[i].toLowerCase(Locale.ENGLISH).endsWith(".war") && war.isFile()
                     && !invalidWars.contains(files[i]) ) {
-                
+
                 ContextName cn = new ContextName(files[i]);
-                
+
                 // Check for WARs with /../ /./ or similar sequences in the name
                 if (!validateContextPath(appBase, cn.getBaseName())) {
                     log.error(sm.getString(
@@ -692,7 +692,7 @@ public class HostConfig
 
                 if (isServiced(cn.getName()))
                     continue;
-                
+
                 deployWAR(cn, war);
             }
         }
@@ -702,10 +702,10 @@ public class HostConfig
     private boolean validateContextPath(File appBase, String contextPath) {
         // More complicated than the ideal as the canonical path may or may
         // not end with File.separator for a directory
-        
+
         StringBuilder docBase;
         String canonicalDocBase = null;
-        
+
         try {
             String canonicalAppBase = appBase.getCanonicalPath();
             docBase = new StringBuilder(canonicalAppBase);
@@ -717,10 +717,10 @@ public class HostConfig
             }
             // At this point docBase should be canonical but will not end
             // with File.separator
-            
+
             canonicalDocBase =
                 (new File(docBase.toString())).getCanonicalPath();
-    
+
             // If the canonicalDocBase ends with File.separator, add one to
             // docBase before they are compared
             if (canonicalDocBase.endsWith(File.separator)) {
@@ -729,9 +729,9 @@ public class HostConfig
         } catch (IOException ioe) {
             return false;
         }
-        
+
         // Compare the two. If they are not the same, the contextPath must
-        // have /../ like sequences in it 
+        // have /../ like sequences in it
         return canonicalDocBase.equals(docBase.toString());
     }
 
@@ -740,10 +740,10 @@ public class HostConfig
      * @param war
      */
     protected void deployWAR(ContextName cn, File war) {
-        
+
         if (deploymentExists(cn.getName()))
             return;
-        
+
         // Checking for a nested /META-INF/context.xml
         JarFile jar = null;
         JarEntry entry = null;
@@ -757,7 +757,7 @@ public class HostConfig
                     cn.getBaseName() + "/META-INF/context.xml");
         }
         boolean xmlInWar = false;
-        
+
         if (deployXML && !xml.exists()) {
             try {
                 jar = new JarFile(war);
@@ -767,7 +767,7 @@ public class HostConfig
                 }
                 if ((copyXML || unpackWARs) && xmlInWar) {
                     istream = jar.getInputStream(entry);
-                    
+
                     ostream =
                         new BufferedOutputStream
                         (new FileOutputStream(xml), 1024);
@@ -815,11 +815,11 @@ public class HostConfig
                 }
             }
         }
-        
+
         DeployedApplication deployedApp = new DeployedApplication(cn.getName());
-        
+
         // Deploy the application in this WAR file
-        if(log.isInfoEnabled()) 
+        if(log.isInfoEnabled())
             log.info(sm.getString("hostConfig.deployWar",
                     war.getAbsolutePath()));
 
@@ -922,7 +922,7 @@ public class HostConfig
             log.error(sm.getString("hostConfig.deployWar.error",
                     war.getAbsolutePath()), t);
         }
-        
+
         deployed.put(cn.getName(), deployedApp);
     }
 
@@ -934,7 +934,7 @@ public class HostConfig
 
         if (files == null)
             return;
-        
+
         for (int i = 0; i < files.length; i++) {
 
             if (files[i].equalsIgnoreCase("META-INF"))
@@ -953,20 +953,20 @@ public class HostConfig
         }
     }
 
-    
+
     /**
      * @param cn
      * @param dir
      */
     protected void deployDirectory(ContextName cn, File dir) {
-        
+
         if (deploymentExists(cn.getName()))
             return;
 
         DeployedApplication deployedApp = new DeployedApplication(cn.getName());
 
         // Deploy the application in this directory
-        if( log.isInfoEnabled() ) 
+        if( log.isInfoEnabled() )
             log.info(sm.getString("hostConfig.deployDir",
                     dir.getAbsolutePath()));
         try {
@@ -1042,24 +1042,24 @@ public class HostConfig
             addWatchedResources(deployedApp, dir.getAbsolutePath(), context);
         } catch (Throwable t) {
             ExceptionUtils.handleThrowable(t);
-            log.error(sm.getString("hostConfig.deployDir.error", 
+            log.error(sm.getString("hostConfig.deployDir.error",
                     dir.getAbsolutePath()), t);
         }
 
         deployed.put(cn.getName(), deployedApp);
     }
 
-    
+
     /**
      * Check if a webapp is already deployed in this host.
-     * 
+     *
      * @param contextName of the context which will be checked
      */
     protected boolean deploymentExists(String contextName) {
         return (deployed.containsKey(contextName) ||
                 (host.findChild(contextName) != null));
     }
-    
+
 
     /**
      * Add watched resources to the specified Context.
@@ -1095,11 +1095,11 @@ public class HostConfig
             if(log.isDebugEnabled())
                 log.debug("Watching WatchedResource '" +
                         resource.getAbsolutePath() + "'");
-            app.reloadResources.put(resource.getAbsolutePath(), 
+            app.reloadResources.put(resource.getAbsolutePath(),
                     Long.valueOf(resource.lastModified()));
         }
     }
-    
+
 
     /**
      * Check resources for redeployment and reloading.
@@ -1171,7 +1171,7 @@ public class HostConfig
                 // Undeploy application
                 if (log.isInfoEnabled())
                     log.info(sm.getString("hostConfig.undeploy", app.name));
-                ContainerBase context = 
+                ContainerBase context =
                     (ContainerBase) host.findChild(app.name);
                 try {
                     host.removeChild(context);
@@ -1232,7 +1232,7 @@ public class HostConfig
                         "] reload resource " + resource);
             long lastModified =
                 app.reloadResources.get(resources[i]).longValue();
-            if ((!resource.exists() && lastModified != 0L) 
+            if ((!resource.exists() && lastModified != 0L)
                 || (resource.lastModified() != lastModified)) {
                 // Reload application
                 if(log.isInfoEnabled())
@@ -1247,7 +1247,7 @@ public class HostConfig
                     log.warn(sm.getString
                              ("hostConfig.context.restart", app.name), e);
                 }
-                // If the context was not started (for example an error 
+                // If the context was not started (for example an error
                 // in web.xml) we'll still get to try to start
                 try {
                     context.start();
@@ -1263,8 +1263,8 @@ public class HostConfig
             }
         }
     }
-    
-    
+
+
     /**
      * Process a "start" event for this Host.
      */
@@ -1282,7 +1282,7 @@ public class HostConfig
         } catch (Exception e) {
             log.error(sm.getString("hostConfig.jmx.register", oname), e);
         }
-        
+
         if (host.getCreateDirs()) {
             File[] dirs = new File[] {host.getAppBaseFile(),configBase()};
             for (int i=0; i<dirs.length; i++) {
@@ -1301,7 +1301,7 @@ public class HostConfig
 
         if (host.getDeployOnStartup())
             deployApps();
-        
+
     }
 
 
@@ -1333,7 +1333,7 @@ public class HostConfig
 
         if (host.getAutoDeploy()) {
             // Check for resources modification to trigger redeployment
-            DeployedApplication[] apps = 
+            DeployedApplication[] apps =
                 deployed.values().toArray(new DeployedApplication[0]);
             for (int i = 0; i < apps.length; i++) {
                 if (!isServiced(apps[i].name))
@@ -1345,7 +1345,7 @@ public class HostConfig
 
     }
 
-    
+
     /**
      * Check status of a specific webapp, for use with stuff like management webapps.
      */
@@ -1362,15 +1362,15 @@ public class HostConfig
      * Add a new Context to be managed by us.
      * Entry point for the admin webapp, and other JMX Context controllers.
      */
-    public void manageApp(Context context)  {    
+    public void manageApp(Context context)  {
 
         String contextName = context.getName();
-        
+
         if (deployed.containsKey(contextName))
             return;
 
         DeployedApplication deployedApp = new DeployedApplication(contextName);
-        
+
         // Add the associated docBase to the redeployed list if it's a WAR
         boolean isWar = false;
         if (context.getDocBase() != null) {
@@ -1413,22 +1413,22 @@ public class HostConfig
 
 
     /**
-     * This class represents the state of a deployed application, as well as 
+     * This class represents the state of a deployed application, as well as
      * the monitored resources.
      */
     protected static class DeployedApplication {
         public DeployedApplication(String name) {
             this.name = name;
         }
-        
+
         /**
-         * Application context path. The assertion is that 
+         * Application context path. The assertion is that
          * (host.getChild(name) != null).
          */
         public String name;
-        
+
         /**
-         * Any modification of the specified (static) resources will cause a 
+         * Any modification of the specified (static) resources will cause a
          * redeployment of the application. If any of the specified resources is
          * removed, the application will be undeployed. Typically, this will
          * contain resources like the context.xml file, a compressed WAR path.
@@ -1438,7 +1438,7 @@ public class HostConfig
             new LinkedHashMap<String, Long>();
 
         /**
-         * Any modification of the specified (static) resources will cause a 
+         * Any modification of the specified (static) resources will cause a
          * reload of the application. This will typically contain resources
          * such as the web.xml of a webapp, but can be configured to contain
          * additional descriptors.
