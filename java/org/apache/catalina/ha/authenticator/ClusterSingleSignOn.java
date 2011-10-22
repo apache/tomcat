@@ -54,19 +54,9 @@ import org.apache.tomcat.util.ExceptionUtils;
  *
  * @author Fabien Carrion
  */
-
-public class ClusterSingleSignOn
-    extends SingleSignOn {
-
+public class ClusterSingleSignOn extends SingleSignOn {
 
     // ----------------------------------------------------- Instance Variables
-
-
-    /**
-     * Descriptive information about this Valve implementation.
-     */
-    protected static final String info =
-        "org.apache.catalina.ha.authenticator.ClusterSingleSignOn";
 
     protected int messageNumber = 0;
 
@@ -76,29 +66,9 @@ public class ClusterSingleSignOn
     // ------------------------------------------------------------- Properties
 
     private CatalinaCluster cluster = null;
-
-
-
-    /**
-     * Return descriptive information about this Valve implementation.
-     */
-    @Override
-    public String getInfo() {
-
-        return (info);
-
-    }
-
-    public CatalinaCluster getCluster() {
-
-        return cluster;
-
-    }
-
+    public CatalinaCluster getCluster() { return cluster; }
     public void setCluster(CatalinaCluster cluster) {
-
         this.cluster = cluster;
-
     }
 
 
@@ -114,7 +84,7 @@ public class ClusterSingleSignOn
      */
     @Override
     protected synchronized void startInternal() throws LifecycleException {
-        
+
         clusterSSOListener = new ClusterSingleSignOnListener();
         clusterSSOListener.setClusterSSO(this);
 
@@ -197,16 +167,18 @@ public class ClusterSingleSignOn
                 new SingleSignOnMessage(cluster.getLocalMember(),
                                         ssoId, session.getId());
             Manager mgr = session.getManager();
-            if ((mgr != null) && (mgr instanceof ClusterManager))
+            if ((mgr != null) && (mgr instanceof ClusterManager)) {
                 msg.setContextName(((ClusterManager) mgr).getName());
+            }
 
             msg.setAction(SingleSignOnMessage.ADD_SESSION);
 
             cluster.send(msg);
 
-            if (containerLog.isDebugEnabled())
+            if (containerLog.isDebugEnabled()) {
                 containerLog.debug("SingleSignOnMessage Send with action "
                                    + msg.getAction());
+            }
         }
 
         associateLocal(ssoId, session);
@@ -237,15 +209,17 @@ public class ClusterSingleSignOn
                 new SingleSignOnMessage(cluster.getLocalMember(),
                                         ssoId, session.getId());
             Manager mgr = session.getManager();
-            if ((mgr != null) && (mgr instanceof ClusterManager))
+            if ((mgr != null) && (mgr instanceof ClusterManager)) {
                 msg.setContextName(((ClusterManager) mgr).getName());
+            }
 
             msg.setAction(SingleSignOnMessage.DEREGISTER_SESSION);
 
             cluster.send(msg);
-            if (containerLog.isDebugEnabled())
+            if (containerLog.isDebugEnabled()) {
                 containerLog.debug("SingleSignOnMessage Send with action "
                                    + msg.getAction());
+            }
         }
 
         deregisterLocal(ssoId, session);
@@ -277,9 +251,10 @@ public class ClusterSingleSignOn
             msg.setAction(SingleSignOnMessage.LOGOUT_SESSION);
 
             cluster.send(msg);
-            if (containerLog.isDebugEnabled())
+            if (containerLog.isDebugEnabled()) {
                 containerLog.debug("SingleSignOnMessage Send with action "
                                    + msg.getAction());
+            }
         }
 
         deregisterLocal(ssoId);
@@ -319,9 +294,10 @@ public class ClusterSingleSignOn
             msg.setPassword(password);
 
             cluster.send(msg);
-            if (containerLog.isDebugEnabled())
+            if (containerLog.isDebugEnabled()) {
                 containerLog.debug("SingleSignOnMessage Send with action "
                                    + msg.getAction());
+            }
         }
 
         registerLocal(ssoId, principal, authType, username, password);
@@ -377,9 +353,10 @@ public class ClusterSingleSignOn
             msg.setPassword(password);
 
             cluster.send(msg);
-            if (containerLog.isDebugEnabled())
+            if (containerLog.isDebugEnabled()) {
                 containerLog.debug("SingleSignOnMessage Send with action "
                                    + msg.getAction());
+            }
         }
 
         updateLocal(ssoId, principal, authType, username, password);
@@ -411,15 +388,17 @@ public class ClusterSingleSignOn
                                         ssoId, session.getId());
 
             Manager mgr = session.getManager();
-            if ((mgr != null) && (mgr instanceof ClusterManager))
+            if ((mgr != null) && (mgr instanceof ClusterManager)) {
                 msg.setContextName(((ClusterManager) mgr).getName());
+            }
 
             msg.setAction(SingleSignOnMessage.REMOVE_SESSION);
 
             cluster.send(msg);
-            if (containerLog.isDebugEnabled())
+            if (containerLog.isDebugEnabled()) {
                 containerLog.debug("SingleSignOnMessage Send with action "
                                    + msg.getAction());
+            }
         }
 
         removeSessionLocal(ssoId, session);
@@ -428,7 +407,7 @@ public class ClusterSingleSignOn
     protected void removeSessionLocal(String ssoId, Session session) {
 
         super.removeSession(ssoId, session);
-        
+
     }
 
 }

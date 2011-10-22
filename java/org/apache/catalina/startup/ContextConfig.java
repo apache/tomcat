@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -112,7 +112,7 @@ public class ContextConfig
     implements LifecycleListener {
 
     private static final Log log = LogFactory.getLog( ContextConfig.class );
-    
+
     private static final String SCI_LOCATION =
         "META-INF/services/javax.servlet.ServletContainerInitializer";
 
@@ -132,7 +132,7 @@ public class ContextConfig
      * context files.
      */
     protected static Digester contextDigester = null;
-    
+
 
     /**
      * The set of Authenticators that we know how to configure.  The key is
@@ -198,14 +198,14 @@ public class ContextConfig
      * The default web application's context file location.
      */
     protected String defaultContextXml = null;
-    
-    
+
+
     /**
      * The default web application's deployment descriptor location.
      */
     protected String defaultWebXml = null;
-    
-    
+
+
     /**
      * Track any fatal errors during startup configuration processing.
      */
@@ -216,14 +216,14 @@ public class ContextConfig
      * Original docBase.
      */
     protected String originalDocBase = null;
-    
+
 
     /**
      * Map of ServletContainerInitializer to classes they expressed interest in.
      */
     protected Map<ServletContainerInitializer, Set<Class<?>>> initializerClassMap =
         new LinkedHashMap<ServletContainerInitializer, Set<Class<?>>>();
-    
+
     /**
      * Map of Types to ServletContainerInitializer that are interested in those
      * types.
@@ -243,7 +243,7 @@ public class ContextConfig
      */
     protected Digester webFragmentDigester = null;
 
-    
+
     // ------------------------------------------------------------- Properties
     /**
      * Return the location of the default deployment descriptor
@@ -361,11 +361,11 @@ public class ContextConfig
      * Process the application classes annotations, if it exists.
      */
     protected void applicationAnnotationsConfig() {
-        
+
         long t1=System.currentTimeMillis();
-        
+
         WebAnnotationSet.loadApplicationAnnotations(context);
-        
+
         long t2=System.currentTimeMillis();
         if (context instanceof StandardContext) {
             ((StandardContext) context).setStartupTime(t2-t1+
@@ -398,9 +398,10 @@ public class ContextConfig
         }
 
         // Has an authenticator been configured already?
-        if (context.getAuthenticator() != null)
+        if (context.getAuthenticator() != null) {
             return;
-        
+        }
+
         if (!(context instanceof ContainerBase)) {
             return;     // Cannot install a Valve even if it would be needed
         }
@@ -490,7 +491,7 @@ public class ContextConfig
      */
     public void createWebXmlDigester(boolean namespaceAware,
             boolean validation) {
-        
+
         if (!namespaceAware && !validation) {
             if (webDigesters[0] == null) {
                 webDigesters[0] = DigesterFactory.newDigester(validation,
@@ -502,7 +503,7 @@ public class ContextConfig
             }
             webDigester = webDigesters[0];
             webFragmentDigester = webFragmentDigesters[0];
-            
+
         } else if (!namespaceAware && validation) {
             if (webDigesters[1] == null) {
                 webDigesters[1] = DigesterFactory.newDigester(validation,
@@ -514,7 +515,7 @@ public class ContextConfig
             }
             webDigester = webDigesters[1];
             webFragmentDigester = webFragmentDigesters[1];
-            
+
         } else if (namespaceAware && !validation) {
             if (webDigesters[2] == null) {
                 webDigesters[2] = DigesterFactory.newDigester(validation,
@@ -526,7 +527,7 @@ public class ContextConfig
             }
             webDigester = webDigesters[2];
             webFragmentDigester = webFragmentDigesters[2];
-            
+
         } else {
             if (webDigesters[3] == null) {
                 webDigesters[3] = DigesterFactory.newDigester(validation,
@@ -541,7 +542,7 @@ public class ContextConfig
         }
     }
 
-    
+
     /**
      * Create (if necessary) and return a Digester configured to process the
      * context configuration descriptor for an application.
@@ -572,18 +573,20 @@ public class ContextConfig
         return System.getProperty(Globals.CATALINA_BASE_PROP);
     }
 
-    
+
     /**
      * Process the default configuration file, if it exists.
      */
     protected void contextConfig() {
-        
+
         // Open the default context.xml file, if it exists
         if( defaultContextXml==null && context instanceof StandardContext ) {
             defaultContextXml = ((StandardContext)context).getDefaultContextXml();
         }
         // set the default if we don't have any overrides
-        if( defaultContextXml==null ) getDefaultContextXml();
+        if( defaultContextXml==null ) {
+            getDefaultContextXml();
+        }
 
         if (!context.getOverride()) {
             File defaultContextFile = new File(defaultContextXml);
@@ -599,7 +602,7 @@ public class ContextConfig
                             "contextConfig.badUrl", defaultContextFile), e);
                 }
             }
-            
+
             File hostContextFile = new File(getConfigBase(),
                     getHostConfigPath(Constants.HostContextXml));
             if (hostContextFile.exists()) {
@@ -612,20 +615,22 @@ public class ContextConfig
                 }
             }
         }
-        if (context.getConfigFile() != null)
+        if (context.getConfigFile() != null) {
             processContextConfig(context.getConfigFile());
-        
+        }
+
     }
 
-    
+
     /**
      * Process a context.xml.
      */
     protected void processContextConfig(URL contextXml) {
-        
-        if (log.isDebugEnabled())
-            log.debug("Processing context [" + context.getName() 
+
+        if (log.isDebugEnabled()) {
+            log.debug("Processing context [" + context.getName()
                     + "] configuration file [" + contextXml + "]");
+        }
 
         InputSource source = null;
         InputStream stream = null;
@@ -633,7 +638,7 @@ public class ContextConfig
         try {
             source = new InputSource(contextXml.toString());
             stream = contextXml.openStream();
-            
+
             // Add as watched resource so that cascade reload occurs if a default
             // config file is modified/added/removed
             if ("file".equals(contextXml.getProtocol())) {
@@ -641,12 +646,13 @@ public class ContextConfig
                         (new File(contextXml.toURI())).getAbsolutePath());
             }
         } catch (Exception e) {
-            log.error(sm.getString("contextConfig.contextMissing",  
+            log.error(sm.getString("contextConfig.contextMissing",
                       contextXml) , e);
         }
-        
-        if (source == null)
+
+        if (source == null) {
             return;
+        }
         synchronized (contextDigester) {
             try {
                 source.setByteStream(stream);
@@ -662,9 +668,10 @@ public class ContextConfig
                     errorHandler.logFindings(log, contextXml.toString());
                     ok = false;
                 }
-                if (log.isDebugEnabled())
-                    log.debug("Successfully processed context [" + context.getName() 
+                if (log.isDebugEnabled()) {
+                    log.debug("Successfully processed context [" + context.getName()
                             + "] configuration file [" + contextXml + "]");
+                }
             } catch (SAXParseException e) {
                 log.error(sm.getString("contextConfig.contextParse",
                         context.getName()), e);
@@ -689,13 +696,13 @@ public class ContextConfig
         }
     }
 
-    
+
     /**
      * Adjust docBase.
      */
     protected void fixDocBase()
         throws IOException {
-        
+
         Host host = (Host) context.getParent();
         File appBase = host.getAppBaseFile();
 
@@ -718,7 +725,7 @@ public class ContextConfig
         }
         file = new File(docBase);
         String origDocBase = docBase;
-        
+
         ContextName cn = new ContextName(context.getPath(),
                 context.getWebappVersion());
         String pathName = cn.getBaseName();
@@ -778,17 +785,18 @@ public class ContextConfig
         context.setDocBase(docBase);
 
     }
-    
-    
+
+
     protected void antiLocking() {
 
-        if ((context instanceof StandardContext) 
+        if ((context instanceof StandardContext)
             && ((StandardContext) context).getAntiResourceLocking()) {
-            
+
             Host host = (Host) context.getParent();
             String docBase = context.getDocBase();
-            if (docBase == null)
+            if (docBase == null) {
                 return;
+            }
             if (originalDocBase == null) {
                 originalDocBase = docBase;
             } else {
@@ -798,7 +806,7 @@ public class ContextConfig
             if (!docBaseFile.isAbsolute()) {
                 docBaseFile = new File(host.getAppBaseFile(), docBase);
             }
-            
+
             String path = context.getPath();
             if (path == null) {
                 return;
@@ -812,24 +820,25 @@ public class ContextConfig
                 file = new File(System.getProperty("java.io.tmpdir"),
                         deploymentCount++ + "-" + docBase + ".war");
             } else {
-                file = new File(System.getProperty("java.io.tmpdir"), 
+                file = new File(System.getProperty("java.io.tmpdir"),
                         deploymentCount++ + "-" + docBase);
             }
-            
-            if (log.isDebugEnabled())
-                log.debug("Anti locking context[" + context.getName() 
+
+            if (log.isDebugEnabled()) {
+                log.debug("Anti locking context[" + context.getName()
                         + "] setting docBase to " + file);
-            
+            }
+
             // Cleanup just in case an old deployment is lying around
             ExpandWar.delete(file);
             if (ExpandWar.copy(docBaseFile, file)) {
                 context.setDocBase(file.getAbsolutePath());
             }
-            
+
         }
-        
+
     }
-    
+
 
     /**
      * Process a "init" event for this Context.
@@ -842,13 +851,14 @@ public class ContextConfig
             contextDigester.getParser();
         }
 
-        if (log.isDebugEnabled())
+        if (log.isDebugEnabled()) {
             log.debug(sm.getString("contextConfig.init"));
+        }
         context.setConfigured(false);
         ok = true;
-        
+
         contextConfig();
-        
+
         createWebXmlDigester(context.getXmlNamespaceAware(),
                 context.getXmlValidation());
 
@@ -858,28 +868,29 @@ public class ContextConfig
             log.error(sm.getString(
                     "contextConfig.fixDocBase", context.getName()), e);
         }
-        
+
     }
-    
-    
+
+
     /**
      * Process a "before start" event for this Context.
      */
     protected synchronized void beforeStart() {
-        
+
         antiLocking();
 
     }
-    
-    
+
+
     /**
      * Process a "contextConfig" event for this Context.
      */
     protected synchronized void configureStart() {
         // Called from StandardContext.start()
 
-        if (log.isDebugEnabled())
+        if (log.isDebugEnabled()) {
             log.debug(sm.getString("contextConfig.start"));
+        }
 
         if (log.isDebugEnabled()) {
             log.debug(sm.getString("contextConfig.xmlSettings",
@@ -887,7 +898,7 @@ public class ContextConfig
                     Boolean.valueOf(context.getXmlValidation()),
                     Boolean.valueOf(context.getXmlNamespaceAware())));
         }
-        
+
         webConfig();
 
         if (!context.getIgnoreAnnotations()) {
@@ -898,28 +909,30 @@ public class ContextConfig
         }
 
         // Configure an authenticator if we need one
-        if (ok)
+        if (ok) {
             authenticatorConfig();
+        }
 
         // Dump the contents of this pipeline if requested
         if ((log.isDebugEnabled()) && (context instanceof ContainerBase)) {
             log.debug("Pipeline Configuration:");
             Pipeline pipeline = ((ContainerBase) context).getPipeline();
             Valve valves[] = null;
-            if (pipeline != null)
+            if (pipeline != null) {
                 valves = pipeline.getValves();
+            }
             if (valves != null) {
                 for (int i = 0; i < valves.length; i++) {
-                    log.debug("  " + valves[i].getInfo());
+                    log.debug("  " + valves[i].getClass().getName());
                 }
             }
             log.debug("======================");
         }
 
         // Make our application available if no problems were encountered
-        if (ok)
+        if (ok) {
             context.setConfigured(true);
-        else {
+        } else {
             log.error(sm.getString("contextConfig.unavailable"));
             context.setConfigured(false);
         }
@@ -932,8 +945,9 @@ public class ContextConfig
      */
     protected synchronized void configureStop() {
 
-        if (log.isDebugEnabled())
+        if (log.isDebugEnabled()) {
             log.debug(sm.getString("contextConfig.stop"));
+        }
 
         int i;
 
@@ -1081,53 +1095,55 @@ public class ContextConfig
             // No need to log failure - it is expected in this case
             ExpandWar.delete(docBaseFile, false);
         }
-        
+
         // Reset ServletContextInitializer scanning
         initializerClassMap.clear();
         typeInitializerMap.clear();
-        
+
         ok = true;
 
     }
-    
-    
+
+
     /**
      * Process a "destroy" event for this Context.
      */
     protected synchronized void destroy() {
         // Called from StandardContext.destroy()
-        if (log.isDebugEnabled())
+        if (log.isDebugEnabled()) {
             log.debug(sm.getString("contextConfig.destroy"));
+        }
 
         // Skip clearing the work directory if Tomcat is being shutdown
         Server s = getServer();
         if (s != null && !s.getState().isAvailable()) {
             return;
         }
-        
+
         // Changed to getWorkPath per Bugzilla 35819.
         String workDir = ((StandardContext) context).getWorkPath();
-        if (workDir != null)
+        if (workDir != null) {
             ExpandWar.delete(new File(workDir));
+        }
     }
-    
-    
+
+
     private Server getServer() {
         Container c = context;
         while (c != null && !(c instanceof Engine)) {
             c = c.getParent();
         }
-        
+
         if (c == null) {
             return null;
         }
-        
+
         Service s = ((Engine)c).getService();
-        
+
         if (s == null) {
             return null;
         }
-        
+
         return s.getServer();
     }
 
@@ -1179,25 +1195,27 @@ public class ContextConfig
      * Get config base.
      */
     protected File getConfigBase() {
-        File configBase = 
+        File configBase =
             new File(System.getProperty(Globals.CATALINA_BASE_PROP), "conf");
         if (!configBase.exists()) {
             return null;
         }
         return configBase;
-    }  
+    }
 
-    
+
     protected String getHostConfigPath(String resourceName) {
         StringBuilder result = new StringBuilder();
         Container container = context;
         Container host = null;
         Container engine = null;
         while (container != null) {
-            if (container instanceof Host)
+            if (container instanceof Host) {
                 host = container;
-            if (container instanceof Engine)
+            }
+            if (container instanceof Engine) {
                 engine = container;
+            }
             container = container.getParent();
         }
         if (engine != null) {
@@ -1225,7 +1243,7 @@ public class ContextConfig
          *   everything else takes priority
          * - Mark Servlets as overridable so SCI configuration can replace
          *   configuration from the defaults
-         */ 
+         */
         Set<WebXml> defaults = new HashSet<WebXml>();
         defaults.add(getDefaultWebXmlFragment());
 
@@ -1234,7 +1252,7 @@ public class ContextConfig
         // Parse context level web.xml
         InputSource contextWebXml = getContextWebXmlSource();
         parseWebXml(contextWebXml, webXml, false);
-        
+
         if (webXml.getMajorVersion() >= 3) {
             // Ordering is important here
 
@@ -1249,12 +1267,12 @@ public class ContextConfig
             if  (!webXml.isMetadataComplete()) {
                 // Step 2. Order the fragments.
                 orderedFragments = WebXml.orderWebFragments(webXml, fragments);
-    
+
                 // Step 3. Look for ServletContainerInitializer implementations
                 if (ok) {
                     processServletContainerInitializers(orderedFragments);
                 }
-    
+
                 // Step 4. Process /WEB-INF/classes for annotations
                 // This will add any matching classes to the typeInitializerMap
                 if (ok) {
@@ -1268,20 +1286,20 @@ public class ContextConfig
                                 "contextConfig.webinfClassesUrl"), e);
                     }
                 }
-    
+
                 // Step 5. Process JARs for annotations - only need to process
                 // those fragments we are going to use
                 // This will add any matching classes to the typeInitializerMap
                 if (ok) {
                     processAnnotations(orderedFragments);
                 }
-    
+
                 // Step 6. Merge web-fragment.xml files into the main web.xml
                 // file.
                 if (ok) {
                     ok = webXml.merge(orderedFragments);
                 }
-    
+
                 // Step 7. Apply global defaults
                 // Have to merge defaults before JSP conversion since defaults
                 // provide JSP servlet definition.
@@ -1291,11 +1309,11 @@ public class ContextConfig
                 if (ok) {
                     convertJsps(webXml);
                 }
-                
+
                 // Step 9. Apply merged web.xml to Context
                 if (ok) {
                     webXml.configureContext(context);
-    
+
                     // Step 9a. Make the merged web.xml available to other
                     // components, specifically Jasper, to save those components
                     // from having to re-generate it.
@@ -1312,7 +1330,7 @@ public class ContextConfig
                 webXml.merge(defaults);
                 webXml.configureContext(context);
             }
-            
+
             // Always need to look for static resources
             // Step 10. Look for static resources packaged in JARs
             if (ok) {
@@ -1333,7 +1351,7 @@ public class ContextConfig
                 // See also StandardContext.resourcesStart() for
                 // WEB-INF/classes/META-INF/resources configuration
             }
-            
+
             // Only look for ServletContainerInitializer if metadata is not
             // complete
             if (!webXml.isMetadataComplete()) {
@@ -1341,7 +1359,7 @@ public class ContextConfig
                 // context
                 if (ok) {
                     for (Map.Entry<ServletContainerInitializer,
-                            Set<Class<?>>> entry : 
+                            Set<Class<?>>> entry :
                                 initializerClassMap.entrySet()) {
                         if (entry.getValue().isEmpty()) {
                             context.addServletContainerInitializer(
@@ -1367,13 +1385,13 @@ public class ContextConfig
         Host host = (Host) context.getParent();
 
         DefaultWebXmlCacheEntry entry = hostWebXmlCache.get(host);
-        
+
         InputSource globalWebXml = getGlobalWebXmlSource();
         InputSource hostWebXml = getHostWebXmlSource();
-        
+
         long globalTimeStamp = 0;
         long hostTimeStamp = 0;
-        
+
         if (globalWebXml != null) {
             try {
                 File f = new File(new URI(globalWebXml.getSystemId()));
@@ -1382,7 +1400,7 @@ public class ContextConfig
                 globalTimeStamp = -1;
             }
         }
-        
+
         if (hostWebXml != null) {
             try {
                 File f = new File(new URI(hostWebXml.getSystemId()));
@@ -1391,12 +1409,12 @@ public class ContextConfig
                 hostTimeStamp = -1;
             }
         }
-        
+
         if (entry != null && entry.getGlobalTimeStamp() == globalTimeStamp &&
                 entry.getHostTimeStamp() == hostTimeStamp) {
             return entry.getWebXml();
         }
-        
+
         // Parsing global web.xml is relatively expensive. Use a sync block to
         // make sure it only happens once
         synchronized (host) {
@@ -1423,13 +1441,13 @@ public class ContextConfig
             } else {
                 parseWebXml(globalWebXml, webXmlDefaultFragment, false);
             }
-            
+
             // Parse host level web.xml if present
             // Additive apart from welcome pages
             webXmlDefaultFragment.setReplaceWelcomeFiles(true);
-            
+
             parseWebXml(hostWebXml, webXmlDefaultFragment, false);
-            
+
             // Don't update the cache if an error occurs
             if (globalTimeStamp != -1 && hostTimeStamp != -1) {
                 entry = new DefaultWebXmlCacheEntry(webXmlDefaultFragment,
@@ -1470,9 +1488,10 @@ public class ContextConfig
         String jspFile = servletDef.getJspFile();
         if ((jspFile != null) && !jspFile.startsWith("/")) {
             if (context.isServlet22()) {
-                if(log.isDebugEnabled())
+                if(log.isDebugEnabled()) {
                     log.debug(sm.getString("contextConfig.jspFile.warning",
                                        jspFile));
+                }
                 jspFile = "/" + jspFile;
             } else {
                 throw new IllegalArgumentException
@@ -1496,7 +1515,7 @@ public class ContextConfig
      */
     protected void processServletContainerInitializers(
             Set<WebXml> fragments) {
-        
+
         for (WebXml fragment : fragments) {
             URL url = fragment.getURL();
             Jar jar = null;
@@ -1534,13 +1553,13 @@ public class ContextConfig
                     jar.close();
                 }
             }
-            
+
             if (sci == null) {
                 continue;
             }
 
             initializerClassMap.put(sci, new HashSet<Class<?>>());
-            
+
             HandlesTypes ht =
                 sci.getClass().getAnnotation(HandlesTypes.class);
             if (ht != null) {
@@ -1560,12 +1579,12 @@ public class ContextConfig
 
         }
     }
-    
-    
+
+
     /**
      * Extract the name of the ServletContainerInitializer.
-     * 
-     * @param is    The resource where the name is defined 
+     *
+     * @param is    The resource where the name is defined
      * @return      The class name
      * @throws IOException
      */
@@ -1573,7 +1592,7 @@ public class ContextConfig
             InputStream is) throws IOException {
 
         String className = null;
-        
+
         if (is != null) {
             String line = null;
             try {
@@ -1588,7 +1607,7 @@ public class ContextConfig
                 // If it does - ignore & return null
             }
         }
-        
+
         ServletContainerInitializer sci = null;
         try {
             Class<?> clazz = Class.forName(className,true,
@@ -1604,11 +1623,11 @@ public class ContextConfig
             log.error(sm.getString("contextConfig.invalidSci", className), e);
             throw new IOException(e);
         }
-        
+
         return sci;
     }
 
-    
+
     /**
      * Scan JARs that contain web-fragment.xml files that will be used to
      * configure this application to see if they also contain static resources.
@@ -1637,8 +1656,8 @@ public class ContextConfig
             }
         }
     }
-    
-    
+
+
     /**
      * Identify the default web.xml to be used and obtain an input source for
      * it.
@@ -1649,7 +1668,9 @@ public class ContextConfig
             defaultWebXml = ((StandardContext) context).getDefaultWebXml();
         }
         // Set the default if we don't have any overrides
-        if (defaultWebXml == null) getDefaultWebXml();
+        if (defaultWebXml == null) {
+            getDefaultWebXml();
+        }
 
         // Is it explicitly suppressed, e.g. in embedded environment?
         if (Constants.NoDefaultWebXml.equals(defaultWebXml)) {
@@ -1657,20 +1678,21 @@ public class ContextConfig
         }
         return getWebXmlSource(defaultWebXml, getBaseDir());
     }
-    
-    
+
+
     /**
      * Identify the host web.xml to be used and obtain an input source for
      * it.
      */
     protected InputSource getHostWebXmlSource() {
         String resourceName = getHostConfigPath(Constants.HostWebXml);
-        
+
         // In an embedded environment, configBase might not be set
         File configBase = getConfigBase();
-        if (configBase == null)
+        if (configBase == null) {
             return null;
-        
+        }
+
         String basePath = null;
         try {
             basePath = configBase.getCanonicalPath();
@@ -1681,7 +1703,7 @@ public class ContextConfig
 
         return getWebXmlSource(resourceName, basePath);
     }
-    
+
     /**
      * Identify the application web.xml to be used and obtain an input source
      * for it.
@@ -1690,7 +1712,7 @@ public class ContextConfig
         InputStream stream = null;
         InputSource source = null;
         URL url = null;
-        
+
         String altDDName = null;
 
         // Open the application web.xml file, if it exists
@@ -1728,15 +1750,15 @@ public class ContextConfig
             source = new InputSource(url.toExternalForm());
             source.setByteStream(stream);
         }
-        
+
         return source;
     }
-    
+
     /**
-     * 
+     *
      * @param filename  Name of the file (possibly with one or more leading path
      *                  segments) to read
-     * @param path      Location that filename is relative to 
+     * @param path      Location that filename is relative to
      */
     protected InputSource getWebXmlSource(String filename, String path) {
         File file = new File(filename);
@@ -1756,7 +1778,7 @@ public class ContextConfig
                     source =
                         new InputSource(getClass().getClassLoader().getResource(
                                 filename).toURI().toString());
-                } 
+                }
             } else {
                 source = new InputSource(file.getAbsoluteFile().toURI().toString());
                 stream = new FileInputStream(file);
@@ -1777,8 +1799,10 @@ public class ContextConfig
 
     protected void parseWebXml(InputSource source, WebXml dest,
             boolean fragment) {
-        
-        if (source == null) return;
+
+        if (source == null) {
+            return;
+        }
 
         XmlErrorHandler handler = new XmlErrorHandler();
 
@@ -1794,14 +1818,14 @@ public class ContextConfig
             digester = webDigester;
             ruleSet = webRuleSet;
         }
-        
+
         // Sync on the ruleSet since the same ruleSet is shared across all four
         // digesters
         synchronized(ruleSet) {
-            
+
             digester.push(dest);
             digester.setErrorHandler(handler);
-            
+
             if(log.isDebugEnabled()) {
                 log.debug(sm.getString("contextConfig.applicationStart",
                         source.getSystemId()));
@@ -1840,17 +1864,17 @@ public class ContextConfig
      * will be parsed before being added to the map. Every JAR will be added and
      * <code>null</code> will be used if no web-fragment.xml was found. Any JARs
      * known not contain fragments will be skipped.
-     * 
+     *
      * @return A map of JAR name to processed web fragment (if any)
      */
     protected Map<String,WebXml> processJarsForWebFragments() {
-        
+
         JarScanner jarScanner = context.getJarScanner();
         FragmentJarScannerCallback callback = new FragmentJarScannerCallback();
-        
+
         jarScanner.scan(context.getServletContext(),
                 context.getLoader().getClassLoader(), callback, null);
-        
+
         return callback.getFragments();
     }
 
@@ -1888,7 +1912,7 @@ public class ContextConfig
             log.error(sm.getString("contextConfig.unknownUrlProtocol",
                     url.getProtocol(), url));
         }
-        
+
     }
 
 
@@ -1896,10 +1920,10 @@ public class ContextConfig
 
         Jar jar = null;
         InputStream is;
-        
+
         try {
             jar = JarFactory.newInstance(url);
-            
+
             jar.nextEntry();
             String entryName = jar.getEntryName();
             while (entryName != null) {
@@ -1933,7 +1957,7 @@ public class ContextConfig
         }
     }
 
-    
+
     protected void processAnnotationsJndi(URL url, WebXml fragment) {
         try {
             URLConnection urlConn = url.openConnection();
@@ -1943,10 +1967,10 @@ public class ContextConfig
                 sm.getString("contextConfig.jndiUrlNotDirContextConn", url);
                 return;
             }
-            
+
             dcUrlConn = (DirContextURLConnection) urlConn;
             dcUrlConn.setUseCaches(false);
-            
+
             String type = dcUrlConn.getHeaderField(ResourceAttributes.TYPE);
             if (ResourceAttributes.COLLECTION_TYPE.equals(type)) {
                 // Collection
@@ -1956,7 +1980,7 @@ public class ContextConfig
                     URL dirUrl = new URL(url.toString() + '/' + dir);
                     processAnnotationsJndi(dirUrl, fragment);
                 }
-                
+
             } else {
                 // Single file
                 if (url.getPath().endsWith(".class")) {
@@ -1982,10 +2006,10 @@ public class ContextConfig
             log.error(sm.getString("contextConfig.jndiUrl", url), e);
         }
     }
-    
-    
+
+
     protected void processAnnotationsFile(File file, WebXml fragment) {
-        
+
         if (file.isDirectory()) {
             String[] dirs = file.list();
             for (String dir : dirs) {
@@ -2014,14 +2038,14 @@ public class ContextConfig
 
     protected void processAnnotationsStream(InputStream is, WebXml fragment)
             throws ClassFormatException, IOException {
-        
+
         ClassParser parser = new ClassParser(is, null);
         JavaClass clazz = parser.parse();
-        
+
         checkHandlesTypes(clazz);
-        
+
         String className = clazz.getClassName();
-        
+
         AnnotationEntry[] annotationsEntries = clazz.getAnnotationEntries();
 
         for (AnnotationEntry ae : annotationsEntries) {
@@ -2045,14 +2069,15 @@ public class ContextConfig
      * @param javaClass
      */
     protected void checkHandlesTypes(JavaClass javaClass) {
-        
+
         // Skip this if we can
-        if (typeInitializerMap.size() == 0)
+        if (typeInitializerMap.size() == 0) {
             return;
-        
+        }
+
         // No choice but to load the class
         String className = javaClass.getClassName();
-        
+
         Class<?> clazz = null;
         try {
             clazz = context.getLoader().getClassLoader().loadClass(className);
@@ -2079,9 +2104,9 @@ public class ContextConfig
             // Skip
             return;
         }
-        
+
         boolean match = false;
-        
+
         for (Map.Entry<Class<?>, Set<ServletContainerInitializer>> entry :
                 typeInitializerMap.entrySet()) {
             if (entry.getKey().isAnnotation()) {
@@ -2109,7 +2134,7 @@ public class ContextConfig
         if (!internalForm.startsWith("L")) {
             return internalForm;
         }
-        
+
         // Assume starts with L, ends with ; and uses / rather than .
         return internalForm.substring(1,
                 internalForm.length() - 1).replace('/', '.');
@@ -2132,7 +2157,7 @@ public class ContextConfig
             servletName = className;
         }
         ServletDef servletDef = fragment.getServlets().get(servletName);
-        
+
         boolean isWebXMLservletDef;
         if (servletDef == null) {
             servletDef = new ServletDef();
@@ -2374,7 +2399,7 @@ public class ContextConfig
         String[] result = new String[values.size()];
         return values.toArray(result);
     }
-    
+
     protected Map<String,String> processAnnotationWebInitParams(
             ElementValue ev) {
         Map<String, String> result = new HashMap<String,String>();
@@ -2402,16 +2427,16 @@ public class ContextConfig
         }
         return result;
     }
-    
+
     private class FragmentJarScannerCallback implements JarScannerCallback {
 
         private static final String FRAGMENT_LOCATION =
             "META-INF/web-fragment.xml";
-        private Map<String,WebXml> fragments = new HashMap<String,WebXml>();
-        
+        private final Map<String,WebXml> fragments = new HashMap<String,WebXml>();
+
         @Override
         public void scan(JarURLConnection jarConn) throws IOException {
-            
+
             URL url = jarConn.getURL();
             URL resourceURL = jarConn.getJarFileURL();
             Jar jar = null;
@@ -2456,7 +2481,7 @@ public class ContextConfig
 
             InputStream stream = null;
             WebXml fragment = new WebXml();
-            
+
             try {
                 File fragmentFile = new File(file, FRAGMENT_LOCATION);
                 if (fragmentFile.isFile()) {
@@ -2481,7 +2506,7 @@ public class ContextConfig
                 fragments.put(fragment.getName(), fragment);
             }
         }
-        
+
         public Map<String,WebXml> getFragments() {
             return fragments;
         }

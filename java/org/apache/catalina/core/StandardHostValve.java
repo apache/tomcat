@@ -66,7 +66,7 @@ final class StandardHostValve extends ValveBase {
 
     static {
         STRICT_SERVLET_COMPLIANCE = Globals.STRICT_SERVLET_COMPLIANCE;
-        
+
         String accessSession = System.getProperty(
                 "org.apache.catalina.core.StandardHostValve.ACCESS_SESSION");
         if (accessSession == null) {
@@ -82,15 +82,8 @@ final class StandardHostValve extends ValveBase {
         super(true);
     }
 
+
     // ----------------------------------------------------- Instance Variables
-
-
-    /**
-     * The descriptive information related to this implementation.
-     */
-    private static final String info =
-        "org.apache.catalina.core.StandardHostValve/1.0";
-
 
     /**
      * The string manager for this package.
@@ -99,22 +92,7 @@ final class StandardHostValve extends ValveBase {
         StringManager.getManager(Constants.Package);
 
 
-    // ------------------------------------------------------------- Properties
-
-
-    /**
-     * Return descriptive information about this Valve implementation.
-     */
-    @Override
-    public String getInfo() {
-
-        return (info);
-
-    }
-
-
     // --------------------------------------------------------- Public Methods
-
 
     /**
      * Select the appropriate child Context to process this request,
@@ -147,7 +125,7 @@ final class StandardHostValve extends ValveBase {
             if (Globals.IS_SECURITY_ENABLED) {
                 PrivilegedAction<Void> pa = new PrivilegedSetTccl(
                         context.getLoader().getClassLoader());
-                AccessController.doPrivileged(pa);                
+                AccessController.doPrivileged(pa);
             } else {
                 Thread.currentThread().setContextClassLoader
                         (context.getLoader().getClassLoader());
@@ -160,7 +138,7 @@ final class StandardHostValve extends ValveBase {
         // Don't fire listeners during async processing
         // If a request init listener throws an exception, the request is
         // aborted
-        boolean asyncAtStart = request.isAsync(); 
+        boolean asyncAtStart = request.isAsync();
         if (asyncAtStart || context.fireRequestInitEvent(request)) {
 
             // Ask this Context to process this request
@@ -171,7 +149,7 @@ final class StandardHostValve extends ValveBase {
                 request.setAttribute(RequestDispatcher.ERROR_EXCEPTION, t);
                 throwable(request, response, t);
             }
-    
+
             // If the request was async at the start and an error occurred then
             // the async error handling will kick-in and that will fire the
             // request destroyed event *after* the error handling has taken
@@ -183,16 +161,16 @@ final class StandardHostValve extends ValveBase {
                 if (context.getState().isAvailable()) {
                     // Error page processing
                     response.setSuspended(false);
-    
+
                     Throwable t = (Throwable) request.getAttribute(
                             RequestDispatcher.ERROR_EXCEPTION);
-    
+
                     if (t != null) {
                         throwable(request, response, t);
                     } else {
                         status(request, response);
                     }
-    
+
                     context.fireRequestDestroyEvent(request);
                 }
             }
@@ -208,7 +186,7 @@ final class StandardHostValve extends ValveBase {
         if (Globals.IS_SECURITY_ENABLED) {
             PrivilegedAction<Void> pa = new PrivilegedSetTccl(
                     StandardHostValve.class.getClassLoader());
-            AccessController.doPrivileged(pa);                
+            AccessController.doPrivileged(pa);
         } else {
             Thread.currentThread().setContextClassLoader
                     (StandardHostValve.class.getClassLoader());
@@ -244,7 +222,7 @@ final class StandardHostValve extends ValveBase {
         // Ask this Context to process this request
         context.getPipeline().getFirst().event(request, response, event);
 
-        
+
         // Error page processing
         response.setSuspended(false);
 
@@ -287,16 +265,18 @@ final class StandardHostValve extends ValveBase {
 
         // Handle a custom error page for this status code
         Context context = request.getContext();
-        if (context == null)
+        if (context == null) {
             return;
+        }
 
         /* Only look for error pages when isError() is set.
          * isError() is set when response.sendError() is invoked. This
          * allows custom error pages without relying on default from
          * web.xml.
          */
-        if (!response.isError())
+        if (!response.isError()) {
             return;
+        }
 
         ErrorPage errorPage = context.findErrorPage(statusCode);
         if (errorPage != null) {
@@ -305,8 +285,9 @@ final class StandardHostValve extends ValveBase {
                               Integer.valueOf(statusCode));
 
             String message = response.getMessage();
-            if (message == null)
+            if (message == null) {
                 message = "";
+            }
             request.setAttribute(RequestDispatcher.ERROR_MESSAGE, message);
             request.setAttribute
                 (ApplicationFilterFactory.DISPATCHER_REQUEST_PATH_ATTR,
@@ -316,9 +297,10 @@ final class StandardHostValve extends ValveBase {
 
 
             Wrapper wrapper = request.getWrapper();
-            if (wrapper != null)
+            if (wrapper != null) {
                 request.setAttribute(RequestDispatcher.ERROR_SERVLET_NAME,
                                   wrapper.getName());
+            }
             request.setAttribute(RequestDispatcher.ERROR_REQUEST_URI,
                                  request.getRequestURI());
             if (custom(request, response, errorPage)) {
@@ -348,8 +330,9 @@ final class StandardHostValve extends ValveBase {
     private void throwable(Request request, Response response,
                              Throwable throwable) {
         Context context = request.getContext();
-        if (context == null)
+        if (context == null) {
             return;
+        }
 
         Throwable realError = throwable;
 
@@ -389,9 +372,10 @@ final class StandardHostValve extends ValveBase {
             request.setAttribute(RequestDispatcher.ERROR_EXCEPTION,
                               realError);
             Wrapper wrapper = request.getWrapper();
-            if (wrapper != null)
+            if (wrapper != null) {
                 request.setAttribute(RequestDispatcher.ERROR_SERVLET_NAME,
                                   wrapper.getName());
+            }
             request.setAttribute(RequestDispatcher.ERROR_REQUEST_URI,
                                  request.getRequestURI());
             request.setAttribute(RequestDispatcher.ERROR_EXCEPTION_TYPE,
@@ -432,8 +416,9 @@ final class StandardHostValve extends ValveBase {
     private boolean custom(Request request, Response response,
                              ErrorPage errorPage) {
 
-        if (container.getLogger().isDebugEnabled())
+        if (container.getLogger().isDebugEnabled()) {
             container.getLogger().debug("Processing " + errorPage);
+        }
 
         request.setPathInfo(errorPage.getLocation());
 
@@ -446,7 +431,7 @@ final class StandardHostValve extends ValveBase {
 
             if (response.isCommitted()) {
                 // Response is committed - including the error page is the
-                // best we can do 
+                // best we can do
                 rd.include(request.getRequest(), response.getResponse());
             } else {
                 // Reset the response (keeping the real error code and message)
@@ -483,17 +468,20 @@ final class StandardHostValve extends ValveBase {
     private static ErrorPage findErrorPage
         (Context context, Throwable exception) {
 
-        if (exception == null)
+        if (exception == null) {
             return (null);
+        }
         Class<?> clazz = exception.getClass();
         String name = clazz.getName();
         while (!Object.class.equals(clazz)) {
             ErrorPage errorPage = context.findErrorPage(name);
-            if (errorPage != null)
+            if (errorPage != null) {
                 return (errorPage);
+            }
             clazz = clazz.getSuperclass();
-            if (clazz == null)
+            if (clazz == null) {
                 break;
+            }
             name = clazz.getName();
         }
         return (null);
@@ -503,7 +491,7 @@ final class StandardHostValve extends ValveBase {
 
     private static class PrivilegedSetTccl implements PrivilegedAction<Void> {
 
-        private ClassLoader cl;
+        private final ClassLoader cl;
 
         PrivilegedSetTccl(ClassLoader cl) {
             this.cl = cl;

@@ -183,13 +183,6 @@ public class AccessLogValve extends ValveBase implements AccessLog {
 
 
     /**
-     * The descriptive information about this implementation.
-     */
-    protected static final String info =
-        "org.apache.catalina.valves.AccessLogValve/2.2";
-
-
-    /**
      * enabled this component
      */
     protected boolean enabled = true;
@@ -624,15 +617,6 @@ public class AccessLogValve extends ValveBase implements AccessLog {
      */
     public void setDirectory(String directory) {
         this.directory = directory;
-    }
-
-
-    /**
-     * Return descriptive information about this implementation.
-     */
-    @Override
-    public String getInfo() {
-        return (info);
     }
 
 

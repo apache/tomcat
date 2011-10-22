@@ -45,11 +45,6 @@ import org.apache.tomcat.util.res.StringManager;
 public class StuckThreadDetectionValve extends ValveBase {
 
     /**
-     * The descriptive information related to this implementation.
-     */
-    private static final String info =
-            "org.apache.catalina.valves.StuckThreadDetectionValve/1.0";
-    /**
      * Logger
      */
     private static final Log log = LogFactory.getLog(StuckThreadDetectionValve.class);
@@ -121,14 +116,6 @@ public class StuckThreadDetectionValve extends ValveBase {
                     + threshold
                     + " sec");
         }
-    }
-
-    /**
-     * Return descriptive information about this Valve implementation.
-     */
-    @Override
-    public String getInfo() {
-        return info;
     }
 
     private void notifyStuckThreadDetected(MonitoredThread monitoredThread,

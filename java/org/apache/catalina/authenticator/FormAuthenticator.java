@@ -58,14 +58,8 @@ public class FormAuthenticator
 
     private static final Log log = LogFactory.getLog(FormAuthenticator.class);
 
+
     // ----------------------------------------------------- Instance Variables
-
-
-    /**
-     * Descriptive information about this implementation.
-     */
-    protected static final String info =
-        "org.apache.catalina.authenticator.FormAuthenticator/1.0";
 
     /**
      * Character encoding to use to read the username and password parameters
@@ -81,19 +75,8 @@ public class FormAuthenticator
      */
     protected String landingPage = null;
 
+
     // ------------------------------------------------------------- Properties
-
-
-    /**
-     * Return descriptive information about this Valve implementation.
-     */
-    @Override
-    public String getInfo() {
-
-        return (info);
-
-    }
-
 
     /**
      * Return the character encoding to use to read the username and password.

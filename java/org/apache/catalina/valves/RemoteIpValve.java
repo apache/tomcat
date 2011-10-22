@@ -353,11 +353,6 @@ public class RemoteIpValve extends ValveBase {
     private static final Pattern commaSeparatedValuesPattern = Pattern.compile("\\s*,\\s*");
 
     /**
-     * The descriptive information related to this implementation.
-     */
-    private static final String info = "org.apache.catalina.valves.RemoteIpValve/1.0";
-
-    /**
      * Logger
      */
     private static final Log log = LogFactory.getLog(RemoteIpValve.class);
@@ -492,14 +487,6 @@ public class RemoteIpValve extends ValveBase {
      */
     public void setPortHeader(String portHeader) {
         this.portHeader = portHeader;
-    }
-
-    /**
-     * Return descriptive information about this Valve implementation.
-     */
-    @Override
-    public String getInfo() {
-        return info;
     }
 
     /**
