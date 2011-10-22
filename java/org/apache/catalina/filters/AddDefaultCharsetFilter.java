@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -40,7 +40,7 @@ import org.apache.juli.logging.LogFactory;
  * auto-detect the character set. This may be exploited by an attacker to
  * perform an XSS attack. Internet Explorer has this behaviour by default. Other
  * browsers have an option to enable it.<br/>
- * 
+ *
  * This filter prevents the attack by explicitly setting a character set. Unless
  * the provided character set is explicitly overridden by the user - in which
  * case they deserve everything they get - the browser will adhere to an
@@ -52,7 +52,7 @@ public class AddDefaultCharsetFilter extends FilterBase {
         LogFactory.getLog(AddDefaultCharsetFilter.class);
 
     private static final String DEFAULT_ENCODING = "ISO-8859-1";
-    
+
     private String encoding;
 
     public void setEncoding(String encoding) {
@@ -81,7 +81,7 @@ public class AddDefaultCharsetFilter extends FilterBase {
     @Override
     public void doFilter(ServletRequest request, ServletResponse response,
             FilterChain chain) throws IOException, ServletException {
-        
+
         // Wrap the response
         if (response instanceof HttpServletResponse) {
             ResponseWrapper wrapped =
@@ -99,7 +99,7 @@ public class AddDefaultCharsetFilter extends FilterBase {
     public static class ResponseWrapper extends HttpServletResponseWrapper {
 
         private String encoding;
-        
+
         public ResponseWrapper(HttpServletResponse response, String encoding) {
             super(response);
             this.encoding = encoding;
@@ -107,7 +107,7 @@ public class AddDefaultCharsetFilter extends FilterBase {
 
         @Override
         public void setContentType(String ct) {
-            
+
             if (ct != null && ct.startsWith("text/")) {
                 if (ct.indexOf("charset=") < 0) {
                     super.setContentType(ct + ";charset=" + encoding);

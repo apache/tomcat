@@ -165,7 +165,7 @@ import org.apache.juli.logging.LogFactory;
  * <strong>Regular expression vs. IP address blocks:</strong> <code>mod_remoteip</code> allows to use address blocks (e.g.
  * <code>192.168/16</code>) to configure <code>RemoteIPInternalProxy</code> and <code>RemoteIPTrustedProxy</code> ; as the JVM doesn't have a
  * library similar to <a
- * href="http://apr.apache.org/docs/apr/1.3/group__apr__network__io.html#gb74d21b8898b7c40bf7fd07ad3eb993d">apr_ipsubnet_test</a>, we rely on 
+ * href="http://apr.apache.org/docs/apr/1.3/group__apr__network__io.html#gb74d21b8898b7c40bf7fd07ad3eb993d">apr_ipsubnet_test</a>, we rely on
  * regular expressions.
  * </p>
  * <hr/>
@@ -196,7 +196,7 @@ import org.apache.juli.logging.LogFactory;
  *       &lt;param-value&gt;x-forwarded-proto&lt;/param-value&gt;
  *    &lt;/init-param&gt;
  * &lt;/filter&gt;
- * 
+ *
  * &lt;filter-mapping&gt;
  *    &lt;filter-name&gt;RemoteIpFilter&lt;/filter-name&gt;
  *    &lt;url-pattern&gt;/*&lt;/url-pattern&gt;
@@ -277,7 +277,7 @@ import org.apache.juli.logging.LogFactory;
  *       &lt;param-value&gt;proxy1|proxy2&lt;/param-value&gt;
  *    &lt;/init-param&gt;
  * &lt;/filter&gt;
- * 
+ *
  * &lt;filter-mapping&gt;
  *    &lt;filter-name&gt;RemoteIpFilter&lt;/filter-name&gt;
  *    &lt;url-pattern&gt;/*&lt;/url-pattern&gt;
@@ -338,7 +338,7 @@ import org.apache.juli.logging.LogFactory;
  *       &lt;param-value&gt;proxy1|proxy2&lt;/param-value&gt;
  *    &lt;/init-param&gt;
  * &lt;/filter&gt;
- * 
+ *
  * &lt;filter-mapping&gt;
  *    &lt;filter-name&gt;RemoteIpFilter&lt;/filter-name&gt;
  *    &lt;url-pattern&gt;/*&lt;/url-pattern&gt;
@@ -400,7 +400,7 @@ import org.apache.juli.logging.LogFactory;
  *       &lt;param-value&gt;proxy1|proxy2&lt;/param-value&gt;
  *    &lt;/init-param&gt;
  * &lt;/filter&gt;
- * 
+ *
  * &lt;filter-mapping&gt;
  *    &lt;filter-name&gt;RemoteIpFilter&lt;/filter-name&gt;
  *    &lt;url-pattern&gt;/*&lt;/url-pattern&gt;
@@ -439,7 +439,7 @@ import org.apache.juli.logging.LogFactory;
  */
 public class RemoteIpFilter implements Filter {
     public static class XForwardedRequest extends HttpServletRequestWrapper {
-        
+
         static final ThreadLocal<SimpleDateFormat[]> threadLocalDateFormats = new ThreadLocal<SimpleDateFormat[]>() {
             @Override
             protected SimpleDateFormat[] initialValue() {
@@ -448,22 +448,22 @@ public class RemoteIpFilter implements Filter {
                     new SimpleDateFormat("EEEEEE, dd-MMM-yy HH:mm:ss zzz", Locale.US),
                     new SimpleDateFormat("EEE MMMM d HH:mm:ss yyyy", Locale.US)
                 };
-                
+
             }
         };
-        
+
         protected Map<String, List<String>> headers;
-        
+
         protected int localPort;
 
         protected String remoteAddr;
-        
+
         protected String remoteHost;
-        
+
         protected String scheme;
-        
+
         protected boolean secure;
-        
+
         protected int serverPort;
 
         public XForwardedRequest(HttpServletRequest request) {
@@ -474,14 +474,14 @@ public class RemoteIpFilter implements Filter {
             this.scheme = request.getScheme();
             this.secure = request.isSecure();
             this.serverPort = request.getServerPort();
-            
+
             headers = new HashMap<String, List<String>>();
             for (Enumeration<String> headerNames = request.getHeaderNames(); headerNames.hasMoreElements();) {
                 String header = headerNames.nextElement();
                 headers.put(header, Collections.list(request.getHeaders(header)));
             }
         }
-        
+
         @Override
         public long getDateHeader(String name) {
             String value = getHeader(name);
@@ -503,7 +503,7 @@ public class RemoteIpFilter implements Filter {
             }
             return date.getTime();
         }
-        
+
         @Override
         public String getHeader(String name) {
             Map.Entry<String, List<String>> header = getHeaderEntry(name);
@@ -512,7 +512,7 @@ public class RemoteIpFilter implements Filter {
             }
             return header.getValue().get(0);
         }
-        
+
         protected Map.Entry<String, List<String>> getHeaderEntry(String name) {
             for (Map.Entry<String, List<String>> entry : headers.entrySet()) {
                 if (entry.getKey().equalsIgnoreCase(name)) {
@@ -521,12 +521,12 @@ public class RemoteIpFilter implements Filter {
             }
             return null;
         }
-        
+
         @Override
         public Enumeration<String> getHeaderNames() {
             return Collections.enumeration(headers.keySet());
         }
-        
+
         @Override
         public Enumeration<String> getHeaders(String name) {
             Map.Entry<String, List<String>> header = getHeaderEntry(name);
@@ -535,7 +535,7 @@ public class RemoteIpFilter implements Filter {
             }
             return Collections.enumeration(header.getValue());
         }
-        
+
         @Override
         public int getIntHeader(String name) {
             String value = getHeader(name);
@@ -544,44 +544,44 @@ public class RemoteIpFilter implements Filter {
             }
             return Integer.parseInt(value);
         }
-        
+
         @Override
         public int getLocalPort() {
             return localPort;
         }
-        
+
         @Override
         public String getRemoteAddr() {
             return this.remoteAddr;
         }
-        
+
         @Override
         public String getRemoteHost() {
             return this.remoteHost;
         }
-        
+
         @Override
         public String getScheme() {
             return scheme;
         }
-        
+
         @Override
         public int getServerPort() {
             return serverPort;
         }
-        
+
         @Override
         public boolean isSecure() {
             return secure;
         }
-        
+
         public void removeHeader(String name) {
             Map.Entry<String, List<String>> header = getHeaderEntry(name);
             if (header != null) {
                 headers.remove(header.getKey());
             }
         }
-        
+
         public void setHeader(String name, String value) {
             List<String> values = Arrays.asList(value);
             Map.Entry<String, List<String>> header = getHeaderEntry(name);
@@ -590,9 +590,9 @@ public class RemoteIpFilter implements Filter {
             } else {
                 header.setValue(values);
             }
-            
+
         }
-        
+
         public void setLocalPort(int localPort) {
             this.localPort = localPort;
         }
@@ -600,64 +600,64 @@ public class RemoteIpFilter implements Filter {
         public void setRemoteAddr(String remoteAddr) {
             this.remoteAddr = remoteAddr;
         }
-        
+
         public void setRemoteHost(String remoteHost) {
             this.remoteHost = remoteHost;
         }
-        
+
         public void setScheme(String scheme) {
             this.scheme = scheme;
         }
-        
+
         public void setSecure(boolean secure) {
             this.secure = secure;
         }
-        
+
         public void setServerPort(int serverPort) {
             this.serverPort = serverPort;
         }
     }
-    
+
     /**
      * {@link Pattern} for a comma delimited string that support whitespace characters
      */
     private static final Pattern commaSeparatedValuesPattern = Pattern.compile("\\s*,\\s*");
-    
+
     protected static final String HTTP_SERVER_PORT_PARAMETER = "httpServerPort";
 
     protected static final String HTTPS_SERVER_PORT_PARAMETER = "httpsServerPort";
-    
+
     protected static final String INTERNAL_PROXIES_PARAMETER = "internalProxies";
-    
+
     /**
      * Logger
      */
     private static final Log log = LogFactory.getLog(RemoteIpFilter.class);
-    
+
     protected static final String PROTOCOL_HEADER_PARAMETER = "protocolHeader";
-    
+
     protected static final String PROTOCOL_HEADER_HTTPS_VALUE_PARAMETER = "protocolHeaderHttpsValue";
-    
+
     protected static final String PORT_HEADER_PARAMETER = "portHeader";
 
     protected static final String CHANGE_LOCAL_PORT_PARAMETER = "changeLocalPort";
 
     protected static final String PROXIES_HEADER_PARAMETER = "proxiesHeader";
-    
+
     protected static final String REMOTE_IP_HEADER_PARAMETER = "remoteIpHeader";
-    
+
     protected static final String TRUSTED_PROXIES_PARAMETER = "trustedProxies";
-    
+
     /**
      * Convert a given comma delimited list of regular expressions into an array of String
-     * 
+     *
      * @return array of patterns (non <code>null</code>)
      */
     protected static String[] commaDelimitedListToStringArray(String commaDelimitedStrings) {
         return (commaDelimitedStrings == null || commaDelimitedStrings.length() == 0) ? new String[0] : commaSeparatedValuesPattern
             .split(commaDelimitedStrings);
     }
-    
+
     /**
      * Convert an array of strings in a comma delimited string
      */
@@ -677,7 +677,7 @@ public class RemoteIpFilter implements Filter {
         }
         return result.toString();
     }
-    
+
     /**
      * @see #setHttpServerPort(int)
      */
@@ -696,28 +696,28 @@ public class RemoteIpFilter implements Filter {
             "192\\.168\\.\\d{1,3}\\.\\d{1,3}|" +
             "169\\.254\\.\\d{1,3}\\.\\d{1,3}|" +
             "127\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}");
-    
+
     /**
      * @see #setProtocolHeader(String)
      */
     private String protocolHeader = null;
-    
+
     private String protocolHeaderHttpsValue = "https";
-    
+
     private String portHeader = null;
-    
+
     private boolean changeLocalPort = false;
 
     /**
      * @see #setProxiesHeader(String)
      */
     private String proxiesHeader = "X-Forwarded-By";
-    
+
     /**
      * @see #setRemoteIpHeader(String)
      */
     private String remoteIpHeader = "X-Forwarded-For";
-    
+
     /**
      * @see #setRequestAttributesEnabled(boolean)
      */
@@ -727,21 +727,21 @@ public class RemoteIpFilter implements Filter {
      * @see #setTrustedProxies(String)
      */
     private Pattern trustedProxies = null;
-    
+
     @Override
     public void destroy() {
         // NOOP
     }
-    
+
     public void doFilter(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException, ServletException {
-        
+
         if (internalProxies != null &&
                 internalProxies.matcher(request.getRemoteAddr()).matches()) {
             String remoteIp = null;
             // In java 6, proxiesHeaderValue should be declared as a java.util.Deque
             LinkedList<String> proxiesHeaderValue = new LinkedList<String>();
             StringBuilder concatRemoteIpHeaderValue = new StringBuilder();
-            
+
             for (Enumeration<String> e = request.getHeaders(remoteIpHeader); e.hasMoreElements();) {
                 if (concatRemoteIpHeaderValue.length() > 0) {
                     concatRemoteIpHeaderValue.append(", ");
@@ -772,13 +772,13 @@ public class RemoteIpFilter implements Filter {
                 String currentRemoteIp = remoteIpHeaderValue[idx];
                 newRemoteIpHeaderValue.addFirst(currentRemoteIp);
             }
-            
+
             XForwardedRequest xRequest = new XForwardedRequest(request);
             if (remoteIp != null) {
-                
+
                 xRequest.setRemoteAddr(remoteIp);
                 xRequest.setRemoteHost(remoteIp);
-                
+
                 if (proxiesHeaderValue.size() == 0) {
                     xRequest.removeHeader(proxiesHeader);
                 } else {
@@ -792,7 +792,7 @@ public class RemoteIpFilter implements Filter {
                     xRequest.setHeader(remoteIpHeader, commaDelimitedRemoteIpHeaderValue);
                 }
             }
-            
+
             if (protocolHeader != null) {
                 String protocolHeaderValue = request.getHeader(protocolHeader);
                 if (protocolHeaderValue == null) {
@@ -807,7 +807,7 @@ public class RemoteIpFilter implements Filter {
                     setPorts(xRequest, httpServerPort);
                 }
             }
-            
+
             if (log.isDebugEnabled()) {
                 log.debug("Incoming request " + request.getRequestURI() + " with originalRemoteAddr '" + request.getRemoteAddr()
                         + "', originalRemoteHost='" + request.getRemoteHost() + "', originalSecure='" + request.isSecure()
@@ -836,9 +836,9 @@ public class RemoteIpFilter implements Filter {
             }
             chain.doFilter(request, response);
         }
-        
+
     }
-    
+
     private void setPorts(XForwardedRequest xrequest, int defaultPort) {
         int port = defaultPort;
         if (getPortHeader() != null) {
@@ -869,39 +869,39 @@ public class RemoteIpFilter implements Filter {
             chain.doFilter(request, response);
         }
     }
-    
+
     public boolean isChangeLocalPort() {
         return changeLocalPort;
     }
-    
+
     public int getHttpsServerPort() {
         return httpsServerPort;
     }
-    
+
     public Pattern getInternalProxies() {
         return internalProxies;
     }
-    
+
     public String getProtocolHeader() {
         return protocolHeader;
     }
-    
+
     public String getPortHeader() {
         return portHeader;
     }
-    
+
     public String getProtocolHeaderHttpsValue() {
         return protocolHeaderHttpsValue;
     }
-    
+
     public String getProxiesHeader() {
         return proxiesHeader;
     }
-    
+
     public String getRemoteIpHeader() {
         return remoteIpHeader;
     }
-    
+
     /**
      * @see #setRequestAttributesEnabled(boolean)
      * @return <code>true</code> if the attributes will be logged, otherwise
@@ -914,41 +914,41 @@ public class RemoteIpFilter implements Filter {
     public Pattern getTrustedProxies() {
         return trustedProxies;
     }
-    
+
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
         if (filterConfig.getInitParameter(INTERNAL_PROXIES_PARAMETER) != null) {
             setInternalProxies(filterConfig.getInitParameter(INTERNAL_PROXIES_PARAMETER));
         }
-        
+
         if (filterConfig.getInitParameter(PROTOCOL_HEADER_PARAMETER) != null) {
             setProtocolHeader(filterConfig.getInitParameter(PROTOCOL_HEADER_PARAMETER));
         }
-        
+
         if (filterConfig.getInitParameter(PROTOCOL_HEADER_HTTPS_VALUE_PARAMETER) != null) {
             setProtocolHeaderHttpsValue(filterConfig.getInitParameter(PROTOCOL_HEADER_HTTPS_VALUE_PARAMETER));
         }
-        
+
         if (filterConfig.getInitParameter(PORT_HEADER_PARAMETER) != null) {
             setPortHeader(filterConfig.getInitParameter(PORT_HEADER_PARAMETER));
         }
-        
+
         if (filterConfig.getInitParameter(CHANGE_LOCAL_PORT_PARAMETER) != null) {
             setChangeLocalPort(Boolean.parseBoolean(filterConfig.getInitParameter(CHANGE_LOCAL_PORT_PARAMETER)));
         }
-        
+
         if (filterConfig.getInitParameter(PROXIES_HEADER_PARAMETER) != null) {
             setProxiesHeader(filterConfig.getInitParameter(PROXIES_HEADER_PARAMETER));
         }
-        
+
         if (filterConfig.getInitParameter(REMOTE_IP_HEADER_PARAMETER) != null) {
             setRemoteIpHeader(filterConfig.getInitParameter(REMOTE_IP_HEADER_PARAMETER));
         }
-        
+
         if (filterConfig.getInitParameter(TRUSTED_PROXIES_PARAMETER) != null) {
             setTrustedProxies(filterConfig.getInitParameter(TRUSTED_PROXIES_PARAMETER));
         }
-        
+
         if (filterConfig.getInitParameter(HTTP_SERVER_PORT_PARAMETER) != null) {
             try {
                 setHttpServerPort(Integer.parseInt(filterConfig.getInitParameter(HTTP_SERVER_PORT_PARAMETER)));
@@ -956,7 +956,7 @@ public class RemoteIpFilter implements Filter {
                 throw new NumberFormatException("Illegal " + HTTP_SERVER_PORT_PARAMETER + " : " + e.getMessage());
             }
         }
-        
+
         if (filterConfig.getInitParameter(HTTPS_SERVER_PORT_PARAMETER) != null) {
             try {
                 setHttpsServerPort(Integer.parseInt(filterConfig.getInitParameter(HTTPS_SERVER_PORT_PARAMETER)));
@@ -965,7 +965,7 @@ public class RemoteIpFilter implements Filter {
             }
         }
     }
-    
+
     /**
      * <p>
      * If <code>true</code>, the return values for both {@link
@@ -980,11 +980,11 @@ public class RemoteIpFilter implements Filter {
     public void setChangeLocalPort(boolean changeLocalPort) {
         this.changeLocalPort = changeLocalPort;
     }
-    
+
     /**
      * <p>
      * Server Port value if the {@link #protocolHeader} indicates HTTP (i.e. {@link #protocolHeader} is not null and
-     * has a value different of {@link #protocolHeaderHttpsValue}). 
+     * has a value different of {@link #protocolHeaderHttpsValue}).
      * </p>
      * <p>
      * Default value : 80
@@ -993,7 +993,7 @@ public class RemoteIpFilter implements Filter {
     public void setHttpServerPort(int httpServerPort) {
         this.httpServerPort = httpServerPort;
     }
-    
+
     /**
      * <p>
      * Server Port value if the {@link #protocolHeader} indicates HTTPS
@@ -1005,7 +1005,7 @@ public class RemoteIpFilter implements Filter {
     public void setHttpsServerPort(int httpsServerPort) {
         this.httpsServerPort = httpsServerPort;
     }
-    
+
     /**
      * <p>
      * Regular expression that defines the internal proxies.
@@ -1021,7 +1021,7 @@ public class RemoteIpFilter implements Filter {
             this.internalProxies = Pattern.compile(internalProxies);
         }
     }
-    
+
     /**
      * <p>
      * Header that holds the incoming port, usally named
@@ -1035,7 +1035,7 @@ public class RemoteIpFilter implements Filter {
     public void setPortHeader(String portHeader) {
         this.portHeader = portHeader;
     }
-    
+
     /**
      * <p>
      * Header that holds the incoming protocol, usally named <code>X-Forwarded-Proto</code>. If <code>null</code>, request.scheme and
@@ -1048,7 +1048,7 @@ public class RemoteIpFilter implements Filter {
     public void setProtocolHeader(String protocolHeader) {
         this.protocolHeader = protocolHeader;
     }
-    
+
     /**
      * <p>
      * Case insensitive value of the protocol header to indicate that the incoming http request uses HTTPS.
@@ -1060,7 +1060,7 @@ public class RemoteIpFilter implements Filter {
     public void setProtocolHeaderHttpsValue(String protocolHeaderHttpsValue) {
         this.protocolHeaderHttpsValue = protocolHeaderHttpsValue;
     }
-    
+
     /**
      * <p>
      * The proxiesHeader directive specifies a header into which mod_remoteip will collect a list of all of the intermediate client IP
@@ -1080,7 +1080,7 @@ public class RemoteIpFilter implements Filter {
     public void setProxiesHeader(String proxiesHeader) {
         this.proxiesHeader = proxiesHeader;
     }
-    
+
     /**
      * <p>
      * Name of the http header from which the remote ip is extracted.
@@ -1095,13 +1095,13 @@ public class RemoteIpFilter implements Filter {
     public void setRemoteIpHeader(String remoteIpHeader) {
         this.remoteIpHeader = remoteIpHeader;
     }
-    
+
     /**
      * Should this filter set request attributes for IP address, Hostname,
      * protocol and port used for the request? This are typically used in
      * conjunction with an {@link AccessLog} which will otherwise log the
      * original values. Default is <code>true</code>.
-     * 
+     *
      * The attributes set are:
      * <ul>
      * <li>org.apache.catalina.RemoteAddr</li>
@@ -1109,10 +1109,10 @@ public class RemoteIpFilter implements Filter {
      * <li>org.apache.catalina.Protocol</li>
      * <li>org.apache.catalina.ServerPost</li>
      * </ul>
-     * 
+     *
      * @param requestAttributesEnabled  <code>true</code> causes the attributes
      *                                  to be set, <code>false</code> disables
-     *                                  the setting of the attributes. 
+     *                                  the setting of the attributes.
      */
     public void setRequestAttributesEnabled(boolean requestAttributesEnabled) {
         this.requestAttributesEnabled = requestAttributesEnabled;
