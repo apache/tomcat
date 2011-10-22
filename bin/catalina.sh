@@ -494,7 +494,7 @@ elif [ "$1" = "configtest" ] ; then
       -Dcatalina.base=\"$CATALINA_BASE\" \
       -Dcatalina.home=\"$CATALINA_HOME\" \
       -Djava.io.tmpdir=\"$CATALINA_TMPDIR\" \
-      org.apache.catalina.startup.Bootstrap configtest 
+      org.apache.catalina.startup.Bootstrap configtest
     result=$?
     if [ $result -ne 0 ]; then
         echo "Configuration error detected!"
