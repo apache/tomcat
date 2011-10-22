@@ -75,18 +75,18 @@ public class AjpProcessor extends AbstractAjpProcessor<Socket> {
      */
     protected SocketWrapper<Socket> socket;
 
-    
+
     /**
      * Input stream.
      */
     protected InputStream input;
-    
-    
+
+
     /**
      * Output stream.
      */
     protected OutputStream output;
-    
+
 
     // --------------------------------------------------------- Public Methods
 
@@ -209,7 +209,7 @@ public class AjpProcessor extends AbstractAjpProcessor<Socket> {
                     error = true;
                 }
             }
-            
+
             if (isAsync() && !error) {
                 break;
             }
@@ -234,7 +234,7 @@ public class AjpProcessor extends AbstractAjpProcessor<Socket> {
             rp.setStage(org.apache.coyote.Constants.STAGE_KEEPALIVE);
             recycle(false);
         }
-        
+
         rp.setStage(org.apache.coyote.Constants.STAGE_ENDED);
 
         if (isAsync() && !error && !endpoint.isPaused()) {
@@ -244,7 +244,7 @@ public class AjpProcessor extends AbstractAjpProcessor<Socket> {
             output = null;
             return SocketState.CLOSED;
         }
-        
+
     }
 
     @Override
@@ -313,7 +313,7 @@ public class AjpProcessor extends AbstractAjpProcessor<Socket> {
                 throw new IOException(sm.getString("ajpprotocol.failedread"));
             }
         }
-        
+
         return true;
 
     }

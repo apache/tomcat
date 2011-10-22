@@ -103,7 +103,7 @@ public abstract class AbstractOutputBuffer<S> implements OutputBuffer{
      */
     protected static final StringManager sm =
         StringManager.getManager(Constants.Package);
-    
+
     /**
      * Logger.
      */
@@ -118,7 +118,7 @@ public abstract class AbstractOutputBuffer<S> implements OutputBuffer{
      */
     public void addFilter(OutputFilter filter) {
 
-        OutputFilter[] newFilterLibrary = 
+        OutputFilter[] newFilterLibrary =
             new OutputFilter[filterLibrary.length + 1];
         for (int i = 0; i < filterLibrary.length; i++) {
             newFilterLibrary[i] = filterLibrary[i];
@@ -168,19 +168,19 @@ public abstract class AbstractOutputBuffer<S> implements OutputBuffer{
 
     /**
      * Write the contents of a byte chunk.
-     * 
+     *
      * @param chunk byte chunk
      * @return number of bytes written
      * @throws IOException an underlying I/O error occurred
      */
     @Override
-    public int doWrite(ByteChunk chunk, Response res) 
+    public int doWrite(ByteChunk chunk, Response res)
         throws IOException {
 
         if (!committed) {
 
             // Send the connector a request for commit. The connector should
-            // then validate the headers, send them (using sendHeaders) and 
+            // then validate the headers, send them (using sendHeaders) and
             // set the filters accordingly.
             response.action(ActionCode.COMMIT, null);
 
@@ -209,7 +209,7 @@ public abstract class AbstractOutputBuffer<S> implements OutputBuffer{
 
     /**
      * Flush the response.
-     * 
+     *
      * @throws IOException an underlying I/O error occurred
      */
     public void flush()
@@ -218,12 +218,12 @@ public abstract class AbstractOutputBuffer<S> implements OutputBuffer{
         if (!committed) {
 
             // Send the connector a request for commit. The connector should
-            // then validate the headers, send them (using sendHeader) and 
+            // then validate the headers, send them (using sendHeader) and
             // set the filters accordingly.
             response.action(ActionCode.COMMIT, null);
 
         }
-        
+
         // go through the filters and if there is gzip filter
         // invoke it to flush
         for (int i = 0; i <= lastActiveFilter; i++) {
@@ -237,10 +237,10 @@ public abstract class AbstractOutputBuffer<S> implements OutputBuffer{
             }
         }
     }
-    
+
     /**
      * Reset current response.
-     * 
+     *
      * @throws IllegalStateException if the response has already been committed
      */
     public void reset() {
@@ -252,9 +252,9 @@ public abstract class AbstractOutputBuffer<S> implements OutputBuffer{
         response.recycle();
 
     }
-    
+
     /**
-     * Recycle the output buffer. This should be called when closing the 
+     * Recycle the output buffer. This should be called when closing the
      * connection.
      */
     public void recycle() {
@@ -270,10 +270,10 @@ public abstract class AbstractOutputBuffer<S> implements OutputBuffer{
         finished = false;
 
     }
-    
+
     /**
      * End processing of current HTTP request.
-     * Note: All bytes of the current request should have been already 
+     * Note: All bytes of the current request should have been already
      * consumed. This method only resets all the pointers so that we are ready
      * to parse the next HTTP request.
      */
@@ -293,10 +293,10 @@ public abstract class AbstractOutputBuffer<S> implements OutputBuffer{
         finished = false;
         byteCount = 0;
     }
-    
+
     /**
      * End request.
-     * 
+     *
      * @throws IOException an underlying I/O error occurred
      */
     public void endRequest()
@@ -305,7 +305,7 @@ public abstract class AbstractOutputBuffer<S> implements OutputBuffer{
         if (!committed) {
 
             // Send the connector a request for commit. The connector should
-            // then validate the headers, send them (using sendHeader) and 
+            // then validate the headers, send them (using sendHeader) and
             // set the filters accordingly.
             response.action(ActionCode.COMMIT, null);
 
@@ -319,12 +319,12 @@ public abstract class AbstractOutputBuffer<S> implements OutputBuffer{
         finished = true;
     }
 
-    
+
     public abstract void init(SocketWrapper<S> socketWrapper,
             AbstractEndpoint endpoint) throws IOException;
 
     public abstract void sendAck() throws IOException;
-    
+
     protected abstract void commit() throws IOException;
 
 
@@ -362,7 +362,7 @@ public abstract class AbstractOutputBuffer<S> implements OutputBuffer{
             message = response.getMessage();
         }
         if (message == null) {
-            write(HttpMessages.getMessage(status)); 
+            write(HttpMessages.getMessage(status));
         } else {
             write(message);
         }
@@ -384,12 +384,12 @@ public abstract class AbstractOutputBuffer<S> implements OutputBuffer{
             buf[pos++] = Constants.LF;
         }
 
-    } 
+    }
 
 
     /**
      * Send a header.
-     * 
+     *
      * @param name Header name
      * @param value Header value
      */
@@ -414,13 +414,13 @@ public abstract class AbstractOutputBuffer<S> implements OutputBuffer{
         buf[pos++] = Constants.LF;
 
     }
-    
-    
+
+
     /**
-     * This method will write the contents of the specified message bytes 
+     * This method will write the contents of the specified message bytes
      * buffer to the output stream, without filtering. This method is meant to
      * be used to write the response header.
-     * 
+     *
      * @param mb data to be written
      */
     protected void write(MessageBytes mb) {
@@ -439,10 +439,10 @@ public abstract class AbstractOutputBuffer<S> implements OutputBuffer{
 
 
     /**
-     * This method will write the contents of the specified message bytes 
+     * This method will write the contents of the specified message bytes
      * buffer to the output stream, without filtering. This method is meant to
      * be used to write the response header.
-     * 
+     *
      * @param bc data to be written
      */
     protected void write(ByteChunk bc) {
@@ -456,10 +456,10 @@ public abstract class AbstractOutputBuffer<S> implements OutputBuffer{
 
 
     /**
-     * This method will write the contents of the specified char 
+     * This method will write the contents of the specified char
      * buffer to the output stream, without filtering. This method is meant to
      * be used to write the response header.
-     * 
+     *
      * @param cc data to be written
      */
     protected void write(CharChunk cc) {
@@ -485,10 +485,10 @@ public abstract class AbstractOutputBuffer<S> implements OutputBuffer{
 
 
     /**
-     * This method will write the contents of the specified byte 
+     * This method will write the contents of the specified byte
      * buffer to the output stream, without filtering. This method is meant to
      * be used to write the response header.
-     * 
+     *
      * @param b data to be written
      */
     public void write(byte[] b) {
@@ -501,10 +501,10 @@ public abstract class AbstractOutputBuffer<S> implements OutputBuffer{
 
 
     /**
-     * This method will write the contents of the specified String to the 
-     * output stream, without filtering. This method is meant to be used to 
+     * This method will write the contents of the specified String to the
+     * output stream, without filtering. This method is meant to be used to
      * write the response header.
-     * 
+     *
      * @param s data to be written
      */
     protected void write(String s) {
@@ -532,10 +532,10 @@ public abstract class AbstractOutputBuffer<S> implements OutputBuffer{
 
 
     /**
-     * This method will print the specified integer to the output stream, 
-     * without filtering. This method is meant to be used to write the 
+     * This method will print the specified integer to the output stream,
+     * without filtering. This method is meant to be used to write the
      * response header.
-     * 
+     *
      * @param i data to be written
      */
     protected void write(int i) {

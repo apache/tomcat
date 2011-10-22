@@ -21,7 +21,7 @@ import org.apache.tomcat.util.net.SocketWrapper;
 import org.apache.tomcat.util.res.StringManager;
 
 public abstract class AbstractAjpProtocol extends AbstractProtocol {
-    
+
     /**
      * The string manager for this package.
      */
@@ -38,9 +38,9 @@ public abstract class AbstractAjpProtocol extends AbstractProtocol {
 
     // ------------------------------------------------- AJP specific properties
     // ------------------------------------------ managed in the ProtocolHandler
-    
+
     /**
-     * Should authentication be done in the native webserver layer, 
+     * Should authentication be done in the native webserver layer,
      * or in the Servlet container ?
      */
     protected boolean tomcatAuthentication = true;
@@ -71,7 +71,7 @@ public abstract class AbstractAjpProtocol extends AbstractProtocol {
             this.packetSize = packetSize;
         }
     }
-    
+
     protected abstract static class AbstractAjpConnectionHandler<S,P extends AbstractAjpProcessor<S>>
             extends AbstractConnectionHandler<S, P> {
 

@@ -31,7 +31,7 @@ import org.apache.tomcat.util.net.SocketWrapper;
 
 /**
  * Output buffer.
- * 
+ *
  * @author <a href="mailto:remm@apache.org">Remy Maucherat</a>
  */
 public class InternalAprOutputBuffer extends AbstractOutputBuffer<Long> {
@@ -82,7 +82,7 @@ public class InternalAprOutputBuffer extends AbstractOutputBuffer<Long> {
      */
     private ByteBuffer bbuf = null;
 
-    
+
     // --------------------------------------------------------- Public Methods
 
     @Override
@@ -96,7 +96,7 @@ public class InternalAprOutputBuffer extends AbstractOutputBuffer<Long> {
 
     /**
      * Flush the response.
-     * 
+     *
      * @throws IOException an underlying I/O error occurred
      */
     @Override
@@ -111,21 +111,21 @@ public class InternalAprOutputBuffer extends AbstractOutputBuffer<Long> {
 
 
     /**
-     * Recycle the output buffer. This should be called when closing the 
+     * Recycle the output buffer. This should be called when closing the
      * connection.
      */
     @Override
     public void recycle() {
 
         super.recycle();
-        
+
         bbuf.clear();
     }
 
 
     /**
      * End request.
-     * 
+     *
      * @throws IOException an underlying I/O error occurred
      */
     @Override
@@ -135,7 +135,7 @@ public class InternalAprOutputBuffer extends AbstractOutputBuffer<Long> {
         if (!committed) {
 
             // Send the connector a request for commit. The connector should
-            // then validate the headers, send them (using sendHeader) and 
+            // then validate the headers, send them (using sendHeader) and
             // set the filters accordingly.
             response.action(ActionCode.COMMIT, null);
 
@@ -177,7 +177,7 @@ public class InternalAprOutputBuffer extends AbstractOutputBuffer<Long> {
 
     /**
      * Commit the response.
-     * 
+     *
      * @throws IOException an underlying I/O error occurred
      */
     @Override
@@ -223,7 +223,7 @@ public class InternalAprOutputBuffer extends AbstractOutputBuffer<Long> {
          * Write chunk.
          */
         @Override
-        public int doWrite(ByteChunk chunk, Response res) 
+        public int doWrite(ByteChunk chunk, Response res)
             throws IOException {
 
             int len = chunk.getLength();

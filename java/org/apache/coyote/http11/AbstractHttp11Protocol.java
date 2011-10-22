@@ -44,7 +44,7 @@ public abstract class AbstractHttp11Protocol extends AbstractProtocol {
         this.socketBuffer = socketBuffer;
     }
 
-    
+
     /**
      * Maximum size of the post which will be saved when processing certain
      * requests, such as a POST.
@@ -52,7 +52,7 @@ public abstract class AbstractHttp11Protocol extends AbstractProtocol {
     private int maxSavePostSize = 4 * 1024;
     public int getMaxSavePostSize() { return maxSavePostSize; }
     public void setMaxSavePostSize(int valueI) { maxSavePostSize = valueI; }
-    
+
 
     /**
      * Maximum size of the HTTP message header.
@@ -61,10 +61,10 @@ public abstract class AbstractHttp11Protocol extends AbstractProtocol {
     public int getMaxHttpHeaderSize() { return maxHttpHeaderSize; }
     public void setMaxHttpHeaderSize(int valueI) { maxHttpHeaderSize = valueI; }
 
-    
+
     /**
      * Specifies a different (usually  longer) connection timeout during data
-     * upload. 
+     * upload.
      */
     private int connectionUploadTimeout = 300000;
     public int getConnectionUploadTimeout() { return connectionUploadTimeout; }
@@ -159,25 +159,25 @@ public abstract class AbstractHttp11Protocol extends AbstractProtocol {
      */
     private boolean secure;
     public boolean getSecure() { return secure; }
-    public void setSecure(boolean b) { 
-        secure = b;         
+    public void setSecure(boolean b) {
+        secure = b;
     }
-    
+
 
     // ------------------------------------------------ HTTP specific properties
     // ------------------------------------------ passed through to the EndPoint
-    
+
     public boolean isSSLEnabled() { return endpoint.isSSLEnabled();}
     public void setSSLEnabled(boolean SSLEnabled) {
         endpoint.setSSLEnabled(SSLEnabled);
-    }    
+    }
 
 
     /**
-     * Maximum number of requests which can be performed over a keepalive 
+     * Maximum number of requests which can be performed over a keepalive
      * connection. The default is the same as for Apache HTTP Server.
      */
-    public int getMaxKeepAliveRequests() { 
+    public int getMaxKeepAliveRequests() {
         return endpoint.getMaxKeepAliveRequests();
     }
     public void setMaxKeepAliveRequests(int mkar) {

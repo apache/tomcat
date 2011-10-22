@@ -172,7 +172,7 @@ public abstract class AbstractInputBuffer<S> implements InputBuffer{
 
         // FIXME: Check for null ?
 
-        InputFilter[] newFilterLibrary = 
+        InputFilter[] newFilterLibrary =
             new InputFilter[filterLibrary.length + 1];
         for (int i = 0; i < filterLibrary.length; i++) {
             newFilterLibrary[i] = filterLibrary[i];
@@ -227,10 +227,10 @@ public abstract class AbstractInputBuffer<S> implements InputBuffer{
 
     public abstract boolean parseRequestLine(boolean useAvailableDataOnly)
         throws IOException;
-    
+
     public abstract boolean parseHeaders() throws IOException;
-    
-    protected abstract boolean fill(boolean block) throws IOException; 
+
+    protected abstract boolean fill(boolean block) throws IOException;
 
     protected abstract void init(SocketWrapper<S> socketWrapper,
             AbstractEndpoint endpoint) throws IOException;
@@ -240,7 +240,7 @@ public abstract class AbstractInputBuffer<S> implements InputBuffer{
 
 
     /**
-     * Recycle the input buffer. This should be called when closing the 
+     * Recycle the input buffer. This should be called when closing the
      * connection.
      */
     public void recycle() {
@@ -259,7 +259,7 @@ public abstract class AbstractInputBuffer<S> implements InputBuffer{
 
     /**
      * End processing of current HTTP request.
-     * Note: All bytes of the current request should have been already 
+     * Note: All bytes of the current request should have been already
      * consumed. This method only resets all the pointers so that we are ready
      * to parse the next HTTP request.
      */
@@ -297,7 +297,7 @@ public abstract class AbstractInputBuffer<S> implements InputBuffer{
 
     /**
      * End request (consumes leftover bytes).
-     * 
+     *
      * @throws IOException an underlying I/O error occurred
      */
     public void endRequest()
@@ -309,7 +309,7 @@ public abstract class AbstractInputBuffer<S> implements InputBuffer{
         }
 
     }
-    
+
     // ---------------------------------------------------- InputBuffer Methods
 
 
@@ -317,7 +317,7 @@ public abstract class AbstractInputBuffer<S> implements InputBuffer{
      * Read some bytes.
      */
     @Override
-    public int doRead(ByteChunk chunk, Request req) 
+    public int doRead(ByteChunk chunk, Request req)
         throws IOException {
 
         if (lastActiveFilter == -1)

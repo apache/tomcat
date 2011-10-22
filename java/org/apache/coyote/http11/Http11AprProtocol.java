@@ -70,10 +70,10 @@ public class Http11AprProtocol extends AbstractHttp11Protocol {
 
     public void setPollerThreadCount(int pollerThreadCount) { ((AprEndpoint)endpoint).setPollerThreadCount(pollerThreadCount); }
     public int getPollerThreadCount() { return ((AprEndpoint)endpoint).getPollerThreadCount(); }
-    
+
     public int getSendfileSize() { return ((AprEndpoint)endpoint).getSendfileSize(); }
     public void setSendfileSize(int sendfileSize) { ((AprEndpoint)endpoint).setSendfileSize(sendfileSize); }
-    
+
     public void setSendfileThreadCount(int sendfileThreadCount) { ((AprEndpoint)endpoint).setSendfileThreadCount(sendfileThreadCount); }
     public int getSendfileThreadCount() { return ((AprEndpoint)endpoint).getSendfileThreadCount(); }
 
@@ -165,7 +165,7 @@ public class Http11AprProtocol extends AbstractHttp11Protocol {
      */
     public int getSSLVerifyDepth() { return ((AprEndpoint)endpoint).getSSLVerifyDepth(); }
     public void setSSLVerifyDepth(int SSLVerifyDepth) { ((AprEndpoint)endpoint).setSSLVerifyDepth(SSLVerifyDepth); }
-    
+
     // ----------------------------------------------------- JMX related methods
 
     @Override
@@ -178,9 +178,9 @@ public class Http11AprProtocol extends AbstractHttp11Protocol {
 
     protected static class Http11ConnectionHandler
             extends AbstractConnectionHandler<Long,Http11AprProcessor> implements Handler {
-        
+
         protected Http11AprProtocol proto;
-        
+
         Http11ConnectionHandler(Http11AprProtocol proto) {
             this.proto = proto;
         }
@@ -194,7 +194,7 @@ public class Http11AprProtocol extends AbstractHttp11Protocol {
         protected Log getLog() {
             return log;
         }
-        
+
         @Override
         public void recycle() {
             recycledProcessors.clear();
@@ -203,7 +203,7 @@ public class Http11AprProtocol extends AbstractHttp11Protocol {
         /**
          * Expected to be used by the handler once the processor is no longer
          * required.
-         * 
+         *
          * @param socket
          * @param processor
          * @param isSocketClosing   Not used in HTTP

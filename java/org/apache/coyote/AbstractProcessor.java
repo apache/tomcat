@@ -36,11 +36,11 @@ public abstract class AbstractProcessor<S> implements ActionHook, Processor {
     protected final Request request;
     protected final Response response;
 
-    
+
     public AbstractProcessor(AbstractEndpoint endpoint) {
         this.endpoint = endpoint;
         asyncStateMachine = new AsyncStateMachine(this);
-        
+
         request = new Request();
 
         response = new Response();
@@ -93,8 +93,8 @@ public abstract class AbstractProcessor<S> implements ActionHook, Processor {
     public Executor getExecutor() {
         return endpoint.getExecutor();
     }
-    
-    
+
+
     public boolean isAsync() {
         return asyncStateMachine.isAsync();
     }

@@ -26,7 +26,7 @@ package org.apache.coyote;
  *
  * The param object can be used to pass and return informations related with the
  * action.
- * 
+ *
  *
  * This interface is typically implemented by ProtocolHandlers, and the param
  * is usually a Request or Response object.
@@ -38,7 +38,7 @@ public interface ActionHook {
 
     /**
      * Send an action to the connector.
-     * 
+     *
      * @param actionCode Type of the action
      * @param param Action parameter
      */
