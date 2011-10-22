@@ -92,7 +92,7 @@ public class UndeployMessage implements ClusterMessage {
     }
     /**
      * @return Returns the compress.
-     * @since 5.5.10 
+     * @since 5.5.10
      */
     public int getCompress() {
         return compress;

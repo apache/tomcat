@@ -26,7 +26,7 @@ import org.apache.catalina.tribes.Member;
 /**
  * Receive SessionID cluster change from other backup node after primary session
  * node is failed.
- * 
+ *
  * @author Peter Rossbach
  * @author Filip Hanik
  * @version $Id$
@@ -49,9 +49,9 @@ public abstract class ClusterListener implements ChannelListener {
     public ClusterListener() {
         // NO-OP
     }
-    
+
     //--Instance Getters/Setters--------------------------------
-    
+
     public CatalinaCluster getCluster() {
         return cluster;
     }
@@ -95,16 +95,16 @@ public abstract class ClusterListener implements ChannelListener {
     /**
      * Callback from the cluster, when a message is received, The cluster will
      * broadcast it invoking the messageReceived on the receiver.
-     * 
+     *
      * @param msg
      *            ClusterMessage - the message received from the cluster
      */
     public abstract void messageReceived(ClusterMessage msg) ;
-    
+
 
     /**
      * Accept only SessionIDMessages
-     * 
+     *
      * @param msg
      *            ClusterMessage
      * @return boolean - returns true to indicate that messageReceived should be

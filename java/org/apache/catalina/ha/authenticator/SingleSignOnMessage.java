@@ -55,7 +55,7 @@ public class SingleSignOnMessage implements ClusterMessage {
         this.ssoId = ssoId;
         this.sessionId = sessionId;
     }
-    
+
     /**
      * Get the address that this message originated from.  This would be set
      * if the message was being relayed from a host other than the one

@@ -307,7 +307,7 @@
       name="stateTransfered"
       is="true"
       description="Is session state transfered complete? "
-      type="boolean"/>  
+      type="boolean"/>
     <attribute
       name="stateTransferTimeout"
       description="state transfer timeout in sec"
@@ -352,7 +352,7 @@
       description="Return the set of active Sessions associated with this Manager."
       impact="ACTION"
       returnType="[Lorg.apache.catalina.Session;">
-    </operation>  
+    </operation>
     <operation
       name="getAllClusterSessions"
       description="send to oldest cluster member that this node need all cluster sessions (resync member)"
@@ -367,7 +367,7 @@
         name="sessionId"
         description="The session id for the session "
         type="java.lang.String"/>
-    </operation>   
+    </operation>
     <operation
       name="getLastAccessedTime"
       description="Get the last access time. This one gets updated whenever a request finishes. "
@@ -377,7 +377,7 @@
         name="sessionId"
         description="Id of the session"
         type="java.lang.String"/>
-    </operation> 
+    </operation>
     <operation
       name="getSessionAttribute"
       description="Return a session attribute"
@@ -401,7 +401,7 @@
         name="sessionId"
         description="Id of the session"
         type="java.lang.String"/>
-    </operation> 
+    </operation>
     <operation
       name="listSessionIds"
       description="Return the list of active primary session ids"
@@ -568,7 +568,7 @@
       description="Return the set of active Sessions associated with this Manager."
       impact="ACTION"
       returnType="[Lorg.apache.catalina.Session;">
-    </operation>  
+    </operation>
     <operation
       name="getCreationTime"
       description="Return the creatio time for this session"
@@ -578,7 +578,7 @@
         name="sessionId"
         description="The session id for the session "
         type="java.lang.String"/>
-    </operation>   
+    </operation>
     <operation
       name="getLastAccessedTime"
       description="Get the last access time. This one gets updated whenever a request finishes. "
@@ -588,7 +588,7 @@
         name="sessionId"
         description="Id of the session"
         type="java.lang.String"/>
-    </operation> 
+    </operation>
     <operation
       name="getSessionAttribute"
       description="Return a session attribute"
@@ -612,7 +612,7 @@
         name="sessionId"
         description="Id of the session"
         type="java.lang.String"/>
-    </operation> 
+    </operation>
     <operation
       name="listSessionIds"
       description="Return the list of active primary session ids"

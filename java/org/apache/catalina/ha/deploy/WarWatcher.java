@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -31,7 +31,7 @@ import org.apache.juli.logging.LogFactory;
  * directory (adding new WAR files->deploy or remove WAR files->undeploy) And
  * notifies a listener of the changes made
  * </p>
- * 
+ *
  * @author Filip Hanik
  * @author Peter Rossbach
  * @version 1.1
@@ -194,7 +194,7 @@ public class WarWatcher {
         /**
          * Returns 1 if the file has been added/modified, 0 if the file is
          * unchanged and -1 if the file has been removed
-         * 
+         *
          * @return int 1=file added; 0=unchanged; -1=file removed
          */
         public int check() {

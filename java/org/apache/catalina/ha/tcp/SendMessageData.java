@@ -28,8 +28,8 @@ public class SendMessageData {
     private Object message ;
     private Member destination ;
     private Exception exception ;
-    
-    
+
+
     /**
      * @param message
      * @param destination
@@ -42,7 +42,7 @@ public class SendMessageData {
         this.destination = destination;
         this.exception = exception;
     }
-    
+
     /**
      * @return Returns the destination.
      */

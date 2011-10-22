@@ -35,7 +35,7 @@ public class ClusterSessionListener extends ClusterListener {
 
     private static final Log log =
         LogFactory.getLog(ClusterSessionListener.class);
-    
+
     //--Constructor---------------------------------------------
 
     public ClusterSessionListener() {
@@ -47,7 +47,7 @@ public class ClusterSessionListener extends ClusterListener {
     /**
      * Callback from the cluster, when a message is received, The cluster will
      * broadcast it invoking the messageReceived on the receiver.
-     * 
+     *
      * @param myobj
      *            ClusterMessage - the message received from the cluster
      */
@@ -85,7 +85,7 @@ public class ClusterSessionListener extends ClusterListener {
 
     /**
      * Accept only SessionMessage
-     * 
+     *
      * @param msg
      *            ClusterMessage
      * @return boolean - returns true to indicate that messageReceived should be

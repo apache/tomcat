@@ -29,11 +29,11 @@ import org.apache.juli.logging.LogFactory;
 
 /**
  * Receive replicated SingleSignOnMessage form other cluster node.
- * 
+ *
  * @author Fabien Carrion
  */
 public class ClusterSingleSignOnListener extends ClusterListener {
- 
+
     private static final Log log =
         LogFactory.getLog(ClusterSingleSignOnListener.class);
 
@@ -66,7 +66,7 @@ public class ClusterSingleSignOnListener extends ClusterListener {
     /**
      * Callback from the cluster, when a message is received, The cluster will
      * broadcast it invoking the messageReceived on the receiver.
-     * 
+     *
      * @param myobj
      *            ClusterMessage - the message received from the cluster
      */
@@ -117,7 +117,7 @@ public class ClusterSingleSignOnListener extends ClusterListener {
 
     /**
      * Accept only SingleSignOnMessage
-     * 
+     *
      * @param msg
      *            ClusterMessage
      * @return boolean - returns true to indicate that messageReceived should be
@@ -131,7 +131,7 @@ public class ClusterSingleSignOnListener extends ClusterListener {
 
 
     private Session getSession(String sessionId, String ctxname) {
-        
+
         Map<String,ClusterManager> managers = clusterSSO.getCluster().getManagers();
         Session session = null;
 

@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -45,14 +45,14 @@ public class BackupManager extends ClusterManagerBase
 
     /** Set to true if we don't want the sessions to expire on shutdown */
     protected boolean mExpireSessionsOnShutdown = true;
-    
+
     /**
      * The name of this manager
      */
     protected String name;
 
     /**
-     * 
+     *
      */
     private int mapSendOptions = Channel.SEND_OPTIONS_SYNCHRONIZED_ACK|Channel.SEND_OPTIONS_USE_ACK;
 
@@ -71,7 +71,7 @@ public class BackupManager extends ClusterManagerBase
 
 
 //******************************************************************************/
-//      ClusterManager Interface     
+//      ClusterManager Interface
 //******************************************************************************/
 
     @Override
@@ -117,7 +117,7 @@ public class BackupManager extends ClusterManagerBase
     public Session createEmptySession() {
         return new DeltaSession(this);
     }
-    
+
 
     @Override
     public String getName() {
@@ -132,13 +132,13 @@ public class BackupManager extends ClusterManagerBase
      * Starts the cluster communication channel, this will connect with the
      * other nodes in the cluster, and request the current session state to be
      * transferred to this node.
-     * 
+     *
      * @exception LifecycleException if this component detects a fatal error
      *  that prevents this component from being used
      */
     @Override
     protected synchronized void startInternal() throws LifecycleException {
-        
+
         super.startInternal();
 
         try {
@@ -156,7 +156,7 @@ public class BackupManager extends ClusterManagerBase
         }
         setState(LifecycleState.STARTING);
     }
-    
+
     public String getMapName() {
         String name = cluster.getManagerName(getName(),this)+"-"+"map";
         if ( log.isDebugEnabled() ) log.debug("Backup manager, Setting map name to:"+name);
@@ -167,7 +167,7 @@ public class BackupManager extends ClusterManagerBase
     /**
      * Stop this component and implement the requirements
      * of {@link org.apache.catalina.util.LifecycleBase#stopInternal()}.
-     * 
+     *
      * This will disconnect the cluster communication channel and stop the
      * listener thread.
      *
@@ -221,7 +221,7 @@ public class BackupManager extends ClusterManagerBase
     public String[] getInvalidatedSessions() {
         return new String[0];
     }
-    
+
     @Override
     public ClusterManager cloneFromTemplate() {
         BackupManager result = new BackupManager();

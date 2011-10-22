@@ -34,7 +34,7 @@ import org.apache.tomcat.util.res.StringManager;
 /**
  * Receive SessionID cluster change from other backup node after primary session
  * node is failed.
- * 
+ *
  * @author Peter Rossbach
  * @version $Id$
  */
@@ -42,7 +42,7 @@ public class JvmRouteSessionIDBinderListener extends ClusterListener {
 
     private static final Log log =
         LogFactory.getLog(JvmRouteSessionIDBinderListener.class);
-    
+
     private static final StringManager sm =
         StringManager.getManager(Constants.Package);
 
@@ -73,7 +73,7 @@ public class JvmRouteSessionIDBinderListener extends ClusterListener {
 
     /**
      * Add this Mover as Cluster Listener ( receiver)
-     * 
+     *
      * @throws LifecycleException
      */
     public void start() throws LifecycleException {
@@ -87,7 +87,7 @@ public class JvmRouteSessionIDBinderListener extends ClusterListener {
 
     /**
      * Remove this from Cluster Listener
-     * 
+     *
      * @throws LifecycleException
      */
     public void stop() throws LifecycleException {
@@ -100,7 +100,7 @@ public class JvmRouteSessionIDBinderListener extends ClusterListener {
     /**
      * Callback from the cluster, when a message is received, The cluster will
      * broadcast it invoking the messageReceived on the receiver.
-     * 
+     *
      * @param msg
      *            ClusterMessage - the message received from the cluster
      */
@@ -150,7 +150,7 @@ public class JvmRouteSessionIDBinderListener extends ClusterListener {
 
     /**
      * Accept only SessionIDMessages
-     * 
+     *
      * @param msg
      *            ClusterMessage
      * @return boolean - returns true to indicate that messageReceived should be
