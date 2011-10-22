@@ -41,7 +41,7 @@ import org.apache.catalina.LifecycleException;
  *
  * <p>The <code>*.jar</code> suffix can be used to include all JAR files in a
  * certain directory. If a file or a directory does not exist, it will be
- * skipped. 
+ * skipped.
  * </p>
  *
  *
