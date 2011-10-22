@@ -66,7 +66,6 @@ public class TesterResponse
     public void setIncluded(@SuppressWarnings("unused") boolean included) {
         // NOOP
     }
-    public String getInfo() { return null; }
     public Request getRequest() { return null; }
     public void setRequest(@SuppressWarnings("unused") Request request) {
         // NOOP
