@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -92,7 +92,7 @@ public class StandardSession implements HttpSession, Session, Serializable {
 
     static {
         STRICT_SERVLET_COMPLIANCE = Globals.STRICT_SERVLET_COMPLIANCE;
-        
+
         String activityCheck = System.getProperty(
                 "org.apache.catalina.session.StandardSession.ACTIVITY_CHECK");
         if (activityCheck == null) {
@@ -111,7 +111,7 @@ public class StandardSession implements HttpSession, Session, Serializable {
                 Boolean.valueOf(lastAccessAtStart).booleanValue();
         }
     }
-    
+
 
     // ----------------------------------------------------------- Constructors
 
@@ -240,7 +240,7 @@ public class StandardSession implements HttpSession, Session, Serializable {
      */
     protected volatile boolean isValid = false;
 
-    
+
     /**
      * Internal notes associated with this session by Catalina components
      * and event listeners.  <b>IMPLEMENTATION NOTE:</b> This object is
@@ -291,7 +291,7 @@ public class StandardSession implements HttpSession, Session, Serializable {
      */
     protected transient AtomicInteger accessCount = null;
 
-    
+
     // ----------------------------------------------------- Session Properties
 
 
@@ -385,7 +385,7 @@ public class StandardSession implements HttpSession, Session, Serializable {
 
         if (manager != null)
             manager.add(this);
-        
+
         if (notify) {
             tellNew();
         }
@@ -637,7 +637,7 @@ public class StandardSession implements HttpSession, Session, Serializable {
             return true;
         }
 
-        if (maxInactiveInterval >= 0) { 
+        if (maxInactiveInterval >= 0) {
             long timeNow = System.currentTimeMillis();
             int timeIdle;
             if (LAST_ACCESS_AT_START) {
@@ -759,11 +759,11 @@ public class StandardSession implements HttpSession, Session, Serializable {
 
             // Mark this session as "being expired"
             expiring = true;
-        
+
             // Notify interested application event listeners
             // FIXME - Assumes we call listeners in reverse order
             Context context = (Context) manager.getContainer();
-            
+
             // The call to expire() may not have been triggered by the webapp.
             // Make sure the webapp's class loader is set when calling the
             // listeners
@@ -904,7 +904,7 @@ public class StandardSession implements HttpSession, Session, Serializable {
         if (ACTIVITY_CHECK) {
             accessCount = new AtomicInteger();
         }
-        
+
         // Notify interested session event listeners
         fireSessionEvent(Session.SESSION_ACTIVATED_EVENT, null);
 
@@ -1446,7 +1446,7 @@ public class StandardSession implements HttpSession, Session, Serializable {
                     ((HttpSessionBindingListener) value).valueBound(event);
                 } catch (Throwable t){
                     manager.getContainer().getLogger().error
-                    (sm.getString("standardSession.bindingEvent"), t); 
+                    (sm.getString("standardSession.bindingEvent"), t);
                 }
             }
         }
@@ -1466,9 +1466,9 @@ public class StandardSession implements HttpSession, Session, Serializable {
                     (sm.getString("standardSession.bindingEvent"), t);
             }
         }
-        
+
         if ( !notify ) return;
-        
+
         // Notify interested application event listeners
         Context context = (Context) manager.getContainer();
         Object listeners[] = context.getApplicationEventListeners();
@@ -1652,7 +1652,7 @@ public class StandardSession implements HttpSession, Session, Serializable {
             Object value = attributes.get(keys[i]);
             if (value == null)
                 continue;
-            else if ( (value instanceof Serializable) 
+            else if ( (value instanceof Serializable)
                     && (!exclude(keys[i]) )) {
                 saveNames.add(keys[i]);
                 saveValues.add(value);
