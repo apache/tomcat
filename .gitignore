@@ -1,0 +1,6 @@
+target
+output
+build.properties
+work
+logs
+*.iml
