@@ -102,7 +102,7 @@
    "%pattern; | %enumeration; | %whiteSpace; | %length; |
    %maxLength; | %minLength;">
 <!ENTITY % facet "%ordered; | %unordered;">
-<!ENTITY % facetAttr 
+<!ENTITY % facetAttr
         "value CDATA #REQUIRED
         id ID #IMPLIED">
 <!ENTITY % fixedAttr "fixed %boolean; #IMPLIED">

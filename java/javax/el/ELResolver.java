@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -28,7 +28,7 @@ import java.util.ResourceBundle;
  *
  */
 public abstract class ELResolver {
-    
+
     static String message(ELContext context, String name, Object[] props) {
         Locale locale = context.getLocale();
         if (locale == null) {
@@ -52,21 +52,21 @@ public abstract class ELResolver {
     }
 
     public static final String RESOLVABLE_AT_DESIGN_TIME = "resolvableAtDesignTime";
-    
+
     public static final String TYPE = "type";
-    
+
     public abstract Object getValue(ELContext context, Object base, Object property) throws NullPointerException, PropertyNotFoundException, ELException;
-    
+
     public abstract Class<?> getType(ELContext context, Object base, Object property) throws NullPointerException, PropertyNotFoundException, ELException;
-    
+
     public abstract void setValue(ELContext context, Object base, Object property, Object value) throws NullPointerException, PropertyNotFoundException, PropertyNotWritableException, ELException;
 
     public abstract boolean isReadOnly(ELContext context, Object base, Object property) throws NullPointerException, PropertyNotFoundException, ELException;
-    
+
     public abstract Iterator<java.beans.FeatureDescriptor> getFeatureDescriptors(ELContext context, Object base);
-    
+
     public abstract Class<?> getCommonPropertyType(ELContext context, Object base);
-    
+
     /**
      * @since EL 2.2
      */

@@ -21,7 +21,7 @@ import java.util.EventListener;
 /**
  * This listener interface can be implemented in order to get notifications of
  * changes to the attribute lists of sessions within this web application.
- * 
+ *
  * @since v 2.3
  */
 public interface HttpSessionAttributeListener extends EventListener {

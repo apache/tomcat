@@ -29,24 +29,24 @@
     <xsd:annotation>
         <xsd:documentation>
             <![CDATA[
-      This is the XML Schema for the Servlet 2.5 deployment descriptor. 
-The deployment descriptor must be named "WEB-INF/web.xml" in the 
-web application's war file.  All Servlet deployment descriptors 
-must indicate the web application schema by using the Java EE 
-namespace: 
-http://java.sun.com/xml/ns/javaee 
-and by indicating the version of the schema by 
-using the version element as shown below: 
-    <web-app xmlns="http://java.sun.com/xml/ns/javaee" 
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
-      xsi:schemaLocation="..." 
-      version="2.5"> 
-      ... 
-    </web-app> 
-The instance documents may indicate the published version of 
-the schema using the xsi:schemaLocation attribute for Java EE 
-namespace with the following location: 
-http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd 
+      This is the XML Schema for the Servlet 2.5 deployment descriptor.
+The deployment descriptor must be named "WEB-INF/web.xml" in the
+web application's war file.  All Servlet deployment descriptors
+must indicate the web application schema by using the Java EE
+namespace:
+http://java.sun.com/xml/ns/javaee
+and by indicating the version of the schema by
+using the version element as shown below:
+    <web-app xmlns="http://java.sun.com/xml/ns/javaee"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="..."
+      version="2.5">
+      ...
+    </web-app>
+The instance documents may indicate the published version of
+the schema using the xsi:schemaLocation attribute for Java EE
+namespace with the following location:
+http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd
 ]]>
         </xsd:documentation>
     </xsd:annotation>

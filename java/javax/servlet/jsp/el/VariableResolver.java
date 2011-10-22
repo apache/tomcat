@@ -28,7 +28,7 @@ package javax.servlet.jsp.el;
  * An instance of this class includes the context against which resolution will
  * happen
  * </p>
- * 
+ *
  * @since 2.0
  * @deprecated As of JSP 2.1, replaced by javax.el.ELResolver
  */
@@ -39,7 +39,7 @@ public interface VariableResolver {
     /**
      * Resolves the specified variable. Returns null if the variable is not
      * found.
-     * 
+     *
      * @param pName
      *            the name of the variable to resolve
      * @return the result of the variable resolution

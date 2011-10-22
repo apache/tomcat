@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -32,11 +32,11 @@ import java.security.PrivilegedAction;
 import java.util.Properties;
 
 /**
- * 
+ *
  * @since 2.1
  */
 public abstract class ExpressionFactory {
-    
+
     private static final boolean IS_SECURITY_ENABLED =
         (System.getSecurityManager() != null);
 
@@ -110,14 +110,14 @@ public abstract class ExpressionFactory {
     /**
      * Create a new {@link ExpressionFactory} passing in the provided
      * {@link Properties}. Search order is the same as {@link #newInstance()}.
-     * 
+     *
      * @param properties the properties to be passed to the new instance (may be null)
      * @return the new ExpressionFactory
      */
     public static ExpressionFactory newInstance(Properties properties) {
         String className = null;
         ExpressionFactory result = null;
-        
+
         ClassLoader tccl = Thread.currentThread().getContextClassLoader();
 
         // First services API
@@ -148,7 +148,7 @@ public abstract class ExpressionFactory {
                         }
                 );
             } else {
-                // Third system property 
+                // Third system property
                 className = getClassNameSysProp();
             }
         }
@@ -156,7 +156,7 @@ public abstract class ExpressionFactory {
             // Fourth - default
             className = "org.apache.el.ExpressionFactoryImpl";
         }
-        
+
         try {
             Class<?> clazz = null;
             if (tccl == null) {
@@ -182,7 +182,7 @@ public abstract class ExpressionFactory {
                 result =
                     (ExpressionFactory) constructor.newInstance(properties);
             }
-            
+
         } catch (ClassNotFoundException e) {
             throw new ELException(
                     "Unable to find ExpressionFactory of type: " + className,
@@ -204,13 +204,13 @@ public abstract class ExpressionFactory {
                     "Unable to create ExpressionFactory of type: " + className,
                     e);
         }
-        
+
         return result;
     }
-    
+
     private static String getClassNameServices(ClassLoader tccl) {
         InputStream is = null;
-        
+
         if (tccl == null) {
             is = ClassLoader.getSystemResourceAsStream(SERVICE_RESOURCE_NAME);
         } else {
@@ -243,10 +243,10 @@ public abstract class ExpressionFactory {
                 } catch (IOException ioe) {/*Ignore*/}
             }
         }
-        
+
         return null;
     }
-    
+
     private static String getClassNameJreDir() {
         File file = new File(PROPERTY_FILE);
         if (file.canRead()) {
@@ -275,7 +275,7 @@ public abstract class ExpressionFactory {
         }
         return null;
     }
-    
+
     private static final String getClassNameSysProp() {
         String value = System.getProperty(PROPERTY_NAME);
         if (value != null && value.trim().length() > 0) {

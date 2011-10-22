@@ -25,11 +25,11 @@ import javax.servlet.ServletResponse;
  * <p>
  * The JspFactory is an abstract class that defines a number of factory
  * methods available to a JSP page at runtime for the purposes of creating
- * instances of various interfaces and classes used to support the JSP 
+ * instances of various interfaces and classes used to support the JSP
  * implementation.
  * <p>
  * A conformant JSP Engine implementation will, during it's initialization
- * instantiate an implementation dependent subclass of this class, and make 
+ * instantiate an implementation dependent subclass of this class, and make
  * it globally available for use by JSP implementation classes by registering
  * the instance created with this class via the
  * static <code> setDefaultFactory() </code> method.
@@ -43,9 +43,9 @@ import javax.servlet.ServletResponse;
 public abstract class JspFactory {
 
     private static volatile JspFactory deflt = null;
-    
+
     /**
-     * Sole constructor. (For invocation by subclass constructors, 
+     * Sole constructor. (For invocation by subclass constructors,
      * typically implicit.)
      */
     public JspFactory() {
@@ -77,14 +77,14 @@ public abstract class JspFactory {
 
     /**
      * <p>
-     * obtains an instance of an implementation dependent 
+     * obtains an instance of an implementation dependent
      * javax.servlet.jsp.PageContext abstract class for the calling Servlet
      * and currently pending request and response.
      * </p>
      *
      * <p>
-     * This method is typically called early in the processing of the 
-     * _jspService() method of a JSP implementation class in order to 
+     * This method is typically called early in the processing of the
+     * _jspService() method of a JSP implementation class in order to
      * obtain a PageContext object for the request being processed.
      * </p>
      * <p>
@@ -138,16 +138,16 @@ public abstract class JspFactory {
      *
      * @return a JspEngineInfo object describing the current JSP engine
      */
-    
+
     public abstract JspEngineInfo getEngineInfo();
-    
+
     /**
      * <p>
      * Obtain the <code>JspApplicationContext</code> instance that was
      * associated within the passed <code>ServletContext</code> for this web
      * application.
      * </p>
-     * 
+     *
      * @param context the current web application's <code>ServletContext</code>
      * @return <code>JspApplicationContext</code> instance
      * @since 2.1

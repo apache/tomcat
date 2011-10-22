@@ -26,7 +26,7 @@ import javax.servlet.annotation.ServletSecurity.TransportGuarantee;
  * TODO SERVLET3 - Add comments
  */
 public class HttpConstraintElement {
-    
+
     private static final String LSTRING_FILE = "javax.servlet.LocalStrings";
     private static final ResourceBundle lStrings =
         ResourceBundle.getBundle(LSTRING_FILE);
@@ -34,7 +34,7 @@ public class HttpConstraintElement {
     private final EmptyRoleSemantic emptyRoleSemantic;// = EmptyRoleSemantic.PERMIT;
     private final TransportGuarantee transportGuarantee;// = TransportGuarantee.NONE;
     private final String[] rolesAllowed;// = new String[0];
-    
+
     /**
      * Default constraint is permit with no transport guarantee.
      */
@@ -44,17 +44,17 @@ public class HttpConstraintElement {
         this.transportGuarantee = TransportGuarantee.NONE;
         this.rolesAllowed = new String[0];
     }
-    
+
     /**
      * Convenience constructor for {@link EmptyRoleSemantic#DENY}.
-     * 
+     *
      */
     public HttpConstraintElement(EmptyRoleSemantic emptyRoleSemantic) {
         this.emptyRoleSemantic = emptyRoleSemantic;
         this.transportGuarantee = TransportGuarantee.NONE;
         this.rolesAllowed = new String[0];
     }
-    
+
     /**
      * Convenience constructor to specify transport guarantee and/or roles.
      */
@@ -66,7 +66,7 @@ public class HttpConstraintElement {
     }
 
     /**
-     * 
+     *
      * @param emptyRoleSemantic
      * @param transportGuarantee
      * @param rolesAllowed
@@ -83,15 +83,15 @@ public class HttpConstraintElement {
         this.transportGuarantee = transportGuarantee;
         this.rolesAllowed = rolesAllowed;
     }
-    
+
     public EmptyRoleSemantic getEmptyRoleSemantic() {
         return emptyRoleSemantic;
     }
-    
+
     public TransportGuarantee getTransportGuarantee() {
         return transportGuarantee;
     }
-    
+
     public String[] getRolesAllowed() {
         return rolesAllowed;
     }

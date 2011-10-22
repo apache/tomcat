@@ -40,7 +40,7 @@ import java.io.IOException;
  * 7) Filters that trigger resource access events <br>
  * 8) XSL/T filters <br>
  * 9) Mime-type chain Filter <br>
- * 
+ *
  * @since Servlet 2.3
  */
 public interface Filter {
@@ -89,7 +89,7 @@ public interface Filter {
      * passed. After the web container calls this method, it will not call the
      * doFilter method again on this instance of the filter. <br>
      * <br>
-     * 
+     *
      * This method gives the filter an opportunity to clean up any resources
      * that are being held (for example, memory, file handles, threads) and make
      * sure that any persistent state is synchronized with the filter's current

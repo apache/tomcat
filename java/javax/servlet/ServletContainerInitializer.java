@@ -24,9 +24,9 @@ import java.util.Set;
  * TODO SERVLET3 - Add comments
  */
 public interface ServletContainerInitializer {
-    
+
     /**
-     * 
+     *
      * @param c
      * @param ctx
      * @throws ServletException

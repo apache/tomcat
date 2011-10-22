@@ -48,7 +48,7 @@ public abstract class BodyContent extends JspWriter {
 
     /**
      * Protected constructor. Unbounded buffer, no autoflushing.
-     * 
+     *
      * @param e
      *            the enclosing JspWriter
      */
@@ -62,7 +62,7 @@ public abstract class BodyContent extends JspWriter {
      * <p>
      * It is not valid to flush a BodyContent because there is no backing stream
      * behind it.
-     * 
+     *
      * @throws IOException
      *             always thrown
      */
@@ -85,14 +85,14 @@ public abstract class BodyContent extends JspWriter {
 
     /**
      * Return the value of this BodyContent as a Reader.
-     * 
+     *
      * @return the value of this BodyContent as a Reader
      */
     public abstract Reader getReader();
 
     /**
      * Return the value of the BodyContent as a String.
-     * 
+     *
      * @return the value of the BodyContent as a String
      */
     public abstract String getString();
@@ -100,7 +100,7 @@ public abstract class BodyContent extends JspWriter {
     /**
      * Write the contents of this BodyContent into a Writer. Subclasses may
      * optimize common invocation patterns.
-     * 
+     *
      * @param out
      *            The writer into which to place the contents of this body
      *            evaluation
@@ -112,7 +112,7 @@ public abstract class BodyContent extends JspWriter {
 
     /**
      * Get the enclosing JspWriter.
-     * 
+     *
      * @return the enclosing JspWriter passed at construction time
      */
     public JspWriter getEnclosingWriter() {

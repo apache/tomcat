@@ -10,7 +10,7 @@
     <xsd:documentation>
 
       $Id$
-      
+
     </xsd:documentation>
   </xsd:annotation>
 
@@ -18,9 +18,9 @@
     <xsd:documentation>
 
       DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
-      
+
       Copyright 2003-2009 Sun Microsystems, Inc. All rights reserved.
-      
+
       The contents of this file are subject to the terms of either the
       GNU General Public License Version 2 only ("GPL") or the Common
       Development and Distribution License("CDDL") (collectively, the
@@ -30,7 +30,7 @@
       glassfish/bootstrap/legal/LICENSE.txt.  See the License for the
       specific language governing permissions and limitations under the
       License.
-      
+
       When distributing the software, include this License Header
       Notice in each file and include the License file at
       glassfish/bootstrap/legal/LICENSE.txt.  Sun designates this
@@ -40,9 +40,9 @@
       below the License Header, with the fields enclosed by brackets []
       replaced by your own identifying information:
       "Portions Copyrighted [year] [name of copyright owner]"
-      
+
       Contributor(s):
-      
+
       If you wish your version of this file to be governed by only the
       CDDL or only the GPL Version 2, indicate your decision by adding
       "[Contributor] elects to include this software in this
@@ -54,7 +54,7 @@
       code and therefore, elected the GPL Version 2 license, then the
       option applies only if the new code is made subject to such
       option by the copyright holder.
-      
+
     </xsd:documentation>
   </xsd:annotation>
 
@@ -73,25 +73,25 @@
       web application's war file.  All Servlet deployment descriptors
       must indicate the web common schema by using the Java EE
       namespace:
-      
-      http://java.sun.com/xml/ns/javaee 
-      
-      and by indicating the version of the schema by 
-      using the version element as shown below: 
-      
+
+      http://java.sun.com/xml/ns/javaee
+
+      and by indicating the version of the schema by
+      using the version element as shown below:
+
       <web-app xmlns="http://java.sun.com/xml/ns/javaee"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xsi:schemaLocation="..."
-      version="3.0"> 
+      version="3.0">
       ...
       </web-app>
-      
+
       The instance documents may indicate the published version of
       the schema using the xsi:schemaLocation attribute for Java EE
       namespace with the following location:
-      
+
       http://java.sun.com/xml/ns/javaee/web-common_3_0.xsd
-      
+
       ]]>
     </xsd:documentation>
   </xsd:annotation>
@@ -101,7 +101,7 @@
 
       The following conventions apply to all Java EE
       deployment descriptor elements unless indicated otherwise.
-      
+
       - In elements that specify a pathname to a file within the
       same JAR file, relative filenames (i.e., those not
       starting with "/") are considered relative to the root of
@@ -110,7 +110,7 @@
       JAR file's namespace.  In general, relative names are
       preferred.  The exception is .war files where absolute
       names are preferred for consistency with the Servlet API.
-      
+
     </xsd:documentation>
   </xsd:annotation>
 
@@ -131,7 +131,7 @@
             The context-param element contains the declaration
             of a web application's servlet context
             initialization parameters.
-            
+
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
@@ -187,17 +187,17 @@
           files available to this module and packaged with
           this application should be examined for annotations
           that specify deployment information.
-          
+
           If metadata-complete is set to "true", the deployment
           tool must ignore any annotations that specify deployment
           information, which might be present in the class files
           of the application.
-          
+
           If metadata-complete is not specified or is set to
           "false", the deployment tool must examine the class
           files of the application for annotations, as
           specified by the specifications.
-          
+
         </xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
@@ -253,7 +253,7 @@
         to the portion of the web application described by the
         containing security-constraint.  The container matches
         role names case sensitively when determining access.
-        
+
       </xsd:documentation>
     </xsd:annotation>
     <xsd:sequence>
@@ -284,9 +284,9 @@
         using the configured mechanism. Legal values are "BASIC",
         "DIGEST", "FORM", "CLIENT-CERT", or a vendor-specific
         authentication scheme.
-        
+
         Used in: login-config
-        
+
       </xsd:documentation>
     </xsd:annotation>
     <xsd:simpleContent>
@@ -303,7 +303,7 @@
 
         The dispatcher has five legal values: FORWARD, REQUEST,
         INCLUDE, ASYNC, and ERROR.
-        
+
         A value of FORWARD means the Filter will be applied under
         RequestDispatcher.forward() calls.
         A value of REQUEST means the Filter will be applied under
@@ -314,11 +314,11 @@
         calls dispatched from an AsyncContext.
         A value of ERROR means the Filter will be applied under the
         error page mechanism.
-        
+
         The absence of any dispatcher elements in a filter-mapping
         indicates a default of applying filters only under ordinary
         client calls to the path or servlet.
-        
+
       </xsd:documentation>
     </xsd:annotation>
     <xsd:simpleContent>
@@ -340,9 +340,9 @@
       <xsd:documentation>
 
         The error-code contains an HTTP error code, ex: 404
-        
+
         Used in: error-page
-        
+
       </xsd:documentation>
     </xsd:annotation>
     <xsd:simpleContent>
@@ -364,15 +364,15 @@
         The error-pageType contains a mapping between an error code
         or exception type to the path of a resource in the web
         application.
-        
+
         Error-page declarations using the exception-type element in
         the deployment descriptor must be unique up to the class name of
         the exception-type. Similarly, error-page declarations using the
         status-code element must be unique in the deployment descriptor
         up to the status code.
-        
+
         Used in: web-app
-        
+
       </xsd:documentation>
     </xsd:annotation>
     <xsd:sequence>
@@ -387,7 +387,7 @@
 
               The exception-type contains a fully qualified class
               name of a Java exception type.
-              
+
             </xsd:documentation>
           </xsd:annotation>
         </xsd:element>
@@ -401,7 +401,7 @@
             resource in the web application relative to the root of
             the web application. The value of the location must have
             a leading `/'.
-            
+
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
@@ -423,9 +423,9 @@
         filter-name value to reference. Filters can access the
         initialization parameters declared in the deployment
         descriptor at runtime via the FilterConfig interface.
-        
+
         Used in: web-app
-        
+
       </xsd:documentation>
     </xsd:annotation>
     <xsd:sequence>
@@ -440,7 +440,7 @@
           <xsd:documentation>
 
             The fully qualified classname of the filter.
-            
+
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
@@ -456,7 +456,7 @@
 
             The init-param element contains a name/value pair as
             an initialization param of a servlet filter
-            
+
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
@@ -473,7 +473,7 @@
       <xsd:documentation>
 
         Declaration of the filter mappings in this web
-        application is done by using filter-mappingType. 
+        application is done by using filter-mappingType.
         The container uses the filter-mapping
         declarations to decide which filters to apply to a request,
         and in what order. The container matches the request URI to
@@ -487,7 +487,7 @@
         filter-name value must be the value of the filter-name
         sub-elements of one of the filter declarations in the
         deployment descriptor.
-        
+
       </xsd:documentation>
     </xsd:annotation>
     <xsd:sequence>
@@ -518,7 +518,7 @@
 
         This type defines a string which contains at least one
         character.
-        
+
       </xsd:documentation>
     </xsd:annotation>
     <xsd:simpleContent>
@@ -539,9 +539,9 @@
         by using filter-nameType. This name is used to map the
         filter.  Each filter name is unique within the web
         application.
-        
+
         Used in: filter, filter-mapping
-        
+
       </xsd:documentation>
     </xsd:annotation>
     <xsd:simpleContent>
@@ -559,9 +559,9 @@
         The form-login-configType specifies the login and error
         pages that should be used in form based login. If form based
         authentication is not used, these elements are ignored.
-        
+
         Used in: login-config
-        
+
       </xsd:documentation>
     </xsd:annotation>
     <xsd:sequence>
@@ -574,7 +574,7 @@
             app where the page that can be used for login can be
             found.  The path begins with a leading / and is interpreted
             relative to the root of the WAR.
-            
+
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
@@ -585,10 +585,10 @@
 
             The form-error-page element defines the location in
             the web app where the error page that is displayed
-            when login is not successful can be found. 
+            when login is not successful can be found.
             The path begins with a leading / and is interpreted
             relative to the root of the WAR.
-            
+
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
@@ -602,7 +602,7 @@
       <xsd:documentation>
 
         A HTTP method type as defined in HTTP 1.1 section 2.2.
-        
+
       </xsd:documentation>
     </xsd:annotation>
     <xsd:restriction base="xsd:token">
@@ -631,9 +631,9 @@
         method that should be used, the realm name that should be
         used for this application, and the attributes that are
         needed by the form login mechanism.
-        
+
         Used in: web-app
-        
+
       </xsd:documentation>
     </xsd:annotation>
     <xsd:sequence>
@@ -648,7 +648,7 @@
 
             The realm name element specifies the realm name to
             use in HTTP Basic authorization.
-            
+
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
@@ -669,9 +669,9 @@
 
         The mime-mappingType defines a mapping between an extension
         and a mime type.
-        
+
         Used in: web-app
-        
+
       </xsd:documentation>
     </xsd:annotation>
     <xsd:sequence>
@@ -680,7 +680,7 @@
 
           The extension element contains a string describing an
           extension. example: "txt"
-          
+
         </xsd:documentation>
       </xsd:annotation>
       <xsd:element name="extension"
@@ -700,12 +700,12 @@
       <xsd:documentation>
 
         The mime-typeType is used to indicate a defined mime type.
-        
+
         Example:
         "text/plain"
-        
+
         Used in: mime-mapping
-        
+
       </xsd:documentation>
     </xsd:annotation>
     <xsd:simpleContent>
@@ -725,9 +725,9 @@
         The security-constraintType is used to associate
         security constraints with one or more web resource
         collections
-        
+
         Used in: web-app
-        
+
       </xsd:documentation>
     </xsd:annotation>
     <xsd:sequence>
@@ -761,9 +761,9 @@
         servlet. If a jsp-file is specified and the load-on-startup
         element is present, then the JSP should be precompiled and
         loaded.
-        
+
         Used in: web-app
-        
+
       </xsd:documentation>
     </xsd:annotation>
     <xsd:sequence>
@@ -779,7 +779,7 @@
 
               The servlet-class element contains the fully
               qualified class name of the servlet.
-              
+
             </xsd:documentation>
           </xsd:annotation>
         </xsd:element>
@@ -812,7 +812,7 @@
             before servlets marked with higher integers. The
             container may choose the order of loading of
             servlets with the same load-on-start-up value.
-            
+
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
@@ -846,10 +846,10 @@
       <xsd:documentation>
 
         The servlet-mappingType defines a mapping between a
-        servlet and a url pattern. 
-        
+        servlet and a url pattern.
+
         Used in: web-app
-        
+
       </xsd:documentation>
     </xsd:annotation>
     <xsd:sequence>
@@ -874,7 +874,7 @@
         The servlet-name element contains the canonical name of the
         servlet. Each servlet name is unique within the web
         application.
-        
+
       </xsd:documentation>
     </xsd:annotation>
     <xsd:simpleContent>
@@ -891,9 +891,9 @@
 
         The session-configType defines the session parameters
         for this web application.
-        
+
         Used in: web-app
-        
+
       </xsd:documentation>
     </xsd:annotation>
     <xsd:sequence>
@@ -911,7 +911,7 @@
             the default behaviour of sessions is never to time
             out. If this element is not specified, the container
             must set its default timeout period.
-            
+
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
@@ -923,7 +923,7 @@
 
             The cookie-config element defines the configuration of the
             session tracking cookies created by this web application.
-            
+
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
@@ -936,7 +936,7 @@
 
             The tracking-mode element defines the tracking modes
             for sessions created by this web application
-            
+
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
@@ -954,9 +954,9 @@
 
         The cookie-configType defines the configuration for the
         session tracking cookies of this web application.
-        
+
         Used in: session-config
-        
+
       </xsd:documentation>
     </xsd:annotation>
     <xsd:sequence>
@@ -969,7 +969,7 @@
             The name that will be assigned to any session tracking
             cookies created by this web application.
             The default is JSESSIONID
-            
+
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
@@ -981,7 +981,7 @@
 
             The domain name that will be assigned to any session tracking
             cookies created by this web application.
-            
+
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
@@ -993,7 +993,7 @@
 
             The path that will be assigned to any session tracking
             cookies created by this web application.
-            
+
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
@@ -1005,7 +1005,7 @@
 
             The comment that will be assigned to any session tracking
             cookies created by this web application.
-            
+
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
@@ -1015,9 +1015,9 @@
         <xsd:annotation>
           <xsd:documentation>
 
-            Specifies whether any session tracking cookies created 
+            Specifies whether any session tracking cookies created
             by this web application will be marked as HttpOnly
-            
+
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
@@ -1027,11 +1027,11 @@
         <xsd:annotation>
           <xsd:documentation>
 
-            Specifies whether any session tracking cookies created 
+            Specifies whether any session tracking cookies created
             by this web application will be marked as secure
             even if the request that initiated the corresponding session
             is using plain HTTP instead of HTTPS
-            
+
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
@@ -1044,7 +1044,7 @@
             The lifetime (in seconds) that will be assigned to any
             session tracking cookies created by this web application.
             Default is -1
-            
+
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
@@ -1063,9 +1063,9 @@
         The name that will be assigned to any session tracking
         cookies created by this web application.
         The default is JSESSIONID
-        
+
         Used in: cookie-config
-        
+
       </xsd:documentation>
     </xsd:annotation>
     <xsd:simpleContent>
@@ -1082,9 +1082,9 @@
 
         The domain name that will be assigned to any session tracking
         cookies created by this web application.
-        
+
         Used in: cookie-config
-        
+
       </xsd:documentation>
     </xsd:annotation>
     <xsd:simpleContent>
@@ -1101,9 +1101,9 @@
 
         The path that will be assigned to any session tracking
         cookies created by this web application.
-        
+
         Used in: cookie-config
-        
+
       </xsd:documentation>
     </xsd:annotation>
     <xsd:simpleContent>
@@ -1120,9 +1120,9 @@
 
         The comment that will be assigned to any session tracking
         cookies created by this web application.
-        
+
         Used in: cookie-config
-        
+
       </xsd:documentation>
     </xsd:annotation>
     <xsd:simpleContent>
@@ -1139,9 +1139,9 @@
 
         The tracking modes for sessions created by this web
         application
-        
+
         Used in: session-config
-        
+
       </xsd:documentation>
     </xsd:annotation>
     <xsd:simpleContent>
@@ -1172,9 +1172,9 @@
         transmission. In most cases, the presence of the INTEGRAL or
         CONFIDENTIAL flag will indicate that the use of SSL is
         required.
-        
+
         Used in: user-data-constraint
-        
+
       </xsd:documentation>
     </xsd:annotation>
     <xsd:simpleContent>
@@ -1196,9 +1196,9 @@
         The user-data-constraintType is used to indicate how
         data communicated between the client and container should be
         protected.
-        
+
         Used in: security-constraint
-        
+
       </xsd:documentation>
     </xsd:annotation>
     <xsd:sequence>
@@ -1223,7 +1223,7 @@
         The elements that use this type designate a path starting
         with a "/" and interpreted relative to the root of a WAR
         file.
-        
+
       </xsd:documentation>
     </xsd:annotation>
     <xsd:simpleContent>
@@ -1240,7 +1240,7 @@
         This type contains the recognized versions of
         web-application supported. It is used to designate the
         version of the web application.
-        
+
       </xsd:documentation>
     </xsd:annotation>
     <xsd:restriction base="xsd:token">
@@ -1263,10 +1263,10 @@
         elements, the security constraint applies to all methods
         except those identified in the collection.
         http-method-omission and http-method elements are never
-        mixed in the same collection. 
-        
+        mixed in the same collection.
+
         Used in: security-constraint
-        
+
       </xsd:documentation>
     </xsd:annotation>
     <xsd:sequence>
@@ -1277,7 +1277,7 @@
 
             The web-resource-name contains the name of this web
             resource collection.
-            
+
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
@@ -1299,7 +1299,7 @@
 
               Each http-method names an HTTP method to which the
               constraint applies.
-              
+
             </xsd:documentation>
           </xsd:annotation>
         </xsd:element>
@@ -1312,7 +1312,7 @@
 
               Each http-method-omission names an HTTP method to
               which the constraint does not apply.
-              
+
             </xsd:documentation>
           </xsd:annotation>
         </xsd:element>
@@ -1331,9 +1331,9 @@
 
         The welcome-file-list contains an ordered list of welcome
         files elements.
-        
+
         Used in: web-app
-        
+
       </xsd:documentation>
     </xsd:annotation>
     <xsd:sequence>
@@ -1345,7 +1345,7 @@
 
             The welcome-file element contains file name to use
             as a default welcome file, such as index.html
-            
+
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
@@ -1360,7 +1360,7 @@
 
         The localeType defines valid locale defined by ISO-639-1
         and ISO-3166.
-        
+
       </xsd:documentation>
     </xsd:annotation>
     <xsd:restriction base="xsd:string">
@@ -1373,7 +1373,7 @@
       <xsd:documentation>
 
         The encodingType defines IANA character sets.
-        
+
       </xsd:documentation>
     </xsd:annotation>
     <xsd:restriction base="xsd:string">
@@ -1390,7 +1390,7 @@
 
         The locale-encoding-mapping-list contains one or more
         locale-encoding-mapping(s).
-        
+
       </xsd:documentation>
     </xsd:annotation>
     <xsd:sequence>
@@ -1413,7 +1413,7 @@
         encoding name. The locale name must be either "Language-code",
         such as "ja", defined by ISO-639 or "Language-code_Country-code",
         such as "ja_JP".  "Country code" is defined by ISO-3166.
-        
+
       </xsd:documentation>
     </xsd:annotation>
     <xsd:sequence>
@@ -1438,7 +1438,7 @@
         of this application resource relative to other application
         configuration resources.
         See section 8.2.2 of the specification for details.
-        
+
       </xsd:documentation>
     </xsd:annotation>
     <xsd:attribute name="id"
@@ -1453,7 +1453,7 @@
       <xsd:documentation>
 
         Please see section 8.2.2 of the specification for details.
-        
+
       </xsd:documentation>
     </xsd:annotation>
     <xsd:choice minOccurs="0"
@@ -1477,7 +1477,7 @@
       <xsd:documentation>
 
         Please see section 8.2.2 of the specification for details.
-        
+
       </xsd:documentation>
     </xsd:annotation>
     <xsd:sequence>
@@ -1507,7 +1507,7 @@
         comes
         before or after other documents within the application.
         See section 8.2.2 of the specification for details.
-        
+
       </xsd:documentation>
     </xsd:annotation>
     <xsd:sequence>
@@ -1531,7 +1531,7 @@
 
         This element specifies configuration information related to the
         handling of multipart/form-data requests.
-        
+
       </xsd:documentation>
     </xsd:annotation>
     <xsd:sequence>
@@ -1543,7 +1543,7 @@
           <xsd:documentation>
 
             The directory location where uploaded files will be stored
-            
+
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
@@ -1555,7 +1555,7 @@
           <xsd:documentation>
 
             The maximum size limit of uploaded files
-            
+
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
@@ -1567,7 +1567,7 @@
           <xsd:documentation>
 
             The maximum size limit of multipart/form-data requests
-            
+
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
@@ -1580,7 +1580,7 @@
 
             The size threshold after which an uploaded file will be
             written to disk
-            
+
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
