@@ -169,7 +169,7 @@ public final class Bootstrap {
 
     /**
      * System property replacement in the given string.
-     * 
+     *
      * @param str The original string
      * @return the modified string
      */

@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -66,7 +66,7 @@ public final class Constants {
     public static final String JavaeeSchemaResourcePath_6 =
         "/javax/servlet/resources/javaee_6.xsd";
 
-    
+
     // W3C
     public static final String W3cSchemaPublicId_10 =
         "xml.xsd";
@@ -83,13 +83,13 @@ public final class Constants {
     public static final String W3cDatatypesDTDResourcePath_10 =
         "/javax/servlet/resources/datatypes.dtd";
 
-    
+
     // JSP
     public static final String JspSchemaPublicId_20 =
         "jsp_2_0.xsd";
     public static final String JspSchemaResourcePath_20 =
         "/javax/servlet/jsp/resources/jsp_2_0.xsd";
-    
+
     public static final String JspSchemaPublicId_21 =
         "jsp_2_1.xsd";
     public static final String JspSchemaResourcePath_21 =
@@ -122,7 +122,7 @@ public final class Constants {
     public static final String TldSchemaResourcePath_21 =
         "/javax/servlet/jsp/resources/web-jsptaglibrary_2_1.xsd";
 
-    
+
     // web.xml
     public static final String WebDtdPublicId_22 =
         "-//Sun Microsystems, Inc.//DTD Web Application 2.2//EN";
@@ -158,13 +158,13 @@ public final class Constants {
         "web-fragment_3_0.xsd";
     public static final String WebFragmentSchemaResourcePath_30 =
         "/javax/servlet/resources/web-fragment_3_0.xsd";
-    
+
     // Web service
     public static final String J2eeWebServiceSchemaPublicId_11 =
             "j2ee_web_services_1_1.xsd";
     public static final String J2eeWebServiceSchemaResourcePath_11 =
             "/javax/servlet/resources/j2ee_web_services_1_1.xsd";
-    
+
     public static final String J2eeWebServiceClientSchemaPublicId_11 =
             "j2ee_web_services_client_1_1.xsd";
     public static final String J2eeWebServiceClientSchemaResourcePath_11 =

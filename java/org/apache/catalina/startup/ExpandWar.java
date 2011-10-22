@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -144,7 +144,7 @@ public class ExpandWar {
             throw e;
         } finally {
             if (!success) {
-                // If something went wrong, delete expanded dir to keep things 
+                // If something went wrong, delete expanded dir to keep things
                 // clean
                 deleteDir(docBase);
             }
@@ -237,9 +237,9 @@ public class ExpandWar {
      * @param dest File object representing the destination
      */
     public static boolean copy(File src, File dest) {
-        
+
         boolean result = true;
-        
+
         String files[] = null;
         if (src.isDirectory()) {
             files = src.list();
@@ -284,10 +284,10 @@ public class ExpandWar {
             }
         }
         return result;
-        
+
     }
-    
-    
+
+
     /**
      * Delete the specified directory, including all of its contents and
      * sub-directories recursively. Any failure will be logged.
@@ -324,8 +324,8 @@ public class ExpandWar {
         }
         return result;
     }
-    
-    
+
+
     /**
      * Delete the specified directory, including all of its contents and
      * sub-directories recursively. Any failure will be logged.
@@ -365,12 +365,12 @@ public class ExpandWar {
         } else {
             result = true;
         }
-        
+
         if (logFailure && !result) {
             log.error(sm.getString(
                     "expandWar.deleteFailed", dir.getAbsolutePath()));
         }
-        
+
         return result;
 
     }
@@ -388,7 +388,7 @@ public class ExpandWar {
         throws IOException {
         BufferedOutputStream output = null;
         try {
-            output = 
+            output =
                 new BufferedOutputStream(new FileOutputStream(file));
             byte buffer[] = new byte[2048];
             while (true) {
