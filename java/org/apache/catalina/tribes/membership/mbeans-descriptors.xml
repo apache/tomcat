@@ -42,11 +42,6 @@
       description="Ping Frequency at msec"
       type="long"/>
     <attribute
-      name="info"
-      description="Class version info"
-      type="java.lang.String"
-      writeable="false"/>
-    <attribute
       name="localLoopbackDisabled"
       description="Is local loopback disabled?"
       is="true"
