@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -409,7 +409,7 @@ public class JDBCRealm
         }
 
         ArrayList<String> roles = getRoles(username);
-        
+
         // Create and return a suitable Principal for this user
         return (new GenericPrincipal(username, credentials, roles));
 
@@ -529,14 +529,14 @@ public class JDBCRealm
         int numberOfTries = 2;
         while (numberOfTries>0) {
             try {
-                
+
                 // Ensure that we have an open database connection
                 open();
-                
+
                 try {
                     stmt = credentials(dbConnection, username);
                     rs = stmt.executeQuery();
-                    
+
                     if (rs.next()) {
                         dbCredentials = rs.getString(1);
                     }
@@ -545,10 +545,10 @@ public class JDBCRealm
                     if (dbCredentials == null) {
                         return (null);
                     }
-                    
+
                     dbCredentials = dbCredentials.trim();
                     return dbCredentials;
-                    
+
                 } finally {
                     if (rs!=null) {
                         try {
@@ -559,21 +559,21 @@ public class JDBCRealm
                     }
                     dbConnection.commit();
                 }
-                
+
             } catch (SQLException e) {
-                
+
                 // Log the problem for posterity
                 containerLog.error(sm.getString("jdbcRealm.exception"), e);
-                
+
                 // Close the connection so that it gets reopened next time
                 if (dbConnection != null)
                     close(dbConnection);
-                
+
             }
-            
+
             numberOfTries--;
         }
-        
+
         return (null);
     }
 
@@ -595,7 +595,7 @@ public class JDBCRealm
      * Return the roles associated with the gven user name.
      */
     protected ArrayList<String> getRoles(String username) {
-        
+
         PreparedStatement stmt = null;
         ResultSet rs = null;
 
@@ -610,10 +610,10 @@ public class JDBCRealm
         int numberOfTries = 2;
         while (numberOfTries>0) {
             try {
-                
+
                 // Ensure that we have an open database connection
                 open();
-                
+
                 try {
                     // Accumulate the user's roles
                     ArrayList<String> roleList = new ArrayList<String>();
@@ -627,9 +627,9 @@ public class JDBCRealm
                     }
                     rs.close();
                     rs = null;
-                    
+
                     return (roleList);
-                    
+
                 } finally {
                     if (rs!=null) {
                         try {
@@ -640,26 +640,26 @@ public class JDBCRealm
                     }
                     dbConnection.commit();
                 }
-                
+
             } catch (SQLException e) {
-                
+
                 // Log the problem for posterity
                 containerLog.error(sm.getString("jdbcRealm.exception"), e);
-                
+
                 // Close the connection so that it gets reopened next time
                 if (dbConnection != null)
                     close(dbConnection);
-                
+
             }
-            
+
             numberOfTries--;
         }
-        
+
         return (null);
-        
+
     }
-    
-    
+
+
     /**
      * Open (if necessary) and return a database connection for use by
      * this Realm.
