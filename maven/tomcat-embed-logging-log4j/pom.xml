@@ -67,67 +67,84 @@
     </dependency>
   </dependencies>
 
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-dependency-plugin</artifactId>
-        <version>2.3</version>
-        <executions>
-          <execution>
-            <id>unpack-commons-deps</id>
-            <phase>generate-sources</phase>
-            <goals>
-              <goal>unpack</goal>
-            </goals>
-            <configuration>
-              <artifactItems>
-                <artifactItem>
-                  <groupId>commons-logging</groupId>
-                  <artifactId>commons-logging</artifactId>
-                  <version>1.1.1</version>
-                  <classifier>sources</classifier>
-                  <type>jar</type>
-                  <overWrite>false</overWrite>
-                  <includes>**/*.java</includes>
-                  <excludes>**/test/**</excludes>
-                </artifactItem>
+  <profiles>
 
-              </artifactItems>
-              <outputDirectory>${commons-logging-sources}/src/java</outputDirectory>
-              <overWriteReleases>false</overWriteReleases>
-              <overWriteSnapshots>true</overWriteSnapshots>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-antrun-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>transform_to_tomcat_packages</id>
-            <phase>process-sources</phase>
-            <configuration>
-              <tasks>
-                <replace dir="${commons-logging-sources}/src/java/org/apache/commons"
-                    encoding="ISO-8859-1">
-                  <replacefilter token="org.apache.commons"
-                        value="org.apache.juli" />
-                </replace>
-                <mkdir dir="${basedir}/src/main/java/org/apache/juli" />
-                <move todir="${basedir}/src/main/java/org/apache/juli">
-                  <fileset dir="${commons-logging-sources}/src/java/org/apache/commons" />
-                </move>
-              </tasks>
-            </configuration>
-            <goals>
-              <goal>run</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-    </plugins>
-  </build>
+    <profile>
+      <id>import-commons-sources</id>
+      <activation>
+        <file>
+          <missing>${basedir}/src/main/java/org/apache/juli</missing>
+        </file>
+      </activation>
+
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-dependency-plugin</artifactId>
+            <version>2.3</version>
+            <executions>
+              <execution>
+                <id>unpack-commons-deps</id>
+                <phase>generate-sources</phase>
+                <goals>
+                  <goal>unpack</goal>
+                </goals>
+                <configuration>
+                  <artifactItems>
+                    <artifactItem>
+                      <groupId>commons-logging</groupId>
+                      <artifactId>commons-logging</artifactId>
+                      <version>1.1.1</version>
+                      <classifier>sources</classifier>
+                      <type>jar</type>
+                      <overWrite>false</overWrite>
+                      <includes>**/*.java</includes>
+                      <excludes>**/test/**</excludes>
+                    </artifactItem>
+
+                  </artifactItems>
+                  <outputDirectory>${commons-logging-sources}/src/java</outputDirectory>
+                  <overWriteReleases>true</overWriteReleases>
+                  <overWriteSnapshots>true</overWriteSnapshots>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-antrun-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>transform_to_tomcat_packages</id>
+                <phase>process-sources</phase>
+                <configuration>
+                  <tasks>
+                    <replace dir="${commons-logging-sources}/src/java/org/apache/commons"
+                        encoding="ISO-8859-1">
+                      <replacefilter token="org.apache.commons"
+                            value="org.apache.juli" />
+                    </replace>
+                    <mkdir dir="${basedir}/src/main/java/org/apache/juli" />
+                    <move todir="${basedir}/src/main/java/org/apache/juli">
+                      <fileset dir="${commons-logging-sources}/src/java/org/apache/commons" />
+                    </move>
+                  </tasks>
+                </configuration>
+                <goals>
+                  <goal>run</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+
+    </profile>
+
+
+
+  </profiles>
+
 
 </project>
