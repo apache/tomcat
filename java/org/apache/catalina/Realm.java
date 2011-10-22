@@ -58,16 +58,7 @@ public interface Realm {
     public void setContainer(Container container);
 
 
-    /**
-     * Return descriptive information about this Realm implementation and
-     * the corresponding version number, in the format
-     * <code>&lt;description&gt;/&lt;version&gt;</code>.
-     */
-    public String getInfo();
-
-
     // --------------------------------------------------------- Public Methods
-
     
     /**
      * Add a property change listener to this component.

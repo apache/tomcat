@@ -79,11 +79,6 @@ public class DummyProxySession implements Session {
     }
 
     @Override
-    public String getInfo() {
-        return null;
-    }
-
-    @Override
     public long getLastAccessedTime() {
         return 0;
     }

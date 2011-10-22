@@ -203,12 +203,6 @@ public class StandardSession implements HttpSession, Session, Serializable {
 
 
     /**
-     * Descriptive information describing this Session implementation.
-     */
-    protected static final String info = "StandardSession/1.0";
-
-
-    /**
      * The last accessed time for this Session.
      */
     protected volatile long lastAccessedTime = creationTime;
@@ -440,19 +434,6 @@ public class StandardSession implements HttpSession, Session, Serializable {
                 }
             }
         }
-
-    }
-
-
-    /**
-     * Return descriptive information about this Session implementation and
-     * the corresponding version number, in the format
-     * <code>&lt;description&gt;/&lt;version&gt;</code>.
-     */
-    @Override
-    public String getInfo() {
-
-        return (info);
 
     }
 

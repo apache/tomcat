@@ -104,13 +104,6 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
 
 
     /**
-     * Descriptive information about this Realm implementation.
-     */
-    protected static final String info =
-        "org.apache.catalina.realm.RealmBase/1.0";
-
-
-    /**
      * The MessageDigest object for digesting user credentials (passwords).
      */
     protected volatile MessageDigest md = null;
@@ -252,18 +245,6 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
         } else {
             return B2CConverter.getCharset(getDigestEncoding());
         }
-    }
-
-    /**
-     * Return descriptive information about this Realm implementation and
-     * the corresponding version number, in the format
-     * <code>&lt;description&gt;/&lt;version&gt;</code>.
-     */
-    @Override
-    public String getInfo() {
-
-        return info;
-
     }
 
 

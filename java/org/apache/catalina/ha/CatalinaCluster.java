@@ -41,11 +41,6 @@ public interface CatalinaCluster extends Cluster {
     // ----------------------------------------------------- Instance Variables
 
     /**
-     * Descriptive information about this component implementation.
-     */
-    public String info = "CatalinaCluster/2.0";
-    
-    /**
      * Start the cluster, the owning container will invoke this
      * @throws Exception - if failure to start cluster
      */

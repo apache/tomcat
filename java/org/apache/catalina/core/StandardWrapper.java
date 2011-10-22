@@ -134,13 +134,6 @@ public class StandardWrapper extends ContainerBase
 
 
     /**
-     * The descriptive information string for this implementation.
-     */
-    protected static final String info =
-        "org.apache.catalina.core.StandardWrapper/1.0";
-
-
-    /**
      * The (single) possibly uninitialized instance of this servlet.
      */
     protected volatile Servlet instance = null;
@@ -353,19 +346,6 @@ public class StandardWrapper extends ContainerBase
     public int getCountAllocated() {
 
         return (this.countAllocated.get());
-
-    }
-
-
-    /**
-     * Return descriptive information about this Container implementation and
-     * the corresponding version number, in the format
-     * <code>&lt;description&gt;/&lt;version&gt;</code>.
-     */
-    @Override
-    public String getInfo() {
-
-        return (info);
 
     }
 

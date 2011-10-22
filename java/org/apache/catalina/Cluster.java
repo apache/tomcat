@@ -37,13 +37,6 @@ public interface Cluster {
     // ------------------------------------------------------------- Properties
 
     /**
-     * Return descriptive information about this Cluster implementation and
-     * the corresponding version number, in the format
-     * <code>&lt;description&gt;/&lt;version&gt;</code>.
-     */
-    public String getInfo();
-
-    /**
      * Return the name of the cluster that this Server is currently
      * configured to operate within.
      *

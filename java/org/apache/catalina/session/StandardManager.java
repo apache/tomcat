@@ -97,13 +97,6 @@ public class StandardManager extends ManagerBase {
 
     // ----------------------------------------------------- Instance Variables
 
-
-    /**
-     * The descriptive information about this implementation.
-     */
-    protected static final String info = "StandardManager/1.0";
-
-
     /**
      * The descriptive name of this Manager implementation (for logging).
      */
@@ -122,20 +115,6 @@ public class StandardManager extends ManagerBase {
 
 
     // ------------------------------------------------------------- Properties
-
-
-    /**
-     * Return descriptive information about this Manager implementation and
-     * the corresponding version number, in the format
-     * <code>&lt;description&gt;/&lt;version&gt;</code>.
-     */
-    @Override
-    public String getInfo() {
-
-        return (info);
-
-    }
-
 
     /**
      * Return the descriptive short name of this Manager implementation.

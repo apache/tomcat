@@ -64,13 +64,6 @@ public class UserDatabaseRealm
     /**
      * Descriptive information about this Realm implementation.
      */
-    protected static final String info =
-        "org.apache.catalina.realm.UserDatabaseRealm/1.0";
-
-
-    /**
-     * Descriptive information about this Realm implementation.
-     */
     protected static final String name = "UserDatabaseRealm";
 
 
@@ -82,20 +75,6 @@ public class UserDatabaseRealm
 
 
     // ------------------------------------------------------------- Properties
-
-
-    /**
-     * Return descriptive information about this Realm implementation and
-     * the corresponding version number, in the format
-     * <code>&lt;description&gt;/&lt;version&gt;</code>.
-     */
-    @Override
-    public String getInfo() {
-
-        return info;
-
-    }
-
 
     /**
      * Return the global JNDI name of the <code>UserDatabase</code> resource

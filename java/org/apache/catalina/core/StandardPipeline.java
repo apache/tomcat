@@ -98,27 +98,12 @@ public class StandardPipeline extends LifecycleBase
 
 
     /**
-     * Descriptive information about this implementation.
-     */
-    protected static final String info = "org.apache.catalina.core.StandardPipeline/1.0";
-
-
-    /**
      * The first valve associated with this Pipeline.
      */
     protected Valve first = null;
+
     
     // --------------------------------------------------------- Public Methods
-
-
-    /**
-     * Return descriptive information about this implementation class.
-     */
-    public String getInfo() {
-
-        return info;
-
-    }
     
     @Override
     public boolean isAsyncSupported() {

@@ -80,11 +80,6 @@ public class SimpleTcpCluster extends LifecycleBase
 
     // ----------------------------------------------------- Instance Variables
 
-    /**
-     * Descriptive information about this component implementation.
-     */
-    protected static final String info = "SimpleTcpCluster/2.2";
-
     public static final String BEFORE_MEMBERREGISTER_EVENT = "before_member_register";
 
     public static final String AFTER_MEMBERREGISTER_EVENT = "after_member_register";
@@ -177,16 +172,6 @@ public class SimpleTcpCluster extends LifecycleBase
 
     public SimpleTcpCluster() {
         // NO-OP
-    }
-
-    /**
-     * Return descriptive information about this Cluster implementation and the
-     * corresponding version number, in the format
-     * <code>&lt;description&gt;/&lt;version&gt;</code>.
-     */
-    @Override
-    public String getInfo() {
-        return (info);
     }
 
     /**

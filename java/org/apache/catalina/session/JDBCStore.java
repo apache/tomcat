@@ -57,11 +57,6 @@ import org.apache.tomcat.util.ExceptionUtils;
 public class JDBCStore extends StoreBase {
 
     /**
-     * The descriptive information about this implementation.
-     */
-    protected static final String info = "JDBCStore/1.0";
-
-    /**
      * Context name associated with this Store
      */
     private String name = null;
@@ -187,14 +182,6 @@ public class JDBCStore extends StoreBase {
     protected PreparedStatement preparedLoadSql = null;
 
     // ------------------------------------------------------------- Properties
-
-    /**
-     * Return the info for this Store.
-     */
-    @Override
-    public String getInfo() {
-        return (info);
-    }
 
     /**
      * Return the name for this instance (built from container name)

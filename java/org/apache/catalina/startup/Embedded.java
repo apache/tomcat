@@ -306,7 +306,8 @@ public class Embedded  extends StandardService {
     public synchronized void addConnector(Connector connector) {
 
         if( log.isDebugEnabled() ) {
-            log.debug("Adding connector (" + connector.getInfo() + ")");
+            log.debug("Adding connector (" + connector.getClass().getName() +
+                    ")");
         }
 
         // Make sure we have a Container to send requests to

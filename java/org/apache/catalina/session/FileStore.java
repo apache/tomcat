@@ -78,14 +78,10 @@ public final class FileStore extends StoreBase {
 
 
     /**
-     * The descriptive information about this implementation.
-     */
-    private static final String info = "FileStore/1.0";
-
-    /**
      * Name to register for this Store, used for logging.
      */
     private static final String storeName = "fileStore";
+
 
     /**
      * Name to register for the background thread.
@@ -123,23 +119,12 @@ public final class FileStore extends StoreBase {
 
 
     /**
-     * Return descriptive information about this Store implementation and
-     * the corresponding version number, in the format
-     * <code>&lt;description&gt;/&lt;version&gt;</code>.
-     */
-    @Override
-    public String getInfo() {
-
-        return (info);
-
-    }
-
-    /**
      * Return the thread name for this Store.
      */
     public String getThreadName() {
         return(threadName);
     }
+
 
     /**
      * Return the name for this Store, used for logging.

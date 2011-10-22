@@ -37,11 +37,6 @@ public class ClusterSingleSignOnListener extends ClusterListener {
     private static final Log log =
         LogFactory.getLog(ClusterSingleSignOnListener.class);
 
-    /**
-     * The descriptive information about this implementation.
-     */
-    protected static final String info = "org.apache.catalina.ha.authenticator.ClusterSingleSignOnListener/1.0";
-
     // ------------------------------------------------------------- Properties
 
     private ClusterSingleSignOn clusterSSO = null;
@@ -54,15 +49,6 @@ public class ClusterSingleSignOnListener extends ClusterListener {
     }
 
     //--Logic---------------------------------------------------
-
-    /**
-     * Return descriptive information about this implementation.
-     */
-    public String getInfo() {
-
-        return (info);
-
-    }
 
     public ClusterSingleSignOn getClusterSSO() {
 

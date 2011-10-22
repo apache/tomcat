@@ -94,14 +94,6 @@ public class Response
 
     // ----------------------------------------------------- Class Variables
 
-
-    /**
-     * Descriptive information about this Response implementation.
-     */
-    protected static final String info =
-        "org.apache.coyote.catalina.CoyoteResponse/1.0";
-
-
     /**
      * The string manager for this package.
      */
@@ -367,16 +359,6 @@ public class Response
      */
     public void setIncluded(boolean included) {
         this.included = included;
-    }
-
-
-    /**
-     * Return descriptive information about this Response implementation and
-     * the corresponding version number, in the format
-     * <code>&lt;description&gt;/&lt;version&gt;</code>.
-     */
-    public String getInfo() {
-        return (info);
     }
 
 

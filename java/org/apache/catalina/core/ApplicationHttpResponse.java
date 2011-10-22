@@ -84,15 +84,7 @@ class ApplicationHttpResponse extends HttpServletResponseWrapper {
     protected boolean included = false;
 
 
-    /**
-     * Descriptive information about this implementation.
-     */
-    protected static final String info =
-        "org.apache.catalina.core.ApplicationHttpResponse/1.0";
-
-
     // ------------------------------------------------ ServletResponse Methods
-
 
     /**
      * Disallow <code>reset()</code> calls on a included response.
@@ -355,17 +347,6 @@ class ApplicationHttpResponse extends HttpServletResponseWrapper {
 
 
     // -------------------------------------------------------- Package Methods
-
-
-    /**
-     * Return descriptive information about this implementation.
-     */
-    public String getInfo() {
-
-        return (info);
-
-    }
-
 
     /**
      * Return the included flag for this response.

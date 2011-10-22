@@ -41,11 +41,6 @@ public abstract class StoreBase extends LifecycleBase implements Store {
     // ----------------------------------------------------- Instance Variables
 
     /**
-     * The descriptive information about this implementation.
-     */
-    protected static final String info = "StoreBase/1.0";
-
-    /**
      * Name to register for this Store, used for logging.
      */
     protected static String storeName = "StoreBase";
@@ -65,16 +60,8 @@ public abstract class StoreBase extends LifecycleBase implements Store {
      */
     protected Manager manager;
 
+    
     // ------------------------------------------------------------- Properties
-
-    /**
-     * Return the info for this Store.
-     */
-    @Override
-    public String getInfo() {
-        return(info);
-    }
-
 
     /**
      * Return the name for this Store, used for logging.

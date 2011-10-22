@@ -645,22 +645,6 @@ public class Request
 
 
     /**
-     * Descriptive information about this Request implementation.
-     */
-    protected static final String info =
-        "org.apache.coyote.catalina.CoyoteRequest/1.0";
-
-    /**
-     * Return descriptive information about this Request implementation and
-     * the corresponding version number, in the format
-     * <code>&lt;description&gt;/&lt;version&gt;</code>.
-     */
-    public String getInfo() {
-        return info;
-    }
-
-
-    /**
      * Mapping data.
      */
     protected MappingData mappingData = new MappingData();
