@@ -23,12 +23,12 @@
          domain="Catalina"
          group="Resources"
          type="org.apache.catalina.deploy.ContextEnvironment">
-    
+
     <attribute name="className"
                description="Fully qualified class name of the managed object"
                type="java.lang.String"
                writeable="false"/>
-      
+
     <attribute name="description"
                description="The description of this environment entry"
                type="java.lang.String"/>
@@ -36,7 +36,7 @@
     <attribute name="name"
                description="The name of this environment entry"
                type="java.lang.String"/>
-      
+
     <attribute name="override"
                description="Does this environment entry allow overrides by the
                application deployment descriptor"
@@ -58,63 +58,63 @@
          domain="Catalina"
          group="Resources"
          type="org.apache.catalina.deploy.ContextResource">
-    
+
     <attribute   name="auth"
                description="The authorization requirement for this resource"
                type="java.lang.String"/>
-      
+
     <attribute   name="description"
                description="The description of this resource"
                type="java.lang.String"/>
-      
+
     <attribute   name="name"
                description="The name of this resource"
                type="java.lang.String"/>
-      
+
     <attribute   name="scope"
                description="The sharing scope of this resource factory"
                type="java.lang.String"/>
-      
+
     <attribute   name="type"
                description="The type of this environment entry"
                type="java.lang.String"/>
   </mbean>
-  
-  
+
+
    <mbean         name="ContextResourceLink"
           className="org.apache.catalina.mbeans.ContextResourceLinkMBean"
           description="Representation of a resource link for a web application"
           domain="Catalina"
           group="Resources"
           type="org.apache.catalina.deploy.ContextResourceLink">
-    
+
     <attribute   name="global"
                description="The global name of this resource"
                type="java.lang.String"/>
-      
+
     <attribute   name="name"
                description="The name of this resource"
                type="java.lang.String"/>
-               
+
     <attribute   name="description"
                description="The description of this resource"
                type="java.lang.String"/>
-      
+
     <attribute   name="type"
                description="The type of this resource"
                type="java.lang.String"/>
-      
+
   </mbean>
-  
+
   <mbean         name="NamingResources"
             className="org.apache.catalina.mbeans.NamingResourcesMBean"
           description="Holds and manages the naming resources defined in the
-                       J2EE Enterprise Naming Context and their associated 
+                       J2EE Enterprise Naming Context and their associated
                        JNDI context"
                domain="Catalina"
                 group="Resources"
                  type="org.apache.catalina.deploy.NamingResources">
-                 
+
     <attribute   name="container"
           description="The container with which the naming resources are associated."
                  type="java.lang.Object"
