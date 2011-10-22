@@ -43,11 +43,6 @@
       is="true"
       type="boolean"/>
     <attribute
-      name="info"
-      description="Class version info"
-      type="java.lang.String"
-      writeable="false"/>
-    <attribute
       name="notifyLifecycleListenerOnFailure"
       description="notify lifecycleListener from message transfer failure"
       is="true"
@@ -113,11 +108,6 @@
       name="filter"
       description="resource filter to disable session replication check"
       type="java.lang.String"/>
-    <attribute
-      name="info"
-      description="Class version info"
-      type="java.lang.String"
-      writeable="false"/>
     <attribute
       name="lastSendTime"
       description="last replicated request time"
