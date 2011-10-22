@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -248,13 +248,13 @@ public class DataSourceRealm extends RealmBase {
      */
     @Override
     public Principal authenticate(String username, String credentials) {
-        
+
         // No user or no credentials
         // Can't possibly authenticate, don't bother the database then
         if (username == null || credentials == null) {
             return null;
         }
-        
+
         Connection dbConnection = null;
 
         // Ensure that we have an open database connection
@@ -263,10 +263,10 @@ public class DataSourceRealm extends RealmBase {
             // If the db connection open fails, return "not authenticated"
             return null;
         }
-        
+
         // Acquire a Principal object for this user
         Principal principal = authenticate(dbConnection, username, credentials);
-            
+
         close(dbConnection);
 
         return principal;
@@ -338,7 +338,7 @@ public class DataSourceRealm extends RealmBase {
         try {
             if (!dbConnection.getAutoCommit()) {
                 dbConnection.commit();
-            }            
+            }
         } catch (SQLException e) {
             containerLog.error("Exception committing connection before closing:", e);
         }
@@ -372,7 +372,7 @@ public class DataSourceRealm extends RealmBase {
         } catch (Exception e) {
             // Log the problem for posterity
             containerLog.error(sm.getString("dataSourceRealm.exception"), e);
-        }  
+        }
         return null;
     }
 
@@ -401,18 +401,18 @@ public class DataSourceRealm extends RealmBase {
         }
 
         try {
-            return getPassword(dbConnection, username);            
+            return getPassword(dbConnection, username);
         } finally {
             close(dbConnection);
         }
     }
-    
+
     /**
      * Return the password associated with the given principal's user name.
      * @param dbConnection The database connection to be used
      * @param username Username for which password should be retrieved
      */
-    protected String getPassword(Connection dbConnection, 
+    protected String getPassword(Connection dbConnection,
                                  String username) {
 
         ResultSet rs = null;
@@ -427,7 +427,7 @@ public class DataSourceRealm extends RealmBase {
             }
 
             return (dbCredentials != null) ? dbCredentials.trim() : null;
-            
+
         } catch(SQLException e) {
             containerLog.error(
                     sm.getString("dataSourceRealm.getPassword.exception",
@@ -444,10 +444,10 @@ public class DataSourceRealm extends RealmBase {
                     containerLog.error(
                         sm.getString("dataSourceRealm.getPassword.exception",
                              username));
-                
+
             }
         }
-        
+
         return null;
     }
 
@@ -491,7 +491,7 @@ public class DataSourceRealm extends RealmBase {
             close(dbConnection);
         }
     }
-    
+
     /**
      * Return the roles associated with the given user name
      * @param dbConnection The database connection to be used
@@ -499,16 +499,16 @@ public class DataSourceRealm extends RealmBase {
      */
     protected ArrayList<String> getRoles(Connection dbConnection,
                                      String username) {
-        
+
         ResultSet rs = null;
         PreparedStatement stmt = null;
         ArrayList<String> list = null;
-        
+
         try {
             stmt = roles(dbConnection, username);
             rs = stmt.executeQuery();
             list = new ArrayList<String>();
-            
+
             while (rs.next()) {
                 String role = rs.getString(1);
                 if (role != null) {
@@ -534,7 +534,7 @@ public class DataSourceRealm extends RealmBase {
                                      username));
             }
         }
-        
+
         return null;
     }
 
@@ -558,7 +558,7 @@ public class DataSourceRealm extends RealmBase {
         return (credentials);
 
     }
-    
+
     /**
      * Return a PreparedStatement configured to perform the SELECT required
      * to retrieve user roles for the specified username.
@@ -571,7 +571,7 @@ public class DataSourceRealm extends RealmBase {
     private PreparedStatement roles(Connection dbConnection, String username)
         throws SQLException {
 
-        PreparedStatement roles = 
+        PreparedStatement roles =
             dbConnection.prepareStatement(preparedRoles);
 
         roles.setString(1, username);
@@ -612,7 +612,7 @@ public class DataSourceRealm extends RealmBase {
         temp.append(userNameCol);
         temp.append(" = ?");
         preparedCredentials = temp.toString();
-        
+
         super.startInternal();
     }
 }

@@ -362,7 +362,7 @@ public class JNDIRealm extends RealmBase {
      * Should we search the entire subtree for matching memberships?
      */
     protected boolean roleSubtree = false;
-    
+
     /**
      * Should we look for nested group in order to determine roles?
      */
@@ -372,10 +372,10 @@ public class JNDIRealm extends RealmBase {
      * When searching for user roles, should the search be performed as the user
      * currently being authenticated? If false, {@link #connectionName} and
      * {@link #connectionPassword} will be used if specified, else an anonymous
-     * connection will be used. 
+     * connection will be used.
      */
     protected boolean roleSearchAsUser = false;
-    
+
     /**
      * An alternate URL, to which, we should connect if connectionURL fails.
      */
@@ -398,7 +398,7 @@ public class JNDIRealm extends RealmBase {
      * to the directory. The default is 5000 (5 seconds).
      */
     protected String connectionTimeout = "5000";
-    
+
     /**
      * The sizeLimit (also known as the countLimit) to use when the realm is
      * configured with {@link #userSearch}. Zero for no limit.
@@ -411,7 +411,7 @@ public class JNDIRealm extends RealmBase {
      */
     protected int timeLimit = 0;
 
-    
+
     /**
      * Should delegated credentials from the SPNEGO authenticator be used if
      * available
@@ -784,7 +784,7 @@ public class JNDIRealm extends RealmBase {
         this.roleSubtree = roleSubtree;
 
     }
-    
+
     /**
      * Return the "The nested group search flag" flag.
      */
@@ -954,7 +954,7 @@ public class JNDIRealm extends RealmBase {
     }
 
 
-    
+
     public boolean isUseDelegatedCredential() {
         return useDelegatedCredential;
     }
@@ -1634,7 +1634,7 @@ public class JNDIRealm extends RealmBase {
      * Configure the context to use {@link #connectionName} and
      * {@link #connectionPassword} if specified or an anonymous connection if
      * those attributes are not specified.
-     * 
+     *
       * @param context      DirContext to configure
      */
     private void userCredentialsRemove(DirContext context)
@@ -1683,10 +1683,10 @@ public class JNDIRealm extends RealmBase {
             containerLog.trace("  getRoles(" + dn + ")");
 
         // Start with roles retrieved from the user entry
-        List<String> list = new ArrayList<String>(); 
+        List<String> list = new ArrayList<String>();
         List<String> userRoles = user.getRoles();
         if (userRoles != null) {
-            list.addAll(userRoles); 
+            list.addAll(userRoles);
         }
         if (commonRole != null)
             list.add(commonRole);
@@ -1700,7 +1700,7 @@ public class JNDIRealm extends RealmBase {
         // Are we configured to do role searches?
         if ((roleFormat == null) || (roleName == null))
             return (list);
-        
+
         // Set up parameters for an appropriate search
         String filter = roleFormat.format(new String[] { doRFC2254Encoding(dn), username });
         SearchControls controls = new SearchControls();
@@ -1766,7 +1766,7 @@ public class JNDIRealm extends RealmBase {
         // if nested group search is enabled, perform searches for nested groups until no new group is found
         if (getRoleNested()) {
 
-            // The following efficient algorithm is known as memberOf Algorithm, as described in "Practices in 
+            // The following efficient algorithm is known as memberOf Algorithm, as described in "Practices in
             // Directory Groups". It avoids group slurping and handles cyclic group memberships as well.
             // See http://middleware.internet2.edu/dir/ for details
 
@@ -1938,7 +1938,7 @@ public class JNDIRealm extends RealmBase {
     protected Principal getPrincipal(String username) {
         return getPrincipal(username, null);
     }
-    
+
     @Override
     protected Principal getPrincipal(String username,
             GSSCredential gssCredential) {
@@ -2066,7 +2066,7 @@ public class JNDIRealm extends RealmBase {
             return new GenericPrincipal(user.getUserName(), user.getPassword(),
                     roles, null, null, gssCredential);
         }
-        
+
         return null;
     }
 
@@ -2313,11 +2313,11 @@ public class JNDIRealm extends RealmBase {
            NameParser parser = context.getNameParser("");
            Name contextName = parser.parse(context.getNameInNamespace());
            Name baseName = parser.parse(base);
-   
+
            // Bugzilla 32269
            Name entryName =
                parser.parse(new CompositeName(result.getName()).get(0));
-   
+
            Name name = contextName.addAll(baseName);
            name = name.addAll(entryName);
            return name.toString();
@@ -2354,7 +2354,7 @@ public class JNDIRealm extends RealmBase {
      * A protected class representing a User
      */
     protected static class User {
-         
+
         private final String username;
         private final String dn;
         private final String password;
@@ -2371,19 +2371,19 @@ public class JNDIRealm extends RealmBase {
                 this.roles = Collections.unmodifiableList(roles);
             }
         }
-    
+
         public String getUserName() {
             return username;
         }
-         
+
         public String getDN() {
             return dn;
         }
-        
+
         public String getPassword() {
             return password;
         }
-         
+
         public List<String> getRoles() {
             return roles;
         }

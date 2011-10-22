@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -108,7 +108,7 @@ public class UserDatabaseRealm
      * security role, within the context of this Realm; otherwise return
      * <code>false</code>. This implementation returns <code>true</code>
      * if the <code>User</code> has the role, or if any <code>Group</code>
-     * that the <code>User</code> is a member of has the role. 
+     * that the <code>User</code> is a member of has the role.
      *
      * @param principal Principal for whom the role is to be checked
      * @param role Security role to be checked
@@ -139,7 +139,7 @@ public class UserDatabaseRealm
         User user = (User)principal;
         Role dbrole = database.findRole(role);
         if(dbrole == null) {
-            return false; 
+            return false;
         }
         if(user.isInRole(dbrole)) {
             return true;
@@ -178,7 +178,7 @@ public class UserDatabaseRealm
 
         if (user == null) {
             return null;
-        } 
+        }
 
         return (user.getPassword());
 
