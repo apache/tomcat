@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -62,38 +62,38 @@ package org.apache.catalina;
  * |                                                               |
  * |                            stop()                             |
  * --->------------------------------>------------------------------
- *   
+ *
  * Any state can transition to FAILED.
- * 
+ *
  * Calling start() while a component is in states STARTING_PREP, STARTING or
  * STARTED has no effect.
- * 
+ *
  * Calling start() while a component is in state NEW will cause init() to be
  * called immediately after the start() method is entered.
- * 
+ *
  * Calling stop() while a component is in states STOPPING_PREP, STOPPING or
  * STOPPED has no effect.
- * 
+ *
  * Calling stop() while a component is in state NEW transitions the component
  * to STOPPED. This is typically encountered when a component fails to start and
  * does not start all its sub-components. When the component is stopped, it will
  * try to stop all sub-components - even those it didn't start.
- * 
+ *
  * MUST_STOP is used to indicate that the {@link #stop()} should be called on
  * the component as soon as {@link #start()} exits. It is typically used when a
  * component has failed to start.
- * 
+ *
  * MUST_DESTROY is used to indicate that the {@link #stop()} should be called on
  * the component as soon as {@link #stop()} exits. It is typically used when a
  * component is not designed to be restarted.
- * 
+ *
  * Attempting any other transition will throw {@link LifecycleException}.
- * 
+ *
  * </pre>
  * The {@link LifecycleEvent}s fired during state changes are defined in the
  * methods that trigger the changed. No {@link LifecycleEvent}s are fired if the
  * attempted transition is not valid.
- * 
+ *
  * TODO: Not all components may transition from STOPPED to STARTING_PREP. These
  *       components should use MUST_DESTROY to signal this.
  *
@@ -180,7 +180,7 @@ public interface Lifecycle {
      */
     public static final String CONFIGURE_START_EVENT = "configure_start";
 
-    
+
     /**
      * The LifecycleEvent type for the "configure_stop" event. Used by those
      * components that use a separate component to perform configuration and
@@ -189,7 +189,7 @@ public interface Lifecycle {
      */
     public static final String CONFIGURE_STOP_EVENT = "configure_stop";
 
-    
+
     // --------------------------------------------------------- Public Methods
 
 
@@ -202,7 +202,7 @@ public interface Lifecycle {
 
 
     /**
-     * Get the life cycle listeners associated with this life cycle. If this 
+     * Get the life cycle listeners associated with this life cycle. If this
      * component has no listeners registered, a zero-length array is returned.
      */
     public LifecycleListener[] findLifecycleListeners();
@@ -224,7 +224,7 @@ public interface Lifecycle {
      *   <li>INIT_EVENT: On the successful completion of component
      *                   initialization.</li>
      * </ol>
-     * 
+     *
      * @exception LifecycleException if this component detects a fatal error
      *  that prevents this component from being used
      */
@@ -245,7 +245,7 @@ public interface Lifecycle {
      *                    any child components. It is at this point that the
      *                    state transitions to {@link LifecycleState#STARTING}
      *                    and that the public methods other than property
-     *                    getters/setters and life cycle methods may be 
+     *                    getters/setters and life cycle methods may be
      *                    used.</li>
      *   <li>AFTER_START_EVENT: At the end of the method, immediately before it
      *                          returns. It is at this point that the state
@@ -280,13 +280,13 @@ public interface Lifecycle {
      *                         transitions to {@link LifecycleState#STOPPED}.
      *                         </li>
      * </ol>
-     * 
+     *
      * Note that if transitioning from {@link LifecycleState#FAILED} then the
      * three events above will be fired but the component will transition
      * directly from {@link LifecycleState#FAILED} to
      * {@link LifecycleState#STOPPING}, bypassing
      * {@link LifecycleState#STOPPING_PREP}
-     * 
+     *
      * @exception LifecycleException if this component detects a fatal error
      *  that needs to be reported
      */
@@ -299,7 +299,7 @@ public interface Lifecycle {
      *   <li>DESTROY_EVENT: On the successful completion of component
      *                      destruction.</li>
      * </ol>
-     * 
+     *
      * @exception LifecycleException if this component detects a fatal error
      *  that prevents this component from being used
      */
@@ -308,12 +308,12 @@ public interface Lifecycle {
 
     /**
      * Obtain the current state of the source component.
-     * 
+     *
      * @return The current state of the source component.
      */
     public LifecycleState getState();
-    
-    
+
+
     /**
      * Obtain a textual representation of the current component state. Useful
      * for JMX.

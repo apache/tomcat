@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -59,7 +59,6 @@ public interface Realm {
 
 
     // --------------------------------------------------------- Public Methods
-    
     /**
      * Add a property change listener to this component.
      *
@@ -107,8 +106,8 @@ public interface Realm {
      *                   credentials in the returned Principal?
      */
     public Principal authenticate(GSSContext gssContext, boolean storeCreds);
-    
-    
+
+
     /**
      * Return the Principal associated with the specified chain of X509
      * client certificates.  If there is none, return <code>null</code>.
@@ -117,8 +116,8 @@ public interface Realm {
      *  the array being the certificate of the client itself.
      */
     public Principal authenticate(X509Certificate certs[]);
-    
-    
+
+
     /**
      * Execute a periodic task, such as reloading, etc. This method will be
      * invoked inside the classloading context of this container. Unexpected
@@ -135,8 +134,8 @@ public interface Realm {
      */
     public SecurityConstraint [] findSecurityConstraints(Request request,
                                                      Context context);
-    
-    
+
+
     /**
      * Perform access control based on the specified authorization constraint.
      * Return <code>true</code> if this constraint is satisfied and processing
@@ -154,8 +153,8 @@ public interface Realm {
                                          SecurityConstraint [] constraint,
                                          Context context)
         throws IOException;
-    
-    
+
+
     /**
      * Return <code>true</code> if the specified Principal has the specified
      * security role, within the context of this Realm; otherwise return
@@ -183,7 +182,7 @@ public interface Realm {
                                          Response response,
                                          SecurityConstraint []constraint)
         throws IOException;
-    
+
     /**
      * Remove a property change listener from this component.
      *

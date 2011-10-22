@@ -22,7 +22,7 @@
          domain="Catalina"
          group="Valve"
          type="org.apache.catalina.valves.AccessLogValve">
-         
+
     <attribute name="asyncSupported"
                description="Does this valve support async reporting."
                is="true"
@@ -107,7 +107,7 @@
     <attribute name="suffix"
                description="The suffix that is added to log file filenames"
                type="java.lang.String"/>
-    
+
     <operation name="rotate"
                description="Move the existing log file to a new name"
                impact="ACTION"
@@ -116,7 +116,7 @@
                  description="File name to move the log file to."
                  type="java.lang.String"/>
     </operation>
- 
+
   </mbean>
 
   <mbean name="CrawlerSessionManagerValve"
@@ -124,7 +124,7 @@
          domain="Catalina"
          group="Valve"
          type="org.apache.catalina.valves.CrawlerSessionManagerValve">
-         
+
     <attribute name="asyncSupported"
                description="Does this valve support async reporting."
                is="true"
@@ -154,7 +154,7 @@
                description="The name of the LifecycleState that this component is currently in"
                type="java.lang.String"
                writeable="false"/>
- 
+
   </mbean>
 
   <mbean name="ErrorReportValve"
@@ -287,12 +287,12 @@
          domain="Catalina"
          group="Valve"
          type="org.apache.catalina.valves.SemaphoreValve">
-         
+
     <attribute name="asyncSupported"
                description="Does this valve support async reporting."
                is="true"
                type="boolean"/>
-               
+
     <attribute name="block"
                description="Should this be blocked until a permit is available?"
                type="boolean"/>
@@ -309,16 +309,16 @@
     <attribute name="fairness"
                description="Use a fair semaphore"
                type="boolean"/>
-               
+
     <attribute name="info"
                description="Information about this implementation"
                type="java.lang.String"
                writeable="false"/>
-               
+
     <attribute name="interruptible"
                description="Should this be blocked interruptibly until a permit is availabl?"
                type="boolean"/>
-               
+
     <attribute name="stateName"
                description="The name of the LifecycleState that this component is currently in"
                type="java.lang.String"
@@ -335,7 +335,7 @@
     <attribute name="allow"
                description="The comma-delimited set of allow expressions"
                type="java.lang.String"/>
-               
+
     <attribute name="asyncSupported"
                description="Does this valve support async reporting."
                is="true"
@@ -349,7 +349,7 @@
     <attribute   name="deny"
                description="The comma-delimited set of deny expressions"
                type="java.lang.String"/>
-               
+
     <attribute name="info"
                description="Information about this implementation"
                type="java.lang.String"
@@ -371,7 +371,7 @@
     <attribute name="allow"
                description="The comma-delimited set of allow expressions"
                type="java.lang.String"/>
-               
+
     <attribute name="asyncSupported"
                description="Does this valve support async reporting."
                is="true"
@@ -385,7 +385,7 @@
     <attribute   name="deny"
                description="The comma-delimited set of deny expressions"
                type="java.lang.String"/>
-               
+
     <attribute name="info"
                description="Information about this implementation"
                type="java.lang.String"
@@ -403,7 +403,7 @@
          domain="Catalina"
          group="Valve"
          type="org.apache.catalina.valves.RemoteIpValve">
-         
+
     <attribute name="asyncSupported"
                description="Does this valve support async reporting."
                is="true"
@@ -413,42 +413,42 @@
                description="Value returned by ServletRequest.getServerPort() when the protocolHeader indicates http protocol"
                type="java.lang.String"
                writeable="false" />
-    
+
     <attribute name="httpsServerPort"
                description="Value returned by ServletRequest.getServerPort() when the protocolHeader indicates https protocol"
                type="java.lang.String"
                writeable="false" />
-               
+
     <attribute name="info"
                description="Information about this implementation"
                type="java.lang.String"
                writeable="false"/>
-               
+
     <attribute name="internalProxies"
                description="Regular expression that matches IP addresses of internal proxies"
                type="java.lang.String"
                writeable="false" />
-    
+
     <attribute name="protocolHeader"
                description="The protocol header (e.g. &quot;X-Forwarded-Proto&quot;)"
                type="java.lang.String"
                writeable="false" />
-               
+
     <attribute name="protocolHeaderHttpsValue"
                description="The value of the protocol header for incoming https request (e.g. &quot;https&quot;)"
                type="java.lang.String"
                writeable="false" />
-               
+
     <attribute name="proxiesHeader"
                description="The proxies header name (e.g. &quot;X-Forwarded-By&quot;)"
                type="java.lang.String"
                writeable="false" />
-               
+
     <attribute name="remoteIpHeader"
                description="The remote IP header name (e.g. &quot;X-Forwarded-For&quot;)"
                type="java.lang.String"
                writeable="false" />
-               
+
     <attribute name="stateName"
                description="The name of the LifecycleState that this component is currently in"
                type="java.lang.String"
@@ -458,7 +458,7 @@
                description="Regular expression that matches IP addresses of trusted proxies"
                type="java.lang.String"
                writeable="false" />
-               
+
   </mbean>
 
   <mbean name="StuckThreadDetectionValve"
