@@ -283,9 +283,9 @@ public class AjpAprProcessor extends AbstractAjpProcessor<Long> {
     protected void output(byte[] src, int offset, int length)
             throws IOException {
         outputBuffer.put(src, offset, length);
-        
+
         long socketRef = socket.getSocket().longValue();
-        
+
         if (outputBuffer.position() > 0) {
             if ((socketRef != 0) && Socket.sendbb(socketRef, 0, outputBuffer.position()) < 0) {
                 throw new IOException(sm.getString("ajpprocessor.failedsend"));

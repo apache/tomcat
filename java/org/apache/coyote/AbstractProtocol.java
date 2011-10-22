@@ -52,13 +52,13 @@ public abstract class AbstractProtocol implements ProtocolHandler,
      */
     protected ObjectName rgOname = null;
 
-    
+
     /**
      * Name of MBean for the ThreadPool.
      */
     protected ObjectName tpOname = null;
 
-    
+
     /**
      * Endpoint that provides low-level network I/O - must be matched to the
      * ProtocolHandler implementation (ProtocolHandler using BIO, requires BIO
@@ -66,7 +66,7 @@ public abstract class AbstractProtocol implements ProtocolHandler,
      */
     protected AbstractEndpoint endpoint = null;
 
-    
+
     // ----------------------------------------------- Generic property handling
 
     /**
@@ -91,7 +91,7 @@ public abstract class AbstractProtocol implements ProtocolHandler,
 
 
     // ------------------------------- Properties managed by the ProtocolHandler
-    
+
     /**
      * The adapter provides the link between the ProtocolHandler and the
      * connector.
@@ -124,7 +124,7 @@ public abstract class AbstractProtocol implements ProtocolHandler,
      * provider is used to perform the conversion. For example it is used with
      * the AJP connectors, the HTTP APR connector and with the
      * {@link org.apache.catalina.valves.SSLValve}. If not specified, the
-     * default provider will be used. 
+     * default provider will be used.
      */
     protected String clientCertProvider = null;
     public String getClientCertProvider() { return clientCertProvider; }
@@ -144,7 +144,7 @@ public abstract class AbstractProtocol implements ProtocolHandler,
     public void setMaxThreads(int maxThreads) {
         endpoint.setMaxThreads(maxThreads);
     }
-    
+
     public int getMaxConnections() { return endpoint.getMaxConnections(); }
     public void setMaxConnections(int maxConnections) {
         endpoint.setMaxConnections(maxConnections);
@@ -236,16 +236,16 @@ public abstract class AbstractProtocol implements ProtocolHandler,
         return ObjectName.quote(name.toString());
     }
 
-    
+
     // -------------------------------------------------------- Abstract methods
-    
+
     /**
      * Concrete implementations need to provide access to their logger to be
      * used by the abstract classes.
      */
     protected abstract Log getLog();
-    
-    
+
+
     /**
      * Obtain the prefix to be used when construction a name for this protocol
      * handler. The name will be prefix-address-port.
@@ -306,7 +306,7 @@ public abstract class AbstractProtocol implements ProtocolHandler,
     private ObjectName createObjectName() throws MalformedObjectNameException {
         // Use the same domain as the connector
         domain = adapter.getDomain();
-        
+
         if (domain == null) {
             return null;
         }
@@ -446,7 +446,7 @@ public abstract class AbstractProtocol implements ProtocolHandler,
             getLog().error(sm.getString("abstractProtocolHandler.destroyError",
                     getName()), e);
         }
-        
+
         if (oname != null) {
             Registry.getRegistry(null, null).unregisterComponent(oname);
         }
@@ -456,10 +456,10 @@ public abstract class AbstractProtocol implements ProtocolHandler,
         if (rgOname != null)
             Registry.getRegistry(null, null).unregisterComponent(rgOname);
     }
-    
-    
+
+
     // ------------------------------------------- Connection handler base class
-    
+
     protected abstract static class AbstractConnectionHandler<S,P extends AbstractProcessor<S>>
             implements AbstractEndpoint.Handler {
 
@@ -473,7 +473,7 @@ public abstract class AbstractProtocol implements ProtocolHandler,
 
         protected RecycledProcessors<P,S> recycledProcessors =
             new RecycledProcessors<P,S>(this);
-        
+
 
         protected abstract AbstractProtocol getProtocol();
 
@@ -487,7 +487,7 @@ public abstract class AbstractProtocol implements ProtocolHandler,
         public void recycle() {
             recycledProcessors.clear();
         }
-        
+
 
         public SocketState process(SocketWrapper<S> socket,
                 SocketStatus status) {
@@ -514,7 +514,7 @@ public abstract class AbstractProtocol implements ProtocolHandler,
                     } else {
                         state = processor.process(socket);
                     }
-    
+
                     if (state != SocketState.CLOSED && processor.isAsync()) {
                         state = processor.asyncPostProcess();
                     }
@@ -561,7 +561,7 @@ public abstract class AbstractProtocol implements ProtocolHandler,
             release(socket, processor, true, false);
             return SocketState.CLOSED;
         }
-        
+
         protected abstract P createProcessor();
         protected abstract void initSsl(SocketWrapper<S> socket, P processor);
         protected abstract void longPoll(SocketWrapper<S> socket, P processor);
@@ -617,7 +617,7 @@ public abstract class AbstractProtocol implements ProtocolHandler,
             }
         }
     }
-    
+
     protected static class RecycledProcessors<P extends AbstractProcessor<S>, S>
             extends ConcurrentLinkedQueue<P> {
 
@@ -644,7 +644,7 @@ public abstract class AbstractProtocol implements ProtocolHandler,
             if (!result) handler.unregister(processor);
             return result;
         }
-    
+
         @Override
         public P poll() {
             P result = super.poll();
@@ -653,7 +653,7 @@ public abstract class AbstractProtocol implements ProtocolHandler,
             }
             return result;
         }
-    
+
         @Override
         public void clear() {
             P next = poll();

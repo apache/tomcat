@@ -70,7 +70,7 @@ public class InternalAprInputBuffer extends AbstractInputBuffer<Long> {
 
         parsingHeader = true;
         swallowInput = true;
-        
+
     }
 
 
@@ -92,7 +92,7 @@ public class InternalAprInputBuffer extends AbstractInputBuffer<Long> {
     // --------------------------------------------------------- Public Methods
 
     /**
-     * Recycle the input buffer. This should be called when closing the 
+     * Recycle the input buffer. This should be called when closing the
      * connection.
      */
     @Override
@@ -103,14 +103,14 @@ public class InternalAprInputBuffer extends AbstractInputBuffer<Long> {
 
 
     /**
-     * Read the request line. This function is meant to be used during the 
-     * HTTP request header parsing. Do NOT attempt to read the request body 
+     * Read the request line. This function is meant to be used during the
+     * HTTP request header parsing. Do NOT attempt to read the request body
      * using it.
      *
      * @throws IOException If an exception occurs during the underlying socket
      * read operations, or if the given buffer is not big enough to accommodate
      * the whole line.
-     * @return true if data is properly fed; false if no data is available 
+     * @return true if data is properly fed; false if no data is available
      * immediately and thread should be freed
      */
     @Override
@@ -219,13 +219,13 @@ public class InternalAprInputBuffer extends AbstractInputBuffer<Long> {
             if (buf[pos] == Constants.SP || buf[pos] == Constants.HT) {
                 space = true;
                 end = pos;
-            } else if ((buf[pos] == Constants.CR) 
+            } else if ((buf[pos] == Constants.CR)
                        || (buf[pos] == Constants.LF)) {
                 // HTTP/0.9 style request
                 eol = true;
                 space = true;
                 end = pos;
-            } else if ((buf[pos] == Constants.QUESTION) 
+            } else if ((buf[pos] == Constants.QUESTION)
                        && (questionPos == -1)) {
                 questionPos = pos;
             }
@@ -236,7 +236,7 @@ public class InternalAprInputBuffer extends AbstractInputBuffer<Long> {
 
         request.unparsedURI().setBytes(buf, start, end - start);
         if (questionPos >= 0) {
-            request.queryString().setBytes(buf, questionPos + 1, 
+            request.queryString().setBytes(buf, questionPos + 1,
                                            end - questionPos - 1);
             request.requestURI().setBytes(buf, start, questionPos - start);
         } else {
@@ -292,7 +292,7 @@ public class InternalAprInputBuffer extends AbstractInputBuffer<Long> {
         } else {
             request.protocol().setString("");
         }
-        
+
         return true;
 
     }
@@ -317,7 +317,7 @@ public class InternalAprInputBuffer extends AbstractInputBuffer<Long> {
 
     /**
      * Parse an HTTP header.
-     * 
+     *
      * @return false after reading a blank line (which indicates that the
      * HTTP header parsing is done
      */
@@ -481,14 +481,14 @@ public class InternalAprInputBuffer extends AbstractInputBuffer<Long> {
 
     }
 
-    
+
     private void skipLine(int start) throws IOException {
         boolean eol = false;
         int lastRealByte = start;
         if (pos - 1 > start) {
             lastRealByte = pos - 1;
         }
-        
+
         while (!eol) {
 
             // Read new bytes if needed
@@ -512,8 +512,8 @@ public class InternalAprInputBuffer extends AbstractInputBuffer<Long> {
                     lastRealByte - start + 1, Charset.forName("ISO-8859-1"))));
         }
     }
-    
-    
+
+
     /**
      * Available bytes (note that due to encoding, this may not correspond )
      */
@@ -535,7 +535,7 @@ public class InternalAprInputBuffer extends AbstractInputBuffer<Long> {
      * Read some bytes.
      */
     @Override
-    public int doRead(ByteChunk chunk, Request req) 
+    public int doRead(ByteChunk chunk, Request req)
         throws IOException {
 
         if (lastActiveFilter == -1)
@@ -562,11 +562,11 @@ public class InternalAprInputBuffer extends AbstractInputBuffer<Long> {
         // Ignore the block parameter and just call fill
         return fill();
     }
-    
-    
+
+
     /**
      * Fill the internal buffer using data from the underlying input stream.
-     * 
+     *
      * @return false if at end of stream
      */
     protected boolean fill()
@@ -598,7 +598,7 @@ public class InternalAprInputBuffer extends AbstractInputBuffer<Long> {
         } else {
 
             if (buf.length - end < 4500) {
-                // In this case, the request header was really large, so we allocate a 
+                // In this case, the request header was really large, so we allocate a
                 // brand new one; the old one will get GCed when subsequent requests
                 // clear all references
                 buf = new byte[buf.length];
@@ -637,7 +637,7 @@ public class InternalAprInputBuffer extends AbstractInputBuffer<Long> {
      * This class is an input buffer which will read its data from an input
      * stream.
      */
-    protected class SocketInputBuffer 
+    protected class SocketInputBuffer
         implements InputBuffer {
 
 
@@ -645,7 +645,7 @@ public class InternalAprInputBuffer extends AbstractInputBuffer<Long> {
          * Read bytes into the specified chunk.
          */
         @Override
-        public int doRead(ByteChunk chunk, Request req ) 
+        public int doRead(ByteChunk chunk, Request req )
             throws IOException {
 
             if (pos >= lastValid) {

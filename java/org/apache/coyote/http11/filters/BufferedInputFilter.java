@@ -137,5 +137,5 @@ public class BufferedInputFilter implements InputFilter {
     public int available() {
         return buffered.getLength();
     }
-    
+
 }

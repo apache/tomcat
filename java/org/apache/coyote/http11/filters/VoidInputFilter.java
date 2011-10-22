@@ -28,7 +28,7 @@ import org.apache.tomcat.util.buf.ByteChunk;
 /**
  * Void input filter, which returns -1 when attempting a read. Used with a GET,
  * HEAD, or a similar request.
- * 
+ *
  * @author Remy Maucherat
  */
 public class VoidInputFilter implements InputFilter {
@@ -58,7 +58,7 @@ public class VoidInputFilter implements InputFilter {
 
     /**
      * Write some bytes.
-     * 
+     *
      * @return number of bytes written by the filter
      */
     @Override
@@ -101,7 +101,7 @@ public class VoidInputFilter implements InputFilter {
 
 
     /**
-     * Return the name of the associated encoding; Here, the value is 
+     * Return the name of the associated encoding; Here, the value is
      * "void".
      */
     @Override
@@ -113,10 +113,10 @@ public class VoidInputFilter implements InputFilter {
     /**
      * End the current request. It is acceptable to write extra bytes using
      * buffer.doWrite during the execution of this method.
-     * 
-     * @return Should return 0 unless the filter does some content length 
+     *
+     * @return Should return 0 unless the filter does some content length
      * delimitation, in which case the number is the amount of extra bytes or
-     * missing bytes, which would indicate an error. 
+     * missing bytes, which would indicate an error.
      * Note: It is recommended that extra bytes be swallowed by the filter.
      */
     @Override
@@ -133,5 +133,5 @@ public class VoidInputFilter implements InputFilter {
     public int available() {
         return 0;
     }
-    
+
 }

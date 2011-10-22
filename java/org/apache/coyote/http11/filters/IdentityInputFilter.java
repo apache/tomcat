@@ -27,7 +27,7 @@ import org.apache.tomcat.util.buf.ByteChunk;
 
 /**
  * Identity input filter.
- * 
+ *
  * @author Remy Maucherat
  */
 public class IdentityInputFilter implements InputFilter {
@@ -100,10 +100,10 @@ public class IdentityInputFilter implements InputFilter {
 
     /**
      * Read bytes.
-     * 
+     *
      * @return If the filter does request length control, this value is
      * significant; it should be the number of bytes consumed from the buffer,
-     * up until the end of the current request body, or the buffer length, 
+     * up until the end of the current request body, or the buffer length,
      * whichever is greater. If the filter does not do request body length
      * control, the returned value should be -1.
      */
@@ -120,7 +120,7 @@ public class IdentityInputFilter implements InputFilter {
                     // The chunk is longer than the number of bytes remaining
                     // in the body; changing the chunk length to the number
                     // of bytes remaining
-                    chunk.setBytes(chunk.getBytes(), chunk.getStart(), 
+                    chunk.setBytes(chunk.getBytes(), chunk.getStart(),
                                    (int) remaining);
                     result = (int) remaining;
                 } else {
@@ -128,7 +128,7 @@ public class IdentityInputFilter implements InputFilter {
                 }
                 remaining = remaining - nRead;
             } else {
-                // No more bytes left to be read : return -1 and clear the 
+                // No more bytes left to be read : return -1 and clear the
                 // buffer
                 chunk.recycle();
                 result = -1;
@@ -183,7 +183,7 @@ public class IdentityInputFilter implements InputFilter {
     public int available() {
         return 0;
     }
-    
+
 
     /**
      * Set the next buffer in the filter pipeline.
@@ -206,7 +206,7 @@ public class IdentityInputFilter implements InputFilter {
 
 
     /**
-     * Return the name of the associated encoding; Here, the value is 
+     * Return the name of the associated encoding; Here, the value is
      * "identity".
      */
     @Override

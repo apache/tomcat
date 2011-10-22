@@ -29,7 +29,7 @@ import org.apache.tomcat.util.net.SocketWrapper;
 
 /**
  * Output buffer.
- * 
+ *
  * @author <a href="mailto:remm@apache.org">Remy Maucherat</a>
  */
 public class InternalOutputBuffer extends AbstractOutputBuffer<Socket>
@@ -75,8 +75,8 @@ public class InternalOutputBuffer extends AbstractOutputBuffer<Socket>
     /**
      * Socket buffer (extra buffering to reduce number of packets sent).
      */
-    private boolean useSocketBuffer = false;    
-    
+    private boolean useSocketBuffer = false;
+
 
     /**
      * Set the socket buffer size.
@@ -105,7 +105,7 @@ public class InternalOutputBuffer extends AbstractOutputBuffer<Socket>
 
     /**
      * Flush the response.
-     * 
+     *
      * @throws IOException an underlying I/O error occurred
      */
     @Override
@@ -113,7 +113,7 @@ public class InternalOutputBuffer extends AbstractOutputBuffer<Socket>
         throws IOException {
 
         super.flush();
-        
+
         // Flush the current buffer
         if (useSocketBuffer) {
             socketBuffer.flushBuffer();
@@ -123,7 +123,7 @@ public class InternalOutputBuffer extends AbstractOutputBuffer<Socket>
 
 
     /**
-     * Recycle the output buffer. This should be called when closing the 
+     * Recycle the output buffer. This should be called when closing the
      * connection.
      */
     @Override
@@ -136,7 +136,7 @@ public class InternalOutputBuffer extends AbstractOutputBuffer<Socket>
 
     /**
      * End processing of current HTTP request.
-     * Note: All bytes of the current request should have been already 
+     * Note: All bytes of the current request should have been already
      * consumed. This method only resets all the pointers so that we are ready
      * to parse the next HTTP request.
      */
@@ -149,7 +149,7 @@ public class InternalOutputBuffer extends AbstractOutputBuffer<Socket>
 
     /**
      * End request.
-     * 
+     *
      * @throws IOException an underlying I/O error occurred
      */
     @Override
@@ -183,7 +183,7 @@ public class InternalOutputBuffer extends AbstractOutputBuffer<Socket>
 
     /**
      * Commit the response.
-     * 
+     *
      * @throws IOException an underlying I/O error occurred
      */
     @Override
@@ -225,7 +225,7 @@ public class InternalOutputBuffer extends AbstractOutputBuffer<Socket>
      * This class is an output buffer which will write data to an output
      * stream.
      */
-    protected class OutputStreamOutputBuffer 
+    protected class OutputStreamOutputBuffer
         implements OutputBuffer {
 
 
@@ -233,15 +233,15 @@ public class InternalOutputBuffer extends AbstractOutputBuffer<Socket>
          * Write chunk.
          */
         @Override
-        public int doWrite(ByteChunk chunk, Response res) 
+        public int doWrite(ByteChunk chunk, Response res)
             throws IOException {
 
             int length = chunk.getLength();
             if (useSocketBuffer) {
-                socketBuffer.append(chunk.getBuffer(), chunk.getStart(), 
+                socketBuffer.append(chunk.getBuffer(), chunk.getStart(),
                                     length);
             } else {
-                outputStream.write(chunk.getBuffer(), chunk.getStart(), 
+                outputStream.write(chunk.getBuffer(), chunk.getStart(),
                                    length);
             }
             byteCount += chunk.getLength();

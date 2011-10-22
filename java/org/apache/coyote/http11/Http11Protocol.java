@@ -40,7 +40,7 @@ public class Http11Protocol extends AbstractHttp11JsseProtocol {
 
     private static final org.apache.juli.logging.Log log
         = org.apache.juli.logging.LogFactory.getLog(Http11Protocol.class);
-    
+
     @Override
     protected Log getLog() { return log; }
 
@@ -63,7 +63,7 @@ public class Http11Protocol extends AbstractHttp11JsseProtocol {
         setTcpNoDelay(Constants.DEFAULT_TCP_NO_DELAY);
     }
 
-    
+
     // ----------------------------------------------------------------- Fields
 
     protected Http11ConnectionHandler cHandler;
@@ -85,7 +85,7 @@ public class Http11Protocol extends AbstractHttp11JsseProtocol {
             this.disableKeepAlivePercentage = disableKeepAlivePercentage;
         }
     }
-    
+
     // ----------------------------------------------------- JMX related methods
 
     @Override
@@ -100,7 +100,7 @@ public class Http11Protocol extends AbstractHttp11JsseProtocol {
             extends AbstractConnectionHandler<Socket, Http11Processor> implements Handler {
 
         protected Http11Protocol proto;
-            
+
         Http11ConnectionHandler(Http11Protocol proto) {
             this.proto = proto;
         }
@@ -114,7 +114,7 @@ public class Http11Protocol extends AbstractHttp11JsseProtocol {
         protected Log getLog() {
             return log;
         }
-        
+
         @Override
         public SSLImplementation getSslImplementation() {
             return proto.sslImplementation;
@@ -123,7 +123,7 @@ public class Http11Protocol extends AbstractHttp11JsseProtocol {
         /**
          * Expected to be used by the handler once the processor is no longer
          * required.
-         * 
+         *
          * @param socket            Not used in BIO
          * @param processor
          * @param isSocketClosing   Not used in HTTP

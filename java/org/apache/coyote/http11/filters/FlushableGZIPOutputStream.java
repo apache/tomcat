@@ -28,7 +28,7 @@ import java.util.zip.GZIPOutputStream;
  * (<a href="http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4255743">Bug
  * 4255743</a> and
  * <a href="http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4813885">Bug
- * 4813885</a>) so the GZIP'd output can be flushed. 
+ * 4813885</a>) so the GZIP'd output can be flushed.
  */
 public class FlushableGZIPOutputStream extends GZIPOutputStream {
     public FlushableGZIPOutputStream(OutputStream os) throws IOException {

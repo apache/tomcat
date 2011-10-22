@@ -33,7 +33,7 @@ import org.apache.tomcat.util.http.MimeHeaders;
 /**
  * Chunked input filter. Parses chunked data according to
  * <a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec3.html#sec3.6.1">http://www.w3.org/Protocols/rfc2616/rfc2616-sec3.html#sec3.6.1</a><br>
- * 
+ *
  * @author Remy Maucherat
  * @author Filip Hanik
  */
@@ -117,7 +117,7 @@ public class ChunkedInputFilter implements InputFilter {
      * Request being parsed.
      */
     private Request request;
-    
+
     // ----------------------------------------------------------- Constructors
     public ChunkedInputFilter(int maxTrailerSize) {
         this.trailingHeaders.setLimit(maxTrailerSize);
@@ -128,10 +128,10 @@ public class ChunkedInputFilter implements InputFilter {
 
     /**
      * Read bytes.
-     * 
+     *
      * @return If the filter does request length control, this value is
      * significant; it should be the number of bytes consumed from the buffer,
-     * up until the end of the current request body, or the buffer length, 
+     * up until the end of the current request body, or the buffer length,
      * whichever is greater. If the filter does not do request body length
      * control, the returned value should be -1.
      */
@@ -174,7 +174,7 @@ public class ChunkedInputFilter implements InputFilter {
             pos = pos + remaining;
             remaining = 0;
             //we need a CRLF
-            if ((pos+1) >= lastValid) {   
+            if ((pos+1) >= lastValid) {
                 //if we call parseCRLF we overrun the buffer here
                 //so we defer it to the next call BZ 11117
                 needCRLFParse = true;
@@ -225,7 +225,7 @@ public class ChunkedInputFilter implements InputFilter {
     public int available() {
         return (lastValid - pos);
     }
-    
+
 
     /**
      * Set the next buffer in the filter pipeline.
@@ -250,7 +250,7 @@ public class ChunkedInputFilter implements InputFilter {
 
 
     /**
-     * Return the name of the associated encoding; Here, the value is 
+     * Return the name of the associated encoding; Here, the value is
      * "identity".
      */
     @Override
@@ -280,10 +280,10 @@ public class ChunkedInputFilter implements InputFilter {
 
     /**
      * Parse the header of a chunk.
-     * A chunk header can look like 
+     * A chunk header can look like
      * A10CRLF
      * F23;chunk-extension to be ignoredCRLF
-     * The letters before CRLF but after the trailer mark, must be valid hex digits, 
+     * The letters before CRLF but after the trailer mark, must be valid hex digits,
      * we should not parse F23IAMGONNAMESSTHISUP34CRLF as a valid header
      * according to spec
      */
@@ -303,12 +303,12 @@ public class ChunkedInputFilter implements InputFilter {
             }
 
             if (buf[pos] == Constants.CR) {
-                // FIXME: Improve parsing to check for CRLF 
+                // FIXME: Improve parsing to check for CRLF
             } else if (buf[pos] == Constants.LF) {
                 eol = true;
             } else if (buf[pos] == Constants.SEMI_COLON) {
                 trailer = true;
-            } else if (!trailer) { 
+            } else if (!trailer) {
                 //don't read data after the trailer
                 if (HexUtils.getDec(buf[pos]) != -1) {
                     readDigit = true;
@@ -386,7 +386,7 @@ public class ChunkedInputFilter implements InputFilter {
         }
     }
 
-    
+
     private boolean parseHeader() throws IOException {
 
         MimeHeaders headers = request.getMimeHeaders();
@@ -400,7 +400,7 @@ public class ChunkedInputFilter implements InputFilter {
             }
 
             chr = buf[pos];
-    
+
             if ((chr == Constants.CR) || (chr == Constants.LF)) {
                 if (chr == Constants.LF) {
                     pos++;
@@ -409,28 +409,28 @@ public class ChunkedInputFilter implements InputFilter {
             } else {
                 break;
             }
-    
+
             pos++;
-    
+
         }
-    
+
         // Mark the current buffer position
         int start = trailingHeaders.getEnd();
-    
+
         //
         // Reading the header name
         // Header name is always US-ASCII
         //
-    
+
         boolean colon = false;
         while (!colon) {
-    
+
             // Read new bytes if needed
             if (pos >= lastValid) {
                 if (readBytes() <0)
                     throw new EOFException("Unexpected end of stream whilst reading trailer headers for chunked request");
             }
-    
+
             chr = buf[pos];
             if ((chr >= Constants.A) && (chr <= Constants.Z)) {
                 chr = (byte) (chr - Constants.LC_OFFSET);
@@ -441,55 +441,55 @@ public class ChunkedInputFilter implements InputFilter {
             } else {
                 trailingHeaders.append(chr);
             }
-    
+
             pos++;
-    
+
         }
         MessageBytes headerValue = headers.addValue(trailingHeaders.getBytes(),
                 start, trailingHeaders.getEnd() - start);
-    
+
         // Mark the current buffer position
         start = trailingHeaders.getEnd();
 
         //
         // Reading the header value (which can be spanned over multiple lines)
         //
-    
+
         boolean eol = false;
         boolean validLine = true;
         int lastSignificantChar = 0;
-    
+
         while (validLine) {
-    
+
             boolean space = true;
-    
+
             // Skipping spaces
             while (space) {
-    
+
                 // Read new bytes if needed
                 if (pos >= lastValid) {
                     if (readBytes() <0)
                         throw new EOFException("Unexpected end of stream whilst reading trailer headers for chunked request");
                 }
-    
+
                 chr = buf[pos];
                 if ((chr == Constants.SP) || (chr == Constants.HT)) {
                     pos++;
                 } else {
                     space = false;
                 }
-    
+
             }
-    
+
             // Reading bytes until the end of the line
             while (!eol) {
-    
+
                 // Read new bytes if needed
                 if (pos >= lastValid) {
                     if (readBytes() <0)
                         throw new EOFException("Unexpected end of stream whilst reading trailer headers for chunked request");
                 }
-    
+
                 chr = buf[pos];
                 if (chr == Constants.CR) {
                     // Skip
@@ -501,20 +501,20 @@ public class ChunkedInputFilter implements InputFilter {
                     trailingHeaders.append(chr);
                     lastSignificantChar = trailingHeaders.getEnd();
                 }
-    
+
                 pos++;
-    
+
             }
-    
+
             // Checking the first character of the new line. If the character
             // is a LWS, then it's a multiline header
-    
+
             // Read new bytes if needed
             if (pos >= lastValid) {
                 if (readBytes() <0)
                     throw new EOFException("Unexpected end of stream whilst reading trailer headers for chunked request");
             }
-    
+
             chr = buf[pos];
             if ((chr != Constants.SP) && (chr != Constants.HT)) {
                 validLine = false;
@@ -524,13 +524,13 @@ public class ChunkedInputFilter implements InputFilter {
                 // be at least one space inserted between the lines)
                 trailingHeaders.append(chr);
             }
-    
+
         }
-    
+
         // Set the header value
         headerValue.setBytes(trailingHeaders.getBytes(), start,
                 lastSignificantChar - start);
-    
+
         return true;
     }
 }

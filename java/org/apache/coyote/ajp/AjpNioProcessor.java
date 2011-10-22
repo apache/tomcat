@@ -72,7 +72,7 @@ public class AjpNioProcessor extends AbstractAjpProcessor<NioChannel> {
      */
     protected NioChannel socket;
 
-    
+
     /**
      * Selector pool for the associated endpoint.
      */
@@ -96,7 +96,7 @@ public class AjpNioProcessor extends AbstractAjpProcessor<NioChannel> {
 
         // Setting up the socket
         this.socket = socket.getSocket();
-        
+
         long soTimeout = endpoint.getSoTimeout();
         boolean cping = false;
 
@@ -279,9 +279,9 @@ public class AjpNioProcessor extends AbstractAjpProcessor<NioChannel> {
         ByteBuffer writeBuffer = socket.getBufHandler() .getWriteBuffer();
 
         writeBuffer.put(src, offset, length);
-        
+
         writeBuffer.flip();
-        
+
         NioEndpoint.KeyAttachment att = (NioEndpoint.KeyAttachment)socket.getAttachment(false);
         if ( att == null ) throw new IOException("Key must be cancelled");
         long writeTimeout = att.getTimeout();
@@ -294,7 +294,7 @@ public class AjpNioProcessor extends AbstractAjpProcessor<NioChannel> {
         try {
             pool.write(writeBuffer, socket, selector, writeTimeout, true,
                     null);
-        }finally { 
+        }finally {
             if ( selector != null ) pool.put(selector);
         }
         writeBuffer.clear();
@@ -310,7 +310,7 @@ public class AjpNioProcessor extends AbstractAjpProcessor<NioChannel> {
         int read = 0;
         int res = 0;
         boolean block = blockFirstRead;
-        
+
         while (read < n) {
             res = readSocket(buf, read + pos, n, block);
             if (res > 0) {
@@ -343,7 +343,7 @@ public class AjpNioProcessor extends AbstractAjpProcessor<NioChannel> {
                 nRead = pool.read(socket.getBufHandler().getReadBuffer(),socket,selector,att.getTimeout());
             } catch ( EOFException eof ) {
                 nRead = -1;
-            } finally { 
+            } finally {
                 if ( selector != null ) pool.put(selector);
             }
         } else {
@@ -372,7 +372,7 @@ public class AjpNioProcessor extends AbstractAjpProcessor<NioChannel> {
 
         first = false;
         bodyMessage.reset();
-        
+
         readMessage(bodyMessage, true);
 
         // No data received.
@@ -409,7 +409,7 @@ public class AjpNioProcessor extends AbstractAjpProcessor<NioChannel> {
         if (bytesRead == 0) {
             return 0;
         }
-        
+
         int messageLength = message.processHeader(true);
         if (messageLength < 0) {
             // Invalid AJP header signature
