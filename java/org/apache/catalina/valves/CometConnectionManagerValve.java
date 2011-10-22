@@ -62,14 +62,6 @@ public class CometConnectionManagerValve extends ValveBase
 
     // ----------------------------------------------------- Instance Variables
 
-
-    /**
-     * The descriptive information related to this implementation.
-     */
-    protected static final String info =
-        "org.apache.catalina.valves.CometConnectionManagerValve/1.0";
-
-
     /**
      * List of current Comet connections.
      */
@@ -153,16 +145,6 @@ public class CometConnectionManagerValve extends ValveBase
 
 
     // --------------------------------------------------------- Public Methods
-
-
-    /**
-     * Return descriptive information about this Valve implementation.
-     */
-    @Override
-    public String getInfo() {
-        return (info);
-    }
-
 
     /**
      * Register requests for tracking, whenever needed.

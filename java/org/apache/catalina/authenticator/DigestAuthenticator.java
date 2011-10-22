@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -64,13 +64,6 @@ public class DigestAuthenticator extends AuthenticatorBase {
 
 
     /**
-     * Descriptive information about this implementation.
-     */
-    protected static final String info =
-        "org.apache.catalina.authenticator.DigestAuthenticator/1.0";
-
-
-    /**
      * Tomcat's DIGEST implementation only supports auth quality of protection.
      */
     protected static final String QOP = "auth";
@@ -81,8 +74,9 @@ public class DigestAuthenticator extends AuthenticatorBase {
     public DigestAuthenticator() {
         super();
         try {
-            if (md5Helper == null)
+            if (md5Helper == null) {
                 md5Helper = MessageDigest.getInstance("MD5");
+            }
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
             throw new IllegalStateException();
@@ -138,17 +132,6 @@ public class DigestAuthenticator extends AuthenticatorBase {
     protected boolean validateUri = true;
 
     // ------------------------------------------------------------- Properties
-
-    /**
-     * Return descriptive information about this Valve implementation.
-     */
-    @Override
-    public String getInfo() {
-
-        return (info);
-
-    }
-
 
     public int getCnonceCacheSize() {
         return cnonceCacheSize;
@@ -225,13 +208,15 @@ public class DigestAuthenticator extends AuthenticatorBase {
         Principal principal = request.getUserPrincipal();
         //String ssoId = (String) request.getNote(Constants.REQ_SSOID_NOTE);
         if (principal != null) {
-            if (log.isDebugEnabled())
+            if (log.isDebugEnabled()) {
                 log.debug("Already authenticated '" + principal.getName() + "'");
+            }
             // Associate the session with any existing SSO session in order
             // to get coordinated session invalidation at logout
             String ssoId = (String) request.getNote(Constants.REQ_SSOID_NOTE);
-            if (ssoId != null)
+            if (ssoId != null) {
                 associate(ssoId, request.getSessionInternal(true));
+            }
             return (true);
         }
 
@@ -268,7 +253,7 @@ public class DigestAuthenticator extends AuthenticatorBase {
             if (digestInfo.validate(request, authorization, config)) {
                 principal = digestInfo.authenticate(context.getRealm());
             }
-            
+
             if (principal != null) {
                 String username = parseUsername(authorization);
                 register(request, response, principal,
@@ -311,10 +296,12 @@ public class DigestAuthenticator extends AuthenticatorBase {
     protected String parseUsername(String authorization) {
 
         // Validate the authorization credentials format
-        if (authorization == null)
+        if (authorization == null) {
             return (null);
-        if (!authorization.startsWith("Digest "))
+        }
+        if (!authorization.startsWith("Digest ")) {
             return (null);
+        }
         authorization = authorization.substring(7).trim();
 
         StringTokenizer commaTokenizer =
@@ -323,14 +310,16 @@ public class DigestAuthenticator extends AuthenticatorBase {
         while (commaTokenizer.hasMoreTokens()) {
             String currentToken = commaTokenizer.nextToken();
             int equalSign = currentToken.indexOf('=');
-            if (equalSign < 0)
+            if (equalSign < 0) {
                 return null;
+            }
             String currentTokenName =
                 currentToken.substring(0, equalSign).trim();
             String currentTokenValue =
                 currentToken.substring(equalSign + 1).trim();
-            if ("username".equals(currentTokenName))
+            if ("username".equals(currentTokenName)) {
                 return (removeQuotes(currentTokenValue));
+            }
         }
 
         return (null);
@@ -373,7 +362,7 @@ public class DigestAuthenticator extends AuthenticatorBase {
 
         long currentTime = System.currentTimeMillis();
 
-        
+
         String ipTimeKey =
             request.getRemoteAddr() + ":" + currentTime + ":" + getKey();
 
@@ -422,8 +411,9 @@ public class DigestAuthenticator extends AuthenticatorBase {
 
         // Get the realm name
         String realmName = config.getRealmName();
-        if (realmName == null)
+        if (realmName == null) {
             realmName = REALM_NAME;
+        }
 
         String authenticateHeader;
         if (isNonceStale) {
@@ -442,21 +432,21 @@ public class DigestAuthenticator extends AuthenticatorBase {
 
 
     // ------------------------------------------------------- Lifecycle Methods
-    
+
     @Override
     protected synchronized void startInternal() throws LifecycleException {
         super.startInternal();
-        
+
         // Generate a random secret key
         if (getKey() == null) {
             setKey(sessionIdGenerator.generateSessionId());
         }
-        
+
         // Generate the opaque string the same way
         if (getOpaque() == null) {
             setOpaque(sessionIdGenerator.generateSessionId());
         }
-        
+
         cnonces = new LinkedHashMap<String, DigestAuthenticator.NonceInfo>() {
 
             private static final long serialVersionUID = 1L;
@@ -484,13 +474,13 @@ public class DigestAuthenticator extends AuthenticatorBase {
             }
         };
     }
- 
+
     private static class DigestInfo {
 
-        private String opaque;
-        private long nonceValidity;
-        private String key;
-        private Map<String,NonceInfo> cnonces;
+        private final String opaque;
+        private final long nonceValidity;
+        private final String key;
+        private final Map<String,NonceInfo> cnonces;
         private boolean validateUri = true;
 
         private String userName = null;
@@ -534,8 +524,9 @@ public class DigestAuthenticator extends AuthenticatorBase {
 
             for (int i = 0; i < tokens.length; i++) {
                 String currentToken = tokens[i];
-                if (currentToken.length() == 0)
+                if (currentToken.length() == 0) {
                     continue;
+                }
 
                 int equalSign = currentToken.indexOf('=');
                 if (equalSign < 0) {
@@ -545,24 +536,33 @@ public class DigestAuthenticator extends AuthenticatorBase {
                     currentToken.substring(0, equalSign).trim();
                 String currentTokenValue =
                     currentToken.substring(equalSign + 1).trim();
-                if ("username".equals(currentTokenName))
+                if ("username".equals(currentTokenName)) {
                     userName = removeQuotes(currentTokenValue);
-                if ("realm".equals(currentTokenName))
+                }
+                if ("realm".equals(currentTokenName)) {
                     realmName = removeQuotes(currentTokenValue, true);
-                if ("nonce".equals(currentTokenName))
+                }
+                if ("nonce".equals(currentTokenName)) {
                     nonce = removeQuotes(currentTokenValue);
-                if ("nc".equals(currentTokenName))
+                }
+                if ("nc".equals(currentTokenName)) {
                     nc = removeQuotes(currentTokenValue);
-                if ("cnonce".equals(currentTokenName))
+                }
+                if ("cnonce".equals(currentTokenName)) {
                     cnonce = removeQuotes(currentTokenValue);
-                if ("qop".equals(currentTokenName))
+                }
+                if ("qop".equals(currentTokenName)) {
                     qop = removeQuotes(currentTokenValue);
-                if ("uri".equals(currentTokenName))
+                }
+                if ("uri".equals(currentTokenName)) {
                     uri = removeQuotes(currentTokenValue);
-                if ("response".equals(currentTokenName))
+                }
+                if ("response".equals(currentTokenName)) {
                     response = removeQuotes(currentTokenValue);
-                if ("opaque".equals(currentTokenName))
+                }
+                if ("opaque".equals(currentTokenName)) {
                     opaque = removeQuotes(currentTokenValue);
+                }
             }
 
             if ( (userName == null) || (realmName == null) || (nonce == null)
@@ -592,7 +592,7 @@ public class DigestAuthenticator extends AuthenticatorBase {
             if (!lcRealm.equals(realmName)) {
                 return false;
             }
-            
+
             // Validate the opaque string
             if (!this.opaque.equals(opaque)) {
                 return false;
@@ -695,19 +695,19 @@ public class DigestAuthenticator extends AuthenticatorBase {
     private static class NonceInfo {
         private volatile long count;
         private volatile long timestamp;
-        
+
         public void setCount(long l) {
             count = l;
         }
-        
+
         public long getCount() {
             return count;
         }
-        
+
         public void setTimestamp(long l) {
             timestamp = l;
         }
-        
+
         public long getTimestamp() {
             return timestamp;
         }

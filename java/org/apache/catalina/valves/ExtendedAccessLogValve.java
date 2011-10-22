@@ -144,21 +144,6 @@ public class ExtendedAccessLogValve extends AccessLogValve {
         "org.apache.catalina.valves.ExtendedAccessLogValve/2.1";
 
 
-    // ------------------------------------------------------------- Properties
-
-
-    /**
-     * Return descriptive information about this implementation.
-     */
-    @Override
-    public String getInfo() {
-        return (extendedAccessLogInfo);
-    }
-
-
-    // --------------------------------------------------------- Public Methods
-
-
     // -------------------------------------------------------- Private Methods
 
     /**

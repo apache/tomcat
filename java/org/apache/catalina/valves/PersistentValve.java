@@ -51,32 +51,8 @@ public class PersistentValve extends ValveBase {
         super(true);
     }
 
-    // ----------------------------------------------------- Instance Variables
-
-
-    /**
-     * The descriptive information related to this implementation.
-     */
-    private static final String info =
-        "org.apache.catalina.valves.PersistentValve/1.0";
-
-
-    // ------------------------------------------------------------- Properties
-
-
-    /**
-     * Return descriptive information about this Valve implementation.
-     */
-    @Override
-    public String getInfo() {
-
-        return (info);
-
-    }
-
 
     // --------------------------------------------------------- Public Methods
-
 
     /**
      * Select the appropriate child Context to process this request,

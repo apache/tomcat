@@ -53,32 +53,8 @@ public class ErrorReportValve extends ValveBase {
         super(true);
     }
 
-    // ----------------------------------------------------- Instance Variables
-
-
-    /**
-     * The descriptive information related to this implementation.
-     */
-    private static final String info =
-        "org.apache.catalina.valves.ErrorReportValve/1.0";
-
-
-    // ------------------------------------------------------------- Properties
-
-
-    /**
-     * Return descriptive information about this Valve implementation.
-     */
-    @Override
-    public String getInfo() {
-
-        return (info);
-
-    }
-
 
     // --------------------------------------------------------- Public Methods
-
 
     /**
      * Invoke the next Valve in the sequence. When the invoke returns, check

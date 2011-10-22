@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -45,45 +45,23 @@ import org.apache.tomcat.util.buf.MessageBytes;
  */
 
 final class StandardContextValve extends ValveBase {
-    
+
     //------------------------------------------------------ Constructor
     public StandardContextValve() {
         super(true);
     }
 
+
     // ----------------------------------------------------- Instance Variables
 
-
-    /**
-     * The descriptive information related to this implementation.
-     */
-    private static final String info =
-        "org.apache.catalina.core.StandardContextValve/1.0";
-
-
     private StandardContext context = null;
-    
-
-    // ------------------------------------------------------------- Properties
-
-
-    /**
-     * Return descriptive information about this Valve implementation.
-     */
-    @Override
-    public String getInfo() {
-
-        return (info);
-
-    }
 
 
     // --------------------------------------------------------- Public Methods
 
-
     /**
      * Cast to a StandardContext right away, as it will be needed later.
-     * 
+     *
      * @see org.apache.catalina.Contained#setContainer(org.apache.catalina.Container)
      */
     @Override
@@ -92,7 +70,7 @@ final class StandardContextValve extends ValveBase {
         context = (StandardContext) container;
     }
 
-    
+
     /**
      * Select the appropriate child Wrapper to process this request,
      * based on the specified request URI.  If no matching Wrapper can
@@ -162,7 +140,7 @@ final class StandardContextValve extends ValveBase {
             response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             return;
         }
-        
+
         if (request.isAsyncSupported()) {
             request.setAsyncSupported(wrapper.getPipeline().isAsyncSupported());
         }

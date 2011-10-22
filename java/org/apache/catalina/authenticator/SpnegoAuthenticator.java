@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -53,7 +53,7 @@ import org.ietf.jgss.Oid;
 public class SpnegoAuthenticator extends AuthenticatorBase {
 
     private static final Log log = LogFactory.getLog(SpnegoAuthenticator.class);
-    
+
     private String loginConfigName = Constants.DEFAULT_LOGIN_MODULE_NAME;
     public String getLoginConfigName() {
         return loginConfigName;
@@ -75,12 +75,6 @@ public class SpnegoAuthenticator extends AuthenticatorBase {
     @Override
     protected String getAuthMethod() {
         return Constants.SPNEGO_METHOD;
-    }
-
-
-    @Override
-    public String getInfo() {
-        return "org.apache.catalina.authenticator.SpnegoAuthenticator/1.0";
     }
 
 
@@ -107,7 +101,7 @@ public class SpnegoAuthenticator extends AuthenticatorBase {
             System.setProperty(Constants.JAAS_CONF_PROPERTY,
                     jaasConfFile.getAbsolutePath());
         }
-        
+
         // This property must be false for SPNEGO to work
         System.setProperty(Constants.USE_SUBJECT_CREDS_ONLY_PROPERTY, "false");
     }
@@ -121,33 +115,37 @@ public class SpnegoAuthenticator extends AuthenticatorBase {
         Principal principal = request.getUserPrincipal();
         String ssoId = (String) request.getNote(Constants.REQ_SSOID_NOTE);
         if (principal != null) {
-            if (log.isDebugEnabled())
+            if (log.isDebugEnabled()) {
                 log.debug("Already authenticated '" + principal.getName() + "'");
+            }
             // Associate the session with any existing SSO session
-            if (ssoId != null)
+            if (ssoId != null) {
                 associate(ssoId, request.getSessionInternal(true));
+            }
             return true;
         }
 
         // Is there an SSO session against which we can try to reauthenticate?
         if (ssoId != null) {
-            if (log.isDebugEnabled())
+            if (log.isDebugEnabled()) {
                 log.debug("SSO Id " + ssoId + " set; attempting " +
                           "reauthentication");
+            }
             /* Try to reauthenticate using data cached by SSO.  If this fails,
                either the original SSO logon was of DIGEST or SSL (which
                we can't reauthenticate ourselves because there is no
                cached username and password), or the realm denied
                the user's reauthentication for some reason.
                In either case we have to prompt the user for a logon */
-            if (reauthenticateFromSSO(ssoId, request))
+            if (reauthenticateFromSSO(ssoId, request)) {
                 return true;
+            }
         }
 
-        MessageBytes authorization = 
+        MessageBytes authorization =
             request.getCoyoteRequest().getMimeHeaders()
             .getValue("authorization");
-        
+
         if (authorization == null) {
             if (log.isDebugEnabled()) {
                 log.debug(sm.getString("authenticator.noAuthHeader"));
@@ -156,7 +154,7 @@ public class SpnegoAuthenticator extends AuthenticatorBase {
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
             return false;
         }
-        
+
         authorization.toBytes();
         ByteChunk authorizationBC = authorization.getByteChunk();
 
@@ -173,7 +171,7 @@ public class SpnegoAuthenticator extends AuthenticatorBase {
         authorizationBC.setOffset(authorizationBC.getOffset() + 10);
         // FIXME: Add trimming
         // authorizationBC.trim();
-                
+
         ByteChunk decoded = new ByteChunk();
         Base64.decode(authorizationBC, decoded);
 

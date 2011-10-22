@@ -79,14 +79,6 @@ public abstract class ValveBase extends LifecycleMBeanBase
 
 
     /**
-     * Descriptive information about this Valve implementation.  This value
-     * should be overridden by subclasses.
-     */
-    protected static final String info =
-        "org.apache.catalina.core.ValveBase/1.0";
-
-
-    /**
      * The next Valve in the pipeline this Valve is a component of.
      */
     protected Valve next = null;
@@ -133,17 +125,6 @@ public abstract class ValveBase extends LifecycleMBeanBase
     public void setContainer(Container container) {
 
         this.container = container;
-
-    }
-
-
-    /**
-     * Return descriptive information about this Valve implementation.
-     */
-    @Override
-    public String getInfo() {
-
-        return (info);
 
     }
 
