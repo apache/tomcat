@@ -32,13 +32,9 @@ import org.apache.tomcat.util.buf.UDecoder;
  */
 public final class Parameters {
 
-
     private static final org.apache.juli.logging.Log log=
         org.apache.juli.logging.LogFactory.getLog(Parameters.class );
 
-    // Transition: we'll use the same Hashtable( String->String[] )
-    // for the beginning. When we are sure all accesses happen through
-    // this class - we can switch to MultiMap
     private final Hashtable<String,String[]> paramHashStringArray =
         new Hashtable<String,String[]>();
     private boolean didQueryParameters=false;

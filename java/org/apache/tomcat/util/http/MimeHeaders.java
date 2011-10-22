@@ -253,15 +253,6 @@ public class MimeHeaders {
         return mhf.getValue();
     }
 
-    /** Create a new named header using translated char[].
-     */
-    public MessageBytes addValue(char c[], int startN, int len)
-    {
-        MimeHeaderField mhf=createHeader();
-        mhf.getName().setChars(c, startN, len);
-        return mhf.getValue();
-    }
-
     /** Allow "set" operations -
         return a MessageBytes container for the
         header value ( existing header or new
@@ -454,11 +445,6 @@ class ValuesEnumerator implements Enumeration<String> {
 }
 
 class MimeHeaderField {
-    // multiple headers with same name - a linked list will
-    // speed up name enumerations and search ( both cpu and
-    // GC)
-    MimeHeaderField next;
-    MimeHeaderField prev;
 
     protected final MessageBytes nameB = MessageBytes.newInstance();
     protected final MessageBytes valueB = MessageBytes.newInstance();
@@ -473,7 +459,6 @@ class MimeHeaderField {
     public void recycle() {
         nameB.recycle();
         valueB.recycle();
-        next=null;
     }
 
     public MessageBytes getName() {

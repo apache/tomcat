@@ -46,11 +46,9 @@ public class ServerCookie implements Serializable {
     // Expires - Not stored explicitly. Generated from Max-Age (see V1)
     private final MessageBytes path=MessageBytes.newInstance();
     private final MessageBytes domain=MessageBytes.newInstance();
-    private boolean secure;
 
     // Version 1 (RFC2109) attributes
     private final MessageBytes comment=MessageBytes.newInstance();
-    private int maxAge = -1;
     private int version = 0;
 
     // Other fields
@@ -90,11 +88,9 @@ public class ServerCookie implements Serializable {
         name.recycle();
         value.recycle();
         comment.recycle();
-        maxAge=-1;
         path.recycle();
         domain.recycle();
         version=0;
-        secure=false;
     }
 
     public MessageBytes getComment() {
@@ -105,24 +101,8 @@ public class ServerCookie implements Serializable {
         return domain;
     }
 
-    public void setMaxAge(int expiry) {
-        maxAge = expiry;
-    }
-
-    public int getMaxAge() {
-        return maxAge;
-    }
-
     public MessageBytes getPath() {
         return path;
-    }
-
-    public void setSecure(boolean flag) {
-        secure = flag;
-    }
-
-    public boolean getSecure() {
-        return secure;
     }
 
     public MessageBytes getName() {
