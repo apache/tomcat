@@ -93,7 +93,7 @@
             <phase>generate-sources</phase>
             <configuration>
               <tasks>
-                <copy todir="src/main/java" includeEmptyDirs="false">
+                <copy todir="${sourceBasePath}" includeEmptyDirs="false">
                   <fileset dir="../../java/">
                     <include name="org/apache/catalina/**" />
                     <include name="org/apache/naming/**" />
@@ -105,7 +105,7 @@
                     <exclude name="org/apache/naming/factory/webservices/**" />
                   </fileset>
                 </copy>
-                <copy todir="src/main/java" includeEmptyDirs="false">
+                <copy todir="${sourceBasePath}" includeEmptyDirs="false">
                   <fileset dir="../../java/">
                     <!-- hackhish -->
                     <include name="org/apache/catalina/ha/ClusterRuleSet.java" />

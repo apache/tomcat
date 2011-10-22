@@ -71,7 +71,7 @@
       <id>import-commons-sources</id>
       <activation>
         <file>
-          <missing>${basedir}/src/main/java/org/apache/juli</missing>
+          <missing>${sourceBasePath}/org/apache/juli</missing>
         </file>
       </activation>
 
@@ -123,8 +123,8 @@
                       <replacefilter token="org.apache.commons"
                             value="org.apache.juli" />
                     </replace>
-                    <mkdir dir="${basedir}/src/main/java/org/apache/juli" />
-                    <move todir="${basedir}/src/main/java/org/apache/juli">
+                    <mkdir dir="${sourceBasePath}/src/main/java/org/apache/juli" />
+                    <move todir="${sourceBasePath}/org/apache/juli">
                       <fileset dir="${commons-logging-sources}/src/java/org/apache/commons" />
                     </move>
                   </tasks>

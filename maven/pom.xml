@@ -41,6 +41,7 @@
     <compiler.debug>true</compiler.debug>
     <!-- looks to not be UTF-8 -->
     <project.build.sourceEncoding>ISO-8859-1</project.build.sourceEncoding>
+    <sourceBasePath>${basedir}/target/src/main/java</sourceBasePath>
   </properties>
 
 
@@ -79,6 +80,7 @@
 
 
   <build>
+    <sourceDirectory>${sourceBasePath}</sourceDirectory>
     <pluginManagement>
       <plugins>
 

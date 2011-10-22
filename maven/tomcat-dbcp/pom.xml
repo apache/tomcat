@@ -58,7 +58,7 @@
       <id>import-commons-sources</id>
       <activation>
         <file>
-          <missing>${basedir}/src/main/java/org/apache/tomcat/dbcp</missing>
+          <missing>${sourceBasePath}/org/apache/tomcat/dbcp</missing>
         </file>
       </activation>
       <build>
@@ -124,8 +124,8 @@
                             value="enumeration" />
                     </replace>
 
-                    <mkdir dir="${basedir}/src/main/java/org/apache/tomcat/dbcp" />
-                    <move todir="${basedir}/src/main/java/org/apache/tomcat/dbcp">
+                    <mkdir dir="${sourceBasePath}/org/apache/tomcat/dbcp" />
+                    <move todir="${sourceBasePath}/org/apache/tomcat/dbcp">
                       <fileset dir="${tomcat-dbcp.home}/src/java/org/apache/commons" />
                     </move>
                   </tasks>

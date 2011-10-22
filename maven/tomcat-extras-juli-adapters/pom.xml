@@ -51,7 +51,7 @@
             <phase>generate-sources</phase>
             <configuration>
               <tasks>
-                <copy todir="src/main/java" includeEmptyDirs="false">
+                <copy todir="${sourceBasePath}" includeEmptyDirs="false">
                   <fileset dir="../../java/">
                     <include name="org/apache/juli/logging/impl/**" />
                     <exclude name="org/apache/juli/logging/impl/WeakHashtable*" />
