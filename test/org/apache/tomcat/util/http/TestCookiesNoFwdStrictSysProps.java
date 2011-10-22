@@ -31,7 +31,7 @@ import org.apache.tomcat.util.buf.ByteChunk;
  * to facilitate this when running the unit tests via Ant.
  */
 public class TestCookiesNoFwdStrictSysProps extends CookiesBaseTest {
-    
+
     @Override
     @Test
     public void testCookiesInstance() throws Exception {
@@ -40,13 +40,13 @@ public class TestCookiesNoFwdStrictSysProps extends CookiesBaseTest {
                 "true");
         System.setProperty("org.apache.tomcat.util.http.ServerCookie.FWD_SLASH_IS_SEPARATOR",
                 "false");
-        
+
         Tomcat tomcat = getTomcatInstance();
 
         addServlets(tomcat);
-        
+
         tomcat.start();
-        
+
         ByteChunk res = getUrl("http://localhost:" + getPort() + "/invalid");
         assertEquals("Cookie name fail", res.toString());
         res = getUrl("http://localhost:" + getPort() + "/null");
@@ -61,5 +61,5 @@ public class TestCookiesNoFwdStrictSysProps extends CookiesBaseTest {
         assertEquals("Cookie name ok", res.toString());
 
     }
-    
+
 }

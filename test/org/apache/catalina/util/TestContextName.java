@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -40,7 +40,7 @@ public class TestContextName {
     private ContextName cn14;
     private ContextName cn15;
     private ContextName cn16;
-    
+
     @Before
     public void setUp() throws Exception {
         cn1 = new ContextName(null, null);
@@ -186,7 +186,7 @@ public class TestContextName {
         doCompare(src, new ContextName(src.getDisplayName()));
         doCompare(src, new ContextName(src.getName()));
     }
-    
+
     private void doCompare(ContextName cn1, ContextName cn2) {
         assertEquals(cn1.getBaseName(), cn2.getBaseName());
         assertEquals(cn1.getDisplayName(), cn2.getDisplayName());

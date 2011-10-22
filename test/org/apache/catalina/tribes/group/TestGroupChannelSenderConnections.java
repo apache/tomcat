@@ -98,7 +98,7 @@ public class TestGroupChannelSenderConnections {
         }
 
     }
-    
+
     public static class TestMsg implements Serializable {
         private static final long serialVersionUID = 1L;
         static Random r = new Random();
@@ -119,13 +119,13 @@ public class TestGroupChannelSenderConnections {
         public TestMsgListener(String name) {
             this.name = name;
         }
-        
+
         @Override
         public void messageReceived(Serializable msg, Member sender) {
             System.out.println("["+name+"] Received message:"+msg+" from " + sender.getName());
         }
 
-    
+
         @Override
         public boolean accept(Serializable msg, Member sender) {
             return true;

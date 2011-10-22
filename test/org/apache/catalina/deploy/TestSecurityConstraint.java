@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -42,14 +42,14 @@ public class TestSecurityConstraint {
      */
     @Test
     public void testCreateConstraints() {
-        
+
         ServletSecurityElement element;
         SecurityConstraint[] result;
         Set<HttpMethodConstraintElement> hmces =
             new HashSet<HttpMethodConstraintElement>();
-        
+
         // Example 13-1
-        // @ServletSecurity 
+        // @ServletSecurity
         element = new ServletSecurityElement();
         result = SecurityConstraint.createConstraints(element, URL_PATTERN);
 
@@ -70,9 +70,9 @@ public class TestSecurityConstraint {
         assertEquals(0, result[0].findCollections()[0].findMethods().length);
         assertEquals(ServletSecurity.TransportGuarantee.CONFIDENTIAL.name(),
                 result[0].getUserConstraint());
-        
+
         // Example 13-3
-        // @ServletSecurity(@HttpConstraint(EmptyRoleSemantic.DENY)) 
+        // @ServletSecurity(@HttpConstraint(EmptyRoleSemantic.DENY))
         element = new ServletSecurityElement(
                 new HttpConstraintElement(EmptyRoleSemantic.DENY));
         result = SecurityConstraint.createConstraints(element, URL_PATTERN);
@@ -83,9 +83,9 @@ public class TestSecurityConstraint {
         assertEquals(0, result[0].findCollections()[0].findMethods().length);
         assertEquals(ServletSecurity.TransportGuarantee.NONE.name(),
                 result[0].getUserConstraint());
-        
+
         // Example 13-4
-        // @ServletSecurity(@HttpConstraint(rolesAllowed = "R1")) 
+        // @ServletSecurity(@HttpConstraint(rolesAllowed = "R1"))
         element = new ServletSecurityElement(new HttpConstraintElement(
                 ServletSecurity.TransportGuarantee.NONE, ROLE1));
         result = SecurityConstraint.createConstraints(element, URL_PATTERN);
@@ -100,10 +100,10 @@ public class TestSecurityConstraint {
                 result[0].getUserConstraint());
 
         // Example 13-5
-        // @ServletSecurity((httpMethodConstraints = { 
-        //     @HttpMethodConstraint(value = "GET", rolesAllowed = "R1"), 
-        //     @HttpMethodConstraint(value = "POST", rolesAllowed = "R1", 
-        //     transportGuarantee = TransportGuarantee.CONFIDENTIAL) 
+        // @ServletSecurity((httpMethodConstraints = {
+        //     @HttpMethodConstraint(value = "GET", rolesAllowed = "R1"),
+        //     @HttpMethodConstraint(value = "POST", rolesAllowed = "R1",
+        //     transportGuarantee = TransportGuarantee.CONFIDENTIAL)
         // })
         hmces.clear();
         hmces.add(new HttpMethodConstraintElement("GET",
@@ -115,7 +115,7 @@ public class TestSecurityConstraint {
                         ROLE1)));
         element = new ServletSecurityElement(hmces);
         result = SecurityConstraint.createConstraints(element, URL_PATTERN);
-        
+
         assertEquals(2, result.length);
         for (int i = 0; i < 2; i++) {
             assertTrue(result[i].getAuthConstraint());
@@ -134,9 +134,9 @@ public class TestSecurityConstraint {
                 fail("Unexpected method :[" + method + "]");
             }
         }
-        
+
         // Example 13-6
-        // @ServletSecurity(value = @HttpConstraint(rolesAllowed = "R1"), 
+        // @ServletSecurity(value = @HttpConstraint(rolesAllowed = "R1"),
         //     httpMethodConstraints = @HttpMethodConstraint("GET"))
         hmces.clear();
         hmces.add(new HttpMethodConstraintElement("GET"));
@@ -146,7 +146,7 @@ public class TestSecurityConstraint {
                         ROLE1),
                 hmces);
         result = SecurityConstraint.createConstraints(element, URL_PATTERN);
-        
+
         assertEquals(2, result.length);
         for (int i = 0; i < 2; i++) {
             assertTrue(result[i].findCollections()[0].findPattern(URL_PATTERN));
@@ -166,10 +166,10 @@ public class TestSecurityConstraint {
             assertEquals(ServletSecurity.TransportGuarantee.NONE.name(),
                     result[i].getUserConstraint());
         }
-        
+
         // Example 13-7
-        // @ServletSecurity(value = @HttpConstraint(rolesAllowed = "R1"), 
-        //     httpMethodConstraints = @HttpMethodConstraint(value="TRACE", 
+        // @ServletSecurity(value = @HttpConstraint(rolesAllowed = "R1"),
+        //     httpMethodConstraints = @HttpMethodConstraint(value="TRACE",
         //         emptyRoleSemantic = EmptyRoleSemantic.DENY))
         hmces.clear();
         hmces.add(new HttpMethodConstraintElement("TRACE",
@@ -180,7 +180,7 @@ public class TestSecurityConstraint {
                         ROLE1),
                 hmces);
         result = SecurityConstraint.createConstraints(element, URL_PATTERN);
-        
+
         assertEquals(2, result.length);
         for (int i = 0; i < 2; i++) {
             assertTrue(result[i].findCollections()[0].findPattern(URL_PATTERN));
@@ -201,7 +201,7 @@ public class TestSecurityConstraint {
             assertEquals(ServletSecurity.TransportGuarantee.NONE.name(),
                     result[i].getUserConstraint());
         }
-        
+
         // Example 13-8 is the same as 13-4
         // Example 13-9 is the same as 13-7
     }

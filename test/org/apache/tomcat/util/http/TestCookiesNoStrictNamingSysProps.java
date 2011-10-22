@@ -35,18 +35,18 @@ public class TestCookiesNoStrictNamingSysProps extends CookiesBaseTest {
     @Override
     @Test
     public void testCookiesInstance() throws Exception {
-    
+
         System.setProperty("org.apache.catalina.STRICT_SERVLET_COMPLIANCE",
                 "true");
         System.setProperty("org.apache.tomcat.util.http.ServerCookie.STRICT_NAMING",
                 "false");
-    
+
         Tomcat tomcat = getTomcatInstance();
-    
+
         addServlets(tomcat);
-        
+
         tomcat.start();
-        
+
         ByteChunk res = getUrl("http://localhost:" + getPort() + "/invalid");
         assertEquals("Cookie name fail", res.toString());
         res = getUrl("http://localhost:" + getPort() + "/null");
@@ -59,6 +59,6 @@ public class TestCookiesNoStrictNamingSysProps extends CookiesBaseTest {
         assertEquals("Cookie name ok", res.toString());
         res = getUrl("http://localhost:" + getPort() + "/valid");
         assertEquals("Cookie name ok", res.toString());
-    
+
     }
 }

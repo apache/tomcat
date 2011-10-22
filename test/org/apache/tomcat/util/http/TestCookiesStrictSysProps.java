@@ -42,13 +42,13 @@ public class TestCookiesStrictSysProps extends CookiesBaseTest {
 
         System.setProperty("org.apache.catalina.STRICT_SERVLET_COMPLIANCE",
                 "true");
-        
+
         Tomcat tomcat = getTomcatInstance();
-        
+
         addServlets(tomcat);
-        
+
         tomcat.start();
-        
+
         ByteChunk res = getUrl("http://localhost:" + getPort() + "/invalid");
         assertEquals("Cookie name fail", res.toString());
         res = getUrl("http://localhost:" + getPort() + "/null");
@@ -61,7 +61,7 @@ public class TestCookiesStrictSysProps extends CookiesBaseTest {
         assertEquals("Cookie name fail", res.toString());
         res = getUrl("http://localhost:" + getPort() + "/valid");
         assertEquals("Cookie name ok", res.toString());
-        
+
         // Need to read response headers to test version switching
         Map<String,List<String>> headers = new HashMap<String,List<String>>();
         getUrl("http://localhost:" + getPort() + "/switch", res, headers);
@@ -69,7 +69,7 @@ public class TestCookiesStrictSysProps extends CookiesBaseTest {
         for (String cookieHeader : cookieHeaders) {
             assertEquals("name=\"val?ue\"; Version=1", cookieHeader);
         }
-        
+
     }
-        
+
 }

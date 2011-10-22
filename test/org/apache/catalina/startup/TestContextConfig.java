@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -59,19 +59,19 @@ public class TestContextConfig extends TomcatBaseTest {
                 "/test", appDir.getAbsolutePath());
         ctxt.setDefaultWebXml(new File("conf/web.xml").getAbsolutePath());
         ctxt.addLifecycleListener(new ContextConfig());
-        
+
         ctxt.addServletContainerInitializer(
                 new CustomDefaultServletSCI(servletName), null);
 
         tomcat.start();
 
         ByteChunk res = new ByteChunk();
-        
+
         int rc =getUrl("http://localhost:" + getPort() + "/test", res, null);
 
         // Check return code
         assertEquals(HttpServletResponse.SC_OK, rc);
-        
+
         // Check context
         assertEquals("OK - Custom default Servlet", res.toString());
     }
@@ -83,13 +83,13 @@ public class TestContextConfig extends TomcatBaseTest {
         File appDir =  new File("test/webapp-3.0-fragments");
         // app dir is relative to server home
         tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());
-        
+
         tomcat.start();
 
         ByteChunk bc = new ByteChunk();
         int rc = getUrl("http://localhost:" + getPort() +
                 "/test/bug51396.jsp", bc, null);
-        
+
         assertEquals(HttpServletResponse.SC_OK, rc);
         assertTrue(bc.toString().contains("<p>OK</p>"));
     }
@@ -98,7 +98,7 @@ public class TestContextConfig extends TomcatBaseTest {
             implements ServletContainerInitializer {
 
         private String servletName;
-        
+
         public CustomDefaultServletSCI(String servletName) {
             this.servletName = servletName;
         }
@@ -110,7 +110,7 @@ public class TestContextConfig extends TomcatBaseTest {
             ServletRegistration.Dynamic r = ctx.addServlet(servletName, s);
             r.addMapping("/");
         }
-        
+
     }
 
     private static class CustomDefaultServlet extends HttpServlet {

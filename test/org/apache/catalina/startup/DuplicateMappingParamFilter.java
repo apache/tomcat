@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -28,16 +28,16 @@ import javax.servlet.annotation.WebFilter;
 
 /**
  * Test Mock with wrong Annotation!
- * 
+ *
  * @author Peter Rossbach
  * @version $Id$
- * 
+ *
  */
-@WebFilter(value = "/param", filterName="paramDFilter", 
+@WebFilter(value = "/param", filterName="paramDFilter",
         urlPatterns = { "/param1" , "/param2" })
 public class DuplicateMappingParamFilter implements Filter {
 
-    
+
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
         // NO-OP

@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -50,15 +50,15 @@ public class TestNamingContext extends TomcatBaseTest {
     public void testLookupNonSingletonResource() throws Exception {
         doTestLookup(false);
     }
-    
+
     public void doTestLookup(boolean useSingletonResource) throws Exception {
         Tomcat tomcat = getTomcatInstance();
         tomcat.enableNaming();
-        
+
         // Must have a real docBase - just use temp
         StandardContext ctx = (StandardContext)
             tomcat.addContext("", System.getProperty("java.io.tmpdir"));
-        
+
         // Create the resource
         ContextResource cr = new ContextResource();
         cr.setName("list/foo");
@@ -66,7 +66,7 @@ public class TestNamingContext extends TomcatBaseTest {
         cr.setProperty("factory", "org.apache.naming.resources.TesterFactory");
         cr.setSingleton(useSingletonResource);
         ctx.getNamingResources().addResource(cr);
-        
+
         // Map the test Servlet
         Bug49994Servlet bug49994Servlet = new Bug49994Servlet();
         Tomcat.addServlet(ctx, "bug49994Servlet", bug49994Servlet);
@@ -75,7 +75,7 @@ public class TestNamingContext extends TomcatBaseTest {
         tomcat.start();
 
         ByteChunk bc = getUrl("http://localhost:" + getPort() + "/");
-        
+
         String expected;
         if (useSingletonResource) {
             expected = "EQUAL";
@@ -89,7 +89,7 @@ public class TestNamingContext extends TomcatBaseTest {
     public static final class Bug49994Servlet extends HttpServlet {
 
         private static final long serialVersionUID = 1L;
-        
+
         @Override
         protected void doGet(HttpServletRequest req, HttpServletResponse resp)
                 throws ServletException, IOException {
@@ -116,18 +116,18 @@ public class TestNamingContext extends TomcatBaseTest {
     public void testListBindings() throws Exception {
         Tomcat tomcat = getTomcatInstance();
         tomcat.enableNaming();
-        
+
         // Must have a real docBase - just use temp
         StandardContext ctx = (StandardContext)
             tomcat.addContext("", System.getProperty("java.io.tmpdir"));
-        
+
         // Create the resource
         ContextResource cr = new ContextResource();
         cr.setName("list/foo");
         cr.setType("org.apache.naming.resources.TesterObject");
         cr.setProperty("factory", "org.apache.naming.resources.TesterFactory");
         ctx.getNamingResources().addResource(cr);
-        
+
         // Map the test Servlet
         Bug23950Servlet bug23950Servlet = new Bug23950Servlet();
         Tomcat.addServlet(ctx, "bug23950Servlet", bug23950Servlet);
@@ -138,11 +138,11 @@ public class TestNamingContext extends TomcatBaseTest {
         ByteChunk bc = getUrl("http://localhost:" + getPort() + "/");
         assertEquals("org.apache.naming.resources.TesterObject", bc.toString());
     }
-    
+
     public static final class Bug23950Servlet extends HttpServlet {
 
         private static final long serialVersionUID = 1L;
-        
+
         @Override
         protected void doGet(HttpServletRequest req, HttpServletResponse resp)
                 throws ServletException, IOException {
@@ -168,11 +168,11 @@ public class TestNamingContext extends TomcatBaseTest {
     public void testBeanFactory() throws Exception {
         Tomcat tomcat = getTomcatInstance();
         tomcat.enableNaming();
-        
+
         // Must have a real docBase - just use temp
         StandardContext ctx = (StandardContext)
             tomcat.addContext("", System.getProperty("java.io.tmpdir"));
-        
+
         // Create the resource
         ContextResource cr = new ContextResource();
         cr.setName("bug50351");
@@ -180,7 +180,7 @@ public class TestNamingContext extends TomcatBaseTest {
         cr.setProperty("factory", "org.apache.naming.factory.BeanFactory");
         cr.setProperty("foo", "value");
         ctx.getNamingResources().addResource(cr);
-        
+
         // Map the test Servlet
         Bug50351Servlet bug50351Servlet = new Bug50351Servlet();
         Tomcat.addServlet(ctx, "bug50351Servlet", bug50351Servlet);
@@ -195,7 +195,7 @@ public class TestNamingContext extends TomcatBaseTest {
     public static final class Bug50351Servlet extends HttpServlet {
 
         private static final long serialVersionUID = 1L;
-        
+
         @Override
         protected void doGet(HttpServletRequest req, HttpServletResponse resp)
                 throws ServletException, IOException {
@@ -213,16 +213,16 @@ public class TestNamingContext extends TomcatBaseTest {
             }
         }
     }
-    
+
     @Test
     public void testBug51744() throws Exception {
         Tomcat tomcat = getTomcatInstance();
         tomcat.enableNaming();
-        
+
         // Must have a real docBase - just use temp
         StandardContext ctx = (StandardContext)
             tomcat.addContext("", System.getProperty("java.io.tmpdir"));
-        
+
         // Map the test Servlet
         Bug51744Servlet bug51744Servlet = new Bug51744Servlet();
         Tomcat.addServlet(ctx, "bug51744Servlet", bug51744Servlet);
@@ -264,7 +264,7 @@ public class TestNamingContext extends TomcatBaseTest {
                     throw new ServletException(
                             "No error when one was expected");
                 }
-                
+
                 out.print(env1.getEnvironment().get("TestName"));
             } catch (NamingException ne) {
                 ne.printStackTrace(out);

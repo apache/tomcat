@@ -53,7 +53,7 @@ public class TestSerializablePrincipal  {
             e.printStackTrace();
             fail("ioe creating temporary file");
         }
-        
+
         // Create the Principal to serialize
         List<String> roles = new ArrayList<String>();
         roles.add("RoleA");
@@ -61,7 +61,7 @@ public class TestSerializablePrincipal  {
         TesterPrincipal tpOriginal = new TesterPrincipal("inner");
         GenericPrincipal gpOriginal =
             new GenericPrincipal("usr", "pwd", roles, tpOriginal);
-        
+
         // Do the serialization
         try {
             FileOutputStream fos = new FileOutputStream(file);
@@ -76,7 +76,7 @@ public class TestSerializablePrincipal  {
             e.printStackTrace();
             fail("ioe serializing principal");
         }
-        
+
         // De-serialize the Principal
         GenericPrincipal gpNew = null;
         try {
@@ -93,7 +93,7 @@ public class TestSerializablePrincipal  {
             e.printStackTrace();
             fail("cnfe de-serializing principal");
         }
-        
+
         // Now test how similar original and de-serialized versions are
         assertEquals("User names different", gpOriginal.getName(),
                 gpNew.getName());

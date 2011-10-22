@@ -54,7 +54,7 @@ public class TestMapper {
         String[] welcomes = new String[2];
         welcomes[0] = "boo/baba";
         welcomes[1] = "bobou";
-        
+
         mapper.addContextVersion("iowejoiejfoiew", "blah7", "",
                 "0", "context0", new String[0], null);
         mapper.addContextVersion("iowejoiejfoiew", "blah7", "/foo",
@@ -86,10 +86,10 @@ public class TestMapper {
     public void testAddHost() throws Exception {
         // Check we have the right number (add 16 but one is a duplicate)
         assertEquals(15, mapper.hosts.length);
-        
+
         // Make sure adding a duplicate *does not* overwrite
         assertEquals("blah7", mapper.hosts[3].object);
-        
+
         // Check for alphabetical order of host names
         String previous;
         String current = mapper.hosts[0].name;
@@ -150,7 +150,7 @@ public class TestMapper {
             mapper.map(host, uri, null, mappingData);
         }
         long time = System.currentTimeMillis() - start;
-        
+
         // Takes ~1s on markt's laptop. If this takes more than 4s something
         // probably needs looking at. If this fails repeatedly then we may need
         // to increase this limit.

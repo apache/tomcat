@@ -40,7 +40,7 @@ import java.util.List;
 public abstract class SimpleHttpClient {
     public static final String TEMP_DIR =
         System.getProperty("java.io.tmpdir");
-    
+
     public static final String CRLF = "\r\n";
 
     public static final String INFO_100 = "HTTP/1.1 100";
@@ -51,19 +51,19 @@ public abstract class SimpleHttpClient {
     public static final String FAIL_50X = "HTTP/1.1 50";
     public static final String FAIL_500 = "HTTP/1.1 500";
     public static final String FAIL_501 = "HTTP/1.1 501";
-    
+
     private static final String SESSION_COOKIE_HEADER_PREFIX =
         "Set-Cookie: JSESSIONID=";
-    
+
     private Socket socket;
     private Writer writer;
     private BufferedReader reader;
     private int port = 8080;
-    
+
     private String[] request;
     private boolean useContinue = false;
     private int requestPause = 1000;
-    
+
     private String responseLine;
     private List<String> responseHeaders = new ArrayList<String>();
     private String responseBody;
@@ -76,7 +76,7 @@ public abstract class SimpleHttpClient {
     public void setRequest(String[] theRequest) {
         request = theRequest;
     }
-    
+
     public void setUseContinue(boolean theUseContinueFlag) {
         useContinue = theUseContinueFlag;
     }
@@ -131,7 +131,7 @@ public abstract class SimpleHttpClient {
     public void connect() throws UnknownHostException, IOException {
         connect(0,0);
     }
-    
+
     public void processRequest() throws IOException, InterruptedException {
         processRequest(true);
     }
@@ -169,7 +169,7 @@ public abstract class SimpleHttpClient {
         // Is a 100 continue response expected?
         if (useContinue) {
             if (isResponse100()) {
-                // Skip the blank after the 100 Continue response 
+                // Skip the blank after the 100 Continue response
                 readLine();
                 // Now get the final response
                 responseLine = readLine();
@@ -177,7 +177,7 @@ public abstract class SimpleHttpClient {
                 throw new IOException("No 100 Continue response");
             }
         }
-        
+
         // Put the headers into the map
         String line = readLine();
         int cl = -1;
@@ -188,7 +188,7 @@ public abstract class SimpleHttpClient {
                 cl = Integer.parseInt(line.substring(16));
             }
         }
-        
+
         // Read the body, if any
         StringBuilder builder = new StringBuilder();
         if (readBody) {
@@ -210,32 +210,32 @@ public abstract class SimpleHttpClient {
     public String readLine() throws IOException {
         return reader.readLine();
     }
-    
+
     public void disconnect() throws IOException {
         writer.close();
         reader.close();
         socket.close();
     }
-    
+
     public void reset() {
         socket = null;
         writer = null;
         reader = null;
-        
+
         request = null;
         requestPause = 1000;
-        
+
         useContinue = false;
 
         responseLine = null;
         responseHeaders = new ArrayList<String>();
         responseBody = null;
     }
-    
+
     public boolean isResponse100() {
         return getResponseLine().startsWith(INFO_100);
     }
-    
+
     public boolean isResponse200() {
         return getResponseLine().startsWith(OK_200);
     }
@@ -255,15 +255,15 @@ public abstract class SimpleHttpClient {
     public boolean isResponse50x() {
         return getResponseLine().startsWith(FAIL_50X);
     }
-    
+
     public boolean isResponse500() {
         return getResponseLine().startsWith(FAIL_500);
     }
-    
+
     public boolean isResponse501() {
         return getResponseLine().startsWith(FAIL_501);
     }
-    
+
     public Socket getSocket() {
         return socket;
     }

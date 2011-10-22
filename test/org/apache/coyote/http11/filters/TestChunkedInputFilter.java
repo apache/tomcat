@@ -44,7 +44,7 @@ public class TestChunkedInputFilter extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
 
         // Must have a real docBase - just use temp
-        Context ctx = 
+        Context ctx =
             tomcat.addContext("", System.getProperty("java.io.tmpdir"));
 
         Tomcat.addServlet(ctx, "servlet", new EchoHeaderServlet());
@@ -83,7 +83,7 @@ public class TestChunkedInputFilter extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
 
         // Must have a real docBase - just use temp
-        Context ctx = 
+        Context ctx =
             tomcat.addContext("", System.getProperty("java.io.tmpdir"));
 
         Tomcat.addServlet(ctx, "servlet", new EchoHeaderServlet());
@@ -126,7 +126,7 @@ public class TestChunkedInputFilter extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
 
         // Must have a real docBase - just use temp
-        Context ctx = 
+        Context ctx =
             tomcat.addContext("", System.getProperty("java.io.tmpdir"));
 
         Tomcat.addServlet(ctx, "servlet", new EchoHeaderServlet());
@@ -157,12 +157,12 @@ public class TestChunkedInputFilter extends TomcatBaseTest {
         client.processRequest();
         assertEquals("null7null", client.getResponseBody());
     }
-    
+
     private static class EchoHeaderServlet extends HttpServlet {
         private static final long serialVersionUID = 1L;
 
         @Override
-        protected void doPost(HttpServletRequest req, HttpServletResponse resp) 
+        protected void doPost(HttpServletRequest req, HttpServletResponse resp)
                 throws ServletException, IOException {
             resp.setContentType("text/plain");
             PrintWriter pw = resp.getWriter();
@@ -179,9 +179,9 @@ public class TestChunkedInputFilter extends TomcatBaseTest {
             while (is.read() > -1) {
                 count++;
             }
-            
+
             pw.write(Integer.valueOf(count).toString());
-            
+
             // Header should be visible now
             value = req.getHeader("x-trailer");
             if (value == null) {
@@ -190,7 +190,7 @@ public class TestChunkedInputFilter extends TomcatBaseTest {
             pw.write(value);
         }
     }
-    
+
     private static class TrailerClient extends SimpleHttpClient {
 
         @Override

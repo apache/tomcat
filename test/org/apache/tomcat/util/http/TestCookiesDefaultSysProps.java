@@ -43,9 +43,9 @@ public class TestCookiesDefaultSysProps extends CookiesBaseTest {
         Tomcat tomcat = getTomcatInstance();
 
         addServlets(tomcat);
-        
+
         tomcat.start();
-        
+
         ByteChunk res = getUrl("http://localhost:" + getPort() + "/invalid");
         assertEquals("Cookie name fail", res.toString());
         res = getUrl("http://localhost:" + getPort() + "/null");
@@ -68,5 +68,5 @@ public class TestCookiesDefaultSysProps extends CookiesBaseTest {
         }
 
     }
-        
+
 }

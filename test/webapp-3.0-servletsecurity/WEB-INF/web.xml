@@ -19,7 +19,7 @@
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://java.sun.com/xml/ns/javaee
                       http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
-  version="3.0">  
+  version="3.0">
 
   <!--
     WARNING:
@@ -34,7 +34,7 @@
      Used as part of the Tomcat unit tests when a full web application is
      required.
   </description>
-  
+
   <servlet>
     <servlet-name>RoleProtected</servlet-name>
     <servlet-class>org.apache.catalina.core.TestStandardWrapper$RoleAllowServlet</servlet-class>

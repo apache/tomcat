@@ -27,26 +27,26 @@ public class TestResponsePerformance {
         Request req = new TesterToAbsoluteRequest();
         Response resp = new Response();
         resp.setRequest(req);
-        
+
         long start = System.currentTimeMillis();
         for (int i = 0; i < 100000; i++) {
             resp.toAbsolute("bar.html");
         }
         long homebrew = System.currentTimeMillis() - start;
-        
+
         start = System.currentTimeMillis();
         for (int i = 0; i < 100000; i++) {
             URI base = URI.create("http://localhost:8080/foo.html");
             base.resolve(URI.create("bar.html")).toASCIIString();
         }
         long uri = System.currentTimeMillis() - start;
-        
+
         System.out.println("Current 'home-brew': " + homebrew +
                 "ms, Using URI: " + uri + "ms");
         assertTrue(homebrew < uri);
     }
 
-    
+
     private static class TesterToAbsoluteRequest extends Request {
 
         @Override

@@ -28,6 +28,6 @@
     Servlet specification and version 2.1 of the JSP specification. This
     typically means ensuring that features introduced in later versions of the
     specification do not change the behaviour of applications that declared an
-    earlier version of the specification. 
+    earlier version of the specification.
   </description>
 </web-app>

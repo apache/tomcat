@@ -38,11 +38,11 @@ public class TestScriptingVariabler extends TomcatBaseTest {
     public void testBug42390() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
-        File appDir = 
+        File appDir =
             new File("test/webapp-3.0");
         // app dir is relative to server home
         tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());
-        
+
         tomcat.start();
 
         Exception e = null;
@@ -55,7 +55,7 @@ public class TestScriptingVariabler extends TomcatBaseTest {
         // Should not fail
         assertNull(e);
     }
-    
+
     public static class Bug48616aTag extends TagSupport {
         private static final long serialVersionUID = 1L;
     }
@@ -81,11 +81,11 @@ public class TestScriptingVariabler extends TomcatBaseTest {
     public void testBug48616() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
-        File appDir = 
+        File appDir =
             new File("test/webapp-3.0");
         // app dir is relative to server home
         tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());
-        
+
         tomcat.start();
 
         Exception e = null;
@@ -103,11 +103,11 @@ public class TestScriptingVariabler extends TomcatBaseTest {
     public void testBug48616b() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
-        File appDir = 
+        File appDir =
             new File("test/webapp-3.0");
         // app dir is relative to server home
         tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());
-        
+
         tomcat.start();
 
         Exception e = null;

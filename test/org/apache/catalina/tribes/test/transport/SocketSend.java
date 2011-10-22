@@ -30,8 +30,8 @@ import org.apache.catalina.tribes.membership.MemberImpl;
 public class SocketSend {
 
     public static void main(String[] args) throws Exception {
-        
-        
+
+
         Member mbr = new MemberImpl("localhost", 9999, 0);
         ChannelData data = new ChannelData();
         data.setOptions(Channel.SEND_OPTIONS_BYTE_MESSAGE);
@@ -62,7 +62,7 @@ public class SocketSend {
                 System.out.println("Throughput "+df.format(mb/seconds)+" MB/seconds messages "+count+", total "+mb+" MB, total "+total+" bytes.");
             }
         }
-        out.flush(); 
+        out.flush();
         System.out.println("Complete, sleeping 5 seconds");
         Thread.sleep(5000);
 

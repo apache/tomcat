@@ -40,7 +40,7 @@ public class TestByteChunk {
 
     /**
      * Test for {@code findByte} vs. {@code indexOf} methods difference.
-     * 
+     *
      * <p>
      * As discussed in the "Re: r944918" thread on dev@, {@code
      * ByteChunk.indexOf()} works for 0-127 ASCII chars only, and cannot find

@@ -83,7 +83,7 @@ public class TestMulticastPackages {
         AbstractSender s2 =(AbstractSender) ((ReplicationTransmitter)channel2.getChannelSender()).getTransport();
         s1.setTimeout(Long.MAX_VALUE); //for debugging
         s2.setTimeout(Long.MAX_VALUE); //for debugging
-        
+
         System.err.println("Starting Single package NO_ACK");
         channel1.send(new Member[] {channel2.getLocalMember(false)}, Data.createRandomData(1024),Channel.SEND_OPTIONS_MULTICAST);
         Thread.sleep(500);
@@ -91,7 +91,7 @@ public class TestMulticastPackages {
         assertEquals("Checking success messages.",1,listener1.count.get());
     }
 
-    
+
     public static void printMissingMsgs(int[] msgs, int maxIdx) {
         for (int i=0; i<maxIdx && i<msgs.length; i++) {
             if (msgs[i]==0) System.out.print(i+", ");
@@ -128,7 +128,7 @@ public class TestMulticastPackages {
                     }
                 }
             };
-        } 
+        }
         for (int x=0; x<threads.length; x++ ) { threads[x].start();}
         for (int x=0; x<threads.length; x++ ) { threads[x].join();}
         //sleep for 50 sec, let the other messages in
@@ -218,7 +218,7 @@ public class TestMulticastPackages {
         public static Data createRandomData(int size) {
             return createRandomData(size,-1);
         }
-        
+
         public static Data createRandomData(int size, int number) {
             int i = r.nextInt();
             i = ( i % 127 );
@@ -236,7 +236,7 @@ public class TestMulticastPackages {
             }
             return d;
         }
-        
+
         public int getNumber() {
             if (!hasNr) return -1;
             return XByteBuffer.toInt(this.data, 0);

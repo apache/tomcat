@@ -27,7 +27,7 @@ public class TesterBeanB {
     public void setName(String name) {
         this.name = name;
     }
-    
+
     public String sayHello() {
         return "Hello from " + name;
     }

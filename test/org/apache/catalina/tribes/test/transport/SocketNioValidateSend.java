@@ -49,7 +49,7 @@ public class SocketNioValidateSend {
         double mb = 0;
         boolean first = true;
         int count = 0;
-        
+
         DecimalFormat df = new DecimalFormat("##.00");
         while (count<100000) {
             if (first) {

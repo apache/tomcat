@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -43,40 +43,40 @@ public class TestTomcatClassLoader extends TomcatBaseTest {
         // Must have a real docBase - just use temp
         Context ctx =
             tomcat.addContext("", System.getProperty("java.io.tmpdir"));
-        
+
         Tomcat.addServlet(ctx, "ClassLoaderReport", new ClassLoaderReport(null));
         ctx.addServletMapping("/", "ClassLoaderReport");
-        
+
         tomcat.start();
-        
+
         ByteChunk res = getUrl("http://localhost:" + getPort() + "/");
         assertEquals("WEBAPP,SYSTEM,OTHER,", res.toString());
     }
 
     @Test
     public void testNonDefaultClassLoader() throws Exception {
-        
+
         ClassLoader cl = new URLClassLoader(new URL[0],
                 Thread.currentThread().getContextClassLoader());
 
         Thread.currentThread().setContextClassLoader(cl);
-        
+
         Tomcat tomcat = getTomcatInstance();
         tomcat.getServer().setParentClassLoader(cl);
 
         // Must have a real docBase - just use temp
         Context ctx =
             tomcat.addContext("", System.getProperty("java.io.tmpdir"));
-        
+
         Tomcat.addServlet(ctx, "ClassLoaderReport", new ClassLoaderReport(cl));
         ctx.addServletMapping("/", "ClassLoaderReport");
-        
+
         tomcat.start();
-        
+
         ByteChunk res = getUrl("http://localhost:" + getPort() + "/");
         assertEquals("WEBAPP,CUSTOM,SYSTEM,OTHER,", res.toString());
     }
-    
+
     private static final class ClassLoaderReport extends HttpServlet {
         private static final long serialVersionUID = 1L;
 
@@ -93,7 +93,7 @@ public class TestTomcatClassLoader extends TomcatBaseTest {
             PrintWriter out = resp.getWriter();
 
             ClassLoader system = ClassLoader.getSystemClassLoader();
-            
+
             ClassLoader cl = Thread.currentThread().getContextClassLoader();
             while (cl != null) {
                 if (system == cl) {
