@@ -327,7 +327,7 @@ public class FileDirContext extends BaseDirContext {
 
         if (file == null)
             return null;
-        
+
         return list(file);
 
     }
@@ -799,7 +799,7 @@ public class FileDirContext extends BaseDirContext {
 
             if (allowLinking)
                 return file;
-            
+
             // Check that this file belongs to our root path
             String canPath = null;
             try {
@@ -1083,10 +1083,10 @@ public class FileDirContext extends BaseDirContext {
             return super.getResourceType();
         }
 
-        
+
         /**
          * Get canonical path.
-         * 
+         *
          * @return String the file's canonical path
          */
         @Override
@@ -1100,7 +1100,7 @@ public class FileDirContext extends BaseDirContext {
             }
             return canonicalPath;
         }
-        
+
 
     }
 

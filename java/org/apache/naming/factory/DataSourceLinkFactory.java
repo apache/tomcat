@@ -5,15 +5,15 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */ 
+ */
 
 
 package org.apache.naming.factory;
@@ -37,7 +37,7 @@ import javax.sql.DataSource;
 
 /**
  * <p>Object factory for resource links for shared data sources.</p>
- * 
+ *
  * @author Filip Hanik
  */
 public class DataSourceLinkFactory extends ResourceLinkFactory {
@@ -50,7 +50,7 @@ public class DataSourceLinkFactory extends ResourceLinkFactory {
 
     /**
      * Create a new DataSource instance.
-     * 
+     *
      * @param obj The reference object describing the DataSource
      */
     @Override
@@ -68,13 +68,13 @@ public class DataSourceLinkFactory extends ResourceLinkFactory {
         }
         return result;
     }
-    
+
     protected Object wrapDataSource(Object datasource, String username, String password) throws NamingException {
         try {
             Class<?> proxyClass = Proxy.getProxyClass(datasource.getClass().getClassLoader(), datasource.getClass().getInterfaces());
             Constructor<?> proxyConstructor = proxyClass.getConstructor(new Class[] { InvocationHandler.class });
             DataSourceHandler handler = new DataSourceHandler((DataSource)datasource, username, password);
-            return proxyConstructor.newInstance(handler);    
+            return proxyConstructor.newInstance(handler);
         }catch (Exception x) {
             if (x instanceof NamingException) throw (NamingException)x;
             else {
@@ -84,15 +84,15 @@ public class DataSourceLinkFactory extends ResourceLinkFactory {
             }
         }
     }
-    
+
     /**
      * Simple wrapper class that will allow a user to configure a ResourceLink for a data source
-     * so that when {@link javax.sql.DataSource#getConnection()} is called, it will invoke 
+     * so that when {@link javax.sql.DataSource#getConnection()} is called, it will invoke
      * {@link javax.sql.DataSource#getConnection(String, String)} with the preconfigured username and password.
      */
     public static class DataSourceHandler implements InvocationHandler {
-        private final DataSource ds; 
-        private final String username; 
+        private final DataSource ds;
+        private final String username;
         private final String password;
         private final Method getConnection;
         public DataSourceHandler(DataSource ds, String username, String password) throws Exception {
@@ -101,10 +101,10 @@ public class DataSourceLinkFactory extends ResourceLinkFactory {
             this.password = password;
             getConnection = ds.getClass().getMethod("getConnection", String.class, String.class);
         }
-        
+
         @Override
         public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-            
+
             if ("getConnection".equals(method.getName()) && (args==null || args.length==0)) {
                 args = new String[] {username,password};
                 method = getConnection;
@@ -122,7 +122,7 @@ public class DataSourceLinkFactory extends ResourceLinkFactory {
                 }
             }
         }
-        
+
         public Object unwrap(Class<?> iface) throws SQLException {
             if (iface == DataSource.class) {
                 return ds;
@@ -130,10 +130,10 @@ public class DataSourceLinkFactory extends ResourceLinkFactory {
                 throw new SQLException("Not a wrapper of "+iface.getName());
             }
         }
-        
+
     }
-    
-    
+
+
 
 
 }

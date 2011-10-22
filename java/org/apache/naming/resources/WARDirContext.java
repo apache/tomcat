@@ -5,15 +5,15 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */ 
+ */
 
 
 package org.apache.naming.resources;
@@ -59,7 +59,7 @@ public class WARDirContext extends BaseDirContext {
 
     private static final org.apache.juli.logging.Log log=
         org.apache.juli.logging.LogFactory.getLog( WARDirContext.class );
-    
+
     // ----------------------------------------------------------- Constructors
 
 
@@ -109,9 +109,9 @@ public class WARDirContext extends BaseDirContext {
 
     /**
      * Set the document root.
-     * 
+     *
      * @param docBase The new document root
-     * 
+     *
      * @exception IllegalArgumentException if the specified value is not
      *  supported by this implementation
      * @exception IllegalArgumentException if this would create a
@@ -188,7 +188,7 @@ public class WARDirContext extends BaseDirContext {
 
     /**
      * Retrieves the named object.
-     * 
+     *
      * @param strName the name of the object to look up
      * @return the object bound to name
      */
@@ -208,7 +208,7 @@ public class WARDirContext extends BaseDirContext {
         Entry entry = treeLookup(name);
         if (entry == null)
             return null;
-            
+
         ZipEntry zipEntry = entry.getEntry();
         if (zipEntry.isDirectory())
             return new WARDirContext(base, entry);
@@ -222,25 +222,25 @@ public class WARDirContext extends BaseDirContext {
      * escaped as part of converting file names to JNDI names. Note that while
      * ' can be used in Windows and Unix file names, " is only valid on Unix.
      * This method assumes that the string is currently unquoted.
-     * 
+     *
      * @return  A valid JNDI name
-     * @throws InvalidNameException 
+     * @throws InvalidNameException
      */
     private Name getEscapedJndiName(String name) throws InvalidNameException {
         return new CompositeName(name.replace("'", "\\'").replace("\"", ""));
     }
 
     /**
-     * Unbinds the named object. Removes the terminal atomic name in name 
-     * from the target context--that named by all but the terminal atomic 
+     * Unbinds the named object. Removes the terminal atomic name in name
+     * from the target context--that named by all but the terminal atomic
      * part of name.
      * <p>
-     * This method is idempotent. It succeeds even if the terminal atomic 
-     * name is not bound in the target context, but throws 
-     * NameNotFoundException if any of the intermediate contexts do not exist. 
-     * 
+     * This method is idempotent. It succeeds even if the terminal atomic
+     * name is not bound in the target context, but throws
+     * NameNotFoundException if any of the intermediate contexts do not exist.
+     *
      * @param name the name to bind; may not be empty
-     * @exception NameNotFoundException if an intermediate context does not 
+     * @exception NameNotFoundException if an intermediate context does not
      * exist
      * @exception NamingException if a naming exception is encountered
      */
@@ -252,11 +252,11 @@ public class WARDirContext extends BaseDirContext {
 
 
     /**
-     * Binds a new name to the object bound to an old name, and unbinds the 
-     * old name. Both names are relative to this context. Any attributes 
-     * associated with the old name become associated with the new name. 
+     * Binds a new name to the object bound to an old name, and unbinds the
+     * old name. Both names are relative to this context. Any attributes
+     * associated with the old name become associated with the new name.
      * Intermediate contexts of the old name are not changed.
-     * 
+     *
      * @param oldName the name of the existing binding; may not be empty
      * @param newName the name of the new binding; may not be empty
      * @exception javax.naming.NameAlreadyBoundException if newName is already
@@ -271,15 +271,15 @@ public class WARDirContext extends BaseDirContext {
 
 
     /**
-     * Enumerates the names bound in the named context, along with the class 
-     * names of objects bound to them. The contents of any subcontexts are 
+     * Enumerates the names bound in the named context, along with the class
+     * names of objects bound to them. The contents of any subcontexts are
      * not included.
      * <p>
-     * If a binding is added to or removed from this context, its effect on 
+     * If a binding is added to or removed from this context, its effect on
      * an enumeration previously returned is undefined.
-     * 
+     *
      * @param name the name of the context to list
-     * @return an enumeration of the names and class names of the bindings in 
+     * @return an enumeration of the names and class names of the bindings in
      * this context. Each element of the enumeration is of type NameClassPair.
      * @exception NamingException if a naming exception is encountered
      */
@@ -291,15 +291,15 @@ public class WARDirContext extends BaseDirContext {
 
 
     /**
-     * Enumerates the names bound in the named context, along with the class 
-     * names of objects bound to them. The contents of any subcontexts are 
+     * Enumerates the names bound in the named context, along with the class
+     * names of objects bound to them. The contents of any subcontexts are
      * not included.
      * <p>
-     * If a binding is added to or removed from this context, its effect on 
+     * If a binding is added to or removed from this context, its effect on
      * an enumeration previously returned is undefined.
-     * 
+     *
      * @param name the name of the context to list
-     * @return an enumeration of the names and class names of the bindings in 
+     * @return an enumeration of the names and class names of the bindings in
      * this context. Each element of the enumeration is of type NameClassPair.
      * @exception NamingException if a naming exception is encountered
      */
@@ -317,22 +317,22 @@ public class WARDirContext extends BaseDirContext {
 
 
     /**
-     * Enumerates the names bound in the named context, along with the 
-     * objects bound to them. The contents of any subcontexts are not 
+     * Enumerates the names bound in the named context, along with the
+     * objects bound to them. The contents of any subcontexts are not
      * included.
      * <p>
-     * If a binding is added to or removed from this context, its effect on 
+     * If a binding is added to or removed from this context, its effect on
      * an enumeration previously returned is undefined.
-     * 
+     *
      * @param strName the name of the context to list
-     * @return an enumeration of the bindings in this context. 
+     * @return an enumeration of the bindings in this context.
      * Each element of the enumeration is of type Binding.
      * @exception NamingException if a naming exception is encountered
      */
     @Override
     protected List<NamingEntry> doListBindings(String strName)
         throws NamingException {
-        
+
         Name name = getEscapedJndiName(strName);
 
         if (name.isEmpty())
@@ -341,32 +341,32 @@ public class WARDirContext extends BaseDirContext {
         Entry entry = treeLookup(name);
         if (entry == null)
             return null;
-        
+
         return list(entry);
     }
 
 
     /**
-     * Destroys the named context and removes it from the namespace. Any 
-     * attributes associated with the name are also removed. Intermediate 
+     * Destroys the named context and removes it from the namespace. Any
+     * attributes associated with the name are also removed. Intermediate
      * contexts are not destroyed.
      * <p>
-     * This method is idempotent. It succeeds even if the terminal atomic 
-     * name is not bound in the target context, but throws 
-     * NameNotFoundException if any of the intermediate contexts do not exist. 
-     * 
-     * In a federated naming system, a context from one naming system may be 
-     * bound to a name in another. One can subsequently look up and perform 
-     * operations on the foreign context using a composite name. However, an 
-     * attempt destroy the context using this composite name will fail with 
-     * NotContextException, because the foreign context is not a "subcontext" 
-     * of the context in which it is bound. Instead, use unbind() to remove 
-     * the binding of the foreign context. Destroying the foreign context 
-     * requires that the destroySubcontext() be performed on a context from 
+     * This method is idempotent. It succeeds even if the terminal atomic
+     * name is not bound in the target context, but throws
+     * NameNotFoundException if any of the intermediate contexts do not exist.
+     *
+     * In a federated naming system, a context from one naming system may be
+     * bound to a name in another. One can subsequently look up and perform
+     * operations on the foreign context using a composite name. However, an
+     * attempt destroy the context using this composite name will fail with
+     * NotContextException, because the foreign context is not a "subcontext"
+     * of the context in which it is bound. Instead, use unbind() to remove
+     * the binding of the foreign context. Destroying the foreign context
+     * requires that the destroySubcontext() be performed on a context from
      * the foreign context's "native" naming system.
-     * 
+     *
      * @param name the name of the context to be destroyed; may not be empty
-     * @exception NameNotFoundException if an intermediate context does not 
+     * @exception NameNotFoundException if an intermediate context does not
      * exist
      * @exception javax.naming.NotContextException if the name is bound but does
      * not name a context, or does not name a context of the appropriate type
@@ -379,12 +379,12 @@ public class WARDirContext extends BaseDirContext {
 
 
     /**
-     * Retrieves the named object, following links except for the terminal 
-     * atomic component of the name. If the object bound to name is not a 
+     * Retrieves the named object, following links except for the terminal
+     * atomic component of the name. If the object bound to name is not a
      * link, returns the object itself.
-     * 
+     *
      * @param name the name of the object to look up
-     * @return the object bound to name, not following the terminal link 
+     * @return the object bound to name, not following the terminal link
      * (if any).
      * @exception NamingException if a naming exception is encountered
      */
@@ -399,17 +399,17 @@ public class WARDirContext extends BaseDirContext {
     /**
      * Retrieves the full name of this context within its own namespace.
      * <p>
-     * Many naming services have a notion of a "full name" for objects in 
-     * their respective namespaces. For example, an LDAP entry has a 
-     * distinguished name, and a DNS record has a fully qualified name. This 
-     * method allows the client application to retrieve this name. The string 
-     * returned by this method is not a JNDI composite name and should not be 
-     * passed directly to context methods. In naming systems for which the 
-     * notion of full name does not make sense, 
+     * Many naming services have a notion of a "full name" for objects in
+     * their respective namespaces. For example, an LDAP entry has a
+     * distinguished name, and a DNS record has a fully qualified name. This
+     * method allows the client application to retrieve this name. The string
+     * returned by this method is not a JNDI composite name and should not be
+     * passed directly to context methods. In naming systems for which the
+     * notion of full name does not make sense,
      * OperationNotSupportedException is thrown.
-     * 
+     *
      * @return this context's name in its own namespace; never null
-     * @exception OperationNotSupportedException if the naming system does 
+     * @exception OperationNotSupportedException if the naming system does
      * not have the notion of a full name
      * @exception NamingException if a naming exception is encountered
      */
@@ -424,14 +424,14 @@ public class WARDirContext extends BaseDirContext {
 
 
     /**
-     * Retrieves selected attributes associated with a named object. 
-     * See the class description regarding attribute models, attribute type 
+     * Retrieves selected attributes associated with a named object.
+     * See the class description regarding attribute models, attribute type
      * names, and operational attributes.
-     * 
+     *
      * @return the requested attributes; never null
      * @param name the name of the object from which to retrieve attributes
-     * @param attrIds the identifiers of the attributes to retrieve. null 
-     * indicates that all attributes should be retrieved; an empty array 
+     * @param attrIds the identifiers of the attributes to retrieve. null
+     * indicates that all attributes should be retrieved; an empty array
      * indicates that none should be retrieved
      * @exception NamingException if a naming exception is encountered
      */
@@ -443,9 +443,9 @@ public class WARDirContext extends BaseDirContext {
 
 
     /**
-     * Retrieves all of the attributes associated with a named object. 
-     * 
-     * @return the set of attributes associated with name. 
+     * Retrieves all of the attributes associated with a named object.
+     *
+     * @return the set of attributes associated with name.
      * Returns an empty attribute set if name has no attributes; never null.
      * @param name the name of the object from which to retrieve attributes
      * @exception NamingException if a naming exception is encountered
@@ -453,7 +453,7 @@ public class WARDirContext extends BaseDirContext {
     @Override
     public Attributes getAttributes(Name name, String[] attrIds)
         throws NamingException {
-        
+
         Entry entry = null;
         if (name.isEmpty())
             entry = entries;
@@ -461,7 +461,7 @@ public class WARDirContext extends BaseDirContext {
             entry = treeLookup(name);
         if (entry == null)
             return null;
-        
+
         ZipEntry zipEntry = entry.getEntry();
 
         ResourceAttributes attrs = new ResourceAttributes();
@@ -473,21 +473,21 @@ public class WARDirContext extends BaseDirContext {
             attrs.setCollection(true);
         attrs.setContentLength(zipEntry.getSize());
         attrs.setLastModified(zipEntry.getTime());
-        
+
         return attrs;
-        
+
     }
 
 
     /**
-     * Modifies the attributes associated with a named object. The order of 
-     * the modifications is not specified. Where possible, the modifications 
+     * Modifies the attributes associated with a named object. The order of
+     * the modifications is not specified. Where possible, the modifications
      * are performed atomically.
-     * 
+     *
      * @param name the name of the object whose attributes will be updated
-     * @param mod_op the modification operation, one of: ADD_ATTRIBUTE, 
+     * @param mod_op the modification operation, one of: ADD_ATTRIBUTE,
      * REPLACE_ATTRIBUTE, REMOVE_ATTRIBUTE
-     * @param attrs the attributes to be used for the modification; may not 
+     * @param attrs the attributes to be used for the modification; may not
      * be null
      * @exception javax.naming.directory.AttributeModificationException if the
      * modification cannot be completed successfully
@@ -501,14 +501,14 @@ public class WARDirContext extends BaseDirContext {
 
 
     /**
-     * Modifies the attributes associated with a named object using an an 
-     * ordered list of modifications. The modifications are performed in the 
-     * order specified. Each modification specifies a modification operation 
-     * code and an attribute on which to operate. Where possible, the 
+     * Modifies the attributes associated with a named object using an an
+     * ordered list of modifications. The modifications are performed in the
+     * order specified. Each modification specifies a modification operation
+     * code and an attribute on which to operate. Where possible, the
      * modifications are performed atomically.
-     * 
+     *
      * @param name the name of the object whose attributes will be updated
-     * @param mods an ordered sequence of modifications to be performed; may 
+     * @param mods an ordered sequence of modifications to be performed; may
      * not be null
      * @exception javax.naming.directory.AttributeModificationException if the
      * modification cannot be completed successfully
@@ -522,12 +522,12 @@ public class WARDirContext extends BaseDirContext {
 
 
     /**
-     * Binds a name to an object, along with associated attributes. If attrs 
-     * is null, the resulting binding will have the attributes associated 
-     * with obj if obj is a DirContext, and no attributes otherwise. If attrs 
-     * is non-null, the resulting binding will have attrs as its attributes; 
+     * Binds a name to an object, along with associated attributes. If attrs
+     * is null, the resulting binding will have the attributes associated
+     * with obj if obj is a DirContext, and no attributes otherwise. If attrs
+     * is non-null, the resulting binding will have attrs as its attributes;
      * any attributes associated with obj are ignored.
-     * 
+     *
      * @param name the name to bind; may not be empty
      * @param obj the object to bind; possibly null
      * @param attrs the attributes to associate with the binding
@@ -545,16 +545,16 @@ public class WARDirContext extends BaseDirContext {
 
 
     /**
-     * Binds a name to an object, along with associated attributes, 
-     * overwriting any existing binding. If attrs is null and obj is a 
-     * DirContext, the attributes from obj are used. If attrs is null and obj 
+     * Binds a name to an object, along with associated attributes,
+     * overwriting any existing binding. If attrs is null and obj is a
+     * DirContext, the attributes from obj are used. If attrs is null and obj
      * is not a DirContext, any existing attributes associated with the object
-     * already bound in the directory remain unchanged. If attrs is non-null, 
-     * any existing attributes associated with the object already bound in 
-     * the directory are removed and attrs is associated with the named 
-     * object. If obj is a DirContext and attrs is non-null, the attributes 
+     * already bound in the directory remain unchanged. If attrs is non-null,
+     * any existing attributes associated with the object already bound in
+     * the directory are removed and attrs is associated with the named
+     * object. If obj is a DirContext and attrs is non-null, the attributes
      * of obj are ignored.
-     * 
+     *
      * @param name the name to bind; may not be empty
      * @param obj the object to bind; possibly null
      * @param attrs the attributes to associate with the binding
@@ -570,14 +570,14 @@ public class WARDirContext extends BaseDirContext {
 
 
     /**
-     * Creates and binds a new context, along with associated attributes. 
-     * This method creates a new subcontext with the given name, binds it in 
-     * the target context (that named by all but terminal atomic component of 
-     * the name), and associates the supplied attributes with the newly 
-     * created object. All intermediate and target contexts must already 
-     * exist. If attrs is null, this method is equivalent to 
+     * Creates and binds a new context, along with associated attributes.
+     * This method creates a new subcontext with the given name, binds it in
+     * the target context (that named by all but terminal atomic component of
+     * the name), and associates the supplied attributes with the newly
+     * created object. All intermediate and target contexts must already
+     * exist. If attrs is null, this method is equivalent to
      * Context.createSubcontext().
-     * 
+     *
      * @param name the name of the context to create; may not be empty
      * @param attrs the attributes to associate with the newly created context
      * @return the newly created context
@@ -595,13 +595,13 @@ public class WARDirContext extends BaseDirContext {
 
 
     /**
-     * Retrieves the schema associated with the named object. The schema 
-     * describes rules regarding the structure of the namespace and the 
-     * attributes stored within it. The schema specifies what types of 
-     * objects can be added to the directory and where they can be added; 
-     * what mandatory and optional attributes an object can have. The range 
+     * Retrieves the schema associated with the named object. The schema
+     * describes rules regarding the structure of the namespace and the
+     * attributes stored within it. The schema specifies what types of
+     * objects can be added to the directory and where they can be added;
+     * what mandatory and optional attributes an object can have. The range
      * of support for schemas is directory-specific.
-     * 
+     *
      * @param name the name of the object whose schema is to be retrieved
      * @return the schema associated with the context; never null
      * @exception OperationNotSupportedException if schema not supported
@@ -615,12 +615,12 @@ public class WARDirContext extends BaseDirContext {
 
 
     /**
-     * Retrieves a context containing the schema objects of the named 
+     * Retrieves a context containing the schema objects of the named
      * object's class definitions.
-     * 
-     * @param name the name of the object whose object class definition is to 
+     *
+     * @param name the name of the object whose object class definition is to
      * be retrieved
-     * @return the DirContext containing the named object's class 
+     * @return the DirContext containing the named object's class
      * definitions; never null
      * @exception OperationNotSupportedException if schema not supported
      * @exception NamingException if a naming exception is encountered
@@ -633,19 +633,19 @@ public class WARDirContext extends BaseDirContext {
 
 
     /**
-     * Searches in a single context for objects that contain a specified set 
-     * of attributes, and retrieves selected attributes. The search is 
+     * Searches in a single context for objects that contain a specified set
+     * of attributes, and retrieves selected attributes. The search is
      * performed using the default SearchControls settings.
-     * 
+     *
      * @param name the name of the context to search
-     * @param matchingAttributes the attributes to search for. If empty or 
+     * @param matchingAttributes the attributes to search for. If empty or
      * null, all objects in the target context are returned.
-     * @param attributesToReturn the attributes to return. null indicates 
-     * that all attributes are to be returned; an empty array indicates that 
+     * @param attributesToReturn the attributes to return. null indicates
+     * that all attributes are to be returned; an empty array indicates that
      * none are to be returned.
-     * @return a non-null enumeration of SearchResult objects. Each 
-     * SearchResult contains the attributes identified by attributesToReturn 
-     * and the name of the corresponding object, named relative to the 
+     * @return a non-null enumeration of SearchResult objects. Each
+     * SearchResult contains the attributes identified by attributesToReturn
+     * and the name of the corresponding object, named relative to the
      * context named by name.
      * @exception NamingException if a naming exception is encountered
      */
@@ -658,17 +658,17 @@ public class WARDirContext extends BaseDirContext {
 
 
     /**
-     * Searches in a single context for objects that contain a specified set 
-     * of attributes. This method returns all the attributes of such objects. 
-     * It is equivalent to supplying null as the atributesToReturn parameter 
+     * Searches in a single context for objects that contain a specified set
+     * of attributes. This method returns all the attributes of such objects.
+     * It is equivalent to supplying null as the atributesToReturn parameter
      * to the method search(Name, Attributes, String[]).
-     * 
+     *
      * @param name the name of the context to search
-     * @param matchingAttributes the attributes to search for. If empty or 
+     * @param matchingAttributes the attributes to search for. If empty or
      * null, all objects in the target context are returned.
-     * @return a non-null enumeration of SearchResult objects. Each 
-     * SearchResult contains the attributes identified by attributesToReturn 
-     * and the name of the corresponding object, named relative to the 
+     * @return a non-null enumeration of SearchResult objects. Each
+     * SearchResult contains the attributes identified by attributesToReturn
+     * and the name of the corresponding object, named relative to the
      * context named by name.
      * @exception NamingException if a naming exception is encountered
      */
@@ -680,17 +680,17 @@ public class WARDirContext extends BaseDirContext {
 
 
     /**
-     * Searches in the named context or object for entries that satisfy the 
-     * given search filter. Performs the search as specified by the search 
+     * Searches in the named context or object for entries that satisfy the
+     * given search filter. Performs the search as specified by the search
      * controls.
-     * 
+     *
      * @param name the name of the context or object to search
-     * @param filter the filter expression to use for the search; may not be 
+     * @param filter the filter expression to use for the search; may not be
      * null
-     * @param cons the search controls that control the search. If null, 
-     * the default search controls are used (equivalent to 
+     * @param cons the search controls that control the search. If null,
+     * the default search controls are used (equivalent to
      * (new SearchControls())).
-     * @return an enumeration of SearchResults of the objects that satisfy 
+     * @return an enumeration of SearchResults of the objects that satisfy
      * the filter; never null
      * @exception javax.naming.directory.InvalidSearchFilterException if the
      * search filter specified is not supported or understood by the underlying
@@ -700,7 +700,7 @@ public class WARDirContext extends BaseDirContext {
      * @exception NamingException if a naming exception is encountered
      */
     @Override
-    public NamingEnumeration<SearchResult> search(String name, String filter, 
+    public NamingEnumeration<SearchResult> search(String name, String filter,
                                     SearchControls cons)
         throws NamingException {
         throw new OperationNotSupportedException();
@@ -708,22 +708,22 @@ public class WARDirContext extends BaseDirContext {
 
 
     /**
-     * Searches in the named context or object for entries that satisfy the 
-     * given search filter. Performs the search as specified by the search 
+     * Searches in the named context or object for entries that satisfy the
+     * given search filter. Performs the search as specified by the search
      * controls.
-     * 
+     *
      * @param name the name of the context or object to search
-     * @param filterExpr the filter expression to use for the search. 
-     * The expression may contain variables of the form "{i}" where i is a 
+     * @param filterExpr the filter expression to use for the search.
+     * The expression may contain variables of the form "{i}" where i is a
      * nonnegative integer. May not be null.
-     * @param filterArgs the array of arguments to substitute for the 
-     * variables in filterExpr. The value of filterArgs[i] will replace each 
+     * @param filterArgs the array of arguments to substitute for the
+     * variables in filterExpr. The value of filterArgs[i] will replace each
      * occurrence of "{i}". If null, equivalent to an empty array.
-     * @param cons the search controls that control the search. If null, the 
+     * @param cons the search controls that control the search. If null, the
      * default search controls are used (equivalent to (new SearchControls())).
-     * @return an enumeration of SearchResults of the objects that satisfy the 
+     * @return an enumeration of SearchResults of the objects that satisfy the
      * filter; never null
-     * @exception ArrayIndexOutOfBoundsException if filterExpr contains {i} 
+     * @exception ArrayIndexOutOfBoundsException if filterExpr contains {i}
      * expressions where i is outside the bounds of the array filterArgs
      * @exception javax.naming.directory.InvalidSearchControlsException if cons
      * contains invalid settings
@@ -732,7 +732,7 @@ public class WARDirContext extends BaseDirContext {
      * @exception NamingException if a naming exception is encountered
      */
     @Override
-    public NamingEnumeration<SearchResult> search(String name, String filterExpr, 
+    public NamingEnumeration<SearchResult> search(String name, String filterExpr,
                                     Object[] filterArgs, SearchControls cons)
         throws NamingException {
         throw new OperationNotSupportedException();
@@ -765,9 +765,9 @@ public class WARDirContext extends BaseDirContext {
 
             Enumeration<? extends ZipEntry> entryList = base.entries();
             entries = new Entry("/", new ZipEntry("/"));
-            
+
             while (entryList.hasMoreElements()) {
-                
+
                 ZipEntry entry = entryList.nextElement();
                 String name = normalize(entry);
                 int pos = name.lastIndexOf('/');
@@ -803,7 +803,7 @@ public class WARDirContext extends BaseDirContext {
                 Entry child = new Entry(entryName, entry);
                 if (parent != null)
                     parent.addChild(child);
-                
+
             }
 
         } catch (Exception e) {
@@ -835,12 +835,12 @@ public class WARDirContext extends BaseDirContext {
      * List children as objects.
      */
     protected ArrayList<NamingEntry> list(Entry entry) {
-        
+
         ArrayList<NamingEntry> entries = new ArrayList<NamingEntry>();
         Entry[] children = entry.getChildren();
         Arrays.sort(children);
         NamingEntry namingEntry = null;
-        
+
         for (int i = 0; i < children.length; i++) {
             ZipEntry current = children[i].getEntry();
             Object object = null;
@@ -853,9 +853,9 @@ public class WARDirContext extends BaseDirContext {
                 (children[i].getName(), object, NamingEntry.ENTRY);
             entries.add(namingEntry);
         }
-        
+
         return entries;
-        
+
     }
 
 
@@ -869,29 +869,29 @@ public class WARDirContext extends BaseDirContext {
 
 
         // -------------------------------------------------------- Constructor
-        
-        
+
+
         public Entry(String name, ZipEntry entry) {
             this.name = name;
             this.entry = entry;
         }
-        
-        
+
+
         // --------------------------------------------------- Member Variables
-        
-        
+
+
         protected String name = null;
-        
-        
+
+
         protected ZipEntry entry = null;
-        
-        
+
+
         protected Entry children[] = new Entry[0];
-        
-        
+
+
         // ----------------------------------------------------- Public Methods
-        
-        
+
+
         @Override
         public int compareTo(Object o) {
             if (!(o instanceof Entry))
@@ -905,7 +905,7 @@ public class WARDirContext extends BaseDirContext {
                 return false;
             return name.equals(((Entry) o).getName());
         }
-        
+
         @Override
         public int hashCode() {
             return name.hashCode();
@@ -914,13 +914,13 @@ public class WARDirContext extends BaseDirContext {
         public ZipEntry getEntry() {
             return entry;
         }
-        
-        
+
+
         public String getName() {
             return name;
         }
-        
-        
+
+
         public void addChild(Entry entry) {
             Entry[] newChildren = new Entry[children.length + 1];
             for (int i = 0; i < children.length; i++)
@@ -956,28 +956,28 @@ public class WARDirContext extends BaseDirContext {
      * to the WAR right away.
      */
     protected class WARResource extends Resource {
-        
-        
+
+
         // -------------------------------------------------------- Constructor
-        
-        
+
+
         public WARResource(ZipEntry entry) {
             this.entry = entry;
         }
-        
-        
+
+
         // --------------------------------------------------- Member Variables
-        
-        
+
+
         protected ZipEntry entry;
-        
-        
+
+
         // ----------------------------------------------------- Public Methods
-        
-        
+
+
         /**
          * Content accessor.
-         * 
+         *
          * @return InputStream
          */
         @Override
@@ -994,8 +994,8 @@ public class WARDirContext extends BaseDirContext {
             }
             return super.streamContent();
         }
-        
-        
+
+
     }
 
 

@@ -5,15 +5,15 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */ 
+ */
 
 package org.apache.naming.resources;
 
@@ -32,104 +32,104 @@ import javax.naming.directory.BasicAttribute;
 
 /**
  * Attributes implementation.
- * 
+ *
  * @author <a href="mailto:remm@apache.org">Remy Maucherat</a>
  * @version $Revision$
  */
 public class ResourceAttributes implements Attributes {
-    
-    
+
+
     // -------------------------------------------------------------- Constants
-    
+
     private static final long serialVersionUID = 1L;
-    
+
     // Default attribute names
-    
+
     /**
      * Creation date.
      */
     public static final String CREATION_DATE = "creationdate";
-    
-    
+
+
     /**
      * Creation date.
      */
     public static final String ALTERNATE_CREATION_DATE = "creation-date";
-    
-    
+
+
     /**
      * Last modification date.
      */
     public static final String LAST_MODIFIED = "getlastmodified";
-    
-    
+
+
     /**
      * Last modification date.
      */
     public static final String ALTERNATE_LAST_MODIFIED = "last-modified";
-    
-    
+
+
     /**
      * Name.
      */
     public static final String NAME = "displayname";
-    
-    
+
+
     /**
      * Type.
      */
     public static final String TYPE = "resourcetype";
-    
-    
+
+
     /**
      * Type.
      */
     public static final String ALTERNATE_TYPE = "content-type";
-    
-    
+
+
     /**
      * MIME type of the content.
      */
     public static final String CONTENT_TYPE = "getcontenttype";
-    
-    
+
+
     /**
      * Content length.
      */
     public static final String CONTENT_LENGTH = "getcontentlength";
-    
-    
+
+
     /**
      * Content length.
      */
     public static final String ALTERNATE_CONTENT_LENGTH = "content-length";
-    
-    
+
+
     /**
      * ETag.
      */
     public static final String ETAG = "getetag";
-    
-    
+
+
     /**
      * ETag.
      */
     public static final String ALTERNATE_ETAG = "etag";
-    
-    
+
+
     /**
      * Collection type.
      */
     public static final String COLLECTION_TYPE = "<collection/>";
-    
-    
+
+
     /**
      * HTTP date format.
      */
     protected static final SimpleDateFormat format =
         new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz", Locale.US);
-    
-    
+
+
     /**
      * Date formats using for Date parsing.
      */
@@ -138,8 +138,8 @@ public class ResourceAttributes implements Attributes {
         new SimpleDateFormat("EEEEEE, dd-MMM-yy HH:mm:ss zzz", Locale.US),
         new SimpleDateFormat("EEE MMMM d HH:mm:ss yyyy", Locale.US)
     };
-    
-    
+
+
     protected static final TimeZone gmtZone = TimeZone.getTimeZone("GMT");
 
 
@@ -158,24 +158,24 @@ public class ResourceAttributes implements Attributes {
 
 
     // ----------------------------------------------------------- Constructors
-    
-    
+
+
     /**
      * Default constructor.
      */
     public ResourceAttributes() {
         // NO-OP
     }
-    
-    
+
+
     /**
      * Merges with another attribute set.
      */
     public ResourceAttributes(Attributes attributes) {
         this.attributes = attributes;
     }
-    
-    
+
+
     // ----------------------------------------------------- Instance Variables
 
 
@@ -214,18 +214,18 @@ public class ResourceAttributes implements Attributes {
      */
     protected Date lastModifiedDate = null;
 
-    
+
     /**
      * Last modified date in HTTP format.
      */
     protected String lastModifiedHttp = null;
-    
+
 
     /**
      * MIME type.
      */
     protected String mimeType = null;
-    
+
 
     /**
      * Name.
@@ -264,8 +264,8 @@ public class ResourceAttributes implements Attributes {
             return (collection);
         }
     }
-    
-    
+
+
     /**
      * Set collection flag.
      *
@@ -280,11 +280,11 @@ public class ResourceAttributes implements Attributes {
             attributes.put(TYPE, value);
         }
     }
-    
-    
+
+
     /**
      * Get content length.
-     * 
+     *
      * @return content length value
      */
     public long getContentLength() {
@@ -311,11 +311,11 @@ public class ResourceAttributes implements Attributes {
         }
         return contentLength;
     }
-    
-    
+
+
     /**
      * Set content length.
-     * 
+     *
      * @param contentLength New content length value
      */
     public void setContentLength(long contentLength) {
@@ -323,11 +323,11 @@ public class ResourceAttributes implements Attributes {
         if (attributes != null)
             attributes.put(CONTENT_LENGTH, Long.valueOf(contentLength));
     }
-    
-    
+
+
     /**
      * Get creation time.
-     * 
+     *
      * @return creation time value
      */
     public long getCreation() {
@@ -349,7 +349,7 @@ public class ResourceAttributes implements Attributes {
                         String creationDateValue = value.toString();
                         Date result = null;
                         // Parsing the HTTP Date
-                        for (int i = 0; (result == null) && 
+                        for (int i = 0; (result == null) &&
                                  (i < formats.length); i++) {
                             try {
                                 result = formats[i].parse(creationDateValue);
@@ -369,11 +369,11 @@ public class ResourceAttributes implements Attributes {
         }
         return creation;
     }
-    
-    
+
+
     /**
      * Set creation.
-     * 
+     *
      * @param creation New creation value
      */
     public void setCreation(long creation) {
@@ -382,11 +382,11 @@ public class ResourceAttributes implements Attributes {
         if (attributes != null)
             attributes.put(CREATION_DATE, new Date(creation));
     }
-    
-    
+
+
     /**
      * Get creation date.
-     * 
+     *
      * @return Creation date value
      */
     public Date getCreationDate() {
@@ -411,7 +411,7 @@ public class ResourceAttributes implements Attributes {
                         String creationDateValue = value.toString();
                         Date result = null;
                         // Parsing the HTTP Date
-                        for (int i = 0; (result == null) && 
+                        for (int i = 0; (result == null) &&
                                  (i < formats.length); i++) {
                             try {
                                 result = formats[i].parse(creationDateValue);
@@ -431,11 +431,11 @@ public class ResourceAttributes implements Attributes {
         }
         return creationDate;
     }
-    
-    
+
+
     /**
      * Creation date mutator.
-     * 
+     *
      * @param creationDate New creation date
      */
     public void setCreationDate(Date creationDate) {
@@ -444,11 +444,11 @@ public class ResourceAttributes implements Attributes {
         if (attributes != null)
             attributes.put(CREATION_DATE, creationDate);
     }
-    
-    
+
+
     /**
      * Get last modified time.
-     * 
+     *
      * @return lastModified time value
      */
     public long getLastModified() {
@@ -470,10 +470,10 @@ public class ResourceAttributes implements Attributes {
                         String lastModifiedDateValue = value.toString();
                         Date result = null;
                         // Parsing the HTTP Date
-                        for (int i = 0; (result == null) && 
+                        for (int i = 0; (result == null) &&
                                  (i < formats.length); i++) {
                             try {
-                                result = 
+                                result =
                                     formats[i].parse(lastModifiedDateValue);
                             } catch (ParseException e) {
                                 // Ignore
@@ -491,11 +491,11 @@ public class ResourceAttributes implements Attributes {
         }
         return lastModified;
     }
-    
-    
+
+
     /**
      * Set last modified.
-     * 
+     *
      * @param lastModified New last modified value
      */
     public void setLastModified(long lastModified) {
@@ -504,11 +504,11 @@ public class ResourceAttributes implements Attributes {
         if (attributes != null)
             attributes.put(LAST_MODIFIED, new Date(lastModified));
     }
-    
-    
+
+
     /**
      * Get lastModified date.
-     * 
+     *
      * @return LastModified date value
      */
     public Date getLastModifiedDate() {
@@ -533,10 +533,10 @@ public class ResourceAttributes implements Attributes {
                         String lastModifiedDateValue = value.toString();
                         Date result = null;
                         // Parsing the HTTP Date
-                        for (int i = 0; (result == null) && 
+                        for (int i = 0; (result == null) &&
                                  (i < formats.length); i++) {
                             try {
-                                result = 
+                                result =
                                     formats[i].parse(lastModifiedDateValue);
                             } catch (ParseException e) {
                                 // Ignore
@@ -554,11 +554,11 @@ public class ResourceAttributes implements Attributes {
         }
         return lastModifiedDate;
     }
-    
-    
+
+
     /**
      * Last modified date mutator.
-     * 
+     *
      * @param lastModifiedDate New last modified date
      */
     public void setLastModifiedDate(Date lastModifiedDate) {
@@ -567,8 +567,8 @@ public class ResourceAttributes implements Attributes {
         if (attributes != null)
             attributes.put(LAST_MODIFIED, lastModifiedDate);
     }
-    
-    
+
+
     /**
      * @return Returns the lastModifiedHttp.
      */
@@ -587,24 +587,24 @@ public class ResourceAttributes implements Attributes {
         }
         return lastModifiedHttp;
     }
-    
-    
+
+
     /**
      * @param lastModifiedHttp The lastModifiedHttp to set.
      */
     public void setLastModifiedHttp(String lastModifiedHttp) {
         this.lastModifiedHttp = lastModifiedHttp;
     }
-    
-    
+
+
     /**
      * @return Returns the mimeType.
      */
     public String getMimeType() {
         return mimeType;
     }
-    
-    
+
+
     /**
      * @param mimeType The mimeType to set.
      */
@@ -612,10 +612,10 @@ public class ResourceAttributes implements Attributes {
         this.mimeType = mimeType;
     }
 
-    
+
     /**
      * Get name.
-     * 
+     *
      * @return Name value
      */
     public String getName() {
@@ -637,7 +637,7 @@ public class ResourceAttributes implements Attributes {
 
     /**
      * Set name.
-     * 
+     *
      * @param name New name value
      */
     public void setName(String name) {
@@ -645,11 +645,11 @@ public class ResourceAttributes implements Attributes {
         if (attributes != null)
             attributes.put(NAME, name);
     }
-    
-    
+
+
     /**
      * Get resource type.
-     * 
+     *
      * @return String resource type
      */
     public String getResourceType() {
@@ -670,11 +670,11 @@ public class ResourceAttributes implements Attributes {
         }
         return result;
     }
-    
-    
+
+
     /**
      * Type mutator.
-     * 
+     *
      * @param resourceType New resource type
      */
     public void setResourceType(String resourceType) {
@@ -686,8 +686,8 @@ public class ResourceAttributes implements Attributes {
 
     /**
      * Get ETag.
-     * 
-     * @return strong ETag if available, else weak ETag. 
+     *
+     * @return strong ETag if available, else weak ETag.
      */
     public String getETag() {
         String result = null;
@@ -717,7 +717,7 @@ public class ResourceAttributes implements Attributes {
                 }
                 result = weakETag;
             }
-        } 
+        }
         return result;
     }
 
@@ -731,19 +731,19 @@ public class ResourceAttributes implements Attributes {
             attributes.put(ETAG, eTag);
     }
 
-    
+
     /**
-     * Return the canonical path of the resource, to possibly be used for 
+     * Return the canonical path of the resource, to possibly be used for
      * direct file serving. Implementations which support this should override
      * it to return the file path.
-     * 
+     *
      * @return The canonical path of the resource
      */
     public String getCanonicalPath() {
         return null;
     }
-    
-    
+
+
     // ----------------------------------------------------- Attributes Methods
 
 
@@ -803,8 +803,8 @@ public class ResourceAttributes implements Attributes {
         }
         return null;
     }
-    
-    
+
+
     /**
      * Put attribute.
      */
@@ -820,8 +820,8 @@ public class ResourceAttributes implements Attributes {
             return attributes.put(attribute);
         }
     }
-    
-    
+
+
     /**
      * Put attribute.
      */
@@ -833,8 +833,8 @@ public class ResourceAttributes implements Attributes {
             return attributes.put(attrID, val);
         }
     }
-    
-    
+
+
     /**
      * Remove attribute.
      */
@@ -846,8 +846,8 @@ public class ResourceAttributes implements Attributes {
             return attributes.remove(attrID);
         }
     }
-    
-    
+
+
     /**
      * Get all attributes.
      */
@@ -894,8 +894,8 @@ public class ResourceAttributes implements Attributes {
             return attributes.getAll();
         }
     }
-    
-    
+
+
     /**
      * Get all attribute IDs.
      */
@@ -936,8 +936,8 @@ public class ResourceAttributes implements Attributes {
             return attributes.getIDs();
         }
     }
-    
-    
+
+
     /**
      * Retrieves the number of attributes in the attribute set.
      */
@@ -956,8 +956,8 @@ public class ResourceAttributes implements Attributes {
             return attributes.size();
         }
     }
-    
-    
+
+
     /**
      * Clone the attributes object (WARNING: fake cloning).
      */
@@ -965,8 +965,8 @@ public class ResourceAttributes implements Attributes {
     public Object clone() {
         return this;
     }
-    
-    
+
+
     /**
      * Case sensitivity.
      */
@@ -974,6 +974,6 @@ public class ResourceAttributes implements Attributes {
     public boolean isCaseIgnored() {
         return false;
     }
-    
-    
+
+
 }
