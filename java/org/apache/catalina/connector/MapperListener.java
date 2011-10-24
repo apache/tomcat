@@ -85,6 +85,7 @@ public class MapperListener extends LifecycleMBeanBase
 
     // --------------------------------------------------------- Public Methods
 
+    @Deprecated
     public String getConnectorName() {
         return this.connector.toString();
     }

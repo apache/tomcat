@@ -93,6 +93,7 @@ public class SingleSignOn extends ValveBase implements SessionListener {
     /**
      * The string manager for this package.
      */
+    @Deprecated
     protected static final StringManager sm =
         StringManager.getManager(Constants.Package);
 
