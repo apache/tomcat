@@ -1632,6 +1632,7 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
         <exclude name="modules/**"/>
         <exclude name="output/**"/>
         <exclude name="build.properties"/>
+        <exclude name=".git/**"/>
       </fileset>
     </copy>
     <!--jdbc-pool sources -->
