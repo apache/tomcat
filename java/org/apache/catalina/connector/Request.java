@@ -282,6 +282,7 @@ public class Request
     /**
      * Session parsed flag.
      */
+    @Deprecated
     protected boolean sessionParsed = false;
 
 
@@ -531,9 +532,11 @@ public class Request
         pathParameters.clear();
     }
 
+    @Deprecated
     protected boolean isProcessing() {
         return coyoteRequest.isProcessing();
     }
+
     /**
      * Clear cached encoders (to save memory for Comet requests).
      */
@@ -639,6 +642,7 @@ public class Request
      *
      * @param host The newly associated Host
      */
+    @Deprecated
     public void setHost(Host host) {
         mappingData.host = host;
     }
@@ -817,6 +821,7 @@ public class Request
      * Return an Iterator containing the String names of all notes bindings
      * that exist for this request.
      */
+    @Deprecated
     public Iterator<String> getNoteNames() {
         return notes.keySet().iterator();
     }
@@ -891,6 +896,7 @@ public class Request
      *
      * @param name The server name
      */
+    @Deprecated
     public void setServerName(String name) {
         coyoteRequest.serverName().setString(name);
     }
@@ -1753,6 +1759,7 @@ public class Request
      * @param name Name of this request parameter
      * @param values Corresponding values for this request parameter
      */
+    @Deprecated
     public void addParameter(String name, String values[]) {
         coyoteRequest.getParameters().addParameterValues(name, values);
     }
@@ -1770,6 +1777,7 @@ public class Request
     /**
      * Clear the collection of Headers associated with this Request.
      */
+    @Deprecated
     public void clearHeaders() {
         // Not used
     }
@@ -1786,6 +1794,7 @@ public class Request
     /**
      * Clear the collection of parameters associated with this Request.
      */
+    @Deprecated
     public void clearParameters() {
         // Not used
     }
@@ -1810,6 +1819,7 @@ public class Request
      *
      * @param path The context path
      */
+    @Deprecated
     public void setContextPath(String path) {
 
         if (path == null) {
@@ -1903,6 +1913,7 @@ public class Request
      * 
      * @return the URL decoded request URI
      */
+    @Deprecated
     public MessageBytes getDecodedRequestURIMB() {
         return coyoteRequest.decodedURI();
     }
@@ -1915,6 +1926,7 @@ public class Request
      *
      * @param path The servlet path
      */
+    @Deprecated
     public void setServletPath(String path) {
         if (path != null)
             mappingData.wrapperPath.setString(path);
@@ -1976,6 +1988,7 @@ public class Request
      * 
      * @return the context path
      */
+    @Deprecated
     public MessageBytes getContextPathMB() {
         return mappingData.contextPath;
     }
@@ -1998,6 +2011,7 @@ public class Request
     /**
      * Set the set of cookies received with this Request.
      */
+    @Deprecated
     public void setCookies(Cookie[] cookies) {
 
         this.cookies = cookies;
@@ -2108,6 +2122,7 @@ public class Request
      * 
      * @return the path info
      */
+    @Deprecated
     public MessageBytes getPathInfoMB() {
         return mappingData.pathInfo;
     }
@@ -2237,6 +2252,7 @@ public class Request
      * 
      * @return the servlet path
      */
+    @Deprecated
     public MessageBytes getServletPathMB() {
         return mappingData.wrapperPath;
     }
@@ -2529,6 +2545,7 @@ public class Request
      * Not part of Servlet 3 spec but probably should be.
      * @return true if the requested session ID was obtained from the SSL session
      */
+    @Deprecated
     public boolean isRequestedSessionIdFromSSL() {
         return requestedSessionSSL;
     }

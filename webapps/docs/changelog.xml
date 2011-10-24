@@ -215,6 +215,10 @@
         <bug>52059</bug>: In Windows uninstaller: Do not forget to remove
         Tomcat keys from 32-bit registry on deinstallation. (kkolinko)
       </fix>
+      <scode>
+        Start the process of deprecating unused and unnecessary code that will
+        be removed in the next major release (8.0.x). (markt)
+      </scode>
     </changelog>
   </subsection>
 </section>

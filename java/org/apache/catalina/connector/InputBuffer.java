@@ -186,6 +186,7 @@ public class InputBuffer extends Reader
      * 
      * @return the associated Coyote request
      */
+    @Deprecated
     public Request getRequest() {
         return this.coyoteRequest;
     }
