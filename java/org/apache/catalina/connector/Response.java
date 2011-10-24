@@ -130,6 +130,7 @@ public class Response
     /**
      * Return the Connector through which this Request was received.
      */
+    @Deprecated
     public Connector getConnector() {
         return (this.connector);
     }
@@ -170,6 +171,7 @@ public class Response
     /**
      * Get the Coyote response.
      */
+    @Deprecated
     public org.apache.coyote.Response getCoyoteResponse() {
         return (coyoteResponse);
     }
@@ -190,6 +192,7 @@ public class Response
      *
      * @param context The newly associated Context
      */
+    @Deprecated
     public void setContext(Context context) {
         request.setContext(context);
     }
@@ -356,6 +359,7 @@ public class Response
     /**
      * Return the "processing inside an include" flag.
      */
+    @Deprecated
     public boolean getIncluded() {
         return included;
     }
@@ -367,6 +371,7 @@ public class Response
      * @param included <code>true</code> if we are currently inside a
      *  RequestDispatcher.include(), else <code>false</code>
      */
+    @Deprecated
     public void setIncluded(boolean included) {
         this.included = included;
     }
@@ -424,6 +429,7 @@ public class Response
     /**
      * Return the output stream associated with this Response.
      */
+    @Deprecated
     public OutputStream getStream() {
         if (outputStream == null) {
             outputStream = new CoyoteOutputStream(outputBuffer);
@@ -480,7 +486,8 @@ public class Response
      *
      * @exception IOException if an input/output error occurs
      */
-    public ServletOutputStream createOutputStream() 
+    @Deprecated
+    public ServletOutputStream createOutputStream()
         throws IOException {
         // Probably useless
         if (outputStream == null) {
@@ -957,6 +964,7 @@ public class Response
      * @exception IllegalStateException if this response has already been
      *  committed
      */
+    @Deprecated
     public void reset(int status, String message) {
         reset();
         setStatus(status, message);
