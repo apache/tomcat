@@ -110,7 +110,7 @@ public class DefaultInstanceManager implements InstanceManager {
             if (is != null) {
                 restrictedFilters.load(is);
             } else {
-                catalinaContext.getLogger().error(sm.getString("defaultInstanceManager.restrictedFiltersResources"));
+                catalinaContext.getLogger().error(sm.getString("defaultInstanceManager.restrictedFiltersResource"));
             }
         } catch (IOException e) {
             catalinaContext.getLogger().error(sm.getString("defaultInstanceManager.restrictedServletsResources"), e);

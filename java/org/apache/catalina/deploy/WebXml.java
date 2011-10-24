@@ -2193,14 +2193,16 @@ public class WebXml {
                     if (!before.equals(WebXml.ORDER_OTHERS) &&
                             order.contains(before) &&
                             order.indexOf(before) < order.indexOf(name)) {
-                        throw new IllegalArgumentException(sm.getString(""));
+                        throw new IllegalArgumentException(
+                                sm.getString("webXml.mergeConflictOrder"));
                     }
                 }
                 for (String after : fragment.getAfterOrdering()) {
                     if (!after.equals(WebXml.ORDER_OTHERS) &&
                             order.contains(after) &&
                             order.indexOf(after) > order.indexOf(name)) {
-                        throw new IllegalArgumentException();
+                        throw new IllegalArgumentException(
+                                sm.getString("webXml.mergeConflictOrder"));
                     }
                 }
             }
