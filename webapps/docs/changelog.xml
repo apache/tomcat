@@ -127,6 +127,10 @@
         Remove the Java 1.2 specific error handling around the adding of the
         shutdown hook. (markt) 
       </scode>
+      <fix>
+        Correct errors in i18n resources and resource usage that meant some
+        messages were either not used or were incorrectly formatted. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
