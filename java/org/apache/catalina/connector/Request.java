@@ -278,13 +278,6 @@ public class Request
 
 
     /**
-     * Session parsed flag.
-     */
-    @Deprecated
-    protected boolean sessionParsed = false;
-
-
-    /**
      * Request parameters parsed flag.
      */
     protected boolean parametersParsed = false;
@@ -466,7 +459,6 @@ public class Request
         usingReader = false;
         userPrincipal = null;
         subject = null;
-        sessionParsed = false;
         parametersParsed = false;
         parts = null;
         partsParseException = null;
@@ -530,11 +522,6 @@ public class Request
         asyncContext = null;
 
         pathParameters.clear();
-    }
-
-    @Deprecated
-    protected boolean isProcessing() {
-        return coyoteRequest.isProcessing();
     }
 
     /**
@@ -632,19 +619,6 @@ public class Request
      */
     public Host getHost() {
         return ((Host) mappingData.host);
-    }
-
-
-    /**
-     * Set the Host within which this Request is being processed.  This
-     * must be called as soon as the appropriate Host is identified, and
-     * before the Request is passed to a context.
-     *
-     * @param host The newly associated Host
-     */
-    @Deprecated
-    public void setHost(Host host) {
-        mappingData.host = host;
     }
 
 
@@ -802,16 +776,6 @@ public class Request
 
 
     /**
-     * Return an Iterator containing the String names of all notes bindings
-     * that exist for this request.
-     */
-    @Deprecated
-    public Iterator<String> getNoteNames() {
-        return notes.keySet().iterator();
-    }
-
-
-    /**
      * Remove any object bound to the specified name in the internal notes
      * for this request.
      *
@@ -872,17 +836,6 @@ public class Request
      */
     public void setSecure(boolean secure) {
         this.secure = secure;
-    }
-
-
-    /**
-     * Set the name of the server (virtual host) to process this request.
-     *
-     * @param name The server name
-     */
-    @Deprecated
-    public void setServerName(String name) {
-        coyoteRequest.serverName().setString(name);
     }
 
 
@@ -1755,34 +1708,11 @@ public class Request
 
 
     /**
-     * Add a parameter name and corresponding set of values to this Request.
-     * (This is used when restoring the original request on a form based
-     * login).
-     *
-     * @param name Name of this request parameter
-     * @param values Corresponding values for this request parameter
-     */
-    @Deprecated
-    public void addParameter(String name, String values[]) {
-        coyoteRequest.getParameters().addParameterValues(name, values);
-    }
-
-
-    /**
      * Clear the collection of Cookies associated with this Request.
      */
     public void clearCookies() {
         cookiesParsed = true;
         cookies = null;
-    }
-
-
-    /**
-     * Clear the collection of Headers associated with this Request.
-     */
-    @Deprecated
-    public void clearHeaders() {
-        // Not used
     }
 
 
@@ -1795,15 +1725,6 @@ public class Request
 
 
     /**
-     * Clear the collection of parameters associated with this Request.
-     */
-    @Deprecated
-    public void clearParameters() {
-        // Not used
-    }
-
-
-    /**
      * Set the authentication type used for this request, if any; otherwise
      * set the type to <code>null</code>.  Typical values are "BASIC",
      * "DIGEST", or "SSL".
@@ -1812,25 +1733,6 @@ public class Request
      */
     public void setAuthType(String type) {
         this.authType = type;
-    }
-
-
-    /**
-     * Set the context path for this Request.  This will normally be called
-     * when the associated Context is mapping the Request to a particular
-     * Wrapper.
-     *
-     * @param path The context path
-     */
-    @Deprecated
-    public void setContextPath(String path) {
-
-        if (path == null) {
-            mappingData.contextPath.setString("");
-        } else {
-            mappingData.contextPath.setString(path);
-        }
-
     }
 
 
@@ -1912,32 +1814,6 @@ public class Request
 
 
     /**
-     * Get the decoded request URI.
-     *
-     * @return the URL decoded request URI
-     */
-    @Deprecated
-    public MessageBytes getDecodedRequestURIMB() {
-        return coyoteRequest.decodedURI();
-    }
-
-
-    /**
-     * Set the servlet path for this Request.  This will normally be called
-     * when the associated Context is mapping the Request to a particular
-     * Wrapper.
-     *
-     * @param path The servlet path
-     */
-    @Deprecated
-    public void setServletPath(String path) {
-        if (path != null) {
-            mappingData.wrapperPath.setString(path);
-        }
-    }
-
-
-    /**
      * Set the Principal who has been authenticated for this Request.  This
      * value is also used to calculate the value to be returned by the
      * <code>getRemoteUser()</code> method.
@@ -1988,17 +1864,6 @@ public class Request
 
 
     /**
-     * Get the context path.
-     *
-     * @return the context path
-     */
-    @Deprecated
-    public MessageBytes getContextPathMB() {
-        return mappingData.contextPath;
-    }
-
-
-    /**
      * Return the set of Cookies received with this Request.
      */
     @Override
@@ -2009,17 +1874,6 @@ public class Request
         }
 
         return cookies;
-
-    }
-
-
-    /**
-     * Set the set of cookies received with this Request.
-     */
-    @Deprecated
-    public void setCookies(Cookie[] cookies) {
-
-        this.cookies = cookies;
 
     }
 
@@ -2120,17 +1974,6 @@ public class Request
     @Override
     public String getPathInfo() {
         return mappingData.pathInfo.toString();
-    }
-
-
-    /**
-     * Get the path info.
-     *
-     * @return the path info
-     */
-    @Deprecated
-    public MessageBytes getPathInfoMB() {
-        return mappingData.pathInfo;
     }
 
 
@@ -2253,17 +2096,6 @@ public class Request
     @Override
     public String getServletPath() {
         return (mappingData.wrapperPath.toString());
-    }
-
-
-    /**
-     * Get the servlet path.
-     *
-     * @return the servlet path
-     */
-    @Deprecated
-    public MessageBytes getServletPathMB() {
-        return mappingData.wrapperPath;
     }
 
 
@@ -2552,15 +2384,6 @@ public class Request
 
     public void setCometTimeout(long timeout) {
         coyoteRequest.action(ActionCode.COMET_SETTIMEOUT, Long.valueOf(timeout));
-    }
-
-    /**
-     * Not part of Servlet 3 spec but probably should be.
-     * @return true if the requested session ID was obtained from the SSL session
-     */
-    @Deprecated
-    public boolean isRequestedSessionIdFromSSL() {
-        return requestedSessionSSL;
     }
 
     /**

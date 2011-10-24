@@ -18,7 +18,6 @@ package org.apache.catalina.connector;
 
 
 import java.io.IOException;
-import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.MalformedURLException;
 import java.security.AccessController;
@@ -117,13 +116,6 @@ public class Response
      */
     protected Connector connector;
 
-    /**
-     * Return the Connector through which this Request was received.
-     */
-    @Deprecated
-    public Connector getConnector() {
-        return (this.connector);
-    }
 
     /**
      * Set the Connector through which this Request was received.
@@ -158,33 +150,12 @@ public class Response
         outputBuffer.setResponse(coyoteResponse);
     }
 
-    /**
-     * Get the Coyote response.
-     */
-    @Deprecated
-    public org.apache.coyote.Response getCoyoteResponse() {
-        return (coyoteResponse);
-    }
-
 
     /**
      * Return the Context within which this Request is being processed.
      */
     public Context getContext() {
         return (request.getContext());
-    }
-
-    /**
-     * Set the Context within which this Request is being processed.  This
-     * must be called as soon as the appropriate Context is identified, because
-     * it identifies the value to be returned by <code>getContextPath()</code>,
-     * and thus enables parsing of the request URI.
-     *
-     * @param context The newly associated Context
-     */
-    @Deprecated
-    public void setContext(Context context) {
-        request.setContext(context);
     }
 
 
@@ -347,27 +318,6 @@ public class Response
 
 
     /**
-     * Return the "processing inside an include" flag.
-     */
-    @Deprecated
-    public boolean getIncluded() {
-        return included;
-    }
-
-
-    /**
-     * Set the "processing inside an include" flag.
-     *
-     * @param included <code>true</code> if we are currently inside a
-     *  RequestDispatcher.include(), else <code>false</code>
-     */
-    @Deprecated
-    public void setIncluded(boolean included) {
-        this.included = included;
-    }
-
-
-    /**
      * The request with which this response is associated.
      */
     protected Request request = null;
@@ -403,18 +353,6 @@ public class Response
             facade = new ResponseFacade(this);
         }
         return (facade);
-    }
-
-
-    /**
-     * Return the output stream associated with this Response.
-     */
-    @Deprecated
-    public OutputStream getStream() {
-        if (outputStream == null) {
-            outputStream = new CoyoteOutputStream(outputBuffer);
-        }
-        return outputStream;
     }
 
 
@@ -457,23 +395,6 @@ public class Response
      */
     public boolean isError() {
         return error;
-    }
-
-
-    /**
-     * Create and return a ServletOutputStream to write the content
-     * associated with this Response.
-     *
-     * @exception IOException if an input/output error occurs
-     */
-    @Deprecated
-    public ServletOutputStream createOutputStream()
-        throws IOException {
-        // Probably useless
-        if (outputStream == null) {
-            outputStream = new CoyoteOutputStream(outputBuffer);
-        }
-        return outputStream;
     }
 
 
@@ -953,22 +874,7 @@ public class Response
     }
 
 
-    /**
-     * Reset this response, and specify the values for the HTTP status code
-     * and corresponding message.
-     *
-     * @exception IllegalStateException if this response has already been
-     *  committed
-     */
-    @Deprecated
-    public void reset(int status, String message) {
-        reset();
-        setStatus(status, message);
-    }
-
-
     // -------------------------------------------- HttpServletResponse Methods
-
 
     /**
      * Add the specified Cookie to those that will be included with

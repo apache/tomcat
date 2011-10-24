@@ -24,15 +24,7 @@ public class Constants {
     public static final String Package = "org.apache.catalina.authenticator";
 
     // Authentication methods for login configuration
-    // Servlet spec schemes
-    @Deprecated
-    public static final String BASIC_METHOD = "BASIC";
-    @Deprecated
-    public static final String CERT_METHOD = "CLIENT_CERT";
-    @Deprecated
-    public static final String DIGEST_METHOD = "DIGEST";
-    @Deprecated
-    public static final String FORM_METHOD = "FORM";
+    // Servlet spec schemes are defined in HttpServletRequest
     // Vendor specific schemes
     public static final String SPNEGO_METHOD = "SPNEGO";
 

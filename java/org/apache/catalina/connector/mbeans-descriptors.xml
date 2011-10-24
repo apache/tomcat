@@ -196,9 +196,17 @@
           group="Mapper"
            type="org.apache.catalina.connector.MapperListener">
 
-    <attribute name="connectorName"
-        description="Name of the associated connector"
-               type="java.lang.String"
-          writeable="false"/>
+    <attribute   name="stateName"
+          description="The name of the LifecycleState that this component is currently in"
+                 type="java.lang.String"
+                 writeable="false"/>
+
+    <operation name="start" description="Start" impact="ACTION" returnType="void" />
+    <operation name="stop" description="Stop" impact="ACTION" returnType="void" />
+    <operation name="pause" description="Start" impact="ACTION" returnType="void" />
+    <operation name="resume" description="Stop" impact="ACTION" returnType="void" />
+    <operation name="init" description="Init" impact="ACTION" returnType="void" />
+    <operation name="destroy" description="Destroy" impact="ACTION" returnType="void" />
+
   </mbean>
 </mbeans-descriptors>
