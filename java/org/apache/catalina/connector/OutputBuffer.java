@@ -178,6 +178,7 @@ public class OutputBuffer extends Writer
      *
      * @return the associated Coyote response
      */
+    @Deprecated
     public Response getResponse() {
         return this.coyoteResponse;
     }
