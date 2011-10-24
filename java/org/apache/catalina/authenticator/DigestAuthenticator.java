@@ -257,8 +257,7 @@ public class DigestAuthenticator extends AuthenticatorBase {
             if (principal != null) {
                 String username = parseUsername(authorization);
                 register(request, response, principal,
-                         Constants.DIGEST_METHOD,
-                         username, null);
+                        HttpServletRequest.DIGEST_AUTH, username, null);
                 return (true);
             }
         }
@@ -280,7 +279,7 @@ public class DigestAuthenticator extends AuthenticatorBase {
 
     @Override
     protected String getAuthMethod() {
-        return Constants.DIGEST_METHOD;
+        return HttpServletRequest.DIGEST_AUTH;
     }
 
 

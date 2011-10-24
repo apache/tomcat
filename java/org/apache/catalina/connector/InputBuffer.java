@@ -180,19 +180,7 @@ public class InputBuffer extends Reader
     }
 
 
-    /**
-     * Get associated Coyote request.
-     *
-     * @return the associated Coyote request
-     */
-    @Deprecated
-    public Request getRequest() {
-        return this.coyoteRequest;
-    }
-
-
     // --------------------------------------------------------- Public Methods
-
 
     /**
      * Recycle the output buffer.

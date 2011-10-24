@@ -174,17 +174,6 @@ public class OutputBuffer extends Writer
 
 
     /**
-     * Get associated Coyote response.
-     *
-     * @return the associated Coyote response
-     */
-    @Deprecated
-    public Response getResponse() {
-        return this.coyoteResponse;
-    }
-
-
-    /**
      * Is the response output suspended ?
      *
      * @return suspended flag value
