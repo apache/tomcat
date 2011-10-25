@@ -451,6 +451,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase
     /**
      * Return an object which may be utilized for mapping to this component.
      */
+    @Deprecated
     @Override
     public Object getMappingObject() {
         return this;

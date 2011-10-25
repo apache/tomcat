@@ -289,6 +289,7 @@ public class StandardWrapper extends ContainerBase
      * Static class array used when the SecurityManager is turned on and 
      * <code>Servlet.service</code>  is invoked.
      */                                                 
+    @Deprecated
     protected static Class<?>[] classTypeUsedInService = new Class[]{
                                                          ServletRequest.class,
                                                          ServletResponse.class};
@@ -1016,6 +1017,7 @@ public class StandardWrapper extends ContainerBase
     /**
      * FIXME: Fooling introspection ...
      */
+    @Deprecated
     public Wrapper findMappingObject() {
         return (Wrapper) getMappingObject();
     }
@@ -1557,6 +1559,7 @@ public class StandardWrapper extends ContainerBase
         return swValve.getProcessingTime();
     }
 
+    @Deprecated
     public void setProcessingTime(long processingTime) {
         swValve.setProcessingTime(processingTime);
     }
@@ -1565,6 +1568,7 @@ public class StandardWrapper extends ContainerBase
         return swValve.getMaxTime();
     }
 
+    @Deprecated
     public void setMaxTime(long maxTime) {
         swValve.setMaxTime(maxTime);
     }
@@ -1573,6 +1577,7 @@ public class StandardWrapper extends ContainerBase
         return swValve.getMinTime();
     }
 
+    @Deprecated
     public void setMinTime(long minTime) {
         swValve.setMinTime(minTime);
     }
@@ -1581,6 +1586,7 @@ public class StandardWrapper extends ContainerBase
         return swValve.getRequestCount();
     }
 
+    @Deprecated
     public void setRequestCount(int requestCount) {
         swValve.setRequestCount(requestCount);
     }
@@ -1589,6 +1595,7 @@ public class StandardWrapper extends ContainerBase
         return swValve.getErrorCount();
     }
 
+    @Deprecated
     public void setErrorCount(int errorCount) {
            swValve.setErrorCount(errorCount);
     }
@@ -1605,6 +1612,7 @@ public class StandardWrapper extends ContainerBase
         return loadTime;
     }
 
+    @Deprecated
     public void setLoadTime(long loadTime) {
         this.loadTime = loadTime;
     }
@@ -1921,14 +1929,17 @@ public class StandardWrapper extends ContainerBase
      // ------------------------------------------------------------- Attributes
         
         
+    @Deprecated
     public boolean isEventProvider() {
         return false;
     }
     
+    @Deprecated
     public boolean isStateManageable() {
         return false;
     }
     
+    @Deprecated
     public boolean isStatisticsProvider() {
         return false;
     }
