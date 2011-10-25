@@ -51,6 +51,7 @@ class ApplicationHttpResponse extends HttpServletResponseWrapper {
      *
      * @param response The servlet response being wrapped
      */
+    @Deprecated
     public ApplicationHttpResponse(HttpServletResponse response) {
 
         this(response, false);
@@ -351,6 +352,7 @@ class ApplicationHttpResponse extends HttpServletResponseWrapper {
     /**
      * Return the included flag for this response.
      */
+    @Deprecated
     boolean isIncluded() {
 
         return (this.included);

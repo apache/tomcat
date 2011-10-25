@@ -49,6 +49,7 @@ class ApplicationResponse extends ServletResponseWrapper {
      *
      * @param response The servlet response being wrapped
      */
+    @Deprecated
     public ApplicationResponse(ServletResponse response) {
 
         this(response, false);
@@ -174,6 +175,7 @@ class ApplicationResponse extends ServletResponseWrapper {
     /**
      * Return the included flag for this response.
      */
+    @Deprecated
     boolean isIncluded() {
 
         return (this.included);
