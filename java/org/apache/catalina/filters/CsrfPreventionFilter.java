@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.catalina.filters;
 
 import java.io.IOException;
@@ -204,14 +203,16 @@ public class CsrfPreventionFilter extends FilterBase {
         for (int j = 0; j < random.length; j++) {
             byte b1 = (byte) ((random[j] & 0xf0) >> 4);
             byte b2 = (byte) (random[j] & 0x0f);
-            if (b1 < 10)
+            if (b1 < 10) {
                 buffer.append((char) ('0' + b1));
-            else
+            } else {
                 buffer.append((char) ('A' + (b1 - 10)));
-            if (b2 < 10)
+            }
+            if (b2 < 10) {
                 buffer.append((char) ('0' + b2));
-            else
+            } else {
                 buffer.append((char) ('A' + (b2 - 10)));
+            }
         }
 
         return buffer.toString();
@@ -220,7 +221,7 @@ public class CsrfPreventionFilter extends FilterBase {
     protected static class CsrfResponseWrapper
             extends HttpServletResponseWrapper {
 
-        private String nonce;
+        private final String nonce;
 
         public CsrfResponseWrapper(HttpServletResponse response, String nonce) {
             super(response);
@@ -257,8 +258,9 @@ public class CsrfPreventionFilter extends FilterBase {
          */
         private String addNonce(String url) {
 
-            if ((url == null) || (nonce == null))
+            if ((url == null) || (nonce == null)) {
                 return (url);
+            }
 
             String path = url;
             String query = "";

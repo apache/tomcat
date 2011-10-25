@@ -14,8 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.catalina.filters;
 
 
@@ -39,21 +37,14 @@ import org.apache.juli.logging.LogFactory;
  * @author Craig R. McClanahan
  *
  */
-
-public final class RemoteHostFilter
-    extends RequestFilter {
-
+public final class RemoteHostFilter extends RequestFilter {
 
     // ----------------------------------------------------- Instance Variables
+
     private static final Log log = LogFactory.getLog(RemoteHostFilter.class);
 
 
-    // ------------------------------------------------------------- Properties
-
-
-
     // --------------------------------------------------------- Public Methods
-
 
     /**
      * Extract the desired request property, and pass it (along with the
@@ -98,5 +89,4 @@ public final class RemoteHostFilter
     protected Log getLogger() {
         return log;
     }
-
 }
