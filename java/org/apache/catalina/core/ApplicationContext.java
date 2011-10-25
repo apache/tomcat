@@ -217,6 +217,7 @@ public class ApplicationContext
      * The path must begin with a "/" and is interpreted as relative to the
      * current context root.
      */
+    @Deprecated
     public DirContext getResources() {
 
         return context.getResources();
@@ -1499,6 +1500,7 @@ public class ApplicationContext
         return this.context;
     }
 
+    @Deprecated
     protected Map<String,String> getReadonlyAttributes() {
         return this.readOnlyAttributes;
     }
