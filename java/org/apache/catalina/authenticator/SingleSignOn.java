@@ -34,7 +34,6 @@ import org.apache.catalina.SessionListener;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
 import org.apache.catalina.valves.ValveBase;
-import org.apache.tomcat.util.res.StringManager;
 
 
 /**
@@ -88,14 +87,6 @@ public class SingleSignOn extends ValveBase implements SessionListener {
      * associated with them.
      */
     protected Map<Session,String> reverse = new HashMap<Session,String>();
-
-
-    /**
-     * The string manager for this package.
-     */
-    @Deprecated
-    protected static final StringManager sm =
-        StringManager.getManager(Constants.Package);
 
 
     /**
