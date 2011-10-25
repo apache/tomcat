@@ -14,8 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.catalina.filters;
 
 
@@ -40,8 +38,7 @@ import org.apache.juli.logging.LogFactory;
  *
  */
 
-public final class RemoteAddrFilter
-    extends RequestFilter {
+public final class RemoteAddrFilter extends RequestFilter {
 
     // ----------------------------------------------------- Instance Variables
     private static final Log log = LogFactory.getLog(RemoteAddrFilter.class);

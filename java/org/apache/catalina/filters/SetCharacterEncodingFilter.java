@@ -52,7 +52,6 @@ import org.apache.juli.logging.LogFactory;
  * and <code>User-Agent</code> headers, or a value stashed in the current
  * user's session.</p>
  */
-
 public class SetCharacterEncodingFilter extends FilterBase {
 
     private static final Log log =
@@ -100,8 +99,9 @@ public class SetCharacterEncodingFilter extends FilterBase {
         // Conditionally select and set the character encoding to be used
         if (ignore || (request.getCharacterEncoding() == null)) {
             String characterEncoding = selectEncoding(request);
-            if (characterEncoding != null)
+            if (characterEncoding != null) {
                 request.setCharacterEncoding(characterEncoding);
+            }
         }
 
         // Pass control on to the next filter
