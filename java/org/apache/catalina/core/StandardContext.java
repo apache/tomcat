@@ -1277,6 +1277,7 @@ public class StandardContext extends ContainerBase
      * Returns true if the resources associated with this context are
      * filesystem based.
      */
+    @Deprecated
     public boolean isFilesystemBased() {
 
         return (filesystemBased);
@@ -1787,6 +1788,7 @@ public class StandardContext extends ContainerBase
     /**
      * Return the compiler classpath.
      */
+    @Deprecated
     public String getCompilerClasspath(){
         return compilerClasspath;
     }
@@ -1795,6 +1797,7 @@ public class StandardContext extends ContainerBase
     /**
      * Set the compiler classpath.
      */
+    @Deprecated
     public void setCompilerClasspath(String compilerClasspath) {
         this.compilerClasspath = compilerClasspath;
     }
@@ -2264,6 +2267,7 @@ public class StandardContext extends ContainerBase
     /**
      * Return the "replace welcome files" property.
      */
+    @Deprecated
     public boolean isReplaceWelcomeFiles() {
 
         return (this.replaceWelcomeFiles);
@@ -2586,6 +2590,7 @@ public class StandardContext extends ContainerBase
     /**
      * Save config ?
      */
+    @Deprecated
     public boolean isSaveConfig() {
         return saveConfig;
     }
@@ -2594,6 +2599,7 @@ public class StandardContext extends ContainerBase
     /**
      * Set save config flag.
      */
+    @Deprecated
     public void setSaveConfig(boolean saveConfig) {
         this.saveConfig = saveConfig;
     }
@@ -3505,6 +3511,7 @@ public class StandardContext extends ContainerBase
     /**
      * FIXME: Fooling introspection ...
      */
+    @Deprecated
     public Context findMappingObject() {
         return (Context) getMappingObject();
     }
@@ -6367,6 +6374,7 @@ public class StandardContext extends ContainerBase
     /**
      * Return the naming resources associated with this web application.
      */
+    @Deprecated
     public javax.naming.directory.DirContext getStaticResources() {
 
         return getResources();
@@ -6378,6 +6386,7 @@ public class StandardContext extends ContainerBase
      * Return the naming resources associated with this web application.
      * FIXME: Fooling introspection ... 
      */
+    @Deprecated
     public javax.naming.directory.DirContext findStaticResources() {
 
         return getResources();
@@ -6504,6 +6513,7 @@ public class StandardContext extends ContainerBase
         return true;
     }
     
+    @Deprecated
     public void startRecursive() throws LifecycleException {
         // nothing to start recursive, the servlets will be started by load-on-startup
         start();
@@ -6545,10 +6555,12 @@ public class StandardContext extends ContainerBase
         return startTime;
     }
     
+    @Deprecated
     public boolean isEventProvider() {
         return false;
     }
     
+    @Deprecated
     public boolean isStatisticsProvider() {
         return false;
     }

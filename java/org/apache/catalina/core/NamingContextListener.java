@@ -171,6 +171,7 @@ public class NamingContextListener
     /**
      * Return the comp context.
      */
+    @Deprecated
     public javax.naming.Context getCompContext() {
         return this.compCtx;
     }
@@ -187,6 +188,7 @@ public class NamingContextListener
     /**
      * Return the associated naming context.
      */
+    @Deprecated
     public NamingContext getNamingContext() {
         return (this.namingContext);
     }
