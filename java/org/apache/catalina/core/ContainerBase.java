@@ -437,16 +437,6 @@ public abstract class ContainerBase extends LifecycleMBeanBase
 
 
     /**
-     * Return an object which may be utilized for mapping to this component.
-     */
-    @Deprecated
-    @Override
-    public Object getMappingObject() {
-        return this;
-    }
-
-
-    /**
      * Return the Cluster with which this Container is associated.  If there is
      * no associated Cluster, return the Cluster associated with our parent
      * Container (if any); otherwise return <code>null</code>.
@@ -1369,13 +1359,13 @@ public abstract class ContainerBase extends LifecycleMBeanBase
                     // Ignore
                 }
                 if (!threadDone) {
-                    Container parent = (Container) getMappingObject();
                     ClassLoader cl =
                         Thread.currentThread().getContextClassLoader();
-                    if (parent.getLoader() != null) {
-                        cl = parent.getLoader().getClassLoader();
+                    Loader loader = getLoader();
+                    if (loader != null) {
+                        cl = loader.getClassLoader();
                     }
-                    processChildren(parent, cl);
+                    processChildren(ContainerBase.this, cl);
                 }
             }
         }

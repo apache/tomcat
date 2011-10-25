@@ -40,8 +40,6 @@ import javax.servlet.Servlet;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
 import javax.servlet.ServletSecurityElement;
 import javax.servlet.SingleThreadModel;
 import javax.servlet.UnavailableException;
@@ -276,16 +274,6 @@ public class StandardWrapper extends ContainerBase
      * <code>Servlet.init</code> is invoked.
      */
     protected static Class<?>[] classType = new Class[]{ServletConfig.class};
-
-
-    /**
-     * Static class array used when the SecurityManager is turned on and
-     * <code>Servlet.service</code>  is invoked.
-     */
-    @Deprecated
-    protected static Class<?>[] classTypeUsedInService = new Class[]{
-                                                         ServletRequest.class,
-                                                         ServletResponse.class};
 
 
     // ------------------------------------------------------------- Properties
@@ -995,15 +983,6 @@ public class StandardWrapper extends ContainerBase
 
 
     /**
-     * FIXME: Fooling introspection ...
-     */
-    @Deprecated
-    public Wrapper findMappingObject() {
-        return (Wrapper) getMappingObject();
-    }
-
-
-    /**
      * Load and initialize an instance of this servlet, if there is not already
      * at least one initialized instance.  This can be used, for example, to
      * load servlets that are marked in the deployment descriptor to be loaded
@@ -1539,45 +1518,20 @@ public class StandardWrapper extends ContainerBase
         return swValve.getProcessingTime();
     }
 
-    @Deprecated
-    public void setProcessingTime(long processingTime) {
-        swValve.setProcessingTime(processingTime);
-    }
-
     public long getMaxTime() {
         return swValve.getMaxTime();
-    }
-
-    @Deprecated
-    public void setMaxTime(long maxTime) {
-        swValve.setMaxTime(maxTime);
     }
 
     public long getMinTime() {
         return swValve.getMinTime();
     }
 
-    @Deprecated
-    public void setMinTime(long minTime) {
-        swValve.setMinTime(minTime);
-    }
-
     public int getRequestCount() {
         return swValve.getRequestCount();
     }
 
-    @Deprecated
-    public void setRequestCount(int requestCount) {
-        swValve.setRequestCount(requestCount);
-    }
-
     public int getErrorCount() {
         return swValve.getErrorCount();
-    }
-
-    @Deprecated
-    public void setErrorCount(int errorCount) {
-           swValve.setErrorCount(errorCount);
     }
 
     /**
@@ -1590,11 +1544,6 @@ public class StandardWrapper extends ContainerBase
 
     public long getLoadTime() {
         return loadTime;
-    }
-
-    @Deprecated
-    public void setLoadTime(long loadTime) {
-        this.loadTime = loadTime;
     }
 
     public int getClassLoadTime() {
@@ -1903,24 +1852,5 @@ public class StandardWrapper extends ContainerBase
     public void removeNotificationListener(NotificationListener listener)
         throws ListenerNotFoundException {
         broadcaster.removeNotificationListener(listener);
-    }
-
-
-     // ------------------------------------------------------------- Attributes
-
-
-    @Deprecated
-    public boolean isEventProvider() {
-        return false;
-    }
-
-    @Deprecated
-    public boolean isStateManageable() {
-        return false;
-    }
-
-    @Deprecated
-    public boolean isStatisticsProvider() {
-        return false;
     }
 }

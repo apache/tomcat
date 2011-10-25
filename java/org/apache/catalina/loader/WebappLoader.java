@@ -1002,16 +1002,6 @@ public class WebappLoader extends LifecycleMBeanBase
         if (servletContext == null)
             return;
 
-        if (container instanceof StandardContext) {
-            String baseClasspath =
-                ((StandardContext) container).getCompilerClasspath();
-            if (baseClasspath != null) {
-                servletContext.setAttribute(Globals.CLASS_PATH_ATTR,
-                                            baseClasspath);
-                return;
-            }
-        }
-
         StringBuilder classpath = new StringBuilder();
 
         // Assemble the class path information from our class loader chain

@@ -169,15 +169,6 @@ public class NamingContextListener
 
 
     /**
-     * Return the comp context.
-     */
-    @Deprecated
-    public javax.naming.Context getCompContext() {
-        return this.compCtx;
-    }
-
-
-    /**
      * Return the env context.
      */
     public javax.naming.Context getEnvContext() {
@@ -185,17 +176,7 @@ public class NamingContextListener
     }
 
 
-    /**
-     * Return the associated naming context.
-     */
-    @Deprecated
-    public NamingContext getNamingContext() {
-        return (this.namingContext);
-    }
-
-
     // ---------------------------------------------- LifecycleListener Methods
-
 
     /**
      * Acknowledge the occurrence of the specified event.
