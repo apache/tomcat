@@ -17,13 +17,9 @@
 package org.apache.tomcat.util.http.mapper;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import static org.junit.Assert.assertEquals;
@@ -47,9 +43,9 @@ public class TestMapperWelcomeFiles extends TomcatBaseTest {
 
         StandardContext ctxt = (StandardContext) tomcat.addWebapp(null, "/test",
                 appDir.getAbsolutePath());
-        Tomcat.addServlet(ctxt, "Ok", new OkServlet());
         ctxt.setReplaceWelcomeFiles(true);
         ctxt.addWelcomeFile("index.jsp");
+        // Mapping for *.do is define in web.xml
         ctxt.addWelcomeFile("index.do");
 
         tomcat.start();
@@ -75,9 +71,9 @@ public class TestMapperWelcomeFiles extends TomcatBaseTest {
 
         StandardContext ctxt = (StandardContext) tomcat.addWebapp(null, "/test",
                 appDir.getAbsolutePath());
-        Tomcat.addServlet(ctxt, "Ok", new OkServlet());
         ctxt.setReplaceWelcomeFiles(true);
         ctxt.addWelcomeFile("index.jsp");
+        // Mapping for *.do is define in web.xml
         ctxt.addWelcomeFile("index.do");
 
         // Simulate STRICT_SERVLET_COMPLIANCE
@@ -94,17 +90,5 @@ public class TestMapperWelcomeFiles extends TomcatBaseTest {
                 "/test/welcome-files/sub", bc,
                 new HashMap<String,List<String>>());
         assertEquals(HttpServletResponse.SC_NOT_FOUND, rc);
-    }
-
-    private static class OkServlet extends HttpServlet {
-
-        private static final long serialVersionUID = 1L;
-
-        @Override
-        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-                throws ServletException, IOException {
-            resp.setContentType("text/plain");
-            resp.getWriter().write("OK-Servlet");
-        }
     }
 }
