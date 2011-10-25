@@ -310,12 +310,6 @@ public class StandardContext extends ContainerBase
 
 
     /**
-     * Compiler classpath to use.
-     */
-    private String compilerClasspath = null;
-
-
-    /**
      * Should we attempt to use cookies for session id communication?
      */
     private boolean cookies = true;
@@ -639,12 +633,6 @@ public class StandardContext extends ContainerBase
 
 
     /**
-     * Filesystem based flag.
-     */
-    private boolean filesystemBased = false;
-
-
-    /**
      * Name of the associated naming context.
      */
     private String namingContextName = null;
@@ -728,12 +716,6 @@ public class StandardContext extends ContainerBase
      * Attribute value used to turn on/off TLD XML namespace validation
      */
     private boolean tldNamespaceAware = Globals.STRICT_SERVLET_COMPLIANCE;
-
-
-    /**
-     * Should we save the configuration.
-     */
-    private boolean saveConfig = true;
 
 
     /**
@@ -1267,18 +1249,6 @@ public class StandardContext extends ContainerBase
 
 
     /**
-     * Returns true if the resources associated with this context are
-     * filesystem based.
-     */
-    @Deprecated
-    public boolean isFilesystemBased() {
-
-        return (filesystemBased);
-
-    }
-
-
-    /**
      * Return the set of initialized application event listener objects,
      * in the order they were specified in the web application deployment
      * descriptor, for this application.
@@ -1779,24 +1749,6 @@ public class StandardContext extends ContainerBase
 
 
     /**
-     * Return the compiler classpath.
-     */
-    @Deprecated
-    public String getCompilerClasspath(){
-        return compilerClasspath;
-    }
-
-
-    /**
-     * Set the compiler classpath.
-     */
-    @Deprecated
-    public void setCompilerClasspath(String compilerClasspath) {
-        this.compilerClasspath = compilerClasspath;
-    }
-
-
-    /**
      * Set the display name of this web application.
      *
      * @param displayName The new display name
@@ -2246,17 +2198,6 @@ public class StandardContext extends ContainerBase
 
 
     /**
-     * Return the "replace welcome files" property.
-     */
-    @Deprecated
-    public boolean isReplaceWelcomeFiles() {
-
-        return (this.replaceWelcomeFiles);
-
-    }
-
-
-    /**
      * Set the "replace welcome files" property.
      *
      * @param replaceWelcomeFiles The new property value
@@ -2469,7 +2410,6 @@ public class StandardContext extends ContainerBase
             ((BaseDirContext) resources).setAliases(getAliases());
         }
         if (resources instanceof FileDirContext) {
-            filesystemBased = true;
             ((FileDirContext) resources).setAllowLinking(isAllowLinking());
         }
         this.webappResources = resources;
@@ -2565,24 +2505,6 @@ public class StandardContext extends ContainerBase
         if (getState().isAvailable()) {
             postWorkDirectory();
         }
-    }
-
-
-    /**
-     * Save config ?
-     */
-    @Deprecated
-    public boolean isSaveConfig() {
-        return saveConfig;
-    }
-
-
-    /**
-     * Set save config flag.
-     */
-    @Deprecated
-    public void setSaveConfig(boolean saveConfig) {
-        this.saveConfig = saveConfig;
     }
 
 
@@ -3486,15 +3408,6 @@ public class StandardContext extends ContainerBase
             return (instanceListeners);
         }
 
-    }
-
-
-    /**
-     * FIXME: Fooling introspection ...
-     */
-    @Deprecated
-    public Context findMappingObject() {
-        return (Context) getMappingObject();
     }
 
 
@@ -4830,7 +4743,6 @@ public class StandardContext extends ContainerBase
             ProxyDirContext proxyDirContext =
                 new ProxyDirContext(env, webappResources);
             if (webappResources instanceof FileDirContext) {
-                filesystemBased = true;
                 ((FileDirContext) webappResources).setAllowLinking
                     (isAllowLinking());
             }
@@ -6330,30 +6242,6 @@ public class StandardContext extends ContainerBase
 
     // ------------------------------------------------------------- Attributes
 
-
-    /**
-     * Return the naming resources associated with this web application.
-     */
-    @Deprecated
-    public javax.naming.directory.DirContext getStaticResources() {
-
-        return getResources();
-
-    }
-
-
-    /**
-     * Return the naming resources associated with this web application.
-     * FIXME: Fooling introspection ...
-     */
-    @Deprecated
-    public javax.naming.directory.DirContext findStaticResources() {
-
-        return getResources();
-
-    }
-
-
     /**
      * Return the naming resources associated with this web application.
      */
@@ -6473,12 +6361,6 @@ public class StandardContext extends ContainerBase
         return true;
     }
 
-    @Deprecated
-    public void startRecursive() throws LifecycleException {
-        // nothing to start recursive, the servlets will be started by load-on-startup
-        start();
-    }
-
     /**
      * The J2EE Server ObjectName this module is deployed on.
      */
@@ -6513,16 +6395,6 @@ public class StandardContext extends ContainerBase
      */
     public long getStartTime() {
         return startTime;
-    }
-
-    @Deprecated
-    public boolean isEventProvider() {
-        return false;
-    }
-
-    @Deprecated
-    public boolean isStatisticsProvider() {
-        return false;
     }
 
     private abstract static class RunnableWithLifecycleException

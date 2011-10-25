@@ -174,13 +174,6 @@ public interface Container extends Lifecycle {
 
 
     /**
-     * Return an object which may be utilized for mapping to this component.
-     */
-    @Deprecated
-    public Object getMappingObject();
-
-
-    /**
      * Return the JMX name associated with this container.
      */
     public ObjectName getObjectName();

@@ -42,22 +42,7 @@ import javax.servlet.http.HttpServletResponseWrapper;
 
 class ApplicationHttpResponse extends HttpServletResponseWrapper {
 
-
     // ----------------------------------------------------------- Constructors
-
-
-    /**
-     * Construct a new wrapped response around the specified servlet response.
-     *
-     * @param response The servlet response being wrapped
-     */
-    @Deprecated
-    public ApplicationHttpResponse(HttpServletResponse response) {
-
-        this(response, false);
-
-    }
-
 
     /**
      * Construct a new wrapped response around the specified servlet response.
@@ -350,17 +335,6 @@ class ApplicationHttpResponse extends HttpServletResponseWrapper {
     // -------------------------------------------------------- Package Methods
 
     /**
-     * Return the included flag for this response.
-     */
-    @Deprecated
-    boolean isIncluded() {
-
-        return (this.included);
-
-    }
-
-
-    /**
      * Set the included flag for this response.
      *
      * @param included The new included flag
@@ -382,6 +356,4 @@ class ApplicationHttpResponse extends HttpServletResponseWrapper {
         super.setResponse(response);
 
     }
-
-
 }

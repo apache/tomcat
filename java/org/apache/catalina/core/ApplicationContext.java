@@ -209,24 +209,8 @@ public class ApplicationContext
      */
     private boolean newServletContextListenerAllowed = true;
 
-    // --------------------------------------------------------- Public Methods
-
-
-    /**
-     * Return the resources object that is mapped to a specified path.
-     * The path must begin with a "/" and is interpreted as relative to the
-     * current context root.
-     */
-    @Deprecated
-    public DirContext getResources() {
-
-        return context.getResources();
-
-    }
-
 
     // ------------------------------------------------- ServletContext Methods
-
 
     /**
      * Return the value of the specified context attribute, if any;
@@ -1500,10 +1484,6 @@ public class ApplicationContext
         return this.context;
     }
 
-    @Deprecated
-    protected Map<String,String> getReadonlyAttributes() {
-        return this.readOnlyAttributes;
-    }
     /**
      * Clear all application-created attributes.
      */
