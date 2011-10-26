@@ -162,6 +162,12 @@ public abstract class RequestFilter
     // ------------------------------------------------------ Protected Methods
 
 
+    @Override
+    protected boolean isConfigProblemFatal() {
+        return true;
+    }
+
+
     /**
      * Perform the filtering that has been configured for this Filter, matching
      * against the specified request property.
@@ -188,6 +194,7 @@ public abstract class RequestFilter
             }
         }
     }
+
 
     /**
      * Perform the filtering that has been configured for this Filter, matching
