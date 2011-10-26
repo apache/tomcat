@@ -72,6 +72,13 @@ public abstract class RequestFilterValve extends ValveBase {
      * The regular expression used to test for allowed requests.
      */
     protected volatile Pattern allow = null;
+
+    /**
+     * Helper variable to catch configuration errors.
+     * It is <code>true</code> by default, but becomes <code>false</code>
+     * if there was an attempt to assign an invalid value to the
+     * <code>allow</code> pattern.
+     */
     protected volatile boolean allowValid = true;
 
 
@@ -79,6 +86,13 @@ public abstract class RequestFilterValve extends ValveBase {
      * The regular expression used to test for denied requests.
      */
     protected volatile Pattern deny = null;
+
+    /**
+     * Helper variable to catch configuration errors.
+     * It is <code>true</code> by default, but becomes <code>false</code>
+     * if there was an attempt to assign an invalid value to the
+     * <code>deny</code> pattern.
+     */
     protected volatile boolean denyValid = true;
 
 
