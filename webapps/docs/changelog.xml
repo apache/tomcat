@@ -223,6 +223,10 @@
         Ignore <code>.git</code> directory when building the source
         distributive. (markt)
       </update>
+      <update>
+        Remove trailing whitespace from the default configuration files.
+        (kkolinko)
+      </update>
     </changelog>
   </subsection>
 </section>
