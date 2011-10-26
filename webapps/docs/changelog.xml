@@ -136,6 +136,11 @@
         <code>authenticator.Constants</code> with the auth method names from
         <code>HttpServletRequest</code>. (kkolinko)
       </scode>
+      <add>
+        Make configuration issues for security related Valves and Filters result
+        in the failure of the valve or filter rather than just a warning
+        message. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">

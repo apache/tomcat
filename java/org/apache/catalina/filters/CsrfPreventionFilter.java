@@ -187,6 +187,13 @@ public class CsrfPreventionFilter extends FilterBase {
         chain.doFilter(request, wResponse);
     }
 
+
+    @Override
+    protected boolean isConfigProblemFatal() {
+        return true;
+    }
+
+
     /**
      * Generate a once time token (nonce) for authenticating subsequent
      * requests. This will also add the token to the session. The nonce
