@@ -219,6 +219,10 @@
         Start the process of deprecating unused and unnecessary code that will
         be removed in the next major release (8.0.x). (markt)
       </scode>
+      <update>
+        Ignore <code>.git</code> directory when building the source
+        distributive. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
