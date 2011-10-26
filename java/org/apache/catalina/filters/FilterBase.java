@@ -47,8 +47,13 @@ public abstract class FilterBase implements Filter {
             String paramName = paramNames.nextElement();
             if (!IntrospectionUtils.setProperty(this, paramName,
                     filterConfig.getInitParameter(paramName))) {
-                getLogger().warn(sm.getString("filterbase.noSuchProperty",
-                        paramName, this.getClass().getName()));
+                String msg = sm.getString("filterbase.noSuchProperty",
+                        paramName, this.getClass().getName());
+                if (isConfigProblemFatal()) {
+                    throw new ServletException(msg);
+                } else {
+                    getLogger().warn(msg);
+                }
             }
         }
     }
@@ -58,4 +63,15 @@ public abstract class FilterBase implements Filter {
         // NOOP
     }
 
+    /**
+     * Determines if an exception when calling a setter or an unknown
+     * configuration attribute triggers the failure of the this filter which in
+     * turn will prevent the web application from starting.
+     *
+     * @return <code>true</true> if a problem should trigger the failure of this
+     *         filter, else <code>false</code>
+     */
+    protected boolean isConfigProblemFatal() {
+        return false;
+    }
 }
