@@ -131,6 +131,11 @@
         Correct errors in i18n resources and resource usage that meant some
         messages were either not used or were incorrectly formatted. (markt)
       </fix>
+      <scode>
+        Replace the use of deprecated auth method names from
+        <code>authenticator.Constants</code> with the auth method names from
+        <code>HttpServletRequest</code>. (kkolinko)
+      </scode>
     </changelog>
   </subsection>
   <subsection name="Coyote">
