@@ -203,11 +203,11 @@
 
 
 
-APACHE TOMCAT SUBCOMPONENTS: 
+APACHE TOMCAT SUBCOMPONENTS:
 
 Apache Tomcat includes a number of subcomponents with separate copyright notices
 and license terms. Your use of these subcomponents is subject to the terms and
-conditions of the following licenses. 
+conditions of the following licenses.
 
 
 For the Eclipse JDT Java compiler:
@@ -433,7 +433,7 @@ For the Windows Installer component:
        license.
     * The bzip2 compression module for NSIS is licensed under the bzip2 license.
     * The lzma compression module for NSIS is licensed under the Common Public
-       License version 1.0. 
+       License version 1.0.
 
 zlib/libpng license
 
@@ -451,7 +451,7 @@ the following restrictions:
        appreciated but is not required.
    2. Altered source versions must be plainly marked as such, and must not be
        misrepresented as being the original software.
-   3. This notice may not be removed or altered from any source distribution. 
+   3. This notice may not be removed or altered from any source distribution.
 
 bzip2 license
 
@@ -467,7 +467,7 @@ are permitted provided that the following conditions are met:
    3. Altered source versions must be plainly marked as such, and must not be
        misrepresented as being the original software.
    4. The name of the author may not be used to endorse or promote products
-       derived from this software without specific prior written permission. 
+       derived from this software without specific prior written permission.
 
 THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS AND ANY EXPRESS OR IMPLIED
 WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
@@ -704,4 +704,4 @@ by name) to the files from the LZMA compression module for NSIS without
 subjecting your linked code to the terms of the Common Public license version
 1.0. Any modifications or additions to files from the LZMA compression module
 for NSIS, however, are subject to the terms of the Common Public License version
-1.0. 
+1.0.
