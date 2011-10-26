@@ -45,7 +45,7 @@ public class TestMapperWelcomeFiles extends TomcatBaseTest {
                 appDir.getAbsolutePath());
         ctxt.setReplaceWelcomeFiles(true);
         ctxt.addWelcomeFile("index.jsp");
-        // Mapping for *.do is define in web.xml
+        // Mapping for *.do is defined in web.xml
         ctxt.addWelcomeFile("index.do");
 
         tomcat.start();
@@ -73,7 +73,7 @@ public class TestMapperWelcomeFiles extends TomcatBaseTest {
                 appDir.getAbsolutePath());
         ctxt.setReplaceWelcomeFiles(true);
         ctxt.addWelcomeFile("index.jsp");
-        // Mapping for *.do is define in web.xml
+        // Mapping for *.do is defined in web.xml
         ctxt.addWelcomeFile("index.do");
 
         // Simulate STRICT_SERVLET_COMPLIANCE
