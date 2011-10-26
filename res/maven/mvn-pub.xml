@@ -30,13 +30,13 @@
   tomcat.lib.path - the path to tomcat JAR files
   tomcat.bin.path - the path to tomcat's bin directory (for other JAR files)
   tomcat.pom.path - the path to the POM files
-  
+
   For passwordless upload you'll also need to set
   maven.scp.username    - Your ASF ID
   maven.scp.privateKey  - Path to your exported ssh key
-  
+
   All these can be defined by mvn.properties (and defaults are in mvn.properties.default)
-  
+
   To get a private key to work on Windows, I followed these steps
   1. on a linux box execute 'ssh-keygen -t rsa'
   2. same linux box execute 'cat id_rsa.pub >> authorized_keys' and 'cat id_rsa.pub >> authorized_keys2'
@@ -50,7 +50,7 @@
   <property file="${basedir}/mvn.properties"/>
   <property file="${basedir}/mvn.properties.default"/>
   <property name="local.repo" value="${user.home}/.m2/repository"/>
-  
+
   <target name="init-maven">
     <typedef resource="org/apache/maven/artifact/ant/antlib.xml" uri="urn:maven-artifact-ant">
       <classpath>
@@ -73,7 +73,7 @@
         <filter token="MAVEN.DEPLOY.VERSION" value="${maven.deploy.version}"/>
       </filterset>
     </copy>
-    
+
     <!--sign the jar, the source and the pom -->
     <exec executable="${maven.gpg.exec}" failonerror="true" inputstring="${maven.gpg.passphrase}">
       <arg value="--passphrase-fd"/>
@@ -98,7 +98,7 @@
       <arg value="${pom}.asc"/>
       <arg value="${pom}.tmp"/>
     </exec>
-    
+
     <!--deploy it-->
     <artifact:deploy file="${file}">
         <pom file="${pom}.tmp"/>
@@ -225,7 +225,7 @@
     <doMavenDeploy artifactId="tomcat-tribes"
                   jarFileName="catalina-tribes.jar"
                srcJarFileName="catalina-tribes-src.jar"/>
-    
+
     <doMavenDeploy artifactId="tomcat-jdbc"
                   jarFileName="tomcat-jdbc.jar"
                srcJarFileName="tomcat-jdbc-src.jar"/>
@@ -325,7 +325,7 @@
       <param name="maven.deploy.version" value="${maven.asf.release.deploy.version}"/>
     </antcall>
   </target>
-  
+
   <target name="help">
     <echo>Help is on the way!</echo>
   </target>

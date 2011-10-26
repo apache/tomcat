@@ -17,7 +17,7 @@ rem limitations under the License.
 rem ---------------------------------------------------------------------------
 rem Set JAVA_HOME or JRE_HOME if not already set, ensure any provided settings
 rem are valid and consistent with the selected start-up options and set up the
-rem endorsed directory. 
+rem endorsed directory.
 rem
 rem $Id$
 rem ---------------------------------------------------------------------------
