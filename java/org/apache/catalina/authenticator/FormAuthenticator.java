@@ -28,6 +28,7 @@ import java.util.Locale;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.catalina.Realm;
@@ -204,7 +205,7 @@ public class FormAuthenticator
                     session.setNote(Constants.FORM_PRINCIPAL_NOTE, principal);
                     if (!matchRequest(request)) {
                         register(request, response, principal,
-                                 Constants.FORM_METHOD,
+                                HttpServletRequest.FORM_AUTH,
                                  username, password);
                         return (true);
                     }
@@ -226,7 +227,7 @@ public class FormAuthenticator
             }
             principal = (Principal)
                 session.getNote(Constants.FORM_PRINCIPAL_NOTE);
-            register(request, response, principal, Constants.FORM_METHOD,
+            register(request, response, principal, HttpServletRequest.FORM_AUTH,
                      (String) session.getNote(Constants.SESS_USERNAME_NOTE),
                      (String) session.getNote(Constants.SESS_PASSWORD_NOTE));
             // If we're caching principals we no longer need the username
@@ -363,7 +364,7 @@ public class FormAuthenticator
 
     @Override
     protected String getAuthMethod() {
-        return Constants.FORM_METHOD;
+        return HttpServletRequest.FORM_AUTH;
     }
 
 

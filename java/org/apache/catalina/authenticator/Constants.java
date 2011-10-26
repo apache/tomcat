@@ -25,14 +25,31 @@ public class Constants {
 
     // Authentication methods for login configuration
     // Servlet spec schemes
+
+    /**
+     * @deprecated Replaced by HttpServletRequest.BASIC_AUTH
+     */
     @Deprecated
     public static final String BASIC_METHOD = "BASIC";
+
+    /**
+     * @deprecated Replaced by HttpServletRequest.CLIENT_CERT_AUTH
+     */
     @Deprecated
     public static final String CERT_METHOD = "CLIENT_CERT";
+
+    /**
+     * @deprecated Replaced by HttpServletRequest.DIGEST_AUTH
+     */
     @Deprecated
     public static final String DIGEST_METHOD = "DIGEST";
+
+    /**
+     * @deprecated Replaced by HttpServletRequest.FORM_AUTH
+     */
     @Deprecated
     public static final String FORM_METHOD = "FORM";
+
     // Vendor specific schemes
     public static final String SPNEGO_METHOD = "SPNEGO";
 

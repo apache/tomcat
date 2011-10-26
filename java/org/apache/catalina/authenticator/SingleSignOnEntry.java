@@ -18,6 +18,8 @@ package org.apache.catalina.authenticator;
 
 import java.security.Principal;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.apache.catalina.Session;
 
 /**
@@ -179,8 +181,8 @@ public class SingleSignOnEntry
         this.username = username;
         this.password = password;
         this.canReauthenticate =
-            (Constants.BASIC_METHOD.equals(authType)
-                || Constants.FORM_METHOD.equals(authType));
+            (HttpServletRequest.BASIC_AUTH.equals(authType)
+                || HttpServletRequest.FORM_AUTH.equals(authType));
     }
 
 }
