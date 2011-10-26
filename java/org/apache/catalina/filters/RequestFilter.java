@@ -158,6 +158,12 @@ public abstract class RequestFilter extends FilterBase implements CometFilter {
     // ------------------------------------------------------ Protected Methods
 
 
+    @Override
+    protected boolean isConfigProblemFatal() {
+        return true;
+    }
+
+
     /**
      * Perform the filtering that has been configured for this Filter, matching
      * against the specified request property.
@@ -184,6 +190,7 @@ public abstract class RequestFilter extends FilterBase implements CometFilter {
             }
         }
     }
+
 
     /**
      * Perform the filtering that has been configured for this Filter, matching

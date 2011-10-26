@@ -23,6 +23,7 @@ import java.util.regex.Pattern;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.catalina.LifecycleException;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
 
@@ -71,12 +72,14 @@ public abstract class RequestFilterValve extends ValveBase {
      * The regular expression used to test for allowed requests.
      */
     protected volatile Pattern allow = null;
+    protected volatile boolean allowValid = true;
 
 
     /**
      * The regular expression used to test for denied requests.
      */
     protected volatile Pattern deny = null;
+    protected volatile boolean denyValid = true;
 
 
     // ------------------------------------------------------------- Properties
@@ -105,8 +108,15 @@ public abstract class RequestFilterValve extends ValveBase {
     public void setAllow(String allow) {
         if (allow == null || allow.length() == 0) {
             this.allow = null;
+            allowValid = true;
         } else {
-            this.allow = Pattern.compile(allow);
+            boolean success = false;
+            try {
+                this.allow = Pattern.compile(allow);
+                success = true;
+            } finally {
+                allowValid = success;
+            }
         }
     }
 
@@ -134,8 +144,15 @@ public abstract class RequestFilterValve extends ValveBase {
     public void setDeny(String deny) {
         if (deny == null || deny.length() == 0) {
             this.deny = null;
+            denyValid = true;
         } else {
-            this.deny = Pattern.compile(deny);
+            boolean success = false;
+            try {
+                this.deny = Pattern.compile(deny);
+                success = true;
+            } finally {
+                denyValid = success;
+            }
         }
     }
 
@@ -160,6 +177,16 @@ public abstract class RequestFilterValve extends ValveBase {
 
 
     // ------------------------------------------------------ Protected Methods
+
+
+    @Override
+    protected void initInternal() throws LifecycleException {
+        super.initInternal();
+        if (!allowValid || !denyValid) {
+            throw new LifecycleException(
+                    sm.getString("requestFilterValve.configInvalid"));
+        }
+    }
 
 
     /**
