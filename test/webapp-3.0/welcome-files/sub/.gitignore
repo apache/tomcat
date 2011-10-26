@@ -14,9 +14,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # -----------------------------------------------------------------------------
-target
-output
-build.properties
-work
-logs
-*.iml
+# Git ignores empty directories and the unit tests require this directory to
+# be present for the welcome file tests to pass. The presence of this file
+# doesn't break the unit tests.
+#
+# Ignore everything in this directory
+*
+# Except this file
+!.gitignore
