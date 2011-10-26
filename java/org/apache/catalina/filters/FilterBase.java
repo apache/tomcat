@@ -68,7 +68,7 @@ public abstract class FilterBase implements Filter {
      * configuration attribute triggers the failure of the this filter which in
      * turn will prevent the web application from starting.
      *
-     * @return <code>true</true> if a problem should trigger the failure of this
+     * @return <code>true</code> if a problem should trigger the failure of this
      *         filter, else <code>false</code>
      */
     protected boolean isConfigProblemFatal() {
