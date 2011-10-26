@@ -487,11 +487,11 @@ log4j.logger.org.apache.catalina.core.ContainerBase.[Catalina].[localhost].[/hos
 
         <li><p>If you want to configure Tomcat to use log4j globally:</p>
         <ul>
-          <li>Put log4j.jar into <code>$CATALINA_HOME/lib</code>.</li>
+          <li>Put <code>log4j.jar</code> and
+            <code>tomcat-juli-adapters.jar</code> from "extras" into
+            <code>$CATALINA_HOME/lib</code>.</li>
           <li>Replace <code>$CATALINA_HOME/bin/tomcat-juli.jar</code> with
           <code>tomcat-juli.jar</code> from "extras".</li>
-          <li>Put <code>tomcat-juli-adapters.jar</code> from "extras" into
-          <code>$CATALINA_HOME/lib</code></li>
         </ul>
         </li>
 
@@ -502,11 +502,11 @@ log4j.logger.org.apache.catalina.core.ContainerBase.[Catalina].[localhost].[/hos
           <li>Create <code>$CATALINA_BASE/bin</code> and
           <code>$CATALINA_BASE/lib</code> directories if they do not exist.
           </li>
-          <li>Put log4j.jar into <code>$CATALINA_BASE/lib</code></li>
+          <li>Put <code>log4j.jar</code> and
+             <code>tomcat-juli-adapters.jar</code> from "extras" into
+             <code>$CATALINA_BASE/lib</code></li>
           <li>Put <code>tomcat-juli.jar</code> from "extras" as
           <code>$CATALINA_BASE/bin/tomcat-juli.jar</code></li>
-          <li>Put <code>tomcat-juli-adapters.jar</code> from "extras" into
-           <code>$CATALINA_BASE/lib</code></li>
           <li>If you are running with a
           <a href="security-manager-howto.html">security manager</a>, you
           would need to edit the
