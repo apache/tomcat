@@ -1075,7 +1075,6 @@ public class MBeanUtils {
         if (domain == null)
             domain = mserver.getDefaultDomain();
         ObjectName oname = createObjectName(domain, connector);
-        connector.setService(null);
         if( mserver.isRegistered( oname ))  {
             mserver.unregisterMBean(oname);
         }
