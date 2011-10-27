@@ -161,6 +161,10 @@
       <fix>
         Improve MimeHeaders.toString(). (kkolinko)
       </fix>
+      <fix>
+        Fix threading issue in NIO connectors during shutdown that meant Comet
+        connections were not always shut down cleanly. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
