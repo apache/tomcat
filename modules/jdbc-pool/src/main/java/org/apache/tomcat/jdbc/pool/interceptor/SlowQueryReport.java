@@ -149,6 +149,7 @@ public class SlowQueryReport extends AbstractQueryReport  {
     }
 
     protected QueryStats getQueryStats(String sql) {
+        if (sql==null) sql = "";
         ConcurrentHashMap<String,QueryStats> queries = SlowQueryReport.this.queries;
         if (queries==null) return null;
         QueryStats qs = queries.get(sql);
