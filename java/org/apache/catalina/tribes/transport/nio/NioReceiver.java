@@ -113,7 +113,12 @@ public class NioReceiver extends ReceiverBase implements Runnable {
         // Get the associated ServerSocket to bind it with
         ServerSocket serverSocket = serverChannel.socket();
         // create a new Selector for use below
-        selector = Selector.open();
+        synchronized (Selector.class) {
+            // Selector.open() isn't thread safe
+            // http://bugs.sun.com/view_bug.do?bug_id=6427854
+            // Affects 1.6.0_29, fixed in 1.7.0_01
+            selector = Selector.open();
+        }
         // set the port the server channel will listen to
         //serverSocket.bind(new InetSocketAddress(getBind(), getTcpListenPort()));
         bind(serverSocket,getPort(),getAutoBind());

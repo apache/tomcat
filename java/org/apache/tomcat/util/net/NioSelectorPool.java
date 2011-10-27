@@ -65,7 +65,12 @@ public class NioSelectorPool {
         if (SHARED && SHARED_SELECTOR == null) {
             synchronized ( NioSelectorPool.class ) {
                 if ( SHARED_SELECTOR == null )  {
-                    SHARED_SELECTOR = Selector.open();
+                    synchronized (Selector.class) {
+                        // Selector.open() isn't thread safe
+                        // http://bugs.sun.com/view_bug.do?bug_id=6427854
+                        // Affects 1.6.0_29, fixed in 1.7.0_01
+                        SHARED_SELECTOR = Selector.open();
+                    }
                     log.info("Using a shared selector for servlet write/read");
                 }
             }
@@ -84,11 +89,26 @@ public class NioSelectorPool {
         Selector s = null;
         try {
             s = selectors.size()>0?selectors.poll():null;
-            if (s == null) s = Selector.open();
+            if (s == null) {
+                synchronized (Selector.class) {
+                    // Selector.open() isn't thread safe
+                    // http://bugs.sun.com/view_bug.do?bug_id=6427854
+                    // Affects 1.6.0_29, fixed in 1.7.0_01
+                    s = Selector.open();
+                }
+            }
             else spare.decrementAndGet();
 
         }catch (NoSuchElementException x ) {
-            try {s = Selector.open();}catch (IOException iox){}
+            try {
+                synchronized (Selector.class) {
+                    // Selector.open() isn't thread safe
+                    // http://bugs.sun.com/view_bug.do?bug_id=6427854
+                    // Affects 1.6.0_29, fixed in 1.7.0_01
+                    s = Selector.open();
+                }
+            } catch (IOException iox) {
+            }
         } finally {
             if ( s == null ) active.decrementAndGet();//we were unable to find a selector
         }
