@@ -32,7 +32,13 @@ import org.apache.catalina.tribes.transport.nio.NioSender;
 public class SocketNioSend {
 
     public static void main(String[] args) throws Exception {
-        Selector selector = Selector.open();
+        Selector selector;
+        synchronized (Selector.class) {
+            // Selector.open() isn't thread safe
+            // http://bugs.sun.com/view_bug.do?bug_id=6427854
+            // Affects 1.6.0_29, fixed in 1.7.0_01
+            selector = Selector.open();
+        }
         Member mbr = new MemberImpl("localhost", 9999, 0);
         ChannelData data = new ChannelData();
         data.setOptions(Channel.SEND_OPTIONS_BYTE_MESSAGE);
