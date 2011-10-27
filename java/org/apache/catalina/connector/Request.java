@@ -2732,6 +2732,8 @@ public class Request
         parametersParsed = true;
 
         Parameters parameters = coyoteRequest.getParameters();
+        // Set this every time in case limit has been changed via JMX
+        parameters.setLimit(getConnector().getMaxParameterCount());
 
         // getCharacterEncoding() may have been overridden to search for
         // hidden form field containing request encoding
