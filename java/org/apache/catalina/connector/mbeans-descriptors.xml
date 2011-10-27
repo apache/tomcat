@@ -81,6 +81,10 @@
           description="Maximum number of Keep-Alive requests to honor per connection"
                  type="int"/>
 
+    <attribute   name="maxParameterCount"
+          description="The maximum number of parameters (GET plus POST) which will be automatically parsed by the container. 10000 by default. A value of less than 0 means no limit."
+                 type="int"/>
+
     <attribute   name="maxPostSize"
           description="Maximum size in bytes of a POST which will be handled by the servlet API provided features"
                  type="int"/>

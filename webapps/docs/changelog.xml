@@ -141,6 +141,11 @@
         in the failure of the valve or filter rather than just a warning
         message. (markt)
       </add>
+      <add>
+        Improve performance of parameter processing for GET and POST requests.
+        Also add an option to limit the maximum number of parameters processed
+        per request. This defaults to 10000. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">

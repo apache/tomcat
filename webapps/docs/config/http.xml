@@ -93,6 +93,12 @@
       By default, DNS lookups are disabled.</p>
     </attribute>
 
+    <attribute name="maxParameterCount" required="false">
+      <p>The maximum number of parameters (GET plus POST) which will be
+      automatically parsed by the container. A value of less than 0 means no
+      limit. If not specified, a default of 10000 is used.</p>
+    </attribute>
+
     <attribute name="maxPostSize" required="false">
       <p>The maximum size in bytes of the POST which will be handled by
       the container FORM URL parameter parsing. The limit can be disabled by
