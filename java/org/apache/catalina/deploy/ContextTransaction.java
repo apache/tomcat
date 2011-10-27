@@ -94,12 +94,15 @@ public class ContextTransaction implements Serializable {
     /**
      * The NamingResources with which we are associated (if any).
      */
+    @Deprecated
     protected NamingResources resources = null;
 
+    @Deprecated
     public NamingResources getNamingResources() {
         return (this.resources);
     }
 
+    @Deprecated
     void setNamingResources(NamingResources resources) {
         this.resources = resources;
     }
