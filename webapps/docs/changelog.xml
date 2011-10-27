@@ -192,6 +192,15 @@
         Fix duplicate <code>resetDeltaRequest()</code> call in
         <code>DeltaSession.setId(String)</code>. (kkolinko)
       </fix>
+      <fix>
+        Work around a <a href="http://bugs.sun.com/view_bug.do?bug_id=6427854">
+        known JVM bug</a> that is fixed in 1.7.0_01 but still present in
+        1.6.0_29 and was triggering intermittent unit test failures for
+        <code>org.apache.catalina.tribes.group.TestGroupChannelMemberArrival.testMemberArrival</code>.
+        The bug affects any components that use NIO although it was more likely
+        to be observed in the clustering module than the HTTP or AJP NIO
+        connector. (markt) 
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
