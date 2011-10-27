@@ -693,6 +693,7 @@ public class NamingResources extends LifecycleMBeanBase implements Serializable 
     /**
      * Return true if the name specified already exists.
      */
+    @Deprecated
     public boolean exists(String name) {
 
         return (entries.containsKey(name));
