@@ -59,7 +59,12 @@ public class ParallelNioSender extends AbstractSender implements MultiPointSende
         new HashMap<Member, NioSender>();
 
     public ParallelNioSender() throws IOException {
-        selector = Selector.open();
+        synchronized (Selector.class) {
+            // Selector.open() isn't thread safe
+            // http://bugs.sun.com/view_bug.do?bug_id=6427854
+            // Affects 1.6.0_29, fixed in 1.7.0_01
+            selector = Selector.open();
+        }
         setConnected(true);
     }
 
