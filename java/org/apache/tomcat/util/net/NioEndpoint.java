@@ -1066,8 +1066,8 @@ public class NioEndpoint extends AbstractEndpoint {
          */
         @Override
         public void run() {
-            // Loop until we receive a shutdown command
-            while (running) {
+            // Loop until destroy() is called
+            while (true) {
                 try {
                     // Loop if endpoint is paused
                     while (paused && (!close) ) {
