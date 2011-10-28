@@ -161,6 +161,10 @@
         exception throwing when an application attempts to modify the associated
         JNDI context to be disabled. (markt)
       </add>
+      <fix>
+        <bug>52091</bug>: Address performance issues related to lock contention
+        StandardWrapper. Patch provided by Taiki Sugawara. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
@@ -199,7 +203,7 @@
         client rather than a 500 response. (markt)
       </fix>
       <fix>
-        <bug>52091</bug>: ddress performance issues related to log creation
+        <bug>52091</bug>: Address performance issues related to log creation
         TagHandlerPool. Patch provided by Taiki Sugawara. (markt)
       </fix>
     </changelog>
