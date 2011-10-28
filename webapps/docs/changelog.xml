@@ -152,6 +152,15 @@
         improve start and stop time. Based on patches by Joe Kislo and Felix
         Schumacher. (markt)
       </add>
+      <fix>
+        <bug>51744</bug>: Throw the correct exception if an application attempts
+        to modify the associated JNDI context. (markt)
+      </fix>
+      <add>
+        <bug>51744</bug>: Add an option to the StandardContext that allows
+        exception throwing when an application attempts to modify the associated
+        JNDI context to be disabled. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">

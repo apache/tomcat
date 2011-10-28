@@ -859,7 +859,8 @@ public class StandardContext extends ContainerBase
 
     private boolean sendRedirectBody = false;
 
-    
+    private boolean jndiExceptionOnFailedWrite = true;
+
     // ----------------------------------------------------- Context Properties
     
     @Override
@@ -2507,6 +2508,26 @@ public class StandardContext extends ContainerBase
 
 
     // ------------------------------------------------------ Public Properties
+
+    /**
+     * Returns whether or not an attempt to modify the JNDI context will trigger
+     * an exception or if the request will be ignored.
+     */
+    public boolean getJndiExceptionOnFailedWrite() {
+        return jndiExceptionOnFailedWrite;
+    }
+
+
+    /**
+     * Controls whether or not an attempt to modify the JNDI context will
+     * trigger an exception or if the request will be ignored.
+     *
+     * @param jndiExceptionOnFailedWrite
+     */
+    public void setJndiExceptionOnFailedWrite(
+            boolean jndiExceptionOnFailedWrite) {
+        this.jndiExceptionOnFailedWrite = jndiExceptionOnFailedWrite;
+    }
 
 
     /**
@@ -5076,6 +5097,7 @@ public class StandardContext extends ContainerBase
             if (getNamingContextListener() == null) {
                 NamingContextListener ncl = new NamingContextListener();
                 ncl.setName(getNamingContextName());
+                ncl.setExceptionOnFailedWrite(getJndiExceptionOnFailedWrite());
                 addLifecycleListener(ncl);
                 setNamingContextListener(ncl);
             }
