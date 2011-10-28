@@ -1212,7 +1212,10 @@ public abstract class ContainerBase extends LifecycleMBeanBase
             parent.removeChild(this);
         }
 
-        startStopExecutor.shutdownNow();
+        // If init fails, this may be null
+        if (startStopExecutor != null) {
+            startStopExecutor.shutdownNow();
+        }
 
         super.destroyInternal();
     }
