@@ -657,6 +657,19 @@
         not specified, the default value of <code>false</code> will be used.</p>
       </attribute>
 
+      <attribute name="jndiExceptionOnFailedWrite" required="false">
+        <p>If <code>true</code>, any attempt by an application to modify the
+        provided JNDI context with a call to bind(), unbind(),
+        createSubContext(), destroySubContext() or close() will trigger a
+        <code>javax.naming.OperationNotSupportedException</code> as required by
+        section EE.5.3.4 of the Java EE specification. This exception can be
+        disabled by setting this attribute to true in which case any calls to
+        modify the JNDI context will return <b>without</b> making any changes
+        and methods that return values will return <code>null</code>. If not
+        specified, the specification compliant default of <code>true</code> will
+        be used.</p>
+      </attribute>
+
       <attribute name="processTlds" required="false">
         <p>Whether the context should process TLDs on startup.  The default
         is true.  The false setting is intended for special cases
