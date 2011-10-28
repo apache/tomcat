@@ -26,7 +26,7 @@ import org.junit.Test;
 
 import org.apache.tomcat.util.buf.B2CConverter;
 
-public class TestParametersPerformance {
+public class TesterParametersPerformance {
 
     @Test
     public void testProcessParametersByteArrayIntInt() {
