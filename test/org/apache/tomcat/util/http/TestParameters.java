@@ -126,8 +126,7 @@ public class TestParameters {
     private static class Parameter {
         private final String name;
         private final String[] values;
-
-        UEncoder uencoder = new UEncoder();
+        private final UEncoder uencoder = new UEncoder();
 
         public Parameter(String name, String... values) {
             this.name = name;
