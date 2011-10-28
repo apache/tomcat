@@ -122,6 +122,9 @@ public final class Parameters {
         handleQueryParameters();
         // no "facade"
         ArrayList<String> values = paramHashValues.get(name);
+        if (values == null) {
+            return null;
+        }
         return values.toArray(new String[values.size()]);
     }
 
