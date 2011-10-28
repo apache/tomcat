@@ -188,6 +188,19 @@
         virtual host.</p>
       </attribute>
 
+      <attribute name="startStopThreads" required="false">
+        <p>The number of threads this <strong>Host</strong> will use to start
+        child <a href="context.html">Context</a> elements in parallel. The same
+        thread pool will be used to deploy new
+        <a href="context.html">Context</a>s if automatic deployment is being
+        used. The special value of 0 will result in the value of
+        <code>Runtime.getRuntime().availableProcessors()</code> being used.
+        Negative values will result in
+        <code>Runtime.getRuntime().availableProcessors() + value</code> being
+        used unless this is less than 1 in which case 1 thread will be used. If
+        not specified, the default value of 1 will be used.</p>
+      </attribute>
+
     </attributes>
 
   </subsection>

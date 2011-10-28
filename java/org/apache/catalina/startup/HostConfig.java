@@ -14,8 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.catalina.startup;
 
 
@@ -33,7 +31,11 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.regex.Matcher;
@@ -144,8 +146,8 @@ public class HostConfig
     /**
      * Map of deployed applications.
      */
-    protected HashMap<String, DeployedApplication> deployed =
-        new HashMap<String, DeployedApplication>();
+    protected Map<String, DeployedApplication> deployed =
+        new ConcurrentHashMap<String, DeployedApplication>();
 
     
     /**
@@ -519,6 +521,10 @@ public class HostConfig
         ContextName cn = new ContextName(name);
         String baseName = cn.getBaseName();
         
+        if (deploymentExists(baseName)) {
+            return;
+        }
+
         // Deploy XML descriptors from configBase
         File xml = new File(configBase, baseName + ".xml");
         if (xml.exists())
@@ -542,17 +548,29 @@ public class HostConfig
         if (files == null)
             return;
         
+        ExecutorService es = host.getStartStopExecutor();
+        List<Future<?>> results = new ArrayList<Future<?>>();
+
         for (int i = 0; i < files.length; i++) {
             File contextXml = new File(configBase, files[i]);
 
             if (files[i].toLowerCase(Locale.ENGLISH).endsWith(".xml")) {
                 ContextName cn = new ContextName(files[i]);
-                String name = cn.getName();
 
-                if (isServiced(name))
+                if (isServiced(cn.getName()) || deploymentExists(cn.getName()))
                     continue;
                 
-                deployDescriptor(cn, contextXml);
+                results.add(
+                        es.submit(new DeployDescriptor(this, cn, contextXml)));
+            }
+        }
+
+        for (Future<?> result : results) {
+            try {
+                result.get();
+            } catch (Exception e) {
+                log.error(sm.getString(
+                        "hostConfig.deployDescriptor.threaded.error"), e);
             }
         }
     }
@@ -563,9 +581,6 @@ public class HostConfig
      * @param contextXml
      */
     protected void deployDescriptor(ContextName cn, File contextXml) {
-        if (deploymentExists(cn.getName())) {
-            return;
-        }
         
         DeployedApplication deployedApp = new DeployedApplication(cn.getName());
 
@@ -692,6 +707,9 @@ public class HostConfig
         if (files == null)
             return;
         
+        ExecutorService es = host.getStartStopExecutor();
+        List<Future<?>> results = new ArrayList<Future<?>>();
+
         for (int i = 0; i < files.length; i++) {
             
             if (files[i].equalsIgnoreCase("META-INF"))
@@ -712,10 +730,19 @@ public class HostConfig
                     continue;
                 }
 
-                if (isServiced(cn.getName()))
+                if (isServiced(cn.getName()) || deploymentExists(cn.getName()))
                     continue;
                 
-                deployWAR(cn, war);
+                results.add(es.submit(new DeployWar(this, cn, war)));
+            }
+        }
+
+        for (Future<?> result : results) {
+            try {
+                result.get();
+            } catch (Exception e) {
+                log.error(sm.getString(
+                        "hostConfig.deployWar.threaded.error"), e);
             }
         }
     }
@@ -762,9 +789,6 @@ public class HostConfig
      * @param war
      */
     protected void deployWAR(ContextName cn, File war) {
-        
-        if (deploymentExists(cn.getName()))
-            return;
         
         // Checking for a nested /META-INF/context.xml
         JarFile jar = null;
@@ -957,6 +981,9 @@ public class HostConfig
         if (files == null)
             return;
         
+        ExecutorService es = host.getStartStopExecutor();
+        List<Future<?>> results = new ArrayList<Future<?>>();
+
         for (int i = 0; i < files.length; i++) {
 
             if (files[i].equalsIgnoreCase("META-INF"))
@@ -967,10 +994,19 @@ public class HostConfig
             if (dir.isDirectory()) {
                 ContextName cn = new ContextName(files[i]);
 
-                if (isServiced(cn.getName()))
+                if (isServiced(cn.getName()) || deploymentExists(cn.getName()))
                     continue;
 
-                deployDirectory(cn, dir);
+                results.add(es.submit(new DeployDirectory(this, cn, dir)));
+            }
+        }
+
+        for (Future<?> result : results) {
+            try {
+                result.get();
+            } catch (Exception e) {
+                log.error(sm.getString(
+                        "hostConfig.deployDir.threaded.error"), e);
             }
         }
     }
@@ -982,9 +1018,6 @@ public class HostConfig
      */
     protected void deployDirectory(ContextName cn, File dir) {
         
-        if (deploymentExists(cn.getName()))
-            return;
-
         DeployedApplication deployedApp = new DeployedApplication(cn.getName());
 
         // Deploy the application in this directory
@@ -1473,7 +1506,61 @@ public class HostConfig
         /**
          * Instant where the application was last put in service.
          */
-     public long timestamp = System.currentTimeMillis();
+        public long timestamp = System.currentTimeMillis();
     }
 
+    private static class DeployDescriptor implements Runnable {
+
+        private HostConfig config;
+        private ContextName cn;
+        private File descriptor;
+
+        public DeployDescriptor(HostConfig config, ContextName cn,
+                File descriptor) {
+            this.config = config;
+            this.cn = cn;
+            this.descriptor= descriptor;
+        }
+
+        @Override
+        public void run() {
+            config.deployDescriptor(cn, descriptor);
+        }
+    }
+
+    private static class DeployWar implements Runnable {
+
+        private HostConfig config;
+        private ContextName cn;
+        private File war;
+
+        public DeployWar(HostConfig config, ContextName cn, File war) {
+            this.config = config;
+            this.cn = cn;
+            this.war = war;
+        }
+
+        @Override
+        public void run() {
+            config.deployWAR(cn, war);
+        }
+    }
+
+    private static class DeployDirectory implements Runnable {
+
+        private HostConfig config;
+        private ContextName cn;
+        private File dir;
+
+        public DeployDirectory(HostConfig config, ContextName cn, File dir) {
+            this.config = config;
+            this.cn = cn;
+            this.dir = dir;
+        }
+
+        @Override
+        public void run() {
+            config.deployDirectory(cn, dir);
+        }
+    }
 }
