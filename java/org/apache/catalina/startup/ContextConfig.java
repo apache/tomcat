@@ -127,12 +127,6 @@ public class ContextConfig
     protected static final LoginConfig DUMMY_LOGIN_CONFIG =
         new LoginConfig("NONE", null, null, null);
 
-    /**
-     * The <code>Digester</code> we will use to process web application
-     * context files.
-     */
-    protected static Digester contextDigester = null;
-
 
     /**
      * The set of Authenticators that we know how to configure.  The key is
@@ -140,32 +134,6 @@ public class ContextConfig
      * the fully qualified Java class name of the corresponding Valve.
      */
     protected static Properties authenticators = null;
-
-
-    /**
-     * The <code>Digester</code>s available to process web deployment descriptor
-     * files.
-     */
-    protected static Digester[] webDigesters = new Digester[4];
-
-
-    /**
-     * The <code>Digester</code>s available to process web fragment deployment
-     * descriptor files.
-     */
-    protected static Digester[] webFragmentDigesters = new Digester[4];
-
-
-    /**
-     * The <code>Rule</code>s used to parse the web.xml
-     */
-    protected static WebRuleSet webRuleSet = new WebRuleSet(false);
-
-
-    /**
-     * The <code>Rule</code>s used to parse the web-fragment.xml
-     */
-    protected static WebRuleSet webFragmentRuleSet = new WebRuleSet(true);
 
 
     /**
@@ -236,12 +204,14 @@ public class ContextConfig
      * deployment descriptor files.
      */
     protected Digester webDigester = null;
+    protected WebRuleSet webRuleSet = null;
 
     /**
      * The <code>Digester</code> we will use to process web fragment
      * deployment descriptor files.
      */
     protected Digester webFragmentDigester = null;
+    protected WebRuleSet webFragmentRuleSet = null;
 
 
     // ------------------------------------------------------------- Properties
@@ -486,60 +456,21 @@ public class ContextConfig
 
 
     /**
-     * Create (if necessary) and return a Digester configured to process the
+     * Create and return a Digester configured to process the
      * web application deployment descriptor (web.xml).
      */
     public void createWebXmlDigester(boolean namespaceAware,
             boolean validation) {
 
-        if (!namespaceAware && !validation) {
-            if (webDigesters[0] == null) {
-                webDigesters[0] = DigesterFactory.newDigester(validation,
-                        namespaceAware, webRuleSet);
-                webFragmentDigesters[0] = DigesterFactory.newDigester(validation,
-                        namespaceAware, webFragmentRuleSet);
-                webDigesters[0].getParser();
-                webFragmentDigesters[0].getParser();
-            }
-            webDigester = webDigesters[0];
-            webFragmentDigester = webFragmentDigesters[0];
+        webRuleSet = new WebRuleSet(false);
+        webDigester = DigesterFactory.newDigester(validation,
+                namespaceAware, webRuleSet);
+        webDigester.getParser();
 
-        } else if (!namespaceAware && validation) {
-            if (webDigesters[1] == null) {
-                webDigesters[1] = DigesterFactory.newDigester(validation,
-                        namespaceAware, webRuleSet);
-                webFragmentDigesters[1] = DigesterFactory.newDigester(validation,
-                        namespaceAware, webFragmentRuleSet);
-                webDigesters[1].getParser();
-                webFragmentDigesters[1].getParser();
-            }
-            webDigester = webDigesters[1];
-            webFragmentDigester = webFragmentDigesters[1];
-
-        } else if (namespaceAware && !validation) {
-            if (webDigesters[2] == null) {
-                webDigesters[2] = DigesterFactory.newDigester(validation,
-                        namespaceAware, webRuleSet);
-                webFragmentDigesters[2] = DigesterFactory.newDigester(validation,
-                        namespaceAware, webFragmentRuleSet);
-                webDigesters[2].getParser();
-                webFragmentDigesters[2].getParser();
-            }
-            webDigester = webDigesters[2];
-            webFragmentDigester = webFragmentDigesters[2];
-
-        } else {
-            if (webDigesters[3] == null) {
-                webDigesters[3] = DigesterFactory.newDigester(validation,
-                        namespaceAware, webRuleSet);
-                webFragmentDigesters[3] = DigesterFactory.newDigester(validation,
-                        namespaceAware, webFragmentRuleSet);
-                webDigesters[3].getParser();
-                webFragmentDigesters[3].getParser();
-            }
-            webDigester = webDigesters[3];
-            webFragmentDigester = webFragmentDigesters[3];
-        }
+        webFragmentRuleSet = new WebRuleSet(true);
+        webFragmentDigester = DigesterFactory.newDigester(validation,
+                namespaceAware, webFragmentRuleSet);
+        webFragmentDigester.getParser();
     }
 
 
@@ -577,7 +508,7 @@ public class ContextConfig
     /**
      * Process the default configuration file, if it exists.
      */
-    protected void contextConfig() {
+    protected void contextConfig(Digester digester) {
 
         // Open the default context.xml file, if it exists
         if( defaultContextXml==null && context instanceof StandardContext ) {
@@ -596,7 +527,7 @@ public class ContextConfig
             if (defaultContextFile.exists()) {
                 try {
                     URL defaultContextUrl = defaultContextFile.toURI().toURL();
-                    processContextConfig(defaultContextUrl);
+                    processContextConfig(digester, defaultContextUrl);
                 } catch (MalformedURLException e) {
                     log.error(sm.getString(
                             "contextConfig.badUrl", defaultContextFile), e);
@@ -608,7 +539,7 @@ public class ContextConfig
             if (hostContextFile.exists()) {
                 try {
                     URL hostContextUrl = hostContextFile.toURI().toURL();
-                    processContextConfig(hostContextUrl);
+                    processContextConfig(digester, hostContextUrl);
                 } catch (MalformedURLException e) {
                     log.error(sm.getString(
                             "contextConfig.badUrl", hostContextFile), e);
@@ -616,7 +547,7 @@ public class ContextConfig
             }
         }
         if (context.getConfigFile() != null) {
-            processContextConfig(context.getConfigFile());
+            processContextConfig(digester, context.getConfigFile());
         }
 
     }
@@ -625,7 +556,7 @@ public class ContextConfig
     /**
      * Process a context.xml.
      */
-    protected void processContextConfig(URL contextXml) {
+    protected void processContextConfig(Digester digester, URL contextXml) {
 
         if (log.isDebugEnabled()) {
             log.debug("Processing context [" + context.getName()
@@ -653,45 +584,43 @@ public class ContextConfig
         if (source == null) {
             return;
         }
-        synchronized (contextDigester) {
+
+        try {
+            source.setByteStream(stream);
+            digester.setClassLoader(this.getClass().getClassLoader());
+            digester.setUseContextClassLoader(false);
+            digester.push(context.getParent());
+            digester.push(context);
+            XmlErrorHandler errorHandler = new XmlErrorHandler();
+            digester.setErrorHandler(errorHandler);
+            digester.parse(source);
+            if (errorHandler.getWarnings().size() > 0 ||
+                    errorHandler.getErrors().size() > 0) {
+                errorHandler.logFindings(log, contextXml.toString());
+                ok = false;
+            }
+            if (log.isDebugEnabled()) {
+                log.debug("Successfully processed context [" + context.getName()
+                        + "] configuration file [" + contextXml + "]");
+            }
+        } catch (SAXParseException e) {
+            log.error(sm.getString("contextConfig.contextParse",
+                    context.getName()), e);
+            log.error(sm.getString("contextConfig.defaultPosition",
+                             "" + e.getLineNumber(),
+                             "" + e.getColumnNumber()));
+            ok = false;
+        } catch (Exception e) {
+            log.error(sm.getString("contextConfig.contextParse",
+                    context.getName()), e);
+            ok = false;
+        } finally {
             try {
-                source.setByteStream(stream);
-                contextDigester.setClassLoader(this.getClass().getClassLoader());
-                contextDigester.setUseContextClassLoader(false);
-                contextDigester.push(context.getParent());
-                contextDigester.push(context);
-                XmlErrorHandler errorHandler = new XmlErrorHandler();
-                contextDigester.setErrorHandler(errorHandler);
-                contextDigester.parse(source);
-                if (errorHandler.getWarnings().size() > 0 ||
-                        errorHandler.getErrors().size() > 0) {
-                    errorHandler.logFindings(log, contextXml.toString());
-                    ok = false;
+                if (stream != null) {
+                    stream.close();
                 }
-                if (log.isDebugEnabled()) {
-                    log.debug("Successfully processed context [" + context.getName()
-                            + "] configuration file [" + contextXml + "]");
-                }
-            } catch (SAXParseException e) {
-                log.error(sm.getString("contextConfig.contextParse",
-                        context.getName()), e);
-                log.error(sm.getString("contextConfig.defaultPosition",
-                                 "" + e.getLineNumber(),
-                                 "" + e.getColumnNumber()));
-                ok = false;
-            } catch (Exception e) {
-                log.error(sm.getString("contextConfig.contextParse",
-                        context.getName()), e);
-                ok = false;
-            } finally {
-                contextDigester.reset();
-                try {
-                    if (stream != null) {
-                        stream.close();
-                    }
-                } catch (IOException e) {
-                    log.error(sm.getString("contextConfig.contextClose"), e);
-                }
+            } catch (IOException e) {
+                log.error(sm.getString("contextConfig.contextClose"), e);
             }
         }
     }
@@ -846,10 +775,8 @@ public class ContextConfig
     protected void init() {
         // Called from StandardContext.init()
 
-        if (contextDigester == null){
-            contextDigester = createContextDigester();
-            contextDigester.getParser();
-        }
+        Digester contextDigester = createContextDigester();
+        contextDigester.getParser();
 
         if (log.isDebugEnabled()) {
             log.debug(sm.getString("contextConfig.init"));
@@ -857,7 +784,7 @@ public class ContextConfig
         context.setConfigured(false);
         ok = true;
 
-        contextConfig();
+        contextConfig(contextDigester);
 
         createWebXmlDigester(context.getXmlNamespaceAware(),
                 context.getXmlValidation());
@@ -1416,8 +1343,9 @@ public class ContextConfig
         }
 
         // Parsing global web.xml is relatively expensive. Use a sync block to
-        // make sure it only happens once
-        synchronized (host) {
+        // make sure it only happens once. Use the pipeline since a lock will
+        // already be held on the host by another thread
+        synchronized (host.getPipeline()) {
             entry = hostWebXmlCache.get(host);
             if (entry != null && entry.getGlobalTimeStamp() == globalTimeStamp &&
                     entry.getHostTimeStamp() == hostTimeStamp) {
@@ -1679,7 +1607,6 @@ public class ContextConfig
         return getWebXmlSource(defaultWebXml, getBaseDir());
     }
 
-
     /**
      * Identify the host web.xml to be used and obtain an input source for
      * it.
@@ -1806,9 +1733,6 @@ public class ContextConfig
 
         XmlErrorHandler handler = new XmlErrorHandler();
 
-        // Web digesters and rulesets are shared between contexts but are not
-        // thread safe. Whilst there should only be one thread at a time
-        // processing a config, play safe and sync.
         Digester digester;
         WebRuleSet ruleSet;
         if (fragment) {
@@ -1819,41 +1743,36 @@ public class ContextConfig
             ruleSet = webRuleSet;
         }
 
-        // Sync on the ruleSet since the same ruleSet is shared across all four
-        // digesters
-        synchronized(ruleSet) {
+        digester.push(dest);
+        digester.setErrorHandler(handler);
 
-            digester.push(dest);
-            digester.setErrorHandler(handler);
+        if(log.isDebugEnabled()) {
+            log.debug(sm.getString("contextConfig.applicationStart",
+                    source.getSystemId()));
+        }
 
-            if(log.isDebugEnabled()) {
-                log.debug(sm.getString("contextConfig.applicationStart",
-                        source.getSystemId()));
-            }
+        try {
+            digester.parse(source);
 
-            try {
-                digester.parse(source);
-
-                if (handler.getWarnings().size() > 0 ||
-                        handler.getErrors().size() > 0) {
-                    ok = false;
-                    handler.logFindings(log, source.getSystemId());
-                }
-            } catch (SAXParseException e) {
-                log.error(sm.getString("contextConfig.applicationParse",
-                        source.getSystemId()), e);
-                log.error(sm.getString("contextConfig.applicationPosition",
-                                 "" + e.getLineNumber(),
-                                 "" + e.getColumnNumber()));
+            if (handler.getWarnings().size() > 0 ||
+                    handler.getErrors().size() > 0) {
                 ok = false;
-            } catch (Exception e) {
-                log.error(sm.getString("contextConfig.applicationParse",
-                        source.getSystemId()), e);
-                ok = false;
-            } finally {
-                digester.reset();
-                ruleSet.recycle();
+                handler.logFindings(log, source.getSystemId());
             }
+        } catch (SAXParseException e) {
+            log.error(sm.getString("contextConfig.applicationParse",
+                    source.getSystemId()), e);
+            log.error(sm.getString("contextConfig.applicationPosition",
+                             "" + e.getLineNumber(),
+                             "" + e.getColumnNumber()));
+            ok = false;
+        } catch (Exception e) {
+            log.error(sm.getString("contextConfig.applicationParse",
+                    source.getSystemId()), e);
+            ok = false;
+        } finally {
+            digester.reset();
+            ruleSet.recycle();
         }
     }
 
@@ -2244,7 +2163,8 @@ public class ContextConfig
 
     /**
      * process filter annotation and merge with existing one!
-     * FIXME: refactoring method to long and has redundant subroutines with processAnnotationWebServlet!
+     * FIXME: refactoring method too long and has redundant subroutines with
+     *        processAnnotationWebServlet!
      * @param className
      * @param ae
      * @param fragment

@@ -461,4 +461,21 @@ public interface Container extends Lifecycle {
      * that the request/response still appears in the correct access logs.
      */
     public AccessLog getAccessLog();
+
+
+    /**
+     * Returns the number of threads available for starting and stopping any
+     * children associated with this container. This allows start/stop calls to
+     * children to be processed in parallel.
+     */
+    public int getStartStopThreads();
+
+
+    /**
+     * Sets the number of threads available for starting and stopping any
+     * children associated with this container. This allows start/stop calls to
+     * children to be processed in parallel.
+     * @param   startStopThreads    The new number of threads to be used
+     */
+    public void setStartStopThreads(int startStopThreads);
 }

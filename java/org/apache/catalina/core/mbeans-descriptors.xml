@@ -1011,6 +1011,10 @@
                description="Will children be started automatically when they are added."
                type="boolean"/>
 
+    <attribute name="startStopThreads"
+               description="The number of threads to use when starting and stopping child Hosts"
+               type="int"/>
+
     <attribute name="stateName"
                description="The name of the LifecycleState that this component is currently in"
                type="java.lang.String"
@@ -1197,6 +1201,10 @@
     <attribute name="startChildren"
                description="Will children be started automatically when they are added?"
                type="boolean"/>
+
+    <attribute name="startStopThreads"
+               description="The number of threads to use when starting, stopping and deploying child Contexts"
+               type="int"/>
 
     <attribute name="stateName"
                description="The name of the LifecycleState that this component is currently in"
