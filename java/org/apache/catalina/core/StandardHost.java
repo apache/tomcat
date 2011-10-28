@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.WeakHashMap;
+import java.util.concurrent.ExecutorService;
 import java.util.regex.Pattern;
 
 import org.apache.catalina.Container;
@@ -176,6 +177,11 @@ public class StandardHost extends ContainerBase implements Host {
 
 
     // ------------------------------------------------------------- Properties
+
+     @Override
+     public ExecutorService getStartStopExecutor() {
+         return startStopExecutor;
+     }
 
 
     /**

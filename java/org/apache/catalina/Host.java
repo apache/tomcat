@@ -17,6 +17,7 @@
 package org.apache.catalina;
 
 import java.io.File;
+import java.util.concurrent.ExecutorService;
 import java.util.regex.Pattern;
 
 
@@ -180,8 +181,15 @@ public interface Host extends Container {
     public void setDeployIgnore(String deployIgnore);
 
 
-    // --------------------------------------------------------- Public Methods
+    /**
+     * Return the executor that is used for starting and stopping contexts. This
+     * is primarily for use by components deploying contexts that want to do
+     * this in a multi-threaded manner.
+     */
+    public ExecutorService getStartStopExecutor();
 
+
+    // --------------------------------------------------------- Public Methods
 
     /**
      * Add an alias name that should be mapped to this same Host.

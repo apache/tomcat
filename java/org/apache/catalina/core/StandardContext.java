@@ -37,7 +37,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
 import java.util.TreeMap;
-import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicLong;
 
 import javax.management.ListenerNotFoundException;
@@ -118,7 +117,6 @@ import org.apache.tomcat.JarScanner;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.modeler.Registry;
 import org.apache.tomcat.util.scan.StandardJarScanner;
-import org.apache.tomcat.util.threads.DedicatedThreadExecutor;
 
 /**
  * Standard implementation of the <b>Context</b> interface.  Each
@@ -5101,9 +5099,7 @@ public class StandardContext extends ContainerBase
             }
         }
 
-        DedicatedThreadExecutor temporaryExecutor = new DedicatedThreadExecutor();
         try {
-
             // Create context attributes that will be required
             if (ok) {
                 getServletContext().setAttribute(
@@ -5128,22 +5124,7 @@ public class StandardContext extends ContainerBase
 
             // Configure and call application event listeners
             if (ok) {
-                // we do it in a dedicated thread for memory leak protection, in
-                // case the Listeners registers some ThreadLocals that they
-                // forget to cleanup
-                Boolean listenerStarted =
-                    temporaryExecutor.execute(new Callable<Boolean>() {
-                        @Override
-                        public Boolean call() throws Exception {
-                            ClassLoader old = bindThread();
-                            try {
-                                return Boolean.valueOf(listenerStart());
-                            } finally {
-                                unbindThread(old);
-                            }
-                        }
-                    });
-                if (!listenerStarted.booleanValue()) {
+                if (!listenerStart()) {
                     log.error( "Error listenerStart");
                     ok = false;
                 }
@@ -5164,22 +5145,7 @@ public class StandardContext extends ContainerBase
 
             // Configure and call application filters
             if (ok) {
-                // we do it in a dedicated thread for memory leak protection, in
-                // case the Filters register some ThreadLocals that they forget
-                // to cleanup
-                Boolean filterStarted =
-                    temporaryExecutor.execute(new Callable<Boolean>() {
-                        @Override
-                        public Boolean call() throws Exception {
-                            ClassLoader old = bindThread();
-                            try {
-                                return Boolean.valueOf(filterStart());
-                            } finally {
-                                unbindThread(old);
-                            }
-                        }
-                    });
-                if (!filterStarted.booleanValue()) {
+                if (!filterStart()) {
                     log.error("Error filterStart");
                     ok = false;
                 }
@@ -5187,27 +5153,12 @@ public class StandardContext extends ContainerBase
 
             // Load and initialize all "load on startup" servlets
             if (ok) {
-                // we do it in a dedicated thread for memory leak protection, in
-                // case the Servlets register some ThreadLocals that they forget
-                // to cleanup
-                temporaryExecutor.execute(new Callable<Void>() {
-                    @Override
-                    public Void call() throws Exception {
-                        ClassLoader old = bindThread();
-                        try {
-                            loadOnStartup(findChildren());
-                            return null;
-                        } finally {
-                            unbindThread(old);
-                        }
-                    }
-                });
+                loadOnStartup(findChildren());
             }
 
         } finally {
             // Unbinding thread
             unbindThread(oldCCL);
-            temporaryExecutor.shutdown();
         }
 
         // Set available status depending upon startup success
@@ -5347,61 +5298,28 @@ public class StandardContext extends ContainerBase
 
             // Stop our child containers, if any
             final Container[] children = findChildren();
-            // we do it in a dedicated thread for memory leak protection, in
-            // case some webapp code registers some ThreadLocals that they
-            // forget to cleanup
-            // TODO Figure out why DedicatedThreadExecutor hangs randomly in the
-            //      unit tests if used here
-            RunnableWithLifecycleException stop =
-                    new RunnableWithLifecycleException() {
-                @Override
-                public void run() {
-                    ClassLoader old = bindThread();
-                    try {
-                        for (int i = 0; i < children.length; i++) {
-                            try {
-                                children[i].stop();
-                            } catch (LifecycleException e) {
-                                le = e;
-                                return;
-                            }
-                        }
 
-                        // Stop our filters
-                        filterStop();
-
-                        // Stop ContainerBackgroundProcessor thread
-                        threadStop();
-
-                        if (manager != null && manager instanceof Lifecycle &&
-                                ((Lifecycle) manager).getState().isAvailable()) {
-                            try {
-                                ((Lifecycle) manager).stop();
-                            } catch (LifecycleException e) {
-                                le = e;
-                                return;
-                            }
-                        }
-
-                        // Stop our application listeners
-                        listenerStop();
-                    }finally{
-                        unbindThread(old);
-                    }
-                }
-            };
-
-            Thread t = new Thread(stop);
-            t.setName("stop children - " + getObjectName().toString());
-            t.start();
+            ClassLoader old = bindThread();
             try {
-                t.join();
-            } catch (InterruptedException e) {
-                // Shouldn't happen
-                throw new LifecycleException(e);
-            }
-            if (stop.getLifecycleException() != null) {
-                throw stop.getLifecycleException();
+                for (int i = 0; i < children.length; i++) {
+                    children[i].stop();
+                }
+
+                // Stop our filters
+                filterStop();
+
+                // Stop ContainerBackgroundProcessor thread
+                threadStop();
+
+                if (manager != null && manager instanceof Lifecycle &&
+                        ((Lifecycle) manager).getState().isAvailable()) {
+                    ((Lifecycle) manager).stop();
+                }
+
+                // Stop our application listeners
+                listenerStop();
+            } finally{
+                unbindThread(old);
             }
 
             // Finalize our character set mapper
@@ -6395,15 +6313,5 @@ public class StandardContext extends ContainerBase
      */
     public long getStartTime() {
         return startTime;
-    }
-
-    private abstract static class RunnableWithLifecycleException
-            implements Runnable {
-
-        protected LifecycleException le = null;
-
-        public LifecycleException getLifecycleException() {
-            return le;
-        }
     }
 }

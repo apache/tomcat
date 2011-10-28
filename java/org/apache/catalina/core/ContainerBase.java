@@ -26,6 +26,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.List;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.Callable;
+import java.util.concurrent.Future;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import javax.management.ObjectName;
 import javax.naming.directory.DirContext;
@@ -273,7 +280,54 @@ public abstract class ContainerBase extends LifecycleMBeanBase
     protected volatile AccessLog accessLog = null;
     private volatile boolean accessLogScanComplete = false;
 
+
+    /**
+     * The number of threads available to process start and stop events for any
+     * children associated with this container.
+     */
+    private int startStopThreads = 1;
+    protected ThreadPoolExecutor startStopExecutor;
+
     // ------------------------------------------------------------- Properties
+
+    @Override
+    public int getStartStopThreads() {
+        return startStopThreads;
+    }
+
+    /**
+     * Handles the special values.
+     */
+    private int getStartStopThreadsInternal() {
+        int result = getStartStopThreads();
+
+        // Positive values are unchanged
+        if (result > 0) {
+            return result;
+        }
+
+        // Zero == Runtime.getRuntime().availableProcessors()
+        // -ve  == Runtime.getRuntime().availableProcessors() + value
+        // These two are the same
+        result = Runtime.getRuntime().availableProcessors() + result;
+        if (result < 1) {
+            result = 1;
+        }
+        return result;
+    }
+
+    @Override
+    public void setStartStopThreads(int startStopThreads) {
+        this.startStopThreads = startStopThreads;
+
+        // Use local copies to ensure thread safety
+        ThreadPoolExecutor executor = startStopExecutor;
+        if (executor != null) {
+            int newThreads = getStartStopThreadsInternal();
+            executor.setMaximumPoolSize(newThreads);
+            executor.setCorePoolSize(newThreads);
+        }
+    }
 
 
     /**
@@ -980,6 +1034,19 @@ public abstract class ContainerBase extends LifecycleMBeanBase
     }
 
 
+    @Override
+    protected void initInternal() throws LifecycleException {
+        BlockingQueue<Runnable> startStopQueue =
+            new LinkedBlockingQueue<Runnable>();
+        startStopExecutor = new ThreadPoolExecutor(
+                getStartStopThreadsInternal(),
+                getStartStopThreadsInternal(), 10, TimeUnit.SECONDS,
+                startStopQueue);
+        startStopExecutor.allowCoreThreadTimeOut(true);
+        super.initInternal();
+    }
+
+
     /**
      * Start this component and implement the requirements
      * of {@link org.apache.catalina.util.LifecycleBase#startInternal()}.
@@ -1008,8 +1075,24 @@ public abstract class ContainerBase extends LifecycleMBeanBase
 
         // Start our child containers, if any
         Container children[] = findChildren();
+        List<Future<Void>> results = new ArrayList<Future<Void>>();
         for (int i = 0; i < children.length; i++) {
-            children[i].start();
+            results.add(startStopExecutor.submit(new StartChild(children[i])));
+        }
+
+        boolean fail = false;
+        for (Future<Void> result : results) {
+            try {
+                result.get();
+            } catch (Exception e) {
+                log.error(sm.getString("containerBase.threadedStartFailed"), e);
+                fail = true;
+            }
+
+        }
+        if (fail) {
+            throw new LifecycleException(
+                    sm.getString("containerBase.threadedStartFailed"));
         }
 
         // Start the Valves in our pipeline (including the basic), if any
@@ -1048,8 +1131,23 @@ public abstract class ContainerBase extends LifecycleMBeanBase
 
         // Stop our child containers, if any
         Container children[] = findChildren();
+        List<Future<Void>> results = new ArrayList<Future<Void>>();
         for (int i = 0; i < children.length; i++) {
-            children[i].stop();
+            results.add(startStopExecutor.submit(new StopChild(children[i])));
+        }
+
+        boolean fail = false;
+        for (Future<Void> result : results) {
+            try {
+                result.get();
+            } catch (Exception e) {
+                log.error(sm.getString("containerBase.threadedStopFailed"), e);
+                fail = true;
+            }
+        }
+        if (fail) {
+            throw new LifecycleException(
+                    sm.getString("containerBase.threadedStopFailed"));
         }
 
         // Stop our subordinate components, if any
@@ -1091,6 +1189,8 @@ public abstract class ContainerBase extends LifecycleMBeanBase
         if (parent != null) {
             parent.removeChild(this);
         }
+
+        startStopExecutor.shutdownNow();
 
         super.destroyInternal();
     }
@@ -1389,6 +1489,39 @@ public abstract class ContainerBase extends LifecycleMBeanBase
                     processChildren(children[i], cl);
                 }
             }
+        }
+    }
+
+
+    // ----------------------------- Inner classes used with start/stop Executor
+
+    private static class StartChild implements Callable<Void> {
+
+        private Container child;
+
+        public StartChild(Container child) {
+            this.child = child;
+        }
+
+        @Override
+        public Void call() throws LifecycleException {
+            child.start();
+            return null;
+        }
+    }
+
+    private static class StopChild implements Callable<Void> {
+
+        private Container child;
+
+        public StopChild(Container child) {
+            this.child = child;
+        }
+
+        @Override
+        public Void call() throws LifecycleException {
+            child.stop();
+            return null;
         }
     }
 }
