@@ -56,6 +56,12 @@
 <section name="Tomcat 7.0.23 (markt)">
   <subsection name="Catalina">
     <changelog>
+      <add>
+        <bug>46264</bug>: Add the ability to start and stop containers
+        (primarily Contexts) using a thread pool rather than a single thread.
+        This can significantly improve start and stop time. Based on patches
+        by Joe Kislo and Felix Schumacher. (markt)
+      </add>
       <fix>
         <bug>51910</bug>: Prevent NPE on connector stop if Comet applications
         are being used without the CometConnectionManagerValve. (markt)
@@ -146,12 +152,6 @@
         Also add an option to limit the maximum number of parameters processed
         per request. This defaults to 10000. (markt)
       </add>
-      <add>
-        Add the ability to start and stop containers (primarily Contexts) using
-        a thread pool rather than a single thread. This can significantly
-        improve start and stop time. Based on patches by Joe Kislo and Felix
-        Schumacher. (markt)
-      </add>
       <fix>
         <bug>51744</bug>: Throw the correct exception if an application attempts
         to modify the associated JNDI context. (markt)
@@ -224,7 +224,8 @@
         Work around a <a href="http://bugs.sun.com/view_bug.do?bug_id=6427854">
         known JVM bug</a> that is fixed in 1.7.0_01 but still present in
         1.6.0_29 and was triggering intermittent unit test failures for
-        <code>org.apache.catalina.tribes.group.TestGroupChannelMemberArrival.testMemberArrival</code>.
+        <code>org.apache.catalina.tribes.group.
+        TestGroupChannelMemberArrival.testMemberArrival</code>.
         The bug affects any components that use NIO although it was more likely
         to be observed in the clustering module than the HTTP or AJP NIO
         connector. (markt) 
