@@ -108,7 +108,7 @@
                  type="int"/>
 
     <attribute   name="port"
-          description="The port number on which we listen for ajp13 requests"
+          description="The port number on which we listen for requests"
                 type="int"/>
 
     <!-- Common -->
