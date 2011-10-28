@@ -26,6 +26,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Stack;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import javax.management.ListenerNotFoundException;
 import javax.management.MBeanNotificationInfo;
@@ -274,6 +275,15 @@ public class StandardWrapper extends ContainerBase
      * <code>Servlet.init</code> is invoked.
      */
     protected static Class<?>[] classType = new Class[]{ServletConfig.class};
+
+    private final ReentrantReadWriteLock parametersLock =
+            new ReentrantReadWriteLock();
+
+    private final ReentrantReadWriteLock mappingsLock =
+            new ReentrantReadWriteLock();
+
+    private final ReentrantReadWriteLock referencesLock =
+            new ReentrantReadWriteLock();
 
 
     // ------------------------------------------------------------- Properties
@@ -712,8 +722,11 @@ public class StandardWrapper extends ContainerBase
     @Override
     public void addInitParameter(String name, String value) {
 
-        synchronized (parameters) {
+        try {
+            parametersLock.writeLock().lock();
             parameters.put(name, value);
+        } finally {
+            parametersLock.writeLock().unlock();
         }
         fireContainerEvent("addInitParameter", name);
 
@@ -741,8 +754,11 @@ public class StandardWrapper extends ContainerBase
     @Override
     public void addMapping(String mapping) {
 
-        synchronized (mappings) {
+        try {
+            mappingsLock.writeLock().lock();
             mappings.add(mapping);
+        } finally {
+            mappingsLock.writeLock().unlock();
         }
         if(parent.getState().equals(LifecycleState.STARTED))
             fireContainerEvent(ADD_MAPPING_EVENT, mapping);
@@ -760,8 +776,11 @@ public class StandardWrapper extends ContainerBase
     @Override
     public void addSecurityReference(String name, String link) {
 
-        synchronized (references) {
+        try {
+            referencesLock.writeLock().lock();
             references.put(name, link);
+        } finally {
+            referencesLock.writeLock().unlock();
         }
         fireContainerEvent("addSecurityReference", name);
 
@@ -916,8 +935,11 @@ public class StandardWrapper extends ContainerBase
     @Override
     public String findInitParameter(String name) {
 
-        synchronized (parameters) {
+        try {
+            parametersLock.readLock().lock();
             return parameters.get(name);
+        } finally {
+            parametersLock.readLock().unlock();
         }
 
     }
@@ -930,9 +952,12 @@ public class StandardWrapper extends ContainerBase
     @Override
     public String[] findInitParameters() {
 
-        synchronized (parameters) {
+        try {
+            parametersLock.readLock().lock();
             String results[] = new String[parameters.size()];
             return parameters.keySet().toArray(results);
+        } finally {
+            parametersLock.readLock().unlock();
         }
 
     }
@@ -944,8 +969,11 @@ public class StandardWrapper extends ContainerBase
     @Override
     public String[] findMappings() {
 
-        synchronized (mappings) {
+        try {
+            mappingsLock.readLock().lock();
             return mappings.toArray(new String[mappings.size()]);
+        } finally {
+            mappingsLock.readLock().unlock();
         }
 
     }
@@ -960,8 +988,11 @@ public class StandardWrapper extends ContainerBase
     @Override
     public String findSecurityReference(String name) {
 
-        synchronized (references) {
+        try {
+            referencesLock.readLock().lock();
             return references.get(name);
+        } finally {
+            referencesLock.readLock().unlock();
         }
 
     }
@@ -974,9 +1005,12 @@ public class StandardWrapper extends ContainerBase
     @Override
     public String[] findSecurityReferences() {
 
-        synchronized (references) {
+        try {
+            referencesLock.readLock().lock();
             String results[] = new String[references.size()];
             return references.keySet().toArray(results);
+        } finally {
+            referencesLock.readLock().unlock();
         }
 
     }
@@ -1224,8 +1258,11 @@ public class StandardWrapper extends ContainerBase
     @Override
     public void removeInitParameter(String name) {
 
-        synchronized (parameters) {
+        try {
+            parametersLock.writeLock().lock();
             parameters.remove(name);
+        } finally {
+            parametersLock.writeLock().unlock();
         }
         fireContainerEvent("removeInitParameter", name);
 
@@ -1253,8 +1290,11 @@ public class StandardWrapper extends ContainerBase
     @Override
     public void removeMapping(String mapping) {
 
-        synchronized (mappings) {
+        try {
+            mappingsLock.writeLock().lock();
             mappings.remove(mapping);
+        } finally {
+            mappingsLock.writeLock().unlock();
         }
         if(parent.getState().equals(LifecycleState.STARTED))
             fireContainerEvent(REMOVE_MAPPING_EVENT, mapping);
@@ -1270,8 +1310,11 @@ public class StandardWrapper extends ContainerBase
     @Override
     public void removeSecurityReference(String name) {
 
-        synchronized (references) {
+        try {
+            referencesLock.writeLock().lock();
             references.remove(name);
+        } finally {
+            referencesLock.writeLock().unlock();
         }
         fireContainerEvent("removeSecurityReference", name);
 
@@ -1481,8 +1524,11 @@ public class StandardWrapper extends ContainerBase
     @Override
     public Enumeration<String> getInitParameterNames() {
 
-        synchronized (parameters) {
+        try {
+            parametersLock.readLock().lock();
             return (new Enumerator<String>(parameters.keySet()));
+        } finally {
+            parametersLock.readLock().unlock();
         }
 
     }
