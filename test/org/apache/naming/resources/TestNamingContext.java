@@ -30,6 +30,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
@@ -215,13 +216,25 @@ public class TestNamingContext extends TomcatBaseTest {
     }
 
     @Test
-    public void testBug51744() throws Exception {
+    public void testBug51744a() throws Exception {
+        doTestBug51744(true);
+    }
+
+    @Test
+    public void testBug51744b() throws Exception {
+        doTestBug51744(false);
+    }
+
+    private void doTestBug51744(boolean exceptionOnFailedWrite)
+            throws Exception {
         Tomcat tomcat = getTomcatInstance();
         tomcat.enableNaming();
 
         // Must have a real docBase - just use temp
         StandardContext ctx = (StandardContext)
             tomcat.addContext("", System.getProperty("java.io.tmpdir"));
+
+        ctx.setJndiExceptionOnFailedWrite(exceptionOnFailedWrite);
 
         // Map the test Servlet
         Bug51744Servlet bug51744Servlet = new Bug51744Servlet();
@@ -233,7 +246,10 @@ public class TestNamingContext extends TomcatBaseTest {
         ByteChunk bc = new ByteChunk();
         int rc = getUrl("http://localhost:" + getPort() + "/", bc, null);
         assertEquals(200, rc);
-        assertEquals(Bug51744Servlet.EXPECTED, bc.toString());
+        assertTrue(bc.toString().contains(Bug51744Servlet.EXPECTED));
+        if (exceptionOnFailedWrite) {
+            assertTrue(bc.toString().contains(Bug51744Servlet.ERROR_MESSAGE));
+        }
     }
 
     public static final class Bug51744Servlet extends HttpServlet {
@@ -241,6 +257,7 @@ public class TestNamingContext extends TomcatBaseTest {
         private static final long serialVersionUID = 1L;
 
         public static final String EXPECTED = "TestValue";
+        public static final String ERROR_MESSAGE = "Error";
 
         @Override
         protected void doGet(HttpServletRequest req, HttpServletResponse resp)
@@ -254,18 +271,13 @@ public class TestNamingContext extends TomcatBaseTest {
                 Context env1 = (Context) ctx1.lookup("java:comp/env");
                 env1.addToEnvironment("TestName", EXPECTED);
 
-                boolean error = false;
+                out.print(env1.getEnvironment().get("TestName"));
+
                 try {
                     env1.close();
                 } catch (NamingException ne) {
-                    error = true;
+                    out.print(ERROR_MESSAGE);
                 }
-                if (!error) {
-                    throw new ServletException(
-                            "No error when one was expected");
-                }
-
-                out.print(env1.getEnvironment().get("TestName"));
             } catch (NamingException ne) {
                 ne.printStackTrace(out);
             }

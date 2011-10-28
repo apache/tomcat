@@ -123,11 +123,20 @@ public class NamingContext implements Context {
     protected String name;
 
 
-    // --------------------------------------------------------- Public Methods
+    /**
+     * Determines if an attempt to write to a read-only context results in an
+     * exception or if the request is ignored.
+     */
+    private boolean exceptionOnFailedWrite = true;
+    public boolean getExceptionOnFailedWrite() {
+        return exceptionOnFailedWrite;
+    }
+    public void setExceptionOnFailedWrite(boolean exceptionOnFailedWrite) {
+        this.exceptionOnFailedWrite = exceptionOnFailedWrite;
+    }
 
 
     // -------------------------------------------------------- Context Methods
-
 
     /**
      * Retrieves the named object. If name is empty, returns a new instance
@@ -249,9 +258,11 @@ public class NamingContext implements Context {
      * @exception NamingException if a naming exception is encountered
      */
     @Override
-    public void unbind(Name name)
-        throws NamingException {
-        checkWritable();
+    public void unbind(Name name) throws NamingException {
+
+        if (!checkWritable()) {
+            return;
+        }
 
         while ((!name.isEmpty()) && (name.get(0).length() == 0))
             name = name.getSuffix(1);
@@ -465,10 +476,11 @@ public class NamingContext implements Context {
      * a context, or does not name a context of the appropriate type
      */
     @Override
-    public void destroySubcontext(Name name)
-        throws NamingException {
+    public void destroySubcontext(Name name) throws NamingException {
 
-        checkWritable();
+        if (!checkWritable()) {
+            return;
+        }
 
         while ((!name.isEmpty()) && (name.get(0).length() == 0))
             name = name.getSuffix(1);
@@ -533,12 +545,15 @@ public class NamingContext implements Context {
      * @exception NamingException if a naming exception is encountered
      */
     @Override
-    public Context createSubcontext(Name name)
-        throws NamingException {
-        checkWritable();
+    public Context createSubcontext(Name name) throws NamingException {
+        if (!checkWritable()) {
+            return null;
+        }
 
-        Context newContext = new NamingContext(env, this.name);
+        NamingContext newContext = new NamingContext(env, this.name);
         bind(name, newContext);
+
+        newContext.setExceptionOnFailedWrite(getExceptionOnFailedWrite());
 
         return newContext;
     }
@@ -744,7 +759,9 @@ public class NamingContext implements Context {
      */
     @Override
     public void close() throws NamingException {
-        checkWritable();
+        if (!checkWritable()) {
+            return;
+        }
         env.clear();
     }
 
@@ -866,7 +883,9 @@ public class NamingContext implements Context {
     protected void bind(Name name, Object obj, boolean rebind)
         throws NamingException {
 
-        checkWritable();
+        if (!checkWritable()) {
+            return;
+        }
 
         while ((!name.isEmpty()) && (name.get(0).length() == 0))
             name = name.getSuffix(1);
@@ -935,12 +954,16 @@ public class NamingContext implements Context {
     /**
      * Throws a naming exception is Context is not writable.
      */
-    protected void checkWritable()
-        throws NamingException {
-        if (!isWritable())
-            throw new NamingException(sm.getString("namingContext.readOnly"));
+    protected boolean checkWritable() throws NamingException {
+        if (isWritable()) {
+            return true;
+        } else {
+            if (exceptionOnFailedWrite) {
+                throw new javax.naming.OperationNotSupportedException(
+                        sm.getString("namingContext.readOnly"));
+            }
+        }
+        return false;
     }
-
-
 }
 
