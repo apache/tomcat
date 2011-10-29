@@ -99,20 +99,18 @@ public final class Parameters {
     // Access to the current name/values, no side effect ( processing ).
     // You must explicitly call handleQueryParameters and the post methods.
 
-    // This is the original data representation ( hash of String->String[])
-
-    public void addParameterValues( String key, String[] newValues) {
-        if ( key==null ) {
+    public void addParameterValues(String key, String[] newValues) {
+        if (key == null) {
             return;
         }
         ArrayList<String> values;
         if (paramHashValues.containsKey(key)) {
-             values = paramHashValues.get(key);
+            values = paramHashValues.get(key);
+            values.ensureCapacity(values.size() + newValues.length);
         } else {
-            values = new ArrayList<String>(1);
+            values = new ArrayList<String>(newValues.length);
             paramHashValues.put(key, values);
         }
-        values.ensureCapacity(values.size() + newValues.length);
         for (String newValue : newValues) {
             values.add(newValue);
         }
@@ -173,8 +171,7 @@ public final class Parameters {
         processParameters( decodedQuery, queryStringEncoding );
     }
 
-    // incredibly inefficient data representation for parameters,
-    // until we test the new one
+
     private void addParam( String key, String value ) {
         if( key==null ) {
             return;
@@ -202,7 +199,7 @@ public final class Parameters {
     private final ByteChunk origValue=new ByteChunk();
     CharChunk tmpNameC=new CharChunk(1024);
     public static final String DEFAULT_ENCODING = "ISO-8859-1";
-    public static final Charset DEFAULT_CHARSET =
+    private static final Charset DEFAULT_CHARSET =
         Charset.forName(DEFAULT_ENCODING);
 
 
@@ -210,7 +207,7 @@ public final class Parameters {
         processParameters(bytes, start, len, getCharset(encoding));
     }
 
-    public void processParameters(byte bytes[], int start, int len,
+    private void processParameters(byte bytes[], int start, int len,
                                   Charset charset) {
 
         if(log.isDebugEnabled()) {
@@ -411,21 +408,21 @@ public final class Parameters {
         }
     }
 
-    /** Debug purpose
+    /**
+     * Debug purpose
      */
     public String paramsAsString() {
-        StringBuilder sb=new StringBuilder();
-        Enumeration<String> en= paramHashValues.keys();
-        while( en.hasMoreElements() ) {
+        StringBuilder sb = new StringBuilder();
+        Enumeration<String> en = paramHashValues.keys();
+        while (en.hasMoreElements()) {
             String k = en.nextElement();
-            sb.append( k ).append("=");
+            sb.append(k).append('=');
             ArrayList<String> values = paramHashValues.get(k);
             for(String value : values) {
-                sb.append(value).append(",");
+                sb.append(value).append(',');
             }
-            sb.append("\n");
+            sb.append('\n');
         }
         return sb.toString();
     }
-
 }

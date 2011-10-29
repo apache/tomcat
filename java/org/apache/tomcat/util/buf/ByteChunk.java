@@ -535,7 +535,7 @@ public final class ByteChunk implements Cloneable, Serializable {
         // bytes will be used. The code below is from Apache Harmony.
         CharBuffer cb;
         cb = charset.decode(ByteBuffer.wrap(buff, start, end-start));
-        return new String(cb.array());
+        return new String(cb.array(), cb.arrayOffset(), cb.length());
     }
 
     public int getInt()
