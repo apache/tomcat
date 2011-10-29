@@ -20,6 +20,8 @@ import java.util.Enumeration;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 
@@ -37,6 +39,8 @@ public class TestParameters {
         new Parameter("foo4", "");
     private static final Parameter EMPTY =
         new Parameter("");
+    private static final Parameter UTF8 =
+            new Parameter("\ufb6b\ufb6a\ufb72", "\uffee\uffeb\uffe2");
 
     @Test
     public void testProcessParametersByteArrayIntInt() {
@@ -45,16 +49,19 @@ public class TestParameters {
         doTestProcessParametersByteArrayIntInt(NO_VALUE);
         doTestProcessParametersByteArrayIntInt(EMPTY_VALUE);
         doTestProcessParametersByteArrayIntInt(EMPTY);
+        doTestProcessParametersByteArrayIntInt(UTF8);
         doTestProcessParametersByteArrayIntInt(
-                SIMPLE, SIMPLE_MULTIPLE, NO_VALUE, EMPTY_VALUE, EMPTY);
+                SIMPLE, SIMPLE_MULTIPLE, NO_VALUE, EMPTY_VALUE, EMPTY, UTF8);
         doTestProcessParametersByteArrayIntInt(
-                SIMPLE_MULTIPLE, NO_VALUE, EMPTY_VALUE, EMPTY, SIMPLE);
+                SIMPLE_MULTIPLE, NO_VALUE, EMPTY_VALUE, EMPTY, UTF8, SIMPLE);
         doTestProcessParametersByteArrayIntInt(
-                NO_VALUE, EMPTY_VALUE, EMPTY, SIMPLE, SIMPLE_MULTIPLE);
+                NO_VALUE, EMPTY_VALUE, EMPTY, UTF8, SIMPLE, SIMPLE_MULTIPLE);
         doTestProcessParametersByteArrayIntInt(
-                EMPTY_VALUE, EMPTY, SIMPLE, SIMPLE_MULTIPLE, NO_VALUE);
+                EMPTY_VALUE, EMPTY, UTF8, SIMPLE, SIMPLE_MULTIPLE, NO_VALUE);
         doTestProcessParametersByteArrayIntInt(
-                EMPTY, SIMPLE, SIMPLE_MULTIPLE, NO_VALUE, EMPTY_VALUE);
+                EMPTY, UTF8, SIMPLE, SIMPLE_MULTIPLE, NO_VALUE, EMPTY_VALUE);
+        doTestProcessParametersByteArrayIntInt(
+                UTF8, SIMPLE, SIMPLE_MULTIPLE, NO_VALUE, EMPTY_VALUE, EMPTY);
     }
 
     // Make sure the inner Parameter class behaves correctly
@@ -68,6 +75,7 @@ public class TestParameters {
 
     private long doTestProcessParametersByteArrayIntInt(
             Parameter... parameters) {
+
         // Build the byte array
         StringBuilder input = new StringBuilder();
         boolean first = true;
@@ -91,6 +99,60 @@ public class TestParameters {
 
         validateParameters(parameters, p);
         return end - start;
+    }
+
+    @Test
+    public void testNonExistantParameter() {
+        Parameters p = new Parameters();
+
+        String value = p.getParameter("foo");
+        assertNull(value);
+
+        Enumeration<String> names = p.getParameterNames();
+        assertFalse(names.hasMoreElements());
+
+        String[] values = p.getParameterValues("foo");
+        assertNull(values);
+    }
+
+
+    @Test
+    public void testAddParameters() {
+        Parameters p = new Parameters();
+
+        // Empty at this point
+        Enumeration<String> names = p.getParameterNames();
+        assertFalse(names.hasMoreElements());
+        String[] values = p.getParameterValues("foo");
+        assertNull(values);
+
+        // Add a parameter with two values
+        p.addParameterValues("foo", new String[] {"value1", "value2"});
+
+        names = p.getParameterNames();
+        assertTrue(names.hasMoreElements());
+        assertEquals("foo", names.nextElement());
+        assertFalse(names.hasMoreElements());
+
+        values = p.getParameterValues("foo");
+        assertEquals(2, values.length);
+        assertEquals("value1", values[0]);
+        assertEquals("value2", values[1]);
+
+        // Add two more values
+        p.addParameterValues("foo", new String[] {"value3", "value4"});
+
+        names = p.getParameterNames();
+        assertTrue(names.hasMoreElements());
+        assertEquals("foo", names.nextElement());
+        assertFalse(names.hasMoreElements());
+
+        values = p.getParameterValues("foo");
+        assertEquals(4, values.length);
+        assertEquals("value1", values[0]);
+        assertEquals("value2", values[1]);
+        assertEquals("value3", values[2]);
+        assertEquals("value4", values[3]);
     }
 
     private void validateParameters(Parameter[] parameters, Parameters p) {
@@ -146,7 +208,7 @@ public class TestParameters {
             StringBuilder result = new StringBuilder();
             boolean first = true;
             if (values.length == 0) {
-                return name;
+                return uencoder.encodeURL(name);
             }
             for (String value : values) {
                 if (first) {
@@ -159,7 +221,7 @@ public class TestParameters {
                 }
                 if (value != null) {
                     result.append('=');
-                    result.append(value);
+                    result.append(uencoder.encodeURL(value));
                 }
             }
 
