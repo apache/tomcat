@@ -99,23 +99,6 @@ public final class Parameters {
     // Access to the current name/values, no side effect ( processing ).
     // You must explicitly call handleQueryParameters and the post methods.
 
-    @Deprecated
-    public void addParameterValues(String key, String[] newValues) {
-        if (key == null) {
-            return;
-        }
-        ArrayList<String> values = paramHashValues.get(key);
-        if (values == null) {
-            values = new ArrayList<String>(newValues.length);
-            paramHashValues.put(key, values);
-        } else {
-            values.ensureCapacity(values.size() + newValues.length);
-        }
-        for (String newValue : newValues) {
-            values.add(newValue);
-        }
-    }
-
     public String[] getParameterValues(String name) {
         handleQueryParameters();
         // no "facade"
