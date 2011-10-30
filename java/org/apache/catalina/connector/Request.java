@@ -2524,13 +2524,13 @@ public class Request
                         if (encoding == null) {
                             encoding = Parameters.DEFAULT_ENCODING;
                         }
-                        parameters.addParameterValues(part.getName(),
-                                new String[] { part.getString(encoding) });
+                        parameters.addParameter(part.getName(),
+                                part.getString(encoding));
                     } catch (UnsupportedEncodingException uee) {
                         try {
-                            parameters.addParameterValues(part.getName(),
-                                    new String[] {part.getString(
-                                            Parameters.DEFAULT_ENCODING)});
+                            parameters.addParameter(part.getName(),
+                                    part.getString(
+                                            Parameters.DEFAULT_ENCODING));
                         } catch (UnsupportedEncodingException e) {
                             // Should not be possible
                         }

@@ -99,6 +99,7 @@ public final class Parameters {
     // Access to the current name/values, no side effect ( processing ).
     // You must explicitly call handleQueryParameters and the post methods.
 
+    @Deprecated
     public void addParameterValues(String key, String[] newValues) {
         if (key == null) {
             return;
@@ -171,7 +172,7 @@ public final class Parameters {
     }
 
 
-    private void addParam( String key, String value ) {
+    public void addParameter( String key, String value ) {
         if( key==null ) {
             return;
         }
@@ -342,7 +343,7 @@ public final class Parameters {
                     value = tmpValue.toString();
                 }
 
-                addParam(name, value);
+                addParameter(name, value);
             } catch (IOException e) {
                 decodeFailCount++;
                 if (decodeFailCount == 1 || log.isDebugEnabled()) {
