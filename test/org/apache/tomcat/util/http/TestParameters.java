@@ -127,7 +127,8 @@ public class TestParameters {
         assertNull(values);
 
         // Add a parameter with two values
-        p.addParameterValues("foo", new String[] {"value1", "value2"});
+        p.addParameter("foo", "value1");
+        p.addParameter("foo", "value2");
 
         names = p.getParameterNames();
         assertTrue(names.hasMoreElements());
@@ -140,7 +141,8 @@ public class TestParameters {
         assertEquals("value2", values[1]);
 
         // Add two more values
-        p.addParameterValues("foo", new String[] {"value3", "value4"});
+        p.addParameter("foo", "value3");
+        p.addParameter("foo", "value4");
 
         names = p.getParameterNames();
         assertTrue(names.hasMoreElements());
