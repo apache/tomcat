@@ -103,13 +103,12 @@ public final class Parameters {
         if (key == null) {
             return;
         }
-        ArrayList<String> values;
-        if (paramHashValues.containsKey(key)) {
-            values = paramHashValues.get(key);
-            values.ensureCapacity(values.size() + newValues.length);
-        } else {
+        ArrayList<String> values = paramHashValues.get(key);
+        if (values == null) {
             values = new ArrayList<String>(newValues.length);
             paramHashValues.put(key, values);
+        } else {
+            values.ensureCapacity(values.size() + newValues.length);
         }
         for (String newValue : newValues) {
             values.add(newValue);
@@ -176,10 +175,8 @@ public final class Parameters {
         if( key==null ) {
             return;
         }
-        ArrayList<String> values;
-        if (paramHashValues.containsKey(key)) {
-            values = paramHashValues.get(key);
-        } else {
+        ArrayList<String> values = paramHashValues.get(key);
+        if (values == null) {
             values = new ArrayList<String>(1);
             paramHashValues.put(key, values);
         }
