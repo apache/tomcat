@@ -63,13 +63,17 @@
         by Joe Kislo and Felix Schumacher. (markt)
       </add>
       <fix>
+        <bug>51744</bug>: Throw the correct exception if an application attempts
+        to modify the associated JNDI context. (markt)
+      </fix>
+      <add>
+        <bug>51744</bug>: Add an option to the StandardContext that allows
+        exception throwing when an application attempts to modify the associated
+        JNDI context to be disabled. (markt)
+      </add>
+      <fix>
         <bug>51910</bug>: Prevent NPE on connector stop if Comet applications
         are being used without the CometConnectionManagerValve. (markt)
-      </fix>
-      <fix>
-        <bug>51940</bug>: Do not limit saving of request bodies during FORM
-        authentication to POST requests since any HTTP method may include a
-        request body. Based on a patch by Nicholas Sushkin. (markt/kkolinko)
       </fix>
       <fix>
         <bug>51956</bug>: RemoteAddrFilter used getRemoteHost instead of
@@ -151,15 +155,6 @@
         Improve performance of parameter processing for GET and POST requests.
         Also add an option to limit the maximum number of parameters processed
         per request. This defaults to 10000. (markt)
-      </add>
-      <fix>
-        <bug>51744</bug>: Throw the correct exception if an application attempts
-        to modify the associated JNDI context. (markt)
-      </fix>
-      <add>
-        <bug>51744</bug>: Add an option to the StandardContext that allows
-        exception throwing when an application attempts to modify the associated
-        JNDI context to be disabled. (markt)
       </add>
       <fix>
         <bug>52091</bug>: Address performance issues related to lock contention
