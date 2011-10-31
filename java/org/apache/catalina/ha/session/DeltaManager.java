@@ -264,7 +264,7 @@ public class DeltaManager extends ClusterManagerBase{
     }
 
     /**
-     * @return Returns the counterReceive_EVT_CHANGE_SESSION_ID.
+     * @return Returns the counterReceive_EVT_ALL_SESSION_NOCONTEXTMANAGER.
      */
     public long getCounterReceive_EVT_ALL_SESSION_NOCONTEXTMANAGER() {
         return counterReceive_EVT_ALL_SESSION_NOCONTEXTMANAGER;
