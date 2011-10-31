@@ -141,6 +141,11 @@
       type="long"
       writeable="false"/>
     <attribute
+      name="counterReceive_EVT_ALL_SESSION_NOCONTEXTMANAGER"
+      description="Count receive EVT_ALL_SESSION_NOCONTEXTMANAGER messages"
+      type="long"
+      writeable="false"/>
+    <attribute
       name="counterSend_EVT_GET_ALL_SESSIONS"
       description="Count send EVT_GET_ALL_SESSIONS messages"
       type="long"
@@ -307,6 +312,11 @@
       description="Number of sessions we rejected due to maxActive beeing reached"
       type="int"
       writeable="false"/>
+    <attribute
+      name="noContextManagerReceived"
+      is="true"
+      description="Is no context manager message received? "
+      type="boolean"/>
     <operation
       name="expireSession"
       description="Expired the given session"

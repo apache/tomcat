@@ -83,6 +83,9 @@ public class SessionMessageImpl extends ClusterMessageBase implements SessionMes
      *    after GET_ALL_SESSION received from this sender.<BR>
      * <B>EVT_CHANGE_SESSION_ID</B><BR>
      *    send original sessionID and new sessionID.<BR>
+     * <B>EVT_ALL_SESSION_NOCONTEXTMANAGER</B><BR>
+     *    send that context manager does not exist
+     *    after GET_ALL_SESSION received from this sender.<BR>
      * @param contextName - the name of the context (application
      * @param eventtype - one of the 8 event type defined in this class
      * @param session - the serialized byte array of the session itself
@@ -151,6 +154,7 @@ public class SessionMessageImpl extends ClusterMessageBase implements SessionMes
             case EVT_ALL_SESSION_DATA : return "ALL-SESSION-DATA";
             case EVT_ALL_SESSION_TRANSFERCOMPLETE : return "SESSION-STATE-TRANSFERED";
             case EVT_CHANGE_SESSION_ID : return "SESSION-ID-CHANGED";
+            case EVT_ALL_SESSION_NOCONTEXTMANAGER : return "NO-CONTEXT-MANAGER";
             default : return "UNKNOWN-EVENT-TYPE";
         }
     }
