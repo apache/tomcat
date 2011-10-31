@@ -21,8 +21,10 @@ import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Enumeration;
-import java.util.Hashtable;
+import java.util.HashMap;
+import java.util.Map;
 
+import org.apache.catalina.util.Enumerator;
 import org.apache.tomcat.util.buf.B2CConverter;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.buf.CharChunk;
@@ -42,8 +44,8 @@ public final class Parameters {
     protected static final StringManager sm =
         StringManager.getManager("org.apache.tomcat.util.http");
 
-    private final Hashtable<String,ArrayList<String>> paramHashValues =
-        new Hashtable<String,ArrayList<String>>();
+    private final HashMap<String,ArrayList<String>> paramHashValues =
+        new HashMap<String,ArrayList<String>>();
     private boolean didQueryParameters=false;
 
     MessageBytes queryMB;
@@ -111,7 +113,7 @@ public final class Parameters {
 
     public Enumeration<String> getParameterNames() {
         handleQueryParameters();
-        return paramHashValues.keys();
+        return new Enumerator<String>(paramHashValues.keySet());
     }
 
     // Shortcut.
@@ -394,12 +396,10 @@ public final class Parameters {
      */
     public String paramsAsString() {
         StringBuilder sb = new StringBuilder();
-        Enumeration<String> en = paramHashValues.keys();
-        while (en.hasMoreElements()) {
-            String k = en.nextElement();
-            sb.append(k).append('=');
-            ArrayList<String> values = paramHashValues.get(k);
-            for(String value : values) {
+        for (Map.Entry<String, ArrayList<String>> e : paramHashValues.entrySet()) {
+            sb.append(e.getKey()).append('=');
+            ArrayList<String> values = e.getValue();
+            for (String value : values) {
                 sb.append(value).append(',');
             }
             sb.append('\n');
