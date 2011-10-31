@@ -84,7 +84,7 @@ public interface SessionMessage extends ClusterMessage {
 
     /**
      * Event type used when context manager doesn't exist.
-     * This is used when the manager which send a session state does not exist. 
+     * This is used when the manager which send a session state does not exist.
      */
     public static final int EVT_ALL_SESSION_NOCONTEXTMANAGER = 16;
 
