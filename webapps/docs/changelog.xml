@@ -230,6 +230,11 @@
         to be observed in the clustering module than the HTTP or AJP NIO
         connector. (markt) 
       </fix>
+      <add>
+        When Context manager does not exist, no context manager message is 
+        replied in order to avoid timeout (default 60sec) of 
+        GET_ALL_SESSIONS sync phase. (kfujino)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Web applications">
