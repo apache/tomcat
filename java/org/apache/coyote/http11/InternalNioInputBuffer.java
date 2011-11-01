@@ -469,6 +469,11 @@ public class InternalNioInputBuffer extends AbstractInputBuffer<NioChannel> {
     @Override
     public boolean parseHeaders()
         throws IOException {
+        if (!parsingHeader) {
+            throw new IllegalStateException(
+                    sm.getString("iib.parseheaders.ise.error"));
+        }
+
         HeaderParseStatus status = HeaderParseStatus.HAVE_MORE_HEADERS;
         
         do {

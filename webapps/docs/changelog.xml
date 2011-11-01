@@ -193,6 +193,10 @@
         Fix threading issue in NIO connectors during shutdown that meant Comet
         connections were not always shut down cleanly. (markt)
       </fix>
+      <add>
+        In HTTP connectors: self-guard against using a non-recycled input
+        buffer. Requests will be rejected with response status 400. (kkolinko)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Jasper">
