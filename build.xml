@@ -472,13 +472,15 @@
     </checkstyle>
   </target>
 
-  <target name="compile" depends="build-prepare,download-compile,validate">
-
+  <target name="compile-prepare">
     <!-- Add the builtin catalina.properties -->
     <copy todir="java/org/apache/catalina/startup"
           file="conf/catalina.properties" encoding="ISO-8859-1">
       <filterset refid="version.filters"/>
     </copy>
+  </target>
+
+  <target name="compile" depends="build-prepare,download-compile,compile-prepare,validate">
     <!-- Compile internal server components -->
     <javac srcdir="java" destdir="${tomcat.classes}"
            debug="${compile.debug}"
