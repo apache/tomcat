@@ -29,6 +29,7 @@ import java.util.EnumSet;
 import java.util.Enumeration;
 import java.util.EventListener;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -66,7 +67,6 @@ import org.apache.catalina.Service;
 import org.apache.catalina.Wrapper;
 import org.apache.catalina.connector.Connector;
 import org.apache.catalina.deploy.FilterDef;
-import org.apache.catalina.util.Enumerator;
 import org.apache.catalina.util.RequestUtil;
 import org.apache.catalina.util.ResourceSet;
 import org.apache.catalina.util.ServerInfo;
@@ -232,9 +232,9 @@ public class ApplicationContext
      */
     @Override
     public Enumeration<String> getAttributeNames() {
-
-        return new Enumerator<String>(attributes.keySet(), true);
-
+        Set<String> names = new HashSet<String>();
+        names.addAll(attributes.keySet());
+        return Collections.enumeration(names);
     }
 
 
@@ -316,7 +316,7 @@ public class ApplicationContext
      */
     @Override
     public Enumeration<String> getInitParameterNames() {
-        return (new Enumerator<String>(parameters.keySet()));
+        return Collections.enumeration(parameters.keySet());
     }
 
 
@@ -670,7 +670,7 @@ public class ApplicationContext
     @Override
     @Deprecated
     public Enumeration<String> getServletNames() {
-        return (new Enumerator<String>(emptyString));
+        return Collections.enumeration(emptyString);
     }
 
 
@@ -680,7 +680,7 @@ public class ApplicationContext
     @Override
     @Deprecated
     public Enumeration<Servlet> getServlets() {
-        return (new Enumerator<Servlet>(emptyServlet));
+        return Collections.enumeration(emptyServlet);
     }
 
 

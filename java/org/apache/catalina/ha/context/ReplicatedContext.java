@@ -17,7 +17,10 @@
 package org.apache.catalina.ha.context;
 
 import java.util.AbstractMap;
+import java.util.Collections;
 import java.util.Enumeration;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.servlet.ServletContext;
@@ -31,7 +34,6 @@ import org.apache.catalina.ha.CatalinaCluster;
 import org.apache.catalina.tribes.Channel;
 import org.apache.catalina.tribes.tipis.AbstractReplicatedMap.MapOwner;
 import org.apache.catalina.tribes.tipis.ReplicatedMap;
-import org.apache.catalina.util.Enumerator;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
@@ -175,11 +177,13 @@ public class ReplicatedContext extends StandardContext implements MapOwner {
         @SuppressWarnings("unchecked")
         @Override
         public Enumeration<String> getAttributeNames() {
+            Set<String> names = new HashSet<String>();
+            names.addAll(attributes.keySet());
+
             return new MultiEnumeration<String>(new Enumeration[] {
                     super.getAttributeNames(),
-                    new Enumerator<String>(tomcatAttributes.keySet(), true)});
+                    Collections.enumeration(names) });
         }
-
     }
 
     protected static class MultiEnumeration<T> implements Enumeration<T> {

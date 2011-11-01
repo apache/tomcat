@@ -29,10 +29,12 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.TimeZone;
 import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -69,7 +71,6 @@ import org.apache.catalina.core.ApplicationSessionCookieConfig;
 import org.apache.catalina.core.AsyncContextImpl;
 import org.apache.catalina.deploy.LoginConfig;
 import org.apache.catalina.realm.GenericPrincipal;
-import org.apache.catalina.util.Enumerator;
 import org.apache.catalina.util.ParameterMap;
 import org.apache.catalina.util.StringParser;
 import org.apache.coyote.ActionCode;
@@ -965,7 +966,11 @@ public class Request
         if (isSecure() && !sslAttributesParsed) {
             getAttribute(Globals.CERTIFICATES_ATTR);
         }
-        return new Enumerator<String>(attributes.keySet(), true);
+        // Take a copy to prevent ConncurrentModificationExceptions if used to
+        // remove attributes
+        Set<String> names = new HashSet<String>();
+        names.addAll(attributes.keySet());
+        return Collections.enumeration(names);
     }
 
 
@@ -1057,11 +1062,11 @@ public class Request
         }
 
         if (locales.size() > 0) {
-            return (new Enumerator<Locale>(locales));
+            return Collections.enumeration(locales);
         }
         ArrayList<Locale> results = new ArrayList<Locale>();
         results.add(defaultLocale);
-        return new Enumerator<Locale>(results);
+        return Collections.enumeration(results);
 
     }
 

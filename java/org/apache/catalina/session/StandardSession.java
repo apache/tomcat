@@ -29,11 +29,14 @@ import java.security.AccessController;
 import java.security.Principal;
 import java.security.PrivilegedAction;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Enumeration;
-import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -55,7 +58,6 @@ import org.apache.catalina.SessionListener;
 import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.realm.GenericPrincipal;
 import org.apache.catalina.security.SecurityUtil;
-import org.apache.catalina.util.Enumerator;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.res.StringManager;
 
@@ -1180,8 +1182,9 @@ public class StandardSession implements HttpSession, Session, Serializable {
             throw new IllegalStateException
                 (sm.getString("standardSession.getAttributeNames.ise"));
 
-        return (new Enumerator<String>(attributes.keySet(), true));
-
+        Set<String> names = new HashSet<String>();
+        names.addAll(attributes.keySet());
+        return Collections.enumeration(names);
     }
 
 
@@ -1870,8 +1873,7 @@ public class StandardSession implements HttpSession, Session, Serializable {
 final class StandardSessionContext
         implements javax.servlet.http.HttpSessionContext {
 
-
-    protected HashMap<?,String> dummy = new HashMap<String,String>();
+    private static final List<String> emptyString = Collections.emptyList();
 
     /**
      * Return the session identifiers of all sessions defined
@@ -1884,9 +1886,7 @@ final class StandardSessionContext
     @Override
     @Deprecated
     public Enumeration<String> getIds() {
-
-        return (new Enumerator<String>(dummy));
-
+        return Collections.enumeration(emptyString);
     }
 
 
@@ -1903,10 +1903,6 @@ final class StandardSessionContext
     @Override
     @Deprecated
     public HttpSession getSession(String id) {
-
         return (null);
-
     }
-
-
 }
