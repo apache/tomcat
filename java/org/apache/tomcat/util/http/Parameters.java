@@ -317,18 +317,16 @@ public final class Parameters {
                 String value;
 
                 if (decodeName) {
-                    name = urlDecode(tmpName, charset);
-                } else {
-                    tmpName.setCharset(charset);
-                    name = tmpName.toString();
+                    urlDecode(tmpName);
                 }
+                tmpName.setCharset(charset);
+                name = tmpName.toString();
 
                 if (decodeValue) {
-                    value = urlDecode(tmpValue, charset);
-                } else {
-                    tmpValue.setCharset(charset);
-                    value = tmpValue.toString();
+                    urlDecode(tmpValue);
                 }
+                tmpValue.setCharset(charset);
+                value = tmpValue.toString();
 
                 addParameter(name, value);
             } catch (IOException e) {
@@ -359,14 +357,12 @@ public final class Parameters {
         }
     }
 
-    private String urlDecode(ByteChunk bc, Charset charset)
+    private void urlDecode(ByteChunk bc)
         throws IOException {
         if( urlDec==null ) {
             urlDec=new UDecoder();
         }
         urlDec.convert(bc);
-        bc.setCharset(charset);
-        return bc.toString();
     }
 
     public void processParameters( MessageBytes data, String encoding ) {
