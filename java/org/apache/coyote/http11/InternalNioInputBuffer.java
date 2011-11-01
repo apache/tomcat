@@ -88,7 +88,11 @@ public class InternalNioInputBuffer extends AbstractInputBuffer<NioChannel> {
         /**
          * Reading all bytes until the next CRLF. The line is being ignored.
          */
-        HEADER_SKIPLINE
+        HEADER_SKIPLINE,
+        /**
+         * Done parsing headers. Request body should follow.
+         */
+        HEADERS_DONE
     }
 
     // ----------------------------------------------------------- Constructors
@@ -469,6 +473,11 @@ public class InternalNioInputBuffer extends AbstractInputBuffer<NioChannel> {
     @Override
     public boolean parseHeaders()
         throws IOException {
+        if (headerParsePos == HeaderParsePosition.HEADERS_DONE) {
+            throw new IllegalStateException(
+                    sm.getString("iib.parseheaders.ise.error"));
+        }
+
         HeaderParseStatus status = HeaderParseStatus.HAVE_MORE_HEADERS;
 
         do {
@@ -527,6 +536,7 @@ public class InternalNioInputBuffer extends AbstractInputBuffer<NioChannel> {
                 // Skip
             } else if (chr == Constants.LF) {
                 pos++;
+                headerParsePos = HeaderParsePosition.HEADERS_DONE;
                 return HeaderParseStatus.DONE;
             } else {
                 break;
