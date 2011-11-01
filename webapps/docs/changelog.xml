@@ -169,6 +169,10 @@
         Switch to using Collections.enumeration() rather than custom code that
         does the same thing. (markt)
       </scode>
+      <fix>
+        <bug>52113</bug>: Don't assume presence of context.xml file with JMX
+        deployment. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
