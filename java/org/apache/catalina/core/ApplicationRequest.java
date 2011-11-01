@@ -19,14 +19,13 @@
 package org.apache.catalina.core;
 
 
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletRequestWrapper;
-
-import org.apache.catalina.util.Enumerator;
 
 
 /**
@@ -120,7 +119,7 @@ class ApplicationRequest extends ServletRequestWrapper {
     public Enumeration<String> getAttributeNames() {
 
         synchronized (attributes) {
-            return (new Enumerator<String>(attributes.keySet()));
+            return Collections.enumeration(attributes.keySet());
         }
 
     }

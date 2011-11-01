@@ -21,6 +21,7 @@ package org.apache.catalina.core;
 import java.io.PrintStream;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -58,7 +59,6 @@ import org.apache.catalina.LifecycleState;
 import org.apache.catalina.Wrapper;
 import org.apache.catalina.mbeans.MBeanUtils;
 import org.apache.catalina.security.SecurityUtil;
-import org.apache.catalina.util.Enumerator;
 import org.apache.catalina.util.InstanceSupport;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -1526,7 +1526,7 @@ public class StandardWrapper extends ContainerBase
 
         try {
             parametersLock.readLock().lock();
-            return (new Enumerator<String>(parameters.keySet()));
+            return Collections.enumeration(parameters.keySet());
         } finally {
             parametersLock.readLock().unlock();
         }
