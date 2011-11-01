@@ -319,12 +319,14 @@ public final class Parameters {
                 if (decodeName) {
                     name = urlDecode(tmpName, charset);
                 } else {
+                    tmpName.setCharset(charset);
                     name = tmpName.toString();
                 }
 
                 if (decodeValue) {
                     value = urlDecode(tmpValue, charset);
                 } else {
+                    tmpValue.setCharset(charset);
                     value = tmpValue.toString();
                 }
 
