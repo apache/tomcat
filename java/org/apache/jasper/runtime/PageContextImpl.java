@@ -23,6 +23,7 @@ import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 
@@ -54,7 +55,6 @@ import org.apache.jasper.el.ExpressionEvaluatorImpl;
 import org.apache.jasper.el.FunctionMapperImpl;
 import org.apache.jasper.el.VariableResolverImpl;
 import org.apache.jasper.security.SecurityUtil;
-import org.apache.jasper.util.Enumerator;
 
 /**
  * Implementation of the PageContext class from the JSP spec. Also doubles as a
@@ -522,7 +522,7 @@ public class PageContextImpl extends PageContext {
     private Enumeration<String> doGetAttributeNamesInScope(int scope) {
         switch (scope) {
         case PAGE_SCOPE:
-            return new Enumerator<String>(attributes.keySet().iterator());
+            return Collections.enumeration(attributes.keySet());
 
         case REQUEST_SCOPE:
             return request.getAttributeNames();
