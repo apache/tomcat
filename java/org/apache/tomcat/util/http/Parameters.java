@@ -20,11 +20,11 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.catalina.util.Enumerator;
 import org.apache.tomcat.util.buf.B2CConverter;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.buf.CharChunk;
@@ -113,7 +113,7 @@ public final class Parameters {
 
     public Enumeration<String> getParameterNames() {
         handleQueryParameters();
-        return new Enumerator<String>(paramHashValues.keySet());
+        return Collections.enumeration(paramHashValues.keySet());
     }
 
     // Shortcut.
