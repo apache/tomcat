@@ -304,6 +304,10 @@ public class InternalAprInputBuffer extends AbstractInputBuffer<Long> {
     @Override
     public boolean parseHeaders()
         throws IOException {
+        if (!parsingHeader) {
+            throw new IllegalStateException(
+                    sm.getString("iib.parseheaders.ise.error"));
+        }
 
         while (parseHeader()) {
             // Loop until there are no more headers
