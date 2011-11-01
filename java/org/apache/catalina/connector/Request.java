@@ -22,6 +22,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
 import java.security.Principal;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -2520,26 +2521,59 @@ public class Request
         parts = new ArrayList<Part>();
         try {
             List<FileItem> items = upload.parseRequest(this);
+            int maxPostSize = getConnector().getMaxPostSize();
+            int postSize = 0;
+            String enc = getCharacterEncoding();
+            Charset charset = null;
+            if (enc != null) {
+                try {
+                    charset = B2CConverter.getCharset(enc);
+                } catch (UnsupportedEncodingException e) {
+                    // Ignore
+                }
+            }
             for (FileItem item : items) {
                 ApplicationPart part = new ApplicationPart(item, mce);
                 parts.add(part);
                 if (part.getFilename() == null) {
+                    String name = part.getName();
+                    String value = null;
                     try {
                         String encoding = parameters.getEncoding();
                         if (encoding == null) {
                             encoding = Parameters.DEFAULT_ENCODING;
                         }
-                        parameters.addParameter(part.getName(),
-                                part.getString(encoding));
+                        value = part.getString(encoding);
                     } catch (UnsupportedEncodingException uee) {
                         try {
-                            parameters.addParameter(part.getName(),
-                                    part.getString(
-                                            Parameters.DEFAULT_ENCODING));
+                            value = part.getString(Parameters.DEFAULT_ENCODING);
                         } catch (UnsupportedEncodingException e) {
                             // Should not be possible
                         }
                     }
+                    if (maxPostSize > 0) {
+                        // Have to calculate equivalent size. Not completely
+                        // accurate but close enough.
+                        if (charset == null) {
+                            // Name length
+                            postSize += name.getBytes().length;
+                        } else {
+                            postSize += name.getBytes(charset).length;
+                        }
+                        if (value != null) {
+                            // Equals sign
+                            postSize++;
+                            // Value length
+                            postSize += part.getSize();
+                        }
+                        // Value separator
+                        postSize++;
+                        if (postSize > maxPostSize) {
+                            throw new IllegalStateException(sm.getString(
+                                    "coyoteRequest.maxPostSizeExceeded"));
+                        }
+                    }
+                    parameters.addParameter(name, value);
                 }
             }
 

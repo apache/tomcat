@@ -157,10 +157,21 @@ public final class Parameters {
     }
 
 
-    public void addParameter( String key, String value ) {
+    public void addParameter( String key, String value )
+            throws IllegalStateException {
+
         if( key==null ) {
             return;
         }
+
+        parameterCount ++;
+        if (limit > -1 && parameterCount > limit) {
+            // Processing this parameter will push us over the limit. ISE is
+            // what Request.parseParts() uses for requests that are too big
+            throw new IllegalStateException(sm.getString(
+                    "parameters.maxCountFail", Integer.valueOf(limit)));
+        }
+
         ArrayList<String> values = paramHashValues.get(key);
         if (values == null) {
             values = new ArrayList<String>(1);
@@ -204,13 +215,6 @@ public final class Parameters {
         int end = start + len;
 
         while(pos < end) {
-            parameterCount ++;
-
-            if (limit > -1 && parameterCount >= limit) {
-                log.warn(sm.getString("parameters.maxCountFail",
-                        Integer.valueOf(limit)));
-                break;
-            }
             int nameStart = pos;
             int nameEnd = -1;
             int valueStart = -1;
@@ -328,7 +332,14 @@ public final class Parameters {
                 tmpValue.setCharset(charset);
                 value = tmpValue.toString();
 
-                addParameter(name, value);
+                try {
+                    addParameter(name, value);
+                } catch (IllegalStateException ise) {
+                    // Hitting limit stops processing further params but does
+                    // not cause request to fail.
+                    log.warn(ise.getMessage());
+                    break;
+                }
             } catch (IOException e) {
                 decodeFailCount++;
                 if (decodeFailCount == 1 || log.isDebugEnabled()) {
