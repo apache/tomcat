@@ -594,7 +594,9 @@ public class MBeanFactory {
                                                              "configBaseName");
             String baseName = context.getBaseName();
             File configFile = new File(new File(configPath), baseName+".xml");
-            context.setConfigFile(configFile.toURI().toURL());
+            if (configFile.isFile()) {
+                context.setConfigFile(configFile.toURI().toURL());
+            }
             mserver.invoke(deployer, "manageApp",
                            new Object[] {context},
                            new String[] {"org.apache.catalina.Context"});
