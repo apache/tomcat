@@ -2747,6 +2747,9 @@ public class Request
             partsParseException = new IllegalStateException(e);
         } catch (FileUploadException e) {
             partsParseException = new IOException(e);
+        } catch (IllegalStateException e) {
+            checkSwallowInput();
+            partsParseException = e;
         }
         
         return;
