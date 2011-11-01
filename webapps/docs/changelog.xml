@@ -165,6 +165,10 @@
         <bug>52091</bug>: Address performance issues related to lock contention
         StandardWrapper. Patch provided by Taiki Sugawara. (markt)
       </fix>
+      <scode>
+        Switch to using Collections.enumeration() rather than custom code that
+        does the same thing. (markt)
+      </scode>
     </changelog>
   </subsection>
   <subsection name="Coyote">
@@ -206,6 +210,10 @@
         <bug>52091</bug>: Address performance issues related to log creation
         TagHandlerPool. Patch provided by Taiki Sugawara. (markt)
       </fix>
+      <scode>
+        Switch to using Collections.enumeration() rather than custom code that
+        does the same thing. (markt)
+      </scode>
     </changelog>
   </subsection>
   <subsection name="Cluster">
