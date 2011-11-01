@@ -35,7 +35,7 @@ import java.util.NoSuchElementException;
  * @author Craig R. McClanahan
  * @version $Id$
  */
-
+@Deprecated
 public final class Enumerator<T> implements Enumeration<T> {
 
 
