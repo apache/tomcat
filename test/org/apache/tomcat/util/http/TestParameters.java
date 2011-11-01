@@ -21,6 +21,7 @@ import java.util.Enumeration;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import org.junit.Test;
@@ -44,24 +45,33 @@ public class TestParameters {
 
     @Test
     public void testProcessParametersByteArrayIntInt() {
-        doTestProcessParametersByteArrayIntInt(SIMPLE);
-        doTestProcessParametersByteArrayIntInt(SIMPLE_MULTIPLE);
-        doTestProcessParametersByteArrayIntInt(NO_VALUE);
-        doTestProcessParametersByteArrayIntInt(EMPTY_VALUE);
-        doTestProcessParametersByteArrayIntInt(EMPTY);
-        doTestProcessParametersByteArrayIntInt(UTF8);
-        doTestProcessParametersByteArrayIntInt(
+        doTestProcessParametersByteArrayIntInt(-1, SIMPLE);
+        doTestProcessParametersByteArrayIntInt(-1, SIMPLE_MULTIPLE);
+        doTestProcessParametersByteArrayIntInt(-1, NO_VALUE);
+        doTestProcessParametersByteArrayIntInt(-1, EMPTY_VALUE);
+        doTestProcessParametersByteArrayIntInt(-1, EMPTY);
+        doTestProcessParametersByteArrayIntInt(-1, UTF8);
+        doTestProcessParametersByteArrayIntInt(-1,
                 SIMPLE, SIMPLE_MULTIPLE, NO_VALUE, EMPTY_VALUE, EMPTY, UTF8);
-        doTestProcessParametersByteArrayIntInt(
+        doTestProcessParametersByteArrayIntInt(-1,
                 SIMPLE_MULTIPLE, NO_VALUE, EMPTY_VALUE, EMPTY, UTF8, SIMPLE);
-        doTestProcessParametersByteArrayIntInt(
+        doTestProcessParametersByteArrayIntInt(-1,
                 NO_VALUE, EMPTY_VALUE, EMPTY, UTF8, SIMPLE, SIMPLE_MULTIPLE);
-        doTestProcessParametersByteArrayIntInt(
+        doTestProcessParametersByteArrayIntInt(-1,
                 EMPTY_VALUE, EMPTY, UTF8, SIMPLE, SIMPLE_MULTIPLE, NO_VALUE);
-        doTestProcessParametersByteArrayIntInt(
+        doTestProcessParametersByteArrayIntInt(-1,
                 EMPTY, UTF8, SIMPLE, SIMPLE_MULTIPLE, NO_VALUE, EMPTY_VALUE);
-        doTestProcessParametersByteArrayIntInt(
+        doTestProcessParametersByteArrayIntInt(-1,
                 UTF8, SIMPLE, SIMPLE_MULTIPLE, NO_VALUE, EMPTY_VALUE, EMPTY);
+
+        doTestProcessParametersByteArrayIntInt(1,
+                SIMPLE, NO_VALUE, EMPTY_VALUE, UTF8);
+        doTestProcessParametersByteArrayIntInt(2,
+                SIMPLE, NO_VALUE, EMPTY_VALUE, UTF8);
+        doTestProcessParametersByteArrayIntInt(3,
+                SIMPLE, NO_VALUE, EMPTY_VALUE, UTF8);
+        doTestProcessParametersByteArrayIntInt(4,
+                SIMPLE, NO_VALUE, EMPTY_VALUE, UTF8);
     }
 
     // Make sure the inner Parameter class behaves correctly
@@ -73,7 +83,7 @@ public class TestParameters {
         assertEquals("foo4=", EMPTY_VALUE.toString());
     }
 
-    private long doTestProcessParametersByteArrayIntInt(
+    private long doTestProcessParametersByteArrayIntInt(int limit,
             Parameter... parameters) {
 
         // Build the byte array
@@ -92,12 +102,19 @@ public class TestParameters {
 
         Parameters p = new Parameters();
         p.setEncoding("UTF-8");
+        p.setLimit(limit);
 
         long start = System.nanoTime();
         p.processParameters(data, 0, data.length);
         long end = System.nanoTime();
 
-        validateParameters(parameters, p);
+        if (limit == -1) {
+            validateParameters(parameters, p);
+        } else {
+            Parameter[] limitParameters = new Parameter[limit];
+            System.arraycopy(parameters, 0, limitParameters, 0, limit);
+            validateParameters(limitParameters, p);
+        }
         return end - start;
     }
 
@@ -155,6 +172,73 @@ public class TestParameters {
         assertEquals("value2", values[1]);
         assertEquals("value3", values[2]);
         assertEquals("value4", values[3]);
+    }
+
+    @Test
+    public void testAddParametersLimit() {
+        Parameters p = new Parameters();
+
+        p.setLimit(2);
+
+        // Empty at this point
+        Enumeration<String> names = p.getParameterNames();
+        assertFalse(names.hasMoreElements());
+        String[] values = p.getParameterValues("foo1");
+        assertNull(values);
+
+        // Add a parameter
+        p.addParameter("foo1", "value1");
+
+        names = p.getParameterNames();
+        assertTrue(names.hasMoreElements());
+        assertEquals("foo1", names.nextElement());
+        assertFalse(names.hasMoreElements());
+
+        values = p.getParameterValues("foo1");
+        assertEquals(1, values.length);
+        assertEquals("value1", values[0]);
+
+        // Add another parameter
+        p.addParameter("foo2", "value2");
+
+        names = p.getParameterNames();
+        assertTrue(names.hasMoreElements());
+        assertEquals("foo2", names.nextElement());
+        assertEquals("foo1", names.nextElement());
+        assertFalse(names.hasMoreElements());
+
+        values = p.getParameterValues("foo1");
+        assertEquals(1, values.length);
+        assertEquals("value1", values[0]);
+
+        values = p.getParameterValues("foo2");
+        assertEquals(1, values.length);
+        assertEquals("value2", values[0]);
+
+        // Add another parameter
+        IllegalStateException e = null;
+        try {
+            p.addParameter("foo3", "value3");
+        } catch (IllegalStateException ise) {
+            e = ise;
+        }
+        assertNotNull(e);
+
+        // Check current parameters remain unaffected
+        names = p.getParameterNames();
+        assertTrue(names.hasMoreElements());
+        assertEquals("foo2", names.nextElement());
+        assertEquals("foo1", names.nextElement());
+        assertFalse(names.hasMoreElements());
+
+        values = p.getParameterValues("foo1");
+        assertEquals(1, values.length);
+        assertEquals("value1", values[0]);
+
+        values = p.getParameterValues("foo2");
+        assertEquals(1, values.length);
+        assertEquals("value2", values[0]);
+
     }
 
     private void validateParameters(Parameter[] parameters, Parameters p) {
