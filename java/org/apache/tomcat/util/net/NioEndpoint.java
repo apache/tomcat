@@ -1055,7 +1055,14 @@ public class NioEndpoint extends AbstractEndpoint {
                                 "endpoint.debug.socketCloseFail"), e);
                     }
                 }
-                try {if (ka!=null && ka.getSendfileData()!=null && ka.getSendfileData().fchannel!=null && ka.getSendfileData().fchannel.isOpen()) ka.getSendfileData().fchannel.close();}catch (Exception ignore){}
+                try {
+                    if (ka != null && ka.getSendfileData() != null
+                            && ka.getSendfileData().fchannel != null
+                            && ka.getSendfileData().fchannel.isOpen()) {
+                        ka.getSendfileData().fchannel.close();
+                    }
+                } catch (Exception ignore) {
+                }
                 if (ka!=null) {
                     ka.reset();
                     countDownConnection();
