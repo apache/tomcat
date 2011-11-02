@@ -37,22 +37,12 @@ Running With JRE 6.0 Or Later
 (1.2) Install the JRE according to the instructions included with the
       release.
 
-(1.3) Set an environment variable named JRE_HOME to the pathname of
-      the directory into which you installed the JRE, e.g. c:\jre6.0
-      or /usr/local/java/jre6.0.
-
-NOTE: You may also use the full JDK rather than just the JRE. In this
-      case set your JAVA_HOME environment variable to the pathname of
-      the directory into which you installed the JDK, e.g. c:\jdk6.0
-      or /usr/local/java/jdk6.0.
+      You may also use the full JDK rather than just the JRE. In this
+      case set you have to configure your environment variables
+      differently - see below.
 
 
 (2) Download and Install the Tomcat Binary Distribution
-
-NOTE:  As an alternative to downloading a binary distribution, you can create
-your own from the Tomcat source repository, as described in "BUILDING.txt".
-If you do this, the value to use for "${catalina.home}" will be the "dist"
-subdirectory of your source distribution.
 
 (2.1) Download a binary distribution of Tomcat from:
 
@@ -60,43 +50,112 @@ subdirectory of your source distribution.
 
 (2.2) Unpack the binary distribution into a convenient location so that the
       distribution resides in its own directory (conventionally named
-      "apache-tomcat-[version]").  For the purposes of the remainder of this document,
-      the symbolic name "$CATALINA_HOME" is used to refer to the full
-      pathname of the release directory.
+      "apache-tomcat-[version]").
 
-NOTE: The scripts expect that the $CATALINA_HOME environment variable is
-either set to the correct value, as defined above, or is absent. In the
-latter case the scripts will try to calculate the value for $CATALINA_HOME
-by themselves.
+      For the purposes of the remainder of this document, the name
+      "CATALINA_HOME" is used to refer to the full pathname of the release
+      directory.
+
+NOTE:  As an alternative to downloading a binary distribution, you can
+create your own from the Tomcat source code, as described in
+"BUILDING.txt".  You can either
+
+  a)  Do the full "release" build and find the created distributive in the
+      "output/release" directory and then proceed with unpacking as above, or
+
+  b)  Do a simple build and use the "output/build" directory as
+      "CATALINA_HOME".  Be warned that there are some differences between
+      contents of "output/build" and the official "release" distributive.
 
 
-(3) Start Up Tomcat
+(3) Configure Environment Variables
 
-(3.1) Tomcat can be started by executing the following commands:
+Tomcat itself is a Java application and does not use environment variables,
+but the startup scripts use them to prepare the command that starts Tomcat.
+The full list of supported environment variables is provided as a comment
+at the top of catalina.bat (Windows) and catalina.sh (Unix) files.
 
-      $CATALINA_HOME\bin\startup.bat          (Windows)
+(3.1) CATALINA_HOME and CATALINA_BASE
+
+The CATALINA_HOME and CATALINA_BASE environment variables are used to
+specify location of Tomcat itself and of its active configuration
+respectively.
+
+The CATALINA_HOME environment variable should be set as defined in (2.2)
+above. The startup scripts have some logic to set this variable
+automatically if it is absent (based on the location of the script in
+Unixes and on the current directory in Windows), but it might be not
+perfect.
+
+The CATALINA_BASE environment variable is optional and is further described
+in "Multiple Tomcat Instances" section below. If it is not set it defaults
+to be equal to CATALINA_HOME.
+
+(3.2) JRE_HOME and other variables
+
+The third and the last environment variable that is needed to start Tomcat
+specifies location of JRE or JDK that should be used to start Tomcat.
+
+There are two different names of this variable, depending on whether JRE or
+JDK is used. Use the JRE_HOME variable to specify location of a JRE and
+JAVA_HOME variable to specify location of a JDK.
+
+All variables except CATALINA_HOME and CATALINA_BASE can be configured in a
+setenv.bat (Windows) or setenv.sh (Unix) file. The setenv file can be either
+in CATALINA_BASE/bin or in CATALINA_HOME/bin. If both are present, only the
+one in CATALINA_BASE is used.
+
+So, either set JRE_HOME variable by yourselves or create the file. For
+example,
+
+On Windows, %CATALINA_BASE%\bin\setenv.bat:
+
+  set "JRE_HOME=%ProgramFiles%\Java\jre6"
+  exit /b 0
+
+On Unix, $CATALINA_BASE/bin/setenv.sh:
+
+  JRE_HOME=/usr/java/latest
+
+
+(4) Start Up Tomcat
+
+(4.1) Tomcat can be started by executing one of the following commands:
+
+      %CATALINA_HOME%\bin\startup.bat         (Windows)
 
       $CATALINA_HOME/bin/startup.sh           (Unix)
 
-(3.2) After startup, the default web applications included with Tomcat will be
+   or
+
+      %CATALINA_HOME%\bin\catalina.bat start  (Windows)
+
+      $CATALINA_HOME/bin/catalina.sh start    (Unix)
+
+(4.2) After startup, the default web applications included with Tomcat will be
       available by visiting:
 
       http://localhost:8080/
 
-(3.3) Further information about configuring and running Tomcat can be found in
+(4.3) Further information about configuring and running Tomcat can be found in
       the documentation included here, as well as on the Tomcat web site:
 
       http://tomcat.apache.org/
 
 
-(4) Shut Down Tomcat
+(5) Shut Down Tomcat
 
-(4.1) Tomcat can be shut down by executing the following command:
+(5.1) Tomcat can be shut down by executing one of the following commands:
 
-      $CATALINA_HOME\bin\shutdown            (Windows)
+      %CATALINA_HOME%\bin\shutdown.bat       (Windows)
 
       $CATALINA_HOME/bin/shutdown.sh         (Unix)
 
+   or
+
+      %CATALINA_HOME%\bin\catalina.bat stop  (Windows)
+
+      $CATALINA_HOME/bin/catalina.sh stop    (Unix)
 
 ==================================================
 Advanced Configuration - Multiple Tomcat Instances
@@ -104,20 +163,25 @@ Advanced Configuration - Multiple Tomcat Instances
 
 In many circumstances, it is desirable to have a single copy of a Tomcat
 binary distribution shared among multiple users on the same server.  To make
-this possible, you can set the $CATALINA_BASE environment variable to the
+this possible, you can set the CATALINA_BASE environment variable to the
 directory that contains the files for your 'personal' Tomcat instance.
 
-When running with separate $CATALINA_HOME and $CATALINA_BASE, the files
+When running with separate CATALINA_HOME and CATALINA_BASE, the files
 and directories are split as following:
 
-In $CATALINA_BASE:
+In CATALINA_BASE:
 
  * bin  - Only the following files:
-          setenv.sh (*nix), setenv.bat (windows) and tomcat-juli.jar
+
+           * setenv.sh (*nix) or setenv.bat (Windows),
+           * tomcat-juli.jar
+
+          The setenv scripts were described above. The tomcat-juli library
+          is documented in the Logging chapter in the User Guide.
 
  * conf - Server configuration files (including server.xml)
 
- * lib  - Libraries
+ * lib  - Libraries and classes
 
  * logs - Log and output files
 
@@ -128,50 +192,60 @@ In $CATALINA_BASE:
  * temp - Directory used by the JVM for temporary files (java.io.tmpdir)
 
 
-In $CATALINA_HOME:
+In CATALINA_HOME:
 
  * bin  - Startup and shutdown scripts
 
           The following files will be used only if they are absent in
-          $CATALINA_BASE/bin:
+          CATALINA_BASE/bin:
 
-          setenv.sh (*nix), setenv.bat (windows) and tomcat-juli.jar
+          setenv.sh (*nix), setenv.bat (Windows), tomcat-juli.jar
 
- * lib  - Libraries
+ * lib  - Libraries and classes, as explained below
 
  * endorsed - Libraries that override standard "Endorsed Standards"
           libraries provided by JRE. See Classloading documentation
-          in the User Guide for details. This directory is not created by
-          default.
+          in the User Guide for details.
 
-If $CATALINA_BASE environment variable is not set, it will default to the
-same value as $CATALINA_HOME, which means that the same directory is used
-for all relative path resolutions.
+          By default this "endorsed" directory is absent.
+
+In the default configuration the JAR libraries and classes both in
+CATALINA_BASE/lib and in CATALINA_HOME/lib will be added to the common
+classpath, but the ones in CATALINA_BASE will be added first and thus will
+be searched first.
+
+The idea is that you may leave the standard Tomcat libraries in
+CATALINA_HOME/lib and add other ones such as database drivers into
+CATALINA_BASE/lib.
+
+In general it is advised to never share libraries between web applications,
+but put them into WEB-INF/lib directories inside the applications. See
+Classloading documentation in the User Guide for details.
 
 
-By default Tomcat will first try to load classes and JARs from
-$CATALINA_BASE/lib and then from $CATALINA_HOME/lib. You may place instance
-specific JARs and classes (e.g. JDBC drivers) in $CATALINA_BASE/lib whilst
-keeping the standard Tomcat JARs in $CATALINA_HOME/lib.
+It might be useful to note that the values of CATALINA_HOME and
+CATALINA_BASE can be referenced in the XML configuration files processed
+by Tomcat as ${catalina.home} and ${catalina.base} respectively.
 
+For example, the standard manager web application can be kept in
+CATALINA_HOME/webapps/manager and loaded into CATALINA_BASE by using
+the following trick:
 
-The values of $CATALINA_BASE and $CATALINA_HOME are available in XML
-configuration files processed by Tomcat as ${catalina.base} and
-${catalina.home} respectively.
+ * Copy the CATALINA_HOME/webapps/manager/META-INF/context.xml
+   file as CATALINA_BASE/conf/Catalina/localhost/manager.xml
 
+ * Add docBase attribute as shown below.
 
-======================================
-Using setenv.* to Tune Tomcat Scripts
-======================================
+The file will look like the following:
 
-The scripts used to run Tomcat can be further configured by setting several
-environment variables. For the list of these environent variables see the
-comment at the top of catalina.sh or .bat script.
+  <?xml version="1.0" encoding="UTF-8"?>
+  <Context docBase="${catalina.home}/webapps/manager"
+    antiResourceLocking="false" privileged="true" >
+  </Context>
 
-The setenv.sh (*nix) or setenv.bat (windows) script can be used to
-configure all those variables except $CATALINA_BASE and $CATALINA_HOME. The
-standard scripts will execute the setenv.* script when it is present either
-in $CATALINA_BASE/bin or in $CATALINA_HOME/bin.
+See Deployer chapter in User Guide and Context and Host chapters in the
+Configuration Reference for more information on contexts and web
+application deployment.
 
 
 ================
@@ -191,9 +265,9 @@ Tomcat install:
     greater than 1024, as ports less than or equal to 1024 require superuser
     access to bind under UNIX.
 
-   Restart Tomcat and you're in business.  Be sure that you replace the "8080"
-   in the URL you're using to access Tomcat.  For example, if you change the
-   port to 1977, you would request the URL http://localhost:1977/ in your browser.
+    Restart Tomcat and you're in business.  Be sure that you replace the "8080"
+    in the URL you're using to access Tomcat.  For example, if you change the
+    port to 1977, you would request the URL http://localhost:1977/ in your browser.
 
 (2) An "out of environment space" error when running the batch files in
     Windows 95, 98, or ME operating systems.
@@ -210,5 +284,6 @@ Tomcat install:
     browser knows that you shouldn't be going through the proxy to access the
     "localhost".
 
-    In Netscape, this is under Edit/Preferences -> Advanced/Proxies, and in
-    Internet Explorer, Tools -> Internet Options -> Connections -> LAN Settings.
+    In Firefox, this is under Tools/Preferences -> Advanced/Network ->
+    Connection -> Settings..., and in Internet Explorer it is Tools ->
+    Internet Options -> Connections -> LAN Settings.
