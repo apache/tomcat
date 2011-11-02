@@ -304,6 +304,9 @@
         Remove trailing whitespace from the default configuration files.
         (kkolinko)
       </update>
+      <update>
+        Improve <code>RUNNING.txt</code>. (kkolinko)
+      </update>
     </changelog>
   </subsection>
 </section>
