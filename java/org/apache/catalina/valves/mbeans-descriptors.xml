@@ -313,7 +313,7 @@
          type="org.apache.catalina.valves.RemoteAddrValve">
 
     <attribute name="allow"
-               description="The comma-delimited set of allow expressions"
+               description="The allow expression"
                type="java.lang.String"/>
 
     <attribute name="asyncSupported"
@@ -327,7 +327,7 @@
                writeable="false"/>
 
     <attribute   name="deny"
-               description="The comma-delimited set of deny expressions"
+               description="The deny expression"
                type="java.lang.String"/>
 
     <attribute name="stateName"
@@ -344,7 +344,7 @@
          type="org.apache.catalina.valves.RemoteHostValve">
 
     <attribute name="allow"
-               description="The comma-delimited set of allow expressions"
+               description="The allow expression"
                type="java.lang.String"/>
 
     <attribute name="asyncSupported"
@@ -358,7 +358,7 @@
                writeable="false"/>
 
     <attribute   name="deny"
-               description="The comma-delimited set of deny expressions"
+               description="The deny expression"
                type="java.lang.String"/>
 
     <attribute name="stateName"
