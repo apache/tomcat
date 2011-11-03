@@ -73,6 +73,14 @@ public abstract class RequestFilterValve extends ValveBase {
      */
     protected volatile Pattern allow = null;
 
+
+    /**
+     * The current allow configuration value that may or may not compile into a
+     * valid {@link Pattern}.
+     */
+    protected volatile String allowValue = null;
+
+
     /**
      * Helper variable to catch configuration errors.
      * It is <code>true</code> by default, but becomes <code>false</code>
@@ -86,6 +94,14 @@ public abstract class RequestFilterValve extends ValveBase {
      * The regular expression used to test for denied requests.
      */
     protected volatile Pattern deny = null;
+
+
+    /**
+     * The current deny configuration value that may or may not compile into a
+     * valid {@link Pattern}.
+     */
+    protected volatile String denyValue = null;
+
 
     /**
      * Helper variable to catch configuration errors.
@@ -104,12 +120,7 @@ public abstract class RequestFilterValve extends ValveBase {
      * Valve, if any; otherwise, return <code>null</code>.
      */
     public String getAllow() {
-        // Use local copies for thread safety
-        Pattern allow = this.allow;
-        if (allow == null) {
-            return null;
-        }
-        return allow.toString();
+        return allowValue;
     }
 
 
@@ -122,10 +133,12 @@ public abstract class RequestFilterValve extends ValveBase {
     public void setAllow(String allow) {
         if (allow == null || allow.length() == 0) {
             this.allow = null;
+            allowValue = null;
             allowValid = true;
         } else {
             boolean success = false;
             try {
+                allowValue = allow;
                 this.allow = Pattern.compile(allow);
                 success = true;
             } finally {
@@ -140,12 +153,7 @@ public abstract class RequestFilterValve extends ValveBase {
      * Valve, if any; otherwise, return <code>null</code>.
      */
     public String getDeny() {
-        // Use local copies for thread safety
-        Pattern deny = this.deny;
-        if (deny == null) {
-            return null;
-        }
-        return deny.toString();
+        return denyValue;
     }
 
 
@@ -158,10 +166,12 @@ public abstract class RequestFilterValve extends ValveBase {
     public void setDeny(String deny) {
         if (deny == null || deny.length() == 0) {
             this.deny = null;
+            denyValue = null;
             denyValid = true;
         } else {
             boolean success = false;
             try {
+                denyValue = deny;
                 this.deny = Pattern.compile(deny);
                 success = true;
             } finally {
@@ -200,6 +210,16 @@ public abstract class RequestFilterValve extends ValveBase {
             throw new LifecycleException(
                     sm.getString("requestFilterValve.configInvalid"));
         }
+    }
+
+
+    @Override
+    protected synchronized void startInternal() throws LifecycleException {
+        if (!allowValid || !denyValid) {
+            throw new LifecycleException(
+                    sm.getString("requestFilterValve.configInvalid"));
+        }
+        super.startInternal();
     }
 
 
