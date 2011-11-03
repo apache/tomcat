@@ -564,7 +564,10 @@ public class NioEndpoint extends AbstractEndpoint {
                 pollers[i].destroy();
                 pollers[i] = null;
             }
-            try { stopLatch.await(selectorTimeout+100,TimeUnit.MILLISECONDS); } catch (InterruptedException ignore ) {}
+            try {
+                stopLatch.await(selectorTimeout + 100, TimeUnit.MILLISECONDS);
+            } catch (InterruptedException ignore) {
+            }
         }
         eventCache.clear();
         keyCache.clear();
@@ -1055,7 +1058,14 @@ public class NioEndpoint extends AbstractEndpoint {
                                 "endpoint.debug.socketCloseFail"), e);
                     }
                 }
-                try {if (ka!=null && ka.getSendfileData()!=null && ka.getSendfileData().fchannel!=null && ka.getSendfileData().fchannel.isOpen()) ka.getSendfileData().fchannel.close();}catch (Exception ignore){}
+                try {
+                    if (ka != null && ka.getSendfileData() != null
+                            && ka.getSendfileData().fchannel != null
+                            && ka.getSendfileData().fchannel.isOpen()) {
+                        ka.getSendfileData().fchannel.close();
+                    }
+                } catch (Exception ignore) {
+                }
                 if (ka!=null) {
                     ka.reset();
                     countDownConnection(); 
@@ -1265,7 +1275,10 @@ public class NioEndpoint extends AbstractEndpoint {
                         log.debug("Send file complete for:"+sd.fileName);
                     }
                     attachment.setSendfileData(null);
-                    try {sd.fchannel.close();}catch(Exception ignore){}
+                    try {
+                        sd.fchannel.close();
+                    } catch (Exception ignore) {
+                    }
                     if ( sd.keepAlive ) {
                         if (reg) {
                             if (log.isDebugEnabled()) {
@@ -1402,9 +1415,23 @@ public class NioEndpoint extends AbstractEndpoint {
             error = false;
             lastRegistered = 0;
             sendfileData = null;
-            if ( readLatch!=null ) try {for (int i=0; i<(int)readLatch.getCount();i++) readLatch.countDown();}catch (Exception ignore){}
+            if (readLatch != null) {
+                try {
+                    for (int i = 0; i < (int) readLatch.getCount(); i++) {
+                        readLatch.countDown();
+                    }
+                } catch (Exception ignore) {
+                }
+            }
             readLatch = null;
-            if ( writeLatch!=null ) try {for (int i=0; i<(int)writeLatch.getCount();i++) writeLatch.countDown();}catch (Exception ignore){}
+            if (writeLatch != null) {
+                try {
+                    for (int i = 0; i < (int) writeLatch.getCount(); i++) {
+                        writeLatch.countDown();
+                    }
+                } catch (Exception ignore) {
+                }
+            }
             writeLatch = null;
             cometNotify = false;
             cometOps = SelectionKey.OP_READ;
