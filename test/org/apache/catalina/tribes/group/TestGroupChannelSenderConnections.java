@@ -20,6 +20,9 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
+import java.util.concurrent.atomic.AtomicInteger;
+
+import static org.junit.Assert.fail;
 
 import org.junit.After;
 import org.junit.Before;
@@ -51,6 +54,7 @@ public class TestGroupChannelSenderConnections extends LoggingBaseTest {
     }
 
     public void sendMessages(long delay, long sleep) throws Exception {
+        resetMessageCounters();
         Member local = channels[0].getLocalMember(true);
         Member dest = channels[1].getLocalMember(true);
         int n = 3;
@@ -59,14 +63,24 @@ public class TestGroupChannelSenderConnections extends LoggingBaseTest {
                 + " ms between them.");
         for (int i = 0; i < n; i++) {
             channels[0].send(new Member[] { dest }, new TestMsg(), 0);
-            if (delay > 0) {
+            boolean last = (i == n - 1);
+            if (!last && delay > 0) {
                 Thread.sleep(delay);
             }
         }
-        log.info("Messages sent. Sleeping for " + (sleep / 1000)
-                + " seconds to inspect connections");
-        if (sleep > 0) {
-            Thread.sleep(sleep);
+        log.info("Messages sent. Waiting no more than " + (sleep / 1000)
+                + " seconds for them to be received");
+        long startTime = System.currentTimeMillis();
+        int countReceived;
+        while ((countReceived = getReceivedMessageCount()) != n) {
+            long time = System.currentTimeMillis();
+            if ((time - startTime) > sleep) {
+                fail("Only " + countReceived + " out of " + n
+                        + " messages have been received in " + (sleep / 1000)
+                        + " seconds");
+                break;
+            }
+            Thread.sleep(100);
         }
     }
 
@@ -107,6 +121,20 @@ public class TestGroupChannelSenderConnections extends LoggingBaseTest {
         }
     }
 
+    private void resetMessageCounters() {
+        for (TestMsgListener listener: listeners) {
+            listener.reset();
+        }
+    }
+
+    private int getReceivedMessageCount() {
+        int count = 0;
+        for (TestMsgListener listener: listeners) {
+            count += listener.getReceivedCount();
+        }
+        return count;
+    }
+
     // Test message. The message size is random.
     public static class TestMsg implements Serializable {
         private static final long serialVersionUID = 1L;
@@ -124,13 +152,23 @@ public class TestGroupChannelSenderConnections extends LoggingBaseTest {
     }
 
     public class TestMsgListener implements ChannelListener {
-        public final String name;
+        private final String name;
+        private final AtomicInteger counter = new AtomicInteger();
         public TestMsgListener(String name) {
             this.name = name;
         }
 
+        public void reset() {
+            counter.set(0);
+        }
+
+        public int getReceivedCount() {
+            return counter.get();
+        }
+
         @Override
         public void messageReceived(Serializable msg, Member sender) {
+            counter.incrementAndGet();
             log.info("["+name+"] Received message:"+msg+" from " + sender.getName());
         }
 
