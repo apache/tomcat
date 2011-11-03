@@ -664,7 +664,8 @@ public class ContextConfig
         String pathName = cn.getBaseName();
 
         boolean unpackWARs = true;
-        if (host instanceof StandardHost) {
+        if (host instanceof StandardHost &&
+                context instanceof StandardContext) {
             unpackWARs = ((StandardHost) host).isUnpackWARs() &&
                     ((StandardContext) context).getUnpackWAR() &&
                     (docBase.startsWith(canonicalAppBase.getPath()));
