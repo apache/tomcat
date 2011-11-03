@@ -51,7 +51,6 @@ import org.apache.catalina.Host;
 import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleEvent;
 import org.apache.catalina.LifecycleListener;
-import org.apache.catalina.core.ContainerBase;
 import org.apache.catalina.core.StandardHost;
 import org.apache.catalina.util.ContextName;
 import org.apache.catalina.util.IOTools;
@@ -1153,8 +1152,7 @@ public class HostConfig
                     // Undeploy application
                     if (log.isInfoEnabled())
                         log.info(sm.getString("hostConfig.undeploy", app.name));
-                    ContainerBase context =
-                        (ContainerBase) host.findChild(app.name);
+                    Container context = host.findChild(app.name);
                     try {
                         host.removeChild(context);
                     } catch (Throwable t) {
@@ -1204,8 +1202,7 @@ public class HostConfig
                 // Undeploy application
                 if (log.isInfoEnabled())
                     log.info(sm.getString("hostConfig.undeploy", app.name));
-                ContainerBase context =
-                    (ContainerBase) host.findChild(app.name);
+                Container context = host.findChild(app.name);
                 try {
                     host.removeChild(context);
                 } catch (Throwable t) {
