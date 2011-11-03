@@ -112,6 +112,23 @@ public abstract class AbstractEndpoint {
 
     // ----------------------------------------------------------------- Properties
 
+    /**
+     * A flag that can be used to speed up Tomcat shutdown by testing
+     * environments where we control external connections to Tomcat. Set it to
+     * {@code true} if it is known that there are no active or pending
+     * connections and all requests have already been processed. The default
+     * value is {@code false}.
+     */
+    private boolean fastShutdown = false;
+
+    public void setFastShutdown(boolean fastShutdown) {
+        this.fastShutdown = fastShutdown;
+    }
+
+    public boolean isFastShutdown() {
+        return fastShutdown;
+    }
+
     private int maxConnections = 10000;
     public void setMaxConnections(int maxCon) {
         this.maxConnections = maxCon;
@@ -514,6 +531,11 @@ public abstract class AbstractEndpoint {
     public void pause() {
         if (running && !paused) {
             paused = true;
+            if (isFastShutdown()) {
+                // unlockAccept will also be called by stopInternal(),
+                // so when shutting down it can be skipped here.
+                return;
+            }
             unlockAccept();
             // Heuristic: Sleep for a while to ensure pause of the endpoint
             try {
