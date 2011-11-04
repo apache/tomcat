@@ -61,6 +61,11 @@ public class TestFlushableGZIPOutputStream {
         }
         output.flush();
 
+        // Using "data" may trigger a JVM crash
+        // output.write("data".getBytes());
+        output.write("data2".getBytes());
+        output.flush();
+
         output.close();
 
         ByteArrayInputStream byteInStream =
