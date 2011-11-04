@@ -37,28 +37,39 @@ public class FlushableGZIPOutputStream extends GZIPOutputStream {
 
     private static final byte[] EMPTYBYTEARRAY = new byte[0];
     private boolean hasData = false;
+    private boolean needReenableCompression = false;
 
     /**
      * Here we make sure we have received data, so that the header has been for
      * sure written to the output stream already.
      */
     @Override
-    public synchronized void write(byte[] bytes, int i, int i1)
+    public synchronized void write(byte[] bytes, int offset, int length)
             throws IOException {
-        super.write(bytes, i, i1);
-        hasData = true;
+        if (length > 0) {
+            prepareForOutput();
+            super.write(bytes, offset, length);
+        }
     }
 
     @Override
     public synchronized void write(int i) throws IOException {
+        prepareForOutput();
         super.write(i);
-        hasData = true;
     }
 
     @Override
     public synchronized void write(byte[] bytes) throws IOException {
-        super.write(bytes);
+        write(bytes, 0, bytes.length);
+    }
+
+    private void prepareForOutput() throws IOException {
         hasData = true;
+        if (needReenableCompression) {
+            def.setLevel(Deflater.DEFAULT_COMPRESSION);
+            deflate();
+            needReenableCompression = false;
+        }
     }
 
     @Override
@@ -80,8 +91,8 @@ public class FlushableGZIPOutputStream extends GZIPOutputStream {
             def.setLevel(Deflater.NO_COMPRESSION);
             deflate();
 
-            def.setLevel(Deflater.DEFAULT_COMPRESSION);
-            deflate();
+            // Cannot reenable compression now. Must wait for data.
+            needReenableCompression = true;
 
             out.flush();
         }
