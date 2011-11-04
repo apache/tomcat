@@ -35,69 +35,74 @@ public class FlushableGZIPOutputStream extends GZIPOutputStream {
         super(os);
     }
 
-    private static final byte[] EMPTYBYTEARRAY = new byte[0];
-    private boolean hasData = false;
-    private boolean needReenableCompression = false;
-
     /**
-     * Here we make sure we have received data, so that the header has been for
-     * sure written to the output stream already.
+     * It is used to reserve one byte of real data so that it can be used when
+     * flushing the stream.
      */
-    @Override
-    public synchronized void write(byte[] bytes, int offset, int length)
-            throws IOException {
-        if (length > 0) {
-            prepareForOutput();
-            super.write(bytes, offset, length);
-        }
-    }
-
-    @Override
-    public synchronized void write(int i) throws IOException {
-        prepareForOutput();
-        super.write(i);
-    }
+    private byte[] lastByte = new byte[1];
+    private boolean hasLastByte = false;
 
     @Override
     public synchronized void write(byte[] bytes) throws IOException {
         write(bytes, 0, bytes.length);
     }
 
-    private void prepareForOutput() throws IOException {
-        hasData = true;
-        if (needReenableCompression) {
-            def.setLevel(Deflater.DEFAULT_COMPRESSION);
-            deflate();
-            needReenableCompression = false;
+    @Override
+    public synchronized void write(byte[] bytes, int offset, int length)
+            throws IOException {
+        if (length > 0) {
+            flushLastByte();
+            if (length > 1) {
+                super.write(bytes, offset, length - 1);
+            }
+            rememberLastByte(bytes[offset + length - 1]);
+        }
+    }
+
+    @Override
+    public synchronized void write(int i) throws IOException {
+        flushLastByte();
+        rememberLastByte((byte) (i & 0xFF));
+    }
+
+    @Override
+    public void close() throws IOException {
+        flushLastByte();
+        super.close();
+    }
+
+    private void rememberLastByte(byte b) {
+        lastByte[0] = b;
+        hasLastByte = true;
+    }
+
+    private void flushLastByte() throws IOException {
+        if (hasLastByte) {
+            super.write(lastByte, 0, 1);
+            hasLastByte = false;
         }
     }
 
     @Override
     public synchronized void flush() throws IOException {
-        if (!hasData) {
-            return; // do not allow the gzip header to be flushed on its own
+        if (hasLastByte) {
+            // - do not allow the gzip header to be flushed on its own
+            // - do not do anything if there is no data to send
+
+            // trick the deflater to flush
+            /**
+             * Now this is tricky: We force the Deflater to flush its data by
+             * switching compression level. As yet, a perplexingly simple workaround
+             * for
+             * http://developer.java.sun.com/developer/bugParade/bugs/4255743.html
+             */
+            if (!def.finished()) {
+                def.setLevel(Deflater.NO_COMPRESSION);
+                flushLastByte();
+                def.setLevel(Deflater.DEFAULT_COMPRESSION);
+            }
         }
-
-        // trick the deflater to flush
-        /**
-         * Now this is tricky: We force the Deflater to flush its data by
-         * switching compression level. As yet, a perplexingly simple workaround
-         * for
-         * http://developer.java.sun.com/developer/bugParade/bugs/4255743.html
-         */
-        if (!def.finished()) {
-            def.setInput(EMPTYBYTEARRAY, 0, 0);
-
-            def.setLevel(Deflater.NO_COMPRESSION);
-            deflate();
-
-            // Cannot reenable compression now. Must wait for data.
-            needReenableCompression = true;
-
-            out.flush();
-        }
-
-        hasData = false; // no more data to flush
+        out.flush();
     }
 
     /*
