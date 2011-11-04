@@ -18,6 +18,8 @@ package org.apache.coyote.http11.filters;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.zip.GZIPInputStream;
@@ -40,18 +42,23 @@ public class TesterFlushableGZIPOutputStream {
 
         OutputStream output = new FlushableGZIPOutputStream(byteOutStream);
 
-        ClassLoader cl = Thread.currentThread().getContextClassLoader();
+        File sourcesDir = new File("test/org/apache/coyote/http11/filters/");
+        InputStream input;
 
-        InputStream input = cl.getResourceAsStream(
-                "org/apache/coyote/http11/filters/bug52121-part1");
-        IOTools.flow(input, output);
-        input.close();
+        input = new FileInputStream(new File(sourcesDir, "bug52121-part1"));
+        try {
+            IOTools.flow(input, output);
+        } finally {
+            input.close();
+        }
         output.flush();
 
-        input = cl.getResourceAsStream(
-                "org/apache/coyote/http11/filters/bug52121-part2");
-        IOTools.flow(input, output);
-        input.close();
+        input = new FileInputStream(new File(sourcesDir, "bug52121-part2"));
+        try {
+            IOTools.flow(input, output);
+        } finally {
+            input.close();
+        }
         output.flush();
 
         output.close();
