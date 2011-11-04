@@ -20,9 +20,15 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.InputStream;
+import java.io.IOException;
 import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.zip.GZIPInputStream;
+
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
@@ -38,32 +44,25 @@ public class TestFlushableGZIPOutputStream {
     public void testBug52121() throws Exception {
 
         ByteArrayOutputStream byteOutStream = new ByteArrayOutputStream();
-        ByteArrayOutputStream sink = new ByteArrayOutputStream();
-
         OutputStream output = new FlushableGZIPOutputStream(byteOutStream);
 
         File sourcesDir = new File("test/org/apache/coyote/http11/filters/");
-        InputStream input;
+        List<byte[]> parts = new ArrayList<byte[]>();
+        byte[] part;
 
-        input = new FileInputStream(new File(sourcesDir, "bug52121-part1"));
-        try {
-            IOTools.flow(input, output);
-        } finally {
-            input.close();
-        }
+        part = loadFile(new File(sourcesDir, "bug52121-part1"));
+        parts.add(part);
+        flowBytes(part, output);
         output.flush();
 
-        input = new FileInputStream(new File(sourcesDir, "bug52121-part2"));
-        try {
-            IOTools.flow(input, output);
-        } finally {
-            input.close();
-        }
+        part = loadFile(new File(sourcesDir, "bug52121-part2"));
+        parts.add(part);
+        flowBytes(part, output);
         output.flush();
 
-        // Using "data" may trigger a JVM crash
-        // output.write("data".getBytes());
-        output.write("data2".getBytes());
+        part = "data2".getBytes("ASCII");
+        parts.add(part);
+        output.write(part);
         output.flush();
 
         output.close();
@@ -72,6 +71,49 @@ public class TestFlushableGZIPOutputStream {
                 new ByteArrayInputStream(byteOutStream.toByteArray());
 
         GZIPInputStream inflaterStream = new GZIPInputStream(byteInStream);
-        IOTools.flow(inflaterStream, sink);
+        ByteArrayOutputStream sink = new ByteArrayOutputStream();
+        try {
+            IOTools.flow(inflaterStream, sink);
+        } finally {
+            sink.close();
+        }
+
+        byte[] decompressedBytes = sink.toByteArray();
+        int originalLength = 0;
+        for (byte[] bytes : parts) {
+            assertArrayEquals(bytes, Arrays.copyOfRange(decompressedBytes,
+                    originalLength, originalLength + bytes.length));
+            originalLength += bytes.length;
+        }
+        assertEquals(originalLength, decompressedBytes.length);
+    }
+
+    /**
+     * Loads file into memory.
+     */
+    private byte[] loadFile(File file) throws IOException {
+        ByteArrayOutputStream byteOutStream = new ByteArrayOutputStream();
+        FileInputStream input = new FileInputStream(file);
+        try {
+            IOTools.flow(input, byteOutStream);
+        } finally {
+            input.close();
+        }
+        return byteOutStream.toByteArray();
+    }
+
+    /**
+     * Writes data to the stream and returns the size of the file.
+     */
+    private void flowBytes(byte[] bytes, OutputStream output)
+            throws IOException {
+        // Could use output.write(), but IOTools writes in small portions, and
+        // that is more natural
+        ByteArrayInputStream byteInStream = new ByteArrayInputStream(bytes);
+        try {
+            IOTools.flow(byteInStream, output);
+        } finally {
+            byteInStream.close();
+        }
     }
 }
