@@ -32,7 +32,7 @@ import org.apache.catalina.util.IOTools;
  * Reproduces what current appears to be a JVM bug. Note: This test case is not
  * part of the Standard test suite that is execute by <code>ant test</code>.
  */
-public class TesterFlushableGZIPOutputStream {
+public class TestFlushableGZIPOutputStream {
 
     @Test
     public void testBug52121() throws Exception {
