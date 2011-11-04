@@ -201,6 +201,11 @@
         In HTTP connectors: self-guard against using a non-recycled input
         buffer. Requests will be rejected with response status 400. (kkolinko)
       </add>
+      <fix>
+        <bug>52121</bug>: Fix possible output corruption when compression is
+        enabled for a connector and the response is flushed. Includes a test
+        caes provided by David Marcks. (kkolinko/markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
