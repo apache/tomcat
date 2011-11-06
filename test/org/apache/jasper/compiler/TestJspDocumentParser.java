@@ -37,16 +37,16 @@ public class TestJspDocumentParser extends TomcatBaseTest {
     public void testBug47977() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
-        File appDir = 
+        File appDir =
             new File("test/webapp-3.0");
         // app dir is relative to server home
         tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());
-        
+
         tomcat.start();
 
         int rc = getUrl("http://localhost:" + getPort() +
                 "/test/bug47977.jspx", new ByteChunk(), null);
-        
+
         assertEquals(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, rc);
     }
 
@@ -54,11 +54,11 @@ public class TestJspDocumentParser extends TomcatBaseTest {
     public void testBug48827() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
-        File appDir = 
+        File appDir =
             new File("test/webapp-3.0");
         // app dir is relative to server home
         tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());
-        
+
         tomcat.start();
 
         Exception e = null;

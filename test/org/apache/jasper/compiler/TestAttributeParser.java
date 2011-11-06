@@ -76,7 +76,7 @@ public class TestAttributeParser {
                 evalAttr("${0 lt 2 ? 1 lt 2 ? 'many': 'one': 'none'}", '\"'));
     }
 
-    
+
     /**
      * Test the quoting requirements of JSP attributes. This doesn't make use of
      * EL. See {@link #testBug45451()} for a test that combines JSP attribute
@@ -95,7 +95,7 @@ public class TestAttributeParser {
         assertEquals("hello world\"", evalAttr("hello world\"", '\"'));
         assertEquals("hello world'", evalAttr("hello world\\'", '\"'));
         assertEquals("hello world\"", evalAttr("hello world\\\"", '\"'));
-        
+
         assertEquals("hello 'world'", evalAttr("hello 'world'", '\''));
         assertEquals("hello 'world", evalAttr("hello 'world", '\''));
         assertEquals("hello world'", evalAttr("hello world'", '\''));
@@ -125,7 +125,7 @@ public class TestAttributeParser {
     public void testLiteral() {
         // Inspired by work on bug 45451, comments from kkolinko on the dev
         // list and looking at the spec to find some edge cases
-        
+
         // '\' is only an escape character inside a StringLiteral
         assertEquals("\\", evalAttr("${'\\\\\\\\'}", '\"'));
         assertEquals("\\", evalAttr("${\"\\\\\\\\\"}", '\"'));
@@ -140,7 +140,7 @@ public class TestAttributeParser {
         assertEquals("'\\", evalAttr("${\\\"'\\\\\\\\\\\"}", '\"'));
         assertEquals("\\\"", evalAttr("${\\\"\\\\\\\\\\\\\\\"\\\"}", '\"'));
         assertEquals("\"\\", evalAttr("${\\\"\\\\\\\"\\\\\\\\\\\"}", '\"'));
-        
+
         // Quoting <% and %>
         assertEquals("hello <% world", evalAttr("hello <\\% world", '\"'));
         assertEquals("hello %> world", evalAttr("hello %> world", '\"'));
@@ -170,7 +170,7 @@ public class TestAttributeParser {
     }
 
     private String evalAttr(String expression, char quote) {
-        
+
         ELContextImpl ctx = new ELContextImpl();
         ctx.setFunctionMapper(new FMapper());
         ExpressionFactoryImpl exprFactory = new ExpressionFactoryImpl();
@@ -180,7 +180,7 @@ public class TestAttributeParser {
                 String.class);
         return (String) ve.getValue(ctx);
     }
-    
+
     private String parseScriptExpression(String expression, char quote) {
         return AttributeParser.getUnquoted(expression, quote, false, false,
                 false);
@@ -199,7 +199,7 @@ public class TestAttributeParser {
                     // Ignore
                 } catch (NoSuchMethodException e) {
                     // Ignore
-                } 
+                }
             }
             return null;
         }

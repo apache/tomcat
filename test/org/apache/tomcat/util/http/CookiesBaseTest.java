@@ -42,17 +42,17 @@ public abstract class CookiesBaseTest extends TomcatBaseTest {
     public static class CookieServlet extends HttpServlet {
 
         private static final long serialVersionUID = 1L;
-        
+
         private final String cookieName;
         private final String cookieValue;
-        
+
         public CookieServlet(String cookieName, String cookieValue) {
             this.cookieName = cookieName;
             this.cookieValue = cookieValue;
         }
-        
+
         @Override
-        public void doGet(HttpServletRequest req, HttpServletResponse res) 
+        public void doGet(HttpServletRequest req, HttpServletResponse res)
                 throws IOException {
             try {
                 Cookie cookie = new Cookie(cookieName, cookieValue);
@@ -62,13 +62,13 @@ public abstract class CookiesBaseTest extends TomcatBaseTest {
                 res.getWriter().write("Cookie name fail");
             }
         }
-        
+
     }
-    
+
 
     public static void addServlets(Tomcat tomcat) {
         // Must have a real docBase - just use temp
-        Context ctx = 
+        Context ctx =
             tomcat.addContext("", System.getProperty("java.io.tmpdir"));
 
         Tomcat.addServlet(ctx, "invalid", new CookieServlet("na;me", "value"));
@@ -91,5 +91,5 @@ public abstract class CookiesBaseTest extends TomcatBaseTest {
     }
 
     public abstract void testCookiesInstance() throws Exception;
-    
+
 }

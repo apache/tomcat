@@ -39,16 +39,16 @@ public class TestValidator extends TomcatBaseTest {
     public void testBug47331() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
-        File appDir = 
+        File appDir =
             new File("test/webapp-3.0");
         // app dir is relative to server home
         tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());
-        
+
         tomcat.start();
 
         int rc = getUrl("http://localhost:" + getPort() +
                 "/test/bug47331.jsp", new ByteChunk(), null);
-        
+
         assertEquals(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, rc);
     }
 
@@ -56,11 +56,11 @@ public class TestValidator extends TomcatBaseTest {
     public void testTldVersions23() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
-        File appDir = 
+        File appDir =
             new File("test/webapp-2.3");
         // app dir is relative to server home
         tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());
-        
+
         tomcat.start();
 
         ByteChunk res = getUrl("http://localhost:" + getPort() +
@@ -81,11 +81,11 @@ public class TestValidator extends TomcatBaseTest {
     public void testTldVersions24() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
-        File appDir = 
+        File appDir =
             new File("test/webapp-2.4");
         // app dir is relative to server home
         tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());
-        
+
         tomcat.start();
 
         ByteChunk res = getUrl("http://localhost:" + getPort() +
@@ -106,11 +106,11 @@ public class TestValidator extends TomcatBaseTest {
     public void testTldVersions25() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
-        File appDir = 
+        File appDir =
             new File("test/webapp-2.5");
         // app dir is relative to server home
         tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());
-        
+
         tomcat.start();
 
         ByteChunk res = getUrl("http://localhost:" + getPort() +
@@ -131,11 +131,11 @@ public class TestValidator extends TomcatBaseTest {
     public void testTldVersions30() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
-        File appDir = 
+        File appDir =
             new File("test/webapp-3.0");
         // app dir is relative to server home
         tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());
-        
+
         tomcat.start();
 
         ByteChunk res = getUrl("http://localhost:" + getPort() +
@@ -151,7 +151,7 @@ public class TestValidator extends TomcatBaseTest {
         assertTrue(result.indexOf("<p>#{'05-hello world'}</p>") > 0);
         assertTrue(result.indexOf("<p>06-hello world</p>") > 0);
     }
-    
+
     public static class Echo extends TagSupport {
 
         private static final long serialVersionUID = 1L;

@@ -46,16 +46,16 @@ public class TestGenerator extends TomcatBaseTest {
     public void testBug45015a() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
-        File appDir = 
+        File appDir =
             new File("test/webapp-3.0");
         // app dir is relative to server home
         tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());
-        
+
         tomcat.start();
 
         ByteChunk res = getUrl("http://localhost:" + getPort() +
                 "/test/bug45nnn/bug45015a.jsp");
-        
+
         String result = res.toString();
         // Beware of the differences between escaping in JSP attributes and
         // in Java Strings
@@ -75,16 +75,16 @@ public class TestGenerator extends TomcatBaseTest {
     public void testBug45015b() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
-        File appDir = 
+        File appDir =
             new File("test/webapp-3.0");
         // app dir is relative to server home
         tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());
-        
+
         tomcat.start();
 
         int rc = getUrl("http://localhost:" + getPort() +
                 "/test/bug45nnn/bug45015b.jsp", new ByteChunk(), null);
-        
+
         assertEquals(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, rc);
     }
 
@@ -92,16 +92,16 @@ public class TestGenerator extends TomcatBaseTest {
     public void testBug45015c() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
-        File appDir = 
+        File appDir =
             new File("test/webapp-3.0");
         // app dir is relative to server home
         tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());
-        
+
         tomcat.start();
 
         int rc = getUrl("http://localhost:" + getPort() +
                 "/test/bug45nnn/bug45015c.jsp", new ByteChunk(), null);
-        
+
         assertEquals(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, rc);
     }
 
@@ -109,21 +109,21 @@ public class TestGenerator extends TomcatBaseTest {
     public void testBug48701Fail() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
-        File appDir = 
+        File appDir =
             new File("test/webapp-3.0");
         // app dir is relative to server home
         StandardContext ctxt = (StandardContext) tomcat.addWebapp(null,
                 "/test", appDir.getAbsolutePath());
-        
+
         // This test needs the JSTL libraries
         File lib = new File("webapps/examples/WEB-INF/lib");
         ctxt.setAliases("/WEB-INF/lib=" + lib.getCanonicalPath());
-        
+
         tomcat.start();
 
         int rc = getUrl("http://localhost:" + getPort() +
                 "/test/bug48nnn/bug48701-fail.jsp", new ByteChunk(), null);
-        
+
         assertEquals(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, rc);
     }
 
@@ -146,20 +146,20 @@ public class TestGenerator extends TomcatBaseTest {
     public void testBug48701TagVariableInfoNameFromAttribute() throws Exception {
         testBug48701("bug48nnn/bug48701-TVI-NFA.jsp");
     }
-    
+
     private void testBug48701(String jsp) throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
-        File appDir = 
+        File appDir =
             new File("test/webapp-3.0");
         // app dir is relative to server home
         tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());
-        
+
         tomcat.start();
 
         ByteChunk res = getUrl("http://localhost:" + getPort() +
                 "/test/" + jsp);
-        
+
         String result = res.toString();
         assertEcho(result, "00-PASS");
     }
@@ -186,9 +186,9 @@ public class TestGenerator extends TomcatBaseTest {
             return super.doStartTag();
         }
 
-        
+
     }
-    
+
     public static class Bug48701TEI extends TagExtraInfo {
 
         @Override
@@ -200,7 +200,7 @@ public class TestGenerator extends TomcatBaseTest {
         }
 
     }
-    
+
     public static class Bean {
         private String time;
 
@@ -231,7 +231,7 @@ public class TestGenerator extends TomcatBaseTest {
 
         ByteChunk res = new ByteChunk();
         Map<String,List<String>> headers = new HashMap<String,List<String>>();
-        
+
         getUrl("http://localhost:" + getPort() + "/test/bug49nnn/bug49799.jsp",
                 res, headers);
 
