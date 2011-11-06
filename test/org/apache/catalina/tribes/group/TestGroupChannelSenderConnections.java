@@ -20,50 +20,68 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
+import java.util.concurrent.atomic.AtomicInteger;
+
+import static org.junit.Assert.fail;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import org.apache.catalina.startup.LoggingBaseTest;
 import org.apache.catalina.tribes.Channel;
 import org.apache.catalina.tribes.ChannelListener;
 import org.apache.catalina.tribes.ManagedChannel;
 import org.apache.catalina.tribes.Member;
 import org.apache.catalina.tribes.transport.ReplicationTransmitter;
 
-public class TestGroupChannelSenderConnections {
-    private static int count = 2;
+public class TestGroupChannelSenderConnections extends LoggingBaseTest {
+    private static final int count = 2;
     private ManagedChannel[] channels = new ManagedChannel[count];
     private TestMsgListener[] listeners = new TestMsgListener[count];
 
     @Before
+    @Override
     public void setUp() throws Exception {
+        super.setUp();
         for (int i = 0; i < channels.length; i++) {
             channels[i] = new GroupChannel();
             channels[i].getMembershipService().setPayload( ("Channel-" + (i + 1)).getBytes("ASCII"));
             listeners[i] = new TestMsgListener( ("Listener-" + (i + 1)));
             channels[i].addChannelListener(listeners[i]);
             channels[i].start(Channel.SND_RX_SEQ|Channel.SND_TX_SEQ);
-
         }
-    }
-
-    public void clear() {
-        // NOOP
     }
 
     public void sendMessages(long delay, long sleep) throws Exception {
+        resetMessageCounters();
         Member local = channels[0].getLocalMember(true);
         Member dest = channels[1].getLocalMember(true);
         int n = 3;
-        System.out.println("Sending " + n + " messages from [" + local.getName() + "] to [" + dest.getName() + "]");
+        log.info("Sending " + n + " messages from [" + local.getName()
+                + "] to [" + dest.getName() + "] with delay of " + delay
+                + " ms between them.");
         for (int i = 0; i < n; i++) {
-            channels[0].send(new Member[] {dest}, new TestMsg(), 0);
-            if ( delay > 0 ) Thread.sleep(delay);
+            channels[0].send(new Member[] { dest }, new TestMsg(), 0);
+            boolean last = (i == n - 1);
+            if (!last && delay > 0) {
+                Thread.sleep(delay);
+            }
         }
-        System.out.println("Messages sent. Sleeping for "+(sleep/1000)+" seconds to inspect connections");
-        if ( sleep > 0 ) Thread.sleep(sleep);
-
+        log.info("Messages sent. Waiting no more than " + (sleep / 1000)
+                + " seconds for them to be received");
+        long startTime = System.currentTimeMillis();
+        int countReceived;
+        while ((countReceived = getReceivedMessageCount()) != n) {
+            long time = System.currentTimeMillis();
+            if ((time - startTime) > sleep) {
+                fail("Only " + countReceived + " out of " + n
+                        + " messages have been received in " + (sleep / 1000)
+                        + " seconds");
+                break;
+            }
+            Thread.sleep(100);
+        }
     }
 
     @Test
@@ -73,7 +91,7 @@ public class TestGroupChannelSenderConnections {
 
     @Test
     public void testKeepAliveCount() throws Exception {
-        System.out.println("Setting keep alive count to 0");
+        log.info("Setting keep alive count to 0");
         for (int i = 0; i < channels.length; i++) {
             ReplicationTransmitter t = (ReplicationTransmitter)channels[0].getChannelSender();
             t.getTransport().setKeepAliveCount(0);
@@ -83,7 +101,7 @@ public class TestGroupChannelSenderConnections {
 
     @Test
     public void testKeepAliveTime() throws Exception {
-        System.out.println("Setting keep alive count to 1 second");
+        log.info("Setting keep alive count to 1 second");
         for (int i = 0; i < channels.length; i++) {
             ReplicationTransmitter t = (ReplicationTransmitter)channels[0].getChannelSender();
             t.getTransport().setKeepAliveTime(1000);
@@ -92,17 +110,36 @@ public class TestGroupChannelSenderConnections {
     }
 
     @After
+    @Override
     public void tearDown() throws Exception {
-        for (int i = 0; i < channels.length; i++) {
-            channels[i].stop(Channel.DEFAULT);
+        try {
+            for (int i = 0; i < channels.length; i++) {
+                channels[i].stop(Channel.DEFAULT);
+            }
+        } finally {
+            super.tearDown();
         }
-
     }
 
+    private void resetMessageCounters() {
+        for (TestMsgListener listener: listeners) {
+            listener.reset();
+        }
+    }
+
+    private int getReceivedMessageCount() {
+        int count = 0;
+        for (TestMsgListener listener: listeners) {
+            count += listener.getReceivedCount();
+        }
+        return count;
+    }
+
+    // Test message. The message size is random.
     public static class TestMsg implements Serializable {
         private static final long serialVersionUID = 1L;
-        static Random r = new Random();
-        HashMap<Integer, ArrayList<Object>> map =
+        private static Random r = new Random();
+        private HashMap<Integer, ArrayList<Object>> map =
             new HashMap<Integer, ArrayList<Object>>();
         public TestMsg() {
             int size = Math.abs(r.nextInt() % 200);
@@ -114,23 +151,31 @@ public class TestGroupChannelSenderConnections {
         }
     }
 
-    public static class TestMsgListener implements ChannelListener {
-        public String name = null;
+    public class TestMsgListener implements ChannelListener {
+        private final String name;
+        private final AtomicInteger counter = new AtomicInteger();
         public TestMsgListener(String name) {
             this.name = name;
         }
 
-        @Override
-        public void messageReceived(Serializable msg, Member sender) {
-            System.out.println("["+name+"] Received message:"+msg+" from " + sender.getName());
+        public void reset() {
+            counter.set(0);
         }
 
+        public int getReceivedCount() {
+            return counter.get();
+        }
+
+        @Override
+        public void messageReceived(Serializable msg, Member sender) {
+            counter.incrementAndGet();
+            log.info("["+name+"] Received message:"+msg+" from " + sender.getName());
+        }
 
         @Override
         public boolean accept(Serializable msg, Member sender) {
             return true;
         }
-
 
     }
 

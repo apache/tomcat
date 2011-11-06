@@ -325,6 +325,10 @@
         use of Tomcat logging configuration in tests that do not start Tomcat.
         (kkolinko)
       </add>
+      <fix>
+        In test suite: speed up <code>TestGroupChannelSenderConnections</code>.
+        Remove 48 seconds worth of waits. (kkolinko)
+      </fix>
     </changelog>
   </subsection>
 </section>
