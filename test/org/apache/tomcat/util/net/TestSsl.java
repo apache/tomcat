@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -49,12 +49,12 @@ public class TestSsl extends TomcatBaseTest {
     @Test
     public void testSimpleSsl() throws Exception {
         TesterSupport.configureClientSsl();
-        
+
         Tomcat tomcat = getTomcatInstance();
 
         File appDir = new File(getBuildDirectory(), "webapps/examples");
         tomcat.addWebapp(null, "/examples", appDir.getAbsolutePath());
-        
+
         TesterSupport.initSsl(tomcat);
 
         tomcat.start();
@@ -66,12 +66,12 @@ public class TestSsl extends TomcatBaseTest {
     @Test
     public void testKeyPass() throws Exception {
         TesterSupport.configureClientSsl();
-        
+
         Tomcat tomcat = getTomcatInstance();
 
         File appDir = new File(getBuildDirectory(), "webapps/examples");
         tomcat.addWebapp(null, "/examples", appDir.getAbsolutePath());
-        
+
         TesterSupport.initSsl(tomcat, "localhost-copy1.jks", "changeit",
                 "tomcatpass");
 
@@ -86,7 +86,7 @@ public class TestSsl extends TomcatBaseTest {
 
     @Test
     public void testRenegotiateFail() throws Exception {
-        
+
         // If RFC5746 is supported, renegotiation will always work (and will
         // always be secure)
         if (TesterSupport.RFC_5746_SUPPORTED) {
@@ -102,7 +102,7 @@ public class TestSsl extends TomcatBaseTest {
         TesterSupport.initSsl(tomcat);
 
         // Default - MITM attack prevented
-        
+
         tomcat.start();
         SSLContext sslCtx = SSLContext.getInstance("TLS");
         sslCtx.init(null, TesterSupport.getTrustManagers(), null);
@@ -115,12 +115,12 @@ public class TestSsl extends TomcatBaseTest {
                 handshakeDone = true;
             }
         });
-        
+
         OutputStream os = socket.getOutputStream();
         os.write("GET /examples/servlets/servlet/HelloWorldExample HTTP/1.0\n".getBytes());
         os.flush();
 
-        
+
         InputStream is = socket.getInputStream();
 
         // Make sure the NIO connector has read the request before the handshake
@@ -129,7 +129,7 @@ public class TestSsl extends TomcatBaseTest {
         socket.startHandshake();
 
         os = socket.getOutputStream();
-        
+
         try {
             os.write("Host: localhost\n\n".getBytes());
         } catch (IOException ex) {
@@ -148,7 +148,7 @@ public class TestSsl extends TomcatBaseTest {
             // success - we timed-out without handshake
             return;
         }
-        
+
         fail("Re-negotiation worked");
     }
 
@@ -165,7 +165,7 @@ public class TestSsl extends TomcatBaseTest {
         tomcat.addWebapp(null, "/examples", appDir.getAbsolutePath());
 
         TesterSupport.initSsl(tomcat);
-        
+
         tomcat.start();
 
         SSLContext sslCtx = SSLContext.getInstance("TLS");

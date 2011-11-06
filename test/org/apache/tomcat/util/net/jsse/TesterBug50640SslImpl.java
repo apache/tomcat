@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -20,14 +20,14 @@ import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.net.ServerSocketFactory;
 
 public class TesterBug50640SslImpl extends JSSEImplementation {
-    
+
     public static final String PROPERTY_NAME = "bug50640";
     public static final String PROPERTY_VALUE = "pass";
 
     @Override
     public ServerSocketFactory getServerSocketFactory(
             AbstractEndpoint endpoint)  {
-        
+
         // Check the custom attribute is visible & correcly set
         String flag = endpoint.getProperty(PROPERTY_NAME);
         if (PROPERTY_VALUE.equals(flag)) {
@@ -35,6 +35,6 @@ public class TesterBug50640SslImpl extends JSSEImplementation {
         } else {
             return null;
         }
-    } 
+    }
 
 }

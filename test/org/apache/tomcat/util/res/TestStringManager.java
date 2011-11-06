@@ -29,7 +29,7 @@ public class TestStringManager {
     @Test
     public void testNullKey() {
         boolean iaeThrown = false;
-        
+
         try {
             sm.getString(null);
         } catch (IllegalArgumentException iae) {

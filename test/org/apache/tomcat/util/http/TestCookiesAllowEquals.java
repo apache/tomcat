@@ -48,7 +48,7 @@ public class TestCookiesAllowEquals extends TomcatBaseTest {
         TestCookieEqualsClient client = new TestCookieEqualsClient();
         client.doRequest();
     }
-    
+
     private class TestCookieEqualsClient extends SimpleHttpClient {
 
 
@@ -57,12 +57,12 @@ public class TestCookiesAllowEquals extends TomcatBaseTest {
             Context root = tomcat.addContext("", TEMP_DIR);
             Tomcat.addServlet(root, "Simple", new SimpleServlet());
             root.addServletMapping("/test", "Simple");
-            
+
             tomcat.start();
             // Open connection
             setPort(tomcat.getConnector().getPort());
             connect();
-            
+
             String[] request = new String[1];
             request[0] =
                 "GET /test HTTP/1.0" + CRLF +
@@ -72,7 +72,7 @@ public class TestCookiesAllowEquals extends TomcatBaseTest {
             setRequest(request);
             processRequest(true); // blocks until response has been read
             String response = getResponseBody();
-            
+
             // Close the connection
             disconnect();
             reset();
@@ -80,15 +80,15 @@ public class TestCookiesAllowEquals extends TomcatBaseTest {
             assertEquals(COOKIE_WITH_EQUALS_1 + COOKIE_WITH_EQUALS_2 +
                     COOKIE_WITH_EQUALS_3, response);
         }
-        
+
         @Override
         public boolean isResponseBodyOK() {
             return true;
         }
-        
+
     }
-    
-    
+
+
     private static class SimpleServlet extends HttpServlet {
 
         private static final long serialVersionUID = 1L;
@@ -103,7 +103,7 @@ public class TestCookiesAllowEquals extends TomcatBaseTest {
             }
             resp.flushBuffer();
         }
-        
+
     }
-    
+
 }
