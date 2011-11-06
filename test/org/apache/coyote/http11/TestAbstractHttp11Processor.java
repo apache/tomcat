@@ -36,13 +36,13 @@ public class TestAbstractHttp11Processor extends TomcatBaseTest {
     @Test
     public void testWithTEVoid() throws Exception {
         Tomcat tomcat = getTomcatInstance();
-        
+
         // Use the normal Tomcat ROOT context
         File root = new File("test/webapp-3.0");
         tomcat.addWebapp("", root.getAbsolutePath());
-        
+
         tomcat.start();
-        
+
         String request =
             "POST /echo-params.jsp HTTP/1.1" + SimpleHttpClient.CRLF +
             "Host: any" + SimpleHttpClient.CRLF +
@@ -65,13 +65,13 @@ public class TestAbstractHttp11Processor extends TomcatBaseTest {
     @Test
     public void testWithTEBuffered() throws Exception {
         Tomcat tomcat = getTomcatInstance();
-        
+
         // Use the normal Tomcat ROOT context
         File root = new File("test/webapp-3.0");
         tomcat.addWebapp("", root.getAbsolutePath());
-        
+
         tomcat.start();
-        
+
         String request =
             "POST /echo-params.jsp HTTP/1.1" + SimpleHttpClient.CRLF +
             "Host: any" + SimpleHttpClient.CRLF +
@@ -95,13 +95,13 @@ public class TestAbstractHttp11Processor extends TomcatBaseTest {
     @Test
     public void testWithTEIdentity() throws Exception {
         Tomcat tomcat = getTomcatInstance();
-        
+
         // Use the normal Tomcat ROOT context
         File root = new File("test/webapp-3.0");
         tomcat.addWebapp("", root.getAbsolutePath());
-        
+
         tomcat.start();
-        
+
         String request =
             "POST /echo-params.jsp HTTP/1.1" + SimpleHttpClient.CRLF +
             "Host: any" + SimpleHttpClient.CRLF +
@@ -127,13 +127,13 @@ public class TestAbstractHttp11Processor extends TomcatBaseTest {
     @Test
     public void testWithTESavedRequest() throws Exception {
         Tomcat tomcat = getTomcatInstance();
-        
+
         // Use the normal Tomcat ROOT context
         File root = new File("test/webapp-3.0");
         tomcat.addWebapp("", root.getAbsolutePath());
-        
+
         tomcat.start();
-        
+
         String request =
             "POST /echo-params.jsp HTTP/1.1" + SimpleHttpClient.CRLF +
             "Host: any" + SimpleHttpClient.CRLF +
@@ -157,13 +157,13 @@ public class TestAbstractHttp11Processor extends TomcatBaseTest {
     @Test
     public void testWithTEUnsupported() throws Exception {
         Tomcat tomcat = getTomcatInstance();
-        
+
         // Use the normal Tomcat ROOT context
         File root = new File("test/webapp-3.0");
         tomcat.addWebapp("", root.getAbsolutePath());
-        
+
         tomcat.start();
-        
+
         String request =
             "POST /echo-params.jsp HTTP/1.1" + SimpleHttpClient.CRLF +
             "Host: any" + SimpleHttpClient.CRLF +
@@ -187,15 +187,15 @@ public class TestAbstractHttp11Processor extends TomcatBaseTest {
     @Test
     public void testPipelining() throws Exception {
         Tomcat tomcat = getTomcatInstance();
-        
+
         // Must have a real docBase - just use temp
         Context ctxt = tomcat.addContext("",
                 System.getProperty("java.io.tmpdir"));
-        
+
         // Add protected servlet
         Tomcat.addServlet(ctxt, "TesterServlet", new TesterServlet());
         ctxt.addServletMapping("/foo", "TesterServlet");
-        
+
         tomcat.start();
 
         String requestPart1 =
@@ -226,17 +226,17 @@ public class TestAbstractHttp11Processor extends TomcatBaseTest {
         };
         Thread t = new Thread(send);
         t.start();
-        
+
         // Sleep for 1500 ms which should mean the all of request 1 has been
         // sent and half of request 2
         Thread.sleep(1500);
-        
+
         // Now read the first response
         client.readResponse(true);
         assertFalse(client.isResponse50x());
         assertTrue(client.isResponse200());
         assertEquals("OK", client.getResponseBody());
-        
+
         // Read the second response. No need to sleep, read will block until
         // there is data to process
         client.readResponse(true);
@@ -244,7 +244,7 @@ public class TestAbstractHttp11Processor extends TomcatBaseTest {
         assertTrue(client.isResponse200());
         assertEquals("OK", client.getResponseBody());
     }
-    
+
     private static final class Client extends SimpleHttpClient {
         @Override
         public boolean isResponseBodyOK() {

@@ -31,7 +31,7 @@ public class SimpleAjpClient {
 
     private static final int AJP_PACKET_SIZE = 8192;
     private static final byte[] AJP_CPING;
-   
+
     static {
         TesterAjpMessage ajpCping = new TesterAjpMessage(16);
         ajpCping.reset();
@@ -45,19 +45,19 @@ public class SimpleAjpClient {
     private String host = "localhost";
     private int port = -1;
     private Socket socket = null;
-    
+
     public void setPort(int port) {
         this.port = port;
     }
-    
+
     public int getPort() {
         return port;
     }
-    
+
     public void connect() throws IOException {
         socket = SocketFactory.getDefault().createSocket(host, port);
     }
-    
+
     public void disconnect() throws IOException {
         socket.close();
         socket = null;
@@ -69,17 +69,17 @@ public class SimpleAjpClient {
     public TesterAjpMessage createForwardMessage(String url) {
         TesterAjpMessage message = new TesterAjpMessage(AJP_PACKET_SIZE);
         message.reset();
-        
+
         // Set the header bytes
         message.getBuffer()[0] = 0x12;
         message.getBuffer()[1] = 0x34;
-        
+
         // Code 2 for forward request
         message.appendByte(Constants.JK_AJP13_FORWARD_REQUEST);
 
         // HTTP method, GET = 2
         message.appendByte(0x02);
-        
+
         // Protocol
         message.appendString("http");
 
@@ -91,19 +91,19 @@ public class SimpleAjpClient {
 
         // Remote host
         message.appendString("client.dev.local");
-        
+
         // Server name
         message.appendString(host);
-        
+
         // Port
         message.appendInt(port);
 
         // Is ssl
         message.appendByte(0x00);
-        
+
         // No other headers or attributes
         message.appendInt(0);
-        
+
         // Terminator
         message.appendByte(0xFF);
 
@@ -165,7 +165,7 @@ public class SimpleAjpClient {
             return message;
         }
     }
-    
+
     protected boolean read(InputStream is, byte[] buf, int pos, int n)
         throws IOException {
 
