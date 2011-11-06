@@ -312,6 +312,9 @@
       <update>
         Improve <code>RUNNING.txt</code>. (kkolinko)
       </update>
+      <update>
+        Update optional Checkstyle library to 5.5. (kkolinko)
+      </update>
     </changelog>
   </subsection>
 </section>
