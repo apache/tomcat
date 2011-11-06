@@ -81,17 +81,17 @@ public class TestCoyoteAdapter extends TomcatBaseTest {
     public void testPathParamsRedirect() throws Exception {
         // Setup Tomcat instance
         Tomcat tomcat = getTomcatInstance();
-        
+
         // Must have a real docBase - just use temp
         File docBase = new File(System.getProperty("java.io.tmpdir"));
-        
+
         // Create the folder that will trigger the redirect
         File foo = new File(docBase, "foo");
         addDeleteOnTearDown(foo);
         if (!foo.mkdirs() && !foo.isDirectory()) {
             fail("Unable to create foo directory in docBase");
         }
-        
+
         Context ctx = tomcat.addContext("", docBase.getAbsolutePath());
 
         Tomcat.addServlet(ctx, "servlet", new PathParamServlet());
@@ -113,7 +113,7 @@ public class TestCoyoteAdapter extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
 
         // Must have a real docBase - just use temp
-        Context ctx = 
+        Context ctx =
             tomcat.addContext("", System.getProperty("java.io.tmpdir"));
 
         Tomcat.addServlet(ctx, "servlet", new PathParamServlet());
@@ -134,7 +134,7 @@ public class TestCoyoteAdapter extends TomcatBaseTest {
         private static final long serialVersionUID = 1L;
 
         @Override
-        protected void doGet(HttpServletRequest req, HttpServletResponse resp) 
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
                 throws ServletException, IOException {
             resp.setContentType("text/plain");
             PrintWriter pw = resp.getWriter();
@@ -167,7 +167,7 @@ public class TestCoyoteAdapter extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
 
         // Must have a real docBase - just use temp
-        Context ctx = 
+        Context ctx =
             tomcat.addContext("/testapp", System.getProperty("java.io.tmpdir"));
 
         Tomcat.addServlet(ctx, "servlet", new PathParamServlet());

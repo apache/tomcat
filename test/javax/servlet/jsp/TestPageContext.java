@@ -36,12 +36,12 @@ public class TestPageContext extends TomcatBaseTest {
         File appDir = new File("test/webapp-3.0");
         // app dir is relative to server home
         tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());
-        
+
         tomcat.start();
 
         ByteChunk res = getUrl("http://localhost:" + getPort() +
                 "/test/bug49nnn/bug49196.jsp");
-        
+
         String result = res.toString();
         assertTrue(result.contains("OK"));
     }
