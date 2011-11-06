@@ -31,7 +31,7 @@ public class TesterServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
-        
+
         resp.setContentType("text/plain");
         PrintWriter out = resp.getWriter();
         out.print("OK");
