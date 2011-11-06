@@ -32,11 +32,11 @@ public class SocketValidateReceive {
     static BigDecimal total = new BigDecimal(0);
     static BigDecimal bytes = new BigDecimal(32871);
 
-    
+
     public static void main(String[] args) throws Exception {
         int size = 43800;
         if (args.length > 0 ) try {size=Integer.parseInt(args[0]);}catch(Exception x){ /* Ignore */ }
-   
+
         ServerSocket srvSocket = new ServerSocket(9999);
         System.out.println("Listening on 9999");
         Socket socket = srvSocket.accept();
@@ -65,7 +65,7 @@ public class SocketValidateReceive {
                 System.exit(1);
             }
             count += reader.append(buf,0,len);
-            
+
             if ( bytes.intValue() != len ) bytes = new BigDecimal((double)len);
             total = total.add(bytes);
             mb += ( (double) len) / 1024 / 1024;
@@ -73,7 +73,7 @@ public class SocketValidateReceive {
                 printStats(start, mb, count, df, total);
             }
         }
-        
+
     }
 
     private static void printStats(long start, double mb, int count, DecimalFormat df, BigDecimal total) {
@@ -81,7 +81,7 @@ public class SocketValidateReceive {
         double seconds = ((double)(time-start))/1000;
         System.out.println("Throughput "+df.format(mb/seconds)+" MB/seconds messages "+count+", total "+mb+" MB, total "+total+" bytes.");
     }
-    
+
     public static class MyDataReader {
         int length = 10;
         int cur = 0;
@@ -89,10 +89,10 @@ public class SocketValidateReceive {
         public MyDataReader(int len) {
             length = len;
         }
-        
+
         public int append(byte[] b, int off, int len) throws Exception {
             int packages = 0;
-            for ( int i=off; i<len; i++ ) { 
+            for ( int i=off; i<len; i++ ) {
                 if ( cur == length ) {
                     cur = 0;
                     seq++;
