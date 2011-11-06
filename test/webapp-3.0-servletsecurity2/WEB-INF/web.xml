@@ -20,7 +20,7 @@
   xsi:schemaLocation="http://java.sun.com/xml/ns/javaee
                       http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
   version="3.0"
-  metadata-complete="true">  
+  metadata-complete="true">
 
   <!--
     WARNING:
@@ -33,7 +33,7 @@
      Used as part of the Tomcat unit tests when a full web application is
      required.
   </description>
-  
+
   <security-constraint>
     <auth-constraint/>
     <web-resource-collection>

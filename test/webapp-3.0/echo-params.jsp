@@ -21,7 +21,7 @@
 Enumeration<String> params = request.getParameterNames();
 while (params.hasMoreElements()) {
     String param = params.nextElement();
-    
+
     String[] values = request.getParameterValues(param);
     for (String value : values) {
         // Don't do this in a real webapp - XSS issues

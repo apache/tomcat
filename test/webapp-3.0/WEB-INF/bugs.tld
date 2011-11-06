@@ -34,7 +34,7 @@
     <tei-class>org.apache.jasper.compiler.TestScriptingVariabler$Bug48616bTei</tei-class>
     <body-content>JSP</body-content>
   </tag>
-  
+
   <tag>
     <name>Bug48701a</name>
     <tag-class>org.apache.jasper.compiler.TestGenerator$Bug48701</tag-class>
