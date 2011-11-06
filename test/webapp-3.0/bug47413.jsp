@@ -26,11 +26,11 @@
     <jsp:setProperty name="values" property="doubleValue" value="${1+2}.${220}"/>
     <p>02-${values.doubleValue}</p>
     <tags:echo-double index="03" echo="${1+2}.${220}"/>
-    
+
     <jsp:setProperty name="values" property="longValue" value="000${1}${7}"/>
     <p>04-${values.longValue}</p>
     <tags:echo-long index="05" echo="000${1}${7}"/>
-    
+
     <jsp:setProperty name="values" property="stringValue"
                      value="${undefinedFoo}hello world${undefinedBar}"/>
     <p>06-${values.stringValue}</p>

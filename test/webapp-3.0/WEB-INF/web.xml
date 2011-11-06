@@ -20,14 +20,14 @@
   xsi:schemaLocation="http://java.sun.com/xml/ns/javaee
                       http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
   version="3.0"
-  metadata-complete="true">  
+  metadata-complete="true">
 
   <display-name>Tomcat Test Application</display-name>
   <description>
      Used as part of the Tomcat unit tests when a full web application is
      required.
   </description>
-  
+
   <!--  Bug 49922 -->
   <filter>
     <filter-name>Bug49922</filter-name>
@@ -95,7 +95,7 @@
     <servlet-name>Bug49922</servlet-name>
     <url-pattern>*.od</url-pattern>
   </servlet-mapping>
-  
+
   <jsp-config>
     <jsp-property-group>
       <default-content-type>text/plain</default-content-type>
@@ -103,14 +103,14 @@
       <url-pattern>/bug49nnn/bug49726b.jsp</url-pattern>
     </jsp-property-group>
   </jsp-config>
-  
+
   <servlet>
     <servlet-name>DenyByAnnotation</servlet-name>
     <servlet-class>org.apache.catalina.core.TestStandardWrapper$DenyAllServlet</servlet-class>
   </servlet>
   <servlet-mapping>
     <servlet-name>DenyByAnnotation</servlet-name>
-    <url-pattern>/testStandardWrapper/securityAnnotationsMetaDataPriority</url-pattern>  
+    <url-pattern>/testStandardWrapper/securityAnnotationsMetaDataPriority</url-pattern>
   </servlet-mapping>
 
   <login-config>
