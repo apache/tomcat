@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -29,7 +29,7 @@ import org.junit.Test;
  * a number of classes. In some cases the Javadoc is unclear on the
  * thread-safety of a class. These tests were written to test the thread-safety
  * of key classes.
- * 
+ *
  * Named Threading so it is not automatically executed as part of the unit
  * tests.
  */
@@ -38,12 +38,12 @@ public class Threading {
     /**
      * {@link FileInputStream#read(byte[])} and related methods are all native
      * methods so it isn't immediately obvious if they are thread-safe or not.
-     * 
+     *
      * <pre>
      * Windows JDK 1.6.0_22_x64 - Thread safe
      * OSX     JDK 1.6.0_22_x64 - Not thread safe
      * </pre>
-     * 
+     *
      * Therefore, have to assume that {@link FileInputStream#read(byte[])} is
      * not thread safe.
      */
@@ -56,24 +56,24 @@ public class Threading {
     }
 
     public void doTestFileInputStream(int threadCount) throws Exception {
-        
+
         // Assumes "ant release" has been run
         // Will need to be updated as new releases are made
         File file = new File(
                 "./output/release/v7.0.20-dev/bin/apache-tomcat-7.0.20-dev.zip");
-        
+
         FileInputStream fis = new FileInputStream(file);
-        
+
         Thread[] threads = new Thread[threadCount];
         FisReaderThread[] runnables = new FisReaderThread[threadCount];
-        
+
         for (int i = 0; i < threadCount; i++) {
             runnables[i] = new FisReaderThread(fis);
             threads[i] = new Thread(runnables[i]);
         }
-        
+
         long start = System.currentTimeMillis();
-        
+
         for (int i = 0; i < threadCount; i++) {
             threads[i].start();
         }
@@ -89,7 +89,7 @@ public class Threading {
             }
         }
         long end = System.currentTimeMillis();
-        
+
         long byteCount = 0;
         for (int i = 0; i < threadCount; i++) {
             byteCount += runnables[i].getByteCount();
@@ -135,11 +135,11 @@ public class Threading {
                 }
             }
         }
-        
+
         public long getByteCount() {
             return byteCount;
         }
-        
+
         public boolean isfailed() {
             return fail;
         }

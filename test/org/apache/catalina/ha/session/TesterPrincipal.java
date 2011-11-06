@@ -21,7 +21,7 @@ import java.io.Serializable;
 import java.security.Principal;
 
 public class TesterPrincipal implements Principal, Serializable {
-    
+
     private static final long serialVersionUID = 1L;
 
     private String name;
@@ -29,10 +29,10 @@ public class TesterPrincipal implements Principal, Serializable {
     public TesterPrincipal(String theName) {
         name = theName;
     }
-    
+
     @Override
     public String getName() {
         return name;
     }
-    
+
 }

@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -42,7 +42,7 @@ public class Benchmarks {
      *  2 threads -  ~2,100ms
      *  4 threads -  ~3,100ms
      * 16 threads - ~14,700ms
-     * 
+     *
      * Results on markt's 2-core OSX dev box
      *  1 thread  -   ~1,400ms
      *  2 threads -   ~1,700ms
@@ -65,8 +65,8 @@ public class Benchmarks {
         doTestManagerBaseGenerateSessionId(100, 100000);
         doTestManagerBaseGenerateSessionId(400, 10000);
     }
-    
-    
+
+
     private void doTestManagerBaseGenerateSessionId(int threadCount,
             int iterCount) throws Exception {
 
@@ -87,16 +87,16 @@ public class Benchmarks {
             mgr.sessionExpirationTiming.add(null);
         }
 
-        
+
         Thread[] threads = new Thread[threadCount];
-        
+
         for (int i = 0; i < threadCount; i++) {
             threads[i] = new Thread(
                     new TestThreadGenerateSessionId(mgr, iterCount));
         }
-        
+
         long start = System.currentTimeMillis();
-        
+
         for (int i = 0; i < threadCount; i++) {
             threads[i].start();
         }
@@ -109,7 +109,7 @@ public class Benchmarks {
             }
         }
         long end = System.currentTimeMillis();
-        
+
         StringBuilder result = new StringBuilder();
         result.append("Threads: ");
         result.append(threadCount);
@@ -117,13 +117,13 @@ public class Benchmarks {
         result.append(end-start);
         System.out.println(result.toString());
     }
-    
-    
+
+
     private static final class TestThreadGenerateSessionId implements Runnable {
 
         private ManagerBase mgr;
         private int count;
-        
+
         public TestThreadGenerateSessionId(ManagerBase mgr, int count) {
             this.mgr = mgr;
             this.count = count;
@@ -137,14 +137,14 @@ public class Benchmarks {
         }
     }
 
-    
+
     /*
      * Results on markt's 4-core Windows dev box
      *  1 thread  -  ~3,800ms
      *  2 threads -  ~6,700ms
      *  4 threads - ~11,000ms
      * 16 threads - ~43,500ms
-     * 
+     *
      * Results on markt's 2-core OSX dev box
      *  1 thread  -  ~4,100ms
      *  2 threads -  ~5,700ms
@@ -161,8 +161,8 @@ public class Benchmarks {
         doTestManagerBaseCreateSession(100, 100000);
         doTestManagerBaseCreateSession(400, 10000);
     }
-    
-    
+
+
     private void doTestManagerBaseCreateSession(int threadCount,
             int iterCount) {
 
@@ -185,14 +185,14 @@ public class Benchmarks {
         }
 
         Thread[] threads = new Thread[threadCount];
-        
+
         for (int i = 0; i < threadCount; i++) {
             threads[i] = new Thread(
                     new TestThreadCreateSession(mgr, iterCount));
         }
-        
+
         long start = System.currentTimeMillis();
-        
+
         for (int i = 0; i < threadCount; i++) {
             threads[i].start();
         }
@@ -205,7 +205,7 @@ public class Benchmarks {
             }
         }
         long end = System.currentTimeMillis();
-        
+
         StringBuilder result = new StringBuilder();
         result.append("Threads: ");
         result.append(threadCount);
@@ -213,12 +213,12 @@ public class Benchmarks {
         result.append(end-start);
         System.out.println(result.toString());
     }
-    
+
     private static final class TestThreadCreateSession implements Runnable {
 
         private ManagerBase mgr;
         private int count;
-        
+
         public TestThreadCreateSession(ManagerBase mgr, int count) {
             this.mgr = mgr;
             this.count = count;
@@ -232,18 +232,18 @@ public class Benchmarks {
             }
         }
     }
-    
-    
+
+
     /*
      * SecureRandom vs. reading /dev/urandom. Very different performance noted
      * on some platforms.
-     * 
+     *
      * Results on markt's 4-core Windows dev box
      *              SecureRandom  /dev/urandom
      *  1 thread  -    ~766ms        N/A
      *  2 threads -    ~843ms        N/A
      *  4 threads -    ~766ms        N/A
-     *  
+     *
      * Results on markt's 2-core OSX dev box
      *              SecureRandom  /dev/urandom
      *  1 thread  -     ~759ms      ~3,500ms
@@ -267,7 +267,7 @@ public class Benchmarks {
             int iterCount, boolean useSecureRandom) throws Exception {
 
         Thread[] threads = new Thread[threadCount];
-        
+
         for (int i = 0; i < threadCount; i++) {
             if (useSecureRandom) {
                 threads[i] = new Thread(new TestThreadSecureRandom(iterCount));
@@ -275,9 +275,9 @@ public class Benchmarks {
                 threads[i] = new Thread(new TestThreadDevUrandom(iterCount));
             }
         }
-        
+
         long start = System.currentTimeMillis();
-        
+
         for (int i = 0; i < threadCount; i++) {
             threads[i].start();
         }
@@ -290,7 +290,7 @@ public class Benchmarks {
             }
         }
         long end = System.currentTimeMillis();
-        
+
         StringBuilder result = new StringBuilder();
         if (useSecureRandom) {
             result.append("SecureRandom ");
@@ -305,11 +305,11 @@ public class Benchmarks {
     }
 
     private static final class TestThreadSecureRandom implements Runnable {
-        
+
         private SecureRandom secureRandom;
         private byte[] bytes = new byte[16];
         private int count;
-        
+
         TestThreadSecureRandom(int iterCount) throws Exception {
             this.count = iterCount;
             this.secureRandom = SecureRandom.getInstance("SHA1PRNG");
@@ -321,15 +321,15 @@ public class Benchmarks {
                 secureRandom.nextBytes(bytes);
             }
         }
-        
+
     }
-    
+
     private static final class TestThreadDevUrandom implements Runnable {
-        
+
         private InputStream is;
         private byte[] bytes = new byte[16];
         private int count;
-        
+
         TestThreadDevUrandom(int iterCount) {
             try {
                 is = new FileInputStream("/dev/urandom");

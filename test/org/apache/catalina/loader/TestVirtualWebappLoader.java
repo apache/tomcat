@@ -41,13 +41,13 @@ public class TestVirtualWebappLoader extends TomcatBaseTest {
     @Test
     public void testStartInternal() throws Exception {
         Tomcat tomcat = getTomcatInstance();
-        File appDir = new File("test/webapp-3.0");      
+        File appDir = new File("test/webapp-3.0");
         // Must have a real docBase - just use temp
-        StandardContext ctx = 
+        StandardContext ctx =
             (StandardContext)tomcat.addContext("",  appDir.getAbsolutePath());
 
         VirtualWebappLoader loader = new VirtualWebappLoader();
-         
+
         loader.setContainer(ctx);
         ctx.setLoader(loader);
         ctx.setResources(new FileDirContext());
@@ -61,12 +61,12 @@ public class TestVirtualWebappLoader extends TomcatBaseTest {
         // ToDo: Why doesn't remove repositories?
         repos = loader.getRepositories();
         assertEquals(2, repos.length);
-        
+
         // no leak
         loader.start();
         repos = loader.getRepositories();
         assertEquals(2,repos.length);
-        
+
         // clear loader
         ctx.setLoader(null);
         // see tearDown()!
