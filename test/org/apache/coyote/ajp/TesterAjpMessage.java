@@ -27,7 +27,7 @@ public class TesterAjpMessage extends AjpMessage {
     public TesterAjpMessage(int packetSize) {
         super(packetSize);
     }
-    
+
     public byte readByte() {
         return buf[pos++];
     }
@@ -42,10 +42,10 @@ public class TesterAjpMessage extends AjpMessage {
         int len = readInt();
         return readString(len);
     }
-    
+
     public String readString(int len) {
         StringBuilder buffer = new StringBuilder(len);
-        
+
         for (int i = 0; i < len; i++) {
             char c = (char) buf[pos++];
             buffer.append(c);
@@ -79,5 +79,5 @@ public class TesterAjpMessage extends AjpMessage {
         buf[3] = (byte) (dLen & 0xFF);
     }
 
-    
+
 }

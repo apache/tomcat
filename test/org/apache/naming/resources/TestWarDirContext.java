@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -29,7 +29,7 @@ import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.util.buf.ByteChunk;
 
 public class TestWarDirContext extends TomcatBaseTest {
-    
+
     @Override
     public void setUp() throws Exception {
         super.setUp();
@@ -50,20 +50,20 @@ public class TestWarDirContext extends TomcatBaseTest {
     @Test
     public void testLookupException() throws Exception {
         Tomcat tomcat = getTomcatInstance();
-        
+
         File appDir = new File("test/webapp-3.0-fragments");
         // app dir is relative to server home
         tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());
-        
+
         tomcat.start();
-        
+
         ByteChunk bc = getUrl("http://localhost:" + getPort() +
                 "/test/warDirContext.jsp");
         assertEquals("<p>java.lang.ClassNotFoundException</p>",
                 bc.toString());
     }
 
-    
+
     /**
      * Additional test following on from SPR-7350 above to check files that
      * contain JNDI reserved characters can be served when caching is enabled.
@@ -71,13 +71,13 @@ public class TestWarDirContext extends TomcatBaseTest {
     @Test
     public void testReservedJNDIFileNamesWithCache() throws Exception {
         Tomcat tomcat = getTomcatInstance();
-        
+
         File appDir = new File("test/webapp-3.0-fragments");
         // app dir is relative to server home
         StandardContext ctxt = (StandardContext) tomcat.addWebapp(
                 null, "/test", appDir.getAbsolutePath());
         ctxt.setCachingAllowed(true);
-        
+
         tomcat.start();
 
         // Should be found in resources.jar
@@ -93,7 +93,7 @@ public class TestWarDirContext extends TomcatBaseTest {
                 bc.toString());
     }
 
-    
+
     /**
      * Additional test following on from SPR-7350 above to check files that
      * contain JNDI reserved characters can be served when caching is disabled.
@@ -101,13 +101,13 @@ public class TestWarDirContext extends TomcatBaseTest {
     @Test
     public void testReservedJNDIFileNamesNoCache() throws Exception {
         Tomcat tomcat = getTomcatInstance();
-        
+
         File appDir = new File("test/webapp-3.0-fragments");
         // app dir is relative to server home
         StandardContext ctxt = (StandardContext) tomcat.addWebapp(
                 null, "/test", appDir.getAbsolutePath());
         ctxt.setCachingAllowed(false);
-        
+
         tomcat.start();
 
         // Should be found in resources.jar
