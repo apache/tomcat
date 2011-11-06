@@ -56,7 +56,7 @@ public class TestOrderInterceptor {
         threads = new Thread[channelCount];
         for ( int i=0; i<channelCount; i++ ) {
             channels[i] = new GroupChannel();
-            
+
             orderitcs[i] = new OrderInterceptor();
             mangleitcs[i] = new MangleOrderInterceptor();
             orderitcs[i].setExpire(Long.MAX_VALUE);
@@ -125,7 +125,7 @@ public class TestOrderInterceptor {
             threads[i].join();
         }
         if (!exceptionQueue.isEmpty()) {
-            fail("Exception while sending in threads: " 
+            fail("Exception while sending in threads: "
                     + exceptionQueue.remove().toString());
         }
         Thread.sleep(5000);
@@ -145,7 +145,7 @@ public class TestOrderInterceptor {
     public static void main(String[] args) {
         org.junit.runner.JUnitCore.main(TestOrderInterceptor.class.getName());
     }
-    
+
     public static class TestListener implements ChannelListener {
         int id = -1;
         public TestListener(int id) {
@@ -169,7 +169,7 @@ public class TestOrderInterceptor {
             return (msg instanceof Integer);
         }
     }
-    
+
     public static class MangleOrderInterceptor extends ChannelInterceptorBase {
         ChannelMessage hold = null;
         Member[] dest = null;

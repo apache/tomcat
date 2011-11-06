@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -45,7 +45,7 @@ public class LoadTest implements MembershipListener,ChannelListener, Runnable {
     public static int size = 24000;
     public static Object mutex = new Object();
     public boolean doRun = true;
-    
+
     public long bytesReceived = 0;
     public float mBytesReceived = 0;
     public int  messagesReceived = 0;
@@ -59,30 +59,30 @@ public class LoadTest implements MembershipListener,ChannelListener, Runnable {
     public boolean async = false;
     public long receiveStart = 0;
     public int channelOptions = Channel.SEND_OPTIONS_DEFAULT;
-    
+
     static int messageSize = 0;
-    
+
     public static long messagesSent = 0;
     public static long messageStartSendTime = 0;
     public static long messageEndSendTime = 0;
     public static int  threadCount = 0;
-    
+
     public static synchronized void startTest() {
         threadCount++;
         if ( messageStartSendTime == 0 ) messageStartSendTime = System.currentTimeMillis();
     }
-    
+
     public static synchronized void endTest() {
         threadCount--;
         if ( messageEndSendTime == 0 && threadCount==0 ) messageEndSendTime = System.currentTimeMillis();
     }
 
-    
+
     public static synchronized long addSendStats(long count) {
         messagesSent+=count;
         return 0l;
-    }    
-    
+    }
+
     private static void printSendStats(long counter, int messageSize) {
         float cnt = counter;
         float size = messageSize;
@@ -96,7 +96,7 @@ public class LoadTest implements MembershipListener,ChannelListener, Runnable {
     }
 
 
-    public LoadTest(ManagedChannel channel, 
+    public LoadTest(ManagedChannel channel,
                     boolean send,
                     int msgCount,
                     boolean debug,
@@ -115,11 +115,11 @@ public class LoadTest implements MembershipListener,ChannelListener, Runnable {
 
     @Override
     public void run() {
-        
+
         long counter = 0;
         long total = 0;
         LoadMessage msg = new LoadMessage();
-        
+
         try {
             startTest();
             while (total < msgCount) {
@@ -158,7 +158,7 @@ public class LoadTest implements MembershipListener,ChannelListener, Runnable {
                     //print from the global counter
                     //printSendStats(LoadTest.messagesSent, LoadTest.messageSize, LoadTest.messageSendTime);
                     printSendStats(LoadTest.messagesSent, LoadTest.messageSize);
-                    
+
                 }
 
             }
@@ -197,29 +197,29 @@ public class LoadTest implements MembershipListener,ChannelListener, Runnable {
     public void memberDisappeared(Member member) {
         log.info("Member disappeared:"+member);
     }
-    
+
     @Override
-    public boolean accept(Serializable msg, Member mbr){ 
+    public boolean accept(Serializable msg, Member mbr){
        return (msg instanceof LoadMessage) || (msg instanceof ByteMessage);
     }
-    
+
     @Override
-    public void messageReceived(Serializable msg, Member mbr){ 
+    public void messageReceived(Serializable msg, Member mbr){
         if ( receiveStart == 0 ) receiveStart = System.currentTimeMillis();
         if ( debug ) {
             if ( msg instanceof LoadMessage ) {
                 printArray(((LoadMessage)msg).getMessage());
             }
         }
-        
+
         if ( msg instanceof ByteMessage && !(msg instanceof LoadMessage)) {
             LoadMessage tmp = new LoadMessage();
             tmp.setMessage(((ByteMessage)msg).getMessage());
             msg = tmp;
             tmp = null;
         }
-        
-        
+
+
         bytesReceived+=((LoadMessage)msg).getMessage().length;
         mBytesReceived+=(((LoadMessage)msg).getMessage().length)/1024f/1024f;
         messagesReceived++;
@@ -237,8 +237,8 @@ public class LoadTest implements MembershipListener,ChannelListener, Runnable {
 
         }
     }
-    
-    
+
+
     public static void printArray(byte[] data) {
         System.out.print("{");
         for (int i=0; i<data.length; i++ ) {
@@ -250,7 +250,7 @@ public class LoadTest implements MembershipListener,ChannelListener, Runnable {
 
 
     public static class LoadMessage extends ByteMessage {
-        
+
         public static byte[] outdata = new byte[size];
         public static Random r = new Random();
         public static int getMessageSize (LoadMessage msg) {
@@ -259,13 +259,13 @@ public class LoadTest implements MembershipListener,ChannelListener, Runnable {
         static {
             r.nextBytes(outdata);
         }
-        
+
         protected byte[] message = getMessage();
-        
+
         public LoadMessage() {
             // Default constructor
         }
-        
+
         @Override
         public byte[] getMessage() {
             if ( message == null ) {
@@ -273,13 +273,13 @@ public class LoadTest implements MembershipListener,ChannelListener, Runnable {
             }
             return message;
         }
-        
+
         @Override
         public void setMessage(byte[] data) {
             this.message = data;
         }
     }
-    
+
     public static void usage() {
         System.out.println("Tribes Load tester.");
         System.out.println("The load tester can be used in sender or received mode or both");
@@ -304,7 +304,7 @@ public class LoadTest implements MembershipListener,ChannelListener, Runnable {
                            "java LoadTest -bind 192.168.0.45 -port 4005\n\t"+
                            "java LoadTest -bind 192.168.0.45 -port 4005 -mbind 192.168.0.45 -count 100 -stats 10\n");
     }
-    
+
     public static void main(String[] args) throws Exception {
         boolean send = true;
         boolean debug = false;
@@ -347,19 +347,19 @@ public class LoadTest implements MembershipListener,ChannelListener, Runnable {
                 if ( "receive".equals(args[++i]) ) send = false;
             } else if ("-debug".equals(args[i])) {
                 debug = true;
-            } else if ("-help".equals(args[i])) 
+            } else if ("-help".equals(args[i]))
             {
                 usage();
                 System.exit(1);
             }
         }
-        
+
         ManagedChannel channel = (ManagedChannel)ChannelCreator.createChannel(args);
-        
+
         LoadTest test = new LoadTest(channel,send,count,debug,pause,stats,breakOnEx);
         test.channelOptions = channelOptions;
         LoadMessage msg = new LoadMessage();
-        
+
         messageSize = LoadMessage.getMessageSize(msg);
         channel.addChannelListener(test);
         channel.addMembershipListener(test);
@@ -377,14 +377,14 @@ public class LoadTest implements MembershipListener,ChannelListener, Runnable {
         if ( shutdown && send ) channel.stop(Channel.DEFAULT);
         System.out.println("System test complete, sleeping to let threads finish.");
         Thread.sleep(60*1000*60);
-    } 
-    
+    }
+
     public static class Shutdown extends Thread {
         ManagedChannel channel = null;
         public Shutdown(ManagedChannel channel) {
             this.channel = channel;
         }
-        
+
         @Override
         public void run() {
             System.out.println("Shutting down...");
@@ -393,7 +393,7 @@ public class LoadTest implements MembershipListener,ChannelListener, Runnable {
             exit.start();
             try {
                 channel.stop(Channel.DEFAULT);
-                
+
             }catch ( Exception x ) {
                 x.printStackTrace();
             }
@@ -416,5 +416,5 @@ public class LoadTest implements MembershipListener,ChannelListener, Runnable {
 
         }
     }
-    
+
 }

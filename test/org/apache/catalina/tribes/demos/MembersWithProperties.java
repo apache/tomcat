@@ -36,13 +36,13 @@ public class MembersWithProperties implements MembershipListener{
         ManagedChannel mchannel = (ManagedChannel)channel;
         mchannel.getMembershipService().setPayload(getPayload(props));
     }
-    
+
     byte[] getPayload(Properties props) throws IOException {
         ByteArrayOutputStream bout = new ByteArrayOutputStream();
         props.store(bout,"");
         return bout.toByteArray();
     }
-    
+
     Properties getProperties(byte[] payload) throws IOException {
         ByteArrayInputStream bin = new ByteArrayInputStream(payload);
         Properties props = new Properties();
@@ -60,7 +60,7 @@ public class MembersWithProperties implements MembershipListener{
             x.printStackTrace();
         }
     }
-  
+
     @Override
     public void memberDisappeared(Member member) {
         try {

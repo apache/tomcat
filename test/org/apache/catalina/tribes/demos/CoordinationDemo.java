@@ -47,13 +47,13 @@ public class CoordinationDemo {
     public CoordinationDemo() {
         // Default constructor
     }
-    
+
     public void init() {
         reader = new BufferedReader(new InputStreamReader(System.in));
         status = new Status[CHANNEL_COUNT];
     }
-    
-    
+
+
     public void clearScreen() {
         StringBuilder buf = new StringBuilder(700);
         for (int i=0; i<CLEAR_SCREEN; i++ ) buf.append("\n");
@@ -68,7 +68,7 @@ public class CoordinationDemo {
         System.out.println("\tquit");
         System.out.print("Enter command:");
     }
-    
+
     public synchronized void printScreen() {
         clearScreen();
         System.out.println(" ###."+getHeader());
@@ -79,9 +79,9 @@ public class CoordinationDemo {
         System.out.println("\n\n");
         System.out.println("Overall status:"+statusLine);
         printMenuOptions();
-        
+
     }
-    
+
     public String getHeader() {
         //member - 30
         //running- 10
@@ -96,19 +96,19 @@ public class CoordinationDemo {
         buf.append(leftfill("View-id(short)",24," "));
         buf.append(leftfill("Count",8," "));
         buf.append("\n");
-        
+
         buf.append(rightfill("==="+new java.sql.Timestamp(System.currentTimeMillis()).toString(),SCREEN_WIDTH,"="));
         buf.append("\n");
         return buf.toString();
     }
-    
+
     public String[] tokenize(String line) {
         StringTokenizer tz = new StringTokenizer(line," ");
         String[] result = new String[tz.countTokens()];
         for (int i=0; i<result.length; i++ ) result[i] = tz.nextToken();
         return result;
     }
-    
+
     public void waitForInput() throws IOException {
         for ( int i=0; i<status.length; i++ ) status[i] = new Status(this);
         printScreen();
@@ -150,7 +150,7 @@ public class CoordinationDemo {
             }
             for (int i = 0; i < status.length; i++) if (MULTI_THREAD ) t[i].start(); else t[i].run();
             setSystemStatus("System stopped.");
-        } else { 
+        } else {
             int index = -1;
             try { index = Integer.parseInt(args[1])-1;}catch ( Exception x ) {setSystemStatus("Invalid index:"+args[1]);}
             if ( index >= 0 ) {
@@ -176,7 +176,7 @@ public class CoordinationDemo {
             }
             for (int i = 0; i < status.length; i++) if (MULTI_THREAD ) t[i].start(); else t[i].run();
             setSystemStatus("System started.");
-        } else { 
+        } else {
             int index = -1;
             try { index = Integer.parseInt(args[1])-1;}catch ( Exception x ) {setSystemStatus("Invalid index:"+args[1]);}
             if ( index >= 0 ) {
@@ -201,7 +201,7 @@ public class CoordinationDemo {
             VIEW_EVENTS[idx] = true;
         }
     }
-    
+
     public static void run(String[] args,CoordinationDemo demo) throws Exception {
         usage();
         java.util.Arrays.fill(VIEW_EVENTS,true);
@@ -221,7 +221,7 @@ public class CoordinationDemo {
         }
         demo.init();
         demo.waitForInput();
-    }    
+    }
 
     private static void usage() {
         System.out.println("Usage:");
@@ -237,14 +237,14 @@ public class CoordinationDemo {
         CoordinationDemo demo = new CoordinationDemo();
         run(args,demo);
     }
-    
+
     public static String leftfill(String value, int length, String ch) {
         return fill(value,length,ch,true);
     }
-    
+
     public static String rightfill(String value, int length, String ch) {
         return fill(value,length,ch,false);
-    }    
+    }
 
     public static String fill(String value, int length, String ch, boolean left) {
         StringBuilder buf = new StringBuilder();
@@ -253,8 +253,8 @@ public class CoordinationDemo {
         if ( left ) buf.append(value.trim());
         return buf.toString();
     }
-    
-    
+
+
     public static class Status {
         public CoordinationDemo parent;
         public GroupChannel channel;
@@ -262,11 +262,11 @@ public class CoordinationDemo {
         public String status;
         public Exception error;
         public String startstatus = "new";
-        
+
         public Status(CoordinationDemo parent) {
             this.parent = parent;
         }
-        
+
         public String getStatusLine() {
             //member - 30
             //running- 10
@@ -297,12 +297,12 @@ public class CoordinationDemo {
             buf.append("\n");
             return buf.toString();
         }
-        
+
         public String getByteString(byte[] b) {
             if ( b == null ) return "{}";
             return Arrays.toString(b,0,Math.min(b.length,4));
         }
-        
+
         public void start() {
             try {
                 if ( channel == null ) {
@@ -329,7 +329,7 @@ public class CoordinationDemo {
                 interceptor = null;
             }
         }
-        
+
         public void stop() {
             try {
                 if ( channel != null ) {
@@ -353,7 +353,7 @@ public class CoordinationDemo {
                 interceptor = null;
             }
         }
-        
+
         public GroupChannel createChannel() {
             channel = new GroupChannel();
             ((ReceiverBase)channel.getChannelReceiver()).setAutoBind(100);
