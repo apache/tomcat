@@ -33,16 +33,16 @@ public class TestCsrfPreventionFilter2 {
     public void testLruCacheConcurrency() throws Exception {
         int threadCount = 2;
         long iterationCount = 100000L;
-        
+
         assertTrue(threadCount > 1);
 
         LruCache<String> cache = new LruCache<String>(threadCount - 1);
-        
+
         LruTestThread[] threads = new LruTestThread[threadCount];
         for (int i = 0; i < threadCount; i++) {
             threads[i] = new LruTestThread(cache, iterationCount);
         }
-        
+
         for (int i = 0; i < threadCount; i++) {
             threads[i].start();
         }

@@ -28,45 +28,45 @@ public class TestWebXml {
 
     @Test
     public void testParseVersion() {
-        
+
         WebXml webxml = new WebXml();
-        
+
         // Defaults
         assertEquals(3, webxml.getMajorVersion());
         assertEquals(0, webxml.getMinorVersion());
-        
+
         // Both get changed
         webxml.setVersion("2.5");
         assertEquals(2, webxml.getMajorVersion());
         assertEquals(5, webxml.getMinorVersion());
-        
+
         // Reset
         webxml.setVersion("0.0");
         assertEquals(0, webxml.getMajorVersion());
         assertEquals(0, webxml.getMinorVersion());
-        
+
         // null input should be ignored
         webxml.setVersion(null);
         assertEquals(0, webxml.getMajorVersion());
         assertEquals(0, webxml.getMinorVersion());
-        
+
         // major only
         webxml.setVersion("3");
         assertEquals(3, webxml.getMajorVersion());
         assertEquals(0, webxml.getMinorVersion());
-        
+
         // no minor digit
         webxml.setVersion("0.0");   // reset
         webxml.setVersion("3.");
         assertEquals(3, webxml.getMajorVersion());
         assertEquals(0, webxml.getMinorVersion());
-        
+
         // minor only
         webxml.setVersion("0.0");   // reset
         webxml.setVersion(".5");
         assertEquals(0, webxml.getMajorVersion());
         assertEquals(5, webxml.getMinorVersion());
-        
+
         // leading & training zeros
         webxml.setVersion("0.0");   // reset
         webxml.setVersion("002.500");
@@ -76,9 +76,9 @@ public class TestWebXml {
 
     @Test
     public void testParsePublicIdVersion22() {
-        
+
         WebXml webxml = new WebXml();
-        
+
         webxml.setPublicId(
                 org.apache.catalina.startup.Constants.WebDtdPublicId_22);
         assertEquals(2, webxml.getMajorVersion());
@@ -88,9 +88,9 @@ public class TestWebXml {
 
     @Test
     public void testParsePublicIdVersion23() {
-        
+
         WebXml webxml = new WebXml();
-        
+
         webxml.setPublicId(
                 org.apache.catalina.startup.Constants.WebDtdPublicId_23);
         assertEquals(2, webxml.getMajorVersion());
@@ -100,9 +100,9 @@ public class TestWebXml {
 
     @Test
     public void testParsePublicIdVersion24() {
-        
+
         WebXml webxml = new WebXml();
-        
+
         webxml.setPublicId(
                 org.apache.catalina.startup.Constants.WebSchemaPublicId_24);
         assertEquals(2, webxml.getMajorVersion());
@@ -112,9 +112,9 @@ public class TestWebXml {
 
     @Test
     public void testParsePublicIdVersion25() {
-        
+
         WebXml webxml = new WebXml();
-        
+
         webxml.setPublicId(
                 org.apache.catalina.startup.Constants.WebSchemaPublicId_25);
         assertEquals(2, webxml.getMajorVersion());
@@ -124,9 +124,9 @@ public class TestWebXml {
 
     @Test
     public void testParsePublicIdVersion30() {
-        
+
         WebXml webxml = new WebXml();
-        
+
         webxml.setPublicId(
                 org.apache.catalina.startup.Constants.WebSchemaPublicId_30);
         assertEquals(3, webxml.getMajorVersion());

@@ -43,21 +43,21 @@ public class TestStandardContextAliases extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
 
         // Must have a real docBase - just use temp
-        StandardContext ctx = (StandardContext) 
+        StandardContext ctx = (StandardContext)
             tomcat.addContext("", System.getProperty("java.io.tmpdir"));
-        
+
         File lib = new File("webapps/examples/WEB-INF/lib");
         ctx.setAliases("/WEB-INF/lib=" + lib.getCanonicalPath());
-        
+
         Tomcat.addServlet(ctx, "test", new TestServlet());
         ctx.addServletMapping("/", "test");
-        
+
         tomcat.start();
 
         ByteChunk res = getUrl("http://localhost:" + getPort() + "/");
 
         String result = res.toString();
-        
+
         assertTrue(result.indexOf("00-PASS") > -1);
         assertTrue(result.indexOf("01-PASS") > -1);
         assertTrue(result.indexOf("02-PASS") > -1);
@@ -74,28 +74,28 @@ public class TestStandardContextAliases extends TomcatBaseTest {
         @Override
         protected void doGet(HttpServletRequest req, HttpServletResponse resp)
                 throws ServletException, IOException {
-            
+
             resp.setContentType("text/plain");
-            
+
             ServletContext context = getServletContext();
-            
+
             // Check resources individually
             URL url = context.getResource("/WEB-INF/lib/jstl.jar");
             if (url != null) {
                 resp.getWriter().write("00-PASS\n");
             }
-            
+
             url = context.getResource("/WEB-INF/lib/standard.jar");
             if (url != null) {
                 resp.getWriter().write("01-PASS\n");
             }
-            
+
             // Check a directory listing
             Set<String> libs = context.getResourcePaths("/WEB-INF/lib");
             if (libs == null) {
                 return;
             }
-            
+
             if (!libs.contains("/WEB-INF/lib/jstl.jar")) {
                 return;
             }
@@ -105,6 +105,6 @@ public class TestStandardContextAliases extends TomcatBaseTest {
 
             resp.getWriter().write("02-PASS\n");
         }
-        
+
     }
 }

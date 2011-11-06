@@ -36,17 +36,17 @@ public class TestNamingContextListener extends TomcatBaseTest {
     private static final String JNDI_NAME = "TestName";
     private static final String JNDI_VALUE= "Test Value";
 
-    /** 
+    /**
      * Test JNDI is available to ServletContextListeners.
      */
     @Test
     public void testBug49132() throws Exception {
         Tomcat tomcat = getTomcatInstance();
-        
+
         // Must have a real docBase - just use temp
-        org.apache.catalina.Context ctx = 
+        org.apache.catalina.Context ctx =
             tomcat.addContext("", System.getProperty("java.io.tmpdir"));
-        
+
         // Enable JNDI - it is disabled by default
         tomcat.enableNaming();
 
@@ -55,9 +55,9 @@ public class TestNamingContextListener extends TomcatBaseTest {
         environment.setName(JNDI_NAME);
         environment.setValue(JNDI_VALUE);
         ctx.getNamingResources().addEnvironment(environment);
-        
+
         ctx.addApplicationListener(Bug49132Listener.class.getName());
-        
+
         tomcat.start();
 
         assertEquals(LifecycleState.STARTED, ctx.getState());
