@@ -42,14 +42,14 @@ public class TestCompiler extends TomcatBaseTest {
 
         ByteChunk res = new ByteChunk();
         Map<String,List<String>> headers = new HashMap<String,List<String>>();
-        
+
         getUrl("http://localhost:" + getPort() + "/test/bug49nnn/bug49726a.jsp",
                 res, headers);
 
         // Check request completed
         String result = res.toString();
         assertEcho(result, "OK");
-        
+
         // Check content type
         assertTrue(headers.get("Content-Type").get(0).startsWith("text/html"));
     }
@@ -64,14 +64,14 @@ public class TestCompiler extends TomcatBaseTest {
 
         ByteChunk res = new ByteChunk();
         Map<String,List<String>> headers = new HashMap<String,List<String>>();
-        
+
         getUrl("http://localhost:" + getPort() + "/test/bug49nnn/bug49726b.jsp",
                 res, headers);
 
         // Check request completed
         String result = res.toString();
         assertEcho(result, "OK");
-        
+
         // Check content type
         assertTrue(headers.get("Content-Type").get(0).startsWith("text/plain"));
     }
