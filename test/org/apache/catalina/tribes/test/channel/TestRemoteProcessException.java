@@ -33,12 +33,12 @@ import org.apache.catalina.tribes.Member;
 import org.apache.catalina.tribes.group.GroupChannel;
 
 /**
- * <p>Title: </p> 
- * 
- * <p>Description: </p> 
- * 
+ * <p>Title: </p>
+ *
+ * <p>Description: </p>
+ *
  * <p>Company: </p>
- * 
+ *
  * @author not attributable
  * @version 1.0
  */

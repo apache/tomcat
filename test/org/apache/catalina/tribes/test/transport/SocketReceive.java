@@ -32,9 +32,9 @@ public class SocketReceive {
     static BigDecimal total = new BigDecimal(0);
     static BigDecimal bytes = new BigDecimal(32871);
 
-    
+
     public static void main(String[] args) throws Exception {
-    
+
         ServerSocket srvSocket = new ServerSocket(9999);
         System.out.println("Listening on 9999");
         Socket socket = srvSocket.accept();
@@ -70,7 +70,7 @@ public class SocketReceive {
                 printStats(start, mb, count, df, total);
             }
         }
-        
+
     }
 
     private static void printStats(long start, double mb, int count, DecimalFormat df, BigDecimal total) {

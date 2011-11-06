@@ -64,11 +64,11 @@ public class SocketNioReceive {
             }
         }
     }
-    
+
     public static class MyList implements MessageListener {
         boolean first = true;
-        
-        
+
+
         @Override
         public void messageReceived(ChannelMessage msg) {
             if (first) {
@@ -82,7 +82,7 @@ public class SocketNioReceive {
                 seconds = ( (double) (time - start)) / 1000;
                 System.out.println("Throughput " + df.format(mb / seconds) + " MB/seconds, messages "+count+", total "+mb+" MB.");
             }
-        }        
+        }
 
         @Override
         public boolean accept(ChannelMessage msg) {
