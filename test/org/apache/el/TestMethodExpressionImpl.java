@@ -46,32 +46,32 @@ public class TestMethodExpressionImpl {
         beanA.setName("A");
         context.getVariableMapper().setVariable("beanA",
                 factory.createValueExpression(beanA, TesterBeanA.class));
-        
+
         TesterBeanAA beanAA = new TesterBeanAA();
         beanAA.setName("AA");
         context.getVariableMapper().setVariable("beanAA",
                 factory.createValueExpression(beanAA, TesterBeanAA.class));
-        
+
         TesterBeanAAA beanAAA = new TesterBeanAAA();
         beanAAA.setName("AAA");
         context.getVariableMapper().setVariable("beanAAA",
                 factory.createValueExpression(beanAAA, TesterBeanAAA.class));
-        
-        TesterBeanB beanB = new TesterBeanB();        
+
+        TesterBeanB beanB = new TesterBeanB();
         beanB.setName("B");
         context.getVariableMapper().setVariable("beanB",
                 factory.createValueExpression(beanB, TesterBeanB.class));
-        
-        TesterBeanBB beanBB = new TesterBeanBB();        
+
+        TesterBeanBB beanBB = new TesterBeanBB();
         beanBB.setName("BB");
         context.getVariableMapper().setVariable("beanBB",
                 factory.createValueExpression(beanBB, TesterBeanBB.class));
-        
-        TesterBeanBBB beanBBB = new TesterBeanBBB();        
+
+        TesterBeanBBB beanBBB = new TesterBeanBBB();
         beanBBB.setName("BBB");
         context.getVariableMapper().setVariable("beanBBB",
                 factory.createValueExpression(beanBBB, TesterBeanBBB.class));
-        
+
         TesterBeanC beanC = new TesterBeanC();
         context.getVariableMapper().setVariable("beanC",
                 factory.createValueExpression(beanC, TesterBeanC.class));

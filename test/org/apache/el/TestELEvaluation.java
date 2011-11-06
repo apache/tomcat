@@ -68,7 +68,7 @@ public class TestELEvaluation {
 
 
     /**
-     * Test use nested ternary expressions. This was primarily an EL parser bug. 
+     * Test use nested ternary expressions. This was primarily an EL parser bug.
      */
     @Test
     public void testBug44994() {
@@ -102,7 +102,7 @@ public class TestELEvaluation {
 
         // '\' is only an escape character inside a StringLiteral
         assertEquals("\\\\", evaluateExpression("\\\\"));
-        
+
         /*
          * LiteralExpresions can only contain ${ or #{ if escaped with \
          * \ is not an escape character in any other circumstances including \\
@@ -124,7 +124,7 @@ public class TestELEvaluation {
     public void testParserStringLiteral() {
         // Inspired by work on bug 45451, comments from kkolinko on the dev
         // list and looking at the spec to find some edge cases
-        
+
         // The only characters that can be escaped inside a String literal
         // are \ " and '. # and $ are not escaped inside a String literal.
         assertEquals("\\", evaluateExpression("${'\\\\'}"));
@@ -170,7 +170,7 @@ public class TestELEvaluation {
         compareBoth("Null should compare equal to \"\"", 0, "", null);
         compareBoth("Null should be less than File()",-1, null, new File(""));
         compareBoth("Null should be less than Date()",-1, null, new Date());
-        compareBoth("Date(0) should be less than Date(1)",-1, new Date(0), new Date(1));        
+        compareBoth("Date(0) should be less than Date(1)",-1, new Date(0), new Date(1));
         try {
             compareBoth("Should not compare",0, new Date(), new File(""));
             fail("Expecting ClassCastException");
@@ -206,7 +206,7 @@ public class TestELEvaluation {
                 String.class);
         return (String) ve.getValue(ctx);
     }
-    
+
     public static class FMapper extends FunctionMapper {
 
         @Override
@@ -220,7 +220,7 @@ public class TestELEvaluation {
                     // Ignore
                 } catch (NoSuchMethodException e) {
                     // Ignore
-                } 
+                }
             }
             return null;
         }
