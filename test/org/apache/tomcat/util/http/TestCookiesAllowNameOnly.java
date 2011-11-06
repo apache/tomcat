@@ -47,7 +47,7 @@ public class TestCookiesAllowNameOnly extends TomcatBaseTest {
         TestCookieNameOnlyClient client = new TestCookieNameOnlyClient();
         client.doRequest();
     }
-    
+
     private class TestCookieNameOnlyClient extends SimpleHttpClient {
 
 
@@ -56,12 +56,12 @@ public class TestCookiesAllowNameOnly extends TomcatBaseTest {
             Context root = tomcat.addContext("", TEMP_DIR);
             Tomcat.addServlet(root, "Simple", new SimpleServlet());
             root.addServletMapping("/test", "Simple");
-            
+
             tomcat.start();
             // Open connection
             setPort(tomcat.getConnector().getPort());
             connect();
-            
+
             String[] request = new String[1];
             request[0] =
                 "GET /test HTTP/1.0" + CRLF +
@@ -70,7 +70,7 @@ public class TestCookiesAllowNameOnly extends TomcatBaseTest {
             setRequest(request);
             processRequest(true); // blocks until response has been read
             String response = getResponseBody();
-            
+
             // Close the connection
             disconnect();
             reset();
@@ -79,15 +79,15 @@ public class TestCookiesAllowNameOnly extends TomcatBaseTest {
             assertEquals(COOKIE_WITH_NAME_ONLY_1 + "=" +
                     COOKIE_WITH_NAME_ONLY_2, response);
         }
-        
+
         @Override
         public boolean isResponseBodyOK() {
             return true;
         }
-        
+
     }
-    
-    
+
+
     private static class SimpleServlet extends HttpServlet {
 
         private static final long serialVersionUID = 1L;
@@ -102,7 +102,7 @@ public class TestCookiesAllowNameOnly extends TomcatBaseTest {
             }
             resp.flushBuffer();
         }
-        
+
     }
-    
+
 }

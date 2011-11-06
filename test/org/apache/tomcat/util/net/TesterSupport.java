@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -52,7 +52,7 @@ import org.apache.catalina.startup.TestTomcat.MapRealm;
 import org.apache.catalina.startup.Tomcat;
 
 public final class TesterSupport {
-    
+
     protected static final boolean RFC_5746_SUPPORTED;
 
     static {
@@ -80,7 +80,7 @@ public final class TesterSupport {
     protected static void initSsl(Tomcat tomcat) {
         initSsl(tomcat, "localhost.jks", null, null);
     }
-    
+
     protected static void initSsl(Tomcat tomcat, String keystore,
             String keystorePass, String keyPass) {
 
@@ -112,10 +112,10 @@ public final class TesterSupport {
             tomcat.getConnector().setAttribute("SSLCertificateKeyFile",
                     keystoreFile.getAbsolutePath());
         }
-        tomcat.getConnector().setSecure(true);            
+        tomcat.getConnector().setSecure(true);
         tomcat.getConnector().setProperty("SSLEnabled", "true");
     }
-    
+
     protected static KeyManager[] getUser1KeyManagers() throws Exception {
         KeyManagerFactory kmf = KeyManagerFactory.getInstance(
                 KeyManagerFactory.getDefaultAlgorithm());
@@ -123,7 +123,7 @@ public final class TesterSupport {
                 "changeit".toCharArray());
         return kmf.getKeyManagers();
     }
-    
+
     protected static TrustManager[] getTrustManagers() throws Exception {
         TrustManagerFactory tmf = TrustManagerFactory.getInstance(
                 TrustManagerFactory.getDefaultAlgorithm());
@@ -142,7 +142,7 @@ public final class TesterSupport {
                     new TesterSSLSocketFactory(sc.getSocketFactory()));
         } catch (Exception e) {
             e.printStackTrace();
-        } 
+        }
     }
 
     private static KeyStore getKeyStore(String keystore) throws Exception {
@@ -163,19 +163,19 @@ public final class TesterSupport {
         }
         return ks;
     }
-    
+
     protected static boolean isRenegotiationSupported(Tomcat tomcat) {
         String protocol = tomcat.getConnector().getProtocolHandlerClassName();
         if (protocol.contains("Apr")) {
             // Disabled by default in 1.1.20 windows binary (2010-07-27)
-            return false; 
+            return false;
         }
         return true;
     }
-    
+
     protected static void configureClientCertContext(Tomcat tomcat) {
         TesterSupport.initSsl(tomcat);
-        
+
         // Need a web application with a protected and unprotected URL
         // Must have a real docBase - just use temp
         Context ctx =
@@ -198,7 +198,7 @@ public final class TesterSupport {
         realm.addUser("CN=user1, C=US", "not used");
         realm.addUserRole("CN=user1, C=US", "testrole");
         ctx.setRealm(realm);
-        
+
         // Configure the authenticator
         LoginConfig lc = new LoginConfig();
         lc.setAuthMethod("CLIENT-CERT");
@@ -211,14 +211,14 @@ public final class TesterSupport {
     public static class SimpleServlet extends HttpServlet {
 
         private static final long serialVersionUID = 1L;
-        
+
         @Override
         protected void doGet(HttpServletRequest req, HttpServletResponse resp)
                 throws ServletException, IOException {
             resp.setContentType("text/plain");
             resp.getWriter().print("OK");
         }
-        
+
         @Override
         protected void doPost(HttpServletRequest req, HttpServletResponse resp)
                 throws ServletException, IOException {
@@ -237,29 +237,29 @@ public final class TesterSupport {
             }
             // len will have been -1 on last iteration
             read++;
-            
+
             // Report the number of bytes read
             resp.setContentType("text/plain");
-            if (contentOK) 
+            if (contentOK)
                 resp.getWriter().print("OK-" + read);
             else
                 resp.getWriter().print("CONTENT-MISMATCH-" + read);
         }
     }
-    
+
     public static class TrustAllCerts implements X509TrustManager {
-        
+
         @Override
         public X509Certificate[] getAcceptedIssuers() {
             return new X509Certificate[0];
         }
-        
+
         @Override
         public void checkClientTrusted(X509Certificate[] certs,
                 String authType) {
             // NOOP - Trust everything
         }
-        
+
         @Override
         public void checkServerTrusted(X509Certificate[] certs,
                 String authType) {

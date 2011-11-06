@@ -57,7 +57,7 @@ public class TestXxxEndpoint extends TomcatBaseTest {
         }
     }
 
-    private long createAprSocket(int port, long pool) 
+    private long createAprSocket(int port, long pool)
                  throws Exception {
         /**
          * Server socket "pointer".
@@ -117,11 +117,11 @@ public class TestXxxEndpoint extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
         File appDir = new File(getBuildDirectory(), "webapps/examples");
         tomcat.addWebapp(null, "/examples", appDir.getAbsolutePath());
-        
+
         int port = getPort();
 
         tomcat.start();
-        
+
         tomcat.getConnector().stop();
         Exception e = null;
         ServerSocket s = null;
@@ -161,14 +161,14 @@ public class TestXxxEndpoint extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
         Connector c = tomcat.getConnector();
         c.setProperty("bindOnInit", "false");
-        
+
         File appDir = new File(getBuildDirectory(), "webapps/examples");
         tomcat.addWebapp(null, "/examples", appDir.getAbsolutePath());
-        
+
         int port = getPort();
 
         tomcat.start();
-        
+
         tomcat.getConnector().stop();
         Exception e = null;
         ServerSocket s = null;
