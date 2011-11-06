@@ -206,6 +206,11 @@
         enabled for a connector and the response is flushed. Includes a test
         caes provided by David Marcks. (kkolinko/markt)
       </fix>
+      <add>
+        Add new attribute <code>fastShutdown</code> to the
+        <code>AbstractEndpoint</code> class and use it to speed up Tomcat
+        tests. (kkolinko)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Jasper">

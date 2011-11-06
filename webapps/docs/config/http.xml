@@ -353,6 +353,17 @@
       provide the thread pool.</p>
     </attribute>
 
+    <attribute name="fastShutdown" required="false">
+      <p>This flag can be used to speed up Tomcat shutdown in testing
+      environments where Tomcat is started and stopped many times in a row,
+      but where all connections to Tomcat are known and controlled. It can be
+      used if it is known that there are no active connections and all requests
+      have already been processed.
+      If it is set to <code>true</code>, it turns off small delay when
+      pausing Connector Endpoint. The default value is
+      <code>false</code>.</p>
+    </attribute>
+
     <attribute name="keepAliveTimeout" required="false">
       <p>The number of milliseconds this <strong>Connector</strong> will wait
       for another HTTP request before closing the connection. The default value
