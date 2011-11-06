@@ -35,7 +35,7 @@ public class TestELParser {
     public void testBug49081() {
         // OP's report
         testExpression("#${1+1}", "#2");
-        
+
         // Variations on a theme
         testExpression("#", "#");
         testExpression("##", "##");
@@ -64,7 +64,7 @@ public class TestELParser {
     public void testJavaKeyWordSuffix() {
         ExpressionFactory factory = ExpressionFactory.newInstance();
         ELContext context = new ELContextImpl();
-        
+
         TesterBeanA beanA = new TesterBeanA();
         beanA.setInt("five");
         ValueExpression var =
@@ -86,7 +86,7 @@ public class TestELParser {
     public void testJavaKeyWordIdentifier() {
         ExpressionFactory factory = ExpressionFactory.newInstance();
         ELContext context = new ELContextImpl();
-        
+
         TesterBeanA beanA = new TesterBeanA();
         beanA.setInt("five");
         ValueExpression var =
@@ -107,7 +107,7 @@ public class TestELParser {
     private void testExpression(String expression, String expected) {
         ExpressionFactory factory = ExpressionFactory.newInstance();
         ELContext context = new ELContextImpl();
-        
+
         ValueExpression ve = factory.createValueExpression(
                 context, expression, String.class);
 
