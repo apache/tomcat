@@ -101,18 +101,18 @@ public class TestStandardWrapper extends TomcatBaseTest {
 
         // Setup Tomcat instance
         Tomcat tomcat = getTomcatInstance();
-        
+
         File appDir = new File("test/webapp-3.0-fragments");
         tomcat.addWebapp(null, "", appDir.getAbsolutePath());
-        
+
         tomcat.start();
-        
+
         ByteChunk bc = new ByteChunk();
         int rc;
         rc = getUrl("http://localhost:" + getPort() +
                 "/testStandardWrapper/securityAnnotationsWebXmlPriority",
                 bc, null, null);
-        
+
         assertNull(bc.toString());
         assertEquals(403, rc);
     }
@@ -122,18 +122,18 @@ public class TestStandardWrapper extends TomcatBaseTest {
 
         // Setup Tomcat instance
         Tomcat tomcat = getTomcatInstance();
-        
+
         File appDir = new File("test/webapp-3.0");
         tomcat.addWebapp(null, "", appDir.getAbsolutePath());
-        
+
         tomcat.start();
-        
+
         ByteChunk bc = new ByteChunk();
         int rc;
         rc = getUrl("http://localhost:" + getPort() +
                 "/testStandardWrapper/securityAnnotationsMetaDataPriority",
                 bc, null, null);
-        
+
         assertEquals("OK", bc.toString());
         assertEquals(200, rc);
     }
@@ -152,17 +152,17 @@ public class TestStandardWrapper extends TomcatBaseTest {
     public void testSecurityAnnotationsNoWebXmlConstraints() throws Exception {
         // Setup Tomcat instance
         Tomcat tomcat = getTomcatInstance();
-        
+
         File appDir = new File("test/webapp-3.0-servletsecurity");
         tomcat.addWebapp(null, "", appDir.getAbsolutePath());
-        
+
         tomcat.start();
-        
+
         ByteChunk bc = new ByteChunk();
         int rc;
         rc = getUrl("http://localhost:" + getPort() + "/",
                 bc, null, null);
-        
+
         assertNull(bc.toString());
         assertEquals(403, rc);
     }
@@ -171,23 +171,23 @@ public class TestStandardWrapper extends TomcatBaseTest {
     public void testSecurityAnnotationsNoWebXmlLoginConfig() throws Exception {
         // Setup Tomcat instance
         Tomcat tomcat = getTomcatInstance();
-        
+
         File appDir = new File("test/webapp-3.0-servletsecurity2");
         tomcat.addWebapp(null, "", appDir.getAbsolutePath());
-        
+
         tomcat.start();
-        
+
         ByteChunk bc = new ByteChunk();
         int rc;
         rc = getUrl("http://localhost:" + getPort() + "/protected.jsp",
                 bc, null, null);
-        
+
         assertNull(bc.toString());
         assertEquals(403, rc);
 
         rc = getUrl("http://localhost:" + getPort() + "/unprotected.jsp",
                 bc, null, null);
-        
+
         assertEquals(200, rc);
         assertTrue(bc.toString().contains("00-OK"));
     }
@@ -197,21 +197,21 @@ public class TestStandardWrapper extends TomcatBaseTest {
 
         // Setup Tomcat instance
         Tomcat tomcat = getTomcatInstance();
-        
+
         // Must have a real docBase - just use temp
         Context ctx =
             tomcat.addContext("", System.getProperty("java.io.tmpdir"));
-        
+
         Servlet s = new DenyAllServlet();
         ServletContainerInitializer sci = new SCI(s, useCreateServlet);
         ctx.addServletContainerInitializer(sci, null);
-        
+
         tomcat.start();
-        
+
         ByteChunk bc = new ByteChunk();
         int rc;
         rc = getUrl("http://localhost:" + getPort() + "/", bc, null, null);
-        
+
         if (useCreateServlet) {
             assertNull(bc.toString());
             assertEquals(403, rc);
@@ -226,27 +226,27 @@ public class TestStandardWrapper extends TomcatBaseTest {
 
         // Setup Tomcat instance
         Tomcat tomcat = getTomcatInstance();
-        
+
         // Must have a real docBase - just use temp
         Context ctx =
             tomcat.addContext("", System.getProperty("java.io.tmpdir"));
-        
+
         Wrapper wrapper = Tomcat.addServlet(ctx, "servlet", servletClassName);
         wrapper.setAsyncSupported(true);
         ctx.addServletMapping("/", "servlet");
-        
+
         if (useRole) {
             MapRealm realm = new MapRealm();
             realm.addUser("testUser", "testPwd");
             realm.addUserRole("testUser", "testRole");
             ctx.setRealm(realm);
-            
+
             ctx.setLoginConfig(new LoginConfig("BASIC", null, null, null));
             ctx.getPipeline().addValve(new BasicAuthenticator());
         }
 
         tomcat.start();
-        
+
         ByteChunk bc = new ByteChunk();
         Map<String,List<String>> reqHeaders = null;
         if (useRole) {
@@ -265,7 +265,7 @@ public class TestStandardWrapper extends TomcatBaseTest {
             rc = getUrl("http://localhost:" + getPort() + "/", bc, reqHeaders,
                     null);
         }
-        
+
         if (expect200) {
             assertEquals("OK", bc.toString());
             assertEquals(200, rc);
@@ -281,27 +281,27 @@ public class TestStandardWrapper extends TomcatBaseTest {
         @Override
         protected void doGet(HttpServletRequest req, HttpServletResponse resp)
                 throws ServletException, IOException {
-            
+
             resp.setContentType("text/plain");
             resp.getWriter().print("OK");
         }
-        
+
         @Override
         protected void doPost(HttpServletRequest req, HttpServletResponse resp)
                 throws ServletException, IOException {
             doGet(req, resp);
         }
     }
-    
+
     @ServletSecurity(@HttpConstraint(EmptyRoleSemantic.DENY))
     public static class DenyAllServlet extends TestServlet {
         private static final long serialVersionUID = 1L;
     }
-    
+
     public static class SubclassDenyAllServlet extends DenyAllServlet {
         private static final long serialVersionUID = 1L;
     }
-    
+
     @ServletSecurity(@HttpConstraint(EmptyRoleSemantic.PERMIT))
     public static class SubclassAllowAllServlet extends DenyAllServlet {
         private static final long serialVersionUID = 1L;
@@ -316,7 +316,7 @@ public class TestStandardWrapper extends TomcatBaseTest {
     public static class MethodConstraintServlet extends TestServlet {
         private static final long serialVersionUID = 1L;
     }
-    
+
     @ServletSecurity(@HttpConstraint(rolesAllowed = "testRole"))
     public static class RoleAllowServlet extends TestServlet {
         private static final long serialVersionUID = 1L;
@@ -331,7 +331,7 @@ public class TestStandardWrapper extends TomcatBaseTest {
 
         private Servlet servlet;
         private boolean createServlet;
-        
+
         public SCI(Servlet servlet, boolean createServlet) {
             this.servlet = servlet;
             this.createServlet = createServlet;
@@ -341,7 +341,7 @@ public class TestStandardWrapper extends TomcatBaseTest {
         public void onStartup(Set<Class<?>> c, ServletContext ctx)
                 throws ServletException {
             Servlet s;
-            
+
             if (createServlet) {
                 s = ctx.createServlet(servlet.getClass());
             } else {
@@ -354,7 +354,7 @@ public class TestStandardWrapper extends TomcatBaseTest {
 
 
     public static final int BUG51445_THREAD_COUNT = 5;
-    
+
     public static CountDownLatch latch = null;
     public static AtomicInteger counter = new AtomicInteger(0);
 
@@ -366,12 +366,12 @@ public class TestStandardWrapper extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
 
         // Must have a real docBase - just use temp
-        StandardContext ctx = (StandardContext) 
+        StandardContext ctx = (StandardContext)
             tomcat.addContext("", System.getProperty("java.io.tmpdir"));
-        
+
         Tomcat.addServlet(ctx, "Bug51445", new Bug51445Servlet());
         ctx.addServletMapping("/", "Bug51445");
-        
+
         tomcat.start();
 
         // Start the threads
@@ -391,7 +391,7 @@ public class TestStandardWrapper extends TomcatBaseTest {
         for (int i = 0; i < BUG51445_THREAD_COUNT; i ++) {
             System.out.println(threads[i].getResult());
         }
-        
+
         // Check the result
         for (int i = 0; i < BUG51445_THREAD_COUNT; i ++) {
             String[] results = threads[i].getResult().split(",");
@@ -404,21 +404,21 @@ public class TestStandardWrapper extends TomcatBaseTest {
 
     @Test
     public void testBug51445AddChild() throws Exception {
-        
+
         latch = new CountDownLatch(BUG51445_THREAD_COUNT);
 
         Tomcat tomcat = getTomcatInstance();
 
         // Must have a real docBase - just use temp
-        StandardContext ctx = (StandardContext) 
+        StandardContext ctx = (StandardContext)
             tomcat.addContext("", System.getProperty("java.io.tmpdir"));
-        
+
         StandardWrapper wrapper = new StandardWrapper();
         wrapper.setServletName("Bug51445");
         wrapper.setServletClass(Bug51445Servlet.class.getName());
         ctx.addChild(wrapper);
         ctx.addServletMapping("/", "Bug51445");
-        
+
         tomcat.start();
 
         // Start the threads
@@ -484,7 +484,7 @@ public class TestStandardWrapper extends TomcatBaseTest {
 
         private int data = 0;
         private int counter;
-        
+
         public Bug51445Servlet() {
             // Use this rather than hashCode since in some environments,
             // multiple instances of this object were created with the same
@@ -497,7 +497,7 @@ public class TestStandardWrapper extends TomcatBaseTest {
                 throws ServletException, IOException {
 
             boolean latchAwaitResult = false;
-            
+
             // Ensure all threads have their own instance of the servlet
             latch.countDown();
             try {

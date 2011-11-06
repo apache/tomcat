@@ -85,21 +85,21 @@ public class TestAddCharSetFilter extends TomcatBaseTest {
     private void doTest(String encoding, String expected) throws Exception {
         doTest(encoding, expected, 1);
     }
-    
+
     private void doTest(String encoding, String expected, int mode)
             throws Exception {
         // Setup Tomcat instance
         Tomcat tomcat = getTomcatInstance();
-        
+
         // Must have a real docBase - just use temp
-        Context ctx = 
+        Context ctx =
             tomcat.addContext("", System.getProperty("java.io.tmpdir"));
 
         // Add the Servlet
         CharsetServlet servlet = new CharsetServlet(mode);
         Tomcat.addServlet(ctx, "servlet", servlet);
         ctx.addServletMapping("/", "servlet");
-        
+
         // Add the Filter
         FilterDef filterDef = new FilterDef();
         filterDef.setFilterClass(AddDefaultCharsetFilter.class.getName());
@@ -112,12 +112,12 @@ public class TestAddCharSetFilter extends TomcatBaseTest {
         filterMap.setFilterName("filter");
         filterMap.addServletName("servlet");
         ctx.addFilterMap(filterMap);
-        
+
         tomcat.start();
 
         Map<String, List<String>> headers = new HashMap<String, List<String>>();
         getUrl("http://localhost:" + getPort() + "/", new ByteChunk(), headers);
-        
+
         List<String> ctHeaders = headers.get("Content-Type");
         assertEquals(1, ctHeaders.size());
         String ct = ctHeaders.get(0);
@@ -127,9 +127,9 @@ public class TestAddCharSetFilter extends TomcatBaseTest {
     private static class CharsetServlet extends HttpServlet {
         private static final long serialVersionUID = 1L;
         private static final String OUTPUT = "OK";
-        
+
         private final int mode;
-        
+
         public CharsetServlet(int mode) {
             this.mode = mode;
         }
@@ -137,13 +137,13 @@ public class TestAddCharSetFilter extends TomcatBaseTest {
         @Override
         protected void doGet(HttpServletRequest req, HttpServletResponse resp)
                 throws ServletException, IOException {
-            
+
             switch (mode) {
                 case 1:
                     resp.setContentType("text/plain");
                     break;
                 case 2:
-                    resp.setContentType("text/plain;charset=ISO-8859-2"); 
+                    resp.setContentType("text/plain;charset=ISO-8859-2");
                     break;
                 case 3:
                     resp.setContentType("text/plain");

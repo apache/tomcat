@@ -291,12 +291,12 @@ public class TestSwallowAbortedUploads extends TomcatBaseTest {
                 String content = new String(sb.toString().getBytes("UTF-8"),
                         "ASCII");
 
-                request = new String[] { "POST http://localhost:" + getPort() + URI + " HTTP/1.1" + CRLF 
+                request = new String[] { "POST http://localhost:" + getPort() + URI + " HTTP/1.1" + CRLF
                         + "Host: localhost" + CRLF
                         + "Connection: close" + CRLF
-                        + "Content-Type: multipart/form-data; boundary=" + boundary + CRLF 
-                        + "Content-Length: " + content.length() + CRLF 
-                        + CRLF 
+                        + "Content-Type: multipart/form-data; boundary=" + boundary + CRLF
+                        + "Content-Length: " + content.length() + CRLF
+                        + CRLF
                         + content + CRLF };
 
                 setRequest(request);
@@ -321,11 +321,11 @@ public class TestSwallowAbortedUploads extends TomcatBaseTest {
         private static final long serialVersionUID = 1L;
 
         private int status = 200;
-        
+
         public void setStatus(int status) {
             this.status = status;
         }
-        
+
         @Override
         protected void doPost(HttpServletRequest req, HttpServletResponse resp)
                 throws ServletException, IOException {
