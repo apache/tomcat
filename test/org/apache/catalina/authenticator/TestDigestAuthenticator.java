@@ -184,8 +184,8 @@ public class TestDigestAuthenticator extends TomcatBaseTest {
 
         Map<String,List<String>> respHeaders =
             new HashMap<String,List<String>>();
-        
-        // The first request will fail - but we need to extract the nonce 
+
+        // The first request will fail - but we need to extract the nonce
         ByteChunk bc = new ByteChunk();
         int rc = getUrl("http://localhost:" + getPort() + uri, bc, reqHeaders,
                 respHeaders);
@@ -209,7 +209,7 @@ public class TestDigestAuthenticator extends TomcatBaseTest {
         }
         rc = getUrl("http://localhost:" + getPort() + uri, bc, reqHeaders,
                 null);
-        
+
         if (req2expect200) {
             assertEquals(200, rc);
             assertEquals("OK", bc.toString());
@@ -217,7 +217,7 @@ public class TestDigestAuthenticator extends TomcatBaseTest {
             assertEquals(401, rc);
             assertNull(bc.toString());
         }
-        
+
         // Third request should succeed if we increment nc
         auth.clear();
         bc.recycle();
@@ -227,7 +227,7 @@ public class TestDigestAuthenticator extends TomcatBaseTest {
                 qop));
         rc = getUrl("http://localhost:" + getPort() + uri, bc, reqHeaders,
                 null);
-        
+
         if (req3expect200) {
             assertEquals(200, rc);
             assertEquals("OK", bc.toString());
@@ -243,11 +243,11 @@ public class TestDigestAuthenticator extends TomcatBaseTest {
 
         // Configure a context with digest auth and a single protected resource
         Tomcat tomcat = getTomcatInstance();
-        
+
         // Must have a real docBase - just use temp
         Context ctxt = tomcat.addContext(CONTEXT_PATH,
                 System.getProperty("java.io.tmpdir"));
-        
+
         // Add protected servlet
         Tomcat.addServlet(ctxt, "TesterServlet", new TesterServlet());
         ctxt.addServletMapping(URI, "TesterServlet");
@@ -257,13 +257,13 @@ public class TestDigestAuthenticator extends TomcatBaseTest {
         sc.addAuthRole(ROLE);
         sc.addCollection(collection);
         ctxt.addConstraint(sc);
-        
+
         // Configure the Realm
         MapRealm realm = new MapRealm();
         realm.addUser(USER, PWD);
         realm.addUserRole(USER, ROLE);
         ctxt.setRealm(realm);
-        
+
         // Configure the authenticator
         LoginConfig lc = new LoginConfig();
         lc.setAuthMethod("DIGEST");
@@ -271,13 +271,13 @@ public class TestDigestAuthenticator extends TomcatBaseTest {
         ctxt.setLoginConfig(lc);
         ctxt.getPipeline().addValve(new DigestAuthenticator());
     }
-    
+
     protected static String getNonce(Map<String,List<String>> respHeaders) {
         List<String> authHeaders =
             respHeaders.get(AuthenticatorBase.AUTH_HEADER_NAME);
         // Assume there is only one
         String authHeader = authHeaders.iterator().next();
-        
+
         int start = authHeader.indexOf("nonce=\"") + 7;
         int end = authHeader.indexOf("\"", start);
         return authHeader.substring(start, end);
@@ -288,7 +288,7 @@ public class TestDigestAuthenticator extends TomcatBaseTest {
             respHeaders.get(AuthenticatorBase.AUTH_HEADER_NAME);
         // Assume there is only one
         String authHeader = authHeaders.iterator().next();
-        
+
         int start = authHeader.indexOf("opaque=\"") + 8;
         int end = authHeader.indexOf("\"", start);
         return authHeader.substring(start, end);
@@ -313,10 +313,10 @@ public class TestDigestAuthenticator extends TomcatBaseTest {
 
         String a1 = user + ":" + realm + ":" + pwd;
         String a2 = "GET:" + uri;
-        
+
         String md5a1 = digest(a1);
         String md5a2 = digest(a2);
-        
+
         String response;
         if (qop == null) {
             response = md5a1 + ":" + nonce + ":" + md5a2;
@@ -326,7 +326,7 @@ public class TestDigestAuthenticator extends TomcatBaseTest {
         }
 
         String md5response = digest(response);
-        
+
         StringBuilder auth = new StringBuilder();
         auth.append("Digest username=\"");
         auth.append(user);
@@ -359,7 +359,7 @@ public class TestDigestAuthenticator extends TomcatBaseTest {
 
         return auth.toString();
     }
-    
+
     private static String digest(String input) throws NoSuchAlgorithmException {
         // This is slow but should be OK as this is only a test
         MessageDigest md5 = MessageDigest.getInstance("MD5");

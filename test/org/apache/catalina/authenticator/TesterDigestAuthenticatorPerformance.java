@@ -48,18 +48,18 @@ public class TesterDigestAuthenticatorPerformance {
     private static String QOP = "auth";
 
     private DigestAuthenticator authenticator = new DigestAuthenticator();
-    
-    
+
+
     @Test
     public void testSimple() throws Exception {
         doTest(100, 1000000);
     }
 
     public void doTest(int threadCount, int requestCount) throws Exception {
-        
+
         TesterRunnable runnables[] = new TesterRunnable[threadCount];
         Thread threads[] = new Thread[threadCount];
-        
+
         // Create the runnables & threads
         for (int i = 0; i < threadCount; i++) {
             runnables[i] = new TesterRunnable(requestCount);
@@ -72,13 +72,13 @@ public class TesterDigestAuthenticatorPerformance {
         for (int i = 0; i < threadCount; i++) {
             threads[i].start();
         }
-        
+
         // Wait for the threads to finish
         for (int i = 0; i < threadCount; i++) {
             threads[i].join();
         }
-        double wallTime = System.currentTimeMillis() - start; 
-        
+        double wallTime = System.currentTimeMillis() - start;
+
         // Gather the results...
         double totalTime = 0;
         int totalSuccess = 0;
@@ -88,12 +88,12 @@ public class TesterDigestAuthenticatorPerformance {
             totalSuccess = totalSuccess + runnables[i].getSuccess();
             totalTime = totalTime + runnables[i].getTime();
         }
-        
+
         System.out.println("Average time per request (user): " +
                 totalTime/(threadCount * requestCount));
         System.out.println("Average time per request (wall): " +
                 wallTime/(threadCount * requestCount));
-        
+
         assertEquals(requestCount * threadCount, totalSuccess);
     }
 
@@ -109,28 +109,28 @@ public class TesterDigestAuthenticatorPerformance {
         Context context = new StandardContext();
         context.setName(CONTEXT_PATH);
         context.setRealm(realm);
-        
+
         // Make the Context and Realm visible to the Authenticator
         authenticator.setContainer(context);
-        
+
         // Prevent caching of cnonces so we can the same one for all requests
         authenticator.setCnonceCacheSize(0);
         authenticator.start();
     }
 
-    
+
     private class TesterRunnable implements Runnable {
 
         // Number of valid requests required
         private int requestCount;
-        
+
         private int success = 0;
         private long time = 0;
 
         private TesterDigestRequest request;
         private HttpServletResponse response;
         private LoginConfig config;
-        
+
         // All init code should be in here. run() needs to be quick
         public TesterRunnable(int requestCount) throws Exception {
             this.requestCount = requestCount;
@@ -159,7 +159,7 @@ public class TesterDigestAuthenticatorPerformance {
             }
             time = System.currentTimeMillis() - start;
         }
-        
+
         public int getSuccess() {
             return success;
         }
@@ -170,13 +170,13 @@ public class TesterDigestAuthenticatorPerformance {
 
         private String buildDigestResponse(String nonce)
                 throws NoSuchAlgorithmException {
-            
+
             String ncString = "00000001";
             String cnonce = "cnonce";
-            
+
             String a1 = USER + ":" + REALM + ":" + PWD;
             String a2 = METHOD + ":" + CONTEXT_PATH + URI;
-            
+
             MessageDigest digester = MessageDigest.getInstance("MD5");
             MD5Encoder encoder = new MD5Encoder();
 
@@ -188,7 +188,7 @@ public class TesterDigestAuthenticatorPerformance {
 
             String md5response =
                 encoder.encode(digester.digest(response.getBytes()));
-    
+
             StringBuilder auth = new StringBuilder();
             auth.append("Digest username=\"");
             auth.append(USER);
@@ -217,16 +217,16 @@ public class TesterDigestAuthenticatorPerformance {
         }
     }
 
-    
+
     private static class TesterDigestRequest extends Request {
 
         private String authHeader = null;
-        
+
         @Override
         public String getRemoteAddr() {
             return "127.0.0.1";
         }
-        
+
         public void setAuthHeader(String authHeader) {
             this.authHeader = authHeader;
         }
@@ -254,6 +254,6 @@ public class TesterDigestAuthenticatorPerformance {
         public String getRequestURI() {
             return CONTEXT_PATH + URI;
         }
-        
+
     }
 }
