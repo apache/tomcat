@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -122,7 +122,7 @@ public class TestRegistration extends TomcatBaseTest {
         }
         tomcat.addContext(contextName, contextDir.getAbsolutePath());
         tomcat.start();
-        
+
         // Verify there are no Catalina MBeans
         onames = mbeanServer.queryNames(new ObjectName("Catalina:*"), null);
         assertEquals("Found: " + onames, 0, onames.size());
@@ -177,7 +177,7 @@ public class TestRegistration extends TomcatBaseTest {
             fail("Failed to create: [" + contextDir2.toString() + "]");
         }
         tomcat.addContext(host, contextName + "2", contextDir2.getAbsolutePath());
-        
+
         tomcat.start();
         tomcat.stop();
         tomcat.destroy();
@@ -188,5 +188,5 @@ public class TestRegistration extends TomcatBaseTest {
         onames = mbeanServer.queryNames(new ObjectName("Tomcat:*"), null);
         assertEquals("Remaining: " + onames, 0, onames.size());
     }
-    
+
 }
