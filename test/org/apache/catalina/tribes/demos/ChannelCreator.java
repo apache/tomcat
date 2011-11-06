@@ -51,16 +51,16 @@ import org.apache.catalina.tribes.transport.ReplicationTransmitter;
  * @version 1.0
  */
 public class ChannelCreator {
-    
-    
+
+
     public static StringBuilder usage() {
         StringBuilder buf = new StringBuilder();
         buf.append("\n\t\t[-bind tcpbindaddress]")
-           .append("\n\t\t[-tcpselto tcpselectortimeout]") 
-           .append("\n\t\t[-tcpthreads tcpthreadcount]") 
+           .append("\n\t\t[-tcpselto tcpselectortimeout]")
+           .append("\n\t\t[-tcpthreads tcpthreadcount]")
            .append("\n\t\t[-port tcplistenport]")
            .append("\n\t\t[-autobind tcpbindtryrange]")
-           .append("\n\t\t[-ackto acktimeout]") 
+           .append("\n\t\t[-ackto acktimeout]")
            .append("\n\t\t[-receiver org.apache.catalina.tribes.transport.nio.NioReceiver|org.apache.catalina.tribes.transport.bio.BioReceiver|]")
            .append("\n\t\t[-transport org.apache.catalina.tribes.transport.nio.PooledParallelSender|org.apache.catalina.tribes.transport.bio.PooledMultiSender]")
            .append("\n\t\t[-transport.xxx transport specific property]")
@@ -108,7 +108,7 @@ public class ChannelCreator {
         int asyncsize = 1024*1024*50; //50MB
         boolean throughput = false;
         boolean failuredetect = false;
-        
+
         for (int i = 0; i < args.length; i++) {
             if ("-bind".equals(args[i])) {
                 bind = args[++i];
@@ -169,7 +169,7 @@ public class ChannelCreator {
                 mbind = args[++i];
             }
         }
-        
+
         System.out.println("Creating receiver class="+receiver);
         Class<?> cl = Class.forName(receiver, true,
                 ChannelCreator.class.getClassLoader());
@@ -184,7 +184,7 @@ public class ChannelCreator {
         rx.setTxBufSize(25188);
         rx.setAutoBind(autoBind);
 
-        
+
         ReplicationTransmitter ps = new ReplicationTransmitter();
         System.out.println("Creating transport class="+transport);
         MultiPointSender sender = (MultiPointSender)Class.forName(transport,true,ChannelCreator.class.getClassLoader()).newInstance();
@@ -211,7 +211,7 @@ public class ChannelCreator {
         channel.setChannelReceiver(rx);
         channel.setChannelSender(ps);
         channel.setMembershipService(service);
-        
+
         if ( throughput ) channel.addInterceptor(new ThroughputInterceptor());
         if (gzip) channel.addInterceptor(new GzipInterceptor());
         if ( frag ) {
@@ -224,14 +224,14 @@ public class ChannelCreator {
             oi.setMaxQueue(ordersize);
             channel.addInterceptor(oi);
         }
-        
+
         if ( async ) {
             MessageDispatchInterceptor mi = new MessageDispatch15Interceptor();
             mi.setMaxQueueSize(asyncsize);
             channel.addInterceptor(mi);
             System.out.println("Added MessageDispatchInterceptor");
         }
-        
+
         if ( failuredetect ) {
             TcpFailureDetector tcpfi = new TcpFailureDetector();
             channel.addInterceptor(tcpfi);

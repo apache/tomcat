@@ -37,7 +37,7 @@ import org.apache.catalina.tribes.group.RpcChannel;
  * @version 1.0
  */
 public class EchoRpcTest implements RpcCallback, Runnable {
-    
+
     Channel channel;
     int count;
     String message;
@@ -46,7 +46,7 @@ public class EchoRpcTest implements RpcCallback, Runnable {
     int options;
     long timeout;
     String name;
-    
+
     public EchoRpcTest(Channel channel, String name, int count, String message, long pause, int options, long timeout) {
         this.channel = channel;
         this.count = count;
@@ -85,7 +85,7 @@ public class EchoRpcTest implements RpcCallback, Runnable {
         System.out.println("Received a reply request message from ["+sender.getName()+"] with data ["+msg+"]");
         return "Reply("+name+"):"+msg;
     }
-    
+
     @Override
     public void run() {
         long counter = 0;
@@ -105,7 +105,7 @@ public class EchoRpcTest implements RpcCallback, Runnable {
             }
         }
     }
-    
+
     public static void usage() {
             System.out.println("Tribes RPC tester.");
             System.out.println("Usage:\n\t"+
@@ -127,7 +127,7 @@ public class EchoRpcTest implements RpcCallback, Runnable {
                                "java EchoRpcTest -bind 192.168.0.45 -port 4005\n\t"+
                                "java EchoRpcTest -bind 192.168.0.45 -port 4005 -mbind 192.168.0.45 -count 100 -stats 10\n");
         }
-    
+
         public static void main(String[] args) throws Exception {
             long pause = 3000;
             int count = 1000000;
@@ -170,24 +170,24 @@ public class EchoRpcTest implements RpcCallback, Runnable {
                     System.exit(1);
                 }
             }
-    
-    
+
+
             ManagedChannel channel = (ManagedChannel)ChannelCreator.createChannel(args);
             EchoRpcTest test = new EchoRpcTest(channel,name,count,message,pause,options,timeout);
             channel.start(Channel.DEFAULT);
             Runtime.getRuntime().addShutdownHook(new Shutdown(channel));
             test.run();
-    
+
             System.out.println("System test complete, sleeping to let threads finish.");
             Thread.sleep(60*1000*60);
-        } 
-    
+        }
+
         public static class Shutdown extends Thread {
             ManagedChannel channel = null;
             public Shutdown(ManagedChannel channel) {
                 this.channel = channel;
             }
-    
+
             @Override
             public void run() {
                 System.out.println("Shutting down...");
@@ -196,7 +196,7 @@ public class EchoRpcTest implements RpcCallback, Runnable {
                 exit.start();
                 try {
                     channel.stop(Channel.DEFAULT);
-    
+
                 }catch ( Exception x ) {
                     x.printStackTrace();
                 }
@@ -216,6 +216,6 @@ public class EchoRpcTest implements RpcCallback, Runnable {
                     x.printStackTrace();
                 }
                 System.exit(0);
-    
+
             }
     }}

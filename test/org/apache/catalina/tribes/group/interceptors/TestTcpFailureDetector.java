@@ -34,12 +34,12 @@ import org.apache.catalina.tribes.MembershipListener;
 import org.apache.catalina.tribes.group.GroupChannel;
 
 /**
- * <p>Title: </p> 
- * 
- * <p>Description: </p> 
- * 
+ * <p>Title: </p>
+ *
+ * <p>Description: </p>
+ *
  * <p>Company: </p>
- * 
+ *
  * @author not attributable
  * @version 1.0
  */
@@ -66,7 +66,7 @@ public class TestTcpFailureDetector {
         channel1.addMembershipListener(mbrlist1);
         channel2.addMembershipListener(mbrlist2);
     }
-    
+
     public void clear() {
         mbrlist1.members.clear();
         mbrlist2.members.clear();
@@ -139,7 +139,7 @@ public class TestTcpFailureDetector {
         try { channel2.stop(Channel.DEFAULT);}catch (Exception ignore){ /* Ignore */ }
         channel2 = null;
     }
-    
+
     public static class TestMbrListener implements MembershipListener {
         public String name = null;
         public TestMbrListener(String name) {
@@ -157,7 +157,7 @@ public class TestTcpFailureDetector {
                 }
             }
         }
-        
+
         @Override
         public void memberDisappeared(Member member) {
             if ( members.contains(member) ) {
@@ -169,7 +169,7 @@ public class TestTcpFailureDetector {
                 }
             }
         }
-        
+
     }
 
 }
