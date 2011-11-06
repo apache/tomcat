@@ -320,6 +320,11 @@
       <update>
         Update optional Checkstyle library to 5.5. (kkolinko)
       </update>
+      <add>
+        In test suite: add <code>LoggingBaseTest</code> class to allow
+        use of Tomcat logging configuration in tests that do not start Tomcat.
+        (kkolinko)
+      </add>
     </changelog>
   </subsection>
 </section>
