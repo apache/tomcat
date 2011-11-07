@@ -89,6 +89,48 @@ public class TestFlushableGZIPOutputStream {
     }
 
     /**
+     * Test for {@code write(int)}.
+     */
+    @Test
+    public void testWriteChar() throws Exception {
+        String phrase = "Apache Tomcat "
+                + "\u0410\u043f\u0430\u0447\u0435 \u0422\u043e\u043c\u043a\u0430\u0442 ";
+        byte[] data = phrase.getBytes("UTF-8");
+
+        ByteArrayOutputStream byteOutStream = new ByteArrayOutputStream();
+        OutputStream output = new FlushableGZIPOutputStream(byteOutStream);
+
+        output.write(data);
+        for (int i=0; i<data.length; i++) {
+            output.write(data[i]);
+        }
+        output.flush();
+        for (int i=0; i<data.length; i++) {
+            output.write(data[i]);
+        }
+        output.write(data);
+        output.close();
+
+        ByteArrayInputStream byteInStream =
+                new ByteArrayInputStream(byteOutStream.toByteArray());
+
+        GZIPInputStream inflaterStream = new GZIPInputStream(byteInStream);
+        ByteArrayOutputStream sink = new ByteArrayOutputStream();
+        try {
+            IOTools.flow(inflaterStream, sink);
+        } finally {
+            sink.close();
+        }
+
+        byte[] decompressedBytes = sink.toByteArray();
+        assertEquals(data.length * 4, decompressedBytes.length);
+        for (int i = 0; i < 4; i++) {
+            assertArrayEquals(data, Arrays.copyOfRange(decompressedBytes,
+                    data.length * i, data.length * (i + 1)));
+        }
+    }
+
+    /**
      * Loads file into memory.
      */
     private byte[] loadFile(File file) throws IOException {
