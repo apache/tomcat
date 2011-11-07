@@ -43,7 +43,7 @@ public class FlushableGZIPOutputStream extends GZIPOutputStream {
     private boolean hasLastByte = false;
 
     @Override
-    public synchronized void write(byte[] bytes) throws IOException {
+    public void write(byte[] bytes) throws IOException {
         write(bytes, 0, bytes.length);
     }
 
