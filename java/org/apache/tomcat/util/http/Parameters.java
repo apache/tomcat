@@ -59,6 +59,12 @@ public final class Parameters {
     private int limit = -1;
     private int parameterCount = 0;
 
+    /**
+     * Is set to <code>true</code> if there were failures during parameter
+     * parsing.
+     */
+    private boolean parseFailed = false;
+
     public Parameters() {
         // NO-OP
     }
@@ -89,12 +95,21 @@ public final class Parameters {
         }
     }
 
+    public boolean isParseFailed() {
+        return parseFailed;
+    }
+
+    public void setParseFailed(boolean parseFailed) {
+        this.parseFailed = parseFailed;
+    }
+
     public void recycle() {
         parameterCount = 0;
         paramHashValues.clear();
         didQueryParameters=false;
         encoding=null;
         decodedQuery.recycle();
+        parseFailed = false;
     }
 
     // -------------------- Data access --------------------
@@ -168,6 +183,7 @@ public final class Parameters {
         if (limit > -1 && parameterCount > limit) {
             // Processing this parameter will push us over the limit. ISE is
             // what Request.parseParts() uses for requests that are too big
+            parseFailed = true;
             throw new IllegalStateException(sm.getString(
                     "parameters.maxCountFail", Integer.valueOf(limit)));
         }
@@ -296,6 +312,7 @@ public final class Parameters {
                                 null));
                     }
                 }
+                parseFailed = true;
                 continue;
                 // invalid chunk - it's better to ignore
             }
@@ -337,10 +354,12 @@ public final class Parameters {
                 } catch (IllegalStateException ise) {
                     // Hitting limit stops processing further params but does
                     // not cause request to fail.
+                    parseFailed = true;
                     log.warn(ise.getMessage());
                     break;
                 }
             } catch (IOException e) {
+                parseFailed = true;
                 decodeFailCount++;
                 if (decodeFailCount == 1 || log.isDebugEnabled()) {
                     if (log.isDebugEnabled()) {

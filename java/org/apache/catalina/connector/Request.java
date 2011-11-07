@@ -2383,6 +2383,12 @@ public class Request
         }
     }
 
+    private void checkParameterParseFailed() {
+        if (getCoyoteRequest().getParameters().isParseFailed()) {
+            setAttribute(Globals.PARAMETER_PARSE_FAILED_ATTR, Boolean.TRUE);
+        }
+    }
+
     public void cometClose() {
         coyoteRequest.action(ActionCode.COMET_CLOSE,getEvent());
         setComet(false);
@@ -2487,109 +2493,117 @@ public class Request
 
         Parameters parameters = coyoteRequest.getParameters();
 
-        File location;
-        String locationStr = mce.getLocation();
-        if (locationStr == null || locationStr.length() == 0) {
-            location = ((File) context.getServletContext().getAttribute(
-                    ServletContext.TEMPDIR));
-        } else {
-            location = new File(locationStr);
-        }
-
-        if (!location.isAbsolute() || !location.isDirectory()) {
-            partsParseException = new IOException(
-                    sm.getString("coyoteRequest.uploadLocationInvalid",
-                            location));
-            return;
-        }
-
-        // Create a new file upload handler
-        DiskFileItemFactory factory = new DiskFileItemFactory();
+        boolean success = false;
         try {
-            factory.setRepository(location.getCanonicalFile());
-        } catch (IOException ioe) {
-            partsParseException = ioe;
-            return;
-        }
-        factory.setSizeThreshold(mce.getFileSizeThreshold());
-
-        ServletFileUpload upload = new ServletFileUpload();
-        upload.setFileItemFactory(factory);
-        upload.setFileSizeMax(mce.getMaxFileSize());
-        upload.setSizeMax(mce.getMaxRequestSize());
-
-        parts = new ArrayList<Part>();
-        try {
-            List<FileItem> items = upload.parseRequest(this);
-            int maxPostSize = getConnector().getMaxPostSize();
-            int postSize = 0;
-            String enc = getCharacterEncoding();
-            Charset charset = null;
-            if (enc != null) {
-                try {
-                    charset = B2CConverter.getCharset(enc);
-                } catch (UnsupportedEncodingException e) {
-                    // Ignore
-                }
+            File location;
+            String locationStr = mce.getLocation();
+            if (locationStr == null || locationStr.length() == 0) {
+                location = ((File) context.getServletContext().getAttribute(
+                        ServletContext.TEMPDIR));
+            } else {
+                location = new File(locationStr);
             }
-            for (FileItem item : items) {
-                ApplicationPart part = new ApplicationPart(item, mce);
-                parts.add(part);
-                if (part.getFilename() == null) {
-                    String name = part.getName();
-                    String value = null;
+
+            if (!location.isAbsolute() || !location.isDirectory()) {
+                partsParseException = new IOException(
+                        sm.getString("coyoteRequest.uploadLocationInvalid",
+                                location));
+                return;
+            }
+
+
+            // Create a new file upload handler
+            DiskFileItemFactory factory = new DiskFileItemFactory();
+            try {
+                factory.setRepository(location.getCanonicalFile());
+            } catch (IOException ioe) {
+                partsParseException = ioe;
+                return;
+            }
+            factory.setSizeThreshold(mce.getFileSizeThreshold());
+
+            ServletFileUpload upload = new ServletFileUpload();
+            upload.setFileItemFactory(factory);
+            upload.setFileSizeMax(mce.getMaxFileSize());
+            upload.setSizeMax(mce.getMaxRequestSize());
+
+            parts = new ArrayList<Part>();
+            try {
+                List<FileItem> items = upload.parseRequest(this);
+                int maxPostSize = getConnector().getMaxPostSize();
+                int postSize = 0;
+                String enc = getCharacterEncoding();
+                Charset charset = null;
+                if (enc != null) {
                     try {
-                        String encoding = parameters.getEncoding();
-                        if (encoding == null) {
-                            encoding = Parameters.DEFAULT_ENCODING;
-                        }
-                        value = part.getString(encoding);
-                    } catch (UnsupportedEncodingException uee) {
-                        try {
-                            value = part.getString(Parameters.DEFAULT_ENCODING);
-                        } catch (UnsupportedEncodingException e) {
-                            // Should not be possible
-                        }
+                        charset = B2CConverter.getCharset(enc);
+                    } catch (UnsupportedEncodingException e) {
+                        // Ignore
                     }
-                    if (maxPostSize > 0) {
-                        // Have to calculate equivalent size. Not completely
-                        // accurate but close enough.
-                        if (charset == null) {
-                            // Name length
-                            postSize += name.getBytes().length;
-                        } else {
-                            postSize += name.getBytes(charset).length;
-                        }
-                        if (value != null) {
-                            // Equals sign
-                            postSize++;
-                            // Value length
-                            postSize += part.getSize();
-                        }
-                        // Value separator
-                        postSize++;
-                        if (postSize > maxPostSize) {
-                            throw new IllegalStateException(sm.getString(
-                                    "coyoteRequest.maxPostSizeExceeded"));
-                        }
-                    }
-                    parameters.addParameter(name, value);
                 }
+                for (FileItem item : items) {
+                    ApplicationPart part = new ApplicationPart(item, mce);
+                    parts.add(part);
+                    if (part.getFilename() == null) {
+                        String name = part.getName();
+                        String value = null;
+                        try {
+                            String encoding = parameters.getEncoding();
+                            if (encoding == null) {
+                                encoding = Parameters.DEFAULT_ENCODING;
+                            }
+                            value = part.getString(encoding);
+                        } catch (UnsupportedEncodingException uee) {
+                            try {
+                                value = part.getString(Parameters.DEFAULT_ENCODING);
+                            } catch (UnsupportedEncodingException e) {
+                                // Should not be possible
+                            }
+                        }
+                        if (maxPostSize > 0) {
+                            // Have to calculate equivalent size. Not completely
+                            // accurate but close enough.
+                            if (charset == null) {
+                                // Name length
+                                postSize += name.getBytes().length;
+                            } else {
+                                postSize += name.getBytes(charset).length;
+                            }
+                            if (value != null) {
+                                // Equals sign
+                                postSize++;
+                                // Value length
+                                postSize += part.getSize();
+                            }
+                            // Value separator
+                            postSize++;
+                            if (postSize > maxPostSize) {
+                                throw new IllegalStateException(sm.getString(
+                                        "coyoteRequest.maxPostSizeExceeded"));
+                            }
+                        }
+                        parameters.addParameter(name, value);
+                    }
+                }
+
+                success = true;
+            } catch (InvalidContentTypeException e) {
+                partsParseException = new ServletException(e);
+            } catch (FileUploadBase.SizeException e) {
+                checkSwallowInput();
+                partsParseException = new IllegalStateException(e);
+            } catch (FileUploadException e) {
+                partsParseException = new IOException(e);
+            } catch (IllegalStateException e) {
+                checkSwallowInput();
+                partsParseException = e;
             }
-
-        } catch (InvalidContentTypeException e) {
-            partsParseException = new ServletException(e);
-        } catch (FileUploadBase.SizeException e) {
-            checkSwallowInput();
-            partsParseException = new IllegalStateException(e);
-        } catch (FileUploadException e) {
-            partsParseException = new IOException(e);
-        } catch (IllegalStateException e) {
-            checkSwallowInput();
-            partsParseException = e;
+        } finally {
+            if (partsParseException != null || !success) {
+                parameters.setParseFailed(true);
+            }
+            checkParameterParseFailed();
         }
-
-        return;
     }
 
 
@@ -2774,108 +2788,120 @@ public class Request
         parametersParsed = true;
 
         Parameters parameters = coyoteRequest.getParameters();
-        // Set this every time in case limit has been changed via JMX
-        parameters.setLimit(getConnector().getMaxParameterCount());
+        boolean success = false;
+        try {
+            // Set this every time in case limit has been changed via JMX
+            parameters.setLimit(getConnector().getMaxParameterCount());
 
-        // getCharacterEncoding() may have been overridden to search for
-        // hidden form field containing request encoding
-        String enc = getCharacterEncoding();
+            // getCharacterEncoding() may have been overridden to search for
+            // hidden form field containing request encoding
+            String enc = getCharacterEncoding();
 
-        boolean useBodyEncodingForURI = connector.getUseBodyEncodingForURI();
-        if (enc != null) {
-            parameters.setEncoding(enc);
-            if (useBodyEncodingForURI) {
-                parameters.setQueryStringEncoding(enc);
-            }
-        } else {
-            parameters.setEncoding
-                (org.apache.coyote.Constants.DEFAULT_CHARACTER_ENCODING);
-            if (useBodyEncodingForURI) {
-                parameters.setQueryStringEncoding
-                    (org.apache.coyote.Constants.DEFAULT_CHARACTER_ENCODING);
-            }
-        }
-
-        parameters.handleQueryParameters();
-
-        if (usingInputStream || usingReader) {
-            return;
-        }
-
-        if( !getConnector().isParseBodyMethod(getMethod()) ) {
-            return;
-        }
-
-        String contentType = getContentType();
-        if (contentType == null) {
-            contentType = "";
-        }
-        int semicolon = contentType.indexOf(';');
-        if (semicolon >= 0) {
-            contentType = contentType.substring(0, semicolon).trim();
-        } else {
-            contentType = contentType.trim();
-        }
-
-        if ("multipart/form-data".equals(contentType)) {
-            parseParts();
-            return;
-        }
-
-        if (!("application/x-www-form-urlencoded".equals(contentType))) {
-            return;
-        }
-
-        int len = getContentLength();
-
-        if (len > 0) {
-            int maxPostSize = connector.getMaxPostSize();
-            if ((maxPostSize > 0) && (len > maxPostSize)) {
-                if (context.getLogger().isDebugEnabled()) {
-                    context.getLogger().debug(
-                            sm.getString("coyoteRequest.postTooLarge"));
+            boolean useBodyEncodingForURI = connector.getUseBodyEncodingForURI();
+            if (enc != null) {
+                parameters.setEncoding(enc);
+                if (useBodyEncodingForURI) {
+                    parameters.setQueryStringEncoding(enc);
                 }
-                checkSwallowInput();
+            } else {
+                parameters.setEncoding
+                    (org.apache.coyote.Constants.DEFAULT_CHARACTER_ENCODING);
+                if (useBodyEncodingForURI) {
+                    parameters.setQueryStringEncoding
+                        (org.apache.coyote.Constants.DEFAULT_CHARACTER_ENCODING);
+                }
+            }
+
+            parameters.handleQueryParameters();
+
+            if (usingInputStream || usingReader) {
+                success = true;
                 return;
             }
-            byte[] formData = null;
-            if (len < CACHED_POST_LEN) {
-                if (postData == null) {
-                    postData = new byte[CACHED_POST_LEN];
-                }
-                formData = postData;
-            } else {
-                formData = new byte[len];
+
+            if( !getConnector().isParseBodyMethod(getMethod()) ) {
+                success = true;
+                return;
             }
-            try {
-                if (readPostBody(formData, len) != len) {
+
+            String contentType = getContentType();
+            if (contentType == null) {
+                contentType = "";
+            }
+            int semicolon = contentType.indexOf(';');
+            if (semicolon >= 0) {
+                contentType = contentType.substring(0, semicolon).trim();
+            } else {
+                contentType = contentType.trim();
+            }
+
+            if ("multipart/form-data".equals(contentType)) {
+                parseParts();
+                success = true;
+                return;
+            }
+
+            if (!("application/x-www-form-urlencoded".equals(contentType))) {
+                success = true;
+                return;
+            }
+
+            int len = getContentLength();
+
+            if (len > 0) {
+                int maxPostSize = connector.getMaxPostSize();
+                if ((maxPostSize > 0) && (len > maxPostSize)) {
+                    if (context.getLogger().isDebugEnabled()) {
+                        context.getLogger().debug(
+                                sm.getString("coyoteRequest.postTooLarge"));
+                    }
+                    checkSwallowInput();
                     return;
                 }
-            } catch (IOException e) {
-                // Client disconnect
-                if (context.getLogger().isDebugEnabled()) {
-                    context.getLogger().debug(
-                            sm.getString("coyoteRequest.parseParameters"), e);
+                byte[] formData = null;
+                if (len < CACHED_POST_LEN) {
+                    if (postData == null) {
+                        postData = new byte[CACHED_POST_LEN];
+                    }
+                    formData = postData;
+                } else {
+                    formData = new byte[len];
                 }
-                return;
-            }
-            parameters.processParameters(formData, 0, len);
-        } else if ("chunked".equalsIgnoreCase(
-                coyoteRequest.getHeader("transfer-encoding"))) {
-            byte[] formData = null;
-            try {
-                formData = readChunkedPostBody();
-            } catch (IOException e) {
-                // Client disconnect
-                if (context.getLogger().isDebugEnabled()) {
-                    context.getLogger().debug(
-                            sm.getString("coyoteRequest.parseParameters"), e);
+                try {
+                    if (readPostBody(formData, len) != len) {
+                        return;
+                    }
+                } catch (IOException e) {
+                    // Client disconnect
+                    if (context.getLogger().isDebugEnabled()) {
+                        context.getLogger().debug(
+                                sm.getString("coyoteRequest.parseParameters"), e);
+                    }
+                    return;
                 }
-                return;
+                parameters.processParameters(formData, 0, len);
+            } else if ("chunked".equalsIgnoreCase(
+                    coyoteRequest.getHeader("transfer-encoding"))) {
+                byte[] formData = null;
+                try {
+                    formData = readChunkedPostBody();
+                } catch (IOException e) {
+                    // Client disconnect
+                    if (context.getLogger().isDebugEnabled()) {
+                        context.getLogger().debug(
+                                sm.getString("coyoteRequest.parseParameters"), e);
+                    }
+                    return;
+                }
+                if (formData != null) {
+                    parameters.processParameters(formData, 0, formData.length);
+                }
             }
-            if (formData != null) {
-                parameters.processParameters(formData, 0, formData.length);
+        } finally {
+            if (!success) {
+                parameters.setParseFailed(true);
             }
+            checkParameterParseFailed();
         }
 
     }
