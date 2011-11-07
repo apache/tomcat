@@ -62,7 +62,7 @@ public class FlushableGZIPOutputStream extends GZIPOutputStream {
     @Override
     public synchronized void write(int i) throws IOException {
         flushLastByte();
-        rememberLastByte((byte) (i & 0xFF));
+        rememberLastByte((byte) i);
     }
 
     @Override
