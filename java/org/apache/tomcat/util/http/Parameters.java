@@ -135,8 +135,8 @@ public final class Parameters {
         return Collections.enumeration(paramHashValues.keySet());
     }
 
-    // Shortcut.
     public String getParameter(String name ) {
+        handleQueryParameters();
         ArrayList<String> values = paramHashValues.get(name);
         if (values != null) {
             if(values.size() == 0) {
