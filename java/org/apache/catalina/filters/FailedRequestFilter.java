@@ -38,9 +38,10 @@ import org.apache.juli.logging.LogFactory;
  *
  * <p>
  * Note that it has side effect that it triggers parameter parsing and thus
- * consumes the body for POST requests, so use it only with addresses that do not
- * use <code>request.getInputStream()</code> and
- * <code>request.getReader()</code>.
+ * consumes the body for POST requests. Parameter parsing does check content
+ * type of the request, so there should not be problems with addresses that use
+ * <code>request.getInputStream()</code> and <code>request.getReader()</code>,
+ * if requests parsed by them do not use standard value for content mime-type.
  */
 public class FailedRequestFilter extends FilterBase implements CometFilter {
 
