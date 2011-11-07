@@ -66,7 +66,7 @@ public class FlushableGZIPOutputStream extends GZIPOutputStream {
     }
 
     @Override
-    public void close() throws IOException {
+    public synchronized void close() throws IOException {
         flushLastByte();
         super.close();
     }
