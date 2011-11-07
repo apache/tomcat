@@ -181,6 +181,26 @@ public abstract class RequestFilterValve extends ValveBase {
     }
 
 
+    /**
+     * Returns {@code false} if the last change to the {@code allow} pattern did
+     * not apply successfully. E.g. if the pattern is syntactically
+     * invalid.
+     */
+    public final boolean isAllowValid() {
+        return allowValid;
+    }
+
+
+    /**
+     * Returns {@code false} if the last change to the {@code deny} pattern did
+     * not apply successfully. E.g. if the pattern is syntactically
+     * invalid.
+     */
+    public final boolean isDenyValid() {
+        return denyValid;
+    }
+
+
     // --------------------------------------------------------- Public Methods
 
     /**
@@ -234,28 +254,10 @@ public abstract class RequestFilterValve extends ValveBase {
      * @exception IOException if an input/output error occurs
      * @exception ServletException if a servlet error occurs
      */
-    protected void process(String property,
-                           Request request, Response response)
-        throws IOException, ServletException {
+    protected void process(String property, Request request, Response response)
+            throws IOException, ServletException {
 
-        // Use local copies for thread safety
-        Pattern deny = this.deny;
-        Pattern allow = this.allow;
-
-        // Check the deny patterns, if any
-        if (deny != null && deny.matcher(property).matches()) {
-            response.sendError(HttpServletResponse.SC_FORBIDDEN);
-            return;
-        }
-
-        // Check the allow patterns, if any
-        if (allow != null && allow.matcher(property).matches()) {
-            getNext().invoke(request, response);
-            return;
-        }
-
-        // Allow if denies specified but not allows
-        if (deny != null && allow == null) {
+        if (isAllowed(property)) {
             getNext().invoke(request, response);
             return;
         }
@@ -263,5 +265,38 @@ public abstract class RequestFilterValve extends ValveBase {
         // Deny this request
         response.sendError(HttpServletResponse.SC_FORBIDDEN);
 
+    }
+
+    /**
+     * Perform the test implemented by this Valve, matching against the
+     * specified request property value. This method is public so that it can be
+     * called through JMX, e.g. to test whether certain IP address is allowed or
+     * denied by the valve configuration.
+     *
+     * @param property
+     *            The request property value on which to filter
+     */
+    public boolean isAllowed(String property) {
+        // Use local copies for thread safety
+        Pattern deny = this.deny;
+        Pattern allow = this.allow;
+
+        // Check the deny patterns, if any
+        if (deny != null && deny.matcher(property).matches()) {
+            return false;
+        }
+
+        // Check the allow patterns, if any
+        if (allow != null && allow.matcher(property).matches()) {
+            return true;
+        }
+
+        // Allow if denies specified but not allows
+        if (deny != null && allow == null) {
+            return true;
+        }
+
+        // Deny this request
+        return false;
     }
 }
