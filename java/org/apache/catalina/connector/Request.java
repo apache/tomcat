@@ -2897,6 +2897,7 @@ public class Request
                     parameters.processParameters(formData, 0, formData.length);
                 }
             }
+            success = true;
         } finally {
             if (!success) {
                 parameters.setParseFailed(true);
