@@ -132,7 +132,7 @@
       </fix>
       <fix>
         Ensure changes to the configuration of the RemoteHostValve and the
-        RemoteIpValve via JMX are thread-safe. (markt)
+        RemoteAddrValve via JMX are thread-safe. (markt)
       </fix>
       <fix>
         Ensure the the memory leak protection for the HttpClient keep-alive
@@ -173,6 +173,12 @@
         <bug>52113</bug>: Don't assume presence of context.xml file with JMX
         deployment. (markt)
       </fix>
+      <update>
+        In <code>RequestFilterValve</code> (<code>RemoteAddrValve</code>,
+        <code>RemoteHostValve</code>): refactor value matching logic into
+        separate method and expose this new method <code>isAllowed</code>
+        through JMX. (kkolinko)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Coyote">
