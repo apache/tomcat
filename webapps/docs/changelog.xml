@@ -335,6 +335,11 @@
         In test suite: speed up <code>TestGroupChannelSenderConnections</code>.
         Remove 48 seconds worth of waits. (kkolinko)
       </fix>
+      <fix>
+        <bug>52148</bug>: Add tomcat-coyote.jar to catalina-tasks.xml as this
+        JAR is now required by the Ant tasks. Patch provided by Volker Krebs.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
