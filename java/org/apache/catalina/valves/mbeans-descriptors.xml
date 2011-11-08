@@ -335,7 +335,7 @@
     <attribute name="allow"
                description="The allow expression"
                type="java.lang.String"/>
-               
+
     <attribute name="allowValid"
                description="Becomes false if assigned value of allow expression is not syntactically correct"
                is="true"
@@ -355,16 +355,16 @@
     <attribute   name="deny"
                description="The deny expression"
                type="java.lang.String"/>
-               
-    <attribute name="info"
-               description="Information about this implementation"
-               type="java.lang.String"
-               writeable="false"/>
 
     <attribute name="denyValid"
                description="Becomes false if assigned value of deny expression is not syntactically correct"
                is="true"
                type="boolean"
+               writeable="false"/>
+
+    <attribute name="info"
+               description="Information about this implementation"
+               type="java.lang.String"
                writeable="false"/>
 
     <attribute name="stateName"
@@ -391,7 +391,7 @@
     <attribute name="allow"
                description="The allow expression"
                type="java.lang.String"/>
-               
+
     <attribute name="allowValid"
                description="Becomes false if assigned value of allow expression is not syntactically correct"
                is="true"
@@ -411,16 +411,16 @@
     <attribute   name="deny"
                description="The deny expression"
                type="java.lang.String"/>
-               
-    <attribute name="info"
-               description="Information about this implementation"
-               type="java.lang.String"
-               writeable="false"/>
 
     <attribute name="denyValid"
                description="Becomes false if assigned value of deny expression is not syntactically correct"
                is="true"
                type="boolean"
+               writeable="false"/>
+
+    <attribute name="info"
+               description="Information about this implementation"
+               type="java.lang.String"
                writeable="false"/>
 
     <attribute name="stateName"
