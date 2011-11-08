@@ -754,7 +754,7 @@
       default configuration of the resource manager will be sufficient.</li>
   <li><strong>WatchedResource</strong> - The auto deployer will monitor the
       specified static resource of the web application for updates, and will
-      reload the web application if is is updated. The content of this element
+      reload the web application if it is updated. The content of this element
       must be a string.</li>
   </ul>
 
