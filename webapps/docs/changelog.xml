@@ -179,6 +179,12 @@
         separate method and expose this new method <code>isAllowed</code>
         through JMX. (kkolinko)
       </update>
+      <fix>
+        <bug>52156</bug>: Ensure that
+        <code>getServletContext().getResource(path)</code> returns the correct
+        resource when path contains <code>/../</code> sequences or any other
+        sequences that require normalization. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
