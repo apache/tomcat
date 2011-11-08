@@ -543,7 +543,7 @@
                impact="ACTION"
                returnType="void">
       <parameter name="name"
-                 description="Path to the resource, either absolue or relative to docBase"
+                 description="Path to the resource, either absolute or relative to docBase"
                  type="java.lang.String"/>
     </operation>
 
