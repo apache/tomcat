@@ -519,7 +519,7 @@ public class ApplicationContext
             String fullPath = context.getPath() + normPath;
             String hostName = context.getParent().getName();
             try {
-                resources.lookup(path);
+                resources.lookup(normPath);
                 return new URL
                     ("jndi", "", 0, getJNDIUri(hostName, fullPath),
                      new DirContextURLStreamHandler(resources));
