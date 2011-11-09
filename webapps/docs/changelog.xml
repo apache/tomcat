@@ -63,6 +63,9 @@
         by Joe Kislo and Felix Schumacher. (markt)
       </add>
       <fix>
+        <bug>50570</bug>: Enable FIPS mode to be set in AprLifecycleListener.
+        Based upon a patch from Chris Beckey. (schultz)
+      <fix>
         <bug>51744</bug>: Throw the correct exception if an application attempts
         to modify the associated JNDI context. (markt)
       </fix>

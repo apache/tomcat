@@ -29,6 +29,7 @@ import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.jni.Library;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.res.StringManager;
+import org.apache.tomcat.jni.SSL;
 
 
 
@@ -66,11 +67,13 @@ public class AprLifecycleListener
 
     // ---------------------------------------------- Properties
     protected static String SSLEngine = "on"; //default on
+    protected static String FIPSMode = "off"; // default off, valid only when SSLEngine="on"
     protected static String SSLRandomSeed = "builtin";
     protected static boolean sslInitialized = false;
     protected static boolean aprInitialized = false;
     protected static boolean sslAvailable = false;
     protected static boolean aprAvailable = false;
+    protected static boolean fipsModeActive = false;
 
     protected static final Object lock = new Object();
 
@@ -106,7 +109,7 @@ public class AprLifecycleListener
                         initializeSSL();
                     } catch (Throwable t) {
                         ExceptionUtils.handleThrowable(t);
-                        log.info(sm.getString("aprListener.sslInit"));
+                        log.error(sm.getString("aprListener.sslInit"), t);
                     }
                 }
             }
@@ -138,6 +141,7 @@ public class AprLifecycleListener
         aprInitialized = false;
         sslInitialized = false; // Well we cleaned the pool in terminate.
         sslAvailable = false; // Well we cleaned the pool in terminate.
+        fipsModeActive = false;
     }
 
     private static void init()
@@ -220,6 +224,7 @@ public class AprLifecycleListener
              //only once per VM
             return;
         }
+
         sslInitialized = true;
 
         String methodName = "randSet";
@@ -237,6 +242,25 @@ public class AprLifecycleListener
         method = clazz.getMethod(methodName, paramTypes);
         method.invoke(null, paramValues);
 
+        if("on".equalsIgnoreCase(AprLifecycleListener.FIPSMode)) {
+            log.info(sm.getString("aprListener.initializingFIPS"));
+
+            int result = SSL.fipsModeSet(1);
+
+            // success is defined as return value = 1
+            if(1 == result) {
+                fipsModeActive = true;
+
+                log.info(sm.getString("aprListener.initializeFIPSSuccess"));
+            } else {
+                // This case should be handled by the native method,
+                // but we'll make absolutely sure, here.
+                log.error(sm.getString("aprListener.initializeFIPSFailed"));
+
+                throw new IllegalStateException(sm.getString("aprListener.initializeFIPSFailed"));
+            }
+        }
+
         sslAvailable = true;
     }
 
@@ -245,6 +269,10 @@ public class AprLifecycleListener
     }
 
     public void setSSLEngine(String SSLEngine) {
+        // Ensure that the SSLEngine is consistent with that used for SSL init
+        if(sslInitialized)
+            throw new IllegalStateException(sm.getString("aprListener.tooLateForSSLEngine"));
+
         AprLifecycleListener.SSLEngine = SSLEngine;
     }
 
@@ -253,7 +281,24 @@ public class AprLifecycleListener
     }
 
     public void setSSLRandomSeed(String SSLRandomSeed) {
+        // Ensure that the random seed is consistent with that used for SSL init
+        if(sslInitialized)
+            throw new IllegalStateException(sm.getString("aprListener.tooLateForSSLRandomSeed"));
+
         AprLifecycleListener.SSLRandomSeed = SSLRandomSeed;
     }
 
+    public void setFIPSMode(String FIPSMode)
+    {
+        // Ensure that the FIPS mode is consistent with that used for SSL init
+        if(sslInitialized)
+            throw new IllegalStateException(sm.getString("aprListener.tooLateForFIPSMode"));
+
+        AprLifecycleListener.FIPSMode = FIPSMode;
+    }
+
+    public boolean isFIPSModeActive()
+    {
+        return fipsModeActive;
+    }
 }
