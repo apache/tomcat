@@ -230,6 +230,15 @@ public final class SSL {
     public static native int initialize(String engine);
 
     /**
+     * Enable/Disable FIPS Mode.
+     *
+     * @param mode 1 - enable, 0 - disable
+     *
+     * @return FIPS_mode_set return code
+     */
+    public static native int fipsModeSet(int mode);
+
+    /**
      * Add content of the file to the PRNG
      * @param filename Filename containing random data.
      *        If null the default file will be tested.
