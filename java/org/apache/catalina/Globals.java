@@ -156,6 +156,15 @@ public final class Globals {
 
 
     /**
+     * All request attributes which names start with this prefix are used by
+     * connector implementations. They are passed down to coyoteRequest and back
+     * up. See <code>Request.setAttribute(String, Object)</code>.
+     */
+    public static final String TOMCAT_CONNECTOR_ATTR_PREFIX =
+        "org.apache.tomcat.";
+
+
+    /**
      * The request attribute that is set to the value of {@code Boolean.TRUE}
      * if connector processing this request supports Comet API.
      */
@@ -226,6 +235,13 @@ public final class Globals {
 
 
     /**
+     *
+     */
+    public static final String ASYNC_SUPPORTED_ATTR =
+        "org.apache.catalina.ASYNC_SUPPORTED";
+
+
+    /**
      * The request attribute that is set to {@code Boolean.TRUE} if some request
      * parameters have been ignored during request parameters parsing. It can
      * happen, for example, if there is a limit on the total count of parseable
@@ -249,12 +265,6 @@ public final class Globals {
      */
     public static final boolean IS_SECURITY_ENABLED =
         (System.getSecurityManager() != null);
-
-    /**
-     *
-     */
-    public static final String ASYNC_SUPPORTED_ATTR =
-        "org.apache.catalina.ASYNC_SUPPORTED";
 
 
     /**
