@@ -27,9 +27,9 @@ import org.apache.catalina.LifecycleListener;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.jni.Library;
+import org.apache.tomcat.jni.SSL;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.res.StringManager;
-import org.apache.tomcat.jni.SSL;
 
 
 
@@ -242,7 +242,7 @@ public class AprLifecycleListener
         method = clazz.getMethod(methodName, paramTypes);
         method.invoke(null, paramValues);
 
-        if("on".equalsIgnoreCase(AprLifecycleListener.FIPSMode)) {
+        if("on".equalsIgnoreCase(FIPSMode)) {
             log.info(sm.getString("aprListener.initializingFIPS"));
 
             int result = SSL.fipsModeSet(1);
@@ -255,9 +255,9 @@ public class AprLifecycleListener
             } else {
                 // This case should be handled by the native method,
                 // but we'll make absolutely sure, here.
-                log.error(sm.getString("aprListener.initializeFIPSFailed"));
-
-                throw new IllegalStateException(sm.getString("aprListener.initializeFIPSFailed"));
+                String message = sm.getString("aprListener.initializeFIPSFailed");
+                log.error(message);
+                throw new IllegalStateException(message);
             }
         }
 
@@ -270,8 +270,10 @@ public class AprLifecycleListener
 
     public void setSSLEngine(String SSLEngine) {
         // Ensure that the SSLEngine is consistent with that used for SSL init
-        if(sslInitialized)
-            throw new IllegalStateException(sm.getString("aprListener.tooLateForSSLEngine"));
+        if (sslInitialized) {
+            throw new IllegalStateException(
+                    sm.getString("aprListener.tooLateForSSLEngine"));
+        }
 
         AprLifecycleListener.SSLEngine = SSLEngine;
     }
@@ -282,23 +284,29 @@ public class AprLifecycleListener
 
     public void setSSLRandomSeed(String SSLRandomSeed) {
         // Ensure that the random seed is consistent with that used for SSL init
-        if(sslInitialized)
-            throw new IllegalStateException(sm.getString("aprListener.tooLateForSSLRandomSeed"));
+        if (sslInitialized) {
+            throw new IllegalStateException(
+                    sm.getString("aprListener.tooLateForSSLRandomSeed"));
+        }
 
         AprLifecycleListener.SSLRandomSeed = SSLRandomSeed;
     }
 
-    public void setFIPSMode(String FIPSMode)
-    {
+    public String getFIPSMode() {
+        return FIPSMode;
+    }
+
+    public void setFIPSMode(String FIPSMode) {
         // Ensure that the FIPS mode is consistent with that used for SSL init
-        if(sslInitialized)
-            throw new IllegalStateException(sm.getString("aprListener.tooLateForFIPSMode"));
+        if (sslInitialized) {
+            throw new IllegalStateException(
+                    sm.getString("aprListener.tooLateForFIPSMode"));
+        }
 
         AprLifecycleListener.FIPSMode = FIPSMode;
     }
 
-    public boolean isFIPSModeActive()
-    {
+    public boolean isFIPSModeActive() {
         return fipsModeActive;
     }
 }
