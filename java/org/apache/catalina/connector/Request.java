@@ -884,6 +884,13 @@ public class Request
             return null;
         }
 
+        if (name.equals(Globals.PARAMETER_PARSE_FAILED_ATTR)) {
+            if (coyoteRequest.getParameters().isParseFailed()) {
+                return Boolean.TRUE;
+            }
+            return null;
+        }
+
         Object attr=attributes.get(name);
 
         if(attr!=null) {
@@ -951,6 +958,7 @@ public class Request
      * <li>{@link Globals#KEY_SIZE_ATTR} (SSL connections only)</li>
      * <li>{@link Globals#SSL_SESSION_ID_ATTR} (SSL connections only)</li>
      * <li>{@link Globals#SSL_SESSION_MGR_ATTR} (SSL connections only)</li>
+     * <li>{@link Globals#PARAMETER_PARSE_FAILED_ATTR}</li>
      * </ul>
      * The underlying connector may also expose request attributes. These all
      * have names starting with "org.apache.tomcat" and include:
@@ -2383,12 +2391,6 @@ public class Request
         }
     }
 
-    private void checkParameterParseFailed() {
-        if (getCoyoteRequest().getParameters().isParseFailed()) {
-            setAttribute(Globals.PARAMETER_PARSE_FAILED_ATTR, Boolean.TRUE);
-        }
-    }
-
     public void cometClose() {
         coyoteRequest.action(ActionCode.COMET_CLOSE,getEvent());
         setComet(false);
@@ -2602,7 +2604,6 @@ public class Request
             if (partsParseException != null || !success) {
                 parameters.setParseFailed(true);
             }
-            checkParameterParseFailed();
         }
     }
 
@@ -2902,7 +2903,6 @@ public class Request
             if (!success) {
                 parameters.setParseFailed(true);
             }
-            checkParameterParseFailed();
         }
 
     }
