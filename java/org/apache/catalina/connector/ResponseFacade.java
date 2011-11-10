@@ -5,17 +5,15 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.catalina.connector;
 
 import java.io.IOException;
@@ -36,7 +34,7 @@ import org.apache.catalina.security.SecurityUtil;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
- * Facade class that wraps a Coyote response object. 
+ * Facade class that wraps a Coyote response object.
  * All methods are delegated to the wrapped response.
  *
  * @author Remy Maucherat
@@ -44,34 +42,34 @@ import org.apache.tomcat.util.res.StringManager;
  * @version $Id$
  */
 @SuppressWarnings("deprecation")
-public class ResponseFacade 
+public class ResponseFacade
     implements HttpServletResponse {
 
 
     // ----------------------------------------------------------- DoPrivileged
-    
+
     private final class SetContentTypePrivilegedAction
             implements PrivilegedAction<Void> {
 
-        private String contentType;
+        private final String contentType;
 
         public SetContentTypePrivilegedAction(String contentType){
             this.contentType = contentType;
         }
-        
+
         @Override
         public Void run() {
             response.setContentType(contentType);
             return null;
-        }            
+        }
     }
 
     private final class DateHeaderPrivilegedAction
             implements PrivilegedAction<Void> {
 
-        private String name;
-        private long value;
-        private boolean add;
+        private final String name;
+        private final long value;
+        private final boolean add;
 
         DateHeaderPrivilegedAction(String name, long value, boolean add) {
             this.name = name;
@@ -89,7 +87,7 @@ public class ResponseFacade
             return null;
         }
     }
-    
+
     // ----------------------------------------------------------- Constructors
 
 
@@ -197,8 +195,9 @@ public class ResponseFacade
         //                (/*sm.getString("responseFacade.finished")*/);
 
         ServletOutputStream sos = response.getOutputStream();
-        if (isFinished())
+        if (isFinished()) {
             response.setSuspended(true);
+        }
         return (sos);
 
     }
@@ -213,8 +212,9 @@ public class ResponseFacade
         //                (/*sm.getString("responseFacade.finished")*/);
 
         PrintWriter writer = response.getWriter();
-        if (isFinished())
+        if (isFinished()) {
             response.setSuspended(true);
+        }
         return (writer);
 
     }
@@ -223,8 +223,9 @@ public class ResponseFacade
     @Override
     public void setContentLength(int len) {
 
-        if (isCommitted())
+        if (isCommitted()) {
             return;
+        }
 
         response.setContentLength(len);
 
@@ -234,13 +235,14 @@ public class ResponseFacade
     @Override
     public void setContentType(String type) {
 
-        if (isCommitted())
+        if (isCommitted()) {
             return;
-        
+        }
+
         if (SecurityUtil.isPackageProtectionEnabled()){
             AccessController.doPrivileged(new SetContentTypePrivilegedAction(type));
         } else {
-            response.setContentType(type);            
+            response.setContentType(type);
         }
     }
 
@@ -248,9 +250,10 @@ public class ResponseFacade
     @Override
     public void setBufferSize(int size) {
 
-        if (isCommitted())
+        if (isCommitted()) {
             throw new IllegalStateException
                 (sm.getString("coyoteResponse.setBufferSize.ise"));
+        }
 
         response.setBufferSize(size);
 
@@ -273,10 +276,11 @@ public class ResponseFacade
     public void flushBuffer()
         throws IOException {
 
-        if (isFinished())
+        if (isFinished()) {
             //            throw new IllegalStateException
             //                (/*sm.getString("responseFacade.finished")*/);
             return;
+        }
 
         if (SecurityUtil.isPackageProtectionEnabled()){
             try{
@@ -300,7 +304,7 @@ public class ResponseFacade
         } else {
             response.setAppCommitted(true);
 
-            response.flushBuffer();            
+            response.flushBuffer();
         }
 
     }
@@ -309,9 +313,10 @@ public class ResponseFacade
     @Override
     public void resetBuffer() {
 
-        if (isCommitted())
+        if (isCommitted()) {
             throw new IllegalStateException
                 (sm.getString("coyoteResponse.resetBuffer.ise"));
+        }
 
         response.resetBuffer();
 
@@ -333,9 +338,10 @@ public class ResponseFacade
     @Override
     public void reset() {
 
-        if (isCommitted())
+        if (isCommitted()) {
             throw new IllegalStateException
                 (sm.getString("coyoteResponse.reset.ise"));
+        }
 
         response.reset();
 
@@ -345,8 +351,9 @@ public class ResponseFacade
     @Override
     public void setLocale(Locale loc) {
 
-        if (isCommitted())
+        if (isCommitted()) {
             return;
+        }
 
         response.setLocale(loc);
     }
@@ -367,8 +374,9 @@ public class ResponseFacade
     @Override
     public void addCookie(Cookie cookie) {
 
-        if (isCommitted())
+        if (isCommitted()) {
             return;
+        }
 
         response.addCookie(cookie);
 
@@ -439,9 +447,10 @@ public class ResponseFacade
     public void sendError(int sc, String msg)
         throws IOException {
 
-        if (isCommitted())
+        if (isCommitted()) {
             throw new IllegalStateException
                 (sm.getString("coyoteResponse.sendError.ise"));
+        }
 
         response.setAppCommitted(true);
 
@@ -454,9 +463,10 @@ public class ResponseFacade
     public void sendError(int sc)
         throws IOException {
 
-        if (isCommitted())
+        if (isCommitted()) {
             throw new IllegalStateException
                 (sm.getString("coyoteResponse.sendError.ise"));
+        }
 
         response.setAppCommitted(true);
 
@@ -469,9 +479,10 @@ public class ResponseFacade
     public void sendRedirect(String location)
         throws IOException {
 
-        if (isCommitted())
+        if (isCommitted()) {
             throw new IllegalStateException
                 (sm.getString("coyoteResponse.sendRedirect.ise"));
+        }
 
         response.setAppCommitted(true);
 
@@ -483,8 +494,9 @@ public class ResponseFacade
     @Override
     public void setDateHeader(String name, long date) {
 
-        if (isCommitted())
+        if (isCommitted()) {
             return;
+        }
 
         if(Globals.IS_SECURITY_ENABLED) {
             AccessController.doPrivileged(new DateHeaderPrivilegedAction
@@ -499,8 +511,9 @@ public class ResponseFacade
     @Override
     public void addDateHeader(String name, long date) {
 
-        if (isCommitted())
+        if (isCommitted()) {
             return;
+        }
 
         if(Globals.IS_SECURITY_ENABLED) {
             AccessController.doPrivileged(new DateHeaderPrivilegedAction
@@ -515,8 +528,9 @@ public class ResponseFacade
     @Override
     public void setHeader(String name, String value) {
 
-        if (isCommitted())
+        if (isCommitted()) {
             return;
+        }
 
         response.setHeader(name, value);
 
@@ -526,8 +540,9 @@ public class ResponseFacade
     @Override
     public void addHeader(String name, String value) {
 
-        if (isCommitted())
+        if (isCommitted()) {
             return;
+        }
 
         response.addHeader(name, value);
 
@@ -537,8 +552,9 @@ public class ResponseFacade
     @Override
     public void setIntHeader(String name, int value) {
 
-        if (isCommitted())
+        if (isCommitted()) {
             return;
+        }
 
         response.setIntHeader(name, value);
 
@@ -548,8 +564,9 @@ public class ResponseFacade
     @Override
     public void addIntHeader(String name, int value) {
 
-        if (isCommitted())
+        if (isCommitted()) {
             return;
+        }
 
         response.addIntHeader(name, value);
 
@@ -559,8 +576,9 @@ public class ResponseFacade
     @Override
     public void setStatus(int sc) {
 
-        if (isCommitted())
+        if (isCommitted()) {
             return;
+        }
 
         response.setStatus(sc);
 
@@ -570,8 +588,9 @@ public class ResponseFacade
     @Override
     public void setStatus(int sc, String sm) {
 
-        if (isCommitted())
+        if (isCommitted()) {
             return;
+        }
 
         response.setStatus(sc, sm);
     }
@@ -604,17 +623,17 @@ public class ResponseFacade
     public int getStatus() {
         return response.getStatus();
     }
-    
+
     @Override
     public String getHeader(String name) {
         return response.getHeader(name);
     }
-    
+
     @Override
     public Collection<String> getHeaderNames() {
         return response.getHeaderNames();
     }
-    
+
     @Override
     public Collection<String> getHeaders(String name) {
         return response.getHeaders(name);
