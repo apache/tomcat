@@ -175,8 +175,8 @@ The DefaultServlet allows the following initParamters:
   <tr>
     <th valign='top'>sendfileSize</th>
     <td valign='top'>
-        If the connector used supports sendfile, this represents the minimal 
-        file size in KB for which sendfile will be used. Use a negative value 
+        If the connector used supports sendfile, this represents the minimal
+        file size in KB for which sendfile will be used. Use a negative value
         to always disable sendfile. [48]
     </td>
   </tr>
