@@ -284,7 +284,7 @@
           <xsl:value-of select="@anchor" />
         </xsl:when>
         <xsl:otherwise>
-          <xsl:if test="local-name()='subsection' and 
+          <xsl:if test="local-name()='subsection' and
               count(//*[(local-name()='section' or local-name()='subsection') and @name=current()/@name]) &gt; 1
               ">
             <xsl:value-of select="concat(ancestor::section/@name, '/')"/>
@@ -518,7 +518,7 @@
       <xsl:variable name="link"><xsl:value-of select="$buglink"/><xsl:value-of select="text()"/></xsl:variable>
       <a href="{$link}"><xsl:apply-templates/></a>
   </xsl:template>
-  
+
   <!-- Link to a SVN revision report -->
   <xsl:template match="rev">
       <xsl:variable name="link"><xsl:value-of select="$revlink"/><xsl:value-of select="text()"/></xsl:variable>
@@ -546,7 +546,7 @@
         </font>
     </td>
   </xsl:template>
-  
+
   <!-- Process everything else by just passing it through -->
   <xsl:template match="*|@*">
     <xsl:copy>

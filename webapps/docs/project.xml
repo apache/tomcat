@@ -56,7 +56,7 @@
         <item name="18) Clustering"         href="cluster-howto.html"/>
         <item name="19) Load Balancer"      href="balancer-howto.html"/>
         <item name="20) Connectors"         href="connectors.html"/>
-        <item name="21) Monitoring and Management"         
+        <item name="21) Monitoring and Management"
               href="monitoring.html"/>
         <item name="22) Logging"            href="logging.html"/>
         <item name="23) APR/Native"         href="apr.html"/>
@@ -68,9 +68,9 @@
         <item name="28) Security Considerations"
               href="security-howto.html"/>
         <item name="29) Windows Service"    href="windows-service-howto.html"/>
-        <item name="30) Windows Authentication"   
+        <item name="30) Windows Authentication"
               href="windows-auth-howto.html"/>
-        <item name="31) Tomcat's JDBC Pool"   
+        <item name="31) Tomcat's JDBC Pool"
               href="jdbc-pool.html"/>
     </menu>
 
@@ -81,7 +81,7 @@
         <item name="Servlet Javadocs"      href="servletapi/index.html"/>
         <item name="JSP 2.2 Javadocs"      href="jspapi/index.html"/>
         <item name="EL 2.2 Javadocs"       href="elapi/index.html"/>
-        <item name="JK 1.2 Documentation"      
+        <item name="JK 1.2 Documentation"
               href="http://tomcat.apache.org/connectors-doc/"/>
     </menu>
 
