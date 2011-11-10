@@ -502,15 +502,19 @@ public class HostConfig
             return;
         }
 
-        // Deploy XML descriptors from configBase
+        // Deploy XML descriptor from configBase
         File xml = new File(configBase, baseName + ".xml");
-        if (xml.exists())
+        if (xml.exists()) {
             deployDescriptor(cn, xml);
-        // Deploy WARs
+            return;
+        }
+        // Deploy WAR
         File war = new File(appBase, baseName + ".war");
-        if (war.exists())
+        if (war.exists()) {
             deployWAR(cn, war);
-        // Deploy expanded folders
+            return;
+        }
+        // Deploy expanded folder
         File dir = new File(appBase, baseName);
         if (dir.exists())
             deployDirectory(cn, dir);
