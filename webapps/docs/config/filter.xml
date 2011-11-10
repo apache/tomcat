@@ -1226,6 +1226,8 @@ org.apache.catalina.filters.RequestDumperFilter.handlers = \
     filter is not so high, because parameter parsing does check content type
     of the request before consuming the request body.</p>
 
+    <p>The request is rejected with HTTP status code 400 (Bad Request).</p>
+
   </subsection>
 
   <subsection name="Filter Class Name">
