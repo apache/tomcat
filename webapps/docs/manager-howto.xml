@@ -172,7 +172,7 @@ an example of restricting access to the localhost by IP address:</p>
 
 <p>The HTML interface is protected against CSRF but the text and JMX interfaces
 are not. To maintain the CSRF protection:</p>
-    
+
 <ul>
   <li>users with the <code>manager-gui</code> role should not be granted either the
       <code>manager-script</code> or <code>manager-jmx</code> roles.</li>
@@ -258,8 +258,8 @@ name or the war file name without the .war extension as the path.  The
 application can later be undeployed (and the corresponding application directory
 removed) by use of the <code>/undeploy</code> command.</p>
 
-<p>The .WAR file may include Tomcat specific deployment configuration, by 
-including a Context configuration XML file in 
+<p>The .WAR file may include Tomcat specific deployment configuration, by
+including a Context configuration XML file in
 <code>/META-INF/context.xml</code>.</p>
 
 <p>URL parameters include:</p>
@@ -759,13 +759,13 @@ error message.  Possible causes for problems include:</p>
 http://localhost:8080/manager/text/undeploy?path=/examples
 </source>
 
-<p><strong><font color="red">WARNING</font> - This command will delete any web 
-application artifacts that exist within <code>appBase</code> directory 
+<p><strong><font color="red">WARNING</font> - This command will delete any web
+application artifacts that exist within <code>appBase</code> directory
 (typically "webapps") for this virtual host</strong>.
-This will delete the the application .WAR, if present, 
-the application directory resulting either from a deploy in unpacked form 
+This will delete the the application .WAR, if present,
+the application directory resulting either from a deploy in unpacked form
 or from .WAR expansion as well as the XML Context definition from
-<code>$CATALINA_BASE/conf/[enginename]/[hostname]/</code> directory. 
+<code>$CATALINA_BASE/conf/[enginename]/[hostname]/</code> directory.
 If you simply want to take an application
 out of service, you should use the <code>/stop</code> command instead.</p>
 
@@ -845,29 +845,29 @@ has been reloaded several times, it may be listed several times.</p>
 
 <p>If the command does not succeed, the response will start with
 <code>FAIL</code> and include an error message.</p>
- 
+
 </subsection>
 
 <subsection name="Server Status">
 
 <p>From this link , you can view information about the server.</p>
 
-<p>First, you have the server and JVM version number, JVM provider, OS name 
+<p>First, you have the server and JVM version number, JVM provider, OS name
 and number followed by the architecture type.</p>
 
-<p>Second, there is several information about the memory usage of the JVM 
+<p>Second, there is several information about the memory usage of the JVM
 (available, total and max memory).</p>
 
-<p>Then, there is information about the Tomcat AJP and HTTP connectors. 
+<p>Then, there is information about the Tomcat AJP and HTTP connectors.
 The same information is available for both of them :
 </p>
 <ul>
-    <li><p>Threads information : Max threads, min and max spare threads, 
+    <li><p>Threads information : Max threads, min and max spare threads,
     current thread count and current thread busy.</p></li>
-    <li><p>Request information : Max processing time and processing time, 
+    <li><p>Request information : Max processing time and processing time,
     request and error count, bytes received and sent.</p></li>
-    <li><p>A table showing Stage, Time, Bytes Sent, Bytes Receive, Client, 
-    VHost and Request. All existing threads are listed in the table. 
+    <li><p>A table showing Stage, Time, Bytes Sent, Bytes Receive, Client,
+    VHost and Request. All existing threads are listed in the table.
     Here is the list of the possible thread stages :</p>
     <ul>
         <li><p><em>"Parse and Prepare Request"</em> : The request headers are
@@ -993,8 +993,8 @@ property, and specify it from the command line:</p>
 <subsection name="Tasks output capture">
 
 <p>Using <em>Ant</em> version <strong>1.6.2</strong> or later,
-the Catalina tasks offer the option to capture their output in 
-properties or external files. They support directly the following subset of the 
+the Catalina tasks offer the option to capture their output in
+properties or external files. They support directly the following subset of the
 <code>&lt;redirector&gt;</code> type attributes:
 </p>
 
@@ -1091,10 +1091,10 @@ any wrong or missing command attribute will still cause Ant execution terminatio
 
 <p>They also support the embedded <code>&lt;redirector&gt;</code> element
 in which you can specify
-its full set of attributes, but <code>input</code>, <code>inputstring</code> and 
+its full set of attributes, but <code>input</code>, <code>inputstring</code> and
 <code>inputencoding</code> that, even if accepted, are not used because they have
 no meaning in this context.
-Refer to <a href="http://ant.apache.org">ant manual</a> for details on 
+Refer to <a href="http://ant.apache.org">ant manual</a> for details on
 <code>&lt;redirector&gt;</code> element attributes.
 </p>
 
@@ -1125,17 +1125,17 @@ can be used:
             path="${mgr.context.path}"
             war="${mgr.war.file}"/&gt;
     &lt;/target&gt;
-    
+
     &lt;target name="context.status"&gt;
         &lt;property name="running" value="${mgr.context.path}:running"/&gt;
         &lt;property name="stopped" value="${mgr.context.path}:stopped"/&gt;
-    
+
         &lt;list url="${mgr.url}"
             outputproperty="ctx.status"
             username="${mgr.username}"
             password="${mgr.password}"&gt;
         &lt;/list&gt;
-        
+
         &lt;condition property="context.running"&gt;
             &lt;contains string="${ctx.status}" substring="${running}"/&gt;
         &lt;/condition&gt;

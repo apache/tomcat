@@ -35,20 +35,20 @@
 
 <section name="Introduction">
 
-<p>Tomcat uses JMX MBeans as the technology for implementing 
+<p>Tomcat uses JMX MBeans as the technology for implementing
 manageability of Tomcat.</p>
 
-<p>The descriptions of JMX MBeans for Catalina are in the mbeans-descriptor.xml 
+<p>The descriptions of JMX MBeans for Catalina are in the mbeans-descriptor.xml
 file in each package.</p>
 
-<p>You will need to add MBean descriptions for your custom components 
+<p>You will need to add MBean descriptions for your custom components
 in order to avoid a "ManagedBean is not found" exception.</p>
 
 </section>
 
 <section name="Adding MBean descriptions">
 
-<p>You may also add MBean descriptions for custom components in 
+<p>You may also add MBean descriptions for custom components in
 a mbeans-descriptor.xml file, located in the same package as the class files
 it describes.</p>
 
