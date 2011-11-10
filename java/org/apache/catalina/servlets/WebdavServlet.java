@@ -270,7 +270,7 @@ public class WebdavServlet
 
     /**
      * Is access allowed via WebDAV to the special paths (/WEB-INF and
-     * /META-INF)? 
+     * /META-INF)?
      */
     private boolean allowSpecialPaths = false;
 
@@ -341,7 +341,7 @@ public class WebdavServlet
         throws ServletException, IOException {
 
         final String path = getRelativePath(req);
-        
+
         // Block access to special subdirectories.
         // DefaultServlet assumes it services resources from the root of the web app
         // and doesn't add any special path protection
@@ -528,18 +528,18 @@ public class WebdavServlet
         }
 
         Node propNode = null;
-        
+
         if (req.getContentLength() > 0) {
             DocumentBuilder documentBuilder = getDocumentBuilder();
-    
+
             try {
                 Document document = documentBuilder.parse
                     (new InputSource(req.getInputStream()));
-    
+
                 // Get the root element of the document
                 Element rootElement = document.getDocumentElement();
                 NodeList childList = rootElement.getChildNodes();
-    
+
                 for (int i=0; i < childList.getLength(); i++) {
                     Node currentNode = childList.item(i);
                     switch (currentNode.getNodeType()) {
@@ -661,7 +661,7 @@ public class WebdavServlet
 
             // Stack of the objects one level below
             Stack<String> stackBelow = new Stack<String>();
- 
+
             while ((!stack.isEmpty()) && (depth >= 0)) {
 
                 String currentPath = stack.pop();
@@ -2807,11 +2807,11 @@ public class WebdavServlet
      */
     private static class WebdavResolver implements EntityResolver {
         private ServletContext context;
-        
+
         public WebdavResolver(ServletContext theContext) {
             context = theContext;
         }
-     
+
         @Override
         public InputSource resolveEntity (String publicId, String systemId) {
             context.log(sm.getString("webdavservlet.enternalEntityIgnored",
