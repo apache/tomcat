@@ -32,7 +32,7 @@ import javax.servlet.jsp.tagext.SimpleTagSupport;
 public class ShuffleSimpleTag extends SimpleTagSupport {
     // No need for this to use SecureRandom
     private static Random random = new Random();
-    
+
     private JspFragment fragment1;
     private JspFragment fragment2;
     private JspFragment fragment3;
@@ -76,11 +76,11 @@ public class ShuffleSimpleTag extends SimpleTagSupport {
     public void setFragment1( JspFragment fragment1 ) {
         this.fragment1 = fragment1;
     }
-    
+
     public void setFragment2( JspFragment fragment2 ) {
         this.fragment2 = fragment2;
     }
-    
+
     public void setFragment3( JspFragment fragment3 ) {
         this.fragment3 = fragment3;
     }

@@ -20,7 +20,7 @@
   xsi:schemaLocation="http://java.sun.com/xml/ns/javaee
                       http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
   version="3.0"
-  metadata-complete="true">  
+  metadata-complete="true">
 
     <description>
       Servlet and JSP Examples.
@@ -227,7 +227,7 @@
             <include-coda>/jsp/jsp2/misc/coda.jspf</include-coda>
         </jsp-property-group>
     </jsp-config>
-    
+
    <security-constraint>
       <display-name>Example Security Constraint</display-name>
       <web-resource-collection>
@@ -256,14 +256,14 @@
         <form-error-page>/jsp/security/protected/error.jsp</form-error-page>
       </form-login-config>
     </login-config>
-        
+
     <!-- Security roles referenced by this web application -->
     <security-role>
       <role-name>role1</role-name>
     </security-role>
     <security-role>
       <role-name>tomcat</role-name>
-    </security-role>    
+    </security-role>
 
     <!-- Environment entry examples -->
     <!--env-entry>
