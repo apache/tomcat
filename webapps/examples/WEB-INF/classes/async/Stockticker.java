@@ -27,14 +27,14 @@ public class Stockticker implements Runnable {
         ArrayList<TickListener> listeners = new ArrayList<TickListener>();
         protected volatile Thread ticker = null;
         protected volatile int ticknr = 0;
-        
+
         public synchronized void start() {
             run = true;
             ticker = new Thread(this);
             ticker.setName("Ticker Thread");
             ticker.start();
         }
-        
+
         public synchronized void stop() {
             run = false;
             try {
@@ -42,15 +42,15 @@ public class Stockticker implements Runnable {
             }catch (InterruptedException x) {
                 Thread.interrupted();
             }
-            
+
             ticker = null;
         }
-        
+
         public void addTickListener(TickListener listener) {
             if (listeners.add(listener)) {
                 if (counter.incrementAndGet()==1) start();
             }
-                
+
         }
 
         public void removeTickListener(TickListener listener) {
@@ -83,7 +83,7 @@ public class Stockticker implements Runnable {
                         for (TickListener l : listeners) {
                             l.tick(stock);
                         }
-                        
+
                     }
                     Thread.sleep(850);
                 }
@@ -93,12 +93,12 @@ public class Stockticker implements Runnable {
                 x.printStackTrace();
             }
         }
-    
-    
+
+
     public static interface TickListener {
         public void tick(Stock stock);
     }
-    
+
     public static final class Stock implements Cloneable {
         protected static DecimalFormat df = new DecimalFormat("0.00");
         protected String symbol = "";
@@ -159,7 +159,7 @@ public class Stockticker implements Runnable {
             if (other instanceof Stock) {
                 return this.symbol.equals(((Stock) other).symbol);
             }
-            
+
             return false;
         }
 

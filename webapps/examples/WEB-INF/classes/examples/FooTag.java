@@ -34,15 +34,15 @@ public class FooTag extends ExampleTagBase {
 
     private String atts[] = new String[3];
     int i = 0;
-    
+
     private final void setAtt(int index, String value) {
         atts[index] = value;
     }
-    
+
     public void setAtt1(String value) {
         setAtt(0, value);
     }
-    
+
     public void setAtt2(String value) {
         setAtt(1, value);
     }
@@ -50,7 +50,7 @@ public class FooTag extends ExampleTagBase {
     public void setAtt3(String value) {
         setAtt(2, value);
     }
-    
+
     /**
      * Process start tag
      *
@@ -67,7 +67,7 @@ public class FooTag extends ExampleTagBase {
         pageContext.setAttribute("member", atts[i]);
         i++;
     }
-    
+
     @Override
     public int doAfterBody() throws JspException {
         try {
@@ -75,7 +75,7 @@ public class FooTag extends ExampleTagBase {
                 bodyOut.writeOut(bodyOut.getEnclosingWriter());
                 return SKIP_BODY;
             }
-            
+
             pageContext.setAttribute("member", atts[i]);
             i++;
             return EVAL_BODY_BUFFERED;
