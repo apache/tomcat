@@ -380,16 +380,7 @@ The expiry time can be fine-tuned by adding several &#x27;
          <code>Cache-Control:max-age=</code> headers can be unnecessarily tricky to
          understand.
          </p>
-         <p>
-         <i>Sample : exclude response status codes 302, 500 and 503</i>
-         </p>
-
-         <source>
-&lt;init-param&gt;
- &lt;param-name&gt;ExpiresExcludedResponseStatusCodes&lt;/param-name&gt;
- &lt;param-value&gt;302, 500, 503&lt;/param-value&gt;
-&lt;/init-param&gt;
-         </source>
+         <p><i>See sample below the table</i></p>
       </attribute>
 
       <attribute name="ExpiresByType &lt;content-type&gt;" required="false">
@@ -429,22 +420,7 @@ The expiry time can be fine-tuned by adding several &#x27;
          configuration of an expiration with a charset must <strong>not</strong> include
          such a space character.
          </p>
-         <p>
-         <i>Sample:</i>
-         </p>
-
-         <source>
-&lt;init-param&gt;
-   &lt;param-name&gt;ExpiresByType text/html&lt;/param-name&gt;
-   &lt;param-value&gt;access plus 1 month 15   days 2 hours&lt;/param-value&gt;
-&lt;/init-param&gt;
-
-&lt;init-param&gt;
-   &lt;!-- 2592000 seconds = 30 days --&gt;
-   &lt;param-name&gt;ExpiresByType image/gif&lt;/param-name&gt;
-   &lt;param-value&gt;A2592000&lt;/param-value&gt;
-&lt;/init-param&gt;
-         </source>
+         <p><i>See sample below the table</i></p>
          <p>
          It overrides, for the specified MIME type <i>only</i>, any
          expiration date set by the <code>ExpiresDefault</code> directive.
@@ -466,6 +442,30 @@ The expiry time can be fine-tuned by adding several &#x27;
          </p>
       </attribute>
     </attributes>
+
+    <p><i>Sample : exclude response status codes 302, 500 and 503</i></p>
+
+<source>
+&lt;init-param&gt;
+ &lt;param-name&gt;ExpiresExcludedResponseStatusCodes&lt;/param-name&gt;
+ &lt;param-value&gt;302, 500, 503&lt;/param-value&gt;
+&lt;/init-param&gt;
+</source>
+
+    <p><i>Sample for ExpiresByType initialization parameter</i></p>
+
+         <source>
+&lt;init-param&gt;
+   &lt;param-name&gt;ExpiresByType text/html&lt;/param-name&gt;
+   &lt;param-value&gt;access plus 1 month 15   days 2 hours&lt;/param-value&gt;
+&lt;/init-param&gt;
+
+&lt;init-param&gt;
+   &lt;!-- 2592000 seconds = 30 days --&gt;
+   &lt;param-name&gt;ExpiresByType image/gif&lt;/param-name&gt;
+   &lt;param-value&gt;A2592000&lt;/param-value&gt;
+&lt;/init-param&gt;
+         </source>
 
   </subsection>
 
@@ -497,12 +497,14 @@ FINE: Filter initialized with configuration ExpiresFilter[
     </source>
     <p>
     Sample of per-request log message where <code>ExpiresFilter</code> adds an
-    expiration date:
+    expiration date is below. The message is on one line and is wrapped here
+    for better readability.
     </p>
 
     <source>
 Mar 26, 2010 2:09:47 PM org.apache.catalina.filters.ExpiresFilter onBeforeWriteResponseBody
-FINE: Request "/tomcat.gif" with response status "200" content-type "image/gif", set expiration date 3/26/10 2:19 PM
+FINE: Request "/tomcat.gif" with response status "200"
+ content-type "image/gif", set expiration date 3/26/10 2:19 PM
     </source>
     <p>
     Sample of per-request log message where <code>ExpiresFilter</code> does not add
@@ -511,7 +513,8 @@ FINE: Request "/tomcat.gif" with response status "200" content-type "image/gif",
 
     <source>
 Mar 26, 2010 2:10:27 PM org.apache.catalina.filters.ExpiresFilter onBeforeWriteResponseBody
-FINE: Request "/docs/config/manager.html" with response status "200" content-type "text/html", no expiration configured
+FINE: Request "/docs/config/manager.html" with response status "200"
+ content-type "text/html", no expiration configured
     </source>
   </subsection>
 
@@ -580,7 +583,7 @@ FINE: Request "/docs/config/manager.html" with response status "200" content-typ
 
   <subsection name="Example">
     <p>To allow access only for the clients connecting from localhost:</p>
-<pre>
+<source>
     &lt;filter>
       &lt;filter-name>Remote Address Filter&lt;/filter-name>
       &lt;filter-class>org.apache.catalina.filters.RemoteAddrFilter&lt;/filter-class>
@@ -593,7 +596,7 @@ FINE: Request "/docs/config/manager.html" with response status "200" content-typ
       &lt;filter-name>Remote Address Filter&lt;/filter-name>
       &lt;url-pattern>/*&lt;/url-pattern>
     &lt;/filter-mapping>
-</pre>
+</source>
   </subsection>
 
 </section>
@@ -1122,7 +1125,8 @@ FINE: Request "/docs/config/manager.html" with response status "200" content-typ
 1request-dumper.org.apache.juli.FileHandler.prefix = request-dumper.
 1request-dumper.org.apache.juli.FileHandler.formatter = org.apache.juli.VerbatimFormatter
 org.apache.catalina.filters.RequestDumperFilter.level = INFO
-org.apache.catalina.filters.RequestDumperFilter.handlers = 1request-dumper.org.apache.juli.FileHandler
+org.apache.catalina.filters.RequestDumperFilter.handlers = \
+  1request-dumper.org.apache.juli.FileHandler
     </source>
   </subsection>
 </section>
