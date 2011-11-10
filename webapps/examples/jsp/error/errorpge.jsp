@@ -20,6 +20,6 @@
 
     <%@ page isErrorPage="true" %>
     <h1> The exception <%= exception.getMessage() %> tells me you
-         made a wrong choice. 
+         made a wrong choice.
 </body>
 </html>
