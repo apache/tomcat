@@ -14,7 +14,6 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package org.apache.tomcat.util.http;
 
 import java.io.IOException;
@@ -34,7 +33,7 @@ import org.apache.tomcat.util.buf.UDecoder;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
- * 
+ *
  * @author Costin Manolache
  */
 public final class Parameters {
@@ -49,7 +48,7 @@ public final class Parameters {
         new HashMap<String,ArrayList<String>>();
 
     private boolean didQueryParameters=false;
-    
+
     MessageBytes queryMB;
 
     UDecoder urlDec;
@@ -57,7 +56,7 @@ public final class Parameters {
 
     String encoding=null;
     String queryStringEncoding=null;
-    
+
     private int limit = -1;
     private int parameterCount = 0;
 
@@ -98,11 +97,11 @@ public final class Parameters {
         encoding=null;
         decodedQuery.recycle();
     }
-    
+
     // -------------------- Data access --------------------
     // Access to the current name/values, no side effect ( processing ).
     // You must explicitly call handleQueryParameters and the post methods.
-    
+
     @Deprecated
     public void addParameterValues(String key, String[] newValues) {
         if (key == null) {
@@ -129,7 +128,7 @@ public final class Parameters {
         }
         return values.toArray(new String[values.size()]);
     }
- 
+
     public Enumeration<String> getParameterNames() {
         handleQueryParameters();
         return Collections.enumeration(paramHashValues.keySet());
@@ -151,13 +150,16 @@ public final class Parameters {
     /** Process the query string into parameters
      */
     public void handleQueryParameters() {
-        if( didQueryParameters ) return;
+        if( didQueryParameters ) {
+            return;
+        }
 
         didQueryParameters=true;
 
-        if( queryMB==null || queryMB.isNull() )
+        if( queryMB==null || queryMB.isNull() ) {
             return;
-        
+        }
+
         if(log.isDebugEnabled()) {
             log.debug("Decoding query " + decodedQuery + " " +
                     queryStringEncoding);
@@ -176,7 +178,9 @@ public final class Parameters {
     public void addParameter( String key, String value )
             throws IllegalStateException {
 
-        if( key==null ) return;
+        if( key==null ) {
+            return;
+        }
 
         parameterCount ++;
         if (limit > -1 && parameterCount > limit) {
@@ -203,28 +207,28 @@ public final class Parameters {
     // if needed
     ByteChunk tmpName=new ByteChunk();
     ByteChunk tmpValue=new ByteChunk();
-    private ByteChunk origName=new ByteChunk();
-    private ByteChunk origValue=new ByteChunk();
+    private final ByteChunk origName=new ByteChunk();
+    private final ByteChunk origValue=new ByteChunk();
     CharChunk tmpNameC=new CharChunk(1024);
     public static final String DEFAULT_ENCODING = "ISO-8859-1";
     private static final Charset DEFAULT_CHARSET =
         Charset.forName(DEFAULT_ENCODING);
-    
-    
+
+
     public void processParameters( byte bytes[], int start, int len ) {
         processParameters(bytes, start, len, getCharset(encoding));
     }
 
     private void processParameters(byte bytes[], int start, int len,
                                   Charset charset) {
-        
+
         if(log.isDebugEnabled()) {
             log.debug(sm.getString("parameters.bytes",
                     new String(bytes, start, len, DEFAULT_CHARSET)));
         }
 
         int decodeFailCount = 0;
-            
+
         int pos = start;
         int end = start + len;
 
@@ -277,6 +281,7 @@ public final class Parameters {
                         break;
                 }
             } while (!parameterComplete && pos < end);
+            }
 
             if (pos == end) {
                 if (nameEnd == -1) {
@@ -285,14 +290,14 @@ public final class Parameters {
                     valueEnd = pos;
                 }
             }
-            
+
             if (log.isDebugEnabled() && valueStart == -1) {
                 log.debug(sm.getString("parameters.noequal",
                         Integer.valueOf(nameStart), Integer.valueOf(nameEnd),
                         new String(bytes, nameStart, nameEnd-nameStart,
                                 DEFAULT_CHARSET)));
             }
-            
+
             if (nameEnd <= nameStart ) {
                 if (log.isInfoEnabled()) {
                     String extract;
@@ -313,7 +318,7 @@ public final class Parameters {
                 continue;
                 // invalid chunk - it's better to ignore
             }
-            
+
             tmpName.setBytes(bytes, nameStart, nameEnd - nameStart);
             tmpValue.setBytes(bytes, valueStart, valueEnd - valueStart);
 
@@ -329,7 +334,7 @@ public final class Parameters {
                     log.error(sm.getString("paramerers.copyFail"), ioe);
                 }
             }
-            
+
             try {
                 String name;
                 String value;
@@ -385,13 +390,15 @@ public final class Parameters {
     private void urlDecode(ByteChunk bc)
         throws IOException {
         if( urlDec==null ) {
-            urlDec=new UDecoder();   
+            urlDec=new UDecoder();
         }
         urlDec.convert(bc);
     }
 
     public void processParameters( MessageBytes data, String encoding ) {
-        if( data==null || data.isNull() || data.getLength() <= 0 ) return;
+        if( data==null || data.isNull() || data.getLength() <= 0 ) {
+            return;
+        }
 
         if( data.getType() != MessageBytes.T_BYTES ) {
             data.toBytes();
