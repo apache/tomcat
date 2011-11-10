@@ -40,7 +40,7 @@
   JNDI resources for the <a href="server.html">Server</a>.</p>
 
   <p>These resources are listed in the server's global JNDI resource context.
-   This context is distinct from the per-web-application JNDI contexts 
+   This context is distinct from the per-web-application JNDI contexts
   described in
   the <a href="../jndi-resources-howto.html">JNDI Resources HOW-TO</a>.
   The resources defined in this element are <strong>not</strong> visible in
@@ -140,10 +140,10 @@
     <p>You can declare the characteristics of resources
     to be returned for JNDI lookups of <code>&lt;resource-ref&gt;</code> and
     <code>&lt;resource-env-ref&gt;</code> elements in the web application
-    deployment descriptor by defining them in this element and then linking 
-    them with <a href="context.html#Resource Links">&lt;ResourceLink&gt;</a> 
+    deployment descriptor by defining them in this element and then linking
+    them with <a href="context.html#Resource Links">&lt;ResourceLink&gt;</a>
     elements
-    in the <code><strong>&lt;Context&gt;</strong></code> element.  
+    in the <code><strong>&lt;Context&gt;</strong></code> element.
 
     You <strong>MUST</strong> also define any other needed parameters using
     attributes on the Resource element, to configure
@@ -219,10 +219,10 @@
   </subsection>
 
   <subsection name="Resource Links">
-    <p>Use <a href="context.html#Resource Links">&lt;ResourceLink&gt;</a> 
-    elements to link resources from the global context into 
-    per-web-application contexts. Here is an example of making a custom 
-    factory available to an application, based on the example definition in the 
+    <p>Use <a href="context.html#Resource Links">&lt;ResourceLink&gt;</a>
+    elements to link resources from the global context into
+    per-web-application contexts. Here is an example of making a custom
+    factory available to an application, based on the example definition in the
     <a href="../jndi-resources-howto.html#Generic JavaBean Resources">
     JNDI Resource HOW-TO</a>:
     </p>
@@ -230,7 +230,7 @@
     <source>
       <![CDATA[
         <Context>
-          <ResourceLink 
+          <ResourceLink
             name="bean/MyBeanFactory"
             global="bean/MyBeanFactory"
             type="com.mycompany.MyBean"
@@ -244,10 +244,10 @@
   <subsection name="Transaction">
 
     <p>You can declare the characteristics of the UserTransaction
-    to be returned for JNDI lookup for <code>java:comp/UserTransaction</code>. 
+    to be returned for JNDI lookup for <code>java:comp/UserTransaction</code>.
     You <strong>MUST</strong> define an object factory class to instantiate
-    this object as well as the needed resource parameters as attributes of the 
-    <code>Transaction</code> 
+    this object as well as the needed resource parameters as attributes of the
+    <code>Transaction</code>
     element, and the properties used to configure that object factory.</p>
 
     <p>The valid attributes for the <code>&lt;Transaction&gt;</code> element

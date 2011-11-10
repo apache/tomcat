@@ -35,14 +35,14 @@
 
 <section name="Introduction">
 
-  <p>The <strong>Executor</strong> represents a thread pool that can be shared 
+  <p>The <strong>Executor</strong> represents a thread pool that can be shared
      between components in Tomcat. Historically there has been a thread pool per
      connector created but this allows you to share a thread pool, between (primarly) connector
      but also other components when those get configured to support executors</p>
 
 
   <p>The executor has to implement the <code>org.apache.catalina.Executor</code> interface.</p>
-  
+
   <p>The executor is a nested element to the <a href="service.html">Service</a> element.
      And in order for it to be picked up by the connectors, the Executor element has to appear
      prior to the Connector element in server.xml</p>
@@ -57,9 +57,9 @@
   support the following attributes:</p>
 
   <attributes>
- 
+
     <attribute name="className" required="false">
-      <p>The class of the implementation. The implementation has to implement the 
+      <p>The class of the implementation. The implementation has to implement the
          <code>org.apache.catalina.Executor</code> interface.
          This interface ensures that the object can be referenced through its <code>name</code> attribute
          and that implements Lifecycle, so that it can be started and stopped with the container.
@@ -107,7 +107,7 @@
           the default is <code>false</code></p>
     </attribute>
     <attribute name="threadRenewalDelay" required="false">
-      <p>After a context is stopped, threads in the pool are renewed. To avoid renewing all threads at the same time, 
+      <p>After a context is stopped, threads in the pool are renewed. To avoid renewing all threads at the same time,
         this delay is observed between 2 threads being renewed. Value is in ms, default value is 1000ms.
         If negative, threads are not renewed.</p>
     </attribute>
