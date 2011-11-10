@@ -5,17 +5,15 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.tomcat.util.http;
 
 
@@ -44,7 +42,7 @@ public final class CookieSupport {
      * inclusion of / depends on the value of {@link #FWD_SLASH_IS_SEPARATOR}.
      */
     public static final boolean ALLOW_HTTP_SEPARATORS_IN_V0;
-    
+
     /**
      * If set to false, we don't use the IE6/7 Max-Age/Expires work around.
      * Default is usually true. If STRICT_SERVLET_COMPLIANCE==true then default
@@ -71,7 +69,7 @@ public final class CookieSupport {
      */
     private static final char[] V0_SEPARATORS = {',', ';', ' ', '\t'};
     private static final boolean[] V0_SEPARATOR_FLAGS = new boolean[128];
-    
+
     /**
      * The list of separators that apply to version 1 cookies. This may or may
      * not include '/' depending on the setting of
@@ -79,20 +77,20 @@ public final class CookieSupport {
      */
     private static final char[] HTTP_SEPARATORS;
     private static final boolean[] HTTP_SEPARATOR_FLAGS = new boolean[128];
-    
+
     static {
         STRICT_SERVLET_COMPLIANCE = Boolean.valueOf(System.getProperty(
                 "org.apache.catalina.STRICT_SERVLET_COMPLIANCE",
                 "false")).booleanValue();
-        
+
         ALLOW_EQUALS_IN_VALUE = Boolean.valueOf(System.getProperty(
                 "org.apache.tomcat.util.http.ServerCookie.ALLOW_EQUALS_IN_VALUE",
                 "false")).booleanValue();
-        
+
         ALLOW_HTTP_SEPARATORS_IN_V0 = Boolean.valueOf(System.getProperty(
                 "org.apache.tomcat.util.http.ServerCookie.ALLOW_HTTP_SEPARATORS_IN_V0",
                 "false")).booleanValue();
-        
+
         String alwaysAddExpires = System.getProperty(
         "org.apache.tomcat.util.http.ServerCookie.ALWAYS_ADD_EXPIRES");
         if (alwaysAddExpires == null) {
@@ -101,7 +99,7 @@ public final class CookieSupport {
             ALWAYS_ADD_EXPIRES =
                 Boolean.valueOf(alwaysAddExpires).booleanValue();
         }
-        
+
         String  fwdSlashIsSeparator = System.getProperty(
                 "org.apache.tomcat.util.http.ServerCookie.FWD_SLASH_IS_SEPARATOR");
         if (fwdSlashIsSeparator == null) {
@@ -110,24 +108,24 @@ public final class CookieSupport {
             FWD_SLASH_IS_SEPARATOR =
                 Boolean.valueOf(fwdSlashIsSeparator).booleanValue();
         }
-        
+
         ALLOW_NAME_ONLY = Boolean.valueOf(System.getProperty(
                 "org.apache.tomcat.util.http.ServerCookie.ALLOW_NAME_ONLY",
                 "false")).booleanValue();
-        
+
 
         /*
-        Excluding the '/' char by default violates the RFC, but 
+        Excluding the '/' char by default violates the RFC, but
         it looks like a lot of people put '/'
-        in unquoted values: '/': ; //47 
-        '\t':9 ' ':32 '\"':34 '(':40 ')':41 ',':44 ':':58 ';':59 '<':60 
+        in unquoted values: '/': ; //47
+        '\t':9 ' ':32 '\"':34 '(':40 ')':41 ',':44 ':':58 ';':59 '<':60
         '=':61 '>':62 '?':63 '@':64 '[':91 '\\':92 ']':93 '{':123 '}':125
         */
         if (CookieSupport.FWD_SLASH_IS_SEPARATOR) {
-            HTTP_SEPARATORS = new char[] { '\t', ' ', '\"', '(', ')', ',', '/', 
+            HTTP_SEPARATORS = new char[] { '\t', ' ', '\"', '(', ')', ',', '/',
                     ':', ';', '<', '=', '>', '?', '@', '[', '\\', ']', '{', '}' };
         } else {
-            HTTP_SEPARATORS = new char[] { '\t', ' ', '\"', '(', ')', ',', 
+            HTTP_SEPARATORS = new char[] { '\t', ' ', '\"', '(', ')', ',',
                     ':', ';', '<', '=', '>', '?', '@', '[', '\\', ']', '{', '}' };
         }
         for (int i = 0; i < 128; i++) {
@@ -142,7 +140,7 @@ public final class CookieSupport {
         }
 
     }
-    
+
     // ----------------------------------------------------------------- Methods
 
     /**
@@ -159,10 +157,12 @@ public final class CookieSupport {
 
         return V0_SEPARATOR_FLAGS[c];
     }
-    
+
     public static boolean isV0Token(String value) {
-        if( value==null) return false;
-        
+        if( value==null) {
+            return false;
+        }
+
         int i = 0;
         int len = value.length();
 
@@ -170,12 +170,13 @@ public final class CookieSupport {
             i++;
             len--;
         }
-        
+
         for (; i < len; i++) {
             char c = value.charAt(i);
 
-            if (isV0Separator(c))
+            if (isV0Separator(c)) {
                 return true;
+            }
         }
         return false;
     }
@@ -198,8 +199,10 @@ public final class CookieSupport {
     }
 
     public static boolean isHttpToken(String value) {
-        if( value==null) return false;
-        
+        if( value==null) {
+            return false;
+        }
+
         int i = 0;
         int len = value.length();
 
@@ -207,18 +210,21 @@ public final class CookieSupport {
             i++;
             len--;
         }
-        
+
         for (; i < len; i++) {
             char c = value.charAt(i);
 
-            if (isHttpSeparator(c))
+            if (isHttpSeparator(c)) {
                 return true;
+            }
         }
         return false;
     }
 
     public static boolean alreadyQuoted (String value) {
-        if (value==null || value.length() < 2) return false;
+        if (value==null || value.length() < 2) {
+            return false;
+        }
         return (value.charAt(0)=='\"' && value.charAt(value.length()-1)=='\"');
     }
 

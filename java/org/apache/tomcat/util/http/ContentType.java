@@ -14,13 +14,12 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package org.apache.tomcat.util.http;
 
 
 /**
  * Useful methods for Content-Type processing
- * 
+ *
  * @author James Duncan Davidson [duncan@eng.sun.com]
  * @author James Todd [gonzo@eng.sun.com]
  * @author Jason Hunter [jch@eng.sun.com]
@@ -38,19 +37,23 @@ public class ContentType {
      */
     public static String getCharsetFromContentType(String contentType) {
 
-        if (contentType == null)
+        if (contentType == null) {
             return (null);
+        }
         int start = contentType.indexOf("charset=");
-        if (start < 0)
+        if (start < 0) {
             return (null);
+        }
         String encoding = contentType.substring(start + 8);
         int end = encoding.indexOf(';');
-        if (end >= 0)
+        if (end >= 0) {
             encoding = encoding.substring(0, end);
+        }
         encoding = encoding.trim();
         if ((encoding.length() > 2) && (encoding.startsWith("\""))
-            && (encoding.endsWith("\"")))
+            && (encoding.endsWith("\""))) {
             encoding = encoding.substring(1, encoding.length() - 1);
+        }
         return (encoding.trim());
 
     }
