@@ -110,6 +110,15 @@
         this to <code>/dev/urandom</code> to allow quicker start times.</p>
       </attribute>
 
+      <attribute name="FIPSMode" required="false">
+        <p>Set to "on" to instruct OpenSSL to go into FIPS mode.
+        FIPS mode <i>requires you to have a FIPS-capable OpenSSL library which
+        you must build yourself</i>.
+        FIPS mode also requires Tomcat native library version 1.1.23 or later,
+        which <i>must be built against the FIPS-compatible OpenSSL</i> library.
+        The default value is <code>off</code>.</p>
+      </attribute>
+
     </attributes>
 
   </subsection>
