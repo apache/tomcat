@@ -294,7 +294,8 @@
       </add>
       <fix>
         Fix setting maxInactiveInterval, sessionIdLength and
-        processExpiresFrequency for cluster managers. (rjung)
+        processExpiresFrequency for cluster managers. Use setter
+        when setting maxActiveSessions. (rjung)
       </fix>
     </changelog>
   </subsection>
