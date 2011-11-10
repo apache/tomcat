@@ -158,7 +158,7 @@ are responsible for installing, configuring, and operating an Apache Tomcat serv
     - Complete documentation and HOWTOs on the JK native webserver connector,
       used to interface Apache Tomcat with servers like Apache HTTPd, IIS
       and others.</li>
-<li>Servlet 3.0 
+<li>Servlet 3.0
     <a href="http://jcp.org/aboutJava/communityprocess/final/jsr315/index.html">
     <strong>Specification</strong></a> and
     <a href="http://download.oracle.com/javaee/6/api/index.html?javax/servlet/package-summary.html">
