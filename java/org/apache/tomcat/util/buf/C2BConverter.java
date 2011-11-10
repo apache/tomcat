@@ -14,7 +14,6 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package org.apache.tomcat.util.buf;
 
 import java.io.IOException;
@@ -23,22 +22,22 @@ import java.io.OutputStreamWriter;
 import java.nio.charset.Charset;
 
 /** Efficient conversion of character to bytes.
- *  
+ *
  *  This uses the standard JDK mechanism - a writer - but provides mechanisms
  *  to recycle all the objects that are used. It is compatible with JDK1.1 and up,
  *  ( nio is better, but it's not available even in 1.2 or 1.3 )
- * 
+ *
  */
 public final class C2BConverter {
-    
+
     private static final org.apache.juli.logging.Log log=
         org.apache.juli.logging.LogFactory.getLog(C2BConverter.class );
-    
-    private IntermediateOutputStream ios;
-    private WriteConvertor conv;
+
+    private final IntermediateOutputStream ios;
+    private final WriteConvertor conv;
     private ByteChunk bb;
-    private String enc;
-    
+    private final String enc;
+
     /** Create a converter, with bytes going to a byte buffer
      */
     public C2BConverter(ByteChunk output, String encoding) throws IOException {
@@ -103,13 +102,14 @@ public final class C2BConverter {
      */
     public final void convert(MessageBytes mb ) throws IOException {
         int type=mb.getType();
-        if( type==MessageBytes.T_BYTES )
+        if( type==MessageBytes.T_BYTES ) {
             return;
+        }
         ByteChunk orig=bb;
         setByteChunk( mb.getByteChunk());
         bb.recycle();
         bb.allocate( 32, -1 );
-        
+
         if( type==MessageBytes.T_STR ) {
             convert( mb.getString() );
             // System.out.println("XXX Converting " + mb.getString() );
@@ -119,11 +119,12 @@ public final class C2BConverter {
                                 charC.getOffset(), charC.getLength());
             //System.out.println("XXX Converting " + mb.getCharChunk() );
         } else {
-            if (log.isDebugEnabled())
+            if (log.isDebugEnabled()) {
                 log.debug("XXX unknowon type " + type );
+            }
         }
         flushBuffer();
-        //System.out.println("C2B: XXX " + bb.getBuffer() + bb.getLength()); 
+        //System.out.println("C2B: XXX " + bb.getBuffer() + bb.getLength());
         setByteChunk(orig);
     }
 
@@ -142,13 +143,13 @@ public final class C2BConverter {
 
 /**
  *  Special writer class, where close() is overridden. The default implementation
- *  would set byteOutputter to null, and the writer can't be recycled. 
+ *  would set byteOutputter to null, and the writer can't be recycled.
  *
  *  Note that the flush method will empty the internal buffers _and_ call
  *  flush on the output stream - that's why we use an intermediary output stream
  *  that overrides flush(). The idea is to  have full control: flushing the
  *  char->byte converter should be independent of flushing the OutputStream.
- * 
+ *
  *  When a WriteConverter is created, it'll allocate one or 2 byte buffers,
  *  with a 8k size that can't be changed ( at least in JDK1.1 -> 1.4 ). It would
  *  also allocate a ByteOutputter or equivalent - again some internal buffers.
@@ -156,23 +157,23 @@ public final class C2BConverter {
  *  It is essential to keep  this object around and reuse it. You can use either
  *  pools or per thread data - but given that in most cases a converter will be
  *  needed for every thread and most of the time only 1 ( or 2 ) encodings will
- *  be used, it is far better to keep it per thread and eliminate the pool 
+ *  be used, it is far better to keep it per thread and eliminate the pool
  *  overhead too.
- * 
+ *
  */
  final class WriteConvertor extends OutputStreamWriter {
     // stream with flush() and close(). overridden.
-    private IntermediateOutputStream ios;
-    
+    private final IntermediateOutputStream ios;
+
     // Has a private, internal byte[8192]
-    
+
     /** Create a converter.
      */
     public WriteConvertor(IntermediateOutputStream out, Charset charset) {
         super(out, charset);
         ios=out;
     }
-    
+
     /** Overridden - will do nothing but reset internal state.
      */
     @Override
@@ -180,23 +181,23 @@ public final class C2BConverter {
         // NOTHING
         // Calling super.close() would reset out and cb.
     }
-    
+
     /**
      *  Flush the characters only
-     */ 
+     */
     @Override
     public  final void flush() throws IOException {
         // Will flushBuffer and out()
-        // flushBuffer put any remaining chars in the byte[] 
+        // flushBuffer put any remaining chars in the byte[]
         super.flush();
     }
-    
+
     @Override
     public  final void write(char cbuf[], int off, int len) throws IOException {
         // will do the conversion and call write on the output stream
         super.write( cbuf, off, len );
     }
-    
+
     /** Reset the buffer
      */
     public  final void recycle() {
@@ -209,36 +210,36 @@ public final class C2BConverter {
         }
         ios.enable();
     }
-    
+
 }
 
 
 /** Special output stream where close() is overridden, so super.close()
     is never called.
-    
+
     This allows recycling. It can also be disabled, so callbacks will
     not be called if recycling the converter and if data was not flushed.
 */
 final class IntermediateOutputStream extends OutputStream {
     private ByteChunk tbuff;
     private boolean enabled=true;
-    
+
     public IntermediateOutputStream(ByteChunk tbuff) {
         this.tbuff=tbuff;
     }
-    
+
     @Override
     public  final void close() throws IOException {
         // shouldn't be called - we filter it out in writer
         throw new IOException("close() called - shouldn't happen ");
     }
-    
+
     @Override
     public  final void flush() throws IOException {
         // nothing - write will go directly to the buffer,
         // we don't keep any state
     }
-    
+
     @Override
     public  final  void write(byte cbuf[], int off, int len) throws IOException {
         // will do the conversion and call write on the output stream
@@ -246,7 +247,7 @@ final class IntermediateOutputStream extends OutputStream {
             tbuff.append( cbuf, off, len );
         }
     }
-    
+
     @Override
     public  final void write( int i ) throws IOException {
         throw new IOException("write( int ) called - shouldn't happen ");
@@ -257,7 +258,7 @@ final class IntermediateOutputStream extends OutputStream {
     void setByteChunk( ByteChunk bb ) {
         tbuff=bb;
     }
-    
+
     /** Temporary disable - this is used to recycle the converter without
      *  generating an output if the buffers were not flushed
      */
