@@ -24,7 +24,7 @@ import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.tagext.SimpleTagSupport;
 
 /**
- * SimpleTag handler that accepts a num attribute and 
+ * SimpleTag handler that accepts a num attribute and
  * invokes its body 'num' times.
  */
 public class RepeatSimpleTag extends SimpleTagSupport {

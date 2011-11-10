@@ -38,7 +38,7 @@
        <required>true</required>
        <rtexprvalue>true</rtexprvalue>
     </attribute>
-  </tag>       
+  </tag>
 
   <!-- A simple Tag -->
   <!-- foo tag -->

@@ -79,30 +79,30 @@ public class RequestInfoExample extends HttpServlet {
         out.println(request.getMethod());
         out.println("</td></tr><tr><td>");
         out.println(RB.getString("requestinfo.label.requesturi"));
-        out.println("</td><td>");        
+        out.println("</td><td>");
         out.println(HTMLFilter.filter(request.getRequestURI()));
-        out.println("</td></tr><tr><td>");        
+        out.println("</td></tr><tr><td>");
         out.println(RB.getString("requestinfo.label.protocol"));
-        out.println("</td><td>");        
+        out.println("</td><td>");
         out.println(request.getProtocol());
         out.println("</td></tr><tr><td>");
         out.println(RB.getString("requestinfo.label.pathinfo"));
-        out.println("</td><td>");        
+        out.println("</td><td>");
         out.println(HTMLFilter.filter(request.getPathInfo()));
         out.println("</td></tr><tr><td>");
         out.println(RB.getString("requestinfo.label.remoteaddr"));
 
         String cipherSuite=
             (String)request.getAttribute("javax.servlet.request.cipher_suite");
-        out.println("</td><td>");                
+        out.println("</td><td>");
         out.println(request.getRemoteAddr());
         out.println("</table>");
-        
+
         if(cipherSuite!=null){
             out.println("</td></tr><tr><td>");
             out.println("SSLCipherSuite:");
             out.println("</td>");
-            out.println("<td>");    
+            out.println("<td>");
             out.println(request.getAttribute("javax.servlet.request.cipher_suite"));
             out.println("</td>");
         }
