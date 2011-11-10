@@ -863,32 +863,10 @@ public class Request
     @Override
     public Object getAttribute(String name) {
 
-        if (name.equals(Globals.DISPATCHER_TYPE_ATTR)) {
-            return (internalDispatcherType == null)
-                ? DispatcherType.REQUEST
-                : internalDispatcherType;
-        } else if (name.equals(Globals.DISPATCHER_REQUEST_PATH_ATTR)) {
-            return (requestDispatcherPath == null)
-                ? getRequestPathMB().toString()
-                : requestDispatcherPath.toString();
-        }
-
-        if (name.equals(Globals.ASYNC_SUPPORTED_ATTR)) {
-            return asyncSupported;
-        }
-
-        if (name.equals(Globals.GSS_CREDENTIAL_ATTR)) {
-            if (userPrincipal instanceof GenericPrincipal) {
-                return ((GenericPrincipal) userPrincipal).getGssCredential();
-            }
-            return null;
-        }
-
-        if (name.equals(Globals.PARAMETER_PARSE_FAILED_ATTR)) {
-            if (coyoteRequest.getParameters().isParseFailed()) {
-                return Boolean.TRUE;
-            }
-            return null;
+        // Special attributes
+        SpecialAttributeAdapter adapter = specialAttributes.get(name);
+        if (adapter != null) {
+            return adapter.get(this, name);
         }
 
         Object attr=attributes.get(name);
@@ -1408,9 +1386,6 @@ public class Request
      */
     @Override
     public void removeAttribute(String name) {
-        Object value = null;
-        boolean found = false;
-
         // Remove the specified attribute
         // Check for read only attribute
         // requests are per thread so synchronization unnecessary
@@ -1423,36 +1398,15 @@ public class Request
             coyoteRequest.getAttributes().remove(name);
         }
 
-        found = attributes.containsKey(name);
+        boolean found = attributes.containsKey(name);
         if (found) {
-            value = attributes.get(name);
+            Object value = attributes.get(name);
             attributes.remove(name);
+
+            // Notify interested application event listeners
+            notifyAttributeRemoved(name, value);
         } else {
             return;
-        }
-
-        // Notify interested application event listeners
-        Object listeners[] = context.getApplicationEventListeners();
-        if ((listeners == null) || (listeners.length == 0)) {
-            return;
-        }
-        ServletRequestAttributeEvent event =
-          new ServletRequestAttributeEvent(context.getServletContext(),
-                                           getRequest(), name, value);
-        for (int i = 0; i < listeners.length; i++) {
-            if (!(listeners[i] instanceof ServletRequestAttributeListener)) {
-                continue;
-            }
-            ServletRequestAttributeListener listener =
-                (ServletRequestAttributeListener) listeners[i];
-            try {
-                listener.attributeRemoved(event);
-            } catch (Throwable t) {
-                ExceptionUtils.handleThrowable(t);
-                context.getLogger().error(sm.getString("coyoteRequest.attributeEvent"), t);
-                // Error valve will pick this exception up and display it to user
-                attributes.put(RequestDispatcher.ERROR_EXCEPTION, t);
-            }
         }
     }
 
@@ -1478,20 +1432,12 @@ public class Request
             return;
         }
 
-        if (name.equals(Globals.DISPATCHER_TYPE_ATTR)) {
-            internalDispatcherType = (DispatcherType)value;
-            return;
-        } else if (name.equals(Globals.DISPATCHER_REQUEST_PATH_ATTR)) {
-            requestDispatcherPath = value;
+        // Special attributes
+        SpecialAttributeAdapter adapter = specialAttributes.get(name);
+        if (adapter != null) {
+            adapter.set(this, name, value);
             return;
         }
-
-        if (name.equals(Globals.ASYNC_SUPPORTED_ATTR)) {
-            this.asyncSupported = (Boolean)value;
-        }
-
-        Object oldValue = null;
-        boolean replaced = false;
 
         // Add or replace the specified attribute
         // Check for read only attribute
@@ -1520,10 +1466,7 @@ public class Request
             value = canonicalPath;
         }
 
-        oldValue = attributes.put(name, value);
-        if (oldValue != null) {
-            replaced = true;
-        }
+        Object oldValue = attributes.put(name, value);
 
         // Pass special attributes to the native layer
         if (name.startsWith("org.apache.tomcat.")) {
@@ -1531,19 +1474,27 @@ public class Request
         }
 
         // Notify interested application event listeners
+        notifyAttributeAssigned(name, value, oldValue);
+    }
+
+
+    /**
+     * Notify interested listeners that attribute has been assigned a value.
+     */
+    private void notifyAttributeAssigned(String name, Object value,
+            Object oldValue) {
         Object listeners[] = context.getApplicationEventListeners();
         if ((listeners == null) || (listeners.length == 0)) {
             return;
         }
+        boolean replaced = (oldValue != null);
         ServletRequestAttributeEvent event = null;
         if (replaced) {
-            event =
-                new ServletRequestAttributeEvent(context.getServletContext(),
-                                                 getRequest(), name, oldValue);
+            event = new ServletRequestAttributeEvent(
+                    context.getServletContext(), getRequest(), name, oldValue);
         } else {
-            event =
-                new ServletRequestAttributeEvent(context.getServletContext(),
-                                                 getRequest(), name, value);
+            event = new ServletRequestAttributeEvent(
+                    context.getServletContext(), getRequest(), name, value);
         }
 
         for (int i = 0; i < listeners.length; i++) {
@@ -1562,7 +1513,36 @@ public class Request
                 ExceptionUtils.handleThrowable(t);
                 context.getLogger().error(sm.getString("coyoteRequest.attributeEvent"), t);
                 // Error valve will pick this exception up and display it to user
-                attributes.put(RequestDispatcher.ERROR_EXCEPTION, t );
+                attributes.put(RequestDispatcher.ERROR_EXCEPTION, t);
+            }
+        }
+    }
+
+
+    /**
+     * Notify interested listeners that attribute has been removed.
+     */
+    private void notifyAttributeRemoved(String name, Object value) {
+        Object listeners[] = context.getApplicationEventListeners();
+        if ((listeners == null) || (listeners.length == 0)) {
+            return;
+        }
+        ServletRequestAttributeEvent event =
+          new ServletRequestAttributeEvent(context.getServletContext(),
+                                           getRequest(), name, value);
+        for (int i = 0; i < listeners.length; i++) {
+            if (!(listeners[i] instanceof ServletRequestAttributeListener)) {
+                continue;
+            }
+            ServletRequestAttributeListener listener =
+                (ServletRequestAttributeListener) listeners[i];
+            try {
+                listener.attributeRemoved(event);
+            } catch (Throwable t) {
+                ExceptionUtils.handleThrowable(t);
+                context.getLogger().error(sm.getString("coyoteRequest.attributeEvent"), t);
+                // Error valve will pick this exception up and display it to user
+                attributes.put(RequestDispatcher.ERROR_EXCEPTION, t);
             }
         }
     }
@@ -3108,4 +3088,94 @@ public class Request
         return true;
     }
 
+
+    // ----------------------------------------------------- Special attributes handling
+
+    private static interface SpecialAttributeAdapter {
+        Object get(Request request, String name);
+
+        void set(Request request, String name, Object value);
+
+        // None of special attributes support removal
+        // void remove(Request request, String name);
+    }
+
+    private static final Map<String, SpecialAttributeAdapter> specialAttributes
+        = new HashMap<String, SpecialAttributeAdapter>();
+
+    static {
+        specialAttributes.put(Globals.DISPATCHER_TYPE_ATTR,
+                new SpecialAttributeAdapter() {
+                    @Override
+                    public Object get(Request request, String name) {
+                        return (request.internalDispatcherType == null) ? DispatcherType.REQUEST
+                                : request.internalDispatcherType;
+                    }
+
+                    @Override
+                    public void set(Request request, String name, Object value) {
+                        request.internalDispatcherType = (DispatcherType) value;
+                    }
+                });
+        specialAttributes.put(Globals.DISPATCHER_REQUEST_PATH_ATTR,
+                new SpecialAttributeAdapter() {
+                    @Override
+                    public Object get(Request request, String name) {
+                        return (request.requestDispatcherPath == null) ? request
+                                .getRequestPathMB().toString()
+                                : request.requestDispatcherPath.toString();
+                    }
+
+                    @Override
+                    public void set(Request request, String name, Object value) {
+                        request.requestDispatcherPath = value;
+                    }
+                });
+        specialAttributes.put(Globals.ASYNC_SUPPORTED_ATTR,
+                new SpecialAttributeAdapter() {
+                    @Override
+                    public Object get(Request request, String name) {
+                        return request.asyncSupported;
+                    }
+
+                    @Override
+                    public void set(Request request, String name, Object value) {
+                        Boolean oldValue = request.asyncSupported;
+                        request.asyncSupported = (Boolean)value;
+                        request.notifyAttributeAssigned(name, value, oldValue);
+                    }
+                });
+        specialAttributes.put(Globals.GSS_CREDENTIAL_ATTR,
+                new SpecialAttributeAdapter() {
+                    @Override
+                    public Object get(Request request, String name) {
+                        if (request.userPrincipal instanceof GenericPrincipal) {
+                            return ((GenericPrincipal) request.userPrincipal)
+                                    .getGssCredential();
+                        }
+                        return null;
+                    }
+
+                    @Override
+                    public void set(Request request, String name, Object value) {
+                        // NO-OP
+                    }
+                });
+        specialAttributes.put(Globals.PARAMETER_PARSE_FAILED_ATTR,
+                new SpecialAttributeAdapter() {
+                    @Override
+                    public Object get(Request request, String name) {
+                        if (request.getCoyoteRequest().getParameters()
+                                .isParseFailed()) {
+                            return Boolean.TRUE;
+                        }
+                        return null;
+                    }
+
+                    @Override
+                    public void set(Request request, String name, Object value) {
+                        // NO-OP
+                    }
+                });
+    }
 }
