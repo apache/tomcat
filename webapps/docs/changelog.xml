@@ -200,6 +200,10 @@
         New filter <code>FailedRequestFilter</code> that will reject a request
         if there were errors during HTTP parameter parsing. (kkolinko)
       </add>
+      <update>
+        Improve special attributes handling in Request object by using hash
+        table lookup instead of series of string comparisons. (kkolinko)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Coyote">
