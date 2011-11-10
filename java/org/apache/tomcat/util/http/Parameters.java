@@ -119,7 +119,7 @@ public final class Parameters {
 
     @Deprecated
     public void addParameterValues(String key, String[] newValues) {
-        if (key == null || newValues.length == 0) {
+        if (key == null) {
             return;
         }
         ArrayList<String> values = paramHashValues.get(key);
