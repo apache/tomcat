@@ -163,7 +163,9 @@
       <add>
         Improve performance of parameter processing for GET and POST requests.
         Also add an option to limit the maximum number of parameters processed
-        per request. This defaults to 10000. (markt/kkolinko)
+        per request. This defaults to 10000. Excessive parameters are ignored.
+        Note that <code>FailedRequestFilter</code> can be used to reject the
+        request if some parameters were ignored. (markt/kkolinko)
       </add>
       <fix>
         <bug>52091</bug>: Address performance issues related to lock contention
@@ -189,6 +191,15 @@
         resource when path contains <code>/../</code> sequences or any other
         sequences that require normalization. (markt)
       </fix>
+      <add>
+        Report existence of HTTP request parameter parsing errors via new
+        special ServletRequest attribute,
+        <code>org.apache.catalina.parameter_parse_failed</code>. (kkolinko)
+      </add>
+      <add>
+        New filter <code>FailedRequestFilter</code> that will reject a request
+        if there were errors during HTTP parameter parsing. (kkolinko)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
