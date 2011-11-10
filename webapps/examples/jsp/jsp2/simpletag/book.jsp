@@ -22,9 +22,9 @@
   <body>
     <h1>JSP 2.0 Examples - Book SimpleTag Handler</h1>
     <hr>
-    <p>Illustrates a semi-realistic use of SimpleTag and the Expression 
-    Language.  First, a &lt;my:findBook&gt; tag is invoked to populate 
-    the page context with a BookBean.  Then, the books fields are printed 
+    <p>Illustrates a semi-realistic use of SimpleTag and the Expression
+    Language.  First, a &lt;my:findBook&gt; tag is invoked to populate
+    the page context with a BookBean.  Then, the books fields are printed
     in all caps.</p>
     <br>
     <b><u>Result:</u></b><br>
