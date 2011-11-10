@@ -42,16 +42,16 @@ import org.apache.tools.ant.types.FileSet;
  *
  * @author Mark Roth
  */
-public class Txt2Html 
-    extends Task 
+public class Txt2Html
+    extends Task
 {
-    
+
     /** The directory to contain the resulting files */
     private File todir;
-    
+
     /** The file to be converted into HTML */
     private List<FileSet> filesets = new LinkedList<FileSet>();
-    
+
     /**
      * Sets the directory to contain the resulting files
      *
@@ -60,7 +60,7 @@ public class Txt2Html
     public void setTodir( File todir ) {
         this.todir = todir;
     }
-    
+
     /**
      * Sets the files to be converted into HTML
      *
@@ -69,7 +69,7 @@ public class Txt2Html
     public void addFileset( FileSet fs ) {
         filesets.add( fs );
     }
-    
+
     /**
      * Perform the conversion
      *
@@ -77,11 +77,11 @@ public class Txt2Html
      *    this task.
      */
     @Override
-    public void execute() 
-        throws BuildException 
+    public void execute()
+        throws BuildException
     {
         int count = 0;
-        
+
         // Step through each file and convert.
         Iterator<FileSet> iter = filesets.iterator();
         while( iter.hasNext() ) {
@@ -92,29 +92,29 @@ public class Txt2Html
             for( int i = 0; i < files.length; i++ ) {
                 File from = new File( basedir, files[i] );
                 File to = new File( todir, files[i] + ".html" );
-                if( !to.exists() || 
-                    (from.lastModified() > to.lastModified()) ) 
+                if( !to.exists() ||
+                    (from.lastModified() > to.lastModified()) )
                 {
-                    log( "Converting file '" + from.getAbsolutePath() + 
+                    log( "Converting file '" + from.getAbsolutePath() +
                         "' to '" + to.getAbsolutePath(), Project.MSG_VERBOSE );
                     try {
                         convert( from, to );
                     }
                     catch( IOException e ) {
-                        throw new BuildException( "Could not convert '" + 
-                            from.getAbsolutePath() + "' to '" + 
+                        throw new BuildException( "Could not convert '" +
+                            from.getAbsolutePath() + "' to '" +
                             to.getAbsolutePath() + "'", e );
                     }
                     count++;
                 }
             }
             if( count > 0 ) {
-                log( "Converted " + count + " file" + (count > 1 ? "s" : "") + 
+                log( "Converted " + count + " file" + (count > 1 ? "s" : "") +
                     " to " + todir.getAbsolutePath() );
             }
         }
     }
-    
+
     /**
      * Perform the actual copy and conversion
      *
@@ -128,10 +128,10 @@ public class Txt2Html
         // Open files:
         BufferedReader in = new BufferedReader( new FileReader( from ) );
         PrintWriter out = new PrintWriter( new FileWriter( to ) );
-        
+
         // Output header:
         out.println( "<html><body><pre>" );
-        
+
         // Convert, line-by-line:
         String line;
         while( (line = in.readLine()) != null ) {
@@ -152,15 +152,15 @@ public class Txt2Html
             }
             out.println( result.toString() );
         }
-        
+
         // Output footer:
         out.println( "</pre></body></html>" );
-        
+
         // Close streams:
         out.close();
         in.close();
     }
-    
+
 }
 
 
