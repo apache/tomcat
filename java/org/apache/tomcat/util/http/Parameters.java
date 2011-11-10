@@ -328,7 +328,7 @@ public final class Parameters {
                     origValue.append(bytes, valueStart, valueEnd - valueStart);
                 } catch (IOException ioe) {
                     // Should never happen...
-                    log.error(sm.getString("paramerers.copyFail"), ioe);
+                    log.error(sm.getString("parameters.copyFail"), ioe);
                 }
             }
 
