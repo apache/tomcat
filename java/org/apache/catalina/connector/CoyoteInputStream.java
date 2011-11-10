@@ -5,17 +5,15 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */ 
-
-
+ */
 package org.apache.catalina.connector;
 
 import java.io.IOException;
@@ -29,7 +27,7 @@ import org.apache.catalina.security.SecurityUtil;
 
 /**
  * This class handles reading bytes.
- * 
+ *
  * @author Remy Maucherat
  * @author Jean-Francois Arcand
  */
@@ -80,11 +78,11 @@ public class CoyoteInputStream
 
     @Override
     public int read()
-        throws IOException {    
+        throws IOException {
         if (SecurityUtil.isPackageProtectionEnabled()){
-            
+
             try{
-                Integer result = 
+                Integer result =
                     AccessController.doPrivileged(
                         new PrivilegedExceptionAction<Integer>(){
 
@@ -111,10 +109,10 @@ public class CoyoteInputStream
 
     @Override
     public int available() throws IOException {
-        
+
         if (SecurityUtil.isPackageProtectionEnabled()){
             try{
-                Integer result = 
+                Integer result =
                     AccessController.doPrivileged(
                         new PrivilegedExceptionAction<Integer>(){
 
@@ -136,21 +134,21 @@ public class CoyoteInputStream
             }
         } else {
            return ib.available();
-        }    
+        }
     }
 
     @Override
     public int read(final byte[] b) throws IOException {
-        
+
         if (SecurityUtil.isPackageProtectionEnabled()){
             try{
-                Integer result = 
+                Integer result =
                     AccessController.doPrivileged(
                         new PrivilegedExceptionAction<Integer>(){
 
                             @Override
                             public Integer run() throws IOException{
-                                Integer integer = 
+                                Integer integer =
                                     Integer.valueOf(ib.read(b, 0, b.length));
                                 return integer;
                             }
@@ -167,23 +165,23 @@ public class CoyoteInputStream
             }
         } else {
             return ib.read(b, 0, b.length);
-         }        
+         }
     }
 
 
     @Override
     public int read(final byte[] b, final int off, final int len)
         throws IOException {
-            
+
         if (SecurityUtil.isPackageProtectionEnabled()){
             try{
-                Integer result = 
+                Integer result =
                     AccessController.doPrivileged(
                         new PrivilegedExceptionAction<Integer>(){
 
                             @Override
                             public Integer run() throws IOException{
-                                Integer integer = 
+                                Integer integer =
                                     Integer.valueOf(ib.read(b, off, len));
                                 return integer;
                             }
@@ -200,7 +198,7 @@ public class CoyoteInputStream
             }
         } else {
             return ib.read(b, off, len);
-        }            
+        }
     }
 
 
@@ -210,14 +208,14 @@ public class CoyoteInputStream
     }
 
 
-    /** 
+    /**
      * Close the stream
      * Since we re-cycle, we can't allow the call to super.close()
      * which would permanently disable us.
      */
     @Override
     public void close() throws IOException {
-        
+
         if (SecurityUtil.isPackageProtectionEnabled()){
             try{
                 AccessController.doPrivileged(
