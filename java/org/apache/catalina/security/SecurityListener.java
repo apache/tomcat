@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -32,7 +32,7 @@ public class SecurityListener implements LifecycleListener {
     private static final Log log = LogFactory.getLog(SecurityListener.class);
 
     private static final StringManager sm =
-        StringManager.getManager(Constants.PACKAGE);    
+        StringManager.getManager(Constants.PACKAGE);
 
     private static final String UMASK_PROPERTY_NAME =
         Constants.PACKAGE + ".SecurityListener.UMASK";
@@ -71,7 +71,7 @@ public class SecurityListener implements LifecycleListener {
      * with null or the empty string will clear the list of users and
      * effectively disables this check. User names will always be checked in a
      * case insensitive manner.
-     * 
+     *
      * @param userNameList  A comma separated list of operating system users not
      *                      permitted to run Tomcat
      */
@@ -92,7 +92,7 @@ public class SecurityListener implements LifecycleListener {
     /**
      * Returns the current list of operating system users not permitted to run
      * Tomcat.
-     * 
+     *
      * @return  A comma separated list of operating sytem user names.
      */
     public String getCheckedOsUsers() {
@@ -113,7 +113,7 @@ public class SecurityListener implements LifecycleListener {
 
     /**
      * Set the minimum umask that must be configured before Tomcat will start.
-     * 
+     *
      * @param umask The 4-digit umask as returned by the OS command <i>umask</i>
      */
     public void setMinimumUmask(String umask) {
@@ -127,7 +127,7 @@ public class SecurityListener implements LifecycleListener {
 
     /**
      * Get the minimum umask that must be configured before Tomcat will start.
-     * 
+     *
      * @return  The 4-digit umask as used by the OS command <i>umask</i>
      */
     public String getMinimumUmask() {
@@ -142,13 +142,13 @@ public class SecurityListener implements LifecycleListener {
         checkOsUser();
         checkUmask();
     }
-    
+
 
     protected void checkOsUser() {
         String userName = System.getProperty("user.name");
         if (userName != null) {
             String userNameLC = userName.toLowerCase();
-        
+
             if (checkedOsUsers.contains(userNameLC)) {
                 // Have to throw Error to force start process to be aborted
                 throw new Error(sm.getString(
@@ -156,7 +156,7 @@ public class SecurityListener implements LifecycleListener {
             }
         }
     }
-    
+
 
     protected void checkUmask() {
         String prop = System.getProperty(UMASK_PROPERTY_NAME);
@@ -185,7 +185,7 @@ public class SecurityListener implements LifecycleListener {
                 return;
             }
         }
-        
+
         if ((umask.intValue() & minimumUmask.intValue()) !=
                 minimumUmask.intValue()) {
             throw new Error(sm.getString("SecurityListener.checkUmaskFail",
