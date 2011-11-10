@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -54,7 +54,7 @@ public interface Wrapper extends Container {
      * Container event for adding a wrapper.
      */
     public static final String ADD_MAPPING_EVENT = "addMapping";
-    
+
     /**
      * Container event for removing a wrapper.
      */
@@ -146,12 +146,12 @@ public interface Wrapper extends Container {
      */
     public boolean isUnavailable();
 
-    
+
     /**
      * Return the associated servlet instance.
      */
     public Servlet getServlet();
-    
+
 
     /**
      * Set the associated servlet instance
@@ -180,7 +180,7 @@ public interface Wrapper extends Container {
 
     /**
      * Add a mapping associated with the Wrapper.
-     * 
+     *
      * @param mapping The new wrapper mapping
      */
     public void addMapping(String mapping);
@@ -341,31 +341,31 @@ public interface Wrapper extends Container {
      * returned.
      */
     public MultipartConfigElement getMultipartConfigElement();
-    
-    
+
+
     /**
      * Set the multi-part configuration for the associated servlet. To clear the
      * multi-part configuration specify <code>null</code> as the new value.
      */
     public void setMultipartConfigElement(
             MultipartConfigElement multipartConfig);
-    
+
     /**
      * Does the associated Servlet support async processing? Defaults to
      * <code>true</code>
      */
     public boolean isAsyncSupported();
-    
+
     /**
      * Set the async support for the associated servlet.
      */
     public void setAsyncSupported(boolean asyncSupport);
-    
+
     /**
      * Is the associated Servlet enabled? Defaults to <code>true</code>.
      */
     public boolean isEnabled();
-    
+
     /**
      * Sets the enabled attribute for the associated servlet.
      */
@@ -375,18 +375,18 @@ public interface Wrapper extends Container {
      * Set the flag that indicates
      * {@link javax.servlet.annotation.ServletSecurity} annotations must be
      * scanned when the Servlet is first used.
-     * 
+     *
      * @param b The new value of the flag
      */
     public void setServletSecurityAnnotationScanRequired(boolean b);
-    
+
     /**
      * Scan for (if necessary) and process (if found) the
      * {@link javax.servlet.annotation.ServletSecurity} annotations for the
      * Servlet associated with this wrapper.
      */
     public void servletSecurityAnnotationScan() throws ServletException;
-    
+
     /**
      * Is the Servlet overridable by a ServletContainerInitializer?
      */
