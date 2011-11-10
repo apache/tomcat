@@ -161,6 +161,12 @@
       minutes) so this is limited to 4KB by default to reduce exposure to a DOS
       attack.</p>
 
+      <p>The <strong>maxParameterCount</strong> attribute controls the
+      maximum number of parameter and value pairs (GET plus POST) that can
+      be parsed and stored in the request. Excessive parameters are ignored.
+      If you want to reject such requests, configure a
+      <a href="config/filter.html">FailedRequestFilter</a>.</p>
+
       <p>The <strong>xpoweredBy</strong> attribute controls whether or not the
       X-Powered-By HTTP header is sent with each request. If sent, the value of
       the header contains the Servlet and JSP specification versions, the full
@@ -207,6 +213,10 @@
       current state of this vulnerability and the work-arounds available see the
       <a href="http://tomcat.apache.org/security-7.html">Tomcat 7 security
       page</a>.</p>
+
+      <p>The <strong>requiredSecret</strong> attribute in AJP connectors
+      configures shared secret between Tomcat and reverse proxy in front of
+      Tomcat. It is used to prevent unauthorized connections over AJP protocol.</p>
     </subsection>
 
     <subsection name="Host">
@@ -220,11 +230,19 @@
 
       <p>In a hosted environment where web applications may not be trusted, set
       the <strong>deployXml</strong> attribute to false to ignore any
-      context.xml packaged with the web application that may try to assigned
+      context.xml packaged with the web application that may try to assign
       increased privileges to the web application. </p>
     </subsection>
 
     <subsection name="Context">
+      <p>This applies to <a href="config/context.html">Context</a>
+      elements in all places where they can be defined:
+      <code>server.xml</code> file,
+      default <code>context.xml</code> file,
+      per-host <code>context.xml.default</code> file,
+      web application context file in per-host configuration directory
+      or inside the web application.</p>
+
       <p>The <strong>crossContext</strong> attribute controls if a context is
       allowed to access the resources of another context. It is
       <code>false</code> by default and should only be changed for trusted web
@@ -252,7 +270,7 @@
       context as required.</p>
 
       <p>Any administrative application should be protected by a
-      RemoteAddressValve. (Note that this Valve is also available as a Filter.)
+      RemoteAddrValve. (Note that this Valve is also available as a Filter.)
       The <strong>allow</strong> attribute should be used to limit access to a
       set of known trusted hosts.</p>
 
@@ -260,7 +278,7 @@
       response sent to clients. To avoid this, custom error handling can be
       configured within each web application. Alternatively, the version number
       can be changed by creating the file
-      CATALINA_HOME/lib/org/apache/catalina/util/ServerInfo.properties with
+      CATALINA_BASE/lib/org/apache/catalina/util/ServerInfo.properties with
       content as follows:</p>
       <source>
 server.info=Apache Tomcat/7.0.x
@@ -335,8 +353,13 @@ server.info=Apache Tomcat/7.0.x
     as UTF-7.</p>
   </section>
 
-  <section name="CATALINA_BASE/conf/web.xml">
-    <p>The DefaultServlet is configured with <strong>readonly</strong> set to
+  <section name="web.xml">
+    <p>This applies to the default <code>conf/web.xml</code> file and
+    <code>WEB-INF/web.xml</code> files in web applications if they define
+    the components mentioned here.</p>
+
+    <p>The <a href="default-servlet.html">DefaultServlet</a> is configured
+    with <strong>readonly</strong> set to
     <code>true</code>. Changing this to <code>false</code> allows clients to
     delete or modify static resources on the server and to upload new
     resources. This should not normally be changed without requiring
@@ -347,6 +370,11 @@ server.info=Apache Tomcat/7.0.x
     considered unsafe but because generating listings of directories with
     thousands of files can consume significant CPU leading to a DOS attack.
     </p>
+
+    <p><a href="config/filter.html">FailedRequestFilter</a>
+    can be configured and used to reject requests that had errors during
+    request parameter parsing. Without the filter the default behaviour is
+    to ignore invalid or excessive parameters.</p>
   </section>
 
   <section name="General">
