@@ -14,26 +14,25 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package org.apache.tomcat.util.buf;
 
 import java.io.CharConversionException;
 import java.io.IOException;
 
-/** 
+/**
  *  All URL decoding happens here. This way we can reuse, review, optimize
  *  without adding complexity to the buffers.
  *
  *  The conversion will modify the original buffer.
- * 
+ *
  *  @author Costin Manolache
  */
 public final class UDecoder {
-    
-    protected static final boolean ALLOW_ENCODED_SLASH = 
+
+    protected static final boolean ALLOW_ENCODED_SLASH =
         Boolean.valueOf(System.getProperty("org.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH", "false")).booleanValue();
 
-    public UDecoder() 
+    public UDecoder()
     {
     }
 
@@ -57,18 +56,23 @@ public final class UDecoder {
 
         int idx= ByteChunk.indexOf( buff, start, end, '%' );
         int idx2=-1;
-        if( query )
+        if( query ) {
             idx2= ByteChunk.indexOf( buff, start, end, '+' );
+        }
         if( idx<0 && idx2<0 ) {
             return;
         }
 
         // idx will be the smallest positive indexes ( first % or + )
-        if( idx2 >= 0 && idx2 < idx ) idx=idx2;
-        if( idx < 0 ) idx=idx2;
+        if( idx2 >= 0 && idx2 < idx ) {
+            idx=idx2;
+        }
+        if( idx < 0 ) {
+            idx=idx2;
+        }
 
         boolean noSlash = !(ALLOW_ENCODED_SLASH || query);
-    
+
         for( int j=idx; j<end; j++, idx++ ) {
             if( buff[ j ] == '+' && query) {
                 buff[idx]= (byte)' ' ;
@@ -81,9 +85,10 @@ public final class UDecoder {
                 }
                 byte b1= buff[j+1];
                 byte b2=buff[j+2];
-                if( !isHexDigit( b1 ) || ! isHexDigit(b2 ))
+                if( !isHexDigit( b1 ) || ! isHexDigit(b2 )) {
                     throw new CharConversionException( "isHexDigit");
-                
+                }
+
                 j+=2;
                 int res=x2c( b1, b2 );
                 if (noSlash && (res == '/')) {
@@ -94,7 +99,7 @@ public final class UDecoder {
         }
 
         mb.setEnd( idx );
-        
+
         return;
     }
 
@@ -122,14 +127,19 @@ public final class UDecoder {
 
         int idx= CharChunk.indexOf( buff, start, cend, '%' );
         int idx2=-1;
-        if( query )
+        if( query ) {
             idx2= CharChunk.indexOf( buff, start, cend, '+' );
+        }
         if( idx<0 && idx2<0 ) {
             return;
         }
-        
-        if( idx2 >= 0 && idx2 < idx ) idx=idx2; 
-        if( idx < 0 ) idx=idx2;
+
+        if( idx2 >= 0 && idx2 < idx ) {
+            idx=idx2;
+        }
+        if( idx < 0 ) {
+            idx=idx2;
+        }
 
         for( int j=idx; j<cend; j++, idx++ ) {
             if( buff[ j ] == '+' && query ) {
@@ -144,9 +154,10 @@ public final class UDecoder {
                 }
                 char b1= buff[j+1];
                 char b2=buff[j+2];
-                if( !isHexDigit( b1 ) || ! isHexDigit(b2 ))
+                if( !isHexDigit( b1 ) || ! isHexDigit(b2 )) {
                     throw new CharConversionException("isHexDigit");
-                
+                }
+
                 j+=2;
                 int res=x2c( b1, b2 );
                 buff[idx]=(char)res;
@@ -169,11 +180,13 @@ public final class UDecoder {
     public void convert(MessageBytes mb, boolean query)
         throws IOException
     {
-        
+
         switch (mb.getType()) {
         case MessageBytes.T_STR:
             String strValue=mb.toString();
-            if( strValue==null ) return;
+            if( strValue==null ) {
+                return;
+            }
             mb.setString( convert( strValue, query ));
             break;
         case MessageBytes.T_CHARS:
@@ -188,7 +201,7 @@ public final class UDecoder {
     }
 
     // XXX Old code, needs to be replaced !!!!
-    // 
+    //
     public final String convert(String str)
     {
         return convert(str, true);
@@ -196,11 +209,14 @@ public final class UDecoder {
 
     public final String convert(String str, boolean query)
     {
-        if (str == null)  return  null;
-        
-        if( (!query || str.indexOf( '+' ) < 0) && str.indexOf( '%' ) < 0 )
+        if (str == null) {
+            return  null;
+        }
+
+        if( (!query || str.indexOf( '+' ) < 0) && str.indexOf( '%' ) < 0 ) {
             return str;
-        
+        }
+
         StringBuilder dec = new StringBuilder();    // decoded string output
         int strPos = 0;
         int strLen = str.length();
@@ -254,7 +270,7 @@ public final class UDecoder {
                  ( c>='a' && c<='f' ) ||
                  ( c>='A' && c<='F' ));
     }
-    
+
     private static int x2c( byte b1, byte b2 ) {
         int digit= (b1>='A') ? ( (b1 & 0xDF)-'A') + 10 :
             (b1 -'0');
