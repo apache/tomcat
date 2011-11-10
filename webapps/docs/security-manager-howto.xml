@@ -58,10 +58,10 @@
 
   <p><strong>WARNING</strong> - A security audit
   have been conducted using the Tomcat codebase. Most of the critical
-  package have been protected and a new security package protection mechanism 
-  has been implemented. Still, make sure that you are satisfied with your SecurityManager 
-  configuration before allowing untrusted users to publish web applications, 
-  JSPs, servlets, beans, or tag libraries.  <strong>However, running with a 
+  package have been protected and a new security package protection mechanism
+  has been implemented. Still, make sure that you are satisfied with your SecurityManager
+  configuration before allowing untrusted users to publish web applications,
+  JSPs, servlets, beans, or tag libraries.  <strong>However, running with a
   SecurityManager is definitely better than running without one.</strong></p>
 
 </section>
@@ -134,7 +134,7 @@ permission java.io.FilePermission
 permission java.io.FilePermission
   "** application working directory**/-", "read,write,delete";
 </source>
-    <p>Where **your application context** equals the folder (or WAR file) under which 
+    <p>Where **your application context** equals the folder (or WAR file) under which
     your application has been deployed and **application working directory** is the
     temporary directory provided to your application as required by the
     Servlet Specification.</p>
@@ -201,17 +201,17 @@ $CATALINA_HOME/bin/catalina.sh start -security    (Unix)
   internal package are protected againts package definition and access. See
   <a href="http://java.sun.com/security/seccodeguide.html">
     http://java.sun.com/security/seccodeguide.html</a>
-    for more information.</p>    
+    for more information.</p>
 
-  
-  <p><strong>WARNING</strong>: Be aware that removing the default package protection 
+
+  <p><strong>WARNING</strong>: Be aware that removing the default package protection
   could possibly open a security hole</p>
 
   <h3>The Default Properties File</h3>
 
   <p>The default <code>$CATALINA_BASE/conf/catalina.properties</code> file
   looks like this:</p>
-<source>  
+<source>
 #
 # List of comma-separated packages that start with or equal this string
 # will cause a security exception to be thrown when

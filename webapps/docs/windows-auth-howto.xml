@@ -238,7 +238,7 @@ com.sun.security.jgss.krb5.accept {
   <li>Pure Java solution</li>
   </ul>
   </subsection>
-  
+
   <subsection name="SPNEGO project at SourceForge">
   <p>Full details of this solution can be found through the
   <a href="http://spnego.sourceforge.net/index.html/">project site</a>. The key
@@ -275,7 +275,7 @@ com.sun.security.jgss.krb5.accept {
   <li><a href="http://adldap.sourceforge.net/wiki/doku.php?id=mod_auth_ntlm_winbind">
   mod_auth_ntlm_winbind</a> for non-Windows platforms. Known to work with httpd
   2.0.x on 32-bit platforms. Some users have reported stability issues with both
-  httpd 2.2.x builds and 64-bit Linux builds.</li> 
+  httpd 2.2.x builds and 64-bit Linux builds.</li>
   </ol>
   <p>There are three steps to configuring httpd to provide Windows
   authentication. They are:</p>
@@ -293,4 +293,4 @@ com.sun.security.jgss.krb5.accept {
 </section>
 
 </body>
-</document> 
+</document>
