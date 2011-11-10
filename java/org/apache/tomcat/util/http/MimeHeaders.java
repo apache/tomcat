@@ -14,7 +14,6 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package org.apache.tomcat.util.http;
 
 import java.io.PrintWriter;
@@ -53,16 +52,16 @@ import org.apache.tomcat.util.buf.MessageBytes;
    directly access all headers, and most headers are single-valued.
    ( the alternative - a hash or similar data structure - will add
    an overhead that is not needed in most cases )
-   
+
    Apache seems to be using a similar method for storing and manipulating
    headers.
-       
+
    Future enhancements:
    - hash the headers the first time a header is requested ( i.e. if the
    servlet needs direct access to headers).
    - scan "common" values ( length, cookies, etc ) during the parse
    ( addHeader hook )
-   
+
 */
 
 
@@ -83,8 +82,8 @@ import org.apache.tomcat.util.buf.MessageBytes;
  *  XXX remove unused methods
  *  XXX External enumerations, with 0 GC.
  *  XXX use HeaderName ID
- *  
- * 
+ *
+ *
  * @author dac@eng.sun.com
  * @author James Todd [gonzo@eng.sun.com]
  * @author Costin Manolache
@@ -95,7 +94,7 @@ public class MimeHeaders {
      *  XXX  make it configurable ( fine-tuning of web-apps )
      */
     public static final int DEFAULT_HEADER_SIZE=8;
-    
+
     /**
      * The header fields.
      */
@@ -154,7 +153,7 @@ public class MimeHeaders {
     }
 
     // -------------------- Idx access to headers ----------
-    
+
     /**
      * Returns the current number of header fields.
      */
@@ -182,7 +181,7 @@ public class MimeHeaders {
      */
     public int findHeader( String name, int starting ) {
         // We can use a hash - but it's not clear how much
-        // benefit you can get - there is an  overhead 
+        // benefit you can get - there is an  overhead
         // and the number of headers is small (4-5 ?)
         // Another problem is that we'll pay the overhead
         // of constructing the hashtable
@@ -195,7 +194,7 @@ public class MimeHeaders {
         }
         return -1;
     }
-    
+
     // -------------------- --------------------
 
     /**
@@ -212,7 +211,7 @@ public class MimeHeaders {
     }
 
     // -------------------- Adding headers --------------------
-    
+
 
     /**
      * Adds a partially constructed field to the header.  This
@@ -263,7 +262,7 @@ public class MimeHeaders {
         return mhf.getValue();
     }
 
-    /** Allow "set" operations - 
+    /** Allow "set" operations -
         return a MessageBytes container for the
         header value ( existing header or new
         if this .
@@ -302,7 +301,7 @@ public class MimeHeaders {
     /**
      * Finds and returns a unique header field with the given name. If no such
      * field exists, null is returned. If the specified header field is not
-     * unique then an {@link IllegalArgumentException} is thrown. 
+     * unique then an {@link IllegalArgumentException} is thrown.
      */
     public MessageBytes getUniqueValue(String name) {
         MessageBytes result = null;
@@ -348,7 +347,7 @@ public class MimeHeaders {
      */
     private void removeHeader(int idx) {
         MimeHeaderField mh = headers[idx];
-        
+
         mh.recycle();
         headers[idx] = headers[count - 1];
         headers[count - 1] = mh;
@@ -397,7 +396,7 @@ class NamesEnumerator implements Enumeration<String> {
         // next element
         pos++;
     }
-    
+
     @Override
     public boolean hasMoreElements() {
         return next!=null;
@@ -440,7 +439,7 @@ class ValuesEnumerator implements Enumeration<String> {
         }
         pos++;
     }
-    
+
     @Override
     public boolean hasMoreElements() {
         return next!=null;
@@ -459,8 +458,8 @@ class MimeHeaderField {
     // speed up name enumerations and search ( both cpu and
     // GC)
     MimeHeaderField next;
-    MimeHeaderField prev; 
-    
+    MimeHeaderField prev;
+
     protected final MessageBytes nameB = MessageBytes.newInstance();
     protected final MessageBytes valueB = MessageBytes.newInstance();
 
