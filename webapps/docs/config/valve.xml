@@ -69,7 +69,7 @@
     <p>Some requests may be handled by Tomcat before they are passed to a
     container. These include redirects from /foo to /foo/ and the rejection of
     invalid requests. Where Tomcat can identify the <code>Context</code> that
-    would have handled the request, the request/response will be logged in the 
+    would have handled the request, the request/response will be logged in the
     <code>AccessLog</code>(s) associated <code>Context</code>, <code>Host</code>
     and <code>Engine</code>. Where Tomcat cannot identify the
     <code>Context</code> that would have handled the request, e.g. in cases
@@ -141,7 +141,7 @@
         attributes (typically set by the RemoteIpValve and similar) that should
         be used to override the values returned by the request for remote
         address, remote host, server port and protocol. If the attributes are
-        not set, or this attribute is set to <code>false</code> then the values 
+        not set, or this attribute is set to <code>false</code> then the values
         from the request will be used. If not set, the default value of
         <code>false</code> will be used.</p>
       </attribute>
@@ -208,7 +208,7 @@
 
       <attribute name="buffered" required="false">
         <p>Flag to determine if logging will be buffered.
-           If set to <code>false</code>, then access logging will be written after each 
+           If set to <code>false</code>, then access logging will be written after each
            request. Default value: <code>true</code>
         </p>
       </attribute>
@@ -353,7 +353,7 @@
         attributes (typically set by the RemoteIpValve and similar) that should
         be used to override the values returned by the request for remote
         address, remote host, server port and protocol. If the attributes are
-        not set, or this attribute is set to <code>false</code> then the values 
+        not set, or this attribute is set to <code>false</code> then the values
         from the request will be used. If not set, the default value of
         <code>false</code> will be used.</p>
       </attribute>
@@ -417,7 +417,7 @@
 
       <attribute name="buffered" required="false">
         <p>Flag to determine if logging will be buffered.
-           If set to <code>false</code>, then access logging will be written after each 
+           If set to <code>false</code>, then access logging will be written after each
            request. Default value: <code>true</code>
         </p>
       </attribute>
@@ -650,19 +650,19 @@
       </attribute>
 
       <attribute name="requireReauthentication" required="false">
-        <p>Default false. Flag to determine whether each request needs to be 
+        <p>Default false. Flag to determine whether each request needs to be
         reauthenticated to the security <strong>Realm</strong>. If "true", this
         Valve uses cached security credentials (username and password) to
-        reauthenticate to the <strong>Realm</strong> each request associated 
-        with an SSO session.  If "false", the Valve can itself authenticate 
-        requests based on the presence of a valid SSO cookie, without 
+        reauthenticate to the <strong>Realm</strong> each request associated
+        with an SSO session.  If "false", the Valve can itself authenticate
+        requests based on the presence of a valid SSO cookie, without
         rechecking with the <strong>Realm</strong>.</p>
       </attribute>
- 
+
       <attribute name="cookieDomain" required="false">
         <p>Sets the host domain to be used for sso cookies.</p>
       </attribute>
-      
+
     </attributes>
 
   </subsection>
@@ -944,7 +944,7 @@
         from the request. If not set, the encoding of the request body will be
         used.</p>
       </attribute>
-      
+
       <attribute name="className" required="true">
         <p>Java class name of the implementation to use.  This MUST be set to
         <strong>org.apache.catalina.authenticator.FormAuthenticator</strong>.</p>
@@ -959,7 +959,7 @@
         workaround for browser caching issues. If not set, the default value of
         <code>true</code> will be used.</p>
       </attribute>
-      
+
       <attribute name="landingPage" required="false">
         <p>Controls the behavior of the FORM authentication process if the
         process is misused, for example by directly requesting the login page
@@ -1219,7 +1219,7 @@
 <section name="Remote IP Valve">
 
   <subsection name="Introduction">
-  
+
     <p>Tomcat port of
     <a href="http://httpd.apache.org/docs/trunk/mod/mod_remoteip.html">mod_remoteip</a>,
     this valve replaces the apparent client remote IP address and hostname for
@@ -1227,14 +1227,14 @@
     via a request headers (e.g. &quot;X-Forwarded-For&quot;).</p>
 
     <p>Another feature of this valve is to replace the apparent scheme
-    (http/https), server port and <code>request.secure</code> with the scheme presented 
-    by a proxy or a load balancer via a request header 
+    (http/https), server port and <code>request.secure</code> with the scheme presented
+    by a proxy or a load balancer via a request header
     (e.g. &quot;X-Forwarded-Proto&quot;).</p>
-    
+
     <p>This Valve may be used at the <code>Engine</code>, <code>Host</code> or
     <code>Context</code> level as required. Normally, this Valve would be used
     at the <code>Engine</code> level.</p>
-    
+
     <p>If used in conjunction with Remote Address/Host valves then this valve
     should be defined first to ensure that the correct client IP address is
     presented to the Remote Address/Host valves.</p>
@@ -1312,19 +1312,19 @@
       </attribute>
 
       <attribute name="httpServerPort" required="false">
-         <p>Value returned by <code>ServletRequest.getServerPort()</code> 
-         when the <strong>protocolHeader</strong> indicates <code>http</code> 
+         <p>Value returned by <code>ServletRequest.getServerPort()</code>
+         when the <strong>protocolHeader</strong> indicates <code>http</code>
          protocol and no <strong>portHeader</strong> is present. If not
          specified, the default of <code>80</code> is used.</p>
       </attribute>
 
       <attribute name="httpsServerPort" required="false">
-         <p>Value returned by <code>ServletRequest.getServerPort()</code> 
-         when the <strong>protocolHeader</strong> indicates <code>https</code> 
+         <p>Value returned by <code>ServletRequest.getServerPort()</code>
+         when the <strong>protocolHeader</strong> indicates <code>https</code>
          protocol and no <strong>portHeader</strong> is present. If not
          specified, the default of <code>443</code> is used.</p>
       </attribute>
-      
+
       <attribute name="changeLocalPort" required="false">
         <p>If <code>true</code>, the value returned by
         <code>ServletRequest.getLocalPort()</code> and
@@ -1342,17 +1342,17 @@
 <section name="Crawler Session Manager Valve">
 
   <subsection name="Introduction">
-  
+
     <p>Web crawlers can trigger the creation of many thousands of sessions as
     they crawl a site which may result in significant memory consumption. This
     Valve ensures that crawlers are associated with a single session - just like
     normal users - regardless of whether or not they provide a session token
     with their requests.</p>
-    
+
     <p>This Valve may be used at the <code>Engine</code>, <code>Host</code> or
     <code>Context</code> level as required. Normally, this Valve would be used
     at the <code>Engine</code> level.</p>
-    
+
     <p>If used in conjunction with Remote IP valve then the Remote IP valve
     should be defined before this valve to ensure that the correct client IP
     address is presented to this valve.</p>
@@ -1397,13 +1397,13 @@
 <section name="Stuck Thread Detection Valve">
 
   <subsection name="Introduction">
-  
-    <p>This valve allows to detect requests that take a long time to process, which might 
+
+    <p>This valve allows to detect requests that take a long time to process, which might
     indicate that the thread that is processing it is stuck.</p>
-    <p>When such a request is detected, the current stack trace of its thread is written 
+    <p>When such a request is detected, the current stack trace of its thread is written
     to tomcat log with a WARN level.</p>
-    <p>The IDs of the stuck threads are available through JMX in the 
-    <code>stuckThreadIds</code> attribute. The JVM Thread MBean can then be used to 
+    <p>The IDs of the stuck threads are available through JMX in the
+    <code>stuckThreadIds</code> attribute. The JVM Thread MBean can then be used to
     retrieve other information about each stuck thread (name, stack trace...).</p>
 
   </subsection>
@@ -1422,10 +1422,10 @@
       </attribute>
 
       <attribute name="threshold" required="false">
-        <p>Minimum duration in seconds after which a thread is considered stuck. 
+        <p>Minimum duration in seconds after which a thread is considered stuck.
         Default is 600 seconds. If set to 0, the detection is disabled.</p>
         <p>Note: since the detection is done in the background thread of the Container
-        (Engine, Host or Context) declaring this Valve, the threshold should be higher 
+        (Engine, Host or Context) declaring this Valve, the threshold should be higher
         than the <code>backgroundProcessorDelay</code> of this Container.</p>
       </attribute>
 

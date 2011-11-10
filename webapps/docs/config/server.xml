@@ -104,9 +104,9 @@
   <p>The following components may be nested inside a <strong>Server</strong>
   element:</p>
   <ul>
-  <li><a href="service.html"><strong>Service</strong></a> - 
+  <li><a href="service.html"><strong>Service</strong></a> -
       One or more service element.</li>
-  <li><a href="globalresources.html"><strong>GlobalNamingResources</strong></a> - 
+  <li><a href="globalresources.html"><strong>GlobalNamingResources</strong></a> -
       Configure the JNDI global resources for the server.</li>
   </ul>
 
