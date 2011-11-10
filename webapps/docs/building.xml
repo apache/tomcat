@@ -51,7 +51,7 @@ Tomcat requires a JDK (version 1.6 or later) to be installed.
 </p>
 
 <p>
-<b>IMPORTANT</b>: Set an environment variable JAVA_HOME to the pathname of the 
+<b>IMPORTANT</b>: Set an environment variable JAVA_HOME to the pathname of the
 directory into which you installed the JDK release.
 </p>
 
@@ -60,7 +60,7 @@ directory into which you installed the JDK release.
 <section name="Install Apache Ant 1.8.1 or later">
 
 <p>
-Download a binary distribution of Ant 1.8.1 or later from 
+Download a binary distribution of Ant 1.8.1 or later from
 <a href="http://ant.apache.org/bindownload.cgi">here</a>.
 </p>
 
@@ -73,7 +73,7 @@ the symbolic name <code>${ant.home}</code> is used to refer to the full pathname
 </p>
 
 <p>
-<b>IMPORTANT</b>: Create an ANT_HOME environment variable to point the directory <code>${ant.home}</code>, 
+<b>IMPORTANT</b>: Create an ANT_HOME environment variable to point the directory <code>${ant.home}</code>,
 and modify the PATH environment variable to include directory
 <code>${ant.home}/bin</code> in its list.  This makes the <code>ant</code> command line script
 available, which will be used to actually perform the build.
@@ -84,20 +84,20 @@ available, which will be used to actually perform the build.
 <section name="Checkout or obtain the source code for Tomcat 7.0">
 
   <p>
-  Tomcat SVN repository URL: 
+  Tomcat SVN repository URL:
   <a href="http://svn.apache.org/repos/asf/tomcat/trunk/">http://svn.apache.org/repos/asf/tomcat/trunk/</a>
   </p>
   <p>
-  Tomcat source packages: 
+  Tomcat source packages:
   <a href="http://tomcat.apache.org/download-70.cgi">http://tomcat.apache.org/download-70.cgi</a>.
   </p>
 
   <p>
-  Checkout the source using SVN, or download and unpack a source package. 
-  For the remainder of this guide, the symbolic name <code>${tomcat.source}</code> is used to refer to the 
+  Checkout the source using SVN, or download and unpack a source package.
+  For the remainder of this guide, the symbolic name <code>${tomcat.source}</code> is used to refer to the
   location where the source has been placed.
   </p>
- 
+
 </section>
 
 <section name="Building Tomcat">
@@ -117,11 +117,11 @@ Use the following commands to build Tomcat:
 </p>
 
 <p>
-<b>WARNING:</b> Running this command will download binary binaries to the 
-  <code>/usr/share/java</code> directory by default. 
-  Make sure this is appropriate to do so on your computer. On Windows, 
-  this usually corresponds to the <code>C:\usr\share\java</code> directory, 
-  unless Cygwin is used. Read below to customize the directory used 
+<b>WARNING:</b> Running this command will download binary binaries to the
+  <code>/usr/share/java</code> directory by default.
+  Make sure this is appropriate to do so on your computer. On Windows,
+  this usually corresponds to the <code>C:\usr\share\java</code> directory,
+  unless Cygwin is used. Read below to customize the directory used
   to download the binaries.
 </p>
 
@@ -169,7 +169,7 @@ get warnings, reformat code, perform refactorings, run Tomcat
 under the IDE, and so on.
 </p>
 <p>
-Sample Eclipse project files and launch targets are provided in the 
+Sample Eclipse project files and launch targets are provided in the
 <code>res/ide-support/eclipse</code> directory of the source tree.
 The instructions below will automatically copy these into the required locations.
 </p>
@@ -210,14 +210,14 @@ and import the Tomcat project located there.
 <code>start-tomcat</code> and <code>stop-tomcat</code> launch configurations are provided in
 <code>res/ide-support/eclipse</code> and will be available in the <em>Run-&gt;Run Configurations</em>
 dialog. Use these to start and stop Tomcat from Eclipse.
-<br/>If you want to configure these yourself (or are using a different IDE) 
+<br/>If you want to configure these yourself (or are using a different IDE)
 then use <code>org.apache.catalina.startup.Bootstrap</code> as the main class,
-<code>start</code>/<code>stop</code> etc. as program arguments, and specify <code>-Dcatalina.home=...</code> 
+<code>start</code>/<code>stop</code> etc. as program arguments, and specify <code>-Dcatalina.home=...</code>
 (with the name of your build directory) as VM arguments.
 </p>
 
 <p>
-Tweaking a few formatting preferences will make it much easier to keep consistent with Tomcat 
+Tweaking a few formatting preferences will make it much easier to keep consistent with Tomcat
 coding conventions (and have your contributions accepted):
 </p>
 <p>
