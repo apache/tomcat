@@ -88,5 +88,5 @@ public class NioX509KeyManager extends X509ExtendedKeyManager {
 
         return super.chooseEngineServerAlias(keyType, issuers, engine);
     }
-    
+
 }
