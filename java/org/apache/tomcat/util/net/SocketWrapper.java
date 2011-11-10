@@ -17,9 +17,9 @@
 package org.apache.tomcat.util.net;
 
 public class SocketWrapper<E> {
-    
+
     protected volatile E socket;
-    
+
     protected volatile long lastAccess = -1;
     protected long timeout = -1;
     protected boolean error = false;
@@ -27,15 +27,15 @@ public class SocketWrapper<E> {
     protected volatile int keepAliveLeft = 100;
     protected boolean async = false;
     protected boolean keptAlive = false;
-    
+
     public SocketWrapper(E socket) {
         this.socket = socket;
     }
-    
+
     public E getSocket() {
         return socket;
     }
-    
+
     public boolean isAsync() { return async; }
     public void setAsync(boolean async) { this.async = async; }
     public long getLastAccess() { return lastAccess; }

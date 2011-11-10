@@ -23,7 +23,7 @@ import java.net.Socket;
 
 /**
  * The common interface through which the {@link JIoEndpoint} interacts with
- * both non-SSL and SSL sockets. 
+ * both non-SSL and SSL sockets.
  */
 public interface ServerSocketFactory {
 
@@ -31,7 +31,7 @@ public interface ServerSocketFactory {
      * Returns a server socket which uses all network interfaces on the host,
      * and is bound to a the specified port. The socket is configured with the
      * socket options (such as accept timeout) given to this factory.
-     * 
+     *
      * @param port
      *            the port to listen to
      * @exception IOException
@@ -47,7 +47,7 @@ public interface ServerSocketFactory {
      * bound to a the specified port, and uses the specified connection backlog.
      * The socket is configured with the socket options (such as accept timeout)
      * given to this factory.
-     * 
+     *
      * @param port
      *            the port to listen to
      * @param backlog
@@ -65,7 +65,7 @@ public interface ServerSocketFactory {
      * on the local host, is bound to a the specified port, and uses the
      * specified connection backlog. The socket is configured with the socket
      * options (such as accept timeout) given to this factory.
-     * 
+     *
      * @param port
      *            the port to listen to
      * @param backlog
@@ -83,14 +83,14 @@ public interface ServerSocketFactory {
     /**
      * Wrapper function for accept(). This allows us to trap and translate
      * exceptions if necessary.
-     * 
+     *
      * @exception IOException
      */
     Socket acceptSocket(ServerSocket socket) throws IOException;
 
     /**
      * Triggers the SSL handshake. This will be a no-op for non-SSL sockets.
-     * 
+     *
      * @exception IOException
      */
     void handshake(Socket sock) throws IOException;
