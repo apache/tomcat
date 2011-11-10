@@ -19,7 +19,7 @@
 
     <%@ page errorPage="errorpge.jsp" %>
     <jsp:useBean id="foo" scope="request" class="error.Smart" />
-    <% 
+    <%
         String name = null;
 
         if (request.getParameter("name") == null) {
@@ -35,7 +35,7 @@
 
     <H1> Yes!!! <a href="http://www.acura.com">Acura</a> is my favorite car.
 
-    <% 
+    <%
           }
         }
     %>
