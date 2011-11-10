@@ -35,14 +35,14 @@
 
 <section name="Introduction">
   <p>
-    The <code>org.apache.catalina.ha.ClusterListener</code> base class 
+    The <code>org.apache.catalina.ha.ClusterListener</code> base class
     lets you listen in on messages that are received by the <code>Cluster</code> component.
-  </p>  
+  </p>
 
 </section>
 <section name="org.apache.catalina.ha.session.ClusterSessionListener">
   <p>
-   When using the DeltaManager, the messages are received by the Cluster object and are propagated to the 
+   When using the DeltaManager, the messages are received by the Cluster object and are propagated to the
    to the manager through this listener.
    </p>
 </section>
@@ -60,7 +60,7 @@
   <subsection name="Common Attributes">
 
   <attributes>
- 
+
     <attribute name="className" required="true">
 
     </attribute>

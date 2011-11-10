@@ -37,7 +37,7 @@
   <p>
   The receiver component is responsible for receiving cluster messages.
   As you might notice through the configuration, is that the receiving of messages
-  and sending of messages are two different components, this is different from many other 
+  and sending of messages are two different components, this is different from many other
   frameworks, but there is a good reason for it, to decouple the logic for how messages are sent from
   how messages are received.<br/>
   The receiver is very much like the Tomcat Connector, its the base of the thread pool
@@ -48,7 +48,7 @@
 
 <section name="Blocking vs Non-Blocking Receiver">
   <p>
-  The receiver supports both a non blocking, <code>org.apache.catalina.tribes.transport.nio.NioReceiver</code>, and a 
+  The receiver supports both a non blocking, <code>org.apache.catalina.tribes.transport.nio.NioReceiver</code>, and a
   blocking, <code>org.apache.catalina.tribes.transport.bio.BioReceiver</code>. It is preferred to use the non blocking receiver
   to be able to grow your cluster without running into thread starvation.<br/>
   Using the non blocking receiver allows you to with a very limited thread count to serve a large number of messages.
@@ -62,9 +62,9 @@
   <attributes>
     <attribute name="className" required="true">
       The implementation of the receiver component. Two implementations available,
-      <code>org.apache.catalina.tribes.transport.nio.NioReceiver</code> and 
+      <code>org.apache.catalina.tribes.transport.nio.NioReceiver</code> and
       <code>org.apache.catalina.tribes.transport.bio.BioReceiver</code>.<br/>
-      The <code>org.apache.catalina.tribes.transport.nio.NioReceiver</code> is the 
+      The <code>org.apache.catalina.tribes.transport.nio.NioReceiver</code> is the
       preferred implementation
     </attribute>
     <attribute name="address" required="false">
@@ -73,20 +73,20 @@
       <code>java.net.InetAddress.getLocalHost().getHostAddress()</code>.
     </attribute>
     <attribute name="direct" required="false">
-      Possible values are <code>true</code> or <code>false</code>. 
+      Possible values are <code>true</code> or <code>false</code>.
       Set to true if you want the receiver to use direct bytebuffers when reading data
       from the sockets.
     </attribute>
     <attribute name="port" required="false">
       The listen port for incoming data. The default value is <code>4000</code>.
-      To avoid port conflicts the receiver will automatically bind to a free port within the range of 
+      To avoid port conflicts the receiver will automatically bind to a free port within the range of
       <code> port &lt;= bindPort &lt;= port+autoBind</code>
-      So for example, if port is 4000, and autoBind is set to 10, then the receiver will open up 
+      So for example, if port is 4000, and autoBind is set to 10, then the receiver will open up
       a server socket on the first available port in the range 4000-4100.
     </attribute>
     <attribute name="autoBind" required="false">
       Default value is <code>100</code>.
-      Use this value if you wish to automatically avoid port conflicts the cluster receiver will try to open a 
+      Use this value if you wish to automatically avoid port conflicts the cluster receiver will try to open a
       server socket on the <code>port</code> attribute port, and then work up <code>autoBind</code> number of times.
     </attribute>
     <attribute name="securePort" required="false">
@@ -104,8 +104,8 @@
     </attribute>
     <attribute name="maxThreads" required="false">
       The maximum number of threads in the receiver thread pool. The default value is <code>6</code>
-      Adjust this value relative to the number of nodes in the cluster, the number of messages being exchanged and 
-      the hardware you are running on. A higher value doesn't mean more efficiency, tune this value according to your 
+      Adjust this value relative to the number of nodes in the cluster, the number of messages being exchanged and
+      the hardware you are running on. A higher value doesn't mean more efficiency, tune this value according to your
       own test results.
     </attribute>
     <attribute name="minThreads" required="false">
@@ -132,11 +132,11 @@
       Boolean value for the socket SO_KEEPALIVE option. Possible values are <code>true</code> or <code>false</code>.
     </attribute>
     <attribute name="soLingerOn" required="false">
-      Boolean value to determine whether to use the SO_LINGER socket option. 
+      Boolean value to determine whether to use the SO_LINGER socket option.
       Possible values are <code>true</code> or <code>false</code>. Default value is <code>true</code>.
     </attribute>
     <attribute name="soLingerTime" required="false">
-      Sets the SO_LINGER socket option time value. The value is in seconds. 
+      Sets the SO_LINGER socket option time value. The value is in seconds.
       The default value is <code>3</code> seconds.
     </attribute>
     <attribute name="soReuseAddress" required="false">
@@ -152,12 +152,12 @@
      The default value is <code>true</code>
     </attribute>
     <attribute name="timeout" required="false">
-     Sets the SO_TIMEOUT option on the socket. The value is in milliseconds and the default value is <code>3000</code> 
+     Sets the SO_TIMEOUT option on the socket. The value is in milliseconds and the default value is <code>3000</code>
      milliseconds.
     </attribute>
     <attribute name="useBufferPool" required="false">
      Boolean value whether to use a shared buffer pool of cached <code>org.apache.catalina.tribes.io.XByteBuffer</code>
-     objects. If set to true, the XByteBuffer that is used to pass a message up the channel, will be recycled at the end 
+     objects. If set to true, the XByteBuffer that is used to pass a message up the channel, will be recycled at the end
      of the requests. This means that interceptors in the channel must not maintain a reference to the object
      after the <code>org.apache.catalina.tribes.ChannelInterceptor#messageReceived</code> method has exited.
     </attribute>
