@@ -63,7 +63,7 @@ class loader is above the child class loader:</p>
           |
        Common
        /     \
-  Webapp1   Webapp2 ... 
+  Webapp1   Webapp2 ...
 </source>
 
 <p>The characteristics of each of these class loaders, including the source
@@ -150,7 +150,7 @@ loaders as it is initialized:</p>
         implementation based on package-renamed copy of Apache Commons Pool
         and Apache Commons DBCP.</li>
     <li><em>tomcat-i18n-**.jar</em> &#8212; Optional JARs containing resource bundles
-        for other languages. As default bundles are also included in each 
+        for other languages. As default bundles are also included in each
         individual JAR, they can be safely removed if no internationalization
         of messages is needed.</li>
     <li><em>tomcat-jdbc.jar</em> &#8212; An alternative database connection pool
@@ -169,13 +169,13 @@ loaders as it is initialized:</p>
 
 <p>As mentioned above, the web application class loader diverges from the
 default Java delegation model (in accordance with the recommendations in the
-Servlet Specification, version 2.4, section 9.7.2 Web Application Classloader).  
+Servlet Specification, version 2.4, section 9.7.2 Web Application Classloader).
 When a request to load a
 class from the web application's <em>WebappX</em> class loader is processed,
 this class loader will look in the local repositories <strong>first</strong>,
 instead of delegating before looking.  There are exceptions. Classes which are
 part of the JRE base classes cannot be overridden. For some classes (such as
-the XML parser components in J2SE 1.4+), the J2SE 1.4 endorsed feature can be 
+the XML parser components in J2SE 1.4+), the J2SE 1.4 endorsed feature can be
 used.
 Last, any JAR file that contains Servlet API classes will be explicitly
 ignored by the classloader &#8212; Do not include such JARs in your web

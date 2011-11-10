@@ -42,9 +42,9 @@ referred to as CGI programs or CGI scripts.
 
 <p>Within Tomcat, CGI support can be added when you are using Tomcat as your
 HTTP server and require CGI support.  Typically this is done
-during development when you don't want to run a web server like 
+during development when you don't want to run a web server like
 Apache httpd.
-Tomcat's CGI support is largely compatible with Apache httpd's, 
+Tomcat's CGI support is largely compatible with Apache httpd's,
 but there are some limitations (e.g., only one cgi-bin directory).
 </p>
 
