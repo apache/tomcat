@@ -14,8 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.catalina.connector;
 
 import java.util.Arrays;
@@ -350,7 +348,7 @@ public class Connector extends LifecycleMBeanBase  {
 
     }
 
-    
+
     /**
      * Return the default timeout for async requests in ms.
      */
@@ -373,7 +371,7 @@ public class Connector extends LifecycleMBeanBase  {
 
     }
 
-    
+
     /**
      * Return the "enable DNS lookups" flag.
      */
@@ -496,11 +494,13 @@ public class Connector extends LifecycleMBeanBase  {
 
         HashSet<String> methodSet = new HashSet<String>();
 
-        if( null != methods )
+        if( null != methods ) {
             methodSet.addAll(Arrays.asList(methods.split("\\s*,\\s*")));
+        }
 
-        if( methodSet.contains("TRACE") )
+        if( methodSet.contains("TRACE") ) {
             throw new IllegalArgumentException(sm.getString("coyoteConnector.parseBodyMethodNoTrace"));
+        }
 
         this.parseBodyMethods = methods;
         this.parseBodyMethodsSet = methodSet;
@@ -555,7 +555,7 @@ public class Connector extends LifecycleMBeanBase  {
         return getProtocolHandlerClassName();
 
     }
-    
+
 
     /**
      * Set the Coyote protocol which will be used by the connector.
@@ -875,7 +875,7 @@ public class Connector extends LifecycleMBeanBase  {
 
 
     protected String createObjectNameKeyProperties(String type) {
-        
+
         Object addressObj = getProperty("address");
 
         StringBuilder sb = new StringBuilder("type=");
@@ -923,14 +923,15 @@ public class Connector extends LifecycleMBeanBase  {
     protected void initInternal() throws LifecycleException {
 
         super.initInternal();
-        
+
         // Initialize adapter
         adapter = new CoyoteAdapter(this);
         protocolHandler.setAdapter(adapter);
 
         // Make sure parseBodyMethodsSet has a default
-        if( null == parseBodyMethodsSet )
+        if( null == parseBodyMethodsSet ) {
             setParseBodyMethods(getParseBodyMethods());
+        }
 
         try {
             protocolHandler.init();
@@ -1003,7 +1004,7 @@ public class Connector extends LifecycleMBeanBase  {
     @Override
     protected void destroyInternal() throws LifecycleException {
         mapperListener.destroy();
-        
+
         try {
             protocolHandler.destroy();
         } catch (Exception e) {
@@ -1015,7 +1016,7 @@ public class Connector extends LifecycleMBeanBase  {
         if (getService() != null) {
             getService().removeConnector(this);
         }
-        
+
         super.destroyInternal();
     }
 
