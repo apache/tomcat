@@ -23,28 +23,28 @@
   <body>
     <h1>JSP 2.0 Expression Language - Implicit Objects</h1>
     <hr>
-    This example illustrates some of the implicit objects available 
-    in the Expression Lanaguage.  The following implicit objects are 
+    This example illustrates some of the implicit objects available
+    in the Expression Lanaguage.  The following implicit objects are
     available (not all illustrated here):
     <ul>
       <li>pageContext - the PageContext object</li>
-      <li>pageScope - a Map that maps page-scoped attribute names to 
+      <li>pageScope - a Map that maps page-scoped attribute names to
           their values</li>
-      <li>requestScope - a Map that maps request-scoped attribute names 
+      <li>requestScope - a Map that maps request-scoped attribute names
           to their values</li>
-      <li>sessionScope - a Map that maps session-scoped attribute names 
+      <li>sessionScope - a Map that maps session-scoped attribute names
           to their values</li>
-      <li>applicationScope - a Map that maps application-scoped attribute 
+      <li>applicationScope - a Map that maps application-scoped attribute
           names to their values</li>
-      <li>param - a Map that maps parameter names to a single String 
+      <li>param - a Map that maps parameter names to a single String
           parameter value</li>
-      <li>paramValues - a Map that maps parameter names to a String[] of 
+      <li>paramValues - a Map that maps parameter names to a String[] of
           all values for that parameter</li>
-      <li>header - a Map that maps header names to a single String 
+      <li>header - a Map that maps header names to a single String
           header value</li>
-      <li>headerValues - a Map that maps header names to a String[] of 
+      <li>headerValues - a Map that maps header names to a String[] of
           all values for that header</li>
-      <li>initParam - a Map that maps context initialization parameter 
+      <li>initParam - a Map that maps context initialization parameter
           names to their String parameter value</li>
       <li>cookie - a Map that maps cookie names to a single Cookie object.</li>
     </ul>
