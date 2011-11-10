@@ -54,7 +54,7 @@ public interface SSLSupport {
     public static final String SESSION_MGR =
             "javax.servlet.request.ssl_session_mgr";
 
-    
+
     /**
      * A mapping table to determine the number of effective bits in the key
      * when using a cipher suite containing the specified cipher name.  The
@@ -86,7 +86,7 @@ public interface SSLSupport {
 
     /**
      * The client certificate chain (if any).
-     * @param force If <code>true</code>, then re-negotiate the 
+     * @param force If <code>true</code>, then re-negotiate the
      *              connection if necessary.
      */
     public Object[] getPeerCertificateChain(boolean force)
@@ -119,19 +119,19 @@ public interface SSLSupport {
      * corresponding effective key size.  The specified phrase must appear in the
      * name of the cipher suite to be recognized.
      */
-    
+
     final class CipherData {
-    
+
         public String phrase = null;
-    
+
         public int keySize = 0;
-    
+
         public CipherData(String phrase, int keySize) {
             this.phrase = phrase;
             this.keySize = keySize;
         }
-    
+
     }
-    
+
 }
 

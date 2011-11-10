@@ -23,11 +23,11 @@ import javax.net.ssl.TrustManager;
 
 public interface SSLUtil {
 
-    public SSLContext createSSLContext() throws Exception; 
+    public SSLContext createSSLContext() throws Exception;
 
     public KeyManager[] getKeyManagers() throws Exception;
-    
+
     public TrustManager[] getTrustManagers() throws Exception;
-    
+
     public void configureSessionContext(SSLSessionContext sslSessionContext);
 }
