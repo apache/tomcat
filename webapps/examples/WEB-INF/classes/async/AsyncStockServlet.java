@@ -41,12 +41,12 @@ public class AsyncStockServlet extends HttpServlet implements TickListener, Asyn
     public static final String POLL = "POLL";
     public static final String LONG_POLL = "LONG-POLL";
     public static final String STREAM = "STREAM";
-    
+
     static ArrayList<Stock> ticks = new ArrayList<Stock>();
     static ConcurrentLinkedQueue<AsyncContext> clients = new ConcurrentLinkedQueue<AsyncContext>();
     static AtomicInteger clientcount = new AtomicInteger(0);
     static Stockticker ticker = new Stockticker();
-    
+
     public AsyncStockServlet() {
         System.out.println("AsyncStockServlet created");
     }
@@ -81,7 +81,7 @@ public class AsyncStockServlet extends HttpServlet implements TickListener, Asyn
             writeStock(actx, stock);
         }
     }
-    
+
     public void writeStock(AsyncContext actx, Stock stock) {
         HttpServletResponse response = (HttpServletResponse)actx.getResponse();
         try {

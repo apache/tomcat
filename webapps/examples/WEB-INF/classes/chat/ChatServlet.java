@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -43,14 +43,14 @@ public class ChatServlet
 
     private static final String CHARSET = "UTF-8";
 
-    protected ArrayList<HttpServletResponse> connections = 
+    protected ArrayList<HttpServletResponse> connections =
         new ArrayList<HttpServletResponse>();
     protected transient MessageSender messageSender = null;
-    
+
     @Override
     public void init() throws ServletException {
         messageSender = new MessageSender();
-        Thread messageSenderThread = 
+        Thread messageSenderThread =
             new Thread(messageSender, "MessageSender[" + getServletContext().getContextPath() + "]");
         messageSenderThread.setDaemon(true);
         messageSenderThread.start();
@@ -65,7 +65,7 @@ public class ChatServlet
 
     /**
      * Process the given Comet event.
-     * 
+     *
      * @param event The Comet event that will be processed
      * @throws IOException
      * @throws ServletException
@@ -78,7 +78,7 @@ public class ChatServlet
         // mixing Comet stuff with regular connection processing
         HttpServletRequest request = event.getHttpServletRequest();
         HttpServletResponse response = event.getHttpServletResponse();
-        
+
         if (event.getEventType() == CometEvent.EventType.BEGIN) {
             String action = request.getParameter("action");
             if (action != null) {
@@ -132,20 +132,20 @@ public class ChatServlet
 
         messageSender.send("Tomcat", request.getSession(true).getAttribute("nickname") + " joined the chat.");
     }
-    
+
     protected void end(CometEvent event, HttpServletRequest request, HttpServletResponse response)
         throws IOException {
         log("End for session: " + request.getSession(true).getId());
         synchronized(connections) {
             connections.remove(response);
         }
-        
+
         PrintWriter writer = response.getWriter();
         writer.println("</body></html>");
-        
+
         event.close();
     }
-    
+
     protected void error(CometEvent event, HttpServletRequest request, HttpServletResponse response)
         throws IOException {
         log("Error for session: " + request.getSession(true).getId());
@@ -154,7 +154,7 @@ public class ChatServlet
         }
         event.close();
     }
-    
+
     protected void read(CometEvent event, HttpServletRequest request, HttpServletResponse response)
         throws IOException {
         InputStream is = request.getInputStream();
@@ -163,7 +163,7 @@ public class ChatServlet
             log("Available: " + is.available());
             int n = is.read(buf);
             if (n > 0) {
-                log("Read " + n + " bytes: " + new String(buf, 0, n) 
+                log("Read " + n + " bytes: " + new String(buf, 0, n)
                         + " for session: " + request.getSession(true).getId());
             } else if (n < 0) {
                 log("End of file: " + n);
@@ -185,7 +185,7 @@ public class ChatServlet
         writer.println("Configure a connector that supports Comet and try again.");
         writer.println("</body></html>");
     }
-    
+
 
     /**
      * Poller class.
@@ -194,11 +194,11 @@ public class ChatServlet
 
         protected boolean running = true;
         protected ArrayList<String> messages = new ArrayList<String>();
-        
+
         public MessageSender() {
             // Default contructor
         }
-        
+
         public void stop() {
             running = false;
             synchronized (messages) {
@@ -260,7 +260,7 @@ public class ChatServlet
      * in HTML.
      *
      * @param message The message string to be filtered
-     * @author Copied from org.apache.catalina.util.RequestUtil#filter(String) 
+     * @author Copied from org.apache.catalina.util.RequestUtil#filter(String)
      */
     protected static String filter(String message) {
         if (message == null)
