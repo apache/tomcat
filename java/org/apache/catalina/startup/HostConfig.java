@@ -445,7 +445,7 @@ public class HostConfig
         String[] filteredAppPaths = filterAppPaths(appBase.list());
         // Deploy XML descriptors from configBase
         deployDescriptors(configBase, configBase.list());
-        // Deploy WARs, and loop if additional descriptors are found
+        // Deploy WARs
         deployWARs(appBase, filteredAppPaths);
         // Deploy expanded folders
         deployDirectories(appBase, filteredAppPaths);
@@ -506,7 +506,7 @@ public class HostConfig
         File xml = new File(configBase, baseName + ".xml");
         if (xml.exists())
             deployDescriptor(cn, xml);
-        // Deploy WARs, and loop if additional descriptors are found
+        // Deploy WARs
         File war = new File(appBase, baseName + ".war");
         if (war.exists())
             deployWAR(cn, war);
