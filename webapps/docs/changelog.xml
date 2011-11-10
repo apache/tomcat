@@ -292,6 +292,10 @@
         replied in order to avoid timeout (default 60sec) of 
         GET_ALL_SESSIONS sync phase. (kfujino)
       </add>
+      <fix>
+        Fix setting maxInactiveInterval, sessionIdLength and
+        processExpiresFrequency for cluster managers. (rjung)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
