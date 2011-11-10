@@ -297,9 +297,8 @@ public final class Parameters {
 
             if (nameEnd <= nameStart ) {
                 if (log.isInfoEnabled()) {
-                    String extract;
-                    if (valueEnd >= nameStart) {
-                        extract = new String(bytes, nameStart,
+                    if (valueEnd >= nameStart && log.isDebugEnabled()) {
+                        String extract = new String(bytes, nameStart,
                                 valueEnd - nameStart, DEFAULT_CHARSET);
                         log.info(sm.getString("parameters.invalidChunk",
                                 Integer.valueOf(nameStart),
