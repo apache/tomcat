@@ -26,11 +26,11 @@
 <FONT size = 5 COLOR="#CC0000">
 <br> You have the following items in your cart:
 <ol>
-<% 
+<%
     String[] items = cart.getItems();
     for (int i=0; i<items.length; i++) {
 %>
-<li> <% out.print(util.HTMLFilter.filter(items[i])); %> 
+<li> <% out.print(util.HTMLFilter.filter(items[i])); %>
 <%
     }
 %>
