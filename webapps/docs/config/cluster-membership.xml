@@ -59,7 +59,7 @@
   <subsection name="Multicast Attributes">
 
   <attributes>
- 
+
     <attribute name="className" required="true">
       <p>
       The default value is <code>org.apache.catalina.tribes.membership.McastService</code>
@@ -72,8 +72,8 @@
       The multicast address that the membership will broadcast its presence and listen
       for other heartbeats on. The default value is <code>228.0.0.4</code>
       Make sure your network is enabled for multicast traffic.<br/>
-      The multicast address, in conjunction with the <code>port</code> is what 
-      creates a cluster group. To divide up your farm into several different group, or to 
+      The multicast address, in conjunction with the <code>port</code> is what
+      creates a cluster group. To divide up your farm into several different group, or to
       split up QA from production, change the <code>port</code> or the <code>address</code>
       <br/>Previously known as mcastAddr.
       </p>
@@ -81,8 +81,8 @@
     <attribute name="port" required="false">
       <p>
       The multicast port, the default value is <code>45564</code><br/>
-      The multicast port, in conjunction with the <code>address</code> is what 
-      creates a cluster group. To divide up your farm into several different group, or to 
+      The multicast port, in conjunction with the <code>address</code> is what
+      creates a cluster group. To divide up your farm into several different group, or to
       split up QA from production, change the <code>port</code> or the <code>address</code>
       </p>
     </attribute>
@@ -94,8 +94,8 @@
     </attribute>
     <attribute name="dropTime" required="false">
       <p>
-      The membership component will time out members and notify the Channel if a member fails to send a heartbeat within 
-      a give time. The default value is <code>3000</code> ms. This means, that if a heartbeat is not received from a 
+      The membership component will time out members and notify the Channel if a member fails to send a heartbeat within
+      a give time. The default value is <code>3000</code> ms. This means, that if a heartbeat is not received from a
       member in that timeframe, the membership component will notify the cluster of this.<br/>
       On a high latency network you may wish to increase this value, to protect against false positives.<br/>
       Apache Tribes also provides a <a href="cluster-interceptor.html#tcpfailuredetector"><code>TcpFailureDetector</code></a> that will
@@ -151,7 +151,7 @@
       The default is <code>5000</code> (5 seconds). <br/>
       </p>
     </attribute>
-    
+
     <attribute name="localLoopbackDisabled" required="false">
       <p>
       Membership uses multicast, it will call <code>java.net.MulticastSocket.setLoopbackMode(localLoopbackDisabled)</code>.

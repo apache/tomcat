@@ -76,7 +76,7 @@
                   domain=&quot;staging-cluster&quot;
                   uniqueId=&quot;{0,1,2,3,4,5,6,7,8,9}&quot;/&gt;
      &lt;/Interceptor&gt;
-   
+
    </source>
   </p>
 </section>
@@ -86,7 +86,7 @@
   <subsection name="Common Attributes">
    <attributes>
      <attribute name="className" required="true">
-       Required, as there is no default 
+       Required, as there is no default
      </attribute>
      <attribute name="optionFlag" required="false">
        If you want the interceptor to trigger on certain message depending on the message's option flag,
@@ -101,7 +101,7 @@
      <attribute name="domain" required="true">
        The logical cluster domain that this Interceptor accepts.
        Two different type of values are possible:<br/>
-       1. Regular string values like &quot;staging-domain&quot; or &quot;tomcat-cluster&quot; will be converted into bytes 
+       1. Regular string values like &quot;staging-domain&quot; or &quot;tomcat-cluster&quot; will be converted into bytes
        using ISO-8859-1 encoding.<br/>
        2. byte array in string form, for example {216,123,12,3}<br/>
      </attribute>
@@ -110,7 +110,7 @@
   <subsection name="org.apache.catalina.tribes.group.interceptors.MessageDispatch15Interceptor Attributes">
    <attributes>
      <attribute name="className" required="true">
-       Required, This dispatcher uses JDK 1.5 java.util.concurrent package 
+       Required, This dispatcher uses JDK 1.5 java.util.concurrent package
      </attribute>
      <attribute name="optionFlag" required="false">
        The default and hard coded value is <code>8 (org.apache.catalina.tribes.Channel.SEND_OPTIONS_ASYNCHRONOUS)</code>.
@@ -130,12 +130,12 @@
      </attribute>
      <attribute name="alwaysSend" required="false">
        What behavior should be executed when the dispatch queue is full. If <code>true</code> (default), then the message is
-       is sent synchronously, if <code>false</code> an error is thrown.   
+       is sent synchronously, if <code>false</code> an error is thrown.
      </attribute>
      <attribute name="maxQueueSize" required="false">
        Size in bytes of the dispatch queue, the default value is <code> 1024*1024*64 (64MB)</code> sets the maximum queue size for the dispatch queue
        if the queue fills up, one can trigger the behavior, if <code>alwaysSend</code> is set to true, the message will be sent synchronously
-       if the flag is false, an error is thrown  
+       if the flag is false, an error is thrown
      </attribute>
    </attributes>
   </subsection>
@@ -153,7 +153,7 @@
      </attribute>
    </attributes>
   </subsection>
-  
+
   <subsection name="Nested element StaticMember Attributes">
    <attributes>
      <attribute name="className" required="true">
@@ -176,7 +176,7 @@
      <attribute name="domain" required="true">
        The logical cluster domain for this this static member listens for cluster messages.
        Two different type of values are possible:<br/>
-       1. Regular string values like &quot;staging-domain&quot; or &quot;tomcat-cluster&quot; will be converted into bytes 
+       1. Regular string values like &quot;staging-domain&quot; or &quot;tomcat-cluster&quot; will be converted into bytes
        using ISO-8859-1 encoding.
        2. byte array in string form, for example {216,123,12,3}<br/>
      </attribute>
@@ -188,7 +188,7 @@
    </attributes>
   </subsection>
   <!--TODO Document all the interceptors-->
-  
+
 </section>
 
 

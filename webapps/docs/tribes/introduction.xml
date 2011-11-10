@@ -151,8 +151,8 @@
     <b>Guaranteed Messaging</b><br/>
     In the default implementation of Tribes uses TCP or UDP for messaging. TCP already has guaranteed message delivery
     and flow control built in. I believe that the performance of Java TCP, will outperform an implementation of
-    Java/UDP/flow-control/message guarantee since the logic happens further down the stack. UDP messaging has been added in for 
-    sending messages over UDP instead of TCP when desired. The same guarantee scenarios as described below are still available 
+    Java/UDP/flow-control/message guarantee since the logic happens further down the stack. UDP messaging has been added in for
+    sending messages over UDP instead of TCP when desired. The same guarantee scenarios as described below are still available
     over UDP, however, when a UDP message is lost, it's considered failed.<br/>
     Tribes supports both non-blocking and blocking IO operations. The recommended setting is to use non blocking
     as it promotes better parallelism when sending and receiving messages. The blocking implementation is available
@@ -265,7 +265,7 @@
 
 <section name="Where can I get Tribes">
   <p>
-    Tribes ships as a module with Tomcat, and is released as part of the Apache Tomcat release.  
+    Tribes ships as a module with Tomcat, and is released as part of the Apache Tomcat release.
   </p>
 
 
