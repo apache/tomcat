@@ -21,7 +21,7 @@
   xsi:schemaLocation="http://java.sun.com/xml/ns/javaee
                       http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
   version="3.0"
-  metadata-complete="true">  
+  metadata-complete="true">
 
   <display-name>Tomcat Manager Application</display-name>
   <description>
@@ -103,7 +103,7 @@
     <filter-name>SetCharacterEncoding</filter-name>
     <url-pattern>/*</url-pattern>
   </filter-mapping>
-  
+
   <filter>
     <filter-name>CSRF</filter-name>
     <filter-class>org.apache.catalina.filters.CsrfPreventionFilter</filter-class>
@@ -112,13 +112,13 @@
       <param-value>/html,/html/,/html/list,/index.jsp</param-value>
     </init-param>
   </filter>
-  
+
   <filter-mapping>
     <filter-name>CSRF</filter-name>
     <servlet-name>HTMLManager</servlet-name>
     <servlet-name>jsp</servlet-name>
   </filter-mapping>
-  
+
   <!-- Define a Security Constraint on this Application -->
   <!-- NOTE:  None of these roles are present in the default users file -->
   <security-constraint>
@@ -188,7 +188,7 @@
   </security-role>
   <security-role>
     <description>
-      The role that is required to access to the Manager Status pages 
+      The role that is required to access to the Manager Status pages
     </description>
     <role-name>manager-status</role-name>
   </security-role>

@@ -37,7 +37,7 @@
     you have used your browsers back button, used a saved book-mark or similar
     then you may have triggered the cross-site request forgery (CSRF) protection
     that has been enabled for the HTML interface of the Manager application. You
-    will need to reset this protection by returning to the 
+    will need to reset this protection by returning to the
     <a href="<%=request.getContextPath()%>/html">main Manager page</a>. Once you
     return to this page, you will be able to continue using the Manager
     appliction's HTML interface normally. If you continue to see this access
