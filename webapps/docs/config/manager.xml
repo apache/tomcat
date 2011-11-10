@@ -85,14 +85,14 @@
       </attribute>
 
       <attribute name="maxInactiveInterval" required="false">
-        <p>The initial maximum time interval, in seconds, 
+        <p>The initial maximum time interval, in seconds,
         between client requests before a session is invalidated. A negative value
         will result in sessions never timing out. If the attribute is not provided,
         a default of 60 seconds is used.</p>
-        
-        <p>This attribute provides the initial value whenever a 
-        new session is created, but the interval may be dynamically 
-        varied by a servlet via the 
+
+        <p>This attribute provides the initial value whenever a
+        new session is created, but the interval may be dynamically
+        varied by a servlet via the
         <code>setMaxInactiveInterval</code> method of the <code>HttpSession</code> object.</p>
       </attribute>
 
@@ -131,7 +131,7 @@
         across application restarts, if possible.  The default is
         "SESSIONS.ser".<br />See
         <a href="#Persistence_Across_Restarts">Persistence Across Restarts</a>
-        for more information. This persistence may be 
+        for more information. This persistence may be
         disabled by setting this attribute to an empty string.</p>
       </attribute>
 
@@ -179,7 +179,7 @@
     <code>org.apache.catalina.STRICT_SERVLET_COMPLIANCE</code>
     <a href="systemprops.html">system properties</a> to <code>true</code> for
     the persistent manager to work correctly.</p>
-    
+
     <p>The persistent implementation of <strong>Manager</strong> is
     <strong>org.apache.catalina.session.PersistentManager</strong>.  In
     addition to the usual operations of creating and deleting sessions, a
