@@ -32,7 +32,7 @@ import java.net.Socket;
 public class DefaultServerSocketFactory implements ServerSocketFactory {
 
     /**
-     * 
+     *
      * @param endpoint  Unused in this implementation.
      */
     public DefaultServerSocketFactory(AbstractEndpoint endpoint) {

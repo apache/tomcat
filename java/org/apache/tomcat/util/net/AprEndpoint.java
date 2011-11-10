@@ -581,7 +581,7 @@ public class AprEndpoint extends AbstractEndpoint {
             if (getExecutor() == null) {
                 createExecutor();
             }
-            
+
             initializeConnectionLatch();
 
             // Start poller threads
@@ -988,7 +988,7 @@ public class AprEndpoint extends AbstractEndpoint {
                 try {
                     //if we have reached max connections, wait
                     countUpOrAwaitConnection();
-                    
+
                     long socket = 0;
                     try {
                         // Accept the next incoming connection from the server
@@ -1107,7 +1107,7 @@ public class AprEndpoint extends AbstractEndpoint {
 
         private long[] addSocket;
         private boolean[] addSocketKeepAlive;
-        
+
         private volatile int addCount = 0;
 
         private boolean comet = true;

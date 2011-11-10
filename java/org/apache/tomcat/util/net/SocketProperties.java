@@ -36,7 +36,7 @@ public class SocketProperties {
      * 0 is disabled
      */
     protected int keyCache = 500;
-    
+
     /**
      * Enable/disable socket processor cache, this bounded cache stores
      * SocketProcessor objects to reduce GC
@@ -49,7 +49,7 @@ public class SocketProperties {
     /**
      * Enable/disable poller event cache, this bounded cache stores
      * PollerEvent objects to reduce GC for the poller
-     * Default is 500 
+     * Default is 500
      * -1 is unlimited
      * 0 is disabled
      * >0 the max number of objects to keep in cache.
@@ -171,13 +171,13 @@ public class SocketProperties {
      * used.
      */
     protected Integer performanceBandwidth = null;
-    
+
     /**
      * The minimum frequency of the timeout interval to avoid excess load from
      * the poller during high traffic
      */
     protected long timeoutInterval = 1000;
-    
+
     /**
      * Timeout in milliseconds for an unlock to take place.
      */
@@ -226,7 +226,7 @@ public class SocketProperties {
             socket.setSoTimeout(soTimeout.intValue());
     }
 
-    
+
     public boolean getDirectBuffer() {
         return directBuffer;
     }
