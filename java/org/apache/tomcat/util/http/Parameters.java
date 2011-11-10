@@ -281,7 +281,6 @@ public final class Parameters {
                         break;
                 }
             } while (!parameterComplete && pos < end);
-            }
 
             if (pos == end) {
                 if (nameEnd == -1) {
