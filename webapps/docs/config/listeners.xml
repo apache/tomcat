@@ -80,7 +80,7 @@
   the <code>className</code> attribute MUST be used to select the
   implementation you wish to use.</p>
 
-  <subsection name="APR Lifecycle Listener (org.apache.catalina.core.AprLifecycleListener)">
+  <subsection name="APR Lifecycle Listener - org.apache.catalina.core.AprLifecycleListener">
 
     <p>The <strong>APR Lifecycle Listener</strong> checks for the presence of
     the APR/native library and loads the library if it is present. For more
@@ -125,7 +125,7 @@
 
   </subsection>
 
-  <subsection name="Jasper Listener (org.apache.catalina.core.JasperListener)">
+  <subsection name="Jasper Listener - org.apache.catalina.core.JasperListener">
 
     <p>The <strong>Jasper Listener</strong> initializes the Jasper 2 JSP engine
     before any web applications that may use it are loaded. For more
@@ -140,8 +140,8 @@
 
   </subsection>
 
-  <subsection name="Global Resources Lifecycle Listener
-  (org.apache.catalina.mbeans.GlobalResourcesLifecycleListener)">
+  <subsection name="Global Resources Lifecycle Listener -
+  org.apache.catalina.mbeans.GlobalResourcesLifecycleListener">
 
     <p>The <strong>Global Resources Lifecycle Listener</strong> initializes the
     Global JNDI resources defined in server.xml as part of the <a
@@ -156,8 +156,7 @@
 
   </subsection>
 
-  <subsection name="JRE Memory Leak Prevention Listener
-      (org.apache.catalina.core.JreMemoryLeakPreventionListener)">
+  <subsection name="JRE Memory Leak Prevention Listener - org.apache.catalina.core.JreMemoryLeakPreventionListener">
 
     <p>The <strong>JRE Memory Leak Prevention Listener</strong> provides
     work-arounds for known places where the Java Runtime environment uses
@@ -292,7 +291,7 @@
 
   </subsection>
 
-  <subsection name="Security Lifecycle Listener (org.apache.catalina.security.SecurityListener)">
+  <subsection name="Security Lifecycle Listener - org.apache.catalina.security.SecurityListener">
 
     <p>The <strong>Security Lifecycle Listener</strong> performs a number of
     security checks when Tomcat starts and prevents Tomcat from starting if they
@@ -327,7 +326,7 @@
 
   </subsection>
 
-  <subsection name="ThreadLocal Leak Prevention Listener (org.apache.catalina.core.ThreadLocalLeakPreventionListener)">
+  <subsection name="ThreadLocal Leak Prevention Listener - org.apache.catalina.core.ThreadLocalLeakPreventionListener">
 
     <p>The <strong>ThreadLocal Leak Prevention Listener</strong> triggers the
     renewal of threads in Executor pools when a
@@ -347,8 +346,7 @@
 
 <section name="Additional Implementations">
 
-  <subsection name="JMX Remote Lifecycle Listener
-  (org.apache.catalina.mbeans.JmxRemoteLifecycleListener)">
+  <subsection name="JMX Remote Lifecycle Listener - org.apache.catalina.mbeans.JmxRemoteLifecycleListener">
 
     <p>This listener requires <code>catalina-jmx-remote.jar</code> to be placed
     in <code>$CATALINA_HOME/lib</code>. This jar may be found in the extras
@@ -374,7 +372,7 @@
 
       <attribute name="rmiRegistryPortPlatform" required="true">
         <p>The port to be used by the JMX/RMI registry for the Platform MBeans.
-        The replaces the use of the
+        This replaces the use of the
         <code>com.sun.management.jmxremote.port</code> system property that
         should not be set when using this valve.</p>
       </attribute>
