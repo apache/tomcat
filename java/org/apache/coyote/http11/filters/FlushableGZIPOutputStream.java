@@ -66,8 +66,26 @@ public class FlushableGZIPOutputStream extends GZIPOutputStream {
     }
 
     @Override
+    public synchronized void finish() throws IOException {
+        try {
+            flushLastByte();
+        } catch (IOException ignore) {
+            // If our write failed, then trailer write in finish() will fail
+            // with IOException as well, but it will leave Deflater in more
+            // consistent state.
+        }
+        super.finish();
+    }
+
+    @Override
     public synchronized void close() throws IOException {
-        flushLastByte();
+        try {
+            flushLastByte();
+        } catch (IOException ignored) {
+            // Ignore. As OutputStream#close() says, the contract of close()
+            // is to close the stream. It does not matter much if the
+            // stream is not writable any more.
+        }
         super.close();
     }
 
@@ -78,8 +96,9 @@ public class FlushableGZIPOutputStream extends GZIPOutputStream {
 
     private void flushLastByte() throws IOException {
         if (hasLastByte) {
-            super.write(lastByte, 0, 1);
+            // Clear the flag first, because write() may fail
             hasLastByte = false;
+            super.write(lastByte, 0, 1);
         }
     }
 
