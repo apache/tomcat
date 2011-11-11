@@ -108,20 +108,17 @@ public class AprLifecycleListener
                     try {
                         initializeSSL();
                     } catch (Throwable t) {
-                        // FIPS Errors are always fatal
-                        if("on".equalsIgnoreCase(FIPSMode)
-                           && !isFIPSModeActive()) {
-                            if(t instanceof Error)
-                               throw (Error)t;
-                            else if(t instanceof RuntimeException)
-                                throw (RuntimeException)t;
-                            else
-                                throw new IllegalStateException(sm.getString("aprListener.sslInit"), t);
-                        } else {
-                            ExceptionUtils.handleThrowable(t);
-                            log.error(sm.getString("aprListener.sslInit"), t);
-                        }
+                        ExceptionUtils.handleThrowable(t);
+                        log.error(sm.getString("aprListener.sslInit"), t);
                     }
+                }
+                // Failure to initialize FIPS mode is fatal
+                if ("on".equalsIgnoreCase(FIPSMode) && !isFIPSModeActive()) {
+                    Error e = new Error(
+                            sm.getString("aprListener.initializeFIPSFailed"));
+                    // Log here, because thrown error might be not logged
+                    log.fatal(e.getMessage(), e);
+                    throw e;
                 }
             }
         } else if (Lifecycle.AFTER_DESTROY_EVENT.equals(event.getType())) {

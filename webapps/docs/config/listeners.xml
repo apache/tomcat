@@ -95,11 +95,12 @@
     <attributes>
 
       <attribute name="SSLEngine" required="false">
-        <p>Name of the SSLEngine to use. off: Do not use SSL, on: Use SSL but no
-        specific ENGINE. The default value is <b>on</b>. This initializes the
+        <p>Name of the SSLEngine to use. <code>off</code>: do not use SSL,
+        <code>on</code>: use SSL but no specific ENGINE.</p>
+        <p>The default value is <b>on</b>. This initializes the
         native SSL engine, which must be enabled in the APR/native connector by
         the use of the <code>SSLEnabled</code> attribute.</p>
-        <p>See the <a href="http://www.openssl.org">Official OpenSSL website</a>
+        <p>See the <a href="http://www.openssl.org/">Official OpenSSL website</a>
         for more details on supported SSL hardware engines and manufacturers.
         </p>
       </attribute>
@@ -111,11 +112,12 @@
       </attribute>
 
       <attribute name="FIPSMode" required="false">
-        <p>Set to "on" to instruct OpenSSL to go into FIPS mode.
-        FIPS mode <i>requires you to have a FIPS-capable OpenSSL library which
-        you must build yourself</i>.
+        <p>Set to <code>on</code> to instruct OpenSSL to go into FIPS mode.
+        FIPS mode <em>requires you to have a FIPS-capable OpenSSL library which
+        you must build yourself</em>.
         FIPS mode also requires Tomcat native library version 1.1.23 or later,
-        which <i>must be built against the FIPS-compatible OpenSSL</i> library.
+        which <em>must be built against the FIPS-compatible OpenSSL</em> library.
+        If this attribute is "on", <b>SSLEngine</b> must be enabled as well.
         The default value is <code>off</code>.</p>
       </attribute>
 
