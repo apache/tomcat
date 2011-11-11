@@ -140,8 +140,7 @@
 
   </subsection>
 
-  <subsection name="Global Resources Lifecycle Listener -
-  org.apache.catalina.mbeans.GlobalResourcesLifecycleListener">
+  <subsection name="Global Resources Lifecycle Listener - org.apache.catalina.mbeans.GlobalResourcesLifecycleListener">
 
     <p>The <strong>Global Resources Lifecycle Listener</strong> initializes the
     Global JNDI resources defined in server.xml as part of the <a
