@@ -474,7 +474,7 @@ public abstract class AbstractOutputBuffer<S> implements OutputBuffer{
             // servlet framework.  It must suffice until servlet output
             // streams properly encode their output.
             if (((c <= 31) && (c != 9)) || c == 127 || c > 255) {
-              c = ' ';
+                c = ' ';
             }
             buf[pos++] = (byte) c;
         }
@@ -519,7 +519,7 @@ public abstract class AbstractOutputBuffer<S> implements OutputBuffer{
             // servlet framework.  It must suffice until servlet output
             // streams properly encode their output.
             if (((c <= 31) && (c != 9)) || c == 127 || c > 255) {
-              c = ' ';
+                c = ' ';
             }
             buf[pos++] = (byte) c;
         }
