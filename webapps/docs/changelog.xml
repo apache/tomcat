@@ -242,6 +242,10 @@
         <code>AbstractEndpoint</code> class and use it to speed up Tomcat
         tests. (kkolinko)
       </add>
+      <fix>
+        Improve multi-byte character handling in Coyote output for HTTP
+        and AJP. (rjung)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
