@@ -210,7 +210,7 @@ public class AjpMessage {
             // servlet framework.  It must suffice until servlet output
             // streams properly encode their output.
             if (((c <= 31) && (c != 9)) || c == 127 || c > 255) {
-              c = ' ';
+                c = ' ';
             }
             appendByte(c);
         }
@@ -243,7 +243,7 @@ public class AjpMessage {
             // servlet framework.  It must suffice until servlet output
             // streams properly encode their output.
             if (((c <= 31) && (c != 9)) || c == 127 || c > 255) {
-              c = ' ';
+                c = ' ';
             }
             appendByte(c);
         }
