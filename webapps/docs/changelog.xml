@@ -64,7 +64,7 @@
       </add>
       <fix>
         <bug>50570</bug>: Enable FIPS mode to be set in AprLifecycleListener.
-        Based upon a patch from Chris Beckey. (schultz)
+        Based upon a patch from Chris Beckey. (schultz/kkolinko)
       </fix>
       <fix>
         <bug>51744</bug>: Throw the correct exception if an application attempts
