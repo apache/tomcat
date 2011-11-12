@@ -108,8 +108,7 @@ public class ProxyConnection extends JdbcInterceptor {
                 return method.invoke(connection.getXAConnection(),args);
             }catch (Throwable t) {
                 if (t instanceof InvocationTargetException) {
-                    InvocationTargetException it = (InvocationTargetException)t;
-                    throw it.getCause()!=null?it.getCause():it;
+                    throw t.getCause() != null ? t.getCause() : t;
                 } else {
                     throw t;
                 }
@@ -130,8 +129,7 @@ public class ProxyConnection extends JdbcInterceptor {
             }
         }catch (Throwable t) {
             if (t instanceof InvocationTargetException) {
-                InvocationTargetException it = (InvocationTargetException)t;
-                throw it.getCause()!=null?it.getCause():it;
+                throw t.getCause() != null ? t.getCause() : t;
             } else {
                 throw t;
             }
