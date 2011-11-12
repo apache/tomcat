@@ -236,8 +236,7 @@ public abstract class AbstractQueryReport extends AbstractCreateStatementInterce
             }catch (Throwable t) {
                 reportFailedQuery(query,args,name,start,t);
                 if (t instanceof InvocationTargetException) {
-                    InvocationTargetException it = (InvocationTargetException)t;
-                    throw it.getCause()!=null?it.getCause():it;
+                    throw t.getCause() != null ? t.getCause() : t;
                 } else {
                     throw t;
                 }
