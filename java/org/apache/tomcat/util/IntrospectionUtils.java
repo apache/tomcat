@@ -30,8 +30,6 @@ import java.util.Hashtable;
 import java.util.StringTokenizer;
 import java.util.Vector;
 
-// Depends: JDK1.1
-
 /**
  * Utils for introspection and reflection
  */
