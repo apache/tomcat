@@ -204,6 +204,10 @@
         Improve special attributes handling in Request object by using hash
         table lookup instead of series of string comparisons. (kkolinko)
       </update>
+      <scode>
+        Deprecate unused methods in <code>IntrospectionUtils</code> class.
+        (kkolinko)
+      </scode>
     </changelog>
   </subsection>
   <subsection name="Coyote">
