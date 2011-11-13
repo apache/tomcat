@@ -170,12 +170,11 @@ public class JspServletWrapper {
                     try {
                         InstanceManager instanceManager = InstanceManagerFactory.getInstanceManager(config);
                         servlet = (Servlet) instanceManager.newInstance(ctxt.getFQCN(), ctxt.getJspLoader());
-                    } catch (IllegalAccessException e) {
-                        throw new JasperException(e);
-                    } catch (InstantiationException e) {
-                        throw new JasperException(e);
                     } catch (Exception e) {
-                        throw new JasperException(e);
+                        Throwable t = ExceptionUtils
+                                .unwrapInvocationTargetException(e);
+                        ExceptionUtils.handleThrowable(t);
+                        throw new JasperException(t);
                     }
 
                     servlet.init(config);
@@ -481,9 +480,11 @@ public class JspServletWrapper {
             try {
                 instanceManager.destroyInstance(theServlet);
             } catch (Exception e) {
+                Throwable t = ExceptionUtils.unwrapInvocationTargetException(e);
+                ExceptionUtils.handleThrowable(t);
                 // Log any exception, since it can't be passed along
                 log.error(Localizer.getMessage("jsp.error.file.not.found",
-                        e.getMessage()), e);
+                        e.getMessage()), t);
             }
         }
     }
