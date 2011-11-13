@@ -41,8 +41,11 @@ public class TrapException extends JdbcInterceptor {
             return super.invoke(proxy, method, args);
         }catch (Exception t) {
             Throwable exception = t;
-            if (t instanceof InvocationTargetException) {
-                exception = t.getCause() != null ? t.getCause() : t;
+            if (t instanceof InvocationTargetException && t.getCause() != null) {
+                exception = t.getCause();
+                if (exception instanceof Error) {
+                    throw exception;
+                }
             }
             Class<?> exceptionClass = exception.getClass();
             if (!isDeclaredException(method, exceptionClass)) {

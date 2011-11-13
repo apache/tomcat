@@ -200,6 +200,13 @@ public class GenericNamingResourcesFactory implements ObjectFactory {
                 log.debug("IntrospectionUtils: IllegalAccessException for " +
                         o.getClass() + " " + name + "=" + value + ")", iae);
         } catch (InvocationTargetException ie) {
+            Throwable cause = ie.getCause();
+            if (cause instanceof ThreadDeath) {
+                throw (ThreadDeath) cause;
+            }
+            if (cause instanceof VirtualMachineError) {
+                throw (VirtualMachineError) cause;
+            }
             if (log.isDebugEnabled())
                 log.debug("IntrospectionUtils: InvocationTargetException for " +
                         o.getClass() + " " + name + "=" + value + ")", ie);
