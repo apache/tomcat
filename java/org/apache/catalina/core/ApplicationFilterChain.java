@@ -261,6 +261,7 @@ final class ApplicationFilterChain implements FilterChain, CometFilterChain {
                                               filter, request, response, e);
                 throw e;
             } catch (Throwable e) {
+                e = ExceptionUtils.unwrapInvocationTargetException(e);
                 ExceptionUtils.handleThrowable(e);
                 if (filter != null)
                     support.fireInstanceEvent(InstanceEvent.AFTER_FILTER_EVENT,
@@ -452,6 +453,7 @@ final class ApplicationFilterChain implements FilterChain, CometFilterChain {
                             */
                 throw e;
             } catch (Throwable e) {
+                e = ExceptionUtils.unwrapInvocationTargetException(e);
                 ExceptionUtils.handleThrowable(e);
                 /*if (filter != null)
                     support.fireInstanceEvent(InstanceEvent.AFTER_FILTER_EVENT,
