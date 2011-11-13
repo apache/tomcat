@@ -22,6 +22,7 @@ import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.tagext.Tag;
 
 import org.apache.jasper.Constants;
+import org.apache.jasper.util.ExceptionUtils;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.InstanceManager;
@@ -121,7 +122,9 @@ public class TagHandlerPool {
                 return instance;
             }
         } catch (Exception e) {
-            throw new JspException(e.getMessage(), e);
+            Throwable t = ExceptionUtils.unwrapInvocationTargetException(e);
+            ExceptionUtils.handleThrowable(t);
+            throw new JspException(e.getMessage(), t);
         }
     }
 
@@ -145,8 +148,10 @@ public class TagHandlerPool {
         try {
             instanceManager.destroyInstance(handler);
         } catch (Exception e) {
+            Throwable t = ExceptionUtils.unwrapInvocationTargetException(e);
+            ExceptionUtils.handleThrowable(t);
             log.warn("Error processing preDestroy on tag instance of " +
-                    handler.getClass().getName(), e);
+                    handler.getClass().getName(), t);
         }
     }
 
@@ -156,12 +161,15 @@ public class TagHandlerPool {
      */
     public synchronized void release() {
         for (int i = current; i >= 0; i--) {
-            handlers[i].release();
+            Tag handler = handlers[i];
+            handler.release();
             try {
-                instanceManager.destroyInstance(handlers[i]);
+                instanceManager.destroyInstance(handler);
             } catch (Exception e) {
-                log.warn("Error processing preDestroy on tag instance of " +
-                        handlers[i].getClass().getName(), e);
+                Throwable t = ExceptionUtils.unwrapInvocationTargetException(e);
+                ExceptionUtils.handleThrowable(t);
+                log.warn("Error processing preDestroy on tag instance of "
+                        + handler.getClass().getName(), t);
             }
         }
     }

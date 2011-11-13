@@ -156,6 +156,12 @@ public class Set implements TagPlugin {
             ctxt.generateJavaSource("        } catch (java.beans.IntrospectionException ex) {");
             ctxt.generateJavaSource("            throw new JspException(ex);");
             ctxt.generateJavaSource("        } catch (java.lang.reflect.InvocationTargetException ex) {");
+            ctxt.generateJavaSource("            if (ex.getCause() instanceof ThreadDeath) {");
+            ctxt.generateJavaSource("                throw (ThreadDeath) ex.getCause();");
+            ctxt.generateJavaSource("            }");
+            ctxt.generateJavaSource("            if (ex.getCause() instanceof VirtualMachineError) {");
+            ctxt.generateJavaSource("                throw (VirtualMachineError) ex.getCause();");
+            ctxt.generateJavaSource("            }");
             ctxt.generateJavaSource("            throw new JspException(ex);");
             ctxt.generateJavaSource("        }");
             ctxt.generateJavaSource("    }");
