@@ -48,6 +48,7 @@ import org.apache.coyote.RequestInfo;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.InstanceManager;
+import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.res.StringManager;
 /**
  *
@@ -239,6 +240,7 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
             ServletException se = new ServletException(e);
             throw se;
         } catch (InvocationTargetException e) {
+            ExceptionUtils.handleThrowable(e.getCause());
             ServletException se = new ServletException(e);
             throw se;
         } catch (NamingException e) {

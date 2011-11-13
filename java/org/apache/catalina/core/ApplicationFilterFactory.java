@@ -28,6 +28,7 @@ import org.apache.catalina.Wrapper;
 import org.apache.catalina.comet.CometFilter;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.deploy.FilterMap;
+import org.apache.tomcat.util.ExceptionUtils;
 
 /**
  * Factory for the creation and caching of Filters and creation
@@ -162,6 +163,8 @@ public final class ApplicationFilterFactory {
                     // Note: The try catch is there because getFilter has a lot of
                     // declared exceptions. However, the filter is allocated much
                     // earlier
+                    Throwable t = ExceptionUtils.unwrapInvocationTargetException(e);
+                    ExceptionUtils.handleThrowable(t);
                 }
                 if (isCometFilter) {
                     filterChain.addFilter(filterConfig);

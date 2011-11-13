@@ -981,6 +981,7 @@ public class ApplicationContext
         } catch (IllegalAccessException e) {
             throw new ServletException(e);
         } catch (InvocationTargetException e) {
+            ExceptionUtils.handleThrowable(e.getCause());
             throw new ServletException(e);
         } catch (NamingException e) {
             throw new ServletException(e);
@@ -1126,6 +1127,7 @@ public class ApplicationContext
         } catch (IllegalAccessException e) {
             throw new ServletException(e);
         } catch (InvocationTargetException e) {
+            ExceptionUtils.handleThrowable(e.getCause());
             throw new ServletException(e);
         } catch (NamingException e) {
             throw new ServletException(e);
@@ -1285,6 +1287,7 @@ public class ApplicationContext
                     "applicationContext.addListener.iae.cnfe", className),
                     e);
         } catch (InvocationTargetException e) {
+            ExceptionUtils.handleThrowable(e.getCause());
             throw new IllegalArgumentException(sm.getString(
                     "applicationContext.addListener.iae.cnfe", className),
                     e);
@@ -1371,6 +1374,7 @@ public class ApplicationContext
         } catch (IllegalAccessException e) {
             throw new ServletException(e);
         } catch (InvocationTargetException e) {
+            ExceptionUtils.handleThrowable(e.getCause());
             throw new ServletException(e);
         } catch (NamingException e) {
             throw new ServletException(e);
