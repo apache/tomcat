@@ -88,9 +88,16 @@ public class BeanELResolver extends ELResolver {
         } catch (IllegalAccessException e) {
             throw new ELException(e);
         } catch (InvocationTargetException e) {
+            Throwable cause = e.getCause();
+            if (cause instanceof ThreadDeath) {
+                throw (ThreadDeath) cause;
+            }
+            if (cause instanceof VirtualMachineError) {
+                throw (VirtualMachineError) cause;
+            }
             throw new ELException(message(context, "propertyReadError",
                     new Object[] { base.getClass().getName(),
-                            property.toString() }), e.getCause());
+                            property.toString() }), cause);
         } catch (Exception e) {
             throw new ELException(e);
         }
@@ -136,9 +143,16 @@ public class BeanELResolver extends ELResolver {
         } catch (IllegalAccessException e) {
             throw new ELException(e);
         } catch (InvocationTargetException e) {
+            Throwable cause = e.getCause();
+            if (cause instanceof ThreadDeath) {
+                throw (ThreadDeath) cause;
+            }
+            if (cause instanceof VirtualMachineError) {
+                throw (VirtualMachineError) cause;
+            }
             throw new ELException(message(context, "propertyWriteError",
                     new Object[] { base.getClass().getName(),
-                            property.toString() }), e.getCause());
+                            property.toString() }), cause);
         } catch (Exception e) {
             throw new ELException(e);
         }
@@ -473,7 +487,14 @@ public class BeanELResolver extends ELResolver {
         } catch (IllegalAccessException e) {
             throw new ELException(e);
         } catch (InvocationTargetException e) {
-            throw new ELException(e.getCause());
+            Throwable cause = e.getCause();
+            if (cause instanceof ThreadDeath) {
+                throw (ThreadDeath) cause;
+            }
+            if (cause instanceof VirtualMachineError) {
+                throw (VirtualMachineError) cause;
+            }
+            throw new ELException(cause);
         }
 
         context.setPropertyResolved(true);

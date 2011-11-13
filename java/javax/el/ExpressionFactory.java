@@ -200,6 +200,13 @@ public abstract class ExpressionFactory {
                     "Unable to create ExpressionFactory of type: " + className,
                     e);
         } catch (InvocationTargetException e) {
+            Throwable cause = e.getCause();
+            if (cause instanceof ThreadDeath) {
+                throw (ThreadDeath) cause;
+            }
+            if (cause instanceof VirtualMachineError) {
+                throw (VirtualMachineError) cause;
+            }
             throw new ELException(
                     "Unable to create ExpressionFactory of type: " + className,
                     e);
