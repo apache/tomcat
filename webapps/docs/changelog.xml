@@ -384,6 +384,11 @@
         rethrow Error as is, without wrapping it in a RuntimeException.
         (kkolinko)
       </fix>
+      <fix>
+        When building jdbc-pool from within Tomcat, use Tomcat's
+        <code>output</code> directory location. This allows to move all build
+        output away from the source tree. (kkolinko)
+      </fix>
     </changelog>
   </subsection>
 </section>
