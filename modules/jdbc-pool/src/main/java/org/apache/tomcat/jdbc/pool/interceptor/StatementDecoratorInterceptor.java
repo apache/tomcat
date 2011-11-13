@@ -114,6 +114,15 @@ public class StatementDecoratorInterceptor extends AbstractCreateStatementInterc
             }
             return createDecorator(proxy, method, args, statement, constructor, sql);
         } catch (Exception x) {
+            if (x instanceof InvocationTargetException) {
+                Throwable cause = x.getCause();
+                if (cause instanceof ThreadDeath) {
+                    throw (ThreadDeath) cause;
+                }
+                if (cause instanceof VirtualMachineError) {
+                    throw (VirtualMachineError) cause;
+                }
+            }
             logger.warn("Unable to create statement proxy for slow query report.", x);
         }
         return statement;
