@@ -378,6 +378,12 @@
         JAR is now required by the Ant tasks. Patch provided by Volker Krebs.
         (markt)
       </fix>
+      <fix>
+        In jdbc-pool: Improve handling of Errors that originate from methods
+        invoked through reflection. In <code>TrapException</code> interceptor:
+        rethrow Error as is, without wrapping it in a RuntimeException.
+        (kkolinko)
+      </fix>
     </changelog>
   </subsection>
 </section>
