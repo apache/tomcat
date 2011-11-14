@@ -195,12 +195,18 @@
                 will be simply redeployed as a compressed archive.
             </li>
             <li>
-                Re-deployment of a web application if the /WEB-INF/web.xml file (or any
-                other resource defined as a WatchedResource) is updated.
+                Re-loading of a web application if the /WEB-INF/web.xml file (or
+                any other resource defined as a WatchedResource) is updated.
             </li>
             <li>
-                Re-deployment of a web application if the Context Descriptor file from which
-                the web application has been deployed is updated.
+                Re-deployment of a web application if the Context Descriptor
+                file from which the web application has been deployed is
+                updated.
+            </li>
+            <li>
+                Re-deployment of dependent web applications if the global or
+                per-host Context Descriptor file used by the web application is
+                updated.
             </li>
             <li>
                 Re-deployment of a web application if a Context Descriptor file (with a

@@ -569,13 +569,6 @@ public class ContextConfig
         try {
             source = new InputSource(contextXml.toString());
             stream = contextXml.openStream();
-
-            // Add as watched resource so that cascade reload occurs if a default
-            // config file is modified/added/removed
-            if ("file".equals(contextXml.getProtocol())) {
-                context.addWatchedResource(
-                        (new File(contextXml.toURI())).getAbsolutePath());
-            }
         } catch (Exception e) {
             log.error(sm.getString("contextConfig.contextMissing",
                       contextXml) , e);
@@ -1710,7 +1703,6 @@ public class ContextConfig
             } else {
                 source = new InputSource(file.getAbsoluteFile().toURI().toString());
                 stream = new FileInputStream(file);
-                context.addWatchedResource(file.getAbsolutePath());
             }
 
             if (stream != null && source != null) {
