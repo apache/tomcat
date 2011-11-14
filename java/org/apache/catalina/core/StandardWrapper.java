@@ -1140,6 +1140,7 @@ public class StandardWrapper extends ContainerBase
                 throw new ServletException
                     (sm.getString("standardWrapper.notServlet", servletClass), e);
             } catch (Throwable e) {
+                e = ExceptionUtils.unwrapInvocationTargetException(e);
                 ExceptionUtils.handleThrowable(e);
                 unavailable(null);
 
@@ -1472,6 +1473,7 @@ public class StandardWrapper extends ContainerBase
                 }
     
             } catch (Throwable t) {
+                t = ExceptionUtils.unwrapInvocationTargetException(t);
                 ExceptionUtils.handleThrowable(t);
                 instanceSupport.fireInstanceEvent
                   (InstanceEvent.AFTER_DESTROY_EVENT, instance, t);
@@ -1521,6 +1523,7 @@ public class StandardWrapper extends ContainerBase
                     }
                 }
             } catch (Throwable t) {
+                t = ExceptionUtils.unwrapInvocationTargetException(t);
                 ExceptionUtils.handleThrowable(t);
                 instancePool = null;
                 nInstances = 0;

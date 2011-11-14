@@ -108,6 +108,7 @@ public class AprLifecycleListener
                     try {
                         initializeSSL();
                     } catch (Throwable t) {
+                        t = ExceptionUtils.unwrapInvocationTargetException(t);
                         ExceptionUtils.handleThrowable(t);
                         log.error(sm.getString("aprListener.sslInit"), t);
                     }
@@ -129,6 +130,7 @@ public class AprLifecycleListener
                 try {
                     terminateAPR();
                 } catch (Throwable t) {
+                    t = ExceptionUtils.unwrapInvocationTargetException(t);
                     ExceptionUtils.handleThrowable(t);
                     log.info(sm.getString("aprListener.aprDestroy"));
                 }
@@ -180,6 +182,7 @@ public class AprLifecycleListener
             patch = clazz.getField("TCN_PATCH_VERSION").getInt(null);
             apver = major * 1000 + minor * 100 + patch;
         } catch (Throwable t) {
+            t = ExceptionUtils.unwrapInvocationTargetException(t);
             ExceptionUtils.handleThrowable(t);
             log.info(sm.getString("aprListener.aprInit",
                     System.getProperty("java.library.path")));
@@ -196,6 +199,7 @@ public class AprLifecycleListener
                 // is below required.
                 terminateAPR();
             } catch (Throwable t) {
+                t = ExceptionUtils.unwrapInvocationTargetException(t);
                 ExceptionUtils.handleThrowable(t);
             }
             return;

@@ -40,6 +40,7 @@ import org.apache.catalina.deploy.FilterDef;
 import org.apache.catalina.security.SecurityUtil;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.InstanceManager;
+import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.log.SystemLogHandler;
 import org.apache.tomcat.util.modeler.Registry;
 import org.apache.tomcat.util.res.StringManager;
@@ -313,7 +314,10 @@ public final class ApplicationFilterConfig implements FilterConfig, Serializable
                 try {
                     ((StandardContext) context).getInstanceManager().destroyInstance(this.filter);
                 } catch (Exception e) {
-                    context.getLogger().error("ApplicationFilterConfig.preDestroy", e);
+                    Throwable t = ExceptionUtils
+                            .unwrapInvocationTargetException(e);
+                    ExceptionUtils.handleThrowable(t);
+                    context.getLogger().error("ApplicationFilterConfig.preDestroy", t);
                 }
             }
         }
@@ -363,7 +367,10 @@ public final class ApplicationFilterConfig implements FilterConfig, Serializable
                     try {
                         ((StandardContext) context).getInstanceManager().destroyInstance(this.filter);
                     } catch (Exception e) {
-                        context.getLogger().error("ApplicationFilterConfig.preDestroy", e);
+                        Throwable t = ExceptionUtils
+                                .unwrapInvocationTargetException(e);
+                        ExceptionUtils.handleThrowable(t);
+                        context.getLogger().error("ApplicationFilterConfig.preDestroy", t);
                     }
                 }
             }

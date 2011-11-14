@@ -4625,6 +4625,7 @@ public class StandardContext extends ContainerBase
                         new ApplicationFilterConfig(this, filterDefs.get(name));
                     filterConfigs.put(name, filterConfig);
                 } catch (Throwable t) {
+                    t = ExceptionUtils.unwrapInvocationTargetException(t);
                     ExceptionUtils.handleThrowable(t);
                     getLogger().error
                         (sm.getString("standardContext.filterStart", name), t);
@@ -4699,6 +4700,7 @@ public class StandardContext extends ContainerBase
             try {
                 results[i] = instanceManager.newInstance(listeners[i]);
             } catch (Throwable t) {
+                t = ExceptionUtils.unwrapInvocationTargetException(t);
                 ExceptionUtils.handleThrowable(t);
                 getLogger().error
                     (sm.getString("standardContext.applicationListener",
@@ -4814,6 +4816,7 @@ public class StandardContext extends ContainerBase
                 try {
                     getInstanceManager().destroyInstance(listeners[j]);
                 } catch (Throwable t) {
+                    t = ExceptionUtils.unwrapInvocationTargetException(t);
                     ExceptionUtils.handleThrowable(t);
                     getLogger().error
                        (sm.getString("standardContext.listenerStop",
@@ -4833,6 +4836,7 @@ public class StandardContext extends ContainerBase
                 try {
                     getInstanceManager().destroyInstance(listeners[j]);
                 } catch (Throwable t) {
+                    t = ExceptionUtils.unwrapInvocationTargetException(t);
                     ExceptionUtils.handleThrowable(t);
                     getLogger().error
                         (sm.getString("standardContext.listenerStop",

@@ -27,7 +27,6 @@ import java.io.InputStream;
 import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.net.MalformedURLException;
@@ -2039,8 +2038,10 @@ public class WebappClassLoader
             }
         } catch (Exception e) {
             // So many things to go wrong above...
+            Throwable t = ExceptionUtils.unwrapInvocationTargetException(e);
+            ExceptionUtils.handleThrowable(t);
             log.warn(sm.getString(
-                    "webappClassLoader.jdbcRemoveFailed", contextName), e);
+                    "webappClassLoader.jdbcRemoveFailed", contextName), t);
         } finally {
             if (is != null) {
                 try {
@@ -2345,22 +2346,13 @@ public class WebappClassLoader
             log.error(sm.getString("webappClassLoader.warnTimerThread",
                     contextName, thread.getName()));
 
-        } catch (NoSuchFieldException e) {
+        } catch (Exception e) {
+            // So many things to go wrong above...
+            Throwable t = ExceptionUtils.unwrapInvocationTargetException(e);
+            ExceptionUtils.handleThrowable(t);
             log.warn(sm.getString(
                     "webappClassLoader.stopTimerThreadFail",
-                    thread.getName(), contextName), e);
-        } catch (IllegalAccessException e) {
-            log.warn(sm.getString(
-                    "webappClassLoader.stopTimerThreadFail",
-                    thread.getName(), contextName), e);
-        } catch (NoSuchMethodException e) {
-            log.warn(sm.getString(
-                    "webappClassLoader.stopTimerThreadFail",
-                    thread.getName(), contextName), e);
-        } catch (InvocationTargetException e) {
-            log.warn(sm.getString(
-                    "webappClassLoader.stopTimerThreadFail",
-                    thread.getName(), contextName), e);
+                    thread.getName(), contextName), t);
         }
     }
 
