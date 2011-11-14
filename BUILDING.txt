@@ -91,9 +91,13 @@ do the following:
   file to indicate to Ant the proxy configuration. Read below.
 
 * WARNING: Running this command will download binaries to the /usr/share/java
-  directory. Make sure this is appropriate to do on your computer. On Windows,
-  this usually corresponds to the "C:\usr\share\java" directory, unless Cygwin
-  is used. Read below to customize the directory used to download the binaries.
+  directory.  On a typical Linux or MacOX system an ordinary user
+  will not have access to write to this directory, and, even if you do,
+  it may not be appropriate for you to write there.
+
+  On Windows this usually corresponds to the "C:\usr\share\java"
+  directory, unless Cygwin is used. Read the next section to learn how
+  to customize the directory used to download the binaries.
 
 * The build can be controlled by creating a ${tomcat.source}/build.properties
   file, and adding the following content to it:
@@ -107,7 +111,7 @@ do the following:
     # ----- Default Base Path for Dependent Packages -----
     # Replace this path with the directory path where dependencies binaries
     # should be downloaded
-    base.path=/usr/share/java
+    base.path=/home/me/some-place-to-download-to
 
 
 (3) Updating sources
