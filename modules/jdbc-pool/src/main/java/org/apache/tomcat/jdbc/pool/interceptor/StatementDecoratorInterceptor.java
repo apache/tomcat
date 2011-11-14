@@ -240,8 +240,9 @@ public class StatementDecoratorInterceptor extends AbstractCreateStatementInterc
                     result = method.invoke(delegate, args);
                 }
             } catch (Throwable t) {
-                if (t instanceof InvocationTargetException) {
-                    throw t.getCause() != null ? t.getCause() : t;
+                if (t instanceof InvocationTargetException
+                        && t.getCause() != null) {
+                    throw t.getCause();
                 } else {
                     throw t;
                 }
@@ -284,7 +285,16 @@ public class StatementDecoratorInterceptor extends AbstractCreateStatementInterc
             if (method.getName().equals("getStatement")) {
                 return this.st;
             } else {
-                return method.invoke(this.delegate, args);
+                try {
+                    return method.invoke(this.delegate, args);
+                } catch (Throwable t) {
+                    if (t instanceof InvocationTargetException
+                            && t.getCause() != null) {
+                        throw t.getCause();
+                    } else {
+                        throw t;
+                    }
+                }
             }
         }
     }
