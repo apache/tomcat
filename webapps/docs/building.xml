@@ -119,10 +119,12 @@ Use the following commands to build Tomcat:
 <p>
 <b>WARNING:</b> Running this command will download binary binaries to the
   <code>/usr/share/java</code> directory by default.
-  Make sure this is appropriate to do so on your computer. On Windows,
+  On a typical Linux or MacOX system, an ordinary user
+  will not have access to write to this directory, and, even if you do,
+  it may not be appropriate for you to write there. On Windows
   this usually corresponds to the <code>C:\usr\share\java</code> directory,
-  unless Cygwin is used. Read below to customize the directory used
-  to download the binaries.
+  unless Cygwin is used. Read below to learn how to customize the directory
+  used to download the binaries.
 </p>
 
 <p>
@@ -139,7 +141,7 @@ Use the following commands to build Tomcat:
     # ----- Default Base Path for Dependent Packages -----<br/>
     # Replace this path with the directory path where<br/>
     # dependencies binaries should be downloaded.<br/>
-    base.path=/usr/share/java<br/>
+    base.path=/home/me/some-place-to-download-to<br/>
 </code>
 </p>
 
@@ -168,6 +170,13 @@ However, it will allow you to view and edit the Java code,
 get warnings, reformat code, perform refactorings, run Tomcat
 under the IDE, and so on.
 </p>
+
+<p>
+<b>WARNING:</b> Do not forget to create and configure
+  <code>${tomcat.source}/build.properties</code> file as described above
+  before running any Ant targets.
+</p>
+
 <p>
 Sample Eclipse project files and launch targets are provided in the
 <code>res/ide-support/eclipse</code> directory of the source tree.
