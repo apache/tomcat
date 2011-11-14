@@ -35,6 +35,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.apache.catalina.Globals;
+import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.res.StringManager;
 /**
  * This utility class associates a <code>Subject</code> to the current
@@ -306,8 +307,8 @@ public final class SecurityUtil{
         } catch( PrivilegedActionException pe) {
             Throwable e;
             if (pe.getException() instanceof InvocationTargetException) {
-                e = ((InvocationTargetException)pe.getException())
-                                .getTargetException();
+                e = pe.getException().getCause();
+                ExceptionUtils.handleThrowable(e);
             } else {
                 e = pe;
             }

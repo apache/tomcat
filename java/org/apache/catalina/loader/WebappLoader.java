@@ -1066,6 +1066,8 @@ public class WebappLoader extends LifecycleMBeanBase
                 return (String)o;
             return null;
         } catch( Exception ex ) {
+            Throwable t = ExceptionUtils.unwrapInvocationTargetException(ex);
+            ExceptionUtils.handleThrowable(t);
             if (log.isDebugEnabled())
                 log.debug("getClasspath ", ex);
         }

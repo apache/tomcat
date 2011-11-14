@@ -40,6 +40,7 @@ import org.apache.catalina.util.LifecycleMBeanBase;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.naming.ContextBindings;
+import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.res.StringManager;
 
 
@@ -1022,8 +1023,10 @@ public class NamingResources extends LifecycleMBeanBase implements Serializable 
                 log.warn(sm.getString("namingResources.cleanupCloseFailed",
                         closeMethod, name, container), e);
             } catch (InvocationTargetException e) {
+                Throwable t = ExceptionUtils.unwrapInvocationTargetException(e);
+                ExceptionUtils.handleThrowable(t);
                 log.warn(sm.getString("namingResources.cleanupCloseFailed",
-                        closeMethod, name, container), e);
+                        closeMethod, name, container), t);
             }
         }
     }

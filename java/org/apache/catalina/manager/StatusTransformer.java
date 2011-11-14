@@ -160,6 +160,7 @@ public class StatusTransformer {
             method.invoke(null, paramValues);
             ok = true;
         } catch (Throwable t) {
+            t = ExceptionUtils.unwrapInvocationTargetException(t);
             ExceptionUtils.handleThrowable(t);
         }
 
