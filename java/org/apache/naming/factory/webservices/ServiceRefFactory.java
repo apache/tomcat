@@ -16,6 +16,7 @@
  */
 package org.apache.naming.factory.webservices;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.net.URL;
@@ -207,6 +208,15 @@ public class ServiceRefFactory
                         portComponentRef.put(endpoint, new QName(port.getName()));
                     }
                 } catch (Exception e) {
+                    if (e instanceof InvocationTargetException) {
+                        Throwable cause = e.getCause();
+                        if (cause instanceof ThreadDeath) {
+                            throw (ThreadDeath) cause;
+                        }
+                        if (cause instanceof VirtualMachineError) {
+                            throw (VirtualMachineError) cause;
+                        }
+                    }
                     NamingException ex = new NamingException
                     ("Error while reading Wsdl File");
                     ex.initCause(e);

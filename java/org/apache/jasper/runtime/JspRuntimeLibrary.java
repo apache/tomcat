@@ -40,6 +40,7 @@ import javax.servlet.jsp.tagext.BodyContent;
 import org.apache.jasper.Constants;
 import org.apache.jasper.JasperException;
 import org.apache.jasper.compiler.Localizer;
+import org.apache.jasper.util.ExceptionUtils;
 
 /**
  * Bunch of util methods that are used by code generated for useBean,
@@ -354,6 +355,8 @@ public class JspRuntimeLibrary {
                 }
             }
         } catch (Exception ex) {
+            Throwable thr = ExceptionUtils.unwrapInvocationTargetException(ex);
+            ExceptionUtils.handleThrowable(thr);
             throw new JasperException(ex);
         }
         if (!ignoreMethodNF && (method == null)) {
@@ -526,6 +529,8 @@ public class JspRuntimeLibrary {
                 method.invoke (bean, new Object[] {tmpval});
             }
         } catch (Exception ex) {
+            Throwable thr = ExceptionUtils.unwrapInvocationTargetException(ex);
+            ExceptionUtils.handleThrowable(thr);
             throw new JasperException ("error in invoking method", ex);
         }
     }
@@ -566,6 +571,8 @@ public class JspRuntimeLibrary {
             Method method = getReadMethod(o.getClass(), prop);
             value = method.invoke(o, (Object[]) null);
         } catch (Exception ex) {
+            Throwable thr = ExceptionUtils.unwrapInvocationTargetException(ex);
+            ExceptionUtils.handleThrowable(thr);
             throw new JasperException (ex);
         }
         return value;
@@ -610,6 +617,8 @@ public class JspRuntimeLibrary {
                     false )
             });
         } catch (Exception ex) {
+            Throwable thr = ExceptionUtils.unwrapInvocationTargetException(ex);
+            ExceptionUtils.handleThrowable(thr);
             throw new JasperException(ex);
         }
     }
@@ -622,6 +631,8 @@ public class JspRuntimeLibrary {
             Method method = getWriteMethod(bean.getClass(), prop);
             method.invoke(bean, new Object[] { value });
         } catch (Exception ex) {
+            Throwable thr = ExceptionUtils.unwrapInvocationTargetException(ex);
+            ExceptionUtils.handleThrowable(thr);
             throw new JasperException(ex);
         }
     }
@@ -634,6 +645,8 @@ public class JspRuntimeLibrary {
             Method method = getWriteMethod(bean.getClass(), prop);
             method.invoke(bean, new Object[] { Integer.valueOf(value) });
         } catch (Exception ex) {
+            Throwable thr = ExceptionUtils.unwrapInvocationTargetException(ex);
+            ExceptionUtils.handleThrowable(thr);
             throw new JasperException(ex);
         }
     }
@@ -646,6 +659,8 @@ public class JspRuntimeLibrary {
             Method method = getWriteMethod(bean.getClass(), prop);
             method.invoke(bean, new Object[] { Short.valueOf(value) });
         } catch (Exception ex) {
+            Throwable thr = ExceptionUtils.unwrapInvocationTargetException(ex);
+            ExceptionUtils.handleThrowable(thr);
             throw new JasperException(ex);
         }
     }
@@ -658,6 +673,8 @@ public class JspRuntimeLibrary {
             Method method = getWriteMethod(bean.getClass(), prop);
             method.invoke(bean, new Object[] { Long.valueOf(value) });
         } catch (Exception ex) {
+            Throwable thr = ExceptionUtils.unwrapInvocationTargetException(ex);
+            ExceptionUtils.handleThrowable(thr);
             throw new JasperException(ex);
         }
     }
@@ -670,6 +687,8 @@ public class JspRuntimeLibrary {
             Method method = getWriteMethod(bean.getClass(), prop);
             method.invoke(bean, new Object[] { Double.valueOf(value) });
         } catch (Exception ex) {
+            Throwable thr = ExceptionUtils.unwrapInvocationTargetException(ex);
+            ExceptionUtils.handleThrowable(thr);
             throw new JasperException(ex);
         }
     }
@@ -682,6 +701,8 @@ public class JspRuntimeLibrary {
             Method method = getWriteMethod(bean.getClass(), prop);
             method.invoke(bean, new Object[] { Float.valueOf(value) });
         } catch (Exception ex) {
+            Throwable thr = ExceptionUtils.unwrapInvocationTargetException(ex);
+            ExceptionUtils.handleThrowable(thr);
             throw new JasperException(ex);
         }
     }
@@ -694,6 +715,8 @@ public class JspRuntimeLibrary {
             Method method = getWriteMethod(bean.getClass(), prop);
             method.invoke(bean, new Object[] { Character.valueOf(value) });
         } catch (Exception ex) {
+            Throwable thr = ExceptionUtils.unwrapInvocationTargetException(ex);
+            ExceptionUtils.handleThrowable(thr);
             throw new JasperException(ex);
         }
     }
@@ -706,6 +729,8 @@ public class JspRuntimeLibrary {
             Method method = getWriteMethod(bean.getClass(), prop);
             method.invoke(bean, new Object[] { Byte.valueOf(value) });
         } catch (Exception ex) {
+            Throwable thr = ExceptionUtils.unwrapInvocationTargetException(ex);
+            ExceptionUtils.handleThrowable(thr);
             throw new JasperException(ex);
         }
     }
@@ -718,6 +743,8 @@ public class JspRuntimeLibrary {
             Method method = getWriteMethod(bean.getClass(), prop);
             method.invoke(bean, new Object[] { Boolean.valueOf(value) });
         } catch (Exception ex) {
+            Throwable thr = ExceptionUtils.unwrapInvocationTargetException(ex);
+            ExceptionUtils.handleThrowable(thr);
             throw new JasperException(ex);
         }
     }
