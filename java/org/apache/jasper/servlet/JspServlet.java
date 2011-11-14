@@ -104,6 +104,7 @@ public class JspServlet extends HttpServlet implements PeriodicEventListener {
                 Object[] args = { config, context };
                 options = (Options) ctor.newInstance(args);
             } catch (Throwable e) {
+                e = ExceptionUtils.unwrapInvocationTargetException(e);
                 ExceptionUtils.handleThrowable(e);
                 // Need to localize this.
                 log.warn("Failed to load engineOptionsClass", e);
