@@ -137,6 +137,8 @@ public abstract class LifecycleBase implements Lifecycle {
 
         if (state.equals(LifecycleState.NEW)) {
             init();
+        } else if (state.equals(LifecycleState.FAILED)){
+            stop();
         } else if (!state.equals(LifecycleState.INITIALIZED) &&
                 !state.equals(LifecycleState.STOPPED)) {
             invalidTransition(Lifecycle.BEFORE_START_EVENT);
@@ -264,6 +266,16 @@ public abstract class LifecycleBase implements Lifecycle {
 
     @Override
     public final synchronized void destroy() throws LifecycleException {
+        if (LifecycleState.FAILED.equals(state)) {
+            try {
+                // Triggers clean-up
+                stop();
+            } catch (LifecycleException e) {
+                // Just log. Still want to destroy.
+                log.warn(sm.getString("lifecycleBase.destroyStopFail"), e);
+            }
+        }
+
         if (LifecycleState.DESTROYING.equals(state) ||
                 LifecycleState.DESTROYED.equals(state)) {
 
