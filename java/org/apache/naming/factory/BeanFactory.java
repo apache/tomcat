@@ -236,6 +236,13 @@ public class BeanFactory
                 ne.setRootCause(ie2);
                 throw ne;
             } catch (java.lang.reflect.InvocationTargetException ite) {
+                Throwable cause = ite.getCause();
+                if (cause instanceof ThreadDeath) {
+                    throw (ThreadDeath) cause;
+                }
+                if (cause instanceof VirtualMachineError) {
+                    throw (VirtualMachineError) cause;
+                }
                 NamingException ne = new NamingException(ite.getMessage());
                 ne.setRootCause(ite);
                 throw ne;
