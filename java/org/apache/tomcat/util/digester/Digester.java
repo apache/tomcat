@@ -2669,8 +2669,14 @@ public class Digester extends DefaultHandler {
     public SAXException createSAXException(String message, Exception e) {
         if ((e != null) &&
             (e instanceof InvocationTargetException)) {
-            Throwable t = ((InvocationTargetException) e).getTargetException();
-            if ((t != null) && (t instanceof Exception)) {
+            Throwable t = e.getCause();
+            if (t instanceof ThreadDeath) {
+                throw (ThreadDeath) t;
+            }
+            if (t instanceof VirtualMachineError) {
+                throw (VirtualMachineError) t;
+            }
+            if (t instanceof Exception) {
                 e = (Exception) t;
             }
         }
@@ -2699,8 +2705,14 @@ public class Digester extends DefaultHandler {
      */
     public SAXException createSAXException(Exception e) {
         if (e instanceof InvocationTargetException) {
-            Throwable t = ((InvocationTargetException) e).getTargetException();
-            if ((t != null) && (t instanceof Exception)) {
+            Throwable t = e.getCause();
+            if (t instanceof ThreadDeath) {
+                throw (ThreadDeath) t;
+            }
+            if (t instanceof VirtualMachineError) {
+                throw (VirtualMachineError) t;
+            }
+            if (t instanceof Exception) {
                 e = (Exception) t;
             }
         }

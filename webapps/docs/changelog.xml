@@ -208,6 +208,11 @@
         Deprecate unused methods in <code>IntrospectionUtils</code> class.
         (kkolinko)
       </scode>
+      <fix>
+        Improve processing of errors that are wrapped in
+        <code>InvocationTargetException</code>. Rethrow fatal errors that must
+        be rethrown. (kkolinko)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
