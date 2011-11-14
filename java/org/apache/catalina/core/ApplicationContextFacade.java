@@ -191,6 +191,7 @@ public class ApplicationContextFacade implements ServletContext {
                 return (URL) invokeMethod(context, "getResource",
                                           new Object[]{path});
             } catch(Throwable t) {
+                ExceptionUtils.handleThrowable(t);
                 if (t instanceof MalformedURLException){
                     throw (MalformedURLException)t;
                 }
@@ -765,6 +766,7 @@ public class ApplicationContextFacade implements ServletContext {
         try{
             return invokeMethod(context, methodName, params);
         }catch(Throwable t){
+            ExceptionUtils.handleThrowable(t);
             throw new RuntimeException(t.getMessage(), t);
         }
     }
@@ -870,8 +872,10 @@ public class ApplicationContextFacade implements ServletContext {
         }
 
         if (ex instanceof InvocationTargetException) {
-            realException =
-                ((InvocationTargetException) ex).getTargetException();
+            realException = ex.getCause();
+            if (realException == null) {
+                realException = ex;
+            }
         } else {
             realException = ex;
         }
