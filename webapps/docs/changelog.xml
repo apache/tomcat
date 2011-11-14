@@ -332,6 +332,10 @@
         easily becomes dated; correct information on how a JRE is identified and
         selected. (markt)
       </fix>
+      <update>
+        <bug>52172</bug>: Clarify Tomcat build instructions. Patch provided
+        by bimargulies. (kkolinko)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Other">
