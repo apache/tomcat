@@ -225,6 +225,10 @@
         correctly applied rather than a reload which ignores changes in
         context.xml files. (markt/kkolinko) 
       </fix>
+      <fix>
+        <bug>52173</bug>: Improve Javadoc for delgate attribute of
+        WebappClassLoader. Based on a patch by bmargulies. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
