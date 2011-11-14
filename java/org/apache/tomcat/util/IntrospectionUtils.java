@@ -264,6 +264,7 @@ public final class IntrospectionUtils {
                 log.debug("IntrospectionUtils: IllegalAccessException for " +
                         o.getClass() + " " + name + "=" + value + ")", iae);
         } catch (InvocationTargetException ie) {
+            ExceptionUtils.handleThrowable(ie.getCause());
             if (log.isDebugEnabled())
                 log.debug("IntrospectionUtils: InvocationTargetException for " +
                         o.getClass() + " " + name + "=" + value + ")", ie);
@@ -312,6 +313,7 @@ public final class IntrospectionUtils {
                 log.debug("IntrospectionUtils: IllegalAccessException for " +
                         o.getClass() + " " + name + ")", iae);
         } catch (InvocationTargetException ie) {
+            ExceptionUtils.handleThrowable(ie.getCause());
             if (log.isDebugEnabled())
                 log.debug("IntrospectionUtils: InvocationTargetException for " +
                         o.getClass() + " " + name + ")");
@@ -454,7 +456,12 @@ public final class IntrospectionUtils {
         if (m == null)
             throw new NoSuchMethodException(target.getClass().getName() + " "
                     + methodN);
-        return m.invoke(target, new Object[] { param1 });
+        try {
+            return m.invoke(target, new Object[] { param1 });
+        } catch (InvocationTargetException ie) {
+            ExceptionUtils.handleThrowable(ie.getCause());
+            throw ie;
+        }
     }
 
     /**
@@ -478,7 +485,12 @@ public final class IntrospectionUtils {
         if (m == null)
             throw new NoSuchMethodException(target.getClass().getName() + " "
                     + methodN);
-        return m.invoke(target, emptyArray);
+        try {
+            return m.invoke(target, emptyArray);
+        } catch (InvocationTargetException ie) {
+            ExceptionUtils.handleThrowable(ie.getCause());
+            throw ie;
+        }
     }
 
     /**
@@ -497,21 +509,27 @@ public final class IntrospectionUtils {
                         " in " + target + " CLASS " + target.getClass());
             return null;
         }
-        Object o = m.invoke(target, params);
+        try {
+            Object o = m.invoke(target, params);
 
-        if (log.isDebugEnabled()) {
-            // debug
-            StringBuilder sb = new StringBuilder();
-            sb.append("" + target.getClass().getName() + "." + methodN + "( ");
-            for (int i = 0; i < params.length; i++) {
-                if (i > 0)
-                    sb.append(", ");
-                sb.append(params[i]);
+            if (log.isDebugEnabled()) {
+                // debug
+                StringBuilder sb = new StringBuilder();
+                sb.append(target.getClass().getName()).append('.')
+                        .append(methodN).append("( ");
+                for (int i = 0; i < params.length; i++) {
+                    if (i > 0)
+                        sb.append(", ");
+                    sb.append(params[i]);
+                }
+                sb.append(")");
+                log.debug("IntrospectionUtils:" + sb.toString());
             }
-            sb.append(")");
-            log.debug("IntrospectionUtils:" + sb.toString());
+            return o;
+        } catch (InvocationTargetException ie) {
+            ExceptionUtils.handleThrowable(ie.getCause());
+            throw ie;
         }
-        return o;
     }
 
     public static Object convert(String object, Class<?> paramType) {
