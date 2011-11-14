@@ -603,6 +603,7 @@ public class WebappLoader extends LifecycleMBeanBase
                 .registerComponent(classLoader, cloname, null);
 
         } catch (Throwable t) {
+            t = ExceptionUtils.unwrapInvocationTargetException(t);
             ExceptionUtils.handleThrowable(t);
             log.error( "LifecycleException ", t );
             throw new LifecycleException("start: ", t);
