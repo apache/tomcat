@@ -114,9 +114,9 @@ public class DataSourceLinkFactory extends ResourceLinkFactory {
             try {
                 return method.invoke(ds,args);
             }catch (Throwable t) {
-                if (t instanceof InvocationTargetException) {
-                    InvocationTargetException it = (InvocationTargetException)t;
-                    throw it.getCause()!=null?it.getCause():it;
+                if (t instanceof InvocationTargetException
+                        && t.getCause() != null) {
+                    throw t.getCause();
                 } else {
                     throw t;
                 }

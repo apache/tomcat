@@ -114,8 +114,15 @@ public final class AstFunction extends SimpleNode {
             throw new ELException(MessageFactory.get("error.function", this
                     .getOutputName()), iae);
         } catch (InvocationTargetException ite) {
+            Throwable cause = ite.getCause();
+            if (cause instanceof ThreadDeath) {
+                throw (ThreadDeath) cause;
+            }
+            if (cause instanceof VirtualMachineError) {
+                throw (VirtualMachineError) cause;
+            }
             throw new ELException(MessageFactory.get("error.function", this
-                    .getOutputName()), ite.getCause());
+                    .getOutputName()), cause);
         }
         return result;
     }
