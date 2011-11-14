@@ -385,6 +385,10 @@
         (kkolinko)
       </fix>
       <fix>
+        In jdbc-pool: Unwrap InvocationTargetException if it is caught in
+        <code>ResultSetProxy</code>, like we do it elsewhere. (kkolinko)
+      </fix>
+      <fix>
         When building jdbc-pool from within Tomcat, use Tomcat's
         <code>output</code> directory location. This allows to move all build
         output away from the source tree. (kkolinko)
