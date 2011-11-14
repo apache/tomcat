@@ -229,6 +229,7 @@ public final class Tool {
             paramValues[0] = params;
             method.invoke(null, paramValues);
         } catch (Throwable t) {
+            t = ExceptionUtils.unwrapInvocationTargetException(t);
             ExceptionUtils.handleThrowable(t);
             log.error("Exception calling main() method", t);
             System.exit(1);
