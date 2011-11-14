@@ -594,16 +594,18 @@ public class HostConfig
         }
 
         Context context = null;
+        boolean isExternalWar = false;
+        boolean isExternal = false;
+        File expandedDocBase = null;
         try {
             synchronized (digester) {
                 try {
                     context = (Context) digester.parse(contextXml);
-                    if (context == null) {
-                        log.error(sm.getString(
-                                "hostConfig.deployDescriptor.error",
-                                contextXml.getAbsolutePath()));
-                        return;
-                    }
+                } catch (Exception e) {
+                    log.error(sm.getString(
+                            "hostConfig.deployDescriptor.error",
+                            contextXml.getAbsolutePath()));
+                    context = new FailedContext();
                 } finally {
                     digester.reset();
                 }
@@ -619,8 +621,6 @@ public class HostConfig
             context.setPath(cn.getPath());
             context.setWebappVersion(cn.getVersion());
             // Add the associated docBase to the redeployed list if it's a WAR
-            boolean isExternalWar = false;
-            boolean isExternal = false;
             if (context.getDocBase() != null) {
                 File docBase = new File(context.getDocBase());
                 if (!docBase.isAbsolute()) {
@@ -645,12 +645,18 @@ public class HostConfig
                     context.setDocBase(null);
                 }
             }
+
             host.addChild(context);
+        } catch (Throwable t) {
+            ExceptionUtils.handleThrowable(t);
+            log.error(sm.getString("hostConfig.deployDescriptor.error",
+                                   contextXml.getAbsolutePath()), t);
+        } finally {
             // Get paths for WAR and expanded WAR in appBase
 
             // default to appBase dir + name
-            File expandedDocBase = new File(appBase(), cn.getBaseName());
-            if (context.getDocBase() != null) {
+            expandedDocBase = new File(appBase(), cn.getBaseName());
+            if (context != null && context.getDocBase() != null) {
                 // first assume docBase is absolute
                 expandedDocBase = new File(context.getDocBase());
                 if (!expandedDocBase.isAbsolute()) {
@@ -658,6 +664,7 @@ public class HostConfig
                     expandedDocBase = new File(appBase(), context.getDocBase());
                 }
             }
+
             // Add the eventual unpacked WAR and all the resources which will be
             // watched inside it
             if (isExternalWar && unpackWARs) {
@@ -690,10 +697,9 @@ public class HostConfig
                             Long.valueOf(contextXml.lastModified()));
                 }
             }
-        } catch (Throwable t) {
-            ExceptionUtils.handleThrowable(t);
-            log.error(sm.getString("hostConfig.deployDescriptor.error",
-                                   contextXml.getAbsolutePath()), t);
+            // Add the global redeploy resources (which are never deleted) at
+            // the end so they don't interfere with the deletion process
+            addGlobalRedeployResources(deployedApp);
         }
 
         if (context != null && host.findChild(context.getName()) != null) {
@@ -872,18 +878,17 @@ public class HostConfig
             log.info(sm.getString("hostConfig.deployWar",
                     war.getAbsolutePath()));
 
+        Context context = null;
         try {
-            Context context = null;
             if (deployXML && xml.exists()) {
                 synchronized (digester) {
                     try {
                         context = (Context) digester.parse(xml);
-                        if (context == null) {
-                            log.error(sm.getString(
-                                    "hostConfig.deployDescriptor.error",
-                                    war.getAbsolutePath()));
-                            return;
-                        }
+                    } catch (Exception e) {
+                        log.error(sm.getString(
+                                "hostConfig.deployDescriptor.error",
+                                war.getAbsolutePath()));
+                        context = new FailedContext();
                     } finally {
                         digester.reset();
                     }
@@ -897,17 +902,17 @@ public class HostConfig
                             jar.getJarEntry(Constants.ApplicationContextXml);
                         istream = jar.getInputStream(entry);
                         context = (Context) digester.parse(istream);
-
+                    } catch (Exception e) {
+                        log.error(sm.getString(
+                                "hostConfig.deployDescriptor.error",
+                                war.getAbsolutePath()));
+                    } finally {
                         if (context == null) {
-                            log.error(sm.getString(
-                                    "hostConfig.deployDescriptor.error",
-                                    war.getAbsolutePath()));
-                            return;
+                            context = new FailedContext();
                         }
                         context.setConfigFile(new URL("jar:" +
                                 war.toURI().toString() + "!/" +
                                 Constants.ApplicationContextXml));
-                    } finally {
                         if (istream != null) {
                             try {
                                 istream.close();
@@ -951,9 +956,14 @@ public class HostConfig
             context.setWebappVersion(cn.getVersion());
             context.setDocBase(cn.getBaseName() + ".war");
             host.addChild(context);
+        } catch (Throwable t) {
+            ExceptionUtils.handleThrowable(t);
+            log.error(sm.getString("hostConfig.deployWar.error",
+                    war.getAbsolutePath()), t);
+        } finally {
             // If we're unpacking WARs, the docBase will be mutated after
             // starting the context
-            if (unpackWARs && (context.getDocBase() != null)) {
+            if (unpackWARs && context != null && context.getDocBase() != null) {
                 File docBase = new File(appBase(), cn.getBaseName());
                 deployedApp.redeployResources.put(docBase.getAbsolutePath(),
                         Long.valueOf(docBase.lastModified()));
@@ -966,10 +976,9 @@ public class HostConfig
             } else {
                 addWatchedResources(deployedApp, null, context);
             }
-        } catch (Throwable t) {
-            ExceptionUtils.handleThrowable(t);
-            log.error(sm.getString("hostConfig.deployWar.error",
-                    war.getAbsolutePath()), t);
+            // Add the global redeploy resources (which are never deleted) at
+            // the end so they don't interfere with the deletion process
+            addGlobalRedeployResources(deployedApp);
         }
         
         deployed.put(cn.getName(), deployedApp);
@@ -1027,20 +1036,20 @@ public class HostConfig
         if( log.isInfoEnabled() ) 
             log.info(sm.getString("hostConfig.deployDir",
                     dir.getAbsolutePath()));
+
+        Context context = null;
+        File xml = new File(dir, Constants.ApplicationContextXml);
+        File xmlCopy = null;
         try {
-            Context context = null;
-            File xml = new File(dir, Constants.ApplicationContextXml);
-            File xmlCopy = null;
             if (deployXML && xml.exists()) {
                 synchronized (digester) {
                     try {
                         context = (Context) digester.parse(xml);
-                        if (context == null) {
-                            log.error(sm.getString(
-                                    "hostConfig.deployDescriptor.error",
-                                    xml));
-                            return;
-                        }
+                    } catch (Exception e) {
+                        log.error(sm.getString(
+                                "hostConfig.deployDescriptor.error",
+                                xml));
+                        context = new FailedContext();
                     } finally {
                         digester.reset();
                     }
@@ -1084,6 +1093,11 @@ public class HostConfig
             context.setWebappVersion(cn.getVersion());
             context.setDocBase(cn.getBaseName());
             host.addChild(context);
+        } catch (Throwable t) {
+            ExceptionUtils.handleThrowable(t);
+            log.error(sm.getString("hostConfig.deployDir.error",
+                    dir.getAbsolutePath()), t);
+        } finally {
             deployedApp.redeployResources.put(dir.getAbsolutePath(),
                     Long.valueOf(dir.lastModified()));
             if (deployXML && xml.exists()) {
@@ -1098,10 +1112,9 @@ public class HostConfig
                 }
             }
             addWatchedResources(deployedApp, dir.getAbsolutePath(), context);
-        } catch (Throwable t) {
-            ExceptionUtils.handleThrowable(t);
-            log.error(sm.getString("hostConfig.deployDir.error", 
-                    dir.getAbsolutePath()), t);
+            // Add the global redeploy resources (which are never deleted) at
+            // the end so they don't interfere with the deletion process
+            addGlobalRedeployResources(deployedApp);
         }
 
         deployed.put(cn.getName(), deployedApp);
@@ -1159,6 +1172,25 @@ public class HostConfig
     }
     
 
+    protected void addGlobalRedeployResources(DeployedApplication app) {
+        // Redeploy resources processing is hard-coded to never delete this file
+        File hostContextXml =
+                new File(getConfigBaseName(), Constants.HostContextXml);
+        if (hostContextXml.isFile()) {
+            app.redeployResources.put(hostContextXml.getAbsolutePath(),
+                    Long.valueOf(hostContextXml.lastModified()));
+        }
+
+        // Redeploy resources in CATALINA_BASE/conf are never deleted
+        File globalContextXml =
+                returnCanonicalPath(Constants.DefaultContextXml);
+        if (globalContextXml.isFile()) {
+            app.redeployResources.put(globalContextXml.getAbsolutePath(),
+                    Long.valueOf(globalContextXml.lastModified()));
+        }
+    }
+
+
     /**
      * Check resources for redeployment and reloading.
      */
@@ -1191,6 +1223,13 @@ public class HostConfig
                         try {
                             File current = new File(resources[j]);
                             current = current.getCanonicalFile();
+                            // Never delete per host context.xml defaults
+                            if (Constants.HostContextXml.equals(
+                                    current.getName())) {
+                                continue;
+                            }
+                            // Only delete resources in the appBase or the
+                            // host's configBase
                             if ((current.getAbsolutePath().startsWith(
                                     appBase().getAbsolutePath() +
                                     File.separator))
@@ -1241,6 +1280,13 @@ public class HostConfig
                     try {
                         File current = new File(resources[j]);
                         current = current.getCanonicalFile();
+                        // Never delete per host context.xml defaults
+                        if (Constants.HostContextXml.equals(
+                                current.getName())) {
+                            continue;
+                        }
+                        // Only delete resources in the appBase or the host's
+                        // configBase
                         if ((current.getAbsolutePath().startsWith(
                                 appBase().getAbsolutePath() + File.separator))
                             || (current.getAbsolutePath().startsWith(
@@ -1262,6 +1308,13 @@ public class HostConfig
                     try {
                         File current = new File(resources2[j]);
                         current = current.getCanonicalFile();
+                        // Never delete per host context.xml defaults
+                        if (Constants.HostContextXml.equals(
+                                current.getName())) {
+                            continue;
+                        }
+                        // Only delete resources in the appBase or the host's
+                        // configBase
                         if ((current.getAbsolutePath().startsWith(
                                 appBase().getAbsolutePath() + File.separator))
                             || ((current.getAbsolutePath().startsWith(

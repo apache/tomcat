@@ -213,6 +213,18 @@
         <code>InvocationTargetException</code>. Rethrow fatal errors that must
         be rethrown. (kkolinko)
       </fix>
+      <fix>
+        Improve handling of failed web application deployments during automatic
+        deployment. Once deployment of a web application fails in one form (e.g.
+        WAR), no further attempt (e.g. directory) will be made to deploy that
+        web application. The base Lifecycle implementation has been improved to
+        allow failed web applications to be started once the configuration
+        issues have been resolved. Any changes to a context.xml file (global,
+        per host or web application specific) will now result in a redeploy
+        of the affected web application(s) that ensures that any changes are
+        correctly applied rather than a reload which ignores changes in
+        context.xml files. (markt/kkolinko) 
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
