@@ -460,12 +460,12 @@ public final class Bootstrap {
                 log.warn("Bootstrap: command \"" + command + "\" does not exist.");
             }
         } catch (Throwable t) {
-            handleThrowable(t);
             // Unwrap the Exception for clearer error reporting
             if (t instanceof InvocationTargetException &&
                     t.getCause() != null) {
                 t = t.getCause();
             }
+            handleThrowable(t);
             t.printStackTrace();
             System.exit(1);
         }

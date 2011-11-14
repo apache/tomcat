@@ -35,6 +35,7 @@ import org.apache.catalina.LifecycleEvent;
 import org.apache.catalina.LifecycleListener;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
@@ -314,6 +315,7 @@ public class JreMemoryLeakPreventionListener implements LifecycleListener {
                         log.error(sm.getString("jreLeakListener.gcDaemonFail"),
                                 e);
                     } catch (InvocationTargetException e) {
+                        ExceptionUtils.handleThrowable(e.getCause());
                         log.error(sm.getString("jreLeakListener.gcDaemonFail"),
                                 e);
                     }
@@ -345,6 +347,7 @@ public class JreMemoryLeakPreventionListener implements LifecycleListener {
                         log.warn(sm.getString("jreLeakListener.authPolicyFail"),
                                 e);
                     } catch (InvocationTargetException e) {
+                        ExceptionUtils.handleThrowable(e.getCause());
                         log.warn(sm.getString("jreLeakListener.authPolicyFail"),
                                 e);
                     }

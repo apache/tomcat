@@ -28,6 +28,7 @@ import javax.security.auth.Subject;
 import javax.servlet.http.HttpSession;
 
 import org.apache.catalina.Session;
+import org.apache.tomcat.util.ExceptionUtils;
 
 /**
  * Utility methods on HttpSessions...
@@ -130,6 +131,9 @@ public class SessionUtils {
                                 }
                             }
                         } catch (Exception e) {
+                            Throwable t = ExceptionUtils
+                                    .unwrapInvocationTargetException(e);
+                            ExceptionUtils.handleThrowable(t);
                             // stay silent
                         }
                     }
