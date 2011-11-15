@@ -541,7 +541,7 @@ public class WebappClassLoader
      * If this flag is true, this class loader delegates
      * to the parent class loader
      * <strong>before</strong> searching its own repositories, as
-     * in an ordinary (non-servlet) chain of of Java class loaders.
+     * in an ordinary (non-servlet) chain of Java class loaders.
      * If set to <code>false</code> (the default),
      * this class loader will search its own repositories first, and
      * delegate to the parent only if the class or resource is not
