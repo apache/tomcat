@@ -23,9 +23,14 @@ $Id$
 
 This subproject contains the source code for Tomcat @VERSION_MAJOR_MINOR@, a container that
 implements the Servlet 3.0 and JSP 2.1 specifications from the Java
-Community Process <http://www.jcp.org/>.  In order to build a binary
-distribution version of the container from a source distribution,
-do the following:
+Community Process <http://www.jcp.org/>.
+
+Note: If you just need to run Apache Tomcat, it is not necessary to build
+it. You may simply download a binary distribution. It is cross-platform.
+Read RUNNING.txt for the instruction on how to run it.
+
+In order to build a binary distribution version of Apache Tomcat from a
+source distribution, do the following:
 
 
 (0) Download and Install a Java Development Kit
@@ -87,9 +92,6 @@ do the following:
     cd ${tomcat.source}
     ant
 
-* NOTE: Users accessing the Internet through a proxy must use a properties
-  file to indicate to Ant the proxy configuration. Read below.
-
 * WARNING: Running this command will download binaries to the /usr/share/java
   directory.  On a typical Linux or MacOX system an ordinary user
   will not have access to write to this directory, and, even if you do,
@@ -98,6 +100,9 @@ do the following:
   On Windows this usually corresponds to the "C:\usr\share\java"
   directory, unless Cygwin is used. Read the next section to learn how
   to customize the directory used to download the binaries.
+
+* NOTE: Users accessing the Internet through a proxy must use a properties
+  file to indicate to Ant the proxy configuration. Read below.
 
 * The build can be controlled by creating a ${tomcat.source}/build.properties
   file, and adding the following content to it:
