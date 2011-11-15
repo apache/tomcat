@@ -93,8 +93,10 @@ available, which will be used to actually perform the build.
   </p>
 
   <p>
-  Checkout the source using SVN, or download and unpack a source package.
-  For the remainder of this guide, the symbolic name <code>${tomcat.source}</code> is used to refer to the
+  Checkout the source using SVN, selecting a tag for released version or
+  trunk for the current development code, or download and unpack a
+  source package. For the remainder of this guide, the symbolic name
+  <code>${tomcat.source}</code> is used to refer to the
   location where the source has been placed.
   </p>
 
@@ -112,8 +114,8 @@ Use the following commands to build Tomcat:
 </p>
 
 <p>
-<b>WARNING:</b> Running this command will download binary binaries to the
-  <code>/usr/share/java</code> directory by default.
+<b>WARNING:</b> Running this command will download libraries required
+  to build Tomcat to the <code>/usr/share/java</code> directory by default.
   On a typical Linux or MacOX system, an ordinary user
   will not have access to write to this directory, and, even if you do,
   it may not be appropriate for you to write there. On Windows
