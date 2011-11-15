@@ -350,7 +350,7 @@
       </fix>
       <update>
         <bug>52172</bug>: Clarify Tomcat build instructions. Patch provided
-        by bimargulies. (kkolinko)
+        by bmargulies. (kkolinko)
       </update>
     </changelog>
   </subsection>
