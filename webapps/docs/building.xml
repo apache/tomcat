@@ -112,11 +112,6 @@ Use the following commands to build Tomcat:
 </p>
 
 <p>
-<b>NOTE:</b> Users accessing the Internet through a proxy must use a properties
-  file to indicate to Ant the proxy configuration. Read below for details.
-</p>
-
-<p>
 <b>WARNING:</b> Running this command will download binary binaries to the
   <code>/usr/share/java</code> directory by default.
   On a typical Linux or MacOX system, an ordinary user
@@ -125,6 +120,11 @@ Use the following commands to build Tomcat:
   this usually corresponds to the <code>C:\usr\share\java</code> directory,
   unless Cygwin is used. Read below to learn how to customize the directory
   used to download the binaries.
+</p>
+
+<p>
+<b>NOTE:</b> Users accessing the Internet through a proxy must use a properties
+  file to indicate to Ant the proxy configuration. Read below for details.
 </p>
 
 <p>
