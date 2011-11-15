@@ -98,8 +98,8 @@ source distribution, do the following:
   it may not be appropriate for you to write there.
 
   On Windows this usually corresponds to the "C:\usr\share\java"
-  directory, unless Cygwin is used. Read the next section to learn how
-  to customize the directory used to download the binaries.
+  directory, unless Cygwin is used. Read below to learn how to customize
+  the directory used to download the binaries.
 
 * NOTE: Users accessing the Internet through a proxy must use a properties
   file to indicate to Ant the proxy configuration. Read below.
