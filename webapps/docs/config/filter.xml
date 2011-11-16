@@ -577,6 +577,12 @@ FINE: Request "/docs/config/manager.html" with response status "200"
         governed solely by the <code>accept</code> attribute.</p>
       </attribute>
 
+      <attribute name="denyStatus" required="false">
+        <p>HTTP response status code that is used when rejecting denied
+        request. The default value is <code>403</code>. For example,
+        it can be set to the value <code>404</code>.</p>
+      </attribute>
+
     </attributes>
 
   </subsection>
@@ -649,6 +655,12 @@ FINE: Request "/docs/config/manager.html" with response status "200"
         is specified, the remote hostname MUST NOT match for this request to be
         accepted.  If this attribute is not specified, request acceptance is
         governed solely by the <code>accept</code> attribute.</p>
+      </attribute>
+
+      <attribute name="denyStatus" required="false">
+        <p>HTTP response status code that is used when rejecting denied
+        request. The default value is <code>403</code>. For example,
+        it can be set to the value <code>404</code>.</p>
       </attribute>
 
     </attributes>
