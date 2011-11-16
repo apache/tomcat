@@ -337,7 +337,7 @@
                type="java.lang.String"/>
 
     <attribute name="denyStatus"
-               description="HTTP response status that is used when rejecting denied request"
+               description="HTTP response status code that is used when rejecting denied request"
                type="int"/>
 
     <attribute name="denyValid"
