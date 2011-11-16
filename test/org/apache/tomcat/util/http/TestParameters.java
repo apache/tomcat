@@ -16,6 +16,8 @@
  */
 package org.apache.tomcat.util.http;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.Enumeration;
 
 import static org.junit.Assert.assertArrayEquals;
@@ -24,16 +26,15 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-import org.junit.Test;
 
-import org.apache.tomcat.util.buf.UEncoder;
+import org.junit.Test;
 
 public class TestParameters {
 
     private static final Parameter SIMPLE =
         new Parameter("foo1", "bar1");
     private static final Parameter SIMPLE_MULTIPLE =
-        new Parameter("foo2", "bar1", "bar2");
+        new Parameter("foo2", "bar1", "bar2", "hello world", "?%@");
     private static final Parameter NO_VALUE =
         new Parameter("foo3");
     private static final Parameter EMPTY_VALUE =
@@ -78,7 +79,10 @@ public class TestParameters {
     @Test
     public void testInternal() {
         assertEquals("foo1=bar1", SIMPLE.toString());
-        assertEquals("foo2=bar1&foo2=bar2", SIMPLE_MULTIPLE.toString());
+        // Note: testing requires that ' ' is encoded as '+',
+        // because that is what browsers will send us.
+        assertEquals("foo2=bar1&foo2=bar2&foo2=hello+world&foo2=%3F%25%40",
+                SIMPLE_MULTIPLE.toString());
         assertEquals("foo3", NO_VALUE.toString());
         assertEquals("foo4=", EMPTY_VALUE.toString());
     }
@@ -274,7 +278,6 @@ public class TestParameters {
     private static class Parameter {
         private final String name;
         private final String[] values;
-        private final UEncoder uencoder = new UEncoder();
 
         public Parameter(String name, String... values) {
             this.name = name;
@@ -291,27 +294,30 @@ public class TestParameters {
 
         @Override
         public String toString() {
-            StringBuilder result = new StringBuilder();
-            boolean first = true;
-            if (values.length == 0) {
-                return uencoder.encodeURL(name);
+            try {
+                StringBuilder result = new StringBuilder();
+                boolean first = true;
+                if (values.length == 0) {
+                    return URLEncoder.encode(name, "UTF-8");
+                }
+                for (String value : values) {
+                    if (first) {
+                        first = false;
+                    } else {
+                        result.append('&');
+                    }
+                    if (name != null) {
+                        result.append(URLEncoder.encode(name, "UTF-8"));
+                    }
+                    if (value != null) {
+                        result.append('=');
+                        result.append(URLEncoder.encode(value, "UTF-8"));
+                    }
+                }
+                return result.toString();
+            } catch (UnsupportedEncodingException ex) {
+                return ex.toString();
             }
-            for (String value : values) {
-                if (first) {
-                    first = false;
-                } else {
-                    result.append('&');
-                }
-                if (name != null) {
-                    result.append(uencoder.encodeURL(name));
-                }
-                if (value != null) {
-                    result.append('=');
-                    result.append(uencoder.encodeURL(value));
-                }
-            }
-
-            return result.toString();
         }
     }
 }
