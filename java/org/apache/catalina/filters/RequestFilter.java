@@ -75,6 +75,12 @@ public abstract class RequestFilter
     protected Pattern deny = null;
     
     /**
+     * The HTTP response status code that is used when rejecting denied
+     * request. It is 403 by default, but may be changed to be 404.
+     */
+    protected int denyStatus = HttpServletResponse.SC_FORBIDDEN;
+
+    /**
      * mime type -- "text/plain"
      */
     private static final String PLAIN_TEXT_MIME_TYPE = "text/plain";
@@ -137,6 +143,22 @@ public abstract class RequestFilter
     }
 
 
+    /**
+     * Return response status code that is used to reject denied request.
+     */
+    public int getDenyStatus() {
+        return denyStatus;
+    }
+
+
+    /**
+     * Set response status code that is used to reject denied request.
+     */
+    public void setDenyStatus(int denyStatus) {
+        this.denyStatus = denyStatus;
+    }
+
+
     // --------------------------------------------------------- Public Methods
 
 
@@ -187,8 +209,7 @@ public abstract class RequestFilter
             chain.doFilter(request, response);
         } else {
             if (response instanceof HttpServletResponse) {
-                ((HttpServletResponse) response)
-                        .sendError(HttpServletResponse.SC_FORBIDDEN);
+                ((HttpServletResponse) response).sendError(denyStatus);
             } else {
                 sendErrorWhenNotHttp(response);
             }
@@ -213,7 +234,7 @@ public abstract class RequestFilter
         if (isAllowed(property)) {
             chain.doFilterEvent(event);
         } else {
-            response.sendError(HttpServletResponse.SC_FORBIDDEN);
+            response.sendError(denyStatus);
             event.close();
         }
     }

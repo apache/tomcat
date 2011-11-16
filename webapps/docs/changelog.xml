@@ -229,6 +229,14 @@
         <bug>52173</bug>: Improve Javadoc for <code>delegate</code> attribute
         of WebappClassLoader. Based on a patch by bmargulies. (markt)
       </fix>
+      <add>
+        Add <code>denyStatus</code> attribute to <code>RequestFilterValve</code>
+        (<code>RemoteAddrValve</code>, <code>RemoteHostValve</code> valves) and
+        <code>RequestFilter</code> (<code>RemoteAddrFilter</code>,
+        <code>RemoteHostFilter</code> filters). It allows to use different
+        HTTP response code when rejecting denied request. E.g. 404 instead
+        of 403. (kkolinko)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
