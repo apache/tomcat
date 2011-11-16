@@ -336,6 +336,10 @@
                description="The deny expression"
                type="java.lang.String"/>
 
+    <attribute name="denyStatus"
+               description="HTTP response status that is used when rejecting denied request"
+               type="int"/>
+
     <attribute name="denyValid"
                description="Becomes false if assigned value of deny expression is not syntactically correct"
                is="true"
@@ -386,6 +390,10 @@
     <attribute   name="deny"
                description="The deny expression"
                type="java.lang.String"/>
+
+    <attribute name="denyStatus"
+               description="HTTP response status code that is used when rejecting denied request"
+               type="int"/>
 
     <attribute name="denyValid"
                description="Becomes false if assigned value of deny expression is not syntactically correct"
