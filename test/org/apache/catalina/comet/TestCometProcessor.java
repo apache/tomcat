@@ -212,14 +212,14 @@ public class TestCometProcessor extends TomcatBaseTest {
             assertEquals(26, response.length);
         } else {
             // Failure expected only expected for the fail on begin
-            // Failure at any later stage and the reponse headers (including the
-            // 200 response code will already have been sent to the client
+            // Failure at any later stage and the response headers (including
+            // the 200 response code will already have been sent to the client
             if (SimpleCometServlet.FAIL_ON_BEGIN.equals(initParam)) {
                 assertEquals("HTTP/1.1 500 Internal Server Error", response[0]);
                 alv.validateAccessLog(1, 500, 0, 1000);
             } else {
                 assertEquals("HTTP/1.1 200 OK", response[0]);
-                alv.validateAccessLog(1, 200, 0, 5000);
+                alv.validateAccessLog(1, 200, 0, 9000);
             }
 
         }
@@ -394,7 +394,7 @@ public class TestCometProcessor extends TomcatBaseTest {
                     os.write("4\r\n".getBytes());
                     os.write("PING\r\n".getBytes());
                     os.flush();
-                    Thread.sleep(2000);
+                    Thread.sleep(1000);
                 }
                 os.write("0\r\n".getBytes());
                 os.write("\r\n".getBytes());
