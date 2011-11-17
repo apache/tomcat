@@ -410,7 +410,7 @@ public final class Parameters {
         if( urlDec==null ) {
             urlDec=new UDecoder();
         }
-        urlDec.convert(bc);
+        urlDec.convert(bc, true);
     }
 
     public void processParameters( MessageBytes data, String encoding ) {

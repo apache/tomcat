@@ -32,6 +32,30 @@ public final class UDecoder {
     protected static final boolean ALLOW_ENCODED_SLASH =
         Boolean.valueOf(System.getProperty("org.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH", "false")).booleanValue();
 
+    private static class DecodeException extends CharConversionException {
+        private static final long serialVersionUID = 1L;
+        public DecodeException(String s) {
+            super(s);
+        }
+
+        @Override
+        public synchronized Throwable fillInStackTrace() {
+            // This class does not provide a stack trace
+            return this;
+        }
+    }
+
+    /** Unexpected end of data. */
+    private static final IOException EXCEPTION_EOF = new DecodeException("EOF");
+
+    /** %xx with not-hex digit */
+    private static final IOException EXCEPTION_NOT_HEX_DIGIT = new DecodeException(
+            "isHexDigit");
+
+    /** %-encoded slash is forbidden in resource path */
+    private static final IOException EXCEPTION_SLASH = new DecodeException(
+            "noSlash");
+
     public UDecoder()
     {
     }
@@ -54,20 +78,17 @@ public final class UDecoder {
         byte buff[]=mb.getBytes();
         int end=mb.getEnd();
 
-        int idx= ByteChunk.indexOf( buff, start, end, '%' );
+        int idx= ByteChunk.findByte( buff, start, end, (byte) '%' );
         int idx2=-1;
         if( query ) {
-            idx2= ByteChunk.indexOf( buff, start, end, '+' );
+            idx2= ByteChunk.findByte( buff, start, (idx >= 0 ? idx : end), (byte) '+' );
         }
         if( idx<0 && idx2<0 ) {
             return;
         }
 
         // idx will be the smallest positive indexes ( first % or + )
-        if( idx2 >= 0 && idx2 < idx ) {
-            idx=idx2;
-        }
-        if( idx < 0 ) {
+        if( (idx2 >= 0 && idx2 < idx) || idx < 0 ) {
             idx=idx2;
         }
 
@@ -81,18 +102,18 @@ public final class UDecoder {
             } else {
                 // read next 2 digits
                 if( j+2 >= end ) {
-                    throw new CharConversionException("EOF");
+                    throw EXCEPTION_EOF;
                 }
                 byte b1= buff[j+1];
                 byte b2=buff[j+2];
                 if( !isHexDigit( b1 ) || ! isHexDigit(b2 )) {
-                    throw new CharConversionException( "isHexDigit");
+                    throw EXCEPTION_NOT_HEX_DIGIT;
                 }
 
                 j+=2;
                 int res=x2c( b1, b2 );
                 if (noSlash && (res == '/')) {
-                    throw new CharConversionException( "noSlash");
+                    throw EXCEPTION_SLASH;
                 }
                 buff[idx]=(byte)res;
             }
@@ -128,16 +149,13 @@ public final class UDecoder {
         int idx= CharChunk.indexOf( buff, start, cend, '%' );
         int idx2=-1;
         if( query ) {
-            idx2= CharChunk.indexOf( buff, start, cend, '+' );
+            idx2= CharChunk.indexOf( buff, start, (idx >= 0 ? idx : cend), '+' );
         }
         if( idx<0 && idx2<0 ) {
             return;
         }
 
-        if( idx2 >= 0 && idx2 < idx ) {
-            idx=idx2;
-        }
-        if( idx < 0 ) {
+        if( (idx2 >= 0 && idx2 < idx) || idx < 0 ) {
             idx=idx2;
         }
 
@@ -150,12 +168,12 @@ public final class UDecoder {
                 // read next 2 digits
                 if( j+2 >= cend ) {
                     // invalid
-                    throw new CharConversionException("EOF");
+                    throw EXCEPTION_EOF;
                 }
                 char b1= buff[j+1];
                 char b2=buff[j+2];
                 if( !isHexDigit( b1 ) || ! isHexDigit(b2 )) {
-                    throw new CharConversionException("isHexDigit");
+                    throw EXCEPTION_NOT_HEX_DIGIT;
                 }
 
                 j+=2;
