@@ -273,6 +273,13 @@
       <code>1</code>.</p>
     </attribute>
 
+    <attribute name="acceptorThreadPriority" required="false">
+      <p>The priority of the acceptor threads. The threads used to accept
+      new connections. The default value is
+      <code>java.lang.Thread#NORM_PRIORITY</code>. See the JavaDoc for the
+      java.lang.Thread class for more details on what this priority means.</p>
+    </attribute>
+
     <attribute name="address" required="false">
       <p>For servers with more than one IP address, this attribute
       specifies which address will be used for listening on the specified
@@ -319,17 +326,6 @@
       be ignored. Note that if a shared executor is not specified for a
       connector then the connector will use a private, internal executor to
       provide the thread pool.</p>
-    </attribute>
-
-    <attribute name="fastShutdown" required="false">
-      <p>This flag can be used to speed up Tomcat shutdown in testing
-      environments where Tomcat is started and stopped many times in a row,
-      but where all connections to Tomcat are known and controlled. It can be
-      used if it is known that there are no active connections and all requests
-      have already been processed.
-      If it is set to <code>true</code>, it turns off small delay when
-      pausing Connector Endpoint. The default value is
-      <code>false</code>.</p>
     </attribute>
 
     <attribute name="keepAliveTimeout" required="false">

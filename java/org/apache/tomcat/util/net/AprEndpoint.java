@@ -40,6 +40,7 @@ import org.apache.tomcat.jni.SSLSocket;
 import org.apache.tomcat.jni.Socket;
 import org.apache.tomcat.jni.Status;
 import org.apache.tomcat.util.ExceptionUtils;
+import org.apache.tomcat.util.net.AbstractEndpoint.Acceptor.AcceptorState;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
 
 
@@ -89,9 +90,6 @@ public class AprEndpoint extends AbstractEndpoint {
      * SSL context.
      */
     protected long sslContext = 0;
-
-
-    private Acceptor acceptors[] = null;
 
 
     protected ConcurrentLinkedQueue<SocketWrapper<Long>> waitingRequests =
@@ -162,14 +160,6 @@ public class AprEndpoint extends AbstractEndpoint {
     public boolean getUseCometTimeout() { return false; } // Not supported
     @Override
     public boolean getUsePolling() { return true; } // Always supported
-
-
-    /**
-     * Acceptor thread count.
-     */
-    protected int acceptorThreadCount = 0;
-    public void setAcceptorThreadCount(int acceptorThreadCount) { this.acceptorThreadCount = acceptorThreadCount; }
-    public int getAcceptorThreadCount() { return acceptorThreadCount; }
 
 
     /**
@@ -619,15 +609,7 @@ public class AprEndpoint extends AbstractEndpoint {
                 }
             }
 
-            // Start acceptor threads
-            acceptors = new Acceptor[acceptorThreadCount];
-            for (int i = 0; i < acceptorThreadCount; i++) {
-                acceptors[i] = new Acceptor();
-                acceptors[i].setName(getName() + "-Acceptor-" + i);
-                acceptors[i].setPriority(threadPriority);
-                acceptors[i].setDaemon(getDaemon());
-                acceptors[i].start();
-            }
+            startAcceptorThreads();
 
             // Start async timeout thread
             Thread timeoutThread = new Thread(new AsyncTimeout(),
@@ -651,25 +633,28 @@ public class AprEndpoint extends AbstractEndpoint {
         if (running) {
             running = false;
             unlockAccept();
-            for (int i = 0; i < acceptors.length; i++) {
-                long s = System.currentTimeMillis() + 10000;
-                while (acceptors[i].isAlive() && serverSock != 0) {
+            for (AbstractEndpoint.Acceptor acceptor : acceptors) {
+                long waitLeft = 10000;
+                while (waitLeft > 0 &&
+                        acceptor.getState() != AcceptorState.ENDED &&
+                        serverSock != 0) {
                     try {
-                        acceptors[i].interrupt();
-                        acceptors[i].join(1000);
+                        Thread.sleep(50);
                     } catch (InterruptedException e) {
-                        // Ignore
+                        // Ignore and clean the interrupt flag
+                        Thread.interrupted();
                     }
-                    if (System.currentTimeMillis() >= s) {
-                        log.warn(sm.getString("endpoint.warn.unlockAcceptorFailed",
-                                 acceptors[i].getName()));
-                        // If the Acceptor is still running force
-                        // the hard socket close.
-                        if (serverSock != 0) {
-                            Socket.shutdown(serverSock, Socket.APR_SHUTDOWN_READ);
-                            serverSock = 0;
-                        }
-                    }
+                    waitLeft -= 50;
+                }
+                if (waitLeft == 0) {
+                    log.warn(sm.getString("endpoint.warn.unlockAcceptorFailed",
+                            acceptor.getThreadName()));
+                   // If the Acceptor is still running force
+                   // the hard socket close.
+                   if (serverSock != 0) {
+                       Socket.shutdown(serverSock, Socket.APR_SHUTDOWN_READ);
+                       serverSock = 0;
+                   }
                 }
             }
             for (int i = 0; i < pollers.length; i++) {
@@ -737,6 +722,11 @@ public class AprEndpoint extends AbstractEndpoint {
 
 
     // ------------------------------------------------------ Protected Methods
+
+    @Override
+    protected AbstractEndpoint.Acceptor createAcceptor() {
+        return new Acceptor();
+    }
 
 
     /**
@@ -957,9 +947,10 @@ public class AprEndpoint extends AbstractEndpoint {
     /**
      * Server socket acceptor thread.
      */
-    protected class Acceptor extends Thread {
+    protected class Acceptor extends AbstractEndpoint.Acceptor {
 
         private final Log log = LogFactory.getLog(AprEndpoint.Acceptor.class);
+
 
         /**
          * The background thread that listens for incoming TCP/IP connections and
@@ -975,6 +966,7 @@ public class AprEndpoint extends AbstractEndpoint {
 
                 // Loop if endpoint is paused
                 while (paused && running) {
+                    state = AcceptorState.PAUSED;
                     try {
                         Thread.sleep(1000);
                     } catch (InterruptedException e) {
@@ -985,6 +977,8 @@ public class AprEndpoint extends AbstractEndpoint {
                 if (!running) {
                     break;
                 }
+                state = AcceptorState.RUNNING;
+
                 try {
                     //if we have reached max connections, wait
                     countUpOrAwaitConnection();
@@ -1036,13 +1030,10 @@ public class AprEndpoint extends AbstractEndpoint {
                         }
                     }
                 }
-
                 // The processor will recycle itself when it finishes
-
             }
-
+            state = AcceptorState.ENDED;
         }
-
     }
 
 

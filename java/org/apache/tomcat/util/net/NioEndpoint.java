@@ -301,13 +301,6 @@ public class NioEndpoint extends AbstractEndpoint {
 
 
     /**
-     * Priority of the acceptor threads.
-     */
-    protected int acceptorThreadPriority = Thread.NORM_PRIORITY;
-    public void setAcceptorThreadPriority(int acceptorThreadPriority) { this.acceptorThreadPriority = acceptorThreadPriority; }
-    public int getAcceptorThreadPriority() { return acceptorThreadPriority; }
-
-    /**
      * Priority of the poller threads.
      */
     protected int pollerThreadPriority = Thread.NORM_PRIORITY;
@@ -334,14 +327,6 @@ public class NioEndpoint extends AbstractEndpoint {
     public boolean getUseCometTimeout() { return getUseComet(); }
     @Override
     public boolean getUsePolling() { return true; } // Always supported
-
-
-    /**
-     * Acceptor thread count.
-     */
-    protected int acceptorThreadCount = 1;
-    public void setAcceptorThreadCount(int acceptorThreadCount) { this.acceptorThreadCount = acceptorThreadCount; }
-    public int getAcceptorThreadCount() { return acceptorThreadCount; }
 
 
     /**
@@ -536,13 +521,7 @@ public class NioEndpoint extends AbstractEndpoint {
                 pollerThread.start();
             }
 
-            // Start acceptor threads
-            for (int i = 0; i < acceptorThreadCount; i++) {
-                Thread acceptorThread = new Thread(new Acceptor(), getName() + "-Acceptor-" + i);
-                acceptorThread.setPriority(threadPriority);
-                acceptorThread.setDaemon(getDaemon());
-                acceptorThread.start();
-            }
+            startAcceptorThreads();
         }
     }
 
@@ -628,6 +607,12 @@ public class NioEndpoint extends AbstractEndpoint {
 
     public byte[] getOomParachuteData() {
         return oomParachuteData;
+    }
+
+
+    @Override
+    protected AbstractEndpoint.Acceptor createAcceptor() {
+        return new Acceptor();
     }
 
 
@@ -742,7 +727,7 @@ public class NioEndpoint extends AbstractEndpoint {
     /**
      * Server socket acceptor thread.
      */
-    protected class Acceptor implements Runnable {
+    protected class Acceptor extends AbstractEndpoint.Acceptor {
         /**
          * The background thread that listens for incoming TCP/IP connections and
          * hands them off to an appropriate processor.
@@ -757,6 +742,7 @@ public class NioEndpoint extends AbstractEndpoint {
 
                 // Loop if endpoint is paused
                 while (paused && running) {
+                    state = AcceptorState.PAUSED;
                     try {
                         Thread.sleep(1000);
                     } catch (InterruptedException e) {
@@ -767,6 +753,8 @@ public class NioEndpoint extends AbstractEndpoint {
                 if (!running) {
                     break;
                 }
+                state = AcceptorState.RUNNING;
+
                 try {
                     //if we have reached max connections, wait
                     countUpOrAwaitConnection();
@@ -829,6 +817,7 @@ public class NioEndpoint extends AbstractEndpoint {
                     log.error(sm.getString("endpoint.accept.fail"), t);
                 }
             }//while
+            state = AcceptorState.ENDED;
         }//run
     }
 
