@@ -58,8 +58,6 @@ public class XMLEncodingDetector {
     private int fBufferSize = DEFAULT_BUFFER_SIZE;
 
     // org.apache.xerces.impl.XMLEntityManager.ScannedEntity fields
-    private int lineNumber = 1;
-    private int columnNumber = 1;
     private boolean literal;
     private char[] ch = new char[DEFAULT_BUFFER_SIZE];
     private int position;
@@ -75,7 +73,6 @@ public class XMLEncodingDetector {
     private static final String fStandaloneSymbol = "standalone";
 
     // org.apache.xerces.impl.XMLDocumentFragmentScannerImpl fields
-    private int fMarkupDepth = 0;
     private String[] fStrings = new String[3];
 
     private ErrorDispatcher err;
@@ -429,8 +426,6 @@ public class XMLEncodingDetector {
         boolean external = false;
         if (c == '\n' ||
             (c == '\r' && (external = fCurrentEntity.isExternal()))) {
-            fCurrentEntity.lineNumber++;
-            fCurrentEntity.columnNumber = 1;
             if (fCurrentEntity.position == fCurrentEntity.count) {
                 fCurrentEntity.ch[0] = (char)c;
                 load(1, false);
@@ -444,7 +439,6 @@ public class XMLEncodingDetector {
         }
 
         // return character that was scanned
-        fCurrentEntity.columnNumber++;
         return c;
 
     }
@@ -481,7 +475,6 @@ public class XMLEncodingDetector {
                 fCurrentEntity.ch[0] = fCurrentEntity.ch[offset];
                 offset = 0;
                 if (load(1, false)) {
-                    fCurrentEntity.columnNumber++;
                     String symbol = fSymbolTable.addSymbol(fCurrentEntity.ch,
                                                            0, 1);
                     return symbol;
@@ -509,7 +502,6 @@ public class XMLEncodingDetector {
             }
         }
         int length = fCurrentEntity.position - offset;
-        fCurrentEntity.columnNumber += length;
 
         // return name
         String symbol = null;
@@ -572,8 +564,6 @@ public class XMLEncodingDetector {
                 c = fCurrentEntity.ch[fCurrentEntity.position++];
                 if (c == '\r' && external) {
                     newlines++;
-                    fCurrentEntity.lineNumber++;
-                    fCurrentEntity.columnNumber = 1;
                     if (fCurrentEntity.position == fCurrentEntity.count) {
                         offset = 0;
                         fCurrentEntity.position = newlines;
@@ -593,8 +583,6 @@ public class XMLEncodingDetector {
                 }
                 else if (c == '\n') {
                     newlines++;
-                    fCurrentEntity.lineNumber++;
-                    fCurrentEntity.columnNumber = 1;
                     if (fCurrentEntity.position == fCurrentEntity.count) {
                         offset = 0;
                         fCurrentEntity.position = newlines;
@@ -636,7 +624,6 @@ public class XMLEncodingDetector {
             }
         }
         int length = fCurrentEntity.position - offset;
-        fCurrentEntity.columnNumber += length - newlines;
         content.setValues(fCurrentEntity.ch, offset, length);
 
         // return next character
@@ -712,7 +699,6 @@ public class XMLEncodingDetector {
                 int length = fCurrentEntity.count - fCurrentEntity.position;
                 buffer.append (fCurrentEntity.ch, fCurrentEntity.position,
                                length);
-                fCurrentEntity.columnNumber += fCurrentEntity.count;
                 fCurrentEntity.position = fCurrentEntity.count;
                 load(0,true);
                 return false;
@@ -727,8 +713,6 @@ public class XMLEncodingDetector {
                     c = fCurrentEntity.ch[fCurrentEntity.position++];
                     if (c == '\r' && external) {
                         newlines++;
-                        fCurrentEntity.lineNumber++;
-                        fCurrentEntity.columnNumber = 1;
                         if (fCurrentEntity.position == fCurrentEntity.count) {
                             offset = 0;
                             fCurrentEntity.position = newlines;
@@ -747,8 +731,6 @@ public class XMLEncodingDetector {
                     }
                     else if (c == '\n') {
                         newlines++;
-                        fCurrentEntity.lineNumber++;
-                        fCurrentEntity.columnNumber = 1;
                         if (fCurrentEntity.position == fCurrentEntity.count) {
                             offset = 0;
                             fCurrentEntity.position = newlines;
@@ -802,13 +784,11 @@ public class XMLEncodingDetector {
             else if (XMLChar.isInvalid(c)) {
                 fCurrentEntity.position--;
                 int length = fCurrentEntity.position - offset;
-                fCurrentEntity.columnNumber += length - newlines;
                 buffer.append(fCurrentEntity.ch, offset, length);
                 return true;
             }
         }
             int length = fCurrentEntity.position - offset;
-            fCurrentEntity.columnNumber += length - newlines;
             if (done) {
                 length -= delimLen;
             }
@@ -846,13 +826,6 @@ public class XMLEncodingDetector {
         int cc = fCurrentEntity.ch[fCurrentEntity.position];
         if (cc == c) {
             fCurrentEntity.position++;
-            if (c == '\n') {
-                fCurrentEntity.lineNumber++;
-                fCurrentEntity.columnNumber = 1;
-            }
-            else {
-                fCurrentEntity.columnNumber++;
-            }
             return true;
         } else if (c == '\n' && cc == '\r' && fCurrentEntity.isExternal()) {
             // handle newlines
@@ -864,8 +837,6 @@ public class XMLEncodingDetector {
             if (fCurrentEntity.ch[fCurrentEntity.position] == '\n') {
                 fCurrentEntity.position++;
             }
-            fCurrentEntity.lineNumber++;
-            fCurrentEntity.columnNumber = 1;
             return true;
         }
 
@@ -904,8 +875,6 @@ public class XMLEncodingDetector {
                 boolean entityChanged = false;
                 // handle newlines
                 if (c == '\n' || (external && c == '\r')) {
-                    fCurrentEntity.lineNumber++;
-                    fCurrentEntity.columnNumber = 1;
                     if (fCurrentEntity.position == fCurrentEntity.count - 1) {
                         fCurrentEntity.ch[0] = (char)c;
                         entityChanged = load(1, true);
@@ -929,9 +898,6 @@ public class XMLEncodingDetector {
                          }
                          }
                          /***/
-                }
-                else {
-                    fCurrentEntity.columnNumber++;
                 }
                 // load more characters, if needed
                 if (!entityChanged)
@@ -986,7 +952,6 @@ public class XMLEncodingDetector {
                 }
             }
         }
-        fCurrentEntity.columnNumber += length;
         return true;
 
     }
@@ -1222,7 +1187,6 @@ public class XMLEncodingDetector {
     private void scanXMLDecl() throws IOException, JasperException {
 
         if (skipString("<?xml")) {
-            fMarkupDepth++;
             // NOTE: special case where document starts with a PI
             //       whose name starts with "xml" (e.g. "xmlfoo")
             if (XMLChar.isName(peekChar())) {
@@ -1269,7 +1233,6 @@ public class XMLEncodingDetector {
 
         // scan decl
         scanXMLDeclOrTextDecl(scanningTextDecl, fStrings);
-        fMarkupDepth--;
 
         // pseudo-attribute values
         String encodingPseudoAttr = fStrings[1];
