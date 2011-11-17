@@ -185,7 +185,7 @@ public class JIoEndpoint extends AbstractEndpoint {
                 while (paused && running) {
                     state = AcceptorState.PAUSED;
                     try {
-                        Thread.sleep(1000);
+                        Thread.sleep(50);
                     } catch (InterruptedException e) {
                         // Ignore
                     }
