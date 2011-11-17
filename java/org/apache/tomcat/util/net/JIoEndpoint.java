@@ -76,13 +76,6 @@ public class JIoEndpoint extends AbstractEndpoint {
     // ------------------------------------------------------------- Properties
 
     /**
-     * Acceptor thread count.
-     */
-    protected int acceptorThreadCount = 0;
-    public void setAcceptorThreadCount(int acceptorThreadCount) { this.acceptorThreadCount = acceptorThreadCount; }
-    public int getAcceptorThreadCount() { return acceptorThreadCount; }
-
-    /**
      * Handling of accepted sockets.
      */
     protected Handler handler = null;
@@ -174,8 +167,7 @@ public class JIoEndpoint extends AbstractEndpoint {
     /**
      * Server socket acceptor thread.
      */
-    protected class Acceptor implements Runnable {
-
+    protected class Acceptor extends AbstractEndpoint.Acceptor {
 
         /**
          * The background thread that listens for incoming TCP/IP connections and
@@ -191,6 +183,7 @@ public class JIoEndpoint extends AbstractEndpoint {
 
                 // Loop if endpoint is paused
                 while (paused && running) {
+                    state = AcceptorState.PAUSED;
                     try {
                         Thread.sleep(1000);
                     } catch (InterruptedException e) {
@@ -201,6 +194,8 @@ public class JIoEndpoint extends AbstractEndpoint {
                 if (!running) {
                     break;
                 }
+                state = AcceptorState.RUNNING;
+
                 try {
                     //if we have reached max connections, wait
                     countUpOrAwaitConnection();
@@ -252,6 +247,7 @@ public class JIoEndpoint extends AbstractEndpoint {
                 }
                 // The processor will recycle itself when it finishes
             }
+            state = AcceptorState.ENDED;
         }
     }
 
@@ -405,14 +401,7 @@ public class JIoEndpoint extends AbstractEndpoint {
 
             initializeConnectionLatch();
 
-            // Start acceptor threads
-            for (int i = 0; i < acceptorThreadCount; i++) {
-                Thread acceptorThread = new Thread(new Acceptor(),
-                        getName() + "-Acceptor-" + i);
-                acceptorThread.setPriority(threadPriority);
-                acceptorThread.setDaemon(getDaemon());
-                acceptorThread.start();
-            }
+            startAcceptorThreads();
 
             // Start async timeout thread
             Thread timeoutThread = new Thread(new AsyncTimeout(),
@@ -454,6 +443,12 @@ public class JIoEndpoint extends AbstractEndpoint {
             serverSocket = null;
         }
         handler.recycle();
+    }
+
+
+    @Override
+    protected AbstractEndpoint.Acceptor createAcceptor() {
+        return new Acceptor();
     }
 
 
