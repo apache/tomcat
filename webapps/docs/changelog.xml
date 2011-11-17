@@ -237,6 +237,10 @@
         HTTP response code when rejecting denied request. E.g. 404 instead
         of 403. (kkolinko)
       </add>
+      <fix>
+        Slightly improve performance of UDecoder.convert(). Align
+        <code>%2f</code> handling between implementations. (kkolinko)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
