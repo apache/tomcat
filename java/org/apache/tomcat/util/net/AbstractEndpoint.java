@@ -30,6 +30,7 @@ import javax.net.ssl.KeyManagerFactory;
 
 import org.apache.juli.logging.Log;
 import org.apache.tomcat.util.IntrospectionUtils;
+import org.apache.tomcat.util.net.AbstractEndpoint.Acceptor.AcceptorState;
 import org.apache.tomcat.util.res.StringManager;
 import org.apache.tomcat.util.threads.LimitLatch;
 import org.apache.tomcat.util.threads.ResizableExecutor;
@@ -74,6 +75,25 @@ public abstract class AbstractEndpoint {
         UNBOUND, BOUND_ON_INIT, BOUND_ON_START
     }
 
+    public abstract static class Acceptor implements Runnable {
+        public enum AcceptorState {
+            NEW, RUNNING, PAUSED, ENDED
+        }
+
+        protected volatile AcceptorState state = AcceptorState.NEW;
+        public final AcceptorState getState() {
+            return state;
+        }
+
+        private String threadName;
+        protected final void setThreadName(final String threadName) {
+            this.threadName = threadName;
+        }
+        protected final String getThreadName() {
+            return threadName;
+        }
+    }
+
     private static final int INITIAL_ERROR_DELAY = 50;
     private static final int MAX_ERROR_DELAY = 1600;
 
@@ -109,25 +129,33 @@ public abstract class AbstractEndpoint {
         return socketProperties;
     }
 
+    /**
+     * Threads used to accept new connections and pass them to worker threads.
+     */
+    protected Acceptor[] acceptors;
+
 
     // ----------------------------------------------------------------- Properties
 
     /**
-     * A flag that can be used to speed up Tomcat shutdown by testing
-     * environments where we control external connections to Tomcat. Set it to
-     * {@code true} if it is known that there are no active or pending
-     * connections and all requests have already been processed. The default
-     * value is {@code false}.
+     * Acceptor thread count.
      */
-    private boolean fastShutdown = false;
-
-    public void setFastShutdown(boolean fastShutdown) {
-        this.fastShutdown = fastShutdown;
+    protected int acceptorThreadCount = 0;
+    public void setAcceptorThreadCount(int acceptorThreadCount) {
+        this.acceptorThreadCount = acceptorThreadCount;
     }
+    public int getAcceptorThreadCount() { return acceptorThreadCount; }
 
-    public boolean isFastShutdown() {
-        return fastShutdown;
+
+    /**
+     * Priority of the acceptor threads.
+     */
+    protected int acceptorThreadPriority = Thread.NORM_PRIORITY;
+    public void setAcceptorThreadPriority(int acceptorThreadPriority) {
+        this.acceptorThreadPriority = acceptorThreadPriority;
     }
+    public int getAcceptorThreadPriority() { return acceptorThreadPriority; }
+
 
     private int maxConnections = 10000;
     public void setMaxConnections(int maxCon) {
@@ -480,6 +508,16 @@ public abstract class AbstractEndpoint {
             if (getLog().isDebugEnabled()) {
                 getLog().debug("Socket unlock completed for:"+saddr);
             }
+
+            // Wait for upto 1000ms acceptor threads to unlock
+            long waitLeft = 1000;
+            for (Acceptor acceptor : acceptors) {
+                while (waitLeft > 0 &&
+                        acceptor.getState() == AcceptorState.RUNNING) {
+                    Thread.sleep(50);
+                    waitLeft -= 50;
+                }
+            }
         } catch(Exception e) {
             if (getLog().isDebugEnabled()) {
                 getLog().debug(sm.getString("endpoint.debug.unlock", "" + getPort()), e);
@@ -525,24 +563,33 @@ public abstract class AbstractEndpoint {
         startInternal();
     }
 
+    protected final void startAcceptorThreads() {
+        int count = getAcceptorThreadCount();
+        acceptors = new Acceptor[count];
+
+        for (int i = 0; i < count; i++) {
+            acceptors[i] = createAcceptor();
+            Thread t = new Thread(acceptors[i], getName() + "-Acceptor-" + i);
+            t.setPriority(getAcceptorThreadPriority());
+            t.setDaemon(getDaemon());
+            t.start();
+        }
+    }
+
+
+    /**
+     * Hook to allow Endpoints to provide a specific Acceptor implementation.
+     */
+    protected abstract Acceptor createAcceptor();
+
+
     /**
      * Pause the endpoint, which will stop it accepting new connections.
      */
     public void pause() {
         if (running && !paused) {
             paused = true;
-            if (isFastShutdown()) {
-                // unlockAccept will also be called by stopInternal(),
-                // so when shutting down it can be skipped here.
-                return;
-            }
             unlockAccept();
-            // Heuristic: Sleep for a while to ensure pause of the endpoint
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                // Ignore
-            }
         }
     }
 
