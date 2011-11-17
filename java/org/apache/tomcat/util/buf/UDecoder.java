@@ -87,7 +87,7 @@ public final class UDecoder {
             return;
         }
 
-        // idx will be the smallest positive indexes ( first % or + )
+        // idx will be the smallest positive index ( first % or + )
         if( (idx2 >= 0 && idx2 < idx) || idx < 0 ) {
             idx=idx2;
         }
@@ -155,6 +155,7 @@ public final class UDecoder {
             return;
         }
 
+        // idx will be the smallest positive index ( first % or + )
         if( (idx2 >= 0 && idx2 < idx) || idx < 0 ) {
             idx=idx2;
         }
