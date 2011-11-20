@@ -53,6 +53,36 @@
   They eventually become mixed with the numbered issues. (I.e., numbered
   issues to not "pop up" wrt. others).
 -->
+<section name="Tomcat 7.0.24 (markt)">
+  <subsection name="Catalina">
+    <changelog>
+    </changelog>
+  </subsection>
+  <subsection name="Coyote">
+    <changelog>
+    </changelog>
+  </subsection>
+  <subsection name="Jasper">
+    <changelog>
+    </changelog>
+  </subsection>
+  <subsection name="Cluster">
+    <changelog>
+    </changelog>
+  </subsection>
+  <subsection name="Web applications">
+    <changelog>
+    </changelog>
+  </subsection>
+  <subsection name="Other">
+    <changelog>
+      <fix>
+        Fix line ends in .gitignore files contained in source
+        distributions. (rjung)
+      </fix>
+    </changelog>
+  </subsection>
+</section>
 <section name="Tomcat 7.0.23 (markt)">
   <subsection name="Catalina">
     <changelog>
