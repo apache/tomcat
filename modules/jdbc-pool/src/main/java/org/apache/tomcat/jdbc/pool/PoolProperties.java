@@ -83,12 +83,13 @@ public class PoolProperties implements PoolConfiguration {
     protected Object dataSource = null;
     protected String dataSourceJNDI = null;
     protected boolean alternateUsernameAllowed = false;
-
-
+    protected boolean commitOnReturn = false;
+    protected boolean rollbackOnReturn = false;
+    
+    
     /**
      * {@inheritDoc}
      */
-
     @Override
     public void setAbandonWhenPercentageFull(int percentage) {
         if (percentage<0) abandonWhenPercentageFull = 0;
@@ -99,7 +100,6 @@ public class PoolProperties implements PoolConfiguration {
     /**
      * {@inheritDoc}
      */
-
     @Override
     public int getAbandonWhenPercentageFull() {
         return abandonWhenPercentageFull;
@@ -108,7 +108,6 @@ public class PoolProperties implements PoolConfiguration {
     /**
      * {@inheritDoc}
      */
-
     @Override
     public boolean isFairQueue() {
         return fairQueue;
@@ -117,7 +116,6 @@ public class PoolProperties implements PoolConfiguration {
     /**
      * {@inheritDoc}
      */
-
     @Override
     public void setFairQueue(boolean fairQueue) {
         this.fairQueue = fairQueue;
@@ -126,7 +124,6 @@ public class PoolProperties implements PoolConfiguration {
     /**
      * {@inheritDoc}
      */
-
     @Override
     public boolean isAccessToUnderlyingConnectionAllowed() {
         return accessToUnderlyingConnectionAllowed;
@@ -1164,4 +1161,32 @@ public class PoolProperties implements PoolConfiguration {
         this.alternateUsernameAllowed = alternateUsernameAllowed;
     }
 
+
+    /** 
+     * {@inheritDoc}
+     */
+    public void setCommitOnReturn(boolean commitOnReturn) {
+        this.commitOnReturn = commitOnReturn;        
+    }
+
+    /** 
+     * {@inheritDoc}
+     */
+    public boolean getCommitOnReturn() {
+        return this.commitOnReturn;
+    }
+
+    /** 
+     * {@inheritDoc}
+     */
+    public void setRollbackOnReturn(boolean rollbackOnReturn) {
+        this.rollbackOnReturn = rollbackOnReturn;
+    }
+
+    /** 
+     * {@inheritDoc}
+     */
+    public boolean getRollbackOnReturn() {
+        return this.rollbackOnReturn;
+    }
 }
