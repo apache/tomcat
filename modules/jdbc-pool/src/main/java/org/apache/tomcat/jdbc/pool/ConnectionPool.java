@@ -777,6 +777,28 @@ public class ConnectionPool {
             }
         }
     }
+    /**
+     * return true if the connection TX termination succeeded
+     * @param con
+     * @return
+     */
+    protected boolean terminateTransaction(PooledConnection con) {
+        try {
+            boolean autocommit = con.getConnection().getAutoCommit();
+            if (!autocommit) {
+                if (this.getPoolProperties().getRollbackOnReturn()) {
+                    con.getConnection().rollback();
+                } else if (this.getPoolProperties().getCommitOnReturn()) {
+                    con.getConnection().commit();
+                }
+            }
+            return true;
+        } catch (SQLException x) {
+            log.warn("Unable to terminate transaction, connection will be closed.",x);
+            return false;
+        }
+        
+    }
 
     /**
      * Determines if a connection should be closed upon return to the pool.
@@ -788,6 +810,7 @@ public class ConnectionPool {
         if (con.isDiscarded()) return true;
         if (isClosed()) return true;
         if (!con.validate(action)) return true;
+        if (!terminateTransaction(con)) return true;
         if (getPoolProperties().getMaxAge()>0 ) {
             return (System.currentTimeMillis()-con.getLastConnected()) > getPoolProperties().getMaxAge();
         } else {

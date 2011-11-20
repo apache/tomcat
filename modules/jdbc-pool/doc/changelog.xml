@@ -33,6 +33,7 @@
     <changelog>
       <fix><rev>1073531</rev> <bug>50805</bug> Only initialize connections once when async (fhanik)</fix>
       <fix><rev>1076380</rev> <bug>50857</bug> Correctly handle timeouts when the pool is busy when async (fhanik)</fix>
+      <add>Added QueryTimeoutInterceptor to be able to configure timeouts on running queries automatically.</add>
     </changelog>
   </subsection>
 </section>
