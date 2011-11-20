@@ -203,6 +203,7 @@
     <include name="**/LICENSE"/>
     <include name="**/NOTICE"/>
     <include name="**/RELEASE-NOTES"/>
+    <include name="**/.gitignore"/>
     <include name="**/*.classpath"/>
     <include name="**/*.css"/>
     <include name="**/*.dtd"/>
