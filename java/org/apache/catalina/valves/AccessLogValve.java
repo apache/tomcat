@@ -122,7 +122,7 @@ import org.apache.tomcat.util.buf.B2CConverter;
  * For UNIX users, another field called <code>checkExists</code> is also
  * available. If set to true, the log file's existence will be checked before
  * each logging. This way an external log rotator can move the file
- * somewhere and tomcat will start with a new file.
+ * somewhere and Tomcat will start with a new file.
  * </p>
  *
  * <p>
