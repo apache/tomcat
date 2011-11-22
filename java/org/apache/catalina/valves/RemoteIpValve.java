@@ -810,10 +810,10 @@ public class RemoteIpValve extends ValveBase {
      *
      * The attributes set are:
      * <ul>
-     * <li>org.apache.catalina.RemoteAddr</li>
-     * <li>org.apache.catalina.RemoteHost</li>
-     * <li>org.apache.catalina.Protocol</li>
-     * <li>org.apache.catalina.ServerPost</li>
+     * <li>org.apache.catalina.AccessLog.RemoteAddr</li>
+     * <li>org.apache.catalina.AccessLog.RemoteHost</li>
+     * <li>org.apache.catalina.AccessLog.Protocol</li>
+     * <li>org.apache.catalina.AccessLog.ServerPort</li>
      * </ul>
      *
      * @param requestAttributesEnabled  <code>true</code> causes the attributes
