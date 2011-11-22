@@ -22,14 +22,17 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.Test;
 
+import org.apache.catalina.startup.LoggingBaseTest;
 import org.apache.tomcat.util.buf.MessageBytes;
 
-public class TestMapper {
+public class TestMapper extends LoggingBaseTest {
 
     private Mapper mapper;
 
     @Before
+    @Override
     public void setUp() throws Exception {
+        super.setUp();
         mapper = new Mapper();
 
         mapper.addHost("sjbjdvwsbvhrb", new String[0], "blah1");
@@ -162,6 +165,21 @@ public class TestMapper {
 
     @Test
     public void testPerformance() throws Exception {
+        // Takes ~1s on markt's laptop. If this takes more than 4s something
+        // probably needs looking at. If this fails repeatedly then we may need
+        // to increase this limit.
+        final long maxTime = 4000;
+        long time = testPerformanceImpl();
+        if (time >= maxTime) {
+            // Rerun to reject occasional failures, e.g. because of gc
+            log.warn("testPerformance() test completed in " + time + " ms");
+            time = testPerformanceImpl();
+            log.warn("testPerformance() test rerun completed in " + time + " ms");
+        }
+        assertTrue(String.valueOf(time), time < maxTime);
+    }
+
+    private long testPerformanceImpl() throws Exception {
         MappingData mappingData = new MappingData();
         MessageBytes host = MessageBytes.newInstance();
         host.setString("iowejoiejfoiew");
@@ -176,10 +194,6 @@ public class TestMapper {
             mapper.map(host, uri, null, mappingData);
         }
         long time = System.currentTimeMillis() - start;
-
-        // Takes ~1s on markt's laptop. If this takes more than 4s something
-        // probably needs looking at. If this fails repeatedly then we may need
-        // to increase this limit.
-        assertTrue(String.valueOf(time), time < 4000);
+        return time;
     }
 }
