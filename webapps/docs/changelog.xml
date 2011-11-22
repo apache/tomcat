@@ -84,6 +84,10 @@
         Fix line ends in <code>.gitignore</code> files contained in source
         distributions. (rjung)
       </fix>
+      <fix>
+        Run Mapper performance test twice if the first run took too long,
+        to ignore occasional failures. (kkolinko)
+      </fix>
     </changelog>
   </subsection>
 </section>
