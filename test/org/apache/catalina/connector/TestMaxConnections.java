@@ -31,16 +31,15 @@ import org.apache.catalina.Context;
 import org.apache.catalina.startup.SimpleHttpClient;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
-import org.apache.juli.logging.Log;
-import org.apache.juli.logging.LogFactory;
 
 public class TestMaxConnections extends TomcatBaseTest {
-    private static Log log = LogFactory.getLog(TestMaxConnections.class);
-    static int soTimeout = 3000;
-    static int connectTimeout = 1000;
+    public static final int soTimeout = 3000;
+    public static final int connectTimeout = 1000;
 
     @Test
     public void testConnector() throws Exception {
+        log.info("This test tries to create 10 connections to connector "
+                + "that has maxConnections='4'. Expect half of them to fail.");
         init();
         ConnectThread[] t = new ConnectThread[10];
         int passcount = 0;
@@ -60,10 +59,11 @@ public class TestMaxConnections extends TomcatBaseTest {
         }
 
         assertTrue("The number of successful requests should have been 4-5, actual "+passcount,4==passcount || 5==passcount);
-        System.out.println("There were [" + connectfail + "] connection failures");
+        log.info("There were [" + passcount + "] passed requests and ["
+                + connectfail + "] connection failures");
     }
 
-    private static class ConnectThread extends Thread {
+    private class ConnectThread extends Thread {
         public boolean passed = true;
         public boolean connectfailed = false;
         @Override
@@ -73,7 +73,7 @@ public class TestMaxConnections extends TomcatBaseTest {
                 client.doHttp10Request();
             }catch (Exception x) {
                 passed = false;
-                log.error(Thread.currentThread().getName()+" Error:"+x.getMessage());
+                log.info(Thread.currentThread().getName()+" Error:"+x.getMessage());
                 connectfailed = "connect timed out".equals(x.getMessage()) || "Connection refused: connect".equals(x.getMessage());
             }
         }
@@ -89,15 +89,15 @@ public class TestMaxConnections extends TomcatBaseTest {
         tomcat.getConnector().setProperty("maxThreads", "10");
         tomcat.getConnector().setProperty("soTimeout", "20000");
         tomcat.getConnector().setProperty("keepAliveTimeout", "50000");
-        tomcat.getConnector().setProperty("port", "8080");
         tomcat.getConnector().setProperty("maxConnections", "4");
         tomcat.getConnector().setProperty("acceptCount", "1");
         tomcat.start();
     }
 
-    private static class TestClient extends SimpleHttpClient {
+    private class TestClient extends SimpleHttpClient {
 
         private void doHttp10Request() throws Exception {
+            setPort(getPort());
 
             long start = System.currentTimeMillis();
             // Open connection
