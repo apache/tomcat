@@ -56,6 +56,10 @@
 <section name="Tomcat 7.0.24 (markt)">
   <subsection name="Catalina">
     <changelog>
+      <fix>
+        <bug>52225</bug>: Fix ClassCastException in an Alias added to
+        existing host through JMX. (kkolinko)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
@@ -77,7 +81,7 @@
   <subsection name="Other">
     <changelog>
       <fix>
-        Fix line ends in .gitignore files contained in source
+        Fix line ends in <code>.gitignore</code> files contained in source
         distributions. (rjung)
       </fix>
     </changelog>
