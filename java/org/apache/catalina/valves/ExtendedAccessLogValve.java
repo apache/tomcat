@@ -93,8 +93,8 @@ import org.apache.tomcat.util.ExceptionUtils;
  *
  *
  * <p>
- * Log rotation can be on or off. This is dictated by the rotatable
- * property.
+ * Log rotation can be on or off. This is dictated by the
+ * <code>rotatable</code> property.
  * </p>
  *
  * <p>
@@ -105,7 +105,7 @@ import org.apache.tomcat.util.ExceptionUtils;
  * </p>
  *
  * <p>
- * For JMX junkies, a public method called </code>rotate</code> has
+ * For JMX junkies, a public method called <code>rotate</code> has
  * been made available to allow you to tell this instance to move
  * the existing log file to somewhere else and start writing a new log file.
  * </p>
