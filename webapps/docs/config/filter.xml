@@ -700,6 +700,16 @@ FINE: Request "/docs/config/manager.html" with response status "200"
     <code>requestAttributesEnabled</code> attribute of
     <code>AccessLogValve</code>.</p>
 
+    <p>The names of request attributes that are set by this filter
+    and can be used by access logging are the following:</p>
+
+    <ul>
+      <li><code>org.apache.catalina.AccessLog.RemoteAddr</code></li>
+      <li><code>org.apache.catalina.AccessLog.RemoteHost</code></li>
+      <li><code>org.apache.catalina.AccessLog.Protocol</code></li>
+      <li><code>org.apache.catalina.AccessLog.ServerPort</code></li>
+    </ul>
+
   </subsection>
 
   <subsection name="Filter Class Name">
