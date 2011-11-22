@@ -147,7 +147,7 @@ public final class Mapper {
         Host newHost = new Host();
         newHost.name = alias;
         newHost.contextList = realHost.contextList;
-        newHost.object = realHost;
+        newHost.object = realHost.object;
         if (insertMap(hosts, newHosts, newHost)) {
             hosts = newHosts;
         }
