@@ -488,6 +488,13 @@
           file="conf/catalina.properties" encoding="ISO-8859-1">
       <filterset refid="version.filters"/>
     </copy>
+    <!-- Copy jdbc-pool documentation -->
+    <copy tofile="webapps/docs/jdbc-pool.xml"
+          file="${tomcat.jdbc.dir}/doc/jdbc-pool.xml" encoding="ISO-8859-1">
+      <filterset>
+        <filter token="TOMCAT_PROJECT_DEST" value="project.xml"/>
+      </filterset>
+    </copy>
   </target>
 
   <target name="compile" depends="build-prepare,download-compile,compile-prepare,validate">
@@ -664,7 +671,7 @@
 
   </target>
 
-  <target name="build-docs" description="Builds all documentation from XML sources">
+  <target name="build-docs" depends="compile-prepare" description="Builds all documentation from XML sources">
 
     <copy todir="${tomcat.build}/webapps">
       <fileset dir="webapps">
@@ -701,12 +708,6 @@
     <mkdir dir="${tomcat.build}/webapps/docs/funcspecs" />
 
     <!-- XSL processing -->
-    <copy tofile="webapps/docs/jdbc-pool.xml" file="${tomcat.jdbc.dir}/doc/jdbc-pool.xml">
-      <!-- jdbc-pool documentation -->
-      <filterset>
-        <filter token="TOMCAT_PROJECT_DEST" value="project.xml"/>
-      </filterset>
-    </copy>
     <xslt basedir="webapps/docs"
            destdir="${tomcat.build}/webapps/docs"
          extension=".html"
