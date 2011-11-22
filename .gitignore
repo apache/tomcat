@@ -16,7 +16,19 @@
 # -----------------------------------------------------------------------------
 target
 output
-build.properties
-work
 logs
+work
+build.properties
+mvn.properties
+.classpath
+.project
+.settings
 *.iml
+*.asc
+*.tmp
+maven-ant-tasks-*.jar
+thumbs.db
+Thumbs.db
+bin/setenv.*
+modules/jdbc-pool/bin
+modules/jdbc-pool/includes

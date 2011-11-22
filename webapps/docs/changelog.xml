@@ -88,6 +88,16 @@
         Run Mapper performance test twice if the first run took too long,
         to ignore occasional failures. (kkolinko)
       </fix>
+      <fix>
+        Align <code>.gitignore</code> and <code>build.xml</code>
+        exclude patterns with <code>svn:ignore</code>. (kkolinko)
+      </fix>
+      <fix>
+        Configure <code>defaultexcludes</code> for Ant 1.8.1/1.8.2.
+        The <code>.git</code> and <code>.gitignore</code> patterns are
+        in since Ant 1.8.2, but we include <code>.gitignore</code> in
+        src distributions. (kkolinko)
+      </fix>
     </changelog>
   </subsection>
 </section>
