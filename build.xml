@@ -154,6 +154,13 @@
   <property name="test.name" value="**/Test*.java"/>
   <property name="test.formatter" value="-Dorg.apache.juli.formatter=java.util.logging.SimpleFormatter"/>
 
+  <!-- Include .gitignore in src distributions. -->
+  <!-- .git and .gitignore are in defaultexcludes since Ant 1.8.2 -->
+  <defaultexcludes add="**/.git" />
+  <defaultexcludes add="**/.git/**" />
+  <defaultexcludes remove="**/.gitignore" />
+  <!--<defaultexcludes echo="true" />-->
+
   <!-- Classpaths -->
   <path id="compile.classpath">
     <pathelement location="${jdt.jar}"/>
@@ -1631,26 +1638,36 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
     <!-- Tomcat source -->
     <copy todir="${tomcat.dist}/src">
       <fileset dir="${basedir}" defaultexcludes="true">
-        <exclude name=".settings/**"/>
-        <exclude name=".classpath"/>
-        <exclude name=".project"/>
-        <exclude name="*.launch"/>
-        <exclude name="modules/**"/>
-        <exclude name="output/**"/>
-        <exclude name="build.properties"/>
-        <exclude name=".git/**"/>
-      </fileset>
-    </copy>
-    <!--jdbc-pool sources -->
-    <copy todir="${tomcat.dist}/src">
-      <fileset dir="${basedir}" defaultexcludes="true">
-        <include name="modules/jdbc-pool/LICENSE"/>
-        <include name="modules/jdbc-pool/NOTICE"/>
-        <include name="modules/jdbc-pool/src/**"/>
-        <include name="modules/jdbc-pool/build.*"/>
-        <include name="modules/jdbc-pool/doc/**"/>
-        <include name="modules/jdbc-pool/resources/**"/>
-        <include name="modules/jdbc-pool/pom.xml"/>
+        <not>
+          <or>
+            <filename name="**/.settings/**" />
+            <filename name="**/.classpath"/>
+            <filename name="**/.project"/>
+            <filename name="**/output/**"/>
+            <filename name="**/target/**"/>
+            <filename name="**/build.properties"/>
+            <filename name="**/mvn.properties"/>
+            <filename name="**/*.iml" />
+            <filename name="**/*.asc" />
+            <filename name="**/*.tmp" />
+            <filename name="**/maven-ant-tasks-*.jar" />
+            <filename name="**/thumbs.db" />
+            <filename name="**/Thumbs.db" />
+            <filename name="*.launch"/>
+            <filename name="bin/setenv.*" />
+            <filename name="logs/**" />
+            <filename name="work/**" />
+            <filename name="modules/jdbc-pool/bin/**" />
+            <filename name="modules/jdbc-pool/includes/**" />
+            <and>
+              <!-- exclude all modules except jdbc-pool -->
+              <filename name="modules/**" />
+              <not>
+                <filename name="modules/jdbc-pool/**" />
+              </not>
+            </and>
+          </or>
+        </not>
       </fileset>
     </copy>
   </target>
