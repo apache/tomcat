@@ -1251,6 +1251,17 @@
     should be defined first to ensure that the correct client IP address is
     presented to the Remote Address/Host valves.</p>
 
+    <p><strong>Note:</strong> By default this valve has no effect on the
+    values that are written into access log. The original values are restored
+    when request processing leaves the valve and that always happens earlier
+    than access logging. To pass the remote address, remote host, server port
+    and protocol values set by this valve to the access log,
+    they are put into request attributes. Publishing these values here
+    is enabled by default, but <code>AccessLogValve</code> should be explicitly
+    configured to use them. See documentation for
+    <code>requestAttributesEnabled</code> attribute of
+    <code>AccessLogValve</code>.</p>
+
   </subsection>
 
   <subsection name="Attributes">
@@ -1291,10 +1302,8 @@
       <attribute name="requestAttributesEnabled" required="false">
         <p>Set to <code>true</code> to set the request attributes used by
         AccessLog implementations to override the values returned by the
-        request for remote address, remote host, server port and protocol. If
-        the attributes are not set, or this attribute is set to
-        <code>false</code> then the values from the request will be used. If not
-        set, the default value of <code>true</code> will be used.</p>
+        request for remote address, remote host, server port and protocol.
+        If not set, the default value of <code>true</code> will be used.</p>
       </attribute>
 
       <attribute name="trustedProxies" required="false">
