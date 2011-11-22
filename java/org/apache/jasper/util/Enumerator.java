@@ -34,6 +34,7 @@ import java.util.NoSuchElementException;
  *
  * @author Craig R. McClanahan
  * @version $Id$
+ * @deprecated Replaced by java.util.Collections#enumeration(..)
  */
 @Deprecated
 public final class Enumerator<T> implements Enumeration<T> {
