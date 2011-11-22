@@ -103,7 +103,7 @@ import org.apache.tomcat.util.buf.B2CConverter;
  * header, the Session or something else in the ServletRequest.<br>
  * It is modeled after the
  * <a href="http://httpd.apache.org/">Apache HTTP Server</a> log configuration
- * syntax:
+ * syntax:</p>
  * <ul>
  * <li><code>%{xxx}i</code> for incoming headers
  * <li><code>%{xxx}o</code> for outgoing response headers
@@ -111,11 +111,10 @@ import org.apache.tomcat.util.buf.B2CConverter;
  * <li><code>%{xxx}r</code> xxx is an attribute in the ServletRequest
  * <li><code>%{xxx}s</code> xxx is an attribute in the HttpSession
  * </ul>
- * </p>
  *
  * <p>
- * Log rotation can be on or off. This is dictated by the rotatable
- * property.
+ * Log rotation can be on or off. This is dictated by the
+ * <code>rotatable</code> property.
  * </p>
  *
  * <p>
@@ -126,7 +125,7 @@ import org.apache.tomcat.util.buf.B2CConverter;
  * </p>
  *
  * <p>
- * For JMX junkies, a public method called </code>rotate</code> has
+ * For JMX junkies, a public method called <code>rotate</code> has
  * been made available to allow you to tell this instance to move
  * the existing log file to somewhere else and start writing a new log file.
  * </p>
