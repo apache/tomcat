@@ -62,20 +62,13 @@
       </fix>
     </changelog>
   </subsection>
-  <subsection name="Coyote">
-    <changelog>
-    </changelog>
-  </subsection>
-  <subsection name="Jasper">
-    <changelog>
-    </changelog>
-  </subsection>
-  <subsection name="Cluster">
-    <changelog>
-    </changelog>
-  </subsection>
   <subsection name="Web applications">
     <changelog>
+      <update>
+        Further clarify the relation between values used by
+        <code>RemoteIpValve</code> and <code>RemoteIpFilter</code>
+        and their use by <code>AccessLogValve</code>. (kkolinko)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Other">
