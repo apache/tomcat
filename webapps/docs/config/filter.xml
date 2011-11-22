@@ -689,6 +689,17 @@ FINE: Request "/docs/config/manager.html" with response status "200"
     should be defined first to ensure that the correct client IP address is
     presented to the Remote Address/Host filters.</p>
 
+    <p><strong>Note:</strong> By default this filter has no effect on the
+    values that are written into access log. The original values are restored
+    when request processing leaves the filter and that always happens earlier
+    than access logging. To pass the remote address, remote host, server port
+    and protocol values set by this filter to the access log,
+    they are put into request attributes. Publishing these values here
+    is enabled by default, but <code>AccessLogValve</code> should be explicitly
+    configured to use them. See documentation for
+    <code>requestAttributesEnabled</code> attribute of
+    <code>AccessLogValve</code>.</p>
+
   </subsection>
 
   <subsection name="Filter Class Name">
@@ -1017,6 +1028,13 @@ FINE: Request "/docs/config/manager.html" with response status "200"
         proxies that have been processed in the incoming
         <strong>remoteIpHeader</strong>. If not specified, the default of
         <code>x-forwarded-by</code> is used.</p>
+      </attribute>
+
+      <attribute name="requestAttributesEnabled" required="false">
+        <p>Set to <code>true</code> to set the request attributes used by
+        AccessLog implementations to override the values returned by the
+        request for remote address, remote host, server port and protocol.
+        If not set, the default value of <code>true</code> will be used.</p>
       </attribute>
 
       <attribute name="trustedProxies" required="false">
