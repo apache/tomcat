@@ -784,12 +784,14 @@ public class ConnectionPool {
      */
     protected boolean terminateTransaction(PooledConnection con) {
         try {
-            boolean autocommit = con.getConnection().getAutoCommit();
-            if (!autocommit) {
-                if (this.getPoolProperties().getRollbackOnReturn()) {
-                    con.getConnection().rollback();
-                } else if (this.getPoolProperties().getCommitOnReturn()) {
-                    con.getConnection().commit();
+            if (con.getPoolProperties().getDefaultAutoCommit()==Boolean.FALSE) {
+                boolean autocommit = con.getConnection().getAutoCommit();
+                if (!autocommit) {
+                    if (this.getPoolProperties().getRollbackOnReturn()) {
+                        con.getConnection().rollback();
+                    } else if (this.getPoolProperties().getCommitOnReturn()) {
+                        con.getConnection().commit();
+                    }
                 }
             }
             return true;
