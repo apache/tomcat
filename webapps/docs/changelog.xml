@@ -60,6 +60,12 @@
         <bug>52225</bug>: Fix ClassCastException in an Alias added to
         existing host through JMX. (kkolinko)
       </fix>
+      <fix>
+        Do not throw IllegalArgumentException from parseParameters() call
+        when chunked POST request is too large, but treat it like an IO error.
+        The <code>FailedRequestFilter</code> filter can be used to detect this
+        condition. (kkolinko)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
