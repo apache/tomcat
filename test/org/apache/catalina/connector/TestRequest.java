@@ -38,7 +38,10 @@ import org.junit.Test;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.authenticator.BasicAuthenticator;
+import org.apache.catalina.deploy.FilterDef;
+import org.apache.catalina.deploy.FilterMap;
 import org.apache.catalina.deploy.LoginConfig;
+import org.apache.catalina.filters.FailedRequestFilter;
 import org.apache.catalina.startup.SimpleHttpClient;
 import org.apache.catalina.startup.TestTomcat.MapRealm;
 import org.apache.catalina.startup.Tomcat;
@@ -58,7 +61,7 @@ public class TestRequest extends TomcatBaseTest {
      */
     @Test
     public void testBug37794() {
-        Bug37794Client client = new Bug37794Client();
+        Bug37794Client client = new Bug37794Client(true);
         client.setPort(getPort());
 
         // Edge cases around zero
@@ -71,14 +74,14 @@ public class TestRequest extends TomcatBaseTest {
         assertTrue(client.isResponseBodyOK());
         client.reset();
         client.doRequest(1, false); // 1 byte - too small should fail
-        assertTrue(client.isResponse500());
+        assertTrue(client.isResponse400());
 
         client.reset();
 
         // Edge cases around actual content length
         client.reset();
         client.doRequest(6, false); // Too small should fail
-        assertTrue(client.isResponse500());
+        assertTrue(client.isResponse400());
         client.reset();
         client.doRequest(7, false); // Just enough should pass
         assertTrue(client.isResponse200());
@@ -99,6 +102,23 @@ public class TestRequest extends TomcatBaseTest {
         client.doRequest(8096, true); // Plenty of space - should pass
         assertTrue(client.isResponse200());
         assertTrue(client.isResponseBodyOK());
+    }
+
+    /**
+     * Additional test for failed requests handling when no FailedRequestFilter
+     * is defined.
+     */
+    @Test
+    public void testBug37794withoutFilter() {
+        Bug37794Client client = new Bug37794Client(false);
+        client.setPort(getPort());
+
+        // Edge cases around actual content length
+        client.reset();
+        client.doRequest(6, false); // Too small should fail
+        // Response code will be OK, but parameters list will be empty
+        assertTrue(client.isResponse200());
+        assertEquals("", client.getResponseBody());
     }
 
     private static class Bug37794Servlet extends HttpServlet {
@@ -130,7 +150,13 @@ public class TestRequest extends TomcatBaseTest {
      */
     private class Bug37794Client extends SimpleHttpClient {
 
+        private final boolean createFilter;
+
         private boolean init;
+
+        public Bug37794Client(boolean createFilter) {
+            this.createFilter = createFilter;
+        }
 
         private synchronized void init() throws Exception {
             if (init) return;
@@ -139,6 +165,19 @@ public class TestRequest extends TomcatBaseTest {
             Context root = tomcat.addContext("", TEMP_DIR);
             Tomcat.addServlet(root, "Bug37794", new Bug37794Servlet());
             root.addServletMapping("/test", "Bug37794");
+
+            if (createFilter) {
+                FilterDef failedRequestFilter = new FilterDef();
+                failedRequestFilter.setFilterName("failedRequestFilter");
+                failedRequestFilter.setFilterClass(
+                        FailedRequestFilter.class.getName());
+                FilterMap failedRequestFilterMap = new FilterMap();
+                failedRequestFilterMap.setFilterName("failedRequestFilter");
+                failedRequestFilterMap.addURLPattern("/*");
+                root.addFilterDef(failedRequestFilter);
+                root.addFilterMap(failedRequestFilterMap);
+            }
+
             tomcat.start();
 
             init = true;
