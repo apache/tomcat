@@ -2867,7 +2867,7 @@ public class Request
                 try {
                     formData = readChunkedPostBody();
                 } catch (IOException e) {
-                    // Client disconnect
+                    // Client disconnect or chunkedPostTooLarge error
                     if (context.getLogger().isDebugEnabled()) {
                         context.getLogger().debug(
                                 sm.getString("coyoteRequest.parseParameters"), e);
@@ -2922,7 +2922,7 @@ public class Request
                     (body.getLength() + len) > connector.getMaxPostSize()) {
                 // Too much data
                 checkSwallowInput();
-                throw new IllegalArgumentException(
+                throw new IOException(
                         sm.getString("coyoteRequest.chunkedPostTooLarge"));
             }
             if (len > 0) {
