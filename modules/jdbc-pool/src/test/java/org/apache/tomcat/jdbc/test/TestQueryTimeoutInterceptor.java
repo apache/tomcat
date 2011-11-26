@@ -18,17 +18,7 @@
 package org.apache.tomcat.jdbc.test;
 
 import java.sql.Connection;
-import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.Arrays;
-import java.util.List;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-
-import javax.sql.PooledConnection;
-
 
 import org.apache.tomcat.jdbc.pool.interceptor.QueryTimeoutInterceptor;
 import org.apache.tomcat.jdbc.test.driver.Driver;
@@ -36,13 +26,11 @@ import org.apache.tomcat.jdbc.test.driver.Driver;
 
 public class TestQueryTimeoutInterceptor extends DefaultTestCase {
 
-    private static final int iterations = 500000; //(new Random(System.currentTimeMillis())).nextInt(1000000)+100000;
     public TestQueryTimeoutInterceptor(String name) {
         super(name);
     }
-    
+
     public void testTimeout() throws Exception {
-        long start = System.currentTimeMillis();
         int timeout = 10;
         int withoutuser =10;
         int withuser = withoutuser;
