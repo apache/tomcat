@@ -1197,6 +1197,7 @@ public class DataSourceProxy implements PoolConfiguration {
     /** 
      * {@inheritDoc}
      */
+    @Override
     public void setCommitOnReturn(boolean commitOnReturn) {
         getPoolProperties().setCommitOnReturn(commitOnReturn);
     }
@@ -1204,6 +1205,7 @@ public class DataSourceProxy implements PoolConfiguration {
     /** 
      * {@inheritDoc}
      */
+    @Override
     public boolean getCommitOnReturn() {
         return getPoolProperties().getCommitOnReturn();
     }
@@ -1211,6 +1213,7 @@ public class DataSourceProxy implements PoolConfiguration {
     /** 
      * {@inheritDoc}
      */
+    @Override
     public void setRollbackOnReturn(boolean rollbackOnReturn) {
         getPoolProperties().setRollbackOnReturn(rollbackOnReturn);
     }
@@ -1218,6 +1221,7 @@ public class DataSourceProxy implements PoolConfiguration {
     /** 
      * {@inheritDoc}
      */
+    @Override
     public boolean getRollbackOnReturn() {
         return getPoolProperties().getRollbackOnReturn();
     }
