@@ -1165,6 +1165,7 @@ public class PoolProperties implements PoolConfiguration {
     /** 
      * {@inheritDoc}
      */
+    @Override
     public void setCommitOnReturn(boolean commitOnReturn) {
         this.commitOnReturn = commitOnReturn;        
     }
@@ -1172,6 +1173,7 @@ public class PoolProperties implements PoolConfiguration {
     /** 
      * {@inheritDoc}
      */
+    @Override
     public boolean getCommitOnReturn() {
         return this.commitOnReturn;
     }
@@ -1179,6 +1181,7 @@ public class PoolProperties implements PoolConfiguration {
     /** 
      * {@inheritDoc}
      */
+    @Override
     public void setRollbackOnReturn(boolean rollbackOnReturn) {
         this.rollbackOnReturn = rollbackOnReturn;
     }
@@ -1186,6 +1189,7 @@ public class PoolProperties implements PoolConfiguration {
     /** 
      * {@inheritDoc}
      */
+    @Override
     public boolean getRollbackOnReturn() {
         return this.rollbackOnReturn;
     }

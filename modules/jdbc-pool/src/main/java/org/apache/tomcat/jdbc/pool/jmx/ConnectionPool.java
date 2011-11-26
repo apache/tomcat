@@ -748,6 +748,7 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
     /** 
      * {@inheritDoc}
      */
+    @Override
     public void setCommitOnReturn(boolean commitOnReturn) {
         getPoolProperties().setCommitOnReturn(commitOnReturn);
     }
@@ -755,6 +756,7 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
     /** 
      * {@inheritDoc}
      */
+    @Override
     public boolean getCommitOnReturn() {
         return getPoolProperties().getCommitOnReturn();
     }
@@ -762,6 +764,7 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
     /** 
      * {@inheritDoc}
      */
+    @Override
     public void setRollbackOnReturn(boolean rollbackOnReturn) {
         getPoolProperties().setRollbackOnReturn(rollbackOnReturn);
     }
@@ -769,6 +772,7 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
     /** 
      * {@inheritDoc}
      */
+    @Override
     public boolean getRollbackOnReturn() {
         return getPoolProperties().getRollbackOnReturn();
     }
