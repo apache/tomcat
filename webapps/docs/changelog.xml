@@ -68,6 +68,15 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name = "Coyote">
+    <changelog>
+      <add>
+        <bug>52028</bug>: Add support for automatic binding to a free port by a
+        connector if the special value of zero is used for the port. This is
+        mainly useful in embedded and testing scenarios. (markt)
+      </add>
+    </changelog>
+  </subsection>
   <subsection name="Web applications">
     <changelog>
       <update>

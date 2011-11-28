@@ -432,7 +432,7 @@ public class TestExpiresFilter extends TomcatBaseTest {
 
             // TEST
             HttpURLConnection httpURLConnection = (HttpURLConnection) new URL(
-                    "http://localhost:" + tomcat.getConnector().getPort() +
+                    "http://localhost:" + tomcat.getConnector().getLocalPort() +
                             "/test").openConnection();
 
             // VALIDATE

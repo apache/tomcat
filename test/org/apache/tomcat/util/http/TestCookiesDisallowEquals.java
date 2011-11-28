@@ -55,7 +55,7 @@ public class TestCookiesDisallowEquals extends TomcatBaseTest {
 
             tomcat.start();
             // Open connection
-            setPort(tomcat.getConnector().getPort());
+            setPort(tomcat.getConnector().getLocalPort());
             connect();
 
             String[] request = new String[1];

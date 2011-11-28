@@ -77,6 +77,10 @@
           description="The number of seconds Tomcat will wait for a subsequent request before closing the connection"
                  type="int"/>
 
+    <attribute   name="localPort"
+          description="The port number on which this connector is listening to requests. If the special value for port of zero is used then this method will report the actual port bound."
+                type="int"/>
+
     <attribute   name="maxKeepAliveRequests"
           description="Maximum number of Keep-Alive requests to honor per connection"
                  type="int"/>
@@ -108,7 +112,7 @@
                  type="int"/>
 
     <attribute   name="port"
-          description="The port number on which we listen for requests"
+          description="The port number on which this connector is configured to listen for requests. The special value of 0 means select a random free port when the socket is bound."
                 type="int"/>
 
     <!-- Common -->
