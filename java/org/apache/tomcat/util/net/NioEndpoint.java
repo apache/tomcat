@@ -21,6 +21,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
 import java.nio.ByteBuffer;
@@ -386,6 +387,26 @@ public class NioEndpoint extends AbstractEndpoint {
     protected SSLContext sslContext = null;
     public SSLContext getSSLContext() { return sslContext;}
     public void setSSLContext(SSLContext c) { sslContext = c;}
+
+
+    /**
+     * Port in use.
+     */
+    @Override
+    public int getLocalPort() {
+        ServerSocketChannel ssc = serverSock;
+        if (ssc == null) {
+            return -1;
+        } else {
+            ServerSocket s = ssc.socket();
+            if (s == null) {
+                return -1;
+            } else {
+                return s.getLocalPort();
+            }
+        }
+    }
+
 
     // --------------------------------------------------------- OOM Parachute Methods
 

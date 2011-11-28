@@ -143,7 +143,10 @@
       <p>The TCP port number on which this <strong>Connector</strong>
       will create a server socket and await incoming connections.  Your
       operating system will allow only one server application to listen
-      to a particular port number on a particular IP address.</p>
+      to a particular port number on a particular IP address. If the special
+      value of 0 (zero) is used, then Tomcat will select a free port at random
+      to use for this connector. This is typically only useful in embedded and
+      testing applications.</p>
     </attribute>
 
     <attribute name="protocol" required="false">

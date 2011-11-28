@@ -68,8 +68,8 @@ public class TestChunkedInputFilter extends TomcatBaseTest {
             "x-trailer: Test", "TestTest0123456789abcdefghijABCDEFGHIJopqrstuvwxyz" + SimpleHttpClient.CRLF +
             SimpleHttpClient.CRLF };
 
-        TrailerClient client = new TrailerClient();
-        client.setPort(getPort());
+        TrailerClient client =
+                new TrailerClient(tomcat.getConnector().getLocalPort());
         client.setRequest(request);
 
         client.connect();
@@ -109,8 +109,8 @@ public class TestChunkedInputFilter extends TomcatBaseTest {
             "x-trailer: Test" + SimpleHttpClient.CRLF +
             SimpleHttpClient.CRLF };
 
-        TrailerClient client = new TrailerClient();
-        client.setPort(getPort());
+        TrailerClient client =
+                new TrailerClient(tomcat.getConnector().getLocalPort());
         client.setRequest(request);
 
         client.connect();
@@ -149,8 +149,8 @@ public class TestChunkedInputFilter extends TomcatBaseTest {
             "0" + SimpleHttpClient.CRLF +
             SimpleHttpClient.CRLF;
 
-        TrailerClient client = new TrailerClient();
-        client.setPort(getPort());
+        TrailerClient client =
+                new TrailerClient(tomcat.getConnector().getLocalPort());
         client.setRequest(new String[] {request});
 
         client.connect();
@@ -192,6 +192,10 @@ public class TestChunkedInputFilter extends TomcatBaseTest {
     }
 
     private static class TrailerClient extends SimpleHttpClient {
+
+        public TrailerClient(int port) {
+            setPort(port);
+        }
 
         @Override
         public boolean isResponseBodyOK() {

@@ -51,7 +51,6 @@ public class TestSwallowAbortedUploads extends TomcatBaseTest {
      */
     public Exception doAbortedUploadTest(AbortedUploadClient client, boolean limited,
                             boolean swallow) {
-        client.setPort(getPort());
         Exception ex = client.doRequest(limited, swallow);
         if (log.isDebugEnabled()) {
             log.debug("Response line: " + client.getResponseLine());
@@ -70,7 +69,6 @@ public class TestSwallowAbortedUploads extends TomcatBaseTest {
      */
     public Exception doAbortedPOSTTest(AbortedPOSTClient client, int status,
                             boolean swallow) {
-        client.setPort(getPort());
         Exception ex = client.doRequest(status, swallow);
         if (log.isDebugEnabled()) {
             log.debug("Response line: " + client.getResponseLine());
@@ -254,6 +252,7 @@ public class TestSwallowAbortedUploads extends TomcatBaseTest {
             context.setSwallowAbortedUploads(swallow);
 
             tomcat.start();
+            setPort(tomcat.getConnector().getLocalPort());
 
             init = true;
         }
@@ -366,6 +365,8 @@ public class TestSwallowAbortedUploads extends TomcatBaseTest {
             context.setSwallowAbortedUploads(swallow);
 
             tomcat.start();
+
+            setPort(tomcat.getConnector().getLocalPort());
 
             init = true;
         }

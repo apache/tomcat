@@ -45,7 +45,6 @@ public class TestInternalInputBuffer extends TomcatBaseTest {
     public void testBug48839() {
 
         Bug48839Client client = new Bug48839Client();
-        client.setPort(getPort());
 
         client.doRequest();
         assertTrue(client.isResponse200());
@@ -68,6 +67,7 @@ public class TestInternalInputBuffer extends TomcatBaseTest {
 
             try {
                 tomcat.start();
+                setPort(tomcat.getConnector().getLocalPort());
 
                 // Open connection
                 connect();
@@ -131,7 +131,6 @@ public class TestInternalInputBuffer extends TomcatBaseTest {
     public void testBug51557NoColon() {
 
         Bug51557Client client = new Bug51557Client("X-Bug51557NoColon");
-        client.setPort(getPort());
 
         client.doRequest();
         assertTrue(client.isResponse200());
@@ -170,7 +169,6 @@ public class TestInternalInputBuffer extends TomcatBaseTest {
 
         Bug51557Client client = new Bug51557Client("X-Bug=51557NoColon",
                 "foo" + SimpleHttpClient.CRLF + " bar");
-        client.setPort(getPort());
 
         client.doRequest();
         assertTrue(client.isResponse200());
@@ -184,7 +182,6 @@ public class TestInternalInputBuffer extends TomcatBaseTest {
 
         Bug51557Client client = new Bug51557Client("=X-Bug51557",
                 "invalid");
-        client.setPort(getPort());
 
         client.doRequest();
         assertTrue(client.isResponse200());
@@ -198,7 +195,6 @@ public class TestInternalInputBuffer extends TomcatBaseTest {
 
         Bug51557Client client = new Bug51557Client("X-Bug51557=",
                 "invalid");
-        client.setPort(getPort());
 
         client.doRequest();
         assertTrue(client.isResponse200());
@@ -211,7 +207,6 @@ public class TestInternalInputBuffer extends TomcatBaseTest {
         Bug51557Client client =
             new Bug51557Client("X-Bug" + s + "51557", "invalid");
 
-        client.setPort(getPort());
         client.doRequest();
         assertTrue(client.isResponse200());
         assertEquals("abcd", client.getResponseBody());
@@ -247,6 +242,7 @@ public class TestInternalInputBuffer extends TomcatBaseTest {
 
             try {
                 tomcat.start();
+                setPort(tomcat.getConnector().getLocalPort());
 
                 // Open connection
                 connect();

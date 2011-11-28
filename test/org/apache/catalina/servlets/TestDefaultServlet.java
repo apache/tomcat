@@ -198,8 +198,8 @@ public class TestDefaultServlet extends TomcatBaseTest {
         tomcat.addWebapp(null, contextPath, appDir.getAbsolutePath());
         tomcat.start();
 
-        TestCustomErrorClient client = new TestCustomErrorClient();
-        client.setPort(getPort());
+        TestCustomErrorClient client =
+                new TestCustomErrorClient(tomcat.getConnector().getLocalPort());
 
         client.reset();
         client.setRequest(new String[] {
@@ -276,8 +276,8 @@ public class TestDefaultServlet extends TomcatBaseTest {
         tomcat.addWebapp(null, contextPath, appDir.getAbsolutePath());
         tomcat.start();
 
-        TestCustomErrorClient client = new TestCustomErrorClient();
-        client.setPort(getPort());
+        TestCustomErrorClient client =
+                new TestCustomErrorClient(tomcat.getConnector().getLocalPort());
 
         client.reset();
         client.setRequest(new String[] {
@@ -294,6 +294,11 @@ public class TestDefaultServlet extends TomcatBaseTest {
     }
 
     private static class TestCustomErrorClient extends SimpleHttpClient {
+
+        public TestCustomErrorClient(int port) {
+            setPort(port);
+        }
+
         @Override
         public boolean isResponseBodyOK() {
             return true;

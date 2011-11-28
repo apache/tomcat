@@ -89,6 +89,18 @@ public class JIoEndpoint extends AbstractEndpoint {
     public void setServerSocketFactory(ServerSocketFactory factory) { this.serverSocketFactory = factory; }
     public ServerSocketFactory getServerSocketFactory() { return serverSocketFactory; }
 
+    /**
+     * Port in use.
+     */
+    @Override
+    public int getLocalPort() {
+        ServerSocket s = serverSocket;
+        if (s == null) {
+            return -1;
+        } else {
+            return s.getLocalPort();
+        }
+    }
 
     /*
      * Optional feature support.
