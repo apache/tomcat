@@ -97,11 +97,12 @@ public class TestStandardContext extends TomcatBaseTest {
         Tomcat.addServlet(root, "Bug46243", new HelloWorldServlet());
         root.addServletMapping("/", "Bug46243");
 
+
         tomcat.start();
 
         // Configure the client
-        Bug46243Client client = new Bug46243Client();
-        client.setPort(getPort());
+        Bug46243Client client =
+                new Bug46243Client(tomcat.getConnector().getLocalPort());
         client.setRequest(new String[] { REQUEST });
 
         client.connect();
@@ -110,6 +111,11 @@ public class TestStandardContext extends TomcatBaseTest {
     }
 
     private static final class Bug46243Client extends SimpleHttpClient {
+
+        public Bug46243Client(int port) {
+            setPort(port);
+        }
+
         @Override
         public boolean isResponseBodyOK() {
             // Don't care about the body in this test
@@ -442,7 +448,6 @@ public class TestStandardContext extends TomcatBaseTest {
     @Test
     public void testBug49711() {
         Bug49711Client client = new Bug49711Client();
-        client.setPort(getPort());
 
         // Make sure non-multipart works properly
         client.doRequest("/regular", false, false);
@@ -530,6 +535,8 @@ public class TestStandardContext extends TomcatBaseTest {
             context.addServletMapping("/regular", "regular");
             context.addServletMapping("/multipart", "multipart");
             tomcat.start();
+
+            setPort(tomcat.getConnector().getLocalPort());
 
             init = true;
         }

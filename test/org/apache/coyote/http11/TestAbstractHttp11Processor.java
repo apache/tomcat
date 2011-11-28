@@ -53,8 +53,7 @@ public class TestAbstractHttp11Processor extends TomcatBaseTest {
             SimpleHttpClient.CRLF +
             "test=data";
 
-        Client client = new Client();
-        client.setPort(getPort());
+        Client client = new Client(tomcat.getConnector().getLocalPort());
         client.setRequest(new String[] {request});
 
         client.connect();
@@ -82,8 +81,7 @@ public class TestAbstractHttp11Processor extends TomcatBaseTest {
             SimpleHttpClient.CRLF +
             "test=data";
 
-        Client client = new Client();
-        client.setPort(getPort());
+        Client client = new Client(tomcat.getConnector().getLocalPort());
         client.setRequest(new String[] {request});
 
         client.connect();
@@ -113,8 +111,7 @@ public class TestAbstractHttp11Processor extends TomcatBaseTest {
             SimpleHttpClient.CRLF +
             "test=data";
 
-        Client client = new Client();
-        client.setPort(getPort());
+        Client client = new Client(tomcat.getConnector().getLocalPort());
         client.setRequest(new String[] {request});
 
         client.connect();
@@ -144,8 +141,7 @@ public class TestAbstractHttp11Processor extends TomcatBaseTest {
             SimpleHttpClient.CRLF +
             "test=data";
 
-        Client client = new Client();
-        client.setPort(getPort());
+        Client client = new Client(tomcat.getConnector().getLocalPort());
         client.setRequest(new String[] {request});
 
         client.connect();
@@ -174,8 +170,7 @@ public class TestAbstractHttp11Processor extends TomcatBaseTest {
             SimpleHttpClient.CRLF +
             "test=data";
 
-        Client client = new Client();
-        client.setPort(getPort());
+        Client client = new Client(tomcat.getConnector().getLocalPort());
         client.setRequest(new String[] {request});
 
         client.connect();
@@ -204,8 +199,7 @@ public class TestAbstractHttp11Processor extends TomcatBaseTest {
             "Host: any" + SimpleHttpClient.CRLF +
             SimpleHttpClient.CRLF;
 
-        final Client client = new Client();
-        client.setPort(getPort());
+        final Client client = new Client(tomcat.getConnector().getLocalPort());
         client.setRequest(new String[] {requestPart1, requestPart2});
         client.setRequestPause(1000);
         client.setUseContentLength(true);
@@ -246,6 +240,11 @@ public class TestAbstractHttp11Processor extends TomcatBaseTest {
     }
 
     private static final class Client extends SimpleHttpClient {
+
+        public Client(int port) {
+            setPort(port);
+        }
+
         @Override
         public boolean isResponseBodyOK() {
             return getResponseBody().contains("test - data");

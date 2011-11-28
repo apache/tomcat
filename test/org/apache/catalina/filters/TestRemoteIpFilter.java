@@ -537,8 +537,9 @@ public class TestRemoteIpFilter extends TomcatBaseTest {
         getTomcatInstance().start();
 
         // TEST
-        HttpURLConnection httpURLConnection = (HttpURLConnection) new URL("http://localhost:" + tomcat.getConnector().getPort() + "/test")
-                .openConnection();
+        HttpURLConnection httpURLConnection = (HttpURLConnection) new URL(
+                "http://localhost:" + tomcat.getConnector().getLocalPort() +
+                "/test").openConnection();
         String expectedRemoteAddr = "my-remote-addr";
         httpURLConnection.addRequestProperty("x-forwarded-for", expectedRemoteAddr);
         httpURLConnection.addRequestProperty("x-forwarded-proto", "https");

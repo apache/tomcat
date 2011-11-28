@@ -147,7 +147,7 @@ public class TestRegistration extends TomcatBaseTest {
         ArrayList<String> expected = new ArrayList<String>(Arrays.asList(basicMBeanNames()));
         expected.addAll(Arrays.asList(hostMBeanNames("localhost")));
         expected.addAll(Arrays.asList(contextMBeanNames("localhost", contextName)));
-        expected.addAll(Arrays.asList(connectorMBeanNames(Integer.toString(getPort()), protocol)));
+        expected.addAll(Arrays.asList(connectorMBeanNames("auto-1", protocol)));
         expected.addAll(Arrays.asList(optionalMBeanNames("localhost")));
 
         // Did we find all expected MBeans?

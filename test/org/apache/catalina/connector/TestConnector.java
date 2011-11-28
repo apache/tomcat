@@ -19,6 +19,7 @@ package org.apache.catalina.connector;
 import java.net.SocketTimeoutException;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
@@ -68,5 +69,27 @@ public class TestConnector extends TomcatBaseTest {
             rc = 503;
         }
         assertEquals(503, rc);
+    }
+
+
+    @Test
+    public void testPort() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+
+        Connector connector1 = tomcat.getConnector();
+        connector1.setPort(0);
+
+        Connector connector2 = new Connector();
+        connector2.setPort(0);
+
+        tomcat.getService().addConnector(connector2);
+
+        tomcat.start();
+
+        int localPort1 = connector1.getLocalPort();
+        int localPort2 = connector2.getLocalPort();
+
+        assertTrue(localPort1 > 0);
+        assertTrue(localPort2 > 0);
     }
 }

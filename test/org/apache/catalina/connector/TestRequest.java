@@ -62,7 +62,6 @@ public class TestRequest extends TomcatBaseTest {
     @Test
     public void testBug37794() {
         Bug37794Client client = new Bug37794Client(true);
-        client.setPort(getPort());
 
         // Edge cases around zero
         client.doRequest(-1, false); // Unlimited
@@ -111,7 +110,6 @@ public class TestRequest extends TomcatBaseTest {
     @Test
     public void testBug37794withoutFilter() {
         Bug37794Client client = new Bug37794Client(false);
-        client.setPort(getPort());
 
         // Edge cases around actual content length
         client.reset();
@@ -179,6 +177,8 @@ public class TestRequest extends TomcatBaseTest {
             }
 
             tomcat.start();
+
+            setPort(tomcat.getConnector().getLocalPort());
 
             init = true;
         }
@@ -391,7 +391,6 @@ public class TestRequest extends TomcatBaseTest {
     @Test
     public void testBug48692() {
         Bug48692Client client = new Bug48692Client();
-        client.setPort(getPort());
 
         // Make sure GET works properly
         client.doRequest("GET", "foo=bar", null, null, false);
@@ -517,6 +516,8 @@ public class TestRequest extends TomcatBaseTest {
             Tomcat.addServlet(root, "EchoParameters", new EchoParametersServlet());
             root.addServletMapping("/echo", "EchoParameters");
             tomcat.start();
+
+            setPort(tomcat.getConnector().getLocalPort());
 
             init = true;
         }

@@ -70,7 +70,7 @@ public abstract class SimpleHttpClient {
     private String responseBody;
     private boolean useContentLength;
 
-    public void setPort(int thePort) {
+    protected void setPort(int thePort) {
         port = thePort;
     }
 

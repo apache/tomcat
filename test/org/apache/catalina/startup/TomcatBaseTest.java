@@ -56,7 +56,6 @@ import org.apache.tomcat.util.buf.ByteChunk;
 public abstract class TomcatBaseTest extends LoggingBaseTest {
     private Tomcat tomcat;
     private boolean accessLogEnabled = false;
-    private static int port = 8000;
 
     public static final String TEMP_DIR = System.getProperty("java.io.tmpdir");
 
@@ -71,15 +70,7 @@ public abstract class TomcatBaseTest extends LoggingBaseTest {
      * Sub-classes need to know port so they can connect
      */
     public int getPort() {
-        return port;
-    }
-
-    /**
-     * Sub-classes may want to add connectors on a new port
-     */
-    public int getNextPort() {
-        port++;
-        return getPort();
+        return tomcat.getConnector().getLocalPort();
     }
 
     /**
@@ -106,9 +97,8 @@ public abstract class TomcatBaseTest extends LoggingBaseTest {
 
         String protocol = getProtocol();
         Connector connector = new Connector(protocol);
-        // If each test is running on same port - they
-        // may interfere with each other
-        connector.setPort(getNextPort());
+        // Use random free port
+        connector.setPort(0);
         // Mainly set to reduce timeouts during async tests
         connector.setAttribute("connectionTimeout", "3000");
         tomcat.getService().addConnector(connector);

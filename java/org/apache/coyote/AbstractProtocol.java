@@ -48,6 +48,13 @@ public abstract class AbstractProtocol implements ProtocolHandler,
 
 
     /**
+     * Counter used to generate unique JMX names for connectors using automatic
+     * port binding.
+     */
+    private static final AtomicInteger nameCounter = new AtomicInteger(0);
+
+
+    /**
      * Name of MBean for the Global Request Processor.
      */
     protected ObjectName rgOname = null;
@@ -57,6 +64,14 @@ public abstract class AbstractProtocol implements ProtocolHandler,
      * Name of MBean for the ThreadPool.
      */
     protected ObjectName tpOname = null;
+
+
+    /**
+     * Unique ID for this connector. Only used if the connector is configured
+     * to use a random port as the port will change if stop(), start() is
+     * called.
+     */
+    private int nameIndex = 0;
 
 
     /**
@@ -194,6 +209,8 @@ public abstract class AbstractProtocol implements ProtocolHandler,
     }
 
 
+    public int getLocalPort() { return endpoint.getLocalPort(); }
+
     /*
      * When Tomcat expects data from the client, this is the time Tomcat will
      * wait for that data to arrive before closing the connection.
@@ -220,6 +237,15 @@ public abstract class AbstractProtocol implements ProtocolHandler,
 
     // ---------------------------------------------------------- Public methods
 
+    public synchronized int getNameIndex() {
+        if (nameIndex == 0) {
+            nameIndex = nameCounter.incrementAndGet();
+        }
+
+        return nameIndex;
+    }
+
+
     /**
      * The name will be prefix-address-port if address is non-null and
      * prefix-port if the address is null. The name will be appropriately quoted
@@ -232,7 +258,13 @@ public abstract class AbstractProtocol implements ProtocolHandler,
             name.append(getAddress());
             name.append('-');
         }
-        name.append(endpoint.getPort());
+        int port = getLocalPort();
+        if (port > 0) {
+            name.append(port);
+        } else {
+            name.append("auto-");
+            name.append(getNameIndex());
+        }
         return ObjectName.quote(name.toString());
     }
 
@@ -313,7 +345,13 @@ public abstract class AbstractProtocol implements ProtocolHandler,
 
         StringBuilder name = new StringBuilder(getDomain());
         name.append(":type=ProtocolHandler,port=");
-        name.append(getPort());
+        int port = getPort();
+        if (port > 0) {
+            name.append(getPort());
+        } else {
+            name.append("auto-");
+            name.append(getNameIndex());
+        }
         InetAddress address = getAddress();
         if (address != null) {
             name.append(",address=");
@@ -321,6 +359,7 @@ public abstract class AbstractProtocol implements ProtocolHandler,
         }
         return new ObjectName(name.toString());
     }
+
 
     // ------------------------------------------------------- Lifecycle methods
 
