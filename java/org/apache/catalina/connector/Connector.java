@@ -60,7 +60,6 @@ public class Connector extends LifecycleMBeanBase  {
 
     // ------------------------------------------------------------ Constructor
 
-
     public Connector() {
         this(null);
     }
@@ -114,7 +113,7 @@ public class Connector extends LifecycleMBeanBase  {
     /**
      * The port number on which we listen for requests.
      */
-    protected int port = 0;
+    protected int port = -1;
 
 
     /**
@@ -256,7 +255,6 @@ public class Connector extends LifecycleMBeanBase  {
 
 
     // ------------------------------------------------------------- Properties
-
 
     /**
      * Return a configured property.
@@ -497,7 +495,9 @@ public class Connector extends LifecycleMBeanBase  {
     }
 
     /**
-     * Return the port number on which we listen for requests.
+     * Return the port number on which this connector is configured to listen
+     * for requests. The special value of 0 means select a random free port
+     * when the socket is bound.
      */
     public int getPort() {
 
@@ -516,6 +516,16 @@ public class Connector extends LifecycleMBeanBase  {
         this.port = port;
         setProperty("port", String.valueOf(port));
 
+    }
+
+
+    /**
+     * Return the port number on which this connector is listening to requests.
+     * If the special value for {@link #port} of zero is used then this method
+     * will report the actual port bound.
+     */
+    public int getLocalPort() {
+        return ((Integer) getProperty("localPort")).intValue();
     }
 
 
@@ -864,7 +874,13 @@ public class Connector extends LifecycleMBeanBase  {
         StringBuilder sb = new StringBuilder("type=");
         sb.append(type);
         sb.append(",port=");
-        sb.append(getPort());
+        int port = getPort();
+        if (port > 0) {
+            sb.append(getPort());
+        } else {
+            sb.append("auto-");
+            sb.append(getProperty("nameIndex"));
+        }
         if (addressObj != null) {
             String address = addressObj.toString();
             if (address.length() > 0) {
@@ -938,7 +954,7 @@ public class Connector extends LifecycleMBeanBase  {
     protected void startInternal() throws LifecycleException {
 
         // Validate settings before starting
-        if (getPort() < 1) {
+        if (getPort() < 0) {
             throw new LifecycleException(sm.getString(
                     "coyoteConnector.invalidPort", Integer.valueOf(getPort())));
         }
@@ -1014,10 +1030,17 @@ public class Connector extends LifecycleMBeanBase  {
         StringBuilder sb = new StringBuilder("Connector[");
         sb.append(getProtocol());
         sb.append('-');
-        sb.append(getPort());
+        int port = getPort();
+        if (port > 0) {
+            sb.append(getPort());
+        } else {
+            sb.append("auto-");
+            sb.append(getProperty("nameIndex"));
+        }
         sb.append(']');
         return sb.toString();
     }
+
 
     // -------------------- JMX registration  --------------------
 

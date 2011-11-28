@@ -115,9 +115,10 @@ public class TestFormAuthenticator extends TomcatBaseTest {
             realm.addUserRole("tomcat", "tomcat");
             ctx.setRealm(realm);
 
-            setPort(getPort());
-
             tomcat.start();
+
+            // Port only known after Tomcat starts
+            setPort(getPort());
         }
 
         private void doResourceRequest(String method) throws Exception {

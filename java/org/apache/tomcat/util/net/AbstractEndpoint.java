@@ -186,6 +186,7 @@ public abstract class AbstractEndpoint {
     public int getPort() { return port; }
     public void setPort(int port ) { this.port=port; }
 
+    public abstract int getLocalPort();
 
     /**
      * Address for the server socket.

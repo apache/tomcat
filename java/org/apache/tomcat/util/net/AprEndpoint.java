@@ -37,6 +37,7 @@ import org.apache.tomcat.jni.Pool;
 import org.apache.tomcat.jni.SSL;
 import org.apache.tomcat.jni.SSLContext;
 import org.apache.tomcat.jni.SSLSocket;
+import org.apache.tomcat.jni.Sockaddr;
 import org.apache.tomcat.jni.Socket;
 import org.apache.tomcat.jni.Status;
 import org.apache.tomcat.util.ExceptionUtils;
@@ -316,8 +317,29 @@ public class AprEndpoint extends AbstractEndpoint {
     public void setSSLInsecureRenegotiation(boolean SSLInsecureRenegotiation) { this.SSLInsecureRenegotiation = SSLInsecureRenegotiation; }
     public boolean getSSLInsecureRenegotiation() { return SSLInsecureRenegotiation; }
 
-    // --------------------------------------------------------- Public Methods
 
+    /**
+     * Port in use.
+     */
+    @Override
+    public int getLocalPort() {
+        long s = serverSock;
+        if (s == 0) {
+            return -1;
+        } else {
+            long sa;
+            try {
+                sa = Address.get(Socket.APR_LOCAL, s);
+                Sockaddr addr = Address.getInfo(sa);
+                return addr.port;
+            } catch (Exception e) {
+                return -1;
+            }
+        }
+    }
+
+
+    // --------------------------------------------------------- Public Methods
 
     /**
      * Number of keepalive sockets.
