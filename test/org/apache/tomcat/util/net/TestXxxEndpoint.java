@@ -118,9 +118,9 @@ public class TestXxxEndpoint extends TomcatBaseTest {
         File appDir = new File(getBuildDirectory(), "webapps/examples");
         tomcat.addWebapp(null, "/examples", appDir.getAbsolutePath());
 
-        int port = getPort();
-
         tomcat.start();
+
+        int port = getPort();
 
         tomcat.getConnector().stop();
         Exception e = null;
