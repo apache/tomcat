@@ -82,6 +82,7 @@ import org.apache.catalina.LifecycleState;
 import org.apache.catalina.Loader;
 import org.apache.catalina.Manager;
 import org.apache.catalina.Pipeline;
+import org.apache.catalina.Realm;
 import org.apache.catalina.Valve;
 import org.apache.catalina.Wrapper;
 import org.apache.catalina.deploy.ApplicationParameter;
@@ -5032,6 +5033,7 @@ public class StandardContext extends ContainerBase
 
                 if ((cluster != null) && (cluster instanceof Lifecycle))
                     ((Lifecycle) cluster).start();
+                Realm realm = getRealm();
                 if ((realm != null) && (realm instanceof Lifecycle))
                     ((Lifecycle) realm).start();
                 if ((resources != null) && (resources instanceof Lifecycle))
@@ -5378,6 +5380,7 @@ public class StandardContext extends ContainerBase
             // Stop resources
             resourcesStop();
 
+            Realm realm = getRealm();
             if ((realm != null) && (realm instanceof Lifecycle)) {
                 ((Lifecycle) realm).stop();
             }
@@ -5442,6 +5445,7 @@ public class StandardContext extends ContainerBase
         if ((manager != null) && (manager instanceof Lifecycle)) {
             ((Lifecycle) manager).destroy();
         }
+        Realm realm = getRealm();
         if ((realm != null) && (realm instanceof Lifecycle)) {
             ((Lifecycle) realm).destroy();
         }
