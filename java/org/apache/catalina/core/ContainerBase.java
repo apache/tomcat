@@ -732,7 +732,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase
             l.lock();
 
             // Change components if necessary
-            Realm oldRealm = realm;
+            Realm oldRealm = this.realm;
             if (oldRealm == realm)
                 return;
             this.realm = realm;
