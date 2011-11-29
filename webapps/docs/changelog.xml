@@ -66,6 +66,11 @@
         The <code>FailedRequestFilter</code> filter can be used to detect this
         condition. (kkolinko)
       </fix>
+      <fix>
+        <bug>52259</bug>: Fix regression caused by the addition of the threaded
+        component start (<bug>46264</bug>) that triggered a deadlock on startup
+        if no Realm was configured. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name = "Coyote">
