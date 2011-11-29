@@ -475,9 +475,9 @@ public abstract class AbstractEndpoint {
         try {
             // Need to create a connection to unlock the accept();
             if (address == null) {
-                saddr = new InetSocketAddress("localhost", getPort());
+                saddr = new InetSocketAddress("localhost", getLocalPort());
             } else {
-                saddr = new InetSocketAddress(address,getPort());
+                saddr = new InetSocketAddress(address, getLocalPort());
             }
             s = new java.net.Socket();
             int stmo = 2 * 1000;
