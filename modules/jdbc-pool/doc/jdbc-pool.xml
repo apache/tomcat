@@ -281,7 +281,8 @@
       <p>(int) The number of milliseconds to sleep between runs of the idle connection validation/cleaner thread.
          This value should not be set under 1 second. It dictates how often we check for idle, abandoned connections, and how often
          we validate idle connections.
-         The default value is <code>5000</code> (5 seconds).</p>
+         The default value is <code>5000</code> (5 seconds). <br/>
+      </p>
     </attribute>
 
     <attribute name="numTestsPerEvictionRun" required="false">
@@ -815,6 +816,9 @@
         ant dist      (creates a release package)
         ant test      (runs tests, expects a test database to be setup)
       </source>
+    </p>
+    <p>
+      The system is structured for a Maven build, but does generate release artifacts. Just the library itself.    
     </p>
   </subsection>
 </section>
