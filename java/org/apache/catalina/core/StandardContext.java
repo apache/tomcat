@@ -5033,7 +5033,7 @@ public class StandardContext extends ContainerBase
 
                 if ((cluster != null) && (cluster instanceof Lifecycle))
                     ((Lifecycle) cluster).start();
-                Realm realm = getRealm();
+                Realm realm = getRealmInternal();
                 if ((realm != null) && (realm instanceof Lifecycle))
                     ((Lifecycle) realm).start();
                 if ((resources != null) && (resources instanceof Lifecycle))
@@ -5380,7 +5380,7 @@ public class StandardContext extends ContainerBase
             // Stop resources
             resourcesStop();
 
-            Realm realm = getRealm();
+            Realm realm = getRealmInternal();
             if ((realm != null) && (realm instanceof Lifecycle)) {
                 ((Lifecycle) realm).stop();
             }
@@ -5445,7 +5445,7 @@ public class StandardContext extends ContainerBase
         if ((manager != null) && (manager instanceof Lifecycle)) {
             ((Lifecycle) manager).destroy();
         }
-        Realm realm = getRealm();
+        Realm realm = getRealmInternal();
         if ((realm != null) && (realm instanceof Lifecycle)) {
             ((Lifecycle) realm).destroy();
         }
