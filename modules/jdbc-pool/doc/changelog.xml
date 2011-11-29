@@ -31,6 +31,7 @@
 <section name="Tomcat JDBC Connection Pool 1.1.0.0">
   <subsection name="pool">
     <changelog>
+      <add><rev>1207712</rev> Pool cleaner should be a global thread, not spawn one thread per connection pool. (fhanik)</add>	
       <fix><rev>1073531</rev> <bug>50805</bug> Only initialize connections once when async (fhanik)</fix>
       <fix><rev>1076380</rev> <bug>50857</bug> Correctly handle timeouts when the pool is busy when async (fhanik)</fix>
       <add>Added QueryTimeoutInterceptor to be able to configure timeouts on running queries automatically.</add>
