@@ -710,13 +710,22 @@ public abstract class ContainerBase extends LifecycleMBeanBase
                 return (realm);
             if (parent != null)
                 return (parent.getRealm());
-            return (null);
+            return null;
         } finally {
             l.unlock();
         }
-
     }
 
+
+    protected Realm getRealmInternal() {
+        Lock l = realmLock.readLock();
+        try {
+            l.lock();
+            return realm;
+        } finally {
+            l.unlock();
+        }
+    }
 
     /**
      * Set the Realm with which this Container is associated.
@@ -1082,7 +1091,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase
             ((Lifecycle) manager).start();
         if ((cluster != null) && (cluster instanceof Lifecycle))
             ((Lifecycle) cluster).start();
-        Realm realm = getRealm();
+        Realm realm = getRealmInternal();
         if ((realm != null) && (realm instanceof Lifecycle))
             ((Lifecycle) realm).start();
         if ((resources != null) && (resources instanceof Lifecycle))
@@ -1169,7 +1178,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase
         if ((resources != null) && (resources instanceof Lifecycle)) {
             ((Lifecycle) resources).stop();
         }
-        Realm realm = getRealm();
+        Realm realm = getRealmInternal();
         if ((realm != null) && (realm instanceof Lifecycle)) {
             ((Lifecycle) realm).stop();
         }
@@ -1321,7 +1330,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase
                 log.warn(sm.getString("containerBase.backgroundProcess.manager", manager), e);
             }
         }
-        Realm realm = getRealm();
+        Realm realm = getRealmInternal();
         if (realm != null) {
             try {
                 realm.backgroundProcess();
