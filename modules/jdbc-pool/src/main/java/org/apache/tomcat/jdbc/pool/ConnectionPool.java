@@ -21,8 +21,14 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Proxy;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.Collections;
 import java.util.ConcurrentModificationException;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Set;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CountDownLatch;
@@ -785,13 +791,12 @@ public class ConnectionPool {
     protected boolean terminateTransaction(PooledConnection con) {
         try {
             if (con.getPoolProperties().getDefaultAutoCommit()==Boolean.FALSE) {
-                boolean autocommit = con.getConnection().getAutoCommit();
-                if (!autocommit) {
-                    if (this.getPoolProperties().getRollbackOnReturn()) {
-                        con.getConnection().rollback();
-                    } else if (this.getPoolProperties().getCommitOnReturn()) {
-                        con.getConnection().commit();
-                    }
+                if (this.getPoolProperties().getRollbackOnReturn()) {
+                    boolean autocommit = con.getConnection().getAutoCommit();
+                    if (!autocommit) con.getConnection().rollback();
+                } else if (this.getPoolProperties().getCommitOnReturn()) {
+                    boolean autocommit = con.getConnection().getAutoCommit();
+                    if (!autocommit) con.getConnection().commit();
                 }
             }
             return true;
@@ -1185,14 +1190,54 @@ public class ConnectionPool {
         }
 
     }
+    
+    
 
-    protected class PoolCleaner extends Thread {
+    private static volatile Timer poolCleanTimer = null;
+    private static HashSet<PoolCleaner> cleaners = new HashSet<PoolCleaner>();
+
+    private static synchronized void registerCleaner(PoolCleaner cleaner) {
+        unregisterCleaner(cleaner);
+        cleaners.add(cleaner);
+        if (poolCleanTimer == null) {
+            poolCleanTimer = new Timer("PoolCleaner["
+                    + System.identityHashCode(ConnectionPool.class
+                            .getClassLoader()) + ":"
+                    + System.currentTimeMillis() + "]", true);
+        }
+        poolCleanTimer.scheduleAtFixedRate(cleaner, cleaner.sleepTime,
+                cleaner.sleepTime);
+    }
+
+    private static synchronized void unregisterCleaner(PoolCleaner cleaner) {
+        boolean removed = cleaners.remove(cleaner);
+        if (removed) {
+            cleaner.cancel();
+            if (poolCleanTimer != null) {
+                poolCleanTimer.purge();
+                if (cleaners.size() == 0) {
+                    poolCleanTimer.cancel();
+                    poolCleanTimer = null;
+                }
+            }
+        }
+    }
+    
+    public static Set<TimerTask> getPoolCleaners() {
+        return Collections.<TimerTask>unmodifiableSet(cleaners);
+    }
+    
+    public static Timer getPoolTimer() {
+        return poolCleanTimer;
+    }
+
+    protected class PoolCleaner extends TimerTask {
         protected ConnectionPool pool;
         protected long sleepTime;
         protected volatile boolean run = true;
+        protected volatile long lastRun = 0;
+
         PoolCleaner(String name, ConnectionPool pool, long sleepTime) {
-            super(name);
-            this.setDaemon(true);
             this.pool = pool;
             this.sleepTime = sleepTime;
             if (sleepTime <= 0) {
@@ -1205,37 +1250,32 @@ public class ConnectionPool {
 
         @Override
         public void run() {
-            while (run) {
+            if (pool.isClosed()) {
+                if (pool.getSize() <= 0) {
+                    run = false;
+                }
+            } else if ((System.currentTimeMillis() - lastRun) > sleepTime) {
+                lastRun = System.currentTimeMillis();
                 try {
-                    sleep(sleepTime);
-                } catch (InterruptedException e) {
-                    // ignore it
-                    Thread.interrupted();
-                    continue;
-                } //catch
+                    if (pool.getPoolProperties().isRemoveAbandoned())
+                        pool.checkAbandoned();
+                    if (pool.getPoolProperties().getMinIdle() < pool.idle
+                            .size())
+                        pool.checkIdle();
+                    if (pool.getPoolProperties().isTestWhileIdle())
+                        pool.testAllIdle();
+                } catch (Exception x) {
+                    log.error("", x);
+                } // catch
+            } // end if
+        } // run
 
-                if (pool.isClosed()) {
-                    if (pool.getSize() <= 0) {
-                        run = false;
-                    }
-                } else {
-                    try {
-                        if (pool.getPoolProperties().isRemoveAbandoned())
-                            pool.checkAbandoned();
-                        if (pool.getPoolProperties().getMinIdle()<pool.idle.size())
-                            pool.checkIdle();
-                        if (pool.getPoolProperties().isTestWhileIdle())
-                            pool.testAllIdle();
-                    } catch (Exception x) {
-                        log.error("", x);
-                    } //catch
-                } //end if
-            } //while
-        } //run
+        public void start() {
+            registerCleaner(this);
+        }
 
         public void stopRunning() {
-            run = false;
-            interrupt();
+            unregisterCleaner(this);
         }
     }
 }
