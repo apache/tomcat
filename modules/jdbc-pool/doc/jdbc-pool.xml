@@ -818,7 +818,7 @@
       </source>
     </p>
     <p>
-      The system is structured for a Maven build, but does generate release artifacts. Just the library itself.    
+      The system is structured for a Maven build, but does generate release artifacts. Just the library itself.
     </p>
   </subsection>
 </section>
