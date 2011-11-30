@@ -93,7 +93,10 @@
   </subsection>
   <subsection name="jdbc-pool">
     <changelog>
-      <add><rev>1207712</rev> Pool cleaner should be a global thread, not spawn one thread per connection pool. (fhanik)</add>
+      <add>
+        <rev>1207712</rev> Pool cleaner should be a global thread, not spawn
+        one thread per connection pool. (fhanik)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Other">
