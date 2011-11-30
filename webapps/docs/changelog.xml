@@ -116,6 +116,10 @@
         in since Ant 1.8.2, but we include <code>.gitignore</code> in
         src distributions. (kkolinko)
       </fix>
+      <add>
+        <bug>52237</bug>: Allow Junit logs to be generated in formats other than
+        plain text. Patch provided by M Hasko. (markt)
+      </add>
     </changelog>
   </subsection>
 </section>
