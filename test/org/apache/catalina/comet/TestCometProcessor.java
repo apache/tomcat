@@ -266,9 +266,6 @@ public class TestCometProcessor extends TomcatBaseTest {
         Thread.sleep(3000);
 
         tomcat.getConnector().stop();
-        // Allow the executor a chance to send the end event
-        Thread.sleep(100);
-        tomcat.getConnector().destroy();
 
         // Wait for the write thread to stop
         int count = 0;
@@ -282,6 +279,9 @@ public class TestCometProcessor extends TomcatBaseTest {
             Thread.sleep(100);
             count ++;
         }
+
+        // Destroy the connector once the executor has sent the end event
+        tomcat.getConnector().destroy();
 
         // Write should trigger an exception once the connector stops since the
         // socket should be closed
