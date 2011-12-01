@@ -151,7 +151,7 @@ public class NioBlockingSelector {
         KeyAttachment att = (KeyAttachment) key.attachment();
         int read = 0;
         boolean timedout = false;
-        int keycount = 1; //assume we can write
+        int keycount = 1; //assume we can read
         long time = System.currentTimeMillis(); //start the timeout timer
         try {
             while ( (!timedout) && read == 0) {
