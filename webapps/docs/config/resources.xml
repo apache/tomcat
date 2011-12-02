@@ -93,7 +93,28 @@
     is configured by its parent Context element.</p>
 
   </subsection>
-
+  
+  <subsection name="VirtualDirContext implementation">
+    <p>This implementation of <strong>Resources</strong> is
+    <strong>org.apache.naming.resources.VirtualDirContext</strong> and is aimed to be used
+    during development to deploy a webapp without copying files to a webapp compliant
+    directory structure.
+    It extends <code>FileDirContext</code> and supports the following
+    additional attributes</p>
+    
+    <attributes>
+      <attribute name="extraResourcePaths" required="false">
+        <p>Allows to map a path of the filesystem to a path in the webapp. Multiple
+        filesystem paths can be mapped to the same path in the webapp. Filesystem
+        path and virtual path must be separated by an equal signe (=). Pairs of paths
+        must be separated by a column.</p>
+        Example: <code>/=/Users/jdoe/mywebapp/src/main/webapp,/=/Users/jdoe/mywebapp/src/main/webapp2,/pictures=/Users/jdoe/sharedpictures</code>
+        <p>The path to the docBase (as declared in the Context) must not be added here.</p>
+        <p>This attribute enhances the feature provided by the <code>aliases</code>
+        attribute of the <strong>StandardContext</strong>.</p>
+      </attribute>
+    </attributes>
+  </subsection>
 
 </section>
 

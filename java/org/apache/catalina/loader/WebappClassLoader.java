@@ -46,11 +46,11 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Set;
-import java.util.Vector;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.jar.Attributes;
 import java.util.jar.Attributes.Name;
@@ -1278,7 +1278,8 @@ public class WebappClassLoader
         if (log.isDebugEnabled())
             log.debug("    findResources(" + name + ")");
 
-        Vector<URL> result = new Vector<URL>();
+        //we use a LinkedHashSet instead of a Vector to avoid duplicates with virtualmappings
+        LinkedHashSet<URL> result = new LinkedHashSet<URL>();
 
         int jarFilesLength = jarFiles.length;
         int repositoriesLength = repositories.length;
@@ -1291,7 +1292,7 @@ public class WebappClassLoader
             Enumeration<URL> otherResourcePaths = super.findResources(name);
 
             while (otherResourcePaths.hasMoreElements()) {
-                result.addElement(otherResourcePaths.nextElement());
+                result.add(otherResourcePaths.nextElement());
             }
 
         }
@@ -1303,7 +1304,7 @@ public class WebappClassLoader
                 // Note : Not getting an exception here means the resource was
                 // found
                 try {
-                    result.addElement(getURI(new File(files[i], name)));
+                    result.add(getURI(new File(files[i], name)));
                 } catch (MalformedURLException e) {
                     // Ignore
                 }
@@ -1321,7 +1322,7 @@ public class WebappClassLoader
                         try {
                             String jarFakeUrl = getURI(jarRealFiles[i]).toString();
                             jarFakeUrl = "jar:" + jarFakeUrl + "!/" + name;
-                            result.addElement(new URL(jarFakeUrl));
+                            result.add(new URL(jarFakeUrl));
                         } catch (MalformedURLException e) {
                             // Ignore
                         }
@@ -1336,12 +1337,24 @@ public class WebappClassLoader
             Enumeration<URL> otherResourcePaths = super.findResources(name);
 
             while (otherResourcePaths.hasMoreElements()) {
-                result.addElement(otherResourcePaths.nextElement());
+                result.add(otherResourcePaths.nextElement());
             }
 
         }
+        
+        final Iterator<URL> iterator = result.iterator();
 
-        return result.elements();
+        return new Enumeration<URL>() {
+            @Override
+            public boolean hasMoreElements() {
+                return iterator.hasNext();
+            }
+
+            @Override
+            public URL nextElement() {
+                return iterator.next();
+            }
+        };
 
     }
 

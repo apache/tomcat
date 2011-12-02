@@ -1177,6 +1177,19 @@ public class StandardContext extends ContainerBase
         }
     }
 
+    /**
+     * Add a URL for a JAR that contains static resources in a
+     * META-INF/resources directory that should be included in the static
+     * resources for this context.
+     */
+    public void addResourcesDirContext(DirContext altDirContext) {
+        if (webappResources instanceof BaseDirContext) {
+            ((BaseDirContext) webappResources).addAltDirContext(altDirContext);
+        } else {
+            log.error(sm.getString("standardContext.noResourceJar", altDirContext,
+                    getName()));
+        }
+    }
 
     /**
      * Set the current alias configuration. The list of aliases should be of the

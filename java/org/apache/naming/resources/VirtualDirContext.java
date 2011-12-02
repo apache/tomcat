@@ -18,70 +18,69 @@ package org.apache.naming.resources;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Hashtable;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.StringTokenizer;
 
 import javax.naming.NamingException;
 import javax.naming.directory.Attributes;
 
+import org.apache.catalina.loader.VirtualWebappLoader;
 import org.apache.naming.NamingEntry;
 
 /**
- * Extended FileDirContext implementation that will allow loading of tld files
- * from the META-INF directory (or subdirectories) in classpath. This will fully
- * mimic the behavior of compressed jars also when using unjarred resources. Tld
- * files can be loaded indifferently from WEB-INF webapp dir (or subdirs) or
- * from META-INF dir from jars available in the classpath: using this DirContext
- * implementation you will be able to use unexpanded jars during development and
- * to make any tld in them virtually available to the webapp.
- *
+ * Extended FileDirContext implementation that allows to expose multiple
+ * directories of the filesystem under a single webapp, a feature mainly used
+ * for development with IDEs.
+ * This should be used in conjunction with {@link VirtualWebappLoader}.
+ * 
  * Sample context xml configuration:
- *
+ * 
  * <code>
- * &lt;Context docBase="\webapps\mydocbase">
+ * &lt;Context path="/mywebapp" docBase="/Users/theuser/mywebapp/src/main/webapp" >
  *   &lt;Resources className="org.apache.naming.resources.VirtualDirContext"
- *              virtualClasspath="\dir\classes;\somedir\somejar.jar"/>
- * &lt;/Resources>
+ *              extraResourcePaths="/pictures=/Users/theuser/mypictures,/movies=/Users/theuser/mymovies" />
+ *   &lt;Loader className="org.apache.catalina.loader.VirtualWebappLoader"
+ *              virtualClasspath="/Users/theuser/mywebapp/target/classes" />
+ *   &lt;JarScanner scanAllDirectories="true" />
+ * &lt;/Context>
  * </code>
- *
- *
+ * 
+ * 
  * <strong>This is not meant to be used for production.
  * Its meant to ease development with IDE's without the
  * need for fully republishing jars in WEB-INF/lib</strong>
- *
- *
+ * 
+ * 
  * @author Fabrizio Giustina
  * @version $Id$
  */
 public class VirtualDirContext extends FileDirContext {
+    private String extraResourcePaths = "";
+    private Map<String, List<String>> mappedResourcePaths;
 
     /**
-     * Map containing generated virtual names for tld files under WEB-INF and
-     * the actual file reference.
+     * <p>
+     * Allows to map a path of the filesystem to a path in the webapp. Multiple
+     * filesystem paths can be mapped to the same path in the webapp. Filesystem
+     * path and virtual path must be separated by an equal sign. Pairs of paths
+     * must be separated by a comma.
+     * </p>
+     * Example: <code>
+     * /=/Users/slaurent/mywebapp/src/main/webapp;/pictures=/Users/slaurent/sharedpictures
+     * </code>
+     * <p>
+     * The path to the docBase must not be added here, otherwise resources would
+     * be listed twice.
+     * </p>
+     * 
+     * @param path
      */
-    private Map<String, File> virtualMappings;
-
-    /**
-     * Map containing a mapping for tag files that should be loaded from the
-     * META-INF dir of referenced jar files.
-     */
-    private Map<String, File> tagfileMappings;
-
-    /**
-     * <code>;</code> separated list of virtual path elements.
-     */
-    private String virtualClasspath;
-
-    /**
-     * <code>virtualClasspath</code> attribute that will be automatically set
-     * from the <code>Context</code> <code>virtualClasspath</code> attribute
-     * from the context xml file.
-     * @param path <code>;</code> separated list of path elements.
-     */
-    public void setVirtualClasspath(String path) {
-        virtualClasspath = path;
+    public void setExtraResourcePaths(String path) {
+        extraResourcePaths = path;
     }
 
     /**
@@ -91,19 +90,39 @@ public class VirtualDirContext extends FileDirContext {
     public void allocate() {
         super.allocate();
 
-        virtualMappings = new Hashtable<String, File>();
-        tagfileMappings = new Hashtable<String, File>();
-
-        // looks into any META-INF dir found in classpath entries for tld files.
-        StringTokenizer tkn = new StringTokenizer(virtualClasspath, ";");
+        mappedResourcePaths = new HashMap<String, List<String>>();
+        StringTokenizer tkn = new StringTokenizer(extraResourcePaths, ",");
         while (tkn.hasMoreTokens()) {
-            File file = new File(tkn.nextToken(), "META-INF");
+            String resSpec = tkn.nextToken();
+            if (resSpec.length() > 0) {
+                int idx = resSpec.indexOf('=');
+                String path;
+                if (idx <= 0) {
+                    path = "";
+                }
+                else {
+                    if (resSpec.startsWith("/=")) {
+                        resSpec = resSpec.substring(1);
+                        idx--;
+                    }
+                    path = resSpec.substring(0, idx);
+                }
+                String dir = resSpec.substring(idx + 1);
+                List<String> resourcePaths = mappedResourcePaths.get(path);
+                if (resourcePaths == null) {
+                    resourcePaths = new ArrayList<String>();
+                    mappedResourcePaths.put(path, resourcePaths);
+                }
+                resourcePaths.add(dir);
 
-            if (!file.exists() || !file.isDirectory()) {
-                continue;
+                // Set allowLinking since there can be no canonical path
+                setAllowLinking(true);
             }
-            scanForTlds(file);
         }
+        if (mappedResourcePaths.isEmpty()) {
+            mappedResourcePaths = null;
+        }
+
     }
 
     /**
@@ -111,48 +130,124 @@ public class VirtualDirContext extends FileDirContext {
      */
     @Override
     public void release() {
+        mappedResourcePaths = null;
+
         super.release();
-        virtualMappings = null;
     }
 
     @Override
     public Attributes getAttributes(String name) throws NamingException {
 
-        // handle "virtual" tlds
-        if (name.startsWith("/WEB-INF/") && name.endsWith(".tld")) {
-            String tldName = name.substring(name.lastIndexOf("/") + 1);
-            if (virtualMappings.containsKey(tldName)) {
-                return new FileResourceAttributes(virtualMappings.get(tldName));
-            }
-        } else if (name.startsWith("/META-INF/tags") && name.endsWith(".tag")
-                || name.endsWith(".tagx")) {
+        NamingException initialException;
+        try {
+            // first try the normal processing, if it fails try with extra
+            // resources
+            Attributes attributes = super.getAttributes(name);
+            return attributes;
+        } catch (NamingException exc) {
+            initialException = exc;
+        }
 
-            // already loaded tag file
-            if (tagfileMappings.containsKey(name)) {
-                return new FileResourceAttributes(tagfileMappings.get(name));
-            }
-
-            // unknown tagfile, search for it in virtualClasspath
-            StringTokenizer tkn = new StringTokenizer(virtualClasspath, ";");
-            while (tkn.hasMoreTokens()) {
-                File file = new File(tkn.nextToken(), name);
-                if (file.exists()) {
-                    tagfileMappings.put(name, file);
-                    return new FileResourceAttributes(file);
+        if (mappedResourcePaths != null) {
+            for (Map.Entry<String, List<String>> mapping : mappedResourcePaths.entrySet()) {
+                String path = mapping.getKey();
+                List<String> dirList = mapping.getValue();
+                String resourcesDir = dirList.get(0);
+                if (name.equals(path)) {
+                    File f = new File(resourcesDir);
+                    if (f.exists() && f.canRead()) {
+                        return new FileResourceAttributes(f);
+                    }
+                }
+                path += "/";
+                if (name.startsWith(path)) {
+                    String res = name.substring(path.length());
+                    File f = new File(resourcesDir + "/" + res);
+                    if (f.exists() && f.canRead()) {
+                        return new FileResourceAttributes(f);
+                    }
                 }
             }
         }
+        throw initialException;
+    }
 
-        return super.getAttributes(name);
+    @Override
+    protected File file(String name) {
+        File file = super.file(name);
+        if (file != null || mappedResourcePaths == null) {
+            return file;
+        }
+        // If not found under docBase, try our other resources
+        // Ensure name string begins with a slash
+        if (name.length() > 0 && name.charAt(0) != '/') {
+            name = "/" + name;
+        }
+        for (Map.Entry<String, List<String>> mapping : mappedResourcePaths.entrySet()) {
+            String path = mapping.getKey();
+            List<String> dirList = mapping.getValue();
+            if (name.equals(path)) {
+                for (String resourcesDir : dirList) {
+                    file = new File(resourcesDir);
+                    if (file.exists() && file.canRead()) {
+                        return file;
+                    }
+                }
+            }
+            if (name.startsWith(path + "/")) {
+                String res = name.substring(path.length());
+                for (String resourcesDir : dirList) {
+                    file = new File(resourcesDir, res);
+                    if (file.exists() && file.canRead()) {
+                        return file;
+                    }
+                }
+            }
+        }
+        return null;
     }
 
     @Override
     protected List<NamingEntry> list(File file) {
         List<NamingEntry> entries = super.list(file);
 
-        // adds virtual tlds for WEB-INF listing
-        if ("WEB-INF".equals(file.getName())) {
-            entries.addAll(getVirtualNamingEntries());
+        if (mappedResourcePaths != null && !mappedResourcePaths.isEmpty()) {
+            Set<String> entryNames = new HashSet<String>(entries.size());
+            for (NamingEntry entry : entries) {
+                entryNames.add(entry.name);
+            }
+            // Add appropriate entries from the extra resource paths
+            String absPath = file.getAbsolutePath();
+            if (absPath.startsWith(getDocBase() + File.separator)) {
+                String relPath = absPath.substring(getDocBase().length());
+                String fsRelPath = relPath.replace(File.separatorChar, '/');
+                for (Map.Entry<String, List<String>> mapping : mappedResourcePaths.entrySet()) {
+                    String path = mapping.getKey();
+                    List<String> dirList = mapping.getValue();
+                    String res = null;
+                    if (fsRelPath.equals(path)) {
+                        res = "";
+                    } else if (fsRelPath.startsWith(path + "/")) {
+                        res = relPath.substring(path.length());
+                    }
+                    if (res != null) {
+                        for (String resourcesDir : dirList) {
+                            File f = new File(resourcesDir, res);
+                            if (f.exists() && f.canRead() && f.isDirectory()) {
+                                List<NamingEntry> virtEntries = super.list(f);
+                                for (NamingEntry entry : virtEntries) {
+                                    // filter duplicate
+                                    if (!entryNames.contains(entry.name)) {
+                                        entryNames.add(entry.name);
+                                        entries.add(entry);
+                                    }
+                                }
+
+                            }
+                        }
+                    }
+                }
+            }
         }
 
         return entries;
@@ -161,65 +256,47 @@ public class VirtualDirContext extends FileDirContext {
     @Override
     protected Object doLookup(String name) {
 
-        // handle "virtual" tlds
-        if (name.startsWith("/WEB-INF/") && name.endsWith(".tld")) {
-            String tldName = name.substring(name.lastIndexOf("/") + 1);
-            if (virtualMappings.containsKey(tldName)) {
-                return new FileResource(virtualMappings.get(tldName));
-            }
-        } else if (name.startsWith("/META-INF/tags") && name.endsWith(".tag")
-                || name.endsWith(".tagx")) {
-
-            // already loaded tag file: we are sure that getAttributes() has
-            // already been called if we are here
-            File tagFile = tagfileMappings.get(name);
-            if (tagFile != null) {
-                return new FileResource(tagFile);
-            }
+        Object retSuper = super.doLookup(name);
+        if (retSuper != null || mappedResourcePaths == null) {
+            return retSuper;
         }
 
-        return super.doLookup(name);
-    }
-
-    /**
-     * Scan a given dir for tld files. Any found tld will be added to the
-     * virtualMappings.
-     * @param dir Dir to scan for tlds
-     */
-    private void scanForTlds(File dir) {
-
-        File[] files = dir.listFiles();
-        for (int j = 0; j < files.length; j++) {
-            File file = files[j];
-
-            if (file.isDirectory()) {
-                scanForTlds(file);
-            } else if (file.getName().endsWith(".tld")) {
-                // just generate a random name using the current timestamp, name
-                // doesn't matter since it needs to be referenced by URI
-                String virtualTldName = "~" + System.currentTimeMillis() + "~"
-                        + file.getName();
-                virtualMappings.put(virtualTldName, file);
+        // Perform lookup using the extra resource paths
+        for (Map.Entry<String, List<String>> mapping : mappedResourcePaths.entrySet()) {
+            String path = mapping.getKey();
+            List<String> dirList = mapping.getValue();
+            if (name.equals(path)) {
+                for (String resourcesDir : dirList) {
+                    File f = new File(resourcesDir);
+                    if (f.exists() && f.canRead()) {
+                        if (f.isFile()) {
+                            return new FileResource(f);
+                        }
+                        else {
+                            // never goes here, if f is a directory the super
+                            // implementation already returned a value
+                        }
+                    }
+                }
+            }
+            path += "/";
+            if (name.startsWith(path)) {
+                String res = name.substring(path.length());
+                for (String resourcesDir : dirList) {
+                    File f = new File(resourcesDir + "/" + res);
+                    if (f.exists() && f.canRead()) {
+                        if (f.isFile()) {
+                            return new FileResource(f);
+                        }
+                        else {
+                            // never goes here, if f is a directory the super
+                            // implementation already returned a value
+                        }
+                    }
+                }
             }
         }
-
-    }
-
-    /**
-     * Returns a list of virtual naming entries.
-     * @return list of naming entries, containing tlds in virtualMappings
-     */
-    private List<NamingEntry> getVirtualNamingEntries() {
-        List<NamingEntry> virtual = new ArrayList<NamingEntry>();
-
-        for (String name : virtualMappings.keySet()) {
-
-            File file = virtualMappings.get(name);
-            NamingEntry entry = new NamingEntry(name, new FileResource(file),
-                    NamingEntry.ENTRY);
-            virtual.add(entry);
-        }
-        return virtual;
+        return retSuper;
     }
 
 }
