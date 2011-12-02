@@ -1341,7 +1341,7 @@ public class WebappClassLoader
             }
 
         }
-        
+
         final Iterator<URL> iterator = result.iterator();
 
         return new Enumeration<URL>() {
