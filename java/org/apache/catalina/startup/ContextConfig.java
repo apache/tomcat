@@ -46,6 +46,9 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
+import javax.naming.Binding;
+import javax.naming.NamingEnumeration;
+import javax.naming.NamingException;
 import javax.servlet.ServletContainerInitializer;
 import javax.servlet.ServletContext;
 import javax.servlet.annotation.HandlesTypes;
@@ -79,6 +82,7 @@ import org.apache.catalina.util.ContextName;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.naming.resources.DirContextURLConnection;
+import org.apache.naming.resources.FileDirContext;
 import org.apache.naming.resources.ResourceAttributes;
 import org.apache.tomcat.JarScanner;
 import org.apache.tomcat.JarScannerCallback;
@@ -1197,14 +1201,21 @@ public class ContextConfig
                 // Step 4. Process /WEB-INF/classes for annotations
                 // This will add any matching classes to the typeInitializerMap
                 if (ok) {
-                    URL webinfClasses;
                     try {
-                        webinfClasses = context.getServletContext().getResource(
-                                "/WEB-INF/classes");
-                        processAnnotationsUrl(webinfClasses, webXml);
-                    } catch (MalformedURLException e) {
+                        NamingEnumeration<Binding> listBindings =
+                            context.getResources().listBindings("/WEB-INF/classes");
+                        while (listBindings.hasMoreElements()) {
+                            Binding binding = listBindings.nextElement();
+                            if (binding.getObject() instanceof FileDirContext) {
+                                File webInfCLassDir =
+                                    new File(
+                                        ((FileDirContext) binding.getObject()).getDocBase());
+                                processAnnotationsFile(webInfCLassDir, webXml);
+                            }
+                        }
+                    } catch (NamingException e) {
                         log.error(sm.getString(
-                                "contextConfig.webinfClassesUrl"), e);
+                            "contextConfig.webinfClassesUrl"), e);
                     }
                 }
 
@@ -1567,10 +1578,25 @@ public class ContextConfig
                     if (jar.entryExists("META-INF/resources/")) {
                         context.addResourceJarUrl(url);
                     }
+                } else if ("file".equals(url.getProtocol())) {
+                    FileDirContext fileDirContext = new FileDirContext();
+                    fileDirContext.setDocBase(new File(url.toURI()).getAbsolutePath());
+                    try {
+                        fileDirContext.lookup("META-INF/resources/");
+                        //lookup succeeded
+                        if(context instanceof StandardContext){
+                            ((StandardContext)context).addResourcesDirContext(fileDirContext);
+                        }
+                    } catch (NamingException e) {
+                        //not found, ignore
+                    }
                 }
             } catch (IOException ioe) {
                 log.error(sm.getString("contextConfig.resourceJarFail", url,
                         context.getName()));
+            } catch (URISyntaxException e) {
+                log.error(sm.getString("contextConfig.resourceJarFail", url,
+                    context.getName()));
             } finally {
                 if (jar != null) {
                     jar.close();
