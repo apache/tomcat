@@ -26,10 +26,10 @@ if(url==null) {
 }
 java.io.InputStream is = url.openStream();
 try {
-	int b;
-	while((b=is.read()) != -1){
-	    out.write(b);
-	}
+    int b;
+    while((b=is.read()) != -1){
+        out.write(b);
+    }
 } finally {
     is.close();
 }

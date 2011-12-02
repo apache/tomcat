@@ -93,7 +93,7 @@
     is configured by its parent Context element.</p>
 
   </subsection>
-  
+
   <subsection name="VirtualDirContext implementation">
     <p>This implementation of <strong>Resources</strong> is
     <strong>org.apache.naming.resources.VirtualDirContext</strong> and is aimed to be used
@@ -101,7 +101,7 @@
     directory structure.
     It extends <code>FileDirContext</code> and supports the following
     additional attributes</p>
-    
+
     <attributes>
       <attribute name="extraResourcePaths" required="false">
         <p>Allows to map a path of the filesystem to a path in the webapp. Multiple
