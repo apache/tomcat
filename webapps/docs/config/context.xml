@@ -539,7 +539,7 @@
         <code>docBase</code> instead.</p>
         <p>These external locations will not be emptied if the context
         is un-deployed.</p>
-        <p>A more powerful feature (for development only) is 
+        <p>A more powerful feature (for development only) is
         <a href="#Virtual_webapp">Virtual webapp</a>.</p>
       </attribute>
 
@@ -1254,14 +1254,14 @@
   </subsection>
 
   <subsection name="Virtual webapp">
-    <p>During development it may be more productive to avoid copying files (static 
+    <p>During development it may be more productive to avoid copying files (static
     resources, JSPs, classes, jars...) and configure tomcat to use files from their
-    source locations. To do that, several customisations of the context configuration are 
+    source locations. To do that, several customisations of the context configuration are
     required:</p>
     <ul>
-      <li>The <code>VirtualDirContext</code> implementation of 
+      <li>The <code>VirtualDirContext</code> implementation of
       <a href="resources.html">Resources</a></li>
-      <li>The <code>VirtualWebappLoader</code> implementation of 
+      <li>The <code>VirtualWebappLoader</code> implementation of
       <a href="loader.html">Loader</a></li>
       <li><code>scanAllDirectories="true"</code> on the <a href="jar-scanner.html">JarScanner</a></li>
     </ul>
@@ -1278,11 +1278,11 @@ mywebapp/
          target/
                 classes/
 </source>
-    <p>To deploy such an application (assuming it also uses the log4j maven artefact), 
+    <p>To deploy such an application (assuming it also uses the log4j maven artefact),
     the context configuration looks like:</p>
 <source>
 &lt;Context path="/mywebapp" docBase="/Users/theuser/mywebapp/src/main/webapp" >
-  &lt;Resources className="org.apache.naming.resources.VirtualDirContext" 
+  &lt;Resources className="org.apache.naming.resources.VirtualDirContext"
                 extraResourcePaths="/WEB-INF/classes=/Users/theuser/mywebapp/target/classes" />
   &lt;Loader className="org.apache.catalina.loader.VirtualWebappLoader"
              virtualClasspath="/Users/theuser/mywebapp/target/classes;/Users/theuser/.m2/repository/log4j/log4j/1.2.15/log4j-1.2.15.jar" />
@@ -1291,7 +1291,7 @@ mywebapp/
 </source>
 
     <p>Here is another example where the webapp serves pictures under /pictures and movies
-    under /movies and also depends on another maven project mylib that would normally 
+    under /movies and also depends on another maven project mylib that would normally
     produce a jar to be packaged in WEB-INF/lib:</p>
 <source>
 mylib/

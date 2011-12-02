@@ -25,10 +25,10 @@ import java.io.InputStream;
 import java.util.Arrays;
 import java.util.HashSet;
 
-import junit.framework.Assert;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+
+import org.junit.Assert;
 import org.junit.Test;
 
 import org.apache.catalina.core.JreMemoryLeakPreventionListener;

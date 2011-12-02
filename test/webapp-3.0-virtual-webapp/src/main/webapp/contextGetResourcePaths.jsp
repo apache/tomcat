@@ -20,8 +20,8 @@ response.setContentType("text/plain");
 String path = request.getParameter("path");
 java.util.Set<String> paths = application.getResourcePaths(path);
 if(paths!=null){
-	for(String p : paths) {
-	    out.println(p);
-	}
+    for(String p : paths) {
+        out.println(p);
+    }
 }
 %>
