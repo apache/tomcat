@@ -17,8 +17,6 @@
 
 package org.apache.catalina.loader;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -29,6 +27,10 @@ import java.util.HashSet;
 
 import junit.framework.Assert;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import org.junit.Test;
+
 import org.apache.catalina.core.JreMemoryLeakPreventionListener;
 import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.startup.Tomcat;
@@ -38,7 +40,6 @@ import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.http.fileupload.FileUtils;
 import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.apache.tomcat.util.scan.StandardJarScanner;
-import org.junit.Test;
 
 public class TestVirtualContext extends TomcatBaseTest {
 

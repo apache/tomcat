@@ -28,7 +28,6 @@ import java.util.StringTokenizer;
 import javax.naming.NamingException;
 import javax.naming.directory.Attributes;
 
-import org.apache.catalina.loader.VirtualWebappLoader;
 import org.apache.naming.NamingEntry;
 
 /**
@@ -36,9 +35,9 @@ import org.apache.naming.NamingEntry;
  * directories of the filesystem under a single webapp, a feature mainly used
  * for development with IDEs.
  * This should be used in conjunction with {@link VirtualWebappLoader}.
- * 
+ *
  * Sample context xml configuration:
- * 
+ *
  * <code>
  * &lt;Context path="/mywebapp" docBase="/Users/theuser/mywebapp/src/main/webapp" >
  *   &lt;Resources className="org.apache.naming.resources.VirtualDirContext"
@@ -48,13 +47,13 @@ import org.apache.naming.NamingEntry;
  *   &lt;JarScanner scanAllDirectories="true" />
  * &lt;/Context>
  * </code>
- * 
- * 
+ *
+ *
  * <strong>This is not meant to be used for production.
  * Its meant to ease development with IDE's without the
  * need for fully republishing jars in WEB-INF/lib</strong>
- * 
- * 
+ *
+ *
  * @author Fabrizio Giustina
  * @version $Id$
  */
@@ -76,7 +75,7 @@ public class VirtualDirContext extends FileDirContext {
      * The path to the docBase must not be added here, otherwise resources would
      * be listed twice.
      * </p>
-     * 
+     *
      * @param path
      */
     public void setExtraResourcePaths(String path) {
