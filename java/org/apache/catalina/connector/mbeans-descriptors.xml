@@ -59,10 +59,6 @@
           description="Timeout value on the incoming connection"
                  type="int"/>
 
-    <attribute   name="emptySessionPath"
-          description="The 'empty session path' flag for this Connector"
-                 type="boolean"/>
-
     <attribute   name="enableLookups"
           description="The 'enable DNS lookups' flag for this Connector"
                  type="boolean"/>
