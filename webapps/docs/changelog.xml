@@ -56,6 +56,11 @@
 <section name="Tomcat 7.0.24 (markt)">
   <subsection name="Catalina">
     <changelog>
+      <add>
+        <bug>52184</bug>: Provide greater control over the logging of errors
+        triggered by invalid input data (i.e. data over which Tomcat has no
+        control). (markt) 
+      </add>
       <fix>
         <bug>52225</bug>: Fix ClassCastException in an Alias added to
         existing host through JMX. (kkolinko)
