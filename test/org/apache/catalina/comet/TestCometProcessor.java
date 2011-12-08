@@ -219,7 +219,7 @@ public class TestCometProcessor extends TomcatBaseTest {
                 alv.validateAccessLog(1, 500, 0, 1000);
             } else {
                 assertEquals("HTTP/1.1 200 OK", response[0]);
-                alv.validateAccessLog(1, 200, 0, 9000);
+                alv.validateAccessLog(1, 200, 0, 5000);
             }
 
         }
