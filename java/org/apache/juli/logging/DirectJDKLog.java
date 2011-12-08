@@ -172,13 +172,26 @@ class DirectJDKLog implements Log {
             Throwable dummyException=new Throwable();
             StackTraceElement locations[]=dummyException.getStackTrace();
             // Caller will be the third element (or later if logger is wrapped)
-            String cname = "unknown";
-            String method = "unknown";
-            if (locations != null && locations.length >2) {
-                StackTraceElement caller=locations[2];
-                cname=caller.getClassName();
-                method=caller.getMethodName();
+            String cname = null;
+            String method = null;
+            if (locations != null) {
+                int i = 2;
+                while (locations.length > i) {
+                    StackTraceElement caller = locations[i];
+                    if (caller.getClassName().startsWith("org.apache.juli")) {
+                        i++;
+                    } else {
+                        cname = caller.getClassName();
+                        method = caller.getMethodName();
+                        break;
+                    }
+                }
             }
+            if (cname == null) {
+                cname = "unknown";
+                method = "unknown";
+            }
+
             if (ex==null) {
                 logger.logp(level, cname, method, msg);
             } else {
