@@ -166,7 +166,6 @@ public class TestCometProcessor extends TomcatBaseTest {
         os.write(requestLine.getBytes());
         os.write("transfer-encoding: chunked\r\n".getBytes());
         os.write("\r\n".getBytes());
-        os.flush();
 
         PingWriterThread writeThread = new PingWriterThread(4, os);
         writeThread.start();
@@ -217,11 +216,10 @@ public class TestCometProcessor extends TomcatBaseTest {
             // the 200 response code will already have been sent to the client
             if (SimpleCometServlet.FAIL_ON_BEGIN.equals(initParam)) {
                 assertEquals("HTTP/1.1 500 Internal Server Error", response[0]);
-                alv.validateAccessLog(1, 500, 0, 1100);
+                alv.validateAccessLog(1, 500, 0, 1000);
             } else {
                 assertEquals("HTTP/1.1 200 OK", response[0]);
-                // 0.1s pre-PINGS, 4s PINGS, 1s processing, 1s margin of error
-                alv.validateAccessLog(1, 200, 0, 6100);
+                alv.validateAccessLog(1, 200, 0, 5000);
             }
 
         }
@@ -392,9 +390,6 @@ public class TestCometProcessor extends TomcatBaseTest {
         @Override
         public void run() {
             try {
-                // Sleep to overcome apparent JVM bug where Poller sometimes
-                // fails to report bytes available to read.
-                Thread.sleep(100);
                 for (int i = 0; i < pingCount; i++) {
                     os.write("4\r\n".getBytes());
                     os.write("PING\r\n".getBytes());
