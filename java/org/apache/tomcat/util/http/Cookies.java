@@ -19,6 +19,9 @@ package org.apache.tomcat.util.http;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
+import org.apache.juli.logging.UserDataHelper;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.buf.MessageBytes;
 
@@ -33,8 +36,9 @@ import org.apache.tomcat.util.buf.MessageBytes;
  */
 public final class Cookies {
 
-    private static final org.apache.juli.logging.Log log =
-        org.apache.juli.logging.LogFactory.getLog(Cookies.class );
+    private static final Log log = LogFactory.getLog(Cookies.class);
+
+    private static final UserDataHelper userDataLog = new UserDataHelper(log);
 
     // expected average number of cookies per request
     public static final int INITIAL_SIZE=4;
@@ -346,8 +350,10 @@ public final class Cookies {
                         // INVALID COOKIE, advance to next delimiter
                         // The starting character of the cookie value was
                         // not valid.
-                        log.info("Cookies: Invalid cookie. " +
-                                "Value not a token or quoted value");
+                        if (userDataLog.isEnabled()) {
+                            userDataLog.log("Cookies: Invalid cookie. " +
+                                    "Value not a token or quoted value");
+                        }
                         while (pos < end && bytes[pos] != ';' &&
                                bytes[pos] != ',')
                             {pos++; }
@@ -428,8 +434,9 @@ public final class Cookies {
                 }
 
                 // Unknown cookie, complain
-                log.info("Cookies: Unknown Special Cookie");
-
+                if (userDataLog.isEnabled()) {
+                    userDataLog.log("Cookies: Unknown Special Cookie");
+                }
             } else { // Normal Cookie
                 if (valueStart == -1 && !CookieSupport.ALLOW_NAME_ONLY) {
                     // Skip name only cookies if not supported
