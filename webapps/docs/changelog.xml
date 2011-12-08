@@ -99,6 +99,15 @@
       </update>
     </changelog>
   </subsection>
+  <sub-section name="Tribes">
+    <changelog>
+      <fix>
+        <bug>52208</bug>: Fix threading issue that may lead to harmless NPE
+        during shutdown that has occasionally been observed when running the
+        unit tests. (markt)
+      </fix>
+    </changelog>
+  </sub-section>
   <subsection name="jdbc-pool">
     <changelog>
       <add>
