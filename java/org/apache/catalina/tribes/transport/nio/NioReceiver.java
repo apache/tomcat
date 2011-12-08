@@ -236,6 +236,10 @@ public class NioReceiver extends ReceiverBase implements Runnable {
         }
 
         setListen(true);
+
+        // Avoid NPEs if selector is set to null on stop.
+        Selector selector = this.selector;
+
         if (selector!=null && datagramChannel!=null) {
             ObjectReader oreader = new ObjectReader(MAX_UDP_SIZE); //max size for a datagram packet
             datagramChannel.socket().setSendBufferSize(getUdpTxBufSize());
@@ -267,7 +271,7 @@ public class NioReceiver extends ReceiverBase implements Runnable {
                     continue; // nothing to do
                 }
                 // get an iterator over the set of selected keys
-                Iterator<SelectionKey> it = (selector!=null)?selector.selectedKeys().iterator():null;
+                Iterator<SelectionKey> it = selector.selectedKeys().iterator();
                 // look at each key in the selected set
                 while (it!=null && it.hasNext()) {
                     SelectionKey key = it.next();
@@ -298,7 +302,7 @@ public class NioReceiver extends ReceiverBase implements Runnable {
                     }
 
                     // remove key from selected set, it's been handled
-                    if (selector!=null) it.remove();
+                    it.remove();
                 }
             } catch (java.nio.channels.ClosedSelectorException cse) {
                 // ignore is normal at shutdown or stop listen socket
