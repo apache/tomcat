@@ -23,7 +23,6 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Collections;
 import java.util.ConcurrentModificationException;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
@@ -436,7 +435,7 @@ public class ConnectionPool {
 
         //if the evictor thread is supposed to run, start it now
         if (properties.isPoolSweeperEnabled()) {
-            poolCleaner = new PoolCleaner("[Pool-Cleaner]:" + properties.getName(), this, properties.getTimeBetweenEvictionRunsMillis());
+            poolCleaner = new PoolCleaner(this, properties.getTimeBetweenEvictionRunsMillis());
             poolCleaner.start();
         } //end if
 
@@ -804,7 +803,7 @@ public class ConnectionPool {
             log.warn("Unable to terminate transaction, connection will be closed.",x);
             return false;
         }
-        
+
     }
 
     /**
@@ -1190,8 +1189,8 @@ public class ConnectionPool {
         }
 
     }
-    
-    
+
+
 
     private static volatile Timer poolCleanTimer = null;
     private static HashSet<PoolCleaner> cleaners = new HashSet<PoolCleaner>();
@@ -1222,11 +1221,11 @@ public class ConnectionPool {
             }
         }
     }
-    
+
     public static Set<TimerTask> getPoolCleaners() {
         return Collections.<TimerTask>unmodifiableSet(cleaners);
     }
-    
+
     public static Timer getPoolTimer() {
         return poolCleanTimer;
     }
@@ -1237,7 +1236,7 @@ public class ConnectionPool {
         protected volatile boolean run = true;
         protected volatile long lastRun = 0;
 
-        PoolCleaner(String name, ConnectionPool pool, long sleepTime) {
+        PoolCleaner(ConnectionPool pool, long sleepTime) {
             this.pool = pool;
             this.sleepTime = sleepTime;
             if (sleepTime <= 0) {
