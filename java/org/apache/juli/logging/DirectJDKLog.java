@@ -166,23 +166,23 @@ class DirectJDKLog implements Log {
     // using java.util.logging - and the ugliness if you need to wrap it - is far
     // worse than the unfriendly and uncommon default format for logs.
 
-    private void log( Level level, String msg, Throwable ex ) {
+    private void log(Level level, String msg, Throwable ex) {
         if (logger.isLoggable(level)) {
             // Hack (?) to get the stack trace.
             Throwable dummyException=new Throwable();
             StackTraceElement locations[]=dummyException.getStackTrace();
-            // Caller will be the third element
-            String cname="unknown";
-            String method="unknown";
-            if( locations!=null && locations.length >2 ) {
+            // Caller will be the third element (or later if logger is wrapped)
+            String cname = "unknown";
+            String method = "unknown";
+            if (locations != null && locations.length >2) {
                 StackTraceElement caller=locations[2];
                 cname=caller.getClassName();
                 method=caller.getMethodName();
             }
-            if( ex==null ) {
-                logger.logp( level, cname, method, msg );
+            if (ex==null) {
+                logger.logp(level, cname, method, msg);
             } else {
-                logger.logp( level, cname, method, msg, ex );
+                logger.logp(level, cname, method, msg, ex);
             }
         }
     }

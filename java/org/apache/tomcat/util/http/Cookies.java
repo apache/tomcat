@@ -31,9 +31,9 @@ import org.apache.tomcat.util.buf.MessageBytes;
  * @author Costin Manolache
  * @author kevin seguin
  */
-public final class Cookies { // extends MultiMap {
+public final class Cookies {
 
-    private static final org.apache.juli.logging.Log log=
+    private static final org.apache.juli.logging.Log log =
         org.apache.juli.logging.LogFactory.getLog(Cookies.class );
 
     // expected average number of cookies per request
@@ -128,8 +128,7 @@ public final class Cookies { // extends MultiMap {
     /** Add all Cookie found in the headers of a request.
      */
     public  void processCookies( MimeHeaders headers ) {
-        if( headers==null )
-         {
+        if( headers==null ) {
             return;// nothing to process
         }
         // process each "cookie" header
@@ -148,7 +147,6 @@ public final class Cookies { // extends MultiMap {
                 continue;
             }
 
-            // Uncomment to test the new parsing code
             if( cookieValue.getType() != MessageBytes.T_BYTES ) {
                 Exception e = new Exception();
                 log.warn("Cookies: Parsing cookie as String. Expected bytes.",
@@ -203,11 +201,11 @@ public final class Cookies { // extends MultiMap {
             return false;
         }
         */
-       if (c == ' ' || c == '\t' || c == '\n' || c == '\r' || c == '\f') {
-        return true;
-    } else {
-        return false;
-    }
+        if (c == ' ' || c == '\t' || c == '\n' || c == '\r' || c == '\f') {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     /**
