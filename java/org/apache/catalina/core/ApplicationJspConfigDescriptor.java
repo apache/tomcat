@@ -19,6 +19,7 @@ package org.apache.catalina.core;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 
 import javax.servlet.descriptor.JspConfigDescriptor;
 import javax.servlet.descriptor.JspPropertyGroupDescriptor;
@@ -27,7 +28,7 @@ import javax.servlet.descriptor.TaglibDescriptor;
 public class ApplicationJspConfigDescriptor implements JspConfigDescriptor {
 
     private Collection<JspPropertyGroupDescriptor> jspPropertyGroups =
-        new HashSet<JspPropertyGroupDescriptor>();
+        new LinkedHashSet<JspPropertyGroupDescriptor>();
 
     private Collection<TaglibDescriptor> taglibs =
         new HashSet<TaglibDescriptor>();

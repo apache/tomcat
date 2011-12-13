@@ -398,7 +398,7 @@ public class WebXml {
 
     // jsp-config/jsp-property-group
     private Set<JspPropertyGroup> jspPropertyGroups =
-        new HashSet<JspPropertyGroup>();
+        new LinkedHashSet<JspPropertyGroup>();
     public void addJspPropertyGroup(JspPropertyGroup propertyGroup) {
         jspPropertyGroups.add(propertyGroup);
     }
