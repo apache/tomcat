@@ -90,6 +90,14 @@
       </update>
     </changelog>
   </subsection>
+  <subsection name="Jasper">
+    <changelog>
+      <fix>
+        <bug>52321</bug>: Ensure that the order of multiple prelude/coda values
+        for JSP pages is respected. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Web applications">
     <changelog>
       <update>
