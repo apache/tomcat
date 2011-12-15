@@ -97,8 +97,8 @@
         for JSP pages is respected. (markt)
       </fix>
       <fix>
-        <bug>52335</bug>: Correctly escape <code>&lt;\%</code> sequences and do
-        not escape <code>\%</code> sequences in template text. (markt)
+        <bug>52335</bug>: Only handle <code>&lt;\%</code> and not
+        <code>\%</code> as escaped in template text. (markt)
       </fix>
     </changelog>
   </subsection>
