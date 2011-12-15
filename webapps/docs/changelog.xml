@@ -96,6 +96,10 @@
         <bug>52321</bug>: Ensure that the order of multiple prelude/coda values
         for JSP pages is respected. (markt)
       </fix>
+      <fix>
+        <bug>52335</bug>: Correctly escape <code>&lt;\%</code> sequences and do
+        not escape <code>\%</code> sequences in template text. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
