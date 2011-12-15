@@ -290,6 +290,26 @@ public class TestParser extends TomcatBaseTest {
         assertEcho(res.toString(), "OK");
     }
 
+    @Test
+    public void testBug52335() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+
+        File appDir =
+            new File("test/webapp-3.0");
+        // app dir is relative to server home
+        tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());
+
+        tomcat.start();
+
+        ByteChunk res = getUrl("http://localhost:" + getPort() +
+                "/test/bug52335.jsp");
+
+        String result = res.toString();
+        // Beware of the differences between escaping in JSP attributes and
+        // in Java Strings
+        assertEcho(result, "00 - \\% \\\\% <\\%");
+    }
+
     /** Assertion for text printed by tags:echo */
     private static void assertEcho(String result, String expected) {
         assertTrue(result.indexOf("<p>" + expected + "</p>") > 0);
