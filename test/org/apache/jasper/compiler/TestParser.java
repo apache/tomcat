@@ -307,7 +307,7 @@ public class TestParser extends TomcatBaseTest {
         String result = res.toString();
         // Beware of the differences between escaping in JSP attributes and
         // in Java Strings
-        assertEcho(result, "00 - \\% \\\\% <\\%");
+        assertEcho(result, "00 - \\% \\\\% <%");
     }
 
     /** Assertion for text printed by tags:echo */
