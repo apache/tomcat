@@ -1295,35 +1295,11 @@ class Parser implements TagConstants {
         }
 
         while (reader.hasMoreInput()) {
+            int prev = ch;
             ch = reader.nextChar();
             if (ch == '<') {
-                // Check for <\%
-                ch = reader.nextChar();
-                if (ch == -1) {
-                    reader.pushChar();
-                    break;
-                } else if (ch == '\\') {
-                    ch = reader.nextChar();
-                    if (ch == -1) {
-                        reader.pushChar();
-                        reader.pushChar();
-                        break;
-                    } else if (ch == '%') {
-                        ttext.write('<');
-                        ttext.write('\\');
-                        ttext.write('%');
-                        continue;
-                    } else {
-                        reader.pushChar();
-                        reader.pushChar();
-                        reader.pushChar();
-                        break;
-                    }
-                } else {
-                    reader.pushChar();
-                    reader.pushChar();
-                    break;
-                }
+                reader.pushChar();
+                break;
             } else if ((ch == '$' || ch == '#') && !pageInfo.isELIgnored()) {
                 if (!reader.hasMoreInput()) {
                     ttext.write(ch);
@@ -1343,9 +1319,10 @@ class Parser implements TagConstants {
                     break;
                 }
                 char next = (char) reader.peekChar();
-                // Looking for \$ or \# when EL is being used
-                if ((next == '$' || next == '#') &&
-                        !pageInfo.isELIgnored()) {
+                // Looking for \% or \$ or \#
+                if ((prev == '<' && next == '%') ||
+                        ((next == '$' || next == '#') &&
+                                !pageInfo.isELIgnored())) {
                     ch = reader.nextChar();
                 }
             }

@@ -14,11 +14,13 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 --%>
-<%@ page isELIgnored="true" %>
+<%@ taglib prefix="tags" tagdir="/WEB-INF/tags" %>
 <html>
   <head><title>Bug 52335 test case</title></head>
   <body>
     <p>00 - \% \\% <\%</p>
+    <p>01 - <b><\%</b></p>
+    <p>02 - <tags:echo echo="Foo" /><\%</p>
   </body>
 </html>
 
