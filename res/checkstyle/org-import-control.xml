@@ -40,6 +40,8 @@
     <allow pkg="javax.persistence"/>
     <allow pkg="javax.servlet"/>
     <allow pkg="org.apache.catalina"/>
+    <disallow pkg="org.apache.catalina.ha"/>
+    <disallow pkg="org.apache.catalina.tribes"/>
     <allow pkg="org.apache.coyote"/>
     <allow pkg="org.apache.juli"/>
     <allow pkg="org.apache.naming"/>
@@ -62,6 +64,7 @@
       <disallow pkg="org.apache.coyote"/>
       <disallow pkg="org.apache.naming"/>
       <allow pkg="org.apache.catalina.ha"/>
+      <allow pkg="org.apache.catalina.tribes"/>
     </subpackage>
     <subpackage name="tribes">
       <disallow pkg="javax.annotation"/>

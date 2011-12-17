@@ -22,6 +22,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.reflect.Constructor;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -34,13 +35,13 @@ import org.apache.catalina.LifecycleException;
 import org.apache.catalina.LifecycleState;
 import org.apache.catalina.Server;
 import org.apache.catalina.core.StandardServer;
-import org.apache.catalina.ha.ClusterRuleSet;
 import org.apache.catalina.security.SecurityConfig;
 import org.apache.juli.ClassLoaderLogManager;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.IntrospectionUtils;
 import org.apache.tomcat.util.digester.Digester;
 import org.apache.tomcat.util.digester.Rule;
+import org.apache.tomcat.util.digester.RuleSet;
 import org.apache.tomcat.util.log.SystemLogHandler;
 import org.apache.tomcat.util.res.StringManager;
 import org.xml.sax.Attributes;
@@ -372,13 +373,13 @@ public class Catalina {
         digester.addRuleSet(new EngineRuleSet("Server/Service/"));
         digester.addRuleSet(new HostRuleSet("Server/Service/Engine/"));
         digester.addRuleSet(new ContextRuleSet("Server/Service/Engine/Host/"));
-        digester.addRuleSet(new ClusterRuleSet("Server/Service/Engine/Host/Cluster/"));
+        addClusterRuleSet(digester, "Server/Service/Engine/Host/Cluster/");
         digester.addRuleSet(new NamingRuleSet("Server/Service/Engine/Host/Context/"));
 
         // When the 'engine' is found, set the parentClassLoader.
         digester.addRule("Server/Service/Engine",
                          new SetParentClassLoaderRule(parentClassLoader));
-        digester.addRuleSet(new ClusterRuleSet("Server/Service/Engine/Cluster/"));
+        addClusterRuleSet(digester, "Server/Service/Engine/Cluster/");
 
         long t2=System.currentTimeMillis();
         if (log.isDebugEnabled()) {
@@ -388,6 +389,27 @@ public class Catalina {
 
     }
 
+    /**
+     * Cluster support is optional. The JARs may have been removed.
+     */
+    private void addClusterRuleSet(Digester digester, String prefix) {
+        Class<?> clazz = null;
+        Constructor<?> constructor = null;
+        try {
+            clazz = Class.forName("org.apache.catalina.ha.ClusterRuleSet");
+            constructor = clazz.getConstructor(String.class);
+            RuleSet ruleSet = (RuleSet) constructor.newInstance(prefix);
+            digester.addRuleSet(ruleSet);
+        } catch (Exception e) {
+            if (log.isDebugEnabled()) {
+                log.debug(sm.getString("catalina.noCluster",
+                        e.getClass().getName() + ": " +  e.getMessage()), e);
+            } else if (log.isInfoEnabled()) {
+                log.info(sm.getString("catalina.noCluster",
+                        e.getClass().getName() + ": " +  e.getMessage()));
+            }
+        }
+    }
 
     /**
      * Create and configure the Digester we will be using for shutdown.
