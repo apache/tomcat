@@ -430,9 +430,7 @@ public class ServletRequestWrapper implements ServletRequest {
      * @param wrappedType
      * @since Servlet 3.0 TODO SERVLET3 - Add comments
      */
-    @SuppressWarnings("unchecked")
-    // Spec API does not use generics
-    public boolean isWrapperFor(@SuppressWarnings("rawtypes") Class wrappedType) {
+    public boolean isWrapperFor(Class<?> wrappedType) {
         if (wrappedType.isAssignableFrom(request.getClass())) {
             return true;
         }
