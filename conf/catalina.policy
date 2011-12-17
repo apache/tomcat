@@ -85,6 +85,10 @@ grant codeBase "file:${catalina.home}/bin/tomcat-juli.jar" {
         permission java.util.PropertyPermission "java.util.logging.config.class", "read";
         permission java.util.PropertyPermission "java.util.logging.config.file", "read";
         permission java.util.PropertyPermission "catalina.base", "read";
+        permission java.util.PropertyPermission
+         "org.apache.juli.logging.UserDataHelper.CONFIG", "read";
+        permission java.util.PropertyPermission
+         "org.apache.juli.logging.UserDataHelper.SUPPRESSION_TIME", "read";
 
         // Note: To enable per context logging configuration, permit read access to
         // the appropriate file. Be sure that the logging configuration is
