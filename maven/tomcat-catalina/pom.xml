@@ -105,12 +105,6 @@
                     <exclude name="org/apache/naming/factory/webservices/**" />
                   </fileset>
                 </copy>
-                <copy todir="${sourceBasePath}" includeEmptyDirs="false">
-                  <fileset dir="../../java/">
-                    <!-- hackhish -->
-                    <include name="org/apache/catalina/ha/ClusterRuleSet.java" />
-                  </fileset>
-                </copy>
               </tasks>
             </configuration>
             <goals>
