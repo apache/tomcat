@@ -109,6 +109,10 @@
         <code>RemoteIpValve</code> and <code>RemoteIpFilter</code>
         and their use by <code>AccessLogValve</code>. (kkolinko)
       </update>
+      <fix>
+        <bug>52366</bug>: Fix typo in VirtualWebappLoader documentation
+        (configuration example). (rjung)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Tribes">
