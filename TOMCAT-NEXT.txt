@@ -18,30 +18,34 @@
 Notes of things to consider for the next major Tomcat release (probably 8.0.x
 but possibly 7.1.x).
 
-1. Refactor the TLD parsing. TLDs are currently parsed twice. Once by Catalina
-   looking for listeners and once by Jasper.
+ 1. Refactor the TLD parsing. TLDs are currently parsed twice. Once by Catalina
+    looking for listeners and once by Jasper.
 
-2. Refactor the XML parsing (org.apache.tomcat.util.xml ?) to remove duplicate
-   XML parsing code in Catalina and Jasper such as the entity resolvers used for
-   validation.
+ 2. Refactor the XML parsing (org.apache.tomcat.util.xml ?) to remove duplicate
+    XML parsing code in Catalina and Jasper such as the entity resolvers used
+    for validation.
 
-3. TLDs may have a many to many relationship between URIs and TLD files. This
-   can result in the same TLD file being parsed many times. Refactor the
-   TldLocationCache to cache the parsed nodes (will need to check for changes to
-   TLD files).
+ 3. TLDs may have a many to many relationship between URIs and TLD files. This
+    can result in the same TLD file being parsed many times. Refactor the
+    TldLocationCache to cache the parsed nodes (will need to check for changes
+    to TLD files).
 
-4. TLD files should be included in the dependencies for JSP and Tag files.
+ 4. TLD files should be included in the dependencies for JSP and Tag files.
 
-5. Run the unused code detector and remove everything that isn't currently used.
-   Add deprecation markers for the removed code to Tomcat 7.0.x
+ 5. Run the unused code detector and remove everything that isn't currently used.
+    Add deprecation markers for the removed code to Tomcat 7.0.x
 
-6. Change the default URIEncoding on the connector to UTF-8.
+ 6. Change the default URIEncoding on the connector to UTF-8.
 
-7. Rip out all the JNDI code in resource handling and replace it with straight
-   URLs (File or WAR).
+ 7. Rip out all the JNDI code in resource handling and replace it with straight
+    URLs (File or WAR).
 
-8. Review the connector shutdown code for timing and threading issues
-   particularly any that may result in a client socket being left open after a
-   connector.stop().
+ 8. Review the connector shutdown code for timing and threading issues
+    particularly any that may result in a client socket being left open after a
+    connector.stop().
 
-9. Remove the svn keywords from all the files. (Just Java files?)
+ 9. Remove the svn keywords from all the files. (Just Java files?)
+
+10. Code to the interfaces in the o.a.catalina package and avoid coding directly
+    to implementations in other packages. This is likely to require a lot of
+    work. Maybe use Structure 101 (or similar) to help.
