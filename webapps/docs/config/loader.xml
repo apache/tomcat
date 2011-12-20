@@ -153,7 +153,7 @@
         <p>Additional repositories to search for resources.
         Multiple elements can be joined using <code>;</code>
         as a separator.</p>
-        <p>Example: <code>virtualClasspath=&quot;${catalina_base}/myapp_config&quot;</code></p>
+        <p>Example: <code>virtualClasspath=&quot;${catalina.base}/myapp_config&quot;</code></p>
       </attribute>
 
       <attribute name="searchVirtualFirst" required="false">
