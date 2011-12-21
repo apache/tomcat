@@ -742,8 +742,7 @@ public class ContextConfig
             docBase = cn.getBaseName();
 
             File file = null;
-            if (docBase.toLowerCase(Locale.ENGLISH).endsWith(".war")) {
-                // TODO - This is never executed. Bug or code to delete?
+            if (originalDocBase.toLowerCase(Locale.ENGLISH).endsWith(".war")) {
                 file = new File(System.getProperty("java.io.tmpdir"),
                         deploymentCount++ + "-" + docBase + ".war");
             } else {
