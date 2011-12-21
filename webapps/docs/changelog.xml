@@ -76,6 +76,12 @@
         component start (<bug>46264</bug>) that triggered a deadlock on startup
         if no Realm was configured. (markt)
       </fix>
+      <fix>
+        <bug>52293</bug>: Correctly handle the case when
+        <code>antiResourceLocking</code> is enabled at the Context level when
+        <code>unpackWARs</code> is disabled at the Host level. Based on a patch
+        by Justin Miller. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name = "Coyote">
