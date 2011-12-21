@@ -19,7 +19,9 @@ logs
 work
 build.properties
 mvn.properties
+.checkstyle
 .classpath
+.fbprefs
 .project
 .settings
 *.iml
