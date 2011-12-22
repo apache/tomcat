@@ -46,7 +46,7 @@ import org.apache.catalina.tribes.Member;
  * TODO memberDisappeared, should do nothing except change map membership
  *       by default it relocates the primary objects
  */
-public class ReplicatedMap extends AbstractReplicatedMap {
+public class ReplicatedMap<K,V> extends AbstractReplicatedMap<K,V> {
 
     private static final long serialVersionUID = 1L;
 

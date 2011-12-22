@@ -16,10 +16,10 @@
  */
 package org.apache.catalina.ha.context;
 
-import java.util.AbstractMap;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -60,8 +60,10 @@ public class ReplicatedContext extends StandardContext implements MapOwner {
             CatalinaCluster catclust = (CatalinaCluster)this.getCluster();
             if (this.context == null) this.context = new ReplApplContext(this);
             if ( catclust != null ) {
-                ReplicatedMap map = new ReplicatedMap(this,catclust.getChannel(),DEFAULT_REPL_TIMEOUT,
-                                                      getName(),getClassLoaders());
+                ReplicatedMap<String,Object> map =
+                        new ReplicatedMap<String,Object>(this,
+                                catclust.getChannel(),DEFAULT_REPL_TIMEOUT,
+                                getName(),getClassLoaders());
                 map.setChannelSendOptions(mapSendOptions);
                 ((ReplApplContext)this.context).setAttributeMap(map);
                 if (getAltDDName() != null) context.setAttribute(Globals.ALT_DD_ATTR, getAltDDName());
@@ -85,10 +87,10 @@ public class ReplicatedContext extends StandardContext implements MapOwner {
 
         super.stopInternal();
 
-        AbstractMap<String,Object> map =
-            ((ReplApplContext)this.context).getAttributeMap();
+        Map<String,Object> map =
+                ((ReplApplContext)this.context).getAttributeMap();
         if ( map!=null && map instanceof ReplicatedMap) {
-            ((ReplicatedMap)map).breakdown();
+            ((ReplicatedMap<?,?>)map).breakdown();
         }
     }
 
@@ -144,10 +146,10 @@ public class ReplicatedContext extends StandardContext implements MapOwner {
              return super.getFacade();
         }
 
-        public AbstractMap<String,Object> getAttributeMap() {
-            return (AbstractMap<String,Object>)this.attributes;
+        public Map<String,Object> getAttributeMap() {
+            return this.attributes;
         }
-        public void setAttributeMap(AbstractMap<String,Object> map) {
+        public void setAttributeMap(Map<String,Object> map) {
             this.attributes = map;
         }
 
