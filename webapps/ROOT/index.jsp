@@ -129,7 +129,7 @@ request.setAttribute("tomcat7ExamplesUrl", "/examples/");
                         <pre>$CATALINA_HOME/RUNNING.txt</pre>
                         <p>Developers may be interested in:</p>
                         <ul>
-                            <li><a href="https://issues.apache.org/bugzilla/buglist.cgi?bug_status=UNCONFIRMED&amp;bug_status=NEW&amp;bug_status=ASSIGNED&amp;bug_status=REOPENED&amp;bug_status=RESOLVED&amp;resolution=LATER&amp;resolution=REMIND&amp;resolution=---&amp;bugidtype=include&amp;product=Tomcat+7&amp;cmdtype=doit&amp;order=Importance">Tomcat 7.0 Bug Database</a></li>
+                            <li><a href="http://tomcat.apache.org/bugreport.html">Tomcat 7.0 Bug Database</a></li>
                             <li><a href="${tomcat7DocUrl}api/index.html">Tomcat 7.0 JavaDocs</a></li>
                             <li><a href="http://svn.apache.org/repos/asf/tomcat/tc7.0.x/">Tomcat 7.0 SVN Repository</a></li>
                         </ul>
