@@ -84,7 +84,7 @@
       </fix>
     </changelog>
   </subsection>
-  <subsection name = "Coyote">
+  <subsection name="Coyote">
     <changelog>
       <add>
         <bug>52028</bug>: Add support for automatic binding to a free port by a
@@ -119,6 +119,10 @@
         <bug>52366</bug>: Fix typo in VirtualWebappLoader documentation
         (configuration example). (rjung)
       </fix>
+      <update>
+        Replace Bugzilla search link on <code>ROOT/index.jsp</code> page with
+        one pointing to the bug reporting page of Tomcat site. (kkolinko)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Tribes">
