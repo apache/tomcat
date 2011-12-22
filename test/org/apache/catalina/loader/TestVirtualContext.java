@@ -165,9 +165,14 @@ public class TestVirtualContext extends TomcatBaseTest {
         // even if there's no such resource
         // assertPageContains("/test/contextGetRealPath.jsp?path=nonexistent",
         // "resourceAInWebInfClasses=true", 404);
+
+        // Real paths depend on the OS and this test has to work on all
+        // platforms so use File to convert the path to a platform specifci form
+        File f = new File(
+            "/test/webapp-3.0-virtual-webapp/src/main/webapp/rsrc/resourceF.properties");
         assertPageContains(
             "/test/contextGetRealPath.jsp?path=/rsrc/resourceF.properties",
-            "/test/webapp-3.0-virtual-webapp/src/main/webapp/rsrc/resourceF.properties");
+            f.getPath());
 
         // tests context.getResource then the content
 
