@@ -84,10 +84,6 @@ public abstract class ChannelInterceptorBase implements ChannelInterceptor {
         if (getPrevious() != null) getPrevious().messageReceived(msg);
     }
 
-    public boolean accept(ChannelMessage msg) {
-        return true;
-    }
-
     @Override
     public void memberAdded(Member member) {
         //notify upwards

@@ -253,6 +253,11 @@ public class ChannelCoordinator extends ChannelInterceptorBase implements Messag
         super.messageReceived(msg);
     }
 
+    @Override
+    public boolean accept(ChannelMessage msg) {
+        return true;
+    }
+
     public ChannelReceiver getClusterReceiver() {
         return clusterReceiver;
     }
