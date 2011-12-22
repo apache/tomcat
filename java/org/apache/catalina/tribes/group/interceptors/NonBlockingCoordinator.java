@@ -501,11 +501,6 @@ public class NonBlockingCoordinator extends ChannelInterceptorBase {
     }
 
     @Override
-    public boolean accept(ChannelMessage msg) {
-        return super.accept(msg);
-    }
-
-    @Override
     public void memberAdded(Member member) {
         memberAdded(member,true);
     }
