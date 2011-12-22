@@ -56,7 +56,7 @@ public class MapDemo implements ChannelListener, MembershipListener{
     /**
      * The Map containing the replicated data
      */
-    protected LazyReplicatedMap map;
+    protected LazyReplicatedMap<String,StringBuilder> map;
 
     /**
      * Table to be displayed in Swing
@@ -70,7 +70,8 @@ public class MapDemo implements ChannelListener, MembershipListener{
      */
     public MapDemo(Channel channel, String mapName ) {
         //instantiate the replicated map
-        map = new LazyReplicatedMap(null,channel,5000, mapName,null);
+        map = new LazyReplicatedMap<String,StringBuilder>(null, channel, 5000,
+                mapName, null);
         //create a gui, name it with the member name of this JVM
         table = SimpleTableDemo.createAndShowGUI(map,channel.getLocalMember(false).getName());
         //add ourself as a listener for messages
@@ -212,7 +213,7 @@ public class MapDemo implements ChannelListener, MembershipListener{
 
         private static int WIDTH = 550;
 
-        private LazyReplicatedMap map;
+        private LazyReplicatedMap<String,StringBuilder> map;
         private boolean DEBUG = false;
         AbstractTableModel dataModel = new AbstractTableModel() {
 
@@ -254,7 +255,8 @@ public class MapDemo implements ChannelListener, MembershipListener{
                 if ( row == 0 ) return columnNames[col];
                 Object[] keys = map.keySetFull().toArray();
                 String key = (String)keys [row-1];
-                LazyReplicatedMap.MapEntry entry = map.getInternal(key);
+                LazyReplicatedMap.MapEntry<String,StringBuilder> entry =
+                        map.getInternal(key);
                 switch (col) {
                     case 0: return String.valueOf(row);
                     case 1: return entry.getKey();
@@ -281,7 +283,7 @@ public class MapDemo implements ChannelListener, MembershipListener{
         JTextField txtChangeValue = new JTextField(20);
 
         JTable table = null;
-        public SimpleTableDemo(LazyReplicatedMap map) {
+        public SimpleTableDemo(LazyReplicatedMap<String,StringBuilder> map) {
             super();
             this.map = map;
 
@@ -370,7 +372,7 @@ public class MapDemo implements ChannelListener, MembershipListener{
             }
             if ( "change".equals(e.getActionCommand()) ) {
                 System.out.println("Change key:"+txtChangeKey.getText()+" value:"+txtChangeValue.getText());
-                StringBuilder buf = (StringBuilder)map.get(txtChangeKey.getText());
+                StringBuilder buf = map.get(txtChangeKey.getText());
                 if ( buf!=null ) {
                     buf.delete(0,buf.length());
                     buf.append(txtChangeValue.getText());
@@ -499,7 +501,8 @@ public class MapDemo implements ChannelListener, MembershipListener{
          * this method should be invoked from the
          * event-dispatching thread.
          */
-        public static SimpleTableDemo createAndShowGUI(LazyReplicatedMap map, String title) {
+        public static SimpleTableDemo createAndShowGUI(
+                LazyReplicatedMap<String,StringBuilder> map, String title) {
             //Make sure we have nice window decorations.
             JFrame.setDefaultLookAndFeelDecorated(true);
 
