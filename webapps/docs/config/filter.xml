@@ -1177,10 +1177,17 @@ org.apache.catalina.filters.RequestDumperFilter.handlers = \
   <subsection name="Introduction">
 
     <p>User agents don&apos;t always include character encoding information in
-    requests. Depending on the how the request is processed, a default of either
-    ISO-8859-1 or the platform default encoding may be used. This is not always
-    desirable. This filter provides options for setting that encoding or forcing
-    it to a particular value.</p>
+    requests. Depending on the how the request is processed, usually the
+    default encoding of ISO-8859-1 is used. This is not always
+    desirable. This filter provides options for setting that encoding or
+    forcing it to a particular value. Essentially this filter calls
+    <code>ServletRequest.setCharacterEncoding()</code> method.</p>
+
+    <p>Effectively the value set by this filter is used when parsing parameters
+    in a POST request, if parameter parsing occurs later than this filter. Thus
+    the order of filter mappings is important. Note that the encoding for GET
+    requests is not set here, but on a <b>Connector</b>. See
+    CharacterEncoding page in the FAQ for details.</p>
 
   </subsection>
 
@@ -1199,7 +1206,7 @@ org.apache.catalina.filters.RequestDumperFilter.handlers = \
 
     <attributes>
 
-      <attribute name="encoding" required="false">
+      <attribute name="encoding" required="true">
         <p>Name of the character encoding which should be set.</p>
       </attribute>
 
@@ -1207,7 +1214,8 @@ org.apache.catalina.filters.RequestDumperFilter.handlers = \
         <p>Determines if any character encoding specified by the user agent is
         ignored. If this attribute is <code>true</code>, any value provided by
         the user agent is ignored. If <code>false</code>, the encoding is only
-        set if the user agent did not specify an encoding.</p>
+        set if the user agent did not specify an encoding. The default value
+        is <code>false</code>.</p>
       </attribute>
 
     </attributes>
@@ -1265,6 +1273,10 @@ org.apache.catalina.filters.RequestDumperFilter.handlers = \
     calls. In general the risk of breaking a web application by adding this
     filter is not so high, because parameter parsing does check content type
     of the request before consuming the request body.</p>
+
+    <p>Note, that for the POST requests to be parsed correctly, a
+    <code>SetCharacterEncodingFilter</code> filter must be configured above
+    this one. See CharacterEncoding page in the FAQ for details.</p>
 
     <p>The request is rejected with HTTP status code 400 (Bad Request).</p>
 
