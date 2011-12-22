@@ -55,6 +55,16 @@
       </scode>
     </changelog>
   </subsection>
+  <subsection name="Tribes">
+    <changelog>
+      <scode>
+        Refactor <code>AbstractReplicatedMap</code> to use generics. A key
+        side-effect of this is that the class now implements
+        <code>Map&lt;K,V&gt;</code> rather than extends
+        <code>ConcurrentMap</code>. (markt)
+      </scode>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <scode>
