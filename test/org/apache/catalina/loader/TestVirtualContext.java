@@ -167,9 +167,9 @@ public class TestVirtualContext extends TomcatBaseTest {
         // "resourceAInWebInfClasses=true", 404);
 
         // Real paths depend on the OS and this test has to work on all
-        // platforms so use File to convert the path to a platform specifci form
+        // platforms so use File to convert the path to a platform specific form
         File f = new File(
-            "/test/webapp-3.0-virtual-webapp/src/main/webapp/rsrc/resourceF.properties");
+            "test/webapp-3.0-virtual-webapp/src/main/webapp/rsrc/resourceF.properties");
         assertPageContains(
             "/test/contextGetRealPath.jsp?path=/rsrc/resourceF.properties",
             f.getPath());
