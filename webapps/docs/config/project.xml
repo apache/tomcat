@@ -54,7 +54,6 @@
     </menu>
 
     <menu name="Nested Components">
-        <item name="Filter"                href="filter.html"/>
         <item name="Global Resources"      href="globalresources.html"/>
         <item name="JarScanner"            href="jar-scanner.html"/>
         <item name="Listeners"             href="listeners.html"/>
@@ -78,7 +77,8 @@
         <item name="ClusterListener"       href="cluster-listener.html"/>
     </menu>
 
-    <menu name="Global Settings">
+    <menu name="Other">
+        <item name="Filter"                href="filter.html"/>
         <item name="System properties"     href="systemprops.html"/>
     </menu>
   </body>
