@@ -25,10 +25,9 @@ import javax.management.MBeanFeatureInfo;
 
 
 /**
- * <p>Convenience base class for <code>AttributeInfo</code>,
- * <code>ConstructorInfo</code>, and <code>OperationInfo</code> classes
- * that will be used to collect configuration information for the
- * <code>ModelMBean</code> beans exposed for management.</p>
+ * <p>Convenience base class for <code>AttributeInfo</code> and
+ * <code>OperationInfo</code> classes that will be used to collect configuration
+ * information for the <code>ModelMBean</code> beans exposed for management.</p>
  *
  * @author Craig R. McClanahan
  * @version $Id$
