@@ -130,14 +130,18 @@ public class MessageDispatchInterceptor extends ChannelInterceptorBase implement
         return currentSize;
     }
 
-    public synchronized long addAndGetCurrentSize(long inc) {
-        currentSize += inc;
-        return currentSize;
+    public long addAndGetCurrentSize(long inc) {
+        synchronized (this) {
+            currentSize += inc;
+            return currentSize;
+        }
     }
 
-    public synchronized long setAndGetCurrentSize(long value) {
-        currentSize = value;
-        return value;
+    public long setAndGetCurrentSize(long value) {
+        synchronized (this) {
+            currentSize = value;
+            return value;
+        }
     }
 
     @Override
