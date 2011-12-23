@@ -87,7 +87,7 @@ public class FastQueue {
     /**
      * enabled the queue
      */
-    private boolean enabled = true;
+    private volatile boolean enabled = true;
 
     /**
      *  max queue size
@@ -158,7 +158,7 @@ public class FastQueue {
 
     public void setEnabled(boolean enable) {
         enabled = enable;
-        if (!enabled) {
+        if (!enable) {
             lock.abortRemove();
             last = first = null;
         }
