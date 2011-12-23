@@ -19,6 +19,7 @@ package org.apache.catalina.valves;
 
 import java.io.IOException;
 import java.io.StringReader;
+import java.io.UnsupportedEncodingException;
 import java.net.InetAddress;
 import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
@@ -404,7 +405,12 @@ public class ExtendedAccessLogValve extends AccessLogValve {
             if (null==value || value.length()==0) {
                 return null;
             }
-            return URLEncoder.encode(value);
+            try {
+                return URLEncoder.encode(value, "UTF-8");
+            } catch (UnsupportedEncodingException e) {
+                // Should never happen - all JVMs are required to support UTF-8
+                return null;
+            }
         }
 
         @Override

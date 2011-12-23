@@ -481,7 +481,7 @@
     <li><b><code>x-A(XXX)</code></b> for the servlet context attribute with name XXX</li>
     <li><b><code>x-C(XXX)</code></b> for the first cookie with name XXX</li>
     <li><b><code>x-O(XXX)</code></b> for a concatenation of all outgoing response headers with name XXX</li>
-    <li><b><code>x-P(XXX)</code></b> for the URL encoded request parameter with name XXX</li>
+    <li><b><code>x-P(XXX)</code></b> for the URL encoded (using UTF-8) request parameter with name XXX</li>
     <li><b><code>x-R(XXX)</code></b> for the request attribute with name XXX</li>
     <li><b><code>x-S(XXX)</code></b> for the session attribute with name XXX</li>
     </ul>
