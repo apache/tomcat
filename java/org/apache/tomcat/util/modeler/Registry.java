@@ -24,7 +24,6 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.lang.management.ManagementFactory;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
@@ -82,7 +81,7 @@ public class Registry implements RegistryMBean, MBeanRegistration  {
 
     /** Will be used to isolate different apps and enhance security.
      */
-    private static HashMap<Object,Registry> perLoaderRegistries = null;
+    private static final HashMap<Object,Registry> perLoaderRegistries = null;
 
     /**
      * The registry instance created by our factory method the first time
@@ -117,9 +116,9 @@ public class Registry implements RegistryMBean, MBeanRegistration  {
 
     // Id - small ints to use array access. No reset on stop()
     // Used for notifications
-    private Hashtable<String,Hashtable<String,Integer>> idDomains =
+    private final Hashtable<String,Hashtable<String,Integer>> idDomains =
         new Hashtable<String,Hashtable<String,Integer>>();
-    private Hashtable<String,int[]> ids = new Hashtable<String,int[]>();
+    private final Hashtable<String,int[]> ids = new Hashtable<String,int[]>();
 
 
     // ----------------------------------------------------------- Constructors
@@ -181,20 +180,6 @@ public class Registry implements RegistryMBean, MBeanRegistration  {
             return null;
         }
         return (registry);
-    }
-
-    /**
-     * Allow containers to isolate apps. Can be called only once.
-     * It  is highly recommended you call this method if using Registry in
-     * a container environment. The default is false for backward compatibility
-     *
-     * @param enable
-     * @since 1.1
-     */
-    public static void setUseContextClassLoader( boolean enable ) {
-        if( enable ) {
-            perLoaderRegistries = new HashMap<Object,Registry>();
-        }
     }
 
     // -------------------- Generic methods  --------------------
@@ -409,57 +394,6 @@ public class Registry implements RegistryMBean, MBeanRegistration  {
         if( mb==null )
             mb = descriptorsByClass.get(name);
         return mb;
-    }
-
-    /**
-     * Return the set of bean names for all managed beans known to
-     * this registry.
-     *
-     * @since 1.0
-     */
-    public String[] findManagedBeans() {
-        return descriptors.keySet().toArray(new String[0]);
-    }
-
-
-    /**
-     * Return the set of bean names for all managed beans known to
-     * this registry that belong to the specified group.
-     *
-     * @param group Name of the group of interest, or <code>null</code>
-     *  to select beans that do <em>not</em> belong to a group
-     * @since 1.0
-     */
-    public String[] findManagedBeans(String group) {
-
-        ArrayList<String> results = new ArrayList<String>();
-        Iterator<ManagedBean> items = descriptors.values().iterator();
-        while (items.hasNext()) {
-            ManagedBean item = items.next();
-            if ((group == null)) {
-                if (item.getGroup() == null){
-                    results.add(item.getName());
-                }
-            } else if (group.equals(item.getGroup())) {
-                results.add(item.getName());
-            }
-        }
-        String values[] = new String[results.size()];
-        return results.toArray(values);
-
-    }
-
-
-    /**
-     * Remove an existing bean from the set of beans known to this registry.
-     *
-     * @param bean The managed bean to be removed
-     * @since 1.0
-     */
-    public void removeManagedBean(ManagedBean bean) {
-       // TODO: change this to use group/name
-        descriptors.remove(bean.getName());
-        descriptorsByClass.remove( bean.getType());
     }
 
     // -------------------- Helpers  --------------------
@@ -895,19 +829,4 @@ public class Registry implements RegistryMBean, MBeanRegistration  {
     {
         return findManagedBean(null, beanClass, type);
     }
-
-    /**
-     * Set the <code>MBeanServer</code> to be utilized for our
-     * registered management beans.
-     *
-     * @param server The new <code>MBeanServer</code> instance
-     */
-    public void setMBeanServer( MBeanServer server ) {
-        this.server=server;
-    }
-
-    public void resetMetadata() {
-        stop();
-    }
-
 }
