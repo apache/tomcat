@@ -54,7 +54,7 @@ public class FastQueue {
     /**
      * Current Queue elements size
      */
-    private int size = 0;
+    private volatile int size = 0;
 
     /**
      * check lock to detect strange threadings things
