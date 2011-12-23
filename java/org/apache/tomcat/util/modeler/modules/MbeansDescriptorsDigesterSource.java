@@ -76,56 +76,6 @@ public class MbeansDescriptorsDigesterSource extends ModelerSource
                 "addAttribute",
             "org.apache.tomcat.util.modeler.AttributeInfo");
 
-        /*digester.addObjectCreate
-            ("mbeans-descriptors/mbean/attribute/descriptor/field",
-            "org.apache.tomcat.util.modeler.FieldInfo");
-        digester.addSetProperties
-            ("mbeans-descriptors/mbean/attribute/descriptor/field");
-        digester.addSetNext
-            ("mbeans-descriptors/mbean/attribute/descriptor/field",
-                "addField",
-            "org.apache.tomcat.util.modeler.FieldInfo");
-
-        digester.addObjectCreate
-            ("mbeans-descriptors/mbean/constructor",
-            "org.apache.tomcat.util.modeler.ConstructorInfo");
-        digester.addSetProperties
-            ("mbeans-descriptors/mbean/constructor");
-        digester.addSetNext
-            ("mbeans-descriptors/mbean/constructor",
-                "addConstructor",
-            "org.apache.tomcat.util.modeler.ConstructorInfo");
-
-        digester.addObjectCreate
-            ("mbeans-descriptors/mbean/constructor/descriptor/field",
-            "org.apache.tomcat.util.modeler.FieldInfo");
-        digester.addSetProperties
-            ("mbeans-descriptors/mbean/constructor/descriptor/field");
-        digester.addSetNext
-            ("mbeans-descriptors/mbean/constructor/descriptor/field",
-                "addField",
-            "org.apache.tomcat.util.modeler.FieldInfo");
-
-        digester.addObjectCreate
-            ("mbeans-descriptors/mbean/constructor/parameter",
-            "org.apache.tomcat.util.modeler.ParameterInfo");
-        digester.addSetProperties
-            ("mbeans-descriptors/mbean/constructor/parameter");
-        digester.addSetNext
-            ("mbeans-descriptors/mbean/constructor/parameter",
-                "addParameter",
-            "org.apache.tomcat.util.modeler.ParameterInfo");
-
-        digester.addObjectCreate
-            ("mbeans-descriptors/mbean/descriptor/field",
-            "org.apache.tomcat.util.modeler.FieldInfo");
-        digester.addSetProperties
-            ("mbeans-descriptors/mbean/descriptor/field");
-        digester.addSetNext
-            ("mbeans-descriptors/mbean/descriptor/field",
-                "addField",
-            "org.apache.tomcat.util.modeler.FieldInfo");
-        */
         digester.addObjectCreate
             ("mbeans-descriptors/mbean/notification",
             "org.apache.tomcat.util.modeler.NotificationInfo");

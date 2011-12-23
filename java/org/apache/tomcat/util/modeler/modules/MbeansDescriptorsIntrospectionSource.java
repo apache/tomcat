@@ -365,28 +365,6 @@ public class MbeansDescriptorsIntrospectionSource extends ModelerSource
                 }
             }
 
-            /*Constructor[] constructors = realClass.getConstructors();
-            for(int i=0;i<constructors.length;i++) {
-                ConstructorInfo info = new ConstructorInfo();
-                String className = realClass.getName();
-                int nIndex = -1;
-                if((nIndex = className.lastIndexOf('.'))!=-1) {
-                    className = className.substring(nIndex+1);
-                }
-                info.setName(className);
-                info.setDescription(constructors[i].getName());
-                Class classes[] = constructors[i].getParameterTypes();
-                for(int j=0;j<classes.length;j++) {
-                    ParameterInfo pi = new ParameterInfo();
-                    pi.setType(classes[j].getName());
-                    pi.setName("param" + j);
-                    pi.setDescription("Introspected parameter param" + j);
-                    info.addParameter(pi);
-                }
-                mbean.addConstructor(info);
-            }
-            */
-
             if( log.isDebugEnabled())
                 log.debug("Setting name: " + type );
             mbean.setName( type );
@@ -418,4 +396,3 @@ public class MbeansDescriptorsIntrospectionSource extends ModelerSource
 
 }
 
-// End of class: MbeanDescriptorsIntrospectionSource

@@ -68,13 +68,11 @@ public class ManagedBean implements java.io.Serializable {
         new HashMap<String,OperationInfo>();
 
     protected String className = BASE_MBEAN;
-    //protected ConstructorInfo constructors[] = new ConstructorInfo[0];
     protected String description = null;
     protected String domain = null;
     protected String group = null;
     protected String name = null;
 
-    //protected List fields = new ArrayList();
     protected NotificationInfo notifications[] = new NotificationInfo[0];
     protected String type = null;
 
@@ -119,14 +117,6 @@ public class ManagedBean implements java.io.Serializable {
     }
 
 
-//    /**
-//     * The collection of constructors for this MBean.
-//     */
-//    public ConstructorInfo[] getConstructors() {
-//        return (this.constructors);
-//    }
-
-
     /**
      * The human-readable description of this MBean.
      */
@@ -152,16 +142,6 @@ public class ManagedBean implements java.io.Serializable {
         this.domain = domain;
     }
 
-
-    /**
-     * <p>Return a <code>List</code> of the {@link FieldInfo} objects for
-     * the name/value pairs that should be
-     * added to the Descriptor created from this metadata.</p>
-     */
-//    public List getFields() {
-//        return (this.fields);
-//    }
-//
 
     /**
      * The (optional) group to which this MBean belongs.
@@ -233,36 +213,6 @@ public class ManagedBean implements java.io.Serializable {
     public void addAttribute(AttributeInfo attribute) {
         attributes.put(attribute.getName(), attribute);
     }
-
-
-    /**
-     * Add a new constructor to the set of constructors for this MBean.
-     *
-     * @param constructor The new constructor descriptor
-     */
-//    public void addConstructor(ConstructorInfo constructor) {
-//
-//        synchronized (constructors) {
-//            ConstructorInfo results[] =
-//                new ConstructorInfo[constructors.length + 1];
-//            System.arraycopy(constructors, 0, results, 0, constructors.length);
-//            results[constructors.length] = constructor;
-//            constructors = results;
-//            this.info = null;
-//        }
-//
-//    }
-
-
-    /**
-     * <p>Add a new field to the fields associated with the
-     * Descriptor that will be created from this metadata.</p>
-     *
-     * @param field The field to be added
-     */
-//    public void addField(FieldInfo field) {
-//        fields.add(field);
-//    }
 
 
     /**
@@ -421,12 +371,6 @@ public class ManagedBean implements java.io.Serializable {
             operations[i] = opers[i].createOperationInfo();
 
 
-//        ConstructorInfo consts[] = getConstructors();
-//        ModelMBeanConstructorInfo constructors[] =
-//            new ModelMBeanConstructorInfo[consts.length];
-//        for (int i = 0; i < consts.length; i++)
-//            constructors[i] = consts[i].createConstructorInfo();
-
         NotificationInfo notifs[] = getNotifications();
         MBeanNotificationInfo notifications[] =
             new MBeanNotificationInfo[notifs.length];
@@ -441,17 +385,6 @@ public class ManagedBean implements java.io.Serializable {
                              new MBeanConstructorInfo[] {},
                              operations,
                              notifications);
-//        try {
-//            Descriptor descriptor = info.getMBeanDescriptor();
-//            Iterator fields = getFields().iterator();
-//            while (fields.hasNext()) {
-//                FieldInfo field = (FieldInfo) fields.next();
-//                descriptor.setField(field.getName(), field.getValue());
-//            }
-//            info.setMBeanDescriptor(descriptor);
-//        } catch (MBeanException e) {
-//            ;
-//        }
 
         return (info);
 
