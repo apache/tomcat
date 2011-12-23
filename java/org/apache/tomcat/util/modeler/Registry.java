@@ -709,31 +709,21 @@ public class Registry implements RegistryMBean, MBeanRegistration  {
         if( searchedPaths.get( packageName ) != null ) {
             return;
         }
-        String descriptors=res + "/mbeans-descriptors.ser";
 
-        URL dURL=classLoader.getResource( descriptors );
+        String descriptors = res + "/mbeans-descriptors.xml";
+        URL dURL = classLoader.getResource( descriptors );
 
-        if( dURL == null ) {
-            descriptors=res + "/mbeans-descriptors.xml";
-            dURL=classLoader.getResource( descriptors );
-        }
-        if( dURL == null ) {
+        if (dURL == null) {
             return;
         }
 
         log.debug( "Found " + dURL);
         searchedPaths.put( packageName,  dURL );
         try {
-            if( descriptors.endsWith(".xml" ))
-                loadDescriptors("MbeansDescriptorsDigesterSource", dURL, null);
-            else
-                loadDescriptors("MbeansDescriptorsSerSource", dURL, null);
-            return;
+            loadDescriptors("MbeansDescriptorsDigesterSource", dURL, null);
         } catch(Exception ex ) {
             log.error("Error loading " + dURL);
         }
-
-        return;
     }
 
     /**
