@@ -132,6 +132,10 @@
         during shutdown that has occasionally been observed when running the
         unit tests. (markt)
       </fix>
+      <fix>
+        <bug>52213</bug>, <bug>52354</bug> and <bug>52355</bug>: Fix some
+        potential concurrency issues in <code>FastQueue</code>. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="jdbc-pool">
