@@ -231,7 +231,7 @@ public class Registry implements RegistryMBean, MBeanRegistration  {
      */
     @Override
     public void loadMetadata(Object source ) throws Exception {
-        loadDescriptors( null, source, null );
+        load( null, source, null );
     }
 
     /** Register a bean by creating a modeler mbean and adding it to the
@@ -520,8 +520,7 @@ public class Registry implements RegistryMBean, MBeanRegistration  {
                 log.debug( "Dynamic mbean support ");
             }
             // Dynamic mbean
-            loadDescriptors("MbeansDescriptorsDynamicMBeanSource",
-                    bean, type);
+            load("MbeansDescriptorsDynamicMBeanSource", bean, type);
 
             managed=findManagedBean(type);
         }
@@ -533,8 +532,7 @@ public class Registry implements RegistryMBean, MBeanRegistration  {
             }
 
             // introspection
-            loadDescriptors("MbeansDescriptorsIntrospectionSource",
-                    beanClass, type);
+            load("MbeansDescriptorsIntrospectionSource", beanClass, type);
 
             managed=findManagedBean(type);
             if( managed==null ) {
@@ -720,22 +718,10 @@ public class Registry implements RegistryMBean, MBeanRegistration  {
         log.debug( "Found " + dURL);
         searchedPaths.put( packageName,  dURL );
         try {
-            loadDescriptors("MbeansDescriptorsDigesterSource", dURL, null);
+            load("MbeansDescriptorsDigesterSource", dURL, null);
         } catch(Exception ex ) {
             log.error("Error loading " + dURL);
         }
-    }
-
-    /**
-     * @param sourceType
-     * @param source
-     * @param param
-     * @throws Exception
-
-     */
-    private void loadDescriptors(String sourceType, Object source,
-            String param) throws Exception {
-        load(sourceType, source, param);
     }
 
     /** Lookup the component descriptor in the package and
