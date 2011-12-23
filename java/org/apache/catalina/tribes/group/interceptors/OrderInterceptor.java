@@ -266,6 +266,7 @@ public class OrderInterceptor extends ChannelInterceptorBase {
             return counter;
         }
 
+        @SuppressWarnings("null") // prev cannot be null
         public static MessageOrder add(MessageOrder head, MessageOrder add) {
             if ( head == null ) return add;
             if ( add == null ) return head;
@@ -288,7 +289,7 @@ public class OrderInterceptor extends ChannelInterceptorBase {
                 iter.next = add;
             } else if (iter.getMsgNr() > add.getMsgNr()) {
                 //add before
-                prev.next = add;
+                prev.next = add; // prev cannot be null here, warning suppressed
                 add.next = iter;
 
             } else {
