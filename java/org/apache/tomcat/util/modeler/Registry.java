@@ -196,44 +196,6 @@ public class Registry implements RegistryMBean, MBeanRegistration  {
         searchedPaths=new HashMap<String,URL>();
     }
 
-    /**
-     * Load an extended mlet file. The source can be an URL, File or
-     * InputStream.
-     *
-     * All mbeans will be instantiated, registered and the attributes will be
-     * set. The result is a list of ObjectNames.
-     *
-     * @param source InputStream or URL of the file
-     * @param cl ClassLoader to be used to load the mbeans, or null to use the
-     *        default JMX mechanism ( i.e. all registered loaders )
-     * @return List of ObjectName for the loaded mbeans
-     * @throws Exception
-     *
-     * @since 1.1
-     */
-    @Override
-    public List<ObjectName> loadMBeans( Object source, ClassLoader cl )
-            throws Exception
-    {
-        return load("MbeansSource", source, null );
-    }
-
-
-    /** Load descriptors. The source can be a File or URL or InputStream for the
-     * descriptors file. In the case of File and URL, if the extension is ".ser"
-     * a serialized version will be loaded.
-     *
-     * This method should be used to explicitly load metadata - but this is not
-     * required in most cases. The registerComponent() method will find metadata
-     * in the same package.
-     *
-     * @param source
-     */
-    @Override
-    public void loadMetadata(Object source ) throws Exception {
-        load( null, source, null );
-    }
-
     /** Register a bean by creating a modeler mbean and adding it to the
      * MBeanServer.
      *

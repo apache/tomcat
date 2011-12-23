@@ -40,24 +40,6 @@ import javax.management.ObjectName;
  */
 public interface RegistryMBean {
 
-    /**
-     * Load an extended mlet file. The source can be an URL, File or
-     * InputStream.
-     *
-     * All mbeans will be instantiated, registered and the attributes will be
-     * set. The result is a list of ObjectNames.
-     *
-     * @param source InputStream or URL of the file
-     * @param cl ClassLoader to be used to load the mbeans, or null to use the
-     *        default JMX mechanism ( i.e. all registered loaders )
-     * @return List of ObjectName for the loaded mbeans
-     * @throws Exception
-     *
-     * @since 1.1
-     */
-    public List<ObjectName> loadMBeans( Object source, ClassLoader cl )
-            throws Exception;
-
     /** Invoke an operation on a set of mbeans.
      *
      * @param mbeans List of ObjectNames
@@ -129,14 +111,4 @@ public interface RegistryMBean {
      * @since 1.1
      */
     public void stop();
-
-    /** Load descriptors. The source can be a File, URL pointing to an
-     * mbeans-descriptors.xml.
-     *
-     * Also ( experimental for now ) a ClassLoader - in which case META-INF/ will
-     * be used.
-     *
-     * @param source
-     */
-    public void loadMetadata(Object source ) throws Exception;
 }

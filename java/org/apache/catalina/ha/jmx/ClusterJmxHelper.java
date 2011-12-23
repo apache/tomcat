@@ -37,11 +37,9 @@ import org.apache.tomcat.util.modeler.Registry;
  */
 public class ClusterJmxHelper {
 
-    protected static Registry registry = Registry.getRegistry(null,null);
+    protected static final Registry registry = Registry.getRegistry(null,null);
 
     private static final Log log = LogFactory.getLog(ClusterJmxHelper.class);
-
-    protected static boolean jmxEnabled = true;
 
     protected static MBeanServer mbeanServer = null;
 
@@ -63,7 +61,8 @@ public class ClusterJmxHelper {
     protected static boolean initMetaData(Class<?> clazz) {
         try {
             if (clazz==null) return false;
-            getRegistry().loadMetadata(clazz.getResourceAsStream("mbeans-descriptors.xml"));
+            getRegistry().load(null,
+                    clazz.getResourceAsStream("mbeans-descriptors.xml"), null);
         }catch (Exception x) {
             log.warn("Unable to load meta data for class:"+clazz.getName());
             return false;
