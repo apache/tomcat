@@ -39,7 +39,7 @@ public class FastQueue {
     /**
      * This is the actual queue
      */
-    private SingleRemoveSynchronizedAddLock lock = null;
+    private final SingleRemoveSynchronizedAddLock lock;
 
     /**
      * First Object at queue (consumer message)
@@ -168,20 +168,6 @@ public class FastQueue {
 
 
     /**
-     * unlock queue for next add
-     */
-    public void unlockAdd() {
-        lock.unlockAdd(size > 0 ? true : false);
-    }
-
-    /**
-     * unlock queue for next remove
-     */
-    public void unlockRemove() {
-        lock.unlockRemove();
-    }
-
-    /**
      * start queuing
      */
     public void start() {
@@ -197,10 +183,6 @@ public class FastQueue {
 
     public int getSize() {
         return size;
-    }
-
-    public SingleRemoveSynchronizedAddLock getLock() {
-        return lock;
     }
 
     /**
