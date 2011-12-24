@@ -103,8 +103,7 @@ public class XMLEncodingDetector {
                                        ErrorDispatcher err)
         throws IOException, JasperException
     {
-        InputStream inStream = JspUtil.getInputStream(fname, jarFile, ctxt,
-                                                      err);
+        InputStream inStream = JspUtil.getInputStream(fname, jarFile, ctxt);
         XMLEncodingDetector detector = new XMLEncodingDetector();
         Object[] ret = detector.getEncoding(inStream, err);
         inStream.close();

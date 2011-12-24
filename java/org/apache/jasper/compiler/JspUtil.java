@@ -677,8 +677,7 @@ public class JspUtil {
     }
 
     public static InputStream getInputStream(String fname, JarFile jarFile,
-            JspCompilationContext ctxt, ErrorDispatcher err)
-            throws JasperException, IOException {
+            JspCompilationContext ctxt) throws IOException {
 
         InputStream in = null;
 
@@ -943,7 +942,7 @@ public class JspUtil {
             int skip) throws JasperException, IOException {
 
         InputStreamReader reader = null;
-        InputStream in = getInputStream(fname, jarFile, ctxt, err);
+        InputStream in = getInputStream(fname, jarFile, ctxt);
         for (int i = 0; i < skip; i++) {
             in.read();
         }

@@ -75,11 +75,6 @@ class JspReader {
     private int currFileId;
 
     /**
-     * Seems redundant.
-     */
-    private int size;
-
-    /**
      * The compilation context.
      */
     private JspCompilationContext context;
@@ -135,7 +130,6 @@ class JspReader {
         this.err = err;
         sourceFiles = new Vector<String>();
         currFileId = 0;
-        size = 0;
         singleFile = false;
         pushFile(fname, encoding, reader);
     }
@@ -504,8 +498,6 @@ class JspReader {
         }
 
         sourceFiles.add(file);
-        this.size++;
-
         return sourceFiles.size() - 1;
     }
 
@@ -524,7 +516,6 @@ class JspReader {
         }
 
         sourceFiles.remove(file);
-        this.size--;
         return sourceFiles.size() - 1;
     }
 
