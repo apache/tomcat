@@ -57,16 +57,6 @@ public class FastQueue {
     private volatile int size = 0;
 
     /**
-     * check lock to detect strange threadings things
-     */
-    private volatile boolean checkLock = false;
-
-    // Flags used to detect unexpected state
-    private volatile boolean inAdd = false;
-    private volatile boolean inRemove = false;
-    private volatile boolean inMutex = false;
-
-    /**
      * limit the queue length ( default is unlimited)
      */
     private int maxQueueLength = 0;
@@ -163,21 +153,6 @@ public class FastQueue {
     }
 
     /**
-     * @return Returns the checkLock.
-     */
-    public boolean isCheckLock() {
-        return checkLock;
-    }
-
-    /**
-     * @param checkLock The checkLock to set.
-     */
-    public void setCheckLock(boolean checkLock) {
-        this.checkLock = checkLock;
-    }
-
-
-    /**
      * @return The max size
      */
     public int getMaxSize() {
@@ -247,14 +222,6 @@ public class FastQueue {
             if (log.isTraceEnabled()) {
                 log.trace("FastQueue.add: starting with size " + size);
             }
-            if (checkLock) {
-                if (inAdd)
-                    log.warn("FastQueue.add: Detected other add");
-                inAdd = true;
-                if (inMutex)
-                    log.warn("FastQueue.add: Detected other mutex in add");
-                inMutex = true;
-            }
 
             if ((maxQueueLength > 0) && (size >= maxQueueLength)) {
                 ok = false;
@@ -285,12 +252,6 @@ public class FastQueue {
                 log.error("FastQueue.add: last is null, size is " + size+ " at end of add");
             }
 
-            if (checkLock) {
-                if (!inMutex) log.warn("FastQueue.add: Cancelled by other mutex in add");
-                inMutex = false;
-                if (!inAdd) log.warn("FastQueue.add: Cancelled by other add");
-                inAdd = false;
-            }
             if (log.isTraceEnabled()) log.trace("FastQueue.add: add ending with size " + size);
 
         } finally {
@@ -330,28 +291,12 @@ public class FastQueue {
             if (log.isTraceEnabled()) {
                 log.trace("FastQueue.remove: remove starting with size " + size);
             }
-            if (checkLock) {
-                if (inRemove)
-                    log.warn("FastQueue.remove: Detected other remove");
-                inRemove = true;
-                if (inMutex)
-                    log.warn("FastQueue.remove: Detected other mutex in remove");
-                inMutex = true;
-            }
 
             element = first;
 
             first = last = null;
             size = 0;
 
-            if (checkLock) {
-                if (!inMutex)
-                    log.warn("FastQueue.remove: Cancelled by other mutex in remove");
-                inMutex = false;
-                if (!inRemove)
-                    log.warn("FastQueue.remove: Cancelled by other remove");
-                inRemove = false;
-            }
             if (log.isTraceEnabled()) {
                 log.trace("FastQueue.remove: remove ending with size " + size);
             }
