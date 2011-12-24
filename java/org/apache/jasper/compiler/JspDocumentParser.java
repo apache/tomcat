@@ -167,8 +167,7 @@ class JspDocumentParser
             InputStream inStream = null;
             try {
                 inStream = JspUtil.getInputStream(path, jarFile,
-                                                  jspDocParser.ctxt,
-                                                  jspDocParser.err);
+                                                  jspDocParser.ctxt);
                 saxParser.parse(new InputSource(inStream), jspDocParser);
             } catch (EnableDTDValidationException e) {
                 saxParser = getSAXParser(true, jspDocParser);
@@ -180,8 +179,7 @@ class JspDocumentParser
                     }
                 }
                 inStream = JspUtil.getInputStream(path, jarFile,
-                                                  jspDocParser.ctxt,
-                                                  jspDocParser.err);
+                                                  jspDocParser.ctxt);
                 saxParser.parse(new InputSource(inStream), jspDocParser);
             } finally {
                 if (inStream != null) {
