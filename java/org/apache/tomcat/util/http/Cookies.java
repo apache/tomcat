@@ -24,6 +24,7 @@ import org.apache.juli.logging.LogFactory;
 import org.apache.juli.logging.UserDataHelper;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.buf.MessageBytes;
+import org.apache.tomcat.util.res.StringManager;
 
 /**
  * A collection of cookies - reusable and tuned for server side performance.
@@ -39,6 +40,9 @@ public final class Cookies {
     private static final Log log = LogFactory.getLog(Cookies.class);
 
     private static final UserDataHelper userDataLog = new UserDataHelper(log);
+
+    protected static final StringManager sm =
+            StringManager.getManager("org.apache.tomcat.util.http");
 
     // expected average number of cookies per request
     public static final int INITIAL_SIZE=4;
@@ -350,9 +354,13 @@ public final class Cookies {
                         // INVALID COOKIE, advance to next delimiter
                         // The starting character of the cookie value was
                         // not valid.
-                        if (userDataLog.isEnabled()) {
-                            userDataLog.log("Cookies: Invalid cookie. " +
-                                    "Value not a token or quoted value");
+                        UserDataHelper.Mode logMode = userDataLog.getNextMode();
+                        if (logMode != null) {
+                            String message = sm.getString("cookies.invalidCookieToken");
+                            if (logMode.fallToDebug()) {
+                                message += sm.getString("cookies.fallToDebug");
+                            }
+                            userDataLog.log(logMode, message);
                         }
                         while (pos < end && bytes[pos] != ';' &&
                                bytes[pos] != ',')
@@ -434,8 +442,13 @@ public final class Cookies {
                 }
 
                 // Unknown cookie, complain
-                if (userDataLog.isEnabled()) {
-                    userDataLog.log("Cookies: Unknown Special Cookie");
+                UserDataHelper.Mode logMode = userDataLog.getNextMode();
+                if (logMode != null) {
+                    String message = sm.getString("cookies.invalidSpecial");
+                    if (logMode.fallToDebug()) {
+                        message += sm.getString("cookies.fallToDebug");
+                    }
+                    userDataLog.log(logMode, message);
                 }
             } else { // Normal Cookie
                 if (valueStart == -1 && !CookieSupport.ALLOW_NAME_ONLY) {
