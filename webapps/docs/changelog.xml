@@ -59,7 +59,7 @@
       <add>
         <bug>52184</bug>: Provide greater control over the logging of errors
         triggered by invalid input data (i.e. data over which Tomcat has no
-        control). (markt) 
+        control). (markt/kkolinko) 
       </add>
       <fix>
         <bug>52225</bug>: Fix ClassCastException in an Alias added to
