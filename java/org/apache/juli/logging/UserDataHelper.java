@@ -65,9 +65,9 @@ public class UserDataHelper {
         }
 
         // Default suppression time of 1 day.
-        suppressionTime = Integer.parseInt(
+        suppressionTime = Integer.getInteger(
                 "org.apache.juli.logging.UserDataHelper.SUPPRESSION_TIME",
-                60 * 60 * 24) * 1000L;
+                60 * 60 * 24).intValue() * 1000L;
 
         if (suppressionTime == 0) {
             config = Config.INFO_ALL;
