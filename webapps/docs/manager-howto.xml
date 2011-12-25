@@ -124,10 +124,12 @@ web application. The available roles are:</p>
 <ul>
   <li><strong>manager-gui</strong> &#8212; Access to the HTML interface.</li>
   <li><strong>manager-status</strong> &#8212; Access to the "Server Status"
-    page in the HTML interface only.</li>
+    page only.</li>
   <li><strong>manager-script</strong> &#8212; Access to the tools-friendly
-    plain text interface, that is described in this document.</li>
-  <li><strong>manager-jmx</strong> &#8212; Access to JMX proxy interface.</li>
+    plain text interface that is described in this document,
+    and to the "Server Status" page.</li>
+  <li><strong>manager-jmx</strong> &#8212; Access to JMX proxy interface
+    and to the "Server Status" page.</li>
 </ul>
 
 <p>The HTML interface is protected against CSRF (Cross-Site Request Forgery)
