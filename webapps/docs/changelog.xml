@@ -82,6 +82,11 @@
         <code>unpackWARs</code> is disabled at the Host level. Based on a patch
         by Justin Miller. (markt)
       </fix>
+      <fix>
+        In <code>ExtendedAccessLogValve</code> when printing %-encoded value of
+        a parameter, use UTF-8 encoding to convert parameter value to bytes
+        instead of platform default encoding. (markt/kkolinko)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
