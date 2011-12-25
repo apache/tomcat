@@ -42,6 +42,7 @@ public class UserDataHelper {
 
     // A value of 0 is equivalent to using INFO_ALL
     // A negative value will trigger infinite suppression
+    // The value is milliseconds
     private long suppressionTime;
 
     private volatile long lastInfoTime = 0;
@@ -64,9 +65,9 @@ public class UserDataHelper {
         }
 
         // Default suppression time of 1 day.
-        suppressionTime = Long.getLong(
+        suppressionTime = Integer.parseInt(
                 "org.apache.juli.logging.UserDataHelper.SUPPRESSION_TIME",
-                60 * 60 * 24).longValue();
+                60 * 60 * 24) * 1000L;
 
         if (suppressionTime == 0) {
             config = Config.INFO_ALL;
@@ -74,55 +75,61 @@ public class UserDataHelper {
     }
 
 
-    public boolean isEnabled() {
+    /**
+     * Returns log mode for the next log message, or <code>null</code> if the
+     * message should not be logged.
+     *
+     * <p>
+     * If <code>INFO_THEN_DEBUG</code> configuration option is enabled, this
+     * method might change internal state of this object.
+     *
+     * @return Log mode, or <code>null</code>
+     */
+    public Mode getNextMode() {
         if (Config.NONE == config) {
-            return false;
+            return null;
         } else if (Config.DEBUG_ALL == config) {
-            return log.isDebugEnabled();
+            return log.isDebugEnabled() ? Mode.DEBUG : null;
         } else if (Config.INFO_THEN_DEBUG == config) {
-            if (logAtInfo(false)) {
-                return log.isInfoEnabled();
+            if (logAtInfo()) {
+                return log.isInfoEnabled() ? Mode.INFO_THEN_DEBUG : null;
             } else {
-                return log.isDebugEnabled();
+                return log.isDebugEnabled() ? Mode.DEBUG : null;
             }
         } else if (Config.INFO_ALL == config) {
-            return log.isInfoEnabled();
+            return log.isInfoEnabled() ? Mode.INFO : null;
         }
         // Should never happen
-        return false;
+        return null;
     }
 
 
-    public void log(String message) {
-        if (Config.NONE == config) {
-            // NOOP;
-        } else if (Config.DEBUG_ALL == config) {
-            log.debug(message);
-        } else if (Config.INFO_THEN_DEBUG == config) {
-            if (logAtInfo(true)) {
+    public void log(Mode mode, String message) {
+        if (mode != null) {
+            switch (mode) {
+            case INFO:
+            case INFO_THEN_DEBUG:
                 log.info(message);
-            } else {
+                break;
+            case DEBUG:
                 log.debug(message);
+                break;
             }
-        } else if (Config.INFO_ALL == config) {
-            log.info(message);
         }
     }
 
 
-    public void log(String message, Throwable t) {
-        if (Config.NONE == config) {
-            // NOOP;
-        } else if (Config.DEBUG_ALL == config) {
-            log.debug(message, t);
-        } else if (Config.INFO_THEN_DEBUG == config) {
-            if (logAtInfo(true)) {
+    public void log(Mode mode, String message, Throwable t) {
+        if (mode != null) {
+            switch (mode) {
+            case INFO:
+            case INFO_THEN_DEBUG:
                 log.info(message, t);
-            } else {
+                break;
+            case DEBUG:
                 log.debug(message, t);
+                break;
             }
-        } else if (Config.INFO_ALL == config) {
-            log.info(message, t);
         }
     }
 
@@ -132,7 +139,7 @@ public class UserDataHelper {
      * see a simple enough way to make it completely thread-safe that was not
      * likely to compromise performance.
      */
-    private boolean logAtInfo(boolean updateLastLoggedTime) {
+    private boolean logAtInfo() {
 
         if (suppressionTime < 0 && lastInfoTime > 0) {
             return false;
@@ -144,9 +151,7 @@ public class UserDataHelper {
             return false;
         }
 
-        if (updateLastLoggedTime) {
-            lastInfoTime = now;
-        }
+        lastInfoTime = now;
         return true;
     }
 
@@ -156,5 +161,22 @@ public class UserDataHelper {
         DEBUG_ALL,
         INFO_THEN_DEBUG,
         INFO_ALL
+    }
+
+    /**
+     * Log mode for the next log message.
+     */
+    public static enum Mode {
+        DEBUG(false), INFO_THEN_DEBUG(true), INFO(false);
+
+        private final boolean fallToDebug;
+
+        Mode(boolean fallToDebug) {
+            this.fallToDebug = fallToDebug;
+        }
+
+        public boolean fallToDebug() {
+            return fallToDebug;
+        }
     }
 }

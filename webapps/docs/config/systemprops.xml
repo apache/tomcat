@@ -511,7 +511,8 @@
          property controls how long messages are logged at DEBUG after a message
          has been logged at INFO. Once this period has elapsed, the next message
          will be logged at INFO followed by a new suppression period where
-         messages are logged at DEBUG and so on.</p>
+         messages are logged at DEBUG and so on. The value is measured
+         in seconds.</p>
       <p>A value of <code>0</code> is equivalent to using <code>INFO_ALL</code>
          for <code>org.apache.juli.logging.UserDataHelper.CONFIG</code>.</p>
       <p>A negative value means an infinite suppression period.</p>
