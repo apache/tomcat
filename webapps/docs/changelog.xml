@@ -87,6 +87,14 @@
         a parameter, use UTF-8 encoding to convert parameter value to bytes
         instead of platform default encoding. (markt/kkolinko)
       </fix>
+      <fix>
+        <bug>52384</bug>: Do not fail with parameter parsing when debug logging
+        is enabled. (kkolinko)
+      </fix>
+      <fix>
+        Do not flag extra '&amp;' characters in parameters as parse errors.
+        (kkolinko)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
