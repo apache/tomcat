@@ -297,6 +297,15 @@ public final class Parameters {
             }
 
             if (nameEnd <= nameStart ) {
+                if (valueStart == -1) {
+                    // &&
+                    if (log.isDebugEnabled()) {
+                        log.debug(sm.getString("parameters.emptyChunk"));
+                    }
+                    // Do not flag as error
+                    continue;
+                }
+                // &=foo&
                 if (log.isInfoEnabled()) {
                     if (valueEnd >= nameStart && log.isDebugEnabled()) {
                         String extract = new String(bytes, nameStart,
@@ -318,7 +327,11 @@ public final class Parameters {
             }
 
             tmpName.setBytes(bytes, nameStart, nameEnd - nameStart);
-            tmpValue.setBytes(bytes, valueStart, valueEnd - valueStart);
+            if (valueStart >= 0) {
+                tmpValue.setBytes(bytes, valueStart, valueEnd - valueStart);
+            } else {
+                tmpValue.setBytes(bytes, 0, 0);
+            }
 
             // Take copies as if anything goes wrong originals will be
             // corrupted. This means original values can be logged.
@@ -326,7 +339,11 @@ public final class Parameters {
             if (log.isDebugEnabled()) {
                 try {
                     origName.append(bytes, nameStart, nameEnd - nameStart);
-                    origValue.append(bytes, valueStart, valueEnd - valueStart);
+                    if (valueStart >= 0) {
+                        origValue.append(bytes, valueStart, valueEnd - valueStart);
+                    } else {
+                        origValue.append(bytes, 0, 0);
+                    }
                 } catch (IOException ioe) {
                     // Should never happen...
                     log.error(sm.getString("parameters.copyFail"), ioe);
@@ -343,11 +360,15 @@ public final class Parameters {
                 tmpName.setCharset(charset);
                 name = tmpName.toString();
 
-                if (decodeValue) {
-                    urlDecode(tmpValue);
+                if (valueStart >= 0) {
+                    if (decodeValue) {
+                        urlDecode(tmpValue);
+                    }
+                    tmpValue.setCharset(charset);
+                    value = tmpValue.toString();
+                } else {
+                    value = "";
                 }
-                tmpValue.setCharset(charset);
-                value = tmpValue.toString();
 
                 try {
                     addParameter(name, value);
