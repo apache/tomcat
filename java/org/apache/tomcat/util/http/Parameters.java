@@ -25,6 +25,7 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.juli.logging.UserDataHelper;
 import org.apache.tomcat.util.buf.B2CConverter;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.buf.CharChunk;
@@ -40,6 +41,8 @@ public final class Parameters {
 
     private static final org.apache.juli.logging.Log log =
         org.apache.juli.logging.LogFactory.getLog(Parameters.class );
+
+    private static final UserDataHelper userDataLog = new UserDataHelper(log);
 
     protected static final StringManager sm =
         StringManager.getManager("org.apache.tomcat.util.http");
@@ -306,20 +309,22 @@ public final class Parameters {
                     continue;
                 }
                 // &=foo&
-                if (log.isInfoEnabled()) {
-                    if (valueEnd >= nameStart && log.isDebugEnabled()) {
-                        String extract = new String(bytes, nameStart,
-                                valueEnd - nameStart, DEFAULT_CHARSET);
-                        log.info(sm.getString("parameters.invalidChunk",
-                                Integer.valueOf(nameStart),
-                                Integer.valueOf(valueEnd),
-                                extract));
+                UserDataHelper.Mode logMode = userDataLog.getNextMode();
+                if (logMode != null) {
+                    String extract;
+                    if (valueEnd >= nameStart) {
+                        extract = new String(bytes, nameStart, valueEnd
+                                - nameStart, DEFAULT_CHARSET);
                     } else {
-                        log.info(sm.getString("parameters.invalidChunk",
-                                Integer.valueOf(nameStart),
-                                Integer.valueOf(nameEnd),
-                                null));
+                        extract = "";
                     }
+                    String message = sm.getString("parameters.invalidChunk",
+                            Integer.valueOf(nameStart),
+                            Integer.valueOf(valueEnd), extract);
+                    if (logMode.fallToDebug()) {
+                        message += sm.getString("parameters.fallToDebug");
+                    }
+                    userDataLog.log(logMode, message);
                 }
                 parseFailed = true;
                 continue;
@@ -387,8 +392,17 @@ public final class Parameters {
                         log.debug(sm.getString("parameters.decodeFail.debug",
                                 origName.toString(), origValue.toString()), e);
                     } else if (log.isInfoEnabled()) {
-                        log.info(sm.getString("parameters.decodeFail.info",
-                                tmpName.toString(), tmpValue.toString()), e);
+                        UserDataHelper.Mode logMode = userDataLog.getNextMode();
+                        if (logMode != null) {
+                            String message = sm.getString(
+                                    "parameters.decodeFail.info",
+                                    tmpName.toString(), tmpValue.toString());
+                            if (logMode.fallToDebug()) {
+                                message += sm
+                                        .getString("parameters.fallToDebug");
+                            }
+                            userDataLog.log(logMode, message, e);
+                        }
                     }
                 }
             }
@@ -403,8 +417,16 @@ public final class Parameters {
         }
 
         if (decodeFailCount > 1 && !log.isDebugEnabled()) {
-            log.info(sm.getString("parameters.multipleDecodingFail",
-                    Integer.valueOf(decodeFailCount)));
+            UserDataHelper.Mode logMode = userDataLog.getNextMode();
+            if (logMode != null) {
+                String message = sm.getString(
+                        "parameters.multipleDecodingFail",
+                        Integer.valueOf(decodeFailCount));
+                if (logMode.fallToDebug()) {
+                    message += sm.getString("parameters.fallToDebug");
+                }
+                userDataLog.log(logMode, message);
+            }
         }
     }
 
