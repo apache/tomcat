@@ -499,7 +499,8 @@
       <p>The default value is <code>INFO_THEN_DEBUG</code>.</p>
       <p>The errors currently logged using this system are:
          <ul>
-         <li>invalid cookies.</li>
+         <li>invalid cookies;</li>
+         <li>invalid parameters.</li>
          </ul>
          Other errors triggered by invalid input data may be added to this
          system in later versions.</p>
