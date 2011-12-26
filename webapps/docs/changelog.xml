@@ -166,6 +166,9 @@
   </subsection>
   <subsection name="Other">
     <changelog>
+      <update>
+        Update commons pool to 1.5.7. (kkolinko)
+      </update>
       <fix>
         Fix line ends in <code>.gitignore</code> files contained in source
         distributions. (rjung)
@@ -185,9 +188,13 @@
         src distributions. (kkolinko)
       </fix>
       <add>
-        <bug>52237</bug>: Allow Junit logs to be generated in formats other than
+        <bug>52237</bug>: Allow JUnit logs to be generated in formats other than
         plain text. Patch provided by M Hasko. (markt)
       </add>
+      <fix>
+        Fix build condition for tomcat-dbcp to always rebuild whan a new version
+        of commons-pool or commons-dbcp is downloaded. (kkolinko)
+      </fix>
     </changelog>
   </subsection>
 </section>

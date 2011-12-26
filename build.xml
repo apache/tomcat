@@ -2235,10 +2235,14 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       <param name="destfile" value="${commons-dbcp.home}/build.xml" />
     </antcall>
     <mkdir dir="${tomcat-dbcp.home}"/>
+    <!-- Rebuild dbcp only if built jars do not exist -->
+    <!-- or new versions of pool or dbcp have been downloaded. -->
     <condition property="no.build.dbcp">
       <and>
-        <available file="${tomcat-dbcp.jar}"/>
-        <available file="${tomcat-dbcp-src.jar}"/>
+        <uptodate srcfile="${commons-pool.home}" targetfile="${tomcat-dbcp.jar}" />
+        <uptodate srcfile="${commons-pool.home}" targetfile="${tomcat-dbcp-src.jar}" />
+        <uptodate srcfile="${commons-dbcp.home}" targetfile="${tomcat-dbcp.jar}" />
+        <uptodate srcfile="${commons-dbcp.home}" targetfile="${tomcat-dbcp-src.jar}" />
       </and>
     </condition>
     <antcall target="build-tomcat-dbcp" />
