@@ -95,6 +95,10 @@
         Do not flag extra '&amp;' characters in parameters as parse errors.
         (kkolinko)
       </fix>
+      <fix>
+        Reduce log level for the message about hitting
+        <code>maxParameterCount</code> limit from WARN to INFO. (kkolinko)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
