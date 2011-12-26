@@ -167,7 +167,7 @@
   <subsection name="Other">
     <changelog>
       <update>
-        Update commons pool to 1.5.7. (kkolinko)
+        Update Apache Commons Pool to 1.5.7. (kkolinko)
       </update>
       <fix>
         Fix line ends in <code>.gitignore</code> files contained in source
@@ -1299,7 +1299,7 @@
   <subsection name="Other">
     <changelog>
       <update>
-        Update to Commons Daemon 1.0.6. (markt)
+        Update to Apache Commons Daemon 1.0.6. (markt)
       </update>
       <update>
         Update to Eclipse JDT Compiler 3.7. (markt)
@@ -2112,7 +2112,7 @@
         not found it might be because execute permission is needed. (kkolinko)
       </update>
       <update>
-        Update commons pool to 1.5.6. (markt)
+        Update Apache Commons Pool to 1.5.6. (markt)
       </update>
       <fix>
         <bug>51135</bug>: Fix auto-detection of JAVA_HOME for 64-bit Windows
@@ -2896,7 +2896,7 @@
   <subsection name="General">
     <changelog>
       <update>
-        Update to Commons Daemon 1.0.5. (mturk)
+        Update to Apache Commons Daemon 1.0.5. (mturk)
       </update>
     </changelog>
   </subsection>
@@ -3197,7 +3197,7 @@
   <subsection name="General">
     <changelog>
       <update>
-        Update to Commons Daemon 1.0.4. (mturk)
+        Update to Apache Commons Daemon 1.0.4. (mturk)
       </update>
     </changelog>
   </subsection>
@@ -4032,7 +4032,7 @@
         Patch provided by sebb. (markt)
       </fix>
       <update>
-        Update commons pool to 1.5.5. (markt)
+        Update Apache Commons Pool to 1.5.5. (markt)
       </update>
       <update>
         <bug>49955</bug>: Improvement and correction of Building Tomcat guide.
@@ -4073,7 +4073,7 @@
         files. (markt)
       </add>
       <update>
-        Update Commons Daemon from 1.0.2 to 1.0.3.(markt)
+        Update Apache Commons Daemon from 1.0.2 to 1.0.3. (markt)
       </update>
       <update>
         Update Eclipse JDT Core Batch Compiler (ecj.jar) from 3.5.1 to 3.6.
