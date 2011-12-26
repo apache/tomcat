@@ -150,7 +150,9 @@
     <td></td>
     <td>List of environment variables that will be provided to the service
         in the form <b>key=value</b>. They are separated using either
-        <b>#</b> or <b>;</b> characters</td>
+        <b>#</b> or <b>;</b> characters. If you need to use either the <b>#</b>
+        or <b>;</b> character within a value then the entire value must be
+        enclosed inside single quotes.</td>
     </tr>
     <tr>
     <td>--User</td>

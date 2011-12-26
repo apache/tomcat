@@ -133,6 +133,11 @@
         and their use by <code>AccessLogValve</code>. (kkolinko)
       </update>
       <fix>
+        <bug>52243</bug>: Improve windows service documentation to clarify how
+        to include <code>#</code> and/or <code>;</code> in the value of an
+        environment variable that is passed to the service. (markt)
+      </fix>
+      <fix>
         <bug>52366</bug>: Fix typo in VirtualWebappLoader documentation
         (configuration example). (rjung)
       </fix>
