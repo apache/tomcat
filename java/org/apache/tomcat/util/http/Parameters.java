@@ -399,7 +399,7 @@ public final class Parameters {
                     // Hitting limit stops processing further params but does
                     // not cause request to fail.
                     parseFailed = true;
-                    log.warn(ise.getMessage());
+                    log.info(ise.getMessage());
                     break;
                 }
             } catch (IOException e) {
