@@ -44,6 +44,8 @@ public final class Parameters {
 
     private static final UserDataHelper userDataLog = new UserDataHelper(log);
 
+    private static final UserDataHelper maxParamCountLog = new UserDataHelper(log);
+
     protected static final StringManager sm =
         StringManager.getManager("org.apache.tomcat.util.http");
 
@@ -381,7 +383,14 @@ public final class Parameters {
                     // Hitting limit stops processing further params but does
                     // not cause request to fail.
                     parseFailed = true;
-                    log.info(ise.getMessage());
+                    UserDataHelper.Mode logMode = maxParamCountLog.getNextMode();
+                    if (logMode != null) {
+                        String message = ise.getMessage();
+                        if (logMode.fallToDebug()) {
+                            message += sm.getString("parameters.maxCountFail.fallToDebug");
+                        }
+                        maxParamCountLog.log(logMode, message);
+                    }
                     break;
                 }
             } catch (IOException e) {
@@ -398,8 +407,7 @@ public final class Parameters {
                                     "parameters.decodeFail.info",
                                     tmpName.toString(), tmpValue.toString());
                             if (logMode.fallToDebug()) {
-                                message += sm
-                                        .getString("parameters.fallToDebug");
+                                message += sm.getString("parameters.fallToDebug");
                             }
                             userDataLog.log(logMode, message, e);
                         }
