@@ -88,6 +88,11 @@
         instead of platform default encoding. (markt/kkolinko)
       </fix>
       <fix>
+        <bug>52303</bug>: Allow web applications that do not have a login
+        configuration to participate in a SSO session. Patch provided by Brian
+        Burch. (markt)
+      </fix>
+      <fix>
         <bug>52384</bug>: Do not fail with parameter parsing when debug logging
         is enabled. (kkolinko)
       </fix>
