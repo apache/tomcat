@@ -18,11 +18,13 @@ package org.apache.catalina.authenticator;
 
 
 import java.io.IOException;
+import java.security.Principal;
 
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.deploy.LoginConfig;
+import org.apache.catalina.Session;
 
 
 
@@ -40,16 +42,42 @@ public final class NonLoginAuthenticator extends AuthenticatorBase {
 
 
     /**
-     * Authenticate the user making this request, based on the specified
-     * login configuration.  Return <code>true</code> if any specified
-     * constraint has been satisfied, or <code>false</code> if we have
-     * created a response challenge already.
+     * Authenticate the user making this request, based on the fact that no
+     * <code>login-config</code> has been defined for the container.
      *
-     * @param request Request we are processing
-     * @param response Response we are populating
-     * @param config    Login configuration describing how authentication
-     *              should be performed
+     * This implementation means "login the user even though there is no
+     * self-contained way to establish a security Principal for that user".
+     * 
+     * This method is called by the AuthenticatorBase super class to
+     * establish a Principal for the user BEFORE the container security
+     * constraints are examined, i.e. it is not yet known whether the user
+     * will eventually be permitted to access the requested resource.
+     * Therefore, it is necessary to always return <code>true</code> to
+     * indicate the user has not failed authentication.
      *
+     * There are two cases:
+     *
+     *  - without SingleSignon: a Session instance does not yet exist
+     *    and there is no <code>auth-method</code> to authenticate the
+     *    user, so leave Request's Principal as null.
+     *    note: AuthenticatorBase will later examine the security constraints
+     *          to determine whether the resource is accessible by a user
+     *          without a security Principal and Role (i.e. unauthenticated).
+     *
+     * - with SingleSignon: if the user has already authenticated via
+     *   another container (using its own login configuration), then
+     *   associate this Session with the SSOEntry so it inherits the
+     *   already-established security Principal and associated Roles.
+     *   note: This particular session will become a full member of the
+     *         SingleSignOnEntry Session collection and so will potentially
+     *         keep the SSOE "alive", even if all the other properly
+     *         authenticated Sessions expire first... until it expires too.
+     *
+     * @param request  Request we are processing
+     * @param response Response we are creating
+     * @param config   Login configuration describing how authentication
+     *                 should be performed
+     * @return boolean to indicate whether the user is authenticated
      * @exception IOException if an input/output error occurs
      */
     @Override
@@ -58,24 +86,51 @@ public final class NonLoginAuthenticator extends AuthenticatorBase {
                                 LoginConfig config)
         throws IOException {
 
-        /*  Associating this request's session with an SSO would allow
-            coordinated session invalidation, but should the session for
-            a webapp that the user didn't log into be invalidated when
-            another session is logged out?
-        String ssoId = (String) request.getNote(Constants.REQ_SSOID_NOTE);
-        if (ssoId != null)
-            associate(ssoId, getSession(request, true));
-        */
+        Principal principal = request.getUserPrincipal();
+        if (principal != null) {
+            // excellent... we have already authenticated the client somehow,
+            // probably from another container that has a login-config
+            if (containerLog.isDebugEnabled())
+                containerLog.debug("Already authenticated as '"
+                          + principal.getName() + "'");
 
-        if (containerLog.isDebugEnabled()) {
-            containerLog.debug("User authentication is not required");
+            // create a new session (only if necessary)
+            Session session = request.getSessionInternal(true);
+
+            // save the inherited Principal (if necessary) in this
+            // session so it can remain authenticated until it expires
+            session.setPrincipal(principal);
+            session.setNote(Constants.FORM_PRINCIPAL_NOTE, principal);
+
+            // is there an SSO session cookie?
+            String ssoId =
+                    (String) request.getNote(Constants.REQ_SSOID_NOTE);
+            if (ssoId != null) {
+                if (containerLog.isDebugEnabled())
+                    containerLog.debug("User authenticated by existing SSO");
+                // Associate session with the existing SSO ID if necessary
+                associate(ssoId, session);
+            }
+            // user was already authenticated, with or without a cookie
+            return true;
         }
-        return (true);
 
+        // No Principal means the user is not already authenticated
+        // and so will not be assigned any roles. It is safe to
+        // to say the user is now authenticated because access to
+        // protected resources will only be allowed with a matching role.
+        // i.e. SC_FORBIDDEN (403 status) will be generated later.
 
+        if (containerLog.isDebugEnabled())
+            containerLog.debug("User authenticated without any roles");
+        return true;
     }
 
 
+    /**
+     * Return the authentication method, which is vendor-specific and
+     * not defined by HttpServletRequest.
+     */
     @Override
     protected String getAuthMethod() {
         return "NONE";
