@@ -105,12 +105,18 @@ public class SecureNioChannel extends NioChannel  {
 //                  NIO SSL METHODS
 //===========================================================================================
     /**
-     * returns true if the network buffer has
-     * been flushed out and is empty
-     * @return boolean
+     * Returns true if the network buffer has been flushed out and is empty.
+     *
+     * @param block     Should a blocking write be used?
+     * @param s
+     * @param timeout
+     * @param lastWrite
+     * @return
+     * @throws IOException
      */
     @Override
-    public boolean flush(boolean block, Selector s, long timeout,MutableInteger lastWrite) throws IOException {
+    public boolean flush(boolean block, Selector s, long timeout,
+            MutableInteger lastWrite) throws IOException {
         if (!block) {
             flush(netOutBuffer);
         } else {
@@ -218,6 +224,7 @@ public class SecureNioChannel extends NioChannel  {
      * @throws IOException - if an IO exception occurs or if application or network buffers contain data
      * @throws SocketTimeoutException - if a socket operation timed out
      */
+    @SuppressWarnings("null") // key cannot be null
     public void rehandshake(long timeout) throws IOException {
         //validate the network buffers are empty
         if (netInBuffer.position() > 0 && netInBuffer.position()<netInBuffer.limit()) throw new IOException("Network input buffer still contains data. Handshake will fail.");
@@ -247,7 +254,7 @@ public class SecureNioChannel extends NioChannel  {
                             }
                             key = getIOChannel().register(selector, hsStatus);
                         } else {
-                            key.interestOps(hsStatus);
+                            key.interestOps(hsStatus); // null warning supressed
                         }
                         int keyCount = selector.select(timeout);
                         if (keyCount == 0 && ((System.currentTimeMillis()-now) >= timeout)) {
