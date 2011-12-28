@@ -93,6 +93,11 @@
         Burch. (markt)
       </fix>
       <fix>
+        <bug>52316</bug>: When using sendfile, use the number of bytes requested
+        to be written to the response in the access log valve for bytes written
+        rather than recording a value of zero. (markt)
+      </fix>
+      <fix>
         <bug>52384</bug>: Do not fail with parameter parsing when debug logging
         is enabled. (kkolinko)
       </fix>
