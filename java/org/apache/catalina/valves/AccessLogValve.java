@@ -1617,6 +1617,20 @@ public class AccessLogValve extends ValveBase implements AccessLog {
             // Don't need to flush since trigger for log message is after the
             // response has been committed
             long length = response.getBytesWritten(false);
+            if (length <= 0) {
+                // Protect against nulls and unexpected types as these values
+                // may be set by untrusted applications
+                Object start = request.getAttribute(
+                        "org.apache.tomcat.sendfile.start");
+                if (start instanceof Long) {
+                    Object end = request.getAttribute(
+                            "org.apache.tomcat.sendfile.end");
+                    if (end instanceof Long) {
+                        length = ((Long) end).longValue() -
+                                ((Long) start).longValue();
+                    }
+                }
+            }
             if (length <= 0 && conversion) {
                 buf.append('-');
             } else {

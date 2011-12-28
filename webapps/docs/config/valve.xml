@@ -80,6 +80,11 @@
     <code>AccessLog</code> implementation found to log those requests that are
     rejected before they are passed to a container.</p>
 
+    <p>If sendfile is used, the response bytes will be written asynchronously
+    in a separate thread and the access log valve will not know how many bytes
+    were actually written. In this case, the number of bytes that was passed to
+    the sendfile thread for writing will be recorded in the access log valve.
+    </p>
   </subsection>
 
   <subsection name="Attributes">
