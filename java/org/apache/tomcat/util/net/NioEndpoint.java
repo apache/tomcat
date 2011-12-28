@@ -901,10 +901,10 @@ public class NioEndpoint extends AbstractEndpoint {
                     } else {
                         cancel = true;
                     }
-                    if ( cancel ) socket.getPoller().cancelledKey(key,SocketStatus.ERROR,false);
+                    if ( cancel ) socket.getPoller().cancelledKey(key,SocketStatus.ERROR);
                 }catch (CancelledKeyException ckx) {
                     try {
-                        socket.getPoller().cancelledKey(key,SocketStatus.DISCONNECT,true);
+                        socket.getPoller().cancelledKey(key,SocketStatus.DISCONNECT);
                     }catch (Exception ignore) {}
                 }
             }//end if
@@ -1028,20 +1028,19 @@ public class NioEndpoint extends AbstractEndpoint {
             else r.reset(socket,ka,OP_REGISTER);
             addEvent(r);
         }
-        public void cancelledKey(SelectionKey key, SocketStatus status, boolean dispatch) {
+        public void cancelledKey(SelectionKey key, SocketStatus status) {
             try {
                 if ( key == null ) return;//nothing to do
                 KeyAttachment ka = (KeyAttachment) key.attachment();
                 if (ka != null && ka.getComet() && status != null) {
-                    //the comet event takes care of clean up
-                    //processSocket(ka.getChannel(), status, dispatch);
                     ka.setComet(false);//to avoid a loop
                     if (status == SocketStatus.TIMEOUT ) {
                         if (processSocket(ka.getChannel(), status, true)) {
                             return; // don't close on comet timeout
                         }
                     } else {
-                        processSocket(ka.getChannel(), status, false); //don't dispatch if the lines below are cancelling the key
+                        // Don't dispatch if the lines below are canceling the key
+                        processSocket(ka.getChannel(), status, false);
                     }
                 }
                 key.attach(null);
@@ -1191,7 +1190,7 @@ public class NioEndpoint extends AbstractEndpoint {
             boolean result = true;
             try {
                 if ( close ) {
-                    cancelledKey(sk, SocketStatus.STOP, attachment.comet);
+                    cancelledKey(sk, SocketStatus.STOP);
                 } else if ( sk.isValid() && attachment != null ) {
                     attachment.access();//make sure we don't time out valid sockets
                     sk.attach(attachment);//cant remember why this is here
@@ -1224,7 +1223,7 @@ public class NioEndpoint extends AbstractEndpoint {
                                 unreg(sk, attachment,sk.readyOps());
                                 boolean close = (!processSocket(channel, null, true));
                                 if (close) {
-                                    cancelledKey(sk,SocketStatus.DISCONNECT,false);
+                                    cancelledKey(sk,SocketStatus.DISCONNECT);
                                 }
                             } else {
                                 result = false;
@@ -1233,10 +1232,10 @@ public class NioEndpoint extends AbstractEndpoint {
                     }
                 } else {
                     //invalid key
-                    cancelledKey(sk, SocketStatus.ERROR,false);
+                    cancelledKey(sk, SocketStatus.ERROR);
                 }
             } catch ( CancelledKeyException ckx ) {
-                cancelledKey(sk, SocketStatus.ERROR,false);
+                cancelledKey(sk, SocketStatus.ERROR);
             } catch (Throwable t) {
                 ExceptionUtils.handleThrowable(t);
                 log.error("",t);
@@ -1252,7 +1251,7 @@ public class NioEndpoint extends AbstractEndpoint {
                 if ( sd.fchannel == null ) {
                     File f = new File(sd.fileName);
                     if ( !f.exists() ) {
-                        cancelledKey(sk,SocketStatus.ERROR,false);
+                        cancelledKey(sk,SocketStatus.ERROR);
                         return false;
                     }
                     sd.fchannel = new FileInputStream(f).getChannel();
@@ -1304,7 +1303,7 @@ public class NioEndpoint extends AbstractEndpoint {
                         if (log.isDebugEnabled()) {
                             log.debug("Send file connection is being closed");
                         }
-                        cancelledKey(sk,SocketStatus.STOP,false);
+                        cancelledKey(sk,SocketStatus.STOP);
                         return false;
                     }
                 } else if ( attachment.interestOps() == 0 && reg ) {
@@ -1319,11 +1318,11 @@ public class NioEndpoint extends AbstractEndpoint {
                 }
             }catch ( IOException x ) {
                 if ( log.isDebugEnabled() ) log.debug("Unable to complete sendfile request:", x);
-                cancelledKey(sk,SocketStatus.ERROR,false);
+                cancelledKey(sk,SocketStatus.ERROR);
                 return false;
             }catch ( Throwable t ) {
                 log.error("",t);
-                cancelledKey(sk, SocketStatus.ERROR, false);
+                cancelledKey(sk, SocketStatus.ERROR);
                 return false;
             }finally {
                 if (sc!=null) sc.setSendFile(false);
@@ -1360,9 +1359,9 @@ public class NioEndpoint extends AbstractEndpoint {
                 try {
                     KeyAttachment ka = (KeyAttachment) key.attachment();
                     if ( ka == null ) {
-                        cancelledKey(key, SocketStatus.ERROR,false); //we don't support any keys without attachments
+                        cancelledKey(key, SocketStatus.ERROR); //we don't support any keys without attachments
                     } else if ( ka.getError() ) {
-                        cancelledKey(key, SocketStatus.ERROR,true);//TODO this is not yet being used
+                        cancelledKey(key, SocketStatus.ERROR);//TODO this is not yet being used
                     } else if (ka.getComet() && ka.getCometNotify() ) {
                         ka.setCometNotify(false);
                         reg(key,ka,0);//avoid multiple calls, this gets reregistered after invocation
@@ -1381,7 +1380,7 @@ public class NioEndpoint extends AbstractEndpoint {
                         } else if (isTimedout) {
                             key.interestOps(0);
                             ka.interestOps(0); //avoid duplicate timeout calls
-                            cancelledKey(key, SocketStatus.TIMEOUT,true);
+                            cancelledKey(key, SocketStatus.TIMEOUT);
                         } else if (timeout > -1) {
                             long nextTime = now+(timeout-delta);
                             nextExpiration = (nextTime < nextExpiration)?nextTime:nextExpiration;
@@ -1400,7 +1399,7 @@ public class NioEndpoint extends AbstractEndpoint {
                         }
                     }//end if
                 }catch ( CancelledKeyException ckx ) {
-                    cancelledKey(key, SocketStatus.ERROR,false);
+                    cancelledKey(key, SocketStatus.ERROR);
                 }
             }//for
             if ( log.isTraceEnabled() ) log.trace("timeout completed: keys processed="+keycount+"; now="+now+"; nextExpiration="+prevExp+"; "+
@@ -1568,6 +1567,7 @@ public class NioEndpoint extends AbstractEndpoint {
             this.status = status;
         }
 
+        @SuppressWarnings("null") // key
         @Override
         public void run() {
             boolean launch = false;
@@ -1588,6 +1588,8 @@ public class NioEndpoint extends AbstractEndpoint {
                     if ( handshake == 0 ) {
                         SocketState state = SocketState.OPEN;
                         // Process the request from this socket
+                        // Suppress null warnings for key in this block since
+                        // key can't be null in this block
                         if (status == null) {
                             state = handler.process(
                                     (KeyAttachment) key.attachment(),
@@ -1601,12 +1603,9 @@ public class NioEndpoint extends AbstractEndpoint {
                         if (state == SocketState.CLOSED) {
                             // Close socket and pool
                             try {
-                                KeyAttachment ka = null;
-                                if (key!=null) {
-                                    ka = (KeyAttachment) key.attachment();
-                                    if (ka!=null) ka.setComet(false);
-                                    socket.getPoller().cancelledKey(key, SocketStatus.ERROR, false);
-                                }
+                                KeyAttachment ka = (KeyAttachment) key.attachment();
+                                if (ka!=null) ka.setComet(false);
+                                socket.getPoller().cancelledKey(key, SocketStatus.ERROR);
                                 nioChannels.offer(socket);
                                 socket = null;
                                 if ( ka!=null ) keyCache.offer(ka);
@@ -1619,7 +1618,7 @@ public class NioEndpoint extends AbstractEndpoint {
                         KeyAttachment ka = null;
                         if (key!=null) {
                             ka = (KeyAttachment) key.attachment();
-                            socket.getPoller().cancelledKey(key, SocketStatus.DISCONNECT, false);
+                            socket.getPoller().cancelledKey(key, SocketStatus.DISCONNECT);
                         }
                         nioChannels.offer(socket);
                         socket = null;
@@ -1632,11 +1631,11 @@ public class NioEndpoint extends AbstractEndpoint {
                         ka.getPoller().add(socket,intops);
                     }
                 }catch(CancelledKeyException cx) {
-                    socket.getPoller().cancelledKey(key,null,false);
+                    socket.getPoller().cancelledKey(key,null);
                 } catch (OutOfMemoryError oom) {
                     try {
                         oomParachuteData = null;
-                        socket.getPoller().cancelledKey(key,SocketStatus.ERROR,false);
+                        socket.getPoller().cancelledKey(key,SocketStatus.ERROR);
                         releaseCaches();
                         log.error("", oom);
                     }catch ( Throwable oomt ) {
@@ -1649,7 +1648,7 @@ public class NioEndpoint extends AbstractEndpoint {
                     }
                 }catch ( Throwable t ) {
                     log.error("",t);
-                    socket.getPoller().cancelledKey(key,SocketStatus.ERROR,false);
+                    socket.getPoller().cancelledKey(key,SocketStatus.ERROR);
                 } finally {
                     if (launch) {
                         try {
