@@ -42,36 +42,38 @@ public final class NonLoginAuthenticator extends AuthenticatorBase {
 
 
     /**
-     * Authenticate the user making this request, based on the fact that no
-     * <code>login-config</code> has been defined for the container.
+     * <p>Authenticate the user making this request, based on the fact that no
+     * <code>login-config</code> has been defined for the container.</p>
      *
-     * This implementation means "login the user even though there is no
-     * self-contained way to establish a security Principal for that user".
-     * 
-     * This method is called by the AuthenticatorBase super class to
+     * <p>This implementation means "login the user even though there is no
+     * self-contained way to establish a security Principal for that user".</p>
+     *
+     * <p>This method is called by the AuthenticatorBase super class to
      * establish a Principal for the user BEFORE the container security
      * constraints are examined, i.e. it is not yet known whether the user
      * will eventually be permitted to access the requested resource.
      * Therefore, it is necessary to always return <code>true</code> to
-     * indicate the user has not failed authentication.
+     * indicate the user has not failed authentication.</p>
      *
-     * There are two cases:
-     *
-     *  - without SingleSignon: a Session instance does not yet exist
-     *    and there is no <code>auth-method</code> to authenticate the
-     *    user, so leave Request's Principal as null.
-     *    note: AuthenticatorBase will later examine the security constraints
-     *          to determine whether the resource is accessible by a user
-     *          without a security Principal and Role (i.e. unauthenticated).
-     *
-     * - with SingleSignon: if the user has already authenticated via
-     *   another container (using its own login configuration), then
-     *   associate this Session with the SSOEntry so it inherits the
-     *   already-established security Principal and associated Roles.
-     *   note: This particular session will become a full member of the
-     *         SingleSignOnEntry Session collection and so will potentially
-     *         keep the SSOE "alive", even if all the other properly
-     *         authenticated Sessions expire first... until it expires too.
+     * <p>There are two cases:
+     * <ul>
+     * <li>without SingleSignon: a Session instance does not yet exist
+     *     and there is no <code>auth-method</code> to authenticate the
+     *     user, so leave Request's Principal as null.
+     *     Note: AuthenticatorBase will later examine the security constraints
+     *           to determine whether the resource is accessible by a user
+     *           without a security Principal and Role (i.e. unauthenticated).
+     * </li>
+     * <li>with SingleSignon: if the user has already authenticated via
+     *     another container (using its own login configuration), then
+     *     associate this Session with the SSOEntry so it inherits the
+     *     already-established security Principal and associated Roles.
+     *     Note: This particular session will become a full member of the
+     *           SingleSignOnEntry Session collection and so will potentially
+     *           keep the SSOE "alive", even if all the other properly
+     *           authenticated Sessions expire first... until it expires too.
+     * </li>
+     * </ul></p>
      *
      * @param request  Request we are processing
      * @param response Response we are creating
@@ -94,23 +96,25 @@ public final class NonLoginAuthenticator extends AuthenticatorBase {
                 containerLog.debug("Already authenticated as '"
                           + principal.getName() + "'");
 
-            // create a new session (only if necessary)
-            Session session = request.getSessionInternal(true);
+            if (cache) {
+                // create a new session (only if necessary)
+                Session session = request.getSessionInternal(true);
 
-            // save the inherited Principal (if necessary) in this
-            // session so it can remain authenticated until it expires
-            session.setPrincipal(principal);
-            session.setNote(Constants.FORM_PRINCIPAL_NOTE, principal);
+                // save the inherited Principal (if necessary) in this
+                // session so it can remain authenticated until it expires
+                session.setPrincipal(principal);
 
-            // is there an SSO session cookie?
-            String ssoId =
-                    (String) request.getNote(Constants.REQ_SSOID_NOTE);
-            if (ssoId != null) {
-                if (containerLog.isDebugEnabled())
-                    containerLog.debug("User authenticated by existing SSO");
-                // Associate session with the existing SSO ID if necessary
-                associate(ssoId, session);
+                // is there an SSO session cookie?
+                String ssoId =
+                        (String) request.getNote(Constants.REQ_SSOID_NOTE);
+                if (ssoId != null) {
+                    if (containerLog.isDebugEnabled())
+                        containerLog.debug("User authenticated by existing SSO");
+                    // Associate session with the existing SSO ID if necessary
+                    associate(ssoId, session);
+                }
             }
+
             // user was already authenticated, with or without a cookie
             return true;
         }
