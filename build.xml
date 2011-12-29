@@ -1138,6 +1138,8 @@
             <exclude name="**/Tester*.java" />
             <!-- Exclude the tests known to fail -->
             <exclude name="org/apache/catalina/tribes/test/**" />
+            <exclude name="org/apache/catalina/comet/TestCometProcessor.java"
+                     unless="${execute.test.comet}"/>
           </fileset>
         </batchtest>
       </junit>
