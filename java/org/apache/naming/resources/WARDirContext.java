@@ -73,6 +73,8 @@ public class WARDirContext extends BaseDirContext {
 
     /**
      * Builds a WAR directory context using the given environment.
+     * Note: The environment is unused by Tomcat but required since we use the
+     *       DirContext interface
      */
     public WARDirContext(Hashtable<String,Object> env) {
         super(env);
@@ -880,10 +882,10 @@ public class WARDirContext extends BaseDirContext {
         // --------------------------------------------------- Member Variables
 
 
-        protected String name = null;
+        protected final String name;
 
 
-        protected ZipEntry entry = null;
+        protected final ZipEntry entry;
 
 
         protected Entry children[] = new Entry[0];
@@ -969,7 +971,7 @@ public class WARDirContext extends BaseDirContext {
         // --------------------------------------------------- Member Variables
 
 
-        protected ZipEntry entry;
+        protected final ZipEntry entry;
 
 
         // ----------------------------------------------------- Public Methods

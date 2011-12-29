@@ -73,6 +73,10 @@ public class ProxyDirContext implements DirContext {
     public ProxyDirContext(Hashtable<String,String> env,
             DirContext dirContext) {
         this.dirContext = dirContext;
+
+        ResourceCache cache = null;
+        int cacheTTL = 5000;  // 5s
+        int cacheObjectMaxSize = 512; // 512 KB
         if (dirContext instanceof BaseDirContext) {
             // Initialize parameters based on the associated dir context, like
             // the caching policy.
@@ -95,6 +99,10 @@ public class ProxyDirContext implements DirContext {
                 }
             }
         }
+        this.cache = cache;
+        this.cacheTTL = cacheTTL;
+        this.cacheObjectMaxSize = cacheObjectMaxSize;
+
         hostName = env.get(HOST);
         contextName = env.get(CONTEXT);
         int i = contextName.indexOf('#');
@@ -150,19 +158,19 @@ public class ProxyDirContext implements DirContext {
     /**
      * Cache.
      */
-    protected ResourceCache cache = null;
+    protected final ResourceCache cache;
 
 
     /**
      * Cache TTL.
      */
-    protected int cacheTTL = 5000; // 5s
+    protected final int cacheTTL;
 
 
     /**
      * Max size of resources which will have their content cached.
      */
-    protected int cacheObjectMaxSize = 512; // 512 KB
+    protected final int cacheObjectMaxSize;
 
 
     /**
