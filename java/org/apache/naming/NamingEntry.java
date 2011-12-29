@@ -14,8 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.naming;
 
 
@@ -25,21 +23,12 @@ package org.apache.naming;
  * @author Remy Maucherat
  * @version $Id$
  */
-
 public class NamingEntry {
-
-
-    // -------------------------------------------------------------- Constants
-
 
     public static final int ENTRY = 0;
     public static final int LINK_REF = 1;
     public static final int REFERENCE = 2;
-
     public static final int CONTEXT = 10;
-
-
-    // ----------------------------------------------------------- Constructors
 
 
     public NamingEntry(String name, Object value, int type) {
@@ -49,19 +38,13 @@ public class NamingEntry {
     }
 
 
-    // ----------------------------------------------------- Instance Variables
-
-
     /**
      * The type instance variable is used to avoid using RTTI when doing
      * lookups.
      */
     public int type;
-    public String name;
+    public final String name;
     public Object value;
-
-
-    // --------------------------------------------------------- Object Methods
 
 
     @Override
@@ -78,6 +61,4 @@ public class NamingEntry {
     public int hashCode() {
         return name.hashCode();
     }
-
-
 }

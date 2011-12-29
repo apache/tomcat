@@ -70,6 +70,7 @@ public class SelectorContext implements Context {
      */
     public SelectorContext(Hashtable<String,Object> env) {
         this.env = env;
+        this.initialContext = false;
     }
 
 
@@ -78,7 +79,7 @@ public class SelectorContext implements Context {
      */
     public SelectorContext(Hashtable<String,Object> env,
             boolean initialContext) {
-        this(env);
+        this.env = env;
         this.initialContext = initialContext;
     }
 
@@ -89,7 +90,7 @@ public class SelectorContext implements Context {
     /**
      * Environment.
      */
-    protected Hashtable<String,Object> env;
+    protected final Hashtable<String,Object> env;
 
 
     /**
@@ -101,7 +102,7 @@ public class SelectorContext implements Context {
     /**
      * Request for an initial context.
      */
-    protected boolean initialContext = false;
+    protected final boolean initialContext;
 
 
     // --------------------------------------------------------- Public Methods

@@ -102,7 +102,7 @@ public class NamingContext implements Context {
     /**
      * Environment.
      */
-    protected Hashtable<String,Object> env;
+    protected final Hashtable<String,Object> env;
 
 
     /**
@@ -120,7 +120,7 @@ public class NamingContext implements Context {
     /**
      * Name of the associated Catalina Context.
      */
-    protected String name;
+    protected final String name;
 
 
     /**

@@ -94,19 +94,13 @@ public abstract class BaseDirContext implements DirContext {
     /**
      * Environment.
      */
-    protected Hashtable<String,Object> env;
+    protected final Hashtable<String,Object> env;
 
 
     /**
      * The string manager for this package.
      */
     protected static final StringManager sm = StringManager.getManager(Constants.Package);
-
-
-    /**
-     * Name parser for this context.
-     */
-    protected final NameParser nameParser = new NameParserImpl();
 
 
     /**
@@ -136,7 +130,7 @@ public abstract class BaseDirContext implements DirContext {
     /**
      * Aliases allow content to be included from other locations.
      */
-    protected Map<String,BaseDirContext> aliases =
+    protected final Map<String,BaseDirContext> aliases =
         new HashMap<String,BaseDirContext>();
 
 
@@ -145,7 +139,7 @@ public abstract class BaseDirContext implements DirContext {
      * searched in the order they are added if the requested resource cannot be
      * found in the primary DirContext.
      */
-    protected List<DirContext> altDirContexts = new ArrayList<DirContext>();
+    protected final List<DirContext> altDirContexts = new ArrayList<DirContext>();
 
 
     // ------------------------------------------------------------- Properties

@@ -14,8 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.naming.factory.webservices;
 
 import java.lang.reflect.InvocationHandler;
@@ -34,15 +32,13 @@ import javax.xml.rpc.ServiceException;
  *
  * @author Fabien Carrion
  */
-
-public class ServiceProxy
-    implements InvocationHandler {
+public class ServiceProxy implements InvocationHandler {
 
     /**
      * Service object.
      * used for delegation
      */
-    private Service service = null;
+    private final Service service;
 
     /**
      * changing behavior to method : Service.getPort(QName, Class)

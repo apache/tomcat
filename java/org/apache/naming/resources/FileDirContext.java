@@ -912,7 +912,7 @@ public class FileDirContext extends BaseDirContext {
         /**
          * Associated file object.
          */
-        protected File file;
+        protected final File file;
 
 
         // --------------------------------------------------- Resource Methods
@@ -961,7 +961,7 @@ public class FileDirContext extends BaseDirContext {
         // --------------------------------------------------- Member Variables
 
 
-        protected File file;
+        protected final File file;
 
 
         protected boolean accessed = false;

@@ -164,7 +164,7 @@ public class ResourceAttributes implements Attributes {
      * Default constructor.
      */
     public ResourceAttributes() {
-        // NO-OP
+        this.attributes = null;
     }
 
 
@@ -248,7 +248,7 @@ public class ResourceAttributes implements Attributes {
     /**
      * External attributes.
      */
-    protected Attributes attributes = null;
+    protected final Attributes attributes;
 
 
     // ------------------------------------------------------------- Properties

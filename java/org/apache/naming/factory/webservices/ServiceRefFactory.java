@@ -56,28 +56,10 @@ import org.apache.naming.ServiceRef;
  *
  * @author Fabien Carrion
  */
-
-public class ServiceRefFactory
-    implements ObjectFactory {
-
-
-    // ----------------------------------------------------------- Constructors
-
-
-    // -------------------------------------------------------------- Constants
-
-
-    // ----------------------------------------------------- Instance Variables
-
-
-    // --------------------------------------------------------- Public Methods
-
-
-    // -------------------------------------------------- ObjectFactory Methods
-
+public class ServiceRefFactory implements ObjectFactory {
 
     /**
-     * Crete a new serviceref instance.
+     * Create a new serviceref instance.
      *
      * @param obj The reference object describing the webservice
      */

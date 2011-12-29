@@ -14,8 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.naming;
 
 import javax.naming.Context;
@@ -28,12 +26,10 @@ import javax.naming.StringRefAddr;
  * @author Remy Maucherat
  * @version $Id$
  */
-
 public class ResourceLinkRef extends Reference {
 
     private static final long serialVersionUID = 1L;
 
-    // -------------------------------------------------------------- Constants
 
     /**
      * Default factory for this reference.
@@ -46,20 +42,6 @@ public class ResourceLinkRef extends Reference {
      * Description address type.
      */
     public static final String GLOBALNAME = "globalName";
-
-
-    // ----------------------------------------------------------- Constructors
-
-
-    /**
-     * ResourceLink Reference.
-     *
-     * @param resourceClass Resource class
-     * @param globalName Global name
-     */
-    public ResourceLinkRef(String resourceClass, String globalName) {
-        this(resourceClass, globalName, null, null);
-    }
 
 
     /**
@@ -77,12 +59,6 @@ public class ResourceLinkRef extends Reference {
             add(refAddr);
         }
     }
-
-
-    // ----------------------------------------------------- Instance Variables
-
-
-    // ------------------------------------------------------ Reference Methods
 
 
     /**
@@ -103,9 +79,4 @@ public class ResourceLinkRef extends Reference {
             }
         }
     }
-
-
-    // ------------------------------------------------------------- Properties
-
-
 }
