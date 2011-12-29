@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.naming.resources;
 
 import java.io.IOException;
@@ -38,7 +37,7 @@ public class DirContextURLStreamHandler extends URLStreamHandler {
 
 
     public DirContextURLStreamHandler() {
-        // NOOP
+        this.context = null;
     }
 
 
@@ -53,14 +52,14 @@ public class DirContextURLStreamHandler extends URLStreamHandler {
     /**
      * Bindings class loader - directory context. Keyed by CL id.
      */
-    private static Hashtable<ClassLoader,DirContext> clBindings =
+    private static final Hashtable<ClassLoader,DirContext> clBindings =
         new Hashtable<ClassLoader,DirContext>();
 
 
     /**
      * Bindings thread - directory context. Keyed by thread id.
      */
-    private static Hashtable<Thread,DirContext> threadBindings =
+    private static final Hashtable<Thread,DirContext> threadBindings =
         new Hashtable<Thread,DirContext>();
 
 
@@ -70,7 +69,7 @@ public class DirContextURLStreamHandler extends URLStreamHandler {
     /**
      * Directory context.
      */
-    protected DirContext context = null;
+    protected final DirContext context;
 
 
     // ------------------------------------------------------------- Properties
@@ -150,19 +149,11 @@ public class DirContextURLStreamHandler extends URLStreamHandler {
 
 
     /**
-     * Returns true if the thread or the context class loader of the current
-     * thread is bound.
-     */
-    public static boolean isBound() {
-        return (clBindings.containsKey
-                (Thread.currentThread().getContextClassLoader()))
-            || (threadBindings.containsKey(Thread.currentThread()));
-    }
-
-
-    /**
      * Binds a directory context to a class loader.
+     * @deprecated Unused in Tomcat. Will remove in Tomcat 9 unless someone
+     *             complains.
      */
+    @Deprecated
     public static void bind(DirContext dirContext) {
         ClassLoader currentCL =
             Thread.currentThread().getContextClassLoader();
@@ -173,7 +164,10 @@ public class DirContextURLStreamHandler extends URLStreamHandler {
 
     /**
      * Unbinds a directory context to a class loader.
+     * @deprecated Unused in Tomcat. Will remove in Tomcat 9 unless someone
+     *             complains.
      */
+    @Deprecated
     public static void unbind() {
         ClassLoader currentCL =
             Thread.currentThread().getContextClassLoader();
@@ -247,22 +241,4 @@ public class DirContextURLStreamHandler extends URLStreamHandler {
     public static void unbind(ClassLoader cl) {
         clBindings.remove(cl);
     }
-
-
-    /**
-     * Get the bound context.
-     */
-    public static DirContext get(ClassLoader cl) {
-        return clBindings.get(cl);
-    }
-
-
-    /**
-     * Get the bound context.
-     */
-    public static DirContext get(Thread thread) {
-        return threadBindings.get(thread);
-    }
-
-
 }

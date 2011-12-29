@@ -52,13 +52,13 @@ public class NamingContextBindingsEnumeration
     /**
      * Underlying enumeration.
      */
-    protected Iterator<NamingEntry> iterator;
+    protected final Iterator<NamingEntry> iterator;
 
 
     /**
      * The context for which this enumeration is being generated.
      */
-    private Context ctx;
+    private final Context ctx;
 
 
     // --------------------------------------------------------- Public Methods

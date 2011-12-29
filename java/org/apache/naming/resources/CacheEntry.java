@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.naming.resources;
 
 import javax.naming.directory.DirContext;
@@ -27,10 +26,6 @@ import javax.naming.directory.DirContext;
  */
 public class CacheEntry {
 
-
-    // ------------------------------------------------- Instance Variables
-
-
     public long timestamp = -1;
     public String name = null;
     public ResourceAttributes attributes = null;
@@ -41,21 +36,6 @@ public class CacheEntry {
     public int size = 1;
 
 
-    // ----------------------------------------------------- Public Methods
-
-
-    public void recycle() {
-        timestamp = -1;
-        name = null;
-        attributes = null;
-        resource = null;
-        context = null;
-        exists = true;
-        accessCount = 0;
-        size = 1;
-    }
-
-
     @Override
     public String toString() {
         return ("Cache entry: " + name + "\n"
@@ -64,6 +44,4 @@ public class CacheEntry {
                 + "Resource: " + resource + "\n"
                 + "Context: " + context);
     }
-
-
 }

@@ -68,8 +68,10 @@ public class DirContextURLConnection
             throw new IllegalArgumentException
                 ("Directory context can't be null");
         if (org.apache.naming.Constants.IS_SECURITY_ENABLED) {
-            this.permission = new JndiPermission(url.toString());
-    }
+            permission = new JndiPermission(url.toString());
+        } else {
+            permission = null;
+        }
         this.context = context;
     }
 
@@ -80,7 +82,7 @@ public class DirContextURLConnection
     /**
      * Directory context.
      */
-    protected DirContext context;
+    protected final DirContext context;
 
 
     /**
@@ -116,7 +118,7 @@ public class DirContextURLConnection
     /**
      * Permission
      */
-    protected Permission permission;
+    protected final Permission permission;
 
 
     // ------------------------------------------------------------- Properties

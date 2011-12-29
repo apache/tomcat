@@ -72,7 +72,6 @@ public class ProxyDirContext implements DirContext {
      */
     public ProxyDirContext(Hashtable<String,String> env,
             DirContext dirContext) {
-        this.env = env;
         this.dirContext = dirContext;
         if (dirContext instanceof BaseDirContext) {
             // Initialize parameters based on the associated dir context, like
@@ -111,18 +110,6 @@ public class ProxyDirContext implements DirContext {
 
 
     /**
-     * Proxy DirContext (either this or the real proxy).
-     */
-    protected ProxyDirContext proxy = this;
-
-
-    /**
-     * Environment.
-     */
-    protected Hashtable<String,String> env;
-
-
-    /**
      * The string manager for this package.
      */
     protected static final StringManager sm =
@@ -132,37 +119,31 @@ public class ProxyDirContext implements DirContext {
     /**
      * Associated DirContext.
      */
-    protected DirContext dirContext;
-
-
-    /**
-     * Virtual path.
-     */
-    protected String vPath = null;
+    protected final DirContext dirContext;
 
 
     /**
      * Host name.
      */
-    protected String hostName;
+    protected final String hostName;
 
 
     /**
      * Context name.
      */
-    protected String contextName;
+    protected final String contextName;
 
 
     /**
      * Context path.
      */
-    protected String contextPath;
+    protected final String contextPath;
 
 
     /**
      * Cache class.
      */
-    protected String cacheClassName =
+    protected final String cacheClassName =
         "org.apache.naming.resources.ResourceCache";
 
 
@@ -187,7 +168,7 @@ public class ProxyDirContext implements DirContext {
     /**
      * Non cacheable resources.
      */
-    protected String[] nonCacheable = { "/WEB-INF/lib/", "/WEB-INF/classes/" };
+    protected final String[] nonCacheable = { "/WEB-INF/lib/", "/WEB-INF/classes/" };
 
 
     // --------------------------------------------------------- Public Methods

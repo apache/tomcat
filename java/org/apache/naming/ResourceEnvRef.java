@@ -14,8 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.naming;
 
 import javax.naming.Context;
@@ -27,21 +25,16 @@ import javax.naming.Reference;
  * @author Remy Maucherat
  * @version $Id$
  */
-
 public class ResourceEnvRef extends Reference {
 
     private static final long serialVersionUID = 1L;
 
-    // -------------------------------------------------------------- Constants
 
     /**
      * Default factory for this reference.
      */
     public static final String DEFAULT_FACTORY =
         org.apache.naming.factory.Constants.DEFAULT_RESOURCE_ENV_FACTORY;
-
-
-    // ----------------------------------------------------------- Constructors
 
 
     /**
@@ -52,25 +45,6 @@ public class ResourceEnvRef extends Reference {
     public ResourceEnvRef(String resourceType) {
         super(resourceType);
     }
-
-
-    /**
-     * Resource env reference.
-     *
-     * @param resourceType Type
-     * @param factory The factory class
-     * @param factoryLocation The factory location
-     */
-    public ResourceEnvRef(String resourceType, String factory,
-                          String factoryLocation) {
-        super(resourceType, factory, factoryLocation);
-    }
-
-
-    // ----------------------------------------------------- Instance Variables
-
-
-    // ------------------------------------------------------ Reference Methods
 
 
     /**
@@ -91,9 +65,4 @@ public class ResourceEnvRef extends Reference {
             }
         }
     }
-
-
-    // ------------------------------------------------------------- Properties
-
-
 }

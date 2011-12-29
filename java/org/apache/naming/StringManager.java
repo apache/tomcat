@@ -55,8 +55,8 @@ public class StringManager {
     /**
      * The ResourceBundle for this StringManager.
      */
-    private ResourceBundle bundle;
-    private Locale locale;
+    private final ResourceBundle bundle;
+    private final Locale locale;
 
     /**
      * Creates a new StringManager for a given package. This is a
@@ -68,8 +68,9 @@ public class StringManager {
      */
     private StringManager(String packageName) {
         String bundleName = packageName + ".LocalStrings";
+        ResourceBundle tempBundle = null;
         try {
-            bundle = ResourceBundle.getBundle(bundleName, Locale.getDefault());
+            tempBundle = ResourceBundle.getBundle(bundleName, Locale.getDefault());
         } catch( MissingResourceException ex ) {
             // Try from the current loader (that's the case for trusted apps)
             // Should only be required if using a TC5 style classloader structure
@@ -77,7 +78,7 @@ public class StringManager {
             ClassLoader cl = Thread.currentThread().getContextClassLoader();
             if( cl != null ) {
                 try {
-                    bundle = ResourceBundle.getBundle(
+                    tempBundle = ResourceBundle.getBundle(
                             bundleName, Locale.getDefault(), cl);
                 } catch(MissingResourceException ex2) {
                     // Ignore
@@ -85,9 +86,12 @@ public class StringManager {
             }
         }
         // Get the actual locale, which may be different from the requested one
-        if (bundle != null) {
-            locale = bundle.getLocale();
+        if (tempBundle != null) {
+            locale = tempBundle.getLocale();
+        } else {
+            locale = null;
         }
+        bundle = tempBundle;
     }
 
     /**
@@ -149,7 +153,7 @@ public class StringManager {
     // STATIC SUPPORT METHODS
     // --------------------------------------------------------------
 
-    private static Hashtable<String, StringManager> managers =
+    private static final Hashtable<String, StringManager> managers =
         new Hashtable<String, StringManager>();
 
     /**

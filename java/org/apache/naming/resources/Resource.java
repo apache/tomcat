@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.naming.resources;
 
 import java.io.ByteArrayInputStream;
@@ -32,7 +31,6 @@ public class Resource {
 
     // ----------------------------------------------------------- Constructors
 
-
     public Resource() {
         // NO-OP
     }
@@ -43,13 +41,7 @@ public class Resource {
     }
 
 
-    public Resource(byte[] binaryContent) {
-        setContent(binaryContent);
-    }
-
-
     // ----------------------------------------------------- Instance Variables
-
 
     /**
      * Binary content.
@@ -64,7 +56,6 @@ public class Resource {
 
 
     // ------------------------------------------------------------- Properties
-
 
     /**
      * Content accessor.
@@ -108,6 +99,4 @@ public class Resource {
     public void setContent(byte[] binaryContent) {
         this.binaryContent = binaryContent;
     }
-
-
 }

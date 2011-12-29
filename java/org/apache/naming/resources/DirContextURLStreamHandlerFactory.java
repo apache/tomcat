@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.naming.resources;
 
 import java.net.URLStreamHandler;
@@ -33,7 +32,7 @@ public class DirContextURLStreamHandlerFactory
         implements URLStreamHandlerFactory {
 
     // Singleton
-    private static DirContextURLStreamHandlerFactory instance =
+    private static final DirContextURLStreamHandlerFactory instance =
         new DirContextURLStreamHandlerFactory();
 
     public static DirContextURLStreamHandlerFactory getInstance() {
@@ -45,7 +44,7 @@ public class DirContextURLStreamHandlerFactory
     }
 
 
-    private List<URLStreamHandlerFactory> userFactories =
+    private final List<URLStreamHandlerFactory> userFactories =
         new CopyOnWriteArrayList<URLStreamHandlerFactory>();
 
     private DirContextURLStreamHandlerFactory() {

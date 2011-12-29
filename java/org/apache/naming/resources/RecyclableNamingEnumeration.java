@@ -50,7 +50,7 @@ public class RecyclableNamingEnumeration<E>
     /**
      * Entries.
      */
-    protected Vector<E> entries;
+    protected final Vector<E> entries;
 
 
     /**
