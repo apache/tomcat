@@ -143,7 +143,7 @@ public class FileHandler
     /**
      * Lock used to control access to the writer.
      */
-    protected ReadWriteLock writerLock = new ReentrantReadWriteLock();
+    protected final ReadWriteLock writerLock = new ReentrantReadWriteLock();
 
 
     /**

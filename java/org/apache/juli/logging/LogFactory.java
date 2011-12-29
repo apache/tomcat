@@ -14,13 +14,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.juli.logging;
 
-
-import java.util.Properties;
 import java.util.logging.LogManager;
-
 
 /**
  * Modified LogFactory: removed all discovery, hardcode a specific implementation
@@ -65,85 +61,18 @@ import java.util.logging.LogManager;
  * @author Richard A. Sitze
  * @version $Id$
  */
-public /* abstract */ class LogFactory {
+public class LogFactory {
 
-    // ----------------------------------------------------- Manifest Constants
-
-    /**
-     * The name of the property used to identify the LogFactory implementation
-     * class name.
-     */
-    public static final String FACTORY_PROPERTY =
-        "org.apache.commons.logging.LogFactory";
-
-    /**
-     * The fully qualified class name of the fallback <code>LogFactory</code>
-     * implementation class to use, if no other can be found.
-     */
-    public static final String FACTORY_DEFAULT =
-        "org.apache.commons.logging.impl.LogFactoryImpl";
-
-    /**
-     * The name of the properties file to search for.
-     */
-    public static final String FACTORY_PROPERTIES =
-        "commons-logging.properties";
-
-    /**
-     * <p>Setting this system property value allows the <code>Hashtable</code> used to store
-     * classloaders to be substituted by an alternative implementation.
-     * </p>
-     * <p>
-     * <strong>Note:</strong> <code>LogFactory</code> will print:
-     * <code><pre>
-     * [ERROR] LogFactory: Load of custom hashtable failed</em>
-     * </code></pre>
-     * to system error and then continue using a standard Hashtable.
-     * </p>
-     * <p>
-     * <strong>Usage:</strong> Set this property when Java is invoked
-     * and <code>LogFactory</code> will attempt to load a new instance
-     * of the given implementation class.
-     * For example, running the following ant scriptlet:
-     * <code><pre>
-     *  &lt;java classname="${test.runner}" fork="yes" failonerror="${test.failonerror}"&gt;
-     *     ...
-     *     &lt;sysproperty
-     *        key="org.apache.commons.logging.LogFactory.HashtableImpl"
-     *        value="org.apache.commons.logging.AltHashtable"/&gt;
-     *  &lt;/java&gt;
-     * </pre></code>
-     * will mean that <code>LogFactory</code> will load an instance of
-     * <code>org.apache.commons.logging.AltHashtable</code>.
-     * </p>
-     * <p>
-     * A typical use case is to allow a custom
-     * Hashtable implementation using weak references to be substituted.
-     * This will allow classloaders to be garbage collected without
-     * the need to release them (on 1.3+ JVMs only, of course ;)
-     * </p>
-     */
-    public static final String HASHTABLE_IMPLEMENTATION_PROPERTY =
-        "org.apache.commons.logging.LogFactory.HashtableImpl";
-
-    private static LogFactory singleton=new LogFactory();
-
-    Properties logConfig;
-
-    // ----------------------------------------------------------- Constructors
+    private static final LogFactory singleton = new LogFactory();
 
 
     /**
      * Protected constructor that is not available for public use.
      */
     private LogFactory() {
-        logConfig=new Properties();
     }
 
-    // hook for syserr logger - class level
-    void setLogConfig( Properties p ) {
-        this.logConfig=p;
-    }
+
     // --------------------------------------------------------- Public Methods
 
     // only those 2 methods need to change to use a different direct logger.
@@ -168,63 +97,6 @@ public /* abstract */ class LogFactory {
     public Log getInstance(String name)
         throws LogConfigurationException {
         return DirectJDKLog.getInstance(name);
-    }
-
-
-    /**
-     * Release any internal references to previously created {@link Log}
-     * instances returned by this factory.  This is useful in environments
-     * like servlet containers, which implement application reloading by
-     * throwing away a ClassLoader.  Dangling references to objects in that
-     * class loader would prevent garbage collection.
-     */
-    public void release() {
-        DirectJDKLog.release();
-    }
-
-    /**
-     * Return the configuration attribute with the specified name (if any),
-     * or <code>null</code> if there is no such attribute.
-     *
-     * @param name Name of the attribute to return
-     */
-    public Object getAttribute(String name) {
-        return logConfig.get(name);
-    }
-
-
-    /**
-     * Return an array containing the names of all currently defined
-     * configuration attributes.  If there are no such attributes, a zero
-     * length array is returned.
-     */
-    public String[] getAttributeNames() {
-        String result[] = new String[logConfig.size()];
-        return logConfig.keySet().toArray(result);
-    }
-
-    /**
-     * Remove any configuration attribute associated with the specified name.
-     * If there is no such attribute, no action is taken.
-     *
-     * @param name Name of the attribute to remove
-     */
-    public void removeAttribute(String name) {
-        logConfig.remove(name);
-     }
-
-
-    /**
-     * Set the configuration attribute with the specified name.  Calling
-     * this with a <code>null</code> value is equivalent to calling
-     * <code>removeAttribute(name)</code>.
-     *
-     * @param name Name of the attribute to set
-     * @param value Value of the attribute to set, or <code>null</code>
-     *  to remove any setting for this attribute
-     */
-    public void setAttribute(String name, Object value) {
-        logConfig.put(name, value);
     }
 
 
@@ -328,38 +200,6 @@ public /* abstract */ class LogFactory {
         if (!LogManager.getLogManager().getClass().getName().equals(
                 "java.util.logging.LogManager")) {
             LogManager.getLogManager().reset();
-        }
-    }
-
-
-    /**
-     * Release any internal references to previously created {@link LogFactory}
-     * instances, after calling the instance method <code>release()</code> on
-     * each of them.  This is useful in environments like servlet containers,
-     * which implement application reloading by throwing away a ClassLoader.
-     * Dangling references to objects in that class loader would prevent
-     * garbage collection.
-     */
-    public static void releaseAll() {
-        singleton.release();
-    }
-
-    /**
-     * Returns a string that uniquely identifies the specified object, including
-     * its class.
-     * <p>
-     * The returned string is of form "classname@hashcode", ie is the same as
-     * the return value of the Object.toString() method, but works even when
-     * the specified object's class has overridden the toString method.
-     *
-     * @param o may be null.
-     * @return a string of form classname@hashcode, or "null" if param o is null.
-     */
-    public static String objectId(Object o) {
-        if (o == null) {
-            return "null";
-        } else {
-            return o.getClass().getName() + "@" + System.identityHashCode(o);
         }
     }
 }
