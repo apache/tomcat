@@ -69,28 +69,6 @@ public class LogConfigurationException extends RuntimeException {
      * @param cause The underlying cause
      */
     public LogConfigurationException(String message, Throwable cause) {
-
-        super(message);
-        this.cause = cause; // Two-argument version requires JDK 1.4 or later
-
+        super(message, cause);
     }
-
-
-    /**
-     * The underlying cause of this exception.
-     */
-    protected Throwable cause = null;
-
-
-    /**
-     * Return the underlying cause of this exception (if any).
-     */
-    @Override
-    public Throwable getCause() {
-
-        return (this.cause);
-
-    }
-
-
 }

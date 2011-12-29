@@ -31,7 +31,7 @@ import java.util.logging.Logger;
  */
 class DirectJDKLog implements Log {
     // no reason to hide this - but good reasons to not hide
-    public Logger logger;
+    public final Logger logger;
 
     /** Alternate config reader and console format
      */
@@ -198,11 +198,6 @@ class DirectJDKLog implements Log {
                 logger.logp(level, cname, method, msg, ex);
             }
         }
-    }
-
-    // for LogFactory
-    static void release() {
-
     }
 
     static Log getInstance(String name) {

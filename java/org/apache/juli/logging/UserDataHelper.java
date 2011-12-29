@@ -38,12 +38,12 @@ public class UserDataHelper {
 
     private final Log log;
 
-    private Config config;
+    private final Config config;
 
     // A value of 0 is equivalent to using INFO_ALL
     // A negative value will trigger infinite suppression
     // The value is milliseconds
-    private long suppressionTime;
+    private final long suppressionTime;
 
     private volatile long lastInfoTime = 0;
 
@@ -51,16 +51,17 @@ public class UserDataHelper {
     public UserDataHelper(Log log) {
         this.log = log;
 
+        Config tempConfig;
         String configString = System.getProperty(
                 "org.apache.juli.logging.UserDataHelper.CONFIG");
         if (configString == null) {
-            config = Config.INFO_THEN_DEBUG;
+            tempConfig = Config.INFO_THEN_DEBUG;
         } else {
             try {
-                config = Config.valueOf(configString);
+                tempConfig = Config.valueOf(configString);
             } catch (IllegalArgumentException iae) {
                 // Ignore - use default
-                config = Config.INFO_THEN_DEBUG;
+                tempConfig = Config.INFO_THEN_DEBUG;
             }
         }
 
@@ -70,8 +71,10 @@ public class UserDataHelper {
                 60 * 60 * 24).intValue() * 1000L;
 
         if (suppressionTime == 0) {
-            config = Config.INFO_ALL;
+            tempConfig = Config.INFO_ALL;
         }
+
+        config = tempConfig;
     }
 
 

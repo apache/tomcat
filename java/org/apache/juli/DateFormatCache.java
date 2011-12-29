@@ -52,9 +52,9 @@ public class DateFormatCache {
     private final String format;
 
     /* Number of cached entries */
-    private int cacheSize = 0;
+    private final int cacheSize;
 
-    private Cache cache;
+    private final Cache cache;
 
     /**
      * Replace the millisecond formatting character 'S' by
