@@ -192,7 +192,9 @@ public class ProxyDirContext implements DirContext {
 
     /**
      * Return the actual directory context we are wrapping.
+     * @deprecated - unused
      */
+    @Deprecated
     public DirContext getDirContext() {
         return this.dirContext;
     }
@@ -200,7 +202,9 @@ public class ProxyDirContext implements DirContext {
 
     /**
      * Return the document root for this component.
+     * @deprecated - unused
      */
+    @Deprecated
     public String getDocBase() {
         if (dirContext instanceof BaseDirContext)
             return ((BaseDirContext) dirContext).getDocBase();

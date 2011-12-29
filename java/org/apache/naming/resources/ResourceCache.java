@@ -111,6 +111,7 @@ public class ResourceCache {
      * Return the access count.
      * Note: Update is not synced, so the number may not be completely
      * accurate.
+     * TODO: Currently unused. Expose via JMX?
      */
     public long getAccessCount() {
         return accessCount;
@@ -119,6 +120,7 @@ public class ResourceCache {
 
     /**
      * Return the maximum size of the cache in KB.
+     * TODO: Currently unused. Expose via JMX?
      */
     public int getCacheMaxSize() {
         return cacheMaxSize;
@@ -135,6 +137,7 @@ public class ResourceCache {
 
     /**
      * Return the current cache size in KB.
+     * TODO: Currently unused. Expose via JMX?
      */
     public int getCacheSize() {
         return cacheSize;
@@ -143,7 +146,9 @@ public class ResourceCache {
 
     /**
      * Return desired entry access ratio.
+     * @deprecated - unused
      */
+    @Deprecated
     public long getDesiredEntryAccessRatio() {
         return desiredEntryAccessRatio;
     }
@@ -151,7 +156,9 @@ public class ResourceCache {
 
     /**
      * Set the desired entry access ratio.
+     * @deprecated - unused
      */
+    @Deprecated
     public void setDesiredEntryAccessRatio(long desiredEntryAccessRatio) {
         this.desiredEntryAccessRatio = desiredEntryAccessRatio;
     }
@@ -161,6 +168,7 @@ public class ResourceCache {
      * Return the number of cache hits.
      * Note: Update is not synced, so the number may not be completely
      * accurate.
+     * TODO: Currently unused. Expose via JMX?
      */
     public long getHitsCount() {
         return hitsCount;
@@ -169,7 +177,9 @@ public class ResourceCache {
 
     /**
      * Return the maximum amount of iterations during a space allocation.
+     * @deprecated - unused
      */
+    @Deprecated
     public int getMaxAllocateIterations() {
         return maxAllocateIterations;
     }
@@ -177,7 +187,9 @@ public class ResourceCache {
 
     /**
      * Set the maximum amount of iterations during a space allocation.
+     * @deprecated - unused
      */
+    @Deprecated
     public void setMaxAllocateIterations(int maxAllocateIterations) {
         this.maxAllocateIterations = maxAllocateIterations;
     }
@@ -185,7 +197,9 @@ public class ResourceCache {
 
     /**
      * Return the amount of spare not found entries.
+     * @deprecated - unused
      */
+    @Deprecated
     public int getSpareNotFoundEntries() {
         return spareNotFoundEntries;
     }
@@ -193,7 +207,9 @@ public class ResourceCache {
 
     /**
      * Set the amount of spare not found entries.
+     * @deprecated - unused
      */
+    @Deprecated
     public void setSpareNotFoundEntries(int spareNotFoundEntries) {
         this.spareNotFoundEntries = spareNotFoundEntries;
     }
