@@ -372,21 +372,6 @@ public class ResourceAttributes implements Attributes {
 
 
     /**
-     * Set creation.
-     *
-     * @param creation New creation value
-     * @deprecated - unused
-     */
-    @Deprecated
-    public void setCreation(long creation) {
-        this.creation = creation;
-        this.creationDate = null;
-        if (attributes != null)
-            attributes.put(CREATION_DATE, new Date(creation));
-    }
-
-
-    /**
      * Get creation date.
      *
      * @return Creation date value
@@ -559,21 +544,6 @@ public class ResourceAttributes implements Attributes {
 
 
     /**
-     * Last modified date mutator.
-     *
-     * @param lastModifiedDate New last modified date
-     * @deprecated - unused
-     */
-    @Deprecated
-    public void setLastModifiedDate(Date lastModifiedDate) {
-        this.lastModified = lastModifiedDate.getTime();
-        this.lastModifiedDate = lastModifiedDate;
-        if (attributes != null)
-            attributes.put(LAST_MODIFIED, lastModifiedDate);
-    }
-
-
-    /**
      * @return Returns the lastModifiedHttp.
      */
     public String getLastModifiedHttp() {
@@ -590,16 +560,6 @@ public class ResourceAttributes implements Attributes {
             lastModifiedHttp = format.format(modifiedDate);
         }
         return lastModifiedHttp;
-    }
-
-
-    /**
-     * @param lastModifiedHttp The lastModifiedHttp to set.
-     * @deprecated - unused
-     */
-    @Deprecated
-    public void setLastModifiedHttp(String lastModifiedHttp) {
-        this.lastModifiedHttp = lastModifiedHttp;
     }
 
 
@@ -730,6 +690,7 @@ public class ResourceAttributes implements Attributes {
 
     /**
      * Set strong ETag.
+     * TODO: This is never called. Should it be?
      */
     public void setETag(String eTag) {
         this.strongETag = eTag;

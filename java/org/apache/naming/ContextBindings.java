@@ -114,19 +114,6 @@ public class ContextBindings {
      * Unbind context name.
      *
      * @param name Name of the context
-     *
-     * @deprecated - unused
-     */
-    @Deprecated
-    public static void unbindContext(Object name) {
-        unbindContext(name, null);
-    }
-
-
-    /**
-     * Unbind context name.
-     *
-     * @param name Name of the context
      * @param token Security token
      */
     public static void unbindContext(Object name, Object token) {
@@ -149,20 +136,6 @@ public class ContextBindings {
      * Binds a naming context to a thread.
      *
      * @param name Name of the context
-     *
-     * @deprecated - unused
-     */
-    @Deprecated
-    public static void bindThread(Object name)
-        throws NamingException {
-        bindThread(name, null);
-    }
-
-
-    /**
-     * Binds a naming context to a thread.
-     *
-     * @param name Name of the context
      * @param token Security token
      */
     public static void bindThread(Object name, Object token)
@@ -175,19 +148,6 @@ public class ContextBindings {
             threadBindings.put(Thread.currentThread(), context);
             threadNameBindings.put(Thread.currentThread(), name);
         }
-    }
-
-
-    /**
-     * Unbinds a naming context to a thread.
-     *
-     * @param name Name of the context
-     *
-     * @deprecated - unused
-     */
-    @Deprecated
-    public static void unbindThread(Object name) {
-        unbindThread(name, null);
     }
 
 
@@ -240,36 +200,6 @@ public class ContextBindings {
 
 
     /**
-     * Binds a naming context to a class loader.
-     *
-     * @param name Name of the context
-     *
-     * @deprecated - unused
-     */
-    @Deprecated
-    public static void bindClassLoader(Object name)
-        throws NamingException {
-        bindClassLoader(name, null);
-    }
-
-
-    /**
-     * Binds a naming context to a thread.
-     *
-     * @param name Name of the context
-     * @param token Security token
-     *
-     * @deprecated - unused
-     */
-    @Deprecated
-    public static void bindClassLoader(Object name, Object token)
-        throws NamingException {
-        bindClassLoader
-            (name, token, Thread.currentThread().getContextClassLoader());
-    }
-
-
-    /**
      * Binds a naming context to a thread.
      *
      * @param name Name of the context
@@ -286,34 +216,6 @@ public class ContextBindings {
             clBindings.put(classLoader, context);
             clNameBindings.put(classLoader, name);
         }
-    }
-
-
-    /**
-     * Unbinds a naming context to a class loader.
-     *
-     * @param name Name of the context
-     *
-     * @deprecated - unused
-     */
-    @Deprecated
-    public static void unbindClassLoader(Object name) {
-        unbindClassLoader(name, null);
-    }
-
-
-    /**
-     * Unbinds a naming context to a class loader.
-     *
-     * @param name Name of the context
-     * @param token Security token
-     *
-     * @deprecated - unused
-     */
-    @Deprecated
-    public static void unbindClassLoader(Object name, Object token) {
-        unbindClassLoader(name, token,
-                          Thread.currentThread().getContextClassLoader());
     }
 
 
