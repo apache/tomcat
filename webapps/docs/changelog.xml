@@ -98,6 +98,10 @@
         rather than recording a value of zero. (markt)
       </fix>
       <fix>
+        <bug>52326</bug>: Reduce log level for class loading errors during
+        <code>@HandlesTypes</code> processing to debug. (markt) 
+      </fix>
+      <fix>
         <bug>52384</bug>: Do not fail with parameter parsing when debug logging
         is enabled. (kkolinko)
       </fix>
