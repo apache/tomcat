@@ -70,20 +70,20 @@ public class ResourceCache {
     /**
      * Max amount of removals during a make space.
      */
-    protected int maxAllocateIterations = 20;
+    protected final int maxAllocateIterations = 20;
 
 
     /**
      * Entry hit ratio at which an entry will never be removed from the cache.
      * Compared with entry.access / hitsCount
      */
-    protected long desiredEntryAccessRatio = 3;
+    protected final long desiredEntryAccessRatio = 3;
 
 
     /**
      * Spare amount of not found entries.
      */
-    protected int spareNotFoundEntries = 500;
+    protected final int spareNotFoundEntries = 500;
 
 
     /**
@@ -145,26 +145,6 @@ public class ResourceCache {
 
 
     /**
-     * Return desired entry access ratio.
-     * @deprecated - unused
-     */
-    @Deprecated
-    public long getDesiredEntryAccessRatio() {
-        return desiredEntryAccessRatio;
-    }
-
-
-    /**
-     * Set the desired entry access ratio.
-     * @deprecated - unused
-     */
-    @Deprecated
-    public void setDesiredEntryAccessRatio(long desiredEntryAccessRatio) {
-        this.desiredEntryAccessRatio = desiredEntryAccessRatio;
-    }
-
-
-    /**
      * Return the number of cache hits.
      * Note: Update is not synced, so the number may not be completely
      * accurate.
@@ -175,48 +155,7 @@ public class ResourceCache {
     }
 
 
-    /**
-     * Return the maximum amount of iterations during a space allocation.
-     * @deprecated - unused
-     */
-    @Deprecated
-    public int getMaxAllocateIterations() {
-        return maxAllocateIterations;
-    }
-
-
-    /**
-     * Set the maximum amount of iterations during a space allocation.
-     * @deprecated - unused
-     */
-    @Deprecated
-    public void setMaxAllocateIterations(int maxAllocateIterations) {
-        this.maxAllocateIterations = maxAllocateIterations;
-    }
-
-
-    /**
-     * Return the amount of spare not found entries.
-     * @deprecated - unused
-     */
-    @Deprecated
-    public int getSpareNotFoundEntries() {
-        return spareNotFoundEntries;
-    }
-
-
-    /**
-     * Set the amount of spare not found entries.
-     * @deprecated - unused
-     */
-    @Deprecated
-    public void setSpareNotFoundEntries(int spareNotFoundEntries) {
-        this.spareNotFoundEntries = spareNotFoundEntries;
-    }
-
-
     // --------------------------------------------------------- Public Methods
-
 
     public boolean allocate(int space) {
 
