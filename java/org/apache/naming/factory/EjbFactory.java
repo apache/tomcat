@@ -14,8 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.naming.factory;
 
 import java.util.Hashtable;
@@ -36,25 +34,7 @@ import org.apache.naming.EjbRef;
  * @author Remy Maucherat
  * @version $Id$
  */
-
-public class EjbFactory
-    implements ObjectFactory {
-
-
-    // ----------------------------------------------------------- Constructors
-
-
-    // -------------------------------------------------------------- Constants
-
-
-    // ----------------------------------------------------- Instance Variables
-
-
-    // --------------------------------------------------------- Public Methods
-
-
-    // -------------------------------------------------- ObjectFactory Methods
-
+public class EjbFactory implements ObjectFactory {
 
     /**
      * Create a new EJB instance.
@@ -75,32 +55,6 @@ public class EjbFactory
                 // Retrieving the EJB link
                 String ejbLink = linkRefAddr.getContent().toString();
                 Object beanObj = (new InitialContext()).lookup(ejbLink);
-                // Load home interface and checking if bean correctly
-                // implements specified home interface
-                /*
-                String homeClassName = ref.getClassName();
-                try {
-                    Class home = Class.forName(homeClassName);
-                    if (home.isInstance(beanObj)) {
-                        System.out.println("Bean of type "
-                                           + beanObj.getClass().getName()
-                                           + " implements home interface "
-                                           + home.getName());
-                    } else {
-                        System.out.println("Bean of type "
-                                           + beanObj.getClass().getName()
-                                           + " doesn't implement home interface "
-                                           + home.getName());
-                        throw new NamingException
-                            ("Bean of type " + beanObj.getClass().getName()
-                             + " doesn't implement home interface "
-                             + home.getName());
-                    }
-                } catch (ClassNotFoundException e) {
-                    System.out.println("Couldn't load home interface "
-                                       + homeClassName);
-                }
-                */
                 return beanObj;
             }
 
@@ -171,9 +125,5 @@ public class EjbFactory
         }
 
         return null;
-
     }
-
-
 }
-
