@@ -2023,16 +2023,16 @@ public class ContextConfig
                     className), e);
             return;
         } catch (ClassNotFoundException e) {
-            log.warn(sm.getString("contextConfig.invalidSciHandlesTypes",
+            log.debug(sm.getString("contextConfig.invalidSciHandlesTypes",
                     className), e);
             return;
         } catch (ClassFormatError e) {
-            log.warn(sm.getString("contextConfig.invalidSciHandlesTypes",
+            log.debug(sm.getString("contextConfig.invalidSciHandlesTypes",
                     className), e);
             return;
         } catch (Throwable t) {
             ExceptionUtils.handleThrowable(t);
-            log.warn(sm.getString("contextConfig.invalidSciHandlesTypes",
+            log.debug(sm.getString("contextConfig.invalidSciHandlesTypes",
                     className), t);
             return;
         }
