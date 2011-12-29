@@ -43,35 +43,35 @@ public class ContextBindings {
     /**
      * Bindings name - naming context. Keyed by name.
      */
-    private static Hashtable<Object,Context> contextNameBindings =
+    private static final Hashtable<Object,Context> contextNameBindings =
         new Hashtable<Object,Context>();
 
 
     /**
      * Bindings thread - naming context. Keyed by thread id.
      */
-    private static Hashtable<Thread,Context> threadBindings =
+    private static final Hashtable<Thread,Context> threadBindings =
         new Hashtable<Thread,Context>();
 
 
     /**
      * Bindings thread - name. Keyed by thread id.
      */
-    private static Hashtable<Thread,Object> threadNameBindings =
+    private static final Hashtable<Thread,Object> threadNameBindings =
         new Hashtable<Thread,Object>();
 
 
     /**
      * Bindings class loader - naming context. Keyed by CL id.
      */
-    private static Hashtable<ClassLoader,Context> clBindings =
+    private static final Hashtable<ClassLoader,Context> clBindings =
         new Hashtable<ClassLoader,Context>();
 
 
     /**
      * Bindings class loader - name. Keyed by CL id.
      */
-    private static Hashtable<ClassLoader,Object> clNameBindings =
+    private static final Hashtable<ClassLoader,Object> clNameBindings =
         new Hashtable<ClassLoader,Object>();
 
 
@@ -114,7 +114,10 @@ public class ContextBindings {
      * Unbind context name.
      *
      * @param name Name of the context
+     *
+     * @deprecated - unused
      */
+    @Deprecated
     public static void unbindContext(Object name) {
         unbindContext(name, null);
     }
@@ -146,7 +149,10 @@ public class ContextBindings {
      * Binds a naming context to a thread.
      *
      * @param name Name of the context
+     *
+     * @deprecated - unused
      */
+    @Deprecated
     public static void bindThread(Object name)
         throws NamingException {
         bindThread(name, null);
@@ -176,7 +182,10 @@ public class ContextBindings {
      * Unbinds a naming context to a thread.
      *
      * @param name Name of the context
+     *
+     * @deprecated - unused
      */
+    @Deprecated
     public static void unbindThread(Object name) {
         unbindThread(name, null);
     }
@@ -234,7 +243,10 @@ public class ContextBindings {
      * Binds a naming context to a class loader.
      *
      * @param name Name of the context
+     *
+     * @deprecated - unused
      */
+    @Deprecated
     public static void bindClassLoader(Object name)
         throws NamingException {
         bindClassLoader(name, null);
@@ -246,7 +258,10 @@ public class ContextBindings {
      *
      * @param name Name of the context
      * @param token Security token
+     *
+     * @deprecated - unused
      */
+    @Deprecated
     public static void bindClassLoader(Object name, Object token)
         throws NamingException {
         bindClassLoader
@@ -278,7 +293,10 @@ public class ContextBindings {
      * Unbinds a naming context to a class loader.
      *
      * @param name Name of the context
+     *
+     * @deprecated - unused
      */
+    @Deprecated
     public static void unbindClassLoader(Object name) {
         unbindClassLoader(name, null);
     }
@@ -289,7 +307,10 @@ public class ContextBindings {
      *
      * @param name Name of the context
      * @param token Security token
+     *
+     * @deprecated - unused
      */
+    @Deprecated
     public static void unbindClassLoader(Object name, Object token) {
         unbindClassLoader(name, token,
                           Thread.currentThread().getContextClassLoader());
