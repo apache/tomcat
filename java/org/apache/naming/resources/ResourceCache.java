@@ -44,7 +44,7 @@ public class ResourceCache {
     /**
      * Random generator used to determine elements to free.
      */
-    protected Random random = new Random();
+    protected final Random random = new Random();
 
 
     /**
@@ -57,7 +57,7 @@ public class ResourceCache {
     /**
      * Not found cache.
      */
-    protected HashMap<String,CacheEntry> notFoundCache =
+    protected final HashMap<String,CacheEntry> notFoundCache =
         new HashMap<String,CacheEntry>();
 
 
