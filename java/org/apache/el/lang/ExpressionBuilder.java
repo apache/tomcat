@@ -78,7 +78,7 @@ public final class ExpressionBuilder implements NodeVisitor {
 
     private VariableMapper varMapper;
 
-    private String expression;
+    private final String expression;
 
     /**
      *

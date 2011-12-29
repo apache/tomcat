@@ -37,12 +37,4 @@ public final class AstMethodParameters extends SimpleNode {
         }
         return params.toArray(new Object[params.size()]);
     }
-
-    public Class<?>[] getParameterTypes(EvaluationContext ctx) {
-        ArrayList<Class<?>> paramTypes = new ArrayList<Class<?>>();
-        for (int i = 0; i < this.jjtGetNumChildren(); i++) {
-            paramTypes.add(this.jjtGetChild(i).getType(ctx));
-        }
-        return paramTypes.toArray(new Class<?>[paramTypes.size()]);
-    }
 }

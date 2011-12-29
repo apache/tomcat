@@ -39,7 +39,7 @@ public abstract class SimpleNode extends ELSupport implements Node {
 
     protected Node[] children;
 
-    protected int id;
+    protected final int id;
 
     protected String image;
 
@@ -103,10 +103,6 @@ public abstract class SimpleNode extends ELSupport implements Node {
                     + "]";
         }
         return ELParserTreeConstants.jjtNodeName[id];
-    }
-
-    public String toString(String prefix) {
-        return prefix + toString();
     }
 
     @Override

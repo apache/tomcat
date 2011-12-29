@@ -28,7 +28,7 @@ import javax.el.FunctionMapper;
 public class FunctionMapperFactory extends FunctionMapper {
 
     protected FunctionMapperImpl memento = null;
-    protected FunctionMapper target;
+    protected final FunctionMapper target;
 
     public FunctionMapperFactory(FunctionMapper mapper) {
         if (mapper == null) {
