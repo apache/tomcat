@@ -668,7 +668,11 @@ public class Tomcat {
 
     private void silence(Host host, String ctx) {
         String base = "org.apache.catalina.core.ContainerBase.[default].[";
-        base += host.getName();
+        if (host == null) {
+            base += getHost().getName();
+        } else {
+            base += host.getName();
+        }
         base += "].[";
         base += ctx;
         base += "]";
