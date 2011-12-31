@@ -2483,10 +2483,17 @@ public class Request
                 location = ((File) context.getServletContext().getAttribute(
                         ServletContext.TEMPDIR));
             } else {
+                // If relative, it is relative to TEMPDIR
                 location = new File(locationStr);
+                if (!location.isAbsolute()) {
+                    location = new File(
+                            (File) context.getServletContext().getAttribute(
+                                        ServletContext.TEMPDIR),
+                                        locationStr).getAbsoluteFile();
+                }
             }
 
-            if (!location.isAbsolute() || !location.isDirectory()) {
+            if (!location.isDirectory()) {
                 partsParseException = new IOException(
                         sm.getString("coyoteRequest.uploadLocationInvalid",
                                 location));
