@@ -113,6 +113,11 @@
         Reduce log level for the message about hitting
         <code>maxParameterCount</code> limit from WARN to INFO. (kkolinko)
       </fix>
+      <fix>
+        <bug>52387</bug>: Ensure that the correct host is used when configuring
+        logging when Tomcat is embedded. Patch provided by David Calavera.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
