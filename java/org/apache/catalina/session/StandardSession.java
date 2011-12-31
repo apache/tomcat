@@ -533,19 +533,14 @@ public class StandardSession implements HttpSession, Session, Serializable {
 
     /**
      * Set the maximum time interval, in seconds, between client requests
-     * before the servlet container will invalidate the session.  A negative
-     * time indicates that the session should never time out.
+     * before the servlet container will invalidate the session.  A zero or
+     * negative time indicates that the session should never time out.
      *
      * @param interval The new maximum interval
      */
     @Override
     public void setMaxInactiveInterval(int interval) {
-
         this.maxInactiveInterval = interval;
-        if (isValid && interval == 0) {
-            expire();
-        }
-
     }
 
 
@@ -639,7 +634,7 @@ public class StandardSession implements HttpSession, Session, Serializable {
             return true;
         }
 
-        if (maxInactiveInterval >= 0) {
+        if (maxInactiveInterval > 0) {
             long timeNow = System.currentTimeMillis();
             int timeIdle;
             if (LAST_ACCESS_AT_START) {
