@@ -494,7 +494,7 @@ public class Tomcat {
 
     public Context addContext(Host host, String contextPath, String contextName,
             String dir) {
-        silence(contextPath);
+        silence(host, contextPath);
         Context ctx = new StandardContext();
         ctx.setName(contextName);
         ctx.setPath(contextPath);
@@ -514,7 +514,7 @@ public class Tomcat {
     }
 
     public Context addWebapp(Host host, String url, String name, String path) {
-        silence(url);
+        silence(host, url);
 
         Context ctx = new StandardContext();
         ctx.setName(name);
@@ -666,9 +666,9 @@ public class Tomcat {
         }
     }
 
-    private void silence(String ctx) {
+    private void silence(Host host, String ctx) {
         String base = "org.apache.catalina.core.ContainerBase.[default].[";
-        base += getHost().getName();
+        base += host.getName();
         base += "].[";
         base += ctx;
         base += "]";
