@@ -116,8 +116,8 @@ public interface HttpSession {
 
     /**
      * Specifies the time, in seconds, between client requests before the
-     * servlet container will invalidate this session. A negative time indicates
-     * the session should never timeout.
+     * servlet container will invalidate this session. A zero or negative time
+     * indicates that the session should never timeout.
      *
      * @param interval
      *            An integer specifying the number of seconds
@@ -129,7 +129,7 @@ public interface HttpSession {
      * will keep this session open between client accesses. After this interval,
      * the servlet container will invalidate the session. The maximum time
      * interval can be set with the <code>setMaxInactiveInterval</code> method.
-     * A negative time indicates the session should never timeout.
+     * A zero or negative time indicates that the session should never timeout.
      *
      * @return an integer specifying the number of seconds this session remains
      *         open between client requests

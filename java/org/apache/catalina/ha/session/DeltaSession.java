@@ -276,16 +276,12 @@ public class DeltaSession extends StandardSession implements Externalizable,Clus
 
     public void setMaxInactiveInterval(int interval, boolean addDeltaRequest) {
         super.maxInactiveInterval = interval;
-        if (isValid && interval == 0) {
-            expire();
-        } else {
-            if (addDeltaRequest && (deltaRequest != null)) {
-                try {
-                    lock();
-                    deltaRequest.setMaxInactiveInterval(interval);
-                }finally{
-                    unlock();
-                }
+        if (addDeltaRequest && (deltaRequest != null)) {
+            try {
+                lock();
+                deltaRequest.setMaxInactiveInterval(interval);
+            }finally{
+                unlock();
             }
         }
     }
@@ -374,7 +370,7 @@ public class DeltaSession extends StandardSession implements Externalizable,Clus
         if (ACTIVITY_CHECK && accessCount.get() > 0) {
             return true;
         }
-        if (maxInactiveInterval >= 0) {
+        if (maxInactiveInterval > 0) {
             long timeNow = System.currentTimeMillis();
             int timeIdle;
             if (LAST_ACCESS_AT_START) {
