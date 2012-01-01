@@ -15,6 +15,8 @@
   limitations under the License.
 ================================================================================
 
+# Java -> Compiler -> Errors/Warnings
+
 The following settings are for Indigo Release (Eclipse 3.7)
 W = Warning
 I = Ignore
@@ -60,3 +62,22 @@ Eclipse IDE is documented here:
 
  3.6: http://help.eclipse.org/helios/topic/org.eclipse.jdt.doc.isv/guide/jdt_api_compile.htm
  3.7: http://help.eclipse.org/indigo/topic/org.eclipse.jdt.doc.user/tasks/task-suppress_warnings.htm
+
+
+# Java -> Code Style -> Organize Imports
+
+The following configuration of Organize Imports can be recommended for a
+quick setup. The order is enforced by checkstyle, so for the authorative
+definition look at <module name="ImportOrder"> in
+res/checkstyle/checkstyle.xml
+
+ - java
+ - javax
+ - async
+ - jsp2
+ - [static] org.junit
+ - org.junit
+ - [static] org
+ - org
+ - com
+ - util
