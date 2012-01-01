@@ -16,15 +16,16 @@
  */
 package org.apache.catalina.startup;
 
+import java.io.InputStream;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import java.io.InputStream;
+import org.junit.Test;
 
 import org.apache.catalina.deploy.WebXml;
 import org.apache.tomcat.util.digester.Digester;
-import org.junit.Test;
 
 public class TestWebRuleSet {
 
