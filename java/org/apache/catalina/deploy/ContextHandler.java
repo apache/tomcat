@@ -146,6 +146,65 @@ public class ContextHandler extends ResourceBase {
         }
         sb.append("]");
         return (sb.toString());
+    }
 
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = super.hashCode();
+        result = prime * result +
+                ((handlerclass == null) ? 0 : handlerclass.hashCode());
+        result = prime * result +
+                ((portNames == null) ? 0 : portNames.hashCode());
+        result = prime * result +
+                ((soapHeaders == null) ? 0 : soapHeaders.hashCode());
+        result = prime * result +
+                ((soapRoles == null) ? 0 : soapRoles.hashCode());
+        return result;
+    }
+
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (!super.equals(obj)) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        ContextHandler other = (ContextHandler) obj;
+        if (handlerclass == null) {
+            if (other.handlerclass != null) {
+                return false;
+            }
+        } else if (!handlerclass.equals(other.handlerclass)) {
+            return false;
+        }
+        if (portNames == null) {
+            if (other.portNames != null) {
+                return false;
+            }
+        } else if (!portNames.equals(other.portNames)) {
+            return false;
+        }
+        if (soapHeaders == null) {
+            if (other.soapHeaders != null) {
+                return false;
+            }
+        } else if (!soapHeaders.equals(other.soapHeaders)) {
+            return false;
+        }
+        if (soapRoles == null) {
+            if (other.soapRoles != null) {
+                return false;
+            }
+        } else if (!soapRoles.equals(other.soapRoles)) {
+            return false;
+        }
+        return true;
     }
 }

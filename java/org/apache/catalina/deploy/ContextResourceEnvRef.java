@@ -14,8 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.catalina.deploy;
 
 
@@ -27,7 +25,6 @@ package org.apache.catalina.deploy;
  * @author Peter Rossbach (pero@apache.org)
  * @version $Id$
  */
-
 public class ContextResourceEnvRef extends ResourceBase {
 
     private static final long serialVersionUID = 1L;
@@ -68,9 +65,33 @@ public class ContextResourceEnvRef extends ResourceBase {
         sb.append(override);
         sb.append("]");
         return (sb.toString());
-
     }
 
 
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = super.hashCode();
+        result = prime * result + (override ? 1231 : 1237);
+        return result;
+    }
 
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (!super.equals(obj)) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        ContextResourceEnvRef other = (ContextResourceEnvRef) obj;
+        if (override != other.override) {
+            return false;
+        }
+        return true;
+    }
 }

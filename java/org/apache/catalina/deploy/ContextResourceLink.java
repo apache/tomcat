@@ -14,8 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.catalina.deploy;
 
 
@@ -28,7 +26,6 @@ package org.apache.catalina.deploy;
  * @author Peter Rossbach (Peter Rossbach (pero@apache.org))
  * @version $Id$
  */
-
 public class ContextResourceLink extends ResourceBase {
 
     private static final long serialVersionUID = 1L;
@@ -81,7 +78,45 @@ public class ContextResourceLink extends ResourceBase {
         }
         sb.append("]");
         return (sb.toString());
-
     }
 
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = super.hashCode();
+        result = prime * result + ((factory == null) ? 0 : factory.hashCode());
+        result = prime * result + ((global == null) ? 0 : global.hashCode());
+        return result;
+    }
+
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (!super.equals(obj)) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        ContextResourceLink other = (ContextResourceLink) obj;
+        if (factory == null) {
+            if (other.factory != null) {
+                return false;
+            }
+        } else if (!factory.equals(other.factory)) {
+            return false;
+        }
+        if (global == null) {
+            if (other.global != null) {
+                return false;
+            }
+        } else if (!global.equals(other.global)) {
+            return false;
+        }
+        return true;
+    }
 }
