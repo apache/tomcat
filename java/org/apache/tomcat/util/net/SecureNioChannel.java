@@ -105,13 +105,14 @@ public class SecureNioChannel extends NioChannel  {
 //                  NIO SSL METHODS
 //===========================================================================================
     /**
-     * Returns true if the network buffer has been flushed out and is empty.
+     * Flush the channel.
      *
      * @param block     Should a blocking write be used?
      * @param s
      * @param timeout
      * @param lastWrite
-     * @return
+     * @return <code>true</code> if the network buffer has been flushed out and
+     *         is empty else <code>false</code>
      * @throws IOException
      */
     @Override

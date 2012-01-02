@@ -34,7 +34,8 @@ import org.apache.naming.NamingEntry;
  * Extended FileDirContext implementation that allows to expose multiple
  * directories of the filesystem under a single webapp, a feature mainly used
  * for development with IDEs.
- * This should be used in conjunction with {@link VirtualWebappLoader}.
+ * This should be used in conjunction with
+ * {@link org.apache.catalina.loader.VirtualWebappLoader}.
  *
  * Sample context xml configuration:
  *

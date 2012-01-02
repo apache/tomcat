@@ -79,13 +79,14 @@ public class NioChannel implements ByteChannel {
      * @param s         Unused. May be used when overridden
      * @param timeout   Unused. May be used when overridden
      * @param lastWrite
-     * @return
+     * @return Always returns <code>true</code> since there is no network buffer
+     *         in the regular channel
      * @throws IOException
      */
     public boolean flush(boolean block, Selector s, long timeout,
             MutableInteger lastWrite) throws IOException {
         if (lastWrite!=null) lastWrite.set(1);
-        return true; //no network buffer in the regular channel
+        return true;
     }
 
 
