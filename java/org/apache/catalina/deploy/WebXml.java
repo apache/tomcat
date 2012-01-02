@@ -1896,15 +1896,19 @@ public class WebXml {
                 }
             } else {
                 // Not defined in main web.xml
-                if (tempResources.containsKey(resourceName)) {
-                    log.error(sm.getString(
-                            "webXml.mergeConflictResource",
-                            resourceName,
-                            fragment.getName(),
-                            fragment.getURL()));
-                    return false;
+                T existingResource = tempResources.get(resourceName);
+                if (existingResource != null) {
+                    if (!existingResource.equals(resource)) {
+                        log.error(sm.getString(
+                                "webXml.mergeConflictResource",
+                                resourceName,
+                                fragment.getName(),
+                                fragment.getURL()));
+                        return false;
+                    }
+                } else {
+                    tempResources.put(resourceName, resource);
                 }
-                tempResources.put(resourceName, resource);
             }
         }
         return true;
