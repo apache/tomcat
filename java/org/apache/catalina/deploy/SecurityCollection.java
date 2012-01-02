@@ -60,18 +60,6 @@ public class SecurityCollection implements Serializable {
      * Construct a new security collection instance with specified values.
      *
      * @param name Name of this security collection
-     */
-    public SecurityCollection(String name) {
-
-        this(name, null);
-
-    }
-
-
-    /**
-     * Construct a new security collection instance with specified values.
-     *
-     * @param name Name of this security collection
      * @param description Description of this security collection
      */
     public SecurityCollection(String name, String description) {
