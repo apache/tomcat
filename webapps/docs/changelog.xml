@@ -118,6 +118,12 @@
         logging when Tomcat is embedded. Patch provided by David Calavera.
         (markt)
       </fix>
+      <update>
+        <bug>52405</bug>: Align the Servlet 3.0 implementation with the changes
+        defined in the first maintenance release (also know as Rev. A). See the
+        <a href="http://jcp.org/aboutJava/communityprocess/maintenance/jsr315/servlet3-mr-reva.html">
+        JCP documentation</a> for a detailed list of changes. (markt) 
+      </update>
     </changelog>
   </subsection>
   <subsection name="Coyote">
