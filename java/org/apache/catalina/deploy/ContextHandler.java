@@ -14,8 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.catalina.deploy;
 
 import java.util.ArrayList;
@@ -29,7 +27,6 @@ import java.util.Iterator;
  *
  * @author Fabien Carrion
  */
-
 public class ContextHandler extends ResourceBase {
 
     private static final long serialVersionUID = 1L;
@@ -59,7 +56,8 @@ public class ContextHandler extends ResourceBase {
      * soapHeader[0] : namespaceURI
      * soapHeader[1] : localpart
      */
-    private HashMap<String, String> soapHeaders = new HashMap<String, String>();
+    private final HashMap<String, String> soapHeaders =
+            new HashMap<String, String>();
 
     public Iterator<String> getLocalparts() {
         return soapHeaders.keySet().iterator();
@@ -83,7 +81,7 @@ public class ContextHandler extends ResourceBase {
     /**
      * The soapRole.
      */
-    private ArrayList<String> soapRoles = new ArrayList<String>();
+    private final ArrayList<String> soapRoles = new ArrayList<String>();
 
     public String getSoapRole(int i) {
         return this.soapRoles.get(i);
@@ -100,7 +98,7 @@ public class ContextHandler extends ResourceBase {
     /**
      * The portName.
      */
-    private ArrayList<String> portNames = new ArrayList<String>();
+    private final ArrayList<String> portNames = new ArrayList<String>();
 
     public String getPortName(int i) {
         return this.portNames.get(i);
@@ -150,6 +148,4 @@ public class ContextHandler extends ResourceBase {
         return (sb.toString());
 
     }
-
-
 }
