@@ -70,13 +70,19 @@ public class NioChannel implements ByteChannel{
     }
 
     /**
-     * returns true if the network buffer has
-     * been flushed out and is empty
-     * @return boolean
+     * Returns true if the network buffer has been flushed out and is empty.
+     *
+     * @param block     Unused. May be used when overridden
+     * @param s         Unused. May be used when overridden
+     * @param timeout   Unused. May be used when overridden
+     * @param lastWrite
+     * @return Always returns <code>true</code> since there is no network buffer
+     *         in the regular channel
+     * @throws IOException
      */
     public boolean flush(boolean block, Selector s, long timeout,MutableInteger lastWrite) throws IOException {
         if (lastWrite!=null) lastWrite.set(1);
-        return true; //no network buffer in the regular channel
+        return true;
     }
 
 
