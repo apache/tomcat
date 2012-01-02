@@ -783,9 +783,10 @@ public class ConnectionPool {
         }
     }
     /**
-     * return true if the connection TX termination succeeded
+     * Terminate the current transaction for the given connection.
      * @param con
-     * @return
+     * @return <code>true</code> if the connection TX termination succeeded
+     *         otherwise <code>false</code>
      */
     protected boolean terminateTransaction(PooledConnection con) {
         try {

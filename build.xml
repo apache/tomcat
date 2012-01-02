@@ -1578,9 +1578,9 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       <link href="../servletapi"/>
       <link href="../jspapi"/>
       <link href="../elapi"/>
-      <link href="http://download.oracle.com/javase/6/docs/api/"/>
+      <link href="http://docs.oracle.com/javase/6/docs/api/"/>
       <link href="http://commons.apache.org/io/api-release/"/>
-      <link href="http://download-llnw.oracle.com/javaee/6/api/"/>
+      <link href="http://docs.oracle.com/javaee/6/api/"/>
       <sourcepath>
         <path location="${tomcat.dist}/src/java"/>
         <!--jdbc-pool src files for javadoc-->
