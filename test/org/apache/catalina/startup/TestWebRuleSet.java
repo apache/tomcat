@@ -46,14 +46,14 @@ public class TestWebRuleSet {
 
         WebXml webXml = new WebXml();
 
-        assertTrue(parse(webXml, "web-fragment-1name.xml", true));
+        parse(webXml, "web-fragment-1name.xml", true, true);
         assertEquals("name1", webXml.getName());
     }
 
 
     @Test
     public void testMultipleNameInWebFragmentXml() throws Exception {
-        assertFalse(parse(new WebXml(), "web-fragment-2name.xml", true));
+        parse(new WebXml(), "web-fragment-2name.xml", true, false);
     }
 
 
@@ -62,7 +62,7 @@ public class TestWebRuleSet {
 
         WebXml webXml = new WebXml();
 
-        assertTrue(parse(webXml, "web-fragment-1ordering.xml", true));
+        parse(webXml, "web-fragment-1ordering.xml", true, true);
         assertEquals(1, webXml.getBeforeOrdering().size());
         assertTrue(webXml.getBeforeOrdering().contains("bar"));
     }
@@ -70,7 +70,7 @@ public class TestWebRuleSet {
 
     @Test
     public void testMultipleOrderingInWebFragmentXml() throws Exception {
-        assertFalse(parse(new WebXml(), "web-fragment-2ordering.xml", true));
+        parse(new WebXml(), "web-fragment-2ordering.xml", true, false);
     }
 
 
@@ -79,7 +79,7 @@ public class TestWebRuleSet {
 
         WebXml webXml = new WebXml();
 
-        assertTrue(parse(webXml, "web-1ordering.xml", false));
+        parse(webXml, "web-1ordering.xml", false, true);
         assertEquals(1, webXml.getAbsoluteOrdering().size());
         assertTrue(webXml.getAbsoluteOrdering().contains("bar"));
     }
@@ -87,34 +87,34 @@ public class TestWebRuleSet {
 
     @Test
     public void testMultipleOrderingInWebXml() throws Exception {
-        assertFalse(parse(new WebXml(), "web-2ordering.xml", false));
+        parse(new WebXml(), "web-2ordering.xml", false, false);
     }
 
 
     @Test
     public void testRecycle() throws Exception {
         // Name
-        assertFalse(parse(new WebXml(), "web-fragment-2name.xml", true));
-        assertTrue(parse(new WebXml(), "web-fragment-1name.xml", true));
-        assertFalse(parse(new WebXml(), "web-fragment-2name.xml", true));
-        assertTrue(parse(new WebXml(), "web-fragment-1name.xml", true));
+        parse(new WebXml(), "web-fragment-2name.xml", true, false);
+        parse(new WebXml(), "web-fragment-1name.xml", true, true);
+        parse(new WebXml(), "web-fragment-2name.xml", true, false);
+        parse(new WebXml(), "web-fragment-1name.xml", true, true);
 
         // Relative ordering
-        assertFalse(parse(new WebXml(), "web-fragment-2ordering.xml", true));
-        assertTrue(parse(new WebXml(), "web-fragment-1ordering.xml", true));
-        assertFalse(parse(new WebXml(), "web-fragment-2ordering.xml", true));
-        assertTrue(parse(new WebXml(), "web-fragment-1ordering.xml", true));
+        parse(new WebXml(), "web-fragment-2ordering.xml", true, false);
+        parse(new WebXml(), "web-fragment-1ordering.xml", true, true);
+        parse(new WebXml(), "web-fragment-2ordering.xml", true, false);
+        parse(new WebXml(), "web-fragment-1ordering.xml", true, true);
 
         // Absolute ordering
-        assertFalse(parse(new WebXml(), "web-2ordering.xml", false));
-        assertTrue(parse(new WebXml(), "web-1ordering.xml", false));
-        assertFalse(parse(new WebXml(), "web-2ordering.xml", false));
-        assertTrue(parse(new WebXml(), "web-1ordering.xml", false));
+        parse(new WebXml(), "web-2ordering.xml", false, false);
+        parse(new WebXml(), "web-1ordering.xml", false, true);
+        parse(new WebXml(), "web-2ordering.xml", false, false);
+        parse(new WebXml(), "web-1ordering.xml", false, true);
 }
 
 
-    private synchronized boolean parse(WebXml webXml, String target,
-            boolean fragment) {
+    private synchronized void parse(WebXml webXml, String target,
+            boolean fragment, boolean expected) {
 
         Digester d;
         if (fragment) {
@@ -135,9 +135,17 @@ public class TestWebRuleSet {
         try {
             d.parse(is);
         } catch (Exception e) {
+            if (expected) {
+                // Didn't expect an exception
+                e.printStackTrace();
+            }
             result = false;
         }
 
-        return result;
+        if (expected) {
+            assertTrue(result);
+        } else {
+            assertFalse(result);
+        }
     }
 }
