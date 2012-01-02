@@ -14,8 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.catalina.deploy;
 
 
@@ -28,7 +26,6 @@ package org.apache.catalina.deploy;
  * @author Peter Rossbach (pero@apache.org)
  * @version $Id$
  */
-
 public class ContextLocalEjb extends ResourceBase {
 
     private static final long serialVersionUID = 1L;
@@ -111,6 +108,53 @@ public class ContextLocalEjb extends ResourceBase {
         }
         sb.append("]");
         return (sb.toString());
+    }
 
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = super.hashCode();
+        result = prime * result + ((home == null) ? 0 : home.hashCode());
+        result = prime * result + ((link == null) ? 0 : link.hashCode());
+        result = prime * result + ((local == null) ? 0 : local.hashCode());
+        return result;
+    }
+
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (!super.equals(obj)) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        ContextLocalEjb other = (ContextLocalEjb) obj;
+        if (home == null) {
+            if (other.home != null) {
+                return false;
+            }
+        } else if (!home.equals(other.home)) {
+            return false;
+        }
+        if (link == null) {
+            if (other.link != null) {
+                return false;
+            }
+        } else if (!link.equals(other.link)) {
+            return false;
+        }
+        if (local == null) {
+            if (other.local != null) {
+                return false;
+            }
+        } else if (!local.equals(other.local)) {
+            return false;
+        }
+        return true;
     }
 }

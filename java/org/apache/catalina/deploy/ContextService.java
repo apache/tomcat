@@ -14,10 +14,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.catalina.deploy;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 
@@ -29,7 +28,6 @@ import java.util.Iterator;
  * @author Fabien Carrion
  * @version $Id$
  */
-
 public class ContextService extends ResourceBase {
 
     private static final long serialVersionUID = 1L;
@@ -188,7 +186,7 @@ public class ContextService extends ResourceBase {
      *
      * The instantiation of the handler have to be done.
      */
-    private HashMap<String, ContextHandler> handlers =
+    private final HashMap<String, ContextHandler> handlers =
         new HashMap<String, ContextHandler>();
 
     public Iterator<String> getHandlers() {
@@ -262,7 +260,97 @@ public class ContextService extends ResourceBase {
         }
         sb.append("]");
         return (sb.toString());
-
     }
 
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = super.hashCode();
+        result = prime * result +
+                ((displayname == null) ? 0 : displayname.hashCode());
+        result = prime * result +
+                ((handlers == null) ? 0 : handlers.hashCode());
+        result = prime *
+                result +
+                ((jaxrpcmappingfile == null) ? 0 : jaxrpcmappingfile.hashCode());
+        result = prime * result +
+                ((largeIcon == null) ? 0 : largeIcon.hashCode());
+        result = prime * result +
+                ((serviceInterface == null) ? 0 : serviceInterface.hashCode());
+        result = prime * result + Arrays.hashCode(serviceqname);
+        result = prime * result +
+                ((smallIcon == null) ? 0 : smallIcon.hashCode());
+        result = prime * result +
+                ((wsdlfile == null) ? 0 : wsdlfile.hashCode());
+        return result;
+    }
+
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (!super.equals(obj)) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        ContextService other = (ContextService) obj;
+        if (displayname == null) {
+            if (other.displayname != null) {
+                return false;
+            }
+        } else if (!displayname.equals(other.displayname)) {
+            return false;
+        }
+        if (handlers == null) {
+            if (other.handlers != null) {
+                return false;
+            }
+        } else if (!handlers.equals(other.handlers)) {
+            return false;
+        }
+        if (jaxrpcmappingfile == null) {
+            if (other.jaxrpcmappingfile != null) {
+                return false;
+            }
+        } else if (!jaxrpcmappingfile.equals(other.jaxrpcmappingfile)) {
+            return false;
+        }
+        if (largeIcon == null) {
+            if (other.largeIcon != null) {
+                return false;
+            }
+        } else if (!largeIcon.equals(other.largeIcon)) {
+            return false;
+        }
+        if (serviceInterface == null) {
+            if (other.serviceInterface != null) {
+                return false;
+            }
+        } else if (!serviceInterface.equals(other.serviceInterface)) {
+            return false;
+        }
+        if (!Arrays.equals(serviceqname, other.serviceqname)) {
+            return false;
+        }
+        if (smallIcon == null) {
+            if (other.smallIcon != null) {
+                return false;
+            }
+        } else if (!smallIcon.equals(other.smallIcon)) {
+            return false;
+        }
+        if (wsdlfile == null) {
+            if (other.wsdlfile != null) {
+                return false;
+            }
+        } else if (!wsdlfile.equals(other.wsdlfile)) {
+            return false;
+        }
+        return true;
+    }
 }

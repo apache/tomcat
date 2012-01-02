@@ -14,8 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.catalina.deploy;
 
 
@@ -28,7 +26,6 @@ package org.apache.catalina.deploy;
  * @author Peter Rossbach (pero@apache.org)
  * @version $Id$
  */
-
 public class ContextResource extends ResourceBase {
 
     private static final long serialVersionUID = 1L;
@@ -128,7 +125,58 @@ public class ContextResource extends ResourceBase {
         }
         sb.append("]");
         return (sb.toString());
-
     }
 
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = super.hashCode();
+        result = prime * result + ((auth == null) ? 0 : auth.hashCode());
+        result = prime * result +
+                ((closeMethod == null) ? 0 : closeMethod.hashCode());
+        result = prime * result + ((scope == null) ? 0 : scope.hashCode());
+        result = prime * result + (singleton ? 1231 : 1237);
+        return result;
+    }
+
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (!super.equals(obj)) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        ContextResource other = (ContextResource) obj;
+        if (auth == null) {
+            if (other.auth != null) {
+                return false;
+            }
+        } else if (!auth.equals(other.auth)) {
+            return false;
+        }
+        if (closeMethod == null) {
+            if (other.closeMethod != null) {
+                return false;
+            }
+        } else if (!closeMethod.equals(other.closeMethod)) {
+            return false;
+        }
+        if (scope == null) {
+            if (other.scope != null) {
+                return false;
+            }
+        } else if (!scope.equals(other.scope)) {
+            return false;
+        }
+        if (singleton != other.singleton) {
+            return false;
+        }
+        return true;
+    }
 }
