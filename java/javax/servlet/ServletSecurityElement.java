@@ -19,6 +19,7 @@ package javax.servlet;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -107,11 +108,16 @@ public class ServletSecurityElement extends HttpConstraintElement {
     }
 
     public Collection<HttpMethodConstraintElement> getHttpMethodConstraints() {
-        return methodConstraints.values();
+        Collection<HttpMethodConstraintElement> result =
+                new HashSet<HttpMethodConstraintElement>();
+        result.addAll(methodConstraints.values());
+        return result;
     }
 
     public Collection<String> getMethodNames() {
-        return methodConstraints.keySet();
+        Collection<String> result = new HashSet<String>();
+        result.addAll(methodConstraints.keySet());
+        return result;
     }
 
     private void addHttpMethodConstraints(
