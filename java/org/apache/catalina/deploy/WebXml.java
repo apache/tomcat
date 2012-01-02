@@ -1378,8 +1378,6 @@ public class WebXml {
         // Merge rules vary from element to element. See SRV.8.2.3
 
         WebXml temp = new WebXml();
-        Map<String,Boolean> mergeInjectionFlags =
-            new HashMap<String, Boolean>();
 
         for (WebXml fragment : fragments) {
             if (!mergeMap(fragment.getContextParams(), contextParams,
@@ -1418,30 +1416,27 @@ public class WebXml {
 
         for (WebXml fragment : fragments) {
             if (!mergeResourceMap(fragment.getEjbLocalRefs(), ejbLocalRefs,
-                    temp.getEjbLocalRefs(), mergeInjectionFlags, fragment)) {
+                    temp.getEjbLocalRefs(), fragment)) {
                 return false;
             }
         }
         ejbLocalRefs.putAll(temp.getEjbLocalRefs());
-        mergeInjectionFlags.clear();
 
         for (WebXml fragment : fragments) {
             if (!mergeResourceMap(fragment.getEjbRefs(), ejbRefs,
-                    temp.getEjbRefs(), mergeInjectionFlags, fragment)) {
+                    temp.getEjbRefs(), fragment)) {
                 return false;
             }
         }
         ejbRefs.putAll(temp.getEjbRefs());
-        mergeInjectionFlags.clear();
 
         for (WebXml fragment : fragments) {
             if (!mergeResourceMap(fragment.getEnvEntries(), envEntries,
-                    temp.getEnvEntries(), mergeInjectionFlags, fragment)) {
+                    temp.getEnvEntries(), fragment)) {
                 return false;
             }
         }
         envEntries.putAll(temp.getEnvEntries());
-        mergeInjectionFlags.clear();
 
         for (WebXml fragment : fragments) {
             if (!mergeMap(fragment.getErrorPages(), errorPages,
@@ -1538,21 +1533,19 @@ public class WebXml {
 
         for (WebXml fragment : fragments) {
             if (!mergeResourceMap(fragment.getMessageDestinationRefs(), messageDestinationRefs,
-                    temp.getMessageDestinationRefs(), mergeInjectionFlags, fragment)) {
+                    temp.getMessageDestinationRefs(), fragment)) {
                 return false;
             }
         }
         messageDestinationRefs.putAll(temp.getMessageDestinationRefs());
-        mergeInjectionFlags.clear();
 
         for (WebXml fragment : fragments) {
             if (!mergeResourceMap(fragment.getMessageDestinations(), messageDestinations,
-                    temp.getMessageDestinations(), mergeInjectionFlags, fragment)) {
+                    temp.getMessageDestinations(), fragment)) {
                 return false;
             }
         }
         messageDestinations.putAll(temp.getMessageDestinations());
-        mergeInjectionFlags.clear();
 
         for (WebXml fragment : fragments) {
             if (!mergeMap(fragment.getMimeMappings(), mimeMappings,
@@ -1564,21 +1557,19 @@ public class WebXml {
 
         for (WebXml fragment : fragments) {
             if (!mergeResourceMap(fragment.getResourceEnvRefs(), resourceEnvRefs,
-                    temp.getResourceEnvRefs(), mergeInjectionFlags, fragment)) {
+                    temp.getResourceEnvRefs(), fragment)) {
                 return false;
             }
         }
         resourceEnvRefs.putAll(temp.getResourceEnvRefs());
-        mergeInjectionFlags.clear();
 
         for (WebXml fragment : fragments) {
             if (!mergeResourceMap(fragment.getResourceRefs(), resourceRefs,
-                    temp.getResourceRefs(), mergeInjectionFlags, fragment)) {
+                    temp.getResourceRefs(), fragment)) {
                 return false;
             }
         }
         resourceRefs.putAll(temp.getResourceRefs());
-        mergeInjectionFlags.clear();
 
         for (WebXml fragment : fragments) {
             for (SecurityConstraint constraint : fragment.getSecurityConstraints()) {
@@ -1596,12 +1587,11 @@ public class WebXml {
 
         for (WebXml fragment : fragments) {
             if (!mergeResourceMap(fragment.getServiceRefs(), serviceRefs,
-                    temp.getServiceRefs(), mergeInjectionFlags, fragment)) {
+                    temp.getServiceRefs(), fragment)) {
                 return false;
             }
         }
         serviceRefs.putAll(temp.getServiceRefs());
-        mergeInjectionFlags.clear();
 
         // As per 'clarification' from the Servlet EG, servlet definitions and
         // mappings in the main web.xml override those in fragments and those in
@@ -1873,27 +1863,12 @@ public class WebXml {
 
     private static <T extends ResourceBase> boolean mergeResourceMap(
             Map<String, T> fragmentResources, Map<String, T> mainResources,
-            Map<String, T> tempResources,
-            Map<String,Boolean> mergeInjectionFlags, WebXml fragment) {
+            Map<String, T> tempResources, WebXml fragment) {
         for (T resource : fragmentResources.values()) {
             String resourceName = resource.getName();
-            boolean mergeInjectionFlag = false;
             if (mainResources.containsKey(resourceName)) {
-                if (mergeInjectionFlags.containsKey(resourceName)) {
-                    mergeInjectionFlag =
-                        mergeInjectionFlags.get(resourceName).booleanValue();
-                } else {
-                    if (mainResources.get(
-                            resourceName).getInjectionTargets().size() == 0) {
-                        mergeInjectionFlag = true;
-                    }
-                    mergeInjectionFlags.put(resourceName,
-                            Boolean.valueOf(mergeInjectionFlag));
-                }
-                if (mergeInjectionFlag) {
-                    mainResources.get(resourceName).getInjectionTargets().addAll(
-                            resource.getInjectionTargets());
-                }
+                mainResources.get(resourceName).getInjectionTargets().addAll(
+                        resource.getInjectionTargets());
             } else {
                 // Not defined in main web.xml
                 T existingResource = tempResources.get(resourceName);
