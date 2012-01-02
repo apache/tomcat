@@ -14,10 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.catalina.deploy;
-
 
 /**
  * <p>Representation of a message destination for a web application, as
@@ -28,7 +25,6 @@ package org.apache.catalina.deploy;
  * @version $Id$
  * @since Tomcat 5.0
  */
-
 public class MessageDestination extends ResourceBase {
 
     private static final long serialVersionUID = 1L;
@@ -108,8 +104,56 @@ public class MessageDestination extends ResourceBase {
         }
         sb.append("]");
         return (sb.toString());
-
     }
 
 
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = super.hashCode();
+        result = prime * result +
+                ((displayName == null) ? 0 : displayName.hashCode());
+        result = prime * result +
+                ((largeIcon == null) ? 0 : largeIcon.hashCode());
+        result = prime * result +
+                ((smallIcon == null) ? 0 : smallIcon.hashCode());
+        return result;
+    }
+
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (!super.equals(obj)) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        MessageDestination other = (MessageDestination) obj;
+        if (displayName == null) {
+            if (other.displayName != null) {
+                return false;
+            }
+        } else if (!displayName.equals(other.displayName)) {
+            return false;
+        }
+        if (largeIcon == null) {
+            if (other.largeIcon != null) {
+                return false;
+            }
+        } else if (!largeIcon.equals(other.largeIcon)) {
+            return false;
+        }
+        if (smallIcon == null) {
+            if (other.smallIcon != null) {
+                return false;
+            }
+        } else if (!smallIcon.equals(other.smallIcon)) {
+            return false;
+        }
+        return true;
+    }
 }
