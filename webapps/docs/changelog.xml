@@ -136,6 +136,9 @@
       <update>
         Remove obsolete <code>emptySessionPath</code> JMX attribute. (rjung)
       </update>
+      <fix>
+        Correct error in fix for <bug>49683</bug>. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
