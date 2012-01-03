@@ -1364,7 +1364,6 @@ public class AprEndpoint extends AbstractEndpoint {
                         } else {
                             destroySocket(desc[n*2+1]);
                         }
-                        return true;
                     }
                 }
             } else if (rv < 0) {
