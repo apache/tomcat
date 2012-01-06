@@ -228,6 +228,10 @@
         Fix build condition for tomcat-dbcp to always rebuild whan a new version
         of commons-pool or commons-dbcp is downloaded. (kkolinko)
       </fix>
+      <update>
+        Add example of configuration for <code>SetCharacterEncodingFilter</code>
+        to the default <code>web.xml</code> file. (kkolinko)
+      </update>
     </changelog>
   </subsection>
 </section>
