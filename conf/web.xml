@@ -388,6 +388,20 @@
 
   <!-- ================== Built In Filter Definitions ===================== -->
 
+  <!-- A filter that sets character encoding that is used to decode -->
+  <!-- parameters in a POST request -->
+<!--
+    <filter>
+        <filter-name>setCharacterEncodingFilter</filter-name>
+        <filter-class>org.apache.catalina.filters.SetCharacterEncodingFilter</filter-class>
+        <init-param>
+            <param-name>encoding</param-name>
+            <param-value>UTF-8</param-value>
+        </init-param>
+        <async-supported>true</async-supported>
+    </filter>
+-->
+
   <!-- A filter that triggers request parameters parsing and rejects the    -->
   <!-- request if some parameters were skipped because of parsing errors or -->
   <!-- request size limitations.                                            -->
@@ -461,6 +475,14 @@
 
 
   <!-- ==================== Built In Filter Mappings ====================== -->
+
+  <!-- The mapping for the Set Character Encoding Filter -->
+<!--
+    <filter-mapping>
+        <filter-name>setCharacterEncodingFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+-->
 
   <!-- The mapping for the Failed Request Filter -->
 <!--
