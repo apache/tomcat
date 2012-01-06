@@ -258,12 +258,13 @@ public abstract class AbstractProtocol implements ProtocolHandler,
             name.append(getAddress());
             name.append('-');
         }
-        int port = getLocalPort();
-        if (port > 0) {
-            name.append(port);
-        } else {
+        int port = getPort();
+        if (port == 0) {
+            // auto binding is in use so port is unknown at this point
             name.append("auto-");
             name.append(getNameIndex());
+        } else {
+            name.append(port);
         }
         return ObjectName.quote(name.toString());
     }
