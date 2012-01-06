@@ -864,31 +864,9 @@ public class AprEndpoint extends AbstractEndpoint {
      */
     protected boolean processSocket(long socket, SocketStatus status) {
         try {
-            if (status == SocketStatus.OPEN || status == SocketStatus.STOP ||
-                    status == SocketStatus.TIMEOUT) {
-                SocketWrapper<Long> wrapper =
+            SocketWrapper<Long> wrapper =
                     new SocketWrapper<Long>(Long.valueOf(socket));
-                SocketEventProcessor proc =
-                    new SocketEventProcessor(wrapper, status);
-                ClassLoader loader = Thread.currentThread().getContextClassLoader();
-                try {
-                    if (Constants.IS_SECURITY_ENABLED) {
-                        PrivilegedAction<Void> pa = new PrivilegedSetTccl(
-                                getClass().getClassLoader());
-                        AccessController.doPrivileged(pa);
-                    } else {
-                        Thread.currentThread().setContextClassLoader(
-                                getClass().getClassLoader());
-                    }
-                    getExecutor().execute(proc);
-                } finally {
-                    if (Constants.IS_SECURITY_ENABLED) {
-                        PrivilegedAction<Void> pa = new PrivilegedSetTccl(loader);
-                        AccessController.doPrivileged(pa);
-                    } else {
-                        Thread.currentThread().setContextClassLoader(loader);
-                    }
-                }            }
+            getExecutor().execute(new SocketEventProcessor(wrapper, status));
         } catch (RejectedExecutionException x) {
             log.warn("Socket processing request was rejected for:"+socket,x);
             return false;
