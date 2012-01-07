@@ -16,6 +16,7 @@
  */
 package org.apache.catalina.connector;
 
+import java.net.InetAddress;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -898,7 +899,10 @@ public class Connector extends LifecycleMBeanBase  {
             sb.append("auto-");
             sb.append(getProperty("nameIndex"));
         }
-        if (addressObj != null) {
+        if (addressObj instanceof InetAddress) {
+            sb.append(",address=");
+            sb.append(((InetAddress) addressObj).getHostAddress());
+        } else if(addressObj != null) {
             String address = addressObj.toString();
             if (address.length() > 0) {
                 sb.append(",address=");

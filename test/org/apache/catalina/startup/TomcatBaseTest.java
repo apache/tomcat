@@ -23,6 +23,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.HttpURLConnection;
+import java.net.InetAddress;
 import java.net.URL;
 import java.util.List;
 import java.util.Map;
@@ -97,6 +98,9 @@ public abstract class TomcatBaseTest extends LoggingBaseTest {
 
         String protocol = getProtocol();
         Connector connector = new Connector(protocol);
+        // Listen only on localhost
+        connector.setAttribute("address",
+                InetAddress.getByName("localhost").getHostAddress());
         // Use random free port
         connector.setPort(0);
         // Mainly set to reduce timeouts during async tests
