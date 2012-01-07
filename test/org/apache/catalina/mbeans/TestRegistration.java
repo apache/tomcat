@@ -17,6 +17,8 @@
 package org.apache.catalina.mbeans;
 
 import java.io.File;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -44,6 +46,19 @@ import org.apache.tomcat.util.modeler.Registry;
 public class TestRegistration extends TomcatBaseTest {
 
     private static final String contextName = "/foo";
+
+    private static final String ADDRESS;
+
+    static {
+        String address;
+        try {
+            address = InetAddress.getByName("localhost").getHostAddress();
+        } catch (UnknownHostException e) {
+            address = "INIT_FAILED";
+        }
+        ADDRESS = address;
+    }
+
 
     private static String[] basicMBeanNames() {
         return new String[] {
@@ -95,11 +110,14 @@ public class TestRegistration extends TomcatBaseTest {
 
     private static String[] connectorMBeanNames(String port, String type) {
         return new String[] {
-        "Tomcat:type=Connector,port=" + port,
-        "Tomcat:type=GlobalRequestProcessor,name=\"http-" + type + "-" + port + "\"",
-        "Tomcat:type=Mapper,port=" + port,
-        "Tomcat:type=ProtocolHandler,port=" + port,
-        "Tomcat:type=ThreadPool,name=\"http-" + type + "-" + port + "\"",
+        "Tomcat:type=Connector,port=" + port + ",address=" + ADDRESS,
+        "Tomcat:type=GlobalRequestProcessor,name=\"http-" + type + "-" +
+                ADDRESS + "-" + port + "\"",
+        "Tomcat:type=Mapper,port=" + port + ",address=" + ADDRESS,
+        "Tomcat:type=ProtocolHandler,port=" + port + ",address=\"" + ADDRESS +
+                "\"",
+        "Tomcat:type=ThreadPool,name=\"http-" + type + "-" + ADDRESS + "-" +
+                port + "\"",
         };
     }
 

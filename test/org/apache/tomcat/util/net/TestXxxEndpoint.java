@@ -18,6 +18,7 @@
 package org.apache.tomcat.util.net;
 
 import java.io.File;
+import java.net.InetAddress;
 import java.net.ServerSocket;
 
 import static org.junit.Assert.assertNotNull;
@@ -136,7 +137,8 @@ public class TestXxxEndpoint extends TomcatBaseTest {
                 nativeSocket = createAprSocket(port, pool);
                 assertTrue(nativeSocket != 0);
             } else {
-                s = new ServerSocket(port);
+                s = new ServerSocket(port, 100,
+                        InetAddress.getByName("localhost"));
             }
         } catch (Exception e1) {
             e = e1;
@@ -183,7 +185,8 @@ public class TestXxxEndpoint extends TomcatBaseTest {
                 nativeSocket = createAprSocket(port, pool);
                 assertTrue(nativeSocket != 0);
             } else {
-                s = new ServerSocket(port);
+                s = new ServerSocket(port, 100,
+                        InetAddress.getByName("localhost"));
             }
         } catch (Exception e1) {
             e = e1;
