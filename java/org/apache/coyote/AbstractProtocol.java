@@ -255,7 +255,7 @@ public abstract class AbstractProtocol implements ProtocolHandler,
         StringBuilder name = new StringBuilder(getNamePrefix());
         name.append('-');
         if (getAddress() != null) {
-            name.append(getAddress());
+            name.append(getAddress().getHostAddress());
             name.append('-');
         }
         int port = getPort();
@@ -356,7 +356,7 @@ public abstract class AbstractProtocol implements ProtocolHandler,
         InetAddress address = getAddress();
         if (address != null) {
             name.append(",address=");
-            name.append(ObjectName.quote(address.toString()));
+            name.append(ObjectName.quote(address.getHostAddress()));
         }
         return new ObjectName(name.toString());
     }
