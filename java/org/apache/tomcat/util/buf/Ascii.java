@@ -75,8 +75,9 @@ public final class Ascii {
 
     /**
      * Returns the upper case equivalent of the specified ASCII character.
+     * @deprecated Unused. Will be removed in Tomcat 8.0.x onwards.
      */
-
+    @Deprecated
     public static int toUpper(int c) {
         return toUpper[c & 0xff] & 0xff;
     }
@@ -91,32 +92,36 @@ public final class Ascii {
 
     /**
      * Returns true if the specified ASCII character is upper or lower case.
+     * @deprecated Unused. Will be removed in Tomcat 8.0.x onwards.
      */
-
+    @Deprecated
     public static boolean isAlpha(int c) {
         return isAlpha[c & 0xff];
     }
 
     /**
      * Returns true if the specified ASCII character is upper case.
+     * @deprecated Unused. Will be removed in Tomcat 8.0.x onwards.
      */
-
+    @Deprecated
     public static boolean isUpper(int c) {
         return isUpper[c & 0xff];
     }
 
     /**
      * Returns true if the specified ASCII character is lower case.
+     * @deprecated Unused. Will be removed in Tomcat 8.0.x onwards.
      */
-
+    @Deprecated
     public static boolean isLower(int c) {
         return isLower[c & 0xff];
     }
 
     /**
      * Returns true if the specified ASCII character is white space.
+     * @deprecated Unused. Will be removed in Tomcat 8.0.x onwards.
      */
-
+    @Deprecated
     public static boolean isWhite(int c) {
         return isWhite[c & 0xff];
     }
@@ -135,7 +140,9 @@ public final class Ascii {
      * @param off the start offset of the bytes
      * @param len the length of the bytes
      * @exception NumberFormatException if the integer format was invalid
+     * @deprecated Unused. Will be removed in Tomcat 8.0.x onwards.
      */
+    @Deprecated
     public static int parseInt(byte[] b, int off, int len)
         throws NumberFormatException
     {
@@ -157,6 +164,10 @@ public final class Ascii {
         return n;
     }
 
+    /**
+     * @deprecated Unused. Will be removed in Tomcat 8.0.x onwards.
+     */
+    @Deprecated
     public static int parseInt(char[] b, int off, int len)
         throws NumberFormatException
     {
@@ -214,6 +225,10 @@ public final class Ascii {
         return n;
     }
 
+    /**
+     * @deprecated Unused. Will be removed in Tomcat 8.0.x onwards.
+     */
+    @Deprecated
     public static long parseLong(char[] b, int off, int len)
         throws NumberFormatException
     {

@@ -141,7 +141,10 @@ public final class ByteChunk implements Cloneable, Serializable {
         allocate( initial, -1 );
     }
 
-    //--------------------
+    /**
+     * @deprecated Unused. Will be removed in Tomcat 8.0.x onwards.
+     */
+    @Deprecated
     public ByteChunk getClone() {
         try {
             return (ByteChunk)this.clone();
@@ -195,6 +198,10 @@ public final class ByteChunk implements Cloneable, Serializable {
         isSet=true;
     }
 
+    /**
+     * @deprecated Unused. Will be removed in Tomcat 8.0.x onwards.
+     */
+    @Deprecated
     public void setOptimizedWrite(boolean optimizedWrite) {
         this.optimizedWrite = optimizedWrite;
     }
@@ -295,7 +302,9 @@ public final class ByteChunk implements Cloneable, Serializable {
      *
      * @param c
      * @throws IOException
+     * @deprecated Unused. Will be removed in Tomcat 8.0.x onwards.
      */
+    @Deprecated
     public void append( char c )
         throws IOException
     {
@@ -399,6 +408,10 @@ public final class ByteChunk implements Cloneable, Serializable {
 
     }
 
+    /**
+     * @deprecated Unused. Will be removed in Tomcat 8.0.x onwards.
+     */
+    @Deprecated
     public int substract(ByteChunk src)
         throws IOException {
 
@@ -538,6 +551,10 @@ public final class ByteChunk implements Cloneable, Serializable {
         return new String(cb.array(), cb.arrayOffset(), cb.length());
     }
 
+    /**
+     * @deprecated Unused. Will be removed in Tomcat 8.0.x onwards.
+     */
+    @Deprecated
     public int getInt()
     {
         return Ascii.parseInt(buff, start,end-start);
@@ -646,7 +663,9 @@ public final class ByteChunk implements Cloneable, Serializable {
     /**
      * Returns true if the message bytes starts with the specified string.
      * @param s the string
+     * @deprecated Unused. Will be removed in Tomcat 8.0.x onwards.
      */
+    @Deprecated
     public boolean startsWith(String s) {
         // Works only if enc==UTF
         byte[] b = buff;
@@ -663,7 +682,11 @@ public final class ByteChunk implements Cloneable, Serializable {
         return true;
     }
 
-    /* Returns true if the message bytes start with the specified byte array */
+    /**
+     * Returns true if the message bytes start with the specified byte array.
+     * @deprecated Unused. Will be removed in Tomcat 8.0.x onwards.
+     */
+    @Deprecated
     public boolean startsWith(byte[] b2) {
         byte[] b1 = buff;
         if (b1 == null && b2 == null) {
@@ -732,7 +755,10 @@ public final class ByteChunk implements Cloneable, Serializable {
         return hashBytes( buff, start, end-start);
     }
 
-    // hash ignoring case
+    /**
+     * @deprecated Unused. Will be removed in Tomcat 8.0.x onwards.
+     */
+    @Deprecated
     public int hashIgnoreCase() {
         return hashBytesIC( buff, start, end-start );
     }
@@ -860,7 +886,9 @@ public final class ByteChunk implements Cloneable, Serializable {
      * @return      The position of the first instance a byte that is not
      *                  in the list of bytes to search for or -1 if no such byte
      *                  is found.
+     * @deprecated Unused. Will be removed in Tomcat 8.0.x onwards.
      */
+    @Deprecated
     public static int findNotBytes(byte bytes[], int start, int end, byte b[]) {
         int blen = b.length;
         int offset = start;
