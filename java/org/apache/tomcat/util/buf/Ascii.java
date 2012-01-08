@@ -75,7 +75,9 @@ public final class Ascii {
      * @param off the start offset of the bytes
      * @param len the length of the bytes
      * @exception NumberFormatException if the integer format was invalid
+     * @deprecated Unused. Will be removed in Tomcat 8.0.x onwards.
      */
+    @Deprecated
     public static int parseInt(byte[] b, int off, int len)
         throws NumberFormatException
     {
@@ -97,6 +99,10 @@ public final class Ascii {
         return n;
     }
 
+    /**
+     * @deprecated Unused. Will be removed in Tomcat 8.0.x onwards.
+     */
+    @Deprecated
     public static int parseInt(char[] b, int off, int len)
         throws NumberFormatException
     {

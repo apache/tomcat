@@ -492,6 +492,10 @@ public final class ByteChunk implements Cloneable, Serializable {
         return new String(cb.array(), cb.arrayOffset(), cb.length());
     }
 
+    /**
+     * @deprecated Unused. Will be removed in Tomcat 8.0.x onwards.
+     */
+    @Deprecated
     public int getInt()
     {
         return Ascii.parseInt(buff, start,end-start);
@@ -600,7 +604,9 @@ public final class ByteChunk implements Cloneable, Serializable {
     /**
      * Returns true if the message bytes starts with the specified string.
      * @param s the string
+     * @deprecated Unused. Will be removed in Tomcat 8.0.x onwards.
      */
+    @Deprecated
     public boolean startsWith(String s) {
         // Works only if enc==UTF
         byte[] b = buff;
