@@ -431,6 +431,8 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
 
         TesterAccessLogValve alv = new TesterAccessLogValve();
         ctx.getPipeline().addValve(alv);
+        TesterAccessLogValve alvGlobal = new TesterAccessLogValve();
+        tomcat.getHost().getPipeline().addValve(alvGlobal);
 
         tomcat.start();
         ByteChunk res = new ByteChunk();
@@ -464,11 +466,14 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
 
         // Check the access log
         if (completeOnTimeout && dispatchUrl != null) {
-            if (!isAccessLogEnabled()) {
-                alv.validateAccessLog(1, 500, 0, TimeoutServlet.ASYNC_TIMEOUT +
-                        TIMEOUT_MARGIN + REQUEST_TIME);
-            }
+            // This error is written into Host-level AccessLogValve only
+            alvGlobal.validateAccessLog(1, 500, 0, TimeoutServlet.ASYNC_TIMEOUT
+                    + TIMEOUT_MARGIN + REQUEST_TIME);
+            alv.validateAccessLog(0, 500, 0, 0);
         } else {
+            alvGlobal.validateAccessLog(1, 200, TimeoutServlet.ASYNC_TIMEOUT,
+                    TimeoutServlet.ASYNC_TIMEOUT + TIMEOUT_MARGIN +
+                    REQUEST_TIME);
             alv.validateAccessLog(1, 200, TimeoutServlet.ASYNC_TIMEOUT,
                     TimeoutServlet.ASYNC_TIMEOUT + TIMEOUT_MARGIN +
                     REQUEST_TIME);
