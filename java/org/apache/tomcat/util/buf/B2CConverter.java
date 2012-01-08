@@ -81,6 +81,10 @@ public class B2CConverter {
     private ReadConvertor conv;
     private String encoding;
 
+    /**
+     * @deprecated Unused. Will be removed in Tomcat 8.0.x onwards.
+     */
+    @Deprecated
     protected B2CConverter() {
     }
 
