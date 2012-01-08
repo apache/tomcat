@@ -110,14 +110,16 @@ public class TestRegistration extends TomcatBaseTest {
 
     private static String[] connectorMBeanNames(String port, String type) {
         return new String[] {
-        "Tomcat:type=Connector,port=" + port + ",address=" + ADDRESS,
-        "Tomcat:type=GlobalRequestProcessor,name=\"http-" + type + "-" +
-                ADDRESS + "-" + port + "\"",
-        "Tomcat:type=Mapper,port=" + port + ",address=" + ADDRESS,
-        "Tomcat:type=ProtocolHandler,port=" + port + ",address=\"" + ADDRESS +
-                "\"",
-        "Tomcat:type=ThreadPool,name=\"http-" + type + "-" + ADDRESS + "-" +
-                port + "\"",
+        "Tomcat:type=Connector,port=" + port + ",address="
+                + ObjectName.quote(ADDRESS),
+        "Tomcat:type=GlobalRequestProcessor,name="
+                + ObjectName.quote("http-" + type + "-" + ADDRESS + "-" + port),
+        "Tomcat:type=Mapper,port=" + port + ",address="
+                + ObjectName.quote(ADDRESS),
+        "Tomcat:type=ProtocolHandler,port=" + port + ",address="
+                + ObjectName.quote(ADDRESS),
+        "Tomcat:type=ThreadPool,name="
+                + ObjectName.quote("http-" + type + "-" + ADDRESS + "-" + port),
         };
     }
 
