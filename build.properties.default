@@ -36,9 +36,6 @@ version.suffix=-dev
 execute.validate=false
 execute.test.bio=true
 execute.test.nio=true
-# Comet tests fail regularly during shutdown. Disable for now as the frequent
-# failures make it harder to spot other test failures in the CI builds
-execute.test.comet=false
 # Still requires APR/native library to be present
 execute.test.apr=true
 # Stop testing if a failure occurs
