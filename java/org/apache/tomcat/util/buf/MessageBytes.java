@@ -518,7 +518,7 @@ public final class MessageBytes implements Cloneable, Serializable {
 
     // -------------------- Future may be different --------------------
 
-    private static MessageBytesFactory factory=new MessageBytesFactory();
+    private static final MessageBytesFactory factory=new MessageBytesFactory();
 
     public static class MessageBytesFactory {
         protected MessageBytesFactory() {
