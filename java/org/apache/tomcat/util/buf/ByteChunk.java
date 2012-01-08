@@ -492,15 +492,6 @@ public final class ByteChunk implements Cloneable, Serializable {
         return new String(cb.array(), cb.arrayOffset(), cb.length());
     }
 
-    /**
-     * @deprecated Unused. Will be removed in Tomcat 8.0.x onwards.
-     */
-    @Deprecated
-    public int getInt()
-    {
-        return Ascii.parseInt(buff, start,end-start);
-    }
-
     public long getLong() {
         return Ascii.parseLong(buff, start,end-start);
     }
@@ -595,28 +586,6 @@ public final class ByteChunk implements Cloneable, Serializable {
 
         while ( len-- > 0) {
             if ( (char)b1[off1++] != c2[off2++]) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    /**
-     * Returns true if the message bytes starts with the specified string.
-     * @param s the string
-     * @deprecated Unused. Will be removed in Tomcat 8.0.x onwards.
-     */
-    @Deprecated
-    public boolean startsWith(String s) {
-        // Works only if enc==UTF
-        byte[] b = buff;
-        int blen = s.length();
-        if (b == null || blen > end-start) {
-            return false;
-        }
-        int boff = start;
-        for (int i = 0; i < blen; i++) {
-            if (b[boff++] != s.charAt(i)) {
                 return false;
             }
         }

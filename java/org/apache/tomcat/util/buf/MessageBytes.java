@@ -422,26 +422,6 @@ public final class MessageBytes implements Cloneable, Serializable {
         return upper.indexOf( sU, starting );
     }
 
-    /**
-     * Returns true if the message bytes starts with the specified string.
-     * @param c the character
-     * @param starting The start position
-     * @deprecated Unused. Will be removed in Tomcat 8.0.x onwards.
-     */
-    @Deprecated
-    public int indexOf(char c, int starting) {
-        switch (type) {
-        case T_STR:
-            return strValue.indexOf( c, starting );
-        case T_CHARS:
-            return charC.indexOf( c, starting);
-        case T_BYTES:
-            return byteC.indexOf( c, starting );
-        default:
-            return -1;
-        }
-    }
-
     /** Copy the src into this MessageBytes, allocating more space if
      *  needed
      */
