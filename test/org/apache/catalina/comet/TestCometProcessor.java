@@ -29,7 +29,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -52,6 +51,7 @@ public class TestCometProcessor extends TomcatBaseTest {
     public void testAsyncClose() throws Exception {
 
         if (!isCometSupported()) {
+            log.info("This test is skipped, because this connector does not support Comet.");
             return;
         }
 
@@ -138,6 +138,7 @@ public class TestCometProcessor extends TomcatBaseTest {
 
     private void doSimpleCometTest(String initParam) throws Exception {
         if (!isCometSupported()) {
+            log.info("This test is skipped, because this connector does not support Comet.");
             return;
         }
 
@@ -233,13 +234,15 @@ public class TestCometProcessor extends TomcatBaseTest {
     public void testCometConnectorStop() throws Exception {
 
         if (!isCometSupported()) {
+            log.info("This test is skipped, because this connector does not support Comet.");
             return;
         }
 
         // Setup Tomcat instance
+        SimpleCometServlet servlet = new SimpleCometServlet();
         Tomcat tomcat = getTomcatInstance();
         Context root = tomcat.addContext("", TEMP_DIR);
-        Tomcat.addServlet(root, "comet", new SimpleCometServlet());
+        Tomcat.addServlet(root, "comet", servlet);
         root.addServletMapping("/", "comet");
         tomcat.start();
 
@@ -267,15 +270,16 @@ public class TestCometProcessor extends TomcatBaseTest {
 
         tomcat.getConnector().stop();
 
-        // Wait for the write thread to stop
         int count = 0;
-        while (writeThread.isAlive() && count < 50) {
+        // Wait for the read thread to stop
+        while (readThread.isAlive() && count < 50) {
             Thread.sleep(100);
             count ++;
         }
 
-        // Wait for the read thread to stop
-        while (readThread.isAlive() && count < 50) {
+        // Wait for the write thread to stop
+        count = 0;
+        while (writeThread.isAlive() && count < 50) {
             Thread.sleep(100);
             count ++;
         }
@@ -283,15 +287,43 @@ public class TestCometProcessor extends TomcatBaseTest {
         // Destroy the connector once the executor has sent the end event
         tomcat.getConnector().destroy();
 
-        // Write should trigger an exception once the connector stops since the
-        // socket should be closed
-        assertNotNull("No exception in writing thread",
-                writeThread.getException());
-
-        // Termination of Read thread varies by platform and protocol
-        // In all cases, the END event should be sent.
+        String[] response = readThread.getResponse().split("\r\n");
+        String lastMessage = "";
+        String lastResponseLine = "";
+        for (int i = response.length; --i >= 0;) {
+            lastMessage = response[i];
+            if (lastMessage.startsWith("Client:")) {
+                break;
+            }
+        }
+        for (int i = response.length; --i >= 0;) {
+            lastResponseLine = response[i];
+            if (lastResponseLine.length() > 0) {
+                break;
+            }
+        }
+        StringBuilder status = new StringBuilder();
+        // Expected, but is not 100% reliable:
+        // WriteThread exception: java.net.SocketException
+        // ReaderThread exception: null
+        // Last message: [Client: END]
+        // Last response line: [0] (empty chunk)
+        // Last comet event: [END]
+        status.append("Status:");
+        status.append("\nWriterThread exception: " + writeThread.getException());
+        status.append("\nReaderThread exception: " + readThread.getException());
+        status.append("\nLast message: [" + lastMessage + "]");
+        status.append("\nLast response line: [" + lastResponseLine + "]");
+        status.append("\nLast comet event: [" + servlet.getLastEvent() + "]");
+        if (writeThread.getException() == null
+                || !lastMessage.contains("Client: END")
+                || !EventType.END.equals(servlet.getLastEvent())) {
+            log.error(status);
+        } else {
+            log.info(status);
+        }
         assertTrue("Comet END event not received",
-                readThread.getResponse().contains("Client: END"));
+                EventType.END.equals(servlet.getLastEvent()));
     }
 
     private boolean isCometSupported() {
@@ -317,6 +349,11 @@ public class TestCometProcessor extends TomcatBaseTest {
         private boolean failOnRead = false;
         private boolean failOnEnd = false;
 
+        private volatile EventType lastEvent;
+
+        public EventType getLastEvent() {
+            return lastEvent;
+        }
 
         @Override
         public void init() throws ServletException {
@@ -338,6 +375,8 @@ public class TestCometProcessor extends TomcatBaseTest {
 
             HttpSession session = request.getSession(true);
             session.setMaxInactiveInterval(30);
+
+            lastEvent = event.getEventType();
 
             if (event.getEventType() == EventType.BEGIN) {
                 if (failOnBegin) {
@@ -409,8 +448,14 @@ public class TestCometProcessor extends TomcatBaseTest {
         private final InputStream is;
         private final StringBuilder response = new StringBuilder();
 
+        private volatile Exception e = null;
+
         public ResponseReaderThread(InputStream is) {
             this.is = is;
+        }
+
+        public Exception getException() {
+            return e;
         }
 
         public String getResponse() {
@@ -426,7 +471,7 @@ public class TestCometProcessor extends TomcatBaseTest {
                     c = is.read();
                 }
             } catch (Exception e) {
-                // Ignore
+                this.e = e;
             }
         }
     }
