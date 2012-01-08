@@ -32,7 +32,7 @@ public final class C2BConverter {
 
     private final IntermediateOutputStream ios;
     private final WriteConvertor conv;
-    private ByteChunk bb;
+    private final ByteChunk bb;
 
     /** Create a converter, with bytes going to a byte buffer
      */
@@ -166,7 +166,7 @@ public final class C2BConverter {
     not be called if recycling the converter and if data was not flushed.
 */
 final class IntermediateOutputStream extends OutputStream {
-    private ByteChunk tbuff;
+    private final ByteChunk tbuff;
     private boolean enabled=true;
 
     public IntermediateOutputStream(ByteChunk tbuff) {
