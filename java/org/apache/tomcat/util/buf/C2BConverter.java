@@ -30,13 +30,9 @@ import java.nio.charset.Charset;
  */
 public final class C2BConverter {
 
-    private static final org.apache.juli.logging.Log log=
-        org.apache.juli.logging.LogFactory.getLog(C2BConverter.class );
-
     private final IntermediateOutputStream ios;
     private final WriteConvertor conv;
     private ByteChunk bb;
-    private final String enc;
 
     /** Create a converter, with bytes going to a byte buffer
      */
@@ -44,41 +40,6 @@ public final class C2BConverter {
         this.bb=output;
         ios=new IntermediateOutputStream( output );
         conv=new WriteConvertor( ios, B2CConverter.getCharset(encoding));
-        this.enc=encoding;
-    }
-
-    /**
-     * Create a converter
-     * @deprecated Unused. Will be removed in Tomcat 8.0.x onwards.
-     */
-    @Deprecated
-    public C2BConverter(String encoding) throws IOException {
-        this( new ByteChunk(1024), encoding );
-    }
-
-    /**
-     * @deprecated Unused. Will be removed in Tomcat 8.0.x onwards.
-     */
-    @Deprecated
-    public ByteChunk getByteChunk() {
-        return bb;
-    }
-
-    /**
-     * @deprecated Unused. Will be removed in Tomcat 8.0.x onwards.
-     */
-    @Deprecated
-    public String getEncoding() {
-        return enc;
-    }
-
-    /**
-     * @deprecated Unused. Will be removed in Tomcat 8.0.x onwards.
-     */
-    @Deprecated
-    public void setByteChunk(ByteChunk bb) {
-        this.bb=bb;
-        ios.setByteChunk( bb );
     }
 
     /** Reset the internal state, empty the buffers.
@@ -113,46 +74,12 @@ public final class C2BConverter {
         conv.write( c );
     }
 
-    /**
-     * Convert a message bytes chars to bytes
-     * @deprecated Unused. Will be removed in Tomcat 8.0.x onwards.
-     */
-    @Deprecated
-    public final void convert(MessageBytes mb ) throws IOException {
-        int type=mb.getType();
-        if( type==MessageBytes.T_BYTES ) {
-            return;
-        }
-        ByteChunk orig=bb;
-        setByteChunk( mb.getByteChunk());
-        bb.recycle();
-        bb.allocate( 32, -1 );
-
-        if( type==MessageBytes.T_STR ) {
-            convert( mb.getString() );
-            // System.out.println("XXX Converting " + mb.getString() );
-        } else if( type==MessageBytes.T_CHARS ) {
-            CharChunk charC=mb.getCharChunk();
-            convert( charC.getBuffer(),
-                                charC.getOffset(), charC.getLength());
-            //System.out.println("XXX Converting " + mb.getCharChunk() );
-        } else {
-            if (log.isDebugEnabled()) {
-                log.debug("XXX unknowon type " + type );
-            }
-        }
-        flushBuffer();
-        //System.out.println("C2B: XXX " + bb.getBuffer() + bb.getLength());
-        setByteChunk(orig);
-    }
-
     /** Flush any internal buffers into the ByteOutput or the internal
      *  byte[]
      */
     public  final void flushBuffer() throws IOException {
         conv.flush();
     }
-
 }
 
 // -------------------- Private implementation --------------------
