@@ -70,61 +70,6 @@ public final class Ascii {
     }
 
     /**
-     * Parses an unsigned integer from the specified subarray of bytes.
-     * @param b the bytes to parse
-     * @param off the start offset of the bytes
-     * @param len the length of the bytes
-     * @exception NumberFormatException if the integer format was invalid
-     * @deprecated Unused. Will be removed in Tomcat 8.0.x onwards.
-     */
-    @Deprecated
-    public static int parseInt(byte[] b, int off, int len)
-        throws NumberFormatException
-    {
-        int c;
-
-        if (b == null || len <= 0 || !isDigit(c = b[off++])) {
-            throw new NumberFormatException();
-        }
-
-        int n = c - '0';
-
-        while (--len > 0) {
-            if (!isDigit(c = b[off++])) {
-                throw new NumberFormatException();
-            }
-            n = n * 10 + c - '0';
-        }
-
-        return n;
-    }
-
-    /**
-     * @deprecated Unused. Will be removed in Tomcat 8.0.x onwards.
-     */
-    @Deprecated
-    public static int parseInt(char[] b, int off, int len)
-        throws NumberFormatException
-    {
-        int c;
-
-        if (b == null || len <= 0 || !isDigit(c = b[off++])) {
-            throw new NumberFormatException();
-        }
-
-        int n = c - '0';
-
-        while (--len > 0) {
-            if (!isDigit(c = b[off++])) {
-                throw new NumberFormatException();
-            }
-            n = n * 10 + c - '0';
-        }
-
-        return n;
-    }
-
-    /**
      * Parses an unsigned long from the specified subarray of bytes.
      * @param b the bytes to parse
      * @param off the start offset of the bytes

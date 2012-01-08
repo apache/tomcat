@@ -200,14 +200,6 @@ final class IntermediateOutputStream extends OutputStream {
 
     // -------------------- Internal methods --------------------
 
-    /**
-     * @deprecated Unused. Will be removed in Tomcat 8.0.x onwards.
-     */
-    @Deprecated
-    void setByteChunk( ByteChunk bb ) {
-        tbuff=bb;
-    }
-
     /** Temporary disable - this is used to recycle the converter without
      *  generating an output if the buffers were not flushed
      */

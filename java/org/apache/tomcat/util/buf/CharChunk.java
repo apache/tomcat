@@ -568,18 +568,6 @@ public final class CharChunk implements Cloneable, Serializable, CharSequence {
         return code;
     }
 
-    /**
-     * @deprecated Unused. Will be removed in Tomcat 8.0.x onwards.
-     */
-    @Deprecated
-    public int hashIgnoreCase() {
-        int code=0;
-        for (int i = start; i < end; i++) {
-            code = code * 37 + Ascii.toLower(buff[i]);
-        }
-        return code;
-    }
-
     public int indexOf(char c) {
         return indexOf( c, start);
     }
