@@ -86,6 +86,10 @@ public final class CharChunk implements Cloneable, Serializable, CharSequence {
 
     // --------------------
 
+    /**
+     * @deprecated Unused. Will be removed in Tomcat 8.0.x onwards.
+     */
+    @Deprecated
     public CharChunk getClone() {
         try {
             return (CharChunk)this.clone();
@@ -111,6 +115,10 @@ public final class CharChunk implements Cloneable, Serializable, CharSequence {
         end=0;
     }
 
+    /**
+     * @deprecated Unused. Will be removed in Tomcat 8.0.x onwards.
+     */
+    @Deprecated
     public void reset() {
         buff=null;
     }
@@ -306,8 +314,11 @@ public final class CharChunk implements Cloneable, Serializable, CharSequence {
     }
 
 
-    /** Add data to the buffer
+    /**
+     * Add data to the buffer.
+     * @deprecated Unused. Will be removed in Tomcat 8.0.x onwards.
      */
+    @Deprecated
     public void append( StringBuilder sb )
         throws IOException
     {
@@ -394,6 +405,10 @@ public final class CharChunk implements Cloneable, Serializable, CharSequence {
 
     }
 
+    /**
+     * @deprecated Unused. Will be removed in Tomcat 8.0.x onwards.
+     */
+    @Deprecated
     public int substract(CharChunk src)
         throws IOException {
 
@@ -517,6 +532,10 @@ public final class CharChunk implements Cloneable, Serializable, CharSequence {
         return new String(buff, start, end-start);
     }
 
+    /**
+     * @deprecated Unused. Will be removed in Tomcat 8.0.x onwards.
+     */
+    @Deprecated
     public int getInt()
     {
         return Ascii.parseInt(buff, start,
@@ -588,6 +607,10 @@ public final class CharChunk implements Cloneable, Serializable, CharSequence {
         return true;
     }
 
+    /**
+     * @deprecated Unused. Will be removed in Tomcat 8.0.x onwards.
+     */
+    @Deprecated
     public boolean equals(byte b2[], int off2, int len2) {
         char b1[]=buff;
         if( b2==null && b1==null ) {
@@ -658,7 +681,10 @@ public final class CharChunk implements Cloneable, Serializable, CharSequence {
         return code;
     }
 
-    // hash ignoring case
+    /**
+     * @deprecated Unused. Will be removed in Tomcat 8.0.x onwards.
+     */
+    @Deprecated
     public int hashIgnoreCase() {
         int code=0;
         for (int i = start; i < end; i++) {

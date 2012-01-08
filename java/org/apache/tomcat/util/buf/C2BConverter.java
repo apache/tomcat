@@ -47,20 +47,35 @@ public final class C2BConverter {
         this.enc=encoding;
     }
 
-    /** Create a converter
+    /**
+     * Create a converter
+     * @deprecated Unused. Will be removed in Tomcat 8.0.x onwards.
      */
+    @Deprecated
     public C2BConverter(String encoding) throws IOException {
         this( new ByteChunk(1024), encoding );
     }
 
+    /**
+     * @deprecated Unused. Will be removed in Tomcat 8.0.x onwards.
+     */
+    @Deprecated
     public ByteChunk getByteChunk() {
         return bb;
     }
 
+    /**
+     * @deprecated Unused. Will be removed in Tomcat 8.0.x onwards.
+     */
+    @Deprecated
     public String getEncoding() {
         return enc;
     }
 
+    /**
+     * @deprecated Unused. Will be removed in Tomcat 8.0.x onwards.
+     */
+    @Deprecated
     public void setByteChunk(ByteChunk bb) {
         this.bb=bb;
         ios.setByteChunk( bb );
@@ -98,8 +113,11 @@ public final class C2BConverter {
         conv.write( c );
     }
 
-    /** Convert a message bytes chars to bytes
+    /**
+     * Convert a message bytes chars to bytes
+     * @deprecated Unused. Will be removed in Tomcat 8.0.x onwards.
      */
+    @Deprecated
     public final void convert(MessageBytes mb ) throws IOException {
         int type=mb.getType();
         if( type==MessageBytes.T_BYTES ) {

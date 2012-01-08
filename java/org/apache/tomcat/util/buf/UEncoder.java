@@ -48,6 +48,10 @@ public final class UEncoder {
         initSafeChars();
     }
 
+    /**
+     * @deprecated Unused. Will be removed in Tomcat 8.0.x onwards.
+     */
+    @Deprecated
     public void setEncoding( String s ) {
         encoding=s;
     }

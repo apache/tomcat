@@ -78,6 +78,10 @@ public final class MessageBytes implements Cloneable, Serializable {
         return factory.newInstance();
     }
 
+    /**
+     * @deprecated Unused. Will be removed in Tomcat 8.0.x onwards.
+     */
+    @Deprecated
     public MessageBytes getClone() {
         try {
             return (MessageBytes)this.clone();
@@ -128,7 +132,9 @@ public final class MessageBytes implements Cloneable, Serializable {
     /** Set the encoding. If the object was constructed from bytes[]. any
      *  previous conversion is reset.
      *  If no encoding is set, we'll use 8859-1.
+     * @deprecated Unused. Will be removed in Tomcat 8.0.x onwards.
      */
+    @Deprecated
     public void setCharset(Charset charset) {
         if( !byteC.isNull() ) {
             // if the encoding changes we need to reset the conversion results
@@ -365,7 +371,9 @@ public final class MessageBytes implements Cloneable, Serializable {
     /**
      * Returns true if the message bytes starts with the specified string.
      * @param s the string
+     * @deprecated Unused. Will be removed in Tomcat 8.0.x onwards.
      */
+    @Deprecated
     public boolean startsWith(String s) {
         switch (type) {
         case T_STR:
@@ -444,6 +452,10 @@ public final class MessageBytes implements Cloneable, Serializable {
         }
     }
 
+    /**
+     * @deprecated Unused. Will be removed in Tomcat 8.0.x onwards.
+     */
+    @Deprecated
     public int indexOf(char c) {
         return indexOf( c, 0);
     }
@@ -521,8 +533,11 @@ public final class MessageBytes implements Cloneable, Serializable {
     private long longValue;
     private boolean hasLongValue=false;
 
-    /** Set the buffer to the representation of an int
+    /**
+     * Set the buffer to the representation of an int
+     * @deprecated Unused. Will be removed in Tomcat 8.0.x onwards.
      */
+    @Deprecated
     public void setInt(int i) {
         byteC.allocate(16, 32);
         int current = i;
@@ -606,8 +621,11 @@ public final class MessageBytes implements Cloneable, Serializable {
     }
 
     // Used for headers conversion
-    /** Convert the buffer to an int, cache the value
+    /**
+     * Convert the buffer to an int, cache the value
+     * @deprecated Unused. Will be removed in Tomcat 8.0.x onwards.
      */
+    @Deprecated
     public int getInt()
     {
         if( hasIntValue ) {
@@ -650,6 +668,10 @@ public final class MessageBytes implements Cloneable, Serializable {
 
     private static MessageBytesFactory factory=new MessageBytesFactory();
 
+    /**
+     * @deprecated Unused. Will be removed in Tomcat 8.0.x onwards.
+     */
+    @Deprecated
     public static void setFactory( MessageBytesFactory mbf ) {
         factory=mbf;
     }

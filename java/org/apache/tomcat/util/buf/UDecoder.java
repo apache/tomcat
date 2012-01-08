@@ -62,7 +62,9 @@ public final class UDecoder {
 
     /** URLDecode, will modify the source.  Includes converting
      *  '+' to ' '.
+     * @deprecated Unused. Will be removed in Tomcat 8.0.x onwards.
      */
+    @Deprecated
     public void convert( ByteChunk mb )
         throws IOException
     {
@@ -129,7 +131,9 @@ public final class UDecoder {
 
     /** In-buffer processing - the buffer will be modified
      *  Includes converting  '+' to ' '.
+     * @deprecated Unused. Will be removed in Tomcat 8.0.x onwards.
      */
+    @Deprecated
     public void convert( CharChunk mb )
         throws IOException
     {
@@ -192,7 +196,9 @@ public final class UDecoder {
 
     /** URLDecode, will modify the source
      *  Includes converting  '+' to ' '.
+     * @deprecated Unused. Will be removed in Tomcat 8.0.x onwards.
      */
+    @Deprecated
     public void convert(MessageBytes mb)
         throws IOException
     {
@@ -230,6 +236,10 @@ public final class UDecoder {
 
     // XXX Old code, needs to be replaced !!!!
     //
+    /**
+     * @deprecated Unused. Will be removed in Tomcat 8.0.x onwards.
+     */
+    @Deprecated
     public final String convert(String str)
     {
         return convert(str, true);
