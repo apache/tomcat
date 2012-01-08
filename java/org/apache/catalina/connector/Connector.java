@@ -882,15 +882,15 @@ public class Connector extends LifecycleMBeanBase  {
             sb.append("auto-");
             sb.append(getProperty("nameIndex"));
         }
+        String address = "";
         if (addressObj instanceof InetAddress) {
+            address = ((InetAddress) addressObj).getHostAddress();
+        } else if (addressObj != null) {
+            address = addressObj.toString();
+        }
+        if (address.length() > 0) {
             sb.append(",address=");
-            sb.append(((InetAddress) addressObj).getHostAddress());
-        } else if(addressObj != null) {
-            String address = addressObj.toString();
-            if (address.length() > 0) {
-                sb.append(",address=");
-                sb.append(ObjectName.quote(address));
-            }
+            sb.append(ObjectName.quote(address));
         }
         return sb.toString();
     }
