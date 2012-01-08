@@ -56,14 +56,15 @@ public class StringCache {
             "tomcat.util.buf.StringCache.cacheSize", "200"));
 
 
-    protected static int maxStringSize = Integer.parseInt(System.getProperty(
-            "tomcat.util.buf.StringCache.maxStringSize", "128"));
+    protected static final int maxStringSize =
+            Integer.parseInt(System.getProperty(
+                    "tomcat.util.buf.StringCache.maxStringSize", "128"));
 
 
    /**
      * Statistics hash map for byte chunk.
      */
-    protected static HashMap<ByteEntry,int[]> bcStats =
+    protected static final HashMap<ByteEntry,int[]> bcStats =
         new HashMap<ByteEntry,int[]>(cacheSize);
 
 
@@ -82,7 +83,7 @@ public class StringCache {
     /**
      * Statistics hash map for char chunk.
      */
-    protected static HashMap<CharEntry,int[]> ccStats =
+    protected static final HashMap<CharEntry,int[]> ccStats =
         new HashMap<CharEntry,int[]>(cacheSize);
 
 
