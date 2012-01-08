@@ -79,14 +79,7 @@ public class B2CConverter {
 
     private IntermediateInputStream iis;
     private ReadConvertor conv;
-    private String encoding;
-
-    /**
-     * @deprecated Unused. Will be removed in Tomcat 8.0.x onwards.
-     */
-    @Deprecated
-    protected B2CConverter() {
-    }
+    private final String encoding;
 
     /** Create a converter, with bytes going to a byte buffer
      */
@@ -106,7 +99,7 @@ public class B2CConverter {
     }
 
     static final int BUFFER_SIZE=8192;
-    char result[]=new char[BUFFER_SIZE];
+    final char result[]=new char[BUFFER_SIZE];
 
     /**
      * Convert a buffer of bytes into a chars.
