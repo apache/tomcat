@@ -60,17 +60,6 @@ public final class UDecoder {
     {
     }
 
-    /** URLDecode, will modify the source.  Includes converting
-     *  '+' to ' '.
-     * @deprecated Unused. Will be removed in Tomcat 8.0.x onwards.
-     */
-    @Deprecated
-    public void convert( ByteChunk mb )
-        throws IOException
-    {
-        convert(mb, true);
-    }
-
     /** URLDecode, will modify the source.
      */
     public void convert( ByteChunk mb, boolean query )
@@ -130,17 +119,6 @@ public final class UDecoder {
     // XXX What do we do about charset ????
 
     /** In-buffer processing - the buffer will be modified
-     *  Includes converting  '+' to ' '.
-     * @deprecated Unused. Will be removed in Tomcat 8.0.x onwards.
-     */
-    @Deprecated
-    public void convert( CharChunk mb )
-        throws IOException
-    {
-        convert(mb, true);
-    }
-
-    /** In-buffer processing - the buffer will be modified
      */
     public void convert( CharChunk mb, boolean query )
         throws IOException
@@ -195,17 +173,6 @@ public final class UDecoder {
     }
 
     /** URLDecode, will modify the source
-     *  Includes converting  '+' to ' '.
-     * @deprecated Unused. Will be removed in Tomcat 8.0.x onwards.
-     */
-    @Deprecated
-    public void convert(MessageBytes mb)
-        throws IOException
-    {
-        convert(mb, true);
-    }
-
-    /** URLDecode, will modify the source
      */
     public void convert(MessageBytes mb, boolean query)
         throws IOException
@@ -236,15 +203,6 @@ public final class UDecoder {
 
     // XXX Old code, needs to be replaced !!!!
     //
-    /**
-     * @deprecated Unused. Will be removed in Tomcat 8.0.x onwards.
-     */
-    @Deprecated
-    public final String convert(String str)
-    {
-        return convert(str, true);
-    }
-
     public final String convert(String str, boolean query)
     {
         if (str == null) {

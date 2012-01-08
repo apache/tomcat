@@ -86,18 +86,6 @@ public final class CharChunk implements Cloneable, Serializable, CharSequence {
 
     // --------------------
 
-    /**
-     * @deprecated Unused. Will be removed in Tomcat 8.0.x onwards.
-     */
-    @Deprecated
-    public CharChunk getClone() {
-        try {
-            return (CharChunk)this.clone();
-        } catch( Exception ex) {
-            return null;
-        }
-    }
-
     public boolean isNull() {
         if( end > 0 ) {
             return false;
@@ -113,14 +101,6 @@ public final class CharChunk implements Cloneable, Serializable, CharSequence {
         isSet=false; // XXX
         start=0;
         end=0;
-    }
-
-    /**
-     * @deprecated Unused. Will be removed in Tomcat 8.0.x onwards.
-     */
-    @Deprecated
-    public void reset() {
-        buff=null;
     }
 
     // -------------------- Setup --------------------
@@ -314,41 +294,6 @@ public final class CharChunk implements Cloneable, Serializable, CharSequence {
     }
 
 
-    /**
-     * Add data to the buffer.
-     * @deprecated Unused. Will be removed in Tomcat 8.0.x onwards.
-     */
-    @Deprecated
-    public void append( StringBuilder sb )
-        throws IOException
-    {
-        int len=sb.length();
-
-        // will grow, up to limit
-        makeSpace( len );
-
-        // if we don't have limit: makeSpace can grow as it wants
-        if( limit < 0 ) {
-            // assert: makeSpace made enough space
-            sb.getChars(0, len, buff, end );
-            end+=len;
-            return;
-        }
-
-        int off=0;
-        int sbOff = off;
-        int sbEnd = off + len;
-        while (sbOff < sbEnd) {
-            int d = min(limit - end, sbEnd - sbOff);
-            sb.getChars( sbOff, sbOff+d, buff, end);
-            sbOff += d;
-            end += d;
-            if (end >= limit) {
-                flushBuffer();
-            }
-        }
-    }
-
     /** Append a string to the buffer
      */
     public void append(String s) throws IOException {
@@ -402,30 +347,6 @@ public final class CharChunk implements Cloneable, Serializable, CharSequence {
         }
 
         return (buff[start++]);
-
-    }
-
-    /**
-     * @deprecated Unused. Will be removed in Tomcat 8.0.x onwards.
-     */
-    @Deprecated
-    public int substract(CharChunk src)
-        throws IOException {
-
-        if ((end - start) == 0) {
-            if (in == null) {
-                return -1;
-            }
-            int n = in.realReadChars( buff, end, buff.length - end);
-            if (n < 0) {
-                return -1;
-            }
-        }
-
-        int len = getLength();
-        src.append(buff, start, len);
-        start = end;
-        return len;
 
     }
 
@@ -532,16 +453,6 @@ public final class CharChunk implements Cloneable, Serializable, CharSequence {
         return new String(buff, start, end-start);
     }
 
-    /**
-     * @deprecated Unused. Will be removed in Tomcat 8.0.x onwards.
-     */
-    @Deprecated
-    public int getInt()
-    {
-        return Ascii.parseInt(buff, start,
-                                end-start);
-    }
-
     // -------------------- equals --------------------
 
     /**
@@ -601,30 +512,6 @@ public final class CharChunk implements Cloneable, Serializable, CharSequence {
         int len=end-start;
         while ( len-- > 0) {
             if (b1[off1++] != b2[off2++]) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    /**
-     * @deprecated Unused. Will be removed in Tomcat 8.0.x onwards.
-     */
-    @Deprecated
-    public boolean equals(byte b2[], int off2, int len2) {
-        char b1[]=buff;
-        if( b2==null && b1==null ) {
-            return true;
-        }
-
-        if (b1== null || b2==null || end-start != len2) {
-            return false;
-        }
-        int off1 = start;
-        int len=end-start;
-
-        while ( len-- > 0) {
-            if ( b1[off1++] != (char)b2[off2++]) {
                 return false;
             }
         }

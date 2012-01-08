@@ -70,15 +70,6 @@ public final class HexUtils {
     // --------------------------------------------------------- Static Methods
 
 
-    /**
-     * Provide a mechanism for ensuring this class is loaded.
-     * @deprecated Unused. Will be removed in Tomcat 8.0.x onwards.
-     */
-    @Deprecated
-    public static void load() {
-        // Nothing to do
-    }
-
     public static int getDec(int index){
         return DEC[index];
     }

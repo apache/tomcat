@@ -21,15 +21,16 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.BitSet;
 
-/** Efficient implementation for encoders.
- *  This class is not thread safe - you need one encoder per thread.
- *  The encoder will save and recycle the internal objects, avoiding
- *  garbage.
+/**
+ * Efficient implementation of an UTF-8 encoder.
+ * This class is not thread safe - you need one encoder per thread.
+ * The encoder will save and recycle the internal objects, avoiding
+ * garbage.
  *
- *  You can add extra characters that you want preserved, for example
- *  while encoding a URL you can add "/".
+ * You can add extra characters that you want preserved, for example
+ * while encoding a URL you can add "/".
  *
- *  @author Costin Manolache
+ * @author Costin Manolache
  */
 public final class UEncoder {
 
@@ -42,18 +43,10 @@ public final class UEncoder {
     private C2BConverter c2b=null;
     private ByteChunk bb=null;
 
-    private String encoding="UTF8";
+    private final String ENCODING = "UTF8";
 
     public UEncoder() {
         initSafeChars();
-    }
-
-    /**
-     * @deprecated Unused. Will be removed in Tomcat 8.0.x onwards.
-     */
-    @Deprecated
-    public void setEncoding( String s ) {
-        encoding=s;
     }
 
     public void addSafeCharacter( char c ) {
@@ -71,7 +64,7 @@ public final class UEncoder {
             throws IOException {
         if( c2b==null ) {
             bb=new ByteChunk(16); // small enough.
-            c2b=new C2BConverter( bb, encoding );
+            c2b=new C2BConverter( bb, ENCODING );
         }
 
         for (int i = 0; i < s.length(); i++) {
