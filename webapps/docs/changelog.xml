@@ -226,7 +226,7 @@
       </fix>
       <add>
         <bug>52237</bug>: Allow JUnit logs to be generated in formats other than
-        plain text. Patch provided by M Hasko. (markt)
+        plain text. Patch provided by M Hasko. (markt/kkolinko)
       </add>
       <fix>
         Fix build condition for tomcat-dbcp to always rebuild whan a new version
