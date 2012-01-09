@@ -1067,9 +1067,10 @@
     </javac>
   </target>
 
-  <!-- Default JUnit formatter log output -->
-  <property name="junit.formatter.type" value="plain"/>
-  <property name="junit.formatter.extension" value=".txt"/>
+  <!-- Default JUnit log output formatter -->
+  <property name="junit.formatter.type" value="plain" />
+  <property name="junit.formatter.usefile" value="true" />
+  <property name="junit.formatter.extension" value=".txt" />
 
   <target name="test" description="Runs the JUnit test cases"
           depends="test-bio,test-nio,test-apr" >
@@ -1126,7 +1127,9 @@
         <sysproperty key="tomcat.test.protocol" value="@{protocol}" />
         <sysproperty key="tomcat.test.accesslog" value="${test.accesslog}" />
 
-        <formatter type="${junit.formatter.type}" usefile="true" extension="@{extension}${junit.formatter.extension}"/>
+        <formatter type="${junit.formatter.type}"
+                   usefile="${junit.formatter.usefile}"
+                   extension="@{extension}${junit.formatter.extension}" />
 
         <!-- If test.entry is defined, run a single test, otherwise run all valid tests -->
         <test todir="${tomcat.build}/logs" name="${test.entry}" if="test.entry"/>
