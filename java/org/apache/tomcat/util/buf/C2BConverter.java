@@ -16,6 +16,7 @@
  */
 package org.apache.tomcat.util.buf;
 
+import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
@@ -25,21 +26,24 @@ import java.nio.charset.Charset;
  * Efficient conversion of character to bytes.
  *
  * This uses the standard JDK mechanism - a writer - but provides mechanisms to
- * recycle all the objects that are used. It is compatible with JDK1.1 and up.
- * (nio is better, but it's not available even in 1.2 or 1.3).
+ * recycle all the objects that are used. Input is buffered to improve
+ * performance.
  */
 public final class C2BConverter {
 
-    private final IntermediateOutputStream ios;
+    private final BufferedWriter writer;
     private final WriteConvertor conv;
+    private final IntermediateOutputStream ios;
     private final ByteChunk bb;
 
-    /** Create a converter, with bytes going to a byte buffer
+    /**
+     * Create a converter, with bytes going to a byte buffer.
      */
     public C2BConverter(ByteChunk output, String encoding) throws IOException {
         this.bb = output;
         ios = new IntermediateOutputStream(output);
         conv = new WriteConvertor(ios, B2CConverter.getCharset(encoding));
+        writer = new BufferedWriter(conv);
     }
 
     /**
@@ -47,7 +51,17 @@ public final class C2BConverter {
      * The encoding remain in effect, the internal buffers remain allocated.
      */
     public final void recycle() {
-        conv.recycle();
+        // Disable any output
+        ios.disable();
+        // Flush out the BufferedWriter and WriteConvertor
+        try {
+            writer.flush();
+        } catch (IOException e) {
+            // TODO Better logging
+            e.printStackTrace();
+        }
+        // Re-enable ready for re-use
+        ios.enable();
         bb.recycle();
     }
 
@@ -55,35 +69,35 @@ public final class C2BConverter {
      * Generate the bytes using the specified encoding.
      */
     public final void convert(char c[], int off, int len) throws IOException {
-        conv.write(c, off, len);
+        writer.write(c, off, len);
     }
 
     /**
      * Generate the bytes using the specified encoding.
      */
     public final void convert(String s, int off, int len) throws IOException {
-        conv.write(s, off, len);
+        writer.write(s, off, len);
     }
 
     /**
      * Generate the bytes using the specified encoding.
      */
     public final void convert(String s) throws IOException {
-        conv.write(s);
+        writer.write(s);
     }
 
     /**
      * Generate the bytes using the specified encoding.
      */
     public final void convert(char c) throws IOException {
-        conv.write(c);
+        writer.write(c);
     }
 
     /**
      * Flush any internal buffers into the ByteOutput or the internal byte[].
      */
     public final void flushBuffer() throws IOException {
-        conv.flush();
+        writer.flush();
     }
 }
 
@@ -108,17 +122,12 @@ public final class C2BConverter {
  * overhead too.
  */
  final class WriteConvertor extends OutputStreamWriter {
-    // stream with flush() and close(). overridden.
-    private final IntermediateOutputStream ios;
-
-    // Has a private, internal byte[8192]
 
     /**
      * Create a converter.
      */
     public WriteConvertor(IntermediateOutputStream out, Charset charset) {
         super(out, charset);
-        ios = out;
     }
 
     /**
@@ -144,19 +153,6 @@ public final class C2BConverter {
     public final void write(char cbuf[], int off, int len) throws IOException {
         // Will do the conversion and call write on the output stream
         super.write( cbuf, off, len );
-    }
-
-    /**
-     * Reset the buffer.
-     */
-    public  final void recycle() {
-        ios.disable();
-        try {
-            flush();
-        } catch( Exception ex ) {
-            ex.printStackTrace();
-        }
-        ios.enable();
     }
 }
 
