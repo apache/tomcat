@@ -22,6 +22,10 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.nio.charset.Charset;
 
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.res.StringManager;
+
 /**
  * Efficient conversion of character to bytes.
  *
@@ -31,9 +35,14 @@ import java.nio.charset.Charset;
  */
 public final class C2BConverter {
 
-    private final BufferedWriter writer;
-    private final WriteConvertor conv;
-    private final IntermediateOutputStream ios;
+    private static final Log log = LogFactory.getLog(C2BConverter.class);
+    private static final StringManager sm =
+            StringManager.getManager(Constants.Package);
+
+    private final String encoding;
+    private BufferedWriter writer;
+    private WriteConvertor conv;
+    private IntermediateOutputStream ios;
     private final ByteChunk bb;
 
     /**
@@ -41,9 +50,8 @@ public final class C2BConverter {
      */
     public C2BConverter(ByteChunk output, String encoding) throws IOException {
         this.bb = output;
-        ios = new IntermediateOutputStream(output);
-        conv = new WriteConvertor(ios, B2CConverter.getCharset(encoding));
-        writer = new BufferedWriter(conv);
+        this.encoding = encoding;
+        init();
     }
 
     /**
@@ -57,12 +65,23 @@ public final class C2BConverter {
         try {
             writer.flush();
         } catch (IOException e) {
-            // TODO Better logging
-            e.printStackTrace();
+            log.warn(sm.getString("c2bConverter.recycleFailed"), e);
+            try {
+                init();
+            } catch (IOException ignore) {
+                // Should never happen since this means encoding is invalid and
+                // in that case, the constructor will have failed.
+            }
         }
         // Re-enable ready for re-use
         ios.enable();
         bb.recycle();
+    }
+
+    private void init() throws IOException {
+        ios = new IntermediateOutputStream(bb);
+        conv = new WriteConvertor(ios, B2CConverter.getCharset(encoding));
+        writer = new BufferedWriter(conv);
     }
 
     /**
