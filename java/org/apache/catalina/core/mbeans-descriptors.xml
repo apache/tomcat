@@ -137,10 +137,6 @@
                description="Should we attempt to use cookies for session id communication?"
                type="boolean"/>
 
-    <attribute name="compilerClasspath"
-               description="The compiler classpath to use"
-               type="java.lang.String"/>
-
     <attribute name="crossContext"
                description="Should we allow the ServletContext.getContext() method to access the context of other web applications in this server?"
                type="boolean"/>
@@ -179,12 +175,6 @@
                type="java.lang.String"
                writeable="false" />
 
-    <attribute name="eventProvider"
-               description="Event provider support for this managed object"
-               is="true"
-               type="boolean"
-               writeable="false" />
-
     <attribute name="ignoreAnnotations"
                description="Ignore annotations flag."
                type="boolean" />
@@ -216,10 +206,6 @@
     <attribute name="manager"
                description="Associated manager."
                type="org.apache.catalina.Manager" />
-
-    <attribute name="mappingObject"
-               description="The object used for mapping"
-               type="java.lang.Object"/>
 
     <attribute name="namingContextListener"
                description="Associated naming context listener."
@@ -281,11 +267,6 @@
                description="Should Tomcat renew the threads of the thread pool when the application is stopped to avoid memory leaks because of uncleaned ThreadLocal variables."
                type="boolean"/>
 
-    <attribute name="saveConfig"
-               description="Should the configuration be written as needed on startup"
-               is="true"
-               type="boolean"/>
-
     <attribute name="server"
                description="The J2EE Server this module is deployed on"
                type="java.lang.String"/>
@@ -330,17 +311,6 @@
                description="The name of the LifecycleState that this component is currently in"
                type="java.lang.String"
                writeable="false"/>
-
-    <attribute name="staticResources"
-               description="Static resources associated with the context."
-               type="javax.naming.directory.DirContext"
-               writeable="false"/>
-
-    <attribute name="statisticsProvider"
-               description="Performance statistics support for this managed object"
-               is="true"
-               type="boolean"
-               writeable="false" />
 
     <attribute name="swallowOutput"
                description="Flag to set to cause the system.out and system.err to be redirected to the logger when executing a servlet"
@@ -1612,12 +1582,6 @@
                type="int"
                writeable="false" />
 
-    <attribute name="eventProvider"
-               description="Event provider support for this managed object"
-               is="true"
-               type="boolean"
-               writeable="false"/>
-
     <attribute name="loadOnStartup"
                description="The load-on-startup order value (negative value means load on first call) for this servlet."
                type="int"/>
@@ -1679,12 +1643,6 @@
     <attribute name="stateName"
                description="The name of the LifecycleState that this component is currently in"
                type="java.lang.String"
-               writeable="false"/>
-
-    <attribute name="statisticsProvider"
-               description="Performance statistics support for this managed object"
-               is="true"
-               type="boolean"
                writeable="false"/>
 
     <operation name="addInitParameter"
