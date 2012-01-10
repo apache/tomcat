@@ -35,19 +35,23 @@ import org.apache.tomcat.util.ExceptionUtils;
  */
 public class MBeanDumper {
 
-    private static Log log = LogFactory.getLog(MBeanDumper.class);
+    private static final Log log = LogFactory.getLog(MBeanDumper.class);
+
+    private static final String CRLF = "\r\n";
 
     /**
      * The following code to dump MBeans has been copied from JMXProxyServlet.
      *
      */
-    public static void listBeans(MBeanServer mbeanServer, Set<ObjectName> names)
+    public static String dumpBeans(MBeanServer mbeanServer, Set<ObjectName> names)
     {
-
+        StringBuilder buf = new StringBuilder();
         Iterator<ObjectName> it=names.iterator();
         while( it.hasNext()) {
             ObjectName oname=it.next();
-            log.info( "Name: " + oname.toString());
+            buf.append("Name: ");
+            buf.append(oname.toString());
+            buf.append(CRLF);
 
             try {
                 MBeanInfo minfo=mbeanServer.getMBeanInfo(oname);
@@ -56,29 +60,31 @@ public class MBeanDumper {
                 if ("org.apache.commons.modeler.BaseModelMBean".equals(code)) {
                     code=(String)mbeanServer.getAttribute(oname, "modelerType");
                 }
-                log.info("modelerType: " + code);
+                buf.append("modelerType: ");
+                buf.append(code);
+                buf.append(CRLF);
 
                 MBeanAttributeInfo attrs[]=minfo.getAttributes();
                 Object value=null;
 
-                for( int i=0; i< attrs.length; i++ ) {
-                    if( ! attrs[i].isReadable() ) continue;
+                for (int i=0; i< attrs.length; i++) {
+                    if (! attrs[i].isReadable()) continue;
                     String attName=attrs[i].getName();
-                    if( "modelerType".equals( attName)) continue;
-                    if( attName.indexOf( "=") >=0 ||
-                            attName.indexOf( ":") >=0 ||
-                            attName.indexOf( " ") >=0 ) {
+                    if ("modelerType".equals(attName)) continue;
+                    if (attName.indexOf("=") >=0 ||
+                            attName.indexOf(":") >=0 ||
+                            attName.indexOf(" ") >=0 ) {
                         continue;
                     }
 
                     try {
                         value=mbeanServer.getAttribute(oname, attName);
-                    } catch( Throwable t) {
+                    } catch (Throwable t) {
                         log.error("Error getting attribute " + oname +
-                            " " + attName + " " + t.toString(), t);
+                            " " + attName + " " + t.toString());
                         continue;
                     }
-                    if( value==null ) continue;
+                    if (value==null) continue;
                     String valueString;
                     try {
                         Class<?> c = value.getClass();
@@ -87,7 +93,7 @@ public class MBeanDumper {
                             StringBuilder sb = new StringBuilder("Array[" +
                                     c.getComponentType().getName() + "] of length " + len);
                             if (len > 0) {
-                                sb.append("\r\n");
+                                sb.append(CRLF);
                             }
                             for (int j = 0; j < len; j++) {
                                 sb.append("\t");
@@ -104,7 +110,7 @@ public class MBeanDumper {
                                     }
                                 }
                                 if (j < len - 1) {
-                                    sb.append("\r\n");
+                                    sb.append(CRLF);
                                 }
                             }
                             valueString = sb.toString();
@@ -112,7 +118,10 @@ public class MBeanDumper {
                         else {
                             valueString = escape(value.toString());
                         }
-                        log.info( attName + ": " + valueString);
+                        buf.append(attName);
+                        buf.append(": ");
+                        buf.append(valueString);
+                        buf.append(CRLF);
                     }
                     catch (Throwable t) {
                         ExceptionUtils.handleThrowable(t);
@@ -121,8 +130,9 @@ public class MBeanDumper {
             } catch (Throwable t) {
                 ExceptionUtils.handleThrowable(t);
             }
-            log.info("");
+            buf.append(CRLF);
         }
+        return buf.toString();
 
     }
 
