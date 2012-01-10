@@ -303,6 +303,11 @@ public class OutputBuffer extends Writer
             return;
         }
 
+        // Flush the convertor if one is in use
+        if (gotEnc && conv != null) {
+            conv.flushBuffer();
+        }
+
         try {
             doFlush = true;
             if (initial) {
@@ -426,7 +431,6 @@ public class OutputBuffer extends Writer
         }
 
         conv.convert((char) c);
-        conv.flushBuffer();
         charsWritten++;
 
     }
@@ -454,7 +458,6 @@ public class OutputBuffer extends Writer
         }
 
         conv.convert(c, off, len);
-        conv.flushBuffer();
         charsWritten += len;
 
     }
@@ -476,8 +479,6 @@ public class OutputBuffer extends Writer
             s = "null";
         }
         conv.convert(s, off, len);
-        conv.flushBuffer();
-
     }
 
 
@@ -493,8 +494,6 @@ public class OutputBuffer extends Writer
             s = "null";
         }
         conv.convert(s);
-        conv.flushBuffer();
-
     }
 
 
@@ -579,14 +578,17 @@ public class OutputBuffer extends Writer
 
 
     public void reset() {
-
+        // If a Writer wasbeing used, there may be unflushed bytes in the
+        // convertor
+        if (gotEnc && conv != null) {
+            conv.recycle();
+        }
         bb.recycle();
         bytesWritten = 0;
         charsWritten = 0;
         gotEnc = false;
         enc = null;
         initial = true;
-
     }
 
 
