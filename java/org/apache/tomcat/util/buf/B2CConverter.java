@@ -72,7 +72,7 @@ public class B2CConverter {
         if (charset == null) {
             // Pre-population of the cache means this must be invalid
             throw new UnsupportedEncodingException(
-                    sm.getString("b2cConvertor.unknownEncoding", enc));
+                    sm.getString("b2cConverter.unknownEncoding", enc));
         }
         return charset;
     }
