@@ -128,6 +128,9 @@
         Improve JMX names for objects related to Connectors that have the
         address attribute set. (markt)
       </fix>
+      <fix>
+        Remove some stale attributes from MBeans. (rjung)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
