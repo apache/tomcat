@@ -180,6 +180,9 @@
         Replace Bugzilla search link on <code>ROOT/index.jsp</code> page with
         one pointing to the bug reporting page of Tomcat site. (kkolinko)
       </update>
+      <update>
+        Move MBean dump code from JMXProxyServlet into a utility class. (rjung)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Tribes">
