@@ -255,6 +255,11 @@ public class OutputBuffer extends Writer
             return;
         }
 
+        // Flush the convertor if one is in use
+        if (gotEnc && conv != null) {
+            conv.flushBuffer();
+        }
+
         if ((!coyoteResponse.isCommitted())
             && (coyoteResponse.getContentLengthLong() == -1)) {
             // If this didn't cause a commit of the response, the final content
