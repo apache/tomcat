@@ -257,7 +257,6 @@ public class Connector extends LifecycleMBeanBase  {
          replacements.put("acceptCount", "backlog");
          replacements.put("connectionLinger", "soLinger");
          replacements.put("connectionTimeout", "soTimeout");
-         replacements.put("randomFile", "randomfile");
          replacements.put("rootFile", "rootfile");
      }
 
