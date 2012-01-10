@@ -131,8 +131,13 @@ public class TestRegistration extends TomcatBaseTest {
     @Test
     public void testMBeanDeregistration() throws Exception {
         final MBeanServer mbeanServer = Registry.getRegistry(null, null).getMBeanServer();
+        // Verify there are no Catalina or Tomcat MBeans
         Set<ObjectName> onames = mbeanServer.queryNames(new ObjectName("Catalina:*"), null);
-        assertEquals("Remaining: " + onames, 0, onames.size());
+        MBeanDumper.listBeans(mbeanServer, onames);
+        assertEquals("Unexpected: " + onames, 0, onames.size());
+        onames = mbeanServer.queryNames(new ObjectName("Tomcat:*"), null);
+        MBeanDumper.listBeans(mbeanServer, onames);
+        assertEquals("Unexpected: " + onames, 0, onames.size());
 
         final Tomcat tomcat = getTomcatInstance();
         final File contextDir = new File(getTemporaryDirectory(), "webappFoo");
@@ -145,6 +150,7 @@ public class TestRegistration extends TomcatBaseTest {
 
         // Verify there are no Catalina MBeans
         onames = mbeanServer.queryNames(new ObjectName("Catalina:*"), null);
+        MBeanDumper.listBeans(mbeanServer, onames);
         assertEquals("Found: " + onames, 0, onames.size());
 
         // Verify there are the correct Tomcat MBeans
@@ -204,8 +210,10 @@ public class TestRegistration extends TomcatBaseTest {
 
         // There should be no Catalina MBeans and no Tomcat MBeans
         onames = mbeanServer.queryNames(new ObjectName("Catalina:*"), null);
+        MBeanDumper.listBeans(mbeanServer, onames);
         assertEquals("Remaining: " + onames, 0, onames.size());
         onames = mbeanServer.queryNames(new ObjectName("Tomcat:*"), null);
+        MBeanDumper.listBeans(mbeanServer, onames);
         assertEquals("Remaining: " + onames, 0, onames.size());
     }
 
