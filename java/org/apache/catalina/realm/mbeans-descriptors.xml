@@ -136,6 +136,7 @@
 
     <attribute   name="useContextClassLoader"
           description="Sets whether to use the context or default ClassLoader."
+                   is="true"
                  type="boolean"/>
 
     <attribute   name="validate"

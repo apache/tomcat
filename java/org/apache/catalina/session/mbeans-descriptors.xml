@@ -128,15 +128,6 @@
                  type="java.lang.String"
             writeable="false"/>
 
-    <attribute   name="randomFile"
-          description="File source of random - /dev/urandom or a pipe that will be used when the Manager is next started"
-                 type="java.lang.String"/>
-
-    <attribute   name="randomFileCurrent"
-          description="File source of random - /dev/urandom or a pipe currently being used"
-                 type="java.lang.String"
-            writeable="false"/>
-
     <attribute   name="rejectedSessions"
           description="Number of sessions we rejected due to maxActive beeing reached"
                  type="int"
@@ -329,10 +320,6 @@
           description="The name of the LifecycleState that this component is currently in"
                  type="java.lang.String"
             writeable="false"/>
-
-    <attribute   name="randomFile"
-          description="File source of random - /dev/urandom or a pipe"
-                 type="java.lang.String"/>
 
     <attribute   name="rejectedSessions"
           description="Number of sessions we rejected due to maxActive beeing reached"
