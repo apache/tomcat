@@ -133,6 +133,17 @@ public class ParserUtils {
         return (parseXMLDocument(uri, new InputSource(is)));
     }
 
+    /**
+     * Set the EntityResolver.
+     * This is needed when the dtds and Jasper itself are in different
+     * classloaders (e.g. OSGi environment).
+     *
+     * @param er EntityResolver to use.
+     */
+    public static void setEntityResolver(EntityResolver er) {
+
+        entityResolver = er;
+    }    
 
     // ------------------------------------------------------ Protected Methods
 
