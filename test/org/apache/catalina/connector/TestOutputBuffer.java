@@ -29,7 +29,6 @@ import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 
 import org.apache.catalina.Context;
-import org.apache.catalina.Wrapper;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.util.buf.ByteChunk;
@@ -41,45 +40,53 @@ public class TestOutputBuffer extends TomcatBaseTest{
         Tomcat tomcat = getTomcatInstance();
 
         Context root = tomcat.addContext("", TEMP_DIR);
-        SingleCharWritingServlet servlet = new SingleCharWritingServlet();
-        Wrapper w =
-                Tomcat.addServlet(root, "singleCharWritingServlet", servlet);
-        w.setAsyncSupported(true);
-        root.addServletMapping("/", "singleCharWritingServlet");
+
+        for (int i = 1; i <= WritingServlet.EXPECTED_CONTENT_LENGTH; i*=10) {
+            WritingServlet servlet = new WritingServlet(i);
+            Tomcat.addServlet(root, "servlet" + i, servlet);
+            root.addServletMapping("/servlet" + i, "servlet" + i);
+        }
 
         tomcat.start();
 
         ByteChunk bc = new ByteChunk();
-        int rc = getUrl("http://localhost:" + getPort() + "/", bc, null, null);
 
-        assertEquals(200, rc);
-        assertEquals(SingleCharWritingServlet.ITERATIONS, bc.getLength());
+        for (int i = 1; i <= WritingServlet.EXPECTED_CONTENT_LENGTH; i*=10) {
+            int rc = getUrl("http://localhost:" + getPort() +
+                    "/servlet" + i, bc, null, null);
+            assertEquals(HttpServletResponse.SC_OK, rc);
+            assertEquals(
+                    WritingServlet.EXPECTED_CONTENT_LENGTH, bc.getLength());
 
-        long noBuffering = servlet.getLastRunNano();
+            bc.recycle();
 
-        System.out.println(noBuffering);
+            rc = getUrl("http://localhost:" + getPort() +
+                    "/servlet" + i + "?useBuffer=y", bc, null, null);
+            assertEquals(HttpServletResponse.SC_OK, rc);
+            assertEquals(
+                    WritingServlet.EXPECTED_CONTENT_LENGTH, bc.getLength());
 
-        bc.recycle();
-
-        rc = getUrl("http://localhost:" + getPort() + "/?useBuffering=y", bc,
-                null, null);
-
-        assertEquals(200, rc);
-        assertEquals(SingleCharWritingServlet.ITERATIONS, bc.getLength());
-
-        long buffering = servlet.getLastRunNano();
-
-        System.out.println(buffering);
+            bc.recycle();
+        }
     }
 
-    private static final class SingleCharWritingServlet extends HttpServlet {
+    private static class WritingServlet extends HttpServlet {
 
         private static final long serialVersionUID = 1L;
 
-        protected static final int ITERATIONS = 100000;
+        protected static final int EXPECTED_CONTENT_LENGTH = 100000;
 
-        // Not thread safe but will only be used with single calls.
-        private volatile long lastRunNano = 0;
+        private final String writeString;
+        private final int writeCount;
+
+        public WritingServlet(int writeLength) {
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < writeLength; i++) {
+                sb.append('x');
+            }
+            writeString = sb.toString();
+            writeCount = EXPECTED_CONTENT_LENGTH / writeLength;
+        }
 
         @Override
         protected void doGet(HttpServletRequest req, HttpServletResponse resp)
@@ -97,20 +104,17 @@ public class TestOutputBuffer extends TomcatBaseTest{
             }
 
             long start = System.nanoTime();
-
-            for (int i = 0; i < ITERATIONS; i++) {
-                w.write('x');
+            for (int i = 0; i < writeCount; i++) {
+                w.write(writeString);
             }
-
-            lastRunNano = System.nanoTime() - start;
-
             if (useBufferStr != null) {
                 w.flush();
             }
-        }
+            long lastRunNano = System.nanoTime() - start;
 
-        public long getLastRunNano() {
-            return lastRunNano;
+            System.out.println("Write length: " + writeString.length() +
+                    ", Buffered: " + (useBufferStr == null ? "n" : "y") +
+                    ", Time: " + lastRunNano + "ns");
         }
     }
 }
