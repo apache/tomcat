@@ -102,6 +102,11 @@
         <code>@HandlesTypes</code> processing to debug. (markt) 
       </fix>
       <fix>
+        <bug>52328</bug>: Improve performance when large numbers of single
+        characters and/or small strings are written to the response via a
+        Writer. (markt)
+      </fix>
+      <fix>
         <bug>52384</bug>: Do not fail with parameter parsing when debug logging
         is enabled. (kkolinko)
       </fix>
