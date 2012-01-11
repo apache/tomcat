@@ -151,6 +151,11 @@
   <subsection name="Jasper">
     <changelog>
       <fix>
+        <bug>52450</bug>: Add setter for entityResolver in ParserUtils.
+        This is mainly useful when jasper and dtds are in different
+        class loaders. (mturk)
+      </fix>
+      <fix>
         <bug>52321</bug>: Ensure that the order of multiple prelude/coda values
         for JSP pages is respected. (markt)
       </fix>
