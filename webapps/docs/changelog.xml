@@ -72,6 +72,10 @@
         condition. (kkolinko)
       </fix>
       <fix>
+        <bug>52245</bug>: Don't allow web applications to package classes from
+        the <code>javax.el</code> package. Patch provide by pid. (markt)
+      </fix>
+      <fix>
         <bug>52259</bug>: Fix regression caused by the addition of the threaded
         component start (<bug>46264</bug>) that triggered a deadlock on startup
         if no Realm was configured. (markt)
