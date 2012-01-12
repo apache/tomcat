@@ -64,6 +64,34 @@ public class TestValueExpressionImpl {
     }
 
     @Test
+    public void testGetValueReferenceVariable() {
+        ExpressionFactory factory = ExpressionFactory.newInstance();
+        ELContext context = new ELContextImpl();
+
+        TesterBeanB beanB = new TesterBeanB();
+        beanB.setName("Tomcat");
+        ValueExpression var =
+            factory.createValueExpression(beanB, TesterBeanB.class);
+        context.getVariableMapper().setVariable("beanB", var);
+
+        ValueExpression var2 = factory.createValueExpression(
+                context, "${beanB.name}", String.class);
+
+        context.getVariableMapper().setVariable("foo", var2);
+
+        ValueExpression ve = factory.createValueExpression(
+                context, "${foo}", ValueExpression.class);
+
+
+        // Now check the value reference
+        ValueReference vr = ve.getValueReference(context);
+        assertNotNull(vr);
+
+        assertEquals(beanB, vr.getBase());
+        assertEquals("name", vr.getProperty());
+    }
+
+    @Test
     public void testBug49345() {
         ExpressionFactory factory = ExpressionFactory.newInstance();
         ELContext context = new ELContextImpl();
