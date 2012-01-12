@@ -5450,20 +5450,6 @@ public class StandardContext extends ContainerBase
     @Override
     protected void destroyInternal() throws LifecycleException {
 
-        if ((manager != null) && (manager instanceof Lifecycle)) {
-            ((Lifecycle) manager).destroy();
-        }
-        Realm realm = getRealmInternal();
-        if ((realm != null) && (realm instanceof Lifecycle)) {
-            ((Lifecycle) realm).destroy();
-        }
-        if ((cluster != null) && (cluster instanceof Lifecycle)) {
-            ((Lifecycle) cluster).destroy();
-        }
-        if ((loader != null) && (loader instanceof Lifecycle)) {
-            ((Lifecycle) loader).destroy();
-        }
-
         // If in state NEW when destroy is called, the object name will never
         // have been set so the notification can't be created
         if (getObjectName() != null) {

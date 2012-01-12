@@ -1195,6 +1195,20 @@ public abstract class ContainerBase extends LifecycleMBeanBase
     @Override
     protected void destroyInternal() throws LifecycleException {
 
+        if ((manager != null) && (manager instanceof Lifecycle)) {
+            ((Lifecycle) manager).destroy();
+        }
+        Realm realm = getRealmInternal();
+        if ((realm != null) && (realm instanceof Lifecycle)) {
+            ((Lifecycle) realm).destroy();
+        }
+        if ((cluster != null) && (cluster instanceof Lifecycle)) {
+            ((Lifecycle) cluster).destroy();
+        }
+        if ((loader != null) && (loader instanceof Lifecycle)) {
+            ((Lifecycle) loader).destroy();
+        }
+
         // Stop the Valves in our pipeline (including the basic), if any
         if (pipeline instanceof Lifecycle) {
             ((Lifecycle) pipeline).destroy();
