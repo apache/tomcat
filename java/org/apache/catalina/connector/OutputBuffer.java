@@ -583,8 +583,7 @@ public class OutputBuffer extends Writer
 
 
     public void reset() {
-        // If a Writer wasbeing used, there may be unflushed bytes in the
-        // convertor
+        // If a Writer was being used, there may be bytes in the converter
         if (gotEnc && conv != null) {
             conv.recycle();
         }
