@@ -256,6 +256,9 @@
         Switch unit tests to bind Connectors to localhost rather than all
         available IP addresses. (markt)
       </update>
+      <update>
+        Update to Eclipse JDT Compiler 3.7.1. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
