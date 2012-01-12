@@ -24,6 +24,7 @@ import javax.el.MethodInfo;
 import javax.el.MethodNotFoundException;
 import javax.el.PropertyNotFoundException;
 import javax.el.ValueExpression;
+import javax.el.ValueReference;
 import javax.el.VariableMapper;
 
 import org.apache.el.lang.EvaluationContext;
@@ -134,6 +135,25 @@ public final class AstIdentifier extends SimpleNode {
         }
         this.image = image;
     }
+
+
+    @Override
+    public ValueReference getValueReference(EvaluationContext ctx) {
+        VariableMapper varMapper = ctx.getVariableMapper();
+
+        if (varMapper == null) {
+            return null;
+        }
+
+        ValueExpression expr = varMapper.resolveVariable(this.image);
+
+        if (expr == null) {
+            return null;
+        }
+
+        return expr.getValueReference(ctx);
+    }
+
 
     private final MethodExpression getMethodExpression(EvaluationContext ctx)
             throws ELException {
