@@ -98,9 +98,9 @@ import org.apache.catalina.realm.RealmBase;
  * In complex cases, you may prefer to use the ordinary Tomcat API to create
  * webapp contexts; for example, you might need to install a custom Loader
  * before the call to {@link Host#addChild(Container)}. To replicate the basic
- * behavior of the <pre>addWebapp</pre> methods, you may want to call three
- * methods of this class: {@link #getDefaultRealm()},
- * {@link #noDefaultWebXmlPath()}, and {@link #getDefaultWebXmlListener()}.
+ * behavior of the <pre>addWebapp</pre> methods, you may want to call two
+ * methods of this class: {@link #noDefaultWebXmlPath()} and
+ * {@link #getDefaultWebXmlListener()}.
  *
  * {@link #getDefaultRealm()} returns the simple security realm.
  *
@@ -140,10 +140,6 @@ public class Tomcat {
     protected String hostname = "localhost";
     protected String basedir;
 
-    // Default in-memory realm, will be set by default on
-    // created contexts. Can be replaced with setRealm() on
-    // the context.
-    protected Realm defaultRealm;
     private final Map<String, String> userPass = new HashMap<String, String>();
     private final Map<String, List<String>> userRoles =
         new HashMap<String, List<String>>();
@@ -441,17 +437,6 @@ public class Tomcat {
     }
 
     /**
-     * Set a custom realm for auth. If not called, a simple
-     * default will be used, using an internal map.
-     *
-     * Must be called before adding a context.
-     */
-    public void setDefaultRealm(Realm realm) {
-        defaultRealm = realm;
-    }
-
-
-    /**
      * Access to the engine, for further customization.
      */
     public Engine getEngine() {
@@ -460,6 +445,7 @@ public class Tomcat {
             engine = new StandardEngine();
             engine.setName( "Tomcat" );
             engine.setDefaultHost(hostname);
+            engine.setRealm(createDefaultRealm());
             service.setContainer(engine);
         }
         return engine;
@@ -520,11 +506,6 @@ public class Tomcat {
         ctx.setName(name);
         ctx.setPath(url);
         ctx.setDocBase(path);
-        if (defaultRealm == null) {
-            initSimpleAuth();
-        }
-        ctx.setRealm(defaultRealm);
-
         ctx.addLifecycleListener(new DefaultWebXmlListener());
 
         ContextConfig ctxCfg = new ContextConfig();
@@ -563,27 +544,16 @@ public class Tomcat {
         return Constants.NoDefaultWebXml;
     }
 
-    /**
-     * For complex configurations, this accessor allows callers of this class
-     * to obtain the simple realm created by default.
-     * @return the simple in-memory realm created by default.
-     */
-    public Realm getDefaultRealm() {
-        if (defaultRealm == null) {
-            initSimpleAuth();
-        }
-        return defaultRealm;
-    }
-
-
     // ---------- Helper methods and classes -------------------
 
     /**
-     * Initialize an in-memory realm. You can replace it
-     * for contexts with a real one.
+     * Create an in-memory realm. You can replace it for contexts with a real
+     * one. The Realm created here will be added to the Engine by default and
+     * may be replaced at the Engine level or over-ridden (as per normal Tomcat
+     * behaviour) at the Host or Context level.
      */
-    protected void initSimpleAuth() {
-        defaultRealm = new RealmBase() {
+    protected Realm createDefaultRealm() {
+        return new RealmBase() {
             @Override
             protected String getName() {
                 return "Simple";
