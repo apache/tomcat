@@ -144,10 +144,10 @@ public class Tomcat {
     // created contexts. Can be replaced with setRealm() on
     // the context.
     protected Realm defaultRealm;
-    private Map<String, String> userPass = new HashMap<String, String>();
-    private Map<String, List<String>> userRoles =
+    private final Map<String, String> userPass = new HashMap<String, String>();
+    private final Map<String, List<String>> userRoles =
         new HashMap<String, List<String>>();
-    private Map<String, Principal> userPrincipals =
+    private final Map<String, Principal> userPrincipals =
         new HashMap<String, Principal>();
 
     public Tomcat() {
@@ -639,7 +639,7 @@ public class Tomcat {
         System.setProperty(Globals.CATALINA_BASE_PROP, basedir);
     }
 
-    static String[] silences = new String[] {
+    static final String[] silences = new String[] {
         "org.apache.coyote.http11.Http11Protocol",
         "org.apache.catalina.core.StandardService",
         "org.apache.catalina.core.StandardEngine",
@@ -816,7 +816,7 @@ public class Tomcat {
      * more direct control over the servlet.
      */
     public static class ExistingStandardWrapper extends StandardWrapper {
-        private Servlet existing;
+        private final Servlet existing;
         boolean init = false;
 
         @SuppressWarnings("deprecation")
