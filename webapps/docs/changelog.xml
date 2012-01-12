@@ -144,6 +144,12 @@
          Move destruction of <code>ContainerBase</code> objects to
          <code>ContainerBase</code> to ensure that they are destroyed. (markt)
       </scode>
+      <fix>
+        <bug>52443</bug>: Change the behaviour of the default Realm in the
+        embedded use case so it is set once on the Engine rather than on every
+        Context thereby avoiding the Lifecycle issues with having the same Realm
+        set on multiple Contexts. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
