@@ -168,6 +168,13 @@
         <bug>52335</bug>: Only handle <code>&lt;\%</code> and not
         <code>\%</code> as escaped in template text. (markt)
       </fix>
+      <fix>
+        <bug>52440</bug>: Ensure that when using
+        <code>ValueExpression.getValueReference()</code> if the expression is an
+        EL variable that the value returned is the <code>ValueReference</code>
+        for the <code>ValueExpression</code> associated with the EL variable.
+        (markt) 
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
