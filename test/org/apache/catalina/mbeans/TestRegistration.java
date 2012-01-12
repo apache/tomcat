@@ -63,6 +63,7 @@ public class TestRegistration extends TomcatBaseTest {
     private static String[] basicMBeanNames() {
         return new String[] {
             "Tomcat:type=Engine",
+            "Tomcat:type=Realm,realmPath=/realm0",
             "Tomcat:type=MBeanFactory",
             "Tomcat:type=NamingResources",
             "Tomcat:type=Server",
