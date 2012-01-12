@@ -5037,12 +5037,10 @@ public class StandardContext extends ContainerBase
                 unbindThread(oldCCL);
                 oldCCL = bindThread();
 
-                // Initialize logger again. Other components might have used it too early,
-                // so it should be reset.
+                // Initialize logger again. Other components might have used it
+                // too early, so it should be reset.
                 logger = null;
                 getLogger();
-                if ((logger != null) && (logger instanceof Lifecycle))
-                    ((Lifecycle) logger).start();
 
                 if ((cluster != null) && (cluster instanceof Lifecycle))
                     ((Lifecycle) cluster).start();
@@ -5400,9 +5398,6 @@ public class StandardContext extends ContainerBase
             if ((cluster != null) && (cluster instanceof Lifecycle)) {
                 ((Lifecycle) cluster).stop();
             }
-            if ((logger != null) && (logger instanceof Lifecycle)) {
-                ((Lifecycle) logger).stop();
-            }
             if ((loader != null) && (loader instanceof Lifecycle)) {
                 ((Lifecycle) loader).stop();
             }
@@ -5464,9 +5459,6 @@ public class StandardContext extends ContainerBase
         }
         if ((cluster != null) && (cluster instanceof Lifecycle)) {
             ((Lifecycle) cluster).destroy();
-        }
-        if ((logger != null) && (logger instanceof Lifecycle)) {
-            ((Lifecycle) logger).destroy();
         }
         if ((loader != null) && (loader instanceof Lifecycle)) {
             ((Lifecycle) loader).destroy();

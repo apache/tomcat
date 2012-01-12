@@ -1085,8 +1085,6 @@ public abstract class ContainerBase extends LifecycleMBeanBase
             ((Lifecycle) loader).start();
         logger = null;
         getLogger();
-        if ((logger != null) && (logger instanceof Lifecycle))
-            ((Lifecycle) logger).start();
         if ((manager != null) && (manager instanceof Lifecycle))
             ((Lifecycle) manager).start();
         if ((cluster != null) && (cluster instanceof Lifecycle))
@@ -1188,9 +1186,6 @@ public abstract class ContainerBase extends LifecycleMBeanBase
         if ((manager != null) && (manager instanceof Lifecycle) &&
                 ((Lifecycle) manager).getState().isAvailable() ) {
             ((Lifecycle) manager).stop();
-        }
-        if ((logger != null) && (logger instanceof Lifecycle)) {
-            ((Lifecycle) logger).stop();
         }
         if ((loader != null) && (loader instanceof Lifecycle)) {
             ((Lifecycle) loader).stop();
