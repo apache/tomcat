@@ -189,7 +189,7 @@ public class WebappClassLoader
      * earlier versions.
      */
     protected static final String[] triggers = {
-        "javax.servlet.Servlet"                     // Servlet API
+        "javax.servlet.Servlet", "javax.el.Expression"       // Servlet API
     };
 
 
@@ -3294,6 +3294,10 @@ public class WebappClassLoader
         }
         if (name.startsWith("javax.servlet.")) {
             // Web apps should never package any other Servlet or JSP classes
+            return false;
+        }
+        if (name.startsWith("javax.el")) {
+            // Must never load javax.el.* classes
             return false;
         }
 
