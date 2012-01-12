@@ -120,8 +120,8 @@ wsdl4j-lib.loc=${base-maven.loc}/wsdl4j/wsdl4j/${wsdl4j-lib.version}/wsdl4j-${ws
 wsdl4j-lib.jar=${wsdl4j-lib.home}/wsdl4j-${wsdl4j-lib.version}.jar
 
 # ----- Eclipse JDT, version 3.2 or later -----
-jdt.version=3.7
-jdt.release=R-3.7-201106131736
+jdt.version=3.7.1
+jdt.release=R-3.7.1-201109091335
 jdt.home=${base.path}/ecj-${jdt.version}
 jdt.jar=${jdt.home}/ecj-${jdt.version}.jar
 # The download will be moved to the archive area eventually. We are taking care of that in advance.
