@@ -143,7 +143,7 @@ public class ParserUtils {
     public static void setEntityResolver(EntityResolver er) {
 
         entityResolver = er;
-    }    
+    }
 
     // ------------------------------------------------------ Protected Methods
 
