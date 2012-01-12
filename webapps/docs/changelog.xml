@@ -140,6 +140,10 @@
       <fix>
         Remove some stale attributes from MBeans. (rjung)
       </fix>
+      <scode>
+         Move destruction of <code>ContainerBase</code> objects to
+         <code>ContainerBase</code> to ensure that they are destroyed. (markt)
+      </scode>
     </changelog>
   </subsection>
   <subsection name="Coyote">
