@@ -14,10 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.catalina.startup;
-
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -29,7 +26,6 @@ import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.net.JarURLConnection;
 import java.net.MalformedURLException;
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
@@ -111,9 +107,7 @@ import org.xml.sax.SAXParseException;
  * @author Jean-Francois Arcand
  * @version $Id$
  */
-
-public class ContextConfig
-    implements LifecycleListener {
+public class ContextConfig implements LifecycleListener {
 
     private static final Log log = LogFactory.getLog( ContextConfig.class );
 
@@ -1325,18 +1319,22 @@ public class ContextConfig
 
         if (globalWebXml != null) {
             try {
-                File f = new File(new URI(globalWebXml.getSystemId()));
-                globalTimeStamp = f.lastModified();
-            } catch (URISyntaxException e) {
+                URL url = new URL(globalWebXml.getSystemId());
+                globalTimeStamp = url.openConnection().getLastModified();
+            } catch (MalformedURLException e) {
+                globalTimeStamp = -1;
+            } catch (IOException e) {
                 globalTimeStamp = -1;
             }
         }
 
         if (hostWebXml != null) {
             try {
-                File f = new File(new URI(hostWebXml.getSystemId()));
-                hostTimeStamp = f.lastModified();
-            } catch (URISyntaxException e) {
+                URL url = new URL(hostWebXml.getSystemId());
+                hostTimeStamp = url.openConnection().getLastModified();
+            } catch (MalformedURLException e) {
+                hostTimeStamp = -1;
+            } catch (IOException e) {
                 hostTimeStamp = -1;
             }
         }
