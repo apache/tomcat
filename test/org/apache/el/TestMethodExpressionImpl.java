@@ -399,4 +399,18 @@ public class TestMethodExpressionImpl {
         Boolean actual = (Boolean) ve.getValue(context);
         assertEquals(Boolean.FALSE, actual);
     }
+
+    @Test
+    public void testBug52445a() {
+        MethodExpression me = factory.createMethodExpression(context,
+                "${beanA.setBean(beanBB)}", null ,
+                new Class<?>[] { TesterBeanB.class });
+        me.invoke(context, null);
+
+        MethodExpression me1 = factory.createMethodExpression(context,
+                "${beanA.bean.sayHello()}", null, null);
+        String actual = (String) me1.invoke(context, null);
+        assertEquals("Hello from BB", actual);
+    }
+
 }
