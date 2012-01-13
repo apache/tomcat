@@ -16,6 +16,28 @@
   Excludes file for Apache RAT tool run by ASF Buildbot,
   http://incubator.apache.org/rat/
 
-  - HTML files in Documentation web application are generated from XML
+  The following files are excluded:
 
-output/build/webapps/docs/**/*.html
+  - *.html files in documentation are generated from XML sources
+  - *.md5 files are generated and cannot contain license
+  - bug52121-part1, bug52121-part2 files in tests are test data for a hard
+  to reproduce testcase and should be used as is.
+
+output/build/webapps/docs/*.html
+output/build/webapps/docs/appdev/*.html
+output/build/webapps/docs/architecture/*.html
+output/build/webapps/docs/config/*.html
+output/build/webapps/docs/funcspecs/*.html
+output/build/webapps/docs/tribes/*.html
+output/deployer/deployer-howto.html
+output/dist/webapps/docs/*.html
+output/dist/webapps/docs/appdev/*.html
+output/dist/webapps/docs/architecture/*.html
+output/dist/webapps/docs/config/*.html
+output/dist/webapps/docs/funcspecs/*.html
+output/dist/webapps/docs/tribes/*.html
+output/dist/src/test/org/apache/coyote/http11/filters/bug52121-part1
+output/dist/src/test/org/apache/coyote/http11/filters/bug52121-part2
+test/org/apache/coyote/http11/filters/bug52121-part1
+test/org/apache/coyote/http11/filters/bug52121-part2
+*.md5
