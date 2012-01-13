@@ -18,4 +18,4 @@
 
   - HTML files in Documentation web application are generated from XML
 
-output/build/webapps/docs/*.html
+output/build/webapps/docs/**/*.html
