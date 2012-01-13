@@ -37,7 +37,7 @@ import org.apache.catalina.Realm;
 import org.apache.catalina.Service;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
-import org.apache.catalina.realm.JAASRealm;
+import org.apache.catalina.realm.NullRealm;
 import org.apache.catalina.util.ServerInfo;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -114,18 +114,20 @@ public class StandardEngine extends ContainerBase implements Engine {
 
     // ------------------------------------------------------------- Properties
 
-    /** Provide a default in case no explicit configuration is set
+    /**
+     * Obtain the configured Realm and provide a default Realm implementation
+     * when no explicit configuration is set.
      *
-     * @return configured realm, or a JAAS realm by default
+     * @return configured realm, or a {@link NullRealm} by default
      */
     @Override
     public Realm getRealm() {
-        Realm configured=super.getRealm();
-        // If no set realm has been called - default to JAAS
+        Realm configured = super.getRealm();
+        // If no set realm has been called - default to NullRealm
         // This can be overridden at engine, context and host level
-        if( configured==null ) {
-            configured=new JAASRealm();
-            this.setRealm( configured );
+        if (configured == null) {
+            configured = new NullRealm();
+            this.setRealm(configured);
         }
         return configured;
     }
