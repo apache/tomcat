@@ -150,6 +150,12 @@
         Context thereby avoiding the Lifecycle issues with having the same Realm
         set on multiple Contexts. (markt)
       </fix>
+      <add>
+        Provide a new Realm implementation, the NullRealm, that does not contain
+        any users and is used as the default Realm implementation (rather than
+        the JAAS Realm which was used prior to this change) if no Realm is
+        specified. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
