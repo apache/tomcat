@@ -245,8 +245,8 @@ public final class AstValue extends SimpleNode {
         Method m = null;
         Object[] values = null;
         if (isParametersProvided()) {
-            values = ((AstMethodParameters)
-                    this.jjtGetChild(2)).getParameters(ctx);
+            values = ((AstMethodParameters) this.jjtGetChild(
+                    this.jjtGetNumChildren() - 1)).getParameters(ctx);
             Class<?>[] types = getTypesFromValues(values);
             m = ReflectionUtil.getMethod(t.base, t.property, types);
         } else {
@@ -329,9 +329,13 @@ public final class AstValue extends SimpleNode {
      */
     @Override
     public boolean isParametersProvided() {
-        if (this.children.length > 2
-                && this.jjtGetChild(2) instanceof AstMethodParameters) {
-            return true;
+        // Assumption is that method parameters, if present, will be the last
+        // child
+        int len = children.length;
+        if (len > 2) {
+            if (this.jjtGetChild(len - 1) instanceof AstMethodParameters) {
+                return true;
+            }
         }
         return false;
     }

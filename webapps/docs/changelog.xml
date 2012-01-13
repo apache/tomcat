@@ -195,6 +195,10 @@
         for the <code>ValueExpression</code> associated with the EL variable.
         (markt) 
       </fix>
+      <fix>
+        <bug>52445</bug>: Don&apos;t assume that EL method expressions have
+        exactly three components (identifier, method name, paramaters). (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
