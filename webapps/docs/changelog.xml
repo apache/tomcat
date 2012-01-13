@@ -156,6 +156,11 @@
         the JAAS Realm which was used prior to this change) if no Realm is
         specified. (markt)
       </add>
+      <fix>
+        <bug>52461</bug>: Don't assume file based URLs when checking last
+        modified times for global and host level web.xml files. Patch provided
+        by violetagg. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
