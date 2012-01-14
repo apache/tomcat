@@ -71,8 +71,7 @@ public class TestNonLoginAndBasicAuthenticator extends TomcatBaseTest {
      */
     @Test
     public void testAcceptPublicNonLogin() throws Exception {
-        doTestNonLogin(USER, PWD, CONTEXT_PATH_NOLOGIN + URI_PUBLIC,
-                        false, 200);
+        doTestNonLogin(CONTEXT_PATH_NOLOGIN + URI_PUBLIC, false, 200);
     }
 
     /*
@@ -82,8 +81,7 @@ public class TestNonLoginAndBasicAuthenticator extends TomcatBaseTest {
      */
     @Test
     public void testRejectProtectedNonLogin() throws Exception {
-        doTestNonLogin(USER, PWD, CONTEXT_PATH_NOLOGIN + URI_PROTECTED,
-                        true, 403);
+        doTestNonLogin(CONTEXT_PATH_NOLOGIN + URI_PROTECTED, true, 403);
     }
 
     /*
@@ -136,14 +134,13 @@ public class TestNonLoginAndBasicAuthenticator extends TomcatBaseTest {
     public void testBasicLoginRejectProtected() throws Exception {
         doTestBasic(USER, PWD, CONTEXT_PATH_LOGIN + URI_PROTECTED,
                 true, 401, false, 200);
-        doTestNonLogin(USER, PWD, CONTEXT_PATH_NOLOGIN + URI_PROTECTED,
+        doTestNonLogin(CONTEXT_PATH_NOLOGIN + URI_PROTECTED,
                 true, 403);
     }
 
 
-    public void doTestNonLogin(String user, String pwd, String uri,
-            boolean expectedReject, int expectedRC)
-            throws Exception {
+    public void doTestNonLogin(String uri, boolean expectedReject,
+            int expectedRC) throws Exception {
 
         Map<String,List<String>> reqHeaders =
                 new HashMap<String,List<String>>();
@@ -189,7 +186,7 @@ public class TestNonLoginAndBasicAuthenticator extends TomcatBaseTest {
         }
 
         // the second access attempt should be sucessful
-        String credentials = USER + ":" + PWD;
+        String credentials = user + ":" + pwd;
         byte[] credentialsBytes = ByteChunk.convertToBytes(credentials);
         String base64auth = Base64.encode(credentialsBytes);
         String authLine = "Basic " + base64auth;
