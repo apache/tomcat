@@ -161,6 +161,10 @@
         modified times for global and host level web.xml files. Patch provided
         by violetagg. (markt)
       </fix>
+      <add>
+        Add test cases for the BASIC and NonLogin Authenticators when not using
+        SSO. Patch provided by Brian Burch. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
