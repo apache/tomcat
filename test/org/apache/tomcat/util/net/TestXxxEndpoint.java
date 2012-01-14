@@ -65,7 +65,8 @@ public class TestXxxEndpoint extends TomcatBaseTest {
          */
         long serverSock = 0;
 
-        String address = null;
+        String address = InetAddress.getByName("localhost").getHostAddress();
+
         // Create the APR address that will be bound
         int family = Socket.APR_INET;
         if (Library.APR_HAVE_IPV6) {
