@@ -13,7 +13,8 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 
-  Excludes file for Apache RAT tool run by ASF Buildbot,
+
+  This is excludes file for Apache RAT tool run by ASF Buildbot,
   http://incubator.apache.org/rat/
 
   The following files are excluded:
@@ -40,4 +41,5 @@ output/dist/src/test/org/apache/coyote/http11/filters/bug52121-part1
 output/dist/src/test/org/apache/coyote/http11/filters/bug52121-part2
 test/org/apache/coyote/http11/filters/bug52121-part1
 test/org/apache/coyote/http11/filters/bug52121-part2
-*.md5
+output/embed/*.md5
+output/extras/*.md5
