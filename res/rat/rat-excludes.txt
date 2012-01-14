@@ -21,6 +21,7 @@
 
   - *.html files in documentation are generated from XML sources
   - *.md5 files are generated and cannot contain license
+  - *.manifest JAR manifest files cannot contain license
   - bug52121-part1, bug52121-part2 files in tests are test data for a hard
   to reproduce testcase and should be used as is.
 
@@ -43,3 +44,7 @@ test/org/apache/coyote/http11/filters/bug52121-part1
 test/org/apache/coyote/http11/filters/bug52121-part2
 output/embed/*.md5
 output/extras/*.md5
+modules/jdbc-pool/resources/MANIFEST.MF
+output/dist/src/modules/jdbc-pool/resources/MANIFEST.MF
+output/dist/src/res/META-INF/*.manifest
+res/META-INF/*.manifest
