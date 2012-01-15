@@ -81,7 +81,7 @@ public class MBeanDumper {
                         value=mbeanServer.getAttribute(oname, attName);
                     } catch (Throwable t) {
                         log.error("Error getting attribute " + oname +
-                            " " + attName + " " + t.toString());
+                            " " + attName, t);
                         continue;
                     }
                     if (value==null) continue;
