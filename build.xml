@@ -1683,11 +1683,6 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
 
   <target name="installer" description="Create Windows installer"
       unless="skip.installer" depends="dist-static">
-    <fixcrlf srcdir="${tomcat.dist}" eol="crlf"
-        encoding="ISO-8859-1" fixlast="false" >
-      <patternset refid="text.files" />
-    </fixcrlf>
-
     <echo message="Builds a Windows installer based on Nullsoft Installer"/>
     <copy todir="${tomcat.dist}">
       <fileset dir="res">
@@ -1701,10 +1696,15 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
     <copy file="${nsis.installoptions.dll}" todir="${tomcat.dist}" />
     <copy file="${nsis.nsexec.dll}" todir="${tomcat.dist}" />
     <copy file="${nsis.nsisdl.dll}" todir="${tomcat.dist}" />
-
     <copy file="res/tomcat.nsi" tofile="${tomcat.dist}/tomcat.nsi" overwrite="true" encoding="ISO-8859-1">
       <filterset refid="version.filters"/>
     </copy>
+
+    <fixcrlf srcdir="${tomcat.dist}" eol="crlf"
+        encoding="ISO-8859-1" fixlast="false" >
+      <patternset refid="text.files" />
+    </fixcrlf>
+
     <exec dir="${tomcat.dist}" executable="${nsis.exe}" osfamily="windows">
       <arg value="/DNSISDIR=${nsis.home}" />
       <arg value="/V2" />
