@@ -47,4 +47,6 @@ output/extras/*.md5
 modules/jdbc-pool/resources/MANIFEST.MF
 output/dist/src/modules/jdbc-pool/resources/MANIFEST.MF
 output/dist/src/res/META-INF/*.manifest
+output/jdbc-pool/resources/MANIFEST.MF
+output/manifests/*.manifest
 res/META-INF/*.manifest
