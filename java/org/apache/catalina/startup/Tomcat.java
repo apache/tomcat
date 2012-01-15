@@ -89,7 +89,7 @@ import org.apache.catalina.realm.RealmBase;
  * this class.
  *
  * This class provides a set of convenience methods for configuring webapp
- * contexts, all overloads of the method <pre>addWebapp</pre>. These methods
+ * contexts, all overloads of the method <code>addWebapp</code>. These methods
  * create a webapp context, configure it, and then add it to a {@link Host}.
  * They do not use a global default web.xml; rather, they add a lifecycle
  * listener that adds the standard DefaultServlet, JSP processing, and welcome
@@ -98,11 +98,9 @@ import org.apache.catalina.realm.RealmBase;
  * In complex cases, you may prefer to use the ordinary Tomcat API to create
  * webapp contexts; for example, you might need to install a custom Loader
  * before the call to {@link Host#addChild(Container)}. To replicate the basic
- * behavior of the <pre>addWebapp</pre> methods, you may want to call two
+ * behavior of the <code>addWebapp</code> methods, you may want to call two
  * methods of this class: {@link #noDefaultWebXmlPath()} and
  * {@link #getDefaultWebXmlListener()}.
- *
- * {@link #getDefaultRealm()} returns the simple security realm.
  *
  * {@link #getDefaultWebXmlListener()} returns a {@link LifecycleListener} that
  * adds the standard DefaultServlet, JSP processing, and welcome files. If you
