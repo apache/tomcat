@@ -14,16 +14,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.catalina.manager;
-
 
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Set;
 
 import javax.management.Attribute;
+import javax.management.MBeanOperationInfo;
+import javax.management.MBeanParameterInfo;
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
 import javax.servlet.ServletException;
@@ -101,6 +100,19 @@ public class JMXProxyServlet extends HttpServlet  {
             getAttribute( writer, qry, name );
             return;
         }
+        qry = request.getParameter("invoke");
+        if(qry != null) {
+            String opName=request.getParameter("op");
+            String ps = request.getParameter("ps");
+            String[] valuesStr;
+            if (ps == null) {
+                valuesStr = new String[0];
+            } else {
+                valuesStr = request.getParameter("ps").split(",");
+            }
+            invokeOperation( writer, qry, opName,valuesStr );
+            return;
+        }
         qry=request.getParameter("qry");
         if( qry == null ) {
             qry = "*:*";
@@ -117,7 +129,8 @@ public class JMXProxyServlet extends HttpServlet  {
             writer.println("OK - Attribute get '" + onameStr + "' - " + att
                     + "= " + MBeanDumper.escape(value.toString()));
         } catch (Exception ex) {
-            writer.println("Error - " + ex.toString());
+            writer.println("Error");
+            ex.printStackTrace(writer);
         }
     }
 
@@ -131,7 +144,8 @@ public class JMXProxyServlet extends HttpServlet  {
             mBeanServer.setAttribute( oname, new Attribute(att, valueObj));
             writer.println("OK - Attribute set");
         } catch( Exception ex ) {
-            writer.println("Error - " + ex.toString());
+            writer.println("Error");
+            ex.printStackTrace(writer);
         }
     }
 
@@ -143,8 +157,9 @@ public class JMXProxyServlet extends HttpServlet  {
             names=mBeanServer.queryNames(new ObjectName(qry), null);
             writer.println("OK - Number of results: " + names.size());
             writer.println();
-        } catch (Exception e) {
-            writer.println("Error - " + e.toString());
+        } catch (Exception ex) {
+            writer.println("Error");
+            ex.printStackTrace(writer);
             return;
         }
 
@@ -160,5 +175,39 @@ public class JMXProxyServlet extends HttpServlet  {
      */
     public boolean isSupported(String type) {
         return true;
+    }
+
+
+    private void invokeOperation(PrintWriter writer, String onameStr, String op,
+            String[] valuesStr) {
+        try {
+            ObjectName oname=new ObjectName( onameStr );
+            MBeanOperationInfo methodInfo = registry.getMethodInfo(oname,op);
+            MBeanParameterInfo[] signature = methodInfo.getSignature();
+            String[] signatureTypes = new String[signature.length];
+            Object[] values = new Object[signature.length];
+            for (int i = 0; i < signature.length; i++) {
+               MBeanParameterInfo pi = signature[i];
+               signatureTypes[i] = pi.getType();
+               values[i] = registry.convertValue(pi.getType(), valuesStr[i] );
+           }
+
+            Object retVal = mBeanServer.invoke(oname,op,values,signatureTypes);
+            writer.println("OK - Operation " + op + " returned:");
+            output("", writer, retVal);
+        } catch( Exception ex ) {
+            writer.println("Error");
+            ex.printStackTrace(writer);
+        }
+    }
+
+    private void output(String indent, PrintWriter writer, Object result) {
+        if (result instanceof Object[]) {
+            for (Object obj : (Object[]) result) {
+                output("  " + indent, writer, obj);
+            }
+        } else {
+            writer.println(indent + result.toString());
+        }
     }
 }
