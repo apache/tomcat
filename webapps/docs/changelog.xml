@@ -53,6 +53,23 @@
   They eventually become mixed with the numbered issues. (I.e., numbered
   issues to not "pop up" wrt. others).
 -->
+<section name="Tomcat 7.0.25 (markt)">
+  <subsection name="Other">
+    <changelog>
+      <fix>
+        When building a Windows installer do not copy whole "res" folder to
+        output/dist, but only the files that we need. Apply fixcrlf filter
+        only after the files are copied, so that <code>INSTALLLICENSE</code>
+        file had correct line ends. (kkolinko)
+      </fix>
+      <update>
+        Remove <code>res/License.rtf</code>. The file that is actually shown
+        by the Windows installer in <code>res/INSTALLLICENSE</code>.
+        (kkolinko)
+      </update>
+    </changelog>
+  </subsection>
+</section>
 <section name="Tomcat 7.0.24 (markt)">
   <subsection name="Catalina">
     <changelog>
