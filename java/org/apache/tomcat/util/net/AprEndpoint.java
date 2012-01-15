@@ -941,21 +941,16 @@ public class AprEndpoint extends AbstractEndpoint {
         return log;
     }
 
+
     // --------------------------------------------------- Acceptor Inner Class
-
-
     /**
-     * Server socket acceptor thread.
+     * The background thread that listens for incoming TCP/IP connections and
+     * hands them off to an appropriate processor.
      */
     protected class Acceptor extends AbstractEndpoint.Acceptor {
 
         private final Log log = LogFactory.getLog(AprEndpoint.Acceptor.class);
 
-
-        /**
-         * The background thread that listens for incoming TCP/IP connections and
-         * hands them off to an appropriate processor.
-         */
         @Override
         public void run() {
 
@@ -997,17 +992,13 @@ public class AprEndpoint extends AbstractEndpoint {
                     // Successful accept, reset the error delay
                     errorDelay = 0;
 
-                    /*
-                     * In the case of a deferred accept unlockAccept needs to
-                     * send data. This data will be rubbish, so destroy the
-                     * socket and don't process it.
-                     */
-                    if (deferAccept && (paused || !running)) {
-                        destroySocket(socket);
-                        continue;
-                    }
-                    // Hand this socket off to an appropriate processor
-                    if (!processSocketWithOptions(socket)) {
+                    if (running && !paused) {
+                        // Hand this socket off to an appropriate processor
+                        if (!processSocketWithOptions(socket)) {
+                            // Close socket and pool right away
+                            destroySocket(socket);
+                        }
+                    } else {
                         // Close socket and pool right away
                         destroySocket(socket);
                     }

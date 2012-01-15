@@ -742,17 +742,14 @@ public class NioEndpoint extends AbstractEndpoint {
         return log;
     }
 
+
     // --------------------------------------------------- Acceptor Inner Class
-
-
     /**
-     * Server socket acceptor thread.
+     * The background thread that listens for incoming TCP/IP connections and
+     * hands them off to an appropriate processor.
      */
     protected class Acceptor extends AbstractEndpoint.Acceptor {
-        /**
-         * The background thread that listens for incoming TCP/IP connections and
-         * hands them off to an appropriate processor.
-         */
+
         @Override
         public void run() {
 
@@ -794,24 +791,17 @@ public class NioEndpoint extends AbstractEndpoint {
                     // Successful accept, reset the error delay
                     errorDelay = 0;
 
-                    // Hand this socket off to an appropriate processor
-                    //TODO FIXME - this is currently a blocking call, meaning we will be blocking
-                    //further accepts until there is a thread available.
-                    if ( running && (!paused) && socket != null ) {
-                        // setSocketOptions() will add channel to the poller
-                        // if successful
+                    // setSocketOptions() will add channel to the poller
+                    // if successful
+                    if (running && !paused) {
                         if (!setSocketOptions(socket)) {
-                            try {
-                                socket.socket().close();
-                                socket.close();
-                            } catch (IOException ix) {
-                                if (log.isDebugEnabled())
-                                    log.debug("", ix);
-                            }
+                            closeSocket(socket);
                         }
+                    } else {
+                        closeSocket(socket);
                     }
                 } catch (SocketTimeoutException sx) {
-                    //normal condition
+                    // Ignore: Normal condition
                 } catch (IOException x) {
                     if (running) {
                         log.error(sm.getString("endpoint.accept.fail"), x);
@@ -837,9 +827,27 @@ public class NioEndpoint extends AbstractEndpoint {
                     ExceptionUtils.handleThrowable(t);
                     log.error(sm.getString("endpoint.accept.fail"), t);
                 }
-            }//while
+            }
             state = AcceptorState.ENDED;
-        }//run
+        }
+    }
+
+
+    private void closeSocket(SocketChannel socket) {
+        try {
+            socket.socket().close();
+        } catch (IOException ioe)  {
+            if (log.isDebugEnabled()) {
+                log.debug("", ioe);
+            }
+        }
+        try {
+            socket.close();
+        } catch (IOException ioe) {
+            if (log.isDebugEnabled()) {
+                log.debug("", ioe);
+            }
+        }
     }
 
 
