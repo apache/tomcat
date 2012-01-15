@@ -177,14 +177,11 @@ public class JIoEndpoint extends AbstractEndpoint {
 
     // --------------------------------------------------- Acceptor Inner Class
     /**
-     * Server socket acceptor thread.
+     * The background thread that listens for incoming TCP/IP connections and
+     * hands them off to an appropriate processor.
      */
     protected class Acceptor extends AbstractEndpoint.Acceptor {
 
-        /**
-         * The background thread that listens for incoming TCP/IP connections and
-         * hands them off to an appropriate processor.
-         */
         @Override
         public void run() {
 
@@ -227,23 +224,15 @@ public class JIoEndpoint extends AbstractEndpoint {
                     errorDelay = 0;
 
                     // Configure the socket
-                    if (setSocketOptions(socket)) {
+                    if (running && !paused && setSocketOptions(socket)) {
                         // Hand this socket off to an appropriate processor
                         if (!processSocket(socket)) {
                             // Close socket right away
-                            try {
-                                socket.close();
-                            } catch (IOException e) {
-                                // Ignore
-                            }
+                            closeSocket(socket);
                         }
                     } else {
                         // Close socket right away
-                        try {
-                            socket.close();
-                        } catch (IOException e) {
-                            // Ignore
-                        }
+                        closeSocket(socket);
                     }
                 } catch (IOException x) {
                     if (running) {
@@ -257,9 +246,17 @@ public class JIoEndpoint extends AbstractEndpoint {
                     ExceptionUtils.handleThrowable(t);
                     log.error(sm.getString("endpoint.accept.fail"), t);
                 }
-                // The processor will recycle itself when it finishes
             }
             state = AcceptorState.ENDED;
+        }
+    }
+
+
+    private void closeSocket(Socket socket) {
+        try {
+            socket.close();
+        } catch (IOException e) {
+            // Ignore
         }
     }
 
