@@ -217,6 +217,11 @@
   </subsection>
   <subsection name="Web applications">
     <changelog>
+      <add>
+        <bug>38216</bug>: Add the ability to invoke MBean operations to the JMX
+        proxy sevrlet in the Manager application. Based on a patch by
+        Christopher Hlubek. (markt)
+      </add>
       <update>
         Further clarify the relation between values used by
         <code>RemoteIpValve</code> and <code>RemoteIpFilter</code>
