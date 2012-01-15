@@ -40,6 +40,7 @@ import org.apache.tomcat.util.buf.ByteChunk;
  * Test BasicAuthenticator and NonLoginAuthenticator when a
  * SingleSignOn Valve is not active.
  *
+ * <p>
  * In the absence of SSO support, these two authenticator classes
  * both have quite simple behaviour. By testing them together, we
  * can make sure they operate independently and confirm that no
@@ -139,7 +140,7 @@ public class TestNonLoginAndBasicAuthenticator extends TomcatBaseTest {
     }
 
 
-    public void doTestNonLogin(String uri, boolean expectedReject,
+    private void doTestNonLogin(String uri, boolean expectedReject,
             int expectedRC) throws Exception {
 
         Map<String,List<String>> reqHeaders =
@@ -159,9 +160,9 @@ public class TestNonLoginAndBasicAuthenticator extends TomcatBaseTest {
             assertEquals(200, rc);
             assertEquals("OK", bc.toString());
         }
-}
+    }
 
-    public void doTestBasic(String user, String pwd, String uri,
+    private void doTestBasic(String user, String pwd, String uri,
             boolean expectedReject1, int expectedRC1,
             boolean expectedReject2, int expectedRC2) throws Exception {
 
