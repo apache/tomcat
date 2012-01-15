@@ -180,6 +180,11 @@
       <fix>
         Correct error in fix for <bug>49683</bug>. (markt)
       </fix>
+      <fix>
+        Ensure that the process of unlocking the acceptor thread does not
+        trigger processing of the connection as if it were a valid request.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
