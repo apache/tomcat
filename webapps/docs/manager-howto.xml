@@ -1301,6 +1301,18 @@ Error: java.lang.NumberFormatException: For input string: "cowbell"
 </source>
   </subsection>
 
+  <subsection name="JMX Invoke command">
+    <p>The <code>invoke</code> command enables methods to be called on MBeans. The
+    general form of the command is:</p>
+<source>
+http://webserver/manager/jmxproxy/?invoke=BEANNAME&amp;op=METHODNAME&amp;ps=COMMASEPARATEDPARAMETERS
+</source>
+    <p>For exmaple, to call the <code>findConnectors()</code> method of the
+    <strong>Service</strong> use:</p>
+<source>
+http://localhost:8080/manager/jmxproxy/?invoke=Catalina%3Atype%3DService&amp;op=findConnectors&amp;ps=
+</source>
+  </subsection>
 
 </section>
 
