@@ -299,6 +299,13 @@
       <update>
         Update to Eclipse JDT Compiler 3.7.1. (markt)
       </update>
+      <update>
+        Add Netbeans <code>nbproject</code> folder to <code>svn:ignore</code>
+        and <code>.gitignore</code>. (rjung)
+      </update>
+      <update>
+        Align <code>.gitignore</code> with trunk. (rjung)
+      </update>
     </changelog>
   </subsection>
 </section>
