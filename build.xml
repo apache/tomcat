@@ -1690,7 +1690,13 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
 
     <echo message="Builds a Windows installer based on Nullsoft Installer"/>
     <copy todir="${tomcat.dist}">
-      <fileset dir="res" />
+      <fileset dir="res">
+        <include name="INSTALLLICENSE" />
+        <include name="License.rtf" />
+        <include name="*.bmp" />
+        <include name="*.ico" />
+        <include name="confinstall/**" />
+      </fileset>
     </copy>
     <copy file="${nsis.installoptions.dll}" todir="${tomcat.dist}" />
     <copy file="${nsis.nsexec.dll}" todir="${tomcat.dist}" />
