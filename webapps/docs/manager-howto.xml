@@ -1307,7 +1307,7 @@ Error: java.lang.NumberFormatException: For input string: "cowbell"
 <source>
 http://webserver/manager/jmxproxy/?invoke=BEANNAME&amp;op=METHODNAME&amp;ps=COMMASEPARATEDPARAMETERS
 </source>
-    <p>For exmaple, to call the <code>findConnectors()</code> method of the
+    <p>For example, to call the <code>findConnectors()</code> method of the
     <strong>Service</strong> use:</p>
 <source>
 http://localhost:8080/manager/jmxproxy/?invoke=Catalina%3Atype%3DService&amp;op=findConnectors&amp;ps=
