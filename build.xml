@@ -1766,6 +1766,11 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
 
   <!-- Sets properties only required for releases -->
   <target name="release-init">
+    <available file="${gpg.exec}" property="gpg.exec.available"/>
+    <antcall target="gpg-init" />
+  </target>
+
+  <target name="gpg-init" if="${gpg.exec.available}">
     <input message="Enter GPG pass-phrase" addproperty="gpg.passphrase" >
       <handler type="secure"/>
     </input>
