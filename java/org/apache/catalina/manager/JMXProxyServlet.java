@@ -108,7 +108,7 @@ public class JMXProxyServlet extends HttpServlet  {
             if (ps == null) {
                 valuesStr = new String[0];
             } else {
-                valuesStr = request.getParameter("ps").split(",");
+                valuesStr = ps.split(",");
             }
             invokeOperation( writer, qry, opName,valuesStr );
             return;
@@ -129,7 +129,7 @@ public class JMXProxyServlet extends HttpServlet  {
             writer.println("OK - Attribute get '" + onameStr + "' - " + att
                     + "= " + MBeanDumper.escape(value.toString()));
         } catch (Exception ex) {
-            writer.println("Error");
+            writer.println("Error - " + ex.toString());
             ex.printStackTrace(writer);
         }
     }
@@ -144,7 +144,7 @@ public class JMXProxyServlet extends HttpServlet  {
             mBeanServer.setAttribute( oname, new Attribute(att, valueObj));
             writer.println("OK - Attribute set");
         } catch( Exception ex ) {
-            writer.println("Error");
+            writer.println("Error - " + ex.toString());
             ex.printStackTrace(writer);
         }
     }
@@ -158,7 +158,7 @@ public class JMXProxyServlet extends HttpServlet  {
             writer.println("OK - Number of results: " + names.size());
             writer.println();
         } catch (Exception ex) {
-            writer.println("Error");
+            writer.println("Error - " + ex.toString());
             ex.printStackTrace(writer);
             return;
         }
@@ -196,7 +196,7 @@ public class JMXProxyServlet extends HttpServlet  {
             writer.println("OK - Operation " + op + " returned:");
             output("", writer, retVal);
         } catch( Exception ex ) {
-            writer.println("Error");
+            writer.println("Error - " + ex.toString());
             ex.printStackTrace(writer);
         }
     }
