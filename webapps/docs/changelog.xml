@@ -75,6 +75,10 @@
         by the Windows installer in <code>res/INSTALLLICENSE</code>.
         (kkolinko)
       </update>
+      <add>
+        Automate the OpenPGP signature generation for the release process.
+        (markt)
+      </add>
     </changelog>
   </subsection>
 </section>
