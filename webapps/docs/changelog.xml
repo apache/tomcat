@@ -57,8 +57,8 @@
   <subsection name="Web applications">
     <changelog>
       <fix>
-        Restore format of first line of error message for JMX proxy servlet in
-        case scripts were depending on it. (mark)
+        Restore format of the first line of error message for JMX proxy
+        servlet in case scripts were depending on it. (markt)
       </fix>
     </changelog>
   </subsection>
