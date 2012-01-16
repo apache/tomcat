@@ -287,6 +287,9 @@
   <subsection name="Other">
     <changelog>
       <update>
+        Update Apache Commons Daemon to 1.0.8. (mturk)
+      </update>
+      <update>
         Update Apache Commons Pool to 1.5.7. (kkolinko)
       </update>
       <fix>
