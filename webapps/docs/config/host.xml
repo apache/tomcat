@@ -391,7 +391,7 @@
         sure to delete the associated expanded directory before restarting
         Tomcat, so that the updated WAR file will be re-expanded when Tomcat
         restarts.<br/>
-        If <code>copyXml</code> is <code>true</code> (it is <code>false</code>
+        If <code>copyXML</code> is <code>true</code> (it is <code>false</code>
         by default), any web application archive file within the Hosts's
         <code>appBase</code> directory that does not have a corresponding
         context XML descriptor (with a ".xml" extension rather than a ".war"
@@ -408,7 +408,7 @@
         context path will <code>/</code>. Multi-level contexts may be defined by
         using #, e.g. use a directory named <code>foo#bar</code> for a context
         path of <code>/foo/bar</code>.<br/>
-        If <code>copyXml</code> is <code>true</code> (it is <code>false</code>
+        If <code>copyXML</code> is <code>true</code> (it is <code>false</code>
         by default), any directory within the Hosts's <code>appBase</code>
         directory that does not have a corresponding context XML descriptor in
         the Host's <code>xmlBase</code> will be scanned to see if it contains
