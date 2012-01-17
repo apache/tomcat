@@ -79,10 +79,14 @@
         Automate the OpenPGP signature generation for the release process.
         (markt)
       </add>
+      <fix>
+        Don&apos;t exclude directories named target from the build process.
+        (rjung)
+      </fix>
     </changelog>
   </subsection>
 </section>
-<section name="Tomcat 7.0.24 (markt)">
+<section name="Tomcat 7.0.24 (markt)" rtext="not released">
   <subsection name="Catalina">
     <changelog>
       <add>
