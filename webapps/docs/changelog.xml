@@ -53,6 +53,17 @@
   They eventually become mixed with the numbered issues. (I.e., numbered
   issues to not "pop up" wrt. others).
 -->
+<section name="Tomcat 7.0.26 (markt)">
+  <subsection name="Web applications">
+    <changelog>
+      <update>
+        Improve <code>BUILDING.txt</code>. Update instructions for
+        building. Add instructions for using Checkstyle and running the
+        tests. (kkolinko)
+      </update>
+    </changelog>
+  </subsection>
+</section>
 <section name="Tomcat 7.0.25 (markt)">
   <subsection name="Web applications">
     <changelog>
