@@ -118,7 +118,7 @@ Use the following commands to build Tomcat:
   to build Tomcat to the <code>/usr/share/java</code> directory by default.
   On a typical Linux or MacOX system, an ordinary user
   will not have access to write to this directory, and, even if you do,
-  it may not be appropriate for you to write there. On Windows
+  it is likely not appropriate for you to write there. On Windows
   this usually corresponds to the <code>C:\usr\share\java</code> directory,
   unless Cygwin is used. Read below to learn how to customize the directory
   used to download the binaries.
