@@ -467,6 +467,9 @@
         <exclude name="**/org/apache/tomcat/dbcp/**"/>
         <exclude name="**/tomcat-deps/**"/>
       </fileset>
+      <fileset dir="modules/jdbc-pool" >
+        <patternset refid="text.files" />
+      </fileset>
     </checkstyle>
     <!-- javax package checks -->
     <checkstyle config="res/checkstyle/javax-checkstyle.xml">
