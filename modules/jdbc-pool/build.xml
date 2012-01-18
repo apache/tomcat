@@ -283,8 +283,8 @@
         <include name="build.xml"/>
         <include name="build.properties.default"/>
         <include name="doc/*.xml"/>
-      	<include name="doc/*.xsl"/>
-      	<include name="resources/MANIFEST.MF"/>
+        <include name="doc/*.xsl"/>
+        <include name="resources/MANIFEST.MF"/>
         <include name="LICENSE"/>
         <include name="NOTICE"/>
       </fileset>
@@ -296,8 +296,8 @@
         <include name="build.xml"/>
         <include name="build.properties.default"/>
         <include name="doc/*.xml"/>
-      	<include name="doc/*.xsl"/>
-      	<include name="resources/MANIFEST.MF"/>
+        <include name="doc/*.xsl"/>
+        <include name="resources/MANIFEST.MF"/>
         <include name="LICENSE"/>
         <include name="NOTICE"/>
       </fileset>
@@ -427,8 +427,8 @@
 
   <!-- Extract the testdb.* properties and remove the leading testdb. -->
   <propertyset dynamic="false" id="testdb">
-  	<propertyref prefix="testdb"/>
-  	<mapper type="regexp" from="^testdb\.(.*)$$" to="\1"/>
+    <propertyref prefix="testdb"/>
+    <mapper type="regexp" from="^testdb\.(.*)$$" to="\1"/>
   </propertyset>
 
   <target name="test" depends="build,build-test">
