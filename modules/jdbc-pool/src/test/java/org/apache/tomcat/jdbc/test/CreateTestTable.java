@@ -19,9 +19,9 @@ package org.apache.tomcat.jdbc.test;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.Random;
-import java.sql.ResultSet;
 
 import org.apache.tomcat.jdbc.pool.interceptor.ResetAbandonedTimer;
 

@@ -21,9 +21,9 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-import org.apache.tomcat.jdbc.pool.FairBlockingQueue;
-
 import junit.framework.TestCase;
+
+import org.apache.tomcat.jdbc.pool.FairBlockingQueue;
 
 public class TestAsyncQueue extends TestCase {
     protected FairBlockingQueue<Object> queue = null;

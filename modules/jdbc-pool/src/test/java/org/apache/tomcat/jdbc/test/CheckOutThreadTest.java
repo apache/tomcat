@@ -16,10 +16,10 @@
  */
 package org.apache.tomcat.jdbc.test;
 
-import java.util.concurrent.CountDownLatch;
 import java.sql.Connection;
-import java.sql.Statement;
 import java.sql.ResultSet;
+import java.sql.Statement;
+import java.util.concurrent.CountDownLatch;
 
 import javax.sql.DataSource;
 
