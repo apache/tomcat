@@ -83,7 +83,7 @@
       </fix>
       <update>
         Remove <code>res/License.rtf</code>. The file that is actually shown
-        by the Windows installer in <code>res/INSTALLLICENSE</code>.
+        by the Windows installer is <code>res/INSTALLLICENSE</code>.
         (kkolinko)
       </update>
       <add>
