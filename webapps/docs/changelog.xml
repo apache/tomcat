@@ -324,7 +324,7 @@
   <subsection name="jdbc-pool">
     <changelog>
       <add>
-        <rev>1207712</rev> Pool cleaner should be a global thread, not spawn
+        <rev>1207712</rev>: Pool cleaner should be a global thread, not spawn
         one thread per connection pool. (fhanik)
       </add>
     </changelog>
@@ -696,6 +696,29 @@
       </update>
     </changelog>
   </subsection>
+  <subsection name="jdbc-pool">
+    <changelog>
+      <fix>
+        <bug>52015</bug>: In jdbc-pool: JdbcInterceptor passes not 'this' but 
+        'proxy' to <code>getNext().invoke</code>. (kfujino)
+      </fix>
+      <fix>
+        In jdbc-pool: Improve handling of Errors that originate from methods
+        invoked through reflection. In <code>TrapException</code> interceptor:
+        rethrow Error as is, without wrapping it in a RuntimeException.
+        (kkolinko)
+      </fix>
+      <fix>
+        In jdbc-pool: Unwrap InvocationTargetException if it is caught in
+        <code>ResultSetProxy</code>, like we do it elsewhere. (kkolinko)
+      </fix>
+      <fix>
+        When building jdbc-pool from within Tomcat, use Tomcat's
+        <code>output</code> directory location. This allows to move all build
+        output away from the source tree. (kkolinko)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <update>
@@ -705,10 +728,6 @@
       <scode>
         Remove some unused code from the packaged renamed Commons BCEL. (markt)
       </scode>
-      <fix>
-        <bug>52015</bug>: In jdbc-pool: JdbcInterceptor passes not 'this' but 
-        'proxy' to getNext().invoke. (kfujino)
-      </fix>
       <fix>
         <bug>52059</bug>: In Windows uninstaller: Do not forget to remove
         Tomcat keys from 32-bit registry on deinstallation. (kkolinko)
@@ -744,21 +763,6 @@
         <bug>52148</bug>: Add tomcat-coyote.jar to catalina-tasks.xml as this
         JAR is now required by the Ant tasks. Patch provided by Volker Krebs.
         (markt)
-      </fix>
-      <fix>
-        In jdbc-pool: Improve handling of Errors that originate from methods
-        invoked through reflection. In <code>TrapException</code> interceptor:
-        rethrow Error as is, without wrapping it in a RuntimeException.
-        (kkolinko)
-      </fix>
-      <fix>
-        In jdbc-pool: Unwrap InvocationTargetException if it is caught in
-        <code>ResultSetProxy</code>, like we do it elsewhere. (kkolinko)
-      </fix>
-      <fix>
-        When building jdbc-pool from within Tomcat, use Tomcat's
-        <code>output</code> directory location. This allows to move all build
-        output away from the source tree. (kkolinko)
       </fix>
     </changelog>
   </subsection>
@@ -945,7 +949,7 @@
       </update>
     </changelog>
   </subsection>
-  <subsection name="Other">
+  <subsection name="jdbc-pool">
     <changelog>
       <fix>
         In jdbc-pool: Avoid IllegalArgumentException when setting maxActive 
@@ -953,7 +957,7 @@
         ArrayBlockingQueue doesn't allow capacity of 0 or less. (kfujino)
       </fix>
       <fix>
-        <bug>48392</bug> (<rev>1169796</rev>): In jdbc-pool: Fix typo in
+        <bug>48392</bug> (<rev>1169796</rev>): Fix typo in
         <code>StatementDecoratorInterceptor</code>. (fhanik) 
       </fix>
       <fix>
@@ -968,9 +972,13 @@
         It removes from the active connection list. (kfujino)
       </fix>
       <fix>
-        <bug>51871</bug>: In jdbc-pool: Fix dependency in Maven POM file of
+        <bug>51871</bug>: Fix dependency in Maven POM file of
         tomcat-jbdc. (kkolinko)
       </fix>
+    </changelog>
+  </subsection>
+  <subsection name="Other">
+    <changelog>
       <update>
         Update the "test" target in the default build file to report a test
         failure only after all available connector variants (bio, nio, apr)
@@ -1097,12 +1105,16 @@
       </fix>
     </changelog>
   </subsection>
-  <subsection name="Other">
+  <subsection name="jdbc-pool">
     <changelog>
       <add>
         <bug>51583</bug> (<rev>1157874</rev>, <rev>1162102</rev>): Fix
         shutdown delay in jdbc-pool. (fhanik/kkolinko)
       </add>
+    </changelog>
+  </subsection>
+  <subsection name="Other">
+    <changelog>
       <fix>
         <bug>51558</bug>: Don&apos;t force the use of StandardManager when using
         any of the <code>Tomcat#addWebapp()</code> methods. (markt)
@@ -1482,6 +1494,13 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="jdbc-pool">
+    <changelog>
+      <add>
+        Include jdbc-pool into Tomcat release. (fhanik)
+      </add>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <update>
@@ -1490,9 +1509,6 @@
       <update>
         Update to Eclipse JDT Compiler 3.7. (markt)
       </update>
-      <add>
-        Include jdbc-pool into tomcat release. (fhanik)
-      </add>
     </changelog>
   </subsection>
 </section>
