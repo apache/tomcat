@@ -22,6 +22,7 @@
   - *.html files in documentation are generated from XML sources
   - *.md5 files are generated and cannot contain license
   - *.manifest JAR manifest files cannot contain license
+  - package-list files in API documentation (javadoc) are generated
   - bug52121-part1, bug52121-part2 files in tests are test data for a hard
   to reproduce testcase and should be used as is.
 
@@ -38,10 +39,6 @@ output/dist/webapps/docs/architecture/*.html
 output/dist/webapps/docs/config/*.html
 output/dist/webapps/docs/funcspecs/*.html
 output/dist/webapps/docs/tribes/*.html
-output/dist/src/test/org/apache/coyote/http11/filters/bug52121-part1
-output/dist/src/test/org/apache/coyote/http11/filters/bug52121-part2
-test/org/apache/coyote/http11/filters/bug52121-part1
-test/org/apache/coyote/http11/filters/bug52121-part2
 output/embed/*.md5
 output/extras/*.md5
 modules/jdbc-pool/resources/MANIFEST.MF
@@ -50,3 +47,11 @@ output/dist/src/res/META-INF/*.manifest
 output/jdbc-pool/resources/MANIFEST.MF
 output/manifests/*.manifest
 res/META-INF/*.manifest
+output/dist/webapps/docs/api/package-list
+output/dist/webapps/docs/elapi/package-list
+output/dist/webapps/docs/jspapi/package-list
+output/dist/webapps/docs/servletapi/package-list
+output/dist/src/test/org/apache/coyote/http11/filters/bug52121-part1
+output/dist/src/test/org/apache/coyote/http11/filters/bug52121-part2
+test/org/apache/coyote/http11/filters/bug52121-part1
+test/org/apache/coyote/http11/filters/bug52121-part2
