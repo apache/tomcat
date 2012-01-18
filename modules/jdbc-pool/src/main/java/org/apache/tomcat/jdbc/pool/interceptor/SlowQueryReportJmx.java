@@ -46,8 +46,8 @@ import javax.management.openmbean.OpenDataException;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.jdbc.pool.ConnectionPool;
-import org.apache.tomcat.jdbc.pool.PooledConnection;
 import org.apache.tomcat.jdbc.pool.PoolProperties.InterceptorProperty;
+import org.apache.tomcat.jdbc.pool.PooledConnection;
 /**
  * Publishes data to JMX and provides notifications
  * when failures happen.

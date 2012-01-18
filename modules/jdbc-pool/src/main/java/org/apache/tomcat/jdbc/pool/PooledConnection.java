@@ -21,13 +21,12 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.HashMap;
 import java.util.Properties;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.jdbc.pool.interceptor.ConnectionState;
-
-import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Represents a pooled connection

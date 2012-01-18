@@ -29,10 +29,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
-import org.apache.tomcat.jdbc.pool.interceptor.AbstractCreateStatementInterceptor;
 
 /**
  * Implementation of <b>JdbcInterceptor</b> that proxies resultSets and statements.

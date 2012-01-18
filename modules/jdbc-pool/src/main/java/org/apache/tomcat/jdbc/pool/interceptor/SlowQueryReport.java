@@ -29,8 +29,8 @@ import javax.management.openmbean.SimpleType;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.jdbc.pool.ConnectionPool;
-import org.apache.tomcat.jdbc.pool.PooledConnection;
 import org.apache.tomcat.jdbc.pool.PoolProperties.InterceptorProperty;
+import org.apache.tomcat.jdbc.pool.PooledConnection;
 
 /**
  * Slow query report interceptor. Tracks timing of query executions.
