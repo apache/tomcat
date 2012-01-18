@@ -744,8 +744,8 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
     public void setValidator(Validator validator) {
         //noop
     }
-    
-    /** 
+
+    /**
      * {@inheritDoc}
      */
     @Override
@@ -753,7 +753,7 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
         getPoolProperties().setCommitOnReturn(commitOnReturn);
     }
 
-    /** 
+    /**
      * {@inheritDoc}
      */
     @Override
@@ -761,7 +761,7 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
         return getPoolProperties().getCommitOnReturn();
     }
 
-    /** 
+    /**
      * {@inheritDoc}
      */
     @Override
@@ -769,13 +769,13 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
         getPoolProperties().setRollbackOnReturn(rollbackOnReturn);
     }
 
-    /** 
+    /**
      * {@inheritDoc}
      */
     @Override
     public boolean getRollbackOnReturn() {
         return getPoolProperties().getRollbackOnReturn();
     }
-    
+
 
 }

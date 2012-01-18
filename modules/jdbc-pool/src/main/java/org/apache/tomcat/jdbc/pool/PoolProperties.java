@@ -85,8 +85,8 @@ public class PoolProperties implements PoolConfiguration {
     protected boolean alternateUsernameAllowed = false;
     protected boolean commitOnReturn = false;
     protected boolean rollbackOnReturn = false;
-    
-    
+
+
     /**
      * {@inheritDoc}
      */
@@ -1162,15 +1162,15 @@ public class PoolProperties implements PoolConfiguration {
     }
 
 
-    /** 
+    /**
      * {@inheritDoc}
      */
     @Override
     public void setCommitOnReturn(boolean commitOnReturn) {
-        this.commitOnReturn = commitOnReturn;        
+        this.commitOnReturn = commitOnReturn;
     }
 
-    /** 
+    /**
      * {@inheritDoc}
      */
     @Override
@@ -1178,7 +1178,7 @@ public class PoolProperties implements PoolConfiguration {
         return this.commitOnReturn;
     }
 
-    /** 
+    /**
      * {@inheritDoc}
      */
     @Override
@@ -1186,7 +1186,7 @@ public class PoolProperties implements PoolConfiguration {
         this.rollbackOnReturn = rollbackOnReturn;
     }
 
-    /** 
+    /**
      * {@inheritDoc}
      */
     @Override

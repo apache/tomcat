@@ -16,7 +16,7 @@
 # -----------------------------------------------------------------------------
 # build.properties.sample
 #
-# This is an example "build.properties" file, used to customize building 
+# This is an example "build.properties" file, used to customize building
 # Tomcat JDBC Pool for your local environment.  It defines the location of all external
 # modules that Tomcat JDBC Pool depends on.  Copy this file to "build.properties"
 # in the top-level source directory, and customize it as needed.
@@ -60,7 +60,7 @@ testdb.validationQuery=SELECT 1
 # Derby
 #testdb.url=jdbc:derby:derbyDB;create=true
 #testdb.driverClassName=org.apache.derby.jdbc.EmbeddedDriver
-#testdb.validationQuery=VALUES 1       
+#testdb.validationQuery=VALUES 1
 
 # ----- JUnit Unit Test Suite, version 3.7 or later -----
 junit.home=${base.path}/junit3.8.2

@@ -1194,7 +1194,7 @@ public class DataSourceProxy implements PoolConfiguration {
         getPoolProperties().setAlternateUsernameAllowed(alternateUsernameAllowed);
     }
 
-    /** 
+    /**
      * {@inheritDoc}
      */
     @Override
@@ -1202,7 +1202,7 @@ public class DataSourceProxy implements PoolConfiguration {
         getPoolProperties().setCommitOnReturn(commitOnReturn);
     }
 
-    /** 
+    /**
      * {@inheritDoc}
      */
     @Override
@@ -1210,7 +1210,7 @@ public class DataSourceProxy implements PoolConfiguration {
         return getPoolProperties().getCommitOnReturn();
     }
 
-    /** 
+    /**
      * {@inheritDoc}
      */
     @Override
@@ -1218,12 +1218,12 @@ public class DataSourceProxy implements PoolConfiguration {
         getPoolProperties().setRollbackOnReturn(rollbackOnReturn);
     }
 
-    /** 
+    /**
      * {@inheritDoc}
      */
     @Override
     public boolean getRollbackOnReturn() {
         return getPoolProperties().getRollbackOnReturn();
     }
-    
+
 }

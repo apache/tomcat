@@ -72,10 +72,10 @@
       <meta name="author" value="{$name}"/>
       <meta name="email" value="{$email}"/>
     </xsl:for-each>
-		<style type="text/css" media="print">
-			.noPrint {display: none;}
-			td#mainBody {width: 100%;}
-		</style>
+    <style type="text/css" media="print">
+.noPrint {display: none;}
+td#mainBody {width: 100%;}
+</style>
     </head>
 
     <body bgcolor="{$body-bg}" text="{$body-fg}" link="{$body-link}"
@@ -433,7 +433,7 @@
       <xsl:variable name="link"><xsl:value-of select="$buglink"/><xsl:value-of select="text()"/></xsl:variable>
       <a href="{$link}"><xsl:apply-templates/></a>
   </xsl:template>
-  
+
   <!-- Link to a SVN revision report -->
   <xsl:template match="rev">
       <xsl:variable name="link"><xsl:value-of select="$revlink"/><xsl:value-of select="text()"/></xsl:variable>

@@ -29,7 +29,7 @@ import org.apache.tomcat.jdbc.pool.PoolProperties.InterceptorProperty;
 public class QueryTimeoutInterceptor extends AbstractCreateStatementInterceptor {
     private static Log log = LogFactory.getLog(QueryTimeoutInterceptor.class);
     int timeout;
-    
+
     @Override
     public void setProperties(Map<String,InterceptorProperty> properties) {
         super.setProperties(properties);
