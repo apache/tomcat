@@ -183,35 +183,35 @@ public class DefaultTestCase extends TestCase {
         org.apache.tomcat.jdbc.test.driver.Driver.reset();
     }
 
-    private final static String PROP_DEFAULTAUTOCOMMIT = "defaultAutoCommit";
-    private final static String PROP_DEFAULTREADONLY = "defaultReadOnly";
-    private final static String PROP_DEFAULTTRANSACTIONISOLATION = "defaultTransactionIsolation";
-    private final static String PROP_DEFAULTCATALOG = "defaultCatalog";
-    private final static String PROP_DRIVERCLASSNAME = "driverClassName";
-    private final static String PROP_MAXACTIVE = "maxActive";
-    private final static String PROP_MAXIDLE = "maxIdle";
-    private final static String PROP_MINIDLE = "minIdle";
-    private final static String PROP_INITIALSIZE = "initialSize";
-    private final static String PROP_MAXWAIT = "maxWait";
-    private final static String PROP_TESTONBORROW = "testOnBorrow";
-    private final static String PROP_TESTONRETURN = "testOnReturn";
-    private final static String PROP_TIMEBETWEENEVICTIONRUNSMILLIS = "timeBetweenEvictionRunsMillis";
-    private final static String PROP_NUMTESTSPEREVICTIONRUN = "numTestsPerEvictionRun";
-    private final static String PROP_MINEVICTABLEIDLETIMEMILLIS = "minEvictableIdleTimeMillis";
-    private final static String PROP_TESTWHILEIDLE = "testWhileIdle";
-    private final static String PROP_PASSWORD = "password";
-    private final static String PROP_URL = "url";
-    private final static String PROP_USERNAME = "username";
-    private final static String PROP_VALIDATIONQUERY = "validationQuery";
-    private final static String PROP_ACCESSTOUNDERLYINGCONNECTIONALLOWED = "accessToUnderlyingConnectionAllowed";
-    private final static String PROP_REMOVEABANDONED = "removeAbandoned";
-    private final static String PROP_REMOVEABANDONEDTIMEOUT = "removeAbandonedTimeout";
-    private final static String PROP_LOGABANDONED = "logAbandoned";
-    private final static String PROP_POOLPREPAREDSTATEMENTS = "poolPreparedStatements";
-    private final static String PROP_MAXOPENPREPAREDSTATEMENTS = "maxOpenPreparedStatements";
-    private final static String PROP_CONNECTIONPROPERTIES = "connectionProperties";
+    private static final String PROP_DEFAULTAUTOCOMMIT = "defaultAutoCommit";
+    private static final String PROP_DEFAULTREADONLY = "defaultReadOnly";
+    private static final String PROP_DEFAULTTRANSACTIONISOLATION = "defaultTransactionIsolation";
+    private static final String PROP_DEFAULTCATALOG = "defaultCatalog";
+    private static final String PROP_DRIVERCLASSNAME = "driverClassName";
+    private static final String PROP_MAXACTIVE = "maxActive";
+    private static final String PROP_MAXIDLE = "maxIdle";
+    private static final String PROP_MINIDLE = "minIdle";
+    private static final String PROP_INITIALSIZE = "initialSize";
+    private static final String PROP_MAXWAIT = "maxWait";
+    private static final String PROP_TESTONBORROW = "testOnBorrow";
+    private static final String PROP_TESTONRETURN = "testOnReturn";
+    private static final String PROP_TIMEBETWEENEVICTIONRUNSMILLIS = "timeBetweenEvictionRunsMillis";
+    private static final String PROP_NUMTESTSPEREVICTIONRUN = "numTestsPerEvictionRun";
+    private static final String PROP_MINEVICTABLEIDLETIMEMILLIS = "minEvictableIdleTimeMillis";
+    private static final String PROP_TESTWHILEIDLE = "testWhileIdle";
+    private static final String PROP_PASSWORD = "password";
+    private static final String PROP_URL = "url";
+    private static final String PROP_USERNAME = "username";
+    private static final String PROP_VALIDATIONQUERY = "validationQuery";
+    private static final String PROP_ACCESSTOUNDERLYINGCONNECTIONALLOWED = "accessToUnderlyingConnectionAllowed";
+    private static final String PROP_REMOVEABANDONED = "removeAbandoned";
+    private static final String PROP_REMOVEABANDONEDTIMEOUT = "removeAbandonedTimeout";
+    private static final String PROP_LOGABANDONED = "logAbandoned";
+    private static final String PROP_POOLPREPAREDSTATEMENTS = "poolPreparedStatements";
+    private static final String PROP_MAXOPENPREPAREDSTATEMENTS = "maxOpenPreparedStatements";
+    private static final String PROP_CONNECTIONPROPERTIES = "connectionProperties";
 
-    private final static String[] ALL_PROPERTIES = {
+    private static final String[] ALL_PROPERTIES = {
         PROP_DEFAULTAUTOCOMMIT,
         PROP_DEFAULTREADONLY,
         PROP_DEFAULTTRANSACTIONISOLATION,

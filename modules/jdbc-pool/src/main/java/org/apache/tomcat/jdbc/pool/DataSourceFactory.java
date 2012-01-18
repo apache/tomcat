@@ -58,50 +58,50 @@ import org.apache.juli.logging.LogFactory;
 public class DataSourceFactory implements ObjectFactory {
     private static final Log log = LogFactory.getLog(DataSourceFactory.class);
 
-    protected final static String PROP_DEFAULTAUTOCOMMIT = "defaultAutoCommit";
-    protected final static String PROP_DEFAULTREADONLY = "defaultReadOnly";
-    protected final static String PROP_DEFAULTTRANSACTIONISOLATION = "defaultTransactionIsolation";
-    protected final static String PROP_DEFAULTCATALOG = "defaultCatalog";
+    protected static final String PROP_DEFAULTAUTOCOMMIT = "defaultAutoCommit";
+    protected static final String PROP_DEFAULTREADONLY = "defaultReadOnly";
+    protected static final String PROP_DEFAULTTRANSACTIONISOLATION = "defaultTransactionIsolation";
+    protected static final String PROP_DEFAULTCATALOG = "defaultCatalog";
 
-    protected final static String PROP_DRIVERCLASSNAME = "driverClassName";
-    protected final static String PROP_PASSWORD = "password";
-    protected final static String PROP_URL = "url";
-    protected final static String PROP_USERNAME = "username";
+    protected static final String PROP_DRIVERCLASSNAME = "driverClassName";
+    protected static final String PROP_PASSWORD = "password";
+    protected static final String PROP_URL = "url";
+    protected static final String PROP_USERNAME = "username";
 
-    protected final static String PROP_MAXACTIVE = "maxActive";
-    protected final static String PROP_MAXIDLE = "maxIdle";
-    protected final static String PROP_MINIDLE = "minIdle";
-    protected final static String PROP_INITIALSIZE = "initialSize";
-    protected final static String PROP_MAXWAIT = "maxWait";
-    protected final static String PROP_MAXAGE = "maxAge";
+    protected static final String PROP_MAXACTIVE = "maxActive";
+    protected static final String PROP_MAXIDLE = "maxIdle";
+    protected static final String PROP_MINIDLE = "minIdle";
+    protected static final String PROP_INITIALSIZE = "initialSize";
+    protected static final String PROP_MAXWAIT = "maxWait";
+    protected static final String PROP_MAXAGE = "maxAge";
 
-    protected final static String PROP_TESTONBORROW = "testOnBorrow";
-    protected final static String PROP_TESTONRETURN = "testOnReturn";
-    protected final static String PROP_TESTWHILEIDLE = "testWhileIdle";
-    protected final static String PROP_TESTONCONNECT = "testOnConnect";
-    protected final static String PROP_VALIDATIONQUERY = "validationQuery";
-    protected final static String PROP_VALIDATOR_CLASS_NAME = "validatorClassName";
+    protected static final String PROP_TESTONBORROW = "testOnBorrow";
+    protected static final String PROP_TESTONRETURN = "testOnReturn";
+    protected static final String PROP_TESTWHILEIDLE = "testWhileIdle";
+    protected static final String PROP_TESTONCONNECT = "testOnConnect";
+    protected static final String PROP_VALIDATIONQUERY = "validationQuery";
+    protected static final String PROP_VALIDATOR_CLASS_NAME = "validatorClassName";
 
-    protected final static String PROP_TIMEBETWEENEVICTIONRUNSMILLIS = "timeBetweenEvictionRunsMillis";
-    protected final static String PROP_NUMTESTSPEREVICTIONRUN = "numTestsPerEvictionRun";
-    protected final static String PROP_MINEVICTABLEIDLETIMEMILLIS = "minEvictableIdleTimeMillis";
+    protected static final String PROP_NUMTESTSPEREVICTIONRUN = "numTestsPerEvictionRun";
+    protected static final String PROP_TIMEBETWEENEVICTIONRUNSMILLIS = "timeBetweenEvictionRunsMillis";
+    protected static final String PROP_MINEVICTABLEIDLETIMEMILLIS = "minEvictableIdleTimeMillis";
 
-    protected final static String PROP_ACCESSTOUNDERLYINGCONNECTIONALLOWED = "accessToUnderlyingConnectionAllowed";
+    protected static final String PROP_ACCESSTOUNDERLYINGCONNECTIONALLOWED = "accessToUnderlyingConnectionAllowed";
 
-    protected final static String PROP_REMOVEABANDONED = "removeAbandoned";
-    protected final static String PROP_REMOVEABANDONEDTIMEOUT = "removeAbandonedTimeout";
-    protected final static String PROP_LOGABANDONED = "logAbandoned";
-    protected final static String PROP_ABANDONWHENPERCENTAGEFULL = "abandonWhenPercentageFull";
+    protected static final String PROP_REMOVEABANDONED = "removeAbandoned";
+    protected static final String PROP_REMOVEABANDONEDTIMEOUT = "removeAbandonedTimeout";
+    protected static final String PROP_LOGABANDONED = "logAbandoned";
+    protected static final String PROP_ABANDONWHENPERCENTAGEFULL = "abandonWhenPercentageFull";
 
-    protected final static String PROP_POOLPREPAREDSTATEMENTS = "poolPreparedStatements";
-    protected final static String PROP_MAXOPENPREPAREDSTATEMENTS = "maxOpenPreparedStatements";
-    protected final static String PROP_CONNECTIONPROPERTIES = "connectionProperties";
+    protected static final String PROP_POOLPREPAREDSTATEMENTS = "poolPreparedStatements";
+    protected static final String PROP_MAXOPENPREPAREDSTATEMENTS = "maxOpenPreparedStatements";
+    protected static final String PROP_CONNECTIONPROPERTIES = "connectionProperties";
 
-    protected final static String PROP_INITSQL = "initSQL";
-    protected final static String PROP_INTERCEPTORS = "jdbcInterceptors";
-    protected final static String PROP_VALIDATIONINTERVAL = "validationInterval";
-    protected final static String PROP_JMX_ENABLED = "jmxEnabled";
-    protected final static String PROP_FAIR_QUEUE = "fairQueue";
+    protected static final String PROP_INITSQL = "initSQL";
+    protected static final String PROP_INTERCEPTORS = "jdbcInterceptors";
+    protected static final String PROP_VALIDATIONINTERVAL = "validationInterval";
+    protected static final String PROP_JMX_ENABLED = "jmxEnabled";
+    protected static final String PROP_FAIR_QUEUE = "fairQueue";
 
     protected static final String PROP_USE_EQUALS = "useEquals";
     protected static final String PROP_USE_CON_LOCK = "useLock";
@@ -119,7 +119,7 @@ public class DataSourceFactory implements ObjectFactory {
     public static final String OBJECT_NAME = "object_name";
 
 
-    protected final static String[] ALL_PROPERTIES = {
+    protected static final String[] ALL_PROPERTIES = {
         PROP_DEFAULTAUTOCOMMIT,
         PROP_DEFAULTREADONLY,
         PROP_DEFAULTTRANSACTIONISOLATION,
@@ -533,7 +533,7 @@ public class DataSourceFactory implements ObjectFactory {
      * @return Properties
      * @throws Exception
      */
-    static protected Properties getProperties(String propText) {
+    protected static Properties getProperties(String propText) {
         return PoolProperties.getProperties(propText,null);
     }
 

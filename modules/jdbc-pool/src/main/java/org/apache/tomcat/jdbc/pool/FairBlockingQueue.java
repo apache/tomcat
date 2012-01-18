@@ -53,7 +53,7 @@ public class FairBlockingQueue<E> implements BlockingQueue<E> {
      * lock, on Solaris its the other way around.
      * Until we have tested other platforms we only check for Linux.
      */
-    final static boolean isLinux = "Linux".equals(System.getProperty("os.name")) &&
+    static final boolean isLinux = "Linux".equals(System.getProperty("os.name")) &&
                                    (!Boolean.getBoolean(FairBlockingQueue.class.getName()+".ignoreOS"));
 
     /**
