@@ -1653,7 +1653,7 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
             <filename name="**/.classpath"/>
             <filename name="**/.project"/>
             <filename name="**/output/**"/>
-            <!-- Comented out, because
+            <!-- Commented out, because
                  test/webapp-3.0-virtual-library and
                  test/webapp-3.0-virtual-webapp use it:
             <filename name="**/target/**"/>
