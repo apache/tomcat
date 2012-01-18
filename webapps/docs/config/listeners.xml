@@ -329,7 +329,7 @@
 
     <p>The <strong>ThreadLocal Leak Prevention Listener</strong> triggers the
     renewal of threads in Executor pools when a
-    <a href="context.html">Context</a>is being stopped to avoid thread-local
+    <a href="context.html">Context</a> is being stopped to avoid thread-local
     related memory leaks. Active threads will be renewed one by one when they
     come back to the pool after executing their task.</p>
 
