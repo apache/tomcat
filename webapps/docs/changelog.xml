@@ -54,6 +54,16 @@
   issues to not "pop up" wrt. others).
 -->
 <section name="Tomcat 7.0.26 (markt)">
+  <subsection name="Jasper">
+    <changelog>
+      <fix>
+        <bug>52480</bug>: When converting class path entries from URLs to
+        files/directories, ensure that any URL encoded characters are converted.
+        Fixes JSP compilation with javac when Tomcat is installed at a path that
+        includes spaces. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Web applications">
     <changelog>
       <update>
