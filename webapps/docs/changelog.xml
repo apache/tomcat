@@ -41,7 +41,7 @@
 <!--
   Subsection ordering:
   General, Catalina, Coyote, Jasper, Cluster, Web applications, Extras, Tribes,
-  Other
+  jdbc-pool, Other
 
   Item Ordering:
 
@@ -71,6 +71,14 @@
         building. Add instructions for using Checkstyle and running the
         tests. (kkolinko)
       </update>
+    </changelog>
+  </subsection>
+  <subsection name="jdbc-pool">
+    <changelog>
+      <fix>
+        Fix code style issues and enable Checkstyle checks for jdbc-pool when
+        it is built within Tomcat. (kkolinko)
+      </fix>
     </changelog>
   </subsection>
 </section>
