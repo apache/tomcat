@@ -18,7 +18,6 @@ package org.apache.tomcat.util.buf;
 
 import java.io.IOException;
 import java.io.Serializable;
-import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.charset.Charset;
@@ -100,17 +99,7 @@ public final class ByteChunk implements Cloneable, Serializable {
         as most standards seem to converge, but the servlet API requires
         8859_1, and this object is used mostly for servlets.
     */
-    public static final Charset DEFAULT_CHARSET;
-
-    static {
-        Charset c = null;
-        try {
-            c = B2CConverter.getCharset("ISO-8859-1");
-        } catch (UnsupportedEncodingException e) {
-            // Should never happen since all JVMs must support ISO-8859-1
-        }
-        DEFAULT_CHARSET = c;
-    }
+    public static final Charset DEFAULT_CHARSET = B2CConverter.ISO_8859_1;
 
     // byte[]
     private byte[] buff;
