@@ -204,7 +204,7 @@
     <attribute
       name="expireSessionsOnShutdown"
       is="true"
-      description="exipre all sessions cluster wide as one node goes down"
+      description="expire all sessions cluster wide as one node goes down"
       type="boolean"/>
     <attribute
       name="invalidatedSessions"
@@ -325,7 +325,7 @@
     </operation>
     <operation
       name="expireAllLocalSessions"
-      description="Exipre all active local sessions and replicate the invalid sessions"
+      description="expire all active local sessions and replicate the invalid sessions"
       impact="ACTION"
       returnType="void"/>
     <operation
@@ -453,7 +453,7 @@
     <attribute
       name="expireSessionsOnShutdown"
       is="true"
-      description="exipre all sessions cluster wide as one node goes down"
+      description="expire all sessions cluster wide as one node goes down"
       type="boolean"/>
     <attribute
       name="invalidatedSessions"
