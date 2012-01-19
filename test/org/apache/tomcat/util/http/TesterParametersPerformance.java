@@ -109,13 +109,7 @@ public class TesterParametersPerformance {
         System.arraycopy(inputBytes, 0, bytes, 0, inputLength);
 
         String[] result = new String[loops];
-        Charset charset = null;
-        try {
-            charset = B2CConverter.getCharset("ISO-8859-1");
-        } catch (UnsupportedEncodingException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+        Charset charset = B2CConverter.ISO_8859_1;
 
         long start = System.nanoTime();
         for (int i = 0; i < loops; i++) {
