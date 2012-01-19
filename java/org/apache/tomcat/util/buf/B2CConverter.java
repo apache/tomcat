@@ -50,6 +50,9 @@ public class B2CConverter {
     private static final Map<String, Charset> encodingToCharsetCache =
         new HashMap<String, Charset>();
 
+    public static final Charset ISO_8859_1;
+    public static final Charset UTF_8;
+
     static {
         for (Charset charset: Charset.availableCharsets().values()) {
             encodingToCharsetCache.put(
@@ -59,6 +62,17 @@ public class B2CConverter {
                         alias.toLowerCase(Locale.US), charset);
             }
         }
+        Charset iso88591 = null;
+        Charset utf8 = null;
+        try {
+            iso88591 = getCharset("ISO-8859-1");
+            utf8 = getCharset("UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            // Impossible. All JVMs must support these.
+            e.printStackTrace();
+        }
+        ISO_8859_1 = iso88591;
+        UTF_8 = utf8;
     }
 
     public static Charset getCharset(String enc)
