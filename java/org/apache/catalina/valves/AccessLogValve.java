@@ -1092,7 +1092,7 @@ public class AccessLogValve extends ValveBase implements AccessLog {
             }
         }
         if (charset == null) {
-            charset = Charset.defaultCharset();
+            charset = B2CConverter.ISO_8859_1;
         }
 
         try {

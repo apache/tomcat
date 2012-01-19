@@ -20,7 +20,6 @@ package org.apache.catalina.authenticator;
 
 
 import java.io.IOException;
-import java.nio.charset.Charset;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.Principal;
@@ -38,6 +37,7 @@ import org.apache.catalina.deploy.LoginConfig;
 import org.apache.catalina.util.MD5Encoder;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.buf.B2CConverter;
 
 
 
@@ -368,7 +368,7 @@ public class DigestAuthenticator extends AuthenticatorBase {
         byte[] buffer;
         synchronized (md5Helper) {
             buffer = md5Helper.digest(
-                    ipTimeKey.getBytes(Charset.defaultCharset()));
+                    ipTimeKey.getBytes(B2CConverter.ISO_8859_1));
         }
 
         return currentTime + ":" + md5Encoder.encode(buffer);
@@ -619,7 +619,7 @@ public class DigestAuthenticator extends AuthenticatorBase {
             byte[] buffer = null;
             synchronized (md5Helper) {
                 buffer = md5Helper.digest(
-                        serverIpTimeKey.getBytes(Charset.defaultCharset()));
+                        serverIpTimeKey.getBytes(B2CConverter.ISO_8859_1));
             }
             String md5ServerIpTimeKey = md5Encoder.encode(buffer);
             if (!md5ServerIpTimeKey.equals(md5clientIpTimeKey)) {
@@ -681,7 +681,7 @@ public class DigestAuthenticator extends AuthenticatorBase {
 
             byte[] buffer;
             synchronized (md5Helper) {
-                buffer = md5Helper.digest(a2.getBytes(Charset.defaultCharset()));
+                buffer = md5Helper.digest(a2.getBytes(B2CConverter.ISO_8859_1));
             }
             String md5a2 = md5Encoder.encode(buffer);
 

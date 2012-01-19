@@ -247,11 +247,11 @@ public final class RequestUtil {
 
         // use the specified encoding to extract bytes out of the
         // given string so that the encoding is not lost. If an
-        // encoding is not specified, let it use platform default
+        // encoding is not specified, use ISO-8859-1
         byte[] bytes = null;
         try {
             if (enc == null) {
-                bytes = str.getBytes(Charset.defaultCharset());
+                bytes = str.getBytes(B2CConverter.ISO_8859_1);
             } else {
                 bytes = str.getBytes(B2CConverter.getCharset(enc));
             }

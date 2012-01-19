@@ -18,6 +18,8 @@
 
 package org.apache.naming.resources;
 
+import java.nio.charset.Charset;
+
 
 /**
  * Static constants for this package.
@@ -29,4 +31,9 @@ public final class Constants {
         "java.protocol.handler.pkgs";
 
     public static final String Package = "org.apache.naming.resources";
+
+    /**
+     * Retain reference to default character set so we don't have to look it up.
+     */
+    public static final Charset ISO_8859_1 = Charset.forName("ISO-8859-1");
 }

@@ -20,7 +20,6 @@ package org.apache.catalina.realm;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.nio.charset.Charset;
 import java.security.Principal;
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -55,6 +54,7 @@ import javax.naming.directory.SearchResult;
 
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.util.Base64;
+import org.apache.tomcat.util.buf.B2CConverter;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.buf.CharChunk;
 import org.ietf.jgss.GSSCredential;
@@ -1513,7 +1513,7 @@ public class JNDIRealm extends RealmBase {
                 synchronized (this) {
                     password = password.substring(5);
                     md.reset();
-                    md.update(credentials.getBytes(Charset.defaultCharset()));
+                    md.update(credentials.getBytes(B2CConverter.ISO_8859_1));
                     String digestedPassword = Base64.encode(md.digest());
                     validated = password.equals(digestedPassword);
                 }
@@ -1524,12 +1524,12 @@ public class JNDIRealm extends RealmBase {
                     password = password.substring(6);
 
                     md.reset();
-                    md.update(credentials.getBytes(Charset.defaultCharset()));
+                    md.update(credentials.getBytes(B2CConverter.ISO_8859_1));
 
                     // Decode stored password.
                     ByteChunk pwbc = new ByteChunk(password.length());
                     try {
-                        pwbc.append(password.getBytes(Charset.defaultCharset()),
+                        pwbc.append(password.getBytes(B2CConverter.ISO_8859_1),
                                 0, password.length());
                     } catch (IOException e) {
                         // Should never happen

@@ -17,6 +17,7 @@
 
 package org.apache.jasper;
 
+import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -219,4 +220,9 @@ public class Constants {
      * the tomcat instance installation path
      */
     public static final String CATALINA_BASE_PROP = "catalina.base";
+
+    /**
+     * Retain reference to default character set so we don't have to look it up.
+     */
+    public static final Charset ISO_8859_1 = Charset.forName("ISO-8859-1");
 }
