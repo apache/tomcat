@@ -24,7 +24,6 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
-import java.nio.charset.Charset;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
@@ -57,6 +56,7 @@ import org.apache.catalina.util.XMLWriter;
 import org.apache.naming.resources.CacheEntry;
 import org.apache.naming.resources.Resource;
 import org.apache.naming.resources.ResourceAttributes;
+import org.apache.tomcat.util.buf.B2CConverter;
 import org.apache.tomcat.util.http.FastHttpDateFormat;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -1153,7 +1153,7 @@ public class WebdavServlet
                 + lock.expiresAt + "-" + System.currentTimeMillis() + "-"
                 + secret;
             String lockToken = md5Encoder.encode(md5Helper.digest(
-                    lockTokenStr.getBytes(Charset.defaultCharset())));
+                    lockTokenStr.getBytes(B2CConverter.ISO_8859_1)));
 
             if ( (exists) && (object instanceof DirContext) &&
                  (lock.depth == maxDepth) ) {

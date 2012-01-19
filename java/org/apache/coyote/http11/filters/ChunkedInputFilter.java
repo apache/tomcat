@@ -19,12 +19,12 @@ package org.apache.coyote.http11.filters;
 
 import java.io.EOFException;
 import java.io.IOException;
-import java.nio.charset.Charset;
 
 import org.apache.coyote.InputBuffer;
 import org.apache.coyote.Request;
 import org.apache.coyote.http11.Constants;
 import org.apache.coyote.http11.InputFilter;
+import org.apache.tomcat.util.buf.B2CConverter;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.buf.HexUtils;
 import org.apache.tomcat.util.buf.MessageBytes;
@@ -51,7 +51,7 @@ public class ChunkedInputFilter implements InputFilter {
 
 
     static {
-        ENCODING.setBytes(ENCODING_NAME.getBytes(Charset.defaultCharset()), 0,
+        ENCODING.setBytes(ENCODING_NAME.getBytes(B2CConverter.ISO_8859_1), 0,
                 ENCODING_NAME.length());
     }
 

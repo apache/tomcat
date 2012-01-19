@@ -241,7 +241,7 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
 
     protected Charset getDigestCharset() throws UnsupportedEncodingException {
         if (digestEncoding == null) {
-            return Charset.defaultCharset();
+            return B2CConverter.ISO_8859_1;
         } else {
             return B2CConverter.getCharset(getDigestEncoding());
         }
