@@ -447,7 +447,7 @@ public class McastServiceImpl
             for (int i = 0; i < expired.length; i++) {
                 final MemberImpl member = expired[i];
                 if (log.isDebugEnabled())
-                    log.debug("Mcast exipre  member " + expired[i]);
+                    log.debug("Mcast expire  member " + expired[i]);
                 try {
                     Runnable t = new Runnable() {
                         @Override
