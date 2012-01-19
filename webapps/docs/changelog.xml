@@ -53,6 +53,10 @@
         Remove duplicate code that converted a Host&apos;s appBase attribute to
         a canonical file. (markt)
       </scode>
+      <scode>
+        <bug>51408</bug>: Remove calls to <code>Charset.defaultCharset()</code>
+        with an explicit reference to the ISO-8859-1 Charset. (markt)
+      </scode>
     </changelog>
   </subsection>
   <subsection name="Tribes">
