@@ -60,6 +60,9 @@
         Provide constants for commonly used <code>Charset</code> objects and use
         these constants where appropriate. (markt)
       </scode>
+      <fix>
+        <bug>52488</bug>: Correct typo: exipre -> expire. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
