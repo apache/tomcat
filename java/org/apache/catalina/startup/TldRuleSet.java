@@ -181,7 +181,7 @@ final class TaglibListenerRule extends Rule {
 
         // Only process the listener if the URI is not a duplicate
         if (!taglibUriRule.isDuplicateUri()) {
-            tldConfig.addApplicationListener(text);
+            tldConfig.addApplicationListener(text.trim());
         }
     }
 
