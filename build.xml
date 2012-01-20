@@ -439,9 +439,6 @@
   </target>
 
   <target name="validate" depends="download-validate" if="${execute.validate}">
-    <!-- FIXME: Temporary trick to remove stale svn checkout at Gump. 2012-01-19 -->
-    <delete defaultexcludes="false" dir="modules/jdbc-pool/jdbc-pool" includeemptydirs="true" />
-
     <!-- Required so we can cache checkstyle results -->
     <mkdir dir="${tomcat.output}/res/checkstyle"/>
 
