@@ -68,6 +68,10 @@
   <subsection name="Jasper">
     <changelog>
       <fix>
+        <bug>52474</bug>: Ensure that leading and trailing white space is
+        removed from listener class names when parsing TLD files. (markt)
+      </fix>
+      <fix>
         <bug>52480</bug>: When converting class path entries from URLs to
         files/directories, ensure that any URL encoded characters are converted.
         Fixes JSP compilation with javac when Tomcat is installed at a path that
