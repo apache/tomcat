@@ -126,8 +126,14 @@ public class JMXProxyServlet extends HttpServlet  {
         try {
             ObjectName oname = new ObjectName(onameStr);
             Object value = mBeanServer.getAttribute(oname, att);
+            String valueStr;
+            if (value != null) {
+                valueStr = value.toString();
+            } else {
+                valueStr = "<null>";
+            }
             writer.println("OK - Attribute get '" + onameStr + "' - " + att
-                    + "= " + MBeanDumper.escape(value.toString()));
+                    + "= " + MBeanDumper.escape(valueStr));
         } catch (Exception ex) {
             writer.println("Error - " + ex.toString());
             ex.printStackTrace(writer);
@@ -193,8 +199,12 @@ public class JMXProxyServlet extends HttpServlet  {
            }
 
             Object retVal = mBeanServer.invoke(oname,op,values,signatureTypes);
-            writer.println("OK - Operation " + op + " returned:");
-            output("", writer, retVal);
+            if (retVal != null) {
+                writer.println("OK - Operation " + op + " returned:");
+                output("", writer, retVal);
+            } else {
+                writer.println("OK - Operation " + op + " without return value");
+            }
         } catch( Exception ex ) {
             writer.println("Error - " + ex.toString());
             ex.printStackTrace(writer);
@@ -207,7 +217,13 @@ public class JMXProxyServlet extends HttpServlet  {
                 output("  " + indent, writer, obj);
             }
         } else {
-            writer.println(indent + result.toString());
+            String strValue;
+            if (result != null) {
+                strValue = result.toString();
+            } else {
+                strValue = "<null>";
+            }
+            writer.println(indent + strValue);
         }
     }
 }

@@ -86,6 +86,11 @@
         building. Add instructions for using Checkstyle and running the
         tests. (kkolinko)
       </update>
+      <add>
+        <bug>38216</bug>: Improve handling of <code>null</code> return values in
+        the JMX proxy servlet which is part of the Manager application.
+        (kkolinko)
+      </add>
     </changelog>
   </subsection>
   <subsection name="jdbc-pool">
