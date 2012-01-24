@@ -63,6 +63,10 @@
       <fix>
         <bug>52488</bug>: Correct typo: exipre -> expire. (markt)
       </fix>
+      <add>
+        Add a unit test for SSO authentication. Patch provided by Brian Burch.
+        (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Jasper">
