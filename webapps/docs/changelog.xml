@@ -67,6 +67,11 @@
         Add a unit test for SSO authentication. Patch provided by Brian Burch.
         (markt)
       </add>
+      <fix>
+        <bug>52511</bug>: Correct regression in the fix for <bug>51741</bug>
+        that caused a harmless exception to be logged when scanning for
+        annotations and <code>WEB-INF/classes</code> did not exist. (markt) 
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
