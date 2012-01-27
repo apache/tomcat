@@ -43,6 +43,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.naming.Binding;
+import javax.naming.NameNotFoundException;
 import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
 import javax.servlet.ServletContainerInitializer;
@@ -1194,14 +1195,19 @@ public class ContextConfig implements LifecycleListener {
                 // Step 4. Process /WEB-INF/classes for annotations
                 // This will add any matching classes to the typeInitializerMap
                 if (ok) {
+                    NamingEnumeration<Binding> listBindings = null;
                     try {
-                        NamingEnumeration<Binding> listBindings =
-                            context.getResources().listBindings("/WEB-INF/classes");
-                        while (listBindings.hasMoreElements()) {
+                        try {
+                            listBindings = context.getResources().listBindings(
+                                    "/WEB-INF/classes");
+                        } catch (NameNotFoundException ignore) {
+                            // Safe to ignore
+                        }
+                        while (listBindings != null &&
+                                listBindings.hasMoreElements()) {
                             Binding binding = listBindings.nextElement();
                             if (binding.getObject() instanceof FileDirContext) {
-                                File webInfCLassDir =
-                                    new File(
+                                File webInfCLassDir = new File(
                                         ((FileDirContext) binding.getObject()).getDocBase());
                                 processAnnotationsFile(webInfCLassDir, webXml);
                             }
