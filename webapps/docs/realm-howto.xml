@@ -203,10 +203,10 @@ techniques are supported:</p>
 </ul>
 
 <p>If using digested passwords with DIGEST authentication, the cleartext used
-   to generate the digest is different. In the examples above
-   <code>{cleartext-password}</code> must be replaced with
-   <code>{username}:{realm}:{cleartext-password}</code>. For example, in a
-   development environment this might take the form
+   to generate the digest is different and the digest must use the MD5
+   algorithm. In the examples above <code>{cleartext-password}</code> must be
+   replaced with <code>{username}:{realm}:{cleartext-password}</code>. For
+   example, in a development environment this might take the form
    <code>testUser:Authentication required:testPassword</code>. The value for
    <code>{realm}</code> is taken from the <code>&lt;realm-name&gt;</code>
    element of the web application's <code>&lt;login-config&gt;</code>. If
