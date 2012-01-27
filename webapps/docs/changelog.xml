@@ -100,6 +100,11 @@
         the JMX proxy servlet which is part of the Manager application.
         (kkolinko)
       </add>
+      <fix>
+        <bug>52515</bug>: Make it clear in the Realm how-to in the documentation
+        web application that digested password storage when using DIGEST
+        authentication requires that MD5 digests are used. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="jdbc-pool">
