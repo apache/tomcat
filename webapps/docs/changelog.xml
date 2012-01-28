@@ -80,6 +80,15 @@
         <bug>51543</bug>: Provide a meaningful error message when writing more
         response headers than permitted. (markt) 
       </add>
+      <fix>
+        <bug>52547</bug>: Ensure that bytes written (which is used by the access
+        log) is correctly reset after an HTTP 1.0 request has been processed.
+        (markt)
+      </fix>
+      <scode>
+        Minor refactoring to reduce code duplication in the HTTP connectors.
+        (markt)
+      </scode>
     </changelog>
   </subsection>
   <subsection name="Jasper">
