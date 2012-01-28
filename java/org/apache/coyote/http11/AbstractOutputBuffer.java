@@ -449,6 +449,7 @@ public abstract class AbstractOutputBuffer<S> implements OutputBuffer{
 
         // Writing the byte chunk to the output buffer
         int length = bc.getLength();
+        checkLengthBeforeWrite(length);
         System.arraycopy(bc.getBytes(), bc.getStart(), buf, pos, length);
         pos = pos + length;
 
@@ -466,6 +467,7 @@ public abstract class AbstractOutputBuffer<S> implements OutputBuffer{
 
         int start = cc.getStart();
         int end = cc.getEnd();
+        checkLengthBeforeWrite(end-start);
         char[] cbuf = cc.getBuffer();
         for (int i = start; i < end; i++) {
             char c = cbuf[i];
@@ -490,6 +492,7 @@ public abstract class AbstractOutputBuffer<S> implements OutputBuffer{
      * @param b data to be written
      */
     public void write(byte[] b) {
+        checkLengthBeforeWrite(b.length);
 
         // Writing the byte chunk to the output buffer
         System.arraycopy(b, 0, buf, pos, b.length);
@@ -512,6 +515,7 @@ public abstract class AbstractOutputBuffer<S> implements OutputBuffer{
 
         // From the Tomcat 3.3 HTTP/1.0 connector
         int len = s.length();
+        checkLengthBeforeWrite(len);
         for (int i = 0; i < len; i++) {
             char c = s.charAt (i);
             // Note:  This is clearly incorrect for many strings,
@@ -540,5 +544,17 @@ public abstract class AbstractOutputBuffer<S> implements OutputBuffer{
 
     }
 
+
+    /**
+     * Checks to see if there is enough space in the buffer to write the
+     * requested number of bytes.
+     */
+    private void checkLengthBeforeWrite(int length)
+            throws IllegalStateException {
+        if (pos + length > buf.length) {
+            throw new IllegalStateException(
+                    sm.getString("iob.responseheadertoolarge.error"));
+        }
+    }
 
 }
