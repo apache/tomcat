@@ -129,7 +129,6 @@ public class InternalOutputBuffer extends AbstractOutputBuffer<Socket>
     @Override
     public void recycle() {
         super.recycle();
-        socketBuffer.recycle();
         outputStream = null;
     }
 

@@ -258,17 +258,8 @@ public abstract class AbstractOutputBuffer<S> implements OutputBuffer{
      * connection.
      */
     public void recycle() {
-        // Recycle filters
-        for (int i = 0; i <= lastActiveFilter; i++) {
-            activeFilters[i].recycle();
-        }
-        // Recycle Request object
-        response.recycle();
-        pos = 0;
-        lastActiveFilter = -1;
-        committed = false;
-        finished = false;
-
+        // Sub-classes may wish to do more than this.
+        nextRequest();
     }
     
     /**
@@ -278,14 +269,12 @@ public abstract class AbstractOutputBuffer<S> implements OutputBuffer{
      * to parse the next HTTP request.
      */
     public void nextRequest() {
-
-        // Recycle Request object
-        response.recycle();
         // Recycle filters
         for (int i = 0; i <= lastActiveFilter; i++) {
             activeFilters[i].recycle();
         }
-
+        // Recycle response object
+        response.recycle();
         // Reset pointers
         pos = 0;
         lastActiveFilter = -1;
