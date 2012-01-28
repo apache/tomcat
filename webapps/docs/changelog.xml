@@ -74,6 +74,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Coyote">
+    <changelog>
+      <add>
+        <bug>51543</bug>: Provide a meaningful error message when writing more
+        response headers than permitted. (markt) 
+      </add>
+    </changelog>
+  </subsection>
   <subsection name="Jasper">
     <changelog>
       <fix>
