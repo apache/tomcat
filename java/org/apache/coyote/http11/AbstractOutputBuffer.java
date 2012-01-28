@@ -268,7 +268,7 @@ public abstract class AbstractOutputBuffer<S> implements OutputBuffer{
         lastActiveFilter = -1;
         committed = false;
         finished = false;
-
+        byteCount = 0;
     }
 
     /**
