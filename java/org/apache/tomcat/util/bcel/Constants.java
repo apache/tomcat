@@ -39,6 +39,10 @@ public interface Constants {
 
   /** One of the access flags for fields, methods, or classes.
    */
+  public static final short ACC_ANNOTATION   = 0x2000;
+
+  /** One of the access flags for fields, methods, or classes.
+   */
   public static final short ACC_ENUM         = 0x4000;
 
   // Applies to classes compiled by new compilers only

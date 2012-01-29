@@ -2009,6 +2009,12 @@ public class ContextConfig implements LifecycleListener {
         if (typeInitializerMap.size() == 0)
             return;
         
+        if ((javaClass.getAccessFlags() &
+                org.apache.tomcat.util.bcel.Constants.ACC_ANNOTATION) > 0) {
+            // Skip annotations.
+            return;
+        }
+
         // No choice but to load the class
         String className = javaClass.getClassName();
         
