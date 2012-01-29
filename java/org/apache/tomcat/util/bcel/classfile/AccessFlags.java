@@ -33,4 +33,10 @@ public abstract class AccessFlags implements java.io.Serializable {
     public AccessFlags() {
     }
 
+    /**
+     * @return Access flags of the object aka. "modifiers".
+    */
+    public final int getAccessFlags() {
+        return access_flags;
+    }
 }

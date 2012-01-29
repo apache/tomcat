@@ -72,6 +72,11 @@
         that caused a harmless exception to be logged when scanning for
         annotations and <code>WEB-INF/classes</code> did not exist. (markt) 
       </fix>
+      <fix>
+        <bug>52549</bug>: Partial fix for HandlesTypes processing that
+        previously loaded every class in the web application. The majority of
+        this issue remains to be fixed. (markt)  
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
