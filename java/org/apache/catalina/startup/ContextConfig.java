@@ -163,7 +163,9 @@ public class ContextConfig implements LifecycleListener {
 
     /**
      * The default web application's context file location.
+     * @deprecated Unnecessary
      */
+    @Deprecated
     protected String defaultContextXml = null;
 
 
