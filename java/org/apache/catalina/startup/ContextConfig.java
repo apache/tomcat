@@ -162,14 +162,6 @@ public class ContextConfig implements LifecycleListener {
 
 
     /**
-     * The default web application's context file location.
-     * @deprecated Unnecessary
-     */
-    @Deprecated
-    protected String defaultContextXml = null;
-
-
-    /**
      * The default web application's deployment descriptor location.
      */
     protected String defaultWebXml = null;
@@ -486,12 +478,14 @@ public class ContextConfig implements LifecycleListener {
      */
     protected void contextConfig(Digester digester) {
 
+        String defaultContextXml = null;
+
         // Open the default context.xml file, if it exists
-        if( defaultContextXml==null && context instanceof StandardContext ) {
+        if (context instanceof StandardContext) {
             defaultContextXml = ((StandardContext)context).getDefaultContextXml();
         }
         // set the default if we don't have any overrides
-        if( defaultContextXml==null ) {
+        if (defaultContextXml == null) {
             defaultContextXml = Constants.DefaultContextXml;
         }
 
