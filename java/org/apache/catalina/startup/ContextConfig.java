@@ -240,35 +240,6 @@ public class ContextConfig implements LifecycleListener {
 
 
     /**
-     * Return the location of the default context file
-     * @deprecated Never changed from default
-     */
-    @Deprecated
-    public String getDefaultContextXml() {
-        if( defaultContextXml == null ) {
-            defaultContextXml=Constants.DefaultContextXml;
-        }
-
-        return (this.defaultContextXml);
-
-    }
-
-
-    /**
-     * Set the location of the default context file
-     *
-     * @param path Absolute/relative path to the default context.xml
-     * @deprecated Unused
-     */
-    @Deprecated
-    public void setDefaultContextXml(String path) {
-
-        this.defaultContextXml = path;
-
-    }
-
-
-    /**
      * Sets custom mappings of login methods to authenticators.
      *
      * @param customAuthenticators Custom mappings of login methods to
@@ -519,7 +490,7 @@ public class ContextConfig implements LifecycleListener {
         }
         // set the default if we don't have any overrides
         if( defaultContextXml==null ) {
-            getDefaultContextXml();
+            defaultContextXml = Constants.DefaultContextXml;
         }
 
         if (!context.getOverride()) {
