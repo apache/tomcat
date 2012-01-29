@@ -241,7 +241,9 @@ public class ContextConfig implements LifecycleListener {
 
     /**
      * Return the location of the default context file
+     * @deprecated Never changed from default
      */
+    @Deprecated
     public String getDefaultContextXml() {
         if( defaultContextXml == null ) {
             defaultContextXml=Constants.DefaultContextXml;
@@ -256,7 +258,9 @@ public class ContextConfig implements LifecycleListener {
      * Set the location of the default context file
      *
      * @param path Absolute/relative path to the default context.xml
+     * @deprecated Unused
      */
+    @Deprecated
     public void setDefaultContextXml(String path) {
 
         this.defaultContextXml = path;
