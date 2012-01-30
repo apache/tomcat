@@ -32,12 +32,12 @@ public class MappingData {
     public Object wrapper = null;
     public boolean jspWildCard = false;
 
-    public MessageBytes contextPath = MessageBytes.newInstance();
-    public MessageBytes requestPath = MessageBytes.newInstance();
-    public MessageBytes wrapperPath = MessageBytes.newInstance();
-    public MessageBytes pathInfo = MessageBytes.newInstance();
+    public final MessageBytes contextPath = MessageBytes.newInstance();
+    public final MessageBytes requestPath = MessageBytes.newInstance();
+    public final MessageBytes wrapperPath = MessageBytes.newInstance();
+    public final MessageBytes pathInfo = MessageBytes.newInstance();
 
-    public MessageBytes redirectPath = MessageBytes.newInstance();
+    public final MessageBytes redirectPath = MessageBytes.newInstance();
 
     public void recycle() {
         host = null;
