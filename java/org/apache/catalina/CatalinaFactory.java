@@ -40,6 +40,10 @@ public class CatalinaFactory {
         // Hide the default constructor
     }
 
+    /**
+     * @deprecated Unused. Will be removed in Tomcat 8.0.x.
+     */
+    @Deprecated
     public String getDefaultPipelineClassName() {
         return StandardPipeline.class.getName();
     }
