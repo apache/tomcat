@@ -762,6 +762,10 @@ public class Registry implements RegistryMBean, MBeanRegistration  {
     // May still be used in tomcat
     // Never part of an official release
 
+    /**
+     * @deprecated
+     */
+    @Deprecated
     public ManagedBean findManagedBean(Class<?> beanClass, String type)
         throws Exception
     {
