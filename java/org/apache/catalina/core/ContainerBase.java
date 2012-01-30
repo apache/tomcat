@@ -19,7 +19,6 @@ package org.apache.catalina.core;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
-import java.io.IOException;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.ArrayList;
@@ -39,7 +38,6 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import javax.management.ObjectName;
 import javax.naming.directory.DirContext;
-import javax.servlet.ServletException;
 
 import org.apache.catalina.AccessLog;
 import org.apache.catalina.CatalinaFactory;
@@ -958,30 +956,6 @@ public abstract class ContainerBase extends LifecycleMBeanBase
                 new ContainerListener[listeners.size()];
             return listeners.toArray(results);
         }
-
-    }
-
-
-    /**
-     * Process the specified Request, to produce the corresponding Response,
-     * by invoking the first Valve in our pipeline (if any), or the basic
-     * Valve otherwise.
-     *
-     * @param request Request to be processed
-     * @param response Response to be produced
-     *
-     * @exception IllegalStateException if neither a pipeline or a basic
-     *  Valve have been configured for this Container
-     * @exception IOException if an input/output error occurred while
-     *  processing
-     * @exception ServletException if a ServletException was thrown
-     *  while processing this request
-     */
-    @Override
-    public void invoke(Request request, Response response)
-        throws IOException, ServletException {
-
-        pipeline.getFirst().invoke(request, response);
 
     }
 
