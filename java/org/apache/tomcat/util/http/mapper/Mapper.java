@@ -57,7 +57,7 @@ public final class Mapper {
     /**
      * Context associated with this wrapper, used for wrapper mapping.
      */
-    protected ContextVersion context = new ContextVersion();
+    protected final ContextVersion context = new ContextVersion();
 
 
     // --------------------------------------------------------- Public Methods
