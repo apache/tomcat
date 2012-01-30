@@ -50,7 +50,7 @@ public class Txt2Html
     private File todir;
 
     /** The file to be converted into HTML */
-    private List<FileSet> filesets = new LinkedList<FileSet>();
+    private final List<FileSet> filesets = new LinkedList<FileSet>();
 
     /**
      * Sets the directory to contain the resulting files
