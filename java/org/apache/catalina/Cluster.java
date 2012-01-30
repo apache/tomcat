@@ -66,23 +66,6 @@ public interface Cluster {
      */
     public Container getContainer();
 
-    /**
-     * Set the protocol parameters.
-     *
-     * @param protocol The protocol used by the cluster
-     * @deprecated
-     */
-    @Deprecated
-    public void setProtocol(String protocol);
-
-    /**
-     * Get the protocol used by the cluster.
-     *
-     * @return The protocol
-     * @deprecated
-     */
-    @Deprecated
-    public String getProtocol();
 
     // --------------------------------------------------------- Public Methods
 

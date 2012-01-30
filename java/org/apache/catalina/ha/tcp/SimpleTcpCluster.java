@@ -904,26 +904,6 @@ public class SimpleTcpCluster extends LifecycleBase
         return log;
     }
 
-
-    // ------------------------------------------------------------- deprecated
-
-    /**
-     *
-     * @see org.apache.catalina.Cluster#setProtocol(java.lang.String)
-     */
-    @Override
-    public void setProtocol(String protocol) {
-        // NO-OP
-    }
-
-    /**
-     * @see org.apache.catalina.Cluster#getProtocol()
-     */
-    @Override
-    public String getProtocol() {
-        return null;
-    }
-
     public int getChannelStartOptions() {
         return channelStartOptions;
     }
