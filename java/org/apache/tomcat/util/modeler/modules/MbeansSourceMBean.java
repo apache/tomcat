@@ -25,8 +25,10 @@ import javax.management.ObjectName;
  * This mbean will load an extended mlet file ( similar in syntax with jboss ).
  * It'll keep track of all attribute changes and update the file when attributes
  * change. 
+ * @deprecated Unused: Will be removed in Tomcat 8.0.x
  */
-public interface MbeansSourceMBean 
+@Deprecated
+public interface MbeansSourceMBean
 {
     /** Set the source to be used to load the mbeans
      * 
