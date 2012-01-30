@@ -17,14 +17,12 @@
 package org.apache.catalina.startup;
 
 import java.beans.PropertyChangeListener;
-import java.io.IOException;
 import java.net.URL;
 import java.util.Set;
 
 import javax.naming.directory.DirContext;
 import javax.servlet.ServletContainerInitializer;
 import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletSecurityElement;
 import javax.servlet.descriptor.JspConfigDescriptor;
@@ -237,10 +235,6 @@ public class FailedContext extends LifecycleMBeanBase implements Context {
     public void addPropertyChangeListener(PropertyChangeListener listener) { /* NO-OP */ }
     @Override
     public void removePropertyChangeListener(PropertyChangeListener listener) { /* NO-OP */ }
-
-    @Override
-    public void invoke(Request request, Response response) throws IOException,
-            ServletException { /* NO-OP */ }
 
     @Override
     public void fireContainerEvent(String type, Object data) { /* NO-OP */ }

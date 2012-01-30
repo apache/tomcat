@@ -14,17 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.catalina;
 
 
 import java.beans.PropertyChangeListener;
-import java.io.IOException;
 
 import javax.management.ObjectName;
 import javax.naming.directory.DirContext;
-import javax.servlet.ServletException;
 
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
@@ -82,7 +78,6 @@ import org.apache.juli.logging.Log;
  * @author Remy Maucherat
  * @version $Id$
  */
-
 public interface Container extends Lifecycle {
 
 
@@ -97,15 +92,6 @@ public interface Container extends Lifecycle {
 
 
     /**
-     * The ContainerEvent event type sent when a Mapper is added
-     * by <code>addMapper()</code>.
-     * @deprecated Unused. Will be removed in Tomcat 8.0.x.
-     */
-    @Deprecated
-    public static final String ADD_MAPPER_EVENT = "addMapper";
-
-
-    /**
      * The ContainerEvent event type sent when a valve is added
      * by <code>addValve()</code>, if this Container supports pipelines.
      */
@@ -117,15 +103,6 @@ public interface Container extends Lifecycle {
      * by <code>removeChild()</code>.
      */
     public static final String REMOVE_CHILD_EVENT = "removeChild";
-
-
-    /**
-     * The ContainerEvent event type sent when a Mapper is removed
-     * by <code>removeMapper()</code>.
-     * @deprecated Unused. Will be removed in Tomcat 8.0.x.
-     */
-    @Deprecated
-    public static final String REMOVE_MAPPER_EVENT = "removeMapper";
 
 
     /**
@@ -390,25 +367,6 @@ public interface Container extends Lifecycle {
      * array is returned.
      */
     public ContainerListener[] findContainerListeners();
-
-
-    /**
-     * Process the specified Request, and generate the corresponding Response,
-     * according to the design of this particular Container.
-     *
-     * @param request Request to be processed
-     * @param response Response to be produced
-     *
-     * @exception IOException if an input/output error occurred while
-     *  processing
-     * @exception ServletException if a ServletException was thrown
-     *  while processing this request
-     *
-     * @deprecated Unused. Will be removed in Tomcat 8.0.x.
-     */
-    @Deprecated
-    public void invoke(Request request, Response response)
-        throws IOException, ServletException;
 
 
     /**
