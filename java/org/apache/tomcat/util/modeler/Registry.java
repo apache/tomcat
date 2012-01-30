@@ -477,16 +477,6 @@ public class Registry implements RegistryMBean, MBeanRegistration  {
             managed=findManagedBean(type);
         }
 
-        if( bean instanceof DynamicMBean ) {
-            if( log.isDebugEnabled() ) {
-                log.debug( "Dynamic mbean support ");
-            }
-            // Dynamic mbean
-            load("MbeansDescriptorsDynamicMBeanSource", bean, type);
-
-            managed=findManagedBean(type);
-        }
-
         // Still not found - use introspection
         if( managed==null ) {
             if( log.isDebugEnabled() ) {
@@ -560,10 +550,7 @@ public class Registry implements RegistryMBean, MBeanRegistration  {
         String type=null;
         Object inputsource=null;
 
-        if( source instanceof DynamicMBean ) {
-            sourceType="MbeansDescriptorsDynamicMBeanSource";
-            inputsource=source;
-        } else if( source instanceof URL ) {
+        if( source instanceof URL ) {
             URL url=(URL)source;
             location=url.toString();
             type=param;
