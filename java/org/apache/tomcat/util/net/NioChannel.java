@@ -23,7 +23,6 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
 
-import org.apache.tomcat.util.MutableInteger;
 import org.apache.tomcat.util.net.NioEndpoint.Poller;
 import org.apache.tomcat.util.net.SecureNioChannel.ApplicationBufferHandler;
 
@@ -78,14 +77,12 @@ public class NioChannel implements ByteChannel {
      * @param block     Unused. May be used when overridden
      * @param s         Unused. May be used when overridden
      * @param timeout   Unused. May be used when overridden
-     * @param lastWrite
      * @return Always returns <code>true</code> since there is no network buffer
      *         in the regular channel
      * @throws IOException
      */
-    public boolean flush(boolean block, Selector s, long timeout,
-            MutableInteger lastWrite) throws IOException {
-        if (lastWrite!=null) lastWrite.set(1);
+    public boolean flush(boolean block, Selector s, long timeout)
+            throws IOException {
         return true;
     }
 

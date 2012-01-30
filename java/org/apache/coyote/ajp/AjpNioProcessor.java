@@ -292,8 +292,7 @@ public class AjpNioProcessor extends AbstractAjpProcessor<NioChannel> {
             //ignore
         }
         try {
-            pool.write(writeBuffer, socket, selector, writeTimeout, true,
-                    null);
+            pool.write(writeBuffer, socket, selector, writeTimeout, true);
         }finally {
             if ( selector != null ) pool.put(selector);
         }

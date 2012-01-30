@@ -29,8 +29,6 @@ import javax.net.ssl.SSLEngineResult;
 import javax.net.ssl.SSLEngineResult.HandshakeStatus;
 import javax.net.ssl.SSLEngineResult.Status;
 
-import org.apache.tomcat.util.MutableInteger;
-
 /**
  *
  * Implementation of a secure socket channel
@@ -110,18 +108,17 @@ public class SecureNioChannel extends NioChannel  {
      * @param block     Should a blocking write be used?
      * @param s
      * @param timeout
-     * @param lastWrite
      * @return <code>true</code> if the network buffer has been flushed out and
      *         is empty else <code>false</code>
      * @throws IOException
      */
     @Override
-    public boolean flush(boolean block, Selector s, long timeout,
-            MutableInteger lastWrite) throws IOException {
+    public boolean flush(boolean block, Selector s, long timeout)
+            throws IOException {
         if (!block) {
             flush(netOutBuffer);
         } else {
-            pool.write(netOutBuffer, this, s, timeout,block,lastWrite);
+            pool.write(netOutBuffer, this, s, timeout,block);
         }
         return !netOutBuffer.hasRemaining();
     }
