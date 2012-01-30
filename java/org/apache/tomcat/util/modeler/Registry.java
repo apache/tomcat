@@ -635,7 +635,7 @@ public class Registry implements RegistryMBean, MBeanRegistration  {
                 type=bean.getClass().getName();
             }
 
-            ManagedBean managed = findManagedBean(bean.getClass(), type);
+            ManagedBean managed = findManagedBean(null, bean.getClass(), type);
 
             // The real mbean is created and registered
             DynamicMBean mbean = managed.createMBean(bean);
@@ -755,20 +755,5 @@ public class Registry implements RegistryMBean, MBeanRegistration  {
 
     @Override
     public void postDeregister() {
-    }
-
-
-    // -------------------- DEPRECATED METHODS  --------------------
-    // May still be used in tomcat
-    // Never part of an official release
-
-    /**
-     * @deprecated
-     */
-    @Deprecated
-    public ManagedBean findManagedBean(Class<?> beanClass, String type)
-        throws Exception
-    {
-        return findManagedBean(null, beanClass, type);
     }
 }
