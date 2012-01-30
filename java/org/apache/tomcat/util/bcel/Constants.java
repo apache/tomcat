@@ -285,9 +285,6 @@ public interface Constants {
   public static final byte T_INT     = 10;
 
 
-  /** Unknown data type. */
-  public static final byte T_UNKNOWN   = 15;
-
   /** The primitive type names corresponding to the T_XX constants,
    * e.g., TYPE_NAMES[T_INT] = "int"
    */
