@@ -30,6 +30,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -183,14 +184,34 @@ public class ContextConfig implements LifecycleListener {
      * Map of ServletContainerInitializer to classes they expressed interest in.
      */
     protected final Map<ServletContainerInitializer, Set<Class<?>>> initializerClassMap =
-        new LinkedHashMap<ServletContainerInitializer, Set<Class<?>>>();
+            new LinkedHashMap<ServletContainerInitializer, Set<Class<?>>>();
 
     /**
      * Map of Types to ServletContainerInitializer that are interested in those
      * types.
      */
     protected final Map<Class<?>, Set<ServletContainerInitializer>> typeInitializerMap =
-        new HashMap<Class<?>, Set<ServletContainerInitializer>>();
+            new HashMap<Class<?>, Set<ServletContainerInitializer>>();
+
+    /**
+     * Cache of JavaClass objects (byte code) by fully qualified class name.
+     * Only populated if it is necessary to scan the super types and interfaces
+     * as part of the processing for {@link HandlesTypes}.
+     */
+    protected final Map<String,JavaClassCacheEntry> javaClassCache =
+            new HashMap<String,JavaClassCacheEntry>();
+
+    /**
+     * Flag that indicates if at least one {@link HandlesTypes} entry is present
+     * that represents an annotation.
+     */
+    protected boolean handlesTypesAnnotations = false;
+
+    /**
+     * Flag that indicates if at least one {@link HandlesTypes} entry is present
+     * that represents a non-annotation.
+     */
+    protected boolean handlesTypesNonAnnotations = false;
 
     /**
      * The <code>Digester</code> we will use to process web application
@@ -1196,6 +1217,9 @@ public class ContextConfig implements LifecycleListener {
                     processAnnotations(orderedFragments);
                 }
 
+                // Cache, if used, is no longer required so clear it
+                javaClassCache.clear();
+
                 // Step 6. Merge web-fragment.xml files into the main web.xml
                 // file.
                 if (ok) {
@@ -1473,6 +1497,11 @@ public class ContextConfig implements LifecycleListener {
                 Class<?>[] types = ht.value();
                 if (types != null) {
                     for (Class<?> type : types) {
+                        if (type.isAnnotation()) {
+                            handlesTypesAnnotations = true;
+                        } else {
+                            handlesTypesNonAnnotations = true;
+                        }
                         Set<ServletContainerInitializer> scis =
                             typeInitializerMap.get(type);
                         if (scis == null) {
@@ -1993,59 +2022,180 @@ public class ContextConfig implements LifecycleListener {
             return;
         }
 
-        // No choice but to load the class
         String className = javaClass.getClassName();
 
+        Class<?> clazz = null;
+        if (handlesTypesNonAnnotations) {
+            // This *might* be match for a HandlesType.
+            populateJavaClassCache(className, javaClass);
+            JavaClassCacheEntry entry = javaClassCache.get(className);
+            if (entry.getSciSet() == null) {
+                populateSCIsForCacheEntry(entry);
+            }
+            if (entry.getSciSet().size() > 0) {
+                // Need to try and load the class
+                clazz = loadClass(className);
+                if (clazz == null) {
+                    // Can't load the class so no point continuing
+                    return;
+                }
+
+                for (ServletContainerInitializer sci :
+                        entry.getSciSet()) {
+                    Set<Class<?>> classes = initializerClassMap.get(sci);
+                    if (classes == null) {
+                        classes = new HashSet<Class<?>>();
+                        initializerClassMap.put(sci, classes);
+                    }
+                    classes.add(clazz);
+                }
+            }
+        }
+
+        if (handlesTypesAnnotations) {
+            for (Map.Entry<Class<?>, Set<ServletContainerInitializer>> entry :
+                    typeInitializerMap.entrySet()) {
+                if (entry.getKey().isAnnotation()) {
+                    AnnotationEntry[] annotationEntries =
+                            javaClass.getAnnotationEntries();
+                    for (AnnotationEntry annotationEntry : annotationEntries) {
+                        if (entry.getKey().getName().equals(
+                                getClassName(annotationEntry.getAnnotationType()))) {
+                            if (clazz == null) {
+                                clazz = loadClass(className);
+                                if (clazz == null) {
+                                    // Can't load the class so no point
+                                    // continuing
+                                    return;
+                                }
+                            }
+                            for (ServletContainerInitializer sci : entry.getValue()) {
+                                initializerClassMap.get(sci).add(clazz);
+                            }
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+
+    private void populateJavaClassCache(String className, JavaClass javaClass) {
+        if (javaClassCache.containsKey(className)) {
+            return;
+        }
+
+        // Add this class to the cache
+        javaClassCache.put(className, new JavaClassCacheEntry(javaClass));
+
+        populateJavaClassCache(javaClass.getSuperclassName());
+
+        for (String iterface : javaClass.getInterfaceNames()) {
+            populateJavaClassCache(iterface);
+        }
+    }
+
+    private void populateJavaClassCache(String className) {
+        if (!javaClassCache.containsKey(className)) {
+            String name = className.replace('.', '/') + ".class";
+            InputStream is =
+                    context.getLoader().getClassLoader().getResourceAsStream(name);
+            ClassParser parser = new ClassParser(is, null);
+            try {
+                JavaClass clazz = parser.parse();
+                populateJavaClassCache(clazz.getClassName(), clazz);
+            } catch (ClassFormatException e) {
+                log.debug(sm.getString("contextConfig.invalidSciHandlesTypes",
+                        className), e);
+            } catch (IOException e) {
+                log.debug(sm.getString("contextConfig.invalidSciHandlesTypes",
+                        className), e);
+            }
+        }
+    }
+
+    private void populateSCIsForCacheEntry(JavaClassCacheEntry cacheEntry) {
+        Set<ServletContainerInitializer> result =
+                new HashSet<ServletContainerInitializer>();
+
+        JavaClass javaClass = cacheEntry.getJavaClass();
+
+        // Super class
+        String superClassName = javaClass.getSuperclassName();
+        JavaClassCacheEntry superClassCacheEntry =
+                javaClassCache.get(superClassName);
+
+        // Avoid an infinite loop with java.lang.Object
+        if (cacheEntry.equals(superClassCacheEntry)) {
+            cacheEntry.setSciSet(new HashSet<ServletContainerInitializer>());
+            return;
+        }
+
+        // May be null of the class is not present or could not be loaded.
+        if (superClassCacheEntry != null) {
+            if (superClassCacheEntry.getSciSet() == null) {
+                populateSCIsForCacheEntry(superClassCacheEntry);
+            }
+            result.addAll(superClassCacheEntry.getSciSet());
+        }
+        result.addAll(getSCIsForClass(superClassName));
+
+        // Interfaces
+        for (String interfaceName : javaClass.getInterfaceNames()) {
+            JavaClassCacheEntry interfaceEntry =
+                    javaClassCache.get(interfaceName);
+            // A null could mean that the class not present in application or
+            // that there is nothing of interest. Either way, nothing to do here
+            // so move along
+            if (interfaceEntry != null) {
+                if (interfaceEntry.getSciSet() == null) {
+                    populateSCIsForCacheEntry(interfaceEntry);
+                }
+                result.addAll(interfaceEntry.getSciSet());
+            }
+            result.addAll(getSCIsForClass(interfaceName));
+        }
+
+        cacheEntry.setSciSet(result);
+    }
+
+    private Set<ServletContainerInitializer> getSCIsForClass(String className) {
+        for (Map.Entry<Class<?>, Set<ServletContainerInitializer>> entry :
+                typeInitializerMap.entrySet()) {
+            Class<?> clazz = entry.getKey();
+            if (!clazz.isAnnotation()) {
+                if (clazz.getName().equals(className)) {
+                    return entry.getValue();
+                }
+            }
+        }
+        return Collections.emptySet();
+    }
+
+    private Class<?> loadClass(String className) {
         Class<?> clazz = null;
         try {
             clazz = context.getLoader().getClassLoader().loadClass(className);
         } catch (NoClassDefFoundError e) {
             log.debug(sm.getString("contextConfig.invalidSciHandlesTypes",
                     className), e);
-            return;
+            return null;
         } catch (ClassNotFoundException e) {
             log.debug(sm.getString("contextConfig.invalidSciHandlesTypes",
                     className), e);
-            return;
+            return null;
         } catch (ClassFormatError e) {
             log.debug(sm.getString("contextConfig.invalidSciHandlesTypes",
                     className), e);
-            return;
+            return null;
         } catch (Throwable t) {
             ExceptionUtils.handleThrowable(t);
             log.debug(sm.getString("contextConfig.invalidSciHandlesTypes",
                     className), t);
-            return;
+            return null;
         }
-
-        if (clazz.isAnnotation()) {
-            // Skip
-            return;
-        }
-
-        boolean match = false;
-
-        for (Map.Entry<Class<?>, Set<ServletContainerInitializer>> entry :
-                typeInitializerMap.entrySet()) {
-            if (entry.getKey().isAnnotation()) {
-                AnnotationEntry[] annotationEntries = javaClass.getAnnotationEntries();
-                for (AnnotationEntry annotationEntry : annotationEntries) {
-                    if (entry.getKey().getName().equals(
-                        getClassName(annotationEntry.getAnnotationType()))) {
-                        match = true;
-                        break;
-                    }
-                }
-            } else if (entry.getKey().isAssignableFrom(clazz)) {
-                match = true;
-            }
-            if (match) {
-                for (ServletContainerInitializer sci : entry.getValue()) {
-                    initializerClassMap.get(sci).add(clazz);
-                }
-                match = false;
-            }
-        }
+        return clazz;
     }
 
     private static final String getClassName(String internalForm) {
@@ -2453,6 +2603,27 @@ public class ContextConfig implements LifecycleListener {
 
         public long getHostTimeStamp() {
             return hostTimeStamp;
+        }
+    }
+
+    private static class JavaClassCacheEntry {
+        private final JavaClass javaClass;
+        private Set<ServletContainerInitializer> sciSet = null;
+
+        public JavaClassCacheEntry(JavaClass javaClass) {
+            this.javaClass = javaClass;
+        }
+
+        public JavaClass getJavaClass() {
+            return javaClass;
+        }
+
+        public Set<ServletContainerInitializer> getSciSet() {
+            return sciSet;
+        }
+
+        public void setSciSet(Set<ServletContainerInitializer> sciSet) {
+            this.sciSet = sciSet;
         }
     }
 }
