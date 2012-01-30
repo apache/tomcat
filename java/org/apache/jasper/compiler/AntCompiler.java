@@ -90,7 +90,7 @@ public class AntCompiler extends Compiler {
 
     public static class JasperAntLogger extends DefaultLogger {
 
-        protected StringBuilder reportBuf = new StringBuilder();
+        protected final StringBuilder reportBuf = new StringBuilder();
 
         @Override
         protected void printMessage(final String message,
@@ -326,33 +326,24 @@ public class AntCompiler extends Compiler {
         /**
          * Wrapped PrintStream.
          */
-        protected PrintStream wrapped = null;
+        protected final PrintStream wrapped;
 
 
         /**
          * Thread <-> PrintStream associations.
          */
-        protected static ThreadLocal<PrintStream> streams =
+        protected static final ThreadLocal<PrintStream> streams =
             new ThreadLocal<PrintStream>();
 
 
         /**
          * Thread <-> ByteArrayOutputStream associations.
          */
-        protected static ThreadLocal<ByteArrayOutputStream> data =
+        protected static final ThreadLocal<ByteArrayOutputStream> data =
             new ThreadLocal<ByteArrayOutputStream>();
 
 
         // --------------------------------------------------------- Public Methods
-
-
-        /**
-         * @deprecated Unused. Will be removed in Tomcat 8.0.x.
-         */
-        @Deprecated
-        public PrintStream getWrapped() {
-          return wrapped;
-        }
 
         /**
          * Start capturing thread's output.
