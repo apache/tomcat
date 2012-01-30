@@ -50,7 +50,10 @@ import org.w3c.dom.Node;
  *
  * XXX add a special attribute to reference the loader mbean,
  * XXX figure out how to deal with private loaders
+ *
+ * @deprecated Unused: Will be removed in Tomcat 8.0.x
  */
+@Deprecated
 public class MbeansSource extends ModelerSource implements MbeansSourceMBean
 {
     private static final Log log = LogFactory.getLog(MbeansSource.class);
