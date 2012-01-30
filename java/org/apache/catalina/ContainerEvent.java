@@ -14,13 +14,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.catalina;
 
 
 import java.util.EventObject;
-
 
 /**
  * General event for notifying listeners of significant changes on a Container.
@@ -28,7 +25,6 @@ import java.util.EventObject;
  * @author Craig R. McClanahan
  * @version $Id$
  */
-
 public final class ContainerEvent extends EventObject {
 
     private static final long serialVersionUID = 1L;
@@ -53,11 +49,9 @@ public final class ContainerEvent extends EventObject {
      * @param data Event data
      */
     public ContainerEvent(Container container, String type, Object data) {
-
         super(container);
         this.type = type;
         this.data = data;
-
     }
 
 
@@ -65,9 +59,7 @@ public final class ContainerEvent extends EventObject {
      * Return the event data of this event.
      */
     public Object getData() {
-
         return (this.data);
-
     }
 
 
@@ -75,9 +67,7 @@ public final class ContainerEvent extends EventObject {
      * Return the Container on which this event occurred.
      */
     public Container getContainer() {
-
         return (Container) getSource();
-
     }
 
 
@@ -85,9 +75,7 @@ public final class ContainerEvent extends EventObject {
      * Return the event type of this event.
      */
     public String getType() {
-
         return (this.type);
-
     }
 
 
@@ -96,11 +84,7 @@ public final class ContainerEvent extends EventObject {
      */
     @Override
     public String toString() {
-
         return ("ContainerEvent['" + getContainer() + "','" +
                 getType() + "','" + getData() + "']");
-
     }
-
-
 }
