@@ -346,6 +346,10 @@ public class AntCompiler extends Compiler {
         // --------------------------------------------------------- Public Methods
 
 
+        /**
+         * @deprecated Unused. Will be removed in Tomcat 8.0.x.
+         */
+        @Deprecated
         public PrintStream getWrapped() {
           return wrapped;
         }
