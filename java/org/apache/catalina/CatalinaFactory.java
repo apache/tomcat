@@ -30,7 +30,7 @@ import org.apache.catalina.core.StandardPipeline;
  */
 public class CatalinaFactory {
 
-    private static CatalinaFactory factory = new CatalinaFactory();
+    private static final CatalinaFactory factory = new CatalinaFactory();
 
     public static CatalinaFactory getFactory() {
         return factory;
@@ -38,14 +38,6 @@ public class CatalinaFactory {
 
     private CatalinaFactory() {
         // Hide the default constructor
-    }
-
-    /**
-     * @deprecated Unused. Will be removed in Tomcat 8.0.x.
-     */
-    @Deprecated
-    public String getDefaultPipelineClassName() {
-        return StandardPipeline.class.getName();
     }
 
     public Pipeline createPipeline(Container container) {
