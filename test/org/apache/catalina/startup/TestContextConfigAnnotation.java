@@ -267,6 +267,8 @@ public class TestContextConfigAnnotation {
     @Test
     public void testCheckHandleTypes() throws Exception {
         ContextConfig config = new ContextConfig();
+        config.handlesTypesAnnotations = true;
+        config.handlesTypesNonAnnotations = true;
 
         // Need a Context, Loader and ClassLoader for checkHandleTypes
         StandardContext context = new StandardContext();

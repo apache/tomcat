@@ -61,6 +61,11 @@
         these constants where appropriate. (markt)
       </scode>
       <fix>
+        <bug>52444</bug>: Only load classes during HandlesTypes processing if
+        the class is a match. Previously, every class in the web application was
+        loaded regardless of whether it was a match or not. (markt)  
+      </fix>
+      <fix>
         <bug>52488</bug>: Correct typo: exipre -> expire. (markt)
       </fix>
       <add>
@@ -71,11 +76,6 @@
         <bug>52511</bug>: Correct regression in the fix for <bug>51741</bug>
         that caused a harmless exception to be logged when scanning for
         annotations and <code>WEB-INF/classes</code> did not exist. (markt) 
-      </fix>
-      <fix>
-        <bug>52549</bug>: Partial fix for HandlesTypes processing that
-        previously loaded every class in the web application. The majority of
-        this issue remains to be fixed. (markt)  
       </fix>
     </changelog>
   </subsection>
