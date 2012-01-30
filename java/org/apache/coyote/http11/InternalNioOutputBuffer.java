@@ -24,7 +24,6 @@ import java.nio.channels.Selector;
 
 import org.apache.coyote.OutputBuffer;
 import org.apache.coyote.Response;
-import org.apache.tomcat.util.MutableInteger;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.http.HttpMessages;
 import org.apache.tomcat.util.net.AbstractEndpoint;
@@ -68,11 +67,6 @@ public class InternalNioOutputBuffer extends AbstractOutputBuffer<NioChannel> {
 
 
     /**
-     * Number of bytes last written
-     */
-    private MutableInteger lastWrite = new MutableInteger(1);
-
-    /**
      * Underlying socket.
      */
     private NioChannel socket;
@@ -113,7 +107,6 @@ public class InternalNioOutputBuffer extends AbstractOutputBuffer<NioChannel> {
             socket.getBufHandler().getWriteBuffer().clear();
             socket = null;
         }
-        lastWrite.set(1);
     }
 
 
@@ -167,10 +160,10 @@ public class InternalNioOutputBuffer extends AbstractOutputBuffer<NioChannel> {
             //ignore
         }
         try {
-            written = pool.write(bytebuffer, socket, selector, writeTimeout, block,lastWrite);
+            written = pool.write(bytebuffer, socket, selector, writeTimeout, block);
             //make sure we are flushed
             do {
-                if (socket.flush(true,selector,writeTimeout,lastWrite)) break;
+                if (socket.flush(true,selector,writeTimeout)) break;
             }while ( true );
         }finally {
             if ( selector != null ) pool.put(selector);
