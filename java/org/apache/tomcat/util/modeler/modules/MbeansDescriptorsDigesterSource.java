@@ -39,7 +39,7 @@ public class MbeansDescriptorsDigesterSource extends ModelerSource
 
     private Registry registry;
     private String type;
-    private List<ObjectName> mbeans = new ArrayList<ObjectName>();
+    private final List<ObjectName> mbeans = new ArrayList<ObjectName>();
     private static volatile Digester digester = null;
 
     private static Digester createDigester() {

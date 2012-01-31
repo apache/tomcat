@@ -42,7 +42,7 @@ public class MbeansDescriptorsIntrospectionSource extends ModelerSource
 
     private Registry registry;
     private String type;
-    private List<ObjectName> mbeans = new ArrayList<ObjectName>();
+    private final List<ObjectName> mbeans = new ArrayList<ObjectName>();
 
     public void setRegistry(Registry reg) {
         this.registry=reg;
@@ -89,18 +89,14 @@ public class MbeansDescriptorsIntrospectionSource extends ModelerSource
 
     // ------------ Implementation for non-declared introspection classes
 
-    private static Hashtable<String,String> specialMethods =
+    private static final Hashtable<String,String> specialMethods =
         new Hashtable<String,String>();
     static {
         specialMethods.put( "preDeregister", "");
         specialMethods.put( "postDeregister", "");
     }
 
-    private static String strArray[]=new String[0];
-    private static ObjectName objNameArray[]=new ObjectName[0];
-    // createMBean == registerClass + registerMBean
-
-    private static Class<?>[] supportedTypes  = new Class[] {
+    private static final Class<?>[] supportedTypes  = new Class[] {
         Boolean.class,
         Boolean.TYPE,
         Byte.class,
@@ -118,11 +114,11 @@ public class MbeansDescriptorsIntrospectionSource extends ModelerSource
         Double.class,
         Double.TYPE,
         String.class,
-        strArray.getClass(),
+        String[].class,
         BigDecimal.class,
         BigInteger.class,
         ObjectName.class,
-        objNameArray.getClass(),
+        Object[].class,
         java.io.File.class,
     };
 
