@@ -16,11 +16,6 @@
  */
 package org.apache.tomcat.util.modeler.modules;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
 import java.util.List;
 
 import javax.management.ObjectName;
@@ -47,49 +42,4 @@ public class ModelerSource {
         // TODO
         return null;
     }
-
-    /** Callback from the BaseMBean to notify that an attribute has changed.
-     * Can be used to implement persistence.
-     *
-     * @param oname
-     * @param name
-     * @param value
-     * @deprecated Unused - will be removed in Tomcat 8.0.x
-     */
-    @Deprecated
-    public void updateField( ObjectName oname, String name,
-                             Object value ) {
-        // nothing by default
-    }
-
-    /**
-     *
-     * @deprecated Unused - will be removed in Tomcat 8.0.x
-     */
-    @Deprecated
-    public void store() {
-        // nothing
-    }
-
-    /**
-     * @deprecated Unused - will be removed in Tomcat 8.0.x
-     */
-    @Deprecated
-    protected InputStream getInputStream() throws IOException {
-        if( source instanceof URL ) {
-            URL url=(URL)source;
-            location=url.toString();
-            return url.openStream();
-        } else if( source instanceof File ) {
-            location=((File)source).getAbsolutePath();
-            return new FileInputStream((File)source);
-        } else if( source instanceof String) {
-            location=(String)source;
-            return new FileInputStream((String)source);
-        } else if( source instanceof InputStream ) {
-            return (InputStream)source;
-        }
-        return null;
-    }
-
 }
