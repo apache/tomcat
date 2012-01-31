@@ -37,12 +37,12 @@ public class MbeansDescriptorsDigesterSource extends ModelerSource
     private static final Log log =
             LogFactory.getLog(MbeansDescriptorsDigesterSource.class);
 
-    Registry registry;
-    String type;
-    List<ObjectName> mbeans = new ArrayList<ObjectName>();
-    protected static volatile Digester digester = null;
+    private Registry registry;
+    private String type;
+    private List<ObjectName> mbeans = new ArrayList<ObjectName>();
+    private static volatile Digester digester = null;
 
-    protected static Digester createDigester() {
+    private static Digester createDigester() {
 
         Digester digester = new Digester();
         digester.setNamespaceAware(false);

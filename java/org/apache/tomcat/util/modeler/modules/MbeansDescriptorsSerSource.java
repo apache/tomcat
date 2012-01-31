@@ -33,9 +33,9 @@ import org.apache.tomcat.util.modeler.Registry;
 public class MbeansDescriptorsSerSource extends ModelerSource
 {
     private static final Log log = LogFactory.getLog(MbeansDescriptorsSerSource.class);
-    Registry registry;
-    String type;
-    List<ObjectName> mbeans=new ArrayList<ObjectName>();
+    private Registry registry;
+    private String type;
+    private List<ObjectName> mbeans=new ArrayList<ObjectName>();
 
     public void setRegistry(Registry reg) {
         this.registry=reg;
