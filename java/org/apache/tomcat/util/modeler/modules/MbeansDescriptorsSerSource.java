@@ -35,7 +35,7 @@ public class MbeansDescriptorsSerSource extends ModelerSource
     private static final Log log = LogFactory.getLog(MbeansDescriptorsSerSource.class);
     private Registry registry;
     private String type;
-    private List<ObjectName> mbeans=new ArrayList<ObjectName>();
+    private final List<ObjectName> mbeans=new ArrayList<ObjectName>();
 
     public void setRegistry(Registry reg) {
         this.registry=reg;
