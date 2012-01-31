@@ -40,9 +40,9 @@ public class MbeansDescriptorsIntrospectionSource extends ModelerSource
 {
     private static final Log log = LogFactory.getLog(MbeansDescriptorsIntrospectionSource.class);
 
-    Registry registry;
-    String type;
-    List<ObjectName> mbeans = new ArrayList<ObjectName>();
+    private Registry registry;
+    private String type;
+    private List<ObjectName> mbeans = new ArrayList<ObjectName>();
 
     public void setRegistry(Registry reg) {
         this.registry=reg;
@@ -89,7 +89,7 @@ public class MbeansDescriptorsIntrospectionSource extends ModelerSource
 
     // ------------ Implementation for non-declared introspection classes
 
-    static Hashtable<String,String> specialMethods =
+    private static Hashtable<String,String> specialMethods =
         new Hashtable<String,String>();
     static {
         specialMethods.put( "preDeregister", "");
@@ -152,7 +152,7 @@ public class MbeansDescriptorsIntrospectionSource extends ModelerSource
      * @param javaType The class to check
      * @return boolean True if the class is compatible.
      */
-    protected boolean isBeanCompatible(Class<?> javaType) {
+    private boolean isBeanCompatible(Class<?> javaType) {
         // Must be a non-primitive and non array
         if (javaType.isArray() || javaType.isPrimitive()) {
             return false;
