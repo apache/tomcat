@@ -43,7 +43,10 @@ import org.xml.sax.SAXException;
  *  Few simple utils to read DOM
  *
  * @author Costin Manolache
+ *
+ * @deprecated Unused: Will be removed in Tomcat 8.0.x
  */
+@Deprecated
 public class DomUtil {
     private static final org.apache.juli.logging.Log log=
         org.apache.juli.logging.LogFactory.getLog( DomUtil.class );
