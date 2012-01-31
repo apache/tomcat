@@ -25,8 +25,9 @@ import org.apache.tomcat.util.modeler.Registry;
 /** Source for descriptor data. More sources can be added.
  *
  */
-public class ModelerSource {
+public abstract class ModelerSource {
     protected Object source;
+    @Deprecated
     protected String location;
 
     /** Load data, returns a list of items.
@@ -36,10 +37,17 @@ public class ModelerSource {
      * @param type
      * @param source Introspected object or some other source
      * @throws Exception
+     *
+     * @deprecated  Location parameter is unused. Will be removed in Tomcat
+     *              8.0.x
      */
+    @Deprecated
     public List<ObjectName> loadDescriptors( Registry registry, String location,
             String type, Object source) throws Exception {
         // TODO
         return null;
     }
+
+    public abstract List<ObjectName> loadDescriptors(Registry registry,
+            String type, Object source) throws Exception;
 }

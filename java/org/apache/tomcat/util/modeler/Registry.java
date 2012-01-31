@@ -582,7 +582,7 @@ public class Registry implements RegistryMBean, MBeanRegistration  {
         }
         ModelerSource ds=getModelerSource(sourceType);
         List<ObjectName> mbeans =
-            ds.loadDescriptors(this, location, type, inputsource);
+            ds.loadDescriptors(this, type, inputsource);
 
         return mbeans;
     }

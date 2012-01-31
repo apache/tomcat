@@ -38,9 +38,7 @@ public class MbeansDescriptorsDigesterSource extends ModelerSource
             LogFactory.getLog(MbeansDescriptorsDigesterSource.class);
 
     Registry registry;
-    String location;
     String type;
-    Object source;
     List<ObjectName> mbeans = new ArrayList<ObjectName>();
     protected static volatile Digester digester = null;
 
@@ -138,6 +136,11 @@ public class MbeansDescriptorsDigesterSource extends ModelerSource
         this.registry=reg;
     }
 
+
+    /**
+     * @deprecated Unused. Will be removed in Tomcat 8.0.x
+     */
+    @Deprecated
     public void setLocation( String loc ) {
         this.location=loc;
     }
@@ -155,10 +158,16 @@ public class MbeansDescriptorsDigesterSource extends ModelerSource
     }
 
     @Override
+    @Deprecated
     public List<ObjectName> loadDescriptors( Registry registry, String location,
             String type, Object source) throws Exception {
+        return loadDescriptors(registry, type, source);
+    }
+
+    @Override
+    public List<ObjectName> loadDescriptors( Registry registry, String type,
+            Object source) throws Exception {
         setRegistry(registry);
-        setLocation(location);
         setType(type);
         setSource(source);
         execute();
