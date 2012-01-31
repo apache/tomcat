@@ -110,16 +110,15 @@ public class MbeansSource extends ModelerSource implements MbeansSourceMBean
     }
 
     @Override
-    public List<ObjectName> loadDescriptors(Registry registry, String location,
-            String type, Object source) throws Exception {
+    public List<ObjectName> loadDescriptors(Registry registry, String type,
+            Object source) throws Exception {
         setRegistry(registry);
-        setLocation(location);
         setType(type);
         setSource(source);
         execute();
         return mbeans;
     }
-    
+
     public void start() throws Exception {
         registry.invoke(mbeans, "start", false);        
     }
