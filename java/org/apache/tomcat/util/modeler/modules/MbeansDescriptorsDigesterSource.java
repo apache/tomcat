@@ -137,14 +137,6 @@ public class MbeansDescriptorsDigesterSource extends ModelerSource
     }
 
 
-    /**
-     * @deprecated Unused. Will be removed in Tomcat 8.0.x
-     */
-    @Deprecated
-    public void setLocation( String loc ) {
-        this.location=loc;
-    }
-
     /** Used if a single component is loaded
      *
      * @param type
@@ -155,13 +147,6 @@ public class MbeansDescriptorsDigesterSource extends ModelerSource
 
     public void setSource( Object source ) {
         this.source=source;
-    }
-
-    @Override
-    @Deprecated
-    public List<ObjectName> loadDescriptors( Registry registry, String location,
-            String type, Object source) throws Exception {
-        return loadDescriptors(registry, type, source);
     }
 
     @Override
