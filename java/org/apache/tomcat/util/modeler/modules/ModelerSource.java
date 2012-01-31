@@ -54,16 +54,27 @@ public class ModelerSource {
      * @param oname
      * @param name
      * @param value
+     * @deprecated Unused - will be removed in Tomcat 8.0.x
      */
+    @Deprecated
     public void updateField( ObjectName oname, String name,
                              Object value ) {
         // nothing by default
     }
 
+    /**
+     *
+     * @deprecated Unused - will be removed in Tomcat 8.0.x
+     */
+    @Deprecated
     public void store() {
         // nothing
     }
 
+    /**
+     * @deprecated Unused - will be removed in Tomcat 8.0.x
+     */
+    @Deprecated
     protected InputStream getInputStream() throws IOException {
         if( source instanceof URL ) {
             URL url=(URL)source;
