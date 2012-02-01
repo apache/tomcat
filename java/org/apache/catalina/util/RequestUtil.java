@@ -84,46 +84,6 @@ public final class RequestUtil {
 
 
     /**
-     * Normalize a relative URI path that may have relative values ("/./",
-     * "/../", and so on ) it it.  <strong>WARNING</strong> - This method is
-     * useful only for normalizing application-generated paths.  It does not
-     * try to perform security checks for malicious input.
-     *
-     * @param path Relative path to be normalized
-     *
-     * @deprecated Deprecated to resolve a circular package dependency and will
-     *             be removed in Tomcat 8.0.x. Use {@link
-     *             org.apache.tomcat.util.http.RequestUtil#normalize(String)} as
-     *             a replacement.
-     */
-    @Deprecated
-    public static String normalize(String path) {
-        return org.apache.tomcat.util.http.RequestUtil.normalize(path);
-    }
-
-
-    /**
-     * Normalize a relative URI path that may have relative values ("/./",
-     * "/../", and so on ) it it.  <strong>WARNING</strong> - This method is
-     * useful only for normalizing application-generated paths.  It does not
-     * try to perform security checks for malicious input.
-     *
-     * @param path Relative path to be normalized
-     * @param replaceBackSlash Should '\\' be replaced with '/'
-     *
-     * @deprecated Deprecated to resolve a circular package dependency and will
-     *             be removed in Tomcat 8.0.x. Use {@link
-     *             org.apache.tomcat.util.http.RequestUtil#normalize(String,
-     *             boolean)} as a replacement.
-     */
-    @Deprecated
-    public static String normalize(String path, boolean replaceBackSlash) {
-        return org.apache.tomcat.util.http.RequestUtil.normalize(path,
-                replaceBackSlash);
-    }
-
-
-    /**
      * Append request parameters from the specified String to the specified
      * Map.  It is presumed that the specified Map is not accessed from any
      * other thread, so no synchronization is performed.
