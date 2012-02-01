@@ -5563,7 +5563,7 @@ public class StandardContext extends ContainerBase
 
     @Override
     public Set<String> addServletSecurity(
-            ApplicationServletRegistration registration,
+            ServletRegistration.Dynamic registration,
             ServletSecurityElement servletSecurityElement) {
 
         Set<String> conflicts = new HashSet<String>();
