@@ -40,7 +40,6 @@ import javax.management.ObjectName;
 import javax.naming.directory.DirContext;
 
 import org.apache.catalina.AccessLog;
-import org.apache.catalina.CatalinaFactory;
 import org.apache.catalina.Cluster;
 import org.apache.catalina.Container;
 import org.apache.catalina.ContainerEvent;
@@ -228,8 +227,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase
     /**
      * The Pipeline object with which this Container is associated.
      */
-    protected Pipeline pipeline =
-        CatalinaFactory.getFactory().createPipeline(this);
+    protected Pipeline pipeline = new StandardPipeline(this);
 
 
     /**
