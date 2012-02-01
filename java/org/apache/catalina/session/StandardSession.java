@@ -52,7 +52,6 @@ import org.apache.catalina.Manager;
 import org.apache.catalina.Session;
 import org.apache.catalina.SessionEvent;
 import org.apache.catalina.SessionListener;
-import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.realm.GenericPrincipal;
 import org.apache.catalina.security.SecurityUtil;
 import org.apache.tomcat.util.ExceptionUtils;
@@ -1685,32 +1684,6 @@ public class StandardSession implements HttpSession, Session, Serializable {
 
 
     // ------------------------------------------------------ Protected Methods
-
-
-    /**
-     * Fire container events if the Context implementation is the
-     * <code>org.apache.catalina.core.StandardContext</code>.
-     *
-     * @param context Context for which to fire events
-     * @param type Event type
-     * @param data Event data
-     *
-     * @exception Exception occurred during event firing
-     *
-     * @deprecated  No longer necessary since {@link StandardContext} implements
-     *              the {@link org.apache.catalina.Container} interface.
-     *
-     */
-    @Deprecated
-    protected void fireContainerEvent(Context context,
-                                    String type, Object data)
-        throws Exception {
-
-        if (context instanceof StandardContext) {
-            ((StandardContext) context).fireContainerEvent(type, data);
-        }
-    }
-
 
     /**
      * Notify all session event listeners that a particular event has
