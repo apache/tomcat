@@ -89,9 +89,7 @@ public class StandardService extends LifecycleMBeanBase implements Service {
     protected ArrayList<Executor> executors = new ArrayList<Executor>();
 
     /**
-     * The Container associated with this Service. (In the case of the
-     * org.apache.catalina.startup.Embedded subclass, this holds the most
-     * recently added Engine.)
+     * The Container associated with this Service.
      */
     protected Container container = null;
 
