@@ -1641,16 +1641,16 @@ public class DefaultServlet
             && (entry.resource != null)
             && ((length > sendfileSize) || (entry.resource.getContent() == null))
             && (entry.attributes.getCanonicalPath() != null)
-            && (Boolean.TRUE == request.getAttribute("org.apache.tomcat.sendfile.support"))
+            && (Boolean.TRUE == request.getAttribute(Globals.SENDFILE_SUPPORTED_ATTR))
             && (request.getClass().getName().equals("org.apache.catalina.connector.RequestFacade"))
             && (response.getClass().getName().equals("org.apache.catalina.connector.ResponseFacade"))) {
-            request.setAttribute("org.apache.tomcat.sendfile.filename", entry.attributes.getCanonicalPath());
+            request.setAttribute(Globals.SENDFILE_FILENAME_ATTR, entry.attributes.getCanonicalPath());
             if (range == null) {
-                request.setAttribute("org.apache.tomcat.sendfile.start", Long.valueOf(0L));
-                request.setAttribute("org.apache.tomcat.sendfile.end", Long.valueOf(length));
+                request.setAttribute(Globals.SENDFILE_FILE_START_ATTR, Long.valueOf(0L));
+                request.setAttribute(Globals.SENDFILE_FILE_END_ATTR, Long.valueOf(length));
             } else {
-                request.setAttribute("org.apache.tomcat.sendfile.start", Long.valueOf(range.start));
-                request.setAttribute("org.apache.tomcat.sendfile.end", Long.valueOf(range.end + 1));
+                request.setAttribute(Globals.SENDFILE_FILE_START_ATTR, Long.valueOf(range.start));
+                request.setAttribute(Globals.SENDFILE_FILE_END_ATTR, Long.valueOf(range.end + 1));
             }
             return true;
         }

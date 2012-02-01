@@ -1273,7 +1273,8 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
 
         // Advertise sendfile support through a request attribute
         if (endpoint.getUseSendfile()) {
-            request.setAttribute("org.apache.tomcat.sendfile.support",
+            request.setAttribute(
+                    org.apache.coyote.Constants.SENDFILE_SUPPORTED_ATTR,
                     Boolean.TRUE);
         }
 

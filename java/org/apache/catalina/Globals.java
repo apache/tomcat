@@ -177,9 +177,11 @@ public final class Globals {
     /**
      * The request attribute that is set to the value of {@code Boolean.TRUE}
      * if connector processing this request supports use of sendfile.
+     *
+     * Duplicated here for neater code in the catalina packages.
      */
     public static final String SENDFILE_SUPPORTED_ATTR =
-        "org.apache.tomcat.sendfile.support";
+            org.apache.coyote.Constants.SENDFILE_SUPPORTED_ATTR;
 
 
     /**
@@ -187,9 +189,11 @@ public final class Globals {
      * to the connector the name of the file that is to be served
      * by sendfile. The value should be {@code java.lang.String}
      * that is {@code File.getCanonicalPath()} of the file to be served.
+     *
+     * Duplicated here for neater code in the catalina packages.
      */
     public static final String SENDFILE_FILENAME_ATTR =
-        "org.apache.tomcat.sendfile.filename";
+            org.apache.coyote.Constants.SENDFILE_FILENAME_ATTR;
 
 
     /**
@@ -198,9 +202,11 @@ public final class Globals {
      * that is to be served by sendfile. The value should be
      * {@code java.lang.Long}. To serve complete file
      * the value should be {@code Long.valueOf(0)}.
+     *
+     * Duplicated here for neater code in the catalina packages.
      */
     public static final String SENDFILE_FILE_START_ATTR =
-        "org.apache.tomcat.sendfile.start";
+            org.apache.coyote.Constants.SENDFILE_FILE_START_ATTR;
 
 
     /**
@@ -209,9 +215,11 @@ public final class Globals {
      * of a file that is to be served by sendfile. The value should be
      * {@code java.lang.Long}. To serve complete file
      * the value should be equal to the length of the file.
+     *
+     * Duplicated here for neater code in the catalina packages.
      */
     public static final String SENDFILE_FILE_END_ATTR =
-        "org.apache.tomcat.sendfile.end";
+            org.apache.coyote.Constants.SENDFILE_FILE_END_ATTR;
 
 
     /**

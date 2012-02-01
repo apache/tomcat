@@ -486,7 +486,7 @@ public class Http11AprProcessor extends AbstractHttp11Processor<Long> {
     @Override
     protected boolean prepareSendfile(OutputFilter[] outputFilters) {
         String fileName = (String) request.getAttribute(
-                "org.apache.tomcat.sendfile.filename");
+                org.apache.coyote.Constants.SENDFILE_FILENAME_ATTR);
         if (fileName != null) {
             // No entity body sent here
             outputBuffer.addActiveFilter(outputFilters[Constants.VOID_FILTER]);
@@ -494,9 +494,9 @@ public class Http11AprProcessor extends AbstractHttp11Processor<Long> {
             sendfileData = new AprEndpoint.SendfileData();
             sendfileData.fileName = fileName;
             sendfileData.start = ((Long) request.getAttribute(
-                    "org.apache.tomcat.sendfile.start")).longValue();
+                    org.apache.coyote.Constants.SENDFILE_FILE_START_ATTR)).longValue();
             sendfileData.end = ((Long) request.getAttribute(
-                    "org.apache.tomcat.sendfile.end")).longValue();
+                    org.apache.coyote.Constants.SENDFILE_FILE_END_ATTR)).longValue();
             return true;
         }
         return false;

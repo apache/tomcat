@@ -88,4 +88,44 @@ public final class Constants {
      */
     public static final String COMET_TIMEOUT_ATTR =
         "org.apache.tomcat.comet.timeout";
+
+
+    /**
+     * The request attribute that is set to the value of {@code Boolean.TRUE}
+     * if connector processing this request supports use of sendfile.
+     */
+    public static final String SENDFILE_SUPPORTED_ATTR =
+        "org.apache.tomcat.sendfile.support";
+
+
+    /**
+     * The request attribute that can be used by a servlet to pass
+     * to the connector the name of the file that is to be served
+     * by sendfile. The value should be {@code java.lang.String}
+     * that is {@code File.getCanonicalPath()} of the file to be served.
+     */
+    public static final String SENDFILE_FILENAME_ATTR =
+        "org.apache.tomcat.sendfile.filename";
+
+
+    /**
+     * The request attribute that can be used by a servlet to pass
+     * to the connector the start offset of the part of a file
+     * that is to be served by sendfile. The value should be
+     * {@code java.lang.Long}. To serve complete file
+     * the value should be {@code Long.valueOf(0)}.
+     */
+    public static final String SENDFILE_FILE_START_ATTR =
+        "org.apache.tomcat.sendfile.start";
+
+
+    /**
+     * The request attribute that can be used by a servlet to pass
+     * to the connector the end offset (not including) of the part
+     * of a file that is to be served by sendfile. The value should be
+     * {@code java.lang.Long}. To serve complete file
+     * the value should be equal to the length of the file.
+     */
+    public static final String SENDFILE_FILE_END_ATTR =
+        "org.apache.tomcat.sendfile.end";
 }
