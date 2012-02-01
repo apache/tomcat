@@ -943,7 +943,7 @@ public class Request
      * have names starting with "org.apache.tomcat" and include:
      * <ul>
      * <li>org.apache.tomcat.sendfile.support</li>
-     * <li>org.apache.tomcat.comet.support</li>
+     * <li>{@link Globals#COMET_SUPPORTED_ATTR</li>
      * <li>org.apache.tomcat.comet.timeout.support</li>
      * </ul>
      * Connector implementations may return some, all or none of these
