@@ -112,7 +112,9 @@ public final class Globals {
     /**
      * The servlet context attribute under which the managed bean Registry
      * will be stored for privileged contexts (if enabled).
+     * @deprecated Unused. Will be removed in Tomcat 8.0.x.
      */
+    @Deprecated
     public static final String MBEAN_REGISTRY_ATTR =
         "org.apache.catalina.Registry";
 
@@ -120,7 +122,9 @@ public final class Globals {
     /**
      * The servlet context attribute under which the MBeanServer will be stored
      * for privileged contexts (if enabled).
+     * @deprecated Unused. Will be removed in Tomcat 8.0.x.
      */
+    @Deprecated
     public static final String MBEAN_SERVER_ATTR =
         "org.apache.catalina.MBeanServer";
 
@@ -159,7 +163,9 @@ public final class Globals {
      * All request attributes which names start with this prefix are used by
      * connector implementations. They are passed down to coyoteRequest and back
      * up. See <code>Request.setAttribute(String, Object)</code>.
+     * @deprecated Unused. Will be removed in Tomcat 8.0.x.
      */
+    @Deprecated
     public static final String TOMCAT_CONNECTOR_ATTR_PREFIX =
         "org.apache.tomcat.";
 
