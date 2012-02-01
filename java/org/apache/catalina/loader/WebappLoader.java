@@ -53,7 +53,6 @@ import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.LifecycleState;
 import org.apache.catalina.Loader;
-import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.mbeans.MBeanUtils;
 import org.apache.catalina.util.LifecycleMBeanBase;
 import org.apache.naming.resources.DirContextURLStreamHandler;
@@ -402,8 +401,8 @@ public class WebappLoader extends LifecycleMBeanBase
             try {
                 Thread.currentThread().setContextClassLoader
                     (WebappLoader.class.getClassLoader());
-                if (container instanceof StandardContext) {
-                    ((StandardContext) container).reload();
+                if (container instanceof Context) {
+                    ((Context) container).reload();
                 }
             } finally {
                 if (container.getLoader() != null) {
@@ -564,19 +563,6 @@ public class WebappLoader extends LifecycleMBeanBase
             classLoader.setResources(container.getResources());
             classLoader.setDelegate(this.delegate);
             classLoader.setSearchExternalFirst(searchExternalFirst);
-            if (container instanceof StandardContext) {
-                classLoader.setAntiJARLocking(
-                        ((StandardContext) container).getAntiJARLocking());
-                classLoader.setClearReferencesStatic(
-                        ((StandardContext) container).getClearReferencesStatic());
-                classLoader.setClearReferencesStopThreads(
-                        ((StandardContext) container).getClearReferencesStopThreads());
-                classLoader.setClearReferencesStopTimerThreads(
-                        ((StandardContext) container).getClearReferencesStopTimerThreads());
-                classLoader.setClearReferencesHttpClientKeepAliveThread(
-                        ((StandardContext) container).getClearReferencesHttpClientKeepAliveThread());
-            }
-
             for (int i = 0; i < repositories.length; i++) {
                 classLoader.addRepository(repositories[i]);
             }
@@ -593,14 +579,14 @@ public class WebappLoader extends LifecycleMBeanBase
             DirContextURLStreamHandler.bind(classLoader,
                     this.container.getResources());
 
-            StandardContext ctx=(StandardContext)container;
-            String contextName = ctx.getName();
+            String contextName = container.getName();
             if (!contextName.startsWith("/")) {
                 contextName = "/" + contextName;
             }
-            ObjectName cloname = new ObjectName
-                (MBeanUtils.getDomain(ctx) + ":type=WebappClassLoader,context="
-                 + contextName + ",host=" + ctx.getParent().getName());
+            ObjectName cloname = new ObjectName(
+                    MBeanUtils.getDomain(container) +
+                    ":type=WebappClassLoader,context=" + contextName +
+                    ",host=" + container.getParent().getName());
             Registry.getRegistry(null, null)
                 .registerComponent(classLoader, cloname, null);
 
@@ -642,14 +628,14 @@ public class WebappLoader extends LifecycleMBeanBase
         DirContextURLStreamHandler.unbind(classLoader);
 
         try {
-            StandardContext ctx=(StandardContext)container;
-            String contextName = ctx.getName();
+            String contextName = container.getName();
             if (!contextName.startsWith("/")) {
                 contextName = "/" + contextName;
             }
-            ObjectName cloname = new ObjectName
-                (MBeanUtils.getDomain(ctx) + ":type=WebappClassLoader,context="
-                 + contextName + ",host=" + ctx.getParent().getName());
+            ObjectName cloname = new ObjectName(
+                    MBeanUtils.getDomain(container) +
+                    ":type=WebappClassLoader,context=" + contextName +
+                    ",host=" + container.getParent().getName());
             Registry.getRegistry(null, null).unregisterComponent(cloname);
         } catch (Exception e) {
             log.error("LifecycleException ", e);
