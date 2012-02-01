@@ -26,7 +26,8 @@ import org.apache.catalina.core.StandardPipeline;
  * there is demand it can be extended to support alternative factories and/or
  * alternative defaults.
  *
- * TODO: Create the other standard components via this factory
+ * @deprecated There was no demand for this capability and it will be removed in
+ *             Tomact 8.0.x
  */
 public class CatalinaFactory {
 
