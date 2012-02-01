@@ -75,6 +75,7 @@ import org.apache.catalina.realm.GenericPrincipal;
 import org.apache.catalina.util.ParameterMap;
 import org.apache.catalina.util.StringParser;
 import org.apache.coyote.ActionCode;
+import org.apache.coyote.http11.UpgradeInbound;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.ExceptionUtils;
@@ -2611,6 +2612,21 @@ public class Request
         }
         return null;
     }
+
+
+    // --------------------------------------------------------- Upgrade Methods
+
+    public void doUpgrade(UpgradeInbound inbound)
+            throws IOException {
+
+        coyoteRequest.action(ActionCode.UPGRADE, inbound);
+
+        // Output required by RFC2616. Protocol specific headers should have
+        // already been set.
+        response.setStatus(HttpServletResponse.SC_SWITCHING_PROTOCOLS);
+        response.flushBuffer();
+    }
+
 
     // ------------------------------------------------------ Protected Methods
 

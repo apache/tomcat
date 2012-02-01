@@ -310,8 +310,23 @@ public abstract class AbstractInputBuffer<S> implements InputBuffer{
 
     }
 
-    // ---------------------------------------------------- InputBuffer Methods
 
+    /**
+     * Available bytes in the buffers (note that due to encoding, this may not
+     * correspond).
+     */
+    public int available() {
+        int result = (lastValid - pos);
+        if ((result == 0) && (lastActiveFilter >= 0)) {
+            for (int i = 0; (result == 0) && (i <= lastActiveFilter); i++) {
+                result = activeFilters[i].available();
+            }
+        }
+        return result;
+    }
+
+
+    // ---------------------------------------------------- InputBuffer Methods
 
     /**
      * Read some bytes.

@@ -253,6 +253,13 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
     protected String server = null;
 
 
+    /**
+     * Listener to which data available events are passed once the associated
+     * connection has completed the HTTP upgrade process.
+     */
+    protected UpgradeInbound upgradeInbound = null;
+
+
     public AbstractHttp11Processor(AbstractEndpoint endpoint) {
         super(endpoint);
     }
@@ -826,6 +833,15 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
             ((AtomicBoolean) param).set(asyncStateMachine.isAsync());
         } else if (actionCode == ActionCode.ASYNC_IS_TIMINGOUT) {
             ((AtomicBoolean) param).set(asyncStateMachine.isAsyncTimingOut());
+        } else if (actionCode == ActionCode.UPGRADE) {
+            upgradeInbound = (UpgradeInbound) param;
+            upgradeInbound.setInputStream(
+                    new UpgradeInputStream(getInputBuffer()));
+            upgradeInbound.setUpgradeOutbound(
+                    new UpgradeOutbound(
+                            new UpgradeOutputStream(getOutputBuffer())));
+            // Stop further HTTP output
+            getOutputBuffer().finished = true;
         } else {
             actionInternal(actionCode, param);
         }
@@ -901,7 +917,7 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
         }
 
         while (!error && keepAlive && !comet && !isAsync() &&
-                !endpoint.isPaused()) {
+                upgradeInbound == null && !endpoint.isPaused()) {
 
             // Parsing the request header
             try {
@@ -1049,6 +1065,9 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
             return SocketState.CLOSED;
         } else if (isAsync() || comet) {
             return SocketState.LONG;
+        } else if (isUpgrade()) {
+            // May be data on the connection to process
+            return upgradeDispatch();
         } else {
             if (sendfileInProgress) {
                 return SocketState.SENDFILE;
@@ -1548,6 +1567,34 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
     }
 
 
+    @Override
+    public boolean isUpgrade() {
+        return upgradeInbound != null;
+    }
+
+
+
+    @Override
+    public SocketState upgradeDispatch() throws IOException {
+        SocketState result = upgradeInbound.onData();
+        AbstractInputBuffer<S> ib = getInputBuffer();
+        while (result == SocketState.UPGRADE) {
+            // Check to see if there is more data to process
+            if (ib.available() == 0) {
+                // Read any data that might be available
+                // Note: This will block for BIO regardless
+                ib.fill(false);
+            }
+            if (ib.available() == 0) {
+                // Still no data available, exit this loop
+                break;
+            }
+            result = upgradeInbound.onData();
+        }
+        return result;
+    }
+
+
     /**
      * Provides a mechanism for those connector implementations (currently only
      * NIO) that need to reset timeouts from Async timeouts to standard HTTP
@@ -1605,6 +1652,7 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
         getInputBuffer().recycle();
         getOutputBuffer().recycle();
         asyncStateMachine.recycle();
+        upgradeInbound = null;
         remoteAddr = null;
         remoteHost = null;
         localAddr = null;
