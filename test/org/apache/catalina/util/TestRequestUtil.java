@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.catalina.util;
 
 import static org.junit.Assert.assertEquals;
@@ -23,14 +22,6 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 
 public class TestRequestUtil {
-
-    @Test
-    public void testNormalizeString() {
-        assertEquals("/something",RequestUtil.normalize("//something"));
-        assertEquals("/some/thing",RequestUtil.normalize("some//thing"));
-        assertEquals("/something/",RequestUtil.normalize("something//"));
-        assertEquals("/",RequestUtil.normalize("//"));
-    }
 
     @Test
     public void testURLDecodeStringInvalid() {

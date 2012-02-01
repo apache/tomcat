@@ -41,9 +41,9 @@ import javax.naming.directory.ModificationItem;
 import javax.naming.directory.SearchControls;
 import javax.naming.directory.SearchResult;
 
-import org.apache.catalina.util.RequestUtil;
 import org.apache.naming.NamingContextEnumeration;
 import org.apache.naming.NamingEntry;
+import org.apache.tomcat.util.http.RequestUtil;
 
 /**
  * Filesystem Directory Context implementation helper class.

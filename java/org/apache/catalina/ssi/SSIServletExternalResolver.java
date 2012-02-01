@@ -34,9 +34,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.catalina.connector.Request;
-import org.apache.catalina.util.RequestUtil;
 import org.apache.coyote.Constants;
 import org.apache.tomcat.util.buf.B2CConverter;
+import org.apache.tomcat.util.http.RequestUtil;
 
 /**
  * An implementation of SSIExternalResolver that is used with servlets.
