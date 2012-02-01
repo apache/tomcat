@@ -2101,6 +2101,9 @@ public class ContextConfig implements LifecycleListener {
             String name = className.replace('.', '/') + ".class";
             InputStream is =
                     context.getLoader().getClassLoader().getResourceAsStream(name);
+            if (is == null) {
+                return;
+            }
             ClassParser parser = new ClassParser(is, null);
             try {
                 JavaClass clazz = parser.parse();
