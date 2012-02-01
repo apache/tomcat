@@ -14,10 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.catalina.session;
-
 
 import java.beans.PropertyChangeSupport;
 import java.io.IOException;
@@ -415,19 +412,15 @@ public class StandardSession implements HttpSession, Session, Serializable {
                 HttpSessionListener listener =
                     (HttpSessionListener) listeners[i];
                 try {
-                    fireContainerEvent(context,
-                                       "beforeSessionCreated",
-                                       listener);
+                    context.fireContainerEvent("beforeSessionCreated",
+                            listener);
                     listener.sessionCreated(event);
-                    fireContainerEvent(context,
-                                       "afterSessionCreated",
-                                       listener);
+                    context.fireContainerEvent("afterSessionCreated", listener);
                 } catch (Throwable t) {
                     ExceptionUtils.handleThrowable(t);
                     try {
-                        fireContainerEvent(context,
-                                           "afterSessionCreated",
-                                           listener);
+                        context.fireContainerEvent("afterSessionCreated",
+                                listener);
                     } catch (Exception e) {
                         // Ignore
                     }
@@ -789,19 +782,16 @@ public class StandardSession implements HttpSession, Session, Serializable {
                         HttpSessionListener listener =
                             (HttpSessionListener) listeners[j];
                         try {
-                            fireContainerEvent(context,
-                                               "beforeSessionDestroyed",
-                                               listener);
+                            context.fireContainerEvent("beforeSessionDestroyed",
+                                    listener);
                             listener.sessionDestroyed(event);
-                            fireContainerEvent(context,
-                                               "afterSessionDestroyed",
-                                               listener);
+                            context.fireContainerEvent("afterSessionDestroyed",
+                                    listener);
                         } catch (Throwable t) {
                             ExceptionUtils.handleThrowable(t);
                             try {
-                                fireContainerEvent(context,
-                                                   "afterSessionDestroyed",
-                                                   listener);
+                                context.fireContainerEvent(
+                                        "afterSessionDestroyed", listener);
                             } catch (Exception e) {
                                 // Ignore
                             }
@@ -1479,41 +1469,35 @@ public class StandardSession implements HttpSession, Session, Serializable {
                 (HttpSessionAttributeListener) listeners[i];
             try {
                 if (unbound != null) {
-                    fireContainerEvent(context,
-                                       "beforeSessionAttributeReplaced",
-                                       listener);
+                    context.fireContainerEvent("beforeSessionAttributeReplaced",
+                            listener);
                     if (event == null) {
                         event = new HttpSessionBindingEvent
                             (getSession(), name, unbound);
                     }
                     listener.attributeReplaced(event);
-                    fireContainerEvent(context,
-                                       "afterSessionAttributeReplaced",
-                                       listener);
+                    context.fireContainerEvent("afterSessionAttributeReplaced",
+                            listener);
                 } else {
-                    fireContainerEvent(context,
-                                       "beforeSessionAttributeAdded",
-                                       listener);
+                    context.fireContainerEvent("beforeSessionAttributeAdded",
+                            listener);
                     if (event == null) {
                         event = new HttpSessionBindingEvent
                             (getSession(), name, value);
                     }
                     listener.attributeAdded(event);
-                    fireContainerEvent(context,
-                                       "afterSessionAttributeAdded",
-                                       listener);
+                    context.fireContainerEvent("afterSessionAttributeAdded",
+                            listener);
                 }
             } catch (Throwable t) {
                 ExceptionUtils.handleThrowable(t);
                 try {
                     if (unbound != null) {
-                        fireContainerEvent(context,
-                                           "afterSessionAttributeReplaced",
-                                           listener);
+                        context.fireContainerEvent(
+                                "afterSessionAttributeReplaced", listener);
                     } else {
-                        fireContainerEvent(context,
-                                           "afterSessionAttributeAdded",
-                                           listener);
+                        context.fireContainerEvent("afterSessionAttributeAdded",
+                                listener);
                     }
                 } catch (Exception e) {
                     // Ignore
@@ -1712,7 +1696,12 @@ public class StandardSession implements HttpSession, Session, Serializable {
      * @param data Event data
      *
      * @exception Exception occurred during event firing
+     *
+     * @deprecated  No longer necessary since {@link StandardContext} implements
+     *              the {@link org.apache.catalina.Container} interface.
+     *
      */
+    @Deprecated
     protected void fireContainerEvent(Context context,
                                     String type, Object data)
         throws Exception {
@@ -1803,23 +1792,20 @@ public class StandardSession implements HttpSession, Session, Serializable {
             HttpSessionAttributeListener listener =
                 (HttpSessionAttributeListener) listeners[i];
             try {
-                fireContainerEvent(context,
-                                   "beforeSessionAttributeRemoved",
-                                   listener);
+                context.fireContainerEvent("beforeSessionAttributeRemoved",
+                        listener);
                 if (event == null) {
                     event = new HttpSessionBindingEvent
                         (getSession(), name, value);
                 }
                 listener.attributeRemoved(event);
-                fireContainerEvent(context,
-                                   "afterSessionAttributeRemoved",
-                                   listener);
+                context.fireContainerEvent("afterSessionAttributeRemoved",
+                        listener);
             } catch (Throwable t) {
                 ExceptionUtils.handleThrowable(t);
                 try {
-                    fireContainerEvent(context,
-                                       "afterSessionAttributeRemoved",
-                                       listener);
+                    context.fireContainerEvent("afterSessionAttributeRemoved",
+                            listener);
                 } catch (Exception e) {
                     // Ignore
                 }
