@@ -126,7 +126,8 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
                 if (attach != null) {
                     attach.setComet(comet);
                     if (comet) {
-                        Integer comettimeout = (Integer) request.getAttribute("org.apache.tomcat.comet.timeout");
+                        Integer comettimeout = (Integer) request.getAttribute(
+                                org.apache.coyote.Constants.COMET_TIMEOUT_ATTR);
                         if (comettimeout != null) {
                             attach.setTimeout(comettimeout.longValue());
                         }
@@ -261,7 +262,8 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
             if (attach != null)  {
                 attach.setComet(comet);
                 if (comet) {
-                    Integer comettimeout = (Integer) request.getAttribute("org.apache.tomcat.comet.timeout");
+                    Integer comettimeout = (Integer) request.getAttribute(
+                            org.apache.coyote.Constants.COMET_TIMEOUT_ATTR);
                     if (comettimeout != null) {
                         attach.setTimeout(comettimeout.longValue());
                     }

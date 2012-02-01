@@ -154,9 +154,11 @@ public final class Globals {
      * per-connection request timeout through Comet API.
      *
      * @see org.apache.catalina.comet.CometEvent#setTimeout(int)
+     *
+     * Duplicated here for neater code in the catalina packages.
      */
     public static final String COMET_TIMEOUT_SUPPORTED_ATTR =
-        "org.apache.tomcat.comet.timeout.support";
+            org.apache.coyote.Constants.COMET_TIMEOUT_SUPPORTED_ATTR;
 
 
     /**
@@ -165,9 +167,11 @@ public final class Globals {
      * timeout for Comet API. The value is in milliseconds.
      *
      * @see org.apache.catalina.comet.CometEvent#setTimeout(int)
+     *
+     * Duplicated here for neater code in the catalina packages.
      */
     public static final String COMET_TIMEOUT_ATTR =
-        "org.apache.tomcat.comet.timeout";
+        org.apache.coyote.Constants.COMET_TIMEOUT_ATTR;
 
 
     /**

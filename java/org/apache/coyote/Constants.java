@@ -67,4 +67,25 @@ public final class Constants {
     public static final String COMET_SUPPORTED_ATTR =
         "org.apache.tomcat.comet.support";
 
+
+    /**
+     * The request attribute that is set to the value of {@code Boolean.TRUE}
+     * if connector processing this request supports setting
+     * per-connection request timeout through Comet API.
+     *
+     * @see org.apache.catalina.comet.CometEvent#setTimeout(int)
+     */
+    public static final String COMET_TIMEOUT_SUPPORTED_ATTR =
+        "org.apache.tomcat.comet.timeout.support";
+
+
+    /**
+     * The request attribute that can be set to a value of type
+     * {@code java.lang.Integer} to specify per-connection request
+     * timeout for Comet API. The value is in milliseconds.
+     *
+     * @see org.apache.catalina.comet.CometEvent#setTimeout(int)
+     */
+    public static final String COMET_TIMEOUT_ATTR =
+        "org.apache.tomcat.comet.timeout";
 }
