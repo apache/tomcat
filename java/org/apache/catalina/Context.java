@@ -14,21 +14,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.catalina;
-
 
 import java.net.URL;
 import java.util.Set;
 
 import javax.servlet.ServletContainerInitializer;
 import javax.servlet.ServletContext;
+import javax.servlet.ServletRegistration;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletSecurityElement;
 import javax.servlet.descriptor.JspConfigDescriptor;
 
-import org.apache.catalina.core.ApplicationServletRegistration;
 import org.apache.catalina.deploy.ApplicationParameter;
 import org.apache.catalina.deploy.ErrorPage;
 import org.apache.catalina.deploy.FilterDef;
@@ -39,7 +36,6 @@ import org.apache.catalina.deploy.SecurityConstraint;
 import org.apache.catalina.util.CharsetMapper;
 import org.apache.tomcat.JarScanner;
 import org.apache.tomcat.util.http.mapper.Mapper;
-
 
 /**
  * A <b>Context</b> is a Container that represents a servlet context, and
@@ -60,7 +56,6 @@ import org.apache.tomcat.util.http.mapper.Mapper;
  * @author Craig R. McClanahan
  * @version $Id$
  */
-
 public interface Context extends Container {
 
 
@@ -1320,7 +1315,7 @@ public interface Context extends Container {
      * @return urls currently mapped to this registration that are already
      *         present in web.xml
      */
-    Set<String> addServletSecurity(ApplicationServletRegistration registration,
+    Set<String> addServletSecurity(ServletRegistration.Dynamic registration,
             ServletSecurityElement servletSecurityElement);
 
     /**

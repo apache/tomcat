@@ -23,6 +23,7 @@ import java.util.Set;
 import javax.naming.directory.DirContext;
 import javax.servlet.ServletContainerInitializer;
 import javax.servlet.ServletContext;
+import javax.servlet.ServletRegistration;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletSecurityElement;
 import javax.servlet.descriptor.JspConfigDescriptor;
@@ -42,7 +43,6 @@ import org.apache.catalina.Valve;
 import org.apache.catalina.Wrapper;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
-import org.apache.catalina.core.ApplicationServletRegistration;
 import org.apache.catalina.deploy.ApplicationParameter;
 import org.apache.catalina.deploy.ErrorPage;
 import org.apache.catalina.deploy.FilterDef;
@@ -604,7 +604,7 @@ public class FailedContext extends LifecycleMBeanBase implements Context {
 
     @Override
     public Set<String> addServletSecurity(
-            ApplicationServletRegistration registration,
+            ServletRegistration.Dynamic registration,
             ServletSecurityElement servletSecurityElement) { return null; }
 
     @Override
