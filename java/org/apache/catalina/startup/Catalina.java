@@ -64,8 +64,6 @@ import org.xml.sax.SAXParseException;
  * <li><b>stop</b>       - Stop the currently running instance of Catalina.
  * </u>
  *
- * Should do the same thing as Embedded, but using a server.xml file.
- *
  * @author Craig R. McClanahan
  * @author Remy Maucherat
  * @version $Id$
@@ -748,11 +746,7 @@ public class Catalina {
 
         String catalinaHome = System.getProperty(Globals.CATALINA_HOME_PROP);
         if (catalinaHome == null) {
-            // Backwards compatibility patch for J2EE RI 1.3
-            String j2eeHome = System.getProperty("com.sun.enterprise.home");
-            if (j2eeHome != null) {
-                catalinaHome=System.getProperty("com.sun.enterprise.home");
-            } else if (System.getProperty(Globals.CATALINA_BASE_PROP) != null) {
+            if (System.getProperty(Globals.CATALINA_BASE_PROP) != null) {
                 catalinaHome = System.getProperty(Globals.CATALINA_BASE_PROP);
             } else {
                 // Use IntrospectionUtils and guess the dir
