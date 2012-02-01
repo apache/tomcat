@@ -16,11 +16,11 @@
  */
 package org.apache.catalina.ssi;
 
-
 import javax.servlet.RequestDispatcher;
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.catalina.util.RequestUtil;
+import org.apache.tomcat.util.http.RequestUtil;
+
 public class SSIServletRequestUtil {
     /**
      * Return the relative path associated with this servlet. Taken from
