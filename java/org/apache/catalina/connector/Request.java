@@ -1449,7 +1449,7 @@ public class Request
 
         // Do the security check before any updates are made
         if (Globals.IS_SECURITY_ENABLED &&
-                name.equals("org.apache.tomcat.sendfile.filename")) {
+                name.equals(Globals.SENDFILE_FILENAME_ATTR)) {
             // Use the canonical file name to avoid any possible symlink and
             // relative path issues
             String canonicalPath;

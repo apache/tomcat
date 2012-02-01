@@ -1621,10 +1621,10 @@ public class AccessLogValve extends ValveBase implements AccessLog {
                 // Protect against nulls and unexpected types as these values
                 // may be set by untrusted applications
                 Object start = request.getAttribute(
-                        "org.apache.tomcat.sendfile.start");
+                        Globals.SENDFILE_FILE_START_ATTR);
                 if (start instanceof Long) {
                     Object end = request.getAttribute(
-                            "org.apache.tomcat.sendfile.end");
+                            Globals.SENDFILE_FILE_END_ATTR);
                     if (end instanceof Long) {
                         length = ((Long) end).longValue() -
                                 ((Long) start).longValue();
