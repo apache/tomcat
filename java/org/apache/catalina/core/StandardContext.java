@@ -116,6 +116,7 @@ import org.apache.naming.resources.WARDirContext;
 import org.apache.tomcat.InstanceManager;
 import org.apache.tomcat.JarScanner;
 import org.apache.tomcat.util.ExceptionUtils;
+import org.apache.tomcat.util.IntrospectionUtils;
 import org.apache.tomcat.util.modeler.Registry;
 import org.apache.tomcat.util.scan.StandardJarScanner;
 
@@ -5032,6 +5033,16 @@ public class StandardContext extends ContainerBase
 
                 // since the loader just started, the webapp classloader is now
                 // created.
+                setClassLoaderProperty("antiJARLocking", getAntiJARLocking());
+                setClassLoaderProperty("clearReferencesStatic",
+                        getClearReferencesStatic());
+                setClassLoaderProperty("clearReferencesStopThreads",
+                        getClearReferencesStopThreads());
+                setClassLoaderProperty("clearReferencesStopTimerThreads",
+                        getClearReferencesStopTimerThreads());
+                setClassLoaderProperty("clearReferencesHttpClientKeepAliveThread",
+                        getClearReferencesHttpClientKeepAliveThread());
+
                 // By calling unbindThread and bindThread in a row, we setup the
                 // current Thread CCL to be the webapp classloader
                 unbindThread(oldCCL);
@@ -5229,6 +5240,16 @@ public class StandardContext extends ContainerBase
             setState(LifecycleState.FAILED);
         } else {
             setState(LifecycleState.STARTING);
+        }
+    }
+
+    private void setClassLoaderProperty(String name, boolean value) {
+        ClassLoader cl = getLoader().getClassLoader();
+        if (IntrospectionUtils.setProperty(cl, name, Boolean.toString(value))) {
+            // Failed to set
+            log.info(sm.getString(
+                    "standardContext.webappClassLoader.missingProperty",
+                    name, Boolean.toString(value)));
         }
     }
 
