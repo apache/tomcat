@@ -142,9 +142,10 @@ public final class Globals {
     /**
      * The request attribute that is set to the value of {@code Boolean.TRUE}
      * if connector processing this request supports Comet API.
+     * Duplicated here for neater code in the catalina packages.
      */
     public static final String COMET_SUPPORTED_ATTR =
-        "org.apache.tomcat.comet.support";
+        org.apache.coyote.Constants.COMET_SUPPORTED_ATTR;
 
 
     /**

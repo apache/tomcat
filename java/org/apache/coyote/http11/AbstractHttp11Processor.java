@@ -1279,7 +1279,8 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
 
         // Advertise comet support through a request attribute
         if (endpoint.getUseComet()) {
-            request.setAttribute("org.apache.tomcat.comet.support",
+            request.setAttribute(
+                    org.apache.coyote.Constants.COMET_SUPPORTED_ATTR,
                     Boolean.TRUE);
         }
         // Advertise comet timeout support
