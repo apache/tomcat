@@ -455,6 +455,9 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
             ((AtomicBoolean) param).set(asyncStateMachine.isAsync());
         } else if (actionCode == ActionCode.ASYNC_IS_TIMINGOUT) {
             ((AtomicBoolean) param).set(asyncStateMachine.isAsyncTimingOut());
+        } else if (actionCode == ActionCode.UPGRADE) {
+            // HTTP connections only. Unsupported for AJP.
+            // NOOP
         }  else {
             actionInternal(actionCode, param);
         }
@@ -509,6 +512,15 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
                 sm.getString("ajpprocessor.comet.notsupported"));
     }
 
+
+    @Override
+    public SocketState upgradeDispatch() throws IOException {
+        // Should never reach this code but in case we do...
+        throw new IOException(
+                sm.getString("ajpprocessor.httpupgrade.notsupported"));
+    }
+
+
     /**
      * Recycle the processor, ready for the next request which may be on the
      * same connection or a different connection.
@@ -549,6 +561,13 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
     @Override
     protected final boolean isComet() {
         // AJP does not support Comet
+        return false;
+    }
+
+
+    @Override
+    protected final boolean isUpgrade() {
+        // AJP does not support HTTP upgrade
         return false;
     }
 

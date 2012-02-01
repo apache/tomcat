@@ -551,6 +551,8 @@ public abstract class AbstractProtocol implements ProtocolHandler,
                         state = processor.asyncDispatch(status);
                     } else if (processor.isComet()) {
                         state = processor.event(status);
+                    } else if (processor.isUpgrade()) {
+                        state = processor.upgradeDispatch();
                     } else {
                         state = processor.process(socket);
                     }
@@ -574,6 +576,9 @@ public abstract class AbstractProtocol implements ProtocolHandler,
                     // closed. If it works, the socket will be re-added to the
                     // poller
                     release(socket, processor, false, false);
+                } else if (state == SocketState.UPGRADE) {
+                    // Need to keep the connection associated with the processor
+                    longPoll(socket, processor);
                 } else {
                     // Connection closed. OK to recycle the processor.
                     release(socket, processor, true, false);
