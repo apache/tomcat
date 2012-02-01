@@ -118,7 +118,9 @@ public final class Globals {
     /**
      * The servlet context attribute under which the managed bean Registry
      * will be stored for privileged contexts (if enabled).
+     * @deprecated Unused. Will be removed in Tomcat 8.0.x.
      */
+    @Deprecated
     public static final String MBEAN_REGISTRY_ATTR =
         "org.apache.catalina.Registry";
 
@@ -126,7 +128,9 @@ public final class Globals {
     /**
      * The servlet context attribute under which the MBeanServer will be stored
      * for privileged contexts (if enabled).
+     * @deprecated Unused. Will be removed in Tomcat 8.0.x.
      */
+    @Deprecated
     public static final String MBEAN_SERVER_ATTR =
         "org.apache.catalina.MBeanServer";
 
