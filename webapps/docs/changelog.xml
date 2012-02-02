@@ -82,6 +82,11 @@
         <code>org.apache.catalina</code> and <code>org.apache.naming</code>.
         (markt)
       </scode>
+      <scode>
+        Remove some initialisation code from the standard start process (i.e.
+        via the scripts) that was intended for embedding but is not required
+        when performing a standard start.(markt) 
+      </scode>
     </changelog>
   </subsection>
   <subsection name="Coyote">
