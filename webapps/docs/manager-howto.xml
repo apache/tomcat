@@ -1265,6 +1265,37 @@ http://webserver/manager/jmxproxy/?qry=STUFF
     you may run.
   </subsection>
 
+  <subsection name="JMX Get command">
+    The JXMProxyServlet also supports a "get" command that you can use to
+    fetch the value of a specific MBean's attribute. The general form of
+    the <code>get</code> command is:
+
+    <source>
+      http://webserver/manager/jmxproxy/?get=BEANNAME&amp;att=MYATTRIBUTE&amp;key=MYKEY
+    </source>
+
+    You must provide the following parameters:
+    <ol>
+      <li><code>get</code>: The full bean name</li>
+      <li><code>att</code>: The attribute you wish to fetch</li>
+      <li><code>key</code>: (optional) The key into a CompositeData MBean attribute</li>
+    </ol>
+
+    If all goes well, then it will say OK, otherwise an error message will
+    be shown. For example, let's say we wish to fetch the current heap memory
+    data:
+
+    <source>
+      http://webserver/manager/jmxproxy/?get=java.lang:type=Memory&amp;att=HeapMemoryUsage
+    </source>
+
+    Or, if you only want the "used" key:
+
+    <source>
+      http://webserver/manager/jmxproxy/?get=java.lang:type=Memory&amp;att=HeapMemoryUsage&amp;key=used
+    </source>
+  </subsection>
+
   <subsection name="JMX Set command">
     Now that you can query an MBean, its time to muck with Tomcat's internals!
     The general form of the set command is :

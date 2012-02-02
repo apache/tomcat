@@ -25,6 +25,7 @@ import javax.management.MBeanOperationInfo;
 import javax.management.MBeanParameterInfo;
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
+import javax.management.openmbean.CompositeData;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -97,7 +98,7 @@ public class JMXProxyServlet extends HttpServlet  {
         qry=request.getParameter("get");
         if( qry!= null ) {
             String name=request.getParameter("att");
-            getAttribute( writer, qry, name );
+            getAttribute( writer, qry, name, request.getParameter("key") );
             return;
         }
         qry = request.getParameter("invoke");
@@ -122,18 +123,35 @@ public class JMXProxyServlet extends HttpServlet  {
 
     }
 
-    public void getAttribute(PrintWriter writer, String onameStr, String att) {
+    public void getAttribute(PrintWriter writer, String onameStr, String att, String key) {
         try {
             ObjectName oname = new ObjectName(onameStr);
             Object value = mBeanServer.getAttribute(oname, att);
+
+            if(null != key && value instanceof CompositeData)
+              value = ((CompositeData)value).get(key);
+
             String valueStr;
             if (value != null) {
                 valueStr = value.toString();
             } else {
                 valueStr = "<null>";
             }
-            writer.println("OK - Attribute get '" + onameStr + "' - " + att
-                    + "= " + MBeanDumper.escape(valueStr));
+
+            writer.print("OK - Attribute get '");
+            writer.print(onameStr);
+            writer.print("' - ");
+            writer.print(att);
+
+            if(null != key) {
+                writer.print(" - key '");
+                writer.print(key);
+                writer.print("'");
+            }
+
+            writer.print(" = ");
+
+            writer.println(MBeanDumper.escape(valueStr));
         } catch (Exception ex) {
             writer.println("Error - " + ex.toString());
             ex.printStackTrace(writer);
