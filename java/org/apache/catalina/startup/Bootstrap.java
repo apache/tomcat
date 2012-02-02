@@ -20,6 +20,7 @@ package org.apache.catalina.startup;
 
 
 import java.io.File;
+import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -68,6 +69,68 @@ public final class Bootstrap {
      */
     private static Bootstrap daemon = null;
 
+
+    private static final File catalinaBaseFile;
+    private static final File catalinaHomeFile;
+
+    static {
+        // Will always be non-null
+        String userDir = System.getProperty("user.dir");
+
+        // Home first
+        String home = System.getProperty(Globals.CATALINA_HOME_PROP);
+        File homeFile = null;
+
+        if (home != null) {
+            File f = new File(home);
+            try {
+                homeFile = f.getCanonicalFile();
+            } catch (IOException ioe) {
+                homeFile = f.getAbsoluteFile();
+            }
+        }
+
+        if (homeFile == null) {
+            // First fall-back. See if current directory is a bin directory
+            // in a normal Tomcat install
+            File bootstrapJar = new File(userDir, "bootstrap.jar");
+
+            if (bootstrapJar.exists()) {
+                File f = new File(userDir, "..");
+                try {
+                    homeFile = f.getCanonicalFile();
+                } catch (IOException ioe) {
+                    homeFile = f.getAbsoluteFile();
+                }
+            }
+        }
+
+        if (homeFile == null) {
+            // Second fall-back. Use current directory
+            File f = new File(userDir);
+            try {
+                homeFile = f.getCanonicalFile();
+            } catch (IOException ioe) {
+                homeFile = f.getAbsoluteFile();
+            }
+        }
+
+        catalinaHomeFile = homeFile;
+
+        // Then base
+        String base = System.getProperty(Globals.CATALINA_BASE_PROP);
+        if (base == null) {
+            catalinaBaseFile = catalinaHomeFile;
+        } else {
+            File baseFile = new File(base);
+            try {
+                baseFile = baseFile.getCanonicalFile();
+            } catch (IOException ioe) {
+                baseFile = baseFile.getAbsoluteFile();
+            }
+            catalinaBaseFile = baseFile;
+        }
+    }
 
     // -------------------------------------------------------------- Variables
 
@@ -216,13 +279,7 @@ public final class Bootstrap {
     /**
      * Initialize daemon.
      */
-    public void init()
-        throws Exception
-    {
-
-        // Set Catalina path
-        setCatalinaHome();
-        setCatalinaBase();
+    public void init() throws Exception {
 
         initClassLoaders();
 
@@ -472,67 +529,42 @@ public final class Bootstrap {
 
     }
 
-    /**
-     * Set the <code>catalina.base</code> System property to the current
-     * working directory if it has not been set.
-     */
-    private void setCatalinaBase() {
-
-        if (System.getProperty(Globals.CATALINA_BASE_PROP) != null)
-            return;
-        if (System.getProperty(Globals.CATALINA_HOME_PROP) != null)
-            System.setProperty(Globals.CATALINA_BASE_PROP,
-                               System.getProperty(Globals.CATALINA_HOME_PROP));
-        else
-            System.setProperty(Globals.CATALINA_BASE_PROP,
-                               System.getProperty("user.dir"));
-
-    }
-
 
     /**
-     * Set the <code>catalina.home</code> System property to the current
-     * working directory if it has not been set.
-     */
-    private void setCatalinaHome() {
-
-        if (System.getProperty(Globals.CATALINA_HOME_PROP) != null)
-            return;
-        File bootstrapJar =
-            new File(System.getProperty("user.dir"), "bootstrap.jar");
-        if (bootstrapJar.exists()) {
-            try {
-                System.setProperty
-                    (Globals.CATALINA_HOME_PROP,
-                     (new File(System.getProperty("user.dir"), ".."))
-                     .getCanonicalPath());
-            } catch (Exception e) {
-                // Ignore
-                System.setProperty(Globals.CATALINA_HOME_PROP,
-                                   System.getProperty("user.dir"));
-            }
-        } else {
-            System.setProperty(Globals.CATALINA_HOME_PROP,
-                               System.getProperty("user.dir"));
-        }
-
-    }
-
-
-    /**
-     * Get the value of the catalina.home environment variable.
+     * Obtain the name of configured home (binary) directory. Note that home and
+     * base may be the same (and are by default).
      */
     public static String getCatalinaHome() {
-        return System.getProperty(Globals.CATALINA_HOME_PROP,
-                                  System.getProperty("user.dir"));
+        return catalinaHomeFile.getPath();
     }
 
 
     /**
-     * Get the value of the catalina.base environment variable.
+     * Obtain the name of the configured base (instance) directory. Note that
+     * home and base may be the same (and are by default). If this is not set
+     * the value returned by {@link #getCatalinaHome()} will be used.
      */
     public static String getCatalinaBase() {
-        return System.getProperty(Globals.CATALINA_BASE_PROP, getCatalinaHome());
+        return catalinaBaseFile.getPath();
+    }
+
+
+    /**
+     * Obtain the configured home (binary) directory. Note that home and
+     * base may be the same (and are by default).
+     */
+    public static File getCatalinaHomeFile() {
+        return catalinaHomeFile;
+    }
+
+
+    /**
+     * Obtain the configured base (instance) directory. Note that
+     * home and base may be the same (and are by default). If this is not set
+     * the value returned by {@link #getCatalinaHomeFile()} will be used.
+     */
+    public static File getCatalinaBaseFile() {
+        return catalinaBaseFile;
     }
 
 
