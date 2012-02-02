@@ -17,13 +17,11 @@
 
 package org.apache.tomcat.util;
 
-import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Hashtable;
-import java.util.StringTokenizer;
 
 /**
  * Utils for introspection and reflection
@@ -33,107 +31,6 @@ public final class IntrospectionUtils {
 
     private static final org.apache.juli.logging.Log log=
         org.apache.juli.logging.LogFactory.getLog( IntrospectionUtils.class );
-
-    /**
-     * @deprecated  No longer required. Will be removed in Tomcat 8.0.x.
-     */
-    @Deprecated
-    public static String guessInstall(String installSysProp,
-            String homeSysProp, String jarName) {
-        return guessInstall(installSysProp, homeSysProp, jarName, null);
-    }
-
-    /**
-     * Guess a product install/home by analyzing the class path. It works for
-     * product using the pattern: lib/executable.jar or if executable.jar is
-     * included in classpath by a shell script. ( java -jar also works )
-     *
-     * Insures both "install" and "home" System properties are set. If either or
-     * both System properties are unset, "install" and "home" will be set to the
-     * same value. This value will be the other System property that is set, or
-     * the guessed value if neither is set.
-     *
-     * @deprecated  No longer required. Will be removed in Tomcat 8.0.x.
-     */
-    @Deprecated
-    public static String guessInstall(String installSysProp,
-            String homeSysProp, String jarName, String classFile) {
-        String install = null;
-        String home = null;
-
-        if (installSysProp != null)
-            install = System.getProperty(installSysProp);
-
-        if (homeSysProp != null)
-            home = System.getProperty(homeSysProp);
-
-        if (install != null) {
-            if (home == null)
-                System.getProperties().put(homeSysProp, install);
-            return install;
-        }
-
-        // Find the directory where jarName.jar is located
-
-        String cpath = System.getProperty("java.class.path");
-        String pathSep = System.getProperty("path.separator");
-        StringTokenizer st = new StringTokenizer(cpath, pathSep);
-        while (st.hasMoreTokens()) {
-            String path = st.nextToken();
-            // log( "path " + path );
-            if (path.endsWith(jarName)) {
-                home = path.substring(0, path.length() - jarName.length());
-                try {
-                    if ("".equals(home)) {
-                        home = new File("./").getCanonicalPath();
-                    } else if (home.endsWith(File.separator)) {
-                        home = home.substring(0, home.length() - 1);
-                    }
-                    File f = new File(home);
-                    String parentDir = f.getParent();
-                    if (parentDir == null)
-                        parentDir = home; // unix style
-                    File f1 = new File(parentDir);
-                    install = f1.getCanonicalPath();
-                    if (installSysProp != null)
-                        System.getProperties().put(installSysProp, install);
-                    if (home == null && homeSysProp != null)
-                        System.getProperties().put(homeSysProp, install);
-                    return install;
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                }
-            } else {
-                String fname = path + (path.endsWith("/") ? "" : "/")
-                        + classFile;
-                if (new File(fname).exists()) {
-                    try {
-                        File f = new File(path);
-                        String parentDir = f.getParent();
-                        if (parentDir == null)
-                            parentDir = path; // unix style
-                        File f1 = new File(parentDir);
-                        install = f1.getCanonicalPath();
-                        if (installSysProp != null)
-                            System.getProperties().put(installSysProp, install);
-                        if (home == null && homeSysProp != null)
-                            System.getProperties().put(homeSysProp, install);
-                        return install;
-                    } catch (Exception ex) {
-                        ex.printStackTrace();
-                    }
-                }
-            }
-        }
-
-        // if install directory can't be found, use home as the default
-        if (home != null) {
-            System.getProperties().put(installSysProp, home);
-            return home;
-        }
-
-        return null;
-    }
 
     /**
      * Find a method with the right name If found, call the method ( if param is
