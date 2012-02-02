@@ -1097,8 +1097,12 @@ public class ContextConfig implements LifecycleListener {
      * Get config base.
      */
     protected File getConfigBase() {
-        File configBase =
-            new File(System.getProperty(Globals.CATALINA_BASE_PROP), "conf");
+        File catalinaBase = context.getCatalinaBase();
+        if (catalinaBase == null) {
+            return null;
+        }
+
+        File configBase = new File(catalinaBase, "conf");
         if (!configBase.exists()) {
             return null;
         }
