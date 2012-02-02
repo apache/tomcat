@@ -368,41 +368,6 @@ public final class IntrospectionUtils {
         }
     }
 
-    /**
-     * @deprecated Not used, though compliments callMethod1 and callMethodN here
-     */
-    @Deprecated
-    public static Object callMethod0(Object target, String methodN)
-            throws Exception {
-        if (target == null) {
-            if (log.isDebugEnabled())
-                log.debug("IntrospectionUtils: Assert: Illegal params " +
-                        target);
-            return null;
-        }
-        if (log.isDebugEnabled())
-            log.debug("IntrospectionUtils: callMethod0 " +
-                    target.getClass().getName() + "." + methodN);
-
-        Class<?> params[] = new Class[0];
-        Method m = findMethod(target.getClass(), methodN, params);
-        if (m == null)
-            throw new NoSuchMethodException(target.getClass().getName() + " "
-                    + methodN);
-        try {
-            return m.invoke(target, emptyArray);
-        } catch (InvocationTargetException ie) {
-            ExceptionUtils.handleThrowable(ie.getCause());
-            throw ie;
-        }
-    }
-
-    /**
-     * @deprecated Used only by deprecated method
-     */
-    @Deprecated
-    private static final Object[] emptyArray = new Object[] {};
-
     public static Object callMethodN(Object target, String methodN,
             Object params[], Class<?> typeParams[]) throws Exception {
         Method m = null;
