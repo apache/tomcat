@@ -131,6 +131,10 @@ public final class IntrospectionUtils {
         }
     }
 
+    /**
+     * @deprecated  No longer required. Will be removed in Tomcat 8.0.x.
+     */
+    @Deprecated
     public static String guessInstall(String installSysProp,
             String homeSysProp, String jarName) {
         return guessInstall(installSysProp, homeSysProp, jarName, null);
@@ -145,7 +149,10 @@ public final class IntrospectionUtils {
      * both System properties are unset, "install" and "home" will be set to the
      * same value. This value will be the other System property that is set, or
      * the guessed value if neither is set.
+     *
+     * @deprecated  No longer required. Will be removed in Tomcat 8.0.x.
      */
+    @Deprecated
     public static String guessInstall(String installSysProp,
             String homeSysProp, String jarName, String classFile) {
         String install = null;
