@@ -605,7 +605,7 @@ public class Tomcat {
         }
         server.setCatalinaBase(baseFile);
 
-        if (catalinaHome == null) {
+        if (catalinaHome != null) {
             File homeFile = new File(catalinaHome);
             homeFile.mkdirs();
             if (!homeFile.isAbsolute()) {
