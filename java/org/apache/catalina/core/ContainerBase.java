@@ -1359,6 +1359,9 @@ public abstract class ContainerBase extends LifecycleMBeanBase
         }
 
         if (base == null) {
+            // In theory this should never happen. In 'standard' usage the start
+            // scripts will set the system property. In embedded usage either
+            // the system property will be set or it will be set explicitly.
             return null;
         }
 

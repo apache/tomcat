@@ -27,7 +27,6 @@ import javax.management.ObjectName;
 import org.apache.catalina.Container;
 import org.apache.catalina.Context;
 import org.apache.catalina.Engine;
-import org.apache.catalina.Globals;
 import org.apache.catalina.Host;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.ha.ClusterDeployer;
@@ -162,8 +161,7 @@ public class FarmWarDeployer extends ClusterListener
             }
         }
 
-        configBase = new File(
-                System.getProperty(Globals.CATALINA_BASE_PROP), "conf");
+        configBase = new File(engine.getCatalinaBase(), "conf");
         configBase = new File(configBase, engine.getName());
         configBase = new File(configBase, hostname);
 
