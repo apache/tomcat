@@ -38,7 +38,6 @@ import org.apache.catalina.core.StandardServer;
 import org.apache.catalina.security.SecurityConfig;
 import org.apache.juli.ClassLoaderLogManager;
 import org.apache.tomcat.util.ExceptionUtils;
-import org.apache.tomcat.util.IntrospectionUtils;
 import org.apache.tomcat.util.digester.Digester;
 import org.apache.tomcat.util.digester.Rule;
 import org.apache.tomcat.util.digester.RuleSet;
@@ -748,14 +747,6 @@ public class Catalina {
         if (catalinaHome == null) {
             if (System.getProperty(Globals.CATALINA_BASE_PROP) != null) {
                 catalinaHome = System.getProperty(Globals.CATALINA_BASE_PROP);
-            } else {
-                // Use IntrospectionUtils and guess the dir
-                catalinaHome = IntrospectionUtils.guessInstall
-                    (Globals.CATALINA_HOME_PROP, Globals.CATALINA_BASE_PROP, "catalina.jar");
-                if (catalinaHome == null) {
-                    catalinaHome = IntrospectionUtils.guessInstall
-                        ("tomcat.install", Globals.CATALINA_HOME_PROP, "tomcat.jar");
-                }
             }
         }
         // last resort - for minimal/embedded cases.
