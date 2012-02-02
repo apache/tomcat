@@ -16,7 +16,6 @@
  */
 package org.apache.catalina.startup;
 
-
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -46,7 +45,6 @@ import javax.management.ObjectName;
 import org.apache.catalina.Container;
 import org.apache.catalina.Context;
 import org.apache.catalina.Engine;
-import org.apache.catalina.Globals;
 import org.apache.catalina.Host;
 import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleEvent;
@@ -387,9 +385,8 @@ public class HostConfig
 
     protected File returnCanonicalPath(String path) {
         File file = new File(path);
-        File base = new File(System.getProperty(Globals.CATALINA_BASE_PROP));
         if (!file.isAbsolute())
-            file = new File(base,path);
+            file = new File(host.getCatalinaBase(), path);
         try {
             return file.getCanonicalFile();
         } catch (IOException e) {
