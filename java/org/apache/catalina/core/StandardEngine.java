@@ -27,7 +27,6 @@ import org.apache.catalina.ContainerEvent;
 import org.apache.catalina.ContainerListener;
 import org.apache.catalina.Context;
 import org.apache.catalina.Engine;
-import org.apache.catalina.Globals;
 import org.apache.catalina.Host;
 import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleEvent;
@@ -205,20 +204,6 @@ public class StandardEngine extends ContainerBase implements Engine {
     @Override
     public void setService(Service service) {
         this.service = service;
-    }
-
-    public String getBaseDir() {
-        if( baseDir==null ) {
-            baseDir=System.getProperty(Globals.CATALINA_BASE_PROP);
-        }
-        if( baseDir==null ) {
-            baseDir=System.getProperty(Globals.CATALINA_HOME_PROP);
-        }
-        return baseDir;
-    }
-
-    public void setBaseDir(String baseDir) {
-        this.baseDir = baseDir;
     }
 
     // --------------------------------------------------------- Public Methods

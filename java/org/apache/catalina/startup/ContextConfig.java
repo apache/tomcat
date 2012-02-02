@@ -67,7 +67,6 @@ import org.apache.catalina.Valve;
 import org.apache.catalina.Wrapper;
 import org.apache.catalina.core.ContainerBase;
 import org.apache.catalina.core.StandardContext;
-import org.apache.catalina.core.StandardEngine;
 import org.apache.catalina.core.StandardHost;
 import org.apache.catalina.deploy.ErrorPage;
 import org.apache.catalina.deploy.FilterDef;
@@ -485,15 +484,6 @@ public class ContextConfig implements LifecycleListener {
     }
 
 
-    protected String getBaseDir() {
-        Container engineC=context.getParent().getParent();
-        if( engineC instanceof StandardEngine ) {
-            return ((StandardEngine)engineC).getBaseDir();
-        }
-        return System.getProperty(Globals.CATALINA_BASE_PROP);
-    }
-
-
     /**
      * Process the default configuration file, if it exists.
      */
@@ -513,7 +503,8 @@ public class ContextConfig implements LifecycleListener {
         if (!context.getOverride()) {
             File defaultContextFile = new File(defaultContextXml);
             if (!defaultContextFile.isAbsolute()) {
-                defaultContextFile =new File(getBaseDir(), defaultContextXml);
+                defaultContextFile =
+                        new File(context.getCatalinaBase(), defaultContextXml);
             }
             if (defaultContextFile.exists()) {
                 try {
@@ -1627,7 +1618,8 @@ public class ContextConfig implements LifecycleListener {
         if (Constants.NoDefaultWebXml.equals(defaultWebXml)) {
             return null;
         }
-        return getWebXmlSource(defaultWebXml, getBaseDir());
+        return getWebXmlSource(defaultWebXml,
+                context.getCatalinaBase().getPath());
     }
 
     /**
