@@ -30,7 +30,6 @@ import java.util.List;
 import java.util.logging.LogManager;
 
 import org.apache.catalina.Container;
-import org.apache.catalina.Globals;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.LifecycleState;
 import org.apache.catalina.Server;
@@ -273,7 +272,7 @@ public class Catalina {
 
         File file = new File(configFile);
         if (!file.isAbsolute()) {
-            file = new File(System.getProperty(Globals.CATALINA_BASE_PROP), configFile);
+            file = new File(Bootstrap.getCatalinaBase(), configFile);
         }
         return (file);
 
@@ -583,6 +582,8 @@ public class Catalina {
         }
 
         getServer().setCatalina(this);
+        getServer().setCatalinaHome(Bootstrap.getCatalinaHomeFile());
+        getServer().setCatalinaBase(Bootstrap.getCatalinaBaseFile());
 
         // Stream redirection
         initStreams();
@@ -742,51 +743,11 @@ public class Catalina {
 
 
     protected void initDirs() {
-
-        String catalinaHome = System.getProperty(Globals.CATALINA_HOME_PROP);
-        if (catalinaHome == null) {
-            if (System.getProperty(Globals.CATALINA_BASE_PROP) != null) {
-                catalinaHome = System.getProperty(Globals.CATALINA_BASE_PROP);
-            }
-        }
-        // last resort - for minimal/embedded cases.
-        if(catalinaHome==null) {
-            catalinaHome=System.getProperty("user.dir");
-        }
-        if (catalinaHome != null) {
-            File home = new File(catalinaHome);
-            if (!home.isAbsolute()) {
-                try {
-                    catalinaHome = home.getCanonicalPath();
-                } catch (IOException e) {
-                    catalinaHome = home.getAbsolutePath();
-                }
-            }
-            System.setProperty(Globals.CATALINA_HOME_PROP, catalinaHome);
-        }
-
-        if (System.getProperty(Globals.CATALINA_BASE_PROP) == null) {
-            System.setProperty(Globals.CATALINA_BASE_PROP,
-                               catalinaHome);
-        } else {
-            String catalinaBase = System.getProperty(Globals.CATALINA_BASE_PROP);
-            File base = new File(catalinaBase);
-            if (!base.isAbsolute()) {
-                try {
-                    catalinaBase = base.getCanonicalPath();
-                } catch (IOException e) {
-                    catalinaBase = base.getAbsolutePath();
-                }
-            }
-            System.setProperty(Globals.CATALINA_BASE_PROP, catalinaBase);
-        }
-
         String temp = System.getProperty("java.io.tmpdir");
         if (temp == null || (!(new File(temp)).exists())
                 || (!(new File(temp)).isDirectory())) {
             log.error(sm.getString("embedded.notmp", temp));
         }
-
     }
 
 
