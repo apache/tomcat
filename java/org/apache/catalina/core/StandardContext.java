@@ -2503,11 +2503,8 @@ public class StandardContext extends ContainerBase
         }
         File workDir = new File(getWorkDir());
         if (!workDir.isAbsolute()) {
-            File catalinaHome = engineBase();
-            String catalinaHomePath = null;
             try {
-                catalinaHomePath = catalinaHome.getCanonicalPath();
-                workDir = new File(catalinaHomePath,
+                workDir = new File(getCatalinaBase().getCanonicalFile(),
                         getWorkDir());
             } catch (IOException e) {
                 log.warn(sm.getString("standardContext.workPath", getName()),
@@ -5650,20 +5647,6 @@ public class StandardContext extends ContainerBase
 
 
     /**
-     * Return a File object representing the base directory for the
-     * entire servlet container (i.e. the Engine container if present).
-     */
-    protected File engineBase() {
-        String base=System.getProperty(Globals.CATALINA_BASE_PROP);
-        if( base == null ) {
-            StandardEngine eng=(StandardEngine)this.getParent().getParent();
-            base=eng.getBaseDir();
-        }
-        return (new File(base));
-    }
-
-
-    /**
      * Bind current thread, both for CL purposes and for JNDI ENC support
      * during : startup, shutdown and realoading of the context.
      *
@@ -5728,7 +5711,7 @@ public class StandardContext extends ContainerBase
         File file = new File(getDocBase());
         if (!file.isAbsolute()) {
             if (container == null) {
-                docBase = (new File(engineBase(), getDocBase())).getPath();
+                docBase = (new File(getCatalinaBase(), getDocBase())).getPath();
             } else {
                 // Use the "appBase" property of this container
                 file = ((Host) container).getAppBaseFile();
@@ -5921,10 +5904,9 @@ public class StandardContext extends ContainerBase
         // Create this directory if necessary
         File dir = new File(workDir);
         if (!dir.isAbsolute()) {
-            File catalinaHome = engineBase();
             String catalinaHomePath = null;
             try {
-                catalinaHomePath = catalinaHome.getCanonicalPath();
+                catalinaHomePath = getCatalinaBase().getCanonicalPath();
                 dir = new File(catalinaHomePath, workDir);
             } catch (IOException e) {
                 log.warn(sm.getString("standardContext.workCreateException",

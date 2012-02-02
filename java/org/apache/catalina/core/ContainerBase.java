@@ -20,7 +20,6 @@ package org.apache.catalina.core;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.io.File;
-import java.io.IOException;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.ArrayList;
@@ -1337,6 +1336,11 @@ public abstract class ContainerBase extends LifecycleMBeanBase
     }
 
 
+    public void setCatalinaBase(File catalinaBase) {
+        this.catalinaBase = catalinaBase;
+    }
+
+
     @Override
     public File getCatalinaBase() {
 
@@ -1351,16 +1355,15 @@ public abstract class ContainerBase extends LifecycleMBeanBase
         String base = System.getProperty(Globals.CATALINA_BASE_PROP);
 
         if (base == null) {
-            return null;
-        } else {
-            File f;
-            try {
-                f = new File(base).getCanonicalFile();
-            } catch (IOException e) {
-                return null;
-            }
-            return f;
+            base = System.getProperty(Globals.CATALINA_HOME_PROP);
         }
+
+        if (base == null) {
+            return null;
+        }
+
+        catalinaBase =new File(base).getAbsoluteFile();
+        return catalinaBase;
     }
 
 

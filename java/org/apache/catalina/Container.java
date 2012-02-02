@@ -16,7 +16,6 @@
  */
 package org.apache.catalina;
 
-
 import java.beans.PropertyChangeListener;
 import java.io.File;
 
