@@ -683,7 +683,6 @@ public class MBeanFactory {
         engine.setDomain(domain);
         engine.setName(domain);
         engine.setDefaultHost(defaultHost);
-        engine.setCatalinaBase(new File(baseDir));
 
         Service service = new StandardService();
         service.setContainer(engine);
