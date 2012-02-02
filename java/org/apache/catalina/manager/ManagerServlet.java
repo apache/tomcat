@@ -14,10 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.catalina.manager;
-
 
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -44,7 +41,6 @@ import org.apache.catalina.Container;
 import org.apache.catalina.ContainerServlet;
 import org.apache.catalina.Context;
 import org.apache.catalina.Engine;
-import org.apache.catalina.Globals;
 import org.apache.catalina.Host;
 import org.apache.catalina.Manager;
 import org.apache.catalina.Server;
@@ -474,7 +470,7 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
         // Identify the appBase of the owning Host of this Context
         // (if any)
         deployed = ((Host) context.getParent()).getAppBaseFile();
-        configBase = new File(System.getProperty(Globals.CATALINA_BASE_PROP), "conf");
+        configBase = new File(context.getCatalinaBase(), "conf");
         Container container = context;
         Container host = null;
         Container engine = null;

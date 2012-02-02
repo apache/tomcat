@@ -14,10 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.catalina.manager.host;
-
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -40,7 +37,6 @@ import org.apache.catalina.Container;
 import org.apache.catalina.ContainerServlet;
 import org.apache.catalina.Context;
 import org.apache.catalina.Engine;
-import org.apache.catalina.Globals;
 import org.apache.catalina.Host;
 import org.apache.catalina.Wrapper;
 import org.apache.catalina.core.ContainerBase;
@@ -375,7 +371,7 @@ public class HostManagerServlet
             file = new File(appBase);
         }
         if (!file.isAbsolute())
-            file = new File(System.getProperty(Globals.CATALINA_BASE_PROP), file.getPath());
+            file = new File(engine.getCatalinaBase(), file.getPath());
         try {
             appBaseFile = file.getCanonicalFile();
         } catch (IOException e) {
@@ -691,8 +687,7 @@ public class HostManagerServlet
      * Get config base.
      */
     protected File getConfigBase(String hostName) {
-        File configBase =
-            new File(System.getProperty(Globals.CATALINA_BASE_PROP), "conf");
+        File configBase = new File(context.getCatalinaBase(), "conf");
         if (!configBase.exists()) {
             return null;
         }

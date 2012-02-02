@@ -14,10 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.catalina.realm;
-
 
 import java.io.File;
 import java.io.IOException;
@@ -36,7 +33,6 @@ import javax.security.auth.login.LoginException;
 import javax.security.auth.spi.LoginModule;
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.catalina.Globals;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.digester.Digester;
@@ -345,7 +341,7 @@ public class JAASMemoryLoginModule extends MemoryRealm implements LoginModule {
         // Validate the existence of our configuration file
         File file = new File(pathname);
         if (!file.isAbsolute())
-            file = new File(System.getProperty(Globals.CATALINA_BASE_PROP), pathname);
+            file = new File(getContainer().getCatalinaBase(), pathname);
         if (!file.exists() || !file.canRead()) {
             log.warn("Cannot load configuration file " + file.getAbsolutePath());
             return;

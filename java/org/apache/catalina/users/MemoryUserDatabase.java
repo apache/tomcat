@@ -516,9 +516,8 @@ public class MemoryUserDatabase implements UserDatabase {
 
 
     /**
-     * Check for permissions to save this user database
-     * to persistent storage location
-     *
+     * Check for permissions to save this user database to persistent storage
+     * location.
      */
     public boolean isWriteable() {
 
@@ -529,7 +528,6 @@ public class MemoryUserDatabase implements UserDatabase {
         }
         File dir = file.getParentFile();
         return dir.exists() && dir.isDirectory() && dir.canWrite();
-
     }
 
 

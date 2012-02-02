@@ -14,10 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.catalina.realm;
-
 
 import java.io.File;
 import java.security.Principal;
@@ -25,7 +22,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.catalina.Globals;
 import org.apache.catalina.LifecycleException;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -267,7 +263,7 @@ public class MemoryRealm  extends RealmBase {
         // Validate the existence of our database file
         File file = new File(pathname);
         if (!file.isAbsolute())
-            file = new File(System.getProperty(Globals.CATALINA_BASE_PROP), pathname);
+            file = new File(getContainer().getCatalinaBase(), pathname);
         if (!file.exists() || !file.canRead())
             throw new LifecycleException
                 (sm.getString("memoryRealm.loadExist",

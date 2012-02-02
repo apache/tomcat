@@ -1062,7 +1062,7 @@ public class AccessLogValve extends ValveBase implements AccessLog {
         // Create the directory if necessary
         File dir = new File(directory);
         if (!dir.isAbsolute()) {
-            dir = new File(System.getProperty(Globals.CATALINA_BASE_PROP), directory);
+            dir = new File(getContainer().getCatalinaBase(), directory);
         }
         if (!dir.mkdirs() && !dir.isDirectory()) {
             log.error(sm.getString("accessLogValve.openDirFail", dir));
