@@ -57,6 +57,15 @@
         <bug>51408</bug>: Replace calls to <code>Charset.defaultCharset()</code>
         with an explicit reference to the ISO-8859-1 Charset. (markt)
       </scode>
+      <scode>
+        Refactor initialization code to use a single, consistent approach to
+        determining the Catalina home (binary) and base (instance) directories.
+        The search order for home is <code>catalina.home</code> system property,
+        parent of current directory if boootstrap.jar is present and finally
+        current working directory. The search order for Catalina base is
+        <code>catalina.base</code> system property falling back to the value for
+        Catalina home. (markt)
+      </scode>
     </changelog>
   </subsection>
   <subsection name="Tribes">
