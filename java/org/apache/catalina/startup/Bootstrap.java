@@ -473,23 +473,6 @@ public final class Bootstrap {
     }
 
     /**
-     * @deprecated Unused. Will be removed in Tomcat 8.0.x.
-     */
-    @Deprecated
-    public void setCatalinaHome(String s) {
-        System.setProperty(Globals.CATALINA_HOME_PROP, s);
-    }
-
-    /**
-     * @deprecated Unused. Will be removed in Tomcat 8.0.x.
-     */
-    @Deprecated
-    public void setCatalinaBase(String s) {
-        System.setProperty(Globals.CATALINA_BASE_PROP, s);
-    }
-
-
-    /**
      * Set the <code>catalina.base</code> System property to the current
      * working directory if it has not been set.
      */
