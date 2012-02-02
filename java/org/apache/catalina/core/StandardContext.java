@@ -5242,7 +5242,7 @@ public class StandardContext extends ContainerBase
 
     private void setClassLoaderProperty(String name, boolean value) {
         ClassLoader cl = getLoader().getClassLoader();
-        if (IntrospectionUtils.setProperty(cl, name, Boolean.toString(value))) {
+        if (!IntrospectionUtils.setProperty(cl, name, Boolean.toString(value))) {
             // Failed to set
             log.info(sm.getString(
                     "standardContext.webappClassLoader.missingProperty",
