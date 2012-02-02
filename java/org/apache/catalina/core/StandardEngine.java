@@ -94,12 +94,6 @@ public class StandardEngine extends ContainerBase implements Engine {
      */
     private Service service = null;
 
-    /** Allow the base dir to be specified explicitly for
-     * each engine. In time we should stop using catalina.base property -
-     * otherwise we loose some flexibility.
-     */
-    private String baseDir = null;
-
     /**
      * The JVM Route ID for this Tomcat instance. All Route ID's must be unique
      * across the cluster.
