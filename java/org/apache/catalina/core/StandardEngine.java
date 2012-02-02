@@ -18,6 +18,7 @@ package org.apache.catalina.core;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.File;
 import java.util.Locale;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -33,6 +34,7 @@ import org.apache.catalina.LifecycleEvent;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.LifecycleListener;
 import org.apache.catalina.Realm;
+import org.apache.catalina.Server;
 import org.apache.catalina.Service;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
@@ -353,6 +355,23 @@ public class StandardEngine extends ContainerBase implements Engine {
         }
         return (ClassLoader.getSystemClassLoader());
     }
+
+
+    @Override
+    public File getCatalinaBase() {
+        if (service != null) {
+            Server s = service.getServer();
+            if (s != null) {
+                File base = s.getCatalinaBase();
+                if (base != null) {
+                    return base;
+                }
+            }
+        }
+        // Fall-back
+        return super.getCatalinaBase();
+    }
+
 
     // -------------------- JMX registration  --------------------
 

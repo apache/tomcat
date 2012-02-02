@@ -294,8 +294,6 @@ public abstract class ContainerBase extends LifecycleMBeanBase
     protected ThreadPoolExecutor startStopExecutor;
 
 
-    private File catalinaBase = null;
-
     // ------------------------------------------------------------- Properties
 
     @Override
@@ -1336,37 +1334,14 @@ public abstract class ContainerBase extends LifecycleMBeanBase
     }
 
 
-    public void setCatalinaBase(File catalinaBase) {
-        this.catalinaBase = catalinaBase;
-    }
-
-
     @Override
     public File getCatalinaBase() {
 
-        if (catalinaBase != null) {
-            return catalinaBase;
-        }
-
-        if (parent != null) {
-            return parent.getCatalinaBase();
-        }
-
-        String base = System.getProperty(Globals.CATALINA_BASE_PROP);
-
-        if (base == null) {
-            base = System.getProperty(Globals.CATALINA_HOME_PROP);
-        }
-
-        if (base == null) {
-            // In theory this should never happen. In 'standard' usage the start
-            // scripts will set the system property. In embedded usage either
-            // the system property will be set or it will be set explicitly.
+        if (parent == null) {
             return null;
         }
 
-        catalinaBase =new File(base).getAbsoluteFile();
-        return catalinaBase;
+        return parent.getCatalinaBase();
     }
 
 
