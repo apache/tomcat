@@ -25,8 +25,6 @@ import java.net.URL;
 import java.util.Enumeration;
 import java.util.Properties;
 
-import org.apache.catalina.Globals;
-
 
 /**
  * Utility class to read the bootstrap Catalina configuration.
@@ -98,7 +96,7 @@ public class CatalinaProperties {
 
         if (is == null) {
             try {
-                File home = new File(getCatalinaBase());
+                File home = new File(Bootstrap.getCatalinaBase());
                 File conf = new File(home, "conf");
                 File propsFile = new File(conf, "catalina.properties");
                 is = new FileInputStream(propsFile);
@@ -144,23 +142,6 @@ public class CatalinaProperties {
             }
         }
 
-    }
-
-
-    /**
-     * Get the value of the catalina.home environment variable.
-     */
-    private static String getCatalinaHome() {
-        return System.getProperty(Globals.CATALINA_HOME_PROP,
-                                  System.getProperty("user.dir"));
-    }
-
-
-    /**
-     * Get the value of the catalina.base environment variable.
-     */
-    private static String getCatalinaBase() {
-        return System.getProperty(Globals.CATALINA_BASE_PROP, getCatalinaHome());
     }
 
 
