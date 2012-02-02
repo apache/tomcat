@@ -17,6 +17,7 @@
 package org.apache.catalina.startup;
 
 import java.beans.PropertyChangeListener;
+import java.io.File;
 import java.net.URL;
 import java.util.Set;
 
@@ -634,4 +635,7 @@ public class FailedContext extends LifecycleMBeanBase implements Context {
 
     @SuppressWarnings("unused")
     public synchronized void addValve(Valve valve) { /* NO-OP */ }
+
+    @Override
+    public File getCatalinaBase() { return null; }
 }

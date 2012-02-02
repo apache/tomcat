@@ -19,6 +19,8 @@ package org.apache.catalina.core;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
+import java.io.File;
+import java.io.IOException;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.ArrayList;
@@ -291,6 +293,9 @@ public abstract class ContainerBase extends LifecycleMBeanBase
      */
     private int startStopThreads = 1;
     protected ThreadPoolExecutor startStopExecutor;
+
+
+    private File catalinaBase = null;
 
     // ------------------------------------------------------------- Properties
 
@@ -1332,8 +1337,34 @@ public abstract class ContainerBase extends LifecycleMBeanBase
     }
 
 
-    // ------------------------------------------------------ Protected Methods
+    @Override
+    public File getCatalinaBase() {
 
+        if (catalinaBase != null) {
+            return catalinaBase;
+        }
+
+        if (parent != null) {
+            return parent.getCatalinaBase();
+        }
+
+        String base = System.getProperty(Globals.CATALINA_BASE_PROP);
+
+        if (base == null) {
+            return null;
+        } else {
+            File f;
+            try {
+                f = new File(base).getCanonicalFile();
+            } catch (IOException e) {
+                return null;
+            }
+            return f;
+        }
+    }
+
+
+    // ------------------------------------------------------ Protected Methods
 
     /**
      * Notify all container event listeners that a particular event has

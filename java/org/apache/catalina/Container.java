@@ -18,6 +18,7 @@ package org.apache.catalina;
 
 
 import java.beans.PropertyChangeListener;
+import java.io.File;
 
 import javax.management.ObjectName;
 import javax.naming.directory.DirContext;
@@ -443,4 +444,10 @@ public interface Container extends Lifecycle {
      * @param   startStopThreads    The new number of threads to be used
      */
     public void setStartStopThreads(int startStopThreads);
+
+
+    /**
+     *
+     */
+    public File getCatalinaBase();
 }
