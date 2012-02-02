@@ -30,7 +30,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.deploy.LoginConfig;
-import org.apache.catalina.startup.Bootstrap;
 import org.apache.catalina.util.Base64;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -86,7 +85,7 @@ public class SpnegoAuthenticator extends AuthenticatorBase {
         String krb5Conf = System.getProperty(Constants.KRB5_CONF_PROPERTY);
         if (krb5Conf == null) {
             // System property not set, use the Tomcat default
-            File krb5ConfFile = new File(Bootstrap.getCatalinaBase(),
+            File krb5ConfFile = new File(container.getCatalinaBase(),
                     Constants.DEFAULT_KRB5_CONF);
             System.setProperty(Constants.KRB5_CONF_PROPERTY,
                     krb5ConfFile.getAbsolutePath());
@@ -96,7 +95,7 @@ public class SpnegoAuthenticator extends AuthenticatorBase {
         String jaasConf = System.getProperty(Constants.JAAS_CONF_PROPERTY);
         if (jaasConf == null) {
             // System property not set, use the Tomcat default
-            File jaasConfFile = new File(Bootstrap.getCatalinaBase(),
+            File jaasConfFile = new File(container.getCatalinaBase(),
                     Constants.DEFAULT_JAAS_CONF);
             System.setProperty(Constants.JAAS_CONF_PROPERTY,
                     jaasConfFile.getAbsolutePath());
