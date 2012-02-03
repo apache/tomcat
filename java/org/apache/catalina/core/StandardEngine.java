@@ -374,6 +374,13 @@ public class StandardEngine extends ContainerBase implements Engine {
         return "type=Engine";
     }
 
+
+    @Override
+    protected String getDomainInternal() {
+        return getName();
+    }
+
+
     // ----------------------------------------------------------- Inner classes
     protected static final class NoopAccessLog implements AccessLog {
 

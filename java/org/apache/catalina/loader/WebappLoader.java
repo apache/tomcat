@@ -14,8 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.catalina.loader;
 
 
@@ -53,7 +51,6 @@ import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.LifecycleState;
 import org.apache.catalina.Loader;
-import org.apache.catalina.mbeans.MBeanUtils;
 import org.apache.catalina.util.LifecycleMBeanBase;
 import org.apache.naming.resources.DirContextURLStreamHandler;
 import org.apache.naming.resources.DirContextURLStreamHandlerFactory;
@@ -583,8 +580,7 @@ public class WebappLoader extends LifecycleMBeanBase
             if (!contextName.startsWith("/")) {
                 contextName = "/" + contextName;
             }
-            ObjectName cloname = new ObjectName(
-                    MBeanUtils.getDomain(container) +
+            ObjectName cloname = new ObjectName(container.getDomain() +
                     ":type=WebappClassLoader,context=" + contextName +
                     ",host=" + container.getParent().getName());
             Registry.getRegistry(null, null)
@@ -632,8 +628,7 @@ public class WebappLoader extends LifecycleMBeanBase
             if (!contextName.startsWith("/")) {
                 contextName = "/" + contextName;
             }
-            ObjectName cloname = new ObjectName(
-                    MBeanUtils.getDomain(container) +
+            ObjectName cloname = new ObjectName(container.getDomain() +
                     ":type=WebappClassLoader,context=" + contextName +
                     ",host=" + container.getParent().getName());
             Registry.getRegistry(null, null).unregisterComponent(cloname);
@@ -1145,7 +1140,7 @@ public class WebappLoader extends LifecycleMBeanBase
 
     @Override
     protected String getDomainInternal() {
-        return MBeanUtils.getDomain(container);
+        return container.getDomain();
     }
 
 

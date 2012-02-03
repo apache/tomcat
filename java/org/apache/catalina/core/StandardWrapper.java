@@ -57,7 +57,6 @@ import org.apache.catalina.InstanceListener;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.LifecycleState;
 import org.apache.catalina.Wrapper;
-import org.apache.catalina.mbeans.MBeanUtils;
 import org.apache.catalina.security.SecurityUtil;
 import org.apache.catalina.util.InstanceSupport;
 import org.apache.juli.logging.Log;
@@ -1042,8 +1041,7 @@ public class StandardWrapper extends ContainerBase
         }
 
         if (isJspServlet) {
-            StringBuilder oname =
-                new StringBuilder(MBeanUtils.getDomain(getParent()));
+            StringBuilder oname = new StringBuilder(getDomain());
 
             oname.append(":type=JspMonitor,name=");
             oname.append(getName());

@@ -14,8 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.catalina.session;
 
 
@@ -41,7 +39,6 @@ import org.apache.catalina.Engine;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.Manager;
 import org.apache.catalina.Session;
-import org.apache.catalina.mbeans.MBeanUtils;
 import org.apache.catalina.util.LifecycleMBeanBase;
 import org.apache.catalina.util.SessionIdGenerator;
 import org.apache.juli.logging.Log;
@@ -1256,7 +1253,7 @@ public abstract class ManagerBase extends LifecycleMBeanBase
 
     @Override
     public String getDomainInternal() {
-        return MBeanUtils.getDomain(container);
+        return container.getDomain();
     }
 
     // ----------------------------------------- PropertyChangeListener Methods

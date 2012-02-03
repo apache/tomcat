@@ -161,6 +161,13 @@ public interface Container extends Lifecycle {
 
 
     /**
+     * Obtain the domain under which this container will be / has been
+     * registered.
+     */
+    public String getDomain();
+
+
+    /**
      * Calculate the key properties string to be added to an object's
      * {@link ObjectName} to indicate that it is associated with this container.
      *
