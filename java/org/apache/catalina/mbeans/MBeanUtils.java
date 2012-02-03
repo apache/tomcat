@@ -1504,7 +1504,12 @@ public class MBeanUtils {
      * Service.
      *
      * @param service
+     *
+     * @deprecated  To be removed since to creates a circular dependency. Will
+     *              be replaced in Tomcat 8 by a new method on {@link
+     *              Service}.
      */
+    @Deprecated
     public static String getDomain(Service service) {
 
         // Null service -> return null
