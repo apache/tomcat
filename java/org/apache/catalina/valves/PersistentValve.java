@@ -26,9 +26,9 @@ import org.apache.catalina.Context;
 import org.apache.catalina.Manager;
 import org.apache.catalina.Session;
 import org.apache.catalina.Store;
+import org.apache.catalina.StoreManager;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
-import org.apache.catalina.session.PersistentManager;
 
 
 /**
@@ -86,8 +86,8 @@ public class PersistentValve extends ValveBase {
         String sessionId = request.getRequestedSessionId();
         Manager manager = context.getManager();
         if (sessionId != null && manager != null) {
-            if (manager instanceof PersistentManager) {
-                Store store = ((PersistentManager) manager).getStore();
+            if (manager instanceof StoreManager) {
+                Store store = ((StoreManager) manager).getStore();
                 if (store != null) {
                     Session session = null;
                     try {
@@ -144,15 +144,15 @@ public class PersistentValve extends ValveBase {
             }
             if (newsessionId!=null) {
                 /* store the session and remove it from the manager */
-                if (manager instanceof PersistentManager) {
+                if (manager instanceof StoreManager) {
                     Session session = manager.findSession(newsessionId);
-                    Store store = ((PersistentManager) manager).getStore();
+                    Store store = ((StoreManager) manager).getStore();
                     if (store != null && session!=null &&
                         session.isValid() &&
                         !isSessionStale(session, System.currentTimeMillis())) {
                         // ((StandardSession)session).passivate();
                         store.save(session);
-                        ((PersistentManager) manager).removeSuper(session);
+                        ((StoreManager) manager).removeSuper(session);
                         session.recycle();
                     } else {
                         if (container.getLogger().isDebugEnabled()) {

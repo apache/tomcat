@@ -30,6 +30,7 @@ import org.apache.catalina.LifecycleException;
 import org.apache.catalina.LifecycleState;
 import org.apache.catalina.Session;
 import org.apache.catalina.Store;
+import org.apache.catalina.StoreManager;
 import org.apache.catalina.security.SecurityUtil;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -47,7 +48,8 @@ import org.apache.juli.logging.LogFactory;
  * @version $Id$
  */
 
-public abstract class PersistentManagerBase extends ManagerBase {
+public abstract class PersistentManagerBase extends ManagerBase
+        implements StoreManager {
 
     private static final Log log = LogFactory.getLog(PersistentManagerBase.class);
 
