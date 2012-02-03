@@ -42,7 +42,6 @@ import org.apache.catalina.Service;
 import org.apache.catalina.User;
 import org.apache.catalina.UserDatabase;
 import org.apache.catalina.Valve;
-import org.apache.catalina.Wrapper;
 import org.apache.catalina.connector.Connector;
 import org.apache.catalina.deploy.ContextEnvironment;
 import org.apache.catalina.deploy.ContextResource;
@@ -1553,56 +1552,5 @@ public class MBeanUtils {
         }
 
         return domain;
-    }
-
-
-    /**
-     * Calculate the key properties string to be added to an object's
-     * {@link ObjectName} to indicate that it is associated with that container.
-     *
-     * @param container The container the object is associated with
-     * @return          A string suitable for appending to the ObjectName
-     *
-     * @deprecated  To be removed since to creates a circular dependency. Will
-     *              be replaced in Tomcat 8 by a new method on {@link
-     *              Container}.
-     */
-    @Deprecated
-    public static String getContainerKeyProperties(Container container) {
-
-        Container c = container;
-        StringBuilder keyProperties = new StringBuilder();
-        int containerCount = 0;
-
-        // Work up container hierarchy, add a component to the name for
-        // each container
-        while (!(c instanceof Engine)) {
-            if (c instanceof Wrapper) {
-                keyProperties.append(",servlet=");
-                keyProperties.append(c.getName());
-            } else if (c instanceof Context) {
-                keyProperties.append(",context=");
-                ContextName cn = new ContextName(c.getName());
-                keyProperties.append(cn.getDisplayName());
-            } else if (c instanceof Host) {
-                keyProperties.append(",host=");
-                keyProperties.append(c.getName());
-            } else if (c == null) {
-                // May happen in unit testing and/or some embedding scenarios
-                keyProperties.append(",container");
-                keyProperties.append(containerCount++);
-                keyProperties.append("=null");
-                break;
-            } else {
-                // Should never happen...
-                keyProperties.append(",container");
-                keyProperties.append(containerCount++);
-                keyProperties.append('=');
-                keyProperties.append(c.getName());
-            }
-            c = c.getParent();
-        }
-
-        return keyProperties.toString();
     }
 }
