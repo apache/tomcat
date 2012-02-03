@@ -1536,7 +1536,12 @@ public class MBeanUtils {
      * Container.
      *
      * @param container
+     *
+     * @deprecated  To be removed since to creates a circular dependency. Will
+     *              be replaced in Tomcat 8 by a new method on {@link
+     *              Container}.
      */
+    @Deprecated
     public static String getDomain(Container container) {
 
         String domain = null;
