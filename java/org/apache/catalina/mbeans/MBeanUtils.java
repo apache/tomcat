@@ -79,7 +79,7 @@ public class MBeanUtils {
      * <code>createManagedBean()</code>.  The first element of each pair
      * is a class name, and the second element is the managed bean name.
      */
-    private static String exceptions[][] = {
+    private static final String exceptions[][] = {
         { "org.apache.catalina.users.MemoryGroup",
           "Group" },
         { "org.apache.catalina.users.MemoryRole",
@@ -908,7 +908,7 @@ public class MBeanUtils {
 
     }
 
-    static Hashtable<String,int[]> seq = new Hashtable<String,int[]>();
+    static final Hashtable<String,int[]> seq = new Hashtable<String,int[]>();
     static int getSeq( String key ) {
         int i[]=seq.get( key );
         if (i == null ) {
