@@ -1117,7 +1117,10 @@ public class MBeanUtils {
      * @param engine The Engine to be managed
      *
      * @exception Exception if an MBean cannot be deregistered
+     *
+     * @deprecated  Unused. Will be removed in Tomcat 8.0.x
      */
+    @Deprecated
     static void destroyMBean(Engine engine)
         throws Exception {
         String domain = engine.getName();
@@ -1163,7 +1166,9 @@ public class MBeanUtils {
      * @param host The Host to be managed
      *
      * @exception Exception if an MBean cannot be deregistered
+     * @deprecated  Unused. Will be removed in Tomcat 8.0.x
      */
+    @Deprecated
     static void destroyMBean(Host host)
         throws Exception {
 
@@ -1184,7 +1189,9 @@ public class MBeanUtils {
      * @param loader The Loader to be managed
      *
      * @exception Exception if an MBean cannot be deregistered
+     * @deprecated  Unused. Will be removed in Tomcat 8.0.x
      */
+    @Deprecated
     static void destroyMBean(Loader loader)
         throws Exception {
 
@@ -1210,7 +1217,9 @@ public class MBeanUtils {
      * @param manager The Manager to be managed
      *
      * @exception Exception if an MBean cannot be deregistered
+     * @deprecated  Unused. Will be removed in Tomcat 8.0.x
      */
+    @Deprecated
     static void destroyMBean(Manager manager)
         throws Exception {
 
@@ -1236,7 +1245,9 @@ public class MBeanUtils {
      * @param resources The NamingResources to be managed
      *
      * @exception Exception if an MBean cannot be deregistered
+     * @deprecated  Unused. Will be removed in Tomcat 8.0.x
      */
+    @Deprecated
     static void destroyMBean(NamingResources resources)
         throws Exception {
 
@@ -1262,7 +1273,9 @@ public class MBeanUtils {
      * @param realm The Realm to be managed
      *
      * @exception Exception if an MBean cannot be deregistered
+     * @deprecated  Unused. Will be removed in Tomcat 8.0.x
      */
+    @Deprecated
     static void destroyMBean(Realm realm)
         throws Exception {
 
@@ -1314,7 +1327,9 @@ public class MBeanUtils {
      * @param server The Server to be managed
      *
      * @exception Exception if an MBean cannot be deregistered
+     * @deprecated  Unused. Will be removed in Tomcat 8.0.x
      */
+    @Deprecated
     static void destroyMBean(Server server)
         throws Exception {
 
@@ -1350,7 +1365,9 @@ public class MBeanUtils {
      * @param service The Service to be managed
      *
      * @exception Exception if an MBean cannot be deregistered
+     * @deprecated  Unused. Will be removed in Tomcat 8.0.x
      */
+    @Deprecated
     static void destroyMBean(Service service)
         throws Exception {
 
@@ -1402,7 +1419,9 @@ public class MBeanUtils {
      * @param userDatabase The UserDatabase to be managed
      *
      * @exception Exception if an MBean cannot be deregistered
+     * @deprecated  Unused. Will be removed in Tomcat 8.0.x
      */
+    @Deprecated
     static void destroyMBean(UserDatabase userDatabase)
         throws Exception {
 
@@ -1473,7 +1492,9 @@ public class MBeanUtils {
      * @param valve The Valve to be managed
      *
      * @exception Exception if an MBean cannot be deregistered
+     * @deprecated  Unused. Will be removed in Tomcat 8.0.x
      */
+    @Deprecated
     static void destroyMBean(Valve valve, Container container)
         throws Exception {
 
