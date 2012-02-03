@@ -154,11 +154,9 @@ public class Tomcat {
      *
      * By default, if this method is not called, we use:
      *  - system properties - catalina.base, catalina.home
-     *  - $HOME/tomcat.$PORT
-     * ( /tmp doesn't seem a good choice for security ).
+     *  - $PWD/tomcat.$PORT
+     * (/tmp doesn't seem a good choice for security).
      *
-     *
-     * TODO: better default ? Maybe current dir ?
      * TODO: disable work dir if not needed ( no jsp, etc ).
      */
     public void setBaseDir(String basedir) {
@@ -596,26 +594,25 @@ public class Tomcat {
 
         File baseFile = new File(basedir);
         baseFile.mkdirs();
-        if (!baseFile.isAbsolute()) {
-            try {
-                baseFile = baseFile.getCanonicalFile();
-            } catch (IOException e) {
-                baseFile = baseFile.getAbsoluteFile();
-            }
+        try {
+            baseFile = baseFile.getCanonicalFile();
+        } catch (IOException e) {
+            baseFile = baseFile.getAbsoluteFile();
         }
         server.setCatalinaBase(baseFile);
+        basedir = baseFile.getPath();
 
-        if (catalinaHome != null) {
+        if (catalinaHome == null) {
+            server.setCatalinaHome(baseFile);
+        } else {
             File homeFile = new File(catalinaHome);
             homeFile.mkdirs();
-            if (!homeFile.isAbsolute()) {
-                try {
-                    homeFile = homeFile.getCanonicalFile();
-                } catch (IOException e) {
-                    homeFile = homeFile.getAbsoluteFile();
-                }
+            try {
+                homeFile = homeFile.getCanonicalFile();
+            } catch (IOException e) {
+                homeFile = homeFile.getAbsoluteFile();
             }
-            server.setCatalinaBase(homeFile);
+            server.setCatalinaHome(homeFile);
         }
     }
 
