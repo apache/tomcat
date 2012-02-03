@@ -36,7 +36,6 @@ import org.apache.catalina.Server;
 import org.apache.catalina.Service;
 import org.apache.catalina.deploy.NamingResources;
 import org.apache.catalina.mbeans.MBeanFactory;
-import org.apache.catalina.mbeans.MBeanUtils;
 import org.apache.catalina.startup.Catalina;
 import org.apache.catalina.util.LifecycleMBeanBase;
 import org.apache.catalina.util.ServerInfo;
@@ -859,7 +858,7 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
         if (services.length > 0) {
             Service service = services[0];
             if (service != null) {
-                domain = MBeanUtils.getDomain(service);
+                domain = service.getDomain();
             }
         }
         return domain;
