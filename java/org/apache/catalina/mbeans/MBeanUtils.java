@@ -971,7 +971,9 @@ public class MBeanUtils {
      * @param connector The Connector to be managed
      *
      * @exception Exception if an MBean cannot be deregistered
+     * @deprecated  Unused. Will be removed in Tomcat 8.0.x
      */
+    @Deprecated
     static void destroyMBean(Connector connector, Service service)
         throws Exception {
 
@@ -1013,7 +1015,9 @@ public class MBeanUtils {
      * @param context The Context to be managed
      *
      * @exception Exception if an MBean cannot be deregistered
+     * @deprecated  Unused. Will be removed in Tomcat 8.0.x
      */
+    @Deprecated
     static void destroyMBean(Context context)
         throws Exception {
 
