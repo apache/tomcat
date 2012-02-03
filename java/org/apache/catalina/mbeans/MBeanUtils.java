@@ -1563,7 +1563,11 @@ public class MBeanUtils {
      * @param container The container the object is associated with
      * @return          A string suitable for appending to the ObjectName
      *
+     * @deprecated  To be removed since to creates a circular dependency. Will
+     *              be replaced in Tomcat 8 by a new method on {@link
+     *              Container}.
      */
+    @Deprecated
     public static String getContainerKeyProperties(Container container) {
 
         Container c = container;
