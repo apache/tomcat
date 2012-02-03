@@ -1088,7 +1088,7 @@ public class NamingResources extends LifecycleMBeanBase implements Serializable 
         Object c = getContainer();
         if (c instanceof Container) {
             return "type=NamingResources" +
-                    MBeanUtils.getContainerKeyProperties((Container) c);
+                    ((Container) c).getMBeanKeyProperties();
         }
         // Server or just unknown
         return "type=NamingResources";

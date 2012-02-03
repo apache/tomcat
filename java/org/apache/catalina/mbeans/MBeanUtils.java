@@ -1562,6 +1562,7 @@ public class MBeanUtils {
      *
      * @param container The container the object is associated with
      * @return          A string suitable for appending to the ObjectName
+     *
      */
     public static String getContainerKeyProperties(Container container) {
 

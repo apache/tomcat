@@ -266,7 +266,7 @@ public abstract class ValveBase extends LifecycleMBeanBase
 
         Container container = getContainer();
 
-        name.append(MBeanUtils.getContainerKeyProperties(container));
+        name.append(container.getMBeanKeyProperties());
 
         int seq = 0;
 

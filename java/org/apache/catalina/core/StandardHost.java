@@ -35,7 +35,6 @@ import org.apache.catalina.LifecycleException;
 import org.apache.catalina.LifecycleListener;
 import org.apache.catalina.Valve;
 import org.apache.catalina.loader.WebappClassLoader;
-import org.apache.catalina.mbeans.MBeanUtils;
 import org.apache.catalina.valves.ValveBase;
 import org.apache.tomcat.util.ExceptionUtils;
 
@@ -825,7 +824,7 @@ public class StandardHost extends ContainerBase implements Host {
     protected String getObjectNameKeyProperties() {
 
         StringBuilder keyProperties = new StringBuilder("type=Host");
-        keyProperties.append(MBeanUtils.getContainerKeyProperties(this));
+        keyProperties.append(getMBeanKeyProperties());
 
         return keyProperties.toString();
     }

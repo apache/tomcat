@@ -1313,7 +1313,7 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
 
         StringBuilder keyProperties = new StringBuilder("type=Realm");
         keyProperties.append(getRealmSuffix());
-        keyProperties.append(MBeanUtils.getContainerKeyProperties(container));
+        keyProperties.append(container.getMBeanKeyProperties());
 
         return keyProperties.toString();
     }
