@@ -555,8 +555,15 @@ public class MBeanUtils {
 
     }
 
-
+    /*
+     * @deprecated  Unused. Will be removed in Tomcat 8.0.x
+     */
+    @Deprecated
     static final Hashtable<String,int[]> seq = new Hashtable<String,int[]>();
+    /*
+     * @deprecated  Unused. Will be removed in Tomcat 8.0.x
+     */
+    @Deprecated
     static int getSeq( String key ) {
         int i[]=seq.get( key );
         if (i == null ) {
