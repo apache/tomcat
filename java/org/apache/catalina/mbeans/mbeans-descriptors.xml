@@ -256,6 +256,18 @@
                  type="java.lang.String"/>
     </operation>
 
+    <operation   name="createValve"
+          description="Create a new Valve for the given Container"
+               impact="ACTION"
+           returnType="java.lang.String">
+      <parameter name="className"
+          description="Fully qualified class name of the Valve to create"
+                 type="java.lang.String"/>
+      <parameter name="parent"
+          description="MBean Name of the associated parent component"
+                 type="java.lang.String"/>
+    </operation>
+
     <operation   name="createWebappLoader"
           description="Create a new Web Application Loader"
                impact="ACTION"

@@ -87,6 +87,10 @@
         via the scripts) that was intended for embedding but is not required
         when performing a standard start.(markt) 
       </scode>
+      <add>
+        Add new method to <code>MBeanFactory</code> that allows any Valve to be
+        created and deprecate the methods to create specific Valves. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
