@@ -1497,41 +1497,4 @@ public class MBeanUtils {
         }
 
     }
-
-
-    /**
-     * Determine the name of the domain to register MBeans for from a given
-     * Service.
-     *
-     * @param service
-     *
-     * @deprecated  To be removed since to creates a circular dependency. Will
-     *              be replaced in Tomcat 8 by a new method on {@link
-     *              Service}.
-     */
-    @Deprecated
-    public static String getDomain(Service service) {
-
-        // Null service -> return null
-        if (service == null) {
-            return null;
-        }
-
-        String domain = null;
-
-        Container engine = service.getContainer();
-
-        // Use the engine name first
-        if (engine != null) {
-            domain = engine.getName();
-        }
-
-        // No engine or no engine name, use the service name
-        if (domain == null) {
-            domain = service.getName();
-        }
-
-        // No service name, use null
-        return domain;
-    }
 }
