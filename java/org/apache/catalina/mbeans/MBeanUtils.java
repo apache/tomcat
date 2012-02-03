@@ -259,7 +259,10 @@ public class MBeanUtils {
      * @param loader The Loader to be managed
      *
      * @exception Exception if an MBean cannot be created or registered
+     *
+     * @deprecated Unused. Will be removed in Tomcat 8.0.x
      */
+    @Deprecated
     static DynamicMBean createMBean(Loader loader)
         throws Exception {
 
@@ -291,7 +294,10 @@ public class MBeanUtils {
      * @param factory The MBeanFactory to be managed
      *
      * @exception Exception if an MBean cannot be created or registered
+     *
+     * @deprecated Unused. Will be removed in Tomcat 8.0.x
      */
+    @Deprecated
     static DynamicMBean createMBean(MBeanFactory factory)
         throws Exception {
 
@@ -322,7 +328,10 @@ public class MBeanUtils {
      * @param resource The NamingResources to be managed
      *
      * @exception Exception if an MBean cannot be created or registered
+     *
+     * @deprecated Unused. Will be removed in Tomcat 8.0.x
      */
+    @Deprecated
     static DynamicMBean createMBean(NamingResources resource)
         throws Exception {
 
