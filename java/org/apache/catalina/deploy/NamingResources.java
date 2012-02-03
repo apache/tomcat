@@ -32,6 +32,7 @@ import javax.naming.NamingException;
 import org.apache.catalina.Container;
 import org.apache.catalina.Context;
 import org.apache.catalina.Engine;
+import org.apache.catalina.JmxEnabled;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.LifecycleState;
 import org.apache.catalina.Server;
@@ -1075,8 +1076,8 @@ public class NamingResources extends LifecycleMBeanBase implements Serializable 
         // Use the same domain as our associated container if we have one
         Object c = getContainer();
 
-        if (c instanceof LifecycleMBeanBase) {
-            return ((LifecycleMBeanBase) c).getDomain();
+        if (c instanceof JmxEnabled) {
+            return ((JmxEnabled) c).getDomain();
         }
 
         return null;

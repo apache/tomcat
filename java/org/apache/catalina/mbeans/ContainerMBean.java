@@ -29,6 +29,7 @@ import javax.management.modelmbean.InvalidTargetObjectTypeException;
 
 import org.apache.catalina.Container;
 import org.apache.catalina.ContainerListener;
+import org.apache.catalina.JmxEnabled;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.LifecycleListener;
 import org.apache.catalina.Valve;
@@ -37,7 +38,6 @@ import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.core.StandardHost;
 import org.apache.catalina.startup.ContextConfig;
 import org.apache.catalina.startup.HostConfig;
-import org.apache.catalina.util.LifecycleMBeanBase;
 import org.apache.catalina.valves.ValveBase;
 import org.apache.tomcat.util.modeler.BaseModelMBean;
 
@@ -170,7 +170,11 @@ public class ContainerMBean extends BaseModelMBean {
             throw new MBeanException(e);
         }
 
-        return ((LifecycleMBeanBase)valve).getObjectName().toString();
+        if (valve instanceof JmxEnabled) {
+            return ((JmxEnabled)valve).getObjectName().toString();
+        } else {
+            return null;
+        }
     }
 
     /**
