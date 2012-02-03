@@ -27,29 +27,20 @@ import javax.management.MBeanServer;
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
 
-import org.apache.catalina.Contained;
 import org.apache.catalina.Container;
 import org.apache.catalina.Context;
 import org.apache.catalina.Engine;
 import org.apache.catalina.Group;
 import org.apache.catalina.Host;
 import org.apache.catalina.Loader;
-import org.apache.catalina.Manager;
-import org.apache.catalina.Realm;
 import org.apache.catalina.Role;
 import org.apache.catalina.Server;
-import org.apache.catalina.Service;
 import org.apache.catalina.User;
 import org.apache.catalina.UserDatabase;
-import org.apache.catalina.Valve;
-import org.apache.catalina.connector.Connector;
 import org.apache.catalina.deploy.ContextEnvironment;
 import org.apache.catalina.deploy.ContextResource;
 import org.apache.catalina.deploy.ContextResourceLink;
-import org.apache.catalina.deploy.NamingResources;
 import org.apache.catalina.util.ContextName;
-import org.apache.catalina.valves.ValveBase;
-import org.apache.tomcat.util.IntrospectionUtils;
 import org.apache.tomcat.util.modeler.ManagedBean;
 import org.apache.tomcat.util.modeler.Registry;
 
@@ -339,77 +330,6 @@ public class MBeanUtils {
 
     /**
      * Create an <code>ObjectName</code> for this
-     * <code>Connector</code> object.
-     *
-     * @param domain Domain in which this name is to be created
-     * @param connector The Connector to be named
-     *
-     * @exception MalformedObjectNameException if a name cannot be created
-     * @deprecated  Unused. Will be removed in Tomcat 8.0.x
-     */
-    @Deprecated
-    static ObjectName createObjectName(String domain,
-                                        Connector connector)
-        throws MalformedObjectNameException {
-
-        ObjectName name = null;
-        try {
-            Object addressObj = IntrospectionUtils.getProperty(connector, "address");
-            Integer port = (Integer)
-                IntrospectionUtils.getProperty(connector, "port");
-
-            StringBuilder sb = new StringBuilder(domain);
-            sb.append(":type=Connector");
-            sb.append(",port=");
-            sb.append(port);
-            if (addressObj != null) {
-                String address = addressObj.toString();
-                if (address.length() > 0) {
-                    sb.append(",address=");
-                    sb.append(ObjectName.quote(address));
-                }
-            }
-            name = new ObjectName(sb.toString());
-            return (name);
-        } catch (Exception e) {
-            MalformedObjectNameException mone =
-                new MalformedObjectNameException
-                ("Cannot create object name for " + connector);
-            mone.initCause(e);
-            throw mone;
-        }
-    }
-
-
-    /**
-     * Create an <code>ObjectName</code> for this
-     * <code>Context</code> object.
-     *
-     * @param domain Domain in which this name is to be created
-     * @param context The Context to be named
-     *
-     * @exception MalformedObjectNameException if a name cannot be created
-     * @deprecated  Unused. Will be removed in Tomcat 8.0.x
-     */
-    @Deprecated
-    static ObjectName createObjectName(String domain,
-                                              Context context)
-        throws MalformedObjectNameException {
-
-        ObjectName name = null;
-        Host host = (Host)context.getParent();
-        ContextName cn = new ContextName(context.getName());
-        name = new ObjectName(domain + ":j2eeType=WebModule,name=//" +
-                              host.getName()+ cn.getDisplayName() +
-                              ",J2EEApplication=none,J2EEServer=none");
-
-        return (name);
-
-    }
-
-
-    /**
-     * Create an <code>ObjectName</code> for this
      * <code>Service</code> object.
      *
      * @param domain Domain in which this name is to be created
@@ -517,27 +437,6 @@ public class MBeanUtils {
 
     /**
      * Create an <code>ObjectName</code> for this
-     * <code>Engine</code> object.
-     *
-     * @param domain Domain in which this name is to be created
-     * @param engine The Engine to be named
-     *
-     * @exception MalformedObjectNameException if a name cannot be created
-     * @deprecated  Unused. Will be removed in Tomcat 8.0.x
-     */
-    @Deprecated
-    static ObjectName createObjectName(String domain, Engine engine)
-        throws MalformedObjectNameException {
-
-        ObjectName name = null;
-        name = new ObjectName(domain + ":type=Engine");
-        return (name);
-
-    }
-
-
-    /**
-     * Create an <code>ObjectName</code> for this
      * <code>Group</code> object.
      *
      * @param domain Domain in which this name is to be created
@@ -553,29 +452,6 @@ public class MBeanUtils {
         name = new ObjectName(domain + ":type=Group,groupname=" +
                               ObjectName.quote(group.getGroupname()) +
                               ",database=" + group.getUserDatabase().getId());
-        return (name);
-
-    }
-
-
-    /**
-     * Create an <code>ObjectName</code> for this
-     * <code>Host</code> object.
-     *
-     * @param domain Domain in which this name is to be created
-     * @param host The Host to be named
-     *
-     * @exception MalformedObjectNameException if a name cannot be created
-     * @deprecated  Unused. Will be removed in Tomcat 8.0.x
-     */
-    @Deprecated
-    static ObjectName createObjectName(String domain,
-                                              Host host)
-        throws MalformedObjectNameException {
-
-        ObjectName name = null;
-        name = new ObjectName(domain + ":type=Host,host=" +
-                              host.getName());
         return (name);
 
     }
@@ -617,133 +493,6 @@ public class MBeanUtils {
 
     /**
      * Create an <code>ObjectName</code> for this
-     * <code>Manager</code> object.
-     *
-     * @param domain Domain in which this name is to be created
-     * @param manager The Manager to be named
-     *
-     * @exception MalformedObjectNameException if a name cannot be created
-     * @deprecated  Unused. Will be removed in Tomcat 8.0.x
-     */
-    @Deprecated
-    static ObjectName createObjectName(String domain,
-                                              Manager manager)
-        throws MalformedObjectNameException {
-
-        ObjectName name = null;
-        Container container = manager.getContainer();
-
-        if (container instanceof Engine) {
-            name = new ObjectName(domain + ":type=Manager");
-        } else if (container instanceof Host) {
-            name = new ObjectName(domain + ":type=Manager,host=" +
-                              container.getName());
-        } else if (container instanceof Context) {
-            Context context = ((Context)container);
-            ContextName cn = new ContextName(context.getName());
-            Container host = context.getParent();
-            name = new ObjectName(domain + ":type=Manager,context=" +
-                    cn.getDisplayName() + ",host=" + host.getName());
-        }
-
-        return (name);
-
-    }
-
-
-    /**
-     * Create an <code>ObjectName</code> for this
-     * <code>Server</code> object.
-     *
-     * @param domain Domain in which this name is to be created
-     * @param resources The NamingResources to be named
-     *
-     * @exception MalformedObjectNameException if a name cannot be created
-     * @deprecated  Unused. Will be removed in Tomcat 8.0.x
-     */
-    @Deprecated
-    static ObjectName createObjectName(String domain,
-                                              NamingResources resources)
-        throws MalformedObjectNameException {
-
-        ObjectName name = null;
-        Object container = resources.getContainer();
-        if (container instanceof Server) {
-            name = new ObjectName(domain + ":type=NamingResources" +
-                        ",resourcetype=Global");
-        } else if (container instanceof Context) {
-            Context context = ((Context)container);
-            ContextName cn = new ContextName(context.getName());
-            Container host = context.getParent();
-            name = new ObjectName(domain + ":type=NamingResources" +
-                        ",resourcetype=Context,context=" + cn.getDisplayName() +
-                        ",host=" + host.getName());
-        }
-
-        return (name);
-
-    }
-
-
-    /**
-     * Create an <code>ObjectName</code> for this
-     * <code>MBeanFactory</code> object.
-     *
-     * @param domain Domain in which this name is to be created
-     * @param factory The MBeanFactory to be named
-     *
-     * @exception MalformedObjectNameException if a name cannot be created
-     * @deprecated  Unused. Will be removed in Tomcat 8.0.x
-     */
-    @Deprecated
-    static ObjectName createObjectName(String domain, MBeanFactory factory)
-        throws MalformedObjectNameException {
-
-        ObjectName name = new ObjectName(domain + ":type=MBeanFactory");
-
-        return (name);
-
-    }
-
-
-    /**
-     * Create an <code>ObjectName</code> for this
-     * <code>Realm</code> object.
-     *
-     * @param domain Domain in which this name is to be created
-     * @param realm The Realm to be named
-     *
-     * @exception MalformedObjectNameException if a name cannot be created
-     * @deprecated  Unused. Will be removed in Tomcat 8.0.x
-     */
-    @Deprecated
-    static ObjectName createObjectName(String domain,
-                                              Realm realm)
-        throws MalformedObjectNameException {
-
-        ObjectName name = null;
-        Container container = realm.getContainer();
-
-        if (container instanceof Engine) {
-            name = new ObjectName(domain + ":type=Realm");
-        } else if (container instanceof Host) {
-            name = new ObjectName(domain + ":type=Realm,host=" +
-                              container.getName());
-        } else if (container instanceof Context) {
-            Context context = ((Context)container);
-            ContextName cn = new ContextName(context.getName());
-            Container host = context.getParent();
-            name = new ObjectName(domain + ":type=Realm,context=" +
-                    cn.getDisplayName() + ",host=" + host.getName());
-        }
-
-        return (name);
-
-    }
-
-
-    /**
-     * Create an <code>ObjectName</code> for this
      * <code>Role</code> object.
      *
      * @param domain Domain in which this name is to be created
@@ -759,50 +508,6 @@ public class MBeanUtils {
         name = new ObjectName(domain + ":type=Role,rolename=" +
                               role.getRolename() + ",database=" +
                               role.getUserDatabase().getId());
-        return (name);
-
-    }
-
-
-    /**
-     * Create an <code>ObjectName</code> for this
-     * <code>Server</code> object.
-     *
-     * @param domain Domain in which this name is to be created
-     * @param server The Server to be named
-     *
-     * @exception MalformedObjectNameException if a name cannot be created
-     * @deprecated  Unused. Will be removed in Tomcat 8.0.x
-     */
-    @Deprecated
-    static ObjectName createObjectName(String domain, Server server)
-        throws MalformedObjectNameException {
-
-        ObjectName name = null;
-        name = new ObjectName(domain + ":type=Server");
-        return (name);
-
-    }
-
-
-    /**
-     * Create an <code>ObjectName</code> for this
-     * <code>Service</code> object.
-     *
-     * @param domain Domain in which this name is to be created
-     * @param service The Service to be named
-     *
-     * @exception MalformedObjectNameException if a name cannot be created
-     * @deprecated  Unused. Will be removed in Tomcat 8.0.x
-     */
-    @Deprecated
-    static ObjectName createObjectName(String domain,
-                                              Service service)
-        throws MalformedObjectNameException {
-
-        ObjectName name = null;
-        name = new ObjectName(domain + ":type=Service,serviceName=" +
-                            service.getName());
         return (name);
 
     }
@@ -850,77 +555,6 @@ public class MBeanUtils {
 
     }
 
-
-    /**
-     * Create an <code>ObjectName</code> for this
-     * <code>Valve</code> object.
-     *
-     * @param domain Domain in which this name is to be created
-     * @param valve The Valve to be named
-     *
-     * @exception MalformedObjectNameException if a name cannot be created
-     * @deprecated  Unused. Will be removed in Tomcat 8.0.x
-     */
-    @Deprecated
-    static ObjectName createObjectName(String domain,
-                                       Valve valve)
-        throws MalformedObjectNameException {
-        if( valve instanceof ValveBase ) {
-            ObjectName name=((ValveBase)valve).getObjectName();
-            if( name != null )
-                return name;
-        }
-
-        ObjectName name = null;
-        Container container = null;
-        String className=valve.getClass().getName();
-        int period = className.lastIndexOf('.');
-        if (period >= 0)
-            className = className.substring(period + 1);
-        if( valve instanceof Contained ) {
-            container = ((Contained)valve).getContainer();
-        }
-        if( container == null ) {
-            throw new MalformedObjectNameException(
-                               "Cannot create mbean for non-contained valve " +
-                               valve);
-        }
-        if (container instanceof Engine) {
-            String local="";
-            int seq = getSeq(local);
-            String ext="";
-            if( seq > 0 ) {
-                ext=",seq=" + seq;
-            }
-            name = new ObjectName(domain + ":type=Valve,name=" + className +
-                                    ext + local );
-        } else if (container instanceof Host) {
-            String local=",host=" +container.getName();
-            int seq = getSeq(local);
-            String ext="";
-            if( seq > 0 ) {
-                ext=",seq=" + seq;
-            }
-            name = new ObjectName(domain + ":type=Valve,name=" + className +
-                                    ext + local );
-        } else if (container instanceof Context) {
-            Context context = ((Context)container);
-            ContextName cn = new ContextName(context.getName());
-            Container host = context.getParent();
-            String local=",context=" + cn.getDisplayName() + ",host=" +
-                    host.getName();
-            int seq = getSeq(local);
-            String ext="";
-            if( seq > 0 ) {
-                ext=",seq=" + seq;
-            }
-            name = new ObjectName(domain + ":type=Valve,name=" + className +
-                                    ext + local );
-        }
-
-        return (name);
-
-    }
 
     static final Hashtable<String,int[]> seq = new Hashtable<String,int[]>();
     static int getSeq( String key ) {
