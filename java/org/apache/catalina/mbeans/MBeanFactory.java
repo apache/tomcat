@@ -31,7 +31,6 @@ import org.apache.catalina.Server;
 import org.apache.catalina.Service;
 import org.apache.catalina.Valve;
 import org.apache.catalina.connector.Connector;
-import org.apache.catalina.core.ContainerBase;
 import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.core.StandardEngine;
 import org.apache.catalina.core.StandardHost;
@@ -138,10 +137,10 @@ public class MBeanFactory {
     }
 
    /**
-     * Get Parent ContainerBase to add its child component
+     * Get Parent Container to add its child component
      * from parent's ObjectName
      */
-    private ContainerBase getParentContainerFromParent(ObjectName pname)
+    private Container getParentContainerFromParent(ObjectName pname)
         throws Exception {
 
         String type = pname.getKeyProperty("type");
@@ -154,16 +153,16 @@ public class MBeanFactory {
             int i = name.indexOf("/");
             String hostName = name.substring(0,i);
             String path = name.substring(i);
-            Host host = (Host) engine.findChild(hostName);
+            Container host = engine.findChild(hostName);
             String pathStr = getPathStr(path);
-            StandardContext context = (StandardContext)host.findChild(pathStr);
+            Container context = host.findChild(pathStr);
             return context;
         } else if (type != null) {
             if (type.equals("Engine")) {
                 return engine;
             } else if (type.equals("Host")) {
                 String hostName = pname.getKeyProperty("host");
-                StandardHost host = (StandardHost) engine.findChild(hostName);
+                Container host = engine.findChild(hostName);
                 return host;
             }
         }
@@ -176,25 +175,25 @@ public class MBeanFactory {
      * Get Parent ContainerBase to add its child component
      * from child component's ObjectName  as a String
      */
-    private ContainerBase getParentContainerFromChild(ObjectName oname)
+    private Container getParentContainerFromChild(ObjectName oname)
         throws Exception {
 
         String hostName = oname.getKeyProperty("host");
         String path = oname.getKeyProperty("path");
         Service service = getService(oname);
-        StandardEngine engine = (StandardEngine) service.getContainer();
+        Container engine = service.getContainer();
         if (hostName == null) {
             // child's container is Engine
             return engine;
         } else if (path == null) {
             // child's container is Host
-            StandardHost host = (StandardHost) engine.findChild(hostName);
+            Container host = engine.findChild(hostName);
             return host;
         } else {
             // child's container is Context
-            StandardHost host = (StandardHost) engine.findChild(hostName);
+            Container host = engine.findChild(hostName);
             path = getPathStr(path);
-            StandardContext context = (StandardContext) host.findChild(path);
+            Container context = host.findChild(path);
             return context;
         }
     }
@@ -264,9 +263,9 @@ public class MBeanFactory {
 
         // Add the new instance to its parent component
         ObjectName pname = new ObjectName(parent);
-        ContainerBase containerBase = getParentContainerFromParent(pname);
+        Container container = getParentContainerFromParent(pname);
         // Add the new instance to its parent component
-        containerBase.setRealm(realm);
+        container.setRealm(realm);
         // Return the corresponding MBean name
         ObjectName oname = realm.getObjectName();
         if (oname != null) {
@@ -362,9 +361,9 @@ public class MBeanFactory {
 
         // Add the new instance to its parent component
         ObjectName pname = new ObjectName(parent);
-        ContainerBase containerBase = getParentContainerFromParent(pname);
+        Container container = getParentContainerFromParent(pname);
         // Add the new instance to its parent component
-        containerBase.setRealm(realm);
+        container.setRealm(realm);
         // Return the corresponding MBean name
         ObjectName oname = realm.getObjectName();
 
@@ -392,9 +391,9 @@ public class MBeanFactory {
 
         // Add the new instance to its parent component
         ObjectName pname = new ObjectName(parent);
-        ContainerBase containerBase = getParentContainerFromParent(pname);
+        Container container = getParentContainerFromParent(pname);
         // Add the new instance to its parent component
-        containerBase.setRealm(realm);
+        container.setRealm(realm);
         // Return the corresponding MBean name
         ObjectName oname = realm.getObjectName();
 
@@ -423,9 +422,9 @@ public class MBeanFactory {
 
         // Add the new instance to its parent component
         ObjectName pname = new ObjectName(parent);
-        ContainerBase containerBase = getParentContainerFromParent(pname);
+        Container container = getParentContainerFromParent(pname);
         // Add the new instance to its parent component
-        containerBase.setRealm(realm);
+        container.setRealm(realm);
         // Return the corresponding MBean name
         ObjectName oname = realm.getObjectName();
         if (oname != null) {
@@ -616,9 +615,9 @@ public class MBeanFactory {
 
         // Add the new instance to its parent component
         ObjectName pname = new ObjectName(parent);
-        ContainerBase containerBase = getParentContainerFromParent(pname);
-        if (containerBase != null) {
-            containerBase.setManager(manager);
+        Container container = getParentContainerFromParent(pname);
+        if (container != null) {
+            container.setManager(manager);
         }
         ObjectName oname = manager.getObjectName();
         if (oname != null) {
@@ -648,9 +647,9 @@ public class MBeanFactory {
 
         // Add the new instance to its parent component
         ObjectName pname = new ObjectName(parent);
-        ContainerBase containerBase = getParentContainerFromParent(pname);
+        Container container = getParentContainerFromParent(pname);
         // Add the new instance to its parent component
-        containerBase.setRealm(realm);
+        container.setRealm(realm);
         // Return the corresponding MBean name
         ObjectName oname = realm.getObjectName();
         // FIXME getObjectName() returns null
@@ -716,9 +715,9 @@ public class MBeanFactory {
 
         // Add the new instance to its parent component
         ObjectName pname = new ObjectName(parent);
-        ContainerBase containerBase = getParentContainerFromParent(pname);
-        if (containerBase != null) {
-            containerBase.setLoader(loader);
+        Container container = getParentContainerFromParent(pname);
+        if (container != null) {
+            container.setLoader(loader);
         }
         // FIXME add Loader.getObjectName
         //ObjectName oname = loader.getObjectName();
@@ -853,7 +852,7 @@ public class MBeanFactory {
 
         ObjectName oname = new ObjectName(name);
         // Acquire a reference to the component to be removed
-        ContainerBase container = getParentContainerFromChild(oname);
+        Container container = getParentContainerFromChild(oname);
         container.setLoader(null);
 
     }
@@ -870,7 +869,7 @@ public class MBeanFactory {
 
         ObjectName oname = new ObjectName(name);
         // Acquire a reference to the component to be removed
-        ContainerBase container = getParentContainerFromChild(oname);
+        Container container = getParentContainerFromChild(oname);
         container.setManager(null);
 
     }
@@ -887,7 +886,7 @@ public class MBeanFactory {
 
         ObjectName oname = new ObjectName(name);
         // Acquire a reference to the component to be removed
-        ContainerBase container = getParentContainerFromChild(oname);
+        Container container = getParentContainerFromChild(oname);
         container.setRealm(null);
     }
 
@@ -923,7 +922,7 @@ public class MBeanFactory {
 
         // Acquire a reference to the component to be removed
         ObjectName oname = new ObjectName(name);
-        ContainerBase container = getParentContainerFromChild(oname);
+        Container container = getParentContainerFromChild(oname);
         Valve[] valves = container.getPipeline().getValves();
         for (int i = 0; i < valves.length; i++) {
             ObjectName voname = ((LifecycleMBeanBase) valves[i]).getObjectName();
