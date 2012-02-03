@@ -116,6 +116,8 @@ public final class Bootstrap {
         }
 
         catalinaHomeFile = homeFile;
+        System.setProperty(
+                Globals.CATALINA_HOME_PROP, catalinaHomeFile.getPath());
 
         // Then base
         String base = System.getProperty(Globals.CATALINA_BASE_PROP);
@@ -130,6 +132,8 @@ public final class Bootstrap {
             }
             catalinaBaseFile = baseFile;
         }
+        System.setProperty(
+                Globals.CATALINA_BASE_PROP, catalinaBaseFile.getPath());
     }
 
     // -------------------------------------------------------------- Variables
