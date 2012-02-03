@@ -26,6 +26,7 @@ import javax.management.ObjectName;
 import org.apache.catalina.Container;
 import org.apache.catalina.Engine;
 import org.apache.catalina.Executor;
+import org.apache.catalina.JmxEnabled;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.LifecycleState;
 import org.apache.catalina.Server;
@@ -520,8 +521,8 @@ public class StandardService extends LifecycleMBeanBase implements Service {
 
         // Initialize any Executors
         for (Executor executor : findExecutors()) {
-            if (executor instanceof LifecycleMBeanBase) {
-                ((LifecycleMBeanBase) executor).setDomain(getDomain());
+            if (executor instanceof JmxEnabled) {
+                ((JmxEnabled) executor).setDomain(getDomain());
             }
             executor.init();
         }

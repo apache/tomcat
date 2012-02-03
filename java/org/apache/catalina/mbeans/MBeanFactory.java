@@ -44,7 +44,6 @@ import org.apache.catalina.realm.UserDatabaseRealm;
 import org.apache.catalina.session.StandardManager;
 import org.apache.catalina.startup.ContextConfig;
 import org.apache.catalina.startup.HostConfig;
-import org.apache.catalina.util.LifecycleMBeanBase;
 
 
 /**
@@ -674,7 +673,7 @@ public class MBeanFactory {
      *
      * @return  The MBean name of the {@link Valve} that was created or
      *          <code>null</code> if the {@link Valve} does not implement
-     *          {@link LifecycleMBeanBase}.
+     *          {@link JmxEnabled}.
      */
     public String createValve(String className, String parent)
             throws Exception {
@@ -925,7 +924,7 @@ public class MBeanFactory {
         Container container = getParentContainerFromChild(oname);
         Valve[] valves = container.getPipeline().getValves();
         for (int i = 0; i < valves.length; i++) {
-            ObjectName voname = ((LifecycleMBeanBase) valves[i]).getObjectName();
+            ObjectName voname = ((JmxEnabled) valves[i]).getObjectName();
             if (voname.equals(oname)) {
                 container.getPipeline().removeValve(valves[i]);
             }
