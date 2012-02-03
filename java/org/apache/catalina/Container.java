@@ -159,6 +159,17 @@ public interface Container extends Lifecycle {
      */
     public ObjectName getObjectName();
 
+
+    /**
+     * Calculate the key properties string to be added to an object's
+     * {@link ObjectName} to indicate that it is associated with this container.
+     *
+     * @return          A string suitable for appending to the ObjectName
+     *
+     */
+    public String getMBeanKeyProperties();
+
+
     /**
      * Return the Pipeline object that manages the Valves associated with
      * this Container.
