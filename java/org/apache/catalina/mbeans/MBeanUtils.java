@@ -961,10 +961,6 @@ public class MBeanUtils {
 
     }
 
-    /*
-     * @deprecated  Unused. Will be removed in Tomcat 8.0.x
-     */
-    @Deprecated
     /**
      * Create an <code>ObjectName</code> for this
      * <code>Valve</code> object.
@@ -1036,6 +1032,10 @@ public class MBeanUtils {
 
     }
 
+    /*
+     * @deprecated  Unused. Will be removed in Tomcat 8.0.x
+     */
+    @Deprecated
     static Hashtable<String,int[]> seq = new Hashtable<String,int[]>();
     /*
      * @deprecated  Unused. Will be removed in Tomcat 8.0.x
