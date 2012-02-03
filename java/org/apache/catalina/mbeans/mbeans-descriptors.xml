@@ -27,15 +27,6 @@
     <!-- value is the object name of the corresponding MBean for the new    -->
     <!-- component.                                                         -->
 
-    <operation   name="createAccessLoggerValve"
-          description="Create a new AccessLoggerValve"
-               impact="ACTION"
-           returnType="java.lang.String">
-      <parameter name="parent"
-          description="MBean Name of the associated parent component"
-                 type="java.lang.String"/>
-    </operation>
-
     <operation   name="createAjpConnector"
           description="Create a new AjpConnector"
                impact="ACTION"
@@ -150,33 +141,6 @@
                  type="java.lang.String"/>
     </operation>
 
-    <operation   name="createRemoteAddrValve"
-          description="Create a new Remote Address Filter Valve"
-               impact="ACTION"
-           returnType="java.lang.String">
-      <parameter name="parent"
-          description="MBean Name of the associated parent component"
-                 type="java.lang.String"/>
-    </operation>
-
-    <operation   name="createRemoteHostValve"
-          description="Create a new Remote Host Filter Valve"
-               impact="ACTION"
-           returnType="java.lang.String">
-      <parameter name="parent"
-          description="MBean Name of the associated parent component"
-                 type="java.lang.String"/>
-    </operation>
-
-    <operation   name="createSingleSignOn"
-          description="Create a new Single Sign On Valve"
-               impact="ACTION"
-           returnType="java.lang.String">
-      <parameter name="parent"
-          description="MBean Name of the associated parent component"
-                 type="java.lang.String"/>
-    </operation>
-
     <operation   name="createStandardContext"
           description="Create a new StandardContext"
                impact="ACTION"
@@ -256,6 +220,18 @@
                  type="java.lang.String"/>
     </operation>
 
+    <operation   name="createValve"
+          description="Create a new Valve for the given Container"
+               impact="ACTION"
+           returnType="java.lang.String">
+      <parameter name="className"
+          description="Fully qualified class name of the Valve to create"
+                 type="java.lang.String"/>
+      <parameter name="parent"
+          description="MBean Name of the associated parent component"
+                 type="java.lang.String"/>
+    </operation>
+    
     <operation   name="createWebappLoader"
           description="Create a new Web Application Loader"
                impact="ACTION"
