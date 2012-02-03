@@ -26,10 +26,10 @@ import org.apache.catalina.Container;
 import org.apache.catalina.Context;
 import org.apache.catalina.Engine;
 import org.apache.catalina.Host;
+import org.apache.catalina.JmxEnabled;
 import org.apache.catalina.Server;
 import org.apache.catalina.Service;
 import org.apache.catalina.Valve;
-import org.apache.catalina.authenticator.SingleSignOn;
 import org.apache.catalina.connector.Connector;
 import org.apache.catalina.core.ContainerBase;
 import org.apache.catalina.core.StandardContext;
@@ -46,10 +46,6 @@ import org.apache.catalina.session.StandardManager;
 import org.apache.catalina.startup.ContextConfig;
 import org.apache.catalina.startup.HostConfig;
 import org.apache.catalina.util.LifecycleMBeanBase;
-import org.apache.catalina.valves.AccessLogValve;
-import org.apache.catalina.valves.RemoteAddrValve;
-import org.apache.catalina.valves.RemoteHostValve;
-import org.apache.catalina.valves.ValveBase;
 
 
 /**
@@ -227,32 +223,6 @@ public class MBeanFactory {
             throw new Exception("Service with the domain is not found");
         }
         return service;
-
-    }
-
-
-    /**
-     * Create a new AccessLoggerValve.
-     *
-     * @param parent MBean Name of the associated parent component
-     *
-     * @exception Exception if an MBean cannot be created or registered
-     *
-     * @deprecated  Will be removed in Tomcat 8.0.x. Replaced by {@link
-     *              #createValve(String, String)}.
-     */
-    @Deprecated
-    public String createAccessLoggerValve(String parent)
-        throws Exception {
-
-        ObjectName pname = new ObjectName(parent);
-        // Create a new AccessLogValve instance
-        AccessLogValve accessLogger = new AccessLogValve();
-        ContainerBase containerBase = getParentContainerFromParent(pname);
-        // Add the new instance to its parent component
-        containerBase.getPipeline().addValve(accessLogger);
-        ObjectName oname = accessLogger.getObjectName();
-        return (oname.toString());
 
     }
 
@@ -463,88 +433,6 @@ public class MBeanFactory {
         } else {
             return null;
         }
-
-    }
-
-
-    /**
-     * Create a new Remote Address Filter Valve.
-     *
-     * @param parent MBean Name of the associated parent component
-     *
-     * @exception Exception if an MBean cannot be created or registered
-     *
-     * @deprecated  Will be removed in Tomcat 8.0.x. Replaced by {@link
-     *              #createValve(String, String)}.
-     */
-    @Deprecated
-    public String createRemoteAddrValve(String parent)
-        throws Exception {
-
-        // Create a new RemoteAddrValve instance
-        RemoteAddrValve valve = new RemoteAddrValve();
-
-        // Add the new instance to its parent component
-        ObjectName pname = new ObjectName(parent);
-        ContainerBase containerBase = getParentContainerFromParent(pname);
-        containerBase.getPipeline().addValve(valve);
-        ObjectName oname = valve.getObjectName();
-        return (oname.toString());
-
-    }
-
-
-     /**
-     * Create a new Remote Host Filter Valve.
-     *
-     * @param parent MBean Name of the associated parent component
-     *
-     * @exception Exception if an MBean cannot be created or registered
-     *
-     * @deprecated  Will be removed in Tomcat 8.0.x. Replaced by {@link
-     *              #createValve(String, String)}.
-     */
-    @Deprecated
-    public String createRemoteHostValve(String parent)
-        throws Exception {
-
-        // Create a new RemoteHostValve instance
-        RemoteHostValve valve = new RemoteHostValve();
-
-        // Add the new instance to its parent component
-        ObjectName pname = new ObjectName(parent);
-        ContainerBase containerBase = getParentContainerFromParent(pname);
-        containerBase.getPipeline().addValve(valve);
-        ObjectName oname = valve.getObjectName();
-        return (oname.toString());
-
-    }
-
-
-    /**
-     * Create a new Single Sign On Valve.
-     *
-     * @param parent MBean Name of the associated parent component
-     *
-     * @exception Exception if an MBean cannot be created or registered
-     *
-     * @deprecated  Will be removed in Tomcat 8.0.x. Replaced by {@link
-     *              #createValve(String, String)}.
-     */
-    @Deprecated
-
-    public String createSingleSignOn(String parent)
-        throws Exception {
-
-        // Create a new SingleSignOn instance
-        SingleSignOn valve = new SingleSignOn();
-
-        // Add the new instance to its parent component
-        ObjectName pname = new ObjectName(parent);
-        ContainerBase containerBase = getParentContainerFromParent(pname);
-        containerBase.getPipeline().addValve(valve);
-        ObjectName oname = valve.getObjectName();
-        return (oname.toString());
 
     }
 
@@ -805,8 +693,8 @@ public class MBeanFactory {
 
         container.getPipeline().addValve(valve);
 
-        if (valve instanceof LifecycleMBeanBase) {
-            return ((LifecycleMBeanBase) valve).getObjectName().toString();
+        if (valve instanceof JmxEnabled) {
+            return ((JmxEnabled) valve).getObjectName().toString();
         } else {
             return null;
         }
@@ -1038,7 +926,7 @@ public class MBeanFactory {
         ContainerBase container = getParentContainerFromChild(oname);
         Valve[] valves = container.getPipeline().getValves();
         for (int i = 0; i < valves.length; i++) {
-            ObjectName voname = ((ValveBase) valves[i]).getObjectName();
+            ObjectName voname = ((LifecycleMBeanBase) valves[i]).getObjectName();
             if (voname.equals(oname)) {
                 container.getPipeline().removeValve(valves[i]);
             }

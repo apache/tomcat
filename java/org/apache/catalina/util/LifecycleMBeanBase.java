@@ -18,13 +18,13 @@
 package org.apache.catalina.util;
 
 import javax.management.InstanceNotFoundException;
-import javax.management.MBeanRegistration;
 import javax.management.MBeanRegistrationException;
 import javax.management.MBeanServer;
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
 
 import org.apache.catalina.Globals;
+import org.apache.catalina.JmxEnabled;
 import org.apache.catalina.LifecycleException;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -32,7 +32,7 @@ import org.apache.tomcat.util.modeler.Registry;
 import org.apache.tomcat.util.res.StringManager;
 
 public abstract class LifecycleMBeanBase extends LifecycleBase
-        implements MBeanRegistration {
+        implements JmxEnabled {
 
     private static Log log = LogFactory.getLog(LifecycleMBeanBase.class);
 
