@@ -91,8 +91,14 @@ public interface Service extends Lifecycle {
      */
     public void setParentClassLoader(ClassLoader parent);
 
-    // --------------------------------------------------------- Public Methods
+    /**
+     * Obtain the domain under which this container will be / has been
+     * registered.
+     */
+    public String getDomain();
 
+
+    // --------------------------------------------------------- Public Methods
 
     /**
      * Add a new Connector to the set of defined Connectors, and associate it

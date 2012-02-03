@@ -27,7 +27,6 @@ import org.apache.catalina.LifecycleException;
 import org.apache.catalina.LifecycleState;
 import org.apache.catalina.Service;
 import org.apache.catalina.core.AprLifecycleListener;
-import org.apache.catalina.mbeans.MBeanUtils;
 import org.apache.catalina.util.LifecycleMBeanBase;
 import org.apache.coyote.Adapter;
 import org.apache.coyote.ProtocolHandler;
@@ -1049,7 +1048,12 @@ public class Connector extends LifecycleMBeanBase  {
 
     @Override
     protected String getDomainInternal() {
-        return MBeanUtils.getDomain(getService());
+        Service s = getService();
+        if (s == null) {
+            return null;
+        } else {
+            return service.getDomain();
+        }
     }
 
     @Override
