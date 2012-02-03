@@ -600,6 +600,7 @@ public class Tomcat {
             baseFile = baseFile.getAbsoluteFile();
         }
         server.setCatalinaBase(baseFile);
+        System.setProperty(Globals.CATALINA_BASE_PROP, baseFile.getPath());
         basedir = baseFile.getPath();
 
         if (catalinaHome == null) {
@@ -614,6 +615,8 @@ public class Tomcat {
             }
             server.setCatalinaHome(homeFile);
         }
+        System.setProperty(Globals.CATALINA_HOME_PROP,
+                server.getCatalinaHome().getPath());
     }
 
     static final String[] silences = new String[] {
