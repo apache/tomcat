@@ -345,7 +345,9 @@ public class MBeanUtils {
      * @param connector The Connector to be named
      *
      * @exception MalformedObjectNameException if a name cannot be created
+     * @deprecated  Unused. Will be removed in Tomcat 8.0.x
      */
+    @Deprecated
     static ObjectName createObjectName(String domain,
                                         Connector connector)
         throws MalformedObjectNameException {
@@ -387,7 +389,9 @@ public class MBeanUtils {
      * @param context The Context to be named
      *
      * @exception MalformedObjectNameException if a name cannot be created
+     * @deprecated  Unused. Will be removed in Tomcat 8.0.x
      */
+    @Deprecated
     static ObjectName createObjectName(String domain,
                                               Context context)
         throws MalformedObjectNameException {
@@ -519,7 +523,9 @@ public class MBeanUtils {
      * @param engine The Engine to be named
      *
      * @exception MalformedObjectNameException if a name cannot be created
+     * @deprecated  Unused. Will be removed in Tomcat 8.0.x
      */
+    @Deprecated
     static ObjectName createObjectName(String domain, Engine engine)
         throws MalformedObjectNameException {
 
@@ -560,7 +566,9 @@ public class MBeanUtils {
      * @param host The Host to be named
      *
      * @exception MalformedObjectNameException if a name cannot be created
+     * @deprecated  Unused. Will be removed in Tomcat 8.0.x
      */
+    @Deprecated
     static ObjectName createObjectName(String domain,
                                               Host host)
         throws MalformedObjectNameException {
@@ -615,7 +623,9 @@ public class MBeanUtils {
      * @param manager The Manager to be named
      *
      * @exception MalformedObjectNameException if a name cannot be created
+     * @deprecated  Unused. Will be removed in Tomcat 8.0.x
      */
+    @Deprecated
     static ObjectName createObjectName(String domain,
                                               Manager manager)
         throws MalformedObjectNameException {
@@ -649,7 +659,9 @@ public class MBeanUtils {
      * @param resources The NamingResources to be named
      *
      * @exception MalformedObjectNameException if a name cannot be created
+     * @deprecated  Unused. Will be removed in Tomcat 8.0.x
      */
+    @Deprecated
     static ObjectName createObjectName(String domain,
                                               NamingResources resources)
         throws MalformedObjectNameException {
@@ -681,7 +693,9 @@ public class MBeanUtils {
      * @param factory The MBeanFactory to be named
      *
      * @exception MalformedObjectNameException if a name cannot be created
+     * @deprecated  Unused. Will be removed in Tomcat 8.0.x
      */
+    @Deprecated
     static ObjectName createObjectName(String domain, MBeanFactory factory)
         throws MalformedObjectNameException {
 
@@ -700,7 +714,9 @@ public class MBeanUtils {
      * @param realm The Realm to be named
      *
      * @exception MalformedObjectNameException if a name cannot be created
+     * @deprecated  Unused. Will be removed in Tomcat 8.0.x
      */
+    @Deprecated
     static ObjectName createObjectName(String domain,
                                               Realm realm)
         throws MalformedObjectNameException {
@@ -756,7 +772,9 @@ public class MBeanUtils {
      * @param server The Server to be named
      *
      * @exception MalformedObjectNameException if a name cannot be created
+     * @deprecated  Unused. Will be removed in Tomcat 8.0.x
      */
+    @Deprecated
     static ObjectName createObjectName(String domain, Server server)
         throws MalformedObjectNameException {
 
@@ -775,7 +793,9 @@ public class MBeanUtils {
      * @param service The Service to be named
      *
      * @exception MalformedObjectNameException if a name cannot be created
+     * @deprecated  Unused. Will be removed in Tomcat 8.0.x
      */
+    @Deprecated
     static ObjectName createObjectName(String domain,
                                               Service service)
         throws MalformedObjectNameException {
@@ -839,7 +859,9 @@ public class MBeanUtils {
      * @param valve The Valve to be named
      *
      * @exception MalformedObjectNameException if a name cannot be created
+     * @deprecated  Unused. Will be removed in Tomcat 8.0.x
      */
+    @Deprecated
     static ObjectName createObjectName(String domain,
                                        Valve valve)
         throws MalformedObjectNameException {
