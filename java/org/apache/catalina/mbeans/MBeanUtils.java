@@ -49,13 +49,6 @@ import org.apache.catalina.deploy.ContextResourceLink;
 import org.apache.catalina.deploy.NamingResources;
 import org.apache.catalina.util.ContextName;
 import org.apache.catalina.valves.ValveBase;
-import org.apache.coyote.ProtocolHandler;
-import org.apache.coyote.ajp.AjpAprProtocol;
-import org.apache.coyote.ajp.AjpProtocol;
-import org.apache.coyote.http11.Http11AprProtocol;
-import org.apache.coyote.http11.Http11NioProtocol;
-import org.apache.coyote.http11.Http11Protocol;
-import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.IntrospectionUtils;
 import org.apache.tomcat.util.modeler.ManagedBean;
 import org.apache.tomcat.util.modeler.Registry;
@@ -966,73 +959,6 @@ public class MBeanUtils {
 
     /**
      * Deregister the MBean for this
-     * <code>Connector</code> object.
-     *
-     * @param connector The Connector to be managed
-     *
-     * @exception Exception if an MBean cannot be deregistered
-     * @deprecated  Unused. Will be removed in Tomcat 8.0.x
-     */
-    @Deprecated
-    static void destroyMBean(Connector connector, Service service)
-        throws Exception {
-
-        // domain is engine name
-        String domain = service.getContainer().getName();
-        if (domain == null)
-            domain = mserver.getDefaultDomain();
-        ObjectName oname = createObjectName(domain, connector);
-        if( mserver.isRegistered( oname ))  {
-            mserver.unregisterMBean(oname);
-        }
-        // Unregister associated request processor
-        String worker = null;
-        ProtocolHandler handler = connector.getProtocolHandler();
-        if (handler instanceof Http11Protocol) {
-            worker = ((Http11Protocol)handler).getName();
-        } else if (handler instanceof Http11NioProtocol) {
-            worker = ((Http11NioProtocol)handler).getName();
-        } else if (handler instanceof Http11AprProtocol) {
-            worker = ((Http11AprProtocol)handler).getName();
-        } else if (handler instanceof AjpProtocol) {
-            worker = ((AjpProtocol)handler).getName();
-        } else if (handler instanceof AjpAprProtocol) {
-            worker = ((AjpAprProtocol)handler).getName();
-        }
-        ObjectName query = new ObjectName(
-                domain + ":type=RequestProcessor,worker=" + worker + ",*");
-        Set<ObjectName> results = mserver.queryNames(query, null);
-        for(ObjectName result : results) {
-            mserver.unregisterMBean(result);
-        }
-    }
-
-
-    /**
-     * Deregister the MBean for this
-     * <code>Context</code> object.
-     *
-     * @param context The Context to be managed
-     *
-     * @exception Exception if an MBean cannot be deregistered
-     * @deprecated  Unused. Will be removed in Tomcat 8.0.x
-     */
-    @Deprecated
-    static void destroyMBean(Context context)
-        throws Exception {
-
-        String domain = context.getParent().getParent().getName();
-        if (domain == null)
-            domain = mserver.getDefaultDomain();
-        ObjectName oname = createObjectName(domain, context);
-        if( mserver.isRegistered(oname) )
-            mserver.unregisterMBean(oname);
-
-    }
-
-
-    /**
-     * Deregister the MBean for this
      * <code>ContextEnvironment</code> object.
      *
      * @param environment The ContextEnvironment to be managed
@@ -1116,29 +1042,6 @@ public class MBeanUtils {
 
     /**
      * Deregister the MBean for this
-     * <code>Engine</code> object.
-     *
-     * @param engine The Engine to be managed
-     *
-     * @exception Exception if an MBean cannot be deregistered
-     *
-     * @deprecated  Unused. Will be removed in Tomcat 8.0.x
-     */
-    @Deprecated
-    static void destroyMBean(Engine engine)
-        throws Exception {
-        String domain = engine.getName();
-        if (domain == null)
-            domain = mserver.getDefaultDomain();
-        ObjectName oname = createObjectName(domain, engine);
-        if( mserver.isRegistered(oname) )
-            mserver.unregisterMBean(oname);
-
-    }
-
-
-    /**
-     * Deregister the MBean for this
      * <code>Group</code> object.
      *
      * @param group The Group to be managed
@@ -1157,141 +1060,6 @@ public class MBeanUtils {
         if (domain == null)
             domain = mserver.getDefaultDomain();
         ObjectName oname = createObjectName(domain, group);
-        if( mserver.isRegistered(oname) )
-            mserver.unregisterMBean(oname);
-
-    }
-
-
-    /**
-     * Deregister the MBean for this
-     * <code>Host</code> object.
-     *
-     * @param host The Host to be managed
-     *
-     * @exception Exception if an MBean cannot be deregistered
-     * @deprecated  Unused. Will be removed in Tomcat 8.0.x
-     */
-    @Deprecated
-    static void destroyMBean(Host host)
-        throws Exception {
-
-        String domain = host.getParent().getName();
-        if (domain == null)
-            domain = mserver.getDefaultDomain();
-        ObjectName oname = createObjectName(domain, host);
-        if( mserver.isRegistered(oname) )
-            mserver.unregisterMBean(oname);
-
-    }
-
-
-    /**
-     * Deregister the MBean for this
-     * <code>Loader</code> object.
-     *
-     * @param loader The Loader to be managed
-     *
-     * @exception Exception if an MBean cannot be deregistered
-     * @deprecated  Unused. Will be removed in Tomcat 8.0.x
-     */
-    @Deprecated
-    static void destroyMBean(Loader loader)
-        throws Exception {
-
-        String mname = createManagedName(loader);
-        ManagedBean managed = registry.findManagedBean(mname);
-        if (managed == null) {
-            return;
-        }
-        String domain = managed.getDomain();
-        if (domain == null)
-            domain = mserver.getDefaultDomain();
-        ObjectName oname = createObjectName(domain, loader);
-        if( mserver.isRegistered(oname) )
-            mserver.unregisterMBean(oname);
-
-    }
-
-
-    /**
-     * Deregister the MBean for this
-     * <code>Manager</code> object.
-     *
-     * @param manager The Manager to be managed
-     *
-     * @exception Exception if an MBean cannot be deregistered
-     * @deprecated  Unused. Will be removed in Tomcat 8.0.x
-     */
-    @Deprecated
-    static void destroyMBean(Manager manager)
-        throws Exception {
-
-        String mname = createManagedName(manager);
-        ManagedBean managed = registry.findManagedBean(mname);
-        if (managed == null) {
-            return;
-        }
-        String domain = managed.getDomain();
-        if (domain == null)
-            domain = mserver.getDefaultDomain();
-        ObjectName oname = createObjectName(domain, manager);
-        if( mserver.isRegistered(oname) )
-            mserver.unregisterMBean(oname);
-
-    }
-
-
-   /**
-     * Deregister the MBean for this
-     * <code>NamingResources</code> object.
-     *
-     * @param resources The NamingResources to be managed
-     *
-     * @exception Exception if an MBean cannot be deregistered
-     * @deprecated  Unused. Will be removed in Tomcat 8.0.x
-     */
-    @Deprecated
-    static void destroyMBean(NamingResources resources)
-        throws Exception {
-
-        String mname = createManagedName(resources);
-        ManagedBean managed = registry.findManagedBean(mname);
-        if (managed == null) {
-            return;
-        }
-        String domain = managed.getDomain();
-        if (domain == null)
-            domain = mserver.getDefaultDomain();
-        ObjectName oname = createObjectName(domain, resources);
-        if( mserver.isRegistered(oname) )
-            mserver.unregisterMBean(oname);
-
-    }
-
-
-    /**
-     * Deregister the MBean for this
-     * <code>Realm</code> object.
-     *
-     * @param realm The Realm to be managed
-     *
-     * @exception Exception if an MBean cannot be deregistered
-     * @deprecated  Unused. Will be removed in Tomcat 8.0.x
-     */
-    @Deprecated
-    static void destroyMBean(Realm realm)
-        throws Exception {
-
-        String mname = createManagedName(realm);
-        ManagedBean managed = registry.findManagedBean(mname);
-        if (managed == null) {
-            return;
-        }
-        String domain = managed.getDomain();
-        if (domain == null)
-            domain = mserver.getDefaultDomain();
-        ObjectName oname = createObjectName(domain, realm);
         if( mserver.isRegistered(oname) )
             mserver.unregisterMBean(oname);
 
@@ -1326,72 +1094,6 @@ public class MBeanUtils {
 
     /**
      * Deregister the MBean for this
-     * <code>Server</code> object.
-     *
-     * @param server The Server to be managed
-     *
-     * @exception Exception if an MBean cannot be deregistered
-     * @deprecated  Unused. Will be removed in Tomcat 8.0.x
-     */
-    @Deprecated
-    static void destroyMBean(Server server)
-        throws Exception {
-
-        String mname = createManagedName(server);
-        ManagedBean managed = registry.findManagedBean(mname);
-        if (managed == null) {
-            return;
-        }
-        String domain = managed.getDomain();
-        if (domain == null)
-            domain = mserver.getDefaultDomain();
-        ObjectName oname = createObjectName(domain, server);
-        if( mserver.isRegistered(oname) )
-            mserver.unregisterMBean(oname);
-
-        // Global String cache - fixed name
-        oname = new ObjectName("Catalina:type=StringCache");
-        if( mserver.isRegistered(oname) )
-            mserver.unregisterMBean(oname);
-
-        // MBean Factory - fixed name
-        oname = new ObjectName("Catalina:type=MBeanFactory");
-        if( mserver.isRegistered(oname) )
-            mserver.unregisterMBean(oname);
-
-    }
-
-
-    /**
-     * Deregister the MBean for this
-     * <code>Service</code> object.
-     *
-     * @param service The Service to be managed
-     *
-     * @exception Exception if an MBean cannot be deregistered
-     * @deprecated  Unused. Will be removed in Tomcat 8.0.x
-     */
-    @Deprecated
-    static void destroyMBean(Service service)
-        throws Exception {
-
-        String mname = createManagedName(service);
-        ManagedBean managed = registry.findManagedBean(mname);
-        if (managed == null) {
-            return;
-        }
-        String domain = managed.getDomain();
-        if (domain == null)
-            domain = mserver.getDefaultDomain();
-        ObjectName oname = createObjectName(domain, service);
-        if( mserver.isRegistered(oname) )
-            mserver.unregisterMBean(oname);
-
-    }
-
-
-    /**
-     * Deregister the MBean for this
      * <code>User</code> object.
      *
      * @param user The User to be managed
@@ -1410,34 +1112,6 @@ public class MBeanUtils {
         if (domain == null)
             domain = mserver.getDefaultDomain();
         ObjectName oname = createObjectName(domain, user);
-        if( mserver.isRegistered(oname) )
-            mserver.unregisterMBean(oname);
-
-    }
-
-
-    /**
-     * Deregister the MBean for this
-     * <code>UserDatabase</code> object.
-     *
-     * @param userDatabase The UserDatabase to be managed
-     *
-     * @exception Exception if an MBean cannot be deregistered
-     * @deprecated  Unused. Will be removed in Tomcat 8.0.x
-     */
-    @Deprecated
-    static void destroyMBean(UserDatabase userDatabase)
-        throws Exception {
-
-        String mname = createManagedName(userDatabase);
-        ManagedBean managed = registry.findManagedBean(mname);
-        if (managed == null) {
-            return;
-        }
-        String domain = managed.getDomain();
-        if (domain == null)
-            domain = mserver.getDefaultDomain();
-        ObjectName oname = createObjectName(domain, userDatabase);
         if( mserver.isRegistered(oname) )
             mserver.unregisterMBean(oname);
 
@@ -1486,40 +1160,5 @@ public class MBeanUtils {
         ObjectName db = new ObjectName(
                 "Users:type=UserDatabase,database=" + userDatabase);
         mserver.unregisterMBean(db);
-    }
-
-
-    /**
-     * Deregister the MBean for this
-     * <code>Valve</code> object.
-     *
-     * @param valve The Valve to be managed
-     *
-     * @exception Exception if an MBean cannot be deregistered
-     * @deprecated  Unused. Will be removed in Tomcat 8.0.x
-     */
-    @Deprecated
-    static void destroyMBean(Valve valve, Container container)
-        throws Exception {
-
-        ((Contained)valve).setContainer(container);
-        String mname = createManagedName(valve);
-        ManagedBean managed = registry.findManagedBean(mname);
-        if (managed == null) {
-            return;
-        }
-        String domain = managed.getDomain();
-        if (domain == null)
-            domain = mserver.getDefaultDomain();
-        ObjectName oname = createObjectName(domain, valve);
-        try {
-            ((Contained)valve).setContainer(null);
-        } catch (Throwable t) {
-            ExceptionUtils.handleThrowable(t);
-        }
-        if( mserver.isRegistered(oname) ) {
-            mserver.unregisterMBean(oname);
-        }
-
     }
 }
