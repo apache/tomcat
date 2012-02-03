@@ -14,11 +14,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.catalina.mbeans;
 
-
-import java.util.Hashtable;
 import java.util.Set;
 
 import javax.management.DynamicMBean;
@@ -553,27 +550,6 @@ public class MBeanUtils {
                               userDatabase.getId());
         return (name);
 
-    }
-
-    /*
-     * @deprecated  Unused. Will be removed in Tomcat 8.0.x
-     */
-    @Deprecated
-    static final Hashtable<String,int[]> seq = new Hashtable<String,int[]>();
-    /*
-     * @deprecated  Unused. Will be removed in Tomcat 8.0.x
-     */
-    @Deprecated
-    static int getSeq( String key ) {
-        int i[]=seq.get( key );
-        if (i == null ) {
-            i=new int[1];
-            i[0]=0;
-            seq.put( key, i);
-        } else {
-            i[0]++;
-        }
-        return i[0];
     }
 
     /**
