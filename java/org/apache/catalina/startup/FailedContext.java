@@ -53,7 +53,6 @@ import org.apache.catalina.deploy.FilterMap;
 import org.apache.catalina.deploy.LoginConfig;
 import org.apache.catalina.deploy.NamingResources;
 import org.apache.catalina.deploy.SecurityConstraint;
-import org.apache.catalina.mbeans.MBeanUtils;
 import org.apache.catalina.util.CharsetMapper;
 import org.apache.catalina.util.ContextName;
 import org.apache.catalina.util.LifecycleMBeanBase;
@@ -122,7 +121,14 @@ public class FailedContext extends LifecycleMBeanBase implements Context {
 
 
     @Override
-    protected String getDomainInternal() { return MBeanUtils.getDomain(this); }
+    protected String getDomainInternal() {
+        Container p = getParent();
+        if (p == null) {
+            return null;
+        } else {
+            return p.getDomain();
+        }
+    }
 
 
     @Override

@@ -30,7 +30,6 @@ import org.apache.catalina.Valve;
 import org.apache.catalina.comet.CometEvent;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
-import org.apache.catalina.mbeans.MBeanUtils;
 import org.apache.catalina.util.LifecycleMBeanBase;
 import org.apache.juli.logging.Log;
 import org.apache.tomcat.util.res.StringManager;
@@ -308,6 +307,11 @@ public abstract class ValveBase extends LifecycleMBeanBase
 
     @Override
     public String getDomainInternal() {
-        return MBeanUtils.getDomain(getContainer());
+        Container c = getContainer();
+        if (c == null) {
+            return null;
+        } else {
+            return c.getDomain();
+        }
     }
 }

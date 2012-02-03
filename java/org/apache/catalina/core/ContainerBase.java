@@ -60,7 +60,6 @@ import org.apache.catalina.Valve;
 import org.apache.catalina.Wrapper;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
-import org.apache.catalina.mbeans.MBeanUtils;
 import org.apache.catalina.util.ContextName;
 import org.apache.catalina.util.LifecycleMBeanBase;
 import org.apache.juli.logging.Log;
@@ -1407,7 +1406,13 @@ public abstract class ContainerBase extends LifecycleMBeanBase
 
     @Override
     protected String getDomainInternal() {
-        return MBeanUtils.getDomain(this);
+
+        Container p = this.getParent();
+        if (p == null) {
+            return null;
+        } else {
+            return p.getDomain();
+        }
     }
 
 

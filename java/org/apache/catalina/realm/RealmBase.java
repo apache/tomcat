@@ -14,8 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.catalina.realm;
 
 
@@ -48,7 +46,6 @@ import org.apache.catalina.core.ApplicationSessionCookieConfig;
 import org.apache.catalina.deploy.LoginConfig;
 import org.apache.catalina.deploy.SecurityCollection;
 import org.apache.catalina.deploy.SecurityConstraint;
-import org.apache.catalina.mbeans.MBeanUtils;
 import org.apache.catalina.util.LifecycleMBeanBase;
 import org.apache.catalina.util.MD5Encoder;
 import org.apache.juli.logging.Log;
@@ -1320,7 +1317,7 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
 
     @Override
     public String getDomainInternal() {
-        return MBeanUtils.getDomain(container);
+        return container.getDomain();
     }
 
     protected String realmPath = "/realm0";
