@@ -231,7 +231,7 @@
           description="MBean Name of the associated parent component"
                  type="java.lang.String"/>
     </operation>
-    
+
     <operation   name="createWebappLoader"
           description="Create a new Web Application Loader"
                impact="ACTION"
