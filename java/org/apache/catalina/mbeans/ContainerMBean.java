@@ -160,8 +160,8 @@ public class ContainerMBean extends BaseModelMBean {
         }
 
         try {
-            ContainerBase container = (ContainerBase)getManagedResource();
-            container.addValve(valve);
+            Container container = (Container)getManagedResource();
+            container.getPipeline().addValve(valve);
         } catch (InstanceNotFoundException e) {
             throw new MBeanException(e);
         } catch (RuntimeOperationsException e) {
@@ -185,9 +185,9 @@ public class ContainerMBean extends BaseModelMBean {
      * @exception MBeanException if a component cannot be removed
      */
     public void removeValve(String valveName) throws MBeanException{
-        ContainerBase container=null;
+        Container container=null;
         try {
-            container = (ContainerBase)getManagedResource();
+            container = (Container)getManagedResource();
         } catch (InstanceNotFoundException e) {
             throw new MBeanException(e);
         } catch (RuntimeOperationsException e) {
@@ -238,7 +238,7 @@ public class ContainerMBean extends BaseModelMBean {
 
         if(listener != null){
             try {
-                ContainerBase container = (ContainerBase)getManagedResource();
+                Container container = (Container)getManagedResource();
                 container.addLifecycleListener(listener);
             } catch (InstanceNotFoundException e) {
                 throw new MBeanException(e);
@@ -257,9 +257,9 @@ public class ContainerMBean extends BaseModelMBean {
      * Note that all the listeners having given ClassName will be removed.
      */
     public void removeLifeCycleListeners(String type) throws MBeanException{
-        ContainerBase container=null;
+        Container container=null;
         try {
-            container = (ContainerBase)getManagedResource();
+            container = (Container)getManagedResource();
         } catch (InstanceNotFoundException e) {
             throw new MBeanException(e);
         } catch (RuntimeOperationsException e) {
@@ -282,11 +282,11 @@ public class ContainerMBean extends BaseModelMBean {
      * container.
      */
     public String[] findLifecycleListenerNames() throws MBeanException {
-        ContainerBase container = null;
+        Container container = null;
         List<String> result = new ArrayList<String>();
 
         try {
-            container = (ContainerBase) getManagedResource();
+            container = (Container) getManagedResource();
         } catch (InstanceNotFoundException e) {
             throw new MBeanException(e);
         } catch (RuntimeOperationsException e) {
@@ -309,11 +309,11 @@ public class ContainerMBean extends BaseModelMBean {
      * container.
      */
     public String[] findContainerListenerNames() throws MBeanException {
-        ContainerBase container = null;
+        Container container = null;
         List<String> result = new ArrayList<String>();
 
         try {
-            container = (ContainerBase) getManagedResource();
+            container = (Container) getManagedResource();
         } catch (InstanceNotFoundException e) {
             throw new MBeanException(e);
         } catch (RuntimeOperationsException e) {
