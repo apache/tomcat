@@ -834,6 +834,10 @@
         <mime-type>application/vnd.ms-cab-compressed</mime-type>
     </mime-mapping>
     <mime-mapping>
+        <extension>cap</extension>
+        <mime-type>application/vnd.tcpdump.pcap</mime-type>
+    </mime-mapping>
+    <mime-mapping>
         <extension>car</extension>
         <mime-type>application/vnd.curl.car</mime-type>
     </mime-mapping>
@@ -1158,6 +1162,10 @@
         <mime-type>application/octet-stream</mime-type>
     </mime-mapping>
     <mime-mapping>
+        <extension>dmp</extension>
+        <mime-type>application/vnd.tcpdump.pcap</mime-type>
+    </mime-mapping>
+    <mime-mapping>
         <extension>dms</extension>
         <mime-type>application/octet-stream</mime-type>
     </mime-mapping>
@@ -1232,6 +1240,10 @@
     <mime-mapping>
         <extension>dv</extension>
         <mime-type>video/x-dv</mime-type>
+    </mime-mapping>
+    <mime-mapping>
+        <extension>dvb</extension>
+        <mime-type>video/vnd.dvb.file</mime-type>
     </mime-mapping>
     <mime-mapping>
         <extension>dvi</extension>
@@ -1518,6 +1530,10 @@
         <mime-type>application/vnd.groove-account</mime-type>
     </mime-mapping>
     <mime-mapping>
+        <extension>gbr</extension>
+        <mime-type>application/rpki-ghostbusters</mime-type>
+    </mime-mapping>
+    <mime-mapping>
         <extension>gdl</extension>
         <mime-type>model/vnd.gdl</mime-type>
     </mime-mapping>
@@ -1764,6 +1780,18 @@
     <mime-mapping>
         <extension>in</extension>
         <mime-type>text/plain</mime-type>
+    </mime-mapping>
+    <mime-mapping>
+        <extension>ink</extension>
+        <mime-type>application/inkml+xml</mime-type>
+    </mime-mapping>
+    <mime-mapping>
+        <extension>inkml</extension>
+        <mime-type>application/inkml+xml</mime-type>
+    </mime-mapping>
+    <mime-mapping>
+        <extension>iota</extension>
+        <mime-type>application/vnd.astraea-software.iota</mime-type>
     </mime-mapping>
     <mime-mapping>
         <extension>ipfix</extension>
@@ -2144,6 +2172,10 @@
     <mime-mapping>
         <extension>mfm</extension>
         <mime-type>application/vnd.mfmp</mime-type>
+    </mime-mapping>
+    <mime-mapping>
+        <extension>mft</extension>
+        <mime-type>application/rpki-manifest</mime-type>
     </mime-mapping>
     <mime-mapping>
         <extension>mgp</extension>
@@ -2613,6 +2645,10 @@
         <mime-type>application/vnd.oasis.opendocument.text-template</mime-type>
     </mime-mapping>
     <mime-mapping>
+        <extension>oxps</extension>
+        <mime-type>application/oxps</mime-type>
+    </mime-mapping>
+    <mime-mapping>
         <extension>oxt</extension>
         <mime-type>application/vnd.openofficeorg.extension</mime-type>
     </mime-mapping>
@@ -2667,6 +2703,10 @@
     <mime-mapping>
         <extension>pbm</extension>
         <mime-type>image/x-portable-bitmap</mime-type>
+    </mime-mapping>
+    <mime-mapping>
+        <extension>pcap</extension>
+        <mime-type>application/vnd.tcpdump.pcap</mime-type>
     </mime-mapping>
     <mime-mapping>
         <extension>pcf</extension>
@@ -3029,6 +3069,10 @@
         <mime-type>application/relax-ng-compact-syntax</mime-type>
     </mime-mapping>
     <mime-mapping>
+        <extension>roa</extension>
+        <mime-type>application/rpki-roa</mime-type>
+    </mime-mapping>
+    <mime-mapping>
         <extension>roff</extension>
         <mime-type>text/troff</mime-type>
     </mime-mapping>
@@ -3271,6 +3315,10 @@
         <mime-type>application/smil+xml</mime-type>
     </mime-mapping>
     <mime-mapping>
+        <extension>smzip</extension>
+        <mime-type>application/vnd.stepmania.package</mime-type>
+    </mime-mapping>
+    <mime-mapping>
         <extension>snd</extension>
         <mime-type>audio/basic</mime-type>
     </mime-mapping>
@@ -3372,7 +3420,7 @@
     </mime-mapping>
     <mime-mapping>
         <extension>sub</extension>
-        <mime-type>image/vnd.dvb.subtitle</mime-type>
+        <mime-type>text/vnd.dvb.subtitle</mime-type>
     </mime-mapping>
     <mime-mapping>
         <extension>sus</extension>
@@ -3445,6 +3493,10 @@
     <mime-mapping>
         <extension>t</extension>
         <mime-type>text/troff</mime-type>
+    </mime-mapping>
+    <mime-mapping>
+        <extension>taglet</extension>
+        <mime-type>application/vnd.mynfc</mime-type>
     </mime-mapping>
     <mime-mapping>
         <extension>tao</extension>
@@ -3735,8 +3787,20 @@
         <mime-type>application/vnd.dece.unspecified</mime-type>
     </mime-mapping>
     <mime-mapping>
+        <extension>uvvz</extension>
+        <mime-type>application/vnd.dece.zip</mime-type>
+    </mime-mapping>
+    <mime-mapping>
         <extension>uvx</extension>
         <mime-type>application/vnd.dece.unspecified</mime-type>
+    </mime-mapping>
+    <mime-mapping>
+        <extension>uvz</extension>
+        <mime-type>application/vnd.dece.zip</mime-type>
+    </mime-mapping>
+    <mime-mapping>
+        <extension>vcard</extension>
+        <mime-type>text/vcard</mime-type>
     </mime-mapping>
     <mime-mapping>
         <extension>vcd</extension>
