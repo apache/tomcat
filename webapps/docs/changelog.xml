@@ -95,9 +95,16 @@
         Partial sync of MIME type mapping with mime.types from the Apache web
         server. (rjung)
       </add>
-      <bug>52587</bug>: Ensure that if it is necessary to fall back to the
-      default NullRealm, the NullRealm instance is created early enough for it
-      to be correctly initialised. (markt)
+      <fix>
+        <bug>52577</bug>: Fix a regression in the fix for <bug>52328</bug>.
+        Prevent output truncation when <code>reset()</code> is called on a
+        response. (mark)
+      </fix>
+      <fix>
+        <bug>52587</bug>: Ensure that if it is necessary to fall back to the
+        default NullRealm, the NullRealm instance is created early enough for it
+        to be correctly initialised. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
