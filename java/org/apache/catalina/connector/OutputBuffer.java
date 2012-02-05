@@ -583,6 +583,10 @@ public class OutputBuffer extends Writer
 
 
     public void reset() {
+        reset(false);
+    }
+
+    public void reset(boolean resetWriterStreamFlags) {
         // If a Writer was being used, there may be bytes in the converter
         if (gotEnc && conv != null) {
             conv.recycle();
@@ -590,8 +594,10 @@ public class OutputBuffer extends Writer
         bb.recycle();
         bytesWritten = 0;
         charsWritten = 0;
-        gotEnc = false;
-        enc = null;
+        if (resetWriterStreamFlags) {
+            gotEnc = false;
+            enc = null;
+        }
         initial = true;
     }
 
