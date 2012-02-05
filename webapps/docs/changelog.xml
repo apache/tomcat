@@ -101,6 +101,12 @@
         response. (mark)
       </fix>
       <fix>
+        <bug>52586</bug>: Remove an old and now unnecessary hack that modified
+        the path info reported via the
+        <code>javax.servlet.forward.path_info</code> request attribute when
+        forwarding to an error page. (markt)
+      </fix>
+      <fix>
         <bug>52587</bug>: Ensure that if it is necessary to fall back to the
         default NullRealm, the NullRealm instance is created early enough for it
         to be correctly initialised. (markt)

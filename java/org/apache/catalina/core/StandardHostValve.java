@@ -435,8 +435,6 @@ final class StandardHostValve extends ValveBase {
         if (container.getLogger().isDebugEnabled())
             container.getLogger().debug("Processing " + errorPage);
 
-        request.setPathInfo(errorPage.getLocation());
-
         try {
             // Forward control to the specified location
             ServletContext servletContext =
