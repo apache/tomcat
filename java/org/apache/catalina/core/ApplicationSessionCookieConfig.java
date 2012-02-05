@@ -21,11 +21,9 @@ import javax.servlet.SessionCookieConfig;
 import javax.servlet.http.Cookie;
 
 import org.apache.catalina.Context;
+import org.apache.catalina.util.SessionConfig;
 
 public class ApplicationSessionCookieConfig implements SessionCookieConfig {
-
-    private static final String DEFAULT_SESSION_COOKIE_NAME = "JSESSIONID";
-    private static final String DEFAULT_SESSION_PARAMETER_NAME = "jsessionid";
 
     private boolean httpOnly;
     private boolean secure;
@@ -124,7 +122,8 @@ public class ApplicationSessionCookieConfig implements SessionCookieConfig {
         //       2. Values from SessionCookieConfig
         //       3. Defaults
 
-        Cookie cookie = new Cookie(getSessionCookieName(context), sessionId);
+        Cookie cookie = new Cookie(
+                SessionConfig.getSessionCookieName(context), sessionId);
 
         // Just apply the defaults.
         cookie.setMaxAge(scc.getMaxAge());
@@ -176,60 +175,31 @@ public class ApplicationSessionCookieConfig implements SessionCookieConfig {
         return cookie;
     }
 
-
-    private static String getConfiguredSessionCookieName(Context context) {
-
-        // Priority is:
-        // 1. Cookie name defined in context
-        // 2. Cookie name configured for app
-        // 3. Default defined by spec
-        if (context != null) {
-            String cookieName = context.getSessionCookieName();
-            if (cookieName != null && cookieName.length() > 0) {
-                return cookieName;
-            }
-
-            SessionCookieConfig scc =
-                context.getServletContext().getSessionCookieConfig();
-            cookieName = scc.getName();
-            if (cookieName != null && cookieName.length() > 0) {
-                return cookieName;
-            }
-        }
-
-        return null;
-    }
-
-
     /**
      * Determine the name to use for the session cookie for the provided
      * context.
      * @param context
+     *
+     * @deprecated  Replaced by
+     *              {@link SessionConfig#getSessionCookieName(Context)}. This
+     *              will be removed in Tomcat 8.0.x.
      */
+    @Deprecated
     public static String getSessionCookieName(Context context) {
-
-        String result = getConfiguredSessionCookieName(context);
-
-        if (result == null) {
-            result = DEFAULT_SESSION_COOKIE_NAME;
-        }
-
-        return result;
+        return SessionConfig.getSessionCookieName(context);
     }
 
     /**
      * Determine the name to use for the session cookie for the provided
      * context.
      * @param context
+     *
+     * @deprecated  Replaced by
+     *              {@link SessionConfig#getSessionUriParamName(Context)}. This
+     *              will be removed in Tomcat 8.0.x.
      */
+    @Deprecated
     public static String getSessionUriParamName(Context context) {
-
-        String result = getConfiguredSessionCookieName(context);
-
-        if (result == null) {
-            result = DEFAULT_SESSION_PARAMETER_NAME;
-        }
-
-        return result;
+        return SessionConfig.getSessionUriParamName(context);
     }
 }

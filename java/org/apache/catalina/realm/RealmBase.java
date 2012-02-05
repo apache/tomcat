@@ -42,12 +42,12 @@ import org.apache.catalina.Service;
 import org.apache.catalina.Wrapper;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
-import org.apache.catalina.core.ApplicationSessionCookieConfig;
 import org.apache.catalina.deploy.LoginConfig;
 import org.apache.catalina.deploy.SecurityCollection;
 import org.apache.catalina.deploy.SecurityConstraint;
 import org.apache.catalina.util.LifecycleMBeanBase;
 import org.apache.catalina.util.MD5Encoder;
+import org.apache.catalina.util.SessionConfig;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.buf.B2CConverter;
@@ -994,7 +994,7 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
         if ((requestedSessionId != null) &&
             request.isRequestedSessionIdFromURL()) {
             file.append(";");
-            file.append(ApplicationSessionCookieConfig.getSessionUriParamName(
+            file.append(SessionConfig.getSessionUriParamName(
                     request.getContext()));
             file.append("=");
             file.append(requestedSessionId);

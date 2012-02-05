@@ -29,9 +29,9 @@ import org.apache.catalina.Host;
 import org.apache.catalina.Wrapper;
 import org.apache.catalina.comet.CometEvent;
 import org.apache.catalina.comet.CometEvent.EventType;
-import org.apache.catalina.core.ApplicationSessionCookieConfig;
 import org.apache.catalina.core.AsyncContextImpl;
 import org.apache.catalina.util.ServerInfo;
+import org.apache.catalina.util.SessionConfig;
 import org.apache.catalina.util.URLEncoder;
 import org.apache.coyote.ActionCode;
 import org.apache.coyote.Adapter;
@@ -676,7 +676,7 @@ public class CoyoteAdapter implements Adapter {
 
                 // Get the session ID if there was one
                 sessionID = request.getPathParameter(
-                        ApplicationSessionCookieConfig.getSessionUriParamName(
+                        SessionConfig.getSessionUriParamName(
                                 request.getContext()));
                 if (sessionID != null) {
                     request.setRequestedSessionId(sessionID);
@@ -731,7 +731,7 @@ public class CoyoteAdapter implements Adapter {
                 // This is not optimal, but as this is not very common, it
                 // shouldn't matter
                 redirectPath = redirectPath + ";" +
-                    ApplicationSessionCookieConfig.getSessionUriParamName(
+                        SessionConfig.getSessionUriParamName(
                             request.getContext()) +
                     "=" + request.getRequestedSessionId();
             }
@@ -921,8 +921,7 @@ public class CoyoteAdapter implements Adapter {
             return;
         }
 
-        String sessionCookieName =
-            ApplicationSessionCookieConfig.getSessionCookieName(context);
+        String sessionCookieName = SessionConfig.getSessionCookieName(context);
 
         for (int i = 0; i < count; i++) {
             ServerCookie scookie = serverCookies.getCookie(i);
