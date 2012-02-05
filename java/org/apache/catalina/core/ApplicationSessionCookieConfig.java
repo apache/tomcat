@@ -174,32 +174,4 @@ public class ApplicationSessionCookieConfig implements SessionCookieConfig {
 
         return cookie;
     }
-
-    /**
-     * Determine the name to use for the session cookie for the provided
-     * context.
-     * @param context
-     *
-     * @deprecated  Replaced by
-     *              {@link SessionConfig#getSessionCookieName(Context)}. This
-     *              will be removed in Tomcat 8.0.x.
-     */
-    @Deprecated
-    public static String getSessionCookieName(Context context) {
-        return SessionConfig.getSessionCookieName(context);
-    }
-
-    /**
-     * Determine the name to use for the session cookie for the provided
-     * context.
-     * @param context
-     *
-     * @deprecated  Replaced by
-     *              {@link SessionConfig#getSessionUriParamName(Context)}. This
-     *              will be removed in Tomcat 8.0.x.
-     */
-    @Deprecated
-    public static String getSessionUriParamName(Context context) {
-        return SessionConfig.getSessionUriParamName(context);
-    }
 }
