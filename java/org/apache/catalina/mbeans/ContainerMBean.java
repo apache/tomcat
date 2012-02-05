@@ -38,7 +38,7 @@ import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.core.StandardHost;
 import org.apache.catalina.startup.ContextConfig;
 import org.apache.catalina.startup.HostConfig;
-import org.apache.catalina.valves.ValveBase;
+// import org.apache.catalina.valves.ValveBase;
 import org.apache.tomcat.util.modeler.BaseModelMBean;
 
 public class ContainerMBean extends BaseModelMBean {
@@ -208,9 +208,12 @@ public class ContainerMBean extends BaseModelMBean {
         if(container != null){
             Valve[] valves = container.getPipeline().getValves();
             for (int i = 0; i < valves.length; i++) {
-                ObjectName voname = ((ValveBase) valves[i]).getObjectName();
-                if (voname.equals(oname)) {
-                    container.getPipeline().removeValve(valves[i]);
+                if (valves[i] instanceof JmxEnabled) {
+                    ObjectName voname =
+                            ((JmxEnabled) valves[i]).getObjectName();
+                    if (voname.equals(oname)) {
+                        container.getPipeline().removeValve(valves[i]);
+                    }
                 }
             }
         }
