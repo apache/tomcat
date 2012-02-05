@@ -70,6 +70,25 @@ public class TestOutputBuffer extends TomcatBaseTest{
         }
     }
 
+    @Test
+    public void testBug52577() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+
+        Context root = tomcat.addContext("", TEMP_DIR);
+
+        Bug52577Servlet bug52577 = new Bug52577Servlet();
+        Tomcat.addServlet(root, "bug52577", bug52577);
+        root.addServletMapping("/", "bug52577");
+
+        tomcat.start();
+
+        ByteChunk bc = new ByteChunk();
+
+        int rc = getUrl("http://localhost:" + getPort() + "/", bc, null, null);
+        assertEquals(HttpServletResponse.SC_OK, rc);
+        assertEquals("OK", bc.toString());
+    }
+
     private static class WritingServlet extends HttpServlet {
 
         private static final long serialVersionUID = 1L;
@@ -115,6 +134,20 @@ public class TestOutputBuffer extends TomcatBaseTest{
             System.out.println("Write length: " + writeString.length() +
                     ", Buffered: " + (useBufferStr == null ? "n" : "y") +
                     ", Time: " + lastRunNano + "ns");
+        }
+    }
+
+    private static class Bug52577Servlet extends HttpServlet {
+
+        private static final long serialVersionUID = 1L;
+
+        @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+                throws ServletException, IOException {
+            Writer w = resp.getWriter();
+            w.write("OK");
+            resp.resetBuffer();
+            w.write("OK");
         }
     }
 }

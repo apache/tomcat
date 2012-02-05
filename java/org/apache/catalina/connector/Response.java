@@ -721,7 +721,7 @@ public class Response
                 (sm.getString("coyoteResponse.resetBuffer.ise"));
         }
 
-        outputBuffer.reset();
+        outputBuffer.reset(resetWriterStreamFlags);
 
         if(resetWriterStreamFlags) {
             usingOutputStream = false;
