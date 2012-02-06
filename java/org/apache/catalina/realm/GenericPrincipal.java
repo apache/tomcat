@@ -198,6 +198,7 @@ public class GenericPrincipal implements TomcatPrincipal {
      */
     protected GSSCredential gssCredential = null;
 
+    @Override
     public GSSCredential getGssCredential() {
         return this.gssCredential;
     }

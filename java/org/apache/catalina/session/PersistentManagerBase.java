@@ -330,6 +330,7 @@ public abstract class PersistentManagerBase extends ManagerBase
      * Return the Store object which manages persistent Session
      * storage for this Manager.
      */
+    @Override
     public Store getStore() {
 
         return (this.store);
@@ -493,6 +494,7 @@ public abstract class PersistentManagerBase extends ManagerBase
      *
      * @param session Session to be removed
      */
+    @Override
     public void removeSuper(Session session) {
         super.remove (session);
     }
