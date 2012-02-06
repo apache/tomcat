@@ -65,7 +65,6 @@ import org.apache.catalina.Server;
 import org.apache.catalina.Service;
 import org.apache.catalina.Valve;
 import org.apache.catalina.Wrapper;
-import org.apache.catalina.core.ContainerBase;
 import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.core.StandardHost;
 import org.apache.catalina.deploy.ErrorPage;
@@ -360,10 +359,6 @@ public class ContextConfig implements LifecycleListener {
             return;
         }
 
-        if (!(context instanceof ContainerBase)) {
-            return;     // Cannot install a Valve even if it would be needed
-        }
-
         // Has a Realm been configured for us to authenticate against?
         if (context.getRealm() == null) {
             log.error(sm.getString("contextConfig.missingRealm"));
@@ -428,10 +423,10 @@ public class ContextConfig implements LifecycleListener {
             }
         }
 
-        if (authenticator != null && context instanceof ContainerBase) {
-            Pipeline pipeline = ((ContainerBase) context).getPipeline();
+        if (authenticator != null) {
+            Pipeline pipeline = context.getPipeline();
             if (pipeline != null) {
-                ((ContainerBase) context).getPipeline().addValve(authenticator);
+                pipeline.addValve(authenticator);
                 if (log.isDebugEnabled()) {
                     log.debug(sm.getString(
                                     "contextConfig.authenticatorConfigured",
@@ -439,7 +434,6 @@ public class ContextConfig implements LifecycleListener {
                 }
             }
         }
-
     }
 
 
@@ -816,9 +810,9 @@ public class ContextConfig implements LifecycleListener {
         }
 
         // Dump the contents of this pipeline if requested
-        if ((log.isDebugEnabled()) && (context instanceof ContainerBase)) {
+        if (log.isDebugEnabled()) {
             log.debug("Pipeline Configuration:");
-            Pipeline pipeline = ((ContainerBase) context).getPipeline();
+            Pipeline pipeline = context.getPipeline();
             Valve valves[] = null;
             if (pipeline != null) {
                 valves = pipeline.getValves();
