@@ -66,12 +66,12 @@ import org.apache.catalina.Host;
 import org.apache.catalina.Manager;
 import org.apache.catalina.Realm;
 import org.apache.catalina.Session;
+import org.apache.catalina.TomcatPrincipal;
 import org.apache.catalina.Wrapper;
 import org.apache.catalina.core.ApplicationPart;
 import org.apache.catalina.core.ApplicationSessionCookieConfig;
 import org.apache.catalina.core.AsyncContextImpl;
 import org.apache.catalina.deploy.LoginConfig;
-import org.apache.catalina.realm.GenericPrincipal;
 import org.apache.catalina.util.ParameterMap;
 import org.apache.catalina.util.StringParser;
 import org.apache.coyote.ActionCode;
@@ -2263,8 +2263,8 @@ public class Request
      */
     @Override
     public Principal getUserPrincipal() {
-        if (userPrincipal instanceof GenericPrincipal) {
-            return ((GenericPrincipal) userPrincipal).getUserPrincipal();
+        if (userPrincipal instanceof TomcatPrincipal) {
+            return ((TomcatPrincipal) userPrincipal).getUserPrincipal();
         }
 
         return userPrincipal;
@@ -3172,8 +3172,8 @@ public class Request
                 new SpecialAttributeAdapter() {
                     @Override
                     public Object get(Request request, String name) {
-                        if (request.userPrincipal instanceof GenericPrincipal) {
-                            return ((GenericPrincipal) request.userPrincipal)
+                        if (request.userPrincipal instanceof TomcatPrincipal) {
+                            return ((TomcatPrincipal) request.userPrincipal)
                                     .getGssCredential();
                         }
                         return null;

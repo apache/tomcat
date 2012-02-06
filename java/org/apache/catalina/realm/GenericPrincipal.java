@@ -25,6 +25,7 @@ import java.util.List;
 
 import javax.security.auth.login.LoginContext;
 
+import org.apache.catalina.TomcatPrincipal;
 import org.ietf.jgss.GSSCredential;
 
 
@@ -36,7 +37,7 @@ import org.ietf.jgss.GSSCredential;
  * @version $Id$
  */
 
-public class GenericPrincipal implements Principal {
+public class GenericPrincipal implements TomcatPrincipal {
 
 
     // ----------------------------------------------------------- Constructors
@@ -175,6 +176,7 @@ public class GenericPrincipal implements Principal {
      */
     protected Principal userPrincipal = null;
 
+    @Override
     public Principal getUserPrincipal() {
         if (userPrincipal != null) {
             return userPrincipal;
@@ -251,6 +253,7 @@ public class GenericPrincipal implements Principal {
      *                   exception to LoginContext
      *
      */
+    @Override
     public void logout() throws Exception {
         if (loginContext != null) {
             loginContext.logout();
