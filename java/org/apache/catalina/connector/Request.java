@@ -71,7 +71,6 @@ import org.apache.catalina.Wrapper;
 import org.apache.catalina.core.ApplicationPart;
 import org.apache.catalina.core.ApplicationSessionCookieConfig;
 import org.apache.catalina.core.AsyncContextImpl;
-import org.apache.catalina.deploy.LoginConfig;
 import org.apache.catalina.util.ParameterMap;
 import org.apache.catalina.util.StringParser;
 import org.apache.coyote.ActionCode;
@@ -2395,13 +2394,7 @@ public class Request
                     sm.getString("coyoteRequest.authenticate.ise"));
         }
 
-        LoginConfig config = context.getLoginConfig();
-
-        if (config == null) {
-            throw new ServletException(
-                    sm.getString("coyoteRequest.noLoginConfig"));
-        }
-        return context.getAuthenticator().authenticate(this, response, config);
+        return context.getAuthenticator().authenticate(this, response);
     }
 
     /**
