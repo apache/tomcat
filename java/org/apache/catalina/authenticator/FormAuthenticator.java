@@ -14,10 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.catalina.authenticator;
-
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -43,7 +40,6 @@ import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.buf.CharChunk;
 import org.apache.tomcat.util.buf.MessageBytes;
 import org.apache.tomcat.util.http.MimeHeaders;
-
 
 /**
  * An <b>Authenticator</b> and <b>Valve</b> implementation of FORM BASED
@@ -122,16 +118,12 @@ public class FormAuthenticator
      *
      * @param request Request we are processing
      * @param response Response we are creating
-     * @param config    Login configuration describing how authentication
-     *              should be performed
      *
      * @exception IOException if an input/output error occurs
      */
     @Override
-    public boolean authenticate(Request request,
-                                HttpServletResponse response,
-                                LoginConfig config)
-        throws IOException {
+    public boolean authenticate(Request request, HttpServletResponse response)
+            throws IOException {
 
         // References to objects we will need later
         Session session = null;
@@ -244,6 +236,8 @@ public class FormAuthenticator
         boolean loginAction =
             requestURI.startsWith(contextPath) &&
             requestURI.endsWith(Constants.FORM_ACTION);
+
+        LoginConfig config = context.getLoginConfig();
 
         // No -- Save this request and redirect to the form login page
         if (!loginAction) {

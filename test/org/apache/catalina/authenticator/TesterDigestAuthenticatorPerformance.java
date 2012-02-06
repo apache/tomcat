@@ -110,6 +110,11 @@ public class TesterDigestAuthenticatorPerformance {
         context.setName(CONTEXT_PATH);
         context.setRealm(realm);
 
+        // Configure the Login config
+        LoginConfig config = new LoginConfig();
+        config.setRealmName(REALM);
+        context.setLoginConfig(config);
+
         // Make the Context and Realm visible to the Authenticator
         authenticator.setContainer(context);
 
@@ -129,7 +134,6 @@ public class TesterDigestAuthenticatorPerformance {
 
         private TesterDigestRequest request;
         private HttpServletResponse response;
-        private LoginConfig config;
 
         // All init code should be in here. run() needs to be quick
         public TesterRunnable(int requestCount) throws Exception {
@@ -138,11 +142,9 @@ public class TesterDigestAuthenticatorPerformance {
             request = new TesterDigestRequest();
             String nonce = authenticator.generateNonce(request);
             request.setAuthHeader(buildDigestResponse(nonce));
+            request.setContext(authenticator.context);
 
             response = new TesterResponse();
-
-            config = new LoginConfig();
-            config.setRealmName(REALM);
         }
 
         @Override
@@ -150,7 +152,7 @@ public class TesterDigestAuthenticatorPerformance {
             long start = System.currentTimeMillis();
             for (int i = 0; i < requestCount; i++) {
                 try {
-                    if (authenticator.authenticate(request, response, config)) {
+                    if (authenticator.authenticate(request, response)) {
                         success++;
                     }
                 } catch (IOException ioe) {

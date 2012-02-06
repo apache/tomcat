@@ -14,10 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.catalina.authenticator;
-
 
 import java.io.IOException;
 import java.security.Principal;
@@ -191,6 +188,26 @@ public abstract class AuthenticatorBase extends ValveBase
     private static final String DATE_ONE =
         (new SimpleDateFormat(DateTool.HTTP_RESPONSE_DATE_HEADER,
                               Locale.US)).format(new Date(1));
+
+
+    protected static String getRealmName(Context context) {
+        if (context == null) {
+            // Very unlikely
+            return REALM_NAME;
+        }
+
+        LoginConfig config = context.getLoginConfig();
+        if (config == null) {
+            return REALM_NAME;
+        }
+
+        String result = config.getRealmName();
+        if (result == null) {
+            return REALM_NAME;
+        }
+
+        return result;
+    }
 
 
     // ------------------------------------------------------------- Properties
@@ -401,7 +418,6 @@ public abstract class AuthenticatorBase extends ValveBase
             log.debug("Security checking request " +
                 request.getMethod() + " " + request.getRequestURI());
         }
-        LoginConfig config = this.context.getLoginConfig();
 
         // Have we got a cached authenticated Principal to record?
         if (cache) {
@@ -431,7 +447,7 @@ public abstract class AuthenticatorBase extends ValveBase
         String requestURI = request.getDecodedRequestURI();
         if (requestURI.startsWith(contextPath) &&
             requestURI.endsWith(Constants.FORM_ACTION)) {
-            if (!authenticate(request, response, config)) {
+            if (!authenticate(request, response)) {
                 if (log.isDebugEnabled()) {
                     log.debug(" Failed authenticate() test ??" + requestURI );
                 }
@@ -527,7 +543,7 @@ public abstract class AuthenticatorBase extends ValveBase
             if (log.isDebugEnabled()) {
                 log.debug(" Calling authenticate()");
             }
-            if (!authenticate(request, response, config)) {
+            if (!authenticate(request, response)) {
                 if (log.isDebugEnabled()) {
                     log.debug(" Failed authenticate() test");
                 }
@@ -602,32 +618,8 @@ public abstract class AuthenticatorBase extends ValveBase
      * @exception IOException if an input/output error occurs
      */
     @Override
-    public boolean authenticate(Request request, HttpServletResponse response)
-            throws IOException {
-        if (context == null || context.getLoginConfig() == null) {
-            return true;
-        }
-        return authenticate(request, response, context.getLoginConfig());
-    }
-
-    /**
-     * Authenticate the user making this request, based on the specified
-     * login configuration.  Return <code>true</code> if any specified
-     * constraint has been satisfied, or <code>false</code> if we have
-     * created a response challenge already.
-     *
-     * @param request Request we are processing
-     * @param response Response we are populating
-     * @param config    Login configuration describing how authentication
-     *              should be performed
-     *
-     * @exception IOException if an input/output error occurs
-     */
-    @Override
     public abstract boolean authenticate(Request request,
-                                            HttpServletResponse response,
-                                            LoginConfig config)
-        throws IOException;
+            HttpServletResponse response) throws IOException;
 
 
     /**
