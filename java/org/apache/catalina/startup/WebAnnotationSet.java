@@ -26,7 +26,7 @@ import javax.annotation.security.RunAs;
 
 import org.apache.catalina.Container;
 import org.apache.catalina.Context;
-import org.apache.catalina.core.StandardWrapper;
+import org.apache.catalina.Wrapper;
 import org.apache.catalina.deploy.ContextEnvironment;
 import org.apache.catalina.deploy.ContextResource;
 import org.apache.catalina.deploy.ContextResourceEnvRef;
@@ -92,14 +92,14 @@ public class WebAnnotationSet {
     protected static void loadApplicationServletAnnotations(Context context) {
 
         ClassLoader classLoader = context.getLoader().getClassLoader();
-        StandardWrapper wrapper = null;
+        Wrapper wrapper = null;
         Class<?> classClass = null;
 
         Container[] children = context.findChildren();
         for (int i = 0; i < children.length; i++) {
-            if (children[i] instanceof StandardWrapper) {
+            if (children[i] instanceof Wrapper) {
 
-                wrapper = (StandardWrapper) children[i];
+                wrapper = (Wrapper) children[i];
                 if (wrapper.getServletClass() == null) {
                     continue;
                 }
