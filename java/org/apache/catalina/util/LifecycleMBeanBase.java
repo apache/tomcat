@@ -79,6 +79,7 @@ public abstract class LifecycleMBeanBase extends LifecycleBase
      * with components that cannot (easily) navigate the component hierarchy to
      * determine the correct domain to use.
      */
+    @Override
     public final void setDomain(String domain) {
         this.domain = domain;
     }
@@ -88,6 +89,7 @@ public abstract class LifecycleMBeanBase extends LifecycleBase
      * Obtain the domain under which this component will be / has been
      * registered.
      */
+    @Override
     public final String getDomain() {
         if (domain == null) {
             domain = getDomainInternal();
@@ -113,6 +115,7 @@ public abstract class LifecycleMBeanBase extends LifecycleBase
     /**
      * Obtain the name under which this component has been registered with JMX.
      */
+    @Override
     public final ObjectName getObjectName() {
         return oname;
     }
