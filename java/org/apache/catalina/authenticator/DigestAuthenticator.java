@@ -33,7 +33,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.Realm;
 import org.apache.catalina.connector.Request;
-import org.apache.catalina.deploy.LoginConfig;
 import org.apache.catalina.util.MD5Encoder;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -193,16 +192,12 @@ public class DigestAuthenticator extends AuthenticatorBase {
      *
      * @param request Request we are processing
      * @param response Response we are creating
-     * @param config    Login configuration describing how authentication
-     *              should be performed
      *
      * @exception IOException if an input/output error occurs
      */
     @Override
-    public boolean authenticate(Request request,
-                                HttpServletResponse response,
-                                LoginConfig config)
-        throws IOException {
+    public boolean authenticate(Request request, HttpServletResponse response)
+            throws IOException {
 
         // Have we already authenticated someone?
         Principal principal = request.getUserPrincipal();
@@ -250,7 +245,7 @@ public class DigestAuthenticator extends AuthenticatorBase {
         DigestInfo digestInfo = new DigestInfo(getOpaque(), getNonceValidity(),
                 getKey(), cnonces, isValidateUri());
         if (authorization != null) {
-            if (digestInfo.validate(request, authorization, config)) {
+            if (digestInfo.validate(request, authorization)) {
                 principal = digestInfo.authenticate(context.getRealm());
             }
 
@@ -268,7 +263,7 @@ public class DigestAuthenticator extends AuthenticatorBase {
         // to be unique).
         String nonce = generateNonce(request);
 
-        setAuthenticateHeader(request, response, config, nonce,
+        setAuthenticateHeader(request, response, nonce,
                 digestInfo.isNonceStale());
         response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
         //      hres.flushBuffer();
@@ -398,21 +393,14 @@ public class DigestAuthenticator extends AuthenticatorBase {
      *
      * @param request HTTP Servlet request
      * @param response HTTP Servlet response
-     * @param config    Login configuration describing how authentication
-     *              should be performed
      * @param nonce nonce token
      */
     protected void setAuthenticateHeader(HttpServletRequest request,
                                          HttpServletResponse response,
-                                         LoginConfig config,
                                          String nonce,
                                          boolean isNonceStale) {
 
-        // Get the realm name
-        String realmName = config.getRealmName();
-        if (realmName == null) {
-            realmName = REALM_NAME;
-        }
+        String realmName = getRealmName(context);
 
         String authenticateHeader;
         if (isNonceStale) {
@@ -504,8 +492,7 @@ public class DigestAuthenticator extends AuthenticatorBase {
             this.validateUri = validateUri;
         }
 
-        public boolean validate(Request request, String authorization,
-                LoginConfig config) {
+        public boolean validate(Request request, String authorization) {
             // Validate the authorization credentials format
             if (authorization == null) {
                 return false;
@@ -584,10 +571,7 @@ public class DigestAuthenticator extends AuthenticatorBase {
             }
 
             // Validate the Realm name
-            String lcRealm = config.getRealmName();
-            if (lcRealm == null) {
-                lcRealm = REALM_NAME;
-            }
+            String lcRealm = getRealmName(request.getContext());
             if (!lcRealm.equals(realmName)) {
                 return false;
             }

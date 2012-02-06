@@ -16,7 +16,6 @@
  */
 package org.apache.catalina.authenticator;
 
-
 import java.io.IOException;
 import java.security.Principal;
 
@@ -24,9 +23,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.catalina.Session;
 import org.apache.catalina.connector.Request;
-import org.apache.catalina.deploy.LoginConfig;
-
-
 
 /**
  * An <b>Authenticator</b> and <b>Valve</b> implementation that checks
@@ -77,15 +73,11 @@ public final class NonLoginAuthenticator extends AuthenticatorBase {
      *
      * @param request  Request we are processing
      * @param response Response we are creating
-     * @param config   Login configuration describing how authentication
-     *                 should be performed
      * @return boolean to indicate whether the user is authenticated
      * @exception IOException if an input/output error occurs
      */
     @Override
-    public boolean authenticate(Request request,
-                                HttpServletResponse response,
-                                LoginConfig config)
+    public boolean authenticate(Request request, HttpServletResponse response)
         throws IOException {
 
         Principal principal = request.getUserPrincipal();

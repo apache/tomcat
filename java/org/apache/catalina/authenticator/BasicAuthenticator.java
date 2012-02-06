@@ -26,7 +26,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.catalina.connector.Request;
-import org.apache.catalina.deploy.LoginConfig;
 import org.apache.catalina.util.Base64;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -60,16 +59,12 @@ public class BasicAuthenticator
      *
      * @param request Request we are processing
      * @param response Response we are creating
-     * @param config    Login configuration describing how authentication
-     *              should be performed
      *
      * @exception IOException if an input/output error occurs
      */
     @Override
-    public boolean authenticate(Request request,
-                                HttpServletResponse response,
-                                LoginConfig config)
-        throws IOException {
+    public boolean authenticate(Request request, HttpServletResponse response)
+            throws IOException {
 
         // Have we already authenticated someone?
         Principal principal = request.getUserPrincipal();
@@ -145,11 +140,7 @@ public class BasicAuthenticator
 
         StringBuilder value = new StringBuilder(16);
         value.append("Basic realm=\"");
-        if (config.getRealmName() == null) {
-            value.append(REALM_NAME);
-        } else {
-            value.append(config.getRealmName());
-        }
+        value.append(getRealmName(context));
         value.append('\"');
         response.setHeader(AUTH_HEADER_NAME, value.toString());
         response.sendError(HttpServletResponse.SC_UNAUTHORIZED);

@@ -29,7 +29,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.connector.Request;
-import org.apache.catalina.deploy.LoginConfig;
 import org.apache.catalina.util.Base64;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -107,8 +106,8 @@ public class SpnegoAuthenticator extends AuthenticatorBase {
 
 
     @Override
-    public boolean authenticate(Request request, HttpServletResponse response,
-            LoginConfig config) throws IOException {
+    public boolean authenticate(Request request, HttpServletResponse response)
+            throws IOException {
 
         // Have we already authenticated someone?
         Principal principal = request.getUserPrincipal();
