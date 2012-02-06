@@ -111,6 +111,10 @@
         default NullRealm, the NullRealm instance is created early enough for it
         to be correctly initialised. (markt)
       </fix>
+      <fix>
+        Fix millisecond output in AccessLogValve when using a
+        SimpleDateFormat based time pattern. (rjung)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

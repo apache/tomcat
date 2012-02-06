@@ -1447,7 +1447,7 @@ public class AccessLogValve extends ValveBase implements AccessLog {
          * chars later with the actual milliseconds because that's
          * relatively cheap.
          */
-        private void tidyFormat() {
+        private String tidyFormat(String format) {
             boolean escape = false;
             StringBuilder result = new StringBuilder();
             int len = format.length();
@@ -1464,6 +1464,7 @@ public class AccessLogValve extends ValveBase implements AccessLog {
                     escape = !escape;
                 }
             }
+            return result.toString();
         }
 
         protected DateAndTimeElement(String header) {
@@ -1492,7 +1493,7 @@ public class AccessLogValve extends ValveBase implements AccessLog {
                     type = formatType.MSEC_FRAC;
                 } else {
                     type = formatType.SDF;
-                    tidyFormat();
+                    format = tidyFormat(format);
                 }
             }
         }
