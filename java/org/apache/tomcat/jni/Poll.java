@@ -154,4 +154,19 @@ public class Poll {
      */
     public static native int pollset(long pollset, long [] descriptors);
 
+    /**
+     * Make poll() return. 
+     * 
+     * @param pollset
+     * @return
+     */
+    public static native int interrupt(long pollset);
+    
+    /**
+     * Check if interrupt() is allowed.
+     * 
+     * @param pollset
+     * @return
+     */
+    public static native boolean wakeable(long pollset);
 }
