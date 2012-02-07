@@ -14,7 +14,6 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package org.apache.tomcat.jni;
 
 /** SSL
@@ -22,7 +21,6 @@ package org.apache.tomcat.jni;
  * @author Mladen Turk
  * @version $Id$
  */
-
 public final class SSL {
 
     /*
@@ -137,7 +135,7 @@ public final class SSL {
     public static final int SSL_OP_NO_SSLv3                         = 0x02000000;
     public static final int SSL_OP_NO_TLSv1                         = 0x04000000;
     public static final int SSL_OP_NO_TICKET                        = 0x00004000;
-    
+
     /* The next flag deliberately changes the ciphertest, this is a check
      * for the PKCS#1 attack */
     public static final int SSL_OP_PKCS1_CHECK_1                    = 0x08000000;
