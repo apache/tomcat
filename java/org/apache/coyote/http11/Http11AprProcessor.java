@@ -266,6 +266,11 @@ public class Http11AprProcessor extends AbstractHttp11Processor<Long> {
     }
 
 
+    @Override
+    public void setSslSupport(SSLSupport sslSupport) {
+        // NOOP for APR
+    }
+
     // ----------------------------------------------------- ActionHook Methods
 
 

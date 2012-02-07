@@ -507,6 +507,14 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
 
 
     @Override
+    public void setSslSupport(SSLSupport sslSupport) {
+        // Should never reach this code but in case we do...
+        throw new IllegalStateException(
+                sm.getString("ajpprocessor.ssl.notsupported"));
+    }
+
+
+    @Override
     public SocketState event(SocketStatus status) throws IOException {
         // Should never reach this code but in case we do...
         throw new IOException(
@@ -538,6 +546,7 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
      *                      allowing the processor to perform any additional
      *                      clean-up that may be required
      */
+    @Override
     public void recycle(boolean socketClosing) {
         asyncStateMachine.recycle();
 
@@ -568,14 +577,14 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
 
 
     @Override
-    protected final boolean isComet() {
+    public final boolean isComet() {
         // AJP does not support Comet
         return false;
     }
 
 
     @Override
-    protected final boolean isUpgrade() {
+    public final boolean isUpgrade() {
         // AJP does not support HTTP upgrade
         return false;
     }

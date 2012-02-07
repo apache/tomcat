@@ -18,10 +18,7 @@ package org.apache.coyote.http11.upgrade;
 
 import java.io.IOException;
 
-import org.apache.coyote.http11.Http11AprProcessor;
 import org.apache.tomcat.jni.Socket;
-import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
-import org.apache.tomcat.util.net.SocketStatus;
 import org.apache.tomcat.util.net.SocketWrapper;
 
 /**
@@ -30,26 +27,16 @@ import org.apache.tomcat.util.net.SocketWrapper;
  * required by the AbstractProtocol. That would simplify the code and further
  * reduce the size of instances of this class.
  */
-public class UpgradeAprProcessor extends Http11AprProcessor
-        implements UpgradeProcessor {
+public class UpgradeAprProcessor extends UpgradeProcessor<Long> {
 
     long socket;
 
+
     public UpgradeAprProcessor(SocketWrapper<Long> wrapper,
-            UpgradeInbound inbound) {
+            UpgradeInbound upgradeInbound) {
+        super(upgradeInbound);
+
         this.socket = wrapper.getSocket().longValue();
-
-        this.upgradeInbound = inbound;
-        upgradeInbound.setUpgradeProcessor(this);
-        upgradeInbound.setUpgradeOutbound(new UpgradeOutbound(this));
-        // Remove the default - no need for it here
-        this.compressableMimeTypes = null;
-    }
-
-
-    @Override
-    public SocketState upgradeDispatch() throws IOException {
-        return upgradeInbound.onData();
     }
 
 
@@ -83,41 +70,4 @@ public class UpgradeAprProcessor extends Http11AprProcessor
     public int read(byte[] bytes) throws IOException {
         return Socket.recv(socket, bytes, 0, bytes.length);
     }
-
-
-    /*
-     * None of the following NO-OP methods are strictly necessary - assuming the
-     * there are no bugs in the connector code that cause upgraded connections
-     * to be treated as Http11, Comet or Async. These NO-OP methods are here for
-     * safety and to aid debugging during development.
-     */
-
-    @Override
-    public SocketState event(SocketStatus status) throws IOException {
-        // TODO Log an error
-        return SocketState.CLOSED;
-    }
-
-
-    @Override
-    public SocketState process(SocketWrapper<Long> socketWrapper)
-            throws IOException {
-        // TODO Log an error
-        return SocketState.CLOSED;
-    }
-
-
-    @Override
-    public SocketState asyncDispatch(SocketStatus status) {
-        // TODO Log an error
-        return SocketState.CLOSED;
-    }
-
-
-    @Override
-    public SocketState asyncPostProcess() {
-        // TODO Log an error
-        return SocketState.CLOSED;
-    }
-
 }

@@ -29,10 +29,10 @@ import org.apache.tomcat.util.net.SocketWrapper;
  * Provides functionality and attributes common to all supported protocols
  * (currently HTTP and AJP).
  */
-public abstract class AbstractProcessor<S> implements ActionHook, Processor {
+public abstract class AbstractProcessor<S> implements ActionHook, Processor<S> {
 
     protected Adapter adapter;
-    protected AsyncStateMachine asyncStateMachine;
+    protected AsyncStateMachine<S> asyncStateMachine;
     protected AbstractEndpoint endpoint;
     protected Request request;
     protected Response response;
@@ -48,7 +48,7 @@ public abstract class AbstractProcessor<S> implements ActionHook, Processor {
 
     public AbstractProcessor(AbstractEndpoint endpoint) {
         this.endpoint = endpoint;
-        asyncStateMachine = new AsyncStateMachine(this);
+        asyncStateMachine = new AsyncStateMachine<S>(this);
 
         request = new Request();
 
@@ -70,6 +70,7 @@ public abstract class AbstractProcessor<S> implements ActionHook, Processor {
     /**
      * The request associated with this processor.
      */
+    @Override
     public Request getRequest() {
         return request;
     }
@@ -104,42 +105,51 @@ public abstract class AbstractProcessor<S> implements ActionHook, Processor {
     }
 
 
+    @Override
     public boolean isAsync() {
         return (asyncStateMachine != null && asyncStateMachine.isAsync());
     }
 
 
+    @Override
     public SocketState asyncPostProcess() {
         return asyncStateMachine.asyncPostProcess();
     }
 
-    protected abstract boolean isComet();
+    @Override
+    public abstract boolean isComet();
 
-    protected abstract boolean isUpgrade();
+    @Override
+    public abstract boolean isUpgrade();
 
     /**
      * Process HTTP requests. All requests are treated as HTTP requests to start
      * with although they may change type during processing.
      */
+    @Override
     public abstract SocketState process(SocketWrapper<S> socket)
         throws IOException;
 
     /**
      * Process in-progress Comet requests. These will start as HTTP requests.
      */
+    @Override
     public abstract SocketState event(SocketStatus status) throws IOException;
 
     /**
      * Process in-progress Servlet 3.0 Async requests. These will start as HTTP
      * requests.
      */
+    @Override
     public abstract SocketState asyncDispatch(SocketStatus status);
 
     /**
      * Processes data received on a connection that has been through an HTTP
      * upgrade.
      */
+    @Override
     public abstract SocketState upgradeDispatch() throws IOException;
 
+    @Override
     public abstract UpgradeInbound getUpgradeInbound();
 }

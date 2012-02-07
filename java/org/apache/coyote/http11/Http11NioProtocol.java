@@ -22,6 +22,7 @@ import java.nio.channels.SocketChannel;
 import java.util.Iterator;
 
 import org.apache.coyote.AbstractProtocol;
+import org.apache.coyote.Processor;
 import org.apache.coyote.http11.upgrade.UpgradeInbound;
 import org.apache.coyote.http11.upgrade.UpgradeNioProcessor;
 import org.apache.juli.logging.Log;
@@ -172,13 +173,13 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol {
             if (log.isDebugEnabled())
                 log.debug("Iterating through our connections to release a socket channel:"+socket);
             boolean released = false;
-            Iterator<java.util.Map.Entry<NioChannel, Http11NioProcessor>> it = connections.entrySet().iterator();
+            Iterator<java.util.Map.Entry<NioChannel, Processor<NioChannel>>> it = connections.entrySet().iterator();
             while (it.hasNext()) {
-                java.util.Map.Entry<NioChannel, Http11NioProcessor> entry = it.next();
+                java.util.Map.Entry<NioChannel, Processor<NioChannel>> entry = it.next();
                 if (entry.getKey().getIOChannel()==socket) {
                     it.remove();
-                    Http11NioProcessor result = entry.getValue();
-                    result.recycle();
+                    Processor<NioChannel> result = entry.getValue();
+                    result.recycle(true);
                     unregister(result);
                     released = true;
                     break;
@@ -194,10 +195,10 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol {
          */
         @Override
         public void release(SocketWrapper<NioChannel> socket) {
-            Http11NioProcessor processor =
+            Processor<NioChannel> processor =
                 connections.remove(socket.getSocket());
             if (processor != null) {
-                processor.recycle();
+                processor.recycle(true);
                 recycledProcessors.offer(processor);
             }
         }
@@ -214,9 +215,9 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol {
          */
         @Override
         public void release(SocketWrapper<NioChannel> socket,
-                Http11NioProcessor processor, boolean isSocketClosing,
+                Processor<NioChannel> processor, boolean isSocketClosing,
                 boolean addToPoller) {
-            processor.recycle();
+            processor.recycle(isSocketClosing);
             recycledProcessors.offer(processor);
             if (addToPoller) {
                 socket.getSocket().getPoller().add(socket.getSocket());
@@ -226,7 +227,7 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol {
 
         @Override
         protected void initSsl(SocketWrapper<NioChannel> socket,
-                Http11NioProcessor processor) {
+                Processor<NioChannel> processor) {
             if (proto.isSSLEnabled() &&
                     (proto.sslImplementation != null)
                     && (socket.getSocket() instanceof SecureNioChannel)) {
@@ -242,7 +243,7 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol {
 
         @Override
         protected void longPoll(SocketWrapper<NioChannel> socket,
-                Http11NioProcessor processor) {
+                Processor<NioChannel> processor) {
             connections.put(socket.getSocket(), processor);
 
             if (processor.isAsync()) {
@@ -284,7 +285,7 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol {
         }
 
         @Override
-        protected Http11NioProcessor createUpgradeProcessor(
+        protected Processor<NioChannel> createUpgradeProcessor(
                 SocketWrapper<NioChannel> socket, UpgradeInbound inbound)
                 throws IOException {
             return new UpgradeNioProcessor(socket, inbound,
@@ -293,7 +294,7 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol {
 
         @Override
         protected void upgradePoll(SocketWrapper<NioChannel> socket,
-                Http11NioProcessor processor) {
+                Processor<NioChannel> processor) {
             connections.put(socket.getSocket(), processor);
 
             SelectionKey key = socket.getSocket().getIOChannel().keyFor(

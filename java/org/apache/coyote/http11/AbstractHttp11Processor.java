@@ -1589,6 +1589,7 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
     }
 
 
+    @Override
     public UpgradeInbound getUpgradeInbound() {
         return upgradeInbound;
     }
@@ -1647,7 +1648,9 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
             SocketWrapper<S> socketWrapper);
 
 
-    public final void recycle() {
+
+    @Override
+    public final void recycle(boolean isSocketClosing) {
         if (getInputBuffer() != null) {
             getInputBuffer().recycle();
         }

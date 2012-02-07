@@ -555,6 +555,7 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
     /**
      * Set the SSL information for this HTTP connection.
      */
+    @Override
     public void setSslSupport(SSLSupport sslSupport) {
         this.sslSupport = sslSupport;
     }

@@ -20,6 +20,7 @@ import java.nio.channels.SocketChannel;
 import java.util.Iterator;
 
 import org.apache.coyote.AbstractProtocol;
+import org.apache.coyote.Processor;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.net.AbstractEndpoint;
@@ -120,12 +121,12 @@ public class AjpNioProtocol extends AbstractAjpProtocol {
             if (log.isDebugEnabled())
                 log.debug("Iterating through our connections to release a socket channel:"+socket);
             boolean released = false;
-            Iterator<java.util.Map.Entry<NioChannel, AjpNioProcessor>> it = connections.entrySet().iterator();
+            Iterator<java.util.Map.Entry<NioChannel, Processor<NioChannel>>> it = connections.entrySet().iterator();
             while (it.hasNext()) {
-                java.util.Map.Entry<NioChannel, AjpNioProcessor> entry = it.next();
+                java.util.Map.Entry<NioChannel, Processor<NioChannel>> entry = it.next();
                 if (entry.getKey().getIOChannel()==socket) {
                     it.remove();
-                    AjpNioProcessor result = entry.getValue();
+                    Processor<NioChannel> result = entry.getValue();
                     result.recycle(true);
                     unregister(result);
                     released = true;
@@ -142,7 +143,7 @@ public class AjpNioProtocol extends AbstractAjpProtocol {
          */
         @Override
         public void release(SocketWrapper<NioChannel> socket) {
-            AjpNioProcessor processor = connections.remove(socket);
+            Processor<NioChannel> processor = connections.remove(socket);
             if (processor != null) {
                 processor.recycle(true);
                 recycledProcessors.offer(processor);
@@ -155,7 +156,7 @@ public class AjpNioProtocol extends AbstractAjpProtocol {
          */
         @Override
         public void release(SocketWrapper<NioChannel> socket,
-                AjpNioProcessor processor, boolean isSocketClosing,
+                Processor<NioChannel> processor, boolean isSocketClosing,
                 boolean addToPoller) {
             processor.recycle(isSocketClosing);
             recycledProcessors.offer(processor);
