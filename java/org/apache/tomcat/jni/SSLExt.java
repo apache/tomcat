@@ -14,43 +14,42 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package org.apache.tomcat.jni;
 
-/** 
- * Support TLS extensions and extra methods. 
- * 
- * The methods are separated to make it easier for java code to 
- * support existing native library - it can check if this class can 
+/**
+ * Support TLS extensions and extra methods.
+ *
+ * The methods are separated to make it easier for java code to
+ * support existing native library - it can check if this class can
  * be loaded in order to use the exensions.
  *
  * @author Costin Manolache
  */
 public final class SSLExt {
 
-    
+
     /**
-     * Set advertised NPN protocol. 
+     * Set advertised NPN protocol.
      * This is only available for recent or patched openssl.
-     * 
+     *
      * Example: "\x06spdy/2"
-     * 
+     *
      * Works with TLS1, doesn't with SSL2/SSL3
-     * 
-     * Servers sends list in ServerHelo, client selects it and 
+     *
+     * Servers sends list in ServerHelo, client selects it and
      * sends it back after ChangeChipher
-     * 
+     *
      * Not supported in 1.0.0, seems to be in 1.0.1 and after
      */
     public static native int setNPN(long tcctx, byte[] proto, int len);
-    
+
     /**
-     * Get other side's advertised protocols. 
+     * Get other side's advertised protocols.
      * Only works after handshake.
      */
     public static native int getNPN(long tcsock, byte[] proto);
 
-    /** 
+    /**
      * Enabling dump/debugging on the socket. Both raw and decrypted
      * packets will be logged.
      */
@@ -61,15 +60,15 @@ public final class SSLExt {
      * Must be saved, keyed by session ID.
      */
     public static native byte[] getSessionData(long tcsock);
-    
+
     /**
      * Server: Set the session data for a socket.
      */
     public static native int setSessionData(long tcsock, byte[] data, int len);
-    
-    
+
+
 //    /**
-//     * Client: get the ticket received from server, if tickets are supported. 
+//     * Client: get the ticket received from server, if tickets are supported.
 //     */
 //    public static native int getTicket(long tcsock, byte[] resBuf);
 //
@@ -78,12 +77,12 @@ public final class SSLExt {
 //     */
 //    public static native int setTicket(long tcsock, byte[] data, int len);
 //
-//    /** 
+//    /**
 //     * Set the key used by server to generate tickets.
 //     * Key must be 48 bytes.
 //     */
 //    public static native int setTicketKeys(long ctx, byte[] data, int len);
-//    
+//
     /**
      * For client side calls. Data should be a \0 terminated string
      */
@@ -92,7 +91,7 @@ public final class SSLExt {
     /* Allow SSL_write(..., n) to return r with 0 < r < n (i.e. report success
      * when just a single record has been written): */
     static final int SSL_MODE_ENABLE_PARTIAL_WRITE = 0x1;
-    
+
     /* Make it possible to retry SSL_write() with changed buffer location
      * (buffer contents must stay the same!); this is not the default to avoid
      * the misconception that non-blocking SSL_write() behaves like
@@ -104,9 +103,9 @@ public final class SSLExt {
 
     /* Save RAM by releasing read and write buffers when they're empty. (SSL3 and
      * TLS only.)  "Released" buffers are put onto a free-list in the context
-     * or just freed (depending on the context's setting for freelist_max_len). */    
+     * or just freed (depending on the context's setting for freelist_max_len). */
     static final int SSL_MODE_SMALL_BUFFERS = 0x10;
-    
+
     // 1.1
     //static final int SSL_MODE_HANDSHAKE_CUTTHROUGH = ..;
 
@@ -121,11 +120,11 @@ public final class SSLExt {
         } catch (Throwable t) {
             t.printStackTrace();
             return -1;
-        }        
+        }
     }
-    
+
     /**
-     * Higher level method, checking if the specified protocol has been 
+     * Higher level method, checking if the specified protocol has been
      * negotiated.
      */
     public static boolean checkNPN(long tcsocket, byte[] expected) {
@@ -144,10 +143,10 @@ public final class SSLExt {
             if (expected[i] != npn[i]) {
                 return false;
             }
-        }   
+        }
         return true;
     }
-    
-    
-    
+
+
+
 }

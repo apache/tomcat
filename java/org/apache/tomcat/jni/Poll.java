@@ -14,7 +14,6 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package org.apache.tomcat.jni;
 
 /** Poll
@@ -22,7 +21,6 @@ package org.apache.tomcat.jni;
  * @author Mladen Turk
  * @version $Id$
  */
-
 public class Poll {
 
     /**
@@ -155,16 +153,16 @@ public class Poll {
     public static native int pollset(long pollset, long [] descriptors);
 
     /**
-     * Make poll() return. 
-     * 
+     * Make poll() return.
+     *
      * @param pollset
      * @return
      */
     public static native int interrupt(long pollset);
-    
+
     /**
      * Check if interrupt() is allowed.
-     * 
+     *
      * @param pollset
      * @return
      */
