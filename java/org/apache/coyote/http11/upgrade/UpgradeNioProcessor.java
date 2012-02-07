@@ -20,12 +20,9 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.nio.channels.Selector;
 
-import org.apache.coyote.http11.Http11NioProcessor;
-import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
 import org.apache.tomcat.util.net.NioChannel;
 import org.apache.tomcat.util.net.NioEndpoint;
 import org.apache.tomcat.util.net.NioSelectorPool;
-import org.apache.tomcat.util.net.SocketStatus;
 import org.apache.tomcat.util.net.SocketWrapper;
 
 /**
@@ -34,28 +31,17 @@ import org.apache.tomcat.util.net.SocketWrapper;
  * required by the AbstractProtocol. That would simplify the code and further
  * reduce the size of instances of this class.
  */
-public class UpgradeNioProcessor extends Http11NioProcessor
-        implements UpgradeProcessor {
+public class UpgradeNioProcessor extends UpgradeProcessor<NioChannel> {
 
     private NioChannel nioChannel;
     private NioSelectorPool pool;
 
     public UpgradeNioProcessor(SocketWrapper<NioChannel> wrapper,
-            UpgradeInbound inbound, NioSelectorPool pool) {
+            UpgradeInbound upgradeInbound, NioSelectorPool pool) {
+        super(upgradeInbound);
+
         this.nioChannel = wrapper.getSocket();
         this.pool = pool;
-
-        this.upgradeInbound = inbound;
-        upgradeInbound.setUpgradeProcessor(this);
-        upgradeInbound.setUpgradeOutbound(new UpgradeOutbound(this));
-        // Remove the default - no need for it here
-        this.compressableMimeTypes = null;
-    }
-
-
-    @Override
-    public SocketState upgradeDispatch() throws IOException {
-        return upgradeInbound.onData();
     }
 
 
@@ -151,7 +137,7 @@ public class UpgradeNioProcessor extends Http11NioProcessor
             return nRead;
         } else if (nRead == -1) {
             //return false;
-            throw new EOFException(sm.getString("iib.eof.error"));
+            throw new EOFException(sm.getString("nio.eof.error"));
         } else {
             return 0;
         }
@@ -189,40 +175,5 @@ public class UpgradeNioProcessor extends Http11NioProcessor
             }
         }
         return written;
-    }
-
-    /*
-     * None of the following NO-OP methods are strictly necessary - assuming the
-     * there are no bugs in the connector code that cause upgraded connections
-     * to be treated as Http11, Comet or Async. These NO-OP methods are here for
-     * safety and to aid debugging during development.
-     */
-
-    @Override
-    public SocketState event(SocketStatus status) throws IOException {
-        // TODO Log an error
-        return SocketState.CLOSED;
-    }
-
-
-    @Override
-    public SocketState process(SocketWrapper<NioChannel> socketWrapper)
-            throws IOException {
-        // TODO Log an error
-        return SocketState.CLOSED;
-    }
-
-
-    @Override
-    public SocketState asyncDispatch(SocketStatus status) {
-        // TODO Log an error
-        return SocketState.CLOSED;
-    }
-
-
-    @Override
-    public SocketState asyncPostProcess() {
-        // TODO Log an error
-        return SocketState.CLOSED;
     }
 }

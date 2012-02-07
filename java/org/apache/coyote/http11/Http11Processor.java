@@ -112,7 +112,8 @@ public class Http11Processor extends AbstractHttp11Processor<Socket> {
     /**
      * Set the SSL information for this HTTP connection.
      */
-    public void setSSLSupport(SSLSupport sslSupport) {
+    @Override
+    public void setSslSupport(SSLSupport sslSupport) {
         this.sslSupport = sslSupport;
     }
 

@@ -84,7 +84,7 @@ import org.apache.tomcat.util.res.StringManager;
  *                                 error()
  * </pre>
  */
-public class AsyncStateMachine {
+public class AsyncStateMachine<S> {
 
     /**
      * The string manager for this package.
@@ -131,10 +131,10 @@ public class AsyncStateMachine {
     private volatile AsyncState state = AsyncState.DISPATCHED;
     // Need this to fire listener on complete
     private AsyncContextCallback asyncCtxt = null;
-    private Processor processor;
+    private Processor<S> processor;
 
 
-    public AsyncStateMachine(Processor processor) {
+    public AsyncStateMachine(Processor<S> processor) {
         this.processor = processor;
     }
 
