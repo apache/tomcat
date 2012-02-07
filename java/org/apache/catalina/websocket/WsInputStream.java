@@ -17,17 +17,19 @@
 package org.apache.catalina.websocket;
 
 import java.io.IOException;
-import java.io.InputStream;
+
+import org.apache.coyote.http11.upgrade.UpgradeProcessor;
 
 public class WsInputStream extends java.io.InputStream {
 
-    private InputStream wrapped;
+    private UpgradeProcessor processor;
     private byte[] mask;
     private long remaining;
     private long read;
 
-    public WsInputStream(InputStream wrapped, byte[] mask, long remaining) {
-        this.wrapped = wrapped;
+    public WsInputStream(UpgradeProcessor processor, byte[] mask,
+            long remaining) {
+        this.processor = processor;
         this.mask = mask;
         this.remaining = remaining;
         this.read = 0;
@@ -42,7 +44,7 @@ public class WsInputStream extends java.io.InputStream {
         remaining--;
         read++;
 
-        int masked = wrapped.read();
+        int masked = processor.read();
         return masked ^ mask[(int) ((read - 1) % 4)];
     }
 

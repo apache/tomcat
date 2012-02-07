@@ -22,8 +22,9 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 
 import org.apache.catalina.util.Conversions;
-import org.apache.coyote.http11.UpgradeInbound;
-import org.apache.coyote.http11.UpgradeOutbound;
+import org.apache.coyote.http11.upgrade.UpgradeInbound;
+import org.apache.coyote.http11.upgrade.UpgradeOutbound;
+import org.apache.coyote.http11.upgrade.UpgradeProcessor;
 import org.apache.tomcat.util.buf.B2CConverter;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
 
@@ -41,7 +42,7 @@ public abstract class StreamInbound implements UpgradeInbound {
     // frames
     // TODO
 
-    private InputStream is = null;
+    private UpgradeProcessor processor = null;
     private WsOutbound outbound;
 
     @Override
@@ -51,8 +52,8 @@ public abstract class StreamInbound implements UpgradeInbound {
 
 
     @Override
-    public void setInputStream(InputStream is) {
-        this.is = is;
+    public void setUpgradeProcessor(UpgradeProcessor processor) {
+        this.processor = processor;
     }
 
     public WsOutbound getStreamOutbound() {
@@ -64,7 +65,7 @@ public abstract class StreamInbound implements UpgradeInbound {
         // Must be start the start of a frame
 
         // Read the first byte
-        int i = is.read();
+        int i = processor.read();
 
         fin = (i & 0x80) > 0;
 
@@ -80,7 +81,7 @@ public abstract class StreamInbound implements UpgradeInbound {
         validateOpCode(opCode);
 
         // Read the next byte
-        i = is.read();
+        i = processor.read();
 
         // Client data must be masked and this isn't
         if ((i & 0x80) == 0) {
@@ -91,19 +92,20 @@ public abstract class StreamInbound implements UpgradeInbound {
         payloadLength = i & 0x7F;
         if (payloadLength == 126) {
             byte[] extended = new byte[2];
-            is.read(extended);
+            processor.read(extended);
             payloadLength = Conversions.byteArrayToLong(extended);
         } else if (payloadLength == 127) {
             byte[] extended = new byte[8];
-            is.read(extended);
+            processor.read(extended);
             payloadLength = Conversions.byteArrayToLong(extended);
         }
 
         byte[] mask = new byte[4];
-        is.read(mask);
+        processor.read(mask);
 
         if (opCode == 1 || opCode == 2) {
-            WsInputStream wsIs = new WsInputStream(is, mask, payloadLength);
+            WsInputStream wsIs = new WsInputStream(processor, mask,
+                    payloadLength);
             if (opCode == 2) {
                 onBinaryData(wsIs);
             } else {
@@ -123,7 +125,7 @@ public abstract class StreamInbound implements UpgradeInbound {
         // TODO: Handle control frames appearing in the middle of a multi-frame
         //       message
 
-        return SocketState.UPGRADE;
+        return SocketState.UPGRADED;
     }
 
     protected abstract void onBinaryData(InputStream is) throws IOException;

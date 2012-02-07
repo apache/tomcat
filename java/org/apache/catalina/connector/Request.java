@@ -74,7 +74,7 @@ import org.apache.catalina.core.AsyncContextImpl;
 import org.apache.catalina.util.ParameterMap;
 import org.apache.catalina.util.StringParser;
 import org.apache.coyote.ActionCode;
-import org.apache.coyote.http11.UpgradeInbound;
+import org.apache.coyote.http11.upgrade.UpgradeInbound;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.ExceptionUtils;
