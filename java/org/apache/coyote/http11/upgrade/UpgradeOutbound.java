@@ -14,42 +14,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.coyote.http11;
+package org.apache.coyote.http11.upgrade;
 
 import java.io.IOException;
 import java.io.OutputStream;
 
 
-import org.apache.tomcat.util.buf.ByteChunk;
-import org.apache.tomcat.util.buf.ByteChunk.ByteOutputChannel;
-
-public class UpgradeOutputStream extends OutputStream
-        implements ByteOutputChannel{
-
-    private AbstractOutputBuffer<?> ob = null;
-    private ByteChunk bb = new ByteChunk(8192);
-
-    public UpgradeOutputStream(AbstractOutputBuffer<?> ob) {
-        this.ob = ob;
-        bb.setByteOutputChannel(this);
-    }
-
+/**
+ * Allows data to be written to the upgraded connection.
+ *
+ * TODO: Override more methods for efficiency.
+ */
+public class UpgradeOutbound extends OutputStream {
 
     @Override
-    public void realWriteBytes(byte[] cbuf, int off, int len)
-            throws IOException {
-        ob.committed = true;
-        ob.doWrite(bb, null);
+    public void flush() throws IOException {
+        processor.flush();
+    }
+
+    private UpgradeProcessor processor;
+
+    public UpgradeOutbound(UpgradeProcessor processor) {
+        this.processor = processor;
     }
 
     @Override
     public void write(int b) throws IOException {
-        bb.append((byte) b);
-    }
-
-    @Override
-    public void flush() throws IOException {
-        bb.flushBuffer();
-        ob.flush();
+        processor.write(b);
     }
 }

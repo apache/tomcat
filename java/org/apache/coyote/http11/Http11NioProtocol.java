@@ -16,11 +16,14 @@
  */
 package org.apache.coyote.http11;
 
+import java.io.IOException;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
 import java.util.Iterator;
 
 import org.apache.coyote.AbstractProtocol;
+import org.apache.coyote.http11.upgrade.UpgradeInbound;
+import org.apache.coyote.http11.upgrade.UpgradeNioProcessor;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.net.AbstractEndpoint;
@@ -278,6 +281,26 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol {
             processor.setServer(proto.getServer());
             register(processor);
             return processor;
+        }
+
+        @Override
+        protected Http11NioProcessor createUpgradeProcessor(
+                SocketWrapper<NioChannel> socket, UpgradeInbound inbound)
+                throws IOException {
+            return new UpgradeNioProcessor(socket, inbound,
+                    ((Http11NioProtocol) getProtocol()).getEndpoint().getSelectorPool());
+        }
+
+        @Override
+        protected void upgradePoll(SocketWrapper<NioChannel> socket,
+                Http11NioProcessor processor) {
+            connections.put(socket.getSocket(), processor);
+
+            SelectionKey key = socket.getSocket().getIOChannel().keyFor(
+                    socket.getSocket().getPoller().getSelector());
+            key.interestOps(SelectionKey.OP_READ);
+            ((KeyAttachment) socket).interestOps(
+                    SelectionKey.OP_READ);
         }
     }
 }

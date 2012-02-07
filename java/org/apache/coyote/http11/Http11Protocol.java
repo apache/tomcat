@@ -16,9 +16,12 @@
  */
 package org.apache.coyote.http11;
 
+import java.io.IOException;
 import java.net.Socket;
 
 import org.apache.coyote.AbstractProtocol;
+import org.apache.coyote.http11.upgrade.UpgradeBioProcessor;
+import org.apache.coyote.http11.upgrade.UpgradeInbound;
 import org.apache.juli.logging.Log;
 import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.net.JIoEndpoint;
@@ -179,6 +182,19 @@ public class Http11Protocol extends AbstractHttp11JsseProtocol {
                     proto.getDisableKeepAlivePercentage());
             register(processor);
             return processor;
+        }
+
+        @Override
+        protected Http11Processor createUpgradeProcessor(
+                SocketWrapper<Socket> socket, UpgradeInbound inbound)
+                throws IOException {
+            return new UpgradeBioProcessor(socket, inbound);
+        }
+
+        @Override
+        protected void upgradePoll(SocketWrapper<Socket> socket,
+                Http11Processor processor) {
+            connections.put(socket.getSocket(), processor);
         }
     }
 }

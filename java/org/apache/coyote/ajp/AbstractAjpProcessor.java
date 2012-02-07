@@ -33,6 +33,7 @@ import org.apache.coyote.OutputBuffer;
 import org.apache.coyote.Request;
 import org.apache.coyote.RequestInfo;
 import org.apache.coyote.Response;
+import org.apache.coyote.http11.upgrade.UpgradeInbound;
 import org.apache.juli.logging.Log;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.buf.ByteChunk;
@@ -517,6 +518,14 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
     public SocketState upgradeDispatch() throws IOException {
         // Should never reach this code but in case we do...
         throw new IOException(
+                sm.getString("ajpprocessor.httpupgrade.notsupported"));
+    }
+
+
+    @Override
+    public UpgradeInbound getUpgradeInbound() {
+        // Should never reach this code but in case we do...
+        throw new IllegalStateException(
                 sm.getString("ajpprocessor.httpupgrade.notsupported"));
     }
 

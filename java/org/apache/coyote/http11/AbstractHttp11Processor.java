@@ -36,6 +36,7 @@ import org.apache.coyote.http11.filters.IdentityOutputFilter;
 import org.apache.coyote.http11.filters.SavedRequestInputFilter;
 import org.apache.coyote.http11.filters.VoidInputFilter;
 import org.apache.coyote.http11.filters.VoidOutputFilter;
+import org.apache.coyote.http11.upgrade.UpgradeInbound;
 import org.apache.juli.logging.Log;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.buf.Ascii;
@@ -59,6 +60,14 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
      */
     protected static final StringManager sm =
         StringManager.getManager(Constants.Package);
+
+    /**
+     * Intended for use by the Upgrade sub-classes that have no need to
+     * initialise the request, response, etc.
+     */
+    protected AbstractHttp11Processor() {
+        // NOOP
+    }
 
     /*
      * Tracks how many internal filters are in the filter library so they
@@ -835,11 +844,6 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
             ((AtomicBoolean) param).set(asyncStateMachine.isAsyncTimingOut());
         } else if (actionCode == ActionCode.UPGRADE) {
             upgradeInbound = (UpgradeInbound) param;
-            upgradeInbound.setInputStream(
-                    new UpgradeInputStream(getInputBuffer()));
-            upgradeInbound.setUpgradeOutbound(
-                    new UpgradeOutbound(
-                            new UpgradeOutputStream(getOutputBuffer())));
             // Stop further HTTP output
             getOutputBuffer().finished = true;
         } else {
@@ -1066,8 +1070,7 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
         } else if (isAsync() || comet) {
             return SocketState.LONG;
         } else if (isUpgrade()) {
-            // May be data on the connection to process
-            return upgradeDispatch();
+            return SocketState.UPGRADING;
         } else {
             if (sendfileInProgress) {
                 return SocketState.SENDFILE;
@@ -1579,22 +1582,15 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
 
     @Override
     public SocketState upgradeDispatch() throws IOException {
-        SocketState result = upgradeInbound.onData();
-        AbstractInputBuffer<S> ib = getInputBuffer();
-        while (result == SocketState.UPGRADE) {
-            // Check to see if there is more data to process
-            if (ib.available() == 0) {
-                // Read any data that might be available
-                // Note: This will block for BIO regardless
-                ib.fill(false);
-            }
-            if (ib.available() == 0) {
-                // Still no data available, exit this loop
-                break;
-            }
-            result = upgradeInbound.onData();
-        }
-        return result;
+        // Should never reach this code but in case we do...
+        // TODO
+        throw new IOException(
+                sm.getString("TODO"));
+    }
+
+
+    public UpgradeInbound getUpgradeInbound() {
+        return upgradeInbound;
     }
 
 
@@ -1652,9 +1648,15 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
 
 
     public final void recycle() {
-        getInputBuffer().recycle();
-        getOutputBuffer().recycle();
-        asyncStateMachine.recycle();
+        if (getInputBuffer() != null) {
+            getInputBuffer().recycle();
+        }
+        if (getOutputBuffer() != null) {
+            getOutputBuffer().recycle();
+        }
+        if (asyncStateMachine != null) {
+            asyncStateMachine.recycle();
+        }
         upgradeInbound = null;
         remoteAddr = null;
         remoteHost = null;
