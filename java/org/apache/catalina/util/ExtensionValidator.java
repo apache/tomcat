@@ -107,8 +107,6 @@ public final class ExtensionValidator {
 
         // add specified folders to the list
         addFolderList("java.ext.dirs");
-        addFolderList("catalina.ext.dirs");
-
     }
 
 
