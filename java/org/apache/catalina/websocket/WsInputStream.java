@@ -22,12 +22,12 @@ import org.apache.coyote.http11.upgrade.UpgradeProcessor;
 
 public class WsInputStream extends java.io.InputStream {
 
-    private UpgradeProcessor processor;
+    private UpgradeProcessor<?> processor;
     private byte[] mask;
     private long remaining;
     private long read;
 
-    public WsInputStream(UpgradeProcessor processor, byte[] mask,
+    public WsInputStream(UpgradeProcessor<?> processor, byte[] mask,
             long remaining) {
         this.processor = processor;
         this.mask = mask;

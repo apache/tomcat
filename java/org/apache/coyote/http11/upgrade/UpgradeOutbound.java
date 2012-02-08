@@ -32,9 +32,9 @@ public class UpgradeOutbound extends OutputStream {
         processor.flush();
     }
 
-    private UpgradeProcessor processor;
+    private UpgradeProcessor<?> processor;
 
-    public UpgradeOutbound(UpgradeProcessor processor) {
+    public UpgradeOutbound(UpgradeProcessor<?> processor) {
         this.processor = processor;
     }
 
