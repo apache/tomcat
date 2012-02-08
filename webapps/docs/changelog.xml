@@ -136,6 +136,10 @@
         Minor refactoring to reduce code duplication in the HTTP connectors.
         (markt)
       </scode>
+      <fix>
+        <bug>52606</bug>: Ensure that POST bodies are available for reply after
+        FORM authentication when using the AJP connectors. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
