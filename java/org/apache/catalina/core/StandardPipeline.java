@@ -25,13 +25,13 @@ import javax.management.ObjectName;
 
 import org.apache.catalina.Contained;
 import org.apache.catalina.Container;
+import org.apache.catalina.JmxEnabled;
 import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.LifecycleState;
 import org.apache.catalina.Pipeline;
 import org.apache.catalina.Valve;
 import org.apache.catalina.util.LifecycleBase;
-import org.apache.catalina.valves.ValveBase;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.ExceptionUtils;
@@ -391,8 +391,8 @@ public class StandardPipeline extends LifecycleBase
             current = basic;
         }
         while (current != null) {
-            if (current instanceof ValveBase) {
-                valveList.add(((ValveBase) current).getObjectName());
+            if (current instanceof JmxEnabled) {
+                valveList.add(((JmxEnabled) current).getObjectName());
             }
             current = current.getNext();
         }
