@@ -42,7 +42,7 @@ public abstract class StreamInbound implements UpgradeInbound {
     // frames
     // TODO
 
-    private UpgradeProcessor processor = null;
+    private UpgradeProcessor<?> processor = null;
     private WsOutbound outbound;
 
     @Override
@@ -52,7 +52,7 @@ public abstract class StreamInbound implements UpgradeInbound {
 
 
     @Override
-    public void setUpgradeProcessor(UpgradeProcessor processor) {
+    public void setUpgradeProcessor(UpgradeProcessor<?> processor) {
         this.processor = processor;
     }
 

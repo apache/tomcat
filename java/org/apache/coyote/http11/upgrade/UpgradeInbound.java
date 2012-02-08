@@ -26,7 +26,7 @@ import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
  */
 public interface UpgradeInbound {
 
-    void setUpgradeProcessor(UpgradeProcessor processor);
+    void setUpgradeProcessor(UpgradeProcessor<?> processor);
 
     SocketState onData() throws IOException;
 
