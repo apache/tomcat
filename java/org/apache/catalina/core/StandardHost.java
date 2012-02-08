@@ -26,16 +26,18 @@ import java.util.WeakHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.regex.Pattern;
 
+import javax.management.ObjectName;
+
 import org.apache.catalina.Container;
 import org.apache.catalina.Context;
 import org.apache.catalina.Host;
+import org.apache.catalina.JmxEnabled;
 import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleEvent;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.LifecycleListener;
 import org.apache.catalina.Valve;
 import org.apache.catalina.loader.WebappClassLoader;
-import org.apache.catalina.valves.ValveBase;
 import org.apache.tomcat.util.ExceptionUtils;
 
 /**
@@ -799,15 +801,16 @@ public class StandardHost extends ContainerBase implements Host {
       *
       * @exception Exception if an MBean cannot be created or registered
       */
-     public String [] getValveNames()
-         throws Exception
-    {
+     public String [] getValveNames() throws Exception {
          Valve [] valves = this.getPipeline().getValves();
          String [] mbeanNames = new String[valves.length];
          for (int i = 0; i < valves.length; i++) {
-             if( valves[i] == null ) continue;
-             if( ((ValveBase)valves[i]).getObjectName() == null ) continue;
-             mbeanNames[i] = ((ValveBase)valves[i]).getObjectName().toString();
+             if (valves[i] instanceof JmxEnabled) {
+                 ObjectName oname = ((JmxEnabled) valves[i]).getObjectName();
+                 if (oname != null) {
+                     mbeanNames[i] = oname.toString();
+                 }
+             }
          }
 
          return mbeanNames;
