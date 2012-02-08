@@ -90,8 +90,13 @@ public abstract class WebSocketServlet extends HttpServlet {
             return;
         }
 
-        // TODO Read client handshake - Origin
-        //                              Sec-WebSocket-Protocol
+        String origin = req.getHeader("Origin");
+        if (!verifyOrigin(origin)) {
+            resp.sendError(HttpServletResponse.SC_FORBIDDEN);
+            return;
+        }
+
+        // TODO Read client handshake - Sec-WebSocket-Protocol
         //                              Sec-WebSocket-Extensions
 
         // TODO Extensions require the ability to specify something (API TBD)
@@ -141,6 +146,21 @@ public abstract class WebSocketServlet extends HttpServlet {
             sha1Helper.update(key.getBytes(B2CConverter.ISO_8859_1));
             return Base64.encode(sha1Helper.digest(WS_ACCEPT));
         }
+    }
+
+    /**
+     * Intended to be overridden by sub-classes that wish to verify the origin
+     * of a WebSocket request before processing it.
+     *
+     * @param origin    The value of the origin header from the request which
+     *                  may be <code>null</code>
+     *
+     * @return  <code>true</code> to accept the request. <code>false</code> to
+     *          reject it. This default implementation always returns
+     *          <code>true</code>.
+     */
+    protected boolean verifyOrigin(String origin) {
+        return true;
     }
 
     protected abstract StreamInbound createWebSocketInbound();
