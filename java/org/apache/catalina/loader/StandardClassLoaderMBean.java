@@ -23,7 +23,10 @@ package org.apache.catalina.loader;
  *
  * @author Remy Maucherat
  * @version $Id$
+ *
+ * @deprecated  Unused. Will be removed in Tomcat 8.0.x.
  */
+@Deprecated
 public interface StandardClassLoaderMBean {
     // Marker interface
 }
