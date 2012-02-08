@@ -436,6 +436,7 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
             first = false;
             empty = false;
             replay = true;
+            endOfStream = false;
 
         } else if (actionCode == ActionCode.ASYNC_START) {
             asyncStateMachine.asyncStart((AsyncContextCallback) param);
