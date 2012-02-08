@@ -119,6 +119,10 @@
         <bug>52591</bug>: When dumping MBean data, skip attributes where getters
         throw <code>UnsupportedOperationException</code>. (markt)
       </fix>
+      <fix>
+        <bug>52607</bug>: Ensure that the extension validator checks the JARs in
+        the shared and common class loaders for extensions. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
