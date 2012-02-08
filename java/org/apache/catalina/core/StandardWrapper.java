@@ -1823,6 +1823,14 @@ public class StandardWrapper extends ContainerBase
     }
 
 
+    /**
+     * JSR 77. Always return false.
+     */
+    public boolean isStateManageable() {
+        return false;
+    }
+
+
     /* Remove a JMX notficationListener
      * @see javax.management.NotificationEmitter#removeNotificationListener(javax.management.NotificationListener, javax.management.NotificationFilter, java.lang.Object)
      */
