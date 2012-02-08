@@ -20,6 +20,7 @@ import java.lang.reflect.Array;
 import java.util.Iterator;
 import java.util.Set;
 
+import javax.management.JMRuntimeException;
 import javax.management.MBeanAttributeInfo;
 import javax.management.MBeanInfo;
 import javax.management.MBeanServer;
@@ -79,10 +80,20 @@ public class MBeanDumper {
 
                     try {
                         value=mbeanServer.getAttribute(oname, attName);
+                    } catch (JMRuntimeException rme) {
+                        Throwable cause = rme.getCause();
+                        if (cause instanceof UnsupportedOperationException) {
+                            log.debug("Error getting attribute " + oname +
+                                    " " + attName, rme);
+                        } else {
+                            log.error("Error getting attribute " + oname +
+                                    " " + attName, rme);
+                        }
+                        continue;
                     } catch (Throwable t) {
                         ExceptionUtils.handleThrowable(t);
                         log.error("Error getting attribute " + oname +
-                            " " + attName, t);
+                                " " + attName, t);
                         continue;
                     }
                     if (value==null) continue;
