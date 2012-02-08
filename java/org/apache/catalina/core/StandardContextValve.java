@@ -26,6 +26,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.catalina.Container;
+import org.apache.catalina.Context;
 import org.apache.catalina.Wrapper;
 import org.apache.catalina.comet.CometEvent;
 import org.apache.catalina.connector.Request;
@@ -54,7 +55,7 @@ final class StandardContextValve extends ValveBase {
 
     // ----------------------------------------------------- Instance Variables
 
-    private StandardContext context = null;
+    private Context context = null;
 
 
     // --------------------------------------------------------- Public Methods
@@ -67,7 +68,7 @@ final class StandardContextValve extends ValveBase {
     @Override
     public void setContainer(Container container) {
         super.setContainer(container);
-        context = (StandardContext) container;
+        context = (Context) container;
     }
 
 
