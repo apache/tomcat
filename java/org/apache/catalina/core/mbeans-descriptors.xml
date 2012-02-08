@@ -953,8 +953,8 @@
                description="The processor delay for this component."
                type="int"/>
 
-    <attribute name="baseDir"
-               description="Base dir for this engine, typically same as catalina.base system property"
+    <attribute name="catalinaBase"
+               description="Base (instance) directory for this Engine, typically same as catalina.base system property"
                type="java.lang.String"/>
 
     <attribute name="defaultHost"
