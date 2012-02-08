@@ -115,6 +115,10 @@
         Fix millisecond output in AccessLogValve when using a
         SimpleDateFormat based time pattern. (rjung)
       </fix>
+      <fix>
+        <bug>52591</bug>: When dumping MBean data, skip attributes where getters
+        throw <code>UnsupportedOperationException</code>. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
