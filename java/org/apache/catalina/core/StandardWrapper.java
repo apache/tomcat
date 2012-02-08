@@ -1896,7 +1896,15 @@ public class StandardWrapper extends ContainerBase
         return keyProperties.toString();
     }
     
+
+    /**
+     * JSR 77. Always return false.
+     */
+    public boolean isStateManageable() {
+        return false;
+    }
     
+
     /* Remove a JMX notficationListener 
      * @see javax.management.NotificationEmitter#removeNotificationListener(javax.management.NotificationListener, javax.management.NotificationFilter, java.lang.Object)
      */
@@ -1981,11 +1989,6 @@ public class StandardWrapper extends ContainerBase
         
     @Deprecated
     public boolean isEventProvider() {
-        return false;
-    }
-    
-    @Deprecated
-    public boolean isStateManageable() {
         return false;
     }
     
