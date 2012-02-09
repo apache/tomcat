@@ -133,8 +133,8 @@ public abstract class LifecycleMBeanBase extends LifecycleBase
 
     /**
      * Utility method to enable sub-classes to easily register additional
-     * components that don't implement {@link MBeanRegistration} with
-     * an MBean server.<br/>
+     * components that don't implement {@link JmxEnabled} with an MBean server.
+     * <br/>
      * Note: This method should only be used once {@link #initInternal()} has
      * been called and before {@link #destroyInternal()} has been called.
      *
@@ -173,8 +173,8 @@ public abstract class LifecycleMBeanBase extends LifecycleBase
 
     /**
      * Utility method to enable sub-classes to easily unregister additional
-     * components that don't implement {@link MBeanRegistration} with
-     * an MBean server.<br/>
+     * components that don't implement {@link JmxEnabled} with an MBean server.
+     * <br/>
      * Note: This method should only be used once {@link #initInternal()} has
      * been called and before {@link #destroyInternal()} has been called.
      *
