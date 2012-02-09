@@ -61,6 +61,11 @@
         these constants where appropriate. (markt)
       </scode>
       <fix>
+        Refactor the fix for <bug>52184</bug> to correct two issues (a missing
+        class and incorrect class/method names) when using the extras logging
+        packages. (markt)  
+      </fix>
+      <fix>
         <bug>52444</bug>: Only load classes during HandlesTypes processing if
         the class is a match. Previously, every class in the web application was
         loaded regardless of whether it was a match or not. (markt)  
