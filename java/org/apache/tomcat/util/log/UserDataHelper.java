@@ -14,7 +14,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.juli.logging;
+package org.apache.tomcat.util.log;
+
+import org.apache.juli.logging.Log;
 
 /**
  * This helper class assists with the logging associated with invalid input
@@ -104,36 +106,6 @@ public class UserDataHelper {
         }
         // Should never happen
         return null;
-    }
-
-
-    public void log(Mode mode, String message) {
-        if (mode != null) {
-            switch (mode) {
-            case INFO:
-            case INFO_THEN_DEBUG:
-                log.info(message);
-                break;
-            case DEBUG:
-                log.debug(message);
-                break;
-            }
-        }
-    }
-
-
-    public void log(Mode mode, String message, Throwable t) {
-        if (mode != null) {
-            switch (mode) {
-            case INFO:
-            case INFO_THEN_DEBUG:
-                log.info(message, t);
-                break;
-            case DEBUG:
-                log.debug(message, t);
-                break;
-            }
-        }
     }
 
 

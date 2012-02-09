@@ -25,12 +25,12 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.juli.logging.UserDataHelper;
 import org.apache.tomcat.util.buf.B2CConverter;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.buf.CharChunk;
 import org.apache.tomcat.util.buf.MessageBytes;
 import org.apache.tomcat.util.buf.UDecoder;
+import org.apache.tomcat.util.log.UserDataHelper;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
@@ -323,10 +323,16 @@ public final class Parameters {
                     String message = sm.getString("parameters.invalidChunk",
                             Integer.valueOf(nameStart),
                             Integer.valueOf(valueEnd), extract);
-                    if (logMode.fallToDebug()) {
-                        message += sm.getString("parameters.fallToDebug");
+                    switch (logMode) {
+                        case INFO_THEN_DEBUG:
+                            message += sm.getString("parameters.fallToDebug");
+                            //$FALL-THROUGH$
+                        case INFO:
+                            log.info(message);
+                            break;
+                        case DEBUG:
+                            log.debug(message);
                     }
-                    userDataLog.log(logMode, message);
                 }
                 parseFailed = true;
                 continue;
@@ -386,10 +392,17 @@ public final class Parameters {
                     UserDataHelper.Mode logMode = maxParamCountLog.getNextMode();
                     if (logMode != null) {
                         String message = ise.getMessage();
-                        if (logMode.fallToDebug()) {
-                            message += sm.getString("parameters.maxCountFail.fallToDebug");
+                        switch (logMode) {
+                            case INFO_THEN_DEBUG:
+                                message += sm.getString(
+                                        "parameters.maxCountFail.fallToDebug");
+                                //$FALL-THROUGH$
+                            case INFO:
+                                log.info(message);
+                                break;
+                            case DEBUG:
+                                log.debug(message);
                         }
-                        maxParamCountLog.log(logMode, message);
                     }
                     break;
                 }
@@ -406,10 +419,16 @@ public final class Parameters {
                             String message = sm.getString(
                                     "parameters.decodeFail.info",
                                     tmpName.toString(), tmpValue.toString());
-                            if (logMode.fallToDebug()) {
-                                message += sm.getString("parameters.fallToDebug");
+                            switch (logMode) {
+                                case INFO_THEN_DEBUG:
+                                    message += sm.getString("parameters.fallToDebug");
+                                    //$FALL-THROUGH$
+                                case INFO:
+                                    log.info(message);
+                                    break;
+                                case DEBUG:
+                                    log.debug(message);
                             }
-                            userDataLog.log(logMode, message, e);
                         }
                     }
                 }
@@ -430,10 +449,16 @@ public final class Parameters {
                 String message = sm.getString(
                         "parameters.multipleDecodingFail",
                         Integer.valueOf(decodeFailCount));
-                if (logMode.fallToDebug()) {
-                    message += sm.getString("parameters.fallToDebug");
+                switch (logMode) {
+                    case INFO_THEN_DEBUG:
+                        message += sm.getString("parameters.fallToDebug");
+                        //$FALL-THROUGH$
+                    case INFO:
+                        log.info(message);
+                        break;
+                    case DEBUG:
+                        log.debug(message);
                 }
-                userDataLog.log(logMode, message);
             }
         }
     }
