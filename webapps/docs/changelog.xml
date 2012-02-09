@@ -182,6 +182,10 @@
         web application that digested password storage when using DIGEST
         authentication requires that MD5 digests are used. (markt)
       </fix>
+      <fix>
+        <bug>52634</bug>: Fix typos in JSP examples. Patch provided by
+        Felix Schumacher. (rjung)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="jdbc-pool">

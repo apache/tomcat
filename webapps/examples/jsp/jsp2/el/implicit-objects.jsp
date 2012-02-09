@@ -24,7 +24,7 @@
     <h1>JSP 2.0 Expression Language - Implicit Objects</h1>
     <hr>
     This example illustrates some of the implicit objects available
-    in the Expression Lanaguage.  The following implicit objects are
+    in the Expression Language.  The following implicit objects are
     available (not all illustrated here):
     <ul>
       <li>pageContext - the PageContext object</li>
