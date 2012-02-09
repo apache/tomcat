@@ -21,9 +21,9 @@ import java.io.StringWriter;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
-import org.apache.juli.logging.UserDataHelper;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.buf.MessageBytes;
+import org.apache.tomcat.util.log.UserDataHelper;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
@@ -356,11 +356,19 @@ public final class Cookies {
                         // not valid.
                         UserDataHelper.Mode logMode = userDataLog.getNextMode();
                         if (logMode != null) {
-                            String message = sm.getString("cookies.invalidCookieToken");
-                            if (logMode.fallToDebug()) {
-                                message += sm.getString("cookies.fallToDebug");
+                            String message = sm.getString(
+                                    "cookies.invalidCookieToken");
+                            switch (logMode) {
+                                case INFO_THEN_DEBUG:
+                                    message += sm.getString(
+                                            "cookies.fallToDebug");
+                                    //$FALL-THROUGH$
+                                case INFO:
+                                    log.info(message);
+                                    break;
+                                case DEBUG:
+                                    log.debug(message);
                             }
-                            userDataLog.log(logMode, message);
                         }
                         while (pos < end && bytes[pos] != ';' &&
                                bytes[pos] != ',')
@@ -445,10 +453,16 @@ public final class Cookies {
                 UserDataHelper.Mode logMode = userDataLog.getNextMode();
                 if (logMode != null) {
                     String message = sm.getString("cookies.invalidSpecial");
-                    if (logMode.fallToDebug()) {
-                        message += sm.getString("cookies.fallToDebug");
+                    switch (logMode) {
+                        case INFO_THEN_DEBUG:
+                            message += sm.getString("cookies.fallToDebug");
+                            //$FALL-THROUGH$
+                        case INFO:
+                            log.info(message);
+                            break;
+                        case DEBUG:
+                            log.debug(message);
                     }
-                    userDataLog.log(logMode, message);
                 }
             } else { // Normal Cookie
                 if (valueStart == -1 && !CookieSupport.ALLOW_NAME_ONLY) {

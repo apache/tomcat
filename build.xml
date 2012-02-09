@@ -1248,7 +1248,6 @@
       </fileset>
       <fileset dir="${tomcat.classes}">
         <include name="org/apache/juli/*" />
-        <include name="org/apache/juli/logging/UserDataHelper*.class"/>
         <!-- Javadoc and i18n exclusions -->
         <exclude name="**/package.html" />
         <exclude name="**/LocalStrings_*" />
