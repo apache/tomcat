@@ -171,7 +171,7 @@ class DirectJDKLog implements Log {
             // Hack (?) to get the stack trace.
             Throwable dummyException=new Throwable();
             StackTraceElement locations[]=dummyException.getStackTrace();
-            // Caller will be the third element (or later if logger is wrapped)
+            // Caller will be the third element
             String cname = "unknown";
             String method = "unknown";
             if (locations != null && locations.length >2) {
