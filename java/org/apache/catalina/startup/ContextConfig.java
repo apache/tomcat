@@ -134,7 +134,24 @@ public class ContextConfig implements LifecycleListener {
      * the name of the implemented authentication method, and the value is
      * the fully qualified Java class name of the corresponding Valve.
      */
-    protected static Properties authenticators = null;
+    protected static final Properties authenticators;
+
+    static {
+        // Load our mapping properties for the standard authenticators
+        InputStream is =
+                ContextConfig.class.getClassLoader().getResourceAsStream(
+                    "org/apache/catalina/startup/Authenticators.properties");
+        Properties props = null;
+        props = new Properties();
+        if (is != null) {
+            try {
+                props.load(is);
+            } catch (IOException e) {
+                props = null;
+            }
+        }
+        authenticators = props;
+    }
 
 
     /**
@@ -375,7 +392,7 @@ public class ContextConfig implements LifecycleListener {
      * Set up an Authenticator automatically if required, and one has not
      * already been configured.
      */
-    protected synchronized void authenticatorConfig() {
+    protected void authenticatorConfig() {
 
         LoginConfig loginConfig = context.getLoginConfig();
 
@@ -420,25 +437,10 @@ public class ContextConfig implements LifecycleListener {
                 customAuthenticators.get(loginConfig.getAuthMethod());
         }
         if (authenticator == null) {
-            // Load our mapping properties if necessary
             if (authenticators == null) {
-                try {
-                    InputStream is=this.getClass().getClassLoader().getResourceAsStream("org/apache/catalina/startup/Authenticators.properties");
-                    if( is!=null ) {
-                        authenticators = new Properties();
-                        authenticators.load(is);
-                    } else {
-                        log.error(sm.getString(
-                                "contextConfig.authenticatorResources"));
-                        ok=false;
-                        return;
-                    }
-                } catch (IOException e) {
-                    log.error(sm.getString(
-                                "contextConfig.authenticatorResources"), e);
-                    ok = false;
-                    return;
-                }
+                log.error(sm.getString("contextConfig.authenticatorResources"));
+                ok = false;
+                return;
             }
 
             // Identify the class name of the Valve we should configure

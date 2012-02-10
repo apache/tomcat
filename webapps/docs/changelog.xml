@@ -128,6 +128,12 @@
         <bug>52607</bug>: Ensure that the extension validator checks the JARs in
         the shared and common class loaders for extensions. (markt)
       </fix>
+      <fix>
+        Correct a threading issue in the generation of the list of standard
+        authenticators during Context initialization that could lead to a web
+        application failing to start if Contexts were started in parallel.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
