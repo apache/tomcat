@@ -139,10 +139,6 @@
     <li>Interactions with <code>JNDIRealm</code> will be initiated by
         the appropriate <code>Authenticator</code> implementation, based
         on the login method that is selected.</li>
-    <li><code>JNDIRealm</code> must have the JNDI API classes available
-        to it.  For a JDK 1.2 container, that means <code>jndi.jar</code>
-        and the appropriate implementation (such as <code>ldap.jar</code>)
-        must be placed in the <code>server/lib</code> directory.</li>
     </ul>
 
   </subsection>

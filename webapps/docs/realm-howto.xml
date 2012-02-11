@@ -679,9 +679,6 @@ the name of this attribute.</p>
 <li>If required, configure a username and password for use by Tomcat, that has
     read only access to the information described above.  (Tomcat will
     never attempt to modify this information.)</li>
-<li>Place a copy of the JNDI driver you will be using (typically
-    <code>ldap.jar</code> available with JNDI) inside the
-    <code>$CATALINA_HOME/lib</code> directory.</li>
 <li>Set up a <code>&lt;Realm&gt;</code> element, as described below, in your
     <code>$CATALINA_BASE/conf/server.xml</code> file.</li>
 <li>Restart Tomcat if it is already running.</li>
