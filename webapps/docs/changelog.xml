@@ -192,6 +192,10 @@
         <bug>52634</bug>: Fix typos in JSP examples. Patch provided by
         Felix Schumacher. (rjung)
       </fix>
+      <fix>
+        <bug>52641</bug>: Remove mentioning of ldap.jar from docs.
+        Patch provided by Felix Schumacher. (rjung)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="jdbc-pool">
