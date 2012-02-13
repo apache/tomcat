@@ -49,7 +49,7 @@ public class SlowQueryReport extends AbstractQueryReport  {
     /**
      * the queries that are used for this interceptor.
      */
-    protected ConcurrentHashMap<String,QueryStats> queries = null;
+    protected volatile ConcurrentHashMap<String,QueryStats> queries = null;
     /**
      * Maximum number of queries we will be storing
      */
@@ -104,7 +104,7 @@ public class SlowQueryReport extends AbstractQueryReport  {
      */
     @Override
     public void closeInvoked() {
-        queries = null;
+        
     }
 
     @Override
@@ -186,6 +186,8 @@ public class SlowQueryReport extends AbstractQueryReport  {
         super.reset(parent, con);
         if (parent!=null)
             queries = SlowQueryReport.perPoolStats.get(parent.getName());
+        else 
+            queries = null;
     }
 
 
