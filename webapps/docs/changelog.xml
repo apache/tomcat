@@ -204,6 +204,9 @@
         Fix code style issues and enable Checkstyle checks for jdbc-pool when
         it is built within Tomcat. (kkolinko)
       </fix>
+      <fix>
+        <bug>51582</bug> Correct set and reset the query cache to avoid NPE   (fhanik)
+      </fix>
     </changelog>
   </subsection>
 </section>
