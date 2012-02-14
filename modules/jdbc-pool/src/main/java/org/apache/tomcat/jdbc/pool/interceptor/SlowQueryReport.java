@@ -104,7 +104,7 @@ public class SlowQueryReport extends AbstractQueryReport  {
      */
     @Override
     public void closeInvoked() {
-        
+        // NOOP
     }
 
     @Override
@@ -186,7 +186,7 @@ public class SlowQueryReport extends AbstractQueryReport  {
         super.reset(parent, con);
         if (parent!=null)
             queries = SlowQueryReport.perPoolStats.get(parent.getName());
-        else 
+        else
             queries = null;
     }
 
