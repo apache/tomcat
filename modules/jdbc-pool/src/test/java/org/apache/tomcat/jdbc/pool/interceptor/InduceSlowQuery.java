@@ -22,7 +22,7 @@ import java.security.SecureRandom;
 
 /**
  * @author fhanik
- * 
+ *
  */
 public class InduceSlowQuery extends AbstractQueryReport {
     public static SecureRandom random = new SecureRandom();
@@ -35,7 +35,7 @@ public class InduceSlowQuery extends AbstractQueryReport {
         try {
             int b = random.nextInt(10);
             if (b == 0) {
-                Thread.sleep((long) random.nextInt(2000));
+                Thread.sleep(random.nextInt(2000));
             }
         } catch (InterruptedException x) {
 
