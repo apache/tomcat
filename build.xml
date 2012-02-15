@@ -482,6 +482,30 @@
     </checkstyle>
   </target>
 
+  <target name="validate-eoln" depends="compile"
+    description="Validate that the source files have correct line ends">
+    <taskdef name="checkeol"
+             classname="org.apache.tomcat.buildutil.CheckEol"
+             classpath="${tomcat.classes}" />
+
+    <checkeol>
+      <fileset dir="." >
+        <patternset refid="text.files" />
+        <include name="**/*.bat"/>
+        <include name="**/*.sh"/>
+        <exclude name=".*/**"/>
+        <exclude name="output/**"/>
+        <exclude name="modules/**"/>
+        <!-- Exclude these else Gump runs validate on them -->
+        <exclude name="**/org/apache/tomcat/dbcp/**"/>
+        <exclude name="**/tomcat-deps/**"/>
+      </fileset>
+      <fileset dir="modules/jdbc-pool" >
+        <patternset refid="text.files" />
+      </fileset>
+    </checkeol>
+  </target>
+
   <target name="compile-prepare">
     <!-- Add the builtin catalina.properties -->
     <copy todir="java/org/apache/catalina/startup"
