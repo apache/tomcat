@@ -134,6 +134,13 @@
         application failing to start if Contexts were started in parallel.
         (markt)
       </fix>
+      <fix>
+        <bug>52669</bug>: Correct regression that broke annotation processing in
+        <code>/WEB-INF/classes</code> for web applications deployed as WARs,
+        packageless classes and some embedding scenarios. The regression was
+        introduced by the invalid assumptions made in the fix for
+        <bug>51741</bug>. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
