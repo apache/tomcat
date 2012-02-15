@@ -85,6 +85,9 @@ public class MBeanDumper {
                         if (cause instanceof UnsupportedOperationException) {
                             log.debug("Error getting attribute " + oname +
                                     " " + attName, rme);
+                        } else if (cause instanceof NullPointerException) {
+                            log.debug("Error getting attribute " + oname +
+                                    " " + attName, rme);
                         } else {
                             log.error("Error getting attribute " + oname +
                                     " " + attName, rme);
