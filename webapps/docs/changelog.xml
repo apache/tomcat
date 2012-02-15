@@ -169,6 +169,10 @@
         Fixes JSP compilation with javac when Tomcat is installed at a path that
         includes spaces. (markt)
       </fix>
+      <fix>
+        <bug>52666</bug>: Correct coercion order in EL when processing the
+        equality and inequality operators. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
