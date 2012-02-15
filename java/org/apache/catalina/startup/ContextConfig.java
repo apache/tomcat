@@ -1156,6 +1156,8 @@ public class ContextConfig implements LifecycleListener {
         parseWebXml(contextWebXml, webXml, false);
 
         if (webXml.getMajorVersion() >= 3) {
+            ServletContext sContext = context.getServletContext();
+
             // Ordering is important here
 
             // Step 1. Identify all the JARs packaged with the application
@@ -1178,6 +1180,9 @@ public class ContextConfig implements LifecycleListener {
                 // Step 4. Process /WEB-INF/classes for annotations
                 // This will add any matching classes to the typeInitializerMap
                 if (ok) {
+                    // Hack required by Eclipse's "serve modules without
+                    // publishing" feature since this backs WEB-INF/classes by
+                    // multiple locations rather than one.
                     NamingEnumeration<Binding> listBindings = null;
                     try {
                         try {
@@ -1190,9 +1195,20 @@ public class ContextConfig implements LifecycleListener {
                                 listBindings.hasMoreElements()) {
                             Binding binding = listBindings.nextElement();
                             if (binding.getObject() instanceof FileDirContext) {
-                                File webInfCLassDir = new File(
+                                File webInfClassDir = new File(
                                         ((FileDirContext) binding.getObject()).getDocBase());
-                                processAnnotationsFile(webInfCLassDir, webXml);
+                                processAnnotationsFile(webInfClassDir, webXml);
+                            } else {
+                                String resource =
+                                        "/WEB-INF/classes/" + binding.getName();
+                                try {
+                                    URL url = sContext.getResource(resource);
+                                    processAnnotationsUrl(url, webXml);
+                                } catch (MalformedURLException e) {
+                                    log.error(sm.getString(
+                                            "contextConfig.webinfClassesUrl",
+                                            resource), e);
+                                }
                             }
                         }
                     } catch (NamingException e) {
@@ -1236,9 +1252,9 @@ public class ContextConfig implements LifecycleListener {
                     // from having to re-generate it.
                     // TODO Use a ServletContainerInitializer for Jasper
                     String mergedWebXml = webXml.toXml();
-                    context.getServletContext().setAttribute(
+                    sContext.setAttribute(
                            org.apache.tomcat.util.scan.Constants.MERGED_WEB_XML,
-                            mergedWebXml);
+                           mergedWebXml);
                     if (context.getLogEffectiveWebXml()) {
                         log.info("web.xml:\n" + mergedWebXml);
                     }
