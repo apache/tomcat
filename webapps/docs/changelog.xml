@@ -141,6 +141,10 @@
         introduced by the invalid assumptions made in the fix for
         <bug>51741</bug>. (markt)
       </fix>
+      <fix>
+        <bug>52671</bug>: When dumping MBean data, skip attributes where getters
+        throw <code>NullPointerException</code>. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
