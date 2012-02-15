@@ -23,10 +23,16 @@ import javax.el.ELException;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
 public class TestELSupport {
+    @Test
+    public void testEquals() {
+        assertTrue(ELSupport.equals("01", Long.valueOf(1)));
+    }
+
     @Test
     public void testBigDecimal() {
         testIsSame(new BigDecimal(
