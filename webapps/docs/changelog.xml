@@ -209,6 +209,16 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Other">
+    <changelog>
+      <fix>
+        Update Commons Daemon to 1.0.9 to resolve <bug>52548</bug> which meant
+        that services created with service.bat did not set the
+        <code>catalina.home</code> and <code>catalina.base</code> system
+        properties. (markt)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 7.0.25 (markt)" rtext="released 2012-01-21">
   <subsection name="Web applications">
