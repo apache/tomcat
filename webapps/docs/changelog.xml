@@ -232,6 +232,11 @@
         <code>catalina.home</code> and <code>catalina.base</code> system
         properties. (markt)
       </fix>
+      <add>
+        Implement check for correct end-of-line characters in the source
+        files. It is run as separate target in <code>build.xml</code>.
+        (kkolinko)
+      </add>
     </changelog>
   </subsection>
 </section>
