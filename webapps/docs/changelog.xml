@@ -288,7 +288,7 @@
       </fix>
       <fix>
         <bug>52245</bug>: Don't allow web applications to package classes from
-        the <code>javax.el</code> package. Patch provide by pid. (markt)
+        the <code>javax.el</code> package. Patch provided by pid. (markt)
       </fix>
       <fix>
         <bug>52259</bug>: Fix regression caused by the addition of the threaded
