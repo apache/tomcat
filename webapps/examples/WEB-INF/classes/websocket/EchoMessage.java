@@ -38,13 +38,14 @@ public class EchoMessage extends WebSocketServlet {
 
         @Override
         protected void onBinaryMessage(ByteBuffer message) throws IOException {
-            System.out.write(message.array(), 0, message.limit());
-            System.out.print('\n');
+            message.position(message.limit());
+            getOutbound().writeBinaryMessage(message);
         }
 
         @Override
         protected void onTextMessage(CharBuffer message) throws IOException {
-            System.out.println(message);
+            message.position(message.limit());
+            getOutbound().writeTextMessage(message);
         }
     }
 }
