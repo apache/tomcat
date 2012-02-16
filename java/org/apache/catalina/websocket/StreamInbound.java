@@ -56,7 +56,7 @@ public abstract class StreamInbound implements UpgradeInbound {
         this.processor = processor;
     }
 
-    public WsOutbound getStreamOutbound() {
+    public WsOutbound getOutbound() {
         return outbound;
     }
 
