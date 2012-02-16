@@ -38,7 +38,7 @@ public class TestWebSocket extends TomcatBaseTest {
         private static final long serialVersionUID = 1L;
 
         @Override
-        protected StreamInbound createWebSocketInbound() {
+        protected StreamInbound createWebSocketInbound(String subProtocol) {
             return new SimpleStreamInbound();
         }
     }
@@ -63,7 +63,7 @@ public class TestWebSocket extends TomcatBaseTest {
         private static final long serialVersionUID = 1L;
 
         @Override
-        protected StreamInbound createWebSocketInbound() {
+        protected StreamInbound createWebSocketInbound(String subProtocol) {
             return new SimpleMessageInbound();
         }
     }
