@@ -18,22 +18,65 @@ package org.apache.catalina.websocket;
 
 import java.io.IOException;
 
+import org.apache.catalina.util.Conversions;
 import org.apache.coyote.http11.upgrade.UpgradeProcessor;
 
 public class WsInputStream extends java.io.InputStream {
 
     private UpgradeProcessor<?> processor;
-    private byte[] mask;
+    private final WsFrameHeader wsFrameHeader;
+    private long payloadLength = -1;
+    private byte[] mask = new byte[4];
+
+
     private long remaining;
     private long read;
 
-    public WsInputStream(UpgradeProcessor<?> processor, byte[] mask,
-            long remaining) {
+    public WsInputStream(UpgradeProcessor<?> processor) throws IOException {
         this.processor = processor;
-        this.mask = mask;
-        this.remaining = remaining;
-        this.read = 0;
+
+        int i = processor.read();
+        this.wsFrameHeader = new WsFrameHeader(i);
+
+        // Client data must be masked
+        i = processor.read();
+        if ((i & 0x80) == 0) {
+            // TODO: StringManager / i18n
+            throw new IOException("Client frame not masked");
+        }
+
+        payloadLength = i & 0x7F;
+        if (payloadLength == 126) {
+            byte[] extended = new byte[2];
+            processor.read(extended);
+            payloadLength = Conversions.byteArrayToLong(extended);
+        } else if (payloadLength == 127) {
+            byte[] extended = new byte[8];
+            processor.read(extended);
+            payloadLength = Conversions.byteArrayToLong(extended);
+        }
+        remaining = payloadLength;
+
+        processor.read(mask);
+
+
+        // TODO: Doesn't currently handle multi-frame messages. That will need
+        //       some refactoring.
+
+        // TODO: Per frame extension handling is not currently supported.
+
+        // TODO: Handle other control frames.
+
+        // TODO: Handle control frames appearing in the middle of a multi-frame
+        //       message
     }
+
+    public WsFrameHeader getFrameHeader() {
+        return wsFrameHeader;
+    }
+
+
+    // ----------------------------------------------------- InputStream methods
 
     @Override
     public int read() throws IOException {
@@ -47,5 +90,4 @@ public class WsInputStream extends java.io.InputStream {
         int masked = processor.read();
         return masked ^ mask[(int) ((read - 1) % 4)];
     }
-
 }
