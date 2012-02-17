@@ -1213,7 +1213,8 @@ public class ContextConfig implements LifecycleListener {
                         }
                     } catch (NamingException e) {
                         log.error(sm.getString(
-                            "contextConfig.webinfClassesUrl"), e);
+                                "contextConfig.webinfClassesUrl",
+                                "/WEB-INF/classes"), e);
                     }
                 }
 
