@@ -21,4 +21,12 @@ package org.apache.catalina.websocket;
  */
 public class Constants {
     public static final String Package = "org.apache.catalina.websocket";
+
+    // OP Codes
+    public static final byte OPCODE_CONTINUATION = 0x00;
+    public static final byte OPCODE_TEXT = 0x01;
+    public static final byte OPCODE_BINARY = 0x02;
+    public static final byte OPCODE_CLOSE = 0x08;
+    public static final byte OPCODE_PING = 0x09;
+    public static final byte OPCODE_PONG = 0x0A;
 }

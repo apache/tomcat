@@ -21,7 +21,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 
-import org.apache.catalina.util.Conversions;
 import org.apache.coyote.http11.upgrade.UpgradeInbound;
 import org.apache.coyote.http11.upgrade.UpgradeOutbound;
 import org.apache.coyote.http11.upgrade.UpgradeProcessor;
@@ -29,18 +28,6 @@ import org.apache.tomcat.util.buf.B2CConverter;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
 
 public abstract class StreamInbound implements UpgradeInbound {
-
-    // These attributes apply to the current frame being processed
-    private boolean fin = true;
-    private boolean rsv1 = false;
-    private boolean rsv2 = false;
-    private boolean rsv3 = false;
-    private int opCode = -1;
-    private long payloadLength = -1;
-
-    // These attributes apply to the message that may be spread over multiple
-    // frames
-    // TODO
 
     private UpgradeProcessor<?> processor = null;
     private WsOutbound outbound;
@@ -62,76 +49,30 @@ public abstract class StreamInbound implements UpgradeInbound {
 
     @Override
     public SocketState onData() throws IOException {
-        // Must be start the start of a frame
+        // Must be start the start of a frame or series of frames
+        WsInputStream wsIs = new WsInputStream(processor);
 
-        // Read the first byte
-        int i = processor.read();
-
-        fin = (i & 0x80) > 0;
-
-        rsv1 = (i & 0x40) > 0;
-        rsv2 = (i & 0x20) > 0;
-        rsv3 = (i & 0x10) > 0;
-
-        if (rsv1 || rsv2 || rsv3) {
-            // TODO: Not supported.
-        }
-
-        opCode = (i & 0x0F);
+        WsFrameHeader header = wsIs.getFrameHeader();
+        byte opCode = header.getOpCode();
         validateOpCode(opCode);
 
-        // Read the next byte
-        i = processor.read();
-
-        // Client data must be masked and this isn't
-        if ((i & 0x80) == 0) {
-            // TODO: Better message
-            throw new IOException();
+        if (opCode == Constants.OPCODE_BINARY) {
+            onBinaryData(wsIs);
+        } else if (opCode == Constants.OPCODE_TEXT) {
+            InputStreamReader r =
+                    new InputStreamReader(wsIs, B2CConverter.UTF_8);
+            onTextData(r);
+        } else {
+            // TODO i18n
+            throw new IOException("OpCode " + opCode + " not supported");
         }
-
-        payloadLength = i & 0x7F;
-        if (payloadLength == 126) {
-            byte[] extended = new byte[2];
-            processor.read(extended);
-            payloadLength = Conversions.byteArrayToLong(extended);
-        } else if (payloadLength == 127) {
-            byte[] extended = new byte[8];
-            processor.read(extended);
-            payloadLength = Conversions.byteArrayToLong(extended);
-        }
-
-        byte[] mask = new byte[4];
-        processor.read(mask);
-
-        if (opCode == 1 || opCode == 2) {
-            WsInputStream wsIs = new WsInputStream(processor, mask,
-                    payloadLength);
-            if (opCode == 2) {
-                onBinaryData(wsIs);
-            } else {
-                InputStreamReader r =
-                        new InputStreamReader(wsIs, B2CConverter.UTF_8);
-                onTextData(r);
-            }
-        }
-
-        // TODO: Doesn't currently handle multi-frame messages. That will need
-        //       some refactoring.
-
-        // TODO: Per frame extension handling is not currently supported.
-
-        // TODO: Handle other control frames.
-
-        // TODO: Handle control frames appearing in the middle of a multi-frame
-        //       message
-
         return SocketState.UPGRADED;
     }
 
     protected abstract void onBinaryData(InputStream is) throws IOException;
     protected abstract void onTextData(Reader r) throws IOException;
 
-    private void validateOpCode(int opCode) throws IOException {
+    private void validateOpCode(byte opCode) throws IOException {
         switch (opCode) {
         case 0:
         case 1:
