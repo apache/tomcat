@@ -24,7 +24,7 @@ import org.apache.coyote.http11.upgrade.UpgradeProcessor;
 public class WsInputStream extends java.io.InputStream {
 
     private UpgradeProcessor<?> processor;
-    private final WsFrameHeader wsFrameHeader;
+    private WsFrameHeader wsFrameHeader;
     private long payloadLength = -1;
     private byte[] mask = new byte[4];
 
@@ -34,6 +34,19 @@ public class WsInputStream extends java.io.InputStream {
 
     public WsInputStream(UpgradeProcessor<?> processor) throws IOException {
         this.processor = processor;
+
+        processFrameHeader();
+    }
+
+
+    private void processFrameHeader() throws IOException {
+
+        // TODO: Per frame extension handling is not currently supported.
+
+        // TODO: Handle other control frames.
+
+        // TODO: Handle control frames appearing in the middle of a multi-frame
+        //       message
 
         int i = processor.read();
         this.wsFrameHeader = new WsFrameHeader(i);
@@ -58,17 +71,6 @@ public class WsInputStream extends java.io.InputStream {
         remaining = payloadLength;
 
         processor.read(mask);
-
-
-        // TODO: Doesn't currently handle multi-frame messages. That will need
-        //       some refactoring.
-
-        // TODO: Per frame extension handling is not currently supported.
-
-        // TODO: Handle other control frames.
-
-        // TODO: Handle control frames appearing in the middle of a multi-frame
-        //       message
     }
 
     public WsFrameHeader getFrameHeader() {
@@ -80,6 +82,16 @@ public class WsInputStream extends java.io.InputStream {
 
     @Override
     public int read() throws IOException {
+        while (remaining == 0 && !getFrameHeader().getFin()) {
+            // Need more data - process next frame
+            processFrameHeader();
+
+            if (getFrameHeader().getOpCode() != Constants.OPCODE_CONTINUATION) {
+                // TODO i18n
+                throw new IOException("Not a continuation frame");
+            }
+        }
+
         if (remaining == 0) {
             return -1;
         }
