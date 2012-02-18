@@ -53,6 +53,16 @@
   They eventually become mixed with the numbered issues. (I.e., numbered
   issues to not "pop up" wrt. others).
 -->
+<section name="Tomcat 7.0.27 (markt)">
+  <subsection name="Other">
+    <changelog>
+      <update>
+        Rearrange <code>validate-eoln</code> target in <code>build.xml</code>
+        so that it could be run ahead of compilation. (kkolinko)
+      </update>
+    </changelog>
+  </subsection>
+</section>
 <section name="Tomcat 7.0.26 (markt)">
   <subsection name="Catalina">
     <changelog>
