@@ -16,68 +16,149 @@
  */
 package org.apache.catalina.websocket;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.io.Reader;
-import java.nio.ByteBuffer;
-import java.nio.CharBuffer;
+import java.io.Writer;
+import java.net.InetSocketAddress;
+import java.net.Socket;
+import java.net.SocketAddress;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 
+import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.tomcat.util.buf.B2CConverter;
+import org.apache.tomcat.util.buf.ByteChunk;
+import org.apache.tomcat.util.buf.C2BConverter;
+import org.apache.tomcat.util.buf.CharChunk;
 
 public class TestWebSocket extends TomcatBaseTest {
 
+    private static final String CRLF = "\r\n";
+
+    private OutputStream os;
+    private InputStream is;
+    boolean isContinuation = false;
+
     @Test
-    public void testSimple() {
-        // TODO: Write a test
+    public void testSimple() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+        File appDir = new File(getBuildDirectory(), "webapps/examples");
+        tomcat.addWebapp(null, "/examples", appDir.getAbsolutePath());
+
+        tomcat.start();
+
+        // Open the socket
+        final String encoding = "ISO-8859-1";
+        SocketAddress addr = new InetSocketAddress("localhost", getPort());
+        Socket socket = new Socket();
+        socket.setSoTimeout(10000);
+        socket.connect(addr, 10000);
+        os = socket.getOutputStream();
+        Writer writer = new OutputStreamWriter(os, encoding);
+        is = socket.getInputStream();
+        Reader r = new InputStreamReader(is, encoding);
+        BufferedReader reader = new BufferedReader(r);
+
+        // Send the WebSocket handshake
+        writer.write("GET /examples/websocket/echoStream HTTP/1.1" + CRLF);
+        writer.write("Host: foo" + CRLF);
+        writer.write("Upgrade: websocket" + CRLF);
+        writer.write("Connection: upgrade" + CRLF);
+        writer.write("Sec-WebSocket-Version: 13" + CRLF);
+        writer.write("Sec-WebSocket-Key: TODO" + CRLF);
+        writer.write(CRLF);
+        writer.flush();
+
+        // Make sure we got an upgrade response
+        String responseLine = reader.readLine();
+        assertTrue(responseLine.startsWith("HTTP/1.1 101"));
+
+        // Swallow the headers
+        String responseHeaderLine = reader.readLine();
+        while (!responseHeaderLine.equals("")) {
+            responseHeaderLine = reader.readLine();
+        }
+
+        // Now we can do WebSocket
+        sendMessage("foo", false);
+        sendMessage("foo", true);
+
+        assertEquals("foofoo",readMessage());
+
+        // Finished with the socket
+        socket.close();
     }
 
-    private static final class StreamingWebSocketServlet
-            extends WebSocketServlet {
+    private void sendMessage(String message, boolean finalFragment)
+            throws IOException{
+        ByteChunk bc = new ByteChunk(8192);
+        C2BConverter c2b = new C2BConverter(bc, "UTF-8");
+        c2b.convert(message);
+        c2b.flushBuffer();
 
-        private static final long serialVersionUID = 1L;
+        int len = bc.getLength();
+        assertTrue(len < 126);
 
-        @Override
-        protected StreamInbound createWebSocketInbound(String subProtocol) {
-            return new SimpleStreamInbound();
+
+        byte first;
+        if (isContinuation) {
+            first = Constants.OPCODE_CONTINUATION;
+        } else {
+            first = Constants.OPCODE_TEXT;
         }
+        if (finalFragment) {
+            first = (byte) (0x80 | first);
+        }
+        os.write(first);
+
+        os.write(0x80 | len);
+
+        // Zero mask
+        os.write(0);
+        os.write(0);
+        os.write(0);
+        os.write(0);
+
+        // Payload
+        os.write(bc.getBytes(), bc.getStart(), len);
+
+        os.flush();
+
+        // Will the next frame be a continuation frame
+        isContinuation = !finalFragment;
     }
 
-    private static final class SimpleStreamInbound extends StreamInbound {
+    private String readMessage() throws IOException {
+        ByteChunk bc = new ByteChunk(125);
+        CharChunk cc = new CharChunk(125);
 
-        @Override
-        protected void onBinaryData(InputStream is) {
-            // TODO Auto-generated method stub
+        // Skip first byte
+        is.read();
+
+        // Get payload length
+        int len = is.read() & 0x7F;
+        assertTrue(len < 126);
+
+        // Read payload
+        int read = 0;
+        while (read < len) {
+            read = read + is.read(bc.getBytes(), read, len - read);
         }
 
-        @Override
-        protected void onTextData(Reader r) {
-            // TODO Auto-generated method stub
-        }
-    }
+        bc.setEnd(len);
 
+        B2CConverter b2c = new B2CConverter("UTF-8");
+        b2c.convert(bc, cc, len);
 
-    private static final class MessageWebSocketServlet
-            extends WebSocketServlet {
-
-        private static final long serialVersionUID = 1L;
-
-        @Override
-        protected StreamInbound createWebSocketInbound(String subProtocol) {
-            return new SimpleMessageInbound();
-        }
-    }
-
-    private static final class SimpleMessageInbound extends MessageInbound {
-
-        @Override
-        protected void onBinaryMessage(ByteBuffer message) {
-            // TODO Auto-generated method stub
-        }
-
-        @Override
-        protected void onTextMessage(CharBuffer message) {
-            // TODO Auto-generated method stub
-        }
+        return cc.toString();
     }
 }
