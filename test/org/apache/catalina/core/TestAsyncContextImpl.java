@@ -1168,7 +1168,16 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
     }
 
     @Test
-    public void testBug51197() throws Exception {
+    public void testBug51197a() throws Exception {
+        doTestBug51197(false);
+    }
+
+    @Test
+    public void testBug51197b() throws Exception {
+        doTestBug51197(true);
+    }
+
+    private void doTestBug51197(boolean threaded) throws Exception {
         // Setup Tomcat instance
         Tomcat tomcat = getTomcatInstance();
 
@@ -1178,7 +1187,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         Context ctx = tomcat.addContext("", docBase.getAbsolutePath());
 
         AsyncErrorServlet asyncErrorServlet =
-            new AsyncErrorServlet(HttpServletResponse.SC_BAD_REQUEST);
+            new AsyncErrorServlet(HttpServletResponse.SC_BAD_REQUEST, threaded);
         Wrapper wrapper =
             Tomcat.addServlet(ctx, "asyncErrorServlet", asyncErrorServlet);
         wrapper.setAsyncSupported(true);
@@ -1212,10 +1221,12 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
 
         private static final long serialVersionUID = 1L;
 
-        private int status = 200;
+        private int status;
+        private boolean threaded;
 
-        public AsyncErrorServlet(int status) {
+        public AsyncErrorServlet(int status, boolean threaded) {
             this.status = status;
+            this.threaded = threaded;
         }
 
         @Override
@@ -1224,18 +1235,22 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
 
             final AsyncContext actxt = req.startAsync();
             actxt.setTimeout(TIMEOUT);
-            actxt.start(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        ((HttpServletResponse) actxt.getResponse()).sendError(
-                                status);
-                    } catch (IOException e) {
-                        // Ignore
+            if (threaded) {
+                actxt.start(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            HttpServletResponse resp =
+                                    (HttpServletResponse) actxt.getResponse();
+                            resp.sendError(status);
+                        } catch (IOException e) {
+                            // Ignore
+                        }
                     }
-                }
-            });
+                });
+            } else {
+                resp.sendError(status);
+            }
         }
     }
-
 }
