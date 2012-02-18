@@ -482,8 +482,28 @@
     </checkstyle>
   </target>
 
-  <target name="validate-eoln" depends="compile"
+  <target name="validate-eoln" depends="build-prepare,compile-prepare"
     description="Validate that the source files have correct line ends">
+
+    <!-- Compile the CheckEol class only. Note that the class depends on
+    Ant only. There is no need to download additional dependencies nor
+    add them to the class path. The rest should be the same as in "compile"
+    target.-->
+    <javac srcdir="java" destdir="${tomcat.classes}"
+           debug="${compile.debug}"
+           deprecation="${compile.deprecation}"
+           source="${compile.source}"
+           target="${compile.target}"
+           optimize="${compile.optimize}"
+           excludes="**/.svn/**"
+           encoding="ISO-8859-1"
+           includeAntRuntime="true" >
+      <!-- Uncomment this to show unchecked warnings:
+      <compilerarg value="-Xlint:unchecked"/>
+      -->
+      <include name="org/apache/tomcat/buildutil/CheckEol*" />
+    </javac>
+
     <taskdef name="checkeol"
              classname="org.apache.tomcat.buildutil.CheckEol"
              classpath="${tomcat.classes}" />
@@ -532,7 +552,7 @@
            excludes="**/.svn/**"
            encoding="ISO-8859-1"
            includeAntRuntime="true" >
-      <!-- Comment this in to show unchecked warnings:
+      <!-- Uncomment this to show unchecked warnings:
       <compilerarg value="-Xlint:unchecked"/>
       -->
       <classpath refid="compile.classpath" />
