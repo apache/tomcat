@@ -59,12 +59,15 @@ public abstract class StreamInbound implements UpgradeInbound {
 
         if (opCode == Constants.OPCODE_BINARY) {
             onBinaryData(wsIs);
+            return SocketState.UPGRADED;
         } else if (opCode == Constants.OPCODE_TEXT) {
             InputStreamReader r =
                     new InputStreamReader(wsIs, B2CConverter.UTF_8);
             onTextData(r);
+            return SocketState.UPGRADED;
         }
 
+        // Must be a control from and they have limited pay load length
         if (wsIs.getPayloadLength() > 125) {
             getOutbound().close(1002, null);
             return SocketState.CLOSED;
@@ -75,13 +78,14 @@ public abstract class StreamInbound implements UpgradeInbound {
             return SocketState.CLOSED;
         } else if (opCode == Constants.OPCODE_PING) {
             doPing(wsIs);
+            return SocketState.UPGRADED;
         } else if (opCode == Constants.OPCODE_PONG) {
             doPong(wsIs);
-        } else {
-            // TODO i18n
-            throw new IOException("OpCode " + opCode + " not supported");
+            return SocketState.UPGRADED;
         }
-        return SocketState.UPGRADED;
+
+        // TODO i18n
+        throw new IOException("OpCode " + opCode + " not supported");
     }
 
     private void doClose(InputStream is) throws IOException {
