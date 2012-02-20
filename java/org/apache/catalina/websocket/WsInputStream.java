@@ -43,6 +43,8 @@ public class WsInputStream extends java.io.InputStream {
 
         // TODO: Per frame extension handling is not currently supported.
 
+        // TODO: Handle control frames between fragments
+
         int i = processor.read();
         this.wsFrameHeader = new WsFrameHeader(i);
 
