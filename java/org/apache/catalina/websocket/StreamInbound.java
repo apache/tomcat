@@ -67,8 +67,10 @@ public abstract class StreamInbound implements UpgradeInbound {
             return SocketState.UPGRADED;
         }
 
-        // Must be a control from and they have limited pay load length
-        if (wsIs.getPayloadLength() > 125) {
+        // Must be a control frame and control frames:
+        // - have a limited payload length
+        // - must not be fragmented
+        if (wsIs.getPayloadLength() > 125 || !wsIs.getFrameHeader().getFin()) {
             getOutbound().close(1002, null);
             return SocketState.CLOSED;
         }
