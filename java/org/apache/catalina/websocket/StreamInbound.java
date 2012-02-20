@@ -54,6 +54,13 @@ public abstract class StreamInbound implements UpgradeInbound {
         WsInputStream wsIs = new WsInputStream(processor);
 
         WsFrameHeader header = wsIs.getFrameHeader();
+
+        // TODO User defined extensions may define values for rsv
+        if (header.getRsv() > 0) {
+            getOutbound().close(1002, null);
+            return SocketState.CLOSED;
+        }
+
         byte opCode = header.getOpCode();
         validateOpCode(opCode);
 
