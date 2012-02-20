@@ -62,7 +62,6 @@ public abstract class StreamInbound implements UpgradeInbound {
         }
 
         byte opCode = header.getOpCode();
-        validateOpCode(opCode);
 
         if (opCode == Constants.OPCODE_BINARY) {
             onBinaryData(wsIs);
@@ -93,8 +92,8 @@ public abstract class StreamInbound implements UpgradeInbound {
             return SocketState.UPGRADED;
         }
 
-        // TODO i18n
-        throw new IOException("OpCode " + opCode + " not supported");
+        getOutbound().close(1002, null);
+        return SocketState.CLOSED;
     }
 
     private void doClose(InputStream is) throws IOException {
@@ -143,19 +142,4 @@ public abstract class StreamInbound implements UpgradeInbound {
 
     protected abstract void onBinaryData(InputStream is) throws IOException;
     protected abstract void onTextData(Reader r) throws IOException;
-
-    private void validateOpCode(byte opCode) throws IOException {
-        switch (opCode) {
-        case 0:
-        case 1:
-        case 2:
-        case 8:
-        case 9:
-        case 10:
-            break;
-        default:
-            // TODO: Message
-            throw new IOException();
-        }
-    }
 }
