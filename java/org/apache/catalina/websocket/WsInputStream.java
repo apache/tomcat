@@ -79,6 +79,10 @@ public class WsInputStream extends java.io.InputStream {
         return wsFrameHeader;
     }
 
+    public long getPayloadLength() {
+        return payloadLength;
+    }
+
 
     // ----------------------------------------------------- InputStream methods
 
