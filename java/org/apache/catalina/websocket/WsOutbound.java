@@ -123,9 +123,6 @@ public class WsOutbound {
     protected void doWriteBinary(ByteBuffer buffer, boolean finalFragment)
             throws IOException {
 
-        // Prepare to write
-        buffer.flip();
-
         // Work out the first byte
         int first = 0x00;
         if (finalFragment) {
@@ -141,13 +138,24 @@ public class WsOutbound {
         // Continuation frame is OpCode 0
         upgradeOutbound.write(first);
 
-        // Note: buffer will never be more than 2^16 in length
         if (buffer.limit() < 126) {
             upgradeOutbound.write(buffer.limit());
-        } else {
+        } else if (buffer.limit() < 65536) {
             upgradeOutbound.write(126);
             upgradeOutbound.write(buffer.limit() >>> 8);
             upgradeOutbound.write(buffer.limit() & 0xFF);
+        } else {
+            // Will never be more than 2^31-1
+            upgradeOutbound.write(127);
+            upgradeOutbound.write(0);
+            upgradeOutbound.write(0);
+            upgradeOutbound.write(0);
+            upgradeOutbound.write(0);
+            upgradeOutbound.write(buffer.limit() >>> 24);
+            upgradeOutbound.write(buffer.limit() >>> 16);
+            upgradeOutbound.write(buffer.limit() >>> 8);
+            upgradeOutbound.write(buffer.limit() & 0xFF);
+
         }
 
         // Write the content
@@ -167,10 +175,9 @@ public class WsOutbound {
 
     protected void doWriteText(CharBuffer buffer, boolean finalFragment)
             throws IOException {
-        buffer.flip();
-
         do {
             B2CConverter.UTF_8.newEncoder().encode(buffer, bb, true);
+            bb.flip();
             if (buffer.hasRemaining()) {
                 doWriteBinary(bb, false);
             } else {
