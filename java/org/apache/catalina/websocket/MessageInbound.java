@@ -24,8 +24,10 @@ import java.nio.CharBuffer;
 
 public abstract class MessageInbound extends StreamInbound {
 
-    // TODO: Make buffer sizes configurable
-    // TODO: Allow buffers to expand
+    // 2MB - like maxPostSize
+    private int byteBufferMaxSize = 2097152;
+    private int charBufferMaxSize = 2097152;
+
     ByteBuffer bb = ByteBuffer.allocate(8192);
     CharBuffer cb = CharBuffer.allocate(8192);
 
@@ -34,6 +36,9 @@ public abstract class MessageInbound extends StreamInbound {
         int read = 0;
         while (read > -1) {
             bb.position(bb.position() + read);
+            if (bb.remaining() == 0) {
+                resizeByteBuffer();
+            }
             read = is.read(bb.array(), bb.position(), bb.remaining());
         }
         bb.flip();
@@ -46,12 +51,69 @@ public abstract class MessageInbound extends StreamInbound {
         int read = 0;
         while (read > -1) {
             cb.position(cb.position() + read);
+            if (cb.remaining() == 0) {
+                resizeCharBuffer();
+            }
             read = r.read(cb.array(), cb.position(), cb.remaining());
         }
         cb.limit(cb.position());
         cb.position(0);
         onTextMessage(cb);
         cb.clear();
+    }
+
+    private void resizeByteBuffer() throws IOException {
+        int maxSize = getByteBufferMaxSize();
+        if (bb.limit() >= maxSize) {
+            // TODO i18n
+            throw new IOException("Buffer not big enough for message");
+        }
+
+        long newSize = bb.limit() * 2;
+        if (newSize > maxSize) {
+            newSize = maxSize;
+        }
+
+        // Cast is safe. newSize < maxSize and maxSize is an int
+        ByteBuffer newBuffer = ByteBuffer.allocate((int) newSize);
+        bb.rewind();
+        newBuffer.put(bb);
+        bb = newBuffer;
+    }
+
+    private void resizeCharBuffer() throws IOException {
+        int maxSize = getCharBufferMaxSize();
+        if (cb.limit() >= maxSize) {
+            // TODO i18n
+            throw new IOException("Buffer not big enough for message");
+        }
+
+        long newSize = cb.limit() * 2;
+        if (newSize > maxSize) {
+            newSize = maxSize;
+        }
+
+        // Cast is safe. newSize < maxSize and maxSize is an int
+        CharBuffer newBuffer = CharBuffer.allocate((int) newSize);
+        cb.rewind();
+        newBuffer.put(cb);
+        cb = newBuffer;
+    }
+
+    public int getByteBufferMaxSize() {
+        return byteBufferMaxSize;
+    }
+
+    public void setByteBufferMaxSize(int byteBufferMaxSize) {
+        this.byteBufferMaxSize = byteBufferMaxSize;
+    }
+
+    public int getCharBufferMaxSize() {
+        return charBufferMaxSize;
+    }
+
+    public void setCharBufferMaxSize(int charBufferMaxSize) {
+        this.charBufferMaxSize = charBufferMaxSize;
     }
 
     protected abstract void onBinaryMessage(ByteBuffer message)

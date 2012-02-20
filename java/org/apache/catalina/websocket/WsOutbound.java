@@ -25,7 +25,7 @@ import org.apache.tomcat.util.buf.B2CConverter;
 
 public class WsOutbound {
 
-    private static final int DEFAULT_BUFFER_SIZE = 2048;
+    private static final int DEFAULT_BUFFER_SIZE = 8192;
 
     private UpgradeOutbound upgradeOutbound;
     private ByteBuffer bb;
@@ -37,9 +37,7 @@ public class WsOutbound {
     public WsOutbound(UpgradeOutbound upgradeOutbound) {
         this.upgradeOutbound = upgradeOutbound;
         // TODO: Make buffer size configurable
-        // Byte buffer needs to be 4* char buffer to be sure that char buffer
-        // can always we written into Byte buffer
-        this.bb = ByteBuffer.allocate(DEFAULT_BUFFER_SIZE * 4);
+        this.bb = ByteBuffer.allocate(DEFAULT_BUFFER_SIZE);
         this.cb = CharBuffer.allocate(DEFAULT_BUFFER_SIZE);
     }
 
@@ -170,8 +168,16 @@ public class WsOutbound {
     protected void doWriteText(CharBuffer buffer, boolean finalFragment)
             throws IOException {
         buffer.flip();
-        B2CConverter.UTF_8.newEncoder().encode(buffer, bb, true);
-        doWriteBinary(bb, finalFragment);
+
+        do {
+            B2CConverter.UTF_8.newEncoder().encode(buffer, bb, true);
+            if (buffer.hasRemaining()) {
+                doWriteBinary(bb, false);
+            } else {
+                doWriteBinary(bb, finalFragment);
+            }
+        } while (buffer.hasRemaining());
+
         // Reset
         cb.clear();
     }
