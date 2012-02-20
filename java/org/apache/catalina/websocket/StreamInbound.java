@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.nio.ByteBuffer;
 
 import org.apache.coyote.http11.upgrade.UpgradeInbound;
 import org.apache.coyote.http11.upgrade.UpgradeOutbound;
@@ -62,11 +63,38 @@ public abstract class StreamInbound implements UpgradeInbound {
             InputStreamReader r =
                     new InputStreamReader(wsIs, B2CConverter.UTF_8);
             onTextData(r);
+        } else if (opCode == Constants.OPCODE_CLOSE){
+            doClose(wsIs);
+            return SocketState.CLOSED;
         } else {
             // TODO i18n
             throw new IOException("OpCode " + opCode + " not supported");
         }
         return SocketState.UPGRADED;
+    }
+
+    private void doClose(InputStream is) throws IOException {
+        // Control messages have a max size of 125 bytes
+        ByteBuffer data = ByteBuffer.allocate(125);
+
+        int status1 = is.read();
+        int status2 = 0;
+        System.out.println("" + status1);
+        if (status1 != -1) {
+            status1 = status1 << 8;
+            status2 = is.read();
+            System.out.println("" + status2);
+            status1 = status1 + status2;
+            int read = 0;
+            while (read > -1) {
+                data.position(data.position() + read);
+                read = is.read(data.array(), data.position(), data.remaining());
+            }
+        } else {
+            status1 = 0;
+        }
+        data.flip();
+        getOutbound().close(status1, data);
     }
 
     protected abstract void onBinaryData(InputStream is) throws IOException;
