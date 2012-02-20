@@ -30,6 +30,7 @@ public class WsOutbound {
     private UpgradeOutbound upgradeOutbound;
     private ByteBuffer bb;
     private CharBuffer cb;
+    private boolean closed = false;
     protected Boolean text = null;
     protected boolean firstFrame = true;
 
@@ -110,15 +111,31 @@ public class WsOutbound {
     }
 
 
-    public void close() throws IOException {
+    public void close(int status, ByteBuffer data) throws IOException {
+        // TODO Think about threading requirements for writing. This is not
+        // currently thread safe and writing almost certainly needs to be.
+        if (closed) {
+            return;
+        }
+        closed = true;
+
         doFlush(true);
 
-        // TODO: Send a close message
+        upgradeOutbound.write(0x88);
+        if (status == 0) {
+            upgradeOutbound.write(0);
+        } else {
+            upgradeOutbound.write(2 + data.limit());
+            upgradeOutbound.write(status >>> 8);
+            upgradeOutbound.write(status);
+            upgradeOutbound.write(data.array(), 0, data.limit());
+        }
+        upgradeOutbound.flush();
+
         bb = null;
         cb = null;
         upgradeOutbound = null;
     }
-
 
     protected void doWriteBinary(ByteBuffer buffer, boolean finalFragment)
             throws IOException {
