@@ -30,7 +30,7 @@ public class WsInputStream extends java.io.InputStream {
 
 
     private long remaining;
-    private long read;
+    private long readThisFragment;
 
     public WsInputStream(UpgradeProcessor<?> processor) throws IOException {
         this.processor = processor;
@@ -42,11 +42,6 @@ public class WsInputStream extends java.io.InputStream {
     private void processFrameHeader() throws IOException {
 
         // TODO: Per frame extension handling is not currently supported.
-
-        // TODO: Handle other control frames.
-
-        // TODO: Handle control frames appearing in the middle of a multi-frame
-        //       message
 
         int i = processor.read();
         this.wsFrameHeader = new WsFrameHeader(i);
@@ -73,6 +68,8 @@ public class WsInputStream extends java.io.InputStream {
         for (int j = 0; j < mask.length; j++) {
             mask[j] = processor.read() & 0xFF;
         }
+
+        readThisFragment = 0;
     }
 
     public WsFrameHeader getFrameHeader() {
@@ -103,12 +100,12 @@ public class WsInputStream extends java.io.InputStream {
         }
 
         remaining--;
-        read++;
+        readThisFragment++;
 
         int masked = processor.read();
         if(masked == -1) {
             return -1;
         }
-        return masked ^ mask[(int) ((read - 1) % 4)];
+        return masked ^ mask[(int) ((readThisFragment - 1) % 4)];
     }
 }
