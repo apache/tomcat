@@ -23,17 +23,13 @@ package org.apache.catalina.websocket;
 public class WsFrameHeader {
 
     private final boolean fin;
-    private final boolean rsv1;
-    private final boolean rsv2;
-    private final boolean rsv3;
+    private final int rsv;
     private final byte opCode;
 
     public WsFrameHeader(int b) {
         fin = (b & 0x80) > 0;
 
-        rsv1 = (b & 0x40) > 0;
-        rsv2 = (b & 0x20) > 0;
-        rsv3 = (b & 0x10) > 0;
+        rsv = (b & 0x70) >>> 4;
 
         opCode = (byte) (b & 0x0F);
     }
@@ -42,21 +38,11 @@ public class WsFrameHeader {
         return fin;
     }
 
-    public boolean getRsv1() {
-        return rsv1;
-    }
-
-    public boolean getRsv2() {
-        return rsv2;
-    }
-
-    public boolean getRsv3() {
-        return rsv3;
+    public int getRsv() {
+        return rsv;
     }
 
     public byte getOpCode() {
         return opCode;
     }
-
-
 }
