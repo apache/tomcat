@@ -26,7 +26,7 @@ public class WsInputStream extends java.io.InputStream {
     private UpgradeProcessor<?> processor;
     private WsFrameHeader wsFrameHeader;
     private long payloadLength = -1;
-    private byte[] mask = new byte[4];
+    private int[] mask = new int[4];
 
 
     private long remaining;
@@ -70,7 +70,9 @@ public class WsInputStream extends java.io.InputStream {
         }
         remaining = payloadLength;
 
-        processor.read(mask);
+        for (int j = 0; j < mask.length; j++) {
+            mask[j] = processor.read() & 0xFF;
+        }
     }
 
     public WsFrameHeader getFrameHeader() {
@@ -100,6 +102,9 @@ public class WsInputStream extends java.io.InputStream {
         read++;
 
         int masked = processor.read();
+        if(masked == -1) {
+            return -1;
+        }
         return masked ^ mask[(int) ((read - 1) % 4)];
     }
 }
