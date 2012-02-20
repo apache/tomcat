@@ -593,7 +593,9 @@ public abstract class AbstractProtocol implements ProtocolHandler,
                     upgradePoll(socket, processor);
                 } else {
                     // Connection closed. OK to recycle the processor.
-                    release(socket, processor, true, false);
+                    if (!(processor instanceof UpgradeProcessor)) {
+                        release(socket, processor, true, false);
+                    }
                 }
                 return state;
             } catch(java.net.SocketException e) {
