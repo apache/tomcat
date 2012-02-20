@@ -63,9 +63,20 @@ public abstract class StreamInbound implements UpgradeInbound {
             InputStreamReader r =
                     new InputStreamReader(wsIs, B2CConverter.UTF_8);
             onTextData(r);
-        } else if (opCode == Constants.OPCODE_CLOSE){
+        }
+
+        if (wsIs.getPayloadLength() > 125) {
+            getOutbound().close(1002, null);
+            return SocketState.CLOSED;
+        }
+
+        if (opCode == Constants.OPCODE_CLOSE){
             doClose(wsIs);
             return SocketState.CLOSED;
+        } else if (opCode == Constants.OPCODE_PING) {
+            doPing(wsIs);
+        } else if (opCode == Constants.OPCODE_PONG) {
+            doPong(wsIs);
         } else {
             // TODO i18n
             throw new IOException("OpCode " + opCode + " not supported");
@@ -74,8 +85,9 @@ public abstract class StreamInbound implements UpgradeInbound {
     }
 
     private void doClose(InputStream is) throws IOException {
-        // Control messages have a max size of 125 bytes
-        ByteBuffer data = ByteBuffer.allocate(125);
+        // Control messages have a max size of 125 bytes. Need to try and read
+        // one more so we reach end of stream (less 2 for the status)
+        ByteBuffer data = ByteBuffer.allocate(124);
 
         int status = is.read();
         if (status != -1) {
@@ -91,6 +103,29 @@ public abstract class StreamInbound implements UpgradeInbound {
         }
         data.flip();
         getOutbound().close(status, data);
+    }
+
+    private void doPing(InputStream is) throws IOException {
+        // Control messages have a max size of 125 bytes. Need to try and read
+        // one more so we reach end of stream
+        ByteBuffer data = ByteBuffer.allocate(126);
+
+        int read = 0;
+        while (read > -1) {
+            data.position(data.position() + read);
+            read = is.read(data.array(), data.position(), data.remaining());
+        }
+
+        data.flip();
+        getOutbound().pong(data);
+    }
+
+    private void doPong(InputStream is) throws IOException {
+        // Unsolicited pong - swallow it
+        int read = 0;
+        while (read > -1) {
+            read = is.read();
+        }
     }
 
     protected abstract void onBinaryData(InputStream is) throws IOException;
