@@ -77,24 +77,20 @@ public abstract class StreamInbound implements UpgradeInbound {
         // Control messages have a max size of 125 bytes
         ByteBuffer data = ByteBuffer.allocate(125);
 
-        int status1 = is.read();
-        int status2 = 0;
-        System.out.println("" + status1);
-        if (status1 != -1) {
-            status1 = status1 << 8;
-            status2 = is.read();
-            System.out.println("" + status2);
-            status1 = status1 + status2;
+        int status = is.read();
+        if (status != -1) {
+            status = status << 8;
+            status = status + is.read();
             int read = 0;
             while (read > -1) {
                 data.position(data.position() + read);
                 read = is.read(data.array(), data.position(), data.remaining());
             }
         } else {
-            status1 = 0;
+            status = 0;
         }
         data.flip();
-        getOutbound().close(status1, data);
+        getOutbound().close(status, data);
     }
 
     protected abstract void onBinaryData(InputStream is) throws IOException;
