@@ -56,8 +56,7 @@ public abstract class MessageInbound extends StreamInbound {
             }
             read = r.read(cb.array(), cb.position(), cb.remaining());
         }
-        cb.limit(cb.position());
-        cb.position(0);
+        cb.flip();
         onTextMessage(cb);
         cb.clear();
     }
