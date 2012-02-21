@@ -80,7 +80,7 @@ public class WsOutbound {
             flush();
         }
         text = Boolean.FALSE;
-        doWriteBinary(msgBb, true);
+        doWriteBytes(msgBb, true);
     }
 
 
@@ -104,9 +104,11 @@ public class WsOutbound {
             return;
         }
         if (text.booleanValue()) {
+            cb.flip();
             doWriteText(cb, finalFragment);
         } else {
-            doWriteBinary(bb, finalFragment);
+            bb.flip();
+            doWriteBytes(bb, finalFragment);
         }
     }
 
@@ -157,7 +159,15 @@ public class WsOutbound {
         upgradeOutbound.flush();
     }
 
-    protected void doWriteBinary(ByteBuffer buffer, boolean finalFragment)
+    /**
+     * Writes the provided bytes as the payload in a new WebSocket frame.
+     *
+     * @param buffer        The bytes to include in the payload.
+     * @param finalFragment Do these bytes represent the final fragment of a
+     *                      WebSocket message?
+     * @throws IOException
+     */
+    protected void doWriteBytes(ByteBuffer buffer, boolean finalFragment)
             throws IOException {
 
         // Work out the first byte
@@ -216,13 +226,13 @@ public class WsOutbound {
             B2CConverter.UTF_8.newEncoder().encode(buffer, bb, true);
             bb.flip();
             if (buffer.hasRemaining()) {
-                doWriteBinary(bb, false);
+                doWriteBytes(bb, false);
             } else {
-                doWriteBinary(bb, finalFragment);
+                doWriteBytes(bb, finalFragment);
             }
         } while (buffer.hasRemaining());
 
-        // Reset
+        // Reset - bb will be cleared in doWriteBytes()
         cb.clear();
     }
 }
