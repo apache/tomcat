@@ -84,13 +84,13 @@ AC_DEFUN(
 
       # This stuff works if the command line parameter --with-java-home was
       # specified, so it takes priority rightfully.
-  
+
       tempval=${withval}
 
       if test ! -d "${tempval}" ; then
           AC_MSG_ERROR(Not a directory: ${tempval})
       fi
-  
+
       JAVA_HOME=${tempval}
       AC_MSG_RESULT(${JAVA_HOME})
     ],
@@ -117,25 +117,28 @@ AC_DEFUN(
       # JAVA_PLATFORM
       AC_MSG_CHECKING([Try to guess JDK location])
 
-      for JAVA_PREFIX in /usr/local /usr/local/lib /usr /usr/lib /opt /usr/java /System/Library/Frameworks/JavaVM.framework/Versions/ ; do
-
-        for JAVA_PLATFORM in 6 5 4 3 2 ; do
-
-          for subversion in .9 .8 .7 .6 .5 .4 .3 .2 .1 .0 "" ; do
-
-            for VARIANT in IBMJava2- java java- jdk jdk- ""; do
+      for JAVA_PREFIX in /usr/local /usr/local/lib /usr /usr/lib /opt /usr/java /System/Library/Frameworks/JavaVM.framework/Versions
+      do
+        for JAVA_PLATFORM in 8 7 6 5 4 3 2
+        do
+          for subversion in .9 .8 .7 .6 .5 .4 .3 .2 .1 .0 ""
+          do
+            for VARIANT in IBMJava2- diablo-jdk java java- jdk jdk- ""
+            do
               GUESS="${JAVA_PREFIX}/${VARIANT}1.${JAVA_PLATFORM}${subversion}"
-dnl           AC_MSG_CHECKING([${GUESS}])
-              if test -d "${GUESS}/bin" & test -d "${GUESS}/include" ; then
+              if test -d "${GUESS}/bin" & test -d "${GUESS}/include"
+              then
                 JAVA_HOME="${GUESS}"
                 AC_MSG_RESULT([${GUESS}])
                 break
               fi
-              if test -d "${GUESS}/Commands" & test -d "${GUESS}/Headers" ; then
+              if test -d "${GUESS}/Commands" & test -d "${GUESS}/Headers"
+              then
                 JAVA_HOME="${GUESS}"
                 AC_MSG_RESULT([${GUESS}])
                 break
               fi
+
             done
 
             if test -n "${JAVA_HOME}" ; then
@@ -211,7 +214,7 @@ AC_DEFUN(
 
         JAVA_OS = ${tempval}
       ],
-      [   
+      [
         AC_MSG_CHECKING(os_type directory)
         JAVA_OS=NONE
         if test -f ${JAVA_HOME}/${JAVA_INC}/jni_md.h; then
@@ -354,7 +357,7 @@ case "$use_openssl" in
         saved_libs="$LIBS"
         CFLAGS="$CFLAGS $TCN_OPENSSL_INC"
         LIBS="$LIBS $TCN_OPENSSL_LIBS"
-         
+
 AC_ARG_ENABLE(openssl-version-check,
 [AC_HELP_STRING([--enable-openssl-version-check],
         [Check OpenSSL Version @<:@default=yes@:>@])])

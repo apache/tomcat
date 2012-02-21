@@ -39,6 +39,10 @@
 <section name="Changes between 1.1.22 and 1.1.23">
   <changelog>
     <fix>
+      <bug>52119</bug>: Autodetect Diablo JDK on FreeBSD and Java7+. Based upon a patch
+      from Michael Osipov. (mturk)
+    </fix>
+    <fix>
       <bug>52717</bug>: Set scope_id for IPv6 addresses if provided. (mturk)
     </fix>
     <update>
