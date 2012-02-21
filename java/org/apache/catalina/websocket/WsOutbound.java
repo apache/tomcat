@@ -167,7 +167,7 @@ public class WsOutbound {
      *                      WebSocket message?
      * @throws IOException
      */
-    protected void doWriteBytes(ByteBuffer buffer, boolean finalFragment)
+    private void doWriteBytes(ByteBuffer buffer, boolean finalFragment)
             throws IOException {
 
         // Work out the first byte
@@ -220,7 +220,7 @@ public class WsOutbound {
     }
 
 
-    protected void doWriteText(CharBuffer buffer, boolean finalFragment)
+    private void doWriteText(CharBuffer buffer, boolean finalFragment)
             throws IOException {
         do {
             B2CConverter.UTF_8.newEncoder().encode(buffer, bb, true);
