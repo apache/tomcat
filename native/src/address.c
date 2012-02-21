@@ -29,6 +29,8 @@ TCN_IMPLEMENT_CALL(jlong, Address, info)(TCN_STDARGS,
 {
     apr_pool_t *p = J2P(pool, apr_pool_t *);
     TCN_ALLOC_CSTRING(hostname);
+    char *sp = NULL;
+    int   scope_id = 0;
     apr_sockaddr_t *sa = NULL;
     apr_sockaddr_t *sl = NULL;
     apr_int32_t f;
@@ -36,6 +38,16 @@ TCN_IMPLEMENT_CALL(jlong, Address, info)(TCN_STDARGS,
 
     UNREFERENCED(o);
     GET_S_FAMILY(f, family);
+#if APR_HAVE_IPV6
+    if (hostname) {
+        /* XXX: This only works for real scope_id's
+         */
+        if ((sp = strchr(J2S(hostname), '%'))) {
+            *sp++ = '\0';
+            scope_id = atoi(sp);
+        }
+    }
+#endif
     TCN_THROW_IF_ERR(apr_sockaddr_info_get(&sa,
             J2S(hostname), f, (apr_port_t)port,
             (apr_int32_t)flags, p), sa);
@@ -57,6 +69,13 @@ TCN_IMPLEMENT_CALL(jlong, Address, info)(TCN_STDARGS,
         if (sl == NULL) {
             sl = sa;
         }
+    }
+    if (sp) {
+        /* Set the provided scope id
+         * APR lack the api for setting this directly so lets presume
+         * the sin6_scope_id is present everywhere
+         */
+        sl->sa.sin6.sin6_scope_id = scope_id;
     }
 #endif
 
