@@ -28,8 +28,8 @@ public abstract class MessageInbound extends StreamInbound {
     private int byteBufferMaxSize = 2097152;
     private int charBufferMaxSize = 2097152;
 
-    ByteBuffer bb = ByteBuffer.allocate(8192);
-    CharBuffer cb = CharBuffer.allocate(8192);
+    private ByteBuffer bb = ByteBuffer.allocate(8192);
+    private CharBuffer cb = CharBuffer.allocate(8192);
 
     @Override
     protected void onBinaryData(InputStream is) throws IOException {

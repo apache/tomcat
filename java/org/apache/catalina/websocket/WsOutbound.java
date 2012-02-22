@@ -31,8 +31,8 @@ public class WsOutbound {
     private ByteBuffer bb;
     private CharBuffer cb;
     private boolean closed = false;
-    protected Boolean text = null;
-    protected boolean firstFrame = true;
+    private Boolean text = null;
+    private boolean firstFrame = true;
 
 
     public WsOutbound(UpgradeOutbound upgradeOutbound) {
