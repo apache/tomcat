@@ -19,6 +19,7 @@ package org.apache.coyote.http11;
 import java.io.IOException;
 
 import org.apache.coyote.AbstractProtocol;
+import org.apache.coyote.Adapter;
 import org.apache.coyote.Processor;
 import org.apache.coyote.http11.upgrade.UpgradeAprProcessor;
 import org.apache.coyote.http11.upgrade.UpgradeInbound;
@@ -26,6 +27,8 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.net.AprEndpoint;
+import org.apache.tomcat.util.net.SocketStatus;
+import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
 import org.apache.tomcat.util.net.AprEndpoint.Handler;
 import org.apache.tomcat.util.net.SocketWrapper;
 
@@ -42,6 +45,15 @@ public class Http11AprProtocol extends AbstractHttp11Protocol {
 
     private static final Log log = LogFactory.getLog(Http11AprProtocol.class);
 
+    /** 
+     * Interface specific for protocols that negotiate at NPN level, like 
+     * SPDY. This is only available for APR, will replace the HTTP framing.
+     */
+    public static interface NpnHandler {
+        SocketState process(SocketWrapper<Long> socket, SocketStatus status,
+                Http11AprProtocol proto, AbstractEndpoint endpoint);
+        public void init(final AbstractEndpoint ep, long sslContext, Adapter adapter);
+    }
 
     @Override
     protected Log getLog() { return log; }
@@ -63,6 +75,7 @@ public class Http11AprProtocol extends AbstractHttp11Protocol {
     }
 
     private final Http11ConnectionHandler cHandler;
+    private NpnHandler npnHandler;
 
     public boolean getUseSendfile() { return ((AprEndpoint)endpoint).getUseSendfile(); }
     public void setUseSendfile(boolean useSendfile) { ((AprEndpoint)endpoint).setUseSendfile(useSendfile); }
@@ -171,6 +184,16 @@ public class Http11AprProtocol extends AbstractHttp11Protocol {
     public int getSSLVerifyDepth() { return ((AprEndpoint)endpoint).getSSLVerifyDepth(); }
     public void setSSLVerifyDepth(int SSLVerifyDepth) { ((AprEndpoint)endpoint).setSSLVerifyDepth(SSLVerifyDepth); }
 
+    // TODO: map of protocols
+    public void setNpnHandler(String impl) {
+        try {
+            Class c = Class.forName(impl);
+            npnHandler = (NpnHandler) c.newInstance();
+        } catch (Exception ex) {
+            getLog().warn("Failed to init light protocol " + impl, ex);
+        }
+    }
+    
     // ----------------------------------------------------- JMX related methods
 
     @Override
@@ -178,7 +201,16 @@ public class Http11AprProtocol extends AbstractHttp11Protocol {
         return ("http-apr");
     }
 
-
+    
+    @Override
+    public void start() throws Exception {
+        super.start();
+        if (npnHandler != null) {
+            long sslCtx = ((AprEndpoint) endpoint).getJniSslContext();
+            npnHandler.init(endpoint, sslCtx, adapter);
+        }
+    }
+    
     // --------------------  Connection handler --------------------
 
     protected static class Http11ConnectionHandler
@@ -224,6 +256,29 @@ public class Http11AprProtocol extends AbstractHttp11Protocol {
                 ((AprEndpoint)proto.endpoint).getPoller().add(
                         socket.getSocket().longValue(), true);
             }
+        }
+        
+        @Override
+        public SocketState process(SocketWrapper<Long> socket,
+                SocketStatus status) {
+            if (proto.npnHandler != null) {
+                Processor<Long> processor = null;
+                if (status == SocketStatus.OPEN) {
+                    processor = connections.get(socket.getSocket());
+                   
+                }
+                if (processor == null) {
+                    // if not null - this is a former comet request, handled by http11
+                    SocketState socketState = proto.npnHandler.process(socket, status,
+                            proto, proto.endpoint);
+                    // handled by npn protocol.
+                    if (socketState == SocketState.CLOSED ||
+                            socketState == SocketState.LONG) {
+                        return socketState;
+                    }
+                }
+            }
+            return super.process(socket, status);
         }
 
         @Override

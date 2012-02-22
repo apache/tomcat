@@ -578,6 +578,9 @@ public class AprEndpoint extends AbstractEndpoint {
         }
     }
 
+    public long getJniSslContext() {
+        return sslContext;
+    }
 
     /**
      * Start the APR endpoint, creating acceptor, poller and sendfile threads.
@@ -811,9 +814,9 @@ public class AprEndpoint extends AbstractEndpoint {
         }
     }
 
-
     /**
-     * Process given socket.
+     * Process given socket. This is called when the socket has been 
+     * accepted.
      */
     protected boolean processSocketWithOptions(long socket) {
         try {
@@ -838,7 +841,8 @@ public class AprEndpoint extends AbstractEndpoint {
 
 
     /**
-     * Process given socket.
+     * Process given socket. Called in non-comet mode, typically keep alive
+     * or upgraded protocol.
      */
     protected boolean processSocket(long socket) {
         try {
@@ -1209,6 +1213,7 @@ public class AprEndpoint extends AbstractEndpoint {
                 addSocket[addCount] = socket;
                 addSocketKeepAlive[addCount] = keepAlive;
                 addCount++;
+                // TODO: interrupt poll ?
                 this.notify();
             }
         }
@@ -1729,6 +1734,8 @@ public class AprEndpoint extends AbstractEndpoint {
      * This class is the equivalent of the Worker, but will simply use in an
      * external Executor thread pool. This will also set the socket options
      * and do the handshake.
+     * 
+     * This is called after an accept().
      */
     protected class SocketWithOptionsProcessor implements Runnable {
 
