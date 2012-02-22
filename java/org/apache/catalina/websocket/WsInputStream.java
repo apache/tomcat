@@ -109,6 +109,7 @@ public class WsInputStream extends java.io.InputStream {
                 // TODO i18n
                 throw new IOException("End of stream before end of frame");
             }
+            read += last;
         }
     }
 
