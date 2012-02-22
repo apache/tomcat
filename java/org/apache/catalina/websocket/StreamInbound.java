@@ -98,17 +98,27 @@ public abstract class StreamInbound implements UpgradeInbound {
 
     private void doClose(InputStream is) throws IOException {
         // Control messages have a max size of 125 bytes. Need to try and read
-        // one more so we reach end of stream (less 2 for the status)
+        // one more so we reach end of stream (less 2 for the status). Note that
+        // the 125 byte limit is enforced in #onData() before this method is
+        // ever called.
         ByteBuffer data = ByteBuffer.allocate(124);
 
         int status = is.read();
         if (status != -1) {
             status = status << 8;
-            status = status + is.read();
-            int read = 0;
-            while (read > -1) {
-                data.position(data.position() + read);
-                read = is.read(data.array(), data.position(), data.remaining());
+            int i = is.read();
+            if (i == -1) {
+                // EOF during middle of close message. Closing anyway but set
+                // close code to protocol error
+                status = 1002;
+            } else {
+                status = status + i;
+                int read = 0;
+                while (read > -1) {
+                    data.position(data.position() + read);
+                    read = is.read(data.array(), data.position(),
+                            data.remaining());
+                }
             }
         } else {
             status = 0;
@@ -119,7 +129,8 @@ public abstract class StreamInbound implements UpgradeInbound {
 
     private void doPing(InputStream is) throws IOException {
         // Control messages have a max size of 125 bytes. Need to try and read
-        // one more so we reach end of stream
+        // one more so we reach end of stream. Note that the 125 byte limit is
+        // enforced in #onData() before this method is ever called.
         ByteBuffer data = ByteBuffer.allocate(126);
 
         int read = 0;
@@ -134,6 +145,9 @@ public abstract class StreamInbound implements UpgradeInbound {
 
     private void doPong(InputStream is) throws IOException {
         // Unsolicited pong - swallow it
+        // Control messages have a max size of 125 bytes. Note that the 125 byte
+        // limit is enforced in #onData() before this method is ever called so
+        // the loop below is not unbounded.
         int read = 0;
         while (read > -1) {
             read = is.read();
