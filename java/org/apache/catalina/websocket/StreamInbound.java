@@ -51,49 +51,58 @@ public abstract class StreamInbound implements UpgradeInbound {
     @Override
     public SocketState onData() throws IOException {
         // Must be start the start of a frame or series of frames
-        WsInputStream wsIs = new WsInputStream(processor);
 
-        WsFrameHeader header = wsIs.getFrameHeader();
+        try {
+            WsInputStream wsIs = new WsInputStream(processor);
 
-        // TODO User defined extensions may define values for rsv
-        if (header.getRsv() > 0) {
+            WsFrameHeader header = wsIs.getFrameHeader();
+
+            // TODO User defined extensions may define values for rsv
+            if (header.getRsv() > 0) {
+                getOutbound().close(1002, null);
+                return SocketState.CLOSED;
+            }
+
+            byte opCode = header.getOpCode();
+
+            if (opCode == Constants.OPCODE_BINARY) {
+                onBinaryData(wsIs);
+                return SocketState.UPGRADED;
+            } else if (opCode == Constants.OPCODE_TEXT) {
+                InputStreamReader r =
+                        new InputStreamReader(wsIs, B2CConverter.UTF_8);
+                onTextData(r);
+                return SocketState.UPGRADED;
+            }
+
+            // Must be a control frame and control frames:
+            // - have a limited payload length
+            // - must not be fragmented
+            if (wsIs.getPayloadLength() > 125 || !wsIs.getFrameHeader().getFin()) {
+                getOutbound().close(1002, null);
+                return SocketState.CLOSED;
+            }
+
+            if (opCode == Constants.OPCODE_CLOSE){
+                doClose(wsIs);
+                return SocketState.CLOSED;
+            } else if (opCode == Constants.OPCODE_PING) {
+                doPing(wsIs);
+                return SocketState.UPGRADED;
+            } else if (opCode == Constants.OPCODE_PONG) {
+                doPong(wsIs);
+                return SocketState.UPGRADED;
+            }
+
+            // Unknown OpCode
+            getOutbound().close(1002, null);
+            return SocketState.CLOSED;
+        } catch (IOException ioe) {
+            // Given something must have gone to reach this point, this might
+            // not work but try it anyway.
             getOutbound().close(1002, null);
             return SocketState.CLOSED;
         }
-
-        byte opCode = header.getOpCode();
-
-        if (opCode == Constants.OPCODE_BINARY) {
-            onBinaryData(wsIs);
-            return SocketState.UPGRADED;
-        } else if (opCode == Constants.OPCODE_TEXT) {
-            InputStreamReader r =
-                    new InputStreamReader(wsIs, B2CConverter.UTF_8);
-            onTextData(r);
-            return SocketState.UPGRADED;
-        }
-
-        // Must be a control frame and control frames:
-        // - have a limited payload length
-        // - must not be fragmented
-        if (wsIs.getPayloadLength() > 125 || !wsIs.getFrameHeader().getFin()) {
-            getOutbound().close(1002, null);
-            return SocketState.CLOSED;
-        }
-
-        if (opCode == Constants.OPCODE_CLOSE){
-            doClose(wsIs);
-            return SocketState.CLOSED;
-        } else if (opCode == Constants.OPCODE_PING) {
-            doPing(wsIs);
-            return SocketState.UPGRADED;
-        } else if (opCode == Constants.OPCODE_PONG) {
-            doPong(wsIs);
-            return SocketState.UPGRADED;
-        }
-
-        getOutbound().close(1002, null);
-        return SocketState.CLOSED;
     }
 
     private void doClose(WsInputStream is) throws IOException {

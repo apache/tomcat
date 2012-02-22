@@ -67,7 +67,7 @@ public class UpgradeAprProcessor extends UpgradeProcessor<Long> {
 
 
     @Override
-    public int read(byte[] bytes) throws IOException {
-        return Socket.recv(socket, bytes, 0, bytes.length);
+    public int read(byte[] bytes, int off, int len) throws IOException {
+        return Socket.recv(socket, bytes, off, len);
     }
 }
