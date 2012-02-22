@@ -54,6 +54,16 @@
   issues to not "pop up" wrt. others).
 -->
 <section name="Tomcat 7.0.27 (markt)">
+  <subsection name="Catalina">
+    <changelog>
+      <update>
+        Explicitly ignore empty path values in <code>virtualClasspath</code>
+        attribute of <code>VirtualWebappLoader</code> class. Document that
+        whitespace around the values is trimmed. Reformat documentation
+        examples to make them more readable. (kkolinko)
+      </update>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <update>
