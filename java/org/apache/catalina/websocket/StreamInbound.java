@@ -96,12 +96,12 @@ public abstract class StreamInbound implements UpgradeInbound {
         return SocketState.CLOSED;
     }
 
-    private void doClose(InputStream is) throws IOException {
+    private void doClose(WsInputStream is) throws IOException {
         // Control messages have a max size of 125 bytes. Need to try and read
         // one more so we reach end of stream (less 2 for the status). Note that
         // the 125 byte limit is enforced in #onData() before this method is
         // ever called.
-        ByteBuffer data = ByteBuffer.allocate(124);
+        ByteBuffer data = null;
 
         int status = is.read();
         if (status != -1) {
@@ -113,37 +113,45 @@ public abstract class StreamInbound implements UpgradeInbound {
                 status = 1002;
             } else {
                 status = status + i;
-                int read = 0;
-                while (read > -1) {
-                    data.position(data.position() + read);
-                    read = is.read(data.array(), data.position(),
-                            data.remaining());
+                if (is.getPayloadLength() > 2) {
+                    data = ByteBuffer.allocate((int) is.getPayloadLength() - 1);
+                    int read = 0;
+                    while (read > -1) {
+                        data.position(data.position() + read);
+                        read = is.read(data.array(), data.position(),
+                                data.remaining());
+                    }
+                    data.flip();
                 }
             }
         } else {
             status = 0;
         }
-        data.flip();
         getOutbound().close(status, data);
     }
 
-    private void doPing(InputStream is) throws IOException {
+    private void doPing(WsInputStream is) throws IOException {
         // Control messages have a max size of 125 bytes. Need to try and read
         // one more so we reach end of stream. Note that the 125 byte limit is
         // enforced in #onData() before this method is ever called.
-        ByteBuffer data = ByteBuffer.allocate(126);
+        ByteBuffer data = null;
 
-        int read = 0;
-        while (read > -1) {
-            data.position(data.position() + read);
-            read = is.read(data.array(), data.position(), data.remaining());
+        if (is.getPayloadLength() > 0) {
+            data = ByteBuffer.allocate((int) is.getPayloadLength() + 1);
+
+            int read = 0;
+            while (read > -1) {
+                data.position(data.position() + read);
+                read = is.read(data.array(), data.position(), data.remaining());
+            }
+
+            data.flip();
         }
 
-        data.flip();
         getOutbound().pong(data);
     }
 
-    private void doPong(InputStream is) throws IOException {
+    private void doPong(WsInputStream is) throws IOException {
         // Unsolicited pong - swallow it
         // Control messages have a max size of 125 bytes. Note that the 125 byte
         // limit is enforced in #onData() before this method is ever called so

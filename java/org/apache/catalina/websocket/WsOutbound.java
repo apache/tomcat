@@ -153,8 +153,12 @@ public class WsOutbound {
         doFlush(true);
 
         upgradeOutbound.write(0x8A);
-        upgradeOutbound.write(data.limit());
-        upgradeOutbound.write(data.array(), 0, data.limit());
+        if (data == null) {
+            upgradeOutbound.write(0);
+        } else {
+            upgradeOutbound.write(data.limit());
+            upgradeOutbound.write(data.array(), 0, data.limit());
+        }
 
         upgradeOutbound.flush();
     }
