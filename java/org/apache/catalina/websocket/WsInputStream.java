@@ -21,6 +21,12 @@ import java.io.IOException;
 import org.apache.catalina.util.Conversions;
 import org.apache.coyote.http11.upgrade.UpgradeProcessor;
 
+/**
+ * This class is used to read WebSocket frames from the underlying socket and
+ * makes the payload available for reading as an {@link InputStream}. It only
+ * makes the number of bytes declared in the payload length available for
+ * reading even if more bytes are available from the socket.
+ */
 public class WsInputStream extends java.io.InputStream {
 
     private UpgradeProcessor<?> processor;
