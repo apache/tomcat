@@ -23,12 +23,12 @@ import java.util.concurrent.Executors;
 /**
  * Will implement polling/reuse of heavy objects, allow additional
  * configuration.
- * 
+ *
  * The abstract methods allow integration with different libraries (
  * compression, request handling )
- * 
+ *
  * In 'external' mode it must be used with APR library and compression.
- * 
+ *
  * In 'intranet' mode - it is supposed to be used behind a load balancer that
  * handles SSL and compression. Test with: --user-data-dir=/tmp/test
  * --use-spdy=no-compress,no-ssl
@@ -61,7 +61,7 @@ public class SpdyContext {
     public void releaseFrame(SpdyFrame done) {
     }
 
-    /** 
+    /**
      * Override for server side to return a custom stream.
      */
     public SpdyStream getStream(SpdyConnection framer) {
@@ -72,11 +72,11 @@ public class SpdyContext {
     public void setExecutor(Executor executor) {
         this.executor = executor;
     }
-    
+
     /**
      * SPDY is a multiplexed protocol - the SpdyProcessors will be executed on
      * this executor.
-     * 
+     *
      * If the context returns null - we'll assume the SpdyProcessors are fully
      * non blocking, and will execute them in the spdy thread.
      */
@@ -87,16 +87,16 @@ public class SpdyContext {
         return executor;
     }
 
-    /** 
+    /**
      * Override for servers.
-     * @throws IOException 
+     * @throws IOException
      */
     protected void onSynStream(SpdyConnection spdyCon, SpdyStream ch) throws IOException {
     }
 
     /**
-     * Client mode: return a connection for host/port. 
-     * @throws IOException 
+     * Client mode: return a connection for host/port.
+     * @throws IOException
      */
     public SpdyConnection getConnection(String host, int port) throws IOException {
         return null;

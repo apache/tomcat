@@ -30,12 +30,12 @@ import java.util.logging.Logger;
  * Main class implementing SPDY protocol. Works with both blocking and
  * non-blocking sockets. To simplify integration in various endpoints there is
  * no 'socket' layer/abstraction, but read/write abstract methods.
- * 
+ *
  * Because SPDY is multiplexing, a blocking socket needs a second thread to
  * handle writes ( the read thread may be blocked while a servlet is writing ).
  * The intended use of SPDY with blocking sockets is for frontend(load-balancer)
  * to tomcat, where each tomcat will have a few spdy connections.
- * 
+ *
  */
 public abstract class SpdyConnection { // implements Runnable {
 
@@ -159,11 +159,11 @@ public abstract class SpdyConnection { // implements Runnable {
     /*
      * Output requirements: - common case: sendFrame called from a thread ( like
      * servlets ), wants to be blocked anyways
-     * 
+     *
      * - but also need to support 'non-blocking' mode ( ping )
-     * 
+     *
      * - we need to queue frames when write would block, so we can prioritize.
-     * 
+     *
      * - for fully non-blocking write: there will be a drain callback.
      */
 
@@ -259,7 +259,7 @@ public abstract class SpdyConnection { // implements Runnable {
 
     /**
      * Blocking call for sendFrame: must be called from a thread pool.
-     * 
+     *
      * Will wait until the actual frame is sent.
      */
     public void sendFrameBlocking(SpdyFrame oframe, SpdyStream proc)
@@ -284,7 +284,7 @@ public abstract class SpdyConnection { // implements Runnable {
 
     /**
      * Send as much as possible without blocking.
-     * 
+     *
      * With a nb transport it should call drain directly.
      */
     public void nonBlockingDrain() {
@@ -509,7 +509,7 @@ public abstract class SpdyConnection { // implements Runnable {
 
     /**
      * Process a SPDY connection. Called in a separate thread.
-     * 
+     *
      * @return
      * @throws IOException
      */
@@ -617,7 +617,7 @@ public abstract class SpdyConnection { // implements Runnable {
     public void setSpdyContext(SpdyContext spdyContext) {
         this.spdyContext = spdyContext;
     }
-    
+
     public SpdyStream get(String host, String url) throws IOException {
         SpdyStream sch = new SpdyStream(this);
         sch.addHeader("host", host);
