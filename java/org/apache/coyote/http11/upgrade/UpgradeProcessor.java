@@ -46,7 +46,7 @@ public abstract class UpgradeProcessor<S> implements Processor<S> {
 
     // Input methods
     public abstract int read() throws IOException;
-    public abstract int read(byte[] bytes) throws IOException;
+    public abstract int read(byte[] bytes, int off, int len) throws IOException;
 
     @Override
     public final UpgradeInbound getUpgradeInbound() {

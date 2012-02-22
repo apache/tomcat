@@ -51,11 +51,10 @@ public class WsInputStream extends java.io.InputStream {
 
         // TODO: Handle control frames between fragments
 
-        int i = processor.read();
-        this.wsFrameHeader = new WsFrameHeader(i);
+        this.wsFrameHeader = new WsFrameHeader(processorRead());
 
         // Client data must be masked
-        i = processor.read();
+        int i = processorRead();
         if ((i & 0x80) == 0) {
             // TODO: StringManager / i18n
             throw new IOException("Client frame not masked");
@@ -64,11 +63,11 @@ public class WsInputStream extends java.io.InputStream {
         payloadLength = i & 0x7F;
         if (payloadLength == 126) {
             byte[] extended = new byte[2];
-            processor.read(extended);
+            processorRead(extended);
             payloadLength = Conversions.byteArrayToLong(extended);
         } else if (payloadLength == 127) {
             byte[] extended = new byte[8];
-            processor.read(extended);
+            processorRead(extended);
             payloadLength = Conversions.byteArrayToLong(extended);
         }
         remaining = payloadLength;
@@ -88,6 +87,30 @@ public class WsInputStream extends java.io.InputStream {
         return payloadLength;
     }
 
+
+    // ----------------------------------- Guaranteed read methods for processor
+
+    private int processorRead() throws IOException {
+        int result = processor.read();
+        if (result == -1) {
+            // TODO i18n
+            throw new IOException("End of stream before end of frame");
+        }
+        return result;
+    }
+
+
+    private void processorRead(byte[] bytes) throws IOException {
+        int read = 0;
+        int last = 0;
+        while (read < bytes.length) {
+            last = processor.read(bytes, read, bytes.length - read);
+            if (last == -1) {
+                // TODO i18n
+                throw new IOException("End of stream before end of frame");
+            }
+        }
+    }
 
     // ----------------------------------------------------- InputStream methods
 

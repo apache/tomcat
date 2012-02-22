@@ -91,8 +91,8 @@ public class UpgradeNioProcessor extends UpgradeProcessor<NioChannel> {
     }
 
     @Override
-    public int read(byte[] bytes) throws IOException {
-        return readSocket(true, bytes, 0, bytes.length);
+    public int read(byte[] bytes, int off, int len) throws IOException {
+        return readSocket(true, bytes, off, len);
     }
 
 
