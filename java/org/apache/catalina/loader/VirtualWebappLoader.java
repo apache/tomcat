@@ -35,7 +35,8 @@ import org.apache.catalina.LifecycleException;
  * <pre>
  * &lt;Context docBase="\webapps\mydocbase">
  *   &lt;Loader className="org.apache.catalina.loader.VirtualWebappLoader"
- *              virtualClasspath="/dir/classes;/somedir/somejar.jar;/somedir/*.jar"/>
+ *              virtualClasspath="/dir/classes;/somedir/somejar.jar;
+ *                /somedir/*.jar"/>
  * &lt;/Context>
  * </pre>
  *
