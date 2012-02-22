@@ -31,8 +31,8 @@ import org.apache.coyote.Request;
 import org.apache.coyote.RequestInfo;
 import org.apache.coyote.Response;
 import org.apache.coyote.http11.upgrade.UpgradeInbound;
-import org.apache.tomcat.spdy.SpdyFrame;
 import org.apache.tomcat.spdy.SpdyConnection;
+import org.apache.tomcat.spdy.SpdyFrame;
 import org.apache.tomcat.spdy.SpdyStream;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.buf.Ascii;
@@ -49,9 +49,9 @@ import org.apache.tomcat.util.net.SocketWrapper;
 /**
  * A spdy stream ( multiplexed over a spdy tcp connection ) processed by a
  * tomcat servlet.
- * 
+ *
  * Based on the AJP processor.
- * 
+ *
  */
 public class SpdyProcessor extends AbstractProcessor<Object> implements
         Runnable {

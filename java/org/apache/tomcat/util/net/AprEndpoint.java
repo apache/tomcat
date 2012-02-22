@@ -815,7 +815,7 @@ public class AprEndpoint extends AbstractEndpoint {
     }
 
     /**
-     * Process given socket. This is called when the socket has been 
+     * Process given socket. This is called when the socket has been
      * accepted.
      */
     protected boolean processSocketWithOptions(long socket) {
@@ -1734,7 +1734,7 @@ public class AprEndpoint extends AbstractEndpoint {
      * This class is the equivalent of the Worker, but will simply use in an
      * external Executor thread pool. This will also set the socket options
      * and do the handshake.
-     * 
+     *
      * This is called after an accept().
      */
     protected class SocketWithOptionsProcessor implements Runnable {

@@ -8,8 +8,8 @@ import java.net.SocketTimeoutException;
 
 /**
  * Spdy context for 'proxy' or test mode spdy - no NPN, no SSL, no compression.
- * 
- * This can be supported without JNI dependencies. 
+ *
+ * This can be supported without JNI dependencies.
  * It can be modified to support SSL and compression - but so far the only way
  * to use NPN is via JNI.
  */
@@ -32,10 +32,10 @@ public class SpdyContextProxy extends SpdyContext {
         }
 
     }
-    
+
     public SpdyConnection getConnection(Socket socket) {
         return new SpdyConnectionSocket(this, socket);
-    }    
+    }
 
     public static class SpdyConnectionSocket extends SpdyConnection {
         Socket socket;
@@ -57,12 +57,12 @@ public class SpdyContextProxy extends SpdyContext {
         public SpdyConnectionSocket(SpdyContext spdyContext) {
             super(spdyContext);
         }
-        
+
         public SpdyConnectionSocket(SpdyContext spdyContext, Socket socket) {
             super(spdyContext);
             this.socket = socket;
         }
-        
+
         @Override
         public synchronized int write(byte[] data, int off, int len) throws IOException {
             socket.getOutputStream().write(data, off, len);

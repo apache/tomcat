@@ -33,26 +33,26 @@ import org.apache.tomcat.util.net.SocketStatus;
 import org.apache.tomcat.util.net.SocketWrapper;
 
 /**
- * SPDY in 'proxy' mode - no SSL and no header compression. 
- * This doesn't require JNI libraries, SSL/compression are off-loaded to 
- * a reverse proxy ( apache, etc ). 
- * 
+ * SPDY in 'proxy' mode - no SSL and no header compression.
+ * This doesn't require JNI libraries, SSL/compression are off-loaded to
+ * a reverse proxy ( apache, etc ).
+ *
  * To configure:
- * <Connector port="8011" protocol="org.apache.coyote.spdy.SpdyProxyProtocol"/> 
- * 
- * To test, use 
+ * <Connector port="8011" protocol="org.apache.coyote.spdy.SpdyProxyProtocol"/>
+ *
+ * To test, use
  *   chrome  --use-spdy=no-compress,no-ssl [--enable-websocket-over-spdy]
- * 
+ *
  * TODO: Remote information (client ip, certs, etc ) will be sent in X- headers.
  * TODO: if spdy->spdy proxy, info about original spdy stream for pushes.
- * 
+ *
  */
 public class SpdyProxyProtocol extends AbstractProtocol {
     private static final Log log = LogFactory.getLog(SpdyProxyProtocol.class);
-    
+
     JIoEndpoint.Handler cHandler = new TomcatJioHandler();
     SpdyContextProxy spdyContext;
-    
+
     public SpdyProxyProtocol() {
         endpoint = new JIoEndpoint();
         ((JIoEndpoint) endpoint).setHandler(cHandler);
@@ -60,7 +60,7 @@ public class SpdyProxyProtocol extends AbstractProtocol {
         setSoTimeout(Constants.DEFAULT_CONNECTION_TIMEOUT);
         setTcpNoDelay(Constants.DEFAULT_TCP_NO_DELAY);
     }
-    
+
     @Override
     protected Log getLog() {
         return log;
@@ -80,7 +80,7 @@ public class SpdyProxyProtocol extends AbstractProtocol {
     protected Handler getHandler() {
         return cHandler;
     }
-    
+
     public void start() throws Exception {
         super.start();
         spdyContext = new SpdyContextProxy() {
@@ -93,7 +93,7 @@ public class SpdyProxyProtocol extends AbstractProtocol {
         };
         spdyContext.setExecutor(endpoint.getExecutor());
     }
-    
+
     public class TomcatJioHandler implements JIoEndpoint.Handler {
 
         @Override
@@ -108,7 +108,7 @@ public class SpdyProxyProtocol extends AbstractProtocol {
         @Override
         public SocketState process(SocketWrapper<Socket> socket,
                 SocketStatus status) {
-            SpdyConnection ch = spdyContext.getConnection(socket.getSocket()); 
+            SpdyConnection ch = spdyContext.getConnection(socket.getSocket());
             ch.onBlockingSocket();
             return SocketState.CLOSED;
         }

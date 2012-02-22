@@ -25,14 +25,14 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * One SPDY stream.
- * 
+ *
  * Created by SpdyContext.getProcessor(framer).
- * 
+ *
  * The methods are called in a IO thread when the framer received a frame for
  * this stream.
- * 
+ *
  * They should not block.
- * 
+ *
  * The frame must be either consumed or popInFrame must be called, after the
  * call is done the frame will be reused.
  */
@@ -56,10 +56,10 @@ public class SpdyStream {
     public SpdyStream(SpdyConnection spdy) {
         this.spdy = spdy;
     }
-    
+
     /**
      * Non-blocking, called when a data frame is received.
-     * 
+     *
      * The processor must consume the data, or set frame.data to null or a fresh
      * buffer ( to avoid a copy ).
      */
@@ -74,9 +74,9 @@ public class SpdyStream {
     /**
      * Non-blocking - handles a syn stream package. The processor must consume
      * frame.data or set it to null.
-     * 
+     *
      * The base method is for client implementation - servers need to override
-     * and process the frame as a request. 
+     * and process the frame as a request.
      */
     public void onCtlFrame(SpdyFrame frame) throws IOException {
         // TODO: handle RST
@@ -92,7 +92,7 @@ public class SpdyStream {
 
     /**
      * True if the channel both received and sent FIN frames.
-     * 
+     *
      * This is tracked by the processor, to avoid extra storage in framer.
      */
     public boolean isFinished() {
@@ -115,7 +115,7 @@ public class SpdyStream {
             throw new IOException(e);
         }
     }
-    
+
     public void getHeaders(Map<String, String> resHeaders) {
         SpdyFrame f = resFrame;
         int nvCount = f.nvCount;
@@ -129,7 +129,7 @@ public class SpdyStream {
             resHeaders.put(n, v);
         }
     }
-    
+
     public SpdyFrame getRequest() {
         if (reqFrame == null) {
             reqFrame = spdy.getFrame(SpdyConnection.TYPE_SYN_STREAM);
@@ -143,8 +143,8 @@ public class SpdyStream {
         nameB = value.getBytes();
         reqFrame.headerValue(nameB, 0, nameB.length);
     }
-    
-    
+
+
     public synchronized void sendDataFrame(byte[] data, int start,
             int length, boolean close) throws IOException {
 
@@ -177,7 +177,7 @@ public class SpdyStream {
 
         send(scheme, method);
     }
-    
+
     public void send(String scheme, String method) throws IOException {
         getRequest();
         if ("GET".equalsIgnoreCase(method)) {
@@ -192,5 +192,5 @@ public class SpdyStream {
         }
         spdy.sendFrameBlocking(reqFrame, this);
     }
-    
+
 }
