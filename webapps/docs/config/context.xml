@@ -1283,9 +1283,10 @@ mywebapp/
 <source>
 &lt;Context path="/mywebapp" docBase="/Users/theuser/mywebapp/src/main/webapp" >
   &lt;Resources className="org.apache.naming.resources.VirtualDirContext"
-                extraResourcePaths="/WEB-INF/classes=/Users/theuser/mywebapp/target/classes" />
+    extraResourcePaths="/WEB-INF/classes=/Users/theuser/mywebapp/target/classes" />
   &lt;Loader className="org.apache.catalina.loader.VirtualWebappLoader"
-             virtualClasspath="/Users/theuser/mywebapp/target/classes;/Users/theuser/.m2/repository/log4j/log4j/1.2.15/log4j-1.2.15.jar" />
+    virtualClasspath="/Users/theuser/mywebapp/target/classes;
+      /Users/theuser/.m2/repository/log4j/log4j/1.2.15/log4j-1.2.15.jar" />
   &lt;JarScanner scanAllDirectories="true" />
 &lt;/Context>
 </source>
@@ -1320,14 +1321,16 @@ mywebapp/
 <source>
 &lt;Context path="/mywebapp" docBase="/Users/theuser/mywebapp/src/main/webapp" >
   &lt;Resources className="org.apache.naming.resources.VirtualDirContext"
-             extraResourcePaths="/WEB-INF/classes=/Users/theuser/mywebapp/target/classes,/pictures=/Users/theuser/mypictures,/movies=/Users/theuser/mymovies" />
+    extraResourcePaths="/WEB-INF/classes=/Users/theuser/mywebapp/target/classes,/pictures=/Users/theuser/mypictures,/movies=/Users/theuser/mymovies" />
   &lt;Loader className="org.apache.catalina.loader.VirtualWebappLoader"
-             virtualClasspath="/Users/theuser/mywebapp/target/classes;/Users/theuser/mylib/target/classes;/Users/theuser/.m2/repository/log4j/log4j/1.2.15/log4j-1.2.15.jar" />
+    virtualClasspath="/Users/theuser/mywebapp/target/classes;
+      /Users/theuser/mylib/target/classes;
+      /Users/theuser/.m2/repository/log4j/log4j/1.2.15/log4j-1.2.15.jar" />
   &lt;JarScanner scanAllDirectories="true" />
 &lt;/Context>
 </source>
     <p>Note that resources in mylib/target/classes/META-INF/resources/ are mapped to / as
-    required by servlet 3 specifications.</p>
+    required by servlet 3 specification.</p>
   </subsection>
 </section>
 

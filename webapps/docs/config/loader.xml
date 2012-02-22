@@ -151,8 +151,14 @@
 
       <attribute name="virtualClasspath" required="false">
         <p>Additional repositories to search for resources.
-        Multiple elements can be joined using <code>;</code>
+        Multiple values can be joined using <code>;</code>
         as a separator.</p>
+        <p>Leading and trailing whitespaces in values are ignored.
+        If a value does not point to an existing directory or
+        <code>*.jar</code> file, it is silently skipped.
+        Diagnostic messages can be seen if you enable debug logging for
+        the VirtualWebappLoader class.
+        </p>
         <p>Example: <code>virtualClasspath=&quot;${catalina.base}/myapp_config&quot;</code></p>
       </attribute>
 
