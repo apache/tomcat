@@ -72,6 +72,7 @@
   <p><b>You may deploy multiple versions of a web application with the same
   context path at the same time.</b> The rules used to match requests to a
   context version are as follows:
+  </p>
   <ul>
   <li>If no session information is present in the request, use the latest
   version.</li>
@@ -81,7 +82,6 @@
   <li>If session information is present in the request but no matching session
   can be found, use the latest version.</li>
   </ul>
-  </p>
   </subsection>
 
   <subsection name="Naming">
@@ -128,12 +128,13 @@
   <p>If you want to deploy a WAR file or a directory using a context path that
   is not related to the base file name then one of the following options must
   be used to prevent double-deployment:
+  </p>
   <ul>
   <li>Disable autoDeploy and deployOnStartup and define all
   <Strong>Context</Strong>s in server.xml</li>
   <li>Locate the WAR and/or directory outside of the Host&apos;s appBase and use
       a context.xml file with a docBase attribute to define it.</li>
-  </ul></p>
+  </ul>
   </subsection>
 
   <subsection name="Defining a context">
@@ -144,6 +145,7 @@
   Tomcat.</p>
 
   <p>Individual <strong>Context</strong> elements may be explicitly defined:
+  </p>
   <ul>
   <li>In an individual file at <code>/META-INF/context.xml</code> inside the
   application files. Optionally (based on the Host&apos;s copyXML attribute)
@@ -159,7 +161,6 @@
   <li>Inside a <a href="host.html">Host</a> element in the main
   <code>conf/server.xml</code>.</li>
   </ul>
-  </p>
 
   <p>Default <strong>Context</strong> elements may be defined that apply to
   multiple web applications. Configuration for an individual web application
@@ -168,6 +169,7 @@
   <strong>Context</strong> will be created once for each
   <strong>Context</strong> to which the default applies. They will <b>not</b> be
   shared between <strong>Context</strong> elements.
+  </p>
   <ul>
   <li>In the <code>$CATALINA_BASE/conf/context.xml</code> file:
   the Context element information will be loaded by all webapps.</li>
@@ -176,7 +178,6 @@
   file: the Context element information will be loaded by all webapps of that
   host.</li>
   </ul>
-  </p>
 
   <p>With the exception of server.xml, files that define <strong>Context
   </strong> elements may only define a single <strong>Context</strong> element.
@@ -415,6 +416,7 @@
         <p>Set to false if Tomcat should <b>not</b> read any additional request
         body data for aborted uploads and instead abort the client connection.
         This setting is used in the following situations:
+        </p>
         <ul>
         <li>the size of the request body is larger than the
             <code>maxPostSize</code> configured in the connector</li>
@@ -422,6 +424,7 @@
         <li>the servlet sets the response status to 413 (Request Entity Too
             Large) </li>
         </ul>
+        <p>
         Not reading the additional data will free the request processing thread
         more quickly. Unfortunately most HTTP clients will not read the response
         if they can not write the full request.</p>
@@ -1227,8 +1230,10 @@
   ...
 &lt;/Context&gt;
 </source>
-    <p>When a request for <code>getConnection()</code> is made in the <code>/foo</code> context, the request is translated into
-       <code>getConnection(&quot;foo&quot;,&quot;foopass&quot;)</code>, while a request in the <code>/bar</code> gets passed straight through.</p>
+    <p>When a request for <code>getConnection()</code> is made in the
+       <code>/foo</code> context, the request is translated into
+       <code>getConnection(&quot;foo&quot;,&quot;foopass&quot;)</code>,
+       while a request in the <code>/bar</code> gets passed straight through.</p>
   </subsection>
 
   <subsection name="Transaction">
