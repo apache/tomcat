@@ -118,6 +118,10 @@ public class VirtualWebappLoader extends WebappLoader {
         while (tkn.hasMoreTokens()) {
             String token = tkn.nextToken().trim();
 
+            if (token.isEmpty()) {
+                continue;
+            }
+
             if (log.isDebugEnabled())
                 log.debug(sm.getString("virtualWebappLoader.token", token));
 
