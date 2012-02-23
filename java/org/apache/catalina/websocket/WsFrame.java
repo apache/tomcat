@@ -23,7 +23,7 @@ import org.apache.catalina.util.Conversions;
 import org.apache.coyote.http11.upgrade.UpgradeProcessor;
 
 /**
- * Represents a WebSocket frame with the exception of the payload for
+ * Represents a complete WebSocket frame with the exception of the payload for
  * non-control frames.
  */
 public class WsFrame {
@@ -35,6 +35,17 @@ public class WsFrame {
     private long payloadLength;
     private ByteBuffer payload;
 
+    /**
+     * Create the new WebSocket frame, reading data from the processor as
+     * necessary.
+     *
+     * @param processor Processor associated with the WebSocket connection on
+     *                  which the frame has been sent
+     *
+     * @throws IOException  If a problem occurs processing the frame. Any
+     *                      exception will trigger the closing of the WebSocket
+     *                      connection.
+     */
     public WsFrame(UpgradeProcessor<?> processor) throws IOException {
 
         int b = processorRead(processor);
