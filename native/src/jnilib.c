@@ -453,7 +453,7 @@ TCN_IMPLEMENT_CALL(jint, Library, size)(TCN_STDARGS, jint what)
     return 0;
 }
 
-TCN_DECLARE(apr_pool_t *) tcn_get_global_pool()
+apr_pool_t *tcn_get_global_pool()
 {
     if (!tcn_global_pool) {
         if (apr_pool_create(&tcn_global_pool, NULL) != APR_SUCCESS) {
@@ -464,17 +464,17 @@ TCN_DECLARE(apr_pool_t *) tcn_get_global_pool()
     return tcn_global_pool;
 }
 
-TCN_DECLARE(jclass) tcn_get_string_class()
+jclass tcn_get_string_class()
 {
     return jString_class;
 }
 
-TCN_DECLARE(JavaVM *) tcn_get_java_vm()
+JavaVM * tcn_get_java_vm()
 {
     return tcn_global_vm;
 }
 
-TCN_DECLARE(jint) tcn_get_java_env(JNIEnv **env)
+jint tcn_get_java_env(JNIEnv **env)
 {
     if ((*tcn_global_vm)->GetEnv(tcn_global_vm, (void **)env,
                                  JNI_VERSION_1_4)) {
