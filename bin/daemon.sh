@@ -36,7 +36,7 @@ DIRNAME="`dirname $ARG0`"
 PROGRAM="`basename $ARG0`"
 while [ ".$1" != . ]
 do
-  case "$o=1" in
+  case "$1" in
     --java-home )
         JAVA_HOME="$2"
         shift; shift;
