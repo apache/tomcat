@@ -1,5 +1,5 @@
---- util/pl/VC-32.pl.org	2010-09-13 18:28:34.000000000 +0200
-+++ util/pl/VC-32.pl	2012-02-23 13:19:12.876834604 +0100
+--- util/pl/VC-32.pl
++++ util/pl/VC-32.pl
 @@ -33,7 +33,7 @@
      # considered safe to ignore.
      # 
