@@ -292,7 +292,7 @@ public class WsOutbound {
         if (data == null) {
             upgradeOutbound.write(0);
         } else {
-            upgradeOutbound.write(data.limit());
+            upgradeOutbound.write(data.limit() - data.position());
             upgradeOutbound.write(data.array(), data.position(),
                     data.limit() - data.position());
         }
