@@ -20,14 +20,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.nio.charset.CodingErrorAction;
 import java.nio.charset.MalformedInputException;
 import java.nio.charset.UnmappableCharacterException;
 
 import org.apache.coyote.http11.upgrade.UpgradeInbound;
 import org.apache.coyote.http11.upgrade.UpgradeOutbound;
 import org.apache.coyote.http11.upgrade.UpgradeProcessor;
-import org.apache.tomcat.util.buf.B2CConverter;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
 
 /**
@@ -83,10 +81,8 @@ public abstract class StreamInbound implements UpgradeInbound {
                 onBinaryData(wsIs);
                 return SocketState.UPGRADED;
             } else if (opCode == Constants.OPCODE_TEXT) {
-                InputStreamReader r = new InputStreamReader(wsIs,
-                        B2CConverter.UTF_8.newDecoder()
-                            .onMalformedInput(CodingErrorAction.REPORT)
-                            .onUnmappableCharacter(CodingErrorAction.REPORT));
+                InputStreamReader r =
+                        new InputStreamReader(wsIs, new Utf8Decoder());
                 onTextData(r);
                 return SocketState.UPGRADED;
             }
