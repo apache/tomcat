@@ -18,6 +18,8 @@ package org.apache.catalina.websocket;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.nio.CharBuffer;
+import java.nio.charset.CoderResult;
 
 import org.apache.catalina.util.Conversions;
 import org.apache.coyote.http11.upgrade.UpgradeProcessor;
@@ -88,6 +90,19 @@ public class WsFrame {
             // Note: Payload limited to <= 125 bytes by test above
             payload = ByteBuffer.allocate((int) payloadLength);
             processorRead(processor, payload);
+
+            if (opCode == Constants.OPCODE_CLOSE && payloadLength > 2) {
+                // Check close payload - if present - is valid UTF-8
+                CharBuffer cb = CharBuffer.allocate((int) payloadLength);
+                Utf8Decoder decoder = new Utf8Decoder();
+                payload.position(2);
+                CoderResult cr = decoder.decode(payload, cb, true);
+                payload.position(0);
+                if (cr.isError()) {
+                    // TODO i18n
+                    throw new IOException("Not UTF-8");
+                }
+            }
         } else {
             payload = null;
         }
