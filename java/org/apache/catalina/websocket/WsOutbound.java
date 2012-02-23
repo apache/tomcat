@@ -126,15 +126,15 @@ public class WsOutbound {
         upgradeOutbound.write(0x88);
         if (status == 0) {
             upgradeOutbound.write(0);
-        } else if (data == null) {
+        } else if (data == null || data.position() == data.limit()) {
             upgradeOutbound.write(2);
             upgradeOutbound.write(status >>> 8);
             upgradeOutbound.write(status);
         } else {
-            upgradeOutbound.write(2 + data.limit());
+            upgradeOutbound.write(2 + data.limit() - data.position());
             upgradeOutbound.write(status >>> 8);
             upgradeOutbound.write(status);
-            upgradeOutbound.write(data.array(), 0, data.limit());
+            upgradeOutbound.write(data.array(), data.position(), data.limit());
         }
         upgradeOutbound.flush();
 

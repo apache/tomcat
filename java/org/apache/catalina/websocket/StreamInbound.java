@@ -20,7 +20,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.nio.ByteBuffer;
 
 import org.apache.coyote.http11.upgrade.UpgradeInbound;
 import org.apache.coyote.http11.upgrade.UpgradeOutbound;
@@ -55,15 +54,15 @@ public abstract class StreamInbound implements UpgradeInbound {
         try {
             WsInputStream wsIs = new WsInputStream(processor);
 
-            WsFrameHeader header = wsIs.getFrameHeader();
+            WsFrame frame = wsIs.getFrame();
 
             // TODO User defined extensions may define values for rsv
-            if (header.getRsv() > 0) {
+            if (frame.getRsv() > 0) {
                 getOutbound().close(1002, null);
                 return SocketState.CLOSED;
             }
 
-            byte opCode = header.getOpCode();
+            byte opCode = frame.getOpCode();
 
             if (opCode == Constants.OPCODE_BINARY) {
                 onBinaryData(wsIs);
@@ -75,22 +74,14 @@ public abstract class StreamInbound implements UpgradeInbound {
                 return SocketState.UPGRADED;
             }
 
-            // Must be a control frame and control frames:
-            // - have a limited payload length
-            // - must not be fragmented
-            if (wsIs.getPayloadLength() > 125 || !wsIs.getFrameHeader().getFin()) {
-                getOutbound().close(1002, null);
-                return SocketState.CLOSED;
-            }
-
             if (opCode == Constants.OPCODE_CLOSE){
-                doClose(wsIs);
+                doClose(frame);
                 return SocketState.CLOSED;
             } else if (opCode == Constants.OPCODE_PING) {
-                doPing(wsIs);
+                doPing(frame);
                 return SocketState.UPGRADED;
             } else if (opCode == Constants.OPCODE_PONG) {
-                doPong(wsIs);
+                // NO-OP
                 return SocketState.UPGRADED;
             }
 
@@ -105,70 +96,23 @@ public abstract class StreamInbound implements UpgradeInbound {
         }
     }
 
-    private void doClose(WsInputStream is) throws IOException {
-        // Control messages have a max size of 125 bytes. Need to try and read
-        // one more so we reach end of stream (less 2 for the status). Note that
-        // the 125 byte limit is enforced in #onData() before this method is
-        // ever called.
-        ByteBuffer data = null;
-
-        int status = is.read();
-        if (status != -1) {
-            status = status << 8;
-            int i = is.read();
-            if (i == -1) {
-                // EOF during middle of close message. Closing anyway but set
-                // close code to protocol error
-                status = 1002;
-            } else {
-                status = status + i;
-                if (is.getPayloadLength() > 2) {
-                    data = ByteBuffer.allocate((int) is.getPayloadLength() - 1);
-                    int read = 0;
-                    while (read > -1) {
-                        data.position(data.position() + read);
-                        read = is.read(data.array(), data.position(),
-                                data.remaining());
-                    }
-                    data.flip();
-                }
+    private void doClose(WsFrame frame) throws IOException {
+        if (frame.getPayLoadLength() > 0) {
+            // Must be status (2 bytes) plus optional message
+            if (frame.getPayLoadLength() == 1) {
+                throw new IOException();
             }
+            int status = (frame.getPayLoad().get() & 0xFF) << 8;
+            status += frame.getPayLoad().get() & 0xFF;
+            getOutbound().close(status, frame.getPayLoad());
         } else {
-            status = 0;
+            // No status
+            getOutbound().close(0, null);
         }
-        getOutbound().close(status, data);
     }
 
-    private void doPing(WsInputStream is) throws IOException {
-        // Control messages have a max size of 125 bytes. Need to try and read
-        // one more so we reach end of stream. Note that the 125 byte limit is
-        // enforced in #onData() before this method is ever called.
-        ByteBuffer data = null;
-
-        if (is.getPayloadLength() > 0) {
-            data = ByteBuffer.allocate((int) is.getPayloadLength() + 1);
-
-            int read = 0;
-            while (read > -1) {
-                data.position(data.position() + read);
-                read = is.read(data.array(), data.position(), data.remaining());
-            }
-
-            data.flip();
-        }
-
-        getOutbound().pong(data);
-    }
-
-    private void doPong(WsInputStream is) throws IOException {
-        // Unsolicited pong - swallow it
-        // Control messages have a max size of 125 bytes. Note that the 125 byte
-        // limit is enforced in #onData() before this method is ever called so
-        // the loop below is not unbounded.
-        int read = 0;
-        while (read > -1) {
-            read = is.read();
-        }
+    private void doPing(WsFrame frame) throws IOException {
+        getOutbound().pong(frame.getPayLoad());
     }
 
     protected abstract void onBinaryData(InputStream is) throws IOException;
