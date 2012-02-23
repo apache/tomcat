@@ -175,6 +175,7 @@ public abstract class WebSocketServlet extends HttpServlet {
         }
     }
 
+
     /**
      * Intended to be overridden by sub-classes that wish to verify the origin
      * of a WebSocket request before processing it.
@@ -189,6 +190,7 @@ public abstract class WebSocketServlet extends HttpServlet {
     protected boolean verifyOrigin(String origin) {
         return true;
     }
+
 
     /**
      * Intended to be overridden by sub-classes that wish to select a
@@ -205,6 +207,7 @@ public abstract class WebSocketServlet extends HttpServlet {
     protected String selectSubProtocol(List<String> subProtocols) {
         return null;
     }
+
 
     /**
      * Create the instance that will process this inbound connection.
