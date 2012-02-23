@@ -104,8 +104,8 @@ public class WsOutbound {
 
     /**
      * Flush any message (binary or textual) that may be buffered and then send
-     * the a WebSocket binary message as a single frame with the provided buffer
-     * as the payload of the message.
+     * a WebSocket binary message as a single frame with the provided buffer as
+     * the payload of the message.
      *
      * @param msgBb The buffer containing the payload
      *
@@ -123,8 +123,8 @@ public class WsOutbound {
 
     /**
      * Flush any message (binary or textual) that may be buffered and then send
-     * the a WebSocket text message as a single frame with the provided buffer
-     * as the payload of the message.
+     * a WebSocket text message as a single frame with the provided buffer as
+     * the payload of the message.
      *
      * @param msgBb The buffer containing the payload
      *
@@ -166,7 +166,7 @@ public class WsOutbound {
 
 
     /**
-     * Respond to a client close by sending a close that echos the status code
+     * Respond to a client close by sending a close that echoes the status code
      * and message.
      *
      * @param frame The close frame received from a client
@@ -274,7 +274,8 @@ public class WsOutbound {
             upgradeOutbound.write(0);
         } else {
             upgradeOutbound.write(data.limit());
-            upgradeOutbound.write(data.array(), 0, data.limit());
+            upgradeOutbound.write(data.array(), data.position(),
+                    data.limit() - data.position());
         }
 
         upgradeOutbound.flush();
