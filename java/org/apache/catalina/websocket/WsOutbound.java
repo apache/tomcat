@@ -25,6 +25,9 @@ import java.nio.charset.CoderResult;
 import org.apache.coyote.http11.upgrade.UpgradeOutbound;
 import org.apache.tomcat.util.buf.B2CConverter;
 
+/**
+ * Provides the means to write WebSocket messages to the client.
+ */
 public class WsOutbound {
 
     private static final int DEFAULT_BUFFER_SIZE = 8192;
@@ -45,6 +48,18 @@ public class WsOutbound {
     }
 
 
+    /**
+     * Adds the data to the buffer for binary data. If a textual message is
+     * currently in progress that message will be completed and a new binary
+     * message started. If the buffer for binary data is full, the buffer will
+     * be flushed and a new binary continuation fragment started.
+     *
+     * @param b The byte (only the least significant byte is used) of data to
+     *          send to the client.
+     *
+     * @throws IOException  If a flush is required and an error occurs writing
+     *                      the WebSocket frame to the client
+     */
     public void writeBinaryData(int b) throws IOException {
         if (bb.position() == bb.capacity()) {
             doFlush(false);
@@ -60,6 +75,17 @@ public class WsOutbound {
     }
 
 
+    /**
+     * Adds the data to the buffer for textual data. If a binary message is
+     * currently in progress that message will be completed and a new textual
+     * message started. If the buffer for textual data is full, the buffer will
+     * be flushed and a new textual continuation fragment started.
+     *
+     * @param b The character to send to the client.
+     *
+     * @throws IOException  If a flush is required and an error occurs writing
+     *                      the WebSocket frame to the client
+     */
     public void writeTextData(char c) throws IOException {
         if (cb.position() == cb.capacity()) {
             doFlush(false);
@@ -100,6 +126,7 @@ public class WsOutbound {
         doFlush(true);
     }
 
+
     private void doFlush(boolean finalFragment) throws IOException {
         if (text == null) {
             // No data
@@ -138,6 +165,7 @@ public class WsOutbound {
         }
     }
 
+
     private boolean validateCloseStatus(int status) {
 
         if (status == 1000 || status == 1001 || status == 1002 ||
@@ -154,6 +182,7 @@ public class WsOutbound {
         // >4999 undefined
         return false;
     }
+
 
     public void close(int status, ByteBuffer data) throws IOException {
         // TODO Think about threading requirements for writing. This is not
@@ -184,6 +213,7 @@ public class WsOutbound {
         upgradeOutbound = null;
     }
 
+
     public void pong(ByteBuffer data) throws IOException {
         // TODO Think about threading requirements for writing. This is not
         // currently thread safe and writing almost certainly needs to be.
@@ -203,6 +233,7 @@ public class WsOutbound {
 
         upgradeOutbound.flush();
     }
+
 
     /**
      * Writes the provided bytes as the payload in a new WebSocket frame.
@@ -269,6 +300,9 @@ public class WsOutbound {
     }
 
 
+    /*
+     * Convert the textual message to bytes and then output it.
+     */
     private void doWriteText(CharBuffer buffer, boolean finalFragment)
             throws IOException {
         CharsetEncoder encoder = B2CConverter.UTF_8.newEncoder();

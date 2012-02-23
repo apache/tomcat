@@ -37,6 +37,7 @@ public class WsInputStream extends java.io.InputStream {
 
     private String error = null;
 
+
     public WsInputStream(UpgradeProcessor<?> processor, WsOutbound outbound)
             throws IOException {
         this.processor = processor;
@@ -44,9 +45,11 @@ public class WsInputStream extends java.io.InputStream {
         processFrame();
     }
 
+
     public WsFrame getFrame() {
         return frame;
     }
+
 
     private void processFrame() throws IOException {
         frame = new WsFrame(processor);
@@ -73,8 +76,8 @@ public class WsInputStream extends java.io.InputStream {
                 } else if (getFrame().getOpCode() == Constants.OPCODE_CLOSE) {
                     outbound.close(frame);
                 } else{
-                    // TODO
-                    throw new IOException("TODO");
+                    // TODO i18n
+                    throw new IOException("Unknown control frame");
                 }
                 processFrame();
             }
