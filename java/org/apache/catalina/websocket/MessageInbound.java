@@ -28,7 +28,6 @@ import java.nio.CharBuffer;
  * specific functionality. Applications that wish to operate on a stream basis
  * rather than a message basis should use {@link StreamInbound}.
  */
-
 public abstract class MessageInbound extends StreamInbound {
 
     // 2MB - like maxPostSize
@@ -38,8 +37,9 @@ public abstract class MessageInbound extends StreamInbound {
     private ByteBuffer bb = ByteBuffer.allocate(8192);
     private CharBuffer cb = CharBuffer.allocate(8192);
 
+
     @Override
-    protected void onBinaryData(InputStream is) throws IOException {
+    protected final void onBinaryData(InputStream is) throws IOException {
         int read = 0;
         while (read > -1) {
             bb.position(bb.position() + read);
@@ -53,8 +53,9 @@ public abstract class MessageInbound extends StreamInbound {
         bb.clear();
     }
 
+
     @Override
-    protected void onTextData(Reader r) throws IOException {
+    protected final void onTextData(Reader r) throws IOException {
         int read = 0;
         while (read > -1) {
             cb.position(cb.position() + read);
@@ -68,6 +69,7 @@ public abstract class MessageInbound extends StreamInbound {
         onTextMessage(cb);
         cb.clear();
     }
+
 
     private void resizeByteBuffer() throws IOException {
         int maxSize = getByteBufferMaxSize();
@@ -88,6 +90,7 @@ public abstract class MessageInbound extends StreamInbound {
         bb = newBuffer;
     }
 
+
     private void resizeCharBuffer() throws IOException {
         int maxSize = getCharBufferMaxSize();
         if (cb.limit() >= maxSize) {
@@ -107,24 +110,70 @@ public abstract class MessageInbound extends StreamInbound {
         cb = newBuffer;
     }
 
-    public int getByteBufferMaxSize() {
+
+    /**
+     * Obtain the current maximum size (in bytes) of the buffer used for binary
+     * messages.
+     */
+    public final int getByteBufferMaxSize() {
         return byteBufferMaxSize;
     }
 
-    public void setByteBufferMaxSize(int byteBufferMaxSize) {
+
+    /**
+     * Set the maximum size (in bytes) of the buffer used for binary messages.
+     */
+    public final void setByteBufferMaxSize(int byteBufferMaxSize) {
         this.byteBufferMaxSize = byteBufferMaxSize;
     }
 
-    public int getCharBufferMaxSize() {
+
+    /**
+     * Obtain the current maximum size (in characters) of the buffer used for
+     * binary messages.
+     */
+    public final int getCharBufferMaxSize() {
         return charBufferMaxSize;
     }
 
-    public void setCharBufferMaxSize(int charBufferMaxSize) {
+
+    /**
+     * Set the maximum size (in characters) of the buffer used for textual
+     * messages.
+     */
+    public final void setCharBufferMaxSize(int charBufferMaxSize) {
         this.charBufferMaxSize = charBufferMaxSize;
     }
 
+
+    /**
+     * This method is called when there is a binary WebSocket message available
+     * to process. The message is presented via a ByteBuffer and may have been
+     * formed from one or more frames. The number of frames used to transmit the
+     * message is not made visible to the application.
+     *
+     * @param message       The WebSocket message
+     *
+     * @throws IOException  If a problem occurs processing the message. Any
+     *                      exception will trigger the closing of the WebSocket
+     *                      connection.
+     */
     protected abstract void onBinaryMessage(ByteBuffer message)
             throws IOException;
+
+
+    /**
+     * This method is called when there is a textual WebSocket message available
+     * to process. The message is presented via a CharBuffer and may have been
+     * formed from one or more frames. The number of frames used to transmit the
+     * message is not made visible to the application.
+     *
+     * @param message       The WebSocket message
+     *
+     * @throws IOException  If a problem occurs processing the message. Any
+     *                      exception will trigger the closing of the WebSocket
+     *                      connection.
+     */
     protected abstract void onTextMessage(CharBuffer message)
             throws IOException;
 }
