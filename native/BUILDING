@@ -61,7 +61,7 @@ NOTES
     ln -d libtcnative-1.dylib libtcnative-1.jnilib
 
 
-Building statically linked library on unixes
+Building statically linked library on Unixes
 --------------------------------------------
 
 To statically link apr and openssl dependencies use the following
@@ -73,10 +73,10 @@ You will need to build static version of openssl library.
 > make
 > make install_sw
 
-Note that for solaris platform you should use -KPIC instead -fPIC
+Note that for Solaris platform you should use -KPIC instead -fPIC
 so that library is compiled with position independent code.
 
-Apr by default build both static and synamic libraries.
+Apr by default builds both static and dynamic libraries.
 
 > ./configure --prefix=~/natives/apr
 > make
@@ -93,7 +93,7 @@ Build Tomcat native by executing
 > make
 > make install
 
-Thats it. You have just build libtchative-1.so with statically linked
+That's it. You have just build libtcnative-1.so with statically linked
 apr and openssl.
 
 
