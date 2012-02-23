@@ -33,7 +33,7 @@
     <property name="year"                  value="2012" />
     <property name="version.major"         value="1" />
     <property name="version.minor"         value="1" />
-    <property name="version.build"         value="17" />
+    <property name="version.build"         value="23" />
     <property name="version.patch"         value="0" />
     <property name="version.suffix"        value="-dev" />
 

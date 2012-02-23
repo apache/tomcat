@@ -484,6 +484,8 @@ static X509 *load_pem_cert(tcn_ssl_ctxt_t *c, const char *file)
         BIO_free(bio);
         return NULL;
     }
+    if (!cb_data)
+        cb_data = &tcn_password_callback;
     cert = PEM_read_bio_X509_AUX(bio, NULL,
                 (pem_password_cb *)SSL_password_callback,
                 (void *)cb_data);
