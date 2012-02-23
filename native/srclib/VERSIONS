@@ -1,4 +1,4 @@
 Use the following version of the libraries
 
-- APR 1.3.9, http://apr.apache.org
-- OpenSSL 0.9.8k, http://www.openssl.org
+- APR 1.4.6, http://apr.apache.org
+- OpenSSL 1.0.0g, http://www.openssl.org
