@@ -61,6 +61,10 @@ public class WsOutbound {
      *                      the WebSocket frame to the client
      */
     public void writeBinaryData(int b) throws IOException {
+        if (closed) {
+            throw new IOException("Closed");
+        }
+
         if (bb.position() == bb.capacity()) {
             doFlush(false);
         }
@@ -87,6 +91,10 @@ public class WsOutbound {
      *                      the WebSocket frame to the client
      */
     public void writeTextData(char c) throws IOException {
+        if (closed) {
+            throw new IOException("Closed");
+        }
+
         if (cb.position() == cb.capacity()) {
             doFlush(false);
         }
@@ -112,6 +120,10 @@ public class WsOutbound {
      * @throws IOException  If an error occurs writing to the client
      */
     public void writeBinaryMessage(ByteBuffer msgBb) throws IOException {
+        if (closed) {
+            throw new IOException("Closed");
+        }
+
         if (text != null) {
             // Empty the buffer
             flush();
@@ -131,6 +143,10 @@ public class WsOutbound {
      * @throws IOException  If an error occurs writing to the client
      */
     public void writeTextMessage(CharBuffer msgCb) throws IOException {
+        if (closed) {
+            throw new IOException("Closed");
+        }
+
         if (text != null) {
             // Empty the buffer
             flush();
@@ -146,6 +162,9 @@ public class WsOutbound {
      * @throws IOException  If an error occurs writing to the client
      */
     public void flush() throws IOException {
+        if (closed) {
+            throw new IOException("Closed");
+        }
         doFlush(true);
     }
 
@@ -264,7 +283,7 @@ public class WsOutbound {
         // TODO Think about threading requirements for writing. This is not
         // currently thread safe and writing almost certainly needs to be.
         if (closed) {
-            // TODO - handle this - ISE?
+            throw new IOException("Closed");
         }
 
         doFlush(true);
