@@ -39,7 +39,7 @@ PROJECT = apr-1
 SRCDIR = .
 !ENDIF
 
-!include <NMAKEMakefile.inc>
+!include <..\..\NMAKEMakefile.inc>
 
 
 !IF "$(TARGET)" != "LIB"

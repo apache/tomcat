@@ -1,0 +1,142 @@
+# Licensed to the Apache Software Foundation (ASF) under one or more
+# contributor license agreements.  See the NOTICE file distributed with
+# this work for additional information regarding copyright ownership.
+# The ASF licenses this file to You under the Apache License, Version 2.0
+# (the "License"); you may not use this file except in compliance with
+# the License.  You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+# ====================================================================
+#
+# NMAKEmakefile   Master Tomcat Native makefile.
+# Usage:
+#                 STATIC=1  Use static version of the APR
+#                 DEBUG=1   Build DEBUG version of TCN
+#
+# Originally contributed by Mladen Turk <mturk redhat.com>
+#
+# ====================================================================
+#
+
+!IF !DEFINED(APR_DECLARE_STATIC) || "$(APR_DECLARE_STATIC)" == ""
+PROJECT = libtcnative-1
+APR_LIB = libapr-1.lib
+!ELSE
+EXTRA_CFLAGS = -DAPR_DECLARE_STATIC
+PROJECT = tcnative-1
+APR_LIB = apr-1.lib
+!ENDIF
+TARGET = DLL
+
+!include <NMAKEmakefile.inc>
+
+!IF !DEFINED(SRCDIR) || "$(SRCDIR)" == ""
+SRCDIR = .
+!ENDIF
+
+INCLUDES = -I$(SRCDIR)\include $(JAVA_INCLUDES)
+
+!IFNDEF WITH_APR
+WITH_APR = $(SRCDIR)\srclib\apr
+LDIRS = /libpath:"$(WITH_APR)\$(WORKDIR)"
+!ELSE
+LDIRS = /libpath:"$(WITH_APR)\lib"
+!ENDIF
+
+INCLUDES = $(INCLUDES) -I$(WITH_APR)\include -I$(WITH_APR)\include\arch\win32
+!IF DEFINED(WITH_OPENSSL)
+INCLUDES = $(INCLUDES) -I$(WITH_OPENSSL)\include
+LDIRS = $(LDIRS) /libpath:"$(WITH_OPENSSL)\lib"
+!ELSE
+WITH_OPENSSL = $(SRCDIR)\srclib\openssl
+INCLUDES = $(INCLUDES) $(WITH_OPENSSL)\inc32
+LDIRS = $(LDIRS) /libpath:"$(WITH_OPENSSL)\out32"
+!ENDIF
+
+LFLAGS = $(LFLAGS) /version:1.1
+LFLAGS = $(LFLAGS) user32.lib psapi.lib gdi32.lib shlwapi.lib wldap32.lib ole32.lib
+LFLAGS = $(LFLAGS) $(APR_LIB)
+LFLAGS = $(LFLAGS) libeay32.lib ssleay32.lib
+!IF DEFINED(WITH_OPENSSL)
+!ELSE
+!ENDIF
+
+CFLAGS = $(CFLAGS) -DZLIB_WINAPI -DNO_IDEA -DNO_RC5 -DNO_MDC2 -DOPENSSL_NO_IDEA \
+	-DOPENSSL_NO_RC5 -DOPENSSL_NO_MDC2 -DHAVE_OPENSSL -DHAVE_SSL_SET_STATE=1 \
+	-DTCN_DECLARE_EXPORT
+
+
+PDBFLAGS = -Fo$(WORKDIR)\ -Fd$(WORKDIR)\$(PROJECT)-src
+OBJECTS = \
+	$(WORKDIR)\address.obj \
+	$(WORKDIR)\bb.obj \
+	$(WORKDIR)\dir.obj \
+	$(WORKDIR)\error.obj \
+	$(WORKDIR)\file.obj \
+	$(WORKDIR)\info.obj \
+	$(WORKDIR)\jnilib.obj \
+	$(WORKDIR)\lock.obj \
+	$(WORKDIR)\misc.obj \
+	$(WORKDIR)\mmap.obj \
+	$(WORKDIR)\multicast.obj \
+	$(WORKDIR)\network.obj \
+	$(WORKDIR)\os.obj \
+	$(WORKDIR)\poll.obj \
+	$(WORKDIR)\pool.obj \
+	$(WORKDIR)\proc.obj \
+	$(WORKDIR)\shm.obj \
+	$(WORKDIR)\ssl.obj \
+	$(WORKDIR)\sslcontext.obj \
+	$(WORKDIR)\sslinfo.obj \
+	$(WORKDIR)\sslnetwork.obj \
+	$(WORKDIR)\sslutils.obj \
+	$(WORKDIR)\stdlib.obj \
+	$(WORKDIR)\user.obj \
+	$(WORKDIR)\thread.obj \
+	$(WORKDIR)\ntpipe.obj \
+	$(WORKDIR)\registry.obj \
+	$(WORKDIR)\system.obj
+
+BUILDLIB = $(PREFIX)\lib
+BUILDBIN = $(WORKDIR)\$(PROJECT).dll
+BUILDPDB = $(WORKDIR)\$(PROJECT).pdb
+BUILDRES = $(WORKDIR)\$(PROJECT).res
+BUILDMAN = $(BUILDBIN).manifest
+
+all : $(WORKDIR) $(BUILDBIN)
+
+$(BUILDLIB) :
+	@if not exist "$(BUILDLIB)\$(NULL)" mkdir "$(BUILDLIB)"
+
+$(WORKDIR) :
+	@$(MAKEWORKDIR)
+
+{$(SRCDIR)\src}.c{$(WORKDIR)}.obj:
+	$(CC) $(CFLAGS) $(INCLUDES) $(PDBFLAGS) $<
+
+{$(SRCDIR)\os\win32}.c{$(WORKDIR)}.obj:
+	$(CC) $(CFLAGS) $(INCLUDES) $(PDBFLAGS) $<
+
+$(OBJECTS): $(SRCDIR)\include\*.h
+
+$(BUILDRES): $(SRCDIR)\os\win32\libtcnative.rc $(SRCDIR)\include\*.h
+	$(RC) $(RCFLAGS) /i "$(SRCDIR)\include" /fo $(BUILDRES) $(SRCDIR)\os\win32\libtcnative.rc
+
+$(BUILDBIN): $(WORKDIR) $(OBJECTS) $(BUILDRES)
+	$(LINK) $(LFLAGS) $(OBJECTS) $(BUILDRES) $(LIBS) $(LDIRS) /pdb:$(BUILDPDB) /out:$(BUILDBIN)
+	IF EXIST $(BUILDMAN) \
+		mt -nologo -manifest $(BUILDMAN) -outputresource:$(BUILDBIN);2
+
+clean:
+	@$(CLEANTARGET)
+
+install: $(BUILDLIB) $(WORKDIR) $(BUILDBIN)
+	@xcopy "$(WORKDIR)\*.lib" "$(BUILDLIB)" /Y /Q
+	@xcopy "$(WORKDIR)\*.dll" "$(BUILDLIB)" /Y /Q
