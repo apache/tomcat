@@ -1,0 +1,42 @@
+Building apr on windows
+-----------------------
+
+Apply apr-enable-ipv6.patch.
+This will enable IPV6 support for windows builds.
+
+Open Visual Studio command prompt and execute
+nmake -f NMAKEMakefile BUILD_CPU=x86
+
+For building 64-bit version execute
+nmake -f NMAKEMakefile BUILD_CPU=x64
+
+Make sure you select the correct Visual Studio command prompt
+environment before calling nmake so that correct
+compiler is setup for the target architecture.
+
+
+Building OpenSSL
+----------------
+
+Apply openssl-msvcrt.patch
+
+This patch makes sure that static version of OpenSSL libraries
+is linked to msvcrt.dll instead statically linking msvcrt.
+Without that patch it won't be possible to create statically linked
+Tomcat native .dll
+
+Then follow the standard OpenSSL make procedure ...
+
+> perl Configure VC-WIN32
+> ms\do_nasm
+> nmake -f ms\nt.mak
+
+For 64-bit Windows use
+> perl Configure VC-WIN64A
+> ms\do_win64a
+> nmake -f ms\nt.mak
+
+For 64-bit Windows on Itanium processor use
+> perl Configure VC-WIN64I
+> ms\do_win64i
+> nmake -f ms\nt.mak

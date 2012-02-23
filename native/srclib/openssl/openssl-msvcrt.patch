@@ -1,0 +1,28 @@
+--- util/pl/VC-32.pl.org	2010-09-13 18:28:34.000000000 +0200
++++ util/pl/VC-32.pl	2012-02-23 13:19:12.876834604 +0100
+@@ -33,7 +33,7 @@
+     # considered safe to ignore.
+     # 
+     $base_cflags= " $mf_cflag";
+-    my $f = $shlib?' /MD':' /MT';
++    my $f = ' /MD';
+     $lib_cflag='/Zl' if (!$shlib);	# remove /DEFAULTLIBs from static lib
+     $opt_cflags=$f.' /Ox';
+     $dbg_cflags=$f.'d /Od -DDEBUG -D_DEBUG';
+@@ -114,7 +114,7 @@
+ else	# Win32
+     {
+     $base_cflags= " $mf_cflag";
+-    my $f = $shlib?' /MD':' /MT';
++    my $f = ' /MD';
+     $lib_cflag='/Zl' if (!$shlib);	# remove /DEFAULTLIBs from static lib
+     $opt_cflags=$f.' /Ox /O2 /Ob2';
+     $dbg_cflags=$f.'d /Od -DDEBUG -D_DEBUG';
+@@ -165,6 +165,7 @@
+ 	{
+ 	$ex_libs.=' gdi32.lib advapi32.lib crypt32.lib user32.lib';
+ 	$ex_libs.=' bufferoverflowu.lib' if ($FLAVOR =~ /WIN64/ and `cl 2>&1` =~ /14\.00\.4[0-9]{4}\./);
++	$ex_libs.=' $(EXTRA_LIBS)'
+ 	# WIN32 UNICODE build gets linked with unicows.lib for
+ 	# backward compatibility with Win9x.
+ 	$ex_libs="unicows.lib $ex_libs" if ($FLAVOR =~ /WIN32/ and $cflags =~ /\-DUNICODE/);
