@@ -67,22 +67,22 @@ public final class SSLExt {
     public static native int setSessionData(long tcsock, byte[] data, int len);
 
 
-//    /**
-//     * Client: get the ticket received from server, if tickets are supported.
-//     */
-//    public static native int getTicket(long tcsock, byte[] resBuf);
-//
-//    /**
-//     * Client: set the previously received ticket.
-//     */
-//    public static native int setTicket(long tcsock, byte[] data, int len);
-//
-//    /**
-//     * Set the key used by server to generate tickets.
-//     * Key must be 48 bytes.
-//     */
-//    public static native int setTicketKeys(long ctx, byte[] data, int len);
-//
+    /**
+     * Client: get the ticket received from server, if tickets are supported.
+     */
+    public static native int getTicket(long tcsock, byte[] resBuf);
+
+    /**
+     * Client: set the previously received ticket.
+     */
+    public static native int setTicket(long tcsock, byte[] data, int len);
+
+    /**
+     * Set the key used by server to generate tickets.
+     * Key must be 48 bytes.
+     */
+    public static native int setTicketKeys(long ctx, byte[] data, int len);
+
     /**
      * For client side calls. Data should be a \0 terminated string
      */
