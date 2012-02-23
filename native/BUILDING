@@ -15,32 +15,42 @@
   limitations under the License.
 ================================================================================
 
-  Building from source package:
-  configure --with-apr=apr_install_location --with-ssl=openssl_install_location
-  make
+Building from source package
+-----------------------------
 
-  Building from the cvs tree:
-  sh buildconf --with-apr=apr_source_location.
-  configure --with-apr=apr_install_location --with-ssl=openssl_install_location
-  make
+>  configure --with-apr=apr_install_location --with-ssl=openssl_install_location
+>  make
 
-  Testing the build:
-  The make should produce a .so file named libtcnative-1.so.
-  Build the jar containing the examples by
-  cd ..
-  ant jar
+Building from the svn tree
+--------------------------
+
+>  sh buildconf --with-apr=apr_source_location.
+>  configure --with-apr=apr_install_location --with-ssl=openssl_install_location
+>  make
+
+Testing the build
+-----------------
+
+The make should produce a .so file named libtcnative-1.so.
+Build the jar containing the examples by
+
+> cd ..
+>  ant jar
   Run one of the example (the echo one):
-  ant run-echo
+>  ant run-echo
  
-  Using it in Tomcat:
-  1 - In <Connector> use of conf/server.xml:
-    protocol="org.apache.coyote.http11.Http11AprProtocol"
-  2 - In bin/setenv.sh add the following: 
-    CATALINA_OPTS="$CATALINA_OPTS -Djava.library.path=tclib_location"
-    In my machine I am using:
-    /home/jfclere/native/native/.libs for tclib_location
+Using it in Tomcat
+------------------
 
-NOTES:
+1. In <Connector> use of conf/server.xml:
+   protocol="org.apache.coyote.http11.Http11AprProtocol"
+2. In bin/setenv.sh add the following:
+   CATALINA_OPTS="$CATALINA_OPTS -Djava.library.path=tclib_location"
+   In my machine I am using:
+   /home/jfclere/native/native/.libs for tclib_location
+
+NOTES
+-----
   - configure --disable-openssl: Configure without ssl support.
   - To use it in Tomcat you may have to add in bin/setenv.sh:
     LD_LIBRARY_PATH=openssl_install_location/lib; export LD_LIBRARY_PATH
@@ -49,3 +59,42 @@ NOTES:
   - For MAC OS X you must manually add a link
     cd ${tcnative installdir}
     ln -d libtcnative-1.dylib libtcnative-1.jnilib
+
+
+Building statically linked library on unixes
+--------------------------------------------
+
+To statically link apr and openssl dependencies use the following
+procedure.
+
+You will need to build static version of openssl library.
+
+> ./config --prefix=~/natives/openssl no-shared -fPIC
+> make
+> make install_sw
+
+Note that for solaris platform you should use -KPIC instead -fPIC
+so that library is compiled with position independent code.
+
+Apr by default build both static and synamic libraries.
+
+> ./configure --prefix=~/natives/apr
+> make
+> make install
+
+After that edit the ~/natives/apr/lib/libapr-1.la file
+and comment or delete the following sections:
+dlname='...' and library_names='...'
+This is needed so that libtool picks the static version of the library.
+
+Build Tomcat native by executing
+
+> ./configure --with-apr=~/natives/apr --with-ssl=~/natives/openssl --prefix=~/natives/tomcat
+> make
+> make install
+
+Thats it. You have just build libtchative-1.so with statically linked
+apr and openssl.
+
+
+
