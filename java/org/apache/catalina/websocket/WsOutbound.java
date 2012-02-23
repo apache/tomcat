@@ -19,6 +19,8 @@ package org.apache.catalina.websocket;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
+import java.nio.charset.CharsetEncoder;
+import java.nio.charset.CoderResult;
 
 import org.apache.coyote.http11.upgrade.UpgradeOutbound;
 import org.apache.tomcat.util.buf.B2CConverter;
@@ -121,8 +123,6 @@ public class WsOutbound {
         }
         closed = true;
 
-        doFlush(true);
-
         upgradeOutbound.write(0x88);
         if (status == 0) {
             upgradeOutbound.write(0);
@@ -173,6 +173,10 @@ public class WsOutbound {
      */
     private void doWriteBytes(ByteBuffer buffer, boolean finalFragment)
             throws IOException {
+
+        if (closed) {
+            throw new IOException("Closed");
+        }
 
         // Work out the first byte
         int first = 0x00;
@@ -226,8 +230,12 @@ public class WsOutbound {
 
     private void doWriteText(CharBuffer buffer, boolean finalFragment)
             throws IOException {
+        CharsetEncoder encoder = B2CConverter.UTF_8.newEncoder();
         do {
-            B2CConverter.UTF_8.newEncoder().encode(buffer, bb, true);
+            CoderResult cr = encoder.encode(buffer, bb, true);
+            if (cr.isError()) {
+                cr.throwException();
+            }
             bb.flip();
             if (buffer.hasRemaining()) {
                 doWriteBytes(bb, false);
