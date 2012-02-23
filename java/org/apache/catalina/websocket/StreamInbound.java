@@ -80,7 +80,7 @@ public abstract class StreamInbound implements UpgradeInbound {
             }
 
             if (opCode == Constants.OPCODE_CLOSE){
-                doClose(frame);
+                getOutbound().close(frame);
                 return SocketState.CLOSED;
             } else if (opCode == Constants.OPCODE_PING) {
                 doPing(frame);
@@ -106,21 +106,6 @@ public abstract class StreamInbound implements UpgradeInbound {
             // not work but try it anyway.
             getOutbound().close(1002, null);
             return SocketState.CLOSED;
-        }
-    }
-
-    private void doClose(WsFrame frame) throws IOException {
-        if (frame.getPayLoadLength() > 0) {
-            // Must be status (2 bytes) plus optional message
-            if (frame.getPayLoadLength() == 1) {
-                throw new IOException();
-            }
-            int status = (frame.getPayLoad().get() & 0xFF) << 8;
-            status += frame.getPayLoad().get() & 0xFF;
-            getOutbound().close(status, frame.getPayLoad());
-        } else {
-            // No status
-            getOutbound().close(0, null);
         }
     }
 

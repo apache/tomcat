@@ -115,6 +115,46 @@ public class WsOutbound {
     }
 
 
+
+    public void close(WsFrame frame) throws IOException {
+        if (frame.getPayLoadLength() > 0) {
+            // Must be status (2 bytes) plus optional message
+            if (frame.getPayLoadLength() == 1) {
+                throw new IOException();
+            }
+            int status = (frame.getPayLoad().get() & 0xFF) << 8;
+            status += frame.getPayLoad().get() & 0xFF;
+
+            if (validateCloseStatus(status)) {
+                // Echo the status back to the client
+                close(status, frame.getPayLoad());
+            } else {
+                // Invalid close code
+                close(1002, null);
+            }
+        } else {
+            // No status
+            close(0, null);
+        }
+    }
+
+    private boolean validateCloseStatus(int status) {
+
+        if (status == 1000 || status == 1001 || status == 1002 ||
+                status == 1003 || status == 1007 || status == 1008 ||
+                status == 1009 || status == 1010 || status == 1011 ||
+                (status > 2999 && status < 5000)) {
+            // Other 1xxx reserved / not permitted
+            // 2xxx reserved
+            // 3xxx framework defined
+            // 4xxx application defined
+            return true;
+        }
+        // <1000 unused
+        // >4999 undefined
+        return false;
+    }
+
     public void close(int status, ByteBuffer data) throws IOException {
         // TODO Think about threading requirements for writing. This is not
         // currently thread safe and writing almost certainly needs to be.
