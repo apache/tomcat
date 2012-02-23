@@ -30,38 +30,50 @@ import org.apache.coyote.http11.upgrade.UpgradeProcessor;
 import org.apache.tomcat.util.buf.B2CConverter;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
 
+/**
+ * Base implementation of the class used to process WebSocket connections based
+ * on streams. Applications should extend this class to provide application
+ * specific functionality. Applications that wish to operate on a message basis
+ * rather than a stream basis should use {@link MessageInbound}.
+ */
 public abstract class StreamInbound implements UpgradeInbound {
 
     private UpgradeProcessor<?> processor = null;
     private WsOutbound outbound;
 
     @Override
-    public void setUpgradeOutbound(UpgradeOutbound upgradeOutbound) {
+    public final void setUpgradeOutbound(UpgradeOutbound upgradeOutbound) {
         outbound = new WsOutbound(upgradeOutbound);
     }
 
 
     @Override
-    public void setUpgradeProcessor(UpgradeProcessor<?> processor) {
+    public final void setUpgradeProcessor(UpgradeProcessor<?> processor) {
         this.processor = processor;
     }
 
-    public WsOutbound getOutbound() {
+
+    /**
+     * Obtain the outbound side of this WebSocket connection used for writing
+     * data to the client.
+     */
+    public final WsOutbound getWsOutbound() {
         return outbound;
     }
 
+
     @Override
-    public SocketState onData() throws IOException {
+    public final SocketState onData() throws IOException {
         // Must be start the start of a frame or series of frames
 
         try {
-            WsInputStream wsIs = new WsInputStream(processor, outbound);
+            WsInputStream wsIs = new WsInputStream(processor, getWsOutbound());
 
             WsFrame frame = wsIs.getFrame();
 
             // TODO User defined extensions may define values for rsv
             if (frame.getRsv() > 0) {
-                getOutbound().close(1002, null);
+                getWsOutbound().close(1002, null);
                 return SocketState.CLOSED;
             }
 
@@ -80,10 +92,10 @@ public abstract class StreamInbound implements UpgradeInbound {
             }
 
             if (opCode == Constants.OPCODE_CLOSE){
-                getOutbound().close(frame);
+                getWsOutbound().close(frame);
                 return SocketState.CLOSED;
             } else if (opCode == Constants.OPCODE_PING) {
-                doPing(frame);
+                getWsOutbound().pong(frame.getPayLoad());
                 return SocketState.UPGRADED;
             } else if (opCode == Constants.OPCODE_PONG) {
                 // NO-OP
@@ -91,28 +103,51 @@ public abstract class StreamInbound implements UpgradeInbound {
             }
 
             // Unknown OpCode
-            getOutbound().close(1002, null);
+            getWsOutbound().close(1002, null);
             return SocketState.CLOSED;
         } catch (MalformedInputException mie) {
             // Invalid UTF-8
-            getOutbound().close(1007, null);
+            getWsOutbound().close(1007, null);
             return SocketState.CLOSED;
         } catch (UnmappableCharacterException uce) {
             // Invalid UTF-8
-            getOutbound().close(1007, null);
+            getWsOutbound().close(1007, null);
             return SocketState.CLOSED;
         } catch (IOException ioe) {
             // Given something must have gone to reach this point, this might
             // not work but try it anyway.
-            getOutbound().close(1002, null);
+            getWsOutbound().close(1002, null);
             return SocketState.CLOSED;
         }
     }
 
-    private void doPing(WsFrame frame) throws IOException {
-        getOutbound().pong(frame.getPayLoad());
-    }
 
+    /**
+     * This method is called when there is a binary WebSocket message available
+     * to process. The message is presented via a stream and may be formed from
+     * one or more frames. The number of frames used to transmit the message is
+     * not made visible to the application.
+     *
+     * @param is    The WebSocket message
+     *
+     * @throws IOException  If a problem occurs processing the message. Any
+     *                      exception will trigger the closing of the WebSocket
+     *                      connection.
+     */
     protected abstract void onBinaryData(InputStream is) throws IOException;
+
+
+    /**
+     * This method is called when there is a textual WebSocket message available
+     * to process. The message is presented via a reader and may be formed from
+     * one or more frames. The number of frames used to transmit the message is
+     * not made visible to the application.
+     *
+     * @param r     The WebSocket message
+     *
+     * @throws IOException  If a problem occurs processing the message. Any
+     *                      exception will trigger the closing of the WebSocket
+     *                      connection.
+     */
     protected abstract void onTextData(Reader r) throws IOException;
 }
