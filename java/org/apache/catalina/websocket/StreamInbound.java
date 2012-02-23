@@ -20,6 +20,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.nio.charset.CodingErrorAction;
+import java.nio.charset.MalformedInputException;
+import java.nio.charset.UnmappableCharacterException;
 
 import org.apache.coyote.http11.upgrade.UpgradeInbound;
 import org.apache.coyote.http11.upgrade.UpgradeOutbound;
@@ -68,8 +71,10 @@ public abstract class StreamInbound implements UpgradeInbound {
                 onBinaryData(wsIs);
                 return SocketState.UPGRADED;
             } else if (opCode == Constants.OPCODE_TEXT) {
-                InputStreamReader r =
-                        new InputStreamReader(wsIs, B2CConverter.UTF_8);
+                InputStreamReader r = new InputStreamReader(wsIs,
+                        B2CConverter.UTF_8.newDecoder()
+                            .onMalformedInput(CodingErrorAction.REPORT)
+                            .onUnmappableCharacter(CodingErrorAction.REPORT));
                 onTextData(r);
                 return SocketState.UPGRADED;
             }
@@ -87,6 +92,14 @@ public abstract class StreamInbound implements UpgradeInbound {
 
             // Unknown OpCode
             getOutbound().close(1002, null);
+            return SocketState.CLOSED;
+        } catch (MalformedInputException mie) {
+            // Invalid UTF-8
+            getOutbound().close(1007, null);
+            return SocketState.CLOSED;
+        } catch (UnmappableCharacterException uce) {
+            // Invalid UTF-8
+            getOutbound().close(1007, null);
             return SocketState.CLOSED;
         } catch (IOException ioe) {
             // Given something must have gone to reach this point, this might
