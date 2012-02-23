@@ -44,6 +44,7 @@
 #include <openssl/err.h>
 #include <openssl/x509.h>
 #include <openssl/pem.h>
+#include <openssl/pkcs12.h> 
 #include <openssl/crypto.h>
 #include <openssl/evp.h>
 #include <openssl/rand.h>

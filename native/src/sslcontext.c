@@ -499,6 +499,53 @@ static X509 *load_pem_cert(tcn_ssl_ctxt_t *c, const char *file)
     return cert;
 }
 
+static int ssl_load_pkcs12(tcn_ssl_ctxt_t *c, const char *file,
+                           EVP_PKEY **pkey, X509 **cert, STACK_OF(X509) **ca)
+{
+    const char *pass;
+    char        buff[PEM_BUFSIZE];
+    int         len, rc = 0;
+    PKCS12     *p12;
+    BIO        *in;
+    tcn_pass_cb_t *cb_data = c->cb_data;
+    
+    if ((in = BIO_new(BIO_s_file())) == 0)
+        return 0;
+    if (BIO_read_filename(in, file) <= 0) {
+        BIO_free(in);
+        return 0;
+    }
+    p12 = d2i_PKCS12_bio(in, 0);
+    if (p12 == 0) {
+        /* Error loading PKCS12 file */
+        goto cleanup;
+    }
+    /* See if an empty password will do */
+    if (PKCS12_verify_mac(p12, "", 0) || PKCS12_verify_mac(p12, 0, 0)) {
+        pass = "";
+    }
+    else {
+        if (!cb_data)
+            cb_data = &tcn_password_callback;    
+        len = SSL_password_callback(buff, PEM_BUFSIZE, 0, cb_data);
+        if (len < 0) {
+            /* Passpharse callback error */
+            goto cleanup;
+        }
+        if (!PKCS12_verify_mac(p12, buff, len)) {
+            /* Mac verify error (wrong password?) in PKCS12 file */
+            goto cleanup;
+        }
+        pass = buff;
+    }
+    rc = PKCS12_parse(p12, pass, pkey, cert, ca);
+cleanup:
+    if (p12 != 0)
+        PKCS12_free(p12);
+    BIO_free(in);
+    return rc;
+} 
+
 TCN_IMPLEMENT_CALL(void, SSLContext, setRandom)(TCN_STDARGS, jlong ctx,
                                                 jstring file)
 {
@@ -522,6 +569,7 @@ TCN_IMPLEMENT_CALL(jboolean, SSLContext, setCertificate)(TCN_STDARGS, jlong ctx,
     TCN_ALLOC_CSTRING(key);
     TCN_ALLOC_CSTRING(password);
     const char *key_file, *cert_file;
+    const char *p;
     char err[256];
 
     UNREFERENCED(o);
@@ -547,19 +595,30 @@ TCN_IMPLEMENT_CALL(jboolean, SSLContext, setCertificate)(TCN_STDARGS, jlong ctx,
         rv = JNI_FALSE;
         goto cleanup;
     }
-    if ((c->keys[idx] = load_pem_key(c, key_file)) == NULL) {
-        ERR_error_string(ERR_get_error(), err);
-        tcn_Throw(e, "Unable to load certificate key %s (%s)",
-                  key_file, err);
-        rv = JNI_FALSE;
-        goto cleanup;
+    if ((p = strrchr(cert_file, '.')) != NULL && strcmp(p, ".pkcs12") == 0) {        
+        if (!ssl_load_pkcs12(c, cert_file, &c->keys[idx], &c->certs[idx], 0)) {
+            ERR_error_string(ERR_get_error(), err);
+            tcn_Throw(e, "Unable to load certificate %s (%s)",
+                      cert_file, err);
+            rv = JNI_FALSE;
+            goto cleanup;        
+        }    
     }
-    if ((c->certs[idx] = load_pem_cert(c, cert_file)) == NULL) {
-        ERR_error_string(ERR_get_error(), err);
-        tcn_Throw(e, "Unable to load certificate %s (%s)",
-                  cert_file, err);
-        rv = JNI_FALSE;
-        goto cleanup;
+    else {
+        if ((c->keys[idx] = load_pem_key(c, key_file)) == NULL) {
+            ERR_error_string(ERR_get_error(), err);
+            tcn_Throw(e, "Unable to load certificate key %s (%s)",
+                      key_file, err);
+            rv = JNI_FALSE;
+            goto cleanup;
+        }
+        if ((c->certs[idx] = load_pem_cert(c, cert_file)) == NULL) {
+            ERR_error_string(ERR_get_error(), err);
+            tcn_Throw(e, "Unable to load certificate %s (%s)",
+                      cert_file, err);
+            rv = JNI_FALSE;
+            goto cleanup;
+        }
     }
     if (SSL_CTX_use_certificate(c->ctx, c->certs[idx]) <= 0) {
         ERR_error_string(ERR_get_error(), err);
