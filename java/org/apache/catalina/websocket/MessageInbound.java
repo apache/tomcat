@@ -22,6 +22,13 @@ import java.io.Reader;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 
+/**
+ * Base implementation of the class used to process WebSocket connections based
+ * on messages. Applications should extend this class to provide application
+ * specific functionality. Applications that wish to operate on a stream basis
+ * rather than a message basis should use {@link StreamInbound}.
+ */
+
 public abstract class MessageInbound extends StreamInbound {
 
     // 2MB - like maxPostSize
