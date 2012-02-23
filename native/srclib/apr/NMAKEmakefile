@@ -50,52 +50,54 @@ PDBFLAGS = -Fo$(WORKDIR)\ -Fd$(WORKDIR)\$(PROJECT)-src
 OBJECTS = \
 	$(WORKDIR)\apr_atomic.obj \
 	$(WORKDIR)\dso.obj \
-	$(WORKDIR)\copy.obj \
-	$(WORKDIR)\fileacc.obj \
-	$(WORKDIR)\filepath_util.obj \
-	$(WORKDIR)\fullrw.obj \
-	$(WORKDIR)\mktemp.obj \
-	$(WORKDIR)\tempdir.obj \
 	$(WORKDIR)\buffer.obj \
+	$(WORKDIR)\copy.obj \
 	$(WORKDIR)\dir.obj \
+	$(WORKDIR)\fileacc.obj \
 	$(WORKDIR)\filedup.obj \
 	$(WORKDIR)\filepath.obj \
+	$(WORKDIR)\filepath_util.obj \
 	$(WORKDIR)\filestat.obj \
 	$(WORKDIR)\filesys.obj \
 	$(WORKDIR)\flock.obj \
+	$(WORKDIR)\fullrw.obj \
+	$(WORKDIR)\mktemp.obj \
 	$(WORKDIR)\open.obj \
 	$(WORKDIR)\pipe.obj \
 	$(WORKDIR)\readwrite.obj \
 	$(WORKDIR)\seek.obj \
+	$(WORKDIR)\tempdir.obj \
 	$(WORKDIR)\proc_mutex.obj \
 	$(WORKDIR)\thread_cond.obj \
 	$(WORKDIR)\thread_mutex.obj \
 	$(WORKDIR)\thread_rwlock.obj \
 	$(WORKDIR)\apr_pools.obj \
-	$(WORKDIR)\errorcodes.obj \
-	$(WORKDIR)\getopt.obj \
-	$(WORKDIR)\otherchild.obj \
-	$(WORKDIR)\version.obj \
+	$(WORKDIR)\apr_app.obj \
 	$(WORKDIR)\charset.obj \
 	$(WORKDIR)\env.obj \
+	$(WORKDIR)\errorcodes.obj \
+	$(WORKDIR)\getopt.obj \
 	$(WORKDIR)\internal.obj \
 	$(WORKDIR)\misc.obj \
+	$(WORKDIR)\otherchild.obj \
 	$(WORKDIR)\rand.obj \
 	$(WORKDIR)\start.obj \
 	$(WORKDIR)\utf8.obj \
+	$(WORKDIR)\version.obj \
 	$(WORKDIR)\common.obj \
 	$(WORKDIR)\mmap.obj \
 	$(WORKDIR)\inet_ntop.obj \
 	$(WORKDIR)\inet_pton.obj \
 	$(WORKDIR)\multicast.obj \
-	$(WORKDIR)\sockaddr.obj \
 	$(WORKDIR)\sendrecv.obj \
+	$(WORKDIR)\sockaddr.obj \
 	$(WORKDIR)\sockets.obj \
+	$(WORKDIR)\socket_util.obj \
 	$(WORKDIR)\sockopt.obj \
 	$(WORKDIR)\apr_getpass.obj \
+	$(WORKDIR)\poll.obj \
 	$(WORKDIR)\pollcb.obj \
 	$(WORKDIR)\pollset.obj \
-	$(WORKDIR)\poll.obj \
 	$(WORKDIR)\select.obj \
 	$(WORKDIR)\apr_random.obj \
 	$(WORKDIR)\sha2.obj \
@@ -113,7 +115,6 @@ OBJECTS = \
 	$(WORKDIR)\signals.obj \
 	$(WORKDIR)\thread.obj \
 	$(WORKDIR)\threadpriv.obj \
-	$(WORKDIR)\access.obj \
 	$(WORKDIR)\time.obj \
 	$(WORKDIR)\timestr.obj \
 	$(WORKDIR)\groupinfo.obj \
@@ -141,6 +142,9 @@ $(BUILDLIB) :
 $(WORKDIR) :
 	@$(MAKEWORKDIR)
 
+$(SRCDIR)\include\apr.h: $(SRCDIR)\include\apr.hw
+	-@copy $(SRCDIR)\include\apr.hw $(SRCDIR)\include\apr.h
+    
 {$(SRCDIR)\atomic\win32}.c{$(WORKDIR)}.obj:
 	$(CC) $(CFLAGS) $(INCLUDES) $(PDBFLAGS) $<
 
@@ -204,10 +208,10 @@ $(WORKDIR) :
 {$(SRCDIR)\user\win32}.c{$(WORKDIR)}.obj:
 	$(CC) $(CFLAGS) $(INCLUDES) $(PDBFLAGS) $<
 
-$(OBJECTS): $(SRCDIR)\include\*.h $(SRCDIR)\include\arch\*.h $(SRCDIR)\include\arch\win32\*.h $(SRCDIR)\include\arch\unix\*.h
+$(OBJECTS): $(SRCDIR)\include\apr.h
 
 !IF "$(TARGET)" == "DLL"
-$(BUILDRES): libapr.rc $(SRCDIR)\include\*.h
+$(BUILDRES): libapr.rc $(SRCDIR)\include\apr.h
 	$(RC) $(RCFLAGS) /i "$(SRCDIR)\include" /d "APR_VERSION_ONLY" /fo $(BUILDRES) libapr.rc
 $(BUILDBIN): $(WORKDIR) $(OBJECTS) $(BUILDRES)
 	$(LINK) $(LFLAGS) $(OBJECTS) $(BUILDRES) $(LIBS) /pdb:$(BUILDPDB) /out:$(BUILDBIN)
@@ -227,3 +231,4 @@ install: $(BUILDINC) $(BUILDLIB) $(WORKDIR) $(BUILDBIN)
 	@xcopy "$(SRCDIR)\include\arch\win32\*.h" "$(BUILDINC)\arch\win32" /Y /Q
 	@xcopy "$(WORKDIR)\*.lib" "$(BUILDLIB)" /Y /Q
 	@xcopy "$(WORKDIR)\*.dll" "$(BUILDLIB)" /Y /Q 2>NUL
+
