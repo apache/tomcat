@@ -39,27 +39,27 @@ import org.apache.tomcat.util.net.SocketWrapper;
 
 /**
  * Plugin for APR connector providing SPDY support via NPN negotiation.
- * 
+ *
  * Example:
- * <Connector port="9443" 
+ * <Connector port="9443"
  *            npnHandler="org.apache.coyote.spdy.SpdyAprNpnHandler"
- *            protocol="HTTP/1.1" 
+ *            protocol="HTTP/1.1"
  *            SSLEnabled="true"
- *            maxThreads="150" 
- *            scheme="https" 
+ *            maxThreads="150"
+ *            scheme="https"
  *            secure="true"
- *            sslProtocol="TLS" 
- *            SSLCertificateFile="conf/localhost-cert.pem" 
+ *            sslProtocol="TLS"
+ *            SSLCertificateFile="conf/localhost-cert.pem"
  *            SSLCertificateKeyFile="conf/localhost-key.pem"/>
- * 
+ *
  * This requires APR library ( libtcnative-1 ) to be present and compiled
  * with a recent openssl or a openssl patched with npn support.
- * 
+ *
  * Because we need to auto-detect SPDY and fallback to HTTP ( based on SSL next
  * proto ) this is implemented in tomcat a special way:
  * Http11AprProtocol will delegate to Spdy.process if spdy is
  * negotiated by TLS.
- * 
+ *
  */
 public class SpdyAprNpnHandler implements Http11AprProtocol.NpnHandler {
 
@@ -70,7 +70,7 @@ public class SpdyAprNpnHandler implements Http11AprProtocol.NpnHandler {
     boolean ssl = true;
 
     @Override
-    public void init(final AbstractEndpoint ep, long sslContext, 
+    public void init(final AbstractEndpoint ep, long sslContext,
             final Adapter adapter) {
         if (sslContext == 0) {
             // Apr endpoint without SSL.
@@ -86,8 +86,8 @@ public class SpdyAprNpnHandler implements Http11AprProtocol.NpnHandler {
             log.warn("SPDY/NPN not supported");
         }
     }
-    
-    
+
+
     private final class SpdyContextApr extends SpdyContext {
         private final AbstractEndpoint ep;
 
@@ -117,7 +117,7 @@ public class SpdyAprNpnHandler implements Http11AprProtocol.NpnHandler {
                 setCompressSupport(new CompressDeflater6());
             }
         }
-        
+
         // TODO: write/read should go to SocketWrapper.
         @Override
         public int write(byte[] data, int off, int len) {
@@ -170,21 +170,21 @@ public class SpdyAprNpnHandler implements Http11AprProtocol.NpnHandler {
             return rd;
         }
     }
-    
+
     // apr normally creates a new object on each poll.
     // For 'upgraded' protocols we need to remember it's handled differently.
-    Map<Long, SpdyConnectionApr> lightProcessors = 
+    Map<Long, SpdyConnectionApr> lightProcessors =
             new HashMap<Long, SpdyConnectionApr>();
 
     @Override
     public SocketState process(SocketWrapper<Long> socketO, SocketStatus status,
             Http11AprProtocol proto, AbstractEndpoint endpoint) {
-        
+
         SocketWrapper<Long> socketW = socketO;
         long socket = ((Long) socketW.getSocket()).longValue();
 
         SpdyConnectionApr lh = lightProcessors.get(socket);
-        // Are we getting an HTTP request ? 
+        // Are we getting an HTTP request ?
         if (lh == null && status != SocketStatus.OPEN) {
             return null;
         }
@@ -197,7 +197,7 @@ public class SpdyAprNpnHandler implements Http11AprProtocol.NpnHandler {
             if (status == SocketStatus.TIMEOUT) {
                 // Called from maintain - we're removed from the poll
                 ((AprEndpoint) endpoint).getCometPoller().add(
-                        socketO.getSocket().longValue(), false); 
+                        socketO.getSocket().longValue(), false);
                 return SocketState.LONG;
             }
             if (status == SocketStatus.STOP || status == SocketStatus.DISCONNECT ||
@@ -215,8 +215,8 @@ public class SpdyAprNpnHandler implements Http11AprProtocol.NpnHandler {
             // OPEN, no existing socket
             if (!ssl || SSLExt.checkNPN(socket, SpdyContext.SPDY_NPN)) {
                 // NPN negotiated or not ssl
-                lh = new SpdyConnectionApr(socketW, spdyContext, ssl); 
-                
+                lh = new SpdyConnectionApr(socketW, spdyContext, ssl);
+
                 int rc = lh.onBlockingSocket();
                 ss = (rc == SpdyConnection.LONG) ? SocketState.LONG
                         : SocketState.CLOSED;
@@ -227,21 +227,21 @@ public class SpdyAprNpnHandler implements Http11AprProtocol.NpnHandler {
                 return null;
             }
         }
-        
+
         // OPEN is used for both 'first time' and 'new connection'
-        // In theory we shouldn't get another open while this is in 
+        // In theory we shouldn't get another open while this is in
         // progress ( only after we add back to the poller )
 
         if (ss == SocketState.LONG) {
             log.info("Long poll: " + status);
             ((AprEndpoint) endpoint).getCometPoller().add(
-                    socketO.getSocket().longValue(), false); 
+                    socketO.getSocket().longValue(), false);
         }
         return ss;
     }
-    
+
     public void onClose(SocketWrapper<Long> socketWrapper) {
     }
 
-    
+
 }
