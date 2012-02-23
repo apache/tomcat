@@ -68,7 +68,11 @@ public class WsInputStream extends java.io.InputStream {
             while (frame.isControl()) {
                 if (getFrame().getOpCode() == Constants.OPCODE_PING) {
                     outbound.pong(frame.getPayLoad());
-                } else {
+                } else if (getFrame().getOpCode() == Constants.OPCODE_PONG) {
+                    // NO-OP. Swallow it.
+                } else if (getFrame().getOpCode() == Constants.OPCODE_CLOSE) {
+                    outbound.close(frame);
+                } else{
                     // TODO
                     throw new IOException("TODO");
                 }
