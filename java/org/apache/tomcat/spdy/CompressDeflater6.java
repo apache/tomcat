@@ -25,7 +25,6 @@ import org.apache.tomcat.spdy.SpdyConnection.CompressSupport;
 
 /**
  * Java6 Deflater with the workaround from tomcat http filters.
- * 
  */
 public class CompressDeflater6 implements CompressSupport {
     public static long DICT_ID = 3751956914L;
@@ -90,7 +89,7 @@ public class CompressDeflater6 implements CompressSupport {
     public synchronized void compress(SpdyFrame frame, int start)
             throws IOException {
         init();
-        
+
         if (compressBuffer == null) {
             compressBuffer = new byte[frame.data.length];
         }
@@ -134,20 +133,20 @@ public class CompressDeflater6 implements CompressSupport {
         // nvCount is compressed in impl - spec is different
         init();
 
-        
+
         if (decompressBuffer == null) {
             decompressBuffer = new byte[frame.data.length];
         }
-        
+
         // will read from dec buffer to frame.data
         decMax = frame.endData;
         decOff = start;
-        
+
         int off = start;
         int max = frame.data.length;
-        
+
         zipIn.setInput(frame.data, start, decMax - start);
-        
+
         while (true) {
             int rd;
             try {
@@ -169,12 +168,12 @@ public class CompressDeflater6 implements CompressSupport {
             byte[] b = new byte[decompressBuffer.length * 2];
             System.arraycopy(decompressBuffer, 0, b, 0, off);
             decompressBuffer = b;
-            
+
         }
         byte[] tmpBuf = decompressBuffer;
         decompressBuffer = frame.data;
         frame.data = tmpBuf;
-        
+
         frame.off = start;
         frame.endData = off;
     }

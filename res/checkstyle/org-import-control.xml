@@ -117,6 +117,9 @@
       <allow pkg="org.apache.tools.ant"/>
     </subpackage>
     <subpackage name="jni"/>
+    <subpackage name="spdy">
+      <allow pkg="org.apache.tomcat.spdy"/>
+    </subpackage>
     <subpackage name="util">
       <allow pkg="org.apache.juli"/>
       <allow pkg="org.apache.tomcat.jni"/>
