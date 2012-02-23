@@ -29,13 +29,18 @@ import org.apache.coyote.http11.upgrade.UpgradeProcessor;
 public class WsInputStream extends java.io.InputStream {
 
     private UpgradeProcessor<?> processor;
-    private WsFrame frame;
+    private WsOutbound outbound;
 
+    private WsFrame frame;
     private long remaining;
     private long readThisFragment;
 
-    public WsInputStream(UpgradeProcessor<?> processor) throws IOException {
+    private String error = null;
+
+    public WsInputStream(UpgradeProcessor<?> processor, WsOutbound outbound)
+            throws IOException {
         this.processor = processor;
+        this.outbound = outbound;
         processFrame();
     }
 
@@ -54,13 +59,25 @@ public class WsInputStream extends java.io.InputStream {
 
     @Override
     public int read() throws IOException {
+        if (error != null) {
+            throw new IOException(error);
+        }
         while (remaining == 0 && !getFrame().getFin()) {
             // Need more data - process next frame
             processFrame();
-
+            while (frame.isControl()) {
+                if (getFrame().getOpCode() == Constants.OPCODE_PING) {
+                    outbound.pong(frame.getPayLoad());
+                } else {
+                    // TODO
+                    throw new IOException("TODO");
+                }
+                processFrame();
+            }
             if (getFrame().getOpCode() != Constants.OPCODE_CONTINUATION) {
                 // TODO i18n
-                throw new IOException("Not a continuation frame");
+                error = "Not a continuation frame";
+                throw new IOException(error);
             }
         }
 

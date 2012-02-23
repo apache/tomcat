@@ -52,7 +52,7 @@ public abstract class StreamInbound implements UpgradeInbound {
         // Must be start the start of a frame or series of frames
 
         try {
-            WsInputStream wsIs = new WsInputStream(processor);
+            WsInputStream wsIs = new WsInputStream(processor, outbound);
 
             WsFrame frame = wsIs.getFrame();
 
