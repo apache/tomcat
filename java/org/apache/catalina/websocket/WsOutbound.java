@@ -102,6 +102,15 @@ public class WsOutbound {
     }
 
 
+    /**
+     * Flush any message (binary or textual) that may be buffered and then send
+     * the a WebSocket binary message as a single frame with the provided buffer
+     * as the payload of the message.
+     *
+     * @param msgBb The buffer containing the payload
+     *
+     * @throws IOException  If an error occurs writing to the client
+     */
     public void writeBinaryMessage(ByteBuffer msgBb) throws IOException {
         if (text != null) {
             // Empty the buffer
@@ -112,6 +121,15 @@ public class WsOutbound {
     }
 
 
+    /**
+     * Flush any message (binary or textual) that may be buffered and then send
+     * the a WebSocket text message as a single frame with the provided buffer
+     * as the payload of the message.
+     *
+     * @param msgBb The buffer containing the payload
+     *
+     * @throws IOException  If an error occurs writing to the client
+     */
     public void writeTextMessage(CharBuffer msgCb) throws IOException {
         if (text != null) {
             // Empty the buffer
@@ -122,6 +140,11 @@ public class WsOutbound {
     }
 
 
+    /**
+     * Flush any message (binary or textual) that may be buffered.
+     *
+     * @throws IOException  If an error occurs writing to the client
+     */
     public void flush() throws IOException {
         doFlush(true);
     }
@@ -142,8 +165,15 @@ public class WsOutbound {
     }
 
 
-
-    public void close(WsFrame frame) throws IOException {
+    /**
+     * Respond to a client close by sending a close that echos the status code
+     * and message.
+     *
+     * @param frame The close frame received from a client
+     *
+     * @throws IOException  If an error occurs writing to the client
+     */
+    protected void close(WsFrame frame) throws IOException {
         if (frame.getPayLoadLength() > 0) {
             // Must be status (2 bytes) plus optional message
             if (frame.getPayLoadLength() == 1) {
@@ -184,6 +214,15 @@ public class WsOutbound {
     }
 
 
+    /**
+     * Send a close message to the client
+     *
+     * @param status    Must be a valid status code or zero to send no code
+     * @param data      Optional message. If message is defined, a valid status
+     *                  code must be provided.
+     *
+     * @throws IOException  If an error occurs writing to the client
+     */
     public void close(int status, ByteBuffer data) throws IOException {
         // TODO Think about threading requirements for writing. This is not
         // currently thread safe and writing almost certainly needs to be.
@@ -214,6 +253,13 @@ public class WsOutbound {
     }
 
 
+    /**
+     * Send a pong message to the client
+     *
+     * @param data      Optional message.
+     *
+     * @throws IOException  If an error occurs writing to the client
+     */
     public void pong(ByteBuffer data) throws IOException {
         // TODO Think about threading requirements for writing. This is not
         // currently thread safe and writing almost certainly needs to be.
