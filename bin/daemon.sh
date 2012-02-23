@@ -34,9 +34,9 @@ while [ -h "$ARG0" ]; do
 done
 DIRNAME="`dirname $ARG0`"
 PROGRAM="`basename $ARG0`"
-for o
+while [ ".$1" != . ]
 do
-  case "$o" in
+  case "$1" in
     --java-home )
         JAVA_HOME="$2"
         shift; shift;
