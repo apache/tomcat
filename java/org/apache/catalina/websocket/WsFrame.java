@@ -60,9 +60,7 @@ public class WsFrame {
             payloadLength = Conversions.byteArrayToLong(extended);
         }
 
-        boolean isControl = (opCode & 0x08) > 0;
-
-        if (isControl) {
+        if (isControl()) {
             if (payloadLength > 125) {
                 throw new IOException();
             }
@@ -75,7 +73,7 @@ public class WsFrame {
             mask[j] = processorRead(processor) & 0xFF;
         }
 
-        if (isControl) {
+        if (isControl()) {
             // Note: Payload limited to <= 125 bytes by test above
             payload = ByteBuffer.allocate((int) payloadLength);
             processorRead(processor, payload);
@@ -94,6 +92,10 @@ public class WsFrame {
 
     public byte getOpCode() {
         return opCode;
+    }
+
+    public boolean isControl() {
+        return (opCode & 0x08) > 0;
     }
 
     public int[] getMask() {
