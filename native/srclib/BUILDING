@@ -5,10 +5,10 @@ Apply apr-enable-ipv6.patch.
 This will enable IPV6 support for windows builds.
 
 Open Visual Studio command prompt and execute
-nmake -f NMAKEMakefile BUILD_CPU=x86
+nmake -f NMAKEMakefile BUILD_CPU=x86 APR_DECLARE_STATIC=1
 
 For building 64-bit version execute
-nmake -f NMAKEMakefile BUILD_CPU=x64
+nmake -f NMAKEMakefile BUILD_CPU=x64 APR_DECLARE_STATIC=1
 
 Make sure you select the correct Visual Studio command prompt
 environment before calling nmake so that correct
