@@ -174,7 +174,8 @@ public class WsOutbound {
             upgradeOutbound.write(2 + data.limit() - data.position());
             upgradeOutbound.write(status >>> 8);
             upgradeOutbound.write(status);
-            upgradeOutbound.write(data.array(), data.position(), data.limit());
+            upgradeOutbound.write(data.array(), data.position(),
+                    data.limit() - data.position());
         }
         upgradeOutbound.flush();
 
