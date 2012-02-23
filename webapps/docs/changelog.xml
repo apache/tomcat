@@ -66,6 +66,10 @@
   </subsection>
   <subsection name="Other">
     <changelog>
+      <fix>
+        <bug>52750</bug>: Fix the way how daemon.sh parses command options so
+        that more then one can be provided. (mturk)
+      </fix>
       <update>
         Rearrange <code>validate-eoln</code> target in <code>build.xml</code>
         so that it could be run ahead of compilation. (kkolinko)
