@@ -27,15 +27,19 @@
 
 !IF !DEFINED(APR_DECLARE_STATIC) || "$(APR_DECLARE_STATIC)" == ""
 PROJECT = libtcnative-1
-APR_LIB = libapr-1.lib
 !ELSE
-EXTRA_CFLAGS = -DAPR_DECLARE_STATIC
 PROJECT = tcnative-1
-APR_LIB = apr-1.lib
 !ENDIF
 TARGET = DLL
 
 !include <NMAKEmakefile.inc>
+
+!IF !DEFINED(APR_DECLARE_STATIC) || "$(APR_DECLARE_STATIC)" == ""
+APR_LIB = libapr-1.lib
+!ELSE
+CFLAGS = $(CFLAGS) -DAPR_DECLARE_STATIC
+APR_LIB = apr-1.lib
+!ENDIF
 
 !IF !DEFINED(SRCDIR) || "$(SRCDIR)" == ""
 SRCDIR = .

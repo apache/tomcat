@@ -30,19 +30,14 @@
 extern int WIN32_SSL_password_prompt(tcn_pass_cb_t *data);
 #endif
 
-#if defined(HAVE_SSL_OCSP) && defined(HAVE_OPENSSL_OCSP)
-#define HAS_OCSP_ENABLED 1
-#else
-#define HAS_OCSP_ENABLED 0
-#endif
-#if HAS_OCSP_ENABLED
+#ifdef HAVE_OPENSSL_OCSP
 #include <openssl/bio.h>
 #include <openssl/ocsp.h>
 /* defines with the values as seen by the asn1parse -dump openssl command */
 #define ASN1_SEQUENCE 0x30
 #define ASN1_OID      0x06
 #define ASN1_STRING   0x86
-
+#pragma message("Using OCSP")
 static int ssl_verify_OCSP(int ok, X509_STORE_CTX *ctx);
 static int ssl_ocsp_request(X509 *cert, X509 *issuer);
 #endif
@@ -662,7 +657,7 @@ int SSL_callback_SSL_verify(int ok, X509_STORE_CTX *ctx)
         SSL_set_verify_result(ssl, X509_V_OK);
     }
 
-#if HAS_OCSP_ENABLED
+#ifdef HAVE_OPENSSL_OCSP
     /* First perform OCSP validation if possible */
     if (ok) {
         /* If there was an optional verification error, it's not
@@ -757,7 +752,7 @@ void SSL_callback_handshake(const SSL *ssl, int where, int rc)
 
 }
 
-#if HAS_OCSP_ENABLED
+#ifdef HAVE_OPENSSL_OCSP
 
 /* Function that is used to do the OCSP verification */
 static int ssl_verify_OCSP(int ok, X509_STORE_CTX *ctx)
@@ -768,7 +763,7 @@ static int ssl_verify_OCSP(int ok, X509_STORE_CTX *ctx)
     cert = X509_STORE_CTX_get_current_cert(ctx);
     /* if we can't get the issuer, we cannot perform OCSP verification */
     if (X509_STORE_CTX_get1_issuer(&issuer, ctx, cert) == 1 ) {
-        r = SSL_ocsp_request(cert, issuer);
+        r = ssl_ocsp_request(cert, issuer);
         if (r == OCSP_STATUS_REVOKED) {
             /* we set the error if we know that it is revoked */
             X509_STORE_CTX_set_error(ctx, X509_V_ERR_CERT_REVOKED);
@@ -883,7 +878,7 @@ static char **decode_OCSP_url(ASN1_OCTET_STRING *os, apr_pool_t *p)
 {
     char **response = NULL;
     unsigned char *ocsp_urls;
-    int i, len, numofresponses = 0 ;
+    int len, numofresponses = 0 ;
 
     len = ASN1_STRING_length(os);
 
@@ -914,7 +909,10 @@ static int add_ocsp_cert(OCSP_REQUEST **req, X509 *cert, X509 *issuer,
     id = OCSP_cert_to_id(NULL, cert, issuer);
     if (!id || !sk_OCSP_CERTID_push(ids, id))
         return 0;
-    return OCSP_request_add0_id(*req, id);
+    if (!OCSP_request_add0_id(*req, id))
+        return 0;
+    else
+        return 1;
 }
 
 
@@ -1084,7 +1082,7 @@ err:
 #define ADDLEN 512
 static OCSP_RESPONSE *ocsp_get_resp(apr_socket_t *sock)
 {
-    int buflen = 0, totalread = 0;
+    apr_size_t buflen = 0, totalread = 0;
     apr_size_t readlen;
     char *buf, tmpbuf[ADDLEN];
     apr_status_t rv = APR_SUCCESS;
@@ -1228,10 +1226,9 @@ static int process_ocsp_response(OCSP_RESPONSE *ocsp_resp)
 static int ssl_ocsp_request(X509 *cert, X509 *issuer)
 {
     char **ocsp_urls = NULL;
-    int nid, i;
+    int nid;
     X509_EXTENSION *ext;
     ASN1_OCTET_STRING *os;
-
     apr_pool_t *p;
 
     apr_pool_create(&p, NULL);

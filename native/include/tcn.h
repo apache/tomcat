@@ -25,6 +25,7 @@
 
 #include "apr.h"
 #include "apr_general.h"
+#include "apr_lib.h"
 #include "apr_pools.h"
 #include "apr_portable.h"
 #include "apr_network_io.h"
