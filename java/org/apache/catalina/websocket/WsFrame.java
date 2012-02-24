@@ -23,12 +23,17 @@ import java.nio.charset.CoderResult;
 
 import org.apache.catalina.util.Conversions;
 import org.apache.coyote.http11.upgrade.UpgradeProcessor;
+import org.apache.tomcat.util.res.StringManager;
 
 /**
  * Represents a complete WebSocket frame with the exception of the payload for
  * non-control frames.
  */
 public class WsFrame {
+
+    private static final StringManager sm =
+            StringManager.getManager(Constants.Package);
+
 
     private final boolean fin;
     private final int rsv;
@@ -58,8 +63,7 @@ public class WsFrame {
         b = processorRead(processor);
         // Client data must be masked
         if ((b & 0x80) == 0) {
-            // TODO: StringManager / i18n
-            throw new IOException("Client frame not masked");
+            throw new IOException(sm.getString("frame.notMasked"));
         }
 
         payloadLength = b & 0x7F;
@@ -99,8 +103,7 @@ public class WsFrame {
                 CoderResult cr = decoder.decode(payload, cb, true);
                 payload.position(0);
                 if (cr.isError()) {
-                    // TODO i18n
-                    throw new IOException("Not UTF-8");
+                    throw new IOException(sm.getString("frame.invalidUtf8"));
                 }
             }
         } else {
@@ -143,8 +146,7 @@ public class WsFrame {
             throws IOException {
         int result = processor.read();
         if (result == -1) {
-            // TODO i18n
-            throw new IOException("End of stream before end of frame");
+            throw new IOException(sm.getString("frame.eos"));
         }
         return result;
     }
@@ -157,8 +159,7 @@ public class WsFrame {
         while (read < bytes.length) {
             last = processor.read(bytes, read, bytes.length - read);
             if (last == -1) {
-                // TODO i18n
-                throw new IOException("End of stream before end of frame");
+                throw new IOException(sm.getString("frame.eos"));
             }
             read += last;
         }
@@ -174,8 +175,7 @@ public class WsFrame {
         while (bb.hasRemaining()) {
             last = processor.read();
             if (last == -1) {
-                // TODO i18n
-                throw new IOException("End of stream before end of frame");
+                throw new IOException(sm.getString("frame.eos"));
             }
             bb.put((byte) (last ^ mask[bb.position() % 4]));
         }

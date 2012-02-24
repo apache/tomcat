@@ -22,6 +22,8 @@ import java.io.Reader;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 
+import org.apache.tomcat.util.res.StringManager;
+
 /**
  * Base implementation of the class used to process WebSocket connections based
  * on messages. Applications should extend this class to provide application
@@ -29,6 +31,10 @@ import java.nio.CharBuffer;
  * rather than a message basis should use {@link StreamInbound}.
  */
 public abstract class MessageInbound extends StreamInbound {
+
+    private static final StringManager sm =
+            StringManager.getManager(Constants.Package);
+
 
     // 2MB - like maxPostSize
     private int byteBufferMaxSize = 2097152;
@@ -73,8 +79,7 @@ public abstract class MessageInbound extends StreamInbound {
     private void resizeByteBuffer() throws IOException {
         int maxSize = getByteBufferMaxSize();
         if (bb.limit() >= maxSize) {
-            // TODO i18n
-            throw new IOException("Buffer not big enough for message");
+            throw new IOException(sm.getString("message.bufferTooSmall"));
         }
 
         long newSize = bb.limit() * 2;
@@ -93,8 +98,7 @@ public abstract class MessageInbound extends StreamInbound {
     private void resizeCharBuffer() throws IOException {
         int maxSize = getCharBufferMaxSize();
         if (cb.limit() >= maxSize) {
-            // TODO i18n
-            throw new IOException("Buffer not big enough for message");
+            throw new IOException(sm.getString("message.bufferTooSmall"));
         }
 
         long newSize = cb.limit() * 2;
