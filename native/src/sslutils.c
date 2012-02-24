@@ -665,17 +665,28 @@ int SSL_callback_SSL_verify(int ok, X509_STORE_CTX *ctx)
 #if HAS_OCSP_ENABLED
     /* First perform OCSP validation if possible */
     if(ok) {
-        int ocsp_response = ssl_verify_OCSP(ok, ctx);
-        if (ocsp_response == OCSP_STATUS_OK ) {
-            skip_crl = 1; /* we know it is valid we skip crl evaluation */
+        /* If there was an optional verification error, it's not
+         * possible to perform OCSP validation since the issuer may be
+         * missing/untrusted.  Fail in that case.
+         */
+        if (SSL_VERIFY_ERROR_IS_OPTIONAL(errnum)) {
+            X509_STORE_CTX_set_error(ctx, X509_V_ERR_APPLICATION_VERIFICATION);
+            errnum = X509_V_ERR_APPLICATION_VERIFICATION;
+            ok = 0;
         }
-        else if(ocsp_response == OCSP_STATUS_REVOKED ) {
-            ok = 0 ;
-            errnum = X509_STORE_CTX_get_error(ctx);
-        }
-        else if (ocsp_response == OCSP_STATUS_UNKNOWN) {
-            /* TODO: do nothing for time being, continue with CRL */
-            ;
+        else {
+            int ocsp_response = ssl_verify_OCSP(ok, ctx);
+            if (ocsp_response == OCSP_STATUS_OK ) {
+                skip_crl = 1; /* we know it is valid we skip crl evaluation */
+            }
+            else if(ocsp_response == OCSP_STATUS_REVOKED ) {
+                ok = 0 ;
+                errnum = X509_STORE_CTX_get_error(ctx);
+            }
+            else if (ocsp_response == OCSP_STATUS_UNKNOWN) {
+                /* TODO: do nothing for time being, continue with CRL */
+                ;
+            }
         }
     }
 #endif
