@@ -19,6 +19,7 @@ package org.apache.catalina.websocket;
 import java.io.IOException;
 
 import org.apache.coyote.http11.upgrade.UpgradeProcessor;
+import org.apache.tomcat.util.res.StringManager;
 
 /**
  * This class is used to read WebSocket frames from the underlying socket and
@@ -27,6 +28,10 @@ import org.apache.coyote.http11.upgrade.UpgradeProcessor;
  * reading even if more bytes are available from the socket.
  */
 public class WsInputStream extends java.io.InputStream {
+
+    private static final StringManager sm =
+            StringManager.getManager(Constants.Package);
+
 
     private UpgradeProcessor<?> processor;
     private WsOutbound outbound;
@@ -76,14 +81,14 @@ public class WsInputStream extends java.io.InputStream {
                 } else if (getFrame().getOpCode() == Constants.OPCODE_CLOSE) {
                     outbound.close(frame);
                 } else{
-                    // TODO i18n
-                    throw new IOException("Unknown control frame");
+                    throw new IOException(sm.getString("is.unknownOpCode",
+                            Byte.valueOf(getFrame().getOpCode())));
                 }
                 processFrame();
             }
             if (getFrame().getOpCode() != Constants.OPCODE_CONTINUATION) {
-                // TODO i18n
-                error = "Not a continuation frame";
+                error = sm.getString("is.notContinutation",
+                        Byte.valueOf(getFrame().getOpCode()));
                 throw new IOException(error);
             }
         }

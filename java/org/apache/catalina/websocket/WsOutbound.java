@@ -24,12 +24,15 @@ import java.nio.charset.CoderResult;
 
 import org.apache.coyote.http11.upgrade.UpgradeOutbound;
 import org.apache.tomcat.util.buf.B2CConverter;
+import org.apache.tomcat.util.res.StringManager;
 
 /**
  * Provides the means to write WebSocket messages to the client.
  */
 public class WsOutbound {
 
+    private static final StringManager sm =
+            StringManager.getManager(Constants.Package);
     private static final int DEFAULT_BUFFER_SIZE = 8192;
 
     private UpgradeOutbound upgradeOutbound;
@@ -62,7 +65,7 @@ public class WsOutbound {
      */
     public void writeBinaryData(int b) throws IOException {
         if (closed) {
-            throw new IOException("Closed");
+            throw new IOException(sm.getString("outbound.closed"));
         }
 
         if (bb.position() == bb.capacity()) {
@@ -92,7 +95,7 @@ public class WsOutbound {
      */
     public void writeTextData(char c) throws IOException {
         if (closed) {
-            throw new IOException("Closed");
+            throw new IOException(sm.getString("outbound.closed"));
         }
 
         if (cb.position() == cb.capacity()) {
@@ -121,7 +124,7 @@ public class WsOutbound {
      */
     public void writeBinaryMessage(ByteBuffer msgBb) throws IOException {
         if (closed) {
-            throw new IOException("Closed");
+            throw new IOException(sm.getString("outbound.closed"));
         }
 
         if (text != null) {
@@ -144,7 +147,7 @@ public class WsOutbound {
      */
     public void writeTextMessage(CharBuffer msgCb) throws IOException {
         if (closed) {
-            throw new IOException("Closed");
+            throw new IOException(sm.getString("outbound.closed"));
         }
 
         if (text != null) {
@@ -163,7 +166,7 @@ public class WsOutbound {
      */
     public void flush() throws IOException {
         if (closed) {
-            throw new IOException("Closed");
+            throw new IOException(sm.getString("outbound.closed"));
         }
         doFlush(true);
     }
@@ -283,7 +286,7 @@ public class WsOutbound {
         // TODO Think about threading requirements for writing. This is not
         // currently thread safe and writing almost certainly needs to be.
         if (closed) {
-            throw new IOException("Closed");
+            throw new IOException(sm.getString("outbound.closed"));
         }
 
         doFlush(true);
