@@ -664,7 +664,7 @@ int SSL_callback_SSL_verify(int ok, X509_STORE_CTX *ctx)
 
 #if HAS_OCSP_ENABLED
     /* First perform OCSP validation if possible */
-    if(ok) {
+    if (ok) {
         /* If there was an optional verification error, it's not
          * possible to perform OCSP validation since the issuer may be
          * missing/untrusted.  Fail in that case.
@@ -676,10 +676,10 @@ int SSL_callback_SSL_verify(int ok, X509_STORE_CTX *ctx)
         }
         else {
             int ocsp_response = ssl_verify_OCSP(ok, ctx);
-            if (ocsp_response == OCSP_STATUS_OK ) {
+            if (ocsp_response == OCSP_STATUS_OK) {
                 skip_crl = 1; /* we know it is valid we skip crl evaluation */
             }
-            else if(ocsp_response == OCSP_STATUS_REVOKED ) {
+            else if (ocsp_response == OCSP_STATUS_REVOKED) {
                 ok = 0 ;
                 errnum = X509_STORE_CTX_get_error(ctx);
             }
