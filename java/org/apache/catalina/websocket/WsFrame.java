@@ -38,7 +38,7 @@ public class WsFrame {
     private final boolean fin;
     private final int rsv;
     private final byte opCode;
-    private int[] mask = new int[4];
+    private byte[] mask = new byte[4];
     private long payloadLength;
     private ByteBuffer payload;
 
@@ -86,9 +86,7 @@ public class WsFrame {
             }
         }
 
-        for (int j = 0; j < mask.length; j++) {
-            mask[j] = processorRead(processor) & 0xFF;
-        }
+        processorRead(processor, mask);
 
         if (isControl()) {
             // Note: Payload limited to <= 125 bytes by test above
@@ -127,7 +125,7 @@ public class WsFrame {
         return (opCode & 0x08) > 0;
     }
 
-    public int[] getMask() {
+    public byte[] getMask() {
         return mask;
     }
 
