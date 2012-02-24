@@ -159,6 +159,12 @@ public class JDTCompiler extends org.apache.jasper.compiler.Compiler {
                 }
                 return result;
             }
+
+            @SuppressWarnings("unused") // New method added to interface in
+                                        // later JDT versions
+            public boolean ignoreOptionalProblems() {
+                return false;
+            }
         }
 
         final INameEnvironment env = new INameEnvironment() {
