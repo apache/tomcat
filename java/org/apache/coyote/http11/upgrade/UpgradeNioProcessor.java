@@ -77,7 +77,12 @@ public class UpgradeNioProcessor extends UpgradeProcessor<NioChannel> {
 
     @Override
     public void write(int b) throws IOException {
-        writeToSocket(new byte[] {(byte) b});
+        writeToSocket(new byte[] {(byte) b}, 0, 1);
+    }
+
+    @Override
+    public void write(byte[]b, int off, int len) throws IOException {
+        writeToSocket(b, off, len);
     }
 
     /*
@@ -147,10 +152,11 @@ public class UpgradeNioProcessor extends UpgradeProcessor<NioChannel> {
     /*
      * Adapted from the NioOutputBuffer
      */
-    private synchronized int writeToSocket(byte[] bytes) throws IOException {
+    private synchronized int writeToSocket(byte[] bytes, int off, int len)
+            throws IOException {
 
         nioChannel.getBufHandler().getWriteBuffer().clear();
-        nioChannel.getBufHandler().getWriteBuffer().put(bytes);
+        nioChannel.getBufHandler().getWriteBuffer().put(bytes, off, len);
         nioChannel.getBufHandler().getWriteBuffer().flip();
 
         int written = 0;

@@ -43,6 +43,7 @@ public abstract class UpgradeProcessor<S> implements Processor<S> {
     // Output methods
     public abstract void flush() throws IOException;
     public abstract void write(int b) throws IOException;
+    public abstract void write(byte[] b, int off, int len) throws IOException;
 
     // Input methods
     public abstract int read() throws IOException;
