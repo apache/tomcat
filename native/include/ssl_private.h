@@ -204,6 +204,11 @@
                                 "In order to read them you have to provide the pass phrases.\n"         \
                                 "Enter password :"
 
+#define OCSP_STATUS_OK        0
+#define OCSP_STATUS_REVOKED   1
+#define OCSP_STATUS_UNKNOWN   2
+
+
 extern void *SSL_temp_keys[SSL_TMP_KEY_MAX];
 
 typedef struct {
@@ -308,4 +313,7 @@ void        SSL_vhost_algo_id(const unsigned char *, unsigned char *, int);
 int         SSL_CTX_use_certificate_chain(SSL_CTX *, const char *, int);
 int         SSL_callback_SSL_verify(int, X509_STORE_CTX *);
 int         SSL_rand_seed(const char *file);
+int         SSL_ocsp_request(X509 *cert, X509 *issuer);
+
+
 #endif /* SSL_PRIVATE_H */

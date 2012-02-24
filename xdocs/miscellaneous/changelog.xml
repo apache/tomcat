@@ -38,6 +38,10 @@
 </section>
 <section name="Changes between 1.1.22 and 1.1.23">
   <changelog>
+    <update>
+      <bug>45392</bug>: Add support for OCSP verification. Based upon a patch
+      from Aristotelis. (mturk)
+    </update>
     <fix>
       <bug>52119</bug>: Autodetect Diablo JDK on FreeBSD and Java7+. Based upon a patch
       from Michael Osipov. (mturk)
