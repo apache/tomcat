@@ -42,4 +42,9 @@ public class UpgradeOutbound extends OutputStream {
     public void write(int b) throws IOException {
         processor.write(b);
     }
+
+    @Override
+    public void write(byte[] b, int off, int len) throws IOException {
+        processor.write(b, off, len);
+    }
 }

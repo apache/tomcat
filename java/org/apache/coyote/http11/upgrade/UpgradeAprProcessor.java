@@ -55,6 +55,12 @@ public class UpgradeAprProcessor extends UpgradeProcessor<Long> {
     }
 
 
+    @Override
+    public void write(byte[]b, int off, int len) throws IOException {
+        Socket.send(socket, b, off, len);
+    }
+
+
     /*
      * Input methods
      */
