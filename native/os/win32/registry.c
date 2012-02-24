@@ -400,7 +400,7 @@ TCN_IMPLEMENT_CALL(jstring, Registry, getValueS)(TCN_STDARGS, jlong key,
             free(vw);
             goto cleanup;
         }
-        v = (*e)->NewString((e), vw, wcslen(vw));
+        v = (*e)->NewString((e), vw, lstrlenW(vw));
         free(vw);
     }
 cleanup:
@@ -545,7 +545,7 @@ TCN_IMPLEMENT_CALL(jint, Registry, setValueS)(TCN_STDARGS, jlong key,
     TCN_ASSERT(key != 0);
     TCN_INIT_WSTRING(name);
     TCN_INIT_WSTRING(val);
-    len = wcslen(J2W(val));
+    len = lstrlenW(J2W(val));
     rc = RegSetValueExW(k->key, J2W(name), 0, REG_SZ,
                         (CONST BYTE *)J2W(val), (len + 1) * 2);
     TCN_FREE_WSTRING(name);
@@ -566,7 +566,7 @@ TCN_IMPLEMENT_CALL(jint, Registry, setValueE)(TCN_STDARGS, jlong key,
     TCN_ASSERT(key != 0);
     TCN_INIT_WSTRING(name);
     TCN_INIT_WSTRING(val);
-    len = wcslen(J2W(val));
+    len = lstrlenW(J2W(val));
     rc = RegSetValueExW(k->key, J2W(name), 0, REG_EXPAND_SZ,
                         (CONST BYTE *)J2W(val), (len + 1) * 2);
     TCN_FREE_WSTRING(name);
@@ -682,7 +682,7 @@ TCN_IMPLEMENT_CALL(jobjectArray, Registry, enumKeys)(TCN_STDARGS, jlong key)
                                NULL,
                                &ftLastWriteTime);
             if (rc == (DWORD)ERROR_SUCCESS) {
-                s = (*e)->NewString((e), achKey, wcslen(achKey));
+                s = (*e)->NewString((e), achKey, lstrlenW(achKey));
                 (*e)->SetObjectArrayElement((e), v, idx, s);
             }
         }
@@ -747,7 +747,7 @@ TCN_IMPLEMENT_CALL(jobjectArray, Registry, enumValues)(TCN_STDARGS, jlong key)
                                NULL,    // &bData,
                                NULL);   // &bcData
             if (rc == (DWORD)ERROR_SUCCESS) {
-                s = (*e)->NewString((e), achValue, wcslen(achValue));
+                s = (*e)->NewString((e), achValue, lstrlenW(achValue));
                 (*e)->SetObjectArrayElement((e), v, idx, s);
             }
         }

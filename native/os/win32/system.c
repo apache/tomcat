@@ -167,11 +167,11 @@ TCN_IMPLEMENT_CALL(jstring, OS, expand)(TCN_STDARGS, jstring val)
     if (len > (TCN_BUFFER_SZ - 1)) {
         jchar *dbuf = malloc((len + 1) * 2);
         ExpandEnvironmentStringsW(J2W(val), dbuf, len);
-        str = (*e)->NewString(e, dbuf, wcslen(dbuf));
+        str = (*e)->NewString(e, dbuf, lstrlenW(dbuf));
         free(dbuf);
     }
     else
-        str = (*e)->NewString(e, buf, wcslen(buf));
+        str = (*e)->NewString(e, buf, lstrlenW(buf));
 
     TCN_FREE_WSTRING(val);
     return str;
@@ -197,7 +197,7 @@ static void init_log_source(const char *domain)
     strcat(event_key, domain);
     if (!RegCreateKey(HKEY_LOCAL_MACHINE, event_key, &key)) {
         RegSetValueEx(key, "EventMessageFile", 0, REG_SZ, (LPBYTE)&dll_file_name[0],
-                      strlen(dll_file_name) + 1);
+                      lstrlenA(dll_file_name) + 1);
         ts = EVENTLOG_ERROR_TYPE | EVENTLOG_WARNING_TYPE | EVENTLOG_INFORMATION_TYPE;
 
         RegSetValueEx(key, "TypesSupported", 0, REG_DWORD, (LPBYTE) &ts, sizeof(DWORD));

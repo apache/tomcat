@@ -197,7 +197,7 @@ ntp_socket_recv(apr_socket_t *sock, char *buf, apr_size_t *len)
     tcn_ntp_conn_t *con = (tcn_ntp_conn_t *)sock;
     DWORD readed;
 
-    if (!ReadFile(con->h_pipe, buf, *len, &readed, &con->rd_o)) {
+    if (!ReadFile(con->h_pipe, buf, (DWORD)*len, &readed, &con->rd_o)) {
         DWORD err = GetLastError();
         if (err == ERROR_IO_PENDING) {
             DWORD r = WaitForSingleObject(con->rd_event, con->timeout);
@@ -223,7 +223,7 @@ ntp_socket_send(apr_socket_t *sock, const char *buf,
     tcn_ntp_conn_t *con = (tcn_ntp_conn_t *)sock;
     DWORD written;
 
-    if (!WriteFile(con->h_pipe, buf, *len, &written, &con->wr_o)) {
+    if (!WriteFile(con->h_pipe, buf, (DWORD)*len, &written, &con->wr_o)) {
         DWORD err = GetLastError();
         if (err == ERROR_IO_PENDING) {
             DWORD r = WaitForSingleObject(con->wr_event, con->timeout);
