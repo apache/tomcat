@@ -44,6 +44,7 @@ extern int WIN32_SSL_password_prompt(tcn_pass_cb_t *data);
 #define ASN1_STRING   0x86
 
 static int ssl_verify_OCSP(int ok, X509_STORE_CTX *ctx);
+static int ssl_ocsp_request(X509 *cert, X509 *issuer);
 #endif
 
 /*  _________________________________________________________________
@@ -1213,8 +1214,7 @@ static int process_ocsp_response(OCSP_RESPONSE *ocsp_resp)
     return o;
 }
 
-
-int SSL_ocsp_request(X509 *cert, X509 *issuer)
+static int ssl_ocsp_request(X509 *cert, X509 *issuer)
 {
     char **ocsp_urls = NULL;
     int nid, i;
