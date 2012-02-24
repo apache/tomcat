@@ -62,7 +62,6 @@ public abstract class MessageInbound extends StreamInbound {
             if (cb.remaining() == 0) {
                 resizeCharBuffer();
             }
-            // TODO This should fail on invalid UTF-8 input but doesn't
             read = r.read(cb.array(), cb.position(), cb.remaining());
         }
         cb.flip();
