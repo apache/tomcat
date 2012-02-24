@@ -64,6 +64,15 @@
       </update>
     </changelog>
   </subsection>
+  <subsection>
+    <changelog>
+      <scode>
+        <bug>52758</bug>: Implement additional interface methods in Eclipse JDT
+        integration required for Jasper to correctly with the latest Eclipse
+        development code. (markt)
+      </scode>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <fix>
