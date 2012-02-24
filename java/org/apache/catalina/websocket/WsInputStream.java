@@ -104,6 +104,58 @@ public class WsInputStream extends java.io.InputStream {
         if(masked == -1) {
             return -1;
         }
-        return masked ^ frame.getMask()[(int) ((readThisFragment - 1) % 4)];
+        return masked ^
+                (frame.getMask()[(int) ((readThisFragment - 1) % 4)] & 0xFF);
     }
+
+
+    @Override
+    public int read(byte b[], int off, int len) throws IOException {
+        if (error != null) {
+            throw new IOException(error);
+        }
+        while (remaining == 0 && !getFrame().getFin()) {
+            // Need more data - process next frame
+            processFrame();
+            while (frame.isControl()) {
+                if (getFrame().getOpCode() == Constants.OPCODE_PING) {
+                    outbound.pong(frame.getPayLoad());
+                } else if (getFrame().getOpCode() == Constants.OPCODE_PONG) {
+                    // NO-OP. Swallow it.
+                } else if (getFrame().getOpCode() == Constants.OPCODE_CLOSE) {
+                    outbound.close(frame);
+                } else{
+                    throw new IOException(sm.getString("is.unknownOpCode",
+                            Byte.valueOf(getFrame().getOpCode())));
+                }
+                processFrame();
+            }
+            if (getFrame().getOpCode() != Constants.OPCODE_CONTINUATION) {
+                error = sm.getString("is.notContinutation",
+                        Byte.valueOf(getFrame().getOpCode()));
+                throw new IOException(error);
+            }
+        }
+
+        if (remaining == 0) {
+            return -1;
+        }
+
+        if (len > remaining) {
+            len = (int) remaining;
+        }
+        int result = processor.read(b, off, len);
+        if(result == -1) {
+            return -1;
+        }
+
+        for (int i = off; i < off + result; i++) {
+            b[i] = (byte) (b[i] ^
+                    frame.getMask()[(int) ((readThisFragment + i - off) % 4)]);
+        }
+        remaining -= result;
+        readThisFragment += result;
+        return result;
+    }
+
 }
