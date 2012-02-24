@@ -1082,7 +1082,8 @@ err:
 #define ADDLEN 512
 static OCSP_RESPONSE *ocsp_get_resp(apr_socket_t *sock)
 {
-    apr_size_t buflen = 0, totalread = 0;
+    int buflen;
+    apr_size_t totalread = 0;
     apr_size_t readlen;
     char *buf, tmpbuf[ADDLEN];
     apr_status_t rv = APR_SUCCESS;
