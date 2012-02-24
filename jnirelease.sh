@@ -70,7 +70,7 @@ if [ "x$JKJNIEXT" = "x" ]; then
     echo ""
     echo "Unknown SVN version"
     echo "Use:"
-    echo "  --ver=<version>|<branch>|trunk" 
+    echo "  --ver=<tagged-version>|trunk"
     echo ""
     exit 1
 fi
@@ -117,20 +117,12 @@ else
   echo ""
   exit 1
 fi
-echo $JKJNIEXT | egrep -e 'x$' > /dev/null 2>&1
-if [ $? -eq 0 ]; then
-    USE_BRANCH=1
-else
-    USE_BRANCH=0
-fi
 
 JKJNISVN=$SVNBASE/${JKJNIEXT}
 if [ "x$JKJNIEXT" = "xtrunk" ]; then
-    JKJNIVER=`svn info ${JKJNISVN} | awk '$1 == "Revision:" {print $2}'`
-elif [ $USE_BRANCH -eq 1 ]; then
-    JKJNIBRANCH=${JKJNIEXT}
-    JKJNISVN=$SVNBASE/branches/${JKJNIBRANCH}
-    JKJNIVER=${JKJNIBRANCH}-`svn info ${JKJNISVN} | awk '$1 == "Revision:" {print $2}'`
+    i="`svn info`"
+    JKJNIVER=`echo "$i" | awk '$1 == "Revision:" {print $2}'`
+    JKJNISVN=`echo "$i" | awk '$1 == "URL:" {print $2}'`
 else
     JKJNIVER=$JKJNIEXT
     JKJNISVN="${SVNBASE}/tags/TOMCAT_NATIVE_`echo $JKJNIVER | sed 's/\./_/g'`"
@@ -150,7 +142,6 @@ do
         echo ""
         echo "svn export ${i} failed"
         echo ""
-        exit 1
     fi
 done
 
