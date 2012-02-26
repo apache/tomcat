@@ -209,7 +209,7 @@
     &lt;param-value&gt;access plus 10 minutes&lt;/param-value&gt;
  &lt;/init-param&gt;
  &lt;init-param&gt;
-    &lt;param-name&gt;ExpiresByType text/javascript&lt;/param-name&gt;
+    &lt;param-name&gt;ExpiresByType application/javascript&lt;/param-name&gt;
     &lt;param-value&gt;access plus 10 minutes&lt;/param-value&gt;
  &lt;/init-param&gt;
 &lt;/filter&gt;
