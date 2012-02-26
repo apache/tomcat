@@ -64,7 +64,7 @@
       </update>
     </changelog>
   </subsection>
-  <subsection>
+  <subsection name="Jasper">
     <changelog>
       <scode>
         <bug>52758</bug>: Implement additional interface methods in Eclipse JDT
