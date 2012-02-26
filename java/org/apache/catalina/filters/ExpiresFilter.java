@@ -95,7 +95,7 @@ import org.apache.juli.logging.LogFactory;
  *          &lt;param-value&gt;access plus 10 minutes&lt;/param-value&gt;
  *       &lt;/init-param&gt;
  *       &lt;init-param&gt;
- *          &lt;param-name&gt;ExpiresByType text/javascript&lt;/param-name&gt;
+ *          &lt;param-name&gt;ExpiresByType application/javascript&lt;/param-name&gt;
  *          &lt;param-value&gt;access plus 10 minutes&lt;/param-value&gt;
  *       &lt;/init-param&gt;
  *    &lt;/filter&gt;
@@ -380,7 +380,7 @@ import org.apache.juli.logging.LogFactory;
  *    byType={
  *       image=ExpiresConfiguration[startingPoint=ACCESS_TIME, duration=[10 MINUTE]],
  *       text/css=ExpiresConfiguration[startingPoint=ACCESS_TIME, duration=[10 MINUTE]],
- *       text/javascript=ExpiresConfiguration[startingPoint=ACCESS_TIME, duration=[10 MINUTE]]}]
+ *       application/javascript=ExpiresConfiguration[startingPoint=ACCESS_TIME, duration=[10 MINUTE]]}]
  * </pre></code>
  * <p>
  * Sample of per-request log message where <tt>ExpiresFilter</tt> adds an
