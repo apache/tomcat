@@ -73,6 +73,14 @@
       </scode>
     </changelog>
   </subsection>
+  <subsection name="Web applications">
+    <changelog>
+      <update>
+        Bring built-in mime types for embedded Tomcat more in line with the
+        ones defined in the default web.xml configuration file. (rjung)
+      </update>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <fix>
