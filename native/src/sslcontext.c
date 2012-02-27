@@ -590,19 +590,19 @@ TCN_IMPLEMENT_CALL(jboolean, SSLContext, setCertificate)(TCN_STDARGS, jlong ctx,
     cert_file = J2S(cert);
     if (!key_file)
         key_file = cert_file;
-    if (!key_file) {
+    if (!key_file || !cert_file) {
         tcn_Throw(e, "No Certificate file specified or invalid file format");
         rv = JNI_FALSE;
         goto cleanup;
     }
-    if ((p = strrchr(cert_file, '.')) != NULL && strcmp(p, ".pkcs12") == 0) {        
+    if ((p = strrchr(cert_file, '.')) != NULL && strcmp(p, ".pkcs12") == 0) {
         if (!ssl_load_pkcs12(c, cert_file, &c->keys[idx], &c->certs[idx], 0)) {
             ERR_error_string(ERR_get_error(), err);
             tcn_Throw(e, "Unable to load certificate %s (%s)",
                       cert_file, err);
             rv = JNI_FALSE;
-            goto cleanup;        
-        }    
+            goto cleanup;
+        }
     }
     else {
         if ((c->keys[idx] = load_pem_key(c, key_file)) == NULL) {
