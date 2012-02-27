@@ -67,31 +67,8 @@ public class WsInputStream extends java.io.InputStream {
 
     @Override
     public int read() throws IOException {
-        if (error != null) {
-            throw new IOException(error);
-        }
-        while (remaining == 0 && !getFrame().getFin()) {
-            // Need more data - process next frame
-            processFrame();
-            while (frame.isControl()) {
-                if (getFrame().getOpCode() == Constants.OPCODE_PING) {
-                    outbound.pong(frame.getPayLoad());
-                } else if (getFrame().getOpCode() == Constants.OPCODE_PONG) {
-                    // NO-OP. Swallow it.
-                } else if (getFrame().getOpCode() == Constants.OPCODE_CLOSE) {
-                    outbound.close(frame);
-                } else{
-                    throw new IOException(sm.getString("is.unknownOpCode",
-                            Byte.valueOf(getFrame().getOpCode())));
-                }
-                processFrame();
-            }
-            if (getFrame().getOpCode() != Constants.OPCODE_CONTINUATION) {
-                error = sm.getString("is.notContinutation",
-                        Byte.valueOf(getFrame().getOpCode()));
-                throw new IOException(error);
-            }
-        }
+
+        makePayloadDataAvailable();
 
         if (remaining == 0) {
             return -1;
@@ -111,31 +88,8 @@ public class WsInputStream extends java.io.InputStream {
 
     @Override
     public int read(byte b[], int off, int len) throws IOException {
-        if (error != null) {
-            throw new IOException(error);
-        }
-        while (remaining == 0 && !getFrame().getFin()) {
-            // Need more data - process next frame
-            processFrame();
-            while (frame.isControl()) {
-                if (getFrame().getOpCode() == Constants.OPCODE_PING) {
-                    outbound.pong(frame.getPayLoad());
-                } else if (getFrame().getOpCode() == Constants.OPCODE_PONG) {
-                    // NO-OP. Swallow it.
-                } else if (getFrame().getOpCode() == Constants.OPCODE_CLOSE) {
-                    outbound.close(frame);
-                } else{
-                    throw new IOException(sm.getString("is.unknownOpCode",
-                            Byte.valueOf(getFrame().getOpCode())));
-                }
-                processFrame();
-            }
-            if (getFrame().getOpCode() != Constants.OPCODE_CONTINUATION) {
-                error = sm.getString("is.notContinutation",
-                        Byte.valueOf(getFrame().getOpCode()));
-                throw new IOException(error);
-            }
-        }
+
+        makePayloadDataAvailable();
 
         if (remaining == 0) {
             return -1;
@@ -158,4 +112,35 @@ public class WsInputStream extends java.io.InputStream {
         return result;
     }
 
+
+    /*
+     * Ensures that there is payload data ready to read.
+     */
+    private void makePayloadDataAvailable() throws IOException {
+        if (error != null) {
+            throw new IOException(error);
+        }
+        while (remaining == 0 && !getFrame().getFin()) {
+            // Need more data - process next frame
+            processFrame();
+            while (frame.isControl()) {
+                if (getFrame().getOpCode() == Constants.OPCODE_PING) {
+                    outbound.pong(frame.getPayLoad());
+                } else if (getFrame().getOpCode() == Constants.OPCODE_PONG) {
+                    // NO-OP. Swallow it.
+                } else if (getFrame().getOpCode() == Constants.OPCODE_CLOSE) {
+                    outbound.close(frame);
+                } else{
+                    throw new IOException(sm.getString("is.unknownOpCode",
+                            Byte.valueOf(getFrame().getOpCode())));
+                }
+                processFrame();
+            }
+            if (getFrame().getOpCode() != Constants.OPCODE_CONTINUATION) {
+                error = sm.getString("is.notContinutation",
+                        Byte.valueOf(getFrame().getOpCode()));
+                throw new IOException(error);
+            }
+        }
+    }
 }
