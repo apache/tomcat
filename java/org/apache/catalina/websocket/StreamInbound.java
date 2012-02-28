@@ -62,59 +62,60 @@ public abstract class StreamInbound implements UpgradeInbound {
 
     @Override
     public final SocketState onData() throws IOException {
-        // Must be start the start of a frame or series of frames
+        // Must be start the start of a message (which may consist of multiple
+        // frames)
 
-        try {
-            WsInputStream wsIs = new WsInputStream(processor, getWsOutbound());
+        // TODO - change this test to check if there is data to read
+        while (true) {
+            try {
+                // New WsInputStream for each message (not each frame)
+                WsInputStream wsIs =
+                        new WsInputStream(processor, getWsOutbound());
+                WsFrame frame = wsIs.getFrame();
 
-            WsFrame frame = wsIs.getFrame();
+                // TODO User defined extensions may define values for rsv
+                if (frame.getRsv() > 0) {
+                    getWsOutbound().close(1002, null);
+                    return SocketState.CLOSED;
+                }
 
-            // TODO User defined extensions may define values for rsv
-            if (frame.getRsv() > 0) {
+                byte opCode = frame.getOpCode();
+
+                if (opCode == Constants.OPCODE_BINARY) {
+                    onBinaryData(wsIs);
+                } else if (opCode == Constants.OPCODE_TEXT) {
+                    InputStreamReader r =
+                            new InputStreamReader(wsIs, new Utf8Decoder());
+                    onTextData(r);
+                } else if (opCode == Constants.OPCODE_CLOSE){
+                    getWsOutbound().close(frame);
+                    return SocketState.CLOSED;
+                } else if (opCode == Constants.OPCODE_PING) {
+                    getWsOutbound().pong(frame.getPayLoad());
+                } else if (opCode == Constants.OPCODE_PONG) {
+                    // NO-OP
+                } else {
+                    // Unknown OpCode
+                    getWsOutbound().close(1002, null);
+                    return SocketState.CLOSED;
+                }
+            } catch (MalformedInputException mie) {
+                // Invalid UTF-8
+                getWsOutbound().close(1007, null);
+                return SocketState.CLOSED;
+            } catch (UnmappableCharacterException uce) {
+                // Invalid UTF-8
+                getWsOutbound().close(1007, null);
+                return SocketState.CLOSED;
+            } catch (IOException ioe) {
+                // Given something must have gone to reach this point, this might
+                // not work but try it anyway.
                 getWsOutbound().close(1002, null);
                 return SocketState.CLOSED;
             }
-
-            byte opCode = frame.getOpCode();
-
-            if (opCode == Constants.OPCODE_BINARY) {
-                onBinaryData(wsIs);
-                return SocketState.UPGRADED;
-            } else if (opCode == Constants.OPCODE_TEXT) {
-                InputStreamReader r =
-                        new InputStreamReader(wsIs, new Utf8Decoder());
-                onTextData(r);
-                return SocketState.UPGRADED;
-            }
-
-            if (opCode == Constants.OPCODE_CLOSE){
-                getWsOutbound().close(frame);
-                return SocketState.CLOSED;
-            } else if (opCode == Constants.OPCODE_PING) {
-                getWsOutbound().pong(frame.getPayLoad());
-                return SocketState.UPGRADED;
-            } else if (opCode == Constants.OPCODE_PONG) {
-                // NO-OP
-                return SocketState.UPGRADED;
-            }
-
-            // Unknown OpCode
-            getWsOutbound().close(1002, null);
-            return SocketState.CLOSED;
-        } catch (MalformedInputException mie) {
-            // Invalid UTF-8
-            getWsOutbound().close(1007, null);
-            return SocketState.CLOSED;
-        } catch (UnmappableCharacterException uce) {
-            // Invalid UTF-8
-            getWsOutbound().close(1007, null);
-            return SocketState.CLOSED;
-        } catch (IOException ioe) {
-            // Given something must have gone to reach this point, this might
-            // not work but try it anyway.
-            getWsOutbound().close(1002, null);
-            return SocketState.CLOSED;
         }
+        // TODO Required once while loop is fixed
+        // return SocketState.UPGRADED;
     }
 
 
