@@ -46,6 +46,7 @@ public class WsFrame {
      * Create the new WebSocket frame, reading data from the processor as
      * necessary.
      *
+     * @param first     First byte of data for this frame
      * @param processor Processor associated with the WebSocket connection on
      *                  which the frame has been sent
      *
@@ -53,9 +54,10 @@ public class WsFrame {
      *                      exception will trigger the closing of the WebSocket
      *                      connection.
      */
-    public WsFrame(UpgradeProcessor<?> processor) throws IOException {
+    private WsFrame(byte first,
+            UpgradeProcessor<?> processor) throws IOException {
 
-        int b = blockingRead(processor);
+        int b = first & 0xFF;
         fin = (b & 0x80) > 0;
         rsv = (b & 0x70) >>> 4;
         opCode = (byte) (b & 0x0F);
@@ -183,5 +185,38 @@ public class WsFrame {
             bb.put((byte) (last ^ mask[bb.position() % 4]));
         }
         bb.flip();
+    }
+
+
+    /**
+     * Read the next WebSocket frame, reading data from the processor as
+     * necessary.
+     *
+     * @param processor Processor associated with the WebSocket connection on
+     *                  which the frame has been sent
+     *
+     * @param block Should this method block until a frame is presented if no
+     *              data is currently available to process. Note that is a
+     *              single byte is available, this method will block until the
+     *              complete frame (excluding payload for non-control frames) is
+     *              available.
+     *
+     * @throws IOException  If a problem occurs processing the frame. Any
+     *                      exception will trigger the closing of the WebSocket
+     *                      connection.
+     */
+    public static WsFrame nextFrame(UpgradeProcessor<?> processor,
+            boolean block) throws IOException {
+
+        byte[] first = new byte[1];
+        int read = processor.read(block, first, 0, 1);
+        if (read == 1) {
+            return new WsFrame(first[0], processor);
+        } else if (read == 0) {
+            return null;
+        } else {
+            // TODO message
+            throw new IOException();
+        }
     }
 }

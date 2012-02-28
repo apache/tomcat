@@ -43,23 +43,33 @@ public class WsInputStream extends java.io.InputStream {
     private String error = null;
 
 
-    public WsInputStream(UpgradeProcessor<?> processor, WsOutbound outbound)
-            throws IOException {
+    public WsInputStream(UpgradeProcessor<?> processor, WsOutbound outbound) {
         this.processor = processor;
         this.outbound = outbound;
-        processFrame();
     }
 
 
-    public WsFrame getFrame() {
+    /**
+     * Process the next WebSocket frame.
+     *
+     * @param block Should this method block until a frame is presented if no
+     *              data is currently available to process. Note that is a
+     *              single byte is available, this method will block until the
+     *              complete frame (excluding payload for non-control frames) is
+     *              available.
+     *
+     * @return  The next frame to be processed or <code>null</code> if block is
+     *          <code>false</code> and there is no data to be processed.
+     *
+     * @throws IOException  If a problem occurs reading the data for the frame.
+     */
+    public WsFrame nextFrame(boolean block) throws IOException {
+        frame = WsFrame.nextFrame(processor, block);
+        if (frame != null) {
+            readThisFragment = 0;
+            remaining = frame.getPayLoadLength();
+        }
         return frame;
-    }
-
-
-    private void processFrame() throws IOException {
-        frame = new WsFrame(processor);
-        readThisFragment = 0;
-        remaining = frame.getPayLoadLength();
     }
 
 
@@ -120,25 +130,25 @@ public class WsInputStream extends java.io.InputStream {
         if (error != null) {
             throw new IOException(error);
         }
-        while (remaining == 0 && !getFrame().getFin()) {
+        while (remaining == 0 && !frame.getFin()) {
             // Need more data - process next frame
-            processFrame();
+            nextFrame(true);
             while (frame.isControl()) {
-                if (getFrame().getOpCode() == Constants.OPCODE_PING) {
+                if (frame.getOpCode() == Constants.OPCODE_PING) {
                     outbound.pong(frame.getPayLoad());
-                } else if (getFrame().getOpCode() == Constants.OPCODE_PONG) {
+                } else if (frame.getOpCode() == Constants.OPCODE_PONG) {
                     // NO-OP. Swallow it.
-                } else if (getFrame().getOpCode() == Constants.OPCODE_CLOSE) {
+                } else if (frame.getOpCode() == Constants.OPCODE_CLOSE) {
                     outbound.close(frame);
                 } else{
                     throw new IOException(sm.getString("is.unknownOpCode",
-                            Byte.valueOf(getFrame().getOpCode())));
+                            Byte.valueOf(frame.getOpCode())));
                 }
-                processFrame();
+                nextFrame(true);
             }
-            if (getFrame().getOpCode() != Constants.OPCODE_CONTINUATION) {
+            if (frame.getOpCode() != Constants.OPCODE_CONTINUATION) {
                 error = sm.getString("is.notContinutation",
-                        Byte.valueOf(getFrame().getOpCode()));
+                        Byte.valueOf(frame.getOpCode()));
                 throw new IOException(error);
             }
         }
