@@ -23,12 +23,6 @@ import java.net.Socket;
 
 import org.apache.tomcat.util.net.SocketWrapper;
 
-/**
- * Implementation note: The need to extend Http11Processor could probably be
- * removed if the Processor interface was expanded to cover all of the methods
- * required by the AbstractProtocol. That would simplify the code and further
- * reduce the size of instances of this class.
- */
 public class UpgradeBioProcessor extends UpgradeProcessor<Socket> {
 
     private final InputStream inputStream;
