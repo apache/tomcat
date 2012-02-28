@@ -68,7 +68,10 @@ public class UpgradeBioProcessor extends UpgradeProcessor<Socket> {
 
 
     @Override
-    public int read(byte[] bytes, int off, int len) throws IOException {
+    public int read(boolean block, byte[] bytes, int off, int len)
+            throws IOException {
+        // The BIO endpoint always uses blocking IO so the block parameter is
+        // ignored and a blocking read is performed.
         return inputStream.read(bytes, off, len);
     }
 }

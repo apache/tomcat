@@ -71,7 +71,9 @@ public class UpgradeAprProcessor extends UpgradeProcessor<Long> {
 
 
     @Override
-    public int read(byte[] bytes, int off, int len) throws IOException {
+    public int read(boolean block, byte[] bytes, int off, int len)
+            throws IOException {
+        // TODO support non-blocking reads
         return Socket.recv(socket, bytes, off, len);
     }
 }

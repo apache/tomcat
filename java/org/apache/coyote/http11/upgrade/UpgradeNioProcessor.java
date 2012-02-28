@@ -102,7 +102,10 @@ public class UpgradeNioProcessor extends UpgradeProcessor<NioChannel> {
     }
 
     @Override
-    public int read(byte[] bytes, int off, int len) throws IOException {
+    public int read(boolean block, byte[] bytes, int off, int len)
+            throws IOException {
+        // TODO Implement non-blocking reads. Should be as simple as replacing
+        // true with block in the two lines below
         if (len > maxRead) {
             return readSocket(true, bytes, off, maxRead);
         } else {

@@ -98,7 +98,7 @@ public class WsInputStream extends java.io.InputStream {
         if (len > remaining) {
             len = (int) remaining;
         }
-        int result = processor.read(b, off, len);
+        int result = processor.read(true, b, off, len);
         if(result == -1) {
             return -1;
         }

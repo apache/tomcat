@@ -155,7 +155,7 @@ public class WsFrame {
         int read = 0;
         int last = 0;
         while (read < bytes.length) {
-            last = processor.read(bytes, read, bytes.length - read);
+            last = processor.read(true, bytes, read, bytes.length - read);
             if (last == -1) {
                 throw new IOException(sm.getString("frame.eos"));
             }

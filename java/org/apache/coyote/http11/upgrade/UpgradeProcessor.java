@@ -46,8 +46,32 @@ public abstract class UpgradeProcessor<S> implements Processor<S> {
     public abstract void write(byte[] b, int off, int len) throws IOException;
 
     // Input methods
+    /**
+     * This is always a blocking read of a single byte.
+     *
+     * @return  The next byte or -1 if the end of the input is reached.
+     *
+     * @throws IOException  If a problem occurs trying to read from the input
+     */
     public abstract int read() throws IOException;
-    public abstract int read(byte[] bytes, int off, int len) throws IOException;
+
+    /**
+     * Read up to len bytes from the input in either blocking or non-blocking
+     * mode (where non-blocking is supported). If the input does not support
+     * non-blocking reads, a blcoking read will be performed.
+     *
+     * @param block
+     * @param bytes
+     * @param off
+     * @param len
+     * @return  The number of bytes read or -1 if the end of the input is
+     *          reached. Non-blocking reads may return zero if no data is
+     *          available. Blocking reads never return zero.
+     *
+     * @throws IOException  If a problem occurs trying to read from the input
+     */
+    public abstract int read(boolean block, byte[] bytes, int off, int len)
+            throws IOException;
 
     @Override
     public final UpgradeInbound getUpgradeInbound() {
