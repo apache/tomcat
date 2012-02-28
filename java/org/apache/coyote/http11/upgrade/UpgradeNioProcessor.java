@@ -25,12 +25,6 @@ import org.apache.tomcat.util.net.NioEndpoint;
 import org.apache.tomcat.util.net.NioSelectorPool;
 import org.apache.tomcat.util.net.SocketWrapper;
 
-/**
- * Implementation note: The need to extend Http11Processor could probably be
- * removed if the Processor interface was expanded to cover all of the methods
- * required by the AbstractProtocol. That would simplify the code and further
- * reduce the size of instances of this class.
- */
 public class UpgradeNioProcessor extends UpgradeProcessor<NioChannel> {
 
     private final NioChannel nioChannel;
@@ -104,7 +98,8 @@ public class UpgradeNioProcessor extends UpgradeProcessor<NioChannel> {
             return -1;
         } else {
             return bytes[0] & 0xFF;
-        }    }
+        }
+    }
 
     @Override
     public int read(byte[] bytes, int off, int len) throws IOException {
@@ -113,7 +108,6 @@ public class UpgradeNioProcessor extends UpgradeProcessor<NioChannel> {
         } else {
             return readSocket(true, bytes, off, len);
         }
-
     }
 
 
