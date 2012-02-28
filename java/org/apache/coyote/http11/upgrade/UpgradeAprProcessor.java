@@ -19,6 +19,7 @@ package org.apache.coyote.http11.upgrade;
 import java.io.IOException;
 
 import org.apache.tomcat.jni.Socket;
+import org.apache.tomcat.jni.Status;
 import org.apache.tomcat.util.net.SocketWrapper;
 
 public class UpgradeAprProcessor extends UpgradeProcessor<Long> {
@@ -73,7 +74,23 @@ public class UpgradeAprProcessor extends UpgradeProcessor<Long> {
     @Override
     public int read(boolean block, byte[] bytes, int off, int len)
             throws IOException {
-        // TODO support non-blocking reads
-        return Socket.recv(socket, bytes, off, len);
+        if (!block) {
+            Socket.optSet(socket, Socket.APR_SO_NONBLOCK, -1);
+        }
+        try {
+            int result = Socket.recv(socket, bytes, off, len);
+            if (result > 0) {
+                return result;
+            } else if (-result == Status.EAGAIN) {
+                return 0;
+            } else {
+                throw new IOException(sm.getString("apr.error",
+                        Integer.valueOf(-result)));
+            }
+        } finally {
+            if (!block) {
+                Socket.optSet(socket, Socket.APR_SO_NONBLOCK, 0);
+            }
+        }
     }
 }
