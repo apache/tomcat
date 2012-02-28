@@ -65,14 +65,11 @@ public abstract class StreamInbound implements UpgradeInbound {
         // Must be start the start of a message (which may consist of multiple
         // frames)
 
-        // TODO - change this test to check if there is data to read
-        while (true) {
-            try {
-                // New WsInputStream for each message (not each frame)
-                WsInputStream wsIs =
-                        new WsInputStream(processor, getWsOutbound());
-                WsFrame frame = wsIs.getFrame();
+        WsInputStream wsIs = new WsInputStream(processor, getWsOutbound());
+        WsFrame frame = wsIs.nextFrame(true);
 
+        while (frame != null) {
+            try {
                 // TODO User defined extensions may define values for rsv
                 if (frame.getRsv() > 0) {
                     getWsOutbound().close(1002, null);
@@ -113,9 +110,9 @@ public abstract class StreamInbound implements UpgradeInbound {
                 getWsOutbound().close(1002, null);
                 return SocketState.CLOSED;
             }
+            frame = wsIs.nextFrame(false);
         }
-        // TODO Required once while loop is fixed
-        // return SocketState.UPGRADED;
+        return SocketState.UPGRADED;
     }
 
 
