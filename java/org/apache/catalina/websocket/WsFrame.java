@@ -55,12 +55,12 @@ public class WsFrame {
      */
     public WsFrame(UpgradeProcessor<?> processor) throws IOException {
 
-        int b = processorRead(processor);
+        int b = blockingRead(processor);
         fin = (b & 0x80) > 0;
         rsv = (b & 0x70) >>> 4;
         opCode = (byte) (b & 0x0F);
 
-        b = processorRead(processor);
+        b = blockingRead(processor);
         // Client data must be masked
         if ((b & 0x80) == 0) {
             throw new IOException(sm.getString("frame.notMasked"));
@@ -69,11 +69,11 @@ public class WsFrame {
         payloadLength = b & 0x7F;
         if (payloadLength == 126) {
             byte[] extended = new byte[2];
-            processorRead(processor, extended);
+            blockingRead(processor, extended);
             payloadLength = Conversions.byteArrayToLong(extended);
         } else if (payloadLength == 127) {
             byte[] extended = new byte[8];
-            processorRead(processor, extended);
+            blockingRead(processor, extended);
             payloadLength = Conversions.byteArrayToLong(extended);
         }
 
@@ -86,12 +86,12 @@ public class WsFrame {
             }
         }
 
-        processorRead(processor, mask);
+        blockingRead(processor, mask);
 
         if (isControl()) {
             // Note: Payload limited to <= 125 bytes by test above
             payload = ByteBuffer.allocate((int) payloadLength);
-            processorRead(processor, payload);
+            blockingRead(processor, payload);
 
             if (opCode == Constants.OPCODE_CLOSE && payloadLength > 2) {
                 // Check close payload - if present - is valid UTF-8
@@ -138,9 +138,10 @@ public class WsFrame {
     }
 
 
-    // ----------------------------------- Guaranteed read methods for processor
-
-    private int processorRead(UpgradeProcessor<?> processor)
+    /*
+     * Blocks until a aingle byte has been read
+     */
+    private int blockingRead(UpgradeProcessor<?> processor)
             throws IOException {
         int result = processor.read();
         if (result == -1) {
@@ -150,7 +151,10 @@ public class WsFrame {
     }
 
 
-    private void processorRead(UpgradeProcessor<?> processor, byte[] bytes)
+    /*
+     * Blocks until the byte array has been filled.
+     */
+    private void blockingRead(UpgradeProcessor<?> processor, byte[] bytes)
             throws IOException {
         int read = 0;
         int last = 0;
@@ -165,9 +169,10 @@ public class WsFrame {
 
 
     /*
-     * Intended to read whole payload. Therefore able to unmask.
+     * Intended to read whole payload and blocks until it has. Therefore able to
+     * unmask the payload data.
      */
-    private void processorRead(UpgradeProcessor<?> processor, ByteBuffer bb)
+    private void blockingRead(UpgradeProcessor<?> processor, ByteBuffer bb)
             throws IOException {
         int last = 0;
         while (bb.hasRemaining()) {
