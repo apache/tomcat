@@ -320,10 +320,6 @@ public class WsOutbound {
     private void doWriteBytes(ByteBuffer buffer, boolean finalFragment)
             throws IOException {
 
-        if (closed) {
-            throw new IOException("Closed");
-        }
-
         // Work out the first byte
         int first = 0x00;
         if (finalFragment) {
