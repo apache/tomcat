@@ -33,7 +33,7 @@ public class WsOutbound {
 
     private static final StringManager sm =
             StringManager.getManager(Constants.Package);
-    private static final int DEFAULT_BUFFER_SIZE = 8192;
+    public static final int DEFAULT_BUFFER_SIZE = 8192;
 
     private UpgradeOutbound upgradeOutbound;
     private ByteBuffer bb;
@@ -44,10 +44,15 @@ public class WsOutbound {
 
 
     public WsOutbound(UpgradeOutbound upgradeOutbound) {
+        this(upgradeOutbound, DEFAULT_BUFFER_SIZE, DEFAULT_BUFFER_SIZE);
+    }
+
+
+    public WsOutbound(UpgradeOutbound upgradeOutbound, int byteBufferSize,
+            int charBufferSize) {
         this.upgradeOutbound = upgradeOutbound;
-        // TODO: Make buffer size configurable
-        this.bb = ByteBuffer.allocate(DEFAULT_BUFFER_SIZE);
-        this.cb = CharBuffer.allocate(DEFAULT_BUFFER_SIZE);
+        this.bb = ByteBuffer.allocate(byteBufferSize);
+        this.cb = CharBuffer.allocate(charBufferSize);
     }
 
 
