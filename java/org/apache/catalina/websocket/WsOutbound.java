@@ -96,7 +96,7 @@ public class WsOutbound {
      * message started. If the buffer for textual data is full, the buffer will
      * be flushed and a new textual continuation fragment started.
      *
-     * @param b The character to send to the client.
+     * @param c The character to send to the client.
      *
      * @throws IOException  If a flush is required and an error occurs writing
      *                      the WebSocket frame to the client
@@ -151,7 +151,7 @@ public class WsOutbound {
      * a WebSocket text message as a single frame with the provided buffer as
      * the payload of the message.
      *
-     * @param msgBb The buffer containing the payload
+     * @param msgCb The buffer containing the payload
      *
      * @throws IOException  If an error occurs writing to the client
      */
@@ -221,7 +221,7 @@ public class WsOutbound {
                 close(status, frame.getPayLoad());
             } else {
                 // Invalid close code
-                close(1002, null);
+                close(Constants.STATUS_PROTOCOL_ERROR, null);
             }
         } else {
             // No status
@@ -232,9 +232,15 @@ public class WsOutbound {
 
     private boolean validateCloseStatus(int status) {
 
-        if (status == 1000 || status == 1001 || status == 1002 ||
-                status == 1003 || status == 1007 || status == 1008 ||
-                status == 1009 || status == 1010 || status == 1011 ||
+        if (status == Constants.STATUS_CLOSE_NORMAL ||
+                status == Constants.STATUS_SHUTDOWN ||
+                status == Constants.STATUS_PROTOCOL_ERROR ||
+                status == Constants.STATUS_UNEXPECTED_DATA_TYPE ||
+                status == Constants.STATUS_BAD_DATA ||
+                status == Constants.STATUS_POLICY_VIOLATION ||
+                status == Constants.STATUS_MESSAGE_TOO_LARGE ||
+                status == Constants.STATUS_REQUIRED_EXTENSION ||
+                status == Constants.STATUS_UNEXPECTED_CONDITION ||
                 (status > 2999 && status < 5000)) {
             // Other 1xxx reserved / not permitted
             // 2xxx reserved

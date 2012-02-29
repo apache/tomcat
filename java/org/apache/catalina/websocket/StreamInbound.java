@@ -113,7 +113,8 @@ public abstract class StreamInbound implements UpgradeInbound {
             try {
                 // TODO User defined extensions may define values for rsv
                 if (frame.getRsv() > 0) {
-                    getWsOutbound().close(1002, null);
+                    getWsOutbound().close(
+                            Constants.STATUS_PROTOCOL_ERROR, null);
                     return SocketState.CLOSED;
                 }
 
@@ -134,21 +135,22 @@ public abstract class StreamInbound implements UpgradeInbound {
                     // NO-OP
                 } else {
                     // Unknown OpCode
-                    getWsOutbound().close(1002, null);
+                    getWsOutbound().close(
+                            Constants.STATUS_PROTOCOL_ERROR, null);
                     return SocketState.CLOSED;
                 }
             } catch (MalformedInputException mie) {
                 // Invalid UTF-8
-                getWsOutbound().close(1007, null);
+                getWsOutbound().close(Constants.STATUS_BAD_DATA, null);
                 return SocketState.CLOSED;
             } catch (UnmappableCharacterException uce) {
                 // Invalid UTF-8
-                getWsOutbound().close(1007, null);
+                getWsOutbound().close(Constants.STATUS_BAD_DATA, null);
                 return SocketState.CLOSED;
             } catch (IOException ioe) {
-                // Given something must have gone to reach this point, this might
-                // not work but try it anyway.
-                getWsOutbound().close(1002, null);
+                // Given something must have gone to reach this point, this
+                // might not work but try it anyway.
+                getWsOutbound().close(Constants.STATUS_PROTOCOL_ERROR, null);
                 return SocketState.CLOSED;
             }
             frame = wsIs.nextFrame(false);
