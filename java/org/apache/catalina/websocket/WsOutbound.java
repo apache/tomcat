@@ -27,7 +27,10 @@ import org.apache.tomcat.util.buf.B2CConverter;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
- * Provides the means to write WebSocket messages to the client.
+ * Provides the means to write WebSocket messages to the client. All methods
+ * that write to the client (or update a buffer that is later written to the
+ * client) are synchronized to prevent multiple threads trying to write to the
+ * client at the same time.
  */
 public class WsOutbound {
 
@@ -68,7 +71,7 @@ public class WsOutbound {
      * @throws IOException  If a flush is required and an error occurs writing
      *                      the WebSocket frame to the client
      */
-    public void writeBinaryData(int b) throws IOException {
+    public synchronized void writeBinaryData(int b) throws IOException {
         if (closed) {
             throw new IOException(sm.getString("outbound.closed"));
         }
@@ -98,7 +101,7 @@ public class WsOutbound {
      * @throws IOException  If a flush is required and an error occurs writing
      *                      the WebSocket frame to the client
      */
-    public void writeTextData(char c) throws IOException {
+    public synchronized void writeTextData(char c) throws IOException {
         if (closed) {
             throw new IOException(sm.getString("outbound.closed"));
         }
@@ -127,7 +130,9 @@ public class WsOutbound {
      *
      * @throws IOException  If an error occurs writing to the client
      */
-    public void writeBinaryMessage(ByteBuffer msgBb) throws IOException {
+    public synchronized void writeBinaryMessage(ByteBuffer msgBb)
+            throws IOException {
+
         if (closed) {
             throw new IOException(sm.getString("outbound.closed"));
         }
@@ -150,7 +155,9 @@ public class WsOutbound {
      *
      * @throws IOException  If an error occurs writing to the client
      */
-    public void writeTextMessage(CharBuffer msgCb) throws IOException {
+    public synchronized void writeTextMessage(CharBuffer msgCb)
+            throws IOException {
+
         if (closed) {
             throw new IOException(sm.getString("outbound.closed"));
         }
@@ -169,7 +176,7 @@ public class WsOutbound {
      *
      * @throws IOException  If an error occurs writing to the client
      */
-    public void flush() throws IOException {
+    public synchronized void flush() throws IOException {
         if (closed) {
             throw new IOException(sm.getString("outbound.closed"));
         }
@@ -250,9 +257,9 @@ public class WsOutbound {
      *
      * @throws IOException  If an error occurs writing to the client
      */
-    public void close(int status, ByteBuffer data) throws IOException {
-        // TODO Think about threading requirements for writing. This is not
-        // currently thread safe and writing almost certainly needs to be.
+    public synchronized void close(int status, ByteBuffer data)
+            throws IOException {
+
         if (closed) {
             return;
         }
@@ -287,9 +294,8 @@ public class WsOutbound {
      *
      * @throws IOException  If an error occurs writing to the client
      */
-    public void pong(ByteBuffer data) throws IOException {
-        // TODO Think about threading requirements for writing. This is not
-        // currently thread safe and writing almost certainly needs to be.
+    public synchronized void pong(ByteBuffer data) throws IOException {
+
         if (closed) {
             throw new IOException(sm.getString("outbound.closed"));
         }
