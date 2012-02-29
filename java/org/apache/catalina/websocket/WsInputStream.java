@@ -17,6 +17,7 @@
 package org.apache.catalina.websocket;
 
 import java.io.IOException;
+import java.io.InputStream;
 
 import org.apache.coyote.http11.upgrade.UpgradeProcessor;
 import org.apache.tomcat.util.res.StringManager;
@@ -27,7 +28,7 @@ import org.apache.tomcat.util.res.StringManager;
  * makes the number of bytes declared in the payload length available for
  * reading even if more bytes are available from the socket.
  */
-public class WsInputStream extends java.io.InputStream {
+public class WsInputStream extends InputStream {
 
     private static final StringManager sm =
             StringManager.getManager(Constants.Package);
@@ -147,7 +148,7 @@ public class WsInputStream extends java.io.InputStream {
                 nextFrame(true);
             }
             if (frame.getOpCode() != Constants.OPCODE_CONTINUATION) {
-                error = sm.getString("is.notContinutation",
+                error = sm.getString("is.notContinuation",
                         Byte.valueOf(frame.getOpCode()));
                 throw new IOException(error);
             }
