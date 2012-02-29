@@ -38,10 +38,51 @@ public abstract class StreamInbound implements UpgradeInbound {
 
     private UpgradeProcessor<?> processor = null;
     private WsOutbound outbound;
+    private int outboundByteBufferSize = WsOutbound.DEFAULT_BUFFER_SIZE;
+    private int outboundCharBufferSize = WsOutbound.DEFAULT_BUFFER_SIZE;
+
+
+
+    public int getOutboundByteBufferSize() {
+        return outboundByteBufferSize;
+    }
+
+
+    /**
+     * This only applies to the {@link WsOutbound} instance returned from
+     * {@link #getWsOutbound()} created by a subsequent call to
+     * {@link #setUpgradeOutbound(UpgradeOutbound)}. The current
+     * {@link WsOutbound} instance, if any, is not affected.
+     *
+     * @param outboundByteBufferSize
+     */
+    public void setOutboundByteBufferSize(int outboundByteBufferSize) {
+        this.outboundByteBufferSize = outboundByteBufferSize;
+    }
+
+
+    public int getOutboundCharBufferSize() {
+        return outboundCharBufferSize;
+    }
+
+
+    /**
+     * This only applies to the {@link WsOutbound} instance returned from
+     * {@link #getWsOutbound()} created by a subsequent call to
+     * {@link #setUpgradeOutbound(UpgradeOutbound)}. The current
+     * {@link WsOutbound} instance, if any, is not affected.
+     *
+     * @param outboundCharBufferSize
+     */
+    public void setOutboundCharBufferSize(int outboundCharBufferSize) {
+        this.outboundCharBufferSize = outboundCharBufferSize;
+    }
+
 
     @Override
     public final void setUpgradeOutbound(UpgradeOutbound upgradeOutbound) {
-        outbound = new WsOutbound(upgradeOutbound);
+        outbound = new WsOutbound(upgradeOutbound, outboundByteBufferSize,
+                outboundCharBufferSize);
     }
 
 
