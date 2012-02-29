@@ -215,8 +215,8 @@ public class WsFrame {
         } else if (read == 0) {
             return null;
         } else {
-            // TODO message
-            throw new IOException();
+            throw new IOException(
+                    sm.getString("frame.readFailed", Integer.valueOf(read)));
         }
     }
 }
