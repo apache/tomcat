@@ -32,14 +32,14 @@ public class EchoMessage extends WebSocketServlet {
     private static final long serialVersionUID = 1L;
     private volatile int byteBufSize;
     private volatile int charBufSize;
-    
+
     @Override
     public void init() throws ServletException {
         super.init();
         byteBufSize = getInitParameterIntValue("byteBufferMaxSize", 2097152);
         charBufSize = getInitParameterIntValue("charBufferMaxSize", 2097152);
     }
-    
+
     public int getInitParameterIntValue(String name, int defaultValue) {
         String val = this.getInitParameter(name);
         int result = defaultValue;
@@ -58,7 +58,7 @@ public class EchoMessage extends WebSocketServlet {
     }
 
     private static final class EchoMessageInbound extends MessageInbound {
-        
+
         public EchoMessageInbound(int byteBufferMaxSize, int charBufferMaxSize) {
             super();
             setByteBufferMaxSize(byteBufferMaxSize);
