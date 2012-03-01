@@ -359,8 +359,19 @@
     <servlet>
       <servlet-name>wsEchoMessage</servlet-name>
       <servlet-class>websocket.EchoMessage</servlet-class>
-      <init-param><param-name>byteBufferMaxSize</param-name><param-value>20971520</param-value></init-param>
-      <init-param><param-name>charBufferMaxSize</param-name><param-value>20971520</param-value></init-param>
+      <!-- Uncomment the following block to increase the default maximum
+           WebSocket buffer size from 2MB to 20MB which is required for the
+           Autobahn test suite to pass fully. -->
+      <!--
+      <init-param>
+        <param-name>byteBufferMaxSize</param-name>
+        <param-value>20971520</param-value>
+      </init-param>
+      <init-param>
+        <param-name>charBufferMaxSize</param-name>
+        <param-value>20971520</param-value>
+      </init-param>
+      -->
     </servlet>
     <servlet-mapping>
       <servlet-name>wsEchoMessage</servlet-name>
