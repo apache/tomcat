@@ -359,6 +359,8 @@
     <servlet>
       <servlet-name>wsEchoMessage</servlet-name>
       <servlet-class>websocket.EchoMessage</servlet-class>
+      <init-param><param-name>byteBufferMaxSize</param-name><param-value>20971520</param-value></init-param>
+      <init-param><param-name>charBufferMaxSize</param-name><param-value>20971520</param-value></init-param>
     </servlet>
     <servlet-mapping>
       <servlet-name>wsEchoMessage</servlet-name>
