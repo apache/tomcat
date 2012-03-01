@@ -85,6 +85,13 @@
       </update>
     </changelog>
   </subsection>
+  <subsection name="jdbc-pool">
+    <changelog>
+      <fix>
+        <bug>52804</bug>: Make pool properties serializable and cloneable (fhanik)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <fix>
