@@ -19,6 +19,7 @@ package org.apache.tomcat.jdbc.pool;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.Serializable;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
@@ -33,7 +34,7 @@ import org.apache.juli.logging.LogFactory;
  * @author Filip Hanik
  *
  */
-public class PoolProperties implements PoolConfiguration {
+public class PoolProperties implements PoolConfiguration, Cloneable, Serializable {
     private static final Log log = LogFactory.getLog(PoolProperties.class);
 
     public static final int DEFAULT_MAX_ACTIVE = 100;
