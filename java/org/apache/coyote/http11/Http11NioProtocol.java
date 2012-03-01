@@ -253,11 +253,7 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol {
                 //  - this is comet request
                 //  - the request line/headers have not been completely
                 //    read
-                SelectionKey key = socket.getSocket().getIOChannel().keyFor(
-                        socket.getSocket().getPoller().getSelector());
-                key.interestOps(SelectionKey.OP_READ);
-                ((KeyAttachment) socket).interestOps(
-                        SelectionKey.OP_READ);
+                socket.getSocket().getPoller().add(socket.getSocket());
             }
         }
 
