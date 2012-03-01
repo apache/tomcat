@@ -296,12 +296,7 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol {
         protected void upgradePoll(SocketWrapper<NioChannel> socket,
                 Processor<NioChannel> processor) {
             connections.put(socket.getSocket(), processor);
-
-            SelectionKey key = socket.getSocket().getIOChannel().keyFor(
-                    socket.getSocket().getPoller().getSelector());
-            key.interestOps(SelectionKey.OP_READ);
-            ((KeyAttachment) socket).interestOps(
-                    SelectionKey.OP_READ);
+            socket.getSocket().getPoller().add(socket.getSocket());
         }
     }
 }
