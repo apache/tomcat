@@ -16,6 +16,7 @@
  */
 package org.apache.catalina.websocket;
 
+import java.io.EOFException;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
@@ -214,6 +215,8 @@ public class WsFrame {
             return new WsFrame(first[0], processor);
         } else if (read == 0) {
             return null;
+        } else if (read == -1) {
+            throw new EOFException(sm.getString("frame.readEos"));
         } else {
             throw new IOException(
                     sm.getString("frame.readFailed", Integer.valueOf(read)));
