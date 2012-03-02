@@ -249,6 +249,7 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol {
             } else {
                 // Either:
                 //  - this is comet request
+                //  - this is an upgraded connection
                 //  - the request line/headers have not been completely
                 //    read
                 socket.getSocket().getPoller().add(socket.getSocket());
@@ -284,13 +285,6 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol {
                 throws IOException {
             return new UpgradeNioProcessor(socket, inbound,
                     ((Http11NioProtocol) getProtocol()).getEndpoint().getSelectorPool());
-        }
-
-        @Override
-        protected void upgradePoll(SocketWrapper<NioChannel> socket,
-                Processor<NioChannel> processor) {
-            connections.put(socket.getSocket(), processor);
-            socket.getSocket().getPoller().add(socket.getSocket());
         }
     }
 }

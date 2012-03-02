@@ -191,11 +191,5 @@ public class Http11Protocol extends AbstractHttp11JsseProtocol {
                 throws IOException {
             return new UpgradeBioProcessor(socket, inbound);
         }
-
-        @Override
-        protected void upgradePoll(SocketWrapper<Socket> socket,
-                Processor<Socket> processor) {
-            connections.put(socket.getSocket(), processor);
-        }
     }
 }
