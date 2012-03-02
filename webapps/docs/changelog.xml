@@ -64,6 +64,15 @@
       </update>
     </changelog>
   </subsection>
+  <subsection name="Coyote">
+    <changelog>
+      <fix>
+        Correctly register NIO sockets with poller after processing Comet events
+        to ensure that no read events are missed. This fixes an intermittent
+        issue observed in the unit tests. (fhanik/markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Jasper">
     <changelog>
       <scode>
@@ -88,7 +97,8 @@
   <subsection name="jdbc-pool">
     <changelog>
       <fix>
-        <bug>52804</bug>: Make pool properties serializable and cloneable (fhanik)
+        <bug>52804</bug>: Make pool properties serializable and cloneable.
+        (fhanik)
       </fix>
     </changelog>
   </subsection>
