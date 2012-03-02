@@ -1532,14 +1532,13 @@
     <copy file="${commons-daemon.home}/windows/ia64/prunsrv.exe"
         tofile="${tomcat.dist}/bin/i64/tomcat${version.major}.exe" />
     <!-- tc native -->
-    <copy file="${tomcat-native.home}/tcnative-1.dll.x86"
-        tofile="${tomcat.dist}/bin/tcnative-1.dll" />
-    <!-- tc native 64 bit for amd/emt -->
-    <copy file="${tomcat-native.home}/tcnative-1.dll.x64"
-        tofile="${tomcat.dist}/bin/x64/tcnative-1.dll" />
-    <!-- tc native 64 bit for ia -->
-    <copy file="${tomcat-native.home}/tcnative-1.dll.i64"
-        tofile="${tomcat.dist}/bin/i64/tcnative-1.dll" />
+    <copy todir="${tomcat.dist}/bin">
+      <fileset dir="${tomcat-native.home}/bin">
+        <include name="*.dll"/>
+        <include name="**/*.dll"/>
+      </fileset>
+    </copy>
+
     <!-- platform README files -->
     <echo append="false" file="${tomcat.dist}/bin/i64/README">
 Apache Tomcat ${version} native binaries for Win64 IA64 platform.
@@ -2339,24 +2338,9 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
   <target name="download-dist"
           description="Download additional components for a distribution" >
 
-    <antcall target="downloadfile-2">
-      <param name="sourcefile.1" value="${tomcat-native.dll.1}/win32/tcnative-1.dll"/>
-      <param name="sourcefile.2" value="${tomcat-native.dll.2}/win32/tcnative-1.dll"/>
-      <param name="destfile" value="${tomcat-native.dll.win32}"/>
-      <param name="destdir" value="${tomcat-native.home}"/>
-    </antcall>
-
-    <antcall target="downloadfile-2">
-      <param name="sourcefile.1" value="${tomcat-native.dll.1}/win64/x64/tcnative-1.dll"/>
-      <param name="sourcefile.2" value="${tomcat-native.dll.2}/win64/x64/tcnative-1.dll"/>
-      <param name="destfile" value="${tomcat-native.dll.x64}"/>
-      <param name="destdir" value="${tomcat-native.home}"/>
-    </antcall>
-
-    <antcall target="downloadfile-2">
-      <param name="sourcefile.1" value="${tomcat-native.dll.1}/win64/ia64/tcnative-1.dll"/>
-      <param name="sourcefile.2" value="${tomcat-native.dll.2}/win64/ia64/tcnative-1.dll"/>
-      <param name="destfile" value="${tomcat-native.dll.i64}"/>
+    <antcall target="downloadzip-2">
+      <param name="sourcefile.1" value="${tomcat-native.win.1}"/>
+      <param name="sourcefile.2" value="${tomcat-native.win.2}"/>
       <param name="destdir" value="${tomcat-native.home}"/>
     </antcall>
 
