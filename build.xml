@@ -1534,8 +1534,8 @@
     <!-- tc native -->
     <copy todir="${tomcat.dist}/bin">
       <fileset dir="${tomcat-native.home}/bin">
-        <include name="*.dll"/>
-        <include name="**/*.dll"/>
+        <exclude name="*.exe"/>
+        <exclude name="*.pdb"/>
       </fileset>
     </copy>
 
@@ -2341,6 +2341,7 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
     <antcall target="downloadzip-2">
       <param name="sourcefile.1" value="${tomcat-native.win.1}"/>
       <param name="sourcefile.2" value="${tomcat-native.win.2}"/>
+      <param name="destfile" value="${tomcat-native.home}/VERSIONS"/>
       <param name="destdir" value="${tomcat-native.home}"/>
     </antcall>
 
