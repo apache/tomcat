@@ -28,6 +28,8 @@ public interface UpgradeInbound {
 
     void setUpgradeProcessor(UpgradeProcessor<?> processor);
 
+    void onUpgradeComplete();
+
     SocketState onData() throws IOException;
 
     void setUpgradeOutbound(UpgradeOutbound upgradeOutbound);

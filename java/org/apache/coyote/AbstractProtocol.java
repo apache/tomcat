@@ -571,6 +571,7 @@ public abstract class AbstractProtocol implements ProtocolHandler,
                         release(socket, processor, false, false);
                         // Create the light-weight upgrade processor
                         processor = createUpgradeProcessor(socket, inbound);
+                        inbound.onUpgradeComplete();
                     }
                 } while (state == SocketState.ASYNC_END ||
                         state == SocketState.UPGRADING);
