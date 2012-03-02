@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.nio.ByteBuffer;
 import java.nio.charset.MalformedInputException;
 import java.nio.charset.UnmappableCharacterException;
 
@@ -113,7 +114,7 @@ public abstract class StreamInbound implements UpgradeInbound {
             try {
                 // TODO User defined extensions may define values for rsv
                 if (frame.getRsv() > 0) {
-                    getWsOutbound().close(
+                    closeOutboundConnection(
                             Constants.STATUS_PROTOCOL_ERROR, null);
                     return SocketState.CLOSED;
                 }
@@ -127,7 +128,7 @@ public abstract class StreamInbound implements UpgradeInbound {
                             new InputStreamReader(wsIs, new Utf8Decoder());
                     onTextData(r);
                 } else if (opCode == Constants.OPCODE_CLOSE){
-                    getWsOutbound().close(frame);
+                    closeOutboundConnection(frame);
                     return SocketState.CLOSED;
                 } else if (opCode == Constants.OPCODE_PING) {
                     getWsOutbound().pong(frame.getPayLoad());
@@ -135,27 +136,70 @@ public abstract class StreamInbound implements UpgradeInbound {
                     // NO-OP
                 } else {
                     // Unknown OpCode
-                    getWsOutbound().close(
+                    closeOutboundConnection(
                             Constants.STATUS_PROTOCOL_ERROR, null);
                     return SocketState.CLOSED;
                 }
             } catch (MalformedInputException mie) {
                 // Invalid UTF-8
-                getWsOutbound().close(Constants.STATUS_BAD_DATA, null);
+                closeOutboundConnection(Constants.STATUS_BAD_DATA, null);
                 return SocketState.CLOSED;
             } catch (UnmappableCharacterException uce) {
                 // Invalid UTF-8
-                getWsOutbound().close(Constants.STATUS_BAD_DATA, null);
+                closeOutboundConnection(Constants.STATUS_BAD_DATA, null);
                 return SocketState.CLOSED;
             } catch (IOException ioe) {
                 // Given something must have gone to reach this point, this
                 // might not work but try it anyway.
-                getWsOutbound().close(Constants.STATUS_PROTOCOL_ERROR, null);
+                closeOutboundConnection(Constants.STATUS_PROTOCOL_ERROR, null);
                 return SocketState.CLOSED;
             }
             frame = wsIs.nextFrame(false);
         }
         return SocketState.UPGRADED;
+    }
+
+    private void closeOutboundConnection(int status, ByteBuffer data) throws IOException {
+        try {
+            getWsOutbound().close(status, data);
+        } finally {
+            onClose(status);
+        }
+    }
+
+    private void closeOutboundConnection(WsFrame frame) throws IOException {
+        try {
+            getWsOutbound().close(frame);
+        } finally {
+            onClose(Constants.OPCODE_CLOSE);
+        }
+    }
+
+    @Override
+    public void onUpgradeComplete() {
+        onOpen(outbound);
+    }
+
+    /**
+     * Intended to be overridden by sub-classes that wish to be notified
+     * when the outbound connection is established. The default implementation
+     * is a NO-OP.
+     *
+     * @param outbound    The outbound WebSocket connection.
+     */
+    protected void onOpen(WsOutbound outbound) {
+        // NO-OP
+    }
+
+    /**
+     * Intended to be overridden by sub-classes that wish to be notified
+     * when the outbound connection is closed. The default implementation
+     * is a NO-OP.
+     *
+     * @param status    The status code of the close reason.
+     */
+    protected void onClose(int status) {
+        // NO-OP
     }
 
 
