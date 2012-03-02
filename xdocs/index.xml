@@ -45,13 +45,13 @@ manual is described in more detail below.</p>
 <br />
 <ul>
 
-<li><a href="news/2011.html#20110808.1">08 August 2011 - <b>TC-Native-1.1.22 released</b></a>
-<p>The Apache Tomcat team is proud to announce the immediate availability of Tomcat Native 1.1.22 Stable.
+<li><a href="news/2012.html#20120302.1">02 March 2012 - <b>TC-Native-1.1.23 released</b></a>
+<p>The Apache Tomcat team is proud to announce the immediate availability of Tomcat Native 1.1.23 Stable.
 </p>
-<p>Download the <a href="http://www.apache.org/dist/tomcat/tomcat-connectors/native/1.1.22/source/tomcat-native-1.1.22-src.tar.gz">TC-native 1.1.22 release sources</a>
- | <a href="http://www.apache.org/dist/tomcat/tomcat-connectors/native/1.1.22/source/tomcat-native-1.1.22-src.tar.gz.asc">PGP signature</a>
+<p>Download the <a href="http://www.apache.org/dist/tomcat/tomcat-connectors/native/1.1.23/source/tomcat-native-1.1.23-src.tar.gz">TC-native 1.1.23 release sources</a>
+ | <a href="http://www.apache.org/dist/tomcat/tomcat-connectors/native/1.1.23/source/tomcat-native-1.1.23-src.tar.gz.asc">PGP signature</a>
 </p>
-<p>Download the <a href="http://www.apache.org/dist/tomcat/tomcat-connectors/native/1.1.22/binaries/">binaries</a> for selected platforms.
+<p>Download the <a href="http://www.apache.org/dist/tomcat/tomcat-connectors/native/1.1.23/binaries/">binaries</a> for selected platforms.
 </p>
 </li>
 </ul>
