@@ -106,12 +106,12 @@ public abstract class StreamInbound implements UpgradeInbound {
     public final SocketState onData() throws IOException {
         // Must be start the start of a message (which may consist of multiple
         // frames)
-
         WsInputStream wsIs = new WsInputStream(processor, getWsOutbound());
-        WsFrame frame = wsIs.nextFrame(true);
 
-        while (frame != null) {
-            try {
+        try {
+            WsFrame frame = wsIs.nextFrame(true);
+
+            while (frame != null) {
                 // TODO User defined extensions may define values for rsv
                 if (frame.getRsv() > 0) {
                     closeOutboundConnection(
@@ -140,21 +140,21 @@ public abstract class StreamInbound implements UpgradeInbound {
                             Constants.STATUS_PROTOCOL_ERROR, null);
                     return SocketState.CLOSED;
                 }
-            } catch (MalformedInputException mie) {
-                // Invalid UTF-8
-                closeOutboundConnection(Constants.STATUS_BAD_DATA, null);
-                return SocketState.CLOSED;
-            } catch (UnmappableCharacterException uce) {
-                // Invalid UTF-8
-                closeOutboundConnection(Constants.STATUS_BAD_DATA, null);
-                return SocketState.CLOSED;
-            } catch (IOException ioe) {
-                // Given something must have gone to reach this point, this
-                // might not work but try it anyway.
-                closeOutboundConnection(Constants.STATUS_PROTOCOL_ERROR, null);
-                return SocketState.CLOSED;
+                frame = wsIs.nextFrame(false);
             }
-            frame = wsIs.nextFrame(false);
+        } catch (MalformedInputException mie) {
+            // Invalid UTF-8
+            closeOutboundConnection(Constants.STATUS_BAD_DATA, null);
+            return SocketState.CLOSED;
+        } catch (UnmappableCharacterException uce) {
+            // Invalid UTF-8
+            closeOutboundConnection(Constants.STATUS_BAD_DATA, null);
+            return SocketState.CLOSED;
+        } catch (IOException ioe) {
+            // Given something must have gone to reach this point, this
+            // might not work but try it anyway.
+            closeOutboundConnection(Constants.STATUS_PROTOCOL_ERROR, null);
+            return SocketState.CLOSED;
         }
         return SocketState.UPGRADED;
     }
