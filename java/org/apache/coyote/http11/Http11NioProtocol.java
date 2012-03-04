@@ -16,7 +16,6 @@
  */
 package org.apache.coyote.http11;
 
-import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
 import java.util.Iterator;
 
@@ -27,7 +26,6 @@ import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.net.NioChannel;
 import org.apache.tomcat.util.net.NioEndpoint;
 import org.apache.tomcat.util.net.NioEndpoint.Handler;
-import org.apache.tomcat.util.net.NioEndpoint.KeyAttachment;
 import org.apache.tomcat.util.net.SSLImplementation;
 import org.apache.tomcat.util.net.SecureNioChannel;
 import org.apache.tomcat.util.net.SocketWrapper;
@@ -43,13 +41,13 @@ import org.apache.tomcat.util.net.SocketWrapper;
  * @author Filip Hanik
  */
 public class Http11NioProtocol extends AbstractHttp11JsseProtocol {
-    
+
     private static final Log log = LogFactory.getLog(Http11NioProtocol.class);
 
 
     @Override
     protected Log getLog() { return log; }
-    
+
 
     @Override
     protected AbstractEndpoint.Handler getHandler() {
@@ -73,7 +71,7 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol {
 
 
     // -------------------- Properties--------------------
-    
+
     private Http11ConnectionHandler cHandler;
 
     // -------------------- Pool setup --------------------
@@ -81,19 +79,19 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol {
     public void setPollerThreadCount(int count) {
         ((NioEndpoint)endpoint).setPollerThreadCount(count);
     }
-    
+
     public int getPollerThreadCount() {
         return ((NioEndpoint)endpoint).getPollerThreadCount();
     }
-    
+
     public void setSelectorTimeout(long timeout) {
         ((NioEndpoint)endpoint).setSelectorTimeout(timeout);
     }
-    
+
     public long getSelectorTimeout() {
         return ((NioEndpoint)endpoint).getSelectorTimeout();
     }
-    
+
     public void setAcceptorThreadPriority(int threadPriority) {
         ((NioEndpoint)endpoint).setAcceptorThreadPriority(threadPriority);
     }
@@ -105,12 +103,12 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol {
     public int getAcceptorThreadPriority() {
       return ((NioEndpoint)endpoint).getAcceptorThreadPriority();
     }
-    
+
     public int getPollerThreadPriority() {
       return ((NioEndpoint)endpoint).getThreadPriority();
     }
-    
-    
+
+
     public boolean getUseSendfile() {
         return ((NioEndpoint)endpoint).getUseSendfile();
     }
@@ -118,7 +116,7 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol {
     public void setUseSendfile(boolean useSendfile) {
         ((NioEndpoint)endpoint).setUseSendfile(useSendfile);
     }
-    
+
     // -------------------- Tcp setup --------------------
     public void setOomParachute(int oomParachute) {
         ((NioEndpoint)endpoint).setOomParachute(oomParachute);
@@ -143,7 +141,7 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol {
         Http11ConnectionHandler(Http11NioProtocol proto) {
             this.proto = proto;
         }
-        
+
         @Override
         protected AbstractProtocol getProtocol() {
             return proto;
@@ -153,8 +151,8 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol {
         protected Log getLog() {
             return log;
         }
-        
-        
+
+
         @Override
         public SSLImplementation getSslImplementation() {
             return proto.sslImplementation;
@@ -166,7 +164,7 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol {
          */
         @Override
         public void release(SocketChannel socket) {
-            if (log.isDebugEnabled()) 
+            if (log.isDebugEnabled())
                 log.debug("Iterating through our connections to release a socket channel:"+socket);
             boolean released = false;
             Iterator<java.util.Map.Entry<NioChannel, Http11NioProcessor>> it = connections.entrySet().iterator();
@@ -181,10 +179,10 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol {
                     break;
                 }
             }
-            if (log.isDebugEnabled()) 
+            if (log.isDebugEnabled())
                 log.debug("Done iterating through our connections to release a socket channel:"+socket +" released:"+released);
         }
-        
+
         /**
          * Expected to be used by the Poller to release resources on socket
          * close, errors etc.
@@ -203,7 +201,7 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol {
         /**
          * Expected to be used by the handler once the processor is no longer
          * required.
-         * 
+         *
          * @param socket
          * @param processor
          * @param isSocketClosing   Not used in HTTP
@@ -241,7 +239,7 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol {
         protected void longPoll(SocketWrapper<NioChannel> socket,
                 Http11NioProcessor processor) {
             connections.put(socket.getSocket(), processor);
-            
+
             if (processor.isAsync()) {
                 socket.setAsync(true);
             } else {
