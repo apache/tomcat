@@ -445,17 +445,25 @@ public class Catalina {
             Digester digester = createStopDigester();
             digester.setClassLoader(Thread.currentThread().getContextClassLoader());
             File file = configFile();
+            FileInputStream fis = null;
             try {
                 InputSource is =
                     new InputSource("file://" + file.getAbsolutePath());
-                FileInputStream fis = new FileInputStream(file);
+                fis = new FileInputStream(file);
                 is.setByteStream(fis);
                 digester.push(this);
                 digester.parse(is);
-                fis.close();
             } catch (Exception e) {
                 log.error("Catalina.stop: ", e);
                 System.exit(1);
+            } finally {
+                if (fis != null) {
+                    try {
+                        fis.close();
+                    } catch (IOException e) {
+                        // Ignore
+                    }
+                }
             }
         } else {
             // Server object already present. Must be running as a service
@@ -469,26 +477,40 @@ public class Catalina {
 
         // Stop the existing server
         s = getServer();
-        try {
-            if (s.getPort()>0) {
-                Socket socket = new Socket(s.getAddress(), s.getPort());
-                OutputStream stream = socket.getOutputStream();
+        if (s.getPort()>0) {
+            Socket socket = null;
+            OutputStream stream = null;
+            try {
+                socket = new Socket(s.getAddress(), s.getPort());
+                stream = socket.getOutputStream();
                 String shutdown = s.getShutdown();
                 for (int i = 0; i < shutdown.length(); i++) {
                     stream.write(shutdown.charAt(i));
                 }
                 stream.flush();
-                stream.close();
-                socket.close();
-            } else {
-                log.error(sm.getString("catalina.stopServer"));
+            } catch (IOException e) {
+                log.error("Catalina.stop: ", e);
                 System.exit(1);
+            } finally {
+                if (stream != null) {
+                    try {
+                        stream.close();
+                    } catch (IOException e) {
+                        // Ignore
+                    }
+                }
+                if (socket != null) {
+                    try {
+                        socket.close();
+                    } catch (IOException e) {
+                        // Ignore
+                    }
+                }
             }
-        } catch (IOException e) {
-            log.error("Catalina.stop: ", e);
+        } else {
+            log.error(sm.getString("catalina.stopServer"));
             System.exit(1);
         }
-
     }
 
 
@@ -571,7 +593,6 @@ public class Catalina {
             inputSource.setByteStream(inputStream);
             digester.push(this);
             digester.parse(inputSource);
-            inputStream.close();
         } catch (SAXParseException spe) {
             log.warn("Catalina.start using " + getConfigFile() + ": " +
                     spe.getMessage());
@@ -579,6 +600,12 @@ public class Catalina {
         } catch (Exception e) {
             log.warn("Catalina.start using " + getConfigFile() + ": " , e);
             return;
+        } finally {
+            try {
+                inputStream.close();
+            } catch (IOException e) {
+                // Ignore
+            }
         }
 
         getServer().setCatalina(this);
