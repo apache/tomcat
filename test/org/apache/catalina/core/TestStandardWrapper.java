@@ -45,7 +45,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
@@ -113,7 +112,7 @@ public class TestStandardWrapper extends TomcatBaseTest {
                 "/testStandardWrapper/securityAnnotationsWebXmlPriority",
                 bc, null, null);
 
-        assertNull(bc.toString());
+        assertTrue(bc.getLength() > 0);
         assertEquals(403, rc);
     }
 
@@ -163,7 +162,7 @@ public class TestStandardWrapper extends TomcatBaseTest {
         rc = getUrl("http://localhost:" + getPort() + "/",
                 bc, null, null);
 
-        assertNull(bc.toString());
+        assertTrue(bc.getLength() > 0);
         assertEquals(403, rc);
     }
 
@@ -182,8 +181,10 @@ public class TestStandardWrapper extends TomcatBaseTest {
         rc = getUrl("http://localhost:" + getPort() + "/protected.jsp",
                 bc, null, null);
 
-        assertNull(bc.toString());
+        assertTrue(bc.getLength() > 0);
         assertEquals(403, rc);
+
+        bc.recycle();
 
         rc = getUrl("http://localhost:" + getPort() + "/unprotected.jsp",
                 bc, null, null);
@@ -213,7 +214,7 @@ public class TestStandardWrapper extends TomcatBaseTest {
         rc = getUrl("http://localhost:" + getPort() + "/", bc, null, null);
 
         if (useCreateServlet) {
-            assertNull(bc.toString());
+            assertTrue(bc.getLength() > 0);
             assertEquals(403, rc);
         } else {
             assertEquals("OK", bc.toString());
@@ -270,7 +271,7 @@ public class TestStandardWrapper extends TomcatBaseTest {
             assertEquals("OK", bc.toString());
             assertEquals(200, rc);
         } else {
-            assertNull(bc.toString());
+            assertTrue(bc.getLength() > 0);
             assertEquals(403, rc);
         }
     }
