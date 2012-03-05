@@ -43,7 +43,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -154,12 +153,13 @@ public class TestStandardContext extends TomcatBaseTest {
         tomcat.addWebapp("", root.getAbsolutePath());
 
         tomcat.start();
-        ByteChunk result;
+        ByteChunk result = new ByteChunk();
 
         // Check filter and servlet aren't called
-        result = getUrl("http://localhost:" + getPort() +
-                "/bug49922/foo");
-        assertNull(result.toString());
+        int rc = getUrl("http://localhost:" + getPort() +
+                "/bug49922/foo", result, null);
+        assertEquals(HttpServletResponse.SC_NOT_FOUND, rc);
+        assertTrue(result.getLength() > 0);
 
         // Check extension mapping works
         result = getUrl("http://localhost:" + getPort() + "/foo.do");
