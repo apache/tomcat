@@ -234,23 +234,26 @@ public abstract class TomcatBaseTest extends LoggingBaseTest {
             Map<String, List<String>> head = connection.getHeaderFields();
             resHead.putAll(head);
         }
-        if (rc == HttpServletResponse.SC_OK) {
-            InputStream is = connection.getInputStream();
-            BufferedInputStream bis = null;
-            try {
-                bis = new BufferedInputStream(is);
-                byte[] buf = new byte[2048];
-                int rd = 0;
-                while((rd = bis.read(buf)) > 0) {
-                    out.append(buf, 0, rd);
-                }
-            } finally {
-                if (bis != null) {
-                    try {
-                        bis.close();
-                    } catch (IOException e) {
-                        // Ignore
-                    }
+        InputStream is;
+        if (rc < 400) {
+            is = connection.getInputStream();
+        } else {
+            is = connection.getErrorStream();
+        }
+        BufferedInputStream bis = null;
+        try {
+            bis = new BufferedInputStream(is);
+            byte[] buf = new byte[2048];
+            int rd = 0;
+            while((rd = bis.read(buf)) > 0) {
+                out.append(buf, 0, rd);
+            }
+        } finally {
+            if (bis != null) {
+                try {
+                    bis.close();
+                } catch (IOException e) {
+                    // Ignore
                 }
             }
         }
