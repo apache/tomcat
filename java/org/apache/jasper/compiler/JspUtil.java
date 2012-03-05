@@ -26,6 +26,7 @@ import java.util.Vector;
 import java.util.jar.JarFile;
 import java.util.zip.ZipEntry;
 
+import org.apache.jasper.Constants;
 import org.apache.jasper.JasperException;
 import org.apache.jasper.JspCompilationContext;
 import org.xml.sax.Attributes;
@@ -738,7 +739,7 @@ public class JspUtil {
 
         index = path.indexOf(WEB_INF_TAGS);
         if (index != -1) {
-            className = "org.apache.jsp.tag.web.";
+            className = Constants.TAG_FILE_PACKAGE_NAME + ".web";
             begin = index + WEB_INF_TAGS.length();
         } else {
             index = path.indexOf(META_INF_TAGS);
@@ -756,7 +757,8 @@ public class JspUtil {
     }
 
     private static String getClassNameBase(String urn) {
-        StringBuilder base = new StringBuilder("org.apache.jsp.tag.meta.");
+        StringBuilder base =
+                new StringBuilder(Constants.TAG_FILE_PACKAGE_NAME + ".meta.");
         if (urn != null) {
             base.append(makeJavaPackage(urn));
             base.append('.');
