@@ -939,6 +939,13 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
             if (flush) {
                 resp.flushBuffer();
             }
+            try {
+                // Give the original thread a chance to exit the
+                // ErrorReportValve before we throw this exception
+                Thread.sleep(500);
+            } catch (InterruptedException e) {
+                throw new ServletException(e);
+            }
             throw new ServletException("Opps.");
         }
     }
