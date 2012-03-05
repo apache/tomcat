@@ -36,6 +36,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import org.junit.Test;
@@ -1203,23 +1204,34 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         url.append(getPort());
         url.append("/asyncErrorServlet");
 
-        int rc = getUrl(url.toString(), new ByteChunk(), null);
+        ByteChunk res = new ByteChunk();
+        int rc = getUrl(url.toString(), res, null);
 
         assertEquals(HttpServletResponse.SC_BAD_REQUEST, rc);
+
+        // SRV 10.9.2 - Writing the response is entirely the application's
+        // responsibility when an error occurs on an application thread.
+        // The test servlet writes no content in this case.
+        if (threaded) {
+            assertEquals(0, res.getLength());
+        } else {
+            assertTrue(res.getLength() > 0);
+        }
 
         // Without this test may complete before access log has a chance to log
         // the request
         Thread.sleep(REQUEST_TIME);
 
         // Check the access log
-        alv.validateAccessLog(1, HttpServletResponse.SC_BAD_REQUEST, TIMEOUT,
-                TIMEOUT + TIMEOUT_MARGIN + REQUEST_TIME);
-
+        alv.validateAccessLog(1, HttpServletResponse.SC_BAD_REQUEST, 0,
+                REQUEST_TIME);
     }
 
     private static class AsyncErrorServlet extends HttpServlet {
 
         private static final long serialVersionUID = 1L;
+
+        public static final String ERROR_MESSAGE = "It broke.";
 
         private int status;
         private boolean threaded;
@@ -1242,7 +1254,10 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
                         try {
                             HttpServletResponse resp =
                                     (HttpServletResponse) actxt.getResponse();
-                            resp.sendError(status);
+                            resp.sendError(status, ERROR_MESSAGE);
+                            // Complete so there is no delay waiting for the
+                            // timeout
+                            actxt.complete();
                         } catch (IOException e) {
                             // Ignore
                         }
