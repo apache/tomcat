@@ -83,6 +83,10 @@
   </subsection>
   <subsection name="Jasper">
     <changelog>
+      <fix>
+        <bug>52725</bug>: Use configurable package name for tags rather than
+        hard-coded value so configuration actually works. (markt)
+      </fix>
       <scode>
         <bug>52758</bug>: Implement additional interface methods in Eclipse JDT
         integration required for Jasper to correctly with the latest Eclipse
