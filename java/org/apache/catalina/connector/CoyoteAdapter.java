@@ -283,7 +283,7 @@ public class CoyoteAdapter implements Adapter {
                     ctxt.fireRequestDestroyEvent(request);
                 }
                 // Lift any suspension (e.g. if sendError() was used by an async
-                // request
+                // request) to allow the response to be written to the client
                 response.setSuspended(false);
             }
 
