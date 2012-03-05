@@ -272,8 +272,7 @@ public class AsyncStateMachine<S> {
     }
 
 
-    public synchronized boolean asyncError() {
-        boolean doDispatch = false;
+    public synchronized void asyncError() {
         if (state == AsyncState.DISPATCHED ||
                 state == AsyncState.TIMING_OUT) {
             state = AsyncState.ERROR;
@@ -282,7 +281,6 @@ public class AsyncStateMachine<S> {
                     sm.getString("asyncStateMachine.invalidAsyncState",
                             "asyncError()", state));
         }
-        return doDispatch;
     }
 
     public synchronized void asyncRun(Runnable runnable) {
