@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
@@ -154,7 +154,7 @@ public class TestNonLoginAndBasicAuthenticator extends TomcatBaseTest {
 
         if (expectedReject) {
             assertEquals(expectedRC, rc);
-            assertNull(bc.toString());
+            assertTrue(bc.getLength() > 0);
         }
         else {
             assertEquals(200, rc);
@@ -178,7 +178,7 @@ public class TestNonLoginAndBasicAuthenticator extends TomcatBaseTest {
 
         if (expectedReject1) {
             assertEquals(expectedRC1, rc);
-            assertNull(bc.toString());
+            assertTrue(bc.getLength() > 0);
         }
         else {
             assertEquals(200, rc);
@@ -200,13 +200,13 @@ public class TestNonLoginAndBasicAuthenticator extends TomcatBaseTest {
         Map<String,List<String>> respHeaders2 =
             new HashMap<String,List<String>>();
 
-        bc.reset();
+        bc.recycle();
         rc = getUrl(HTTP_PREFIX + getPort() + uri, bc, reqHeaders2,
                 respHeaders2);
 
         if (expectedReject2) {
             assertEquals(expectedRC2, rc);
-            assertNull(bc.toString());
+            assertTrue(bc.getLength() > 0);
         }
         else {
             assertEquals(200, rc);
