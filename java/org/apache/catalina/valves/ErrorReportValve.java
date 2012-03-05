@@ -101,12 +101,13 @@ public class ErrorReportValve extends ValveBase {
             return;
         }
 
-        if (request.isAsyncStarted()) {
+        Throwable throwable =
+                (Throwable) request.getAttribute(RequestDispatcher.ERROR_EXCEPTION);
+
+        if (request.isAsyncStarted() && response.getStatus() < 400 &&
+                throwable == null) {
             return;
         }
-
-        Throwable throwable =
-            (Throwable) request.getAttribute(RequestDispatcher.ERROR_EXCEPTION);
 
         if (throwable != null) {
 
@@ -133,6 +134,9 @@ public class ErrorReportValve extends ValveBase {
             ExceptionUtils.handleThrowable(tt);
         }
 
+        if (request.isAsyncStarted()) {
+            request.getAsyncContext().complete();
+        }
     }
 
 
