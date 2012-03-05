@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
@@ -190,7 +190,8 @@ public class TestDigestAuthenticator extends TomcatBaseTest {
         int rc = getUrl("http://localhost:" + getPort() + uri, bc, reqHeaders,
                 respHeaders);
         assertEquals(401, rc);
-        assertNull(bc.toString());
+        assertTrue(bc.getLength() > 0);
+        bc.recycle();
 
         // Second request should succeed (if we use the server nonce)
         auth.clear();
@@ -215,7 +216,7 @@ public class TestDigestAuthenticator extends TomcatBaseTest {
             assertEquals("OK", bc.toString());
         } else {
             assertEquals(401, rc);
-            assertNull(bc.toString());
+            assertTrue(bc.getLength() > 0);
         }
 
         // Third request should succeed if we increment nc
@@ -233,7 +234,7 @@ public class TestDigestAuthenticator extends TomcatBaseTest {
             assertEquals("OK", bc.toString());
         } else {
             assertEquals(401, rc);
-            assertNull(bc.toString());
+            assertTrue(bc.getLength() > 0);
         }
     }
 
