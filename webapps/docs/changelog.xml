@@ -62,6 +62,11 @@
         whitespace around the values is trimmed. Reformat documentation
         examples to make them more readable. (kkolinko)
       </update>
+      <fix>
+        Further improve fix for <bug>51197</bug> to allow an error reporting
+        Valve to write a response body if <code>sendError()</code> is called
+        during an asynchronous request on a container thread. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
