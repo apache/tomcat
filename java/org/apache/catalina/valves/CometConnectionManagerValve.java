@@ -126,17 +126,23 @@ public class CometConnectionManagerValve extends ValveBase
                     session.removeAttribute(cometRequestsAttribute);
                 }
                 // Close the comet connection
+                CometEventImpl cometEvent = request.getEvent();
                 try {
-                    CometEventImpl cometEvent = request.getEvent();
                     cometEvent.setEventType(CometEvent.EventType.END);
                     cometEvent.setEventSubType(
                             CometEvent.EventSubType.WEBAPP_RELOAD);
                     getNext().event(request, request.getResponse(), cometEvent);
-                    cometEvent.close();
                 } catch (Exception e) {
                     container.getLogger().warn(
                             sm.getString("cometConnectionManagerValve.event"),
                             e);
+                } finally {
+                    try {
+                        cometEvent.close();
+                    } catch (IOException e) {
+                        container.getLogger().warn(sm.getString(
+                                "cometConnectionManagerValve.event"), e);
+                    }
                 }
             }
             cometRequests.clear();
