@@ -14,10 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.catalina.users;
-
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -35,12 +32,10 @@ import org.apache.catalina.User;
 import org.apache.catalina.UserDatabase;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
-import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.digester.AbstractObjectCreationFactory;
 import org.apache.tomcat.util.digester.Digester;
 import org.apache.tomcat.util.res.StringManager;
 import org.xml.sax.Attributes;
-
 
 /**
  * <p>Concrete implementation of {@link UserDatabase} that loads all
@@ -51,7 +46,6 @@ import org.xml.sax.Attributes;
  * @version $Id$
  * @since 4.1
  */
-
 public class MemoryUserDatabase implements UserDatabase {
 
 
@@ -410,7 +404,6 @@ public class MemoryUserDatabase implements UserDatabase {
                 if (!file.exists()) {
                     return;
                 }
-                FileInputStream fis = new FileInputStream(file);
 
                 // Construct a digester to read the XML input file
                 Digester digester = new Digester();
@@ -432,16 +425,18 @@ public class MemoryUserDatabase implements UserDatabase {
                      new MemoryUserCreationFactory(this), true);
 
                 // Parse the XML input file to load this database
+                FileInputStream fis = null;
                 try {
+                    fis =  new FileInputStream(file);
                     digester.parse(fis);
-                    fis.close();
-                } catch (Exception e) {
-                    try {
-                        fis.close();
-                    } catch (Throwable t) {
-                        ExceptionUtils.handleThrowable(t);
+                } finally {
+                    if (fis != null) {
+                        try {
+                            fis.close();
+                        } catch (IOException ioe) {
+                            // Ignore
+                        }
                     }
-                    throw e;
                 }
 
             }
