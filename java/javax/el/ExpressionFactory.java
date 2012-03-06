@@ -227,8 +227,10 @@ public abstract class ExpressionFactory {
         if (is != null) {
             String line = null;
             BufferedReader br = null;
+            InputStreamReader isr = null;
             try {
-                br = new BufferedReader(new InputStreamReader(is, "UTF-8"));
+                isr = new InputStreamReader(is, "UTF-8");
+                br = new BufferedReader(isr);
                 line = br.readLine();
                 if (line != null && line.trim().length() > 0) {
                     return line.trim();
@@ -243,6 +245,11 @@ public abstract class ExpressionFactory {
                 try {
                     if (br != null) {
                         br.close();
+                    }
+                } catch (IOException ioe) {/*Ignore*/}
+                try {
+                    if (isr != null) {
+                        isr.close();
                     }
                 } catch (IOException ioe) {/*Ignore*/}
                 try {
