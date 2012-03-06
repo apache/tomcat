@@ -21,19 +21,20 @@ import java.nio.CharBuffer;
 import java.util.ArrayDeque;
 import java.util.Collection;
 import java.util.Deque;
-import java.util.Iterator;
 
 import org.apache.catalina.websocket.WsOutbound;
 
 public class Snake {
 
-    private static final int DEFAULT_LENGTH = 6;
+    private static final int DEFAULT_LENGTH = 5;
 
     private final int id;
     private final WsOutbound outbound;
 
     private Direction direction;
-    private Deque<Location> locations = new ArrayDeque<Location>();
+    private int length = DEFAULT_LENGTH;
+    private Location head;
+    private Deque<Location> tail = new ArrayDeque<Location>();
     private String hexColor;
 
     public Snake(int id, WsOutbound outbound) {
@@ -45,14 +46,12 @@ public class Snake {
 
     private void resetState() {
         this.direction = Direction.NONE;
-        this.locations.clear();
-        Location startLocation = SnakeWebSocketServlet.getRandomLocation();
-        for (int i = 0; i < DEFAULT_LENGTH; i++) {
-            locations.add(startLocation);
-        }
+        this.head = SnakeWebSocketServlet.getRandomLocation();
+        this.tail.clear();
+        this.length = DEFAULT_LENGTH;
     }
 
-    private void kill() {
+    private synchronized void kill() {
         resetState();
         try {
             CharBuffer response = CharBuffer.wrap("{'type': 'dead'}");
@@ -62,8 +61,8 @@ public class Snake {
         }
     }
 
-    private void reward() {
-        grow();
+    private synchronized void reward() {
+        length++;
         try {
             CharBuffer response = CharBuffer.wrap("{'type': 'kill'}");
             outbound.writeTextMessage(response);
@@ -73,8 +72,7 @@ public class Snake {
     }
 
     public synchronized void update(Collection<Snake> snakes) {
-        Location firstLocation = locations.getFirst();
-        Location nextLocation = firstLocation.getAdjacentLocation(direction);
+        Location nextLocation = head.getAdjacentLocation(direction);
         if (nextLocation.x >= SnakeWebSocketServlet.PLAYFIELD_WIDTH) {
             nextLocation.x = 0;
         }
@@ -87,42 +85,40 @@ public class Snake {
         if (nextLocation.y < 0) {
             nextLocation.y = SnakeWebSocketServlet.PLAYFIELD_HEIGHT;
         }
-        locations.addFirst(nextLocation);
-        locations.removeLast();
+        if (direction != Direction.NONE) {
+            tail.addFirst(head);
+            if (tail.size() > length) {
+                tail.removeLast();
+            }
+            head = nextLocation;
+        }
 
         for (Snake snake : snakes) {
-            if (snake.getId() != getId() &&
-                    colliding(snake.getHeadLocation())) {
-                snake.kill();
-                reward();
+            if (snake.getTail().contains(head)) {
+                kill();
+                if (id != snake.id) {
+                    snake.reward();
+                }
             }
         }
     }
 
-    private void grow() {
-        Location lastLocation = locations.getLast();
-        Location newLocation = new Location(lastLocation.x, lastLocation.y);
-        locations.add(newLocation);
+    public synchronized Collection<Location> getTail() {
+        return tail;
     }
 
-    private boolean colliding(Location location) {
-        return direction != Direction.NONE && locations.contains(location);
-    }
-
-    public void setDirection(Direction direction) {
+    public synchronized void setDirection(Direction direction) {
         this.direction = direction;
     }
 
     public synchronized String getLocationsJson() {
         StringBuilder sb = new StringBuilder();
-        for (Iterator<Location> iterator = locations.iterator();
-                iterator.hasNext();) {
-            Location location = iterator.next();
+        sb.append(String.format("{x: %d, y: %d}",
+                Integer.valueOf(head.x), Integer.valueOf(head.y)));
+        for (Location location : tail) {
+            sb.append(',');
             sb.append(String.format("{x: %d, y: %d}",
                     Integer.valueOf(location.x), Integer.valueOf(location.y)));
-            if (iterator.hasNext()) {
-                sb.append(',');
-            }
         }
         return String.format("{'id':%d,'body':[%s]}",
                 Integer.valueOf(id), sb.toString());
@@ -134,9 +130,5 @@ public class Snake {
 
     public String getHexColor() {
         return hexColor;
-    }
-
-    public synchronized Location getHeadLocation() {
-        return locations.getFirst();
     }
 }

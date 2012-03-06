@@ -101,6 +101,7 @@ public class SnakeWebSocketServlet extends WebSocketServlet {
                 CharBuffer response = CharBuffer.wrap(message);
                 connection.getWsOutbound().writeTextMessage(response);
             } catch (IOException ignore) {
+                // Ignore
             }
         }
     }
@@ -196,13 +197,13 @@ public class SnakeWebSocketServlet extends WebSocketServlet {
         @Override
         protected void onTextMessage(CharBuffer charBuffer) throws IOException {
             String message = charBuffer.toString();
-            if ("left".equals(message)) {
+            if ("west".equals(message)) {
                 snake.setDirection(Direction.WEST);
-            } else if ("up".equals(message)) {
+            } else if ("north".equals(message)) {
                 snake.setDirection(Direction.NORTH);
-            } else if ("right".equals(message)) {
+            } else if ("east".equals(message)) {
                 snake.setDirection(Direction.EAST);
-            } else if ("down".equals(message)) {
+            } else if ("south".equals(message)) {
                 snake.setDirection(Direction.SOUTH);
             }
         }
