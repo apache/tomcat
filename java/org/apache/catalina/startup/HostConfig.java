@@ -778,6 +778,7 @@ public class HostConfig
         JarFile jar = null;
         JarEntry entry = null;
         InputStream istream = null;
+        FileOutputStream fos = null;
         BufferedOutputStream ostream = null;
         File xml;
         if (copyXML) {
@@ -798,9 +799,8 @@ public class HostConfig
                 if ((copyXML || unpackWARs) && xmlInWar) {
                     istream = jar.getInputStream(entry);
 
-                    ostream =
-                        new BufferedOutputStream
-                        (new FileOutputStream(xml), 1024);
+                    fos = new FileOutputStream(xml);
+                    ostream = new BufferedOutputStream(fos, 1024);
                     byte buffer[] = new byte[1024];
                     while (true) {
                         int n = istream.read(buffer);
@@ -810,10 +810,6 @@ public class HostConfig
                         ostream.write(buffer, 0, n);
                     }
                     ostream.flush();
-                    ostream.close();
-                    ostream = null;
-                    istream.close();
-                    istream = null;
                 }
             } catch (IOException e) {
                 /* Ignore */
@@ -821,16 +817,24 @@ public class HostConfig
                 if (ostream != null) {
                     try {
                         ostream.close();
-                    } catch (Throwable t) {
-                        ExceptionUtils.handleThrowable(t);
+                    } catch (IOException ioe) {
+                        // Ignore
                     }
                     ostream = null;
+                }
+                if (fos != null) {
+                    try {
+                        fos.close();
+                    } catch (IOException ioe) {
+                        // Ignore
+                    }
+                    fos = null;
                 }
                 if (istream != null) {
                     try {
                         istream.close();
-                    } catch (Throwable t) {
-                        ExceptionUtils.handleThrowable(t);
+                    } catch (IOException ioe) {
+                        // Ignore
                     }
                     istream = null;
                 }
@@ -838,8 +842,8 @@ public class HostConfig
                 if (jar != null) {
                     try {
                         jar.close();
-                    } catch (Throwable t) {
-                        ExceptionUtils.handleThrowable(t);
+                    } catch (IOException ioe) {
+                        // Ignore;
                     }
                     jar = null;
                 }
