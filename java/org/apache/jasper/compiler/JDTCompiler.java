@@ -90,8 +90,8 @@ public class JDTCompiler extends org.apache.jasper.compiler.Compiler {
 
         class CompilationUnit implements ICompilationUnit {
 
-            String className;
-            String sourceFile;
+            private final String className;
+            private final String sourceFile;
 
             CompilationUnit(String sourceFile, String className) {
                 this.className = className;
