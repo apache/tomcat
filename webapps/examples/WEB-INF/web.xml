@@ -377,5 +377,13 @@
       <servlet-name>wsEchoMessage</servlet-name>
       <url-pattern>/websocket/echoMessage</url-pattern>
     </servlet-mapping>
+    <servlet>
+      <servlet-name>wsSnake</servlet-name>
+      <servlet-class>websocket.snake.SnakeWebSocketServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+      <servlet-name>wsSnake</servlet-name>
+      <url-pattern>/websocket/snake</url-pattern>
+    </servlet-mapping>
 
 </web-app>
