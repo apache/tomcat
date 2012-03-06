@@ -27,7 +27,7 @@ import org.apache.catalina.core.StandardPipeline;
  * alternative defaults.
  *
  * @deprecated There was no demand for this capability and it will be removed in
- *             Tomact 8.0.x
+ *             Tomcat 8.0.x
  */
 public class CatalinaFactory {
 
