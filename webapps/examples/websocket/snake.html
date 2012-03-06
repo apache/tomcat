@@ -67,6 +67,7 @@
         Game.socket = null;
         Game.nextFrame = null;
         Game.interval = null;
+        Game.direction = 'none';
         Game.gridSize = 10;
 
         function Snake() {
@@ -94,22 +95,27 @@
                 if (code > 36 && code < 41) {
                     switch (code) {
                         case 37:
-                            Game.socket.send('left');
+                            if (Game.direction != 'east') Game.setDirection('west');
                             break;
                         case 38:
-                            Game.socket.send('up');
+                            if (Game.direction != 'south') Game.setDirection('north');
                             break;
                         case 39:
-                            Game.socket.send('right');
+                            if (Game.direction != 'west') Game.setDirection('east');
                             break;
                         case 40:
-                            Game.socket.send('down');
+                            if (Game.direction != 'north') Game.setDirection('south');
                             break;
                     }
-                    Console.log('Sent: keyCode ' + code);
                 }
             }, false);
             Game.connect('ws://' + window.location.host + '/examples/websocket/snake');
+        };
+
+        Game.setDirection  = function(direction) {
+            Game.direction = direction;
+            Game.socket.send(direction);
+            Console.log('Sent: Direction ' + direction);
         };
 
         Game.startGameLoop = function() {
@@ -156,7 +162,8 @@
 
         Game.removeSnake = function(id) {
             Game.entities[id] = null;
-            delete Game.entities[id]; // force GC
+            // Force GC.
+            delete Game.entities[id];
         };
 
         Game.run = (function() {
@@ -184,12 +191,13 @@
             }
 
             Game.socket.onopen = function () {
-                // Socket initialised.. start the game loop
+                // Socket open.. start the game loop.
                 Console.log('Info: WebSocket connection opened.');
                 Console.log('Info: Press an arrow key to begin.');
                 Game.startGameLoop();
                 setInterval(function() {
-                    Game.socket.send('ping'); // prevent server read timeout
+                    // Prevent server read timeout.
+                    Game.socket.send('ping');
                 }, 5000);
             };
 
@@ -199,7 +207,8 @@
             };
 
             Game.socket.onmessage = function (message) {
-                var packet = eval('(' + message.data + ')'); // Consider using json lib to parse data.
+                // _Potential_ security hole, consider using json lib to parse data in production.
+                var packet = eval('(' + message.data + ')');
                 switch (packet.type) {
                     case 'update':
                         for (var i = 0; i < packet.data.length; i++) {
@@ -216,6 +225,7 @@
                         break;
                     case 'dead':
                         Console.log('Info: Your snake is dead, bad luck!');
+                        Game.direction = 'none';
                         break;
                     case 'kill':
                         Console.log('Info: Head shot!');
