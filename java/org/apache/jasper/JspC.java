@@ -1300,19 +1300,19 @@ public class JspC implements Options {
                     Localizer.getMessage("jsp.error.jspc.no_uriroot"));
             }
 
-            if( context==null ) {
+            File uriRootF = new File(uriRoot);
+            if (!uriRootF.isDirectory()) {
+                throw new JasperException(
+                    Localizer.getMessage("jsp.error.jspc.uriroot_not_dir"));
+            }
+
+            if(context == null) {
                 initServletContext();
             }
 
             // No explicit pages, we'll process all .jsp in the webapp
             if (pages.size() == 0) {
-                scanFiles( new File( uriRoot ));
-            }
-
-            File uriRootF = new File(uriRoot);
-            if (!uriRootF.exists() || !uriRootF.isDirectory()) {
-                throw new JasperException(
-                    Localizer.getMessage("jsp.error.jspc.uriroot_not_dir"));
+                scanFiles(uriRootF);
             }
 
             initWebXml();

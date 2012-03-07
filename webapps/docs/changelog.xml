@@ -104,6 +104,10 @@
         integration required for Jasper to correctly with the latest Eclipse
         development code. (markt)
       </scode>
+      <fix>
+        <bug>52772</bug>: Ensure uriRoot is fully validated before it is used.
+        Patch based on a suggestion by Eugene Chung. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
