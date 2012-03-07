@@ -3311,44 +3311,53 @@ public class WebappClassLoader
      * Check the specified JAR file, and return <code>true</code> if it does
      * not contain any of the trigger classes.
      *
-     * @param jarfile The JAR file to be checked
+     * @param file  The JAR file to be checked
      *
      * @exception IOException if an input/output error occurs
      */
-    protected boolean validateJarFile(File jarfile)
+    protected boolean validateJarFile(File file)
         throws IOException {
 
         if (triggers == null)
             return (true);
-        JarFile jarFile = new JarFile(jarfile);
-        for (int i = 0; i < triggers.length; i++) {
-            Class<?> clazz = null;
-            try {
-                if (parent != null) {
-                    clazz = parent.loadClass(triggers[i]);
-                } else {
-                    clazz = Class.forName(triggers[i]);
+
+        JarFile jarFile = null;
+        try {
+            jarFile = new JarFile(file);
+            for (int i = 0; i < triggers.length; i++) {
+                Class<?> clazz = null;
+                try {
+                    if (parent != null) {
+                        clazz = parent.loadClass(triggers[i]);
+                    } else {
+                        clazz = Class.forName(triggers[i]);
+                    }
+                } catch (Exception e) {
+                    clazz = null;
                 }
-            } catch (Exception e) {
-                clazz = null;
+                if (clazz == null)
+                    continue;
+                String name = triggers[i].replace('.', '/') + ".class";
+                if (log.isDebugEnabled())
+                    log.debug(" Checking for " + name);
+                JarEntry jarEntry = jarFile.getJarEntry(name);
+                if (jarEntry != null) {
+                    log.info("validateJarFile(" + file +
+                        ") - jar not loaded. See Servlet Spec 2.3, "
+                        + "section 9.7.2. Offending class: " + name);
+                    return false;
+                }
             }
-            if (clazz == null)
-                continue;
-            String name = triggers[i].replace('.', '/') + ".class";
-            if (log.isDebugEnabled())
-                log.debug(" Checking for " + name);
-            JarEntry jarEntry = jarFile.getJarEntry(name);
-            if (jarEntry != null) {
-                log.info("validateJarFile(" + jarfile +
-                    ") - jar not loaded. See Servlet Spec 2.3, "
-                    + "section 9.7.2. Offending class: " + name);
-                jarFile.close();
-                return (false);
+            return true;
+        } finally {
+            if (jarFile != null) {
+                try {
+                    jarFile.close();
+                } catch (IOException ioe) {
+                    // Ignore
+                }
             }
         }
-        jarFile.close();
-        return (true);
-
     }
 
 
