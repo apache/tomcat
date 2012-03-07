@@ -86,6 +86,11 @@
         to ensure that no read events are missed. This fixes an intermittent
         issue observed in the unit tests. (fhanik/markt)
       </fix>
+      <fix>
+        <bug>52770</bug>: Fix a bug in the highly unlikely circumstance that
+        an infinite timeout was specified for writing data to a client when
+        using NIO. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
