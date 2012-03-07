@@ -116,7 +116,7 @@ public final class NonLoginAuthenticator
                                 LoginConfig config)
         throws IOException {
 
-        Principal principal = request.getUserPrincipal();
+        Principal principal = request.getPrincipal();
         if (principal != null) {
             // excellent... we have already authenticated the client somehow,
             // probably from another container that has a login-config
