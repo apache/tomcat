@@ -1555,6 +1555,7 @@
           
     <attribute name="prestartminSpareThreads"
                description="Prestart threads?"
+               is="true"
                type="boolean"/>
 
     <attribute name="queueSize"

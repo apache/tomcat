@@ -102,6 +102,10 @@
         <bug>52760</bug>: Fix expires filter mime type in javascript examples.
         (rjung)
       </fix>
+      <fix>
+        <bug>52842</bug>: Exception in MBeanDumper when dumping MBean for
+        StandardThreadExecutor. (rjung)
+      </fix>
       <update>
         Bring built-in mime types for embedded Tomcat more in line with the
         ones defined in the default web.xml configuration file. (rjung)
