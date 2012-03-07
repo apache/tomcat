@@ -103,7 +103,11 @@ public class NioBlockingSelector {
                 try {
                     if ( att.getWriteLatch()==null || att.getWriteLatch().getCount()==0) att.startWriteLatch(1);
                     poller.add(att,SelectionKey.OP_WRITE,reference);
-                    att.awaitWriteLatch(writeTimeout,TimeUnit.MILLISECONDS);
+                    if (writeTimeout < 0) {
+                        att.awaitWriteLatch(Long.MAX_VALUE,TimeUnit.MILLISECONDS);
+                    } else {
+                        att.awaitWriteLatch(writeTimeout,TimeUnit.MILLISECONDS);
+                    }
                 }catch (InterruptedException ignore) {
                     Thread.interrupted();
                 }
