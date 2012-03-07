@@ -171,7 +171,7 @@ public class JspC implements Options {
     protected boolean smapSuppressed = true;
     protected boolean smapDumped = false;
     protected boolean caching = true;
-    protected Map<String, TagLibraryInfo> cache =
+    protected final Map<String, TagLibraryInfo> cache =
         new HashMap<String, TagLibraryInfo>();
 
     protected String compiler = null;
@@ -196,7 +196,7 @@ public class JspC implements Options {
     /**
      * The pages.
      */
-    protected List<String> pages = new Vector<String>();
+    protected final List<String> pages = new Vector<String>();
 
     /**
      * Needs better documentation, this data member does.
