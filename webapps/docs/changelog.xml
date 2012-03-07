@@ -72,6 +72,11 @@
         <bug>52727</bug>, <bug>52729</bug>, <bug>52731</bug> and
         <bug>52732</bug>. (markt)
       </scode>
+      <fix>
+        <bug>52846</bug>: Make sure NonLoginAuthenticator registers not 
+        MemoryUser but GenericPrincipal into a session when UserDatabaseRealm 
+        is used. (kfujino)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
