@@ -1487,6 +1487,7 @@
 
     <attribute name="daemon"
                description="Run threads in daemon or non-daemon state?"
+               is="true"
                type="boolean"/>
 
     <attribute name="largestPoolSize"
