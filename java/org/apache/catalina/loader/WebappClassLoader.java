@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -80,7 +80,7 @@ import org.apache.tomcat.util.res.StringManager;
 /**
  * Specialized web application class loader.
  * <p>
- * This class loader is a full reimplementation of the 
+ * This class loader is a full reimplementation of the
  * <code>URLClassLoader</code> from the JDK. It is designed to be fully
  * compatible with a normal <code>URLClassLoader</code>, although its internal
  * behavior may be completely different.
@@ -91,13 +91,13 @@ import org.apache.tomcat.util.res.StringManager;
  * delegation to the parent class loader will occur. This allows the web
  * application to override any shared class except the classes from J2SE.
  * Special handling is provided from the JAXP XML parser interfaces, the JNDI
- * interfaces, and the classes from the servlet API, which are never loaded 
+ * interfaces, and the classes from the servlet API, which are never loaded
  * from the webapp repositories. The <code>delegate</code> property
  * allows an application to modify this behavior to move the parent class loader
  * ahead of the local repositories.
  * <p>
- * <strong>IMPLEMENTATION NOTE</strong> - Due to limitations in Jasper 
- * compilation technology, any repository which contains classes from 
+ * <strong>IMPLEMENTATION NOTE</strong> - Due to limitations in Jasper
+ * compilation technology, any repository which contains classes from
  * the servlet API will be ignored by the class loader.
  * <p>
  * <strong>IMPLEMENTATION NOTE</strong> - The class loader generates source
@@ -136,7 +136,7 @@ public class WebappClassLoader
         new ArrayList<String>();
 
     private static final String JVN_THREAD_GROUP_SYSTEM = "system";
-    
+
     static {
         JVM_THREAD_GROUP_NAMES.add(JVN_THREAD_GROUP_SYSTEM);
         JVM_THREAD_GROUP_NAMES.add("RMI Runtime");
@@ -160,7 +160,7 @@ public class WebappClassLoader
 
     }
 
-    
+
     protected static final class PrivilegedGetClassLoader
         implements PrivilegedAction<ClassLoader> {
 
@@ -171,9 +171,9 @@ public class WebappClassLoader
         }
 
         @Override
-        public ClassLoader run() {       
+        public ClassLoader run() {
             return clazz.getClassLoader();
-        }           
+        }
     }
 
 
@@ -207,13 +207,13 @@ public class WebappClassLoader
     protected static final StringManager sm =
         StringManager.getManager(Constants.Package);
 
-    
+
     /**
      * Use anti JAR locking code, which does URL rerouting when accessing
      * resources.
      */
-    boolean antiJARLocking = false; 
-    
+    boolean antiJARLocking = false;
+
     // ----------------------------------------------------------- Constructors
 
 
@@ -244,9 +244,9 @@ public class WebappClassLoader
     public WebappClassLoader(ClassLoader parent) {
 
         super(new URL[0], parent);
-                
+
         this.parent = getParent();
-        
+
         system = getSystemClassLoader();
         securityManager = System.getSecurityManager();
 
@@ -441,7 +441,7 @@ public class WebappClassLoader
      * some issues reported with log4j when this option is true. Applications
      * without memory leaks using recent JVMs should operate correctly with this
      * option set to <code>false</code>. If not specified, the default value of
-     * <code>false</code> will be used. 
+     * <code>false</code> will be used.
      */
     private boolean clearReferencesStatic = false;
 
@@ -480,7 +480,7 @@ public class WebappClassLoader
      * expire however, on a busy system that might not happen for some time.
      */
     private boolean clearReferencesHttpClientKeepAliveThread = true;
-    
+
     /**
      * Name of associated context used with logging and JMX to associate with
      * the right web application. Particularly useful for the clear references
@@ -562,8 +562,8 @@ public class WebappClassLoader
     public boolean getAntiJARLocking() {
         return antiJARLocking;
     }
-    
-    
+
+
     /**
      * @param antiJARLocking The antiJARLocking to set.
      */
@@ -672,7 +672,7 @@ public class WebappClassLoader
         this.loaderDir = new File(workDir, "loader");
         if (loaderDir == null) {
             canonicalLoaderDir = null;
-        } else { 
+        } else {
             try {
                 canonicalLoaderDir = loaderDir.getCanonicalPath();
                 if (!canonicalLoaderDir.endsWith(File.separator)) {
@@ -789,7 +789,7 @@ public class WebappClassLoader
              clearReferencesHttpClientKeepAliveThread;
      }
 
-     
+
     // ------------------------------------------------------- Reloader Methods
 
 
@@ -819,7 +819,7 @@ public class WebappClassLoader
             repositoryURLs = null;
         } catch (MalformedURLException e) {
             IllegalArgumentException iae = new IllegalArgumentException
-                ("Invalid repository: " + repository); 
+                ("Invalid repository: " + repository);
             iae.initCause(e);
             throw iae;
         }
@@ -950,7 +950,7 @@ public class WebappClassLoader
     /**
      * Return a String array of the current repositories for this class
      * loader.  If there are no repositories, a zero-length array is
-     * returned.For security reason, returns a clone of the Array (since 
+     * returned.For security reason, returns a clone of the Array (since
      * String are immutable).
      */
     public String[] findRepositories() {
@@ -985,7 +985,7 @@ public class WebappClassLoader
                     ((ResourceAttributes) resources.getAttributes(paths[i]))
                     .getLastModified();
                 if (lastModified != lastModifiedDates[i]) {
-                    if( log.isDebugEnabled() ) 
+                    if( log.isDebugEnabled() )
                         log.debug("  Resource '" + paths[i]
                                   + "' was modified; Date is now: "
                                   + new java.util.Date(lastModified) + " Was: "
@@ -1015,7 +1015,7 @@ public class WebappClassLoader
                         continue;
                     if (!name.equals(jarNames[i])) {
                         // Missing JAR
-                        log.info("    Additional JARs have been added : '" 
+                        log.info("    Additional JARs have been added : '"
                                  + name + "'");
                         return (true);
                     }
@@ -1199,7 +1199,7 @@ public class WebappClassLoader
         // Return the class we have located
         if (log.isTraceEnabled())
             log.debug("      Returning class " + clazz);
-        
+
         if (log.isTraceEnabled()) {
             ClassLoader cl;
             if (Globals.IS_SECURITY_ENABLED){
@@ -1406,13 +1406,13 @@ public class WebappClassLoader
         // (2) Search local repositories
         url = findResource(name);
         if (url != null) {
-            // Locating the repository for special handling in the case 
+            // Locating the repository for special handling in the case
             // of a JAR
             if (antiJARLocking) {
                 ResourceEntry entry = resourceEntries.get(name);
                 try {
                     String repository = entry.codeBase.toString();
-                    if ((repository.endsWith(".jar")) 
+                    if ((repository.endsWith(".jar"))
                             && (!(name.endsWith(".class")))) {
                         // Copy binary content to the work directory if not present
                         File resourceFile = new File(loaderDir, name);
@@ -1804,7 +1804,7 @@ public class WebappClassLoader
 
 
     /**
-     * Get the lifecycle listeners associated with this lifecycle. If this 
+     * Get the lifecycle listeners associated with this lifecycle. If this
      * Lifecycle has no listeners registered, a zero-length array is returned.
      */
     @Override
@@ -1826,7 +1826,7 @@ public class WebappClassLoader
 
     /**
      * Obtain the current state of the source component.
-     * 
+     *
      * @return The current state of the source component.
      */
     @Override
@@ -1849,7 +1849,7 @@ public class WebappClassLoader
         // NOOP
     }
 
-    
+
     /**
      * Start the class loader.
      *
@@ -1887,9 +1887,9 @@ public class WebappClassLoader
         // Clearing references should be done before setting started to
         // false, due to possible side effects
         clearReferences();
-        
+
         started = false;
-        
+
         int length = files.length;
         for (int i = 0; i < length; i++) {
             files[i] = null;
@@ -1936,16 +1936,16 @@ public class WebappClassLoader
     public void destroy() {
         // NOOP
     }
-    
+
 
     /**
-     * Used to periodically signal to the classloader to release 
+     * Used to periodically signal to the classloader to release
      * JAR resources.
      */
     public void closeJARs(boolean force) {
         if (jarFiles.length > 0) {
                 synchronized (jarFiles) {
-                    if (force || (System.currentTimeMillis() 
+                    if (force || (System.currentTimeMillis()
                                   > (lastJarAccessed + 90000))) {
                         for (int i = 0; i < jarFiles.length; i++) {
                             try {
@@ -1967,7 +1967,7 @@ public class WebappClassLoader
 
     // ------------------------------------------------------ Protected Methods
 
-    
+
     /**
      * Clear references.
      */
@@ -1978,10 +1978,10 @@ public class WebappClassLoader
 
         // Stop any threads the web application started
         clearReferencesThreads();
-        
+
         // Check for leaks triggered by ThreadLocals loaded by this class loader
         checkThreadLocalsForLeaks();
-        
+
         // Clear RMI Targets loaded by this class loader
         clearReferencesRmiTargets();
 
@@ -1990,15 +1990,15 @@ public class WebappClassLoader
         if (clearReferencesStatic) {
             clearReferencesStaticFinal();
         }
-        
+
          // Clear the IntrospectionUtils cache.
         IntrospectionUtils.clear();
-        
+
         // Clear the classloader reference in common-logging
         if (clearReferencesLogFactoryRelease) {
             org.apache.juli.logging.LogFactory.release(this);
         }
-        
+
         // Clear the resource bundle cache
         // This shouldn't be necessary, the cache uses weak references but
         // it has caused leaks. Oddly, using the leak detection code in
@@ -2019,7 +2019,7 @@ public class WebappClassLoader
      * if it checked the context class loader) b) using reflection would
      * create a dependency on the DriverManager implementation which can,
      * and has, changed.
-     * 
+     *
      * We can't just create an instance of JdbcLeakPrevention as it will be
      * loaded by the common class loader (since it's .class file is in the
      * $CATALINA_HOME/lib directory). This would fail DriverManager's check
@@ -2027,7 +2027,7 @@ public class WebappClassLoader
      * our parent class loader but define the class with this class loader
      * so the JdbcLeakPrevention looks like a webapp class to the
      * DriverManager.
-     * 
+     *
      * If only apps cleaned up after themselves...
      */
     private final void clearReferencesJdbc() {
@@ -2053,7 +2053,7 @@ public class WebappClassLoader
                 defineClass("org.apache.catalina.loader.JdbcLeakPrevention",
                     classBytes, 0, offset, this.getClass().getProtectionDomain());
             Object obj = lpClass.newInstance();
-            @SuppressWarnings("unchecked") // clearJdbcDriverRegistrations() returns List<String> 
+            @SuppressWarnings("unchecked") // clearJdbcDriverRegistrations() returns List<String>
             List<String> driverNames = (List<String>) obj.getClass().getMethod(
                     "clearJdbcDriverRegistrations").invoke(obj);
             for (String name : driverNames) {
@@ -2081,7 +2081,7 @@ public class WebappClassLoader
 
 
     private final void clearReferencesStaticFinal() {
-        
+
         @SuppressWarnings("unchecked") // resourceEntries is HashMap<String, ResourceEntry>
         Collection<ResourceEntry> values =
             ((HashMap<String,ResourceEntry>) resourceEntries.clone()).values();
@@ -2117,7 +2117,7 @@ public class WebappClassLoader
                     for (int i = 0; i < fields.length; i++) {
                         Field field = fields[i];
                         int mods = field.getModifiers();
-                        if (field.getType().isPrimitive() 
+                        if (field.getType().isPrimitive()
                                 || (field.getName().indexOf("$") != -1)) {
                             continue;
                         }
@@ -2132,14 +2132,14 @@ public class WebappClassLoader
                                 } else {
                                     field.set(null, null);
                                     if (log.isDebugEnabled()) {
-                                        log.debug("Set field " + field.getName() 
+                                        log.debug("Set field " + field.getName()
                                                 + " to null in class " + clazz.getName());
                                     }
                                 }
                             } catch (Throwable t) {
                                 ExceptionUtils.handleThrowable(t);
                                 if (log.isDebugEnabled()) {
-                                    log.debug("Could not set field " + field.getName() 
+                                    log.debug("Could not set field " + field.getName()
                                             + " to null in class " + clazz.getName(), t);
                                 }
                             }
@@ -2153,7 +2153,7 @@ public class WebappClassLoader
                 }
             }
         }
-        
+
     }
 
 
@@ -2165,7 +2165,7 @@ public class WebappClassLoader
         for (int i = 0; i < fields.length; i++) {
             Field field = fields[i];
             int mods = field.getModifiers();
-            if (field.getType().isPrimitive() 
+            if (field.getType().isPrimitive()
                     || (field.getName().indexOf("$") != -1)) {
                 continue;
             }
@@ -2181,16 +2181,16 @@ public class WebappClassLoader
                     if (!loadedByThisOrChild(valueClass)) {
                         if (log.isDebugEnabled()) {
                             log.debug("Not setting field " + field.getName() +
-                                    " to null in object of class " + 
+                                    " to null in object of class " +
                                     instance.getClass().getName() +
                                     " because the referenced object was of type " +
-                                    valueClass.getName() + 
+                                    valueClass.getName() +
                                     " which was not loaded by this WebappClassLoader.");
                         }
                     } else {
                         field.set(instance, null);
                         if (log.isDebugEnabled()) {
-                            log.debug("Set field " + field.getName() 
+                            log.debug("Set field " + field.getName()
                                     + " to null in class " + instance.getClass().getName());
                         }
                     }
@@ -2198,8 +2198,8 @@ public class WebappClassLoader
             } catch (Throwable t) {
                 ExceptionUtils.handleThrowable(t);
                 if (log.isDebugEnabled()) {
-                    log.debug("Could not set field " + field.getName() 
-                            + " to null in object instance of class " 
+                    log.debug("Could not set field " + field.getName()
+                            + " to null in object instance of class "
                             + instance.getClass().getName(), t);
                 }
             }
@@ -2210,7 +2210,7 @@ public class WebappClassLoader
     @SuppressWarnings("deprecation") // thread.stop()
     private void clearReferencesThreads() {
         Thread[] threads = getThreads();
-        
+
         // Iterate over the set of threads
         for (Thread thread : threads) {
             if (thread != null) {
@@ -2220,7 +2220,7 @@ public class WebappClassLoader
                     if (thread == Thread.currentThread()) {
                         continue;
                     }
-                    
+
                     // JVM controlled threads
                     ThreadGroup tg = thread.getThreadGroup();
                     if (tg != null &&
@@ -2233,11 +2233,11 @@ public class WebappClassLoader
                             log.debug(sm.getString(
                                     "webappClassLoader.checkThreadsHttpClient"));
                         }
-                    
+
                         // Don't warn about remaining JVM controlled threads
                         continue;
                     }
-                   
+
                     // Skip threads that have already died
                     if (!thread.isAlive()) {
                         continue;
@@ -2258,13 +2258,13 @@ public class WebappClassLoader
                         log.error(sm.getString("webappClassLoader.warnThread",
                                 contextName, thread.getName()));
                     }
-                    
+
                     // Don't try an stop the threads unless explicitly
                     // configured to do so
                     if (!clearReferencesStopThreads) {
                         continue;
                     }
-                    
+
                     // If the thread has been started via an executor, try
                     // shutting down the executor
                     try {
@@ -2272,7 +2272,7 @@ public class WebappClassLoader
                             thread.getClass().getDeclaredField("target");
                         targetField.setAccessible(true);
                         Object target = targetField.get(thread);
-                        
+
                         if (target != null &&
                                 target.getClass().getCanonicalName().equals(
                                 "java.util.concurrent.ThreadPoolExecutor.Worker")) {
@@ -2312,21 +2312,21 @@ public class WebappClassLoader
         }
     }
 
-    
+
     /*
      * Look at a threads stack trace to see if it is a request thread or not. It
      * isn't perfect, but it should be good-enough for most cases.
      */
     private boolean isRequestThread(Thread thread) {
-        
+
         StackTraceElement[] elements = thread.getStackTrace();
-        
+
         if (elements == null || elements.length == 0) {
             // Must have stopped already. Too late to ignore it. Assume not a
             // request processing thread.
             return false;
         }
-        
+
         // Step through the methods in reverse order looking for calls to any
         // CoyoteAdapter method. All request threads will have this unless
         // Tomcat has been heavily modified - in which case there isn't much we
@@ -2340,33 +2340,33 @@ public class WebappClassLoader
         }
         return false;
     }
-    
-    
+
+
     private void clearReferencesStopTimerThread(Thread thread) {
-        
+
         // Need to get references to:
         // - newTasksMayBeScheduled field
         // - queue field
         // - queue.clear()
-        
+
         try {
             Field newTasksMayBeScheduledField =
                 thread.getClass().getDeclaredField("newTasksMayBeScheduled");
             newTasksMayBeScheduledField.setAccessible(true);
             Field queueField = thread.getClass().getDeclaredField("queue");
             queueField.setAccessible(true);
-    
+
             Object queue = queueField.get(thread);
-            
+
             Method clearMethod = queue.getClass().getDeclaredMethod("clear");
             clearMethod.setAccessible(true);
-            
+
             synchronized(queue) {
                 newTasksMayBeScheduledField.setBoolean(thread, false);
                 clearMethod.invoke(queue);
                 queue.notify();  // In case queue was already empty.
             }
-            
+
             log.error(sm.getString("webappClassLoader.warnTimerThread",
                     contextName, thread.getName()));
 
@@ -2398,7 +2398,7 @@ public class WebappClassLoader
                 Class.forName("java.lang.ThreadLocal$ThreadLocalMap");
             Field tableField = tlmClass.getDeclaredField("table");
             tableField.setAccessible(true);
-            
+
             for (int i = 0; i < threads.length; i++) {
                 Object threadLocalMap;
                 if (threads[i] != null) {
@@ -2426,7 +2426,7 @@ public class WebappClassLoader
         } catch (IllegalAccessException e) {
             log.warn(sm.getString("webappClassLoader.checkThreadLocalsForLeaksFail",
                     contextName), e);
-        }       
+        }
     }
 
 
@@ -2509,7 +2509,7 @@ public class WebappClassLoader
         }
         return name;
     }
-    
+
     /**
      * @param o object to test, may be null
      * @return <code>true</code> if o has been loaded by the current classloader
@@ -2536,18 +2536,18 @@ public class WebappClassLoader
         }
         return false;
     }
-        
+
     /*
      * Get the set of current threads as an array.
      */
     private Thread[] getThreads() {
-        // Get the current thread group 
+        // Get the current thread group
         ThreadGroup tg = Thread.currentThread( ).getThreadGroup( );
         // Find the root thread group
         while (tg.getParent() != null) {
             tg = tg.getParent();
         }
-        
+
         int threadCountGuess = tg.activeCount() + 50;
         Thread[] threads = new Thread[threadCountGuess];
         int threadCountActual = tg.enumerate(threads);
@@ -2556,10 +2556,10 @@ public class WebappClassLoader
             threadCountGuess *=2;
             threads = new Thread[threadCountGuess];
             // Note tg.enumerate(Thread[]) silently ignores any threads that
-            // can't fit into the array 
+            // can't fit into the array
             threadCountActual = tg.enumerate(threads);
         }
-        
+
         return threads;
     }
 
@@ -2585,7 +2585,7 @@ public class WebappClassLoader
             if (objTable == null) {
                 return;
             }
-            
+
             // Iterate over the values in the table
             if (objTable instanceof Map<?,?>) {
                 Iterator<?> iter = ((Map<?,?>) objTable).values().iterator();
@@ -2605,7 +2605,7 @@ public class WebappClassLoader
             if (implTable == null) {
                 return;
             }
-            
+
             // Iterate over the values in the table
             if (implTable instanceof Map<?,?>) {
                 Iterator<?> iter = ((Map<?,?>) implTable).values().iterator();
@@ -2634,8 +2634,8 @@ public class WebappClassLoader
                     contextName), e);
         }
     }
-    
-    
+
+
     /**
      * Clear the {@link ResourceBundle} cache of any bundles loaded by this
      * class loader or any class loader where this loader is a parent class
@@ -2643,7 +2643,7 @@ public class WebappClassLoader
      * are complications around the
      * {@link org.apache.jasper.servlet.JasperLoader} that mean a reflection
      * based approach is more likely to be complete.
-     * 
+     *
      * The ResourceBundle is using WeakReferences so it shouldn't be pinning the
      * class loader in memory. However, it is. Therefore clear ou the
      * references.
@@ -2659,20 +2659,20 @@ public class WebappClassLoader
             // Java 5 uses SoftCache extends Abstract Map
             // So use Map and it *should* work with both
             Map<?,?> cacheList = (Map<?,?>) cacheListField.get(null);
-            
+
             // Get the keys (loader references are in the key)
             Set<?> keys = cacheList.keySet();
-            
+
             Field loaderRefField = null;
-            
+
             // Iterate over the keys looking at the loader instances
             Iterator<?> keysIter = keys.iterator();
-            
+
             int countRemoved = 0;
-            
+
             while (keysIter.hasNext()) {
                 Object key = keysIter.next();
-                
+
                 if (loaderRefField == null) {
                     loaderRefField =
                         key.getClass().getDeclaredField("loaderRef");
@@ -2680,19 +2680,19 @@ public class WebappClassLoader
                 }
                 WeakReference<?> loaderRef =
                     (WeakReference<?>) loaderRefField.get(key);
-                
+
                 ClassLoader loader = (ClassLoader) loaderRef.get();
-                
+
                 while (loader != null && loader != this) {
                     loader = loader.getParent();
                 }
-                
+
                 if (loader != null) {
                     keysIter.remove();
                     countRemoved++;
                 }
             }
-            
+
             if (countRemoved > 0 && log.isDebugEnabled()) {
                 log.debug(sm.getString(
                         "webappClassLoader.clearReferencesResourceBundlesCount",
@@ -2791,9 +2791,9 @@ public class WebappClassLoader
             int pos = name.lastIndexOf('.');
             if (pos != -1)
                 packageName = name.substring(0, pos);
-        
+
             Package pkg = null;
-        
+
             if (packageName != null) {
                 pkg = getPackage(packageName);
                 // Define the package (if null)
@@ -2812,7 +2812,7 @@ public class WebappClassLoader
                     pkg = getPackage(packageName);
                 }
             }
-    
+
             if (securityManager != null) {
 
                 // Checking sealing
@@ -2829,12 +2829,12 @@ public class WebappClassLoader
                             ("Sealing violation loading " + name + " : Package "
                              + packageName + " is sealed.");
                 }
-    
+
             }
 
             try {
                 clazz = defineClass(name, entry.binaryContent, 0,
-                        entry.binaryContent.length, 
+                        entry.binaryContent.length,
                         new CodeSource(entry.codeBase, entry.certificates));
             } catch (UnsupportedClassVersionError ucve) {
                 throw new UnsupportedClassVersionError(
@@ -2849,7 +2849,7 @@ public class WebappClassLoader
             entry.manifest = null;
             entry.certificates = null;
         }
-        
+
         return clazz;
 
     }
@@ -2866,10 +2866,10 @@ public class WebappClassLoader
             entry.codeBase = getURL(new File(file, path), false);
         } catch (MalformedURLException e) {
             return null;
-        }   
+        }
         return entry;
     }
-    
+
 
     /**
      * Find specified resource in local repositories.
@@ -2922,7 +2922,7 @@ public class WebappClassLoader
                 if (canonicalPath != null) {
                     // we create the ResourceEntry based on the information returned
                     // by the DirContext rather than just using the path to the
-                    // repository. This allows to have smart DirContext implementations 
+                    // repository. This allows to have smart DirContext implementations
                     // that "virtualize" the docbase (e.g. Eclipse WTP)
                     entry = findResourceInternal(new File(canonicalPath), "");
                 } else {
@@ -2953,7 +2953,7 @@ public class WebappClassLoader
 
                         int j;
 
-                        long[] result2 = 
+                        long[] result2 =
                             new long[lastModifiedDates.length + 1];
                         for (j = 0; j < lastModifiedDates.length; j++) {
                             result2[j] = lastModifiedDates[j];
@@ -2989,11 +2989,11 @@ public class WebappClassLoader
                     return null;
                 }
                 for (i = 0; (entry == null) && (i < jarFilesLength); i++) {
-    
+
                     jarEntry = jarFiles[i].getJarEntry(path);
-    
+
                     if (jarEntry != null) {
-    
+
                         entry = new ResourceEntry();
                         try {
                             entry.codeBase = getURL(jarRealFiles[i], false);
@@ -3011,7 +3011,7 @@ public class WebappClassLoader
                         } catch (IOException e) {
                             return null;
                         }
-    
+
                         // Extract resources contained in JAR to the workdir
                         if (antiJARLocking && !(path.endsWith(".class"))) {
                             byte[] buf = new byte[1024];
@@ -3022,7 +3022,7 @@ public class WebappClassLoader
                                     jarFiles[i].entries();
                                 while (entries.hasMoreElements()) {
                                     JarEntry jarEntry2 =  entries.nextElement();
-                                    if (!(jarEntry2.isDirectory()) 
+                                    if (!(jarEntry2.isDirectory())
                                         && (!jarEntry2.getName().endsWith
                                             (".class"))) {
                                         resourceFile = new File
@@ -3081,25 +3081,25 @@ public class WebappClassLoader
                                 }
                             }
                         }
-    
+
                     }
-    
+
                 }
-    
+
                 if (entry == null) {
                     synchronized (notFoundResources) {
                         notFoundResources.put(name, name);
                     }
                     return null;
                 }
-    
+
                 if (binaryStream != null) {
-    
+
                     byte[] binaryContent = new byte[contentLength];
-    
+
                     int pos = 0;
                     try {
-    
+
                         while (true) {
                             int n = binaryStream.read(binaryContent, pos,
                                                       binaryContent.length - pos);
@@ -3124,13 +3124,13 @@ public class WebappClassLoader
                         }
                     }
                     entry.binaryContent = binaryContent;
-    
-                    // The certificates are only available after the JarEntry 
+
+                    // The certificates are only available after the JarEntry
                     // associated input stream has been fully read
                     if (jarEntry != null) {
                         entry.certificates = jarEntry.getCertificates();
                     }
-    
+
                 }
             } finally {
                 if (binaryStream != null) {
@@ -3166,7 +3166,7 @@ public class WebappClassLoader
     protected boolean isPackageSealed(String name, Manifest man) {
 
         String path = name.replace('.', '/') + '/';
-        Attributes attr = man.getAttributes(path); 
+        Attributes attr = man.getAttributes(path);
         String sealed = null;
         if (attr != null) {
             sealed = attr.getValue(Name.SEALED);
@@ -3225,8 +3225,8 @@ public class WebappClassLoader
     protected void refreshPolicy() {
 
         try {
-            // The policy file may have been modified to adjust 
-            // permissions, so we're reloading it when loading or 
+            // The policy file may have been modified to adjust
+            // permissions, so we're reloading it when loading or
             // reloading a Context
             Policy policy = Policy.getPolicy();
             policy.refresh();
@@ -3240,7 +3240,7 @@ public class WebappClassLoader
 
     /**
      * Filter classes.
-     * 
+     *
      * @param name class name
      * @return true if the class should be filtered
      */
@@ -3268,12 +3268,12 @@ public class WebappClassLoader
 
 
     /**
-     * Validate a classname. As per SRV.9.7.2, we must restrict loading of 
-     * classes from J2SE (java.*) and most classes of the servlet API 
+     * Validate a classname. As per SRV.9.7.2, we must restrict loading of
+     * classes from J2SE (java.*) and most classes of the servlet API
      * (javax.servlet.*). That should enhance robustness and prevent a number
      * of user error (where an older version of servlet.jar would be present
      * in /WEB-INF/lib).
-     * 
+     *
      * @param name class name
      * @return true if the name is valid
      */
@@ -3339,7 +3339,7 @@ public class WebappClassLoader
                 log.debug(" Checking for " + name);
             JarEntry jarEntry = jarFile.getJarEntry(name);
             if (jarEntry != null) {
-                log.info("validateJarFile(" + jarfile + 
+                log.info("validateJarFile(" + jarfile +
                     ") - jar not loaded. See Servlet Spec 2.3, "
                     + "section 9.7.2. Offending class: " + name);
                 jarFile.close();
@@ -3367,7 +3367,7 @@ public class WebappClassLoader
         if(encoded) {
             return getURI(realFile);
         }
-        
+
         return realFile.toURI().toURL();
     }
 
