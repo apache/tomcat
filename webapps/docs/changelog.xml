@@ -73,6 +73,10 @@
         <bug>52732</bug>. (markt)
       </scode>
       <fix>
+        <bug>52792</bug>: Improve error message when a JNDI resource can not be
+        found. (markt)
+      </fix>
+      <fix>
         <bug>52846</bug>: Make sure NonLoginAuthenticator registers not 
         MemoryUser but GenericPrincipal into a session when UserDatabaseRealm 
         is used. (kfujino)
