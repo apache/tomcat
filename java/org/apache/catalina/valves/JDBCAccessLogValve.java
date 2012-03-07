@@ -59,9 +59,8 @@ import org.apache.tomcat.util.ExceptionUtils;
  * only).
  * </p>
  * <p>
- * When Tomcat is started, a database connection (with autoReconnect option)
- * is created and used for all the log activity. When Tomcat is shutdown, the
- * database connection is closed.
+ * When Tomcat is started, a database connection is created and used for all the
+ * log activity. When Tomcat is shutdown, the database connection is closed.
  * This logger can be used at the level of the Engine context (being shared
  * by all the defined hosts) or the Host context (one instance of the logger
  * per host, possibly using different databases).
@@ -575,7 +574,6 @@ public final class JDBCAccessLogValve extends ValveBase implements AccessLog {
 
         // Open a new connection
         Properties props = new Properties();
-        props.put("autoReconnect", "true");
         if (connectionName != null) {
             props.put("user", connectionName);
         }

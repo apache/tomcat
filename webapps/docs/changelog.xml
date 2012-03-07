@@ -66,6 +66,10 @@
         <code>catalina.base</code> system property falling back to the value for
         Catalina home. (markt)
       </scode>
+      <fix>
+        <bug>52767</bug>: Remove reference to MySQL specific autoReconnect
+        property in <code>JDBCAccessLogValve</code>. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Tribes">
