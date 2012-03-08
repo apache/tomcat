@@ -29,5 +29,5 @@ public interface X509UsernameRetriever {
      * @return An appropriate user name obtained from one or more fields
      *         in the certificate.
      */
-    public String getUsername(X509Certificate clientCert);
+    public String getUsername(X509Certificate cert);
 }
