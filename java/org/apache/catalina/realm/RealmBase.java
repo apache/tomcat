@@ -1068,7 +1068,7 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
         if (container != null) {
             this.containerLog = container.getLogger();
         }
-        
+
         x509UsernameRetriever = createUsernameRetriever(x509UsernameRetrieverClassName);
     }
 
@@ -1440,7 +1440,7 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
         try {
             @SuppressWarnings("unchecked")
             Class<? extends X509UsernameRetriever> clazz = (Class<? extends X509UsernameRetriever>)Class.forName(className);
-            return (X509UsernameRetriever)clazz.newInstance();
+            return clazz.newInstance();
         } catch (ClassNotFoundException e) {
             throw new LifecycleException(sm.getString("realmBase.createUsernameRetriever.ClassNotFoundException", className), e);
         } catch (InstantiationException e) {
