@@ -68,6 +68,11 @@
         during an asynchronous request on a container thread. (markt)
       </fix>
       <fix>
+        <bug>52500</bug>: Added configurable mechanism to retrieve user names
+        from X509 client certificates. Based on a patch provided by
+        Michael Furman. (schultz)
+      </fix>fix>
+      <fix>
         <bug>52719</bug>: Fix a theoretical resource leak in the JAR validation
         that checks for non-permitted classes in web application JARs. (markt)
       </fix>
