@@ -188,6 +188,14 @@
         attributes.</p>
       </attribute>
 
+      <attribute name="X509UsernameRetrieverClassName" required="false">
+        <p>When using X509 client certificates, this specifies the class name
+        that will be used to retrieve the user name from the certificate.
+        The class must implement the
+        <code>org.apache.catalina.realm.X509UsernameRetriever</code>
+        interface. The default is to use the certificate's SubjectDN
+        as the username.</p>
+      </attribute>
     </attributes>
 
     <p>See the <a href="../realm-howto.html">Container-Managed Security Guide</a> for more
@@ -288,6 +296,14 @@
         attributes.</p>
       </attribute>
 
+      <attribute name="X509UsernameRetrieverClassName" required="false">
+        <p>When using X509 client certificates, this specifies the class name
+        that will be used to retrieve the user name from the certificate.
+        The class must implement the
+        <code>org.apache.catalina.realm.X509UsernameRetriever</code>
+        interface. The default is to use the certificate's SubjectDN
+        as the username.</p>
+      </attribute>
     </attributes>
 
     <p>See the <a href="../realm-howto.html#DataSourceRealm">
@@ -575,6 +591,14 @@
         expression.</p>
       </attribute>
 
+      <attribute name="X509UsernameRetrieverClassName" required="false">
+        <p>When using X509 client certificates, this specifies the class name
+        that will be used to retrieve the user name from the certificate.
+        The class must implement the
+        <code>org.apache.catalina.realm.X509UsernameRetriever</code>
+        interface. The default is to use the certificate's SubjectDN
+        as the username.</p>
+      </attribute>
     </attributes>
 
     <p>See the <a href="../realm-howto.html">Container-Managed Security Guide</a> for more
@@ -611,6 +635,14 @@
         and role information.</p>
       </attribute>
 
+      <attribute name="X509UsernameRetrieverClassName" required="false">
+        <p>When using X509 client certificates, this specifies the class name
+        that will be used to retrieve the user name from the certificate.
+        The class must implement the
+        <code>org.apache.catalina.realm.X509UsernameRetriever</code>
+        interface. The default is to use the certificate's SubjectDN
+        as the username.</p>
+      </attribute>
     </attributes>
 
     <p>See the
@@ -668,6 +700,14 @@
         name. If not specified, the default is <code>true</code>.</p>
       </attribute>
 
+      <attribute name="X509UsernameRetrieverClassName" required="false">
+        <p>When using X509 client certificates, this specifies the class name
+        that will be used to retrieve the user name from the certificate.
+        The class must implement the
+        <code>org.apache.catalina.realm.X509UsernameRetriever</code>
+        interface. The default is to use the certificate's SubjectDN
+        as the username.</p>
+      </attribute>
     </attributes>
 
     <p>The XML document referenced by the <code>pathname</code> attribute must
@@ -765,6 +805,14 @@
         <code>false</code>.</p>
       </attribute>
 
+      <attribute name="X509UsernameRetrieverClassName" required="false">
+        <p>When using X509 client certificates, this specifies the class name
+        that will be used to retrieve the user name from the certificate.
+        The class must implement the
+        <code>org.apache.catalina.realm.X509UsernameRetriever</code>
+        interface. The default is to use the certificate's SubjectDN
+        as the username.</p>
+      </attribute>
     </attributes>
 
     <p>See the <a href="../realm-howto.html">Container-Managed Security
