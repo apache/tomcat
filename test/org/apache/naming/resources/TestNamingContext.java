@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 
 import javax.naming.Binding;
+import javax.naming.CompositeName;
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingEnumeration;
@@ -35,6 +36,7 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 
 import org.apache.catalina.core.StandardContext;
+import org.apache.catalina.deploy.ContextEnvironment;
 import org.apache.catalina.deploy.ContextResource;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
@@ -280,6 +282,64 @@ public class TestNamingContext extends TomcatBaseTest {
                 }
             } catch (NamingException ne) {
                 ne.printStackTrace(out);
+            }
+        }
+    }
+
+    @Test
+    public void testBug52830() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+        tomcat.enableNaming();
+
+        // Must have a real docBase - just use temp
+        StandardContext ctx = (StandardContext)
+            tomcat.addContext("", System.getProperty("java.io.tmpdir"));
+
+        // Create the resource
+        ContextEnvironment env = new ContextEnvironment();
+        env.setName("boolean");
+        env.setType(Boolean.class.getName());
+        env.setValue("true");
+        ctx.getNamingResources().addEnvironment(env);
+
+        // Map the test Servlet
+        Bug52830Servlet bug52830Servlet = new Bug52830Servlet();
+        Tomcat.addServlet(ctx, "bug52830Servlet", bug52830Servlet);
+        ctx.addServletMapping("/", "bug52830Servlet");
+
+        tomcat.start();
+
+        ByteChunk bc = new ByteChunk();
+        int rc = getUrl("http://localhost:" + getPort() + "/", bc, null);
+        assertEquals(200, rc);
+        assertTrue(bc.toString().contains("truetrue"));
+    }
+
+    public static final class Bug52830Servlet extends HttpServlet {
+
+        private static final long serialVersionUID = 1L;
+
+        public static final String JNDI_NAME = "java:comp/env/boolean";
+
+        @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+                throws ServletException, IOException {
+
+            resp.setContentType("text/plain;UTF-8");
+            PrintWriter out = resp.getWriter();
+
+            try {
+                Context initCtx = new InitialContext();
+
+                Boolean b1 = (Boolean) initCtx.lookup(JNDI_NAME);
+                Boolean b2 = (Boolean) initCtx.lookup(
+                        new CompositeName(JNDI_NAME));
+
+                out.print(b1);
+                out.print(b2);
+
+            } catch (NamingException ne) {
+                throw new ServletException(ne);
             }
         }
     }
