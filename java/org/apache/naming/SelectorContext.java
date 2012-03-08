@@ -21,6 +21,7 @@ package org.apache.naming;
 import java.util.Hashtable;
 
 import javax.naming.Binding;
+import javax.naming.CompositeName;
 import javax.naming.Context;
 import javax.naming.Name;
 import javax.naming.NameClassPair;
@@ -767,15 +768,22 @@ public class SelectorContext implements Context {
     protected Name parseName(Name name)
         throws NamingException {
 
-        if ((!initialContext) && (!name.isEmpty())
-            && (name.get(0).equals(prefix))) {
-            return (name.getSuffix(1));
+        if (!initialContext && !name.isEmpty() &&
+                name.get(0).startsWith(prefix)) {
+            if (name.get(0).equals(prefix)) {
+                return name.getSuffix(1);
+            } else {
+                Name result = new CompositeName();
+                result.add(name.get(0).substring(prefixLength));
+                result.addAll(name.getSuffix(1));
+                return result;
+            }
         } else {
             if (initialContext) {
-                return (name);
+                return name;
             } else {
-                throw new NamingException
-                    (sm.getString("selectorContext.noJavaUrl"));
+                throw new NamingException(
+                        sm.getString("selectorContext.noJavaUrl"));
             }
         }
 
