@@ -146,7 +146,12 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
      */
     protected boolean validate = true;
 
-    
+    /**
+     * The name of the class to use for retrieving user names from X509
+     * certificates.
+     */
+    protected String x509UsernameRetrieverClassName;
+
     /**
      * The object that will extract user names from X509 client certificates.
      */
