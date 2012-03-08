@@ -290,10 +290,11 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
     /**
      * Sets the name of the class that will be used to extract user names
      * from X509 client certificates. The class must implement
-     * {@see X509UsernameRetriever}.
+     * X509UsernameRetriever.
      *
      * @param className The name of the class that will be used to extract user names
      *                  from X509 client certificates.
+     * @see X509UsernameRetriever
      */
     public void setX509UsernameRetrieverClassName(String className)
     {
