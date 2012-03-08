@@ -18,6 +18,7 @@
 package org.apache.catalina.ha.authenticator;
 
 import org.apache.catalina.ha.ClusterMessage;
+import org.apache.catalina.ha.session.SerializablePrincipal;
 import org.apache.catalina.tribes.Member;
 
 /**
@@ -43,6 +44,7 @@ public class SingleSignOnMessage implements ClusterMessage {
     private String authType = null;
     private String password = null;
     private String username = null;
+    private SerializablePrincipal principal = null;
 
     private Member address = null;
     private long timestamp = 0;
@@ -175,6 +177,13 @@ public class SingleSignOnMessage implements ClusterMessage {
         this.username = username;
     }
 
+    public SerializablePrincipal getPrincipal() {
+        return principal;
+    }
+
+    public void setPrincipal(SerializablePrincipal principal) {
+        this.principal = principal;
+    }
 
     // --------------------------------------------------------- Public Methods
 
