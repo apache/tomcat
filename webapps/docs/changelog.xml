@@ -86,6 +86,11 @@
         found. (markt)
       </fix>
       <fix>
+        <bug>52830</bug>: Correct JNDI lookups when using
+        <code>javax.naming.Name</code> to identify the resource rather than a
+        <code>java.lang.String</code>. (markt)
+      </fix>
+      <fix>
         <bug>52846</bug>: Make sure NonLoginAuthenticator registers not 
         MemoryUser but GenericPrincipal into a session when UserDatabaseRealm 
         is used. (kfujino)
