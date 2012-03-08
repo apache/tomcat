@@ -282,8 +282,7 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
      * @return The name of the class that will be used to extract user names
      *         from X509 client certificates.
      */
-    public String getX509UsernameRetrieverClassName()
-    {
+    public String getX509UsernameRetrieverClassName() {
         return x509UsernameRetrieverClassName;
     }
 
@@ -296,8 +295,7 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
      *                  from X509 client certificates.
      * @see X509UsernameRetriever
      */
-    public void setX509UsernameRetrieverClassName(String className)
-    {
+    public void setX509UsernameRetrieverClassName(String className) {
         this.x509UsernameRetrieverClassName = className;
     }
 
