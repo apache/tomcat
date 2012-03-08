@@ -31,6 +31,8 @@ import org.apache.catalina.Session;
 import org.apache.catalina.authenticator.SingleSignOn;
 import org.apache.catalina.ha.CatalinaCluster;
 import org.apache.catalina.ha.ClusterManager;
+import org.apache.catalina.ha.session.SerializablePrincipal;
+import org.apache.catalina.realm.GenericPrincipal;
 import org.apache.tomcat.util.ExceptionUtils;
 
 
@@ -293,6 +295,12 @@ public class ClusterSingleSignOn extends SingleSignOn {
             msg.setUsername(username);
             msg.setPassword(password);
 
+            SerializablePrincipal sp = null;
+            if (principal instanceof GenericPrincipal) {
+                sp = SerializablePrincipal.createPrincipal((GenericPrincipal) principal);
+                msg.setPrincipal(sp);
+            }
+
             cluster.send(msg);
             if (containerLog.isDebugEnabled()) {
                 containerLog.debug("SingleSignOnMessage Send with action "
@@ -351,6 +359,12 @@ public class ClusterSingleSignOn extends SingleSignOn {
             msg.setAuthType(authType);
             msg.setUsername(username);
             msg.setPassword(password);
+
+            SerializablePrincipal sp = null;
+            if (principal instanceof GenericPrincipal) {
+                sp = SerializablePrincipal.createPrincipal((GenericPrincipal) principal);
+                msg.setPrincipal(sp);
+            }
 
             cluster.send(msg);
             if (containerLog.isDebugEnabled()) {
