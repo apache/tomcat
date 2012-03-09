@@ -2132,9 +2132,6 @@ class Generator {
                 out.println(");");
             }
 
-            // Restore EL context
-            out.printil("jspContext.getELContext().putContext(javax.servlet.jsp.JspContext.class,getJspContext());");
-
             n.setEndJavaLine(out.getJavaLine());
         }
 
@@ -4221,6 +4218,7 @@ class Generator {
             out.printil("}");
             out.printil("try {");
             out.pushIndent();
+            out.printil("Object _jspx_saved_JspContext = this.jspContext.getELContext().getContext(javax.servlet.jsp.JspContext.class);");
             out.printil("this.jspContext.getELContext().putContext(javax.servlet.jsp.JspContext.class,this.jspContext);");
             out.printil("switch( this.discriminator ) {");
             out.pushIndent();
@@ -4233,6 +4231,10 @@ class Generator {
             }
             out.popIndent();
             out.printil("}"); // switch
+
+            // restore nested JspContext on ELContext
+            out.printil("jspContext.getELContext().putContext(javax.servlet.jsp.JspContext.class,_jspx_saved_JspContext);");
+
             out.popIndent();
             out.printil("}"); // try
             out.printil("catch( java.lang.Throwable e ) {");
