@@ -28,11 +28,12 @@ import javax.servlet.http.HttpServletResponse;
 
 import junit.framework.Assert;
 
+import org.junit.Test;
+
 import org.apache.catalina.Context;
 import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
-import org.junit.Test;
 
 public class TestWebappClassLoaderExecutorMemoryLeak extends TomcatBaseTest {
 
