@@ -136,16 +136,16 @@ public abstract class ManagerBase extends LifecycleMBeanBase
 
     protected static final int TIMING_STATS_CACHE_SIZE = 100;
 
-    protected Deque<SessionTiming> sessionCreationTiming =
+    protected final Deque<SessionTiming> sessionCreationTiming =
         new LinkedList<SessionTiming>();
 
-    protected Deque<SessionTiming> sessionExpirationTiming =
+    protected final Deque<SessionTiming> sessionExpirationTiming =
         new LinkedList<SessionTiming>();
 
     /**
      * Number of sessions that have expired.
      */
-    protected AtomicLong expiredSessions = new AtomicLong(0);
+    protected final AtomicLong expiredSessions = new AtomicLong(0);
 
 
     /**
@@ -202,7 +202,8 @@ public abstract class ManagerBase extends LifecycleMBeanBase
     /**
      * The property change support for this component.
      */
-    protected PropertyChangeSupport support = new PropertyChangeSupport(this);
+    protected final PropertyChangeSupport support =
+            new PropertyChangeSupport(this);
 
 
     // ------------------------------------------------------------- Properties
@@ -1286,8 +1287,8 @@ public abstract class ManagerBase extends LifecycleMBeanBase
     // ----------------------------------------------------------- Inner classes
 
     protected static final class SessionTiming {
-        private long timestamp;
-        private int duration;
+        private final long timestamp;
+        private final int duration;
 
         public SessionTiming(long timestamp, int duration) {
             this.timestamp = timestamp;
