@@ -77,9 +77,9 @@
         that checks for non-permitted classes in web application JARs. (markt)
       </fix>
       <scode>
-        Code clean-up identified by <bug>52724</bug>, <bug>52726</bug>,
-        <bug>52727</bug>, <bug>52729</bug>, <bug>52731</bug> and
-        <bug>52732</bug>. (markt)
+        Code clean-up identified by <bug>52723</bug>, <bug>52724</bug>,
+        <bug>52726</bug>, <bug>52727</bug>, <bug>52729</bug>, <bug>52731</bug>
+        and <bug>52732</bug>. (markt)
       </scode>
       <fix>
         <bug>52792</bug>: Improve error message when a JNDI resource can not be
