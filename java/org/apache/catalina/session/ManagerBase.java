@@ -775,6 +775,9 @@ public abstract class ManagerBase extends LifecycleMBeanBase
 
         do {
             if (result != null) {
+                // Not thread-safe but if one of multiple increments is lost
+                // that is not a big deal since the fact that there was any
+                // duplicate is a much bigger issue.
                 duplicates++;
             }
 
