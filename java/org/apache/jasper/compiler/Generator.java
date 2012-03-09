@@ -95,35 +95,35 @@ class Generator {
                     "org.apache.jasper.compiler.Generator.STRICT_GET_PROPERTY",
                     "true")).booleanValue();
 
-    private ServletWriter out;
+    private final ServletWriter out;
 
-    private ArrayList<GenBuffer> methodsBuffered;
+    private final ArrayList<GenBuffer> methodsBuffered;
 
-    private FragmentHelperClass fragmentHelperClass;
+    private final FragmentHelperClass fragmentHelperClass;
 
-    private ErrorDispatcher err;
+    private final ErrorDispatcher err;
 
-    private BeanRepository beanInfo;
+    private final BeanRepository beanInfo;
 
-    private Set<String> varInfoNames;
+    private final Set<String> varInfoNames;
 
-    private JspCompilationContext ctxt;
+    private final JspCompilationContext ctxt;
 
-    private boolean isPoolingEnabled;
+    private final boolean isPoolingEnabled;
 
-    private boolean breakAtLF;
+    private final boolean breakAtLF;
 
     private String jspIdPrefix;
 
     private int jspId;
 
-    private PageInfo pageInfo;
+    private final PageInfo pageInfo;
 
-    private Vector<String> tagHandlerPoolNames;
+    private final Vector<String> tagHandlerPoolNames;
 
     private GenBuffer charArrayBuffer;
 
-    private DateFormat timestampFormat;
+    private final DateFormat timestampFormat;
 
     /**
      * @param s
@@ -276,7 +276,7 @@ class Generator {
 
         class TagHandlerPoolVisitor extends Node.Visitor {
 
-            private Vector<String> names;
+            private final Vector<String> names;
 
             /*
              * Constructor
@@ -354,7 +354,7 @@ class Generator {
 
         class ScriptingVarVisitor extends Node.Visitor {
 
-            private Vector<String> vars;
+            private final Vector<String> vars;
 
             ScriptingVarVisitor() {
                 vars = new Vector<String>();
@@ -754,9 +754,9 @@ class Generator {
          * handlers: <key>: tag short name <value>: introspection info of tag
          * handler for <prefix:shortName> tag
          */
-        private Hashtable<String,Hashtable<String,TagHandlerInfo>> handlerInfos;
+        private final Hashtable<String,Hashtable<String,TagHandlerInfo>> handlerInfos;
 
-        private Hashtable<String,Integer> tagVarNumbers;
+        private final Hashtable<String,Integer> tagVarNumbers;
 
         private String parent;
 
@@ -770,13 +770,13 @@ class Generator {
 
         private boolean isFragment;
 
-        private boolean isTagFile;
+        private final boolean isTagFile;
 
         private ServletWriter out;
 
-        private ArrayList<GenBuffer> methodsBuffered;
+        private final ArrayList<GenBuffer> methodsBuffered;
 
-        private FragmentHelperClass fragmentHelperClass;
+        private final FragmentHelperClass fragmentHelperClass;
 
         private int methodNesting;
 
@@ -1401,7 +1401,7 @@ class Generator {
              */
             class ParamVisitor extends Node.Visitor {
 
-                private boolean ie;
+                private final boolean ie;
 
                 ParamVisitor(boolean ie) {
                     this.ie = ie;
@@ -3446,6 +3446,8 @@ class Generator {
         breakAtLF = ctxt.getOptions().getMappedFile();
         if (isPoolingEnabled) {
             tagHandlerPoolNames = new Vector<String>();
+        } else {
+            tagHandlerPoolNames = null;
         }
         timestampFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         timestampFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
