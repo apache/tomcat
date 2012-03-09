@@ -25,11 +25,12 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.junit.Test;
+
 import org.apache.catalina.Context;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.util.buf.ByteChunk;
-import org.junit.Test;
 
 public class TestWebappClassLoaderThreadLocalMemoryLeak extends TomcatBaseTest {
 
@@ -126,7 +127,7 @@ public class TestWebappClassLoaderThreadLocalMemoryLeak extends TomcatBaseTest {
     }
 
     static class ThreadScopedHolder {
-        private final static ThreadLocal<List<MyCounter>> threadLocal =
+        private static final ThreadLocal<List<MyCounter>> threadLocal =
                 new ThreadLocal<List<MyCounter>>();
 
         public static void saveInHolder(List<MyCounter> o) {
