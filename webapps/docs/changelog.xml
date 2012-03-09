@@ -126,6 +126,10 @@
         <bug>52772</bug>: Ensure uriRoot is fully validated before it is used.
         Patch based on a suggestion by Eugene Chung. (markt)
       </fix>
+      <fix>
+        <bug>52776</bug>: Refactor the code so JspFragment.invoke cleans up
+        after itself. Patch provided by Karl von Randow. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">
