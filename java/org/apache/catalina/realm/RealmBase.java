@@ -304,8 +304,7 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
      * @return The name of the class that will be used to extract user names
      *         from X509 client certificates.
      */
-    public String getX509UsernameRetrieverClassName()
-    {
+    public String getX509UsernameRetrieverClassName() {
         return x509UsernameRetrieverClassName;
     }
 
@@ -319,8 +318,7 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
      *
      * @see X509UsernameRetriever.
      */
-    public void setX509UsernameRetrieverClassName(String className)
-    {
+    public void setX509UsernameRetrieverClassName(String className) {
         this.x509UsernameRetrieverClassName = className;
     }
 
@@ -1091,7 +1089,7 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
         if (container != null) {
             this.containerLog = container.getLogger();
         }
-        
+
         x509UsernameRetriever = createUsernameRetriever(x509UsernameRetrieverClassName);
     }
         
@@ -1463,7 +1461,7 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
         try {
             @SuppressWarnings("unchecked")
             Class<? extends X509UsernameRetriever> clazz = (Class<? extends X509UsernameRetriever>)Class.forName(className);
-            return (X509UsernameRetriever)clazz.newInstance();
+            return clazz.newInstance();
         } catch (ClassNotFoundException e) {
             throw new LifecycleException(sm.getString("realmBase.createUsernameRetriever.ClassNotFoundException", className), e);
         } catch (InstantiationException e) {
