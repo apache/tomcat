@@ -95,6 +95,11 @@
         MemoryUser but GenericPrincipal into a session when UserDatabaseRealm 
         is used. (kfujino)
       </fix>
+      <add>
+        <bug>52850</bug>: Extend memory leak prevention and detection code to
+        work with IBM as well as Oracle JVMs. Patch provided by Rohit Kelapure.
+        (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
