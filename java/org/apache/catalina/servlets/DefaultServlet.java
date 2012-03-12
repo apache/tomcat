@@ -158,7 +158,7 @@ public class DefaultServlet
     /**
      * Array containing the safe characters set.
      */
-    protected static URLEncoder urlEncoder;
+    protected static final URLEncoder urlEncoder;
 
 
     /**
@@ -211,7 +211,7 @@ public class DefaultServlet
     /**
      * Full range marker.
      */
-    protected static ArrayList<Range> FULL = new ArrayList<Range>();
+    protected static final ArrayList<Range> FULL = new ArrayList<Range>();
 
 
     // ----------------------------------------------------- Static Initializer
@@ -716,7 +716,10 @@ public class DefaultServlet
 
     /**
      * Display the size of a file.
+     * @deprecated Will be removed in Tomcat 8.0.x. Replaced by
+     *             {@link #renderSize(long)}
      */
+    @Deprecated
     protected void displaySize(StringBuilder buf, int filesize) {
 
         int leftside = filesize / 1024;
