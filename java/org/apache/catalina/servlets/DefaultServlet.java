@@ -715,25 +715,6 @@ public class DefaultServlet
 
 
     /**
-     * Display the size of a file.
-     * @deprecated Will be removed in Tomcat 8.0.x. Replaced by
-     *             {@link #renderSize(long)}
-     */
-    @Deprecated
-    protected void displaySize(StringBuilder buf, int filesize) {
-
-        int leftside = filesize / 1024;
-        int rightside = (filesize % 1024) / 103;  // makes 1 digit
-        // To avoid 0.0 for non-zero file, we bump to 0.1
-        if (leftside == 0 && rightside == 0 && filesize != 0)
-            rightside = 1;
-        buf.append(leftside).append(".").append(rightside);
-        buf.append(" KB");
-
-    }
-
-
-    /**
      * Serve the specified resource, optionally including the data content.
      *
      * @param request The servlet request we are processing
