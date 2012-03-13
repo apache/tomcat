@@ -455,11 +455,12 @@
         <exclude name="res/checkstyle/header-al2.txt"/>
         <!-- Exclude auto-generated files -->
         <exclude name="java/org/apache/el/parser/ELParser*.java" />
-        <exclude name="java/org/apache/el/parser/JJTELParserState.java" />
         <exclude name="java/org/apache/el/parser/Node.java" />
-        <exclude name="java/org/apache/el/parser/ParseException.java" />
-        <exclude name="java/org/apache/el/parser/SimpleCharStream.java" />
-        <exclude name="java/org/apache/el/parser/Token*.java" />
+        <exclude name="java/org/apache/tomcat/util/http/parser/HttpParser*.java" />
+        <exclude name="java/org/apache/**/parser/JJT*ParserState.java" />
+        <exclude name="java/org/apache/**/parser/ParseException.java" />
+        <exclude name="java/org/apache/**/parser/SimpleCharStream.java" />
+        <exclude name="java/org/apache/**/parser/Token*.java" />
         <!-- Exclude these else Gump runs validate on them -->
         <exclude name="**/org/apache/tomcat/dbcp/**"/>
         <exclude name="**/tomcat-deps/**"/>
