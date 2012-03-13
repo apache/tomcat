@@ -32,6 +32,7 @@ import org.apache.coyote.RequestInfo;
 import org.apache.coyote.Response;
 import org.apache.coyote.http11.upgrade.UpgradeInbound;
 import org.apache.tomcat.spdy.SpdyConnection;
+import org.apache.tomcat.spdy.SpdyContext;
 import org.apache.tomcat.spdy.SpdyFrame;
 import org.apache.tomcat.spdy.SpdyStream;
 import org.apache.tomcat.util.ExceptionUtils;
@@ -220,7 +221,7 @@ public class SpdyProcessor extends AbstractProcessor<Object> implements
 
     @Override
     public void action(ActionCode actionCode, Object param) {
-        if (spdy.getSpdyContext().debug) {
+        if (SpdyContext.debug) {
             // System.err.println(actionCode);
         }
 
@@ -473,7 +474,8 @@ public class SpdyProcessor extends AbstractProcessor<Object> implements
     }
 
     @Override
-    public SocketState process(SocketWrapper socket) throws IOException {
+    public SocketState process(SocketWrapper<Object> socket)
+            throws IOException {
         throw new IOException("Unimplemented");
     }
 
@@ -533,7 +535,7 @@ public class SpdyProcessor extends AbstractProcessor<Object> implements
                     throw new IOException("Name too long");
                 }
                 request.requestURI().setBytes(frame.data, frame.off, valueLen);
-                if (spdy.getSpdyContext().debug) {
+                if (SpdyContext.debug) {
                     System.err.println("URL= " + request.requestURI());
                 }
                 frame.advance(valueLen);
