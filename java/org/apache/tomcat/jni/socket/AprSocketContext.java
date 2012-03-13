@@ -508,6 +508,7 @@ public class AprSocketContext {
      * To clean the pools - we could track if all channels are
      * closed, but this seems simpler and safer.
      */
+    @Override
     protected void finalize() {
         if (rootPool != 0) {
             log.warning(this + " GC without stop()");
@@ -860,6 +861,7 @@ public class AprSocketContext {
             setDaemon(true);
         }
 
+        @Override
         public void run() {
             while(running) {
                 try {
@@ -972,6 +974,7 @@ public class AprSocketContext {
 
         private List<AprSocket> updates = new ArrayList<AprSocket>();
 
+        @Override
         public void run() {
             if (!running) {
                 return;
@@ -1286,7 +1289,7 @@ public class AprSocketContext {
             }
             if (failed) {
                 up.reset();
-                throw new IOException("poll add error " +  rv + " " + up + " " + Error.strerror((int)rv));
+                throw new IOException("poll add error " +  rv + " " + up + " " + Error.strerror(rv));
             }
         }
 
@@ -1303,7 +1306,7 @@ public class AprSocketContext {
             up.clearStatus(AprSocket.POLL);
 
             if (rv != Status.APR_SUCCESS) {
-                log.severe("poll remove error " +  Error.strerror((int)rv) + " " + up);
+                log.severe("poll remove error " +  Error.strerror(rv) + " " + up);
             } else {
                 polledCount.decrementAndGet();
             }

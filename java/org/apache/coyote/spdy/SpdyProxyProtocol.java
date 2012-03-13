@@ -81,6 +81,7 @@ public class SpdyProxyProtocol extends AbstractProtocol {
         return cHandler;
     }
 
+    @Override
     public void start() throws Exception {
         super.start();
         spdyContext = new SpdyContextProxy() {

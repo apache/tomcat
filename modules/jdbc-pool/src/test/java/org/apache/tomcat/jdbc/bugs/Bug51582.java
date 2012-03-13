@@ -110,7 +110,7 @@ public class Bug51582
               e.printStackTrace();
             }
 
-          };
+          }
 
         };
         threadList.add(thread);

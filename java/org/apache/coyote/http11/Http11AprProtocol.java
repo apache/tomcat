@@ -187,7 +187,7 @@ public class Http11AprProtocol extends AbstractHttp11Protocol {
     // TODO: map of protocols
     public void setNpnHandler(String impl) {
         try {
-            Class c = Class.forName(impl);
+            Class<?> c = Class.forName(impl);
             npnHandler = (NpnHandler) c.newInstance();
         } catch (Exception ex) {
             getLog().warn("Failed to init light protocol " + impl, ex);

@@ -73,8 +73,10 @@ public class SpdyContextJni extends SpdyContext {
         handler.process(s, true, true, false);
     }
 
+    @Override
     public void listen(final int port, String cert, String key) throws IOException {
         con = new AprSocketContext() {
+            @Override
             protected void onSocket(AprSocket s) throws IOException {
                 SpdyConnectionAprSocket spdy = new SpdyConnectionAprSocket(SpdyContextJni.this);
                 spdy.setSocket(s);
@@ -90,6 +92,7 @@ public class SpdyContextJni extends SpdyContext {
         con.listen(port);
     }
 
+    @Override
     public void stop() throws IOException {
         con.stop();
     }

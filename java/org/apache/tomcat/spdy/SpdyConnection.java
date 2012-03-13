@@ -147,6 +147,7 @@ public abstract class SpdyConnection { // implements Runnable {
         outCondition = framerLock.newCondition();
     }
 
+    @Override
     public String toString() {
         return "SpdyCon open=" + channels.size();
     }
@@ -278,7 +279,7 @@ public abstract class SpdyConnection { // implements Runnable {
                 framerLock.unlock();
             }
 
-            if (getSpdyContext().debug) {
+            if (SpdyContext.debug) {
                 trace("> " + out);
             }
 
@@ -335,6 +336,7 @@ public abstract class SpdyConnection { // implements Runnable {
     static int drainCnt = 0;
 
     Runnable nbDrain = new Runnable() {
+        @Override
         public void run() {
             drain();
         }
@@ -381,12 +383,12 @@ public abstract class SpdyConnection { // implements Runnable {
      */
     public int onBlockingSocket() {
         try {
-            if (getSpdyContext().debug) {
+            if (SpdyContext.debug) {
                 trace("< onConnection() " + lastChannel);
             }
             int rc = processInput();
 
-            if (getSpdyContext().debug) {
+            if (SpdyContext.debug) {
                 trace("< onConnection() " + rc + " " + lastChannel);
             }
             return rc;
@@ -494,7 +496,7 @@ public abstract class SpdyConnection { // implements Runnable {
                 inFrame.nvCount = inFrame.read16();
             }
 
-            if (getSpdyContext().debug) {
+            if (SpdyContext.debug) {
                 trace("< " + inFrame);
             }
 

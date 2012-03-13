@@ -117,6 +117,7 @@ public class AprSocket implements Runnable {
         poller = null;
     }
 
+    @Override
     public String toString() {
         return (context.isServer() ? "AprSrv-" : "AprCli-") +
                 Long.toHexString(socket) + " " + Integer.toHexString(status);
@@ -285,7 +286,7 @@ public class AprSocket implements Runnable {
                 log.warning("apr.send(): Failed to send, closing " + sent);
             }
             reset();
-            throw new IOException("Error sending " + sent + " " + Error.strerror((int) -sent));
+            throw new IOException("Error sending " + sent + " " + Error.strerror(-sent));
         } else {
             off += sent;
             len -= sent;
@@ -337,7 +338,7 @@ public class AprSocket implements Runnable {
         }
         // abrupt close
         reset();
-        throw new IOException("apr.read(): " + read + " " + Error.strerror((int) -read));
+        throw new IOException("apr.read(): " + read + " " + Error.strerror(-read));
     }
 
     public int readNB(byte[] data, int off, int len) throws IOException {
@@ -799,13 +800,13 @@ public class AprSocket implements Runnable {
                 log.info(this + " StartSSL");
             }
 
-            AprSocketContext aprCon = (AprSocketContext) context;
+            AprSocketContext aprCon = context;
             SSLSocket.attach(aprCon.getSslCtx(), socket);
 
             if (context.debugSSL) {
                 SSLExt.debug(socket);
             }
-            if (!((AprSocketContext) getContext()).isServer()) {
+            if (!getContext().isServer()) {
                 if (context.USE_TICKETS && hostInfo.ticketLen > 0) {
                     SSLExt.setTicket(socket, hostInfo.ticket,
                             hostInfo.ticketLen);

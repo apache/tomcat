@@ -83,6 +83,7 @@ public class SpdyFrame {
         endData = 0;
     }
 
+    @Override
     public String toString() {
         if (c) {
             if (type == 6) {
