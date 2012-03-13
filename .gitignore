@@ -30,6 +30,7 @@ mvn.properties
 .settings
 *.iml
 *.asc
+*.jj
 *.tmp
 maven-ant-tasks-*.jar
 thumbs.db
