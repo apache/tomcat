@@ -116,8 +116,13 @@
     <subpackage name="buildutil">
       <allow pkg="org.apache.tools.ant"/>
     </subpackage>
-    <subpackage name="jni"/>
+    <subpackage name="jni">
+      <subpackage name="socket">
+        <allow pkg="org.apache.tomcat.jni"/>
+      </subpackage>
+    </subpackage>
     <subpackage name="spdy">
+      <allow pkg="org.apache.tomcat.jni"/>
       <allow pkg="org.apache.tomcat.spdy"/>
     </subpackage>
     <subpackage name="util">
