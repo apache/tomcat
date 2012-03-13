@@ -26,8 +26,8 @@ public class SpdyFrame {
     public static byte[] HTTP11 = "HTTP/1.1".getBytes();
 
     public static byte[] OK200 = "200 OK".getBytes();
-    
-    
+
+
     // This is a bit more complicated, to avoid multiple reads/writes.
     // We'll read as much as possible - possible past frame end. This may
     // cost an extra copy - or even more complexity for dealing with slices
@@ -43,8 +43,8 @@ public class SpdyFrame {
     /**
      *  end of data in the buffer.
      */
-    public int endData; 
-    
+    public int endData;
+
     // Processed data from the frame
     boolean c; // for control
 
@@ -240,7 +240,7 @@ public class SpdyFrame {
         nvCount++;
         headerValue(buf, soff, len);
     }
-    
+
     public void addHeader(String name, String value) {
         byte[] nameB = name.getBytes();
         headerName(nameB, 0, nameB.length);
@@ -258,7 +258,7 @@ public class SpdyFrame {
         headerName(nameB, 0, nameB.length);
         headerValue(valueB, 0, valueB.length);
     }
-    
+
     public void getHeaders(Map<String, String> resHeaders) {
         for (int i = 0; i < nvCount; i++) {
             int len = read16();
@@ -270,7 +270,7 @@ public class SpdyFrame {
             resHeaders.put(n, v);
         }
     }
-    
+
 
     // TODO: instead of that, use byte[][]
     void makeSpace(int len) {

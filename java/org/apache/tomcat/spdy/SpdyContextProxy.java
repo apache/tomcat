@@ -20,7 +20,6 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
-import java.util.concurrent.Semaphore;
 
 /**
  * Spdy context for 'proxy' or test mode spdy - no NPN, no SSL, no compression.
@@ -99,20 +98,22 @@ public class SpdyContextProxy extends SpdyContext {
             }
         }
     }
-    
-    
+
+
     boolean running = true;
     ServerSocket serverSocket;
-    
+
+    @Override
     public void stop() throws IOException {
         running = false;
         serverSocket.close();
     }
-    
+
     /**
      *  For small servers/testing: run in server mode.
      *  Need to override onSynStream() to implement the logic.
      */
+    @Override
     public void listen(final int port, String cert, String key) throws IOException {
         getExecutor().execute(new Runnable() {
             @Override

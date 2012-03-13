@@ -66,18 +66,18 @@ public class SpdyContext {
 
     /**
      * Set the max frame size.
-     * 
+     *
      * Larger data packets will be split in multiple frames.
-     * 
-     * ( the code is currently accepting larger control frames - it's not 
+     *
+     * ( the code is currently accepting larger control frames - it's not
      * clear if we should just reject them, many servers limit header size -
      * the http connector also has a 8k limit - getMaxHttpHeaderSize )
      */
-    public void setFrameSize(int frameSize) { 
+    public void setFrameSize(int frameSize) {
         defaultFrameSize = frameSize;
     }
-    
-    /** 
+
+    /**
      * Override for server side to return a custom stream.
      */
     public SpdyStream getStream(SpdyConnection framer) {
@@ -120,11 +120,11 @@ public class SpdyContext {
 
     public void releaseConnection(SpdyConnection con) {
     }
-    
+
     public void listen(final int port, String cert, String key) throws IOException {
         throw new IOException("Not implemented");
-    }    
-    
+    }
+
     /**
      * Close all pending connections and free resources.
      */
