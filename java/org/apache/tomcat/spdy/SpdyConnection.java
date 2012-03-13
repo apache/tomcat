@@ -146,20 +146,20 @@ public abstract class SpdyConnection { // implements Runnable {
         this.spdyContext = spdyContext;
         outCondition = framerLock.newCondition();
     }
-    
+
     public String toString() {
         return "SpdyCon open=" + channels.size();
     }
-    
+
     public void dump(PrintWriter out) {
-        out.println("SpdyConnection open=" + channels.size() + 
+        out.println("SpdyConnection open=" + channels.size() +
                 " outQ:" + outQueue.size());
         for (SpdyStream str: channels.values()) {
             str.dump(out);
         }
-        
+
         out.println();
-        
+
     }
 
     /**
@@ -215,7 +215,7 @@ public abstract class SpdyConnection { // implements Runnable {
             draining = false;
         }
     }
-    
+
     /**
      * Non blocking if the socket is not blocking.
      */
@@ -233,7 +233,7 @@ public abstract class SpdyConnection { // implements Runnable {
                         return false;
                     }
                     if (goAway < out.streamId) {
-                        
+
                     }
                     SpdyFrame oframe = out;
                     try {
@@ -297,7 +297,7 @@ public abstract class SpdyConnection { // implements Runnable {
                         out.off += wr;
                         toWrite -= wr;
                     }
-                } 
+                }
                 // Frame was sent
                 framerLock.lock();
                 try {
@@ -305,9 +305,9 @@ public abstract class SpdyConnection { // implements Runnable {
                 } finally {
                     framerLock.unlock();
                 }
-                
+
                 synchronized (channels) {
-                    if (out.stream != null && 
+                    if (out.stream != null &&
                             out.stream.finRcvd && out.stream.finSent) {
                         channels.remove(out.streamId);
                     }
@@ -354,7 +354,7 @@ public abstract class SpdyConnection { // implements Runnable {
         // We can't assing a stream ID until it is sent - priorities
         // we can't compress either - it's stateful.
         oframe.stream = proc;
-        
+
         framerLock.lock();
         try {
             outQueue.add(oframe);
@@ -448,7 +448,7 @@ public abstract class SpdyConnection { // implements Runnable {
                 }
 
                 // TODO: if data, split it in 2 frames
-                // grow the buffer if needed. 
+                // grow the buffer if needed.
                 if (inFrame.data.length < inFrame.endData) {
                     byte[] tmp = new byte[inFrame.endData];
                     System.arraycopy(inFrame.data, 0, tmp, 0, inFrame.endReadData);
@@ -557,7 +557,7 @@ public abstract class SpdyConnection { // implements Runnable {
 
     /**
      * Process a SPDY connection. Called in a separate thread.
-     * 
+     *
      * @return
      * @throws IOException
      */
@@ -577,7 +577,7 @@ public abstract class SpdyConnection { // implements Runnable {
             case TYPE_GOAWAY: {
                 int lastStream = inFrame.readInt();
                 log.info("GOAWAY last=" + lastStream);
-                
+
                 // Server will shut down - but will keep processing the current requests,
                 // up to lastStream. If we sent any new ones - they need to be canceled.
                 abort("GO_AWAY", lastStream);
@@ -601,7 +601,7 @@ public abstract class SpdyConnection { // implements Runnable {
                     return CLOSE;
                 }
                 sch.onCtlFrame(inFrame);
-                
+
                 synchronized(channels) {
                     channels.remove(inFrame.streamId);
                 }
@@ -663,7 +663,7 @@ public abstract class SpdyConnection { // implements Runnable {
             // Data frame
             SpdyStream sch;
             synchronized (channels) {
-                sch = channels.get(inFrame.streamId);                
+                sch = channels.get(inFrame.streamId);
             }
             if (sch == null) {
                 abort("Missing channel");

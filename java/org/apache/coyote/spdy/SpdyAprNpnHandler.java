@@ -17,18 +17,12 @@
 package org.apache.coyote.spdy;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.apache.coyote.Adapter;
 import org.apache.coyote.http11.Http11AprProtocol;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
-import org.apache.tomcat.jni.Error;
 import org.apache.tomcat.jni.SSLExt;
-import org.apache.tomcat.jni.Status;
-import org.apache.tomcat.jni.socket.AprSocketContext;
-import org.apache.tomcat.spdy.CompressDeflater6;
 import org.apache.tomcat.spdy.SpdyConnection;
 import org.apache.tomcat.spdy.SpdyContext;
 import org.apache.tomcat.spdy.SpdyContextJni;
@@ -113,7 +107,7 @@ public class SpdyAprNpnHandler implements Http11AprProtocol.NpnHandler {
             Http11AprProtocol proto, AbstractEndpoint endpoint) {
 
         SocketWrapper<Long> socketW = socketO;
-        long socket = ((Long) socketW.getSocket()).longValue();
+        long socket = socketW.getSocket().longValue();
 
         try {
             spdyContext.onAccept(socket);
@@ -125,6 +119,4 @@ public class SpdyAprNpnHandler implements Http11AprProtocol.NpnHandler {
 
     public void onClose(SocketWrapper<Long> socketWrapper) {
     }
-
-
 }

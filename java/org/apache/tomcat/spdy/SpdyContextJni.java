@@ -1,4 +1,18 @@
 /*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package org.apache.tomcat.spdy;
 
@@ -12,9 +26,9 @@ import org.apache.tomcat.jni.socket.AprSocketContext.TlsCertVerifier;
 
 public class SpdyContextJni extends SpdyContext {
     AprSocketContext con;
-    
+
     //AprSocketContext socketCtx;
-    
+
     public SpdyContextJni() {
         con = new AprSocketContext();
         //if (insecureCerts) {
@@ -26,11 +40,11 @@ public class SpdyContextJni extends SpdyContext {
         //}
         con.setNpn("spdy/2");
     }
-    
+
     @Override
     public SpdyConnection getConnection(String host, int port) throws IOException {
         SpdyConnectionAprSocket spdy = new SpdyConnectionAprSocket(this);
-        
+
         AprSocket ch = con.socket(host, port, tls);
 
         spdy.setSocket(ch);
@@ -38,7 +52,7 @@ public class SpdyContextJni extends SpdyContext {
         ch.connect();
 
         ch.setHandler(new SpdySocketHandler(spdy));
-        
+
         // need to consume the input to receive more read events
         int rc = spdy.processInput();
         if (rc == SpdyConnection.CLOSE) {
@@ -48,50 +62,50 @@ public class SpdyContextJni extends SpdyContext {
 
         return spdy;
     }
-    
+
     public void onAccept(long socket) throws IOException {
         SpdyConnectionAprSocket spdy = new SpdyConnectionAprSocket(SpdyContextJni.this);
         AprSocket s = con.socket(socket);
         spdy.setSocket(s);
-        
+
         SpdySocketHandler handler = new SpdySocketHandler(spdy);
-        s.setHandler(handler);    
+        s.setHandler(handler);
         handler.process(s, true, true, false);
     }
-    
+
     public void listen(final int port, String cert, String key) throws IOException {
         con = new AprSocketContext() {
             protected void onSocket(AprSocket s) throws IOException {
                 SpdyConnectionAprSocket spdy = new SpdyConnectionAprSocket(SpdyContextJni.this);
                 spdy.setSocket(s);
-                
+
                 SpdySocketHandler handler = new SpdySocketHandler(spdy);
                 s.setHandler(handler);
             }
         };
-        
+
         con.setNpn(SpdyContext.SPDY_NPN_OUT);
         con.setKeys(cert, key);
-        
+
         con.listen(port);
     }
 
     public void stop() throws IOException {
         con.stop();
     }
-    
+
     public AprSocketContext getAprContext() {
         return con;
-    } 
-    
+    }
+
     // NB
     class SpdySocketHandler implements NonBlockingPollHandler {
         SpdyConnection con;
-        
+
         SpdySocketHandler(SpdyConnection con) {
             this.con = con;
         }
-        
+
         @Override
         public void closed(AprSocket ch) {
             // not used ( polling not implemented yet )
@@ -119,9 +133,9 @@ public class SpdyContextJni extends SpdyContext {
         @Override
         public void error(AprSocket ch, Throwable t) {
         }
-        
+
     }
-    
+
     public static class SpdyConnectionAprSocket extends SpdyConnection {
         AprSocket socket;
 
@@ -141,7 +155,7 @@ public class SpdyContextJni extends SpdyContext {
         public void close() throws IOException {
             socket.close();
         }
-        
+
         @Override
         public int write(byte[] data, int off, int len) throws IOException {
             if (socket == null) {

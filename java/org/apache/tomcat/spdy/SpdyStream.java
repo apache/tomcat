@@ -54,18 +54,18 @@ public class SpdyStream {
     protected boolean finSent;
 
     protected boolean finRcvd;
-    
+
     /**
      *  Dummy data frame to insert on reset / go away
      */
     static SpdyFrame END_FRAME;
-    
+
     static {
         END_FRAME = new SpdyFrame(16);
         END_FRAME.endData = 0;
         END_FRAME.off = 0;
-        END_FRAME.c = false; 
-        END_FRAME.flags =SpdyConnection.FLAG_HALF_CLOSE; 
+        END_FRAME.c = false;
+        END_FRAME.flags =SpdyConnection.FLAG_HALF_CLOSE;
     }
 
     public SpdyStream(SpdyConnection spdy) {
@@ -117,30 +117,30 @@ public class SpdyStream {
             inData.add(frame);
             if (frame.isHalfClose()) {
                 finRcvd = true;
-            }            
+            }
         }
     }
 
-    /** 
+    /**
      * Called on GOAWAY or reset.
      */
     public void onReset() {
         finRcvd = true;
         finSent = true;
-        
+
         // To unblock
         inData.add(END_FRAME);
     }
-    
+
     /**
      * True if the channel both received and sent FIN frames.
-     * 
+     *
      * This is tracked by the processor, to avoid extra storage in framer.
      */
     public boolean isFinished() {
         return finSent && finRcvd;
     }
-    
+
     /**
      * Waits and return the next data frame.
      */
@@ -152,7 +152,7 @@ public class SpdyStream {
             }
         }
     }
-    
+
     /**
      * Waits and return the next frame. First frame will be the control frame
      */
@@ -162,7 +162,7 @@ public class SpdyStream {
             synchronized (this) {
                 if (inData.size() == 0 && finRcvd) {
                     return null;
-                }                
+                }
             }
             in = inData.poll(to, TimeUnit.MILLISECONDS);
             if (in == END_FRAME) {
