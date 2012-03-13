@@ -465,6 +465,7 @@
         <exclude name="**/tomcat-deps/**"/>
       </fileset>
       <fileset dir="modules/jdbc-pool" >
+        <exclude name=".*/**"/>
         <patternset refid="text.files" />
       </fileset>
     </checkstyle>
