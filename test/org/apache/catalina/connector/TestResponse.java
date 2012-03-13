@@ -19,6 +19,7 @@ package org.apache.catalina.connector;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -93,6 +94,93 @@ public class TestResponse extends TomcatBaseTest {
             HttpSession session = req.getSession(true);
             session.invalidate();
             req.getSession(true);
+        }
+
+    }
+
+
+    /**
+     * Tests an issue noticed during the investigation of BZ 52811.
+     */
+    @Test
+    public void testCharset() throws Exception {
+        // Setup Tomcat instance
+        Tomcat tomcat = getTomcatInstance();
+
+        // Must have a real docBase - just use temp
+        File docBase = new File(System.getProperty("java.io.tmpdir"));
+        Context ctx = tomcat.addContext("", docBase.getAbsolutePath());
+
+        Tomcat.addServlet(ctx, "servlet", new CharsetServlet());
+        ctx.addServletMapping("/", "servlet");
+
+        tomcat.start();
+
+        ByteChunk bc = getUrl("http://localhost:" + getPort() + "/");
+
+        assertEquals("OK", bc.toString());
+    }
+
+    private static final class CharsetServlet extends HttpServlet {
+        private static final long serialVersionUID = 1L;
+
+        @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+                throws ServletException, IOException {
+            PrintWriter pw = resp.getWriter();
+            resp.setHeader("Content-Type", "text/plain;charset=UTF-8");
+
+            // Should be ISO-8859-1 because getWriter() was called before
+            // setHeader()
+            if (resp.getCharacterEncoding().equals("ISO-8859-1")) {
+                pw.print("OK");
+            } else {
+                pw.print("FAIL: " + resp.getCharacterEncoding());
+            }
+        }
+
+    }
+
+
+    @Test
+    public void testBug52811() throws Exception {
+        // Setup Tomcat instance
+        Tomcat tomcat = getTomcatInstance();
+
+        // Must have a real docBase - just use temp
+        File docBase = new File(System.getProperty("java.io.tmpdir"));
+        Context ctx = tomcat.addContext("", docBase.getAbsolutePath());
+
+        Tomcat.addServlet(ctx, "servlet", new Bug52811Servlet());
+        ctx.addServletMapping("/", "servlet");
+
+        tomcat.start();
+
+        ByteChunk bc = getUrl("http://localhost:" + getPort() + "/");
+
+        assertEquals("OK", bc.toString());
+    }
+
+    private static final class Bug52811Servlet extends HttpServlet {
+        private static final long serialVersionUID = 1L;
+
+        @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+                throws ServletException, IOException {
+
+            resp.setContentType("multipart/related;" +
+                    "boundary=1_4F50BD36_CDF8C28;" +
+                    "Start=\"<31671603.smil>\";" +
+                    "Type=\"application/smil;charset=UTF-8\"");
+
+            // Should be ISO-8859-1 because the charset in the above is part
+            // of the Type parameter
+            PrintWriter pw = resp.getWriter();
+            if (resp.getCharacterEncoding().equals("ISO-8859-1")) {
+                pw.print("OK");
+            } else {
+                pw.print("FAIL: " + resp.getCharacterEncoding());
+            }
         }
 
     }
