@@ -19,6 +19,7 @@ package org.apache.catalina.connector;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.StringReader;
 import java.net.MalformedURLException;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
@@ -52,6 +53,9 @@ import org.apache.tomcat.util.buf.UEncoder;
 import org.apache.tomcat.util.http.FastHttpDateFormat;
 import org.apache.tomcat.util.http.MimeHeaders;
 import org.apache.tomcat.util.http.ServerCookie;
+import org.apache.tomcat.util.http.parser.AstMediaType;
+import org.apache.tomcat.util.http.parser.HttpParser;
+import org.apache.tomcat.util.http.parser.ParseException;
 import org.apache.tomcat.util.net.URL;
 import org.apache.tomcat.util.res.StringManager;
 
@@ -684,7 +688,6 @@ public class Response
      * @param type The new content type
      */
     @Override
-    @SuppressWarnings("deprecation") // isSpace (deprecated) cannot be replaced by isWhiteSpace
     public void setContentType(String type) {
 
         if (isCommitted()) {
@@ -696,39 +699,30 @@ public class Response
             return;
         }
 
-        // Ignore charset if getWriter() has already been called
-        if (usingWriter) {
-            if (type != null) {
-                int index = type.indexOf(";");
-                if (index != -1) {
-                    type = type.substring(0, index);
-                }
-            }
+        if (type == null) {
+            coyoteResponse.setContentType(null);
+            return;
         }
 
-        coyoteResponse.setContentType(type);
+        AstMediaType m = null;
+        HttpParser hp = new HttpParser(new StringReader(type));
+        try {
+             m = hp.MediaType();
+        } catch (ParseException e) {
+            // Invalid - Assume no charset and just pass through whatever
+            // the user provided.
+            coyoteResponse.setContentTypeNoCharset(type);
+            return;
+        }
 
-        // Check to see if content type contains charset
-        if (type != null) {
-            int index = type.indexOf(";");
-            if (index != -1) {
-                int len = type.length();
-                index++;
-                // N.B. isSpace (deprecated) cannot be replaced by isWhiteSpace
-                while (index < len && Character.isSpace(type.charAt(index))) {
-                    index++;
-                }
-                if (index+7 < len
-                        && type.charAt(index) == 'c'
-                        && type.charAt(index+1) == 'h'
-                        && type.charAt(index+2) == 'a'
-                        && type.charAt(index+3) == 'r'
-                        && type.charAt(index+4) == 's'
-                        && type.charAt(index+5) == 'e'
-                        && type.charAt(index+6) == 't'
-                        && type.charAt(index+7) == '=') {
-                    isCharacterEncodingSet = true;
-                }
+        coyoteResponse.setContentTypeNoCharset(m.toStringNoCharset());
+
+        String charset = m.getCharset();
+        if (charset != null) {
+            // Ignore charset if getWriter() has already been called
+            if (!usingWriter) {
+                coyoteResponse.setCharacterEncoding(charset);
+                isCharacterEncodingSet = true;
             }
         }
     }
@@ -1013,8 +1007,31 @@ public class Response
             return;
         }
 
-        coyoteResponse.addHeader(name, value);
+        char cc=name.charAt(0);
+        if (cc=='C' || cc=='c') {
+            if (checkSpecialHeader(name, value))
+            return;
+        }
 
+        coyoteResponse.addHeader(name, value);
+    }
+
+
+    /**
+     * An extended version of this exists in {@link org.apache.coyote.Response}.
+     * This check is required here to ensure that the usingWriter checks in
+     * {@link #setContentType(String)} are applied since usingWriter is not
+     * visible to {@link org.apache.coyote.Response}
+     *
+     * Called from set/addHeader.
+     * Return true if the header is special, no need to set the header.
+     */
+    private boolean checkSpecialHeader(String name, String value) {
+        if (name.equalsIgnoreCase("Content-Type")) {
+            setContentType(value);
+            return true;
+        }
+        return false;
     }
 
 
@@ -1329,8 +1346,13 @@ public class Response
             return;
         }
 
-        coyoteResponse.setHeader(name, value);
+        char cc=name.charAt(0);
+        if (cc=='C' || cc=='c') {
+            if (checkSpecialHeader(name, value))
+            return;
+        }
 
+        coyoteResponse.setHeader(name, value);
     }
 
 
