@@ -16,7 +16,18 @@
  */
 package org.apache.tomcat.spdy;
 
+import java.util.Map;
+
 public class SpdyFrame {
+    public static byte[] STATUS = "status".getBytes();
+
+    public static byte[] VERSION = "version".getBytes();
+
+    public static byte[] HTTP11 = "HTTP/1.1".getBytes();
+
+    public static byte[] OK200 = "200 OK".getBytes();
+    
+    
     // This is a bit more complicated, to avoid multiple reads/writes.
     // We'll read as much as possible - possible past frame end. This may
     // cost an extra copy - or even more complexity for dealing with slices
@@ -25,18 +36,21 @@ public class SpdyFrame {
 
     public int off = 8; // used when reading - current offset
 
-    public int endFrame; // end of frame == size + 8
+    int endReadData; // how much has been read ( may be more or less than a frame )
 
     // On write it is incremented.
 
-    public int endData; // end of data in the buffer (may be past frame end)
-
+    /**
+     *  end of data in the buffer.
+     */
+    public int endData; 
+    
     // Processed data from the frame
     boolean c; // for control
 
     int version;
 
-    private int flags;
+    int flags;
 
     public int type;
 
@@ -62,7 +76,7 @@ public class SpdyFrame {
     public void recyle() {
         type = 0;
         c = false;
-        endFrame = 0;
+        endReadData = 0;
         off = 8;
         streamId = 0;
         nvCount = 0;
@@ -76,10 +90,10 @@ public class SpdyFrame {
             }
             return "C" + " S=" + streamId + (flags != 0 ? " F=" + flags : "")
                     + (version != 2 ? "  v" + version : "") + " t=" + type
-                    + " L=" + endFrame + "/" + off;
+                    + " L=" + endData + "/" + off;
         } else {
             return "D" + " S=" + streamId + (flags != 0 ? " F=" + flags : "")
-                    + " L=" + endFrame + "/" + off;
+                    + " L=" + endData + "/" + off;
         }
     }
 
@@ -118,7 +132,7 @@ public class SpdyFrame {
     }
 
     public boolean parse() {
-        endFrame = 0;
+        endData = 0;
         streamId = 0;
         nvCount = 0;
 
@@ -142,12 +156,12 @@ public class SpdyFrame {
         flags = data[4] & 0xFF;
         for (int i = 5; i < 8; i++) {
             b0 = data[i] & 0xFF;
-            endFrame = endFrame << 8 | b0;
+            endData = endData << 8 | b0;
         }
 
         // size will represent the end of the data ( header is held in same
         // buffer)
-        endFrame += 8;
+        endData += 8;
 
         return true;
     }
@@ -226,6 +240,37 @@ public class SpdyFrame {
         nvCount++;
         headerValue(buf, soff, len);
     }
+    
+    public void addHeader(String name, String value) {
+        byte[] nameB = name.getBytes();
+        headerName(nameB, 0, nameB.length);
+        nameB = value.getBytes();
+        headerValue(nameB, 0, nameB.length);
+    }
+
+    public void addHeader(byte[] nameB, String value) {
+        headerName(nameB, 0, nameB.length);
+        nameB = value.getBytes();
+        headerValue(nameB, 0, nameB.length);
+    }
+
+    public void addHeader(byte[] nameB, byte[] valueB) {
+        headerName(nameB, 0, nameB.length);
+        headerValue(valueB, 0, valueB.length);
+    }
+    
+    public void getHeaders(Map<String, String> resHeaders) {
+        for (int i = 0; i < nvCount; i++) {
+            int len = read16();
+            String n = new String(data, off, len, SpdyStream.UTF8);
+            advance(len);
+            len = read16();
+            String v = new String(data, off, len, SpdyStream.UTF8);
+            advance(len);
+            resHeaders.put(n, v);
+        }
+    }
+    
 
     // TODO: instead of that, use byte[][]
     void makeSpace(int len) {
@@ -294,11 +339,14 @@ public class SpdyFrame {
     }
 
     public int remaining() {
-        return endFrame - off;
+        return endData - off;
     }
 
     public void advance(int cnt) {
         off += cnt;
     }
 
+    public boolean isData() {
+        return !c;
+    }
 }

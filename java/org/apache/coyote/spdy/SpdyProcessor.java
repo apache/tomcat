@@ -93,7 +93,7 @@ public class SpdyProcessor extends AbstractProcessor<Object> implements
         public int doRead(ByteChunk bchunk, Request request) throws IOException {
             if (inFrame == null) {
                 // blocking
-                inFrame = spdyStream.getIn(endpoint.getSoTimeout());
+                inFrame = spdyStream.getDataFrame(endpoint.getSoTimeout());
             }
             if (inFrame == null) {
                 return -1;
@@ -388,13 +388,6 @@ public class SpdyProcessor extends AbstractProcessor<Object> implements
 
     }
 
-    private static byte[] STATUS = "status".getBytes();
-
-    private static byte[] VERSION = "version".getBytes();
-
-    private static byte[] HTTP11 = "HTTP/1.1".getBytes();
-
-    private static byte[] OK200 = "200 OK".getBytes();
 
     /**
      * When committing the response, we have to validate the set of headers, as
@@ -424,8 +417,6 @@ public class SpdyProcessor extends AbstractProcessor<Object> implements
 
     private void sendResponseHead() throws IOException {
         SpdyFrame rframe = spdy.getFrame(SpdyConnection.TYPE_SYN_REPLY);
-        // TODO: is closed ?
-        rframe.streamId = spdyStream.reqFrame.streamId;
         rframe.associated = 0;
 
         MimeHeaders headers = response.getMimeHeaders();
@@ -444,10 +435,8 @@ public class SpdyProcessor extends AbstractProcessor<Object> implements
             bc = mb.getByteChunk();
             rframe.headerValue(bc.getBuffer(), bc.getStart(), bc.getLength());
         }
-        rframe.headerName(STATUS, 0, STATUS.length);
-
         if (response.getStatus() == 0) {
-            rframe.headerValue(OK200, 0, OK200.length);
+            rframe.addHeader(SpdyFrame.STATUS, SpdyFrame.OK200);
         } else {
             // HTTP header contents
             String message = null;
@@ -466,12 +455,13 @@ public class SpdyProcessor extends AbstractProcessor<Object> implements
             // TODO: optimize
             String status = response.getStatus() + " " + message;
             byte[] statusB = status.getBytes();
+            rframe.headerName(SpdyFrame.STATUS, 0, SpdyFrame.STATUS.length);
             rframe.headerValue(statusB, 0, statusB.length);
         }
-        rframe.headerName(VERSION, 0, VERSION.length);
-        rframe.headerValue(HTTP11, 0, HTTP11.length);
+        rframe.addHeader(SpdyFrame.VERSION, SpdyFrame.HTTP11);
 
-        spdy.sendFrameBlocking(rframe, spdyStream);
+        rframe.streamId = spdyStream.reqFrame.streamId;
+        spdy.send(rframe, spdyStream);
         // we can't reuse the frame - it'll be queued, the coyote processor
         // may be reused as well.
         outCommit = true;

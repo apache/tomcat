@@ -17,8 +17,10 @@
 package org.apache.tomcat.spdy;
 
 import java.io.IOException;
+import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
+import java.util.concurrent.Semaphore;
 
 /**
  * Spdy context for 'proxy' or test mode spdy - no NPN, no SSL, no compression.
@@ -78,6 +80,11 @@ public class SpdyContextProxy extends SpdyContext {
         }
 
         @Override
+        public void close() throws IOException {
+            socket.close();
+        }
+
+        @Override
         public synchronized int write(byte[] data, int off, int len) throws IOException {
             socket.getOutputStream().write(data, off, len);
             return len;
@@ -90,6 +97,54 @@ public class SpdyContextProxy extends SpdyContext {
             } catch (SocketTimeoutException ex) {
                 return 0;
             }
+        }
+    }
+    
+    
+    boolean running = true;
+    ServerSocket serverSocket;
+    
+    public void stop() throws IOException {
+        running = false;
+        serverSocket.close();
+    }
+    
+    /**
+     *  For small servers/testing: run in server mode.
+     *  Need to override onSynStream() to implement the logic.
+     */
+    public void listen(final int port, String cert, String key) throws IOException {
+        getExecutor().execute(new Runnable() {
+            @Override
+            public void run() {
+                accept(port);
+            }
+        });
+    }
+
+    private void accept(int port) {
+        try {
+            serverSocket = new ServerSocket(port);
+            while (running) {
+                final Socket socket = serverSocket.accept();
+                final SpdyConnection con = getConnection(socket);
+                getExecutor().execute(new Runnable() {
+                    @Override
+                    public void run() {
+                        con.onBlockingSocket();
+                        try {
+                            socket.close();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                });
+            }
+        } catch (IOException ex) {
+            if (running) {
+                ex.printStackTrace();
+            }
+            running = false;
         }
     }
 }

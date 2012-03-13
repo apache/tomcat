@@ -17,6 +17,7 @@
 package org.apache.tomcat.spdy;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.nio.charset.Charset;
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
@@ -43,18 +44,42 @@ public class SpdyStream {
 
     public SpdyFrame reqFrame;
 
-    SpdyFrame resFrame;
+    public SpdyFrame resFrame;
 
-    BlockingQueue<SpdyFrame> inData = new LinkedBlockingQueue<SpdyFrame>();
+    /**
+     * For blocking support.
+     */
+    protected BlockingQueue<SpdyFrame> inData = new LinkedBlockingQueue<SpdyFrame>();
 
-    public static final SpdyFrame END_FRAME = new SpdyFrame(16);
-
-    boolean finSent;
+    protected boolean finSent;
 
     protected boolean finRcvd;
+    
+    /**
+     *  Dummy data frame to insert on reset / go away
+     */
+    static SpdyFrame END_FRAME;
+    
+    static {
+        END_FRAME = new SpdyFrame(16);
+        END_FRAME.endData = 0;
+        END_FRAME.off = 0;
+        END_FRAME.c = false; 
+        END_FRAME.flags =SpdyConnection.FLAG_HALF_CLOSE; 
+    }
 
     public SpdyStream(SpdyConnection spdy) {
         this.spdy = spdy;
+    }
+
+    public void dump(PrintWriter out) {
+        if (reqFrame != null) {
+            out.println("Req: " + reqFrame);
+        }
+        if (resFrame != null) {
+            out.println("Res: " + resFrame);
+        }
+        out.println("In: " + inData.size() + (finRcvd ? " FIN":""));
     }
 
     /**
@@ -64,10 +89,11 @@ public class SpdyStream {
      * buffer ( to avoid a copy ).
      */
     public void onDataFrame(SpdyFrame inFrame) {
-        inData.add(inFrame);
-        if (inFrame.closed()) {
-            finRcvd = true;
-            inData.add(END_FRAME);
+        synchronized(this) {
+            inData.add(inFrame);
+            if (inFrame.closed()) {
+                finRcvd = true;
+            }
         }
     }
 
@@ -84,29 +110,61 @@ public class SpdyStream {
             reqFrame = frame;
         } else if (frame.type == SpdyConnection.TYPE_SYN_REPLY) {
             resFrame = frame;
+        } else if (frame.type == SpdyConnection.TYPE_RST_STREAM) {
+            onReset();
         }
-        if (frame.isHalfClose()) {
-            finRcvd = true;
+        synchronized (this) {
+            inData.add(frame);
+            if (frame.isHalfClose()) {
+                finRcvd = true;
+            }            
         }
     }
 
+    /** 
+     * Called on GOAWAY or reset.
+     */
+    public void onReset() {
+        finRcvd = true;
+        finSent = true;
+        
+        // To unblock
+        inData.add(END_FRAME);
+    }
+    
     /**
      * True if the channel both received and sent FIN frames.
-     *
+     * 
      * This is tracked by the processor, to avoid extra storage in framer.
      */
     public boolean isFinished() {
         return finSent && finRcvd;
     }
-
-    public SpdyFrame getIn(long to) throws IOException {
+    
+    /**
+     * Waits and return the next data frame.
+     */
+    public SpdyFrame getDataFrame(long to) throws IOException {
+        while (true) {
+            SpdyFrame res = getFrame(to);
+            if (res == null || res.isData()) {
+                return res;
+            }
+        }
+    }
+    
+    /**
+     * Waits and return the next frame. First frame will be the control frame
+     */
+    public SpdyFrame getFrame(long to) throws IOException {
         SpdyFrame in;
         try {
-            if (inData.size() == 0 && finRcvd) {
-                return null;
+            synchronized (this) {
+                if (inData.size() == 0 && finRcvd) {
+                    return null;
+                }                
             }
             in = inData.poll(to, TimeUnit.MILLISECONDS);
-
             if (in == END_FRAME) {
                 return null;
             }
@@ -137,13 +195,13 @@ public class SpdyStream {
         return reqFrame;
     }
 
-    public void addHeader(String name, String value) {
-        byte[] nameB = name.getBytes();
-        getRequest().headerName(nameB, 0, nameB.length);
-        nameB = value.getBytes();
-        reqFrame.headerValue(nameB, 0, nameB.length);
+    public SpdyFrame getResponse() {
+        if (resFrame == null) {
+            resFrame = spdy.getFrame(SpdyConnection.TYPE_SYN_REPLY);
+            resFrame.streamId = reqFrame.streamId;
+        }
+        return resFrame;
     }
-
 
     public synchronized void sendDataFrame(byte[] data, int start,
             int length, boolean close) throws IOException {
@@ -159,12 +217,11 @@ public class SpdyStream {
         // 1 tcp packet. That's the current choice, seems closer to rest of
         // tomcat
 
-        oframe.streamId = reqFrame.streamId;
         if (close)
             oframe.halfClose();
 
         oframe.append(data, start, length);
-        spdy.sendFrameBlocking(oframe, this);
+        spdy.send(oframe, this);
     }
 
     public void send() throws IOException {
@@ -172,8 +229,8 @@ public class SpdyStream {
     }
 
     public void send(String host, String url, String scheme, String method) throws IOException {
-        addHeader("host", host);
-        addHeader("url", url);
+        getRequest().addHeader("host", host);
+        getRequest().addHeader("url", url);
 
         send(scheme, method);
     }
@@ -184,13 +241,14 @@ public class SpdyStream {
             // TODO: add the others
             reqFrame.halfClose();
         }
-        addHeader("scheme", "http"); // todo
-        addHeader("method", method);
-        addHeader("version", "HTTP/1.1");
+        getRequest().addHeader("scheme", "http"); // todo
+        getRequest().addHeader("method", method);
+        getRequest().addHeader("version", "HTTP/1.1");
         if (reqFrame.isHalfClose()) {
             finSent = true;
         }
-        spdy.sendFrameBlocking(reqFrame, this);
+        spdy.send(reqFrame, this);
     }
+
 
 }
