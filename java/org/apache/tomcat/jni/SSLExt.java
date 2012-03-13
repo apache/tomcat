@@ -88,15 +88,22 @@ public final class SSLExt {
      */
     public static native int setSNI(long tcsock, byte[] data, int len);
 
+    /**
+     * Return the last openssl error
+     */
+    public static native String sslErrReasonErrorString();
+    
+    public static native long sslCtxSetMode(long ctx, long mode);
+    
     /* Allow SSL_write(..., n) to return r with 0 < r < n (i.e. report success
      * when just a single record has been written): */
-    static final int SSL_MODE_ENABLE_PARTIAL_WRITE = 0x1;
+    public static final int SSL_MODE_ENABLE_PARTIAL_WRITE = 0x1;
 
     /* Make it possible to retry SSL_write() with changed buffer location
      * (buffer contents must stay the same!); this is not the default to avoid
      * the misconception that non-blocking SSL_write() behaves like
      * non-blocking write(): */
-    static final int SSL_MODE_ACCEPT_MOVING_WRITE_BUFFER = 0x2;
+    public static final int SSL_MODE_ACCEPT_MOVING_WRITE_BUFFER = 0x2;
 
     /* Don't attempt to automatically build certificate chain */
     static final int SSL_MODE_NO_AUTO_CHAIN = 0x8;
@@ -104,7 +111,7 @@ public final class SSLExt {
     /* Save RAM by releasing read and write buffers when they're empty. (SSL3 and
      * TLS only.)  "Released" buffers are put onto a free-list in the context
      * or just freed (depending on the context's setting for freelist_max_len). */
-    static final int SSL_MODE_SMALL_BUFFERS = 0x10;
+    public static final int SSL_MODE_RELEASE_BUFFERS = 0x10;
 
     // 1.1
     //static final int SSL_MODE_HANDSHAKE_CUTTHROUGH = ..;
@@ -112,7 +119,7 @@ public final class SSLExt {
     /**
      * SSL_set_mode
      */
-    public static native int sslSetMode(long tcsock, int mode);
+    public static native long sslSetMode(long tcsock, long mode);
 
     public static int setNPN(long sslContext, byte[] spdyNPN) {
         try {
