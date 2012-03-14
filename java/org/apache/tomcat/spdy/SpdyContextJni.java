@@ -30,6 +30,8 @@ public class SpdyContextJni extends SpdyContext {
     //AprSocketContext socketCtx;
 
     public SpdyContextJni() {
+        compression = true;
+        tls = true;
         con = new AprSocketContext();
         //if (insecureCerts) {
         con.customVerification(new TlsCertVerifier() {
@@ -144,10 +146,6 @@ public class SpdyContextJni extends SpdyContext {
 
         public SpdyConnectionAprSocket(SpdyContext spdyContext) {
             super(spdyContext);
-            //setCompressSupport(new CompressJzlib());
-            if (spdyContext.compression) {
-                setCompressSupport(new CompressDeflater6());
-            }
         }
 
         public void setSocket(AprSocket ch) {

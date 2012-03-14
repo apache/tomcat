@@ -30,11 +30,14 @@ import java.net.SocketTimeoutException;
  */
 public class SpdyContextProxy extends SpdyContext {
 
+    protected Socket getSocket(String host, int port) throws IOException {
+        return new Socket(host, port);
+    }
 
     @Override
     public SpdyConnection getConnection(String host, int port) throws IOException {
         try {
-            Socket sock = new Socket(host, port);
+            Socket sock = getSocket(host, port);
 
             sock.getInputStream();
             SpdyConnectionSocket con = new SpdyConnectionSocket(this, sock);
