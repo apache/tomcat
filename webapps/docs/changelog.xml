@@ -185,6 +185,9 @@
         Update the native component of the Tomcat APR/native connector to
         1.1.23 and take advantage of the simplified distribution. (mturk)
       </update>
+      <update>
+        Update to Eclipse JDT Compiler 3.7.2. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
