@@ -557,7 +557,6 @@ public abstract class SpdyConnection { // implements Runnable {
     /**
      * Process a SPDY connection. Called in a separate thread.
      *
-     * @return
      * @throws IOException
      */
     protected int handleFrame() throws IOException {

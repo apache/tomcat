@@ -62,7 +62,7 @@ public class AprSocketContext {
     /**
      * Called in SSL mode after the handshake is completed.
      *
-     * @see AprSocketContext.customVerification()
+     * @see AprSocketContext#customVerification(TlsCertVerifier)
      */
     public static interface TlsCertVerifier {
         public void handshakeDone(AprSocket ch);
