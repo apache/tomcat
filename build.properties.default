@@ -132,16 +132,13 @@ jdt.loc.1=http://archive.eclipse.org/eclipse/downloads/drops/${jdt.release}/ecj-
 jdt.loc.2=http://download.eclipse.org/eclipse/downloads/drops/${jdt.release}/ecj-${jdt.version}.jar
 
 # ----- Tomcat native library -----
-tomcat-native.version=1.1.22
+tomcat-native.version=1.1.23
 tomcat-native.home=${base.path}/tomcat-native-${tomcat-native.version}
 tomcat-native.tar.gz=${tomcat-native.home}/tomcat-native.tar.gz
 tomcat-native.loc.1=${base-tomcat.loc.1}/tomcat-connectors/native/${tomcat-native.version}/source/tomcat-native-${tomcat-native.version}-src.tar.gz
 tomcat-native.loc.2=${base-tomcat.loc.2}/tomcat-connectors/native/${tomcat-native.version}/source/tomcat-native-${tomcat-native.version}-src.tar.gz
-tomcat-native.dll.1=${base-tomcat.loc.1}/tomcat-connectors/native/${tomcat-native.version}/binaries
-tomcat-native.dll.2=${base-tomcat.loc.2}/tomcat-connectors/native/${tomcat-native.version}/binaries
-tomcat-native.dll.win32=${tomcat-native.home}/tcnative-1.dll.x86
-tomcat-native.dll.x64=${tomcat-native.home}/tcnative-1.dll.x64
-tomcat-native.dll.i64=${tomcat-native.home}/tcnative-1.dll.i64
+tomcat-native.win.1=${base-tomcat.loc.1}/tomcat-connectors/native/${tomcat-native.version}/binaries/tomcat-native-${tomcat-native.version}-win32-bin.zip
+tomcat-native.win.2=${base-tomcat.loc.2}/tomcat-connectors/native/${tomcat-native.version}/binaries/tomcat-native-${tomcat-native.version}-win32-bin.zip
 
 # ----- Commons DBCP, version 1.1 or later -----
 commons-dbcp.version=1.4
@@ -164,7 +161,7 @@ nsis.nsisdl.dll=${nsis.home}/Plugins/NSISdl.dll
 nsis.loc=${base-sf.loc}/nsis/nsis-2.46.zip
 
 # ----- Commons Daemon, version 1.0-Alpha or later -----
-commons-daemon.version=1.0.9
+commons-daemon.version=1.0.10
 commons-daemon.home=${base.path}/commons-daemon-${commons-daemon.version}
 commons-daemon.jar=${commons-daemon.home}/commons-daemon-${commons-daemon.version}.jar
 commons-daemon.native.win.home=${commons-daemon.home}/windows
