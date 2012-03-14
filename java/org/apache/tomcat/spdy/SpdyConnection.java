@@ -138,18 +138,19 @@ public abstract class SpdyConnection { // implements Runnable {
      */
     SpdyFrame out;
 
-    boolean draining = false;
-
     private int goAway = Integer.MAX_VALUE;
 
     public SpdyConnection(SpdyContext spdyContext) {
         this.spdyContext = spdyContext;
         outCondition = framerLock.newCondition();
+        if (spdyContext.compression) {
+            setCompressSupport(new CompressDeflater6());
+        }
     }
 
     @Override
     public String toString() {
-        return "SpdyCon open=" + channels.size();
+        return "SpdyCon open=" + channels.size() + " " + lastChannel;
     }
 
     public void dump(PrintWriter out) {
@@ -205,15 +206,7 @@ public abstract class SpdyConnection { // implements Runnable {
 
     public void drain() {
         synchronized (nbDrain) {
-            if (draining) {
-                return;
-            }
-            draining = true;
-        }
-
-        _drain();
-        synchronized (nbDrain) {
-            draining = false;
+            _drain();
         }
     }
 
@@ -308,9 +301,13 @@ public abstract class SpdyConnection { // implements Runnable {
                 }
 
                 synchronized (channels) {
-                    if (out.stream != null &&
-                            out.stream.finRcvd && out.stream.finSent) {
-                        channels.remove(out.streamId);
+                    if (out.stream != null) {
+                        if (out.isHalfClose()) {
+                            out.stream.finSent = true;
+                        }
+                        if (out.stream.finRcvd && out.stream.finSent) {
+                            channels.remove(out.streamId);
+                        }
                     }
                 }
                 out = null;
@@ -345,7 +342,7 @@ public abstract class SpdyConnection { // implements Runnable {
     public void send(SpdyFrame oframe, SpdyStream proc)
             throws IOException {
         queueFrame(oframe, proc, oframe.pri == 0 ? outQueue : prioriyQueue);
-        nonBlockingDrain();
+        drain();
     }
 
     private void queueFrame(SpdyFrame oframe, SpdyStream proc,
