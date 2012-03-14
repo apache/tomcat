@@ -215,7 +215,6 @@ public abstract class WebSocketServlet extends HttpServlet {
      *
      * @param subProtocol   The sub-protocol agreed between the client and
      *                      server or <code>null</code> if none was agreed
-     * @return
      */
     protected abstract StreamInbound createWebSocketInbound(String subProtocol);
 }

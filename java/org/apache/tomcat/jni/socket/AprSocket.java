@@ -194,16 +194,14 @@ public class AprSocket implements Runnable {
     }
 
     /**
-     * Write.
-     *
-     *  For both blocking and non-blocking, it'll return the number of bytes
-     *  written - it'll attempt to send as much as possible, but if the buffers
-     *  are full it'll return 0.
+     * Write as much data as possible to the socket.
      *
      * @param data
      * @param off
      * @param len
-     * @return
+     * @return  For both blocking and non-blocking, returns the number of bytes
+     *          written. If no data can be written (e.g. if the buffers are
+     *          full) 0 will be returned.
      * @throws IOException
      */
     public int write(byte[] data, int off, int len, long to) throws IOException {
