@@ -106,13 +106,14 @@ public abstract class AbstractProcessor<S> implements ActionHook, Processor {
 
     protected abstract boolean isComet();
 
+    protected abstract boolean isUpgrade();
+
     /**
      * Process HTTP requests. All requests are treated as HTTP requests to start
      * with although they may change type during processing.
      */
     public abstract SocketState process(SocketWrapper<S> socket)
         throws IOException;
-
 
     /**
      * Process in-progress Comet requests. These will start as HTTP requests.
@@ -124,4 +125,10 @@ public abstract class AbstractProcessor<S> implements ActionHook, Processor {
      * requests.
      */
     public abstract SocketState asyncDispatch(SocketStatus status);
+
+    /**
+     * Processes data received on a connection that has been through an HTTP
+     * upgrade.
+     */
+    public abstract SocketState upgradeDispatch() throws IOException;
 }

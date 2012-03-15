@@ -347,4 +347,22 @@
       <url-pattern>/async/stockticker</url-pattern>
     </servlet-mapping>
 
+    <!-- WebSocket Examples -->
+    <servlet>
+      <servlet-name>wsEchoStream</servlet-name>
+      <servlet-class>websocket.EchoStream</servlet-class>
+    </servlet>
+    <servlet-mapping>
+      <servlet-name>wsEchoStream</servlet-name>
+      <url-pattern>/websocket/echoStream</url-pattern>
+    </servlet-mapping>
+    <servlet>
+      <servlet-name>wsEchoMessage</servlet-name>
+      <servlet-class>websocket.EchoMessage</servlet-class>
+    </servlet>
+    <servlet-mapping>
+      <servlet-name>wsEchoMessage</servlet-name>
+      <url-pattern>/websocket/echoMessage</url-pattern>
+    </servlet-mapping>
+
 </web-app>
