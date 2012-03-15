@@ -30,7 +30,7 @@ public class EchoMessage extends WebSocketServlet {
     private static final long serialVersionUID = 1L;
 
     @Override
-    protected StreamInbound createWebSocketInbound() {
+    protected StreamInbound createWebSocketInbound(String subProtocol) {
         return new EchoMessageInbound();
     }
 
@@ -38,13 +38,12 @@ public class EchoMessage extends WebSocketServlet {
 
         @Override
         protected void onBinaryMessage(ByteBuffer message) throws IOException {
-            System.out.write(message.array(), 0, message.limit());
-            System.out.print('\n');
+            getOutbound().writeBinaryMessage(message);
         }
 
         @Override
         protected void onTextMessage(CharBuffer message) throws IOException {
-            System.out.println(message);
+            getOutbound().writeTextMessage(message);
         }
     }
 }

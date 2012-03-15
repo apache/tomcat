@@ -20,8 +20,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.nio.ByteBuffer;
 
-import org.apache.catalina.util.Conversions;
 import org.apache.coyote.http11.upgrade.UpgradeInbound;
 import org.apache.coyote.http11.upgrade.UpgradeOutbound;
 import org.apache.coyote.http11.upgrade.UpgradeProcessor;
@@ -29,18 +29,6 @@ import org.apache.tomcat.util.buf.B2CConverter;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
 
 public abstract class StreamInbound implements UpgradeInbound {
-
-    // These attributes apply to the current frame being processed
-    private boolean fin = true;
-    private boolean rsv1 = false;
-    private boolean rsv2 = false;
-    private boolean rsv3 = false;
-    private int opCode = -1;
-    private long payloadLength = -1;
-
-    // These attributes apply to the message that may be spread over multiple
-    // frames
-    // TODO
 
     private UpgradeProcessor<?> processor = null;
     private WsOutbound outbound;
@@ -56,93 +44,102 @@ public abstract class StreamInbound implements UpgradeInbound {
         this.processor = processor;
     }
 
-    public WsOutbound getStreamOutbound() {
+    public WsOutbound getOutbound() {
         return outbound;
     }
 
     @Override
     public SocketState onData() throws IOException {
-        // Must be start the start of a frame
+        // Must be start the start of a frame or series of frames
+        WsInputStream wsIs = new WsInputStream(processor);
 
-        // Read the first byte
-        int i = processor.read();
+        WsFrameHeader header = wsIs.getFrameHeader();
 
-        fin = (i & 0x80) > 0;
-
-        rsv1 = (i & 0x40) > 0;
-        rsv2 = (i & 0x20) > 0;
-        rsv3 = (i & 0x10) > 0;
-
-        if (rsv1 || rsv2 || rsv3) {
-            // TODO: Not supported.
+        // TODO User defined extensions may define values for rsv
+        if (header.getRsv() > 0) {
+            getOutbound().close(1002, null);
+            return SocketState.CLOSED;
         }
 
-        opCode = (i & 0x0F);
-        validateOpCode(opCode);
+        byte opCode = header.getOpCode();
 
-        // Read the next byte
-        i = processor.read();
-
-        // Client data must be masked and this isn't
-        if ((i & 0x80) == 0) {
-            // TODO: Better message
-            throw new IOException();
+        if (opCode == Constants.OPCODE_BINARY) {
+            onBinaryData(wsIs);
+            return SocketState.UPGRADED;
+        } else if (opCode == Constants.OPCODE_TEXT) {
+            InputStreamReader r =
+                    new InputStreamReader(wsIs, B2CConverter.UTF_8);
+            onTextData(r);
+            return SocketState.UPGRADED;
         }
 
-        payloadLength = i & 0x7F;
-        if (payloadLength == 126) {
-            byte[] extended = new byte[2];
-            processor.read(extended);
-            payloadLength = Conversions.byteArrayToLong(extended);
-        } else if (payloadLength == 127) {
-            byte[] extended = new byte[8];
-            processor.read(extended);
-            payloadLength = Conversions.byteArrayToLong(extended);
+        // Must be a control frame and control frames:
+        // - have a limited payload length
+        // - must not be fragmented
+        if (wsIs.getPayloadLength() > 125 || !wsIs.getFrameHeader().getFin()) {
+            getOutbound().close(1002, null);
+            return SocketState.CLOSED;
         }
 
-        byte[] mask = new byte[4];
-        processor.read(mask);
+        if (opCode == Constants.OPCODE_CLOSE){
+            doClose(wsIs);
+            return SocketState.CLOSED;
+        } else if (opCode == Constants.OPCODE_PING) {
+            doPing(wsIs);
+            return SocketState.UPGRADED;
+        } else if (opCode == Constants.OPCODE_PONG) {
+            doPong(wsIs);
+            return SocketState.UPGRADED;
+        }
 
-        if (opCode == 1 || opCode == 2) {
-            WsInputStream wsIs = new WsInputStream(processor, mask,
-                    payloadLength);
-            if (opCode == 2) {
-                onBinaryData(wsIs);
-            } else {
-                InputStreamReader r =
-                        new InputStreamReader(wsIs, B2CConverter.UTF_8);
-                onTextData(r);
+        getOutbound().close(1002, null);
+        return SocketState.CLOSED;
+    }
+
+    private void doClose(InputStream is) throws IOException {
+        // Control messages have a max size of 125 bytes. Need to try and read
+        // one more so we reach end of stream (less 2 for the status)
+        ByteBuffer data = ByteBuffer.allocate(124);
+
+        int status = is.read();
+        if (status != -1) {
+            status = status << 8;
+            status = status + is.read();
+            int read = 0;
+            while (read > -1) {
+                data.position(data.position() + read);
+                read = is.read(data.array(), data.position(), data.remaining());
             }
+        } else {
+            status = 0;
+        }
+        data.flip();
+        getOutbound().close(status, data);
+    }
+
+    private void doPing(InputStream is) throws IOException {
+        // Control messages have a max size of 125 bytes. Need to try and read
+        // one more so we reach end of stream
+        ByteBuffer data = ByteBuffer.allocate(126);
+
+        int read = 0;
+        while (read > -1) {
+            data.position(data.position() + read);
+            read = is.read(data.array(), data.position(), data.remaining());
         }
 
-        // TODO: Doesn't currently handle multi-frame messages. That will need
-        //       some refactoring.
+        data.flip();
+        getOutbound().pong(data);
+    }
 
-        // TODO: Per frame extension handling is not currently supported.
-
-        // TODO: Handle other control frames.
-
-        // TODO: Handle control frames appearing in the middle of a multi-frame
-        //       message
-
-        return SocketState.UPGRADED;
+    private void doPong(InputStream is) throws IOException {
+        // Unsolicited pong - swallow it
+        int read = 0;
+        while (read > -1) {
+            read = is.read();
+        }
     }
 
     protected abstract void onBinaryData(InputStream is) throws IOException;
     protected abstract void onTextData(Reader r) throws IOException;
-
-    private void validateOpCode(int opCode) throws IOException {
-        switch (opCode) {
-        case 0:
-        case 1:
-        case 2:
-        case 8:
-        case 9:
-        case 10:
-            break;
-        default:
-            // TODO: Message
-            throw new IOException();
-        }
-    }
 }

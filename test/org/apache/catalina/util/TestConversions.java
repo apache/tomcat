@@ -18,25 +18,20 @@ package org.apache.catalina.util;
 
 import java.io.IOException;
 
-public class Conversions {
+import static org.junit.Assert.assertEquals;
+import org.junit.Test;
 
-    private Conversions() {
-        // Utility class. Hide default constructor.
+public class TestConversions {
+
+    @Test
+    public void testByteArrayToLong() throws IOException {
+        assertEquals(0L, Conversions.byteArrayToLong(new byte[] { 0 }));
+        assertEquals(1L, Conversions.byteArrayToLong(new byte[] { 1 }));
+        assertEquals(0xFF, Conversions.byteArrayToLong(new byte[] { -1 }));
+        assertEquals(0xFFFF,
+                Conversions.byteArrayToLong(new byte[] { -1, -1 }));
+        assertEquals(0xFFFFFF,
+                Conversions.byteArrayToLong(new byte[] { -1, -1, -1 }));
     }
 
-    public static long byteArrayToLong(byte[] input) throws IOException {
-        if (input.length > 8) {
-            // TODO: Better message
-            throw new IOException();
-        }
-
-        int shift = 0;
-        long result = 0;
-        for (int i = input.length - 1; i >= 0; i--) {
-            result = result + ((input[i] & 0xFF) << shift);
-            shift += 8;
-        }
-
-        return result;
-    }
 }

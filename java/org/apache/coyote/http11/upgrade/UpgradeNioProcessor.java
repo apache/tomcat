@@ -33,8 +33,8 @@ import org.apache.tomcat.util.net.SocketWrapper;
  */
 public class UpgradeNioProcessor extends UpgradeProcessor<NioChannel> {
 
-    private NioChannel nioChannel;
-    private NioSelectorPool pool;
+    private final NioChannel nioChannel;
+    private final NioSelectorPool pool;
 
     public UpgradeNioProcessor(SocketWrapper<NioChannel> wrapper,
             UpgradeInbound upgradeInbound, NioSelectorPool pool) {
