@@ -1491,7 +1491,7 @@ public class DeltaManager extends ClusterManagerBase{
      */
     protected void handleALL_SESSION_NOCONTEXTMANAGER(SessionMessage msg, Member sender) {
         counterReceive_EVT_ALL_SESSION_NOCONTEXTMANAGER++ ;
-        if (log.isDebugEnabled()) 
+        if (log.isDebugEnabled())
             log.debug(sm.getString("deltaManager.receiveMessage.noContextManager",getName(), sender.getHost(), Integer.valueOf(sender.getPort())));
         noContextManagerReceived = true ;
     }
