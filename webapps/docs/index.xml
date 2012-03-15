@@ -135,6 +135,8 @@ Apache Tomcat 7, and using many of the Apache Tomcat features.</p>
     Configuring Tomcat to use integrated Windows authentication.</li>
 <li><a href="jdbc-pool.html"><strong>High Concurrency JDBC Pool</strong></a> -
     Configuring Tomcat to use an alternative JDBC pool.</li>
+<li><a href="web-socket-howto.html"><strong>WebSocket support</strong></a> -
+    Developing WebSocket applications for Apache Tomcat.</li>
 
 </ol>
 
