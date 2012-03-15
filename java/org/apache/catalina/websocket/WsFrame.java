@@ -16,6 +16,7 @@
  */
 package org.apache.catalina.websocket;
 
+import java.io.EOFException;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
@@ -46,6 +47,7 @@ public class WsFrame {
      * Create the new WebSocket frame, reading data from the processor as
      * necessary.
      *
+     * @param first     First byte of data for this frame
      * @param processor Processor associated with the WebSocket connection on
      *                  which the frame has been sent
      *
@@ -53,14 +55,15 @@ public class WsFrame {
      *                      exception will trigger the closing of the WebSocket
      *                      connection.
      */
-    public WsFrame(UpgradeProcessor<?> processor) throws IOException {
+    private WsFrame(byte first,
+            UpgradeProcessor<?> processor) throws IOException {
 
-        int b = processorRead(processor);
+        int b = first & 0xFF;
         fin = (b & 0x80) > 0;
         rsv = (b & 0x70) >>> 4;
         opCode = (byte) (b & 0x0F);
 
-        b = processorRead(processor);
+        b = blockingRead(processor);
         // Client data must be masked
         if ((b & 0x80) == 0) {
             throw new IOException(sm.getString("frame.notMasked"));
@@ -69,11 +72,11 @@ public class WsFrame {
         payloadLength = b & 0x7F;
         if (payloadLength == 126) {
             byte[] extended = new byte[2];
-            processorRead(processor, extended);
+            blockingRead(processor, extended);
             payloadLength = Conversions.byteArrayToLong(extended);
         } else if (payloadLength == 127) {
             byte[] extended = new byte[8];
-            processorRead(processor, extended);
+            blockingRead(processor, extended);
             payloadLength = Conversions.byteArrayToLong(extended);
         }
 
@@ -86,12 +89,12 @@ public class WsFrame {
             }
         }
 
-        processorRead(processor, mask);
+        blockingRead(processor, mask);
 
         if (isControl()) {
             // Note: Payload limited to <= 125 bytes by test above
             payload = ByteBuffer.allocate((int) payloadLength);
-            processorRead(processor, payload);
+            blockingRead(processor, payload);
 
             if (opCode == Constants.OPCODE_CLOSE && payloadLength > 2) {
                 // Check close payload - if present - is valid UTF-8
@@ -138,9 +141,10 @@ public class WsFrame {
     }
 
 
-    // ----------------------------------- Guaranteed read methods for processor
-
-    private int processorRead(UpgradeProcessor<?> processor)
+    /*
+     * Blocks until a aingle byte has been read
+     */
+    private int blockingRead(UpgradeProcessor<?> processor)
             throws IOException {
         int result = processor.read();
         if (result == -1) {
@@ -150,12 +154,15 @@ public class WsFrame {
     }
 
 
-    private void processorRead(UpgradeProcessor<?> processor, byte[] bytes)
+    /*
+     * Blocks until the byte array has been filled.
+     */
+    private void blockingRead(UpgradeProcessor<?> processor, byte[] bytes)
             throws IOException {
         int read = 0;
         int last = 0;
         while (read < bytes.length) {
-            last = processor.read(bytes, read, bytes.length - read);
+            last = processor.read(true, bytes, read, bytes.length - read);
             if (last == -1) {
                 throw new IOException(sm.getString("frame.eos"));
             }
@@ -165,9 +172,10 @@ public class WsFrame {
 
 
     /*
-     * Intended to read whole payload. Therefore able to unmask.
+     * Intended to read whole payload and blocks until it has. Therefore able to
+     * unmask the payload data.
      */
-    private void processorRead(UpgradeProcessor<?> processor, ByteBuffer bb)
+    private void blockingRead(UpgradeProcessor<?> processor, ByteBuffer bb)
             throws IOException {
         int last = 0;
         while (bb.hasRemaining()) {
@@ -178,5 +186,40 @@ public class WsFrame {
             bb.put((byte) (last ^ mask[bb.position() % 4]));
         }
         bb.flip();
+    }
+
+
+    /**
+     * Read the next WebSocket frame, reading data from the processor as
+     * necessary.
+     *
+     * @param processor Processor associated with the WebSocket connection on
+     *                  which the frame has been sent
+     *
+     * @param block Should this method block until a frame is presented if no
+     *              data is currently available to process. Note that is a
+     *              single byte is available, this method will block until the
+     *              complete frame (excluding payload for non-control frames) is
+     *              available.
+     *
+     * @throws IOException  If a problem occurs processing the frame. Any
+     *                      exception will trigger the closing of the WebSocket
+     *                      connection.
+     */
+    public static WsFrame nextFrame(UpgradeProcessor<?> processor,
+            boolean block) throws IOException {
+
+        byte[] first = new byte[1];
+        int read = processor.read(block, first, 0, 1);
+        if (read == 1) {
+            return new WsFrame(first[0], processor);
+        } else if (read == 0) {
+            return null;
+        } else if (read == -1) {
+            throw new EOFException(sm.getString("frame.readEos"));
+        } else {
+            throw new IOException(
+                    sm.getString("frame.readFailed", Integer.valueOf(read)));
+        }
     }
 }

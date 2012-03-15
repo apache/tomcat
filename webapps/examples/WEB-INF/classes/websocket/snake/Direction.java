@@ -14,23 +14,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.coyote.http11.upgrade;
+package websocket.snake;
 
-import java.io.IOException;
-
-import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
-
-/**
- * Receives notification that there is data to be read on the upgraded
- * connection and processes it.
- */
-public interface UpgradeInbound {
-
-    void setUpgradeProcessor(UpgradeProcessor<?> processor);
-
-    void onUpgradeComplete();
-
-    SocketState onData() throws IOException;
-
-    void setUpgradeOutbound(UpgradeOutbound upgradeOutbound);
+public enum Direction {
+    NONE, NORTH, SOUTH, EAST, WEST
 }

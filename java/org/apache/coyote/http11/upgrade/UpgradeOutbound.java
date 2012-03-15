@@ -22,8 +22,6 @@ import java.io.OutputStream;
 
 /**
  * Allows data to be written to the upgraded connection.
- *
- * TODO: Override more methods for efficiency.
  */
 public class UpgradeOutbound extends OutputStream {
 

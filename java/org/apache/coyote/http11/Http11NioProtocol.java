@@ -17,7 +17,6 @@
 package org.apache.coyote.http11;
 
 import java.io.IOException;
-import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
 import java.util.Iterator;
 
@@ -31,7 +30,6 @@ import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.net.NioChannel;
 import org.apache.tomcat.util.net.NioEndpoint;
 import org.apache.tomcat.util.net.NioEndpoint.Handler;
-import org.apache.tomcat.util.net.NioEndpoint.KeyAttachment;
 import org.apache.tomcat.util.net.SSLImplementation;
 import org.apache.tomcat.util.net.SecureNioChannel;
 import org.apache.tomcat.util.net.SocketWrapper;
@@ -251,6 +249,7 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol {
             } else {
                 // Either:
                 //  - this is comet request
+                //  - this is an upgraded connection
                 //  - the request line/headers have not been completely
                 //    read
                 socket.getSocket().getPoller().add(socket.getSocket());
@@ -286,18 +285,6 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol {
                 throws IOException {
             return new UpgradeNioProcessor(socket, inbound,
                     ((Http11NioProtocol) getProtocol()).getEndpoint().getSelectorPool());
-        }
-
-        @Override
-        protected void upgradePoll(SocketWrapper<NioChannel> socket,
-                Processor<NioChannel> processor) {
-            connections.put(socket.getSocket(), processor);
-
-            SelectionKey key = socket.getSocket().getIOChannel().keyFor(
-                    socket.getSocket().getPoller().getSelector());
-            key.interestOps(SelectionKey.OP_READ);
-            ((KeyAttachment) socket).interestOps(
-                    SelectionKey.OP_READ);
         }
     }
 }
