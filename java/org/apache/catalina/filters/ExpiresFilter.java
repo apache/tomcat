@@ -464,12 +464,12 @@ public class ExpiresFilter extends FilterBase {
         /**
          * List of duration elements.
          */
-        private List<Duration> durations;
+        private final List<Duration> durations;
 
         /**
          * Starting point of the elaspse to set in the response.
          */
-        private StartingPoint startingPoint;
+        private final StartingPoint startingPoint;
 
         public ExpiresConfiguration(StartingPoint startingPoint,
                 List<Duration> durations) {
@@ -533,7 +533,7 @@ public class ExpiresFilter extends FilterBase {
 
         private PrintWriter printWriter;
 
-        private HttpServletRequest request;
+        private final HttpServletRequest request;
 
         private ServletOutputStream servletOutputStream;
 
@@ -636,11 +636,11 @@ public class ExpiresFilter extends FilterBase {
      * "Start Write Response Body" event.
      */
     public class XPrintWriter extends PrintWriter {
-        private PrintWriter out;
+        private final PrintWriter out;
 
-        private HttpServletRequest request;
+        private final HttpServletRequest request;
 
-        private XHttpServletResponse response;
+        private final XHttpServletResponse response;
 
         public XPrintWriter(PrintWriter out, HttpServletRequest request,
                 XHttpServletResponse response) {
@@ -851,11 +851,11 @@ public class ExpiresFilter extends FilterBase {
      */
     public class XServletOutputStream extends ServletOutputStream {
 
-        private HttpServletRequest request;
+        private final HttpServletRequest request;
 
-        private XHttpServletResponse response;
+        private final XHttpServletResponse response;
 
-        private ServletOutputStream servletOutputStream;
+        private final ServletOutputStream servletOutputStream;
 
         public XServletOutputStream(ServletOutputStream servletOutputStream,
                 HttpServletRequest request, XHttpServletResponse response) {

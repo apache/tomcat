@@ -14,8 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.catalina.filters;
 
 
@@ -57,9 +55,7 @@ import org.apache.catalina.comet.CometFilterChain;
  * <li>The request will be rejected with a "Forbidden" HTTP response.</li>
  * </ul>
  */
-
-public abstract class RequestFilter
-    extends FilterBase implements CometFilter {
+public abstract class RequestFilter extends FilterBase implements CometFilter {
 
 
     // ----------------------------------------------------- Instance Variables

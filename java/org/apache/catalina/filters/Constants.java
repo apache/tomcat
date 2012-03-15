@@ -14,8 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.catalina.filters;
 
 
@@ -26,7 +24,6 @@ package org.apache.catalina.filters;
  * @author Craig R. McClanahan
  * @version $Id$
  */
-
 public final class Constants {
 
     public static final String Package = "org.apache.catalina.filters";
