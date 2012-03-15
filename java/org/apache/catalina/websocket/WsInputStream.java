@@ -18,68 +18,48 @@ package org.apache.catalina.websocket;
 
 import java.io.IOException;
 
-import org.apache.catalina.util.Conversions;
 import org.apache.coyote.http11.upgrade.UpgradeProcessor;
+import org.apache.tomcat.util.res.StringManager;
 
+/**
+ * This class is used to read WebSocket frames from the underlying socket and
+ * makes the payload available for reading as an {@link InputStream}. It only
+ * makes the number of bytes declared in the payload length available for
+ * reading even if more bytes are available from the socket.
+ */
 public class WsInputStream extends java.io.InputStream {
 
+    private static final StringManager sm =
+            StringManager.getManager(Constants.Package);
+
+
     private UpgradeProcessor<?> processor;
-    private WsFrameHeader wsFrameHeader;
-    private long payloadLength = -1;
-    private int[] mask = new int[4];
+    private WsOutbound outbound;
 
-
+    private WsFrame frame;
     private long remaining;
     private long readThisFragment;
 
-    public WsInputStream(UpgradeProcessor<?> processor) throws IOException {
+    private String error = null;
+
+
+    public WsInputStream(UpgradeProcessor<?> processor, WsOutbound outbound)
+            throws IOException {
         this.processor = processor;
-
-        processFrameHeader();
+        this.outbound = outbound;
+        processFrame();
     }
 
 
-    private void processFrameHeader() throws IOException {
+    public WsFrame getFrame() {
+        return frame;
+    }
 
-        // TODO: Per frame extension handling is not currently supported.
 
-        // TODO: Handle control frames between fragments
-
-        int i = processor.read();
-        this.wsFrameHeader = new WsFrameHeader(i);
-
-        // Client data must be masked
-        i = processor.read();
-        if ((i & 0x80) == 0) {
-            // TODO: StringManager / i18n
-            throw new IOException("Client frame not masked");
-        }
-
-        payloadLength = i & 0x7F;
-        if (payloadLength == 126) {
-            byte[] extended = new byte[2];
-            processor.read(extended);
-            payloadLength = Conversions.byteArrayToLong(extended);
-        } else if (payloadLength == 127) {
-            byte[] extended = new byte[8];
-            processor.read(extended);
-            payloadLength = Conversions.byteArrayToLong(extended);
-        }
-        remaining = payloadLength;
-
-        for (int j = 0; j < mask.length; j++) {
-            mask[j] = processor.read() & 0xFF;
-        }
-
+    private void processFrame() throws IOException {
+        frame = new WsFrame(processor);
         readThisFragment = 0;
-    }
-
-    public WsFrameHeader getFrameHeader() {
-        return wsFrameHeader;
-    }
-
-    public long getPayloadLength() {
-        return payloadLength;
+        remaining = frame.getPayLoadLength();
     }
 
 
@@ -87,13 +67,29 @@ public class WsInputStream extends java.io.InputStream {
 
     @Override
     public int read() throws IOException {
-        while (remaining == 0 && !getFrameHeader().getFin()) {
+        if (error != null) {
+            throw new IOException(error);
+        }
+        while (remaining == 0 && !getFrame().getFin()) {
             // Need more data - process next frame
-            processFrameHeader();
-
-            if (getFrameHeader().getOpCode() != Constants.OPCODE_CONTINUATION) {
-                // TODO i18n
-                throw new IOException("Not a continuation frame");
+            processFrame();
+            while (frame.isControl()) {
+                if (getFrame().getOpCode() == Constants.OPCODE_PING) {
+                    outbound.pong(frame.getPayLoad());
+                } else if (getFrame().getOpCode() == Constants.OPCODE_PONG) {
+                    // NO-OP. Swallow it.
+                } else if (getFrame().getOpCode() == Constants.OPCODE_CLOSE) {
+                    outbound.close(frame);
+                } else{
+                    throw new IOException(sm.getString("is.unknownOpCode",
+                            Byte.valueOf(getFrame().getOpCode())));
+                }
+                processFrame();
+            }
+            if (getFrame().getOpCode() != Constants.OPCODE_CONTINUATION) {
+                error = sm.getString("is.notContinutation",
+                        Byte.valueOf(getFrame().getOpCode()));
+                throw new IOException(error);
             }
         }
 
@@ -108,6 +104,58 @@ public class WsInputStream extends java.io.InputStream {
         if(masked == -1) {
             return -1;
         }
-        return masked ^ mask[(int) ((readThisFragment - 1) % 4)];
+        return masked ^
+                (frame.getMask()[(int) ((readThisFragment - 1) % 4)] & 0xFF);
     }
+
+
+    @Override
+    public int read(byte b[], int off, int len) throws IOException {
+        if (error != null) {
+            throw new IOException(error);
+        }
+        while (remaining == 0 && !getFrame().getFin()) {
+            // Need more data - process next frame
+            processFrame();
+            while (frame.isControl()) {
+                if (getFrame().getOpCode() == Constants.OPCODE_PING) {
+                    outbound.pong(frame.getPayLoad());
+                } else if (getFrame().getOpCode() == Constants.OPCODE_PONG) {
+                    // NO-OP. Swallow it.
+                } else if (getFrame().getOpCode() == Constants.OPCODE_CLOSE) {
+                    outbound.close(frame);
+                } else{
+                    throw new IOException(sm.getString("is.unknownOpCode",
+                            Byte.valueOf(getFrame().getOpCode())));
+                }
+                processFrame();
+            }
+            if (getFrame().getOpCode() != Constants.OPCODE_CONTINUATION) {
+                error = sm.getString("is.notContinutation",
+                        Byte.valueOf(getFrame().getOpCode()));
+                throw new IOException(error);
+            }
+        }
+
+        if (remaining == 0) {
+            return -1;
+        }
+
+        if (len > remaining) {
+            len = (int) remaining;
+        }
+        int result = processor.read(b, off, len);
+        if(result == -1) {
+            return -1;
+        }
+
+        for (int i = off; i < off + result; i++) {
+            b[i] = (byte) (b[i] ^
+                    frame.getMask()[(int) ((readThisFragment + i - off) % 4)]);
+        }
+        remaining -= result;
+        readThisFragment += result;
+        return result;
+    }
+
 }

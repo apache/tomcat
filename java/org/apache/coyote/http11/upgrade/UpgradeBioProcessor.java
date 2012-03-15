@@ -58,6 +58,12 @@ public class UpgradeBioProcessor extends UpgradeProcessor<Socket> {
     }
 
 
+    @Override
+    public void write(byte[]b, int off, int len) throws IOException {
+        outputStream.write(b, off, len);
+    }
+
+
     /*
      * Input methods
      */
@@ -68,7 +74,7 @@ public class UpgradeBioProcessor extends UpgradeProcessor<Socket> {
 
 
     @Override
-    public int read(byte[] bytes) throws IOException {
-        return inputStream.read(bytes);
+    public int read(byte[] bytes, int off, int len) throws IOException {
+        return inputStream.read(bytes, off, len);
     }
 }
