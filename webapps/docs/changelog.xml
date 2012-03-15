@@ -114,6 +114,11 @@
         an infinite timeout was specified for writing data to a client when
         using NIO. (markt)
       </fix>
+      <fix>
+        <bug>52858</bug>: Fix high CPU load with SSL, NIO and sendfile when
+        client breaks the connection before reading all the requested data.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
