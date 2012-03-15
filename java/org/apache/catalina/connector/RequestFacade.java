@@ -41,6 +41,7 @@ import javax.servlet.http.Part;
 
 import org.apache.catalina.Globals;
 import org.apache.catalina.security.SecurityUtil;
+import org.apache.coyote.http11.UpgradeInbound;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
@@ -1085,4 +1086,20 @@ public class RequestFacade implements HttpServletRequest {
         return request.getConnector().getAllowTrace();
     }
 
+    /**
+     * Sets the response status to {@link
+     * HttpServletResponse.SC_SWITCHING_PROTOCOLS} and flushes the response.
+     * Protocol specific headers must have already been set before this method
+     * is called.
+     *
+     * @param inbound   The handler for all further incoming data on the current
+     *                  connection.
+     *
+     * @throws IOException  If the upgrade fails (e.g. if the response has
+     *                      already been committed.
+     */
+    public void doUpgrade(UpgradeInbound inbound)
+            throws IOException {
+        request.doUpgrade(inbound);
+    }
 }
