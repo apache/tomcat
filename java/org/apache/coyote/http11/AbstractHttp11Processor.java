@@ -1277,18 +1277,21 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
 
         // Advertise sendfile support through a request attribute
         if (endpoint.getUseSendfile()) {
-            request.setAttribute("org.apache.tomcat.sendfile.support",
+            request.setAttribute(
+                    org.apache.coyote.Constants.SENDFILE_SUPPORTED_ATTR,
                     Boolean.TRUE);
         }
 
         // Advertise comet support through a request attribute
         if (endpoint.getUseComet()) {
-            request.setAttribute("org.apache.tomcat.comet.support",
+            request.setAttribute(
+                    org.apache.coyote.Constants.COMET_SUPPORTED_ATTR,
                     Boolean.TRUE);
         }
         // Advertise comet timeout support
         if (endpoint.getUseCometTimeout()) {
-            request.setAttribute("org.apache.tomcat.comet.timeout.support",
+            request.setAttribute(
+                    org.apache.coyote.Constants.COMET_TIMEOUT_SUPPORTED_ATTR,
                     Boolean.TRUE);
         }
 

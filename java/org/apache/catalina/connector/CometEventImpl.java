@@ -22,6 +22,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.catalina.Globals;
 import org.apache.catalina.comet.CometEvent;
 import org.apache.tomcat.util.res.StringManager;
 
@@ -121,8 +122,10 @@ public class CometEventImpl implements CometEvent {
     @Override
     public void setTimeout(int timeout) throws IOException, ServletException,
             UnsupportedOperationException {
-        if (request.getAttribute("org.apache.tomcat.comet.timeout.support") == Boolean.TRUE) {
-            request.setAttribute("org.apache.tomcat.comet.timeout", Integer.valueOf(timeout));
+        if (request.getAttribute(Globals.COMET_TIMEOUT_SUPPORTED_ATTR) ==
+                Boolean.TRUE) {
+            request.setAttribute(Globals.COMET_TIMEOUT_ATTR,
+                    Integer.valueOf(timeout));
             if (request.isComet()) {
                 request.setCometTimeout(timeout);
             }

@@ -1008,9 +1008,9 @@ public class Request
      * The underlying connector may also expose request attributes. These all
      * have names starting with "org.apache.tomcat" and include:
      * <ul>
-     * <li>org.apache.tomcat.sendfile.support</li>
-     * <li>org.apache.tomcat.comet.support</li>
-     * <li>org.apache.tomcat.comet.timeout.support</li>
+     * <li>{@link Globals#SENDFILE_SUPPORTED_ATTR}</li>
+     * <li>{@link Globals#COMET_SUPPORTED_ATTR}</li>
+     * <li>{@link Globals#COMET_TIMEOUT_SUPPORTED_ATTR}</li>
      * </ul>
      * Connector implementations may return some, all or none of these
      * attributes and may also support additional attributes.
@@ -1515,7 +1515,7 @@ public class Request
 
         // Do the security check before any updates are made
         if (Globals.IS_SECURITY_ENABLED &&
-                name.equals("org.apache.tomcat.sendfile.filename")) {
+                name.equals(Globals.SENDFILE_FILENAME_ATTR)) {
             // Use the canonical file name to avoid any possible symlink and
             // relative path issues
             String canonicalPath;
