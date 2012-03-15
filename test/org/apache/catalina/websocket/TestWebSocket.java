@@ -21,9 +21,16 @@ import java.io.Reader;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 
+import org.junit.Test;
+
 import org.apache.catalina.startup.TomcatBaseTest;
 
 public class TestWebSocket extends TomcatBaseTest {
+
+    @Test
+    public void testSimple() {
+        // TODO: Write a test
+    }
 
     private static final class StreamingWebSocketServlet
             extends WebSocketServlet {
