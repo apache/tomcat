@@ -93,14 +93,24 @@ public class Snake {
             head = nextLocation;
         }
 
+        handleCollisions(snakes);
+    }
+
+    private void handleCollisions(Collection<Snake> snakes) {
         for (Snake snake : snakes) {
-            if (snake.getTail().contains(head)) {
+            boolean headCollision = id != snake.id && snake.getHead().equals(head);
+            boolean tailCollision = snake.getTail().contains(head);
+            if (headCollision || tailCollision) {
                 kill();
                 if (id != snake.id) {
                     snake.reward();
                 }
             }
         }
+    }
+
+    public synchronized Location getHead() {
+        return head;
     }
 
     public synchronized Collection<Location> getTail() {

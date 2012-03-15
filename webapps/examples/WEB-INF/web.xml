@@ -350,7 +350,7 @@
     <!-- WebSocket Examples -->
     <servlet>
       <servlet-name>wsEchoStream</servlet-name>
-      <servlet-class>websocket.EchoStream</servlet-class>
+      <servlet-class>websocket.echo.EchoStream</servlet-class>
     </servlet>
     <servlet-mapping>
       <servlet-name>wsEchoStream</servlet-name>
@@ -358,7 +358,7 @@
     </servlet-mapping>
     <servlet>
       <servlet-name>wsEchoMessage</servlet-name>
-      <servlet-class>websocket.EchoMessage</servlet-class>
+      <servlet-class>websocket.echo.EchoMessage</servlet-class>
       <!-- Uncomment the following block to increase the default maximum
            WebSocket buffer size from 2MB to 20MB which is required for the
            Autobahn test suite to pass fully. -->
@@ -376,6 +376,14 @@
     <servlet-mapping>
       <servlet-name>wsEchoMessage</servlet-name>
       <url-pattern>/websocket/echoMessage</url-pattern>
+    </servlet-mapping>
+    <servlet>
+        <servlet-name>wsChat</servlet-name>
+        <servlet-class>websocket.chat.ChatWebSocketServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>wsChat</servlet-name>
+        <url-pattern>/websocket/chat</url-pattern>
     </servlet-mapping>
     <servlet>
       <servlet-name>wsSnake</servlet-name>
