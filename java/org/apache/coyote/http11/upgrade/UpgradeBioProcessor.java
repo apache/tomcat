@@ -31,8 +31,8 @@ import org.apache.tomcat.util.net.SocketWrapper;
  */
 public class UpgradeBioProcessor extends UpgradeProcessor<Socket> {
 
-    private InputStream inputStream;
-    private OutputStream outputStream;
+    private final InputStream inputStream;
+    private final OutputStream outputStream;
 
     public UpgradeBioProcessor(SocketWrapper<Socket> wrapper,
             UpgradeInbound upgradeInbound) throws IOException {

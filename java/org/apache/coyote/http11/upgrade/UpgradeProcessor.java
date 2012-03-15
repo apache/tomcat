@@ -21,7 +21,6 @@ import java.util.concurrent.Executor;
 
 import org.apache.coyote.Processor;
 import org.apache.coyote.Request;
-import org.apache.coyote.http11.Constants;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
 import org.apache.tomcat.util.net.SSLSupport;
 import org.apache.tomcat.util.net.SocketStatus;

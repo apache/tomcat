@@ -29,7 +29,7 @@ import org.apache.tomcat.util.net.SocketWrapper;
  */
 public class UpgradeAprProcessor extends UpgradeProcessor<Long> {
 
-    long socket;
+    private final long socket;
 
 
     public UpgradeAprProcessor(SocketWrapper<Long> wrapper,

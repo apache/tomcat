@@ -25,11 +25,12 @@ import org.apache.tomcat.util.buf.B2CConverter;
 
 public class WsOutbound {
 
-    private static final int DEFAULT_BUFFER_SIZE = 2048;
+    private static final int DEFAULT_BUFFER_SIZE = 8192;
 
     private UpgradeOutbound upgradeOutbound;
     private ByteBuffer bb;
     private CharBuffer cb;
+    private boolean closed = false;
     protected Boolean text = null;
     protected boolean firstFrame = true;
 
@@ -37,9 +38,7 @@ public class WsOutbound {
     public WsOutbound(UpgradeOutbound upgradeOutbound) {
         this.upgradeOutbound = upgradeOutbound;
         // TODO: Make buffer size configurable
-        // Byte buffer needs to be 4* char buffer to be sure that char buffer
-        // can always we written into Byte buffer
-        this.bb = ByteBuffer.allocate(DEFAULT_BUFFER_SIZE * 4);
+        this.bb = ByteBuffer.allocate(DEFAULT_BUFFER_SIZE);
         this.cb = CharBuffer.allocate(DEFAULT_BUFFER_SIZE);
     }
 
@@ -81,7 +80,7 @@ public class WsOutbound {
             flush();
         }
         text = Boolean.FALSE;
-        doWriteBinary(msgBb, true);
+        doWriteBytes(msgBb, true);
     }
 
 
@@ -105,28 +104,71 @@ public class WsOutbound {
             return;
         }
         if (text.booleanValue()) {
+            cb.flip();
             doWriteText(cb, finalFragment);
         } else {
-            doWriteBinary(bb, finalFragment);
+            bb.flip();
+            doWriteBytes(bb, finalFragment);
         }
     }
 
 
-    public void close() throws IOException {
+    public void close(int status, ByteBuffer data) throws IOException {
+        // TODO Think about threading requirements for writing. This is not
+        // currently thread safe and writing almost certainly needs to be.
+        if (closed) {
+            return;
+        }
+        closed = true;
+
         doFlush(true);
 
-        // TODO: Send a close message
+        upgradeOutbound.write(0x88);
+        if (status == 0) {
+            upgradeOutbound.write(0);
+        } else if (data == null) {
+            upgradeOutbound.write(2);
+            upgradeOutbound.write(status >>> 8);
+            upgradeOutbound.write(status);
+        } else {
+            upgradeOutbound.write(2 + data.limit());
+            upgradeOutbound.write(status >>> 8);
+            upgradeOutbound.write(status);
+            upgradeOutbound.write(data.array(), 0, data.limit());
+        }
+        upgradeOutbound.flush();
+
         bb = null;
         cb = null;
         upgradeOutbound = null;
     }
 
+    public void pong(ByteBuffer data) throws IOException {
+        // TODO Think about threading requirements for writing. This is not
+        // currently thread safe and writing almost certainly needs to be.
+        if (closed) {
+            // TODO - handle this - ISE?
+        }
 
-    protected void doWriteBinary(ByteBuffer buffer, boolean finalFragment)
+        doFlush(true);
+
+        upgradeOutbound.write(0x8A);
+        upgradeOutbound.write(data.limit());
+        upgradeOutbound.write(data.array(), 0, data.limit());
+
+        upgradeOutbound.flush();
+    }
+
+    /**
+     * Writes the provided bytes as the payload in a new WebSocket frame.
+     *
+     * @param buffer        The bytes to include in the payload.
+     * @param finalFragment Do these bytes represent the final fragment of a
+     *                      WebSocket message?
+     * @throws IOException
+     */
+    private void doWriteBytes(ByteBuffer buffer, boolean finalFragment)
             throws IOException {
-
-        // Prepare to write
-        buffer.flip();
 
         // Work out the first byte
         int first = 0x00;
@@ -143,13 +185,24 @@ public class WsOutbound {
         // Continuation frame is OpCode 0
         upgradeOutbound.write(first);
 
-        // Note: buffer will never be more than 2^16 in length
         if (buffer.limit() < 126) {
             upgradeOutbound.write(buffer.limit());
-        } else {
+        } else if (buffer.limit() < 65536) {
             upgradeOutbound.write(126);
             upgradeOutbound.write(buffer.limit() >>> 8);
             upgradeOutbound.write(buffer.limit() & 0xFF);
+        } else {
+            // Will never be more than 2^31-1
+            upgradeOutbound.write(127);
+            upgradeOutbound.write(0);
+            upgradeOutbound.write(0);
+            upgradeOutbound.write(0);
+            upgradeOutbound.write(0);
+            upgradeOutbound.write(buffer.limit() >>> 24);
+            upgradeOutbound.write(buffer.limit() >>> 16);
+            upgradeOutbound.write(buffer.limit() >>> 8);
+            upgradeOutbound.write(buffer.limit() & 0xFF);
+
         }
 
         // Write the content
@@ -167,12 +220,19 @@ public class WsOutbound {
     }
 
 
-    protected void doWriteText(CharBuffer buffer, boolean finalFragment)
+    private void doWriteText(CharBuffer buffer, boolean finalFragment)
             throws IOException {
-        buffer.flip();
-        B2CConverter.UTF_8.newEncoder().encode(buffer, bb, true);
-        doWriteBinary(bb, finalFragment);
-        // Reset
+        do {
+            B2CConverter.UTF_8.newEncoder().encode(buffer, bb, true);
+            bb.flip();
+            if (buffer.hasRemaining()) {
+                doWriteBytes(bb, false);
+            } else {
+                doWriteBytes(bb, finalFragment);
+            }
+        } while (buffer.hasRemaining());
+
+        // Reset - bb will be cleared in doWriteBytes()
         cb.clear();
     }
 }

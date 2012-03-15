@@ -14,29 +14,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.catalina.util;
+package org.apache.catalina.websocket;
 
-import java.io.IOException;
+/**
+ * This class does not represent the complete frame header, just those parts of
+ * it that need to be exposed more widely than the {@link WsInputStream}.
+ */
+public class WsFrameHeader {
 
-public class Conversions {
+    private final boolean fin;
+    private final int rsv;
+    private final byte opCode;
 
-    private Conversions() {
-        // Utility class. Hide default constructor.
+    public WsFrameHeader(int b) {
+        fin = (b & 0x80) > 0;
+
+        rsv = (b & 0x70) >>> 4;
+
+        opCode = (byte) (b & 0x0F);
     }
 
-    public static long byteArrayToLong(byte[] input) throws IOException {
-        if (input.length > 8) {
-            // TODO: Better message
-            throw new IOException();
-        }
+    public boolean getFin() {
+        return fin;
+    }
 
-        int shift = 0;
-        long result = 0;
-        for (int i = input.length - 1; i >= 0; i--) {
-            result = result + ((input[i] & 0xFF) << shift);
-            shift += 8;
-        }
+    public int getRsv() {
+        return rsv;
+    }
 
-        return result;
+    public byte getOpCode() {
+        return opCode;
     }
 }
