@@ -28,7 +28,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
-import org.apache.tomcat.util.MutableInteger;
 
 /**
  *
@@ -166,13 +165,13 @@ public class NioSelectorPool {
      * @throws IOException if an IO Exception occurs in the underlying socket logic
      */
     public int write(ByteBuffer buf, NioChannel socket, Selector selector, long writeTimeout) throws IOException {
-        return write(buf,socket,selector,writeTimeout,true,null);
+        return write(buf,socket,selector,writeTimeout,true);
     }
 
     public int write(ByteBuffer buf, NioChannel socket, Selector selector,
-                     long writeTimeout, boolean block,MutableInteger lastWrite) throws IOException {
+                     long writeTimeout, boolean block) throws IOException {
         if ( SHARED && block ) {
-            return blockingSelector.write(buf,socket,writeTimeout,lastWrite);
+            return blockingSelector.write(buf,socket,writeTimeout);
         }
         SelectionKey key = null;
         int written = 0;
@@ -184,7 +183,6 @@ public class NioSelectorPool {
                 int cnt = 0;
                 if ( keycount > 0 ) { //only write if we were registered for a write
                     cnt = socket.write(buf); //write the data
-                    if (lastWrite!=null) lastWrite.set(cnt);
                     if (cnt == -1) throw new EOFException();
 
                     written += cnt;

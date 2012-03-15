@@ -41,7 +41,7 @@ import javax.servlet.http.Part;
 
 import org.apache.catalina.Globals;
 import org.apache.catalina.security.SecurityUtil;
-import org.apache.coyote.http11.UpgradeInbound;
+import org.apache.coyote.http11.upgrade.UpgradeInbound;
 import org.apache.tomcat.util.res.StringManager;
 
 /**

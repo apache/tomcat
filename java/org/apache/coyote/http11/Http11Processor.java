@@ -49,6 +49,15 @@ public class Http11Processor extends AbstractHttp11Processor<Socket> {
    // ------------------------------------------------------------ Constructor
 
 
+    /**
+     * Intended for use by the Upgrade sub-classes that have no need to
+     * initialise the request, response, etc.
+     */
+    protected Http11Processor() {
+        // NOOP
+    }
+
+
     public Http11Processor(int headerBufferSize, JIoEndpoint endpoint,
             int maxTrailerSize) {
 
@@ -103,7 +112,8 @@ public class Http11Processor extends AbstractHttp11Processor<Socket> {
     /**
      * Set the SSL information for this HTTP connection.
      */
-    public void setSSLSupport(SSLSupport sslSupport) {
+    @Override
+    public void setSslSupport(SSLSupport sslSupport) {
         this.sslSupport = sslSupport;
     }
 

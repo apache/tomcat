@@ -16,6 +16,7 @@
  */
 package org.apache.coyote;
 
+import java.io.IOException;
 import java.net.InetAddress;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -28,6 +29,7 @@ import javax.management.MBeanServer;
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
 
+import org.apache.coyote.http11.upgrade.UpgradeInbound;
 import org.apache.juli.logging.Log;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.modeler.Registry;
@@ -500,7 +502,7 @@ public abstract class AbstractProtocol implements ProtocolHandler,
     
     // ------------------------------------------- Connection handler base class
     
-    protected abstract static class AbstractConnectionHandler<S,P extends AbstractProcessor<S>>
+    protected abstract static class AbstractConnectionHandler<S,P extends Processor<S>>
             implements AbstractEndpoint.Handler {
 
         protected abstract Log getLog();
@@ -508,8 +510,8 @@ public abstract class AbstractProtocol implements ProtocolHandler,
         protected RequestGroupInfo global = new RequestGroupInfo();
         protected AtomicLong registerCount = new AtomicLong(0);
 
-        protected ConcurrentHashMap<S,P> connections =
-            new ConcurrentHashMap<S,P>();
+        protected ConcurrentHashMap<S,Processor<S>> connections =
+            new ConcurrentHashMap<S,Processor<S>>();
 
         protected RecycledProcessors<P,S> recycledProcessors =
             new RecycledProcessors<P,S>(this);
@@ -531,7 +533,7 @@ public abstract class AbstractProtocol implements ProtocolHandler,
 
         public SocketState process(SocketWrapper<S> socket,
                 SocketStatus status) {
-            P processor = connections.remove(socket.getSocket());
+            Processor<S> processor = connections.remove(socket.getSocket());
 
             socket.setAsync(false);
 
@@ -576,9 +578,18 @@ public abstract class AbstractProtocol implements ProtocolHandler,
                     // closed. If it works, the socket will be re-added to the
                     // poller
                     release(socket, processor, false, false);
-                } else if (state == SocketState.UPGRADE) {
+                } else if (state == SocketState.UPGRADED) {
                     // Need to keep the connection associated with the processor
-                    longPoll(socket, processor);
+                    upgradePoll(socket, processor);
+                } else if (state == SocketState.UPGRADING) {
+                    // Get the UpgradeInbound handler
+                    UpgradeInbound inbound = processor.getUpgradeInbound();
+                    // Release the Http11 processor to be re-used
+                    release(socket, processor, false, false);
+                    // Create the light-weight upgrade processor
+                    processor = createUpgradeProcessor(socket, inbound);
+                    // Need to keep the connection associated with the processor
+                    upgradePoll(socket, processor);
                 } else {
                     // Connection closed. OK to recycle the processor.
                     release(socket, processor, true, false);
@@ -608,11 +619,18 @@ public abstract class AbstractProtocol implements ProtocolHandler,
         }
         
         protected abstract P createProcessor();
-        protected abstract void initSsl(SocketWrapper<S> socket, P processor);
-        protected abstract void longPoll(SocketWrapper<S> socket, P processor);
-        protected abstract void release(SocketWrapper<S> socket, P processor,
-                boolean socketClosing, boolean addToPoller);
-
+        protected abstract void initSsl(SocketWrapper<S> socket,
+                Processor<S> processor);
+        protected abstract void longPoll(SocketWrapper<S> socket,
+                Processor<S> processor);
+        protected abstract void upgradePoll(SocketWrapper<S> socket,
+                Processor<S> processor);
+        protected abstract void release(SocketWrapper<S> socket,
+                Processor<S> processor, boolean socketClosing,
+                boolean addToPoller);
+        protected abstract Processor<S> createUpgradeProcessor(
+                SocketWrapper<S> socket,
+                UpgradeInbound inbound) throws IOException;
 
         protected void register(AbstractProcessor<S> processor) {
             if (getProtocol().getDomain() != null) {
@@ -641,12 +659,16 @@ public abstract class AbstractProtocol implements ProtocolHandler,
             }
         }
 
-        protected void unregister(AbstractProcessor<S> processor) {
+        protected void unregister(Processor<S> processor) {
             if (getProtocol().getDomain() != null) {
                 synchronized (this) {
                     try {
-                        RequestInfo rp =
-                            processor.getRequest().getRequestProcessor();
+                        Request r = processor.getRequest();
+                        if (r == null) {
+                            // Probably an UpgradeProcessor
+                            return;
+                        }
+                        RequestInfo rp = r.getRequestProcessor();
                         rp.setGlobalProcessor(null);
                         ObjectName rpName = rp.getRpName();
                         if (getLog().isDebugEnabled()) {
@@ -663,8 +685,8 @@ public abstract class AbstractProtocol implements ProtocolHandler,
         }
     }
     
-    protected static class RecycledProcessors<P extends AbstractProcessor<S>, S>
-            extends ConcurrentLinkedQueue<P> {
+    protected static class RecycledProcessors<P extends Processor<S>, S>
+            extends ConcurrentLinkedQueue<Processor<S>> {
 
         private static final long serialVersionUID = 1L;
         private transient AbstractConnectionHandler<S,P> handler;
@@ -675,7 +697,7 @@ public abstract class AbstractProtocol implements ProtocolHandler,
         }
 
         @Override
-        public boolean offer(P processor) {
+        public boolean offer(Processor<S> processor) {
             int cacheSize = handler.getProtocol().getProcessorCache();
             boolean offer = cacheSize == -1 ? true : size.get() < cacheSize;
             //avoid over growing our cache or add after we have stopped
@@ -691,8 +713,8 @@ public abstract class AbstractProtocol implements ProtocolHandler,
         }
     
         @Override
-        public P poll() {
-            P result = super.poll();
+        public Processor<S> poll() {
+            Processor<S> result = super.poll();
             if (result != null) {
                 size.decrementAndGet();
             }
@@ -701,7 +723,7 @@ public abstract class AbstractProtocol implements ProtocolHandler,
     
         @Override
         public void clear() {
-            P next = poll();
+            Processor<S> next = poll();
             while (next != null) {
                 handler.unregister(next);
                 next = poll();

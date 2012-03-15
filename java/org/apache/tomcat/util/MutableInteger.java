@@ -17,6 +17,10 @@
 
 package org.apache.tomcat.util;
 
+/**
+ * @deprecated Will be removed in Tomcat 8.0.x
+ */
+@Deprecated
 public class MutableInteger {
     protected int value = 0;
     public MutableInteger() {}

@@ -20,7 +20,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 
-import org.apache.coyote.http11.UpgradeOutbound;
+import org.apache.coyote.http11.upgrade.UpgradeOutbound;
 import org.apache.tomcat.util.buf.B2CConverter;
 
 public class WsOutbound {
