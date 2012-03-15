@@ -83,7 +83,8 @@ public class ResourceBase implements Serializable, Injectable {
     /**
      * Holder for our configured properties.
      */
-    private HashMap<String, Object> properties = new HashMap<String, Object>();
+    private final HashMap<String, Object> properties =
+            new HashMap<String, Object>();
 
     /**
      * Return a configured property.
@@ -113,7 +114,7 @@ public class ResourceBase implements Serializable, Injectable {
         return properties.keySet().iterator();
     }
 
-    private List<InjectionTarget> injectionTargets = new ArrayList<InjectionTarget>();
+    private final List<InjectionTarget> injectionTargets = new ArrayList<InjectionTarget>();
 
     @Override
     public void addInjectionTarget(String injectionTargetName, String jndiName) {
