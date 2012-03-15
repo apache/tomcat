@@ -39,7 +39,7 @@ public class EchoStream extends WebSocketServlet {
         @Override
         protected void onBinaryData(InputStream is) throws IOException {
             // Simply echo the data to back to the client.
-            WsOutbound outbound = getOutbound();
+            WsOutbound outbound = getWsOutbound();
 
             int i = is.read();
             while (i != -1) {
@@ -53,7 +53,7 @@ public class EchoStream extends WebSocketServlet {
         @Override
         protected void onTextData(Reader r) throws IOException {
             // Simply echo the data to back to the client.
-            WsOutbound outbound = getOutbound();
+            WsOutbound outbound = getWsOutbound();
 
             int c = r.read();
             while (c != -1) {

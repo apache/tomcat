@@ -175,6 +175,7 @@ public abstract class WebSocketServlet extends HttpServlet {
         }
     }
 
+
     /**
      * Intended to be overridden by sub-classes that wish to verify the origin
      * of a WebSocket request before processing it.
@@ -190,6 +191,7 @@ public abstract class WebSocketServlet extends HttpServlet {
         return true;
     }
 
+
     /**
      * Intended to be overridden by sub-classes that wish to select a
      * sub-protocol if the client provides a list of supported protocols.
@@ -199,14 +201,17 @@ public abstract class WebSocketServlet extends HttpServlet {
      *                      obligation to respect the declared preference
      * @return  <code>null</code> if no sub-protocol is selected or the name of
      *          the protocol which <b>must</b> be one of the protocols listed by
-     *          the client.
+     *          the client. This default implementation always returns
+     *          <code>null</code>.
      */
     protected String selectSubProtocol(List<String> subProtocols) {
         return null;
     }
 
+
     /**
      * Create the instance that will process this inbound connection.
+     * Applications must provide a new instance for each connection.
      *
      * @param subProtocol   The sub-protocol agreed between the client and
      *                      server or <code>null</code> if none was agreed

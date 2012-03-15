@@ -46,7 +46,7 @@ public class TestWebSocket extends TomcatBaseTest {
 
     private OutputStream os;
     private InputStream is;
-    boolean isContinuation = false;
+    private boolean isContinuation = false;
 
     @Test
     public void testSimple() throws Exception {
