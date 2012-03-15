@@ -1254,7 +1254,7 @@ public class NioEndpoint extends AbstractEndpoint {
         public boolean processSendfile(SelectionKey sk, KeyAttachment attachment, boolean reg, boolean event) {
             NioChannel sc = null;
             try {
-                //unreg(sk,attachment);//only do this if we do process send file on a separate thread
+                unreg(sk, attachment, sk.readyOps());
                 SendfileData sd = attachment.getSendfileData();
                 if ( sd.fchannel == null ) {
                     File f = new File(sd.fileName);
