@@ -98,8 +98,8 @@ public class SnakeWebSocketServlet extends WebSocketServlet {
     private void broadcast(String message) {
         for (SnakeMessageInbound connection : getConnections()) {
             try {
-                CharBuffer response = CharBuffer.wrap(message);
-                connection.getWsOutbound().writeTextMessage(response);
+                CharBuffer buffer = CharBuffer.wrap(message);
+                connection.getWsOutbound().writeTextMessage(buffer);
             } catch (IOException ignore) {
                 // Ignore
             }
