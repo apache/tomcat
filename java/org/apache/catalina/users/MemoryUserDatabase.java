@@ -58,9 +58,7 @@ public class MemoryUserDatabase implements UserDatabase {
      * Create a new instance with default values.
      */
     public MemoryUserDatabase() {
-
-        super();
-
+        this(null);
     }
 
 
@@ -70,10 +68,7 @@ public class MemoryUserDatabase implements UserDatabase {
      * @param id Unique global identifier of this user database
      */
     public MemoryUserDatabase(String id) {
-
-        super();
         this.id = id;
-
     }
 
 
@@ -84,13 +79,13 @@ public class MemoryUserDatabase implements UserDatabase {
      * The set of {@link Group}s defined in this database, keyed by
      * group name.
      */
-    protected HashMap<String,Group> groups = new HashMap<String,Group>();
+    protected final HashMap<String,Group> groups = new HashMap<String,Group>();
 
 
     /**
      * The unique global identifier of this user database.
      */
-    protected String id = null;
+    protected final String id;
 
 
     /**
@@ -123,7 +118,7 @@ public class MemoryUserDatabase implements UserDatabase {
      * The set of {@link Role}s defined in this database, keyed by
      * role name.
      */
-    protected HashMap<String,Role> roles = new HashMap<String,Role>();
+    protected final HashMap<String,Role> roles = new HashMap<String,Role>();
 
 
     /**
@@ -137,7 +132,7 @@ public class MemoryUserDatabase implements UserDatabase {
      * The set of {@link User}s defined in this database, keyed by
      * user name.
      */
-    protected HashMap<String,User> users = new HashMap<String,User>();
+    protected final HashMap<String,User> users = new HashMap<String,User>();
 
 
     // ------------------------------------------------------------- Properties

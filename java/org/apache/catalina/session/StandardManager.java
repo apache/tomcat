@@ -107,7 +107,7 @@ public class StandardManager extends ManagerBase {
     /**
      * The descriptive name of this Manager implementation (for logging).
      */
-    protected static String name = "StandardManager";
+    protected static final String name = "StandardManager";
 
 
     /**
