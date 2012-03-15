@@ -89,6 +89,12 @@
     <Bug code="IS" />
   </Match>
   <Match>
+    <!-- We can live with the threading issue. See code comment for details. -->
+    <Class name="org.apache.catalina.session.ManagerBase" />
+    <Method name="generateSessionId" />
+    <Bug code="VO" />
+  </Match>
+  <Match>
     <!-- Use of null is deliberate -->
     <Class name="org.apache.catalina.ssi.ExpressionParseTree" />
     <Method name="pushOpp" />
