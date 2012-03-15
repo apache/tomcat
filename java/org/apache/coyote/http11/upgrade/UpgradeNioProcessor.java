@@ -25,16 +25,12 @@ import org.apache.tomcat.util.net.NioEndpoint;
 import org.apache.tomcat.util.net.NioSelectorPool;
 import org.apache.tomcat.util.net.SocketWrapper;
 
-/**
- * Implementation note: The need to extend Http11Processor could probably be
- * removed if the Processor interface was expanded to cover all of the methods
- * required by the AbstractProtocol. That would simplify the code and further
- * reduce the size of instances of this class.
- */
 public class UpgradeNioProcessor extends UpgradeProcessor<NioChannel> {
 
     private final NioChannel nioChannel;
     private final NioSelectorPool pool;
+    private final int maxRead;
+    private final int maxWrite;
 
     public UpgradeNioProcessor(SocketWrapper<NioChannel> wrapper,
             UpgradeInbound upgradeInbound, NioSelectorPool pool) {
@@ -42,6 +38,8 @@ public class UpgradeNioProcessor extends UpgradeProcessor<NioChannel> {
 
         this.nioChannel = wrapper.getSocket();
         this.pool = pool;
+        this.maxRead = nioChannel.getBufHandler().getReadBuffer().capacity();
+        this.maxWrite = nioChannel.getBufHandler().getWriteBuffer().capacity();
     }
 
 
@@ -82,7 +80,11 @@ public class UpgradeNioProcessor extends UpgradeProcessor<NioChannel> {
 
     @Override
     public void write(byte[]b, int off, int len) throws IOException {
-        writeToSocket(b, off, len);
+        int written = 0;
+        while (len - written > maxWrite) {
+            written += writeToSocket(b, off + written, maxWrite);
+        }
+        writeToSocket(b, off + written, len - written);
     }
 
     /*
@@ -91,13 +93,22 @@ public class UpgradeNioProcessor extends UpgradeProcessor<NioChannel> {
     @Override
     public int read() throws IOException {
         byte[] bytes = new byte[1];
-        readSocket(true, bytes, 0, 1);
-        return bytes[0];
+        int result = readSocket(true, bytes, 0, 1);
+        if (result == -1) {
+            return -1;
+        } else {
+            return bytes[0] & 0xFF;
+        }
     }
 
     @Override
-    public int read(byte[] bytes, int off, int len) throws IOException {
-        return readSocket(true, bytes, off, len);
+    public int read(boolean block, byte[] bytes, int off, int len)
+            throws IOException {
+        if (len > maxRead) {
+            return readSocket(block, bytes, off, maxRead);
+        } else {
+            return readSocket(block, bytes, off, len);
+        }
     }
 
 

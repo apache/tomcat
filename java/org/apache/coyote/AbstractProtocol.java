@@ -563,7 +563,18 @@ public abstract class AbstractProtocol implements ProtocolHandler,
                     if (state != SocketState.CLOSED && processor.isAsync()) {
                         state = processor.asyncPostProcess();
                     }
-                } while (state == SocketState.ASYNC_END);
+
+                    if (state == SocketState.UPGRADING) {
+                        // Get the UpgradeInbound handler
+                        UpgradeInbound inbound = processor.getUpgradeInbound();
+                        // Release the Http11 processor to be re-used
+                        release(socket, processor, false, false);
+                        // Create the light-weight upgrade processor
+                        processor = createUpgradeProcessor(socket, inbound);
+                        inbound.onUpgradeComplete();
+                    }
+                } while (state == SocketState.ASYNC_END ||
+                        state == SocketState.UPGRADING);
 
                 if (state == SocketState.LONG) {
                     // In the middle of processing a request/response. Keep the
@@ -581,16 +592,7 @@ public abstract class AbstractProtocol implements ProtocolHandler,
                     release(socket, processor, false, false);
                 } else if (state == SocketState.UPGRADED) {
                     // Need to keep the connection associated with the processor
-                    upgradePoll(socket, processor);
-                } else if (state == SocketState.UPGRADING) {
-                    // Get the UpgradeInbound handler
-                    UpgradeInbound inbound = processor.getUpgradeInbound();
-                    // Release the Http11 processor to be re-used
-                    release(socket, processor, false, false);
-                    // Create the light-weight upgrade processor
-                    processor = createUpgradeProcessor(socket, inbound);
-                    // Need to keep the connection associated with the processor
-                    upgradePoll(socket, processor);
+                    longPoll(socket, processor);
                 } else {
                     // Connection closed. OK to recycle the processor.
                     if (!(processor instanceof UpgradeProcessor)) {
@@ -628,8 +630,6 @@ public abstract class AbstractProtocol implements ProtocolHandler,
         protected abstract void initSsl(SocketWrapper<S> socket,
                 Processor<S> processor);
         protected abstract void longPoll(SocketWrapper<S> socket,
-                Processor<S> processor);
-        protected abstract void upgradePoll(SocketWrapper<S> socket,
                 Processor<S> processor);
         protected abstract void release(SocketWrapper<S> socket,
                 Processor<S> processor, boolean socketClosing,

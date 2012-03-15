@@ -27,13 +27,16 @@ import org.apache.tomcat.util.buf.B2CConverter;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
- * Provides the means to write WebSocket messages to the client.
+ * Provides the means to write WebSocket messages to the client. All methods
+ * that write to the client (or update a buffer that is later written to the
+ * client) are synchronized to prevent multiple threads trying to write to the
+ * client at the same time.
  */
 public class WsOutbound {
 
     private static final StringManager sm =
             StringManager.getManager(Constants.Package);
-    private static final int DEFAULT_BUFFER_SIZE = 8192;
+    public static final int DEFAULT_BUFFER_SIZE = 8192;
 
     private UpgradeOutbound upgradeOutbound;
     private ByteBuffer bb;
@@ -44,10 +47,15 @@ public class WsOutbound {
 
 
     public WsOutbound(UpgradeOutbound upgradeOutbound) {
+        this(upgradeOutbound, DEFAULT_BUFFER_SIZE, DEFAULT_BUFFER_SIZE);
+    }
+
+
+    public WsOutbound(UpgradeOutbound upgradeOutbound, int byteBufferSize,
+            int charBufferSize) {
         this.upgradeOutbound = upgradeOutbound;
-        // TODO: Make buffer size configurable
-        this.bb = ByteBuffer.allocate(DEFAULT_BUFFER_SIZE);
-        this.cb = CharBuffer.allocate(DEFAULT_BUFFER_SIZE);
+        this.bb = ByteBuffer.allocate(byteBufferSize);
+        this.cb = CharBuffer.allocate(charBufferSize);
     }
 
 
@@ -63,7 +71,7 @@ public class WsOutbound {
      * @throws IOException  If a flush is required and an error occurs writing
      *                      the WebSocket frame to the client
      */
-    public void writeBinaryData(int b) throws IOException {
+    public synchronized void writeBinaryData(int b) throws IOException {
         if (closed) {
             throw new IOException(sm.getString("outbound.closed"));
         }
@@ -88,12 +96,12 @@ public class WsOutbound {
      * message started. If the buffer for textual data is full, the buffer will
      * be flushed and a new textual continuation fragment started.
      *
-     * @param b The character to send to the client.
+     * @param c The character to send to the client.
      *
      * @throws IOException  If a flush is required and an error occurs writing
      *                      the WebSocket frame to the client
      */
-    public void writeTextData(char c) throws IOException {
+    public synchronized void writeTextData(char c) throws IOException {
         if (closed) {
             throw new IOException(sm.getString("outbound.closed"));
         }
@@ -122,7 +130,9 @@ public class WsOutbound {
      *
      * @throws IOException  If an error occurs writing to the client
      */
-    public void writeBinaryMessage(ByteBuffer msgBb) throws IOException {
+    public synchronized void writeBinaryMessage(ByteBuffer msgBb)
+            throws IOException {
+
         if (closed) {
             throw new IOException(sm.getString("outbound.closed"));
         }
@@ -141,11 +151,13 @@ public class WsOutbound {
      * a WebSocket text message as a single frame with the provided buffer as
      * the payload of the message.
      *
-     * @param msgBb The buffer containing the payload
+     * @param msgCb The buffer containing the payload
      *
      * @throws IOException  If an error occurs writing to the client
      */
-    public void writeTextMessage(CharBuffer msgCb) throws IOException {
+    public synchronized void writeTextMessage(CharBuffer msgCb)
+            throws IOException {
+
         if (closed) {
             throw new IOException(sm.getString("outbound.closed"));
         }
@@ -164,7 +176,7 @@ public class WsOutbound {
      *
      * @throws IOException  If an error occurs writing to the client
      */
-    public void flush() throws IOException {
+    public synchronized void flush() throws IOException {
         if (closed) {
             throw new IOException(sm.getString("outbound.closed"));
         }
@@ -209,7 +221,7 @@ public class WsOutbound {
                 close(status, frame.getPayLoad());
             } else {
                 // Invalid close code
-                close(1002, null);
+                close(Constants.STATUS_PROTOCOL_ERROR, null);
             }
         } else {
             // No status
@@ -220,9 +232,15 @@ public class WsOutbound {
 
     private boolean validateCloseStatus(int status) {
 
-        if (status == 1000 || status == 1001 || status == 1002 ||
-                status == 1003 || status == 1007 || status == 1008 ||
-                status == 1009 || status == 1010 || status == 1011 ||
+        if (status == Constants.STATUS_CLOSE_NORMAL ||
+                status == Constants.STATUS_SHUTDOWN ||
+                status == Constants.STATUS_PROTOCOL_ERROR ||
+                status == Constants.STATUS_UNEXPECTED_DATA_TYPE ||
+                status == Constants.STATUS_BAD_DATA ||
+                status == Constants.STATUS_POLICY_VIOLATION ||
+                status == Constants.STATUS_MESSAGE_TOO_LARGE ||
+                status == Constants.STATUS_REQUIRED_EXTENSION ||
+                status == Constants.STATUS_UNEXPECTED_CONDITION ||
                 (status > 2999 && status < 5000)) {
             // Other 1xxx reserved / not permitted
             // 2xxx reserved
@@ -245,9 +263,9 @@ public class WsOutbound {
      *
      * @throws IOException  If an error occurs writing to the client
      */
-    public void close(int status, ByteBuffer data) throws IOException {
-        // TODO Think about threading requirements for writing. This is not
-        // currently thread safe and writing almost certainly needs to be.
+    public synchronized void close(int status, ByteBuffer data)
+            throws IOException {
+
         if (closed) {
             return;
         }
@@ -282,9 +300,8 @@ public class WsOutbound {
      *
      * @throws IOException  If an error occurs writing to the client
      */
-    public void pong(ByteBuffer data) throws IOException {
-        // TODO Think about threading requirements for writing. This is not
-        // currently thread safe and writing almost certainly needs to be.
+    public synchronized void pong(ByteBuffer data) throws IOException {
+
         if (closed) {
             throw new IOException(sm.getString("outbound.closed"));
         }
@@ -314,10 +331,6 @@ public class WsOutbound {
      */
     private void doWriteBytes(ByteBuffer buffer, boolean finalFragment)
             throws IOException {
-
-        if (closed) {
-            throw new IOException("Closed");
-        }
 
         // Work out the first byte
         int first = 0x00;

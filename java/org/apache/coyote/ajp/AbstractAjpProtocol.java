@@ -91,12 +91,6 @@ public abstract class AbstractAjpProtocol extends AbstractProtocol {
         }
 
         @Override
-        protected void upgradePoll(SocketWrapper<S> socket,
-                Processor<S> processor) {
-            // TODO Should never happen. ISE?
-        }
-
-        @Override
         protected P createUpgradeProcessor(SocketWrapper<S> socket,
                 UpgradeInbound inbound) {
             // TODO should fail - throw IOE
