@@ -100,6 +100,14 @@
         work with IBM as well as Oracle JVMs. Patch provided by Rohit Kelapure.
         (markt)
       </add>
+      <add>
+        Add support for the WebSocket protocol (RFC6455). Both streaming and
+        message based APIs are provided and the implementation currently fully
+        passes the Autobahn test suite. Also included are several examples.
+        A significant contribution to this new functionality was provided by
+        Johno Crawford - particularly the examples. Contributions were also
+        provided by Petr Praus, Jonathan Drake & Slávka. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
