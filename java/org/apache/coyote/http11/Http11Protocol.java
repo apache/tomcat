@@ -16,9 +16,13 @@
  */
 package org.apache.coyote.http11;
 
+import java.io.IOException;
 import java.net.Socket;
 
 import org.apache.coyote.AbstractProtocol;
+import org.apache.coyote.Processor;
+import org.apache.coyote.http11.upgrade.UpgradeBioProcessor;
+import org.apache.coyote.http11.upgrade.UpgradeInbound;
 import org.apache.juli.logging.Log;
 import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.net.JIoEndpoint;
@@ -131,28 +135,28 @@ public class Http11Protocol extends AbstractHttp11JsseProtocol {
          */
         @Override
         public void release(SocketWrapper<Socket> socket,
-                Http11Processor processor, boolean isSocketClosing,
+                Processor<Socket> processor, boolean isSocketClosing,
                 boolean addToPoller) {
-            processor.recycle();
+            processor.recycle(isSocketClosing);
             recycledProcessors.offer(processor);
         }
 
         @Override
         protected void initSsl(SocketWrapper<Socket> socket,
-                Http11Processor processor) {
+                Processor<Socket> processor) {
             if (proto.isSSLEnabled() && (proto.sslImplementation != null)) {
-                processor.setSSLSupport(
+                processor.setSslSupport(
                         proto.sslImplementation.getSSLSupport(
                                 socket.getSocket()));
             } else {
-                processor.setSSLSupport(null);
+                processor.setSslSupport(null);
             }
 
         }
 
         @Override
         protected void longPoll(SocketWrapper<Socket> socket,
-                Http11Processor processor) {
+                Processor<Socket> processor) {
             connections.put(socket.getSocket(), processor);
         }
 
@@ -179,6 +183,19 @@ public class Http11Protocol extends AbstractHttp11JsseProtocol {
                     proto.getDisableKeepAlivePercentage());
             register(processor);
             return processor;
+        }
+
+        @Override
+        protected Processor<Socket> createUpgradeProcessor(
+                SocketWrapper<Socket> socket, UpgradeInbound inbound)
+                throws IOException {
+            return new UpgradeBioProcessor(socket, inbound);
+        }
+
+        @Override
+        protected void upgradePoll(SocketWrapper<Socket> socket,
+                Processor<Socket> processor) {
+            connections.put(socket.getSocket(), processor);
         }
     }
 }

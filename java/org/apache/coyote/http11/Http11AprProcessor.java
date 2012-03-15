@@ -57,6 +57,15 @@ public class Http11AprProcessor extends AbstractHttp11Processor<Long> {
     // ----------------------------------------------------------- Constructors
 
 
+    /**
+     * Intended for use by the Upgrade sub-classes that have no need to
+     * initialise the request, response, etc.
+     */
+    protected Http11AprProcessor() {
+        // NOOP
+    }
+
+
     public Http11AprProcessor(int headerBufferSize, AprEndpoint endpoint,
             int maxTrailerSize) {
 
@@ -256,6 +265,11 @@ public class Http11AprProcessor extends AbstractHttp11Processor<Long> {
         sendfileData = null;
     }
 
+
+    @Override
+    public void setSslSupport(SSLSupport sslSupport) {
+        // NOOP for APR
+    }
 
     // ----------------------------------------------------- ActionHook Methods
 

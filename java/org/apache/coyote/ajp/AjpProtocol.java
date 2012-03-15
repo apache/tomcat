@@ -19,6 +19,7 @@ package org.apache.coyote.ajp;
 import java.net.Socket;
 
 import org.apache.coyote.AbstractProtocol;
+import org.apache.coyote.Processor;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.net.AbstractEndpoint;
@@ -121,7 +122,7 @@ public class AjpProtocol extends AbstractAjpProtocol {
          */
         @Override
         public void release(SocketWrapper<Socket> socket,
-                AjpProcessor processor, boolean isSocketClosing,
+                Processor<Socket> processor, boolean isSocketClosing,
                 boolean addToPoller) {
             processor.recycle(isSocketClosing);
             recycledProcessors.offer(processor);

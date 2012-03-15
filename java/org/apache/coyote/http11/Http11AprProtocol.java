@@ -16,7 +16,12 @@
  */
 package org.apache.coyote.http11;
 
+import java.io.IOException;
+
 import org.apache.coyote.AbstractProtocol;
+import org.apache.coyote.Processor;
+import org.apache.coyote.http11.upgrade.UpgradeAprProcessor;
+import org.apache.coyote.http11.upgrade.UpgradeInbound;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.net.AbstractEndpoint;
@@ -211,9 +216,9 @@ public class Http11AprProtocol extends AbstractHttp11Protocol {
          */
         @Override
         public void release(SocketWrapper<Long> socket,
-                Http11AprProcessor processor, boolean isSocketClosing,
+                Processor<Long> processor, boolean isSocketClosing,
                 boolean addToPoller) {
-            processor.recycle();
+            processor.recycle(isSocketClosing);
             recycledProcessors.offer(processor);
             if (addToPoller && proto.endpoint.isRunning()) {
                 ((AprEndpoint)proto.endpoint).getPoller().add(
@@ -223,21 +228,29 @@ public class Http11AprProtocol extends AbstractHttp11Protocol {
 
         @Override
         protected void initSsl(SocketWrapper<Long> socket,
-                Http11AprProcessor processor) {
+                Processor<Long> processor) {
             // NOOP for APR
         }
 
         @Override
         protected void longPoll(SocketWrapper<Long> socket,
-                Http11AprProcessor processor) {
+                Processor<Long> processor) {
             connections.put(socket.getSocket(), processor);
 
             if (processor.isAsync()) {
                 socket.setAsync(true);
-            } else if (processor.comet && proto.endpoint.isRunning()) {
+            } else if (processor.isComet() && proto.endpoint.isRunning()) {
                 ((AprEndpoint) proto.endpoint).getCometPoller().add(
                         socket.getSocket().longValue(), false);
             }
+        }
+
+        @Override
+        protected void upgradePoll(SocketWrapper<Long> socket,
+                Processor<Long> processor) {
+            connections.put(socket.getSocket(), processor);
+            ((AprEndpoint) proto.endpoint).getPoller().add(
+                    socket.getSocket().longValue(), false);
         }
 
         @Override
@@ -262,6 +275,13 @@ public class Http11AprProtocol extends AbstractHttp11Protocol {
             processor.setClientCertProvider(proto.getClientCertProvider());
             register(processor);
             return processor;
+        }
+
+        @Override
+        protected Processor<Long> createUpgradeProcessor(
+                SocketWrapper<Long> socket, UpgradeInbound inbound)
+                throws IOException {
+            return new UpgradeAprProcessor(socket, inbound);
         }
     }
 }

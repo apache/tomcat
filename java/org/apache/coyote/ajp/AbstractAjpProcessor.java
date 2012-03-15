@@ -33,6 +33,7 @@ import org.apache.coyote.OutputBuffer;
 import org.apache.coyote.Request;
 import org.apache.coyote.RequestInfo;
 import org.apache.coyote.Response;
+import org.apache.coyote.http11.upgrade.UpgradeInbound;
 import org.apache.juli.logging.Log;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.buf.ByteChunk;
@@ -507,6 +508,14 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
 
 
     @Override
+    public void setSslSupport(SSLSupport sslSupport) {
+        // Should never reach this code but in case we do...
+        throw new IllegalStateException(
+                sm.getString("ajpprocessor.ssl.notsupported"));
+    }
+
+
+    @Override
     public SocketState event(SocketStatus status) throws IOException {
         // Should never reach this code but in case we do...
         throw new IOException(
@@ -522,6 +531,14 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
     }
 
 
+    @Override
+    public UpgradeInbound getUpgradeInbound() {
+        // Should never reach this code but in case we do...
+        throw new IllegalStateException(
+                sm.getString("ajpprocessor.httpupgrade.notsupported"));
+    }
+
+
     /**
      * Recycle the processor, ready for the next request which may be on the
      * same connection or a different connection.
@@ -530,6 +547,7 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
      *                      allowing the processor to perform any additional
      *                      clean-up that may be required
      */
+    @Override
     public void recycle(boolean socketClosing) {
         asyncStateMachine.recycle();
 
@@ -560,14 +578,14 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
 
 
     @Override
-    protected final boolean isComet() {
+    public final boolean isComet() {
         // AJP does not support Comet
         return false;
     }
 
 
     @Override
-    protected final boolean isUpgrade() {
+    public final boolean isUpgrade() {
         // AJP does not support HTTP upgrade
         return false;
     }
