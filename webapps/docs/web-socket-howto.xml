@@ -1,0 +1,71 @@
+<?xml version="1.0"?>
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one or more
+  contributor license agreements.  See the NOTICE file distributed with
+  this work for additional information regarding copyright ownership.
+  The ASF licenses this file to You under the Apache License, Version 2.0
+  (the "License"); you may not use this file except in compliance with
+  the License.  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+<!DOCTYPE document [
+  <!ENTITY project SYSTEM "project.xml">
+]>
+<document url="web-socket-howto.html">
+
+    &project;
+
+    <properties>
+      <title>WebSocket How-To</title>
+    </properties>
+
+<body>
+
+<section name="Table of Contents">
+<toc/>
+</section>
+
+<section name="Overview">
+<p>Tomcat provides support for WebSocket as defined by
+   <a href="http://tools.ietf.org/html/rfc6455">RFC 6455</a>. This feature is
+   not yet finalised and you are encouraged to provide feedback in the form
+   of bug reports (via
+   <a href="https://issues.apache.org/bugzilla">Bugzilla</a>), suggested API
+   changes (via the <a href="mailto:dev@tomcat.apache.org">dev list</a>) or
+   other comments (again via the <a href="mailto:dev@tomcat.apache.org">dev
+   list</a>).</p>
+</section>
+
+<section name="Application development">
+<p>The API used for application development has not yet been finalised. Rather
+   than document something here that will quickly be out of date, please see the
+   Javadoc for the
+   <a href="api/index.html?org/apache/catalina/websocket/package-summary.html">
+   <code>org.apache.catalina.websocket</code></a> package. To
+   view this locally, you'll need to to install the full-docs package. You can
+   also read this on the Apache Tomcat website. Start with the
+   <a href="api/index.html?org/apache/catalina/websocket/WebSocketServlet.html">
+   <code>WebSocketServlet</code></a> class.</p>
+
+<p>There are also several example applications that demonstrate how the
+   WebSocket API can be used. You'll need to look at both the client side <a
+   href="http://svn.apache.org/viewvc/tomcat/trunk/webapps/examples/websocket/">
+   html</a> and the server side <a
+   href="http://svn.apache.org/viewvc/tomcat/trunk/webapps/examples/WEB-INF/classes/websocket/">
+   code</a>.</p>
+
+<p>Do keep in mind that the API is fluid and is likely to change, possibly
+   significantly, between point releases. The documentation will be updated once
+   the API is considered stable (unlikely to be until JSR 356 is complete).</p>
+</section>
+
+
+</body>
+</document>
