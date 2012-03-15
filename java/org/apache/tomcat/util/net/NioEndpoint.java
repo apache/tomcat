@@ -1615,7 +1615,7 @@ public class NioEndpoint extends AbstractEndpoint {
                                     if (ka!=null) ka.setComet(false);
                                     socket.getPoller().cancelledKey(key, SocketStatus.ERROR, false);
                                 }
-                                if (socket!=null) nioChannels.offer(socket);
+                                nioChannels.offer(socket);
                                 socket = null;
                                 if ( ka!=null ) keyCache.offer(ka);
                                 ka = null;
@@ -1629,7 +1629,7 @@ public class NioEndpoint extends AbstractEndpoint {
                             ka = (KeyAttachment) key.attachment();
                             socket.getPoller().cancelledKey(key, SocketStatus.DISCONNECT, false);
                         }
-                        if (socket!=null) nioChannels.offer(socket);
+                        nioChannels.offer(socket);
                         socket = null;
                         if ( ka!=null ) keyCache.offer(ka);
                         ka = null;

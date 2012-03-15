@@ -28,17 +28,18 @@ import org.apache.catalina.tribes.group.GroupChannel;
 
 public class TestNonBlockingCoordinator {
 
+    private static final int CHANNEL_COUNT = 10;
+
     private GroupChannel[] channels = null;
     private NonBlockingCoordinator[] coordinators = null;
-    private final int channelCount = 10;
 
     @Before
     public void setUp() throws Exception {
         System.out.println("Setup");
-        channels = new GroupChannel[channelCount];
-        coordinators = new NonBlockingCoordinator[channelCount];
-        Thread[] threads = new Thread[channelCount];
-        for ( int i=0; i<channelCount; i++ ) {
+        channels = new GroupChannel[CHANNEL_COUNT];
+        coordinators = new NonBlockingCoordinator[CHANNEL_COUNT];
+        Thread[] threads = new Thread[CHANNEL_COUNT];
+        for ( int i=0; i<CHANNEL_COUNT; i++ ) {
             channels[i] = new GroupChannel();
             coordinators[i] = new NonBlockingCoordinator();
             channels[i].addInterceptor(coordinators[i]);
@@ -56,10 +57,10 @@ public class TestNonBlockingCoordinator {
                 }
             };
         }
-        for (int i = 0; i < channelCount; i++) {
+        for (int i = 0; i < CHANNEL_COUNT; i++) {
             threads[i].start();
         }
-        for (int i = 0; i < channelCount; i++) {
+        for (int i = 0; i < CHANNEL_COUNT; i++) {
             threads[i].join();
         }
         Thread.sleep(1000);
@@ -68,7 +69,7 @@ public class TestNonBlockingCoordinator {
     @Test
     public void testCoord1() throws Exception {
         int expectedCount = channels[0].getMembers().length;
-        for (int i = 1; i < channelCount; i++) {
+        for (int i = 1; i < CHANNEL_COUNT; i++) {
             assertEquals("Message count expected to be equal.", expectedCount,
                     channels[i].getMembers().length);
         }
@@ -82,7 +83,7 @@ public class TestNonBlockingCoordinator {
                 /* Ignore */
             }
         }
-        for (int i = 0; i < channelCount; i++) {
+        for (int i = 0; i < CHANNEL_COUNT; i++) {
             assertEquals(member, coordinators[i].getCoordinator());
         }
         System.out.println("Coordinator[1] is:" + member);
@@ -93,7 +94,7 @@ public class TestNonBlockingCoordinator {
         Member member = coordinators[1].getCoordinator();
         System.out.println("Coordinator[2a] is:" + member);
         int index = -1;
-        for ( int i=0; i<channelCount; i++ ) {
+        for ( int i=0; i<CHANNEL_COUNT; i++ ) {
             if ( channels[i].getLocalMember(false).equals(member) ) {
                 System.out.println("Shutting down:" + channels[i].getLocalMember(true).toString());
                 channels[i].stop(Channel.DEFAULT);
@@ -109,7 +110,7 @@ public class TestNonBlockingCoordinator {
         }
         System.out.println("Member count:"+channels[index].getMembers().length);
         member = coordinators[index].getCoordinator();
-        for (int i = 1; i < channelCount; i++) {
+        for (int i = 1; i < CHANNEL_COUNT; i++) {
             if (i != dead) {
                 assertEquals(member, coordinators[i].getCoordinator());
             }
@@ -120,7 +121,7 @@ public class TestNonBlockingCoordinator {
     @After
     public void tearDown() throws Exception {
         System.out.println("tearDown");
-        for ( int i=0; i<channelCount; i++ ) {
+        for ( int i=0; i<CHANNEL_COUNT; i++ ) {
             channels[i].stop(Channel.DEFAULT);
         }
     }
