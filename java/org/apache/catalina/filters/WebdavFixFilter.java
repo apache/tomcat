@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.catalina.filters;
 
 import java.io.IOException;
@@ -58,7 +57,6 @@ import javax.servlet.http.HttpServletResponse;
  *   <li>Unknown issue means it doesn't work</li>
  * </ul>
  */
-
 public class WebdavFixFilter implements Filter {
 
     private static final String LOG_MESSAGE_PREAMBLE =

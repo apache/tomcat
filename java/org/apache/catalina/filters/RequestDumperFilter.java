@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.catalina.filters;
 
 import java.io.IOException;
@@ -49,7 +48,6 @@ import org.apache.juli.logging.LogFactory;
  *
  * @author Craig R. McClanahan
  */
-
 public class RequestDumperFilter implements Filter {
 
     private static final String NON_HTTP_REQ_MSG =
@@ -121,9 +119,10 @@ public class RequestDumperFilter implements Filter {
             doLog("       contextPath", hRequest.getContextPath());
             Cookie cookies[] = hRequest.getCookies();
             if (cookies != null) {
-                for (int i = 0; i < cookies.length; i++)
+                for (int i = 0; i < cookies.length; i++) {
                     doLog("            cookie", cookies[i].getName() +
                             "=" + cookies[i].getValue());
+                }
             }
             Enumeration<String> hnames = hRequest.getHeaderNames();
             while (hnames.hasMoreElements()) {
@@ -151,8 +150,9 @@ public class RequestDumperFilter implements Filter {
             StringBuilder result = new StringBuilder(pname);
             result.append('=');
             for (int i = 0; i < pvalues.length; i++) {
-                if (i > 0)
+                if (i > 0) {
                     result.append(", ");
+                }
                 result.append(pvalues[i]);
             }
             doLog("         parameter", result.toString());
@@ -219,8 +219,9 @@ public class RequestDumperFilter implements Filter {
             Iterable<String> rhnames = hResponse.getHeaderNames();
             for (String rhname : rhnames) {
                 Iterable<String> rhvalues = hResponse.getHeaders(rhname);
-                for (String rhvalue : rhvalues)
+                for (String rhvalue : rhvalues) {
                     doLog("            header", rhname + "=" + rhvalue);
+                }
             }
         }
 
@@ -274,8 +275,8 @@ public class RequestDumperFilter implements Filter {
     }
 
     private static final class Timestamp {
-        private Date date = new Date(0);
-        private SimpleDateFormat format =
+        private final Date date = new Date(0);
+        private final SimpleDateFormat format =
             new SimpleDateFormat("dd-MMM-yyyy HH:mm:ss");
         private String dateString = format.format(date);
         private void update() {
