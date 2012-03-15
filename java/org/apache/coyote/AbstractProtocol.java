@@ -533,12 +533,6 @@ public abstract class AbstractProtocol implements ProtocolHandler,
                 SocketStatus status) {
             P processor = connections.remove(socket.getSocket());
 
-            if (getLog().isDebugEnabled()) {
-                getLog().debug("process() entry " +
-                        "Socket: [" + logHashcode(socket.getSocket()) + "], " +
-                        "Processor [" + logHashcode(processor) + "]");
-            }
-
             socket.setAsync(false);
 
             try {
@@ -549,51 +543,20 @@ public abstract class AbstractProtocol implements ProtocolHandler,
                     processor = createProcessor();
                 }
 
-                if (getLog().isDebugEnabled()) {
-                    getLog().debug("process() gotProcessor " +
-                            "Socket: [" + logHashcode(socket.getSocket()) + "], " +
-                            "Processor [" + logHashcode(processor) + "]");
-                }
-
                 initSsl(socket, processor);
 
                 SocketState state = SocketState.CLOSED;
                 do {
                     if (processor.isAsync() || state == SocketState.ASYNC_END) {
                         state = processor.asyncDispatch(status);
-                        if (getLog().isDebugEnabled()) {
-                            getLog().debug("process() asyncDispatch " +
-                                    "Socket: [" + logHashcode(socket.getSocket()) + "], " +
-                                    "Processor: [" + logHashcode(processor) + "], " +
-                                    "State: [" + state.toString() + "]");
-                        }
                     } else if (processor.isComet()) {
                         state = processor.event(status);
-                        if (getLog().isDebugEnabled()) {
-                            getLog().debug("process() event " +
-                                    "Socket: [" + logHashcode(socket.getSocket()) + "], " +
-                                    "Processor: [" + logHashcode(processor) + "], " +
-                                    "State: [" + state.toString() + "]");
-                        }
                     } else {
                         state = processor.process(socket);
-                        if (getLog().isDebugEnabled()) {
-                            getLog().debug("process() process " +
-                                    "Socket: [" + logHashcode(socket.getSocket()) + "], " +
-                                    "Processor: [" + logHashcode(processor) + "], " +
-                                    "State: [" + state.toString() + "]");
-                        }
                     }
     
                     if (state != SocketState.CLOSED && processor.isAsync()) {
                         state = processor.asyncPostProcess();
-                        if (getLog().isDebugEnabled()) {
-                            getLog().debug("process() asyncPostProcess " +
-                                    "Socket: [" + logHashcode(socket.getSocket()) + "], " +
-                                    "Processor: [" + logHashcode(processor) + "], " +
-                                    "State: [" + state.toString() + "]");
-                        }
-
                     }
                 } while (state == SocketState.ASYNC_END);
 
@@ -639,14 +602,6 @@ public abstract class AbstractProtocol implements ProtocolHandler,
             return SocketState.CLOSED;
         }
         
-        private String logHashcode (Object o) {
-            if (o == null) {
-                return "null";
-            } else {
-                return Integer.toString(o.hashCode());
-            }
-        }
-
         protected abstract P createProcessor();
         protected abstract void initSsl(SocketWrapper<S> socket, P processor);
         protected abstract void longPoll(SocketWrapper<S> socket, P processor);
