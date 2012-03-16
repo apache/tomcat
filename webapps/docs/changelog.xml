@@ -105,8 +105,8 @@
         message based APIs are provided and the implementation currently fully
         passes the Autobahn test suite. Also included are several examples.
         A significant contribution to this new functionality was provided by
-        Johno Crawford - particularly the examples. Contributions were also
-        provided by Petr Praus, Jonathan Drake & Slávka. (markt)
+        Johno Crawford &#x2014; particularly the examples. Contributions were
+        also provided by Petr Praus, Jonathan Drake &amp; Slávka. (markt)
       </add>
     </changelog>
   </subsection>
