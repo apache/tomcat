@@ -38,9 +38,10 @@
    not yet finalised and you are encouraged to provide feedback in the form
    of bug reports (via
    <a href="https://issues.apache.org/bugzilla">Bugzilla</a>), suggested API
-   changes (via the <a href="mailto:dev@tomcat.apache.org">dev list</a>) or
-   other comments (again via the <a href="mailto:dev@tomcat.apache.org">dev
-   list</a>).</p>
+   changes (via the
+   <a href="http://tomcat.apache.org/lists.html#tomcat-dev">dev list</a>) or
+   other comments (again via the
+   <a href="http://tomcat.apache.org/lists.html#tomcat-dev">dev list</a>).</p>
 </section>
 
 <section name="Application development">
@@ -48,14 +49,16 @@
    than document something here that will quickly be out of date, please see the
    Javadoc for the
    <a href="api/index.html?org/apache/catalina/websocket/package-summary.html">
-   <code>org.apache.catalina.websocket</code></a> package. To
-   view this locally, you'll need to to install the full-docs package. You can
+   <code>org.apache.catalina.websocket</code></a> package. The Javadoc
+   pages are not included with Tomcat binary distributions. To view them
+   locally you would have to download and install "Full documentation"
+   distributive, or build it from sources. You can
    also read this on the Apache Tomcat website. Start with the
    <a href="api/index.html?org/apache/catalina/websocket/WebSocketServlet.html">
    <code>WebSocketServlet</code></a> class.</p>
 
 <p>There are also several example applications that demonstrate how the
-   WebSocket API can be used. You'll need to look at both the client side <a
+   WebSocket API can be used. You will need to look at both the client side <a
    href="http://svn.apache.org/viewvc/tomcat/trunk/webapps/examples/websocket/">
    html</a> and the server side <a
    href="http://svn.apache.org/viewvc/tomcat/trunk/webapps/examples/WEB-INF/classes/websocket/">
