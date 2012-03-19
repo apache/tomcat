@@ -180,7 +180,10 @@ public class Catalina {
     }
 
     public ClassLoader getParentClassLoader() {
-        return parentClassLoader;
+        if (parentClassLoader != null) {
+            return (parentClassLoader);
+        }
+        return ClassLoader.getSystemClassLoader();
     }
 
     public void setServer(Server server) {
