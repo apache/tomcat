@@ -1088,7 +1088,7 @@ public class RequestFacade implements HttpServletRequest {
 
     /**
      * Sets the response status to {@link
-     * HttpServletResponse.SC_SWITCHING_PROTOCOLS} and flushes the response.
+     * HttpServletResponse#SC_SWITCHING_PROTOCOLS} and flushes the response.
      * Protocol specific headers must have already been set before this method
      * is called.
      *
