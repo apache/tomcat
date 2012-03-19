@@ -113,6 +113,11 @@
         When stopping a Context, ensure that any Servlets registered with JMX
         are unregistered. (markt)
       </fix>
+      <scode>
+        Make the implementation of <code>Catalina.getParentClassLoader</code>
+        consistent with similar methods across the code base and have it return
+        the system class loader if no parent class loader is set. (markt)
+      </scode>
     </changelog>
   </subsection>
   <subsection name="Coyote">
