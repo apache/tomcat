@@ -41,6 +41,7 @@ import java.security.Permission;
 import java.security.PermissionCollection;
 import java.security.Policy;
 import java.security.PrivilegedAction;
+import java.security.ProtectionDomain;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Enumeration;
@@ -1089,16 +1090,24 @@ public class WebappClassLoader
     // ---------------------------------------------------- ClassLoader Methods
 
 
-     /**
-      * Add the specified URL to the classloader.
-      */
+    /**
+     * Add the specified URL to the classloader.
+     */
     @Override
-     protected void addURL(URL url) {
-         super.addURL(url);
-         hasExternalRepositories = true;
-         repositoryURLs = null;
-     }
+    protected void addURL(URL url) {
+        super.addURL(url);
+        hasExternalRepositories = true;
+        repositoryURLs = null;
+    }
 
+
+    /**
+     * Expose this method for use by the unit tests.
+     */
+    protected final Class<?> doDefineClass(String name, byte[] b, int off, int len,
+            ProtectionDomain protectionDomain) {
+        return super.defineClass(name, b, off, len, protectionDomain);
+    }
 
     /**
      * Find the specified class in our local repositories, if possible.  If
@@ -2567,6 +2576,16 @@ public class WebappClassLoader
                 return true;
             }
             cl = cl.getParent();
+        }
+
+        if (o instanceof Collection<?>) {
+            Iterator<?> iter = ((Collection<?>) o).iterator();
+            while (iter.hasNext()) {
+                Object entry = iter.next();
+                if (loadedByThisOrChild(entry)) {
+                    return true;
+                }
+            }
         }
         return false;
     }

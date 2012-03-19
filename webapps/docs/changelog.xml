@@ -97,8 +97,9 @@
       </fix>
       <add>
         <bug>52850</bug>: Extend memory leak prevention and detection code to
-        work with IBM as well as Oracle JVMs. Patch provided by Rohit Kelapure.
-        (markt)
+        work with IBM as well as Oracle JVMs. Extend unit tests to check direct
+        and indirect ThreadLocal memory leak detection. Based on a patch
+        provided by Rohit Kelapure. (markt)
       </add>
       <add>
         Add support for the WebSocket protocol (RFC6455). Both streaming and
