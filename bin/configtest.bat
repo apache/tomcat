@@ -18,7 +18,7 @@ if "%OS%" == "Windows_NT" setlocal
 rem ---------------------------------------------------------------------------
 rem Configuration test script for the CATALINA Server
 rem
-rem $Id$
+rem $Id:$
 rem ---------------------------------------------------------------------------
 
 rem Guess CATALINA_HOME if not defined
