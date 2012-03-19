@@ -93,7 +93,7 @@ rem                   set TITLE=Tomcat.Cluster#1.Server#1 [%DATE% %TIME%]
 rem
 rem
 rem
-rem $Id:$
+rem $Id$
 rem ---------------------------------------------------------------------------
 
 rem Suppress Terminate batch job on CTRL+C
