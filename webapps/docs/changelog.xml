@@ -108,6 +108,10 @@
         Johno Crawford &#x2014; particularly the examples. Contributions were
         also provided by Petr Praus, Jonathan Drake &amp; Slávka. (markt)
       </add>
+      <fix>
+        When stopping a Context, ensure that any Servlets registered with JMX
+        are unregistered. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
