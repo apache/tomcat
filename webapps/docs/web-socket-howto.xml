@@ -52,8 +52,8 @@
    <code>org.apache.catalina.websocket</code></a> package. The Javadoc
    pages are not included with Tomcat binary distributions. To view them
    locally you would have to download and install "Full documentation"
-   distributive, or build it from sources. You can
-   also read this on the Apache Tomcat website. Start with the
+   distribution, or build it from sources. You can
+   also read this on the Apache Tomcat web site. Start with the
    <a href="api/index.html?org/apache/catalina/websocket/WebSocketServlet.html">
    <code>WebSocketServlet</code></a> class.</p>
 
