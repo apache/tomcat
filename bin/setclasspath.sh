@@ -20,7 +20,7 @@
 #  are valid and consistent with the selected start-up options and set up the
 #  endorsed directory.
 #
-#  $Id$
+#  $Id:$
 # -----------------------------------------------------------------------------
 
 # Make sure prerequisite environment variables are set
