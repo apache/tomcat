@@ -39,7 +39,7 @@
 #                   It can also be used to update the XML parser implementation.
 #                   Defaults to $CATALINA_HOME/endorsed.
 #
-# $Id:$
+# $Id$
 # -----------------------------------------------------------------------------
 
 # OS specific support.  $var _must_ be set to either true or false.
