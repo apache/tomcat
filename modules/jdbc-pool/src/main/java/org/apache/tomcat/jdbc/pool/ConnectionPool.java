@@ -634,13 +634,19 @@ public class ConnectionPool {
                 waitcount.decrementAndGet();
             }
             if (maxWait==0 && con == null) { //no wait, return one if we have one
-                throw new SQLException("[" + Thread.currentThread().getName()+"] " +
+                if (jmxPool!=null) {
+                    jmxPool.notify(org.apache.tomcat.jdbc.pool.jmx.ConnectionPool.POOL_EMPTY, "Pool empty - no wait.");
+                }
+                throw new PoolExhaustedException("[" + Thread.currentThread().getName()+"] " +
                         "NoWait: Pool empty. Unable to fetch a connection, none available["+busy.size()+" in use].");
             }
             //we didn't get a connection, lets see if we timed out
             if (con == null) {
                 if ((System.currentTimeMillis() - now) >= maxWait) {
-                    throw new SQLException("[" + Thread.currentThread().getName()+"] " +
+                    if (jmxPool!=null) {
+                        jmxPool.notify(org.apache.tomcat.jdbc.pool.jmx.ConnectionPool.POOL_EMPTY, "Pool empty - timeout.");
+                    }
+                    throw new PoolExhaustedException("[" + Thread.currentThread().getName()+"] " +
                         "Timeout: Pool empty. Unable to fetch a connection in " + (maxWait / 1000) +
                         " seconds, none available[size:"+size.get() +"; busy:"+busy.size()+"; idle:"+idle.size()+"; lastwait:"+timetowait+"].");
                 } else {
