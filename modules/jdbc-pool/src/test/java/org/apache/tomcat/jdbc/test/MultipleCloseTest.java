@@ -18,6 +18,7 @@
 package org.apache.tomcat.jdbc.test;
 
 import java.sql.Connection;
+
 import org.apache.tomcat.jdbc.test.driver.Driver;
 
 public class MultipleCloseTest extends DefaultTestCase {
