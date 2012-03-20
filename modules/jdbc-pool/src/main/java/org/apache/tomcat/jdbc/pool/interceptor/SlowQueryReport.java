@@ -84,6 +84,9 @@ public class SlowQueryReport extends AbstractQueryReport  {
             long delta = now - start;
             QueryStats qs = this.getQueryStats(sql);
             qs.failure(delta, now);
+            if (log.isWarnEnabled()) {
+                log.warn("Failed Query Report SQL="+sql+"; time="+delta+" ms;");
+            }
         }
         return sql;
     }
@@ -94,6 +97,9 @@ public class SlowQueryReport extends AbstractQueryReport  {
         if (this.maxQueries > 0 ) {
             QueryStats qs = this.getQueryStats(sql);
             qs.add(delta, start);
+            if (log.isWarnEnabled()) {
+                log.warn("Slow Query Report SQL="+sql+"; time="+delta+" ms;");
+            }
         }
         return sql;
     }
