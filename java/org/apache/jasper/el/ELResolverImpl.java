@@ -19,43 +19,22 @@ package org.apache.jasper.el;
 
 import java.util.Iterator;
 
-import javax.el.ArrayELResolver;
-import javax.el.BeanELResolver;
-import javax.el.CompositeELResolver;
 import javax.el.ELContext;
 import javax.el.ELException;
 import javax.el.ELResolver;
-import javax.el.ListELResolver;
-import javax.el.MapELResolver;
 import javax.el.PropertyNotFoundException;
 import javax.el.PropertyNotWritableException;
-import javax.el.ResourceBundleELResolver;
 import javax.servlet.jsp.el.VariableResolver;
 
-import org.apache.jasper.Constants;
-
+@Deprecated
 public final class ELResolverImpl extends ELResolver {
-    private static final ELResolver DefaultResolver;
-
-    static {
-        if (Constants.IS_SECURITY_ENABLED) {
-            DefaultResolver = null;
-        } else {
-            DefaultResolver = new CompositeELResolver();
-            ((CompositeELResolver) DefaultResolver).add(new MapELResolver());
-            ((CompositeELResolver) DefaultResolver).add(new ResourceBundleELResolver());
-            ((CompositeELResolver) DefaultResolver).add(new ListELResolver());
-            ((CompositeELResolver) DefaultResolver).add(new ArrayELResolver());
-            ((CompositeELResolver) DefaultResolver).add(new BeanELResolver());
-        }
-    }
 
     private final VariableResolver variableResolver;
     private final ELResolver elResolver;
 
     public ELResolverImpl(VariableResolver variableResolver) {
         this.variableResolver = variableResolver;
-        this.elResolver = getDefaultResolver();
+        this.elResolver = ELContextImpl.getDefaultResolver();
     }
 
     @Override
@@ -157,17 +136,12 @@ public final class ELResolverImpl extends ELResolver {
         return elResolver.getCommonPropertyType(context, base);
     }
 
+    /**
+     * @deprecated  Use {@link ELContextImpl#getDefaultResolver()} instead. This
+     *              method will be removed in Tomcat 8.0.x onwards.
+     */
+    @Deprecated
     public static ELResolver getDefaultResolver() {
-        if (Constants.IS_SECURITY_ENABLED) {
-            CompositeELResolver defaultResolver = new CompositeELResolver();
-            defaultResolver.add(new MapELResolver());
-            defaultResolver.add(new ResourceBundleELResolver());
-            defaultResolver.add(new ListELResolver());
-            defaultResolver.add(new ArrayELResolver());
-            defaultResolver.add(new BeanELResolver());
-            return defaultResolver;
-        } else {
-            return DefaultResolver;
-        }
+        return ELContextImpl.getDefaultResolver();
     }
 }

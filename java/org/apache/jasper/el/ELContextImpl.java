@@ -20,11 +20,19 @@ import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.el.ArrayELResolver;
+import javax.el.BeanELResolver;
+import javax.el.CompositeELResolver;
 import javax.el.ELContext;
 import javax.el.ELResolver;
 import javax.el.FunctionMapper;
+import javax.el.ListELResolver;
+import javax.el.MapELResolver;
+import javax.el.ResourceBundleELResolver;
 import javax.el.ValueExpression;
 import javax.el.VariableMapper;
+
+import org.apache.jasper.Constants;
 
 /**
  * Implementation of ELContext
@@ -62,6 +70,21 @@ public final class ELContextImpl extends ELContext {
 
     }
 
+    private static final ELResolver DefaultResolver;
+
+    static {
+        if (Constants.IS_SECURITY_ENABLED) {
+            DefaultResolver = null;
+        } else {
+            DefaultResolver = new CompositeELResolver();
+            ((CompositeELResolver) DefaultResolver).add(new MapELResolver());
+            ((CompositeELResolver) DefaultResolver).add(new ResourceBundleELResolver());
+            ((CompositeELResolver) DefaultResolver).add(new ListELResolver());
+            ((CompositeELResolver) DefaultResolver).add(new ArrayELResolver());
+            ((CompositeELResolver) DefaultResolver).add(new BeanELResolver());
+        }
+    }
+
     private final ELResolver resolver;
 
     private FunctionMapper functionMapper = NullFunctionMapper;
@@ -69,7 +92,7 @@ public final class ELContextImpl extends ELContext {
     private VariableMapper variableMapper;
 
     public ELContextImpl() {
-        this(ELResolverImpl.getDefaultResolver());
+        this(getDefaultResolver());
     }
 
     public ELContextImpl(ELResolver resolver) {
@@ -102,4 +125,17 @@ public final class ELContextImpl extends ELContext {
         this.variableMapper = variableMapper;
     }
 
+    public static ELResolver getDefaultResolver() {
+        if (Constants.IS_SECURITY_ENABLED) {
+            CompositeELResolver defaultResolver = new CompositeELResolver();
+            defaultResolver.add(new MapELResolver());
+            defaultResolver.add(new ResourceBundleELResolver());
+            defaultResolver.add(new ListELResolver());
+            defaultResolver.add(new ArrayELResolver());
+            defaultResolver.add(new BeanELResolver());
+            return defaultResolver;
+        } else {
+            return DefaultResolver;
+        }
+    }
 }
