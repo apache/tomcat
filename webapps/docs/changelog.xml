@@ -137,6 +137,10 @@
         client breaks the connection before reading all the requested data.
         (markt)
       </fix>
+      <fix>
+        <bug>52926</bug>: Avoid NPE when an NIO Comet connection times out on
+        one thread at the same time as it is closed on another thread. (markt)  
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
