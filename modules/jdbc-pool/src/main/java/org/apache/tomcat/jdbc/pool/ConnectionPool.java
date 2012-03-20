@@ -656,10 +656,8 @@ public class ConnectionPool {
     protected PooledConnection createConnection(long now, PooledConnection notUsed, String username, String password) throws SQLException {
         //no connections where available we'll create one
         PooledConnection con = create(false);
-        if (username!=null) con.getAttributes().put(
-                PooledConnection.PROP_USER, username);
-        if (password!=null) con.getAttributes().put(
-                PooledConnection.PROP_PASSWORD, password);
+        if (username!=null) con.getAttributes().put(PooledConnection.PROP_USER, username);
+        if (password!=null) con.getAttributes().put(PooledConnection.PROP_PASSWORD, password);
         boolean error = false;
         try {
             //connect and validate the connection
