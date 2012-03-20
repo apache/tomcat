@@ -135,13 +135,4 @@ public final class ELResolverImpl extends ELResolver {
         }
         return elResolver.getCommonPropertyType(context, base);
     }
-
-    /**
-     * @deprecated  Use {@link ELContextImpl#getDefaultResolver()} instead. This
-     *              method will be removed in Tomcat 8.0.x onwards.
-     */
-    @Deprecated
-    public static ELResolver getDefaultResolver() {
-        return ELContextImpl.getDefaultResolver();
-    }
 }
