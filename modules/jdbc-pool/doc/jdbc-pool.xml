@@ -46,13 +46,13 @@
       <li>commons-dbcp is complex, over 60 classes. tomcat-jdbc-pool, core is 8 classes, hence modifications for future requirement will require
           much less changes. This is all you need to run the connection pool itself, the rest is gravy.</li>
       <li>commons-dbcp uses static interfaces. This means you can't compile it with JDK 1.6, or if you run on JDK 1.6/1.7 you will get
-          NoSuchMethodException for all the methods not implemented, even if the driver supports it.  </li>
+          <code>NoSuchMethodException</code> for all the methods not implemented, even if the driver supports it.  </li>
       <li>The commons-dbcp has become fairly stagnant. Sparse updates, releases, and new feature support.</li>
       <li>It's not worth rewriting over 60 classes, when something as a connection pool can be accomplished with as a much simpler implementation.</li>
       <li>Tomcat jdbc pool implements a fairness option not available in commons-dbcp and still performs faster than commons-dbcp</li>
       <li>Tomcat jdbc pool implements the ability retrieve a connection asynchronously, without adding additional threads to the library itself</li>
       <li>Tomcat jdbc pool is a Tomcat module, it depends on Tomcat JULI, a simplified logging framework used in Tomcat.</li>
-      <li>Retrieve the underlying connection using the javax.sql.PooledConnection interface.</li>
+      <li>Retrieve the underlying connection using the <code>javax.sql.PooledConnection</code> interface.</li>
       <li>Starvation proof. If a pool is empty, and threads are waiting for a connection, when a connection is returned,
           the pool will awake the correct thread waiting. Most pools will simply starve.</li>
     </ol>
@@ -61,7 +61,7 @@
   <p>Features added over other connection pool implementations
     <ol>
       <li>Support for highly concurrent environments and multi core/cpu systems.</li>
-      <li>Dynamic implementation of interface, will support java.sql and javax.sql interfaces for
+      <li>Dynamic implementation of interface, will support <code>java.sql</code> and <code>javax.sql</code> interfaces for
           your runtime environment (as long as your JDBC driver does the same), even when compiled with a lower version of the JDK.</li>
       <li>Validation intervals - we don't have to validate every single time we use the connection, we can do this
           when we borrow or return the connection, just not more frequent than an interval we can configure.</li>
@@ -70,18 +70,19 @@
       <li>Ability to configure custom interceptors.
           This allows you to write custom interceptors to enhance the functionality. You can use interceptors to gather query stats,
           cache session states, reconnect the connection upon failures, retry queries, cache query results, and so on.
-          Your options are endless and the interceptors are dynamic, not tied to a JDK version of a java.sql/javax.sql interface.</li>
+          Your options are endless and the interceptors are dynamic, not tied to a JDK version of a 
+          <code>java.sql</code>/<code>javax.sql</code> interface.</li>
       <li>High performance - we will show some differences in performance later on</li>
       <li>Extremely simple, due to the very simplified implementation, the line count and source file count are very low, compare with c3p0
           that has over 200 source files(last time we checked), Tomcat jdbc has a core of 8 files, the connection pool itself is about half
           that. As bugs may occur, they will be faster to track down, and easier to fix. Complexity reduction has been a focus from inception.</li>
-      <li>Asynchronous connection retrieval - you can queue your request for a connection and receive a Future&lt;Connection&gt; back.</li>
+      <li>Asynchronous connection retrieval - you can queue your request for a connection and receive a <code>Future&lt;Connection&gt;</code> back.</li>
       <li>Better idle connection handling. Instead of closing connections directly, it can still pool connections and sizes the idle pool with a smarter algorithm.</li>
       <li>You can decide at what moment connections are considered abandoned, is it when the pool is full, or directly at a timeout
           by specifying a pool usage threshold.
       </li>
       <li>The abandon connection timer will reset upon a statement/query activity. Allowing a connections that is in use for a long time to not timeout.
-          This is achieved using the ResetAbandonedTimer
+          This is achieved using the <code>ResetAbandonedTimer</code>
       </li>
       <li>Close connections after they have been connected for a certain time. Age based close upon return to the pool.
       </li>
@@ -161,20 +162,22 @@
   <attributes>
 
     <attribute name="defaultAutoCommit" required="false">
-      <p>(boolean) The default auto-commit state of connections created by this pool. If not set, default is JDBC driver default (If not set then the setAutoCommit method will not be called.)</p>
+      <p>(boolean) The default auto-commit state of connections created by this pool. If not set, default is JDBC driver default (If not set then the <code>setAutoCommit</code> method will not be called.)</p>
     </attribute>
 
     <attribute name="defaultReadOnly" required="false">
-      <p>(boolean) The default read-only state of connections created by this pool. If not set then the setReadOnly method will not be called. (Some drivers don't support read only mode, ex: Informix)</p>
+      <p>(boolean) The default read-only state of connections created by this pool. If not set then the <code>setReadOnly</code> method will not be called. (Some drivers don't support read only mode, ex: Informix)</p>
     </attribute>
 
     <attribute name="defaultTransactionIsolation" required="false">
-      <p>(String) The default TransactionIsolation state of connections created by this pool. One of the following: (see javadoc )<br/>
-         * NONE<br/>
-         * READ_COMMITTED<br/>
-         * READ_UNCOMMITTED<br/>
-         * REPEATABLE_READ<br/>
-         * SERIALIZABLE<br/>
+      <p>(String) The default TransactionIsolation state of connections created by this pool. One of the following: (see javadoc )
+         <ul>
+           <li><code>NONE</code></li>
+           <li><code>READ_COMMITTED</code></li>
+           <li><code>READ_UNCOMMITTED</code></li>
+           <li><code>REPEATABLE_READ</code></li>
+           <li><code>SERIALIZABLE</code></li>
+         </ul>
          If not set, the method will not be called and it defaults to the JDBC driver.
       </p>
     </attribute>
@@ -236,16 +239,15 @@
     <attribute name="testOnBorrow" required="false">
       <p>(boolean) The indication of whether objects will be validated before being borrowed from the pool.
          If the object fails to validate, it will be dropped from the pool, and we will attempt to borrow another.
-         NOTE - for a true value to have any effect, the validationQuery parameter must be set to a non-null string.
-         Default value is false
-         In order to have a more efficient validation, see <code>validationInterval</code>
+         NOTE - for a true value to have any effect, the <code>validationQuery</code> parameter must be set to a non-null string.
+         In order to have a more efficient validation, see <code>validationInterval</code>.
          Default value is <code>false</code>
       </p>
     </attribute>
 
     <attribute name="testOnReturn" required="false">
       <p>(boolean) The indication of whether objects will be validated before being returned to the pool.
-         NOTE - for a true value to have any effect, the validationQuery parameter must be set to a non-null string.
+         NOTE - for a true value to have any effect, the <code>validationQuery</code> parameter must be set to a non-null string.
          The default value is <code>false</code>.
       </p>
     </attribute>
@@ -253,7 +255,7 @@
     <attribute name="testWhileIdle" required="false">
       <p>(boolean) The indication of whether objects will be validated by the idle object evictor (if any).
          If an object fails to validate, it will be dropped from the pool.
-         NOTE - for a true value to have any effect, the validationQuery parameter must be set to a non-null string.
+         NOTE - for a true value to have any effect, the <code>validationQuery</code> parameter must be set to a non-null string.
          The default value is <code>false</code> and this property has to be set in order for the
          pool cleaner/test thread is to run (also see <code>timeBetweenEvictionRunsMillis</code>)
       </p>
@@ -261,7 +263,7 @@
 
     <attribute name="validationQuery" required="false">
       <p>(String) The SQL query that will be used to validate connections from this pool before returning them to the caller.
-         If specified, this query does not have to return any data, it just can't throw a SQLException.
+         If specified, this query does not have to return any data, it just can't throw a <code>SQLException</code>.
          The default value is <code>null</code>.
          Example values are <code>SELECT 1</code>(mysql), <code>select 1 from dual</code>(oracle), <code>SELECT 1</code>(MS Sql Server)
       </p>
@@ -304,7 +306,7 @@
     <attribute name="removeAbandoned" required="false">
       <p>(boolean) Flag to remove abandoned connections if they exceed the <code>removeAbandonedTimout</code>.
          If set to true a connection is considered abandoned and eligible for removal if it has been in use
-         longer than the <code>removeAbandonedTimeout</code> Setting this to true can recover db connections from
+         longer than the <code>removeAbandonedTimeout</code> Setting this to <code>true</code> can recover db connections from
          applications that fail to close a connection. See also <code>logAbandoned</code>
          The default value is <code>false</code>.</p>
     </attribute>
@@ -329,11 +331,11 @@
     </attribute>
 
     <attribute name="poolPreparedStatements" required="false">
-      <p>(boolean) Property not used. The default value is <code>false</code>.</p>
+      <p>(boolean) Property not used.</p>
     </attribute>
 
     <attribute name="maxOpenPreparedStatements" required="false">
-      <p>(int) Property not used. The default value is <code>false</code>.</p>
+      <p>(int) Property not used.</p>
     </attribute>
 
   </attributes>
@@ -354,8 +356,9 @@
          These interceptors will be inserted as an interceptor into the chain of operations on a <code>java.sql.Connection</code> object.
          The default value is <code>null</code>.<br/>
          Predefined interceptors:<br/>
-         org.apache.tomcat.jdbc.pool.interceptor.ConnectionState - keeps track of auto commit, read only, catalog and transaction isolation level.<br/>
-         org.apache.tomcat.jdbc.pool.interceptor.StatementFinalizer - keeps track of opened statements, and closes them when the connection is returned to the pool.<br/>
+         <code>org.apache.tomcat.jdbc.pool.interceptor.ConnectionState</code> - keeps track of auto commit, read only, catalog and transaction isolation level.<br/>
+         <code>org.apache.tomcat.jdbc.pool.interceptor.StatementFinalizer</code> - keeps track of opened statements, and closes them when the connection is returned to the pool.<br/>
+         More predefined interceptors are described in detail in the <a href="#JDBC_interceptors">JDBC Interceptors section</a>.<br/>
       </p>
     </attribute>
 
@@ -377,7 +380,7 @@
          This flag is required when you want to use asynchronous connection retrieval.<br/>
          Setting this flag ensures that threads receive connections in the order they arrive.<br/>
          During performance tests, there is a very large difference in how locks
-         and lock waiting is implemented. When <code>fairQueue=true></code>
+         and lock waiting is implemented. When <code>fairQueue=true</code>
          there is a decision making process based on what operating system the system is running.
          If the system is running on Linux (property <code>os.name=Linux</code>.
          To disable this Linux specific behavior and still use the fair queue, simply add the property
@@ -465,18 +468,18 @@
     of the results from a method invokation as well. You could build query performance analyzer that provides JMX notifications when a
     query is running longer than the expected time.</p>
   </subsection>
-  <subsection name="JDBC interceptors">
+  <subsection name="Configuring JDBC interceptors">
     <p>Configuring JDBC interceptors is done using the <b>jdbcInterceptors</b> property.
-    The property contains a list of semi colon separated class names. If the classname if not fully qualified it will be prefixed with the
+    The property contains a list of semi colon separated class names. If the classname is not fully qualified it will be prefixed with the
     <code>org.apache.tomcat.jdbc.pool.interceptor.</code> prefix.<br/>
     Example:<br/>
-    <code>
+      <code>
       jdbcInterceptors=&quot;org.apache.tomcat.jdbc.pool.interceptor.ConnectionState;org.apache.tomcat.jdbc.pool.interceptor.StatementFinalizer&quot;
+      </code>
       <br/>
       is the same as
       <br/>
-      jdbcInterceptors=&quot;ConnectionState;StatementFinalizer&quot;
-    </code><br/>
+      <code> jdbcInterceptors=&quot;ConnectionState;StatementFinalizer&quot;</code><br/>
     Interceptors can have properties as well. These would be configured within the paranthesis of the class names.
     Example:<br/>
     <code>
@@ -518,7 +521,7 @@
     </attributes>
   </subsection>
   <subsection name="org.apache.tomcat.jdbc.pool.interceptor.QueryTimeoutInterceptor">
-    <p>Automatically calls java.sql.Statement.setQueryTimeout(seconds) when a new statement is created.
+    <p>Automatically calls <code>java.sql.Statement.setQueryTimeout(seconds)</code> when a new statement is created.
        The pool itself doesn't timeout the query, it is still up to the JDBC driver to enforce query timeouts.
     </p>
     <attributes>
@@ -551,11 +554,11 @@
        for monitoring tools to react to. Inherits all the attributes from its parent class.
        This class uses Tomcat's JMX engine so it wont work outside of the Tomcat container.
        By default, JMX notifications are sent through the ConnectionPool mbean if it is enabled.
-       The SlowQueryReportJmx can also register an MBean if <code>notifyPool=false</code>
+       The <code>SlowQueryReportJmx</code> can also register an MBean if <code>notifyPool=false</code>
     </p>
     <attributes>
       <attribute name="notifyPool" required="false">
-        <p>(boolean as String) Set to false if you want JMX notifications to go to the SlowQueryReportJmx MBean
+        <p>(boolean as String) Set to false if you want JMX notifications to go to the <code>SlowQueryReportJmx</code> MBean
            The default value is <code>true</code>.
         </p>
       </attribute>
@@ -671,9 +674,11 @@
   <subsection name="Asynchronous Connection Retrieval">
     <p> The Tomcat JDBC connection pool supports asynchronous connection retrieval without adding additional threads to the
         pool library. It does this by adding a method to the data source called <code>Future&lt;Connection&gt; getConnectionAsync()</code>.
-        In order to use the async retrieval, two conditions must be met:<br/>
-        1. You must configure the <code>fairQueue</code> property to be <code>true</code>.<br/>
-        2. You will have to cast the data source to <code>org.apache.tomcat.jdbc.pool.DataSource</code><br/>
+        In order to use the async retrieval, two conditions must be met:
+        <ol>
+          <li>You must configure the <code>fairQueue</code> property to be <code>true</code>.</li>
+          <li>You will have to cast the data source to <code>org.apache.tomcat.jdbc.pool.DataSource</code></li>
+        </ol>
         An example of using the async feature is show below.
       <source>
 
@@ -697,7 +702,7 @@
   <subsection name="Interceptors">
     <p>Interceptors are a powerful way to enable, disable or modify functionality on a specific connection or its sub components.
        There are many different use cases for when interceptors are useful. By default, and for performance reasons, the connection pool is stateless.
-       The only state the pool itself inserts are <code>defaultAutoCommit, defaultReadOnly, defaultTransactionIsolation, defaultCatalog</code> if
+       The only state the pool itself inserts are <code>defaultAutoCommit</code>, <code>defaultReadOnly</code>, <code>defaultTransactionIsolation</code>, <code>defaultCatalog</code> if
        these are set. These 4 properties are only set upon connection creation. Should these properties be modified during the usage of the connection,
        the pool itself will not reset them.</p>
     <p>An interceptor has to extend the <code>org.apache.tomcat.jdbc.pool.JdbcInterceptor</code> class. This class is fairly simple,
