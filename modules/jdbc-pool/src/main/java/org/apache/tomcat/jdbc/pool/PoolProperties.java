@@ -86,6 +86,7 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
     protected boolean alternateUsernameAllowed = false;
     protected boolean commitOnReturn = false;
     protected boolean rollbackOnReturn = false;
+    protected boolean useDisposableConnectionFacade;
 
 
     /**
@@ -1194,4 +1195,29 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
     public boolean getRollbackOnReturn() {
         return this.rollbackOnReturn;
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setUseDisposableConnectionFacade(boolean useDisposableConnectionFacade) {
+        this.useDisposableConnectionFacade = useDisposableConnectionFacade;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean getUseDisposableConnectionFacade() {
+        return useDisposableConnectionFacade;
+    }
+
+    @Override
+    protected Object clone() throws CloneNotSupportedException {
+        // TODO Auto-generated method stub
+        return super.clone();
+    }
+
+
+
 }

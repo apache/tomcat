@@ -821,4 +821,18 @@ public interface PoolConfiguration {
      */
     public boolean getRollbackOnReturn();
 
+    /**
+     * If set to true, the connection will be wrapped with facade that will disallow the connection to be used after
+     * {@link java.sql.Connection#close()} is called. If set to true, after {@link java.sql.Connection#close()} all calls except
+     * {@link java.sql.Connection#close()} and {@link java.sql.Connection#isClosed()} will throw an exception.
+     * @param useDisposableConnectionFacade
+     */
+    public void setUseDisposableConnectionFacade(boolean useDisposableConnectionFacade);
+    /**
+     * Returns true if this connection pool is configured to use a connection facade to prevent re-use of connection after
+     * {@link java.sql.Connection#close()} has been invoked
+     * @return true if {@link java.sql.Connection#close()} has been invoked.
+     */
+    public boolean getUseDisposableConnectionFacade();
+
 }

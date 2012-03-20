@@ -777,5 +777,22 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
         return getPoolProperties().getRollbackOnReturn();
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setUseDisposableConnectionFacade(boolean useDisposableConnectionFacade) {
+        getPoolProperties().setUseDisposableConnectionFacade(useDisposableConnectionFacade);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean getUseDisposableConnectionFacade() {
+        return getPoolProperties().getUseDisposableConnectionFacade();
+    }
+
+
 
 }

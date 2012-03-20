@@ -1226,4 +1226,20 @@ public class DataSourceProxy implements PoolConfiguration {
         return getPoolProperties().getRollbackOnReturn();
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setUseDisposableConnectionFacade(boolean useDisposableConnectionFacade) {
+        getPoolProperties().setUseDisposableConnectionFacade(useDisposableConnectionFacade);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean getUseDisposableConnectionFacade() {
+        return getPoolProperties().getUseDisposableConnectionFacade();
+    }
+
 }
