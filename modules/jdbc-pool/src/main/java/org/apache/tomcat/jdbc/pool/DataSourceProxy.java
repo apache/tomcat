@@ -47,7 +47,7 @@ public class DataSourceProxy implements PoolConfiguration {
 
     protected volatile ConnectionPool pool = null;
 
-    protected PoolConfiguration poolProperties = null;
+    protected volatile PoolConfiguration poolProperties = null;
 
     public DataSourceProxy() {
         this(new PoolProperties());
