@@ -420,6 +420,9 @@ public class PooledConnection {
                 this.lastValidated = now;
                 return true;
             } else {
+                if (getPoolProperties().getLogValidationErrors()) {
+                    log.error("Custom validation through "+poolProperties.getValidator()+" failed.");
+                }
                 return false;
             }
         }
@@ -441,9 +444,12 @@ public class PooledConnection {
             stmt.close();
             this.lastValidated = now;
             return true;
-        } catch (Exception ignore) {
-            if (log.isDebugEnabled())
-                log.debug("Unable to validate object:",ignore);
+        } catch (Exception ex) {
+            if (getPoolProperties().getLogValidationErrors()) {
+                log.warn("SQL Validation error", ex);
+            } else if (log.isDebugEnabled()) {
+                log.debug("Unable to validate object:",ex);
+            }
             if (stmt!=null)
                 try { stmt.close();} catch (Exception ignore2){/*NOOP*/}
         }
