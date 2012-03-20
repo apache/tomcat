@@ -41,7 +41,7 @@ public final class ExpressionEvaluatorImpl extends ExpressionEvaluator {
             FunctionMapper fMapper) throws ELException {
         try {
             ELContextImpl ctx =
-                new ELContextImpl(ELResolverImpl.getDefaultResolver());
+                new ELContextImpl(ELContextImpl.getDefaultResolver());
             if (fMapper != null) {
                 ctx.setFunctionMapper(new FunctionMapperImpl(fMapper));
             }
