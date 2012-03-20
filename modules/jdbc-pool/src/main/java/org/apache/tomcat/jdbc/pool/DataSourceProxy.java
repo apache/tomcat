@@ -540,7 +540,7 @@ public class DataSourceProxy implements PoolConfiguration {
      * {@link javax.sql.DataSource#getParentLogger}
      */
     public Logger getParentLogger() throws SQLFeatureNotSupportedException {
-	throw new SQLFeatureNotSupportedException();
+        throw new SQLFeatureNotSupportedException();
     }
 
     /**
