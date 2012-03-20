@@ -70,7 +70,7 @@ public abstract class JdbcInterceptor implements InvocationHandler {
     /**
      * The next interceptor in the chain
      */
-    private JdbcInterceptor next = null;
+    private volatile JdbcInterceptor next = null;
     /**
      * Property that decides how we do string comparison, default is to use
      * {@link String#equals(Object)}. If set to <code>false</code> then the

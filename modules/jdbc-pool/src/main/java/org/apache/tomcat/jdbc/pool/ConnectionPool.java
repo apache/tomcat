@@ -312,7 +312,12 @@ public class ConnectionPool {
             getProxyConstructor(con.getXAConnection() != null);
             //create the proxy
             //TODO possible optimization, keep track if this connection was returned properly, and don't generate a new facade
-            Connection connection = (Connection)proxyClassConstructor.newInstance(new Object[] { handler });
+            Connection connection = null;
+            if (getPoolProperties().getUseDisposableConnectionFacade() ) {
+                connection = (Connection)proxyClassConstructor.newInstance(new Object[] { new DisposableConnectionFacade(handler) });
+            } else {
+                connection = (Connection)proxyClassConstructor.newInstance(new Object[] {handler});
+            }
             //return the connection
             return connection;
         }catch (Exception x) {
