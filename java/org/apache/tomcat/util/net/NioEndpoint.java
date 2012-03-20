@@ -718,6 +718,9 @@ public class NioEndpoint extends AbstractEndpoint {
     public boolean processSocket(NioChannel socket, SocketStatus status, boolean dispatch) {
         try {
             KeyAttachment attachment = (KeyAttachment)socket.getAttachment(false);
+            if (attachment == null) {
+                return false;
+            }
             attachment.setCometNotify(false); //will get reset upon next reg
             SocketProcessor sc = processorCache.poll();
             if ( sc == null ) sc = new SocketProcessor(socket,status);
