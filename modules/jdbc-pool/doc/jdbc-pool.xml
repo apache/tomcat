@@ -70,7 +70,7 @@
       <li>Ability to configure custom interceptors.
           This allows you to write custom interceptors to enhance the functionality. You can use interceptors to gather query stats,
           cache session states, reconnect the connection upon failures, retry queries, cache query results, and so on.
-          Your options are endless and the interceptors are dynamic, not tied to a JDK version of a 
+          Your options are endless and the interceptors are dynamic, not tied to a JDK version of a
           <code>java.sql</code>/<code>javax.sql</code> interface.</li>
       <li>High performance - we will show some differences in performance later on</li>
       <li>Extremely simple, due to the very simplified implementation, the line count and source file count are very low, compare with c3p0
@@ -455,7 +455,7 @@
       </p>
     </attribute>
     <attribute name="useDisposableConnectionFacade" required="false">
-      <p>(boolean) Set this to true if you wish to put a facade on your connection so that it cannot be reused after it has been closed. This prevents a thread holding on to a 
+      <p>(boolean) Set this to true if you wish to put a facade on your connection so that it cannot be reused after it has been closed. This prevents a thread holding on to a
                    reference of a connection it has already called closed on, to execute queries on it. Default value is <code>false</code> for backwards compatibility.
       </p>
     </attribute>
