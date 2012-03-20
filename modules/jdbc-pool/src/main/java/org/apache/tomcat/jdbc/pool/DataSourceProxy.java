@@ -19,9 +19,11 @@ package org.apache.tomcat.jdbc.pool;
 import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.sql.SQLFeatureNotSupportedException;
 import java.util.Iterator;
 import java.util.Properties;
 import java.util.concurrent.Future;
+import java.util.logging.Logger;
 
 import javax.sql.XAConnection;
 
@@ -531,6 +533,14 @@ public class DataSourceProxy implements PoolConfiguration {
     @Override
     public void setUseEquals(boolean useEquals) {
         this.getPoolProperties().setUseEquals(useEquals);
+    }
+
+    /**
+     * no-op
+     * {@link javax.sql.DataSource#getParentLogger}
+     */
+    public Logger getParentLogger() throws SQLFeatureNotSupportedException {
+	throw new SQLFeatureNotSupportedException();
     }
 
     /**
