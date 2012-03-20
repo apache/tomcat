@@ -835,4 +835,16 @@ public interface PoolConfiguration {
      */
     public boolean getUseDisposableConnectionFacade();
 
+    /**
+     * Set to true if you wish that errors from validation should be logged as error messages.
+     * @param logValidationErrors set to true to log validation errors
+     */
+    public void setLogValidationErrors(boolean logValidationErrors);
+
+    /**
+     * Returns true if errors that happen during validation will be logged
+     * @return true if errors that happen during validation will be logged
+     */
+    public boolean getLogValidationErrors();
+
 }

@@ -1252,4 +1252,20 @@ public class DataSourceProxy implements PoolConfiguration {
         return getPoolProperties().getUseDisposableConnectionFacade();
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setLogValidationErrors(boolean logValidationErrors) {
+        getPoolProperties().setLogValidationErrors(logValidationErrors);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean getLogValidationErrors() {
+        return getPoolProperties().getLogValidationErrors();
+    }
+
 }

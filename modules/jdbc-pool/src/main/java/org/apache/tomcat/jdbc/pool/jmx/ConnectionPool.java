@@ -794,6 +794,24 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
         return getPoolProperties().getUseDisposableConnectionFacade();
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setLogValidationErrors(boolean logValidationErrors) {
+        getPoolProperties().setLogValidationErrors(logValidationErrors);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean getLogValidationErrors() {
+        return getPoolProperties().getLogValidationErrors();
+    }
+
+
+
 
 
 }
