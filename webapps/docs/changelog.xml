@@ -90,6 +90,10 @@
         <code>javax.naming.Name</code> to identify the resource rather than a
         <code>java.lang.String</code>. (markt)
       </fix>
+      <add>
+        <bug>52839</bug>: Add a unit test for DigestAuthenticator and
+        SingleSignOn. Patch provide by Brian Burch. (markt)
+      </add>
       <fix>
         <bug>52846</bug>: Make sure NonLoginAuthenticator registers not 
         MemoryUser but GenericPrincipal into a session when UserDatabaseRealm 
