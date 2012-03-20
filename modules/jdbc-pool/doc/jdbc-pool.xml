@@ -135,7 +135,8 @@
       <code>org.apache.tomcat.jdbc.pool.DataSource</code> object will then register the actual
       connection pool MBean.
       If you're running outside of a container, you can register the DataSource yourself under any object name you specify,
-      and it propagates the registration to the underlying pool.
+      and it propagates the registration to the underlying pool. To do this you would call <code>mBeanServer.registerMBean(dataSource.getPool().getJmxPool(),objectname)</code>.
+      Prior to this call, ensure that the pool has been created by calling <code>dataSource.createPool()</code>.
     </p>
   </subsection>
 
