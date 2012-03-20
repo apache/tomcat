@@ -446,11 +446,21 @@
       </p>
     </attribute>
     <attribute name="dataSource" required="false">
-      <p>(javax.sql.DataSource)
+      <p>(javax.sql.DataSource) Inject a data source to the connection pool, and the pool will use the data source to retrieve connections instead of establishing them using the <code>java.sql.Driver</code> interface.
+         This is useful when you wish to pool XA connections or connections established using a data source instead of a connection string. Default value is <code>null</code>
       </p>
     </attribute>
     <attribute name="dataSourceJNDI" required="false">
-      <p>(String)
+      <p>(String) The JNDI name for a data source to be looked up in JNDI and then used to establish connections to the database. See the <code>dataSource</code> attribute. Default value is <code>null</code>
+      </p>
+    </attribute>
+    <attribute name="useDisposableConnectionFacade" required="false">
+      <p>(boolean) Set this to true if you wish to put a facade on your connection so that it cannot be reused after it has been closed. This prevents a thread holding on to a 
+                   reference of a connection it has already called closed on, to execute queries on it. Default value is <code>false</code> for backwards compatibility.
+      </p>
+    </attribute>
+    <attribute name="logValidationErrors" required="false">
+      <p>(boolean) Set this to true to log errors during the validation phase to the log file. If set to true, errors will be logged as SEVERE. Default value is <code>false</code> for backwards compatibility.
       </p>
     </attribute>
   </attributes>
