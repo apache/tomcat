@@ -33,6 +33,7 @@ import org.apache.catalina.tribes.ChannelException;
 import org.apache.catalina.tribes.ChannelListener;
 import org.apache.catalina.tribes.ChannelMessage;
 import org.apache.catalina.tribes.Member;
+import org.apache.catalina.tribes.TesterUtil;
 import org.apache.catalina.tribes.group.ChannelInterceptorBase;
 import org.apache.catalina.tribes.group.GroupChannel;
 import org.apache.catalina.tribes.group.InterceptorPayload;
@@ -77,6 +78,7 @@ public class TestOrderInterceptor {
                 }
             };
         }
+        TesterUtil.addRandomDomain(channels);
         for ( int i=0; i<channelCount; i++ ) threads[i].start();
         for ( int i=0; i<channelCount; i++ ) threads[i].join();
         Thread.sleep(1000);

@@ -29,7 +29,9 @@ import org.junit.Test;
 
 import org.apache.catalina.tribes.Channel;
 import org.apache.catalina.tribes.ChannelListener;
+import org.apache.catalina.tribes.ManagedChannel;
 import org.apache.catalina.tribes.Member;
+import org.apache.catalina.tribes.TesterUtil;
 import org.apache.catalina.tribes.group.GroupChannel;
 
 /**
@@ -54,6 +56,7 @@ public class TestRemoteProcessException {
         channel2 = new GroupChannel();
         listener1 = new Listener();
         channel2.addChannelListener(listener1);
+        TesterUtil.addRandomDomain(new ManagedChannel[] {channel1, channel2});
         channel1.start(Channel.DEFAULT);
         channel2.start(Channel.DEFAULT);
     }

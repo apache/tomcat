@@ -33,6 +33,7 @@ import org.apache.catalina.tribes.Channel;
 import org.apache.catalina.tribes.ChannelListener;
 import org.apache.catalina.tribes.ManagedChannel;
 import org.apache.catalina.tribes.Member;
+import org.apache.catalina.tribes.TesterUtil;
 import org.apache.catalina.tribes.transport.ReplicationTransmitter;
 
 public class TestGroupChannelSenderConnections extends LoggingBaseTest {
@@ -51,6 +52,7 @@ public class TestGroupChannelSenderConnections extends LoggingBaseTest {
             channels[i].addChannelListener(listeners[i]);
             channels[i].start(Channel.SND_RX_SEQ|Channel.SND_TX_SEQ);
         }
+        TesterUtil.addRandomDomain(channels);
     }
 
     public void sendMessages(long delay, long sleep) throws Exception {
