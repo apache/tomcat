@@ -24,6 +24,7 @@ import org.junit.Test;
 
 import org.apache.catalina.tribes.Channel;
 import org.apache.catalina.tribes.Member;
+import org.apache.catalina.tribes.TesterUtil;
 import org.apache.catalina.tribes.group.GroupChannel;
 
 public class TestNonBlockingCoordinator {
@@ -57,6 +58,7 @@ public class TestNonBlockingCoordinator {
                 }
             };
         }
+        TesterUtil.addRandomDomain(channels);
         for (int i = 0; i < CHANNEL_COUNT; i++) {
             threads[i].start();
         }
