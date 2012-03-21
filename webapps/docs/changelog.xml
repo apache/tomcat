@@ -122,6 +122,13 @@
         consistent with similar methods across the code base and have it return
         the system class loader if no parent class loader is set. (markt)
       </scode>
+      <fix>
+        <bug>52953</bug>: Ensure users can authenticate when using DIGEST
+        authentication with digested passwords if the digested password is
+        stored using upper case hexadecimal characters since DIGEST
+        authentication expects digests to use lower case characters. Based on a
+        patch provided by Neale Rudd. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
