@@ -31,7 +31,9 @@ import org.junit.Test;
 import org.apache.catalina.tribes.Channel;
 import org.apache.catalina.tribes.ChannelListener;
 import org.apache.catalina.tribes.ChannelReceiver;
+import org.apache.catalina.tribes.ManagedChannel;
 import org.apache.catalina.tribes.Member;
+import org.apache.catalina.tribes.TesterUtil;
 import org.apache.catalina.tribes.group.GroupChannel;
 import org.apache.catalina.tribes.group.interceptors.MessageDispatch15Interceptor;
 import org.apache.catalina.tribes.group.interceptors.ThroughputInterceptor;
@@ -67,6 +69,7 @@ public class TestMulticastPackages {
         rb1.setUdpPort(50000);
         rb2.setUdpPort(50000);
         channel2.addChannelListener(listener1);
+        TesterUtil.addRandomDomain(new ManagedChannel[] {channel1, channel2});
         channel1.start(Channel.DEFAULT);
         channel2.start(Channel.DEFAULT);
     }

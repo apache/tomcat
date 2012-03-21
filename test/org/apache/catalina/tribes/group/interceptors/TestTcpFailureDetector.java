@@ -31,6 +31,7 @@ import org.apache.catalina.tribes.ChannelException;
 import org.apache.catalina.tribes.ManagedChannel;
 import org.apache.catalina.tribes.Member;
 import org.apache.catalina.tribes.MembershipListener;
+import org.apache.catalina.tribes.TesterUtil;
 import org.apache.catalina.tribes.group.GroupChannel;
 
 /**
@@ -65,6 +66,7 @@ public class TestTcpFailureDetector {
         channel2.addInterceptor(tcpFailureDetector2);
         channel1.addMembershipListener(mbrlist1);
         channel2.addMembershipListener(mbrlist2);
+        TesterUtil.addRandomDomain(new ManagedChannel[] {channel1, channel2});
     }
 
     public void clear() {
