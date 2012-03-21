@@ -129,6 +129,10 @@
         authentication expects digests to use lower case characters. Based on a
         patch provided by Neale Rudd. (markt)
       </fix>
+      <fix>
+        <bug>52958</bug>: Fix MBean descriptors for
+        <code>org.apache.catalina.realm</code> package. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
