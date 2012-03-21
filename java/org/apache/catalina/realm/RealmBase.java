@@ -27,6 +27,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.Principal;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
+import java.util.Locale;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -381,7 +382,8 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
                                   String qop, String realm,
                                   String md5a2) {
 
-        String md5a1 = getDigest(username, realm);
+        // In digest auth, digests are always lower case
+        String md5a1 = getDigest(username, realm).toLowerCase(Locale.ENGLISH);
         if (md5a1 == null)
             return null;
         String serverDigestValue;
