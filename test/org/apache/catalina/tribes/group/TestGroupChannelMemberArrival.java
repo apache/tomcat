@@ -138,9 +138,21 @@ public class TestGroupChannelMemberArrival {
 
         private void report(String event, Member member, int count) {
             StringBuilder message = new StringBuilder(100);
-            message.append(System.currentTimeMillis()).append(' ').append(name)
-                    .append(':').append(event).append(", has ").append(count)
-                    .append(" members now. Member:[");
+            message.append(System.currentTimeMillis());
+            message.append(' ');
+            message.append(name);
+            message.append(':');
+            message.append(event);
+            message.append(", has ");
+            message.append(count);
+            message.append(" members now. Member:[");
+            message.append("host: ");
+            appendByteArrayToString(message, member.getHost());
+            message.append(", port: ");
+            message.append(member.getPort());
+            message.append(", id: ");
+            appendByteArrayToString(message, member.getUniqueId());
+            message.append(", payload: ");
             try {
                 message.append(new String(member.getPayload(), "ASCII"));
             } catch (Exception x) {
@@ -150,6 +162,19 @@ public class TestGroupChannelMemberArrival {
             message.append("]; Thread:").append(t.getName()).append(", hash:")
                     .append(t.hashCode());
             System.out.println(message);
+        }
+
+        private void appendByteArrayToString(StringBuilder sb, byte[] input) {
+            if (input == null) {
+                sb.append("null");
+                return;
+            }
+            for (int i = 0; i < input.length; i++) {
+                if (i > 0) {
+                    sb.append('.');
+                }
+                sb.append(input[i] & 0xFF);
+            }
         }
     }
 
