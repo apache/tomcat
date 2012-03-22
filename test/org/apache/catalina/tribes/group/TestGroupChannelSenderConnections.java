@@ -50,9 +50,11 @@ public class TestGroupChannelSenderConnections extends LoggingBaseTest {
             channels[i].getMembershipService().setPayload( ("Channel-" + (i + 1)).getBytes("ASCII"));
             listeners[i] = new TestMsgListener( ("Listener-" + (i + 1)));
             channels[i].addChannelListener(listeners[i]);
-            channels[i].start(Channel.SND_RX_SEQ|Channel.SND_TX_SEQ);
         }
         TesterUtil.addRandomDomain(channels);
+        for (int i = 0; i < channels.length; i++) {
+            channels[i].start(Channel.SND_RX_SEQ|Channel.SND_TX_SEQ);
+        }
     }
 
     public void sendMessages(long delay, long sleep) throws Exception {
