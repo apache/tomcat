@@ -91,8 +91,7 @@ request.setAttribute("tomcat7ExamplesUrl", "/examples/");
                 </div>
                 <div class="col25">
                     <div class="container">
-                        <p><a href="${tomcat7ExamplesUrl}servlets/">Servlet Examples</a></p>
-                        <p><a href="${tomcat7ExamplesUrl}jsp/">JSP Examples</a></p>
+                        <p><a href="${tomcat7ExamplesUrl}">Examples</a></p>
                     </div>
                 </div>
                 <div class="col25">
