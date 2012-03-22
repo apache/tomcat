@@ -963,7 +963,6 @@ public class NioEndpoint extends AbstractEndpoint {
             // exit, otherwise parallel closure of sockets which are still
             // in the poller can cause problems
             close = true;
-            events.clear();
             selector.wakeup();
         }
 
@@ -998,6 +997,9 @@ public class NioEndpoint extends AbstractEndpoint {
             if ( r==null) r = new PollerEvent(socket,null,interestOps);
             else r.reset(socket,null,interestOps);
             addEvent(r);
+            if (close) {
+                processSocket(socket, SocketStatus.STOP, false);
+            }
         }
 
         /**
@@ -1113,12 +1115,15 @@ public class NioEndpoint extends AbstractEndpoint {
                         }
                     }
 
-                    boolean hasEvents = events();
+                    boolean hasEvents = false;
 
                     // Time to terminate?
                     if (close) {
+                        events();
                         timeout(0, false);
                         break;
+                    } else {
+                        hasEvents = events();
                     }
                     try {
                         if ( !close ) {
@@ -1132,6 +1137,7 @@ public class NioEndpoint extends AbstractEndpoint {
                             wakeupCounter.set(0);
                         }
                         if (close) {
+                            events();
                             timeout(0, false);
                             selector.close();
                             break;
