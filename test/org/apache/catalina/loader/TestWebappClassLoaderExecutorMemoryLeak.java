@@ -49,7 +49,8 @@ public class TestWebappClassLoaderExecutorMemoryLeak extends TomcatBaseTest {
             ((StandardContext) ctx).setClearReferencesStopThreads(true);
         }
 
-        Tomcat.addServlet(ctx, "taskServlet", new ExecutorServlet());
+        ExecutorServlet executorServlet = new ExecutorServlet();
+        Tomcat.addServlet(ctx, "taskServlet", executorServlet);
         ctx.addServletMapping("/", "taskServlet");
 
         tomcat.start();
@@ -67,8 +68,8 @@ public class TestWebappClassLoaderExecutorMemoryLeak extends TomcatBaseTest {
             // ignore
         }
 
-        Assert.assertTrue(ExecutorServlet.tpe.isShutdown());
-        Assert.assertTrue(ExecutorServlet.tpe.isTerminated());
+        Assert.assertTrue(executorServlet.tpe.isShutdown());
+        Assert.assertTrue(executorServlet.tpe.isTerminated());
     }
 
     static class ExecutorServlet extends HttpServlet {
@@ -79,7 +80,7 @@ public class TestWebappClassLoaderExecutorMemoryLeak extends TomcatBaseTest {
         long n = 1000L;
         int tpSize = 10;
 
-        public static ThreadPoolExecutor tpe;
+        public volatile ThreadPoolExecutor tpe;
 
         @Override
         protected void doGet(HttpServletRequest req, HttpServletResponse resp)

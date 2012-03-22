@@ -1578,7 +1578,9 @@ public abstract class ContainerBase extends LifecycleMBeanBase
 
         @Override
         public Void call() throws LifecycleException {
-            child.stop();
+            if (child.getState().isAvailable()) {
+                child.stop();
+            }
             return null;
         }
     }
