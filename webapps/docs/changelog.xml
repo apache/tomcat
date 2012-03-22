@@ -130,6 +130,10 @@
         patch provided by Neale Rudd. (markt)
       </fix>
       <fix>
+        <bug>52957</bug>: Ensure that a Valve implements Lifecycle before
+        calling any Lifecycle methods on that Valve. (markt)
+      </fix>
+      <fix>
         <bug>52958</bug>: Fix MBean descriptors for
         <code>org.apache.catalina.realm</code> package. (markt)
       </fix>
