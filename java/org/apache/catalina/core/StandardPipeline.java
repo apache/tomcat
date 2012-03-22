@@ -432,20 +432,20 @@ public class StandardPipeline extends LifecycleBase
         if (valve instanceof Contained)
             ((Contained) valve).setContainer(null);
 
-        // Stop this valve if necessary
-        if (getState().isAvailable()) {
-            if (valve instanceof Lifecycle) {
+        if (valve instanceof Lifecycle) {
+            // Stop this valve if necessary
+            if (getState().isAvailable()) {
                 try {
                     ((Lifecycle) valve).stop();
                 } catch (LifecycleException e) {
                     log.error("StandardPipeline.removeValve: stop: ", e);
                 }
             }
-        }
-        try {
-            ((Lifecycle) valve).destroy();
-        } catch (LifecycleException e) {
-            log.error("StandardPipeline.removeValve: destroy: ", e);
+            try {
+                ((Lifecycle) valve).destroy();
+            } catch (LifecycleException e) {
+                log.error("StandardPipeline.removeValve: destroy: ", e);
+            }
         }
 
         container.fireContainerEvent(Container.REMOVE_VALVE_EVENT, valve);
