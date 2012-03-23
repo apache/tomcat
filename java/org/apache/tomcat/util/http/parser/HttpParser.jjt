@@ -119,7 +119,7 @@ void Value() #Value : { Token t = null; }
 
 <IN_QUOTED_TEXT> TOKEN :
 {
-  < #QUOTED_TEXT :   (("\\" (<QUOTED_TEXT_CHAR> | "\"")) | <QUOTED_TEXT_CHAR>)* >
+  < #QUOTED_TEXT :   (<QUOTED_TEXT_CHAR> | ("\\" <CHAR> ))* >
 | < #END_QUOTE :     "\"" >
 | < #QUOTED_TEXT_CHAR:
      [
@@ -127,6 +127,11 @@ void Value() #Value : { Token t = null; }
      "\u0020"-"\u0021",
      "\u0023"-"\u005b",
      "\u005d"-"\u00ff"
+     ]
+  >
+| < #CHAR:
+     [
+     "\u0000"-"\u007f"
      ]
   >
 }
