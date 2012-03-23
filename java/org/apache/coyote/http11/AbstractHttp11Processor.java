@@ -61,14 +61,6 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
     protected static final StringManager sm =
         StringManager.getManager(Constants.Package);
 
-    /**
-     * Intended for use by the Upgrade sub-classes that have no need to
-     * initialise the request, response, etc.
-     */
-    protected AbstractHttp11Processor() {
-        // NOOP
-    }
-
     /*
      * Tracks how many internal filters are in the filter library so they
      * are skipped when looking for pluggable filters.
