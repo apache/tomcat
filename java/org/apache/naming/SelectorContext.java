@@ -21,7 +21,6 @@ package org.apache.naming;
 import java.util.Hashtable;
 
 import javax.naming.Binding;
-import javax.naming.CompositeName;
 import javax.naming.Context;
 import javax.naming.Name;
 import javax.naming.NameClassPair;
@@ -773,9 +772,8 @@ public class SelectorContext implements Context {
             if (name.get(0).equals(prefix)) {
                 return name.getSuffix(1);
             } else {
-                Name result = new CompositeName();
-                result.add(name.get(0).substring(prefixLength));
-                result.addAll(name.getSuffix(1));
+                Name result = name.getSuffix(1);
+                result.add(0, name.get(0).substring(prefixLength));
                 return result;
             }
         } else {
