@@ -62,15 +62,6 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
     // ----------------------------------------------------------- Constructors
 
 
-    /**
-     * Intended for use by the Upgrade sub-classes that have no need to
-     * initialise the request, response, etc.
-     */
-    protected Http11NioProcessor() {
-        // NOOP
-    }
-
-
     public Http11NioProcessor(int maxHttpHeaderSize, NioEndpoint endpoint,
             int maxTrailerSize) {
 
