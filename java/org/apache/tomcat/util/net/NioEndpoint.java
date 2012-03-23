@@ -1121,6 +1121,12 @@ public class NioEndpoint extends AbstractEndpoint {
                     if (close) {
                         events();
                         timeout(0, false);
+                        try {
+                            selector.close();
+                        } catch (IOException ioe) {
+                            log.error(sm.getString(
+                                    "endpoint.nio.selectorCloseFail"), ioe);
+                        }
                         break;
                     } else {
                         hasEvents = events();
@@ -1139,7 +1145,12 @@ public class NioEndpoint extends AbstractEndpoint {
                         if (close) {
                             events();
                             timeout(0, false);
-                            selector.close();
+                            try {
+                                selector.close();
+                            } catch (IOException ioe) {
+                                log.error(sm.getString(
+                                        "endpoint.nio.selectorCloseFail"), ioe);
+                            }
                             break;
                         }
                     } catch ( NullPointerException x ) {
