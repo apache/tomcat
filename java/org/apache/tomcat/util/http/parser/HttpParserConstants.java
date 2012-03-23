@@ -36,6 +36,8 @@ public interface HttpParserConstants {
   int END_QUOTE = 12;
   /** RegularExpression Id. */
   int QUOTED_TEXT_CHAR = 13;
+  /** RegularExpression Id. */
+  int CHAR = 14;
 
   /** Lexical state. */
   int DEFAULT = 0;
@@ -58,6 +60,7 @@ public interface HttpParserConstants {
     "<QUOTED_TEXT>",
     "\"\\\"\"",
     "<QUOTED_TEXT_CHAR>",
+    "<CHAR>",
   };
 
 }

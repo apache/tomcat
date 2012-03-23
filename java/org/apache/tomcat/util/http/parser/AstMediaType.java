@@ -21,6 +21,9 @@ package org.apache.tomcat.util.http.parser;
  * by <a href="http://javacc.java.net/doc/JJTree.html"> JJTree</a>.
  */
 public class AstMediaType extends SimpleNode {
+
+    private static final String CHARSET = "charset";
+
     public AstMediaType(int id) {
         super(id);
     }
@@ -33,10 +36,10 @@ public class AstMediaType extends SimpleNode {
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append(children[0].toString());
-        sb.append("/");
+        sb.append('/');
         sb.append(children[1].toString());
         for (int i = 2; i < children.length; i++) {
-            sb.append(";");
+            sb.append(';');
             sb.append(children[i].toString());
         }
         return sb.toString();
@@ -45,12 +48,13 @@ public class AstMediaType extends SimpleNode {
     public String toStringNoCharset() {
         StringBuilder sb = new StringBuilder();
         sb.append(children[0].toString());
-        sb.append("/");
+        sb.append('/');
         sb.append(children[1].toString());
         for (int i = 2; i < children.length; i++) {
             AstParameter p = (AstParameter) children[i];
-            if (!"charset".equals(p.children[0].jjtGetValue())) {
-                sb.append(";");
+            if (!CHARSET.equals(
+                    p.children[0].jjtGetValue().toString().toLowerCase())) {
+                sb.append(';');
                 sb.append(p.toString());
             }
         }
@@ -60,7 +64,8 @@ public class AstMediaType extends SimpleNode {
     public String getCharset() {
         for (int i = 2; i < children.length; i++) {
             AstParameter p = (AstParameter) children[i];
-            if ("charset".equals(p.children[0].jjtGetValue())) {
+            if (CHARSET.equals(
+                    p.children[0].jjtGetValue().toString().toLowerCase())) {
                 return p.children[1].jjtGetValue().toString();
             }
         }
