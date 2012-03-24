@@ -124,7 +124,7 @@ public class TestMethodExpressionImpl {
                 me3.invoke(context, new Object[] { "JUnit2" }));
         assertEquals("Hello JUnit from B",
                 me2.invoke(context, new Object[] { null }));
-        assertEquals("Hello null from B",
+        assertEquals("Hello  from B",
                 me3.invoke(context, new Object[] { null }));
     }
 
