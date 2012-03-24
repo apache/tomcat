@@ -23,7 +23,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import javax.el.ELException;
 import javax.el.MethodNotFoundException;
+
+import org.apache.el.lang.ELSupport;
 
 
 /**
@@ -106,12 +109,14 @@ public class ReflectionUtil {
      * @param base the object that owns the method
      * @param property the name of the method
      * @param paramTypes the parameter types to use
+     * @param paramValues the parameter values
      * @return the method specified
      * @throws MethodNotFoundException
      */
     @SuppressWarnings("null")
     public static Method getMethod(Object base, Object property,
-            Class<?>[] paramTypes) throws MethodNotFoundException {
+            Class<?>[] paramTypes, Object[] paramValues)
+            throws MethodNotFoundException {
         if (base == null || property == null) {
             throw new MethodNotFoundException(MessageFactory.get(
                     "error.method.notfound", base, property,
@@ -163,15 +168,30 @@ public class ReflectionUtil {
                     Class<?> varType = mParamTypes[i].getComponentType();
                     for (int j = i; j < paramCount; j++) {
                         if (!isAssignableFrom(paramTypes[j], varType)) {
-                            break;
+                            if (paramValues == null) {
+                                noMatch = true;
+                                break;
+                            } else {
+                                if (!isCoercibleFrom(paramValues[j], varType)) {
+                                    noMatch = true;
+                                    break;
+                                }
+                            }
                         }
                         // Don't treat a varArgs match as an exact match, it can
                         // lead to a varArgs method matching when the result
                         // should be ambiguous
                     }
                 } else if (!isAssignableFrom(paramTypes[i], mParamTypes[i])) {
-                    noMatch = true;
-                    break;
+                    if (paramValues == null) {
+                        noMatch = true;
+                        break;
+                    } else {
+                        if (!isCoercibleFrom(paramValues[i], mParamTypes[i])) {
+                            noMatch = true;
+                            break;
+                        }
+                    }
                 }
             }
             if (noMatch) {
@@ -297,6 +317,17 @@ public class ReflectionUtil {
             targetClass = target;
         }
         return targetClass.isAssignableFrom(src);
+    }
+
+    private static boolean isCoercibleFrom(Object src, Class<?> target) {
+        // TODO: This isn't pretty but it works. Significant refactoring would
+        //       be required to avoid the exception.
+        try {
+            ELSupport.coerceToType(src, target);
+        } catch (ELException e) {
+            return false;
+        }
+        return true;
     }
 
     protected static final String paramString(Class<?>[] types) {
