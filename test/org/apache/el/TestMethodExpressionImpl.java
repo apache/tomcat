@@ -75,6 +75,10 @@ public class TestMethodExpressionImpl {
         TesterBeanC beanC = new TesterBeanC();
         context.getVariableMapper().setVariable("beanC",
                 factory.createValueExpression(beanC, TesterBeanC.class));
+
+        TesterBeanEnum beanEnum = new TesterBeanEnum();
+        context.getVariableMapper().setVariable("beanEnum",
+                factory.createValueExpression(beanEnum, TesterBeanEnum.class));
     }
 
     @Test
@@ -120,7 +124,7 @@ public class TestMethodExpressionImpl {
                 me3.invoke(context, new Object[] { "JUnit2" }));
         assertEquals("Hello JUnit from B",
                 me2.invoke(context, new Object[] { null }));
-        assertEquals("Hello null from B",
+        assertEquals("Hello  from B",
                 me3.invoke(context, new Object[] { null }));
     }
 
@@ -413,4 +417,17 @@ public class TestMethodExpressionImpl {
         assertEquals("Hello from BB", actual);
     }
 
+    @Test
+    public void testBug52970() {
+        MethodExpression me = factory.createMethodExpression(context,
+                "${beanEnum.submit('APPLE')}", null ,
+                new Class<?>[] { TesterBeanEnum.class });
+        me.invoke(context, null);
+
+        ValueExpression ve = factory.createValueExpression(context,
+                "#{beanEnum.lastSubmitted}", TesterEnum.class);
+        TesterEnum actual = (TesterEnum) ve.getValue(context);
+        assertEquals(TesterEnum.APPLE, actual);
+
+    }
 }

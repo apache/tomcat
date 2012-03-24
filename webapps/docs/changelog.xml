@@ -181,6 +181,10 @@
         <bug>52776</bug>: Refactor the code so JspFragment.invoke cleans up
         after itself. Patch provided by Karl von Randow. (markt)
       </fix>
+      <fix>
+        <bug>52970</bug>: Take account of coercion rules when invoking methods
+        via EL. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">
