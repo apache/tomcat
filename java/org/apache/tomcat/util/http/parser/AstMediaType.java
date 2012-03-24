@@ -52,8 +52,8 @@ public class AstMediaType extends SimpleNode {
         sb.append(children[1].toString());
         for (int i = 2; i < children.length; i++) {
             AstParameter p = (AstParameter) children[i];
-            if (!CHARSET.equals(
-                    p.children[0].jjtGetValue().toString().toLowerCase())) {
+            if (!CHARSET.equalsIgnoreCase(
+                    p.children[0].jjtGetValue().toString())) {
                 sb.append(';');
                 sb.append(p.toString());
             }
@@ -64,8 +64,8 @@ public class AstMediaType extends SimpleNode {
     public String getCharset() {
         for (int i = 2; i < children.length; i++) {
             AstParameter p = (AstParameter) children[i];
-            if (CHARSET.equals(
-                    p.children[0].jjtGetValue().toString().toLowerCase())) {
+            if (CHARSET.equalsIgnoreCase(
+                    p.children[0].jjtGetValue().toString())) {
                 return p.children[1].jjtGetValue().toString();
             }
         }
