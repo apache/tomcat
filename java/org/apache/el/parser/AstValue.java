@@ -230,7 +230,8 @@ public final class AstValue extends SimpleNode {
             @SuppressWarnings("rawtypes") Class[] paramTypes)
             throws ELException {
         Target t = getTarget(ctx);
-        Method m = ReflectionUtil.getMethod(t.base, t.property, paramTypes);
+        Method m = ReflectionUtil.getMethod(
+                t.base, t.property, paramTypes, null);
         return new MethodInfo(m.getName(), m.getReturnType(), m
                 .getParameterTypes());
     }
@@ -244,19 +245,20 @@ public final class AstValue extends SimpleNode {
         Target t = getTarget(ctx);
         Method m = null;
         Object[] values = null;
+        Class<?>[] types = null;
         if (isParametersProvided()) {
             values = ((AstMethodParameters) this.jjtGetChild(
                     this.jjtGetNumChildren() - 1)).getParameters(ctx);
-            Class<?>[] types = getTypesFromValues(values);
-            m = ReflectionUtil.getMethod(t.base, t.property, types);
+            types = getTypesFromValues(values);
         } else {
-            m = ReflectionUtil.getMethod(t.base, t.property, paramTypes);
             values = paramValues;
+            types = paramTypes;
         }
-        if (m.isVarArgs()) {
-            // May need to convert values
-            values = toVarArgs(values, m);
-        }
+        m = ReflectionUtil.getMethod(t.base, t.property, types, values);
+
+        // Handle varArgs and any co-ercion required
+        values = convertArgs(values, m);
+
         Object result = null;
         try {
             result = m.invoke(t.base, values);
@@ -277,17 +279,34 @@ public final class AstValue extends SimpleNode {
         return result;
     }
 
-    private Object[] toVarArgs(Object[] src, Method m) {
-        int paramCount = m.getParameterTypes().length;
+    private Object[] convertArgs(Object[] src, Method m) {
+        Class<?>[] types = m.getParameterTypes();
+        if (types.length == 0) {
+            return new Object[0];
+        }
+
+        int paramCount = types.length;
 
         Object[] dest = new Object[paramCount];
-        Object[] varArgs = (Object[]) Array.newInstance(
-                m.getParameterTypes()[paramCount - 1].getComponentType(),
-                src.length - (paramCount - 1));
-        System.arraycopy(src, 0, dest, 0, paramCount - 1);
-        System.arraycopy(src, paramCount - 1, varArgs, 0,
-                src.length - (paramCount - 1));
-        dest[paramCount - 1] = varArgs;
+
+        for (int i = 0; i < paramCount - 1; i++) {
+            dest[i] = ELSupport.coerceToType(src[i], types[i]);
+        }
+
+        if (m.isVarArgs()) {
+            Object[] varArgs = (Object[]) Array.newInstance(
+                    m.getParameterTypes()[paramCount - 1].getComponentType(),
+                    src.length - (paramCount - 1));
+            for (int i = 0; i < src.length - (paramCount - 1); i ++) {
+                varArgs[i] = ELSupport.coerceToType(src[paramCount - 1 + i],
+                        types[paramCount - 1].getComponentType());
+            }
+            dest[paramCount - 1] = varArgs;
+        } else {
+            dest[paramCount - 1] = ELSupport.coerceToType(
+                    src[paramCount - 1], types[paramCount - 1]);
+        }
+
         return dest;
     }
 
