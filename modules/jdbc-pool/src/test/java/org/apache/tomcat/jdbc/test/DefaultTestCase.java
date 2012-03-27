@@ -87,9 +87,16 @@ public class DefaultTestCase extends TestCase {
                     get = PoolProperties.class.getMethod(name, new Class[0]);
                 }catch (NoSuchMethodException x) {
                     try {
-                    get = PoolProperties.class.getMethod(bname, new Class[0]);
+                        get = PoolProperties.class.getMethod(bname, new Class[0]);
                     }catch (NoSuchMethodException x2) {
-                        System.err.println(x2.getMessage());
+                        String msg = x2.getMessage();
+                        if (msg.indexOf("isPoolPreparedStatements")>=0) {
+                            //noop - ignore known missing properties
+                        } else if (msg.indexOf("isMaxOpenPreparedStatements")>=0) {
+                            //noop - ignore known missing properties
+                        } else {
+                            System.err.println("Missing property:"+x2.getMessage());
+                        }
                     }
                 }
                    if (get!=null) {
