@@ -61,6 +61,10 @@ public abstract class JdbcInterceptor implements InvocationHandler {
      */
     public static final String ISWRAPPERFOR_VAL = "isWrapperFor";
 
+    /**
+     * {@link java.sql.Connection#isValid(boolean)} method name
+     */
+    public static final String ISVALID_VAL = "isValid";
 
     /**
      * Properties for this interceptor.
