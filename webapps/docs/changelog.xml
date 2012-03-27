@@ -142,6 +142,11 @@
         <bug>52958</bug>: Fix MBean descriptors for
         <code>org.apache.catalina.realm</code> package. (markt)
       </fix>
+      <fix>
+        <bug>52974</bug>: Fix <code>NameNotFoundException</code> when
+        field/method is annotated with <code>@Resource</code> annotation. Patch
+        provided by Violet Agg. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
