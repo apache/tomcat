@@ -463,6 +463,11 @@
       <p>(boolean) Set this to true to log errors during the validation phase to the log file. If set to true, errors will be logged as SEVERE. Default value is <code>false</code> for backwards compatibility.
       </p>
     </attribute>
+    <attribute name="propagateInterruptState" required="false">
+      <p>(boolean) Set this to true to propagate the interrupt state for a thread that has been interrupted (not clearing the interrupt state). Default value is <code>false</code> for backwards compatibility.
+      </p>
+    </attribute>
+    
   </attributes>
   </subsection>
 </section>

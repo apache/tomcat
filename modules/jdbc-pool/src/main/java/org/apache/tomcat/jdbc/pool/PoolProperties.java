@@ -88,6 +88,7 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
     protected boolean rollbackOnReturn = false;
     protected boolean useDisposableConnectionFacade = true;
     protected boolean logValidationErrors = false;
+    protected boolean propagateInterruptState = false;
 
 
     /**
@@ -1227,6 +1228,22 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
     @Override
     public boolean getLogValidationErrors() {
         return this.logValidationErrors;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean getPropagateInterruptState() {
+        return propagateInterruptState;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setPropagateInterruptState(boolean propagateInterruptState) {
+        this.propagateInterruptState = propagateInterruptState;
     }
 
     @Override
