@@ -26,6 +26,8 @@ import org.apache.tomcat.jdbc.pool.PoolProperties;
  * @version 1.0
  */
 public class DefaultProperties extends PoolProperties {
+    private static final long serialVersionUID = 1L;
+
     public DefaultProperties() {
         dbProperties = new Properties();
 
