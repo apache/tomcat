@@ -223,7 +223,9 @@
       </fix>
       <fix>
         <bug>52002</bug> (<rev>1302948</rev>):
-        Add in configuration option to disallow connection reuse. (fhanik)
+        Add in configuration option to disallow connection reuse. 
+        (<rev>1305862</rev>):
+        useDisposableConnectionFacade is by default enabled (fhanik)
       </fix>
       <fix>
         <bug>52493</bug> (<rev>1302969</rev>):
