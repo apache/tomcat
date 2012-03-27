@@ -1268,4 +1268,20 @@ public class DataSourceProxy implements PoolConfiguration {
         return getPoolProperties().getLogValidationErrors();
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean getPropagateInterruptState() {
+        return getPoolProperties().getPropagateInterruptState();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setPropagateInterruptState(boolean propagateInterruptState) {
+        getPoolProperties().setPropagateInterruptState(propagateInterruptState);
+    }
+
 }

@@ -30,6 +30,7 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.jdbc.pool.PoolConfiguration;
 import org.apache.tomcat.jdbc.pool.PoolProperties.InterceptorDefinition;
+import org.apache.tomcat.jdbc.pool.PoolExhaustedException;
 import org.apache.tomcat.jdbc.pool.PoolUtilities;
 import org.apache.tomcat.jdbc.pool.Validator;
 
@@ -811,6 +812,21 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
     }
 
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean getPropagateInterruptState() {
+        return getPoolProperties().getPropagateInterruptState();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setPropagateInterruptState(boolean propagateInterruptState) {
+        getPoolProperties().setPropagateInterruptState(propagateInterruptState);
+    }
 
 
 

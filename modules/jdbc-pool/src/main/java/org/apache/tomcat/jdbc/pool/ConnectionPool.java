@@ -381,7 +381,9 @@ public class ConnectionPool {
                     }
                 } //while
             } catch (InterruptedException ex) {
-                Thread.interrupted();
+                if (!getPoolProperties().getPropagateInterruptState()) {
+                    Thread.interrupted();
+                }
             }
             if (pool.size()==0 && force && pool!=busy) pool = busy;
         }
@@ -626,7 +628,9 @@ public class ConnectionPool {
                 //retrieve an existing connection
                 con = idle.poll(timetowait, TimeUnit.MILLISECONDS);
             } catch (InterruptedException ex) {
-                Thread.interrupted();//clear the flag, and bail out
+                if (!getPoolProperties().getPropagateInterruptState()) {
+                    Thread.interrupted();
+                }
                 SQLException sx = new SQLException("Pool wait interrupted.");
                 sx.initCause(ex);
                 throw sx;
