@@ -467,7 +467,7 @@
       <p>(boolean) Set this to true to propagate the interrupt state for a thread that has been interrupted (not clearing the interrupt state). Default value is <code>false</code> for backwards compatibility.
       </p>
     </attribute>
-    
+
   </attributes>
   </subsection>
 </section>
