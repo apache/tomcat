@@ -456,7 +456,7 @@
     </attribute>
     <attribute name="useDisposableConnectionFacade" required="false">
       <p>(boolean) Set this to true if you wish to put a facade on your connection so that it cannot be reused after it has been closed. This prevents a thread holding on to a
-                   reference of a connection it has already called closed on, to execute queries on it. Default value is <code>false</code> for backwards compatibility.
+                   reference of a connection it has already called closed on, to execute queries on it. Default value is <code>true</code>.
       </p>
     </attribute>
     <attribute name="logValidationErrors" required="false">
