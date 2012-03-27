@@ -42,14 +42,16 @@ public class DisposableConnectionFacade extends JdbcInterceptor {
 
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-        if (compare(ISCLOSED_VAL, method) && getNext() == null) {
-            return Boolean.TRUE;
-        }
-        if (compare(CLOSE_VAL, method) && getNext() == null) {
-            return null;
-        }
-        if (compare(ISVALID_VAL, method) && getNext() == null) {
-            return Boolean.FALSE;
+        if (getNext()==null) {
+            if (compare(ISCLOSED_VAL, method)) {
+                return Boolean.TRUE;
+            }
+            else if (compare(CLOSE_VAL, method)) {
+                return null;
+            }
+            else if (compare(ISVALID_VAL, method)) {
+                return Boolean.FALSE;
+            }
         }
 
         try {
