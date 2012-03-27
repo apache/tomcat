@@ -48,6 +48,9 @@ public class DisposableConnectionFacade extends JdbcInterceptor {
         if (compare(CLOSE_VAL, method) && getNext() == null) {
             return null;
         }
+        if (compare(ISVALID_VAL, method) && getNext() == null) {
+            return Boolean.FALSE;
+        }
 
         try {
             return super.invoke(proxy, method, args);
@@ -56,7 +59,7 @@ public class DisposableConnectionFacade extends JdbcInterceptor {
                 if (compare(TOSTRING_VAL, method)) {
                     return "DisposableConnectionFacade[null]";
                 }
-                throw new SQLException("Connection has already been closed.");
+                throw new SQLException("PooledConnection has already been closed.");
             }
 
             throw e;

@@ -86,7 +86,7 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
     protected boolean alternateUsernameAllowed = false;
     protected boolean commitOnReturn = false;
     protected boolean rollbackOnReturn = false;
-    protected boolean useDisposableConnectionFacade = false;
+    protected boolean useDisposableConnectionFacade = true;
     protected boolean logValidationErrors = false;
 
 
