@@ -239,6 +239,11 @@
         <bug>50860</bug> (<rev>1303031</rev>):
         Add in option to configure logging for validation errors. (fhanik)
       </fix>
+      <fix>
+        <bug>52066</bug> (<rev>1305931</rev>):
+        Add in configuration option, progagateInterruptState, to allow threads to 
+        retain the interrupt state. (fhanik)
+      </fix>  
     </changelog>
   </subsection>
   <subsection name="Other">
