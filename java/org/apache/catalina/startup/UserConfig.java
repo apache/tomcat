@@ -20,7 +20,11 @@ package org.apache.catalina.startup;
 
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.Host;
@@ -258,14 +262,24 @@ public final class UserConfig
             return;
         }
 
+        ExecutorService executor = host.getStartStopExecutor();
+        List<Future<?>> results = new ArrayList<Future<?>>();
+
         // Deploy the web application (if any) for each defined user
         Enumeration<String> users = database.getUsers();
         while (users.hasMoreElements()) {
             String user = users.nextElement();
             String home = database.getHome(user);
-            deploy(user, home);
+            results.add(executor.submit(new DeployUserDirectory(this, user, home)));
         }
 
+        for (Future<?> result : results) {
+            try {
+                result.get();
+            } catch (Exception e) {
+                host.getLogger().error(sm.getString("userConfig.deploy.threaded.error"), e);
+            }
+        }
     }
 
 
@@ -334,5 +348,22 @@ public final class UserConfig
 
     }
 
+    private static class DeployUserDirectory implements Runnable {
+
+        private UserConfig config;
+        private String user;
+        private String home;
+
+        public DeployUserDirectory(UserConfig config, String user, String home) {
+            this.config = config;
+            this.user = user;
+            this.home= home;
+        }
+
+        @Override
+        public void run() {
+            config.deploy(user, home);
+        }
+    }
 
 }

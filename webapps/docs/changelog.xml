@@ -147,6 +147,9 @@
         field/method is annotated with <code>@Resource</code> annotation. Patch
         provided by Violet Agg. (markt)
       </fix>
+      <add>
+        Add support for multi-thread deployment in UserConfig. (kfujino)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
