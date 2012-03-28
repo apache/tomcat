@@ -173,6 +173,10 @@
         <bug>52926</bug>: Avoid NPE when an NIO Comet connection times out on
         one thread at the same time as it is closed on another thread. (markt)  
       </fix>
+      <add>
+        Include port number when known in connector name when loggin messages
+        from connectors that use automatic free port allocation. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Jasper">
