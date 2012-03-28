@@ -171,10 +171,11 @@ public class TestRegistration extends TomcatBaseTest {
         } else {
             protocol = "bio";
         }
+        String index = getTomcatInstance().getConnector().getProperty("nameIndex").toString();
         ArrayList<String> expected = new ArrayList<String>(Arrays.asList(basicMBeanNames()));
         expected.addAll(Arrays.asList(hostMBeanNames("localhost")));
         expected.addAll(Arrays.asList(contextMBeanNames("localhost", contextName)));
-        expected.addAll(Arrays.asList(connectorMBeanNames("auto-1", protocol)));
+        expected.addAll(Arrays.asList(connectorMBeanNames("auto-" + index, protocol)));
         expected.addAll(Arrays.asList(optionalMBeanNames("localhost")));
 
         // Did we find all expected MBeans?
