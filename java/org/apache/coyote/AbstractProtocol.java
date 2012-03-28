@@ -263,9 +263,14 @@ public abstract class AbstractProtocol implements ProtocolHandler,
         }
         int port = getPort();
         if (port == 0) {
-            // auto binding is in use so port is unknown at this point
+            // Auto binding is in use. Check if port is known
             name.append("auto-");
             name.append(getNameIndex());
+            port = getLocalPort();
+            if (port != -1) {
+                name.append('-');
+                name.append(port);
+            }
         } else {
             name.append(port);
         }
