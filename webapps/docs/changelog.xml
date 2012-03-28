@@ -177,6 +177,11 @@
         Include port number when known in connector name when loggin messages
         from connectors that use automatic free port allocation. (markt)
       </add>
+      <fix>
+        Don't try an unlock the acceptor thread if it is not locked. This is
+        unlikely to impact normal usage but it does fix some unit test issues.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
