@@ -929,12 +929,19 @@ public class AprEndpoint extends AbstractEndpoint {
         return true;
     }
 
-    private void destroySocket(long socket)
-    {
-        if (running && socket != 0) {
-            // If not running the socket will be destroyed by
-            // parent pool or acceptor socket.
-            // In any case disable double free which would cause JVM core.
+    private void destroySocket(long socket) {
+        // If not running the socket will be destroyed by
+        // parent pool or acceptor socket.
+        // In any case disable double free which would cause JVM core.
+        destroySocket(socket, running);
+    }
+
+    private void destroySocket(long socket, boolean doIt) {
+        // Be VERY careful if you call this method directly. If it is called
+        // twice for the same socket the JVM will core. Currently this is only
+        // called from Poller.closePollset() to ensure kept alive connections
+        // are closed when calling stop() followed by start().
+        if (doIt && socket != 0) {
             Socket.destroy(socket);
             countDownConnection();
         }
@@ -1183,7 +1190,7 @@ public class AprEndpoint extends AbstractEndpoint {
                     if (comet) {
                         processSocket(desc[n*2+1], SocketStatus.STOP);
                     } else {
-                        destroySocket(desc[n*2+1]);
+                        destroySocket(desc[n*2+1], true);
                     }
                 }
             }
