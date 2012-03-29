@@ -234,6 +234,10 @@
   </subsection>
   <subsection name="jdbc-pool">
     <changelog>
+      <update>
+        Pool cleaner thread should be created using the classloader
+        that loaded the pool, not the context loader (fhanik)
+      </update>
       <fix>
         <bug>52804</bug>: Make pool properties serializable and cloneable.
         (fhanik)
