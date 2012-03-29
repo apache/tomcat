@@ -92,6 +92,8 @@
   <property name="catalina-ha.jar" value="${tomcat.build}/lib/catalina-ha.jar"/>
   <property name="catalina-ant.jar" value="${tomcat.build}/lib/catalina-ant.jar"/>
   <property name="tomcat-coyote.jar" value="${tomcat.build}/lib/tomcat-coyote.jar"/>
+  <property name="tomcat-jni.jar" value="${tomcat.build}/lib/tomcat-jni.jar"/>
+  <property name="tomcat-spdy.jar" value="${tomcat.build}/lib/tomcat-spdy.jar"/>
   <property name="tomcat-api.jar" value="${tomcat.build}/lib/tomcat-api.jar"/>
   <property name="tomcat-util.jar" value="${tomcat.build}/lib/tomcat-util.jar"/>
 
@@ -164,6 +166,7 @@
   <!-- Classpaths -->
   <path id="compile.classpath">
     <pathelement location="${jdt.jar}"/>
+    <pathelement location="${npn.jar}"/>
   </path>
 
   <path id="tomcat.classpath">
@@ -321,16 +324,25 @@
     <include name="org/apache/catalina/ant/jmx/*" />
     <include name="org/apache/catalina/util/Base64.*" />
   </patternset>
-
+  
+  <patternset id="files.tomcat-jni">
+	<include name="org/apache/tomcat/jni/**" />
+  </patternset>
+  	
   <patternset id="files.tomcat-coyote">
     <include name="org/apache/coyote/**" />
-    <include name="org/apache/tomcat/jni/**" />
     <include name="org/apache/jk/**" />
     <include name="org/apache/tomcat/util/**" />
     <!-- Exclude the files shared between Catalina & Jasper -->
     <exclude name="org/apache/tomcat/util/file/**" />
     <exclude name="org/apache/tomcat/util/res/**" />
     <exclude name="org/apache/tomcat/util/scan/**" />
+    <exclude name="org/apache/coyote/spdy/**" />    
+  </patternset>
+
+  <patternset id="files.tomcat-spdy">
+  	<include name="org/apache/coyote/spdy/**" />
+	<include name="org/apache/tomcat/spdy/**" />
   </patternset>
 
   <patternset id="files.jasper">
@@ -672,6 +684,14 @@
     <jarIt jarfile="${tomcat-coyote.jar}"
       filesDir="${tomcat.classes}"
       filesId="files.tomcat-coyote" />
+
+    <jarIt jarfile="${tomcat-spdy.jar}"
+      filesDir="${tomcat.classes}"
+      filesId="files.tomcat-spdy" />
+
+    <jarIt jarfile="${tomcat-jni.jar}"
+      filesDir="${tomcat.classes}"
+      filesId="files.tomcat-jni" />
 
     <!-- Jasper Implementation JAR File -->
     <jarIt jarfile="${jasper.jar}"
@@ -2324,6 +2344,13 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       <param name="destfile" value="${jdt.jar}"/>
       <param name="destdir" value="${jdt.home}"/>
     </antcall>
+
+    <antcall target="downloadfile">
+     <param name="sourcefile" value="${npn.loc}"/>
+     <param name="destfile" value="${npn.jar}"/>
+     <param name="destdir" value="${npn.home}"/>
+    </antcall>
+  
   </target>
 
   <target name="download-test-compile"
