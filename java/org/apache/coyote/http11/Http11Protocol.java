@@ -25,9 +25,11 @@ import org.apache.coyote.http11.upgrade.UpgradeBioProcessor;
 import org.apache.coyote.http11.upgrade.UpgradeInbound;
 import org.apache.juli.logging.Log;
 import org.apache.tomcat.util.net.AbstractEndpoint;
+import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
 import org.apache.tomcat.util.net.JIoEndpoint;
 import org.apache.tomcat.util.net.JIoEndpoint.Handler;
 import org.apache.tomcat.util.net.SSLImplementation;
+import org.apache.tomcat.util.net.SocketStatus;
 import org.apache.tomcat.util.net.SocketWrapper;
 
 
@@ -89,6 +91,14 @@ public class Http11Protocol extends AbstractHttp11JsseProtocol {
             this.disableKeepAlivePercentage = disableKeepAlivePercentage;
         }
     }
+    
+    @Override
+    public void start() throws Exception {
+        super.start();
+        if (npnHandler != null) {
+            npnHandler.init(endpoint, 0, adapter);
+        }
+    }
 
     // ----------------------------------------------------- JMX related methods
 
@@ -124,6 +134,17 @@ public class Http11Protocol extends AbstractHttp11JsseProtocol {
             return proto.sslImplementation;
         }
 
+        public SocketState process(SocketWrapper<Socket> socket,
+                SocketStatus status) {
+            if (proto.npnHandler != null) {
+                SocketState ss = proto.npnHandler.process(socket, status);
+                if (ss != SocketState.OPEN) {
+                    return ss;
+                }
+            }
+            return super.process(socket, status);
+        }
+        
         /**
          * Expected to be used by the handler once the processor is no longer
          * required.
@@ -190,6 +211,10 @@ public class Http11Protocol extends AbstractHttp11JsseProtocol {
                 SocketWrapper<Socket> socket, UpgradeInbound inbound)
                 throws IOException {
             return new UpgradeBioProcessor(socket, inbound);
+        }
+
+        @Override
+        public void beforeHandshake(SocketWrapper<Socket> socket) {
         }
     }
 }

@@ -1,37 +1,29 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one or more
- * contributor license agreements.  See the NOTICE file distributed with
- * this work for additional information regarding copyright ownership.
- * The ASF licenses this file to You under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with
- * the License.  You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
  */
 package org.apache.tomcat.spdy;
 
 import java.io.IOException;
+import java.net.Socket;
+import java.nio.channels.ByteChannel;
+import java.util.Arrays;
+import java.util.List;
 
+import javax.net.ssl.SSLEngine;
+
+import org.apache.tomcat.jni.SSLExt;
 import org.apache.tomcat.jni.Status;
 import org.apache.tomcat.jni.socket.AprSocket;
 import org.apache.tomcat.jni.socket.AprSocketContext;
 import org.apache.tomcat.jni.socket.AprSocketContext.NonBlockingPollHandler;
 import org.apache.tomcat.jni.socket.AprSocketContext.TlsCertVerifier;
 
-public class SpdyContextJni extends SpdyContext {
+
+public class NetSupportOpenSSL extends SpdyContext.NetSupport {
+
+    List<String> protos = Arrays.asList(new String[] {"spdy/2", "http/1.1"});
     AprSocketContext con;
 
-    //AprSocketContext socketCtx;
-
-    public SpdyContextJni() {
-        compression = true;
-        tls = true;
+    public NetSupportOpenSSL() {
         con = new AprSocketContext();
         //if (insecureCerts) {
         con.customVerification(new TlsCertVerifier() {
@@ -40,14 +32,21 @@ public class SpdyContextJni extends SpdyContext {
             }
         });
         //}
-        con.setNpn("spdy/2");
+        con.setNpn("spdy/2");        
     }
-
+    
+    @Override
+    public boolean isSpdy(Object socketW) {
+        byte[] proto = new byte[32];
+        int len = SSLExt.getNPN((Long) socketW, proto);
+        return len == 6; // todo: check spdy/2
+    }
+    
     @Override
     public SpdyConnection getConnection(String host, int port) throws IOException {
-        SpdyConnectionAprSocket spdy = new SpdyConnectionAprSocket(this);
+        SpdyConnectionAprSocket spdy = new SpdyConnectionAprSocket(ctx);
 
-        AprSocket ch = con.socket(host, port, tls);
+        AprSocket ch = con.socket(host, port, ctx.tls);
 
         spdy.setSocket(ch);
 
@@ -65,8 +64,13 @@ public class SpdyContextJni extends SpdyContext {
         return spdy;
     }
 
-    public void onAccept(long socket) throws IOException {
-        SpdyConnectionAprSocket spdy = new SpdyConnectionAprSocket(SpdyContextJni.this);
+    @Override
+    public void onAccept(Object socket) throws IOException {
+        onAcceptLong((Long) socket);
+    }
+    
+    public void onAcceptLong(long socket) throws IOException {
+        SpdyConnectionAprSocket spdy = new SpdyConnectionAprSocket(ctx);
         AprSocket s = con.socket(socket);
         spdy.setSocket(s);
 
@@ -75,12 +79,17 @@ public class SpdyContextJni extends SpdyContext {
         handler.process(s, true, true, false);
     }
 
+    public AprSocketContext getAprContext() {
+        return con;
+    }
+
+
     @Override
     public void listen(final int port, String cert, String key) throws IOException {
         con = new AprSocketContext() {
             @Override
             protected void onSocket(AprSocket s) throws IOException {
-                SpdyConnectionAprSocket spdy = new SpdyConnectionAprSocket(SpdyContextJni.this);
+                SpdyConnectionAprSocket spdy = new SpdyConnectionAprSocket(ctx);
                 spdy.setSocket(s);
 
                 SpdySocketHandler handler = new SpdySocketHandler(spdy);
@@ -99,12 +108,8 @@ public class SpdyContextJni extends SpdyContext {
         con.stop();
     }
 
-    public AprSocketContext getAprContext() {
-        return con;
-    }
-
     // NB
-    class SpdySocketHandler implements NonBlockingPollHandler {
+    static class SpdySocketHandler implements NonBlockingPollHandler {
         SpdyConnection con;
 
         SpdySocketHandler(SpdyConnection con) {
@@ -194,4 +199,5 @@ public class SpdyContextJni extends SpdyContext {
         }
     }
 
+    
 }

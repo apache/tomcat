@@ -140,5 +140,9 @@ public class AjpProtocol extends AbstractAjpProtocol {
             register(processor);
             return processor;
         }
+
+        @Override
+        public void beforeHandshake(SocketWrapper<Socket> socket) {
+        }
     }
 }
