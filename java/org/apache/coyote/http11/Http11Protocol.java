@@ -25,7 +25,6 @@ import org.apache.coyote.http11.upgrade.UpgradeBioProcessor;
 import org.apache.coyote.http11.upgrade.UpgradeInbound;
 import org.apache.juli.logging.Log;
 import org.apache.tomcat.util.net.AbstractEndpoint;
-import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
 import org.apache.tomcat.util.net.JIoEndpoint;
 import org.apache.tomcat.util.net.JIoEndpoint.Handler;
 import org.apache.tomcat.util.net.SSLImplementation;
@@ -134,6 +133,7 @@ public class Http11Protocol extends AbstractHttp11JsseProtocol {
             return proto.sslImplementation;
         }
 
+        @Override
         public SocketState process(SocketWrapper<Socket> socket,
                 SocketStatus status) {
             if (proto.npnHandler != null) {

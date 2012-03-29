@@ -29,7 +29,6 @@ import org.apache.coyote.http11.upgrade.UpgradeNioProcessor;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.net.AbstractEndpoint;
-import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
 import org.apache.tomcat.util.net.NioChannel;
 import org.apache.tomcat.util.net.NioEndpoint;
 import org.apache.tomcat.util.net.NioEndpoint.Handler;
@@ -212,6 +211,7 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol {
             }
         }
 
+        @Override
         public SocketState process(SocketWrapper<NioChannel> socket,
                 SocketStatus status) {
             if (proto.npnHandler != null) {
