@@ -131,7 +131,7 @@ public class ConnectionState extends JdbcInterceptor  {
                 case 1:{result = transactionIsolation; break;}
                 case 2:{result = readOnly; break;}
                 case 3:{result = catalog; break;}
-                default: result = null;
+                default: // NOOP
             }
             //return cached result, if we have it
             if (result!=null) return result;

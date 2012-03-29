@@ -20,6 +20,8 @@ import java.sql.SQLException;
 
 public class PoolExhaustedException extends SQLException {
 
+    private static final long serialVersionUID = 3501536931777262475L;
+
     public PoolExhaustedException() {
     }
 

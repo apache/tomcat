@@ -160,7 +160,7 @@ public class StatementDecoratorInterceptor extends AbstractCreateStatementInterc
         private Object actualProxy;
         private Object connection;
         private String sql;
-        private Constructor constructor;
+        private Constructor<?> constructor;
 
         public StatementProxy(T delegate, String sql) {
             this.delegate = delegate;
@@ -189,10 +189,10 @@ public class StatementDecoratorInterceptor extends AbstractCreateStatementInterc
         }
 
 
-        public Constructor getConstructor() {
+        public Constructor<?> getConstructor() {
             return constructor;
         }
-        public void setConstructor(Constructor constructor) {
+        public void setConstructor(Constructor<?> constructor) {
             this.constructor = constructor;
         }
         public void closeInvoked() {
