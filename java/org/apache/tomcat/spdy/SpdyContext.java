@@ -222,7 +222,7 @@ public final class SpdyContext {
     public void onStream(SpdyConnection spdyConnection, SpdyStream ch) throws IOException {
         if (handler instanceof NonBlockingSpdyHandler) {
             handler.onStream(spdyConnection, ch);
-        } else if (handler instanceof SpdyHandler) {
+        } else {
             getExecutor().execute(ch);
         }
     }
