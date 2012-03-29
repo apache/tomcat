@@ -23,12 +23,8 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import org.apache.tomcat.util.net.NioSelectorPool;
 
 /**
  * Main class implementing SPDY protocol. Works with both blocking and
