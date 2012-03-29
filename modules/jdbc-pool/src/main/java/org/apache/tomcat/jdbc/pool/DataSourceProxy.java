@@ -61,12 +61,14 @@ public class DataSourceProxy implements PoolConfiguration {
     }
 
 
+    @SuppressWarnings("unused") // Has to match signature in DataSource
     public boolean isWrapperFor(Class<?> iface) throws SQLException {
         // we are not a wrapper of anything
         return false;
     }
 
 
+    @SuppressWarnings("unused") // Has to match signature in DataSource
     public <T> T unwrap(Class<T> iface) throws SQLException {
         //we can't unwrap anything
         return null;
@@ -175,7 +177,7 @@ public class DataSourceProxy implements PoolConfiguration {
      * {@link javax.sql.DataSource#getConnection()}
      */
     public javax.sql.PooledConnection getPooledConnection(String username,
-                                                String password) throws SQLException {
+            String password) throws SQLException {
         return (javax.sql.PooledConnection) getConnection();
     }
 
@@ -547,6 +549,7 @@ public class DataSourceProxy implements PoolConfiguration {
      * no-op
      * {@link javax.sql.DataSource#getLogWriter}
      */
+    @SuppressWarnings("unused") // Has to match signature in DataSource
     public PrintWriter getLogWriter() throws SQLException {
         return null;
     }
@@ -556,6 +559,7 @@ public class DataSourceProxy implements PoolConfiguration {
      * no-op
      * {@link javax.sql.DataSource#setLogWriter(PrintWriter)}
      */
+    @SuppressWarnings("unused") // Has to match signature in DataSource
     public void setLogWriter(PrintWriter out) throws SQLException {
         // NOOP
     }
