@@ -286,6 +286,7 @@ public class SpdyStream implements Runnable {
             return current.readByte();
         }
 
+        @Override
         public int read(byte b[], int off, int len) throws IOException {
             fill();
             if (current == null) {
@@ -298,9 +299,11 @@ public class SpdyStream implements Runnable {
             return rd;
         }
 
+        @Override
         public int available() throws IOException {
             return 0;
         }
+        @Override
         public void close() throws IOException {
             // send RST if not closed
         }
