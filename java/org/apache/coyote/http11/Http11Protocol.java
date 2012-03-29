@@ -91,7 +91,7 @@ public class Http11Protocol extends AbstractHttp11JsseProtocol {
             this.disableKeepAlivePercentage = disableKeepAlivePercentage;
         }
     }
-    
+
     @Override
     public void start() throws Exception {
         super.start();
@@ -144,7 +144,7 @@ public class Http11Protocol extends AbstractHttp11JsseProtocol {
             }
             return super.process(socket, status);
         }
-        
+
         /**
          * Expected to be used by the handler once the processor is no longer
          * required.

@@ -305,7 +305,7 @@ public abstract class SpdyConnection { // implements Runnable {
      *
      * With a nb transport it should call drain directly.
      */
-    public void nonBlockingSend(SpdyFrame oframe, SpdyStream proc) 
+    public void nonBlockingSend(SpdyFrame oframe, SpdyStream proc)
             throws IOException {
         queueFrame(oframe, proc, oframe.pri == 0 ? outQueue : prioriyQueue);
         getSpdyContext().getExecutor().execute(nbDrain);
@@ -322,7 +322,7 @@ public abstract class SpdyConnection { // implements Runnable {
 
     /**
      * Add the frame to the queue and send until the queue is empty.
-     * 
+     *
      */
     public void send(SpdyFrame oframe, SpdyStream proc)
             throws IOException {
@@ -341,7 +341,7 @@ public abstract class SpdyConnection { // implements Runnable {
 
         // all sync for adding/removing is on outQueue
         synchronized (outQueue) {
-            queue.add(oframe);            
+            queue.add(oframe);
         }
     }
 
@@ -537,7 +537,7 @@ public abstract class SpdyConnection { // implements Runnable {
     }
 
     /**
-     * Process a SPDY connection. Called in the input thread, should not 
+     * Process a SPDY connection. Called in the input thread, should not
      * block.
      *
      * @return

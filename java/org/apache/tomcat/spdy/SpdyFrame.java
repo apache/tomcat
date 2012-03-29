@@ -350,5 +350,4 @@ public class SpdyFrame {
     public boolean isData() {
         return !c;
     }
-    
 }

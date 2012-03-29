@@ -57,13 +57,13 @@ public final class SpdyContext {
     private NetSupport netSupport;
 
 
-    public static abstract class NetSupport {
+    public abstract static class NetSupport {
         protected SpdyContext ctx;
-        
+
         public void setSpdyContext(SpdyContext ctx) {
             this.ctx = ctx;
         }
-        
+
         public abstract SpdyConnection getConnection(String host, int port) throws IOException;
 
         public void onCreateEngine(Object engine) {
@@ -83,10 +83,10 @@ public final class SpdyContext {
         public void stop() throws IOException {
         }
     }
-    
+
     public SpdyContext() {
     }
-    
+
     public void setTlsComprression(boolean tls, boolean compress) {
         this.tls = tls;
         this.compression = compress;
@@ -153,11 +153,11 @@ public final class SpdyContext {
             // non-ssl mode must be set explicitly
             throw new RuntimeException("SSL NextProtoclNegotiation no supported.");
         }
-        
+
         return netSupport;
     }
-    
-    
+
+
     /**
      * SPDY is a multiplexed protocol - the SpdyProcessors will be executed on
      * this executor.
@@ -173,7 +173,7 @@ public final class SpdyContext {
     }
 
     SpdyHandler handler;
-    
+
     public SpdyHandler getHandler() {
         return handler;
     }
@@ -184,18 +184,18 @@ public final class SpdyContext {
 
     public static interface SpdyHandler {
         public void onStream(SpdyConnection spdyCon, SpdyStream ch) throws IOException;
-        
+
     }
 
     /**
      * A handler implementing this interface will be called in the 'io' thread - the
-     * thread reading the multiplexed stream, and in the case of non-blocking 
+     * thread reading the multiplexed stream, and in the case of non-blocking
      * transports also handling polling the socket.
-     *  
+     *
      */
     public static interface NonBlockingSpdyHandler extends SpdyHandler {
     }
-    
+
 
     /**
      * Client mode: return a connection for host/port.

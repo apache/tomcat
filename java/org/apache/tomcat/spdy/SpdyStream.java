@@ -153,8 +153,8 @@ public class SpdyStream implements Runnable {
     }
 
     /**
-     * Waits and return the next frame. 
-     * 
+     * Waits and return the next frame.
+     *
      * First frame will be the control frame
      */
     public SpdyFrame getFrame(long to) throws IOException {
@@ -262,7 +262,7 @@ public class SpdyStream implements Runnable {
     public InputStream getInputStream() {
         return new SpdyInputStream();
     }
-    
+
     class SpdyInputStream extends InputStream {
         SpdyFrame current = null;
         long to = 10000; // TODO
@@ -276,7 +276,7 @@ public class SpdyStream implements Runnable {
                 current = getFrame(to);
             }
         }
-        
+
         @Override
         public int read() throws IOException {
             fill();
@@ -285,7 +285,7 @@ public class SpdyStream implements Runnable {
             }
             return current.readByte();
         }
-        
+
         public int read(byte b[], int off, int len) throws IOException {
             fill();
             if (current == null) {
@@ -297,15 +297,15 @@ public class SpdyStream implements Runnable {
             current.off += rd;
             return rd;
         }
-     
+
         public int available() throws IOException {
             return 0;
         }
         public void close() throws IOException {
             // send RST if not closed
         }
-        
-        
-        
+
+
+
     }
 }
