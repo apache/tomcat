@@ -28,13 +28,16 @@ import javax.net.ssl.SSLSocket;
 
 public class NetSupportSocket extends SpdyContext.NetSupport {
 
+    @Override
     public void onCreateEngine(Object engine) {
     }
 
+    @Override
     public boolean isSpdy(Object socketW) {
         return false;
     }
 
+    @Override
     public SpdyConnection getConnection(String host, int port) throws IOException {
         try {
             Socket sock = getSocket(host, port);
@@ -78,6 +81,7 @@ public class NetSupportSocket extends SpdyContext.NetSupport {
         serverSocket.close();
     }
 
+    @Override
     public void onAccept(Object socket) {
         SpdyConnectionSocket ch = new SpdyConnectionSocket(ctx, (Socket) socket);
         ctx.getExecutor().execute(ch.inputThread);
