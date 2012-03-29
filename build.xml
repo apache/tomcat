@@ -162,6 +162,8 @@
   <defaultexcludes add="**/.git/**" />
   <defaultexcludes remove="**/.gitignore" />
   <!--<defaultexcludes echo="true" />-->
+	
+  <available file="${npn.jar}" property="npn.exists" />
 
   <!-- Classpaths -->
   <path id="compile.classpath">
@@ -570,7 +572,10 @@
       <compilerarg value="-Xlint:unchecked"/>
       -->
       <classpath refid="compile.classpath" />
-      <exclude name="org/apache/naming/factory/webservices/**" />
+        <exclude name="org/apache/naming/factory/webservices/**" />
+        <exclude name="org/apache/tomcat/spdy/NetSupportJava7*" unless="npn.exists"/>
+        <exclude name="org/apache/coyote/spdy/*Nio*" unless="npn.exists"/>
+        <exclude name="org/apache/coyote/spdy/SpdyNpnHandler*" unless="npn.exists"/>
     </javac>
     <!-- Copy static resource files -->
     <copy todir="${tomcat.classes}" encoding="ISO-8859-1">
@@ -2345,12 +2350,15 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       <param name="destdir" value="${jdt.home}"/>
     </antcall>
 
+  </target>
+	
+  <target name="download-npn"
+          description="Download optional NPN" >
     <antcall target="downloadfile">
      <param name="sourcefile" value="${npn.loc}"/>
      <param name="destfile" value="${npn.jar}"/>
      <param name="destdir" value="${npn.home}"/>
     </antcall>
-
   </target>
 
   <target name="download-test-compile"
