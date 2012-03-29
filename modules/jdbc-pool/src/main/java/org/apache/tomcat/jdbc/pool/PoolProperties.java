@@ -35,6 +35,8 @@ import org.apache.juli.logging.LogFactory;
  *
  */
 public class PoolProperties implements PoolConfiguration, Cloneable, Serializable {
+
+    private static final long serialVersionUID = -8519283440854213745L;
     private static final Log log = LogFactory.getLog(PoolProperties.class);
 
     public static final int DEFAULT_MAX_ACTIVE = 100;
