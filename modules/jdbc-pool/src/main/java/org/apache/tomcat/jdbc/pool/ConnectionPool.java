@@ -1217,13 +1217,16 @@ public class ConnectionPool {
         unregisterCleaner(cleaner);
         cleaners.add(cleaner);
         if (poolCleanTimer == null) {
-            poolCleanTimer = new Timer("PoolCleaner["
-                    + System.identityHashCode(ConnectionPool.class
-                            .getClassLoader()) + ":"
-                    + System.currentTimeMillis() + "]", true);
+            ClassLoader loader = Thread.currentThread().getContextClassLoader();
+            try {
+                Thread.currentThread().setContextClassLoader(ConnectionPool.class.getClassLoader());
+                poolCleanTimer = new Timer("PoolCleaner["+ System.identityHashCode(ConnectionPool.class.getClassLoader()) + ":"+
+                                           System.currentTimeMillis() + "]", true);
+            }finally {
+                Thread.currentThread().setContextClassLoader(loader);
+            }
         }
-        poolCleanTimer.scheduleAtFixedRate(cleaner, cleaner.sleepTime,
-                cleaner.sleepTime);
+        poolCleanTimer.scheduleAtFixedRate(cleaner, cleaner.sleepTime,cleaner.sleepTime);
     }
 
     private static synchronized void unregisterCleaner(PoolCleaner cleaner) {
