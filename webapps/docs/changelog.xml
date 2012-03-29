@@ -182,6 +182,12 @@
         unlikely to impact normal usage but it does fix some unit test issues.
         (markt)
       </fix>
+      <fix>
+        When using the APR connector ensure that any connections in a keep-alive
+        state are closed when the connector is stopped rather than when the
+        connector is destroyed. This is important when stop() followed by
+        start() is called on the connector. (markt) 
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
