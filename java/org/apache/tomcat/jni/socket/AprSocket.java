@@ -600,6 +600,7 @@ public class AprSocket implements Runnable {
             try {
                 long sa = Address.get(Socket.APR_LOCAL, socket);
                 Sockaddr addr = Address.getInfo(sa);
+                return addr.port;
             } catch (Exception ex) {
                 throw new IOException(ex);
             }
