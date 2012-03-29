@@ -324,11 +324,11 @@
     <include name="org/apache/catalina/ant/jmx/*" />
     <include name="org/apache/catalina/util/Base64.*" />
   </patternset>
-  
+
   <patternset id="files.tomcat-jni">
-	<include name="org/apache/tomcat/jni/**" />
+    <include name="org/apache/tomcat/jni/**" />
   </patternset>
-  	
+
   <patternset id="files.tomcat-coyote">
     <include name="org/apache/coyote/**" />
     <include name="org/apache/jk/**" />
@@ -337,12 +337,12 @@
     <exclude name="org/apache/tomcat/util/file/**" />
     <exclude name="org/apache/tomcat/util/res/**" />
     <exclude name="org/apache/tomcat/util/scan/**" />
-    <exclude name="org/apache/coyote/spdy/**" />    
+    <exclude name="org/apache/coyote/spdy/**" />
   </patternset>
 
   <patternset id="files.tomcat-spdy">
-  	<include name="org/apache/coyote/spdy/**" />
-	<include name="org/apache/tomcat/spdy/**" />
+    <include name="org/apache/coyote/spdy/**" />
+    <include name="org/apache/tomcat/spdy/**" />
   </patternset>
 
   <patternset id="files.jasper">
@@ -2350,7 +2350,7 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
      <param name="destfile" value="${npn.jar}"/>
      <param name="destdir" value="${npn.home}"/>
     </antcall>
-  
+
   </target>
 
   <target name="download-test-compile"
