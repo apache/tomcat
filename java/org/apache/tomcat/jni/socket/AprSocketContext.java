@@ -417,6 +417,9 @@ public class AprSocketContext {
 
     public AprSocket socket(long socket) throws IOException {
         AprSocket sock = newSocket(this);
+        // Tomcat doesn't set this
+        SSLExt.sslSetMode(socket, SSLExt.SSL_MODE_ENABLE_PARTIAL_WRITE |
+                SSLExt.SSL_MODE_ACCEPT_MOVING_WRITE_BUFFER);
         sock.setStatus(AprSocket.ACCEPTED);
         sock.socket = socket;
         return sock;
@@ -429,7 +432,7 @@ public class AprSocketContext {
             if (socket.socket != 0) {
                 long s = socket.socket;
                 socket.socket = 0;
-                System.err.println("DESTROY: " + Long.toHexString(s));
+                log.info("DESTROY: " + Long.toHexString(s));
                 Socket.destroy(s);
             }
         }
@@ -583,7 +586,7 @@ public class AprSocketContext {
             if (rootPool == 0) {
                 return;
             }
-            System.err.println("DESTROY " + rootPool);
+            log.info("Destroy root pool " + rootPool);
             //Pool.destroy(rootPool);
             //rootPool = 0;
         }
@@ -1226,7 +1229,9 @@ public class AprSocketContext {
                 updateIOThread(ch);
             } else {
                 synchronized (this) {
-                    updates.add(ch);
+                    if (!updates.contains(ch)) {
+                        updates.add(ch);
+                    }
                     interruptPoll();
                 }
                 if (debugPoll) {
@@ -1276,6 +1281,9 @@ public class AprSocketContext {
             boolean failed = false;
             int rv;
             synchronized (channels) {
+                if (up.isClosed()) {
+                    return;
+                }
                 rv = Poll.add(serverPollset, up.socket, req);
                 if (rv != Status.APR_SUCCESS) {
                     up.poller = null;

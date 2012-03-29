@@ -33,7 +33,7 @@ import java.util.concurrent.Executors;
  * handles SSL and compression. Test with: --user-data-dir=/tmp/test
  * --use-spdy=no-compress,no-ssl
  */
-public class SpdyContext {
+public final class SpdyContext {
 
     public static final byte[] SPDY_NPN;
 
@@ -52,7 +52,45 @@ public class SpdyContext {
     public static boolean debug = false;
 
     protected boolean tls = true;
-    protected boolean compression = false;
+    protected boolean compression = true;
+
+    private NetSupport netSupport;
+
+
+    public static abstract class NetSupport {
+        protected SpdyContext ctx;
+        
+        public void setSpdyContext(SpdyContext ctx) {
+            this.ctx = ctx;
+        }
+        
+        public abstract SpdyConnection getConnection(String host, int port) throws IOException;
+
+        public void onCreateEngine(Object engine) {
+        }
+
+        public boolean isSpdy(Object socketW) {
+            return false;
+        }
+
+        public void onAccept(Object socket) throws IOException {
+        }
+
+        public void listen(int port, String cert, String key)
+                throws IOException {
+        }
+
+        public void stop() throws IOException {
+        }
+    }
+    
+    public SpdyContext() {
+    }
+    
+    public void setTlsComprression(boolean tls, boolean compress) {
+        this.tls = tls;
+        this.compression = compress;
+    }
 
     /**
      * Get a frame - frames are heavy buffers, may be reused.
@@ -89,6 +127,37 @@ public class SpdyContext {
         this.executor = executor;
     }
 
+    public void setNetSupport(NetSupport netSupport) {
+        this.netSupport = netSupport;
+        netSupport.setSpdyContext(this);
+    }
+
+    public NetSupport getNetSupport() {
+        if (netSupport == null) {
+            try {
+                Class<?> c0 = Class.forName("org.apache.tomcat.spdy.NetSupportOpenSSL");
+                netSupport = (NetSupport) c0.newInstance();
+                netSupport.setSpdyContext(this);
+                return netSupport;
+            } catch (Throwable t) {
+                // ignore, openssl not supported
+            }
+            try {
+                Class<?> c1 = Class.forName("org.apache.tomcat.spdy.NetSupportJava7");
+                netSupport = (NetSupport) c1.newInstance();
+                netSupport.setSpdyContext(this);
+                return netSupport;
+            } catch (Throwable t) {
+                // ignore, npn not supported
+            }
+            // non-ssl mode must be set explicitly
+            throw new RuntimeException("SSL NextProtoclNegotiation no supported.");
+        }
+        
+        return netSupport;
+    }
+    
+    
     /**
      * SPDY is a multiplexed protocol - the SpdyProcessors will be executed on
      * this executor.
@@ -103,31 +172,58 @@ public class SpdyContext {
         return executor;
     }
 
-    /**
-     * Override for servers.
-     * @throws IOException
-     */
-    protected void onSynStream(SpdyConnection spdyCon, SpdyStream ch) throws IOException {
+    SpdyHandler handler;
+    
+    public SpdyHandler getHandler() {
+        return handler;
     }
+
+    public void setHandler(SpdyHandler handler) {
+        this.handler = handler;
+    }
+
+    public static interface SpdyHandler {
+        public void onStream(SpdyConnection spdyCon, SpdyStream ch) throws IOException;
+        
+    }
+
+    /**
+     * A handler implementing this interface will be called in the 'io' thread - the
+     * thread reading the multiplexed stream, and in the case of non-blocking 
+     * transports also handling polling the socket.
+     *  
+     */
+    public static interface NonBlockingSpdyHandler extends SpdyHandler {
+    }
+    
 
     /**
      * Client mode: return a connection for host/port.
      * @throws IOException
      */
     public SpdyConnection getConnection(String host, int port) throws IOException {
-        return null;
+        return netSupport.getConnection(host, port);
     }
 
     public void releaseConnection(SpdyConnection con) {
     }
 
-    public void listen(final int port, String cert, String key) throws IOException {
-        throw new IOException("Not implemented");
+    public final void listen(final int port, String cert, String key) throws IOException {
+        netSupport.listen(port, cert, key);
     }
 
     /**
      * Close all pending connections and free resources.
      */
-    public void stop() throws IOException {
+    public final void stop() throws IOException {
+        netSupport.stop();
+    }
+
+    public void onStream(SpdyConnection spdyConnection, SpdyStream ch) throws IOException {
+        if (handler instanceof NonBlockingSpdyHandler) {
+            handler.onStream(spdyConnection, ch);
+        } else if (handler instanceof SpdyHandler) {
+            getExecutor().execute(ch);
+        }
     }
 }

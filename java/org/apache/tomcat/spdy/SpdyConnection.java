@@ -23,11 +23,12 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import org.apache.tomcat.util.net.NioSelectorPool;
 
 /**
  * Main class implementing SPDY protocol. Works with both blocking and
@@ -119,13 +120,9 @@ public abstract class SpdyConnection { // implements Runnable {
 
     LinkedList<SpdyFrame> outQueue = new LinkedList<SpdyFrame>();
 
-    Lock framerLock = new ReentrantLock();
-
     // --------------
 
     public static byte[] NPN = "spdy/2".getBytes();
-
-    private Condition outCondition;
 
     public static final int LONG = 1;
 
@@ -142,9 +139,8 @@ public abstract class SpdyConnection { // implements Runnable {
 
     public SpdyConnection(SpdyContext spdyContext) {
         this.spdyContext = spdyContext;
-        outCondition = framerLock.newCondition();
         if (spdyContext.compression) {
-            setCompressSupport(new CompressDeflater6());
+            setCompressSupport(CompressDeflater6.get());
         }
     }
 
@@ -215,9 +211,7 @@ public abstract class SpdyConnection { // implements Runnable {
      */
     private boolean _drain() {
         while (true) {
-            framerLock.lock();
-
-            try {
+            synchronized (outQueue) {
                 if (out == null) {
                     out = prioriyQueue.poll();
                     if (out == null) {
@@ -227,49 +221,46 @@ public abstract class SpdyConnection { // implements Runnable {
                         return false;
                     }
                     if (goAway < out.streamId) {
-
+                        // TODO
                     }
-                    SpdyFrame oframe = out;
                     try {
-                        if (!oframe.c) {
+                        if (!out.c) {
                             // late: IDs are assigned as we send ( priorities may affect
                             // the transmission order )
-                            if (oframe.stream != null) {
-                                oframe.streamId = oframe.stream.getRequest().streamId;
+                            if (out.stream != null) {
+                                out.streamId = out.stream.getRequest().streamId;
                             }
-                        } else if (oframe.type == TYPE_SYN_STREAM) {
-                            oframe.fixNV(18);
+                        } else if (out.type == TYPE_SYN_STREAM) {
+                            out.fixNV(18);
                             if (compressSupport != null) {
-                                compressSupport.compress(oframe, 18);
+                                compressSupport.compress(out, 18);
                             }
-                        } else if (oframe.type == TYPE_SYN_REPLY
-                                || oframe.type == TYPE_HEADERS) {
-                            oframe.fixNV(14);
+                        } else if (out.type == TYPE_SYN_REPLY
+                                || out.type == TYPE_HEADERS) {
+                            out.fixNV(14);
                             if (compressSupport != null) {
-                                compressSupport.compress(oframe, 14);
+                                compressSupport.compress(out, 14);
                             }
                         }
                     } catch (IOException ex) {
                         abort("Compress error");
                         return false;
                     }
-                    if (oframe.type == TYPE_SYN_STREAM) {
-                        oframe.streamId = outStreamId;
+                    if (out.type == TYPE_SYN_STREAM) {
+                        out.streamId = outStreamId;
                         outStreamId += 2;
                         synchronized(channels) {
-                            channels.put(oframe.streamId, oframe.stream);
+                            channels.put(out.streamId, out.stream);
                         }
                     }
 
-                    oframe.serializeHead();
+                    out.serializeHead();
 
                 }
                 if (out.endData == out.off) {
                     out = null;
                     continue;
                 }
-            } finally {
-                framerLock.unlock();
             }
 
             if (SpdyContext.debug) {
@@ -291,13 +282,6 @@ public abstract class SpdyConnection { // implements Runnable {
                         out.off += wr;
                         toWrite -= wr;
                     }
-                }
-                // Frame was sent
-                framerLock.lock();
-                try {
-                    outCondition.signalAll();
-                } finally {
-                    framerLock.unlock();
                 }
 
                 synchronized (channels) {
@@ -325,8 +309,9 @@ public abstract class SpdyConnection { // implements Runnable {
      *
      * With a nb transport it should call drain directly.
      */
-    public void nonBlockingDrain() {
-        // TODO: if (nonBlocking()) { drain() }
+    public void nonBlockingSend(SpdyFrame oframe, SpdyStream proc) 
+            throws IOException {
+        queueFrame(oframe, proc, oframe.pri == 0 ? outQueue : prioriyQueue);
         getSpdyContext().getExecutor().execute(nbDrain);
     }
 
@@ -339,6 +324,10 @@ public abstract class SpdyConnection { // implements Runnable {
         }
     };
 
+    /**
+     * Add the frame to the queue and send until the queue is empty.
+     * 
+     */
     public void send(SpdyFrame oframe, SpdyStream proc)
             throws IOException {
         queueFrame(oframe, proc, oframe.pri == 0 ? outQueue : prioriyQueue);
@@ -346,7 +335,7 @@ public abstract class SpdyConnection { // implements Runnable {
     }
 
     private void queueFrame(SpdyFrame oframe, SpdyStream proc,
-            LinkedList<SpdyFrame> outQueue) throws IOException {
+            LinkedList<SpdyFrame> queue) throws IOException {
 
         oframe.endData = oframe.off;
         oframe.off = 0;
@@ -354,12 +343,9 @@ public abstract class SpdyConnection { // implements Runnable {
         // we can't compress either - it's stateful.
         oframe.stream = proc;
 
-        framerLock.lock();
-        try {
-            outQueue.add(oframe);
-            outCondition.signalAll();
-        } finally {
-            framerLock.unlock();
+        // all sync for adding/removing is on outQueue
+        synchronized (outQueue) {
+            queue.add(oframe);            
         }
     }
 
@@ -555,8 +541,10 @@ public abstract class SpdyConnection { // implements Runnable {
     }
 
     /**
-     * Process a SPDY connection. Called in a separate thread.
+     * Process a SPDY connection. Called in the input thread, should not 
+     * block.
      *
+     * @return
      * @throws IOException
      */
     protected int handleFrame() throws IOException {
@@ -569,8 +557,8 @@ public abstract class SpdyConnection { // implements Runnable {
                     int id = inFrame.read24();
                     int value = inFrame.readInt();
                 }
+                // TODO: save/interpret settings
                 break;
-                // receivedHello = currentInFrame;
             }
             case TYPE_GOAWAY: {
                 int lastStream = inFrame.readInt();
@@ -585,24 +573,22 @@ public abstract class SpdyConnection { // implements Runnable {
             case TYPE_RST_STREAM: {
                 inFrame.streamId = inFrame.read32();
                 int errCode = inFrame.read32();
-                trace("> RST "
-                        + inFrame.streamId
-                        + " "
-                        + ((errCode < RST_ERRORS.length) ? RST_ERRORS[errCode]
-                                : errCode));
+                if (SpdyContext.debug) {
+                    trace("> RST "
+                            + inFrame.streamId
+                            + " "
+                            + ((errCode < RST_ERRORS.length) ? RST_ERRORS[errCode]
+                                    : errCode));
+                }
                 SpdyStream sch;
                 synchronized(channels) {
-                        sch = channels.get(inFrame.streamId);
+                        sch = channels.remove(inFrame.streamId);
                 }
-                if (sch == null) {
-                    abort("Missing channel " + inFrame.streamId);
-                    return CLOSE;
+                // if RST stream is for a closed channel - we can ignore.
+                if (sch != null) {
+                    sch.onReset();
                 }
-                sch.onCtlFrame(inFrame);
 
-                synchronized(channels) {
-                    channels.remove(inFrame.streamId);
-                }
                 inFrame = null;
                 break;
             }
@@ -622,7 +608,7 @@ public abstract class SpdyConnection { // implements Runnable {
                     abort("Error reading headers " + t);
                     return CLOSE;
                 }
-                spdyContext.onSynStream(this, ch);
+                spdyContext.onStream(this, ch);
                 break;
             }
             case TYPE_SYN_REPLY: {
@@ -697,7 +683,7 @@ public abstract class SpdyConnection { // implements Runnable {
      * balancer and tomcat) there is no need for the compression overhead. There
      * are also multiple possible implementations.
      */
-    public static interface CompressSupport {
+    static interface CompressSupport {
         public void compress(SpdyFrame frame, int start) throws IOException;
 
         public void decompress(SpdyFrame frame, int start) throws IOException;

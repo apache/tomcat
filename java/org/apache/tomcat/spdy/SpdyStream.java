@@ -17,6 +17,7 @@
 package org.apache.tomcat.spdy;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintWriter;
 import java.nio.charset.Charset;
 import java.util.Map;
@@ -37,7 +38,7 @@ import java.util.concurrent.TimeUnit;
  * The frame must be either consumed or popInFrame must be called, after the
  * call is done the frame will be reused.
  */
-public class SpdyStream {
+public class SpdyStream implements Runnable {
     public static final Charset UTF8 = Charset.forName("UTF-8");
 
     protected SpdyConnection spdy;
@@ -84,9 +85,6 @@ public class SpdyStream {
 
     /**
      * Non-blocking, called when a data frame is received.
-     *
-     * The processor must consume the data, or set frame.data to null or a fresh
-     * buffer ( to avoid a copy ).
      */
     public void onDataFrame(SpdyFrame inFrame) {
         synchronized(this) {
@@ -110,8 +108,6 @@ public class SpdyStream {
             reqFrame = frame;
         } else if (frame.type == SpdyConnection.TYPE_SYN_REPLY) {
             resFrame = frame;
-        } else if (frame.type == SpdyConnection.TYPE_RST_STREAM) {
-            onReset();
         }
         synchronized (this) {
             inData.add(frame);
@@ -142,7 +138,7 @@ public class SpdyStream {
     }
 
     /**
-     * Waits and return the next data frame.
+     * Waits and return the next data frame, null on timeout.
      */
     public SpdyFrame getDataFrame(long to) throws IOException {
         while (true) {
@@ -150,27 +146,29 @@ public class SpdyStream {
             if (res == null || res.isData()) {
                 return res;
             }
+            if (res.type == SpdyConnection.TYPE_RST_STREAM) {
+                throw new IOException("Reset");
+            }
         }
     }
 
     /**
-     * Waits and return the next frame. First frame will be the control frame
+     * Waits and return the next frame. 
+     * 
+     * First frame will be the control frame
      */
     public SpdyFrame getFrame(long to) throws IOException {
         SpdyFrame in;
         try {
             synchronized (this) {
                 if (inData.size() == 0 && finRcvd) {
-                    return null;
+                    return END_FRAME;
                 }
             }
             in = inData.poll(to, TimeUnit.MILLISECONDS);
-            if (in == END_FRAME) {
-                return null;
-            }
             return in;
         } catch (InterruptedException e) {
-            throw new IOException(e);
+            return null;
         }
     }
 
@@ -250,5 +248,64 @@ public class SpdyStream {
         spdy.send(reqFrame, this);
     }
 
+    @Override
+    public void run() {
+        try {
+            spdy.spdyContext.handler.onStream(spdy, this);
+        } catch (IOException e) {
+            e.printStackTrace();
+            // TODO: send rst, error processing the stream.
+        }
+    }
 
+
+    public InputStream getInputStream() {
+        return new SpdyInputStream();
+    }
+    
+    class SpdyInputStream extends InputStream {
+        SpdyFrame current = null;
+        long to = 10000; // TODO
+        int pos = 0;
+
+        private void fill() throws IOException {
+            if (current == null || current.off == current.endData) {
+                if (current != null) {
+                    spdy.spdyContext.releaseFrame(current);
+                }
+                current = getFrame(to);
+            }
+        }
+        
+        @Override
+        public int read() throws IOException {
+            fill();
+            if (current == null) {
+                return -1;
+            }
+            return current.readByte();
+        }
+        
+        public int read(byte b[], int off, int len) throws IOException {
+            fill();
+            if (current == null) {
+                return -1;
+            }
+            // don't wait for next frame
+            int rd = Math.min(len, current.endData - current.off);
+            System.arraycopy(current.data, current.off, b, off, rd);
+            current.off += rd;
+            return rd;
+        }
+     
+        public int available() throws IOException {
+            return 0;
+        }
+        public void close() throws IOException {
+            // send RST if not closed
+        }
+        
+        
+        
+    }
 }

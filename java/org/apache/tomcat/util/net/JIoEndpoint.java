@@ -128,6 +128,7 @@ public class JIoEndpoint extends AbstractEndpoint {
         public SocketState process(SocketWrapper<Socket> socket,
                 SocketStatus status);
         public SSLImplementation getSslImplementation();
+        public void beforeHandshake(SocketWrapper<Socket> socket);        
     }
 
 
@@ -289,7 +290,7 @@ public class JIoEndpoint extends AbstractEndpoint {
             synchronized (socket) {
                 try {
                     SocketState state = SocketState.OPEN;
-
+                    handler.beforeHandshake(socket);
                     try {
                         // SSL handshake
                         serverSocketFactory.handshake(socket.getSocket());

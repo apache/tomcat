@@ -23,8 +23,10 @@ import org.apache.coyote.AbstractProtocol;
 import org.apache.coyote.ajp.Constants;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.spdy.NetSupportSocket;
 import org.apache.tomcat.spdy.SpdyConnection;
-import org.apache.tomcat.spdy.SpdyContextProxy;
+import org.apache.tomcat.spdy.SpdyContext;
+import org.apache.tomcat.spdy.SpdyContext.SpdyHandler;
 import org.apache.tomcat.spdy.SpdyStream;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler;
 import org.apache.tomcat.util.net.JIoEndpoint;
@@ -51,7 +53,7 @@ public class SpdyProxyProtocol extends AbstractProtocol {
     private static final Log log = LogFactory.getLog(SpdyProxyProtocol.class);
 
     JIoEndpoint.Handler cHandler = new TomcatJioHandler();
-    SpdyContextProxy spdyContext;
+    SpdyContext spdyContext;
 
     public SpdyProxyProtocol() {
         endpoint = new JIoEndpoint();
@@ -84,14 +86,17 @@ public class SpdyProxyProtocol extends AbstractProtocol {
     @Override
     public void start() throws Exception {
         super.start();
-        spdyContext = new SpdyContextProxy() {
+        spdyContext = new SpdyContext();
+        spdyContext.setTlsComprression(false, false);
+        spdyContext.setHandler(new SpdyHandler() {
             @Override
-            protected void onSynStream(SpdyConnection con, SpdyStream ch) throws IOException {
+            public void onStream(SpdyConnection con, SpdyStream ch) throws IOException {
                 SpdyProcessor sp = new SpdyProcessor(con, endpoint);
                 sp.setAdapter(adapter);
                 sp.onSynStream(ch);
             }
-        };
+        });
+        spdyContext.setNetSupport(new NetSupportSocket());
         spdyContext.setExecutor(endpoint.getExecutor());
     }
 
@@ -109,14 +114,21 @@ public class SpdyProxyProtocol extends AbstractProtocol {
         @Override
         public SocketState process(SocketWrapper<Socket> socket,
                 SocketStatus status) {
-            SpdyConnection ch = spdyContext.getConnection(socket.getSocket());
-            ch.onBlockingSocket();
+            try {
+                spdyContext.getNetSupport().onAccept(socket.getSocket());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
             return SocketState.CLOSED;
         }
 
         @Override
         public SSLImplementation getSslImplementation() {
             return null;
+        }
+
+        @Override
+        public void beforeHandshake(SocketWrapper<Socket> socket) {
         }
 
     }

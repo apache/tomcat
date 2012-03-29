@@ -26,11 +26,11 @@ import org.apache.tomcat.spdy.SpdyConnection.CompressSupport;
 /**
  * Java6 Deflater with the workaround from tomcat http filters.
  */
-public class CompressDeflater6 implements CompressSupport {
+class CompressDeflater6 implements CompressSupport {
     public static long DICT_ID = 3751956914L;
 
     // Make sure to use the latest from net/spdy/spdy_framer.cc, not from spec
-    private static String SPDY_DICT_S = "optionsgetheadpostputdeletetraceacceptaccept-charsetaccept-encodingaccept-"
+    static String SPDY_DICT_S = "optionsgetheadpostputdeletetraceacceptaccept-charsetaccept-encodingaccept-"
             + "languageauthorizationexpectfromhostif-modified-sinceif-matchif-none-matchi"
             + "f-rangeif-unmodifiedsincemax-forwardsproxy-authorizationrangerefererteuser"
             + "-agent10010120020120220320420520630030130230330430530630740040140240340440"
@@ -67,6 +67,11 @@ public class CompressDeflater6 implements CompressSupport {
     public CompressDeflater6() {
     }
 
+    public static CompressDeflater6 get() {
+        // TODO: code to plug in v7-specific. It is marginally faster.
+        return new CompressDeflater6();
+    }
+    
     public void recycle() {
         // TODO
     }
@@ -143,7 +148,6 @@ public class CompressDeflater6 implements CompressSupport {
         decOff = start;
 
         int off = start;
-        int max = frame.data.length;
 
         zipIn.setInput(frame.data, start, decMax - start);
 

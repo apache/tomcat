@@ -183,4 +183,15 @@ public abstract class AbstractHttp11Protocol extends AbstractProtocol {
     public void setMaxKeepAliveRequests(int mkar) {
         endpoint.setMaxKeepAliveRequests(mkar);
     }
+    
+    protected NpnHandler npnHandler;
+    public void setNpnHandler(String impl) {
+        try {
+            Class<?> c = Class.forName(impl);
+            npnHandler = (NpnHandler) c.newInstance();
+        } catch (Exception ex) {
+            getLog().warn("Failed to init light protocol " + impl, ex);
+        }
+    }
+
 }

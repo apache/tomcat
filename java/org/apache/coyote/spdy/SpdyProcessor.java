@@ -97,15 +97,21 @@ public class SpdyProcessor extends AbstractProcessor<Object> implements
                 inFrame = spdyStream.getDataFrame(endpoint.getSoTimeout());
             }
             if (inFrame == null) {
+                return -1; // timeout
+            }
+            if (inFrame.remaining() == 0 && inFrame.isHalfClose()) {
                 return -1;
             }
-
-            int rd = Math.min(inFrame.endData, bchunk.getBytes().length);
+            
+            int rd = Math.min(inFrame.remaining(), bchunk.getBytes().length);
             System.arraycopy(inFrame.data, inFrame.off, bchunk.getBytes(),
                     bchunk.getStart(), rd);
             inFrame.advance(rd);
-            if (inFrame.off == inFrame.endData) {
+            if (inFrame.remaining() == 0) {
                 spdy.getSpdyContext().releaseFrame(inFrame);
+                if (!inFrame.isHalfClose()) {
+                    inFrame = null;
+                }
             }
             bchunk.setEnd(bchunk.getEnd() + rd);
             return rd;

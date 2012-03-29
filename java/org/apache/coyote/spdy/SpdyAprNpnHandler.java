@@ -20,12 +20,14 @@ import java.io.IOException;
 
 import org.apache.coyote.Adapter;
 import org.apache.coyote.http11.Http11AprProtocol;
+import org.apache.coyote.http11.NpnHandler;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.jni.SSLExt;
+import org.apache.tomcat.spdy.NetSupportOpenSSL;
 import org.apache.tomcat.spdy.SpdyConnection;
 import org.apache.tomcat.spdy.SpdyContext;
-import org.apache.tomcat.spdy.SpdyContextJni;
+import org.apache.tomcat.spdy.SpdyContext.SpdyHandler;
 import org.apache.tomcat.spdy.SpdyStream;
 import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
@@ -57,66 +59,57 @@ import org.apache.tomcat.util.net.SocketWrapper;
  * negotiated by TLS.
  *
  */
-public class SpdyAprNpnHandler implements Http11AprProtocol.NpnHandler {
+public class SpdyAprNpnHandler implements NpnHandler {
 
     private static final Log log = LogFactory.getLog(AprEndpoint.class);
 
-    private SpdyContextApr spdyContext;
-
-    boolean ssl = true;
+    private SpdyContext spdyContext;
 
     @Override
     public void init(final AbstractEndpoint ep, long sslContext,
             final Adapter adapter) {
+        spdyContext = new SpdyContext();
         if (sslContext == 0) {
-            // Apr endpoint without SSL.
-            ssl = false;
-            spdyContext = new SpdyContextApr(ep, adapter);
-            spdyContext.setExecutor(ep.getExecutor());
+            // Apr endpoint without SSL - proxy mode.
+            spdyContext.setTlsComprression(false, false);
             return;
         }
-        if (0 == SSLExt.setNPN(sslContext, SpdyContext.SPDY_NPN_OUT)) {
-            spdyContext = new SpdyContextApr(ep, adapter);
-            spdyContext.setExecutor(ep.getExecutor());
-        } else {
+        if (0 != SSLExt.setNPN(sslContext, SpdyContext.SPDY_NPN_OUT)) {
             log.warn("SPDY/NPN not supported");
         }
-    }
-
-
-    private final class SpdyContextApr extends SpdyContextJni {
-        private final AbstractEndpoint ep;
-
-        private final Adapter adapter;
-
-        private SpdyContextApr(AbstractEndpoint ep, Adapter adapter) {
-            this.ep = ep;
-            this.adapter = adapter;
-        }
-
-        @Override
-        protected void onSynStream(SpdyConnection con, SpdyStream ch) throws IOException {
-            SpdyProcessor sp = new SpdyProcessor(con, ep);
-            sp.setAdapter(adapter);
-            sp.onSynStream(ch);
-        }
+        spdyContext.setNetSupport(new NetSupportOpenSSL());
+        spdyContext.setExecutor(ep.getExecutor());
+        spdyContext.setHandler(new SpdyHandler() {
+            @Override
+            public void onStream(SpdyConnection con, SpdyStream ch)
+                    throws IOException {
+                SpdyProcessor sp = new SpdyProcessor(con, ep);
+                sp.setAdapter(adapter);
+                sp.onSynStream(ch);
+            }
+        });
     }
 
     @Override
-    public SocketState process(SocketWrapper<Long> socketO, SocketStatus status,
-            Http11AprProtocol proto, AbstractEndpoint endpoint) {
+    public SocketState process(SocketWrapper<?> socketO, SocketStatus status) {
 
-        SocketWrapper<Long> socketW = socketO;
+        SocketWrapper<Long> socketW = (SocketWrapper<Long>) socketO;
         long socket = socketW.getSocket().longValue();
+        
+        if (! spdyContext.getNetSupport().isSpdy(socketW.getSocket())) {
+            return SocketState.OPEN;            
+        }
 
         try {
-            spdyContext.onAccept(socket);
+            ((NetSupportOpenSSL) spdyContext.getNetSupport()).onAcceptLong(socket);
         } catch (IOException e) {
         }
         // No need to keep tomcat thread busy - but socket will be handled by apr socket context.
         return SocketState.LONG;
     }
 
-    public void onClose(SocketWrapper<Long> socketWrapper) {
+
+    @Override
+    public void onCreateEngine(Object socket) {
     }
 }
