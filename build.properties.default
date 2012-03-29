@@ -135,7 +135,7 @@ jdt.loc.2=http://download.eclipse.org/eclipse/downloads/drops/${jdt.release}/ecj
 npn.version=8.1.2.v20120308
 npn.home=${base.path}/npn-${npn.version}
 npn.jar=${npn.home}/npn-${npn.version}.jar
-npn.loc=http://repo2.maven.org/maven2/org/mortbay/jetty/npn/npn-boot/${npn.version}/npn-boot-${npn.version}.jar
+npn.loc=http://repo1.maven.org/maven2/org/eclipse/jetty/npn/npn-api/${npn.version}/npn-api-${npn.version}.jar
 
 # ----- Tomcat native library -----
 tomcat-native.version=1.1.23
