@@ -17,6 +17,8 @@
 
 package org.apache.tomcat.jdbc.test;
 
+import java.util.Map;
+
 import org.apache.tomcat.jdbc.pool.ConnectionPool;
 import org.apache.tomcat.jdbc.pool.DataSource;
 
@@ -26,19 +28,33 @@ public class PoolCleanerTest extends DefaultTestCase {
         super(name);
     }
 
+    private int countPoolCleanerThreads() {
+        Map<Thread, StackTraceElement[]> threadmap = Thread.getAllStackTraces();
+        int result = 0;
+        for (Thread t : threadmap.keySet()) {
+            if (t.getName().startsWith("PoolCleaner[")) result++;
+        }
+        return result;
+    }
+
     public void testPoolCleaner() throws Exception {
         datasource.getPoolProperties().setTimeBetweenEvictionRunsMillis(2000);
         datasource.getPoolProperties().setTestWhileIdle(true);
         assertEquals("Pool cleaner should not be started yet.",0,ConnectionPool.getPoolCleaners().size() );
         assertNull("Pool timer should be null", ConnectionPool.getPoolTimer());
+        assertEquals("Pool cleaner threads should not be present.",0, countPoolCleanerThreads());
 
         datasource.getConnection().close();
         assertEquals("Pool cleaner should have 1 cleaner.",1,ConnectionPool.getPoolCleaners().size() );
         assertNotNull("Pool timer should not be null", ConnectionPool.getPoolTimer());
+        assertEquals("Pool cleaner threads should be 1.",1, countPoolCleanerThreads());
 
         datasource.close();
         assertEquals("Pool shutdown, no cleaners should be present.",0,ConnectionPool.getPoolCleaners().size() );
         assertNull("Pool timer should be null after shutdown", ConnectionPool.getPoolTimer());
+        assertEquals("Pool cleaner threads should not be present after close.",0, countPoolCleanerThreads());
+
+
     }
 
     public void test2PoolCleaners() throws Exception {
@@ -49,11 +65,13 @@ public class PoolCleanerTest extends DefaultTestCase {
 
         assertEquals("Pool cleaner should not be started yet.",0,ConnectionPool.getPoolCleaners().size() );
         assertNull("Pool timer should be null", ConnectionPool.getPoolTimer());
+        assertEquals("Pool cleaner threads should not be present.",0, countPoolCleanerThreads());
 
         datasource.getConnection().close();
         ds2.getConnection().close();
         assertEquals("Pool cleaner should have 2 cleaner.",2,ConnectionPool.getPoolCleaners().size() );
         assertNotNull("Pool timer should not be null", ConnectionPool.getPoolTimer());
+        assertEquals("Pool cleaner threads should be 1.",1, countPoolCleanerThreads());
 
         datasource.close();
         assertEquals("Pool cleaner should have 1 cleaner.",1,ConnectionPool.getPoolCleaners().size() );
@@ -62,6 +80,7 @@ public class PoolCleanerTest extends DefaultTestCase {
         ds2.close();
         assertEquals("Pool shutdown, no cleaners should be present.",0,ConnectionPool.getPoolCleaners().size() );
         assertNull("Pool timer should be null after shutdown", ConnectionPool.getPoolTimer());
+        assertEquals("Pool cleaner threads should not be present after close.",0, countPoolCleanerThreads());
     }
 
     public void testIdleTimeout() throws Exception {
