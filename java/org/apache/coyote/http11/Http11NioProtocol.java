@@ -84,7 +84,7 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol {
             npnHandler.init(getEndpoint(), 0, adapter);
         }
     }
-    
+
     // -------------------- Properties--------------------
 
     private Http11ConnectionHandler cHandler;
@@ -222,7 +222,7 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol {
             }
             return super.process(socket, status);
         }
-        
+
 
         /**
          * Expected to be used by the handler once the processor is no longer

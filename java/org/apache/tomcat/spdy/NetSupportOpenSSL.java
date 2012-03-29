@@ -42,16 +42,16 @@ public class NetSupportOpenSSL extends SpdyContext.NetSupport {
             }
         });
         //}
-        con.setNpn("spdy/2");        
+        con.setNpn("spdy/2");
     }
-    
+
     @Override
     public boolean isSpdy(Object socketW) {
         byte[] proto = new byte[32];
         int len = SSLExt.getNPN((Long) socketW, proto);
         return len == 6; // todo: check spdy/2
     }
-    
+
     @Override
     public SpdyConnection getConnection(String host, int port) throws IOException {
         SpdyConnectionAprSocket spdy = new SpdyConnectionAprSocket(ctx);
@@ -78,7 +78,7 @@ public class NetSupportOpenSSL extends SpdyContext.NetSupport {
     public void onAccept(Object socket) throws IOException {
         onAcceptLong((Long) socket);
     }
-    
+
     public void onAcceptLong(long socket) throws IOException {
         SpdyConnectionAprSocket spdy = new SpdyConnectionAprSocket(ctx);
         AprSocket s = con.socket(socket);
@@ -209,5 +209,5 @@ public class NetSupportOpenSSL extends SpdyContext.NetSupport {
         }
     }
 
-    
+
 }

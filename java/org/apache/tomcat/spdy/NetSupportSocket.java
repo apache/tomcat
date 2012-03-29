@@ -30,7 +30,7 @@ public class NetSupportSocket extends SpdyContext.NetSupport {
 
     public void onCreateEngine(Object engine) {
     }
-    
+
     public boolean isSpdy(Object socketW) {
         return false;
     }
@@ -48,9 +48,9 @@ public class NetSupportSocket extends SpdyContext.NetSupport {
             ex.printStackTrace();
             throw ex;
         }
-        
+
     }
-    
+
 
     protected Socket getSocket(String host, int port) throws IOException {
         try {
@@ -61,12 +61,12 @@ public class NetSupportSocket extends SpdyContext.NetSupport {
                 socket.startHandshake();
                 return socket;
             } else {
-                return new Socket(host, port);            
+                return new Socket(host, port);
             }
         } catch (NoSuchAlgorithmException e) {
             throw new IOException(e);
         }
-        
+
     }
 
     boolean running = true;
@@ -84,7 +84,7 @@ public class NetSupportSocket extends SpdyContext.NetSupport {
         ch.onBlockingSocket();
     }
 
-    
+
     @Override
     public void listen(final int port, String cert, String key) throws IOException {
         ctx.getExecutor().execute(new Runnable() {
@@ -167,6 +167,6 @@ public class NetSupportSocket extends SpdyContext.NetSupport {
             }
         }
     }
-    
+
 }
 

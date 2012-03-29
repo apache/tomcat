@@ -71,7 +71,7 @@ class CompressDeflater6 implements CompressSupport {
         // TODO: code to plug in v7-specific. It is marginally faster.
         return new CompressDeflater6();
     }
-    
+
     public void recycle() {
         // TODO
     }

@@ -128,7 +128,7 @@ public class JIoEndpoint extends AbstractEndpoint {
         public SocketState process(SocketWrapper<Socket> socket,
                 SocketStatus status);
         public SSLImplementation getSslImplementation();
-        public void beforeHandshake(SocketWrapper<Socket> socket);        
+        public void beforeHandshake(SocketWrapper<Socket> socket);
     }
 
 

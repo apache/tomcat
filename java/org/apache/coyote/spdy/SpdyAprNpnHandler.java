@@ -19,7 +19,6 @@ package org.apache.coyote.spdy;
 import java.io.IOException;
 
 import org.apache.coyote.Adapter;
-import org.apache.coyote.http11.Http11AprProtocol;
 import org.apache.coyote.http11.NpnHandler;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -95,9 +94,9 @@ public class SpdyAprNpnHandler implements NpnHandler {
 
         SocketWrapper<Long> socketW = (SocketWrapper<Long>) socketO;
         long socket = socketW.getSocket().longValue();
-        
+
         if (! spdyContext.getNetSupport().isSpdy(socketW.getSocket())) {
-            return SocketState.OPEN;            
+            return SocketState.OPEN;
         }
 
         try {

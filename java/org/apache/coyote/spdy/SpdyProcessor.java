@@ -102,7 +102,7 @@ public class SpdyProcessor extends AbstractProcessor<Object> implements
             if (inFrame.remaining() == 0 && inFrame.isHalfClose()) {
                 return -1;
             }
-            
+
             int rd = Math.min(inFrame.remaining(), bchunk.getBytes().length);
             System.arraycopy(inFrame.data, inFrame.off, bchunk.getBytes(),
                     bchunk.getStart(), rd);
