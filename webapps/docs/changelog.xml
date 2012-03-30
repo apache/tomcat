@@ -219,6 +219,10 @@
         (markt)
       </fix>
       <fix>
+        <bug>52998</bug>: Remainder of fix. Cache the class to use for the EL
+        expression factory per class loader. (kkolinko)
+      </fix>
+      <fix>
         <bug>53001</bug>: Revert the fix for <bug>46915</bug> since the use case
         described in the bug is invalid since it breaks the EL specification.
         (markt)
