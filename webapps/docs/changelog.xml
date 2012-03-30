@@ -213,6 +213,11 @@
         <bug>52970</bug>: Take account of coercion rules when invoking methods
         via EL. (markt)
       </fix>
+      <fix>
+        <bug>53001</bug>: Revert the fix for <bug>46915</bug> since the use case
+        described in the bug is invalid since it breaks the EL specification.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">
