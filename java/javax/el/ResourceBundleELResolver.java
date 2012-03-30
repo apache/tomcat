@@ -33,18 +33,20 @@ public class ResourceBundleELResolver extends ELResolver {
 
     @Override
     public Object getValue(ELContext context, Object base, Object property)
-            throws NullPointerException, PropertyNotFoundException, ELException {
+            throws NullPointerException, PropertyNotFoundException,
+            ELException {
+
         if (context == null) {
             throw new NullPointerException();
         }
 
         if (base instanceof ResourceBundle) {
+            context.setPropertyResolved(true);
+
             if (property != null) {
                 try {
-                    Object result = ((ResourceBundle) base).getObject(property
+                    return ((ResourceBundle) base).getObject(property
                             .toString());
-                    context.setPropertyResolved(true);
-                    return result;
                 } catch (MissingResourceException mre) {
                     return "???" + property.toString() + "???";
                 }
