@@ -68,6 +68,14 @@
         during an asynchronous request on a container thread. (markt)
       </fix>
       <fix>
+        Correct fix for <bug>51741</bug> (<rev>1307600</rev>):
+        If <code>VirtualDirContext</code> class is configured with non-empty
+        value of <code>extraResourcePaths</code> option (a feature added
+        in 7.0.24), do not implicitly set <code>allowLinking</code> option to
+        the value of <code>true</code>. If it is really needed, it should be
+        set explicitly. (kkolinko)
+      </fix>
+      <fix>
         <bug>52500</bug>: Added configurable mechanism to retrieve user names
         from X509 client certificates. Based on a patch provided by
         Michael Furman. (schultz)
