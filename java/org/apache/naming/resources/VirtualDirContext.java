@@ -114,9 +114,6 @@ public class VirtualDirContext extends FileDirContext {
                     mappedResourcePaths.put(path, resourcePaths);
                 }
                 resourcePaths.add(dir);
-
-                // Set allowLinking since there can be no canonical path
-                setAllowLinking(true);
             }
         }
         if (mappedResourcePaths.isEmpty()) {
