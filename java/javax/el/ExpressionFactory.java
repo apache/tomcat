@@ -25,11 +25,17 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
+import java.lang.ref.WeakReference;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.Properties;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
  *
@@ -47,6 +53,10 @@ public abstract class ExpressionFactory {
 
     private static final String SEP;
     private static final String PROPERTY_FILE;
+
+    private static final CacheValue nullTcclFactory = new CacheValue();
+    private static ConcurrentMap<CacheKey, CacheValue> factoryCache
+        = new ConcurrentHashMap<CacheKey, CacheValue>();
 
     static {
         if (IS_SECURITY_ENABLED) {
@@ -118,15 +128,60 @@ public abstract class ExpressionFactory {
         ExpressionFactory result = null;
 
         ClassLoader tccl = Thread.currentThread().getContextClassLoader();
-        String className = discoverClassName(tccl);
+
+        CacheValue cacheValue;
+        Class<?> clazz;
+
+        if (tccl == null) {
+            cacheValue = nullTcclFactory;
+        } else {
+            CacheKey key = new CacheKey(tccl);
+            cacheValue = factoryCache.get(key);
+            if (cacheValue == null) {
+                CacheValue newCacheValue = new CacheValue();
+                cacheValue = factoryCache.putIfAbsent(key, newCacheValue);
+                if (cacheValue == null) {
+                    cacheValue = newCacheValue;
+                }
+            }
+        }
+
+        final Lock readLock = cacheValue.getLock().readLock();
+        readLock.lock();
+        try {
+            clazz = cacheValue.getFactoryClass();
+        } finally {
+            readLock.unlock();
+        }
+
+        if (clazz == null) {
+            String className = null;
+            try {
+                final Lock writeLock = cacheValue.getLock().writeLock();
+                writeLock.lock();
+                try {
+                    className = cacheValue.getFactoryClassName();
+                    if (className == null) {
+                        className = discoverClassName(tccl);
+                        cacheValue.setFactoryClassName(className);
+                    }
+                    if (tccl == null) {
+                        clazz = Class.forName(className);
+                    } else {
+                        clazz = tccl.loadClass(className);
+                    }
+                    cacheValue.setFactoryClass(clazz);
+                } finally {
+                    writeLock.unlock();
+                }
+            } catch (ClassNotFoundException e) {
+                throw new ELException(
+                    "Unable to find ExpressionFactory of type: " + className,
+                    e);
+            }
+        }
 
         try {
-            Class<?> clazz = null;
-            if (tccl == null) {
-                clazz = Class.forName(className);
-            } else {
-                clazz = tccl.loadClass(className);
-            }
             Constructor<?> constructor = null;
             // Do we need to look for a constructor that will take properties?
             if (properties != null) {
@@ -146,21 +201,17 @@ public abstract class ExpressionFactory {
                     (ExpressionFactory) constructor.newInstance(properties);
             }
 
-        } catch (ClassNotFoundException e) {
-            throw new ELException(
-                    "Unable to find ExpressionFactory of type: " + className,
-                    e);
         } catch (InstantiationException e) {
             throw new ELException(
-                    "Unable to create ExpressionFactory of type: " + className,
+                    "Unable to create ExpressionFactory of type: " + clazz.getName(),
                     e);
         } catch (IllegalAccessException e) {
             throw new ELException(
-                    "Unable to create ExpressionFactory of type: " + className,
+                    "Unable to create ExpressionFactory of type: " + clazz.getName(),
                     e);
         } catch (IllegalArgumentException e) {
             throw new ELException(
-                    "Unable to create ExpressionFactory of type: " + className,
+                    "Unable to create ExpressionFactory of type: " + clazz.getName(),
                     e);
         } catch (InvocationTargetException e) {
             Throwable cause = e.getCause();
@@ -171,11 +222,75 @@ public abstract class ExpressionFactory {
                 throw (VirtualMachineError) cause;
             }
             throw new ELException(
-                    "Unable to create ExpressionFactory of type: " + className,
+                    "Unable to create ExpressionFactory of type: " + clazz.getName(),
                     e);
         }
 
         return result;
+    }
+
+    /**
+     * Key used to cache ExpressionFactory discovery information per class
+     * loader. The class loader reference is never {@code null}, because
+     * {@code null} tccl is handled separately.
+     */
+    private static class CacheKey {
+        private final int hash;
+        private final WeakReference<ClassLoader> ref;
+
+        public CacheKey(ClassLoader cl) {
+            hash = cl.hashCode();
+            ref = new WeakReference<ClassLoader>(cl);
+        }
+
+        @Override
+        public int hashCode() {
+            return hash;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (obj == this) {
+                return true;
+            }
+            if (!(obj instanceof CacheKey)) {
+                return false;
+            }
+            ClassLoader thisCl = ref.get();
+            if (thisCl == null) {
+                return false;
+            }
+            return thisCl == ((CacheKey) obj).ref.get();
+        }
+    }
+
+    private static class CacheValue {
+        private final ReadWriteLock lock = new ReentrantReadWriteLock();
+        private String className;
+        private WeakReference<Class<?>> ref;
+
+        public CacheValue() {
+        }
+
+        public ReadWriteLock getLock() {
+            return lock;
+        }
+
+        public String getFactoryClassName() {
+            return className;
+        }
+
+        public void setFactoryClassName(String className) {
+            this.className = className;
+        }
+
+        public Class<?> getFactoryClass() {
+            return ref != null ? ref.get() : null;
+        }
+
+        public void setFactoryClass(Class<?> clazz) {
+            ref = new WeakReference<Class<?>>(clazz);
+        }
     }
 
     /**
