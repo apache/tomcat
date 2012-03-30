@@ -162,7 +162,7 @@
   <defaultexcludes add="**/.git/**" />
   <defaultexcludes remove="**/.gitignore" />
   <!--<defaultexcludes echo="true" />-->
-	
+
   <available file="${npn.jar}" property="npn.exists" />
 
   <!-- Classpaths -->
@@ -2351,7 +2351,7 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
     </antcall>
 
   </target>
-	
+
   <target name="download-npn"
           description="Download optional NPN" >
     <antcall target="downloadfile">
