@@ -214,6 +214,11 @@
         via EL. (markt)
       </fix>
       <fix>
+        <bug>52998</bug>: Partial fix. Remove static references to the EL
+        expression factory and use per web application references instead.
+        (markt)
+      </fix>
+      <fix>
         <bug>53001</bug>: Revert the fix for <bug>46915</bug> since the use case
         described in the bug is invalid since it breaks the EL specification.
         (markt)
