@@ -27,6 +27,7 @@ import java.util.Locale;
 import javax.el.ELException;
 import javax.el.ExpressionFactory;
 import javax.el.FunctionMapper;
+import javax.servlet.jsp.JspFactory;
 import javax.servlet.jsp.tagext.FunctionInfo;
 import javax.servlet.jsp.tagext.PageData;
 import javax.servlet.jsp.tagext.TagAttributeInfo;
@@ -500,8 +501,7 @@ class Validator {
                 new JspUtil.ValidAttribute("doctype-public"),
                 new JspUtil.ValidAttribute("doctype-system") };
 
-        private static final ExpressionFactory EXPRESSION_FACTORY =
-            ExpressionFactory.newInstance();
+        private final ExpressionFactory expressionFactory;
 
         /*
          * Constructor
@@ -510,6 +510,11 @@ class Validator {
             this.pageInfo = compiler.getPageInfo();
             this.err = compiler.getErrorDispatcher();
             this.loader = compiler.getCompilationContext().getClassLoader();
+            // Get the cached EL expression factory for this context
+            expressionFactory =
+                    JspFactory.getDefaultFactory().getJspApplicationContext(
+                    compiler.getCompilationContext().getServletContext()).
+                    getExpressionFactory();
         }
 
         @Override
@@ -1177,7 +1182,7 @@ class Validator {
                                             Boolean.TYPE == expectedClass ||
                                             expectedClass.isEnum()) {
                                         try {
-                                            EXPRESSION_FACTORY.coerceToType(attrs.getValue(i), expectedClass);
+                                            expressionFactory.coerceToType(attrs.getValue(i), expectedClass);
                                         } catch (Exception e) {
                                             err.jspError
                                                 (n, "jsp.error.coerce_to_type",
