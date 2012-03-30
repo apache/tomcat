@@ -21,4 +21,18 @@
   <artifactId>tomcat-util</artifactId>
   <version>@MAVEN.DEPLOY.VERSION@</version>
   <description>Common code shared by Catalina and Jasper</description>
+  <dependencies>
+    <dependency>
+      <groupId>org.apache.tomcat</groupId>
+      <artifactId>tomcat-juli</artifactId>
+      <version>@MAVEN.DEPLOY.VERSION@</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.tomcat</groupId>
+      <artifactId>tomcat-api</artifactId>
+      <version>@MAVEN.DEPLOY.VERSION@</version>
+      <scope>compile</scope>
+    </dependency>
+  </dependencies>
 </project>

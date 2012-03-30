@@ -252,6 +252,8 @@
                srcJarFileName="servlet-api-src.jar"/>
 
     <doMavenDeploy artifactId="tomcat-api"/>
+    <doMavenDeploy artifactId="tomcat-jni"/>
+    <doMavenDeploy artifactId="tomcat-spdy"/>
     <doMavenDeploy artifactId="tomcat-util"/>
     <doMavenDeploy artifactId="tomcat-coyote"/>
     <doMavenDeploy artifactId="tomcat-dbcp"/>
