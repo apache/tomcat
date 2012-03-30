@@ -115,48 +115,11 @@ public abstract class ExpressionFactory {
      * @return the new ExpressionFactory
      */
     public static ExpressionFactory newInstance(Properties properties) {
-        String className = null;
         ExpressionFactory result = null;
         
         ClassLoader tccl = Thread.currentThread().getContextClassLoader();
+        String className = discoverClassName(tccl);
 
-        // First services API
-        className = getClassNameServices(tccl);
-        if (className == null) {
-            if (IS_SECURITY_ENABLED) {
-                className = AccessController.doPrivileged(
-                        new PrivilegedAction<String>() {
-                            @Override
-                            public String run() {
-                                return getClassNameJreDir();
-                            }
-                        }
-                );
-            } else {
-                // Second el.properties file
-                className = getClassNameJreDir();
-            }
-        }
-        if (className == null) {
-            if (IS_SECURITY_ENABLED) {
-                className = AccessController.doPrivileged(
-                        new PrivilegedAction<String>() {
-                            @Override
-                            public String run() {
-                                return getClassNameSysProp();
-                            }
-                        }
-                );
-            } else {
-                // Third system property 
-                className = getClassNameSysProp();
-            }
-        }
-        if (className == null) {
-            // Fourth - default
-            className = "org.apache.el.ExpressionFactoryImpl";
-        }
-        
         try {
             Class<?> clazz = null;
             if (tccl == null) {
@@ -215,6 +178,55 @@ public abstract class ExpressionFactory {
         return result;
     }
     
+    /**
+     * Discover the name of class that implements ExpressionFactory.
+     *
+     * @param tccl
+     *            {@code ClassLoader}
+     * @return Class name. There is default, so it is never {@code null}.
+     */
+    private static String discoverClassName(ClassLoader tccl) {
+        String className = null;
+
+        // First services API
+        className = getClassNameServices(tccl);
+        if (className == null) {
+            if (IS_SECURITY_ENABLED) {
+                className = AccessController.doPrivileged(
+                        new PrivilegedAction<String>() {
+                            @Override
+                            public String run() {
+                                return getClassNameJreDir();
+                            }
+                        }
+                );
+            } else {
+                // Second el.properties file
+                className = getClassNameJreDir();
+            }
+        }
+        if (className == null) {
+            if (IS_SECURITY_ENABLED) {
+                className = AccessController.doPrivileged(
+                        new PrivilegedAction<String>() {
+                            @Override
+                            public String run() {
+                                return getClassNameSysProp();
+                            }
+                        }
+                );
+            } else {
+                // Third system property
+                className = getClassNameSysProp();
+            }
+        }
+        if (className == null) {
+            // Fourth - default
+            className = "org.apache.el.ExpressionFactoryImpl";
+        }
+        return className;
+    }
+
     private static String getClassNameServices(ClassLoader tccl) {
         InputStream is = null;
         
