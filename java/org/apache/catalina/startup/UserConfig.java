@@ -25,6 +25,7 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
+import java.util.regex.Pattern;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.Host;
@@ -99,6 +100,15 @@ public final class UserConfig
     private String userClass =
         "org.apache.catalina.startup.PasswdUserDatabase";
 
+    /**
+     * A regular expression defining user who deployment is allowed.
+     */
+    protected Pattern enabled = null;
+
+    /**
+     * A regular expression defining user who deployment is denied.
+     */
+    protected Pattern disabled = null;
 
     // ------------------------------------------------------------- Properties
 
@@ -210,6 +220,50 @@ public final class UserConfig
 
     }
 
+    /**
+     * Return the regular expression used to test for user who deployment is allowed. 
+     */
+    public String getEnabled() {
+        if (enabled == null) return null;
+        return enabled.toString();
+    }
+
+
+    /**
+     * Set the regular expression used to test for user who deployment is allowed.
+     *
+     * @param enabled The new enabled expression
+     */
+    public void setEnabled(String enabled) {
+        if (enabled == null || enabled.length() == 0) {
+            this.enabled = null;
+        } else {
+            this.enabled = Pattern.compile(enabled);
+        }
+    }
+
+
+    /**
+     * Return the regular expression used to test for user who deployment is denied.
+     */
+    public String getDisabled() {
+        if (disabled == null) return null;
+        return disabled.toString();
+    }
+
+
+    /**
+     * Set the regular expression used to test for user who deployment is denied.
+     *
+     * @param disabled The new disabled expression
+     */
+    public void setDisabled(String disabled) {
+        if (disabled == null || disabled.length() == 0) {
+            this.disabled = null;
+        } else {
+            this.disabled = Pattern.compile(disabled);
+        }
+    }
 
     // --------------------------------------------------------- Public Methods
 
@@ -270,6 +324,7 @@ public final class UserConfig
         while (users.hasMoreElements()) {
             String user = users.nextElement();
             String home = database.getHome(user);
+            if (!isDeployEnabled(user)) continue;
             results.add(executor.submit(new DeployUserDirectory(this, user, home)));
         }
 
@@ -346,6 +401,26 @@ public final class UserConfig
         if (host.getLogger().isDebugEnabled())
             host.getLogger().debug(sm.getString("userConfig.stop"));
 
+    }
+
+    /**
+     * Test enabled and disabled rules for the provided user.
+     *
+     * @return <code>true</code> if this user is allowed to deploy,
+     *         <code>false</code> otherwise
+     */
+    private boolean isDeployEnabled(String user) {
+        if (disabled != null && disabled.matcher(user).matches()) {
+            return false;
+        }
+        if (enabled != null) {
+            if (enabled.matcher(user).matches()) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+        return true;
     }
 
     private static class DeployUserDirectory implements Runnable {
