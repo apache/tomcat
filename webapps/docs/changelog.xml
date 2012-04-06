@@ -57,7 +57,7 @@
   <subsection name="Catalina">
     <changelog>
       <add>
-        Add new attributes of enabled and disabled to UserConfig. (kfujino)
+        Add new attributes of allow and deny to UserConfig. (kfujino)
       </add>
     </changelog>
   </subsection>
