@@ -20,7 +20,8 @@ import java.io.File;
 
 import javax.servlet.http.HttpServletResponse;
 
-import org.junit.Assert;
+import static org.junit.Assert.assertEquals;
+
 import org.junit.Test;
 
 import org.apache.catalina.core.StandardContext;
@@ -48,6 +49,6 @@ public class TestCompositeELResolver extends TomcatBaseTest {
         int rc = getUrl("http://localhost:" + getPort() +
                 "/test/bug50408.jsp", new ByteChunk(), null);
 
-        Assert.assertEquals(HttpServletResponse.SC_OK, rc);
+        assertEquals(HttpServletResponse.SC_OK, rc);
     }
 }
