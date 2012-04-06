@@ -377,18 +377,18 @@
         used.</p>
       </attribute>
 
-      <attribute name="enabled" required="false">
+      <attribute name="allow" required="false">
         <p>A regular expression defining user who deployment is allowed. If this 
         attribute is specified, the user to deploy must match for this pattern.
         If this attribute is not specified, all users will be deployed unless the
-        user matches a disabled pattern.</p>
+        user matches a deny pattern.</p>
       </attribute>
 
-      <attribute name="disabled" required="false">
+      <attribute name="deny" required="false">
         <p>A regular expression defining user who deployment is denied. If this
         attribute is specified, the user to deploy must not match for this
         pattern. If this attribute is not specified, deployment of user will be
-        governed by a enabled attribute.</p>
+        governed by a allow attribute.</p>
       </attribute>
 
     </attributes>

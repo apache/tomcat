@@ -103,12 +103,12 @@ public final class UserConfig
     /**
      * A regular expression defining user who deployment is allowed.
      */
-    protected Pattern enabled = null;
+    protected Pattern allow = null;
 
     /**
      * A regular expression defining user who deployment is denied.
      */
-    protected Pattern disabled = null;
+    protected Pattern deny = null;
 
     // ------------------------------------------------------------- Properties
 
@@ -223,22 +223,22 @@ public final class UserConfig
     /**
      * Return the regular expression used to test for user who deployment is allowed. 
      */
-    public String getEnabled() {
-        if (enabled == null) return null;
-        return enabled.toString();
+    public String getAllow() {
+        if (allow == null) return null;
+        return allow.toString();
     }
 
 
     /**
      * Set the regular expression used to test for user who deployment is allowed.
      *
-     * @param enabled The new enabled expression
+     * @param allow The new allow expression
      */
-    public void setEnabled(String enabled) {
-        if (enabled == null || enabled.length() == 0) {
-            this.enabled = null;
+    public void setAllow(String allow) {
+        if (allow == null || allow.length() == 0) {
+            this.allow = null;
         } else {
-            this.enabled = Pattern.compile(enabled);
+            this.allow = Pattern.compile(allow);
         }
     }
 
@@ -246,22 +246,22 @@ public final class UserConfig
     /**
      * Return the regular expression used to test for user who deployment is denied.
      */
-    public String getDisabled() {
-        if (disabled == null) return null;
-        return disabled.toString();
+    public String getDeny() {
+        if (deny == null) return null;
+        return deny.toString();
     }
 
 
     /**
      * Set the regular expression used to test for user who deployment is denied.
      *
-     * @param disabled The new disabled expression
+     * @param deny The new deny expression
      */
-    public void setDisabled(String disabled) {
-        if (disabled == null || disabled.length() == 0) {
-            this.disabled = null;
+    public void setDeny(String deny) {
+        if (deny == null || deny.length() == 0) {
+            this.deny = null;
         } else {
-            this.disabled = Pattern.compile(disabled);
+            this.deny = Pattern.compile(deny);
         }
     }
 
@@ -323,8 +323,8 @@ public final class UserConfig
         Enumeration<String> users = database.getUsers();
         while (users.hasMoreElements()) {
             String user = users.nextElement();
+            if (!isDeployAllowed(user)) continue;
             String home = database.getHome(user);
-            if (!isDeployEnabled(user)) continue;
             results.add(executor.submit(new DeployUserDirectory(this, user, home)));
         }
 
@@ -404,17 +404,17 @@ public final class UserConfig
     }
 
     /**
-     * Test enabled and disabled rules for the provided user.
+     * Test allow and deny rules for the provided user.
      *
      * @return <code>true</code> if this user is allowed to deploy,
      *         <code>false</code> otherwise
      */
-    private boolean isDeployEnabled(String user) {
-        if (disabled != null && disabled.matcher(user).matches()) {
+    private boolean isDeployAllowed(String user) {
+        if (deny != null && deny.matcher(user).matches()) {
             return false;
         }
-        if (enabled != null) {
-            if (enabled.matcher(user).matches()) {
+        if (allow != null) {
+            if (allow.matcher(user).matches()) {
                 return true;
             } else {
                 return false;
