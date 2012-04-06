@@ -16,10 +16,6 @@
  */
 package org.apache.catalina.websocket;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -36,6 +32,12 @@ import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
+import org.junit.Test;
+
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.catalina.util.Base64;
@@ -43,7 +45,6 @@ import org.apache.tomcat.util.buf.B2CConverter;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.buf.C2BConverter;
 import org.apache.tomcat.util.buf.CharChunk;
-import org.junit.Test;
 
 public class TestWebSocket extends TomcatBaseTest {
 
@@ -303,7 +304,7 @@ public class TestWebSocket extends TomcatBaseTest {
         return cc.toString();
     }
 
-    private class WebSocketCLient 
+    private class WebSocketCLient
     {
         // Open the socket
         final String encoding = "ISO-8859-1";
