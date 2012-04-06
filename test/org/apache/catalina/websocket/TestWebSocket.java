@@ -65,7 +65,7 @@ public class TestWebSocket extends TomcatBaseTest {
 
         tomcat.start();
 
-        WebSocketCLient client= new WebSocketCLient();
+        WebSocketClient client= new WebSocketClient();
 
 
         // Send the WebSocket handshake
@@ -105,7 +105,7 @@ public class TestWebSocket extends TomcatBaseTest {
         tomcat.addWebapp(null, "/examples", appDir.getAbsolutePath());
 
         tomcat.start();
-        WebSocketCLient client= new WebSocketCLient();
+        WebSocketClient client= new WebSocketClient();
 
         // Send the WebSocket handshake
         client.writer.write("GET /examples/websocket/echoStream HTTP/1.1" + CRLF);
@@ -142,7 +142,7 @@ public class TestWebSocket extends TomcatBaseTest {
         tomcat.addWebapp(null, "/examples", appDir.getAbsolutePath());
 
         tomcat.start();
-        WebSocketCLient client= new WebSocketCLient();
+        WebSocketClient client= new WebSocketClient();
 
 
         // Send the WebSocket handshake
@@ -170,7 +170,7 @@ public class TestWebSocket extends TomcatBaseTest {
         tomcat.addWebapp(null, "/examples", appDir.getAbsolutePath());
 
         tomcat.start();
-        WebSocketCLient client= new WebSocketCLient();
+        WebSocketClient client= new WebSocketClient();
 
         // Send the WebSocket handshake
         client.writer.write("GET /examples/websocket/echoStream HTTP/1.1" + CRLF);
@@ -196,7 +196,7 @@ public class TestWebSocket extends TomcatBaseTest {
         tomcat.addWebapp(null, "/examples", appDir.getAbsolutePath());
 
         tomcat.start();
-        WebSocketCLient client= new WebSocketCLient();
+        WebSocketClient client= new WebSocketClient();
 
         // Send the WebSocket handshake
         client.writer.write("GET /examples/websocket/echoStream HTTP/1.1" + CRLF);
@@ -304,7 +304,7 @@ public class TestWebSocket extends TomcatBaseTest {
         return cc.toString();
     }
 
-    private class WebSocketCLient
+    private class WebSocketClient
     {
         // Open the socket
         final String encoding = "ISO-8859-1";
@@ -312,7 +312,7 @@ public class TestWebSocket extends TomcatBaseTest {
         Writer writer ;
         BufferedReader reader;
 
-        private WebSocketCLient() {
+        private WebSocketClient() {
             SocketAddress addr = new InetSocketAddress("localhost", getPort());
             socket = new Socket();
             try {
