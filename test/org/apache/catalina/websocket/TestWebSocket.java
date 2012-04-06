@@ -324,7 +324,7 @@ public class TestWebSocket extends TomcatBaseTest {
                 Reader r = new InputStreamReader(is, encoding);
                 reader = new BufferedReader(r);
             } catch (Exception e) {
-                new RuntimeException(e);
+                throw new RuntimeException(e);
             }
         }
 
