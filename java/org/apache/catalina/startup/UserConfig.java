@@ -221,7 +221,7 @@ public final class UserConfig
     }
 
     /**
-     * Return the regular expression used to test for user who deployment is allowed. 
+     * Return the regular expression used to test for user who deployment is allowed.
      */
     public String getAllow() {
         if (allow == null) return null;
