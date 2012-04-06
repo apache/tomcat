@@ -19,7 +19,8 @@ package javax.servlet.jsp;
 
 import java.io.File;
 
-import org.junit.Assert;
+import static org.junit.Assert.assertTrue;
+
 import org.junit.Test;
 
 import org.apache.catalina.startup.Tomcat;
@@ -42,6 +43,6 @@ public class TestPageContext extends TomcatBaseTest {
                 "/test/bug49nnn/bug49196.jsp");
 
         String result = res.toString();
-        Assert.assertTrue(result.contains("OK"));
+        assertTrue(result.contains("OK"));
     }
 }
