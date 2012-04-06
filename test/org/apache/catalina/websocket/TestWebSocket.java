@@ -241,7 +241,7 @@ public class TestWebSocket extends TomcatBaseTest {
 
 
     private void sendMessage(String message, boolean finalFragment)
-    throws IOException{
+            throws IOException {
         ByteChunk bc = new ByteChunk(8192);
         C2BConverter c2b = new C2BConverter(bc, "UTF-8");
         c2b.convert(message);
@@ -249,7 +249,6 @@ public class TestWebSocket extends TomcatBaseTest {
 
         int len = bc.getLength();
         assertTrue(len < 126);
-
 
         byte first;
         if (isContinuation) {
@@ -304,8 +303,7 @@ public class TestWebSocket extends TomcatBaseTest {
         return cc.toString();
     }
 
-    private class WebSocketClient
-    {
+    private class WebSocketClient {
         // Open the socket
         final String encoding = "ISO-8859-1";
         Socket socket ;
