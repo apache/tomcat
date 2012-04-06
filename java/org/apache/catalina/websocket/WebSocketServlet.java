@@ -143,7 +143,7 @@ public abstract class WebSocketServlet extends HttpServlet {
                 }
             }
         }
-        return true;
+        return false;
     }
 
 
@@ -166,7 +166,7 @@ public abstract class WebSocketServlet extends HttpServlet {
         return result;
     }
 
-
+    // ToDo: Use ThreadLocal pool sha1Helper
     private String getWebSocketAccept(String key) {
         synchronized (sha1Helper) {
             sha1Helper.reset();
