@@ -143,7 +143,7 @@ public abstract class WebSocketServlet extends HttpServlet {
                 }
             }
         }
-        return true;
+        return false;
     }
 
 
