@@ -50,9 +50,6 @@
   <subsection name="Catalina">
     <changelog>
       <scode>
-        Correct websocket protocol version detection. (pero)
-      </scode>
-      <scode>
         Remove duplicate code that converted a Host&apos;s appBase attribute to
         a canonical file. (markt)
       </scode>
