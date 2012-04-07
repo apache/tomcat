@@ -64,6 +64,13 @@
       </add>
     </changelog>
   </subsection>
+  <subsection name="Other">
+    <changelog>
+      <update>
+        Update to Eclipse JDT Compiler 3.7.2 at maven tomcat-japser.pom. (pero)
+      </update>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 7.0.27 (markt)" rtext="released 2012-04-05">
   <subsection name="Catalina">
