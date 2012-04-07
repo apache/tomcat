@@ -16,10 +16,6 @@
  */
 package org.apache.catalina.websocket;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -36,6 +32,12 @@ import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
+import org.junit.Test;
+
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.catalina.util.Base64;
@@ -43,7 +45,6 @@ import org.apache.tomcat.util.buf.B2CConverter;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.buf.C2BConverter;
 import org.apache.tomcat.util.buf.CharChunk;
-import org.junit.Test;
 
 public class TestWebSocket extends TomcatBaseTest {
 
@@ -64,7 +65,7 @@ public class TestWebSocket extends TomcatBaseTest {
 
         tomcat.start();
 
-        WebSocketCLient client= new WebSocketCLient();
+        WebSocketClient client= new WebSocketClient();
 
 
         // Send the WebSocket handshake
@@ -104,7 +105,7 @@ public class TestWebSocket extends TomcatBaseTest {
         tomcat.addWebapp(null, "/examples", appDir.getAbsolutePath());
 
         tomcat.start();
-        WebSocketCLient client= new WebSocketCLient();
+        WebSocketClient client= new WebSocketClient();
 
         // Send the WebSocket handshake
         client.writer.write("GET /examples/websocket/echoStream HTTP/1.1" + CRLF);
@@ -141,7 +142,7 @@ public class TestWebSocket extends TomcatBaseTest {
         tomcat.addWebapp(null, "/examples", appDir.getAbsolutePath());
 
         tomcat.start();
-        WebSocketCLient client= new WebSocketCLient();
+        WebSocketClient client= new WebSocketClient();
 
 
         // Send the WebSocket handshake
@@ -169,7 +170,7 @@ public class TestWebSocket extends TomcatBaseTest {
         tomcat.addWebapp(null, "/examples", appDir.getAbsolutePath());
 
         tomcat.start();
-        WebSocketCLient client= new WebSocketCLient();
+        WebSocketClient client= new WebSocketClient();
 
         // Send the WebSocket handshake
         client.writer.write("GET /examples/websocket/echoStream HTTP/1.1" + CRLF);
@@ -195,7 +196,7 @@ public class TestWebSocket extends TomcatBaseTest {
         tomcat.addWebapp(null, "/examples", appDir.getAbsolutePath());
 
         tomcat.start();
-        WebSocketCLient client= new WebSocketCLient();
+        WebSocketClient client= new WebSocketClient();
 
         // Send the WebSocket handshake
         client.writer.write("GET /examples/websocket/echoStream HTTP/1.1" + CRLF);
@@ -240,7 +241,7 @@ public class TestWebSocket extends TomcatBaseTest {
 
 
     private void sendMessage(String message, boolean finalFragment)
-    throws IOException{
+            throws IOException {
         ByteChunk bc = new ByteChunk(8192);
         C2BConverter c2b = new C2BConverter(bc, "UTF-8");
         c2b.convert(message);
@@ -248,7 +249,6 @@ public class TestWebSocket extends TomcatBaseTest {
 
         int len = bc.getLength();
         assertTrue(len < 126);
-
 
         byte first;
         if (isContinuation) {
@@ -303,15 +303,14 @@ public class TestWebSocket extends TomcatBaseTest {
         return cc.toString();
     }
 
-    private class WebSocketCLient 
-    {
+    private class WebSocketClient {
         // Open the socket
         final String encoding = "ISO-8859-1";
         Socket socket ;
         Writer writer ;
         BufferedReader reader;
 
-        private WebSocketCLient() {
+        private WebSocketClient() {
             SocketAddress addr = new InetSocketAddress("localhost", getPort());
             socket = new Socket();
             try {
@@ -323,7 +322,7 @@ public class TestWebSocket extends TomcatBaseTest {
                 Reader r = new InputStreamReader(is, encoding);
                 reader = new BufferedReader(r);
             } catch (Exception e) {
-                new RuntimeException(e);
+                throw new RuntimeException(e);
             }
         }
 
