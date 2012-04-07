@@ -69,6 +69,9 @@
       <update>
         Update to Eclipse JDT Compiler 3.7.2 at maven tomcat-japser.pom. (pero)
       </update>
+      <fix>
+        Add missing dependencies in pom files. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
