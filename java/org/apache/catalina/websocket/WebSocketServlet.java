@@ -23,6 +23,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -45,19 +47,8 @@ public abstract class WebSocketServlet extends HttpServlet {
             "258EAFA5-E914-47DA-95CA-C5AB0DC85B11".getBytes(
                     B2CConverter.ISO_8859_1);
 
-    private MessageDigest sha1Helper;
-
-
-    @Override
-    public void init() throws ServletException {
-        super.init();
-
-        try {
-            sha1Helper = MessageDigest.getInstance("SHA1");
-        } catch (NoSuchAlgorithmException e) {
-            throw new ServletException(e);
-        }
-    }
+    private Queue<MessageDigest> sha1Helpers =
+            new ConcurrentLinkedQueue<MessageDigest>();
 
 
     @Override
@@ -167,12 +158,24 @@ public abstract class WebSocketServlet extends HttpServlet {
     }
 
 
-    private String getWebSocketAccept(String key) {
-        synchronized (sha1Helper) {
-            sha1Helper.reset();
-            sha1Helper.update(key.getBytes(B2CConverter.ISO_8859_1));
-            return Base64.encode(sha1Helper.digest(WS_ACCEPT));
+    private String getWebSocketAccept(String key) throws ServletException {
+
+        MessageDigest sha1Helper = sha1Helpers.poll();
+        if (sha1Helper == null) {
+            try {
+                sha1Helper = MessageDigest.getInstance("SHA1");
+            } catch (NoSuchAlgorithmException e) {
+                throw new ServletException(e);
+            }
         }
+
+        sha1Helper.reset();
+        sha1Helper.update(key.getBytes(B2CConverter.ISO_8859_1));
+        String result = Base64.encode(sha1Helper.digest(WS_ACCEPT));
+
+        sha1Helpers.add(sha1Helper);
+
+        return result;
     }
 
 
