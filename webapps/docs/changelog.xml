@@ -62,6 +62,10 @@
       <add>
         Add new attributes of allow and deny to UserConfig. (kfujino)
       </add>
+      <fix>
+        Remove potential bottleneck on creation of new WebSocket connections.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
