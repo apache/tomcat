@@ -57,7 +57,7 @@
   <subsection name="Catalina">
     <changelog>
       <fix>
-        Correct websocket protocol version detection. (pero)
+        <bug>53021</bug>: Correct WebSocket protocol version detection. (pero)
       </fix>
       <add>
         Add new attributes of allow and deny to UserConfig. (kfujino)
