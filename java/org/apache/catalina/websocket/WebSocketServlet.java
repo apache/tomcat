@@ -102,8 +102,8 @@ public abstract class WebSocketServlet extends HttpServlet {
         //      data present when the frame is fragmented.
 
         // If we got this far, all is good. Accept the connection.
-        resp.setHeader("upgrade", "websocket");
-        resp.setHeader("connection", "upgrade");
+        resp.setHeader("Upgrade", "websocket");
+        resp.setHeader("Connection", "upgrade");
         resp.setHeader("Sec-WebSocket-Accept", getWebSocketAccept(key));
         if (subProtocol != null) {
             resp.setHeader("Sec-WebSocket-Protocol", subProtocol);
