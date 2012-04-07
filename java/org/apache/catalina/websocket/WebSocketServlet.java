@@ -157,7 +157,7 @@ public abstract class WebSocketServlet extends HttpServlet {
         return result;
     }
 
-    // ToDo: Use ThreadLocal pool sha1Helper
+
     private String getWebSocketAccept(String key) throws ServletException {
 
         MessageDigest sha1Helper = sha1Helpers.poll();
