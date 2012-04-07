@@ -60,7 +60,8 @@
         <bug>53021</bug>: Correct WebSocket protocol version detection. (pero)
       </fix>
       <add>
-        Add new attributes of allow and deny to UserConfig. (kfujino)
+        Add new attributes of <code>allow</code> and <code>deny</code> to
+        UserConfig. (kfujino)
       </add>
       <fix>
         Remove potential bottleneck on creation of new WebSocket connections.
@@ -71,7 +72,7 @@
   <subsection name="Other">
     <changelog>
       <update>
-        Update to Eclipse JDT Compiler 3.7.2 at maven tomcat-japser.pom. (pero)
+        Update to Eclipse JDT Compiler 3.7.2 at maven tomcat-jasper.pom. (pero)
       </update>
       <fix>
         Add missing dependencies in pom files. (markt)
