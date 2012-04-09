@@ -447,7 +447,8 @@ public final class Bootstrap {
 
 
     /**
-     * Main method, used for testing only.
+     * Main method and entry point when starting Tomcat via the provided
+     * scripts.
      *
      * @param args Command line arguments to be processed
      */
