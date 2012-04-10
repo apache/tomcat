@@ -442,11 +442,7 @@ public class ConnectionPool {
             idle = new ArrayBlockingQueue<PooledConnection>(properties.getMaxActive(),properties.isFairQueue());
         }
 
-        //if the evictor thread is supposed to run, start it now
-        if (properties.isPoolSweeperEnabled()) {
-            poolCleaner = new PoolCleaner(this, properties.getTimeBetweenEvictionRunsMillis());
-            poolCleaner.start();
-        } //end if
+        initializePoolCleaner(properties);
 
         //create JMX MBean
         if (this.getPoolProperties().isJmxEnabled()) createMBean();
@@ -493,6 +489,15 @@ public class ConnectionPool {
         } //catch
 
         closed = false;
+    }
+
+
+    public void initializePoolCleaner(PoolConfiguration properties) {
+        //if the evictor thread is supposed to run, start it now
+        if (properties.isPoolSweeperEnabled()) {
+            poolCleaner = new PoolCleaner(this, properties.getTimeBetweenEvictionRunsMillis());
+            poolCleaner.start();
+        } //end if
     }
 
 
