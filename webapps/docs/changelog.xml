@@ -79,6 +79,15 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="jdbc-pool">
+    <changelog>
+      <fix>
+        <bug>50864</bug> (<rev>1311844</rev>):
+        JMX enable most pool properties (fhanik)
+      </fix>  
+    </changelog>
+  </subsection>
+  
 </section>
 <section name="Tomcat 7.0.27 (markt)" rtext="released 2012-04-05">
   <subsection name="Catalina">
