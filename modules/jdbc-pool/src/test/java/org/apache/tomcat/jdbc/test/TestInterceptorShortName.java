@@ -30,10 +30,14 @@ public class TestInterceptorShortName extends DefaultTestCase {
     public void testShortInterceptor() throws Exception {
         this.datasource = this.createDefaultDataSource();
         this.datasource.setJdbcInterceptors("TestInterceptor");
+        this.datasource.setUseDisposableConnectionFacade(false);
         this.datasource.setMaxActive(1);
+        this.datasource.createPool();
+        assertEquals("Only one interceptor should have been called setProperties[1]",1,TestInterceptor.instancecount.get());
+        TestInterceptor.instancecount.set(0);
         Connection con = this.datasource.getConnection();
         assertTrue("Pool should have been started.",TestInterceptor.poolstarted);
-        assertEquals("Only one interceptor should have been called setProperties",1,TestInterceptor.instancecount.get());
+        assertEquals("Only one interceptor should have been called setProperties[2]",1,TestInterceptor.instancecount.get());
         con.close();
         this.datasource.close();
         assertTrue("Pool should have been closed.",TestInterceptor.poolclosed);
