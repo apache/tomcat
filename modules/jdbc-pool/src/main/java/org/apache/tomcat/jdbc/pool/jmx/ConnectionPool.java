@@ -490,176 +490,177 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
 
     @Override
     public void setInitialSize(int initialSize) {
-        // TODO Auto-generated method stub
+        // noop - this pool is already running
+        throw new UnsupportedOperationException();
 
     }
 
 
     @Override
     public void setInitSQL(String initSQL) {
-        // TODO Auto-generated method stub
+        getPoolProperties().setInitSQL(initSQL);
 
     }
 
 
     @Override
     public void setJdbcInterceptors(String jdbcInterceptors) {
-        // TODO Auto-generated method stub
-
+        // noop - this pool is already running
+        throw new UnsupportedOperationException();
     }
 
 
     @Override
     public void setJmxEnabled(boolean jmxEnabled) {
-        // TODO Auto-generated method stub
-
+        // noop - this pool is already running and obviously jmx enabled
+        throw new UnsupportedOperationException();
     }
 
 
     @Override
     public void setLogAbandoned(boolean logAbandoned) {
-        // TODO Auto-generated method stub
-
+        getPoolProperties().setLogAbandoned(logAbandoned);
     }
 
 
     @Override
     public void setMaxActive(int maxActive) {
-        // TODO Auto-generated method stub
-
+        getPoolProperties().setMaxActive(maxActive);
     }
 
 
     @Override
     public void setMaxIdle(int maxIdle) {
-        // TODO Auto-generated method stub
+        getPoolProperties().setMaxIdle(maxIdle);
 
     }
 
 
     @Override
     public void setMaxWait(int maxWait) {
-        // TODO Auto-generated method stub
-
+        getPoolProperties().setMaxWait(maxWait);
     }
 
 
     @Override
     public void setMinEvictableIdleTimeMillis(int minEvictableIdleTimeMillis) {
-        // TODO Auto-generated method stub
-
+        boolean wasEnabled = getPoolProperties().isPoolSweeperEnabled();
+        getPoolProperties().setMinEvictableIdleTimeMillis(minEvictableIdleTimeMillis);
+        boolean shouldBeEnabled = getPoolProperties().isPoolSweeperEnabled();
+        //make sure pool cleaner starts when it should
+        if (!wasEnabled && shouldBeEnabled) pool.initializePoolCleaner(getPoolProperties());
     }
 
 
     @Override
     public void setMinIdle(int minIdle) {
-        // TODO Auto-generated method stub
-
+        getPoolProperties().setMinIdle(minIdle);
     }
 
 
     @Override
     public void setNumTestsPerEvictionRun(int numTestsPerEvictionRun) {
-        // TODO Auto-generated method stub
-
+        getPoolProperties().setNumTestsPerEvictionRun(numTestsPerEvictionRun);
     }
 
 
     @Override
     public void setPassword(String password) {
-        // TODO Auto-generated method stub
-
+        getPoolProperties().setPassword(password);
     }
 
 
     @Override
     public void setRemoveAbandoned(boolean removeAbandoned) {
-        // TODO Auto-generated method stub
-
+        boolean wasEnabled = getPoolProperties().isPoolSweeperEnabled();
+        getPoolProperties().setRemoveAbandoned(removeAbandoned);
+        boolean shouldBeEnabled = getPoolProperties().isPoolSweeperEnabled();
+        //make sure pool cleaner starts when it should
+        if (!wasEnabled && shouldBeEnabled) pool.initializePoolCleaner(getPoolProperties());
     }
 
 
     @Override
     public void setRemoveAbandonedTimeout(int removeAbandonedTimeout) {
-        // TODO Auto-generated method stub
-
+        boolean wasEnabled = getPoolProperties().isPoolSweeperEnabled();
+        getPoolProperties().setRemoveAbandonedTimeout(removeAbandonedTimeout);
+        boolean shouldBeEnabled = getPoolProperties().isPoolSweeperEnabled();
+        //make sure pool cleaner starts when it should
+        if (!wasEnabled && shouldBeEnabled) pool.initializePoolCleaner(getPoolProperties());
     }
 
 
     @Override
     public void setTestOnBorrow(boolean testOnBorrow) {
-        // TODO Auto-generated method stub
-
+        getPoolProperties().setTestOnBorrow(testOnBorrow);
     }
 
 
     @Override
     public void setTestOnConnect(boolean testOnConnect) {
-        // TODO Auto-generated method stub
-
+        getPoolProperties().setTestOnConnect(testOnConnect);
     }
 
 
     @Override
     public void setTestOnReturn(boolean testOnReturn) {
-        // TODO Auto-generated method stub
-
+        getPoolProperties().setTestOnReturn(testOnReturn);
     }
 
 
     @Override
     public void setTestWhileIdle(boolean testWhileIdle) {
-        // TODO Auto-generated method stub
-
+        boolean wasEnabled = getPoolProperties().isPoolSweeperEnabled();
+        getPoolProperties().setTestWhileIdle(testWhileIdle);
+        boolean shouldBeEnabled = getPoolProperties().isPoolSweeperEnabled();
+        //make sure pool cleaner starts when it should
+        if (!wasEnabled && shouldBeEnabled) pool.initializePoolCleaner(getPoolProperties());
     }
 
 
     @Override
     public void setTimeBetweenEvictionRunsMillis(int timeBetweenEvictionRunsMillis) {
-        // TODO Auto-generated method stub
-
+        boolean wasEnabled = getPoolProperties().isPoolSweeperEnabled();
+        getPoolProperties().setTimeBetweenEvictionRunsMillis(timeBetweenEvictionRunsMillis);
+        boolean shouldBeEnabled = getPoolProperties().isPoolSweeperEnabled();
+        //make sure pool cleaner starts when it should
+        if (!wasEnabled && shouldBeEnabled) pool.initializePoolCleaner(getPoolProperties());
     }
 
 
     @Override
     public void setUrl(String url) {
-        // TODO Auto-generated method stub
-
+        getPoolProperties().setUrl(url);
     }
 
 
     @Override
     public void setUseEquals(boolean useEquals) {
-        // TODO Auto-generated method stub
-
+        getPoolProperties().setUseEquals(useEquals);
     }
 
 
     @Override
     public void setUseLock(boolean useLock) {
-        // TODO Auto-generated method stub
-
+        getPoolProperties().setUseLock(useLock);
     }
 
 
     @Override
     public void setUsername(String username) {
-        // TODO Auto-generated method stub
-
+        getPoolProperties().setUsername(username);
     }
 
 
     @Override
     public void setValidationInterval(long validationInterval) {
-        // TODO Auto-generated method stub
-
+        getPoolProperties().setValidationInterval(validationInterval);
     }
 
 
     @Override
     public void setValidationQuery(String validationQuery) {
-        // TODO Auto-generated method stub
-
+        getPoolProperties().setValidationQuery(validationQuery);
     }
 
     /**
@@ -686,7 +687,7 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
 
     @Override
     public void setSuspectTimeout(int seconds) {
-        //no op
+        getPoolProperties().setSuspectTimeout(seconds);
     }
 
     /**
@@ -711,7 +712,7 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
      */
     @Override
     public void setDataSourceJNDI(String jndiDS) {
-        //noop
+        getPoolProperties().setDataSourceJNDI(jndiDS);
     }
 
     /**
@@ -735,7 +736,7 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
      */
     @Override
     public void setAlternateUsernameAllowed(boolean alternateUsernameAllowed) {
-        //noop
+        getPoolProperties().setAlternateUsernameAllowed(alternateUsernameAllowed);
     }
 
     /**
@@ -743,7 +744,7 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
      */
     @Override
     public void setValidator(Validator validator) {
-        //noop
+        getPoolProperties().setValidator(validator);
     }
 
     /**
