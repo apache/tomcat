@@ -71,6 +71,10 @@
         <bug>53056</bug>: Add APR version number to tcnative version INFO log
         message. (schultz)
       </fix>
+      <fix>
+        <bug>53057</bug>: Add OpenSSL version number INFO log message when
+        initializing. (schultz)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
