@@ -213,7 +213,10 @@ public class AprLifecycleListener
         }
 
         log.info(sm.getString("aprListener.tcnValid", major + "."
-                    + minor + "." + patch));
+                    + minor + "." + patch,
+                    Library.APR_MAJOR_VERSION + "."
+                    + Library.APR_MINOR_VERSION + "."
+                    + Library.APR_PATCH_VERSION));
 
         // Log APR flags
         log.info(sm.getString("aprListener.flags",
