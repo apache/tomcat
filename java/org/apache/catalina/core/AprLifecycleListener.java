@@ -276,6 +276,8 @@ public class AprLifecycleListener
             }
         }
 
+        log.info(sm.getString("aprListener.initializedOpenSSL", SSL.versionString()));
+
         sslAvailable = true;
     }
 
