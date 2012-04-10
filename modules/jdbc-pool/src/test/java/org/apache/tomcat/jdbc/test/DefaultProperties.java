@@ -29,7 +29,7 @@ public class DefaultProperties extends PoolProperties {
     private static final long serialVersionUID = 1L;
 
     public DefaultProperties() {
-        dbProperties = new Properties();
+        setDbProperties(new Properties());
 
         //mysql
         //url = System.getProperty("url","jdbc:mysql://localhost:3306/mysql?autoReconnect=true");
@@ -39,38 +39,38 @@ public class DefaultProperties extends PoolProperties {
         //url = System.getProperty("url","jdbc:derby:derbyDB;create=true");
         //driverClassName = System.getProperty("driverClassName","org.apache.derby.jdbc.EmbeddedDriver");
 
-        url = System.getProperty("url","jdbc:h2:~/.h2/test;QUERY_TIMEOUT=0;DB_CLOSE_ON_EXIT=FALSE");
-        driverClassName = System.getProperty("driverClassName","org.h2.Driver");
+        setUrl(System.getProperty("url","jdbc:h2:~/.h2/test;QUERY_TIMEOUT=0;DB_CLOSE_ON_EXIT=FALSE"));
+        setDriverClassName(System.getProperty("driverClassName","org.h2.Driver"));
         System.setProperty("h2.serverCachedObjects", "10000");
 
-        password = System.getProperty("password","password");
-        username = System.getProperty("username","root");
+        setPassword(System.getProperty("password","password"));
+        setUsername(System.getProperty("username","root"));
 
-        validationQuery = System.getProperty("validationQuery","SELECT 1");
-        defaultAutoCommit = Boolean.TRUE;
-        defaultReadOnly = Boolean.FALSE;
-        defaultTransactionIsolation = DataSourceFactory.UNKNOWN_TRANSACTIONISOLATION;
-        connectionProperties = null;
-        defaultCatalog = null;
-        initialSize = 10;
-        maxActive = 100;
-        maxIdle = initialSize;
-        minIdle = initialSize;
-        maxWait = 10000;
+        setValidationQuery(System.getProperty("validationQuery","SELECT 1"));
+        setDefaultAutoCommit(Boolean.TRUE);
+        setDefaultReadOnly(Boolean.FALSE);
+        setDefaultTransactionIsolation(DataSourceFactory.UNKNOWN_TRANSACTIONISOLATION);
+        setConnectionProperties(null);
+        setDefaultCatalog(null);
+        setInitialSize(10);
+        setMaxActive(100);
+        setMaxIdle(getInitialSize());
+        setMinIdle(getInitialSize());
+        setMaxWait(10000);
 
-        testOnBorrow = true;
-        testOnReturn = false;
-        testWhileIdle = true;
-        timeBetweenEvictionRunsMillis = 5000;
-        numTestsPerEvictionRun = 0;
-        minEvictableIdleTimeMillis = 1000;
-        removeAbandoned = true;
-        removeAbandonedTimeout = 5000;
-        logAbandoned = true;
-        validationInterval = 0; //always validate
-        initSQL = null;
-        testOnConnect = false;
-        dbProperties.setProperty("user",username);
-        dbProperties.setProperty("password",password);
+        setTestOnBorrow(true);
+        setTestOnReturn(false);
+        setTestWhileIdle(true);
+        setTimeBetweenEvictionRunsMillis(5000);
+        setNumTestsPerEvictionRun(0);
+        setMinEvictableIdleTimeMillis(1000);
+        setRemoveAbandoned(true);
+        setRemoveAbandonedTimeout(5000);
+        setLogAbandoned(true);
+        setValidationInterval(0); //always validate
+        setInitSQL(null);
+        setTestOnConnect(false);
+        getDbProperties().setProperty("user",getUsername());
+        getDbProperties().setProperty("password",getPassword());
     }
 }
