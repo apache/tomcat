@@ -67,6 +67,10 @@
         Remove potential bottleneck on creation of new WebSocket connections.
         (markt)
       </fix>
+      <fix>
+        <bug>53056</bug>: Add APR version number to tcnative version INFO log
+        message. (schultz)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
