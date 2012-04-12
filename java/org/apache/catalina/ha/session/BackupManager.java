@@ -33,6 +33,7 @@ import org.apache.catalina.tribes.tipis.AbstractReplicatedMap.MapOwner;
 import org.apache.catalina.tribes.tipis.LazyReplicatedMap;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.res.StringManager;
 
 /**
  *@author Filip Hanik
@@ -42,6 +43,11 @@ public class BackupManager extends ClusterManagerBase
         implements MapOwner, DistributedManager {
 
     private static final Log log = LogFactory.getLog(BackupManager.class);
+
+    /**
+     * The string manager for this package.
+     */
+    protected static final StringManager sm = StringManager.getManager(Constants.Package);
 
     protected static long DEFAULT_REPL_TIMEOUT = 15000;//15 seconds
 
@@ -151,7 +157,7 @@ public class BackupManager extends ClusterManagerBase
                     setCluster((CatalinaCluster)cluster);
                 } else {
                     throw new LifecycleException(
-                            "no cluster associated with this context: " + getName());
+                            sm.getString("backupManager.noCluster", getName()));
                 }
             }
             cluster.registerManager(this);
@@ -162,8 +168,8 @@ public class BackupManager extends ClusterManagerBase
             map.setChannelSendOptions(mapSendOptions);
             this.sessions = map;
         }  catch ( Exception x ) {
-            log.error("Unable to start BackupManager",x);
-            throw new LifecycleException("Failed to start BackupManager",x);
+            log.error(sm.getString("backupManager.startUnable", getName()),x);
+            throw new LifecycleException(sm.getString("backupManager.startFailed", getName()),x);
         }
         setState(LifecycleState.STARTING);
     }
@@ -189,7 +195,7 @@ public class BackupManager extends ClusterManagerBase
     protected synchronized void stopInternal() throws LifecycleException {
 
         if (log.isDebugEnabled())
-            log.debug("Stopping");
+            log.debug(sm.getString("backupManager.stopped", getName()));
 
         setState(LifecycleState.STOPPING);
 
