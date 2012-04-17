@@ -118,5 +118,27 @@ public interface ReplicatedMapEntry extends Serializable {
      */
     public void setVersion(long version);
 
+    /**
+     * Return the last replicate time.
+     * @return
+     */
+    public long getLastTimeReplicated();
+
+    /**
+     * Set the last replicate time.
+     * @param lastTimeReplicated
+     */
+    public void setLastTimeReplicated(long lastTimeReplicated);
+
+    /**
+     * If this returns true, to replicate that an object has been accessed
+     * @return boolean
+     */
+    public boolean isAccessReplicate();
+
+    /**
+     * Access to an existing object.
+     */
+    public void accessEntry();
 
 }

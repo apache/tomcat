@@ -222,6 +222,30 @@ public class DeltaSession extends StandardSession implements Externalizable,Clus
                 this.endAccess();
             }
         }
+
+        /**
+         * If this returns true, to replicate that an object has been accessed
+         * @return boolean
+         */
+        @Override
+        public boolean isAccessReplicate() {
+            long replDelta = System.currentTimeMillis() - getLastTimeReplicated();
+            if (maxInactiveInterval >=0 && replDelta > (maxInactiveInterval * 1000)) {
+                return true;
+            }
+            return false;
+        }
+
+        /**
+         * Access to an existing object.
+         */
+        @Override
+        public void accessEntry() {
+            this.access();
+            this.setPrimarySession(false);
+            this.endAccess();
+        }
+
     // ----------------------------------------------------- Session Properties
 
     /**
@@ -843,7 +867,8 @@ public class DeltaSession extends StandardSession implements Externalizable,Clus
         }
     }
 
-    protected long getLastTimeReplicated() {
+    @Override
+    public long getLastTimeReplicated() {
         return lastTimeReplicated;
     }
 
@@ -852,7 +877,8 @@ public class DeltaSession extends StandardSession implements Externalizable,Clus
         return version;
     }
 
-    protected void setLastTimeReplicated(long lastTimeReplicated) {
+    @Override
+    public void setLastTimeReplicated(long lastTimeReplicated) {
         this.lastTimeReplicated = lastTimeReplicated;
     }
 
