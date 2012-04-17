@@ -82,6 +82,10 @@
       <fix>
         Avoid NPE when reload if a state of a BackupManager is FAILED. (kfujino)
       </fix>
+      <fix>
+        <bug>53087</bug>: In order to avoid that a backup node expire a session,
+        replicate session access time in BackupManager. (kfujino)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
