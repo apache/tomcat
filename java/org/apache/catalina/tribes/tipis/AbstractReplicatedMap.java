@@ -402,8 +402,10 @@ public abstract class AbstractReplicatedMap extends ConcurrentHashMap implements
         if ( !entry.isSerializable() ) return;
         if (entry.isPrimary() && entry.getBackupNodes()!= null && entry.getBackupNodes().length > 0) {
             Object value = entry.getValue();
-            //check to see if we need to replicate this object isDirty()||complete
-            boolean repl = complete || ( (value instanceof ReplicatedMapEntry) && ( (ReplicatedMapEntry) value).isDirty());
+            //check to see if we need to replicate this object isDirty()||complete || isAccessReplicate()
+            boolean isDirty = ((value instanceof ReplicatedMapEntry) && ((ReplicatedMapEntry) value).isDirty());
+            boolean isAccess = ((value instanceof ReplicatedMapEntry) && ((ReplicatedMapEntry) value).isAccessReplicate());
+            boolean repl = complete || isDirty || isAccess;
             
             if (!repl) {
                 if ( log.isTraceEnabled() )
@@ -412,9 +414,9 @@ public abstract class AbstractReplicatedMap extends ConcurrentHashMap implements
                 return;
             }
             //check to see if the message is diffable
-            boolean diff = ( (value instanceof ReplicatedMapEntry) && ( (ReplicatedMapEntry) value).isDiffable());
+            boolean diff = ((value instanceof ReplicatedMapEntry) && ((ReplicatedMapEntry) value).isDiffable());
             MapMessage msg = null;
-            if (diff) {
+            if (diff && isDirty) {
                 ReplicatedMapEntry rentry = (ReplicatedMapEntry)entry.getValue();
                 try {
                     rentry.lock();
@@ -432,6 +434,12 @@ public abstract class AbstractReplicatedMap extends ConcurrentHashMap implements
                 }
                 
             }
+            if (msg == null && isAccess) {
+                //construct a access message
+                msg = new MapMessage(mapContextName, MapMessage.MSG_ACCESS,
+                        false, (Serializable) entry.getKey(), null, null, entry.getPrimary(),
+                        entry.getBackupNodes());
+            }
             if (msg == null) {
                 //construct a complete
                 msg = new MapMessage(mapContextName, MapMessage.MSG_BACKUP,
@@ -442,6 +450,9 @@ public abstract class AbstractReplicatedMap extends ConcurrentHashMap implements
             }
             try {
                 if ( channel!=null && entry.getBackupNodes()!= null && entry.getBackupNodes().length > 0 ) {
+                    if ((entry.getValue() instanceof ReplicatedMapEntry)) {
+                        ((ReplicatedMapEntry)entry.getValue()).setLastTimeReplicated(System.currentTimeMillis());
+                    }
                     channel.send(entry.getBackupNodes(), msg, channelSendOptions);
                 }
             } catch (ChannelException x) {
@@ -670,6 +681,17 @@ public abstract class AbstractReplicatedMap extends ConcurrentHashMap implements
             } //end if
             super.put(entry.getKey(), entry);
         } //end if
+
+        if (mapmsg.getMsgType() == MapMessage.MSG_ACCESS) {
+            MapEntry entry = (MapEntry)super.get(mapmsg.getKey());
+            if (entry != null) {
+                entry.setBackupNodes(mapmsg.getBackupNodes());
+                entry.setPrimary(mapmsg.getPrimary());
+                if (entry.getValue() instanceof ReplicatedMapEntry) {
+                    ((ReplicatedMapEntry) entry.getValue()).accessEntry();
+                }
+            }
+        }
     }
 
     @Override
@@ -1277,6 +1299,7 @@ public abstract class AbstractReplicatedMap extends ConcurrentHashMap implements
         public static final int MSG_INIT = 8;
         public static final int MSG_COPY = 9;
         public static final int MSG_STATE_COPY = 10;
+        public static final int MSG_ACCESS = 11;
 
         private byte[] mapId;
         private int msgtype;
@@ -1314,6 +1337,7 @@ public abstract class AbstractReplicatedMap extends ConcurrentHashMap implements
                 case MSG_INIT: return "MSG_INIT";
                 case MSG_STATE_COPY: return "MSG_STATE_COPY";
                 case MSG_COPY: return "MSG_COPY";
+                case MSG_ACCESS: return "MSG_ACCESS";
                 default : return "UNKNOWN";
             }
         }
