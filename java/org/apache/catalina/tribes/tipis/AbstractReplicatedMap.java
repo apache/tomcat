@@ -152,8 +152,7 @@ public abstract class AbstractReplicatedMap<K,V>
 //------------------------------------------------------------------------------
 
     public static interface MapOwner {
-        // a typo, should have been "objectMadePrimary"
-        public void objectMadePrimay(Object key, Object value);
+        public void objectMadePrimary(Object key, Object value);
     }
 
 //------------------------------------------------------------------------------
@@ -817,7 +816,7 @@ public abstract class AbstractReplicatedMap<K,V>
                     entry.setProxy(false);
                     Member[] backup = publishEntryInfo(entry.getKey(), entry.getValue());
                     entry.setBackupNodes(backup);
-                    if ( mapOwner!=null ) mapOwner.objectMadePrimay(entry.getKey(),entry.getValue());
+                    if ( mapOwner!=null ) mapOwner.objectMadePrimary(entry.getKey(),entry.getValue());
 
                 } catch (ChannelException x) {
                     log.error("Unable to relocate[" + entry.getKey() + "] to a new backup node", x);
@@ -937,7 +936,7 @@ public abstract class AbstractReplicatedMap<K,V>
                 entry.setBackupNodes(backup);
                 entry.setBackup(false);
                 entry.setProxy(false);
-                if ( getMapOwner()!=null ) getMapOwner().objectMadePrimay(key, entry.getValue());
+                if ( getMapOwner()!=null ) getMapOwner().objectMadePrimary(key, entry.getValue());
 
             } catch (Exception x) {
                 log.error("Unable to replicate out data for a LazyReplicatedMap.get operation", x);

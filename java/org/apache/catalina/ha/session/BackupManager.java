@@ -111,7 +111,7 @@ public class BackupManager extends ClusterManagerBase
 // OVERRIDE THESE METHODS TO IMPLEMENT THE REPLICATION
 //=========================================================================
     @Override
-    public void objectMadePrimay(Object key, Object value) {
+    public void objectMadePrimary(Object key, Object value) {
         if (value!=null && value instanceof DeltaSession) {
             DeltaSession session = (DeltaSession)value;
             synchronized (session) {

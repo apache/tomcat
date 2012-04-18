@@ -211,7 +211,7 @@ public class ReplicatedContext extends StandardContext implements MapOwner {
     }
 
     @Override
-    public void objectMadePrimay(Object key, Object value) {
+    public void objectMadePrimary(Object key, Object value) {
         //noop
     }
 
