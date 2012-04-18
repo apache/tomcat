@@ -30,7 +30,6 @@ import java.security.PrivilegedAction;
 import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -69,8 +68,12 @@ public class DefaultInstanceManager implements InstanceManager {
     private final Properties restrictedFilters = new Properties();
     private final Properties restrictedListeners = new Properties();
     private final Properties restrictedServlets = new Properties();
-    private final Map<Class<?>,List<AnnotationCacheEntry>> annotationCache =
-        new WeakHashMap<Class<?>, List<AnnotationCacheEntry>>();
+    private final Map<Class<?>, AnnotationCacheEntry[]> annotationCache =
+        new WeakHashMap<Class<?>, AnnotationCacheEntry[]>();
+
+    // Used when there are no annotations in a class
+    private static final AnnotationCacheEntry[] ANNOTATIONS_EMPTY
+        = new AnnotationCacheEntry[0];
 
     public DefaultInstanceManager(Context context, Map<String, Map<String, String>> injectionMap, org.apache.catalina.Context catalinaContext, ClassLoader containerClassLoader) {
         classLoader = catalinaContext.getLoader().getClassLoader();
@@ -177,7 +180,7 @@ public class DefaultInstanceManager implements InstanceManager {
 
         // At the end the postconstruct annotated
         // method is invoked
-        List<AnnotationCacheEntry> annotations;
+        AnnotationCacheEntry[] annotations;
         synchronized (annotationCache) {
             annotations = annotationCache.get(clazz);
         }
@@ -213,7 +216,7 @@ public class DefaultInstanceManager implements InstanceManager {
 
         // At the end the postconstruct annotated
         // method is invoked
-        List<AnnotationCacheEntry> annotations = null;
+        AnnotationCacheEntry[] annotations = null;
         synchronized (annotationCache) {
             annotations = annotationCache.get(clazz);
         }
@@ -251,13 +254,19 @@ public class DefaultInstanceManager implements InstanceManager {
             Map<String, String> injections) throws IllegalAccessException,
             InvocationTargetException, NamingException {
 
+        List<AnnotationCacheEntry> annotations = null;
+
         while (clazz != null) {
-            List<AnnotationCacheEntry> annotations = null;
+            AnnotationCacheEntry[] annotationsArray = null;
             synchronized (annotationCache) {
-                annotations = annotationCache.get(clazz);
+                annotationsArray = annotationCache.get(clazz);
             }
-            if (annotations == null) {
-                annotations = new ArrayList<AnnotationCacheEntry>();
+            if (annotationsArray == null) {
+                if (annotations == null) {
+                    annotations = new ArrayList<AnnotationCacheEntry>();
+                } else {
+                    annotations.clear();
+                }
 
                 if (context != null) {
                     // Initialize fields annotations for resource injection if
@@ -421,12 +430,15 @@ public class DefaultInstanceManager implements InstanceManager {
                             preDestroy.getParameterTypes(), null,
                             AnnotationCacheEntryType.PRE_DESTROY));
                 }
-                if (annotations.size() == 0) {
-                    // Use common empty list to save memory
-                    annotations = Collections.emptyList();
+                if (annotations.isEmpty()) {
+                    // Use common object to save memory
+                    annotationsArray = ANNOTATIONS_EMPTY;
+                } else {
+                    annotationsArray = annotations.toArray(
+                            new AnnotationCacheEntry[annotations.size()]);
                 }
                 synchronized (annotationCache) {
-                    annotationCache.put(clazz, annotations);
+                    annotationCache.put(clazz, annotationsArray);
                 }
             }
             clazz = clazz.getSuperclass();
@@ -455,7 +467,7 @@ public class DefaultInstanceManager implements InstanceManager {
         Class<?> clazz = instance.getClass();
 
         while (clazz != null) {
-            List<AnnotationCacheEntry> annotations;
+            AnnotationCacheEntry[] annotations;
             synchronized (annotationCache) {
                 annotations = annotationCache.get(clazz);
             }
