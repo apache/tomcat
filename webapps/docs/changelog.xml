@@ -75,6 +75,11 @@
         <bug>53057</bug>: Add OpenSSL version number INFO log message when
         initializing. (schultz)
       </fix>
+      <update>
+        Save a bit of memory in annotations cache in
+        <code>DefaultInstanceManager</code> by trimming annotation lists
+        to their size. (kkolinko)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Cluster">
