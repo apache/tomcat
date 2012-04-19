@@ -406,10 +406,11 @@ public abstract class AbstractReplicatedMap<K,V>
         if ( entry == null ) return;
         if ( !entry.isSerializable() ) return;
         if (entry.isPrimary() && entry.getBackupNodes()!= null && entry.getBackupNodes().length > 0) {
-            Object value = entry.getValue();
             //check to see if we need to replicate this object isDirty()||complete || isAccessReplicate()
-            boolean isDirty = ((value instanceof ReplicatedMapEntry) && ((ReplicatedMapEntry) value).isDirty());
-            boolean isAccess = ((value instanceof ReplicatedMapEntry) && ((ReplicatedMapEntry) value).isAccessReplicate());
+            ReplicatedMapEntry rentry = null;
+            if (entry.getValue() instanceof ReplicatedMapEntry) rentry = (ReplicatedMapEntry)entry.getValue();
+            boolean isDirty = rentry != null && rentry.isDirty();
+            boolean isAccess = rentry != null && rentry.isAccessReplicate();
             boolean repl = complete || isDirty || isAccess;
 
             if (!repl) {
@@ -419,10 +420,9 @@ public abstract class AbstractReplicatedMap<K,V>
                 return;
             }
             //check to see if the message is diffable
-            boolean diff = ((value instanceof ReplicatedMapEntry) && ((ReplicatedMapEntry) value).isDiffable());
+            boolean diff = rentry != null && rentry.isDiffable();
             MapMessage msg = null;
-            if (diff && isDirty) {
-                ReplicatedMapEntry rentry = (ReplicatedMapEntry)entry.getValue();
+            if (diff && (isDirty || complete)) {
                 try {
                     rentry.lock();
                     //construct a diff message
@@ -455,9 +455,7 @@ public abstract class AbstractReplicatedMap<K,V>
             }
             try {
                 if ( channel!=null && entry.getBackupNodes()!= null && entry.getBackupNodes().length > 0 ) {
-                    if ((entry.getValue() instanceof ReplicatedMapEntry)) {
-                        ((ReplicatedMapEntry)entry.getValue()).setLastTimeReplicated(System.currentTimeMillis());
-                    }
+                    if (rentry != null) rentry.setLastTimeReplicated(System.currentTimeMillis());
                     channel.send(entry.getBackupNodes(), msg, channelSendOptions);
                 }
             } catch (ChannelException x) {
