@@ -434,19 +434,18 @@ public abstract class AbstractReplicatedMap extends ConcurrentHashMap implements
                 }
                 
             }
-            if (msg == null && isAccess) {
-                //construct a access message
-                msg = new MapMessage(mapContextName, MapMessage.MSG_ACCESS,
-                        false, (Serializable) entry.getKey(), null, null, entry.getPrimary(),
-                        entry.getBackupNodes());
-            }
-            if (msg == null) {
+            if (msg == null && complete) {
                 //construct a complete
                 msg = new MapMessage(mapContextName, MapMessage.MSG_BACKUP,
                                      false, (Serializable) entry.getKey(),
                                      (Serializable) entry.getValue(),
                                      null, entry.getPrimary(),entry.getBackupNodes());
-
+            }
+            if (msg == null) {
+                //construct a access message
+                msg = new MapMessage(mapContextName, MapMessage.MSG_ACCESS,
+                        false, (Serializable) entry.getKey(), null, null, entry.getPrimary(),
+                        entry.getBackupNodes());
             }
             try {
                 if ( channel!=null && entry.getBackupNodes()!= null && entry.getBackupNodes().length > 0 ) {
