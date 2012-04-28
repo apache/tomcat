@@ -716,13 +716,13 @@ conn.close();
     <ul>
     <li><strong>timeBetweenEvictionRunsMillis</strong> - The number of
         milliseconds between consecutive runs of the evictor.
-        Default: 30*60*1000 (30 minutes)</li>
+        Default: -1 (disabled)</li>
     <li><strong>numTestsPerEvictionRun</strong> - The number of connections
         that will be checked for idleness by the evitor during each
         run of the evictor. Default: 3</li>
     <li><strong>minEvictableIdleTimeMillis</strong> - The idle time in
         milliseconds after which a connection can be removed from the pool
-        by the evictor. Default: -1 (disabled)</li>
+        by the evictor. Default: 30*60*1000 (30 minutes)</li>
     <li><strong>testWhileIdle</strong> - true or false: whether a connection
         should be validated by the evictor thread using the validation query
         while sitting idle in the pool. Default: false</li>
