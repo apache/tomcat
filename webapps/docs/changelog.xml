@@ -93,13 +93,11 @@
       </fix>
     </changelog>
   </subsection>
-  <subsection name="Other">
+  <subsection name="Web applications">
     <changelog>
-      <update>
-        Update to Eclipse JDT Compiler 3.7.2 at maven tomcat-jasper.pom. (pero)
-      </update>
       <fix>
-        Add missing dependencies in pom files. (markt)
+        <bug>53158</bug>: Fix documented defaults for DBCP.
+        Patch provided by ph.dezanneau at gmail.com. (rjung)
       </fix>
     </changelog>
   </subsection>
@@ -111,7 +109,16 @@
       </fix>  
     </changelog>
   </subsection>
-  
+  <subsection name="Other">
+    <changelog>
+      <update>
+        Update to Eclipse JDT Compiler 3.7.2 at maven tomcat-jasper.pom. (pero)
+      </update>
+      <fix>
+        Add missing dependencies in pom files. (markt)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 7.0.27 (markt)" rtext="released 2012-04-05">
   <subsection name="Catalina">
