@@ -59,7 +59,7 @@
   If still more simultaneous requests are received, they are stacked up
   inside the server socket created by the <strong>Connector</strong>, up to
   the configured maximum (the value of the <code>acceptCount</code>
-  attribute.  Any further simultaneous requests will receive "connection
+  attribute).  Any further simultaneous requests will receive "connection
   refused" errors, until resources are available to process them.</p>
 
 </section>
