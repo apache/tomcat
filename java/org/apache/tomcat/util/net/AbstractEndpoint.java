@@ -163,7 +163,12 @@ public abstract class AbstractEndpoint {
         LimitLatch latch = this.connectionLimitLatch;
         if (latch != null) {
             // Update the latch that enforces this
+            if (maxCon == -1)
+                releaseConnectionLatch();
+            else
             latch.setLimit(maxCon);
+        } else if (maxCon > 0) {
+            initializeConnectionLatch();
         }
     }
 
@@ -655,6 +660,7 @@ public abstract class AbstractEndpoint {
     public abstract boolean getUsePolling();
 
     protected LimitLatch initializeConnectionLatch() {
+        if (maxConnections==-1) return null;
         if (connectionLimitLatch==null) {
             connectionLimitLatch = new LimitLatch(getMaxConnections());
         }
@@ -668,11 +674,13 @@ public abstract class AbstractEndpoint {
     }
 
     protected void countUpOrAwaitConnection() throws InterruptedException {
+        if (maxConnections==-1) return;
         LimitLatch latch = connectionLimitLatch;
         if (latch!=null) latch.countUpOrAwait();
     }
 
     protected long countDownConnection() {
+        if (maxConnections==-1) return -1;
         LimitLatch latch = connectionLimitLatch;
         if (latch!=null) {
             long result = latch.countDown();

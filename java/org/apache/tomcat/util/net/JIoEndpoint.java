@@ -216,6 +216,7 @@ public class JIoEndpoint extends AbstractEndpoint {
                         // socket
                         socket = serverSocketFactory.acceptSocket(serverSocket);
                     } catch (IOException ioe) {
+                        countDownConnection();
                         // Introduce delay if necessary
                         errorDelay = handleExceptionWithDelay(errorDelay);
                         // re-throw
@@ -228,10 +229,12 @@ public class JIoEndpoint extends AbstractEndpoint {
                     if (running && !paused && setSocketOptions(socket)) {
                         // Hand this socket off to an appropriate processor
                         if (!processSocket(socket)) {
+                            countDownConnection();
                             // Close socket right away
                             closeSocket(socket);
                         }
                     } else {
+                        countDownConnection();
                         // Close socket right away
                         closeSocket(socket);
                     }
@@ -335,6 +338,16 @@ public class JIoEndpoint extends AbstractEndpoint {
                     if (launch) {
                         try {
                             getExecutor().execute(new SocketProcessor(socket, SocketStatus.OPEN));
+                        } catch (RejectedExecutionException x) {
+                            log.warn("Socket reprocessing request was rejected for:"+socket,x);
+                            try {
+                                //unable to handle connection at this time
+                                handler.process(socket, SocketStatus.DISCONNECT);
+                            } finally {
+                                countDownConnection();
+                            }
+
+
                         } catch (NullPointerException npe) {
                             if (running) {
                                 log.error(sm.getString("endpoint.launch.fail"),
@@ -560,6 +573,7 @@ public class JIoEndpoint extends AbstractEndpoint {
                             return false;
                         }
                         getExecutor().execute(proc);
+                        //TODO gotta catch RejectedExecutionException and properly handle it
                     } finally {
                         if (Constants.IS_SECURITY_ENABLED) {
                             PrivilegedAction<Void> pa = new PrivilegedSetTccl(loader);
