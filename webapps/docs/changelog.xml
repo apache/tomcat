@@ -72,6 +72,15 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Coyote">
+    <changelog>
+      <scode>
+        Update default value of pollerThreadCount for the NIO connector.
+        The new default value will never go above 2 regardless of 
+        available processors. (fhanik)
+      </scode>
+    </changelog>
+  </subsection>
   <subsection name="Tribes">
     <changelog>
       <scode>
