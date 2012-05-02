@@ -787,6 +787,8 @@ public class NioEndpoint extends AbstractEndpoint {
                         // socket
                         socket = serverSock.accept();
                     } catch (IOException ioe) {
+                        //we didn't get a socket
+                        countDownConnection();
                         // Introduce delay if necessary
                         errorDelay = handleExceptionWithDelay(errorDelay);
                         // re-throw
@@ -799,9 +801,11 @@ public class NioEndpoint extends AbstractEndpoint {
                     // if successful
                     if (running && !paused) {
                         if (!setSocketOptions(socket)) {
+                            countDownConnection();
                             closeSocket(socket);
                         }
                     } else {
+                        countDownConnection();
                         closeSocket(socket);
                     }
                 } catch (SocketTimeoutException sx) {

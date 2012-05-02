@@ -995,6 +995,8 @@ public class AprEndpoint extends AbstractEndpoint {
                         // socket
                         socket = Socket.accept(serverSock);
                     } catch (Exception e) {
+                        //we didn't get a socket
+                        countDownConnection();
                         // Introduce delay if necessary
                         errorDelay = handleExceptionWithDelay(errorDelay);
                         // re-throw
@@ -1006,10 +1008,12 @@ public class AprEndpoint extends AbstractEndpoint {
                     if (running && !paused) {
                         // Hand this socket off to an appropriate processor
                         if (!processSocketWithOptions(socket)) {
+                            countDownConnection();
                             // Close socket and pool right away
                             destroySocket(socket);
                         }
                     } else {
+                        countDownConnection();
                         // Close socket and pool right away
                         destroySocket(socket);
                     }

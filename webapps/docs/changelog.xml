@@ -82,6 +82,16 @@
       </scode>
     </changelog>
   </subsection>
+  <subsection name="jdbc-pool">
+    <changelog>
+      <fix><bug>51237</bug><rev>1302902</rev> Slow Query Report should log using WARN level when queries are slow and within the threshold of caching it</fix>
+      <fix><bug>52002</bug><rev>1302948</rev> Add in configuration option to disallow connection reuse</fix>
+      <fix><bug>52493</bug><rev>1302969</rev> Java 7 DataSource method addition</fix>
+      <fix><bug>51893</bug><rev>1302990</rev> Throw an error and notification when pool is exhausted</fix>
+      <fix><bug>50860</bug><rev>1303031</rev> Add in option to configure logging for validation errors</fix>
+    </changelog>
+  </subsection>
+
   <subsection name="Other">
     <changelog>
       <scode>
