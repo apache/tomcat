@@ -108,10 +108,6 @@
 <source>--Classpath=xx.jar</source>
 </p>
 <p> as command line parameter.</p>
-    <p><strong>Note:</strong> PR_DEPENDSON, PR_ENVIRONMENT, PR_JVMOPTIONS,
-    PR_JVMMS, PR_JVMMX, PR_JVMSS, PR_STARTPARAMS, PR_STOPPARAMS and
-    PR_STOPTIMEOUT will not work until this bug is fixed:
-    <a href="http://issues.apache.org/jira/browse/DAEMON-49">DAEMON-49</a></p>
 <p>
     <table>
     <tr>
