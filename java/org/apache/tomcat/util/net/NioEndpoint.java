@@ -333,7 +333,7 @@ public class NioEndpoint extends AbstractEndpoint {
     /**
      * Poller thread count.
      */
-    protected int pollerThreadCount = Runtime.getRuntime().availableProcessors();
+    protected int pollerThreadCount = Math.min(2,Runtime.getRuntime().availableProcessors());
     public void setPollerThreadCount(int pollerThreadCount) { this.pollerThreadCount = pollerThreadCount; }
     public int getPollerThreadCount() { return pollerThreadCount; }
 
