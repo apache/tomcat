@@ -88,6 +88,11 @@
         <bug>53173</bug> (<rev>1333116</rev>) :
         Properly count down maxConnections (fhanik)
       </fix>
+      <update>
+        Update default value of pollerThreadCount for the NIO connector.
+        The new default value will never go above 2 regardless of 
+        available processors. (fhanik)
+      </update>
     </changelog>
   </subsection>    
   <subsection name="Cluster">
