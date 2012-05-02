@@ -541,6 +541,12 @@ public abstract class AbstractProtocol implements ProtocolHandler,
                 SocketStatus status) {
             Processor<S> processor = connections.remove(socket.getSocket());
 
+            if (status == SocketStatus.DISCONNECT && processor == null) {
+                //nothing more to be done endpoint requested a close
+                //and there are no object associated with this connection
+                return SocketState.CLOSED;
+            }
+
             socket.setAsync(false);
 
             try {
@@ -555,7 +561,9 @@ public abstract class AbstractProtocol implements ProtocolHandler,
 
                 SocketState state = SocketState.CLOSED;
                 do {
-                    if (processor.isAsync() || state == SocketState.ASYNC_END) {
+                    if (status == SocketStatus.DISCONNECT) {
+                        //do nothing here, just wait for it to get recycled
+                    } else if (processor.isAsync() || state == SocketState.ASYNC_END) {
                         state = processor.asyncDispatch(status);
                     } else if (processor.isComet()) {
                         state = processor.event(status);

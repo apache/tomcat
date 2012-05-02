@@ -20,12 +20,17 @@ import java.util.Collection;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.AbstractQueuedSynchronizer;
 
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
+
 /**
  * Shared latch that allows the latch to be acquired a limited number of times
  * after which all subsequent requests to acquire the latch will be placed in a
  * FIFO queue until one of the shares is returned.
  */
 public class LimitLatch {
+
+    private static final Log log = LogFactory.getLog(LimitLatch.class);
 
     private class Sync extends AbstractQueuedSynchronizer {
         private static final long serialVersionUID = 1L;
@@ -68,6 +73,14 @@ public class LimitLatch {
     }
 
     /**
+     * Returns the current count for the latch
+     * @return the current count for latch
+     */
+    public long getCount() {
+        return count.get();
+    }
+
+    /**
      * Obtain the current limit.
      */
     public long getLimit() {
@@ -96,6 +109,9 @@ public class LimitLatch {
      * latch is current available.
      */
     public void countUpOrAwait() throws InterruptedException {
+        if (log.isDebugEnabled()) {
+            log.debug("Counting up["+Thread.currentThread().getName()+"] latch="+getCount());
+        }
         sync.acquireSharedInterruptibly(1);
     }
 
@@ -105,7 +121,11 @@ public class LimitLatch {
      */
     public long countDown() {
         sync.releaseShared(0);
-        return count.get();
+        long result = getCount();
+        if (log.isDebugEnabled()) {
+            log.debug("Counting down["+Thread.currentThread().getName()+"] latch="+result);
+    }
+        return result;
     }
 
     /**
