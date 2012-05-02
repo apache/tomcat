@@ -608,8 +608,15 @@
 
       <attribute name="pollerThreadCount" required="false">
         <p>(int)The number of threads to be used to run for the polling events.
-        Default value is <code>1</code> per processor. Can't see a reason to go
-        above that. But experiment and find your own results.</p>
+        Default value is <code>1</code> per processor up to and including version 7.0.27.
+        Default value as of version 7.0.28 is <code>1</code> per processor but not more than 2.<br/>
+        When accepting a socket, the operating system holds a global lock. So the benefit of 
+        going above 2 threads diminishes rapidly. Having more than one thread is for 
+        system that need to accept connections very rapidly. However usually just 
+        increasing <code>acceptCount</code> will solve that problem. 
+        Increasing this value may also be beneficial when a large amount of send file 
+        operations are going on.
+        </p>
       </attribute>
 
       <attribute name="pollerThreadPriority" required="false">
