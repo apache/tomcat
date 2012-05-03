@@ -350,7 +350,7 @@
       <p>Note that for APR/native on Windows, the configured value will be
       reduced to the highest multiple of 1024 that is less than or equal to
       maxConnections. This is done for performance reasons.<br/>
-      If set to a value of -1, the maxConnections feature is disabled 
+      If set to a value of -1, the maxConnections feature is disabled
       and connections are not counted.</p>
     </attribute>
 
