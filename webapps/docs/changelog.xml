@@ -80,6 +80,11 @@
         <code>DefaultInstanceManager</code> by trimming annotation lists
         to their size. (kkolinko)
       </update>
+      <fix>
+        Correctly configure the parser used to process server.xml so that
+        external entities may be used to include the content of external files
+        into server.xml. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
