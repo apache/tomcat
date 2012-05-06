@@ -90,6 +90,10 @@
   <subsection name="Coyote">
     <changelog>
       <fix>
+        <bug>52055</bug>: Additional fix required to ensure that
+        <code>InputFilter</code>s are recycled between requests. (markt)
+      </fix>
+      <fix>
         <bug>53173</bug> (<rev>1333116</rev>) :
         Properly count down maxConnections (fhanik)
       </fix>
