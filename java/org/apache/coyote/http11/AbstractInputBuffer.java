@@ -248,6 +248,11 @@ public abstract class AbstractInputBuffer<S> implements InputBuffer{
         // Recycle Request object
         request.recycle();
 
+        // Recycle filters
+        for (int i = 0; i <= lastActiveFilter; i++) {
+            activeFilters[i].recycle();
+        }
+
         lastValid = 0;
         pos = 0;
         lastActiveFilter = -1;
