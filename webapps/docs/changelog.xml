@@ -85,6 +85,10 @@
         external entities may be used to include the content of external files
         into server.xml. (markt)
       </fix>
+      <fix>
+        Make sure ContextMBean#findFilterDefs returns correct filter
+        definitions. (kfujino)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
