@@ -201,14 +201,14 @@ public class ContextMBean extends ContainerMBean {
         } catch (InvalidTargetObjectTypeException e) {
             throw new MBeanException(e);
         }
-        
-        ApplicationParameter[] params = context.findApplicationParameters();
-        String[] stringParams = new String[params.length];
-        for(int counter=0; counter < params.length; counter++){
-            stringParams[counter]=params[counter].toString();
+
+        FilterDef[] filterDefs = context.findFilterDefs();
+        String[] stringFilters = new String[filterDefs.length];
+        for(int counter=0; counter < filterDefs.length; counter++){
+            stringFilters[counter]=filterDefs[counter].toString();
         }
-        
-        return stringParams;
+
+        return stringFilters;
         
     }
     
