@@ -61,14 +61,6 @@ public interface Context extends Container {
 
     // ----------------------------------------------------- Manifest Constants
 
-
-    /**
-     * The LifecycleEvent type sent when a context is reloaded.
-     * @deprecated Will be removed in Tomcat 8.0.x onwards.
-     */
-    @Deprecated
-    public static final String RELOAD_EVENT = "reload";
-
     /**
      * Container event for adding a welcome file.
      */
@@ -88,6 +80,7 @@ public interface Context extends Container {
      * Container event for changing the ID of a session.
      */
     public static final String CHANGE_SESSION_ID_EVENT = "changeSessionId";
+
 
     // ------------------------------------------------------------- Properties
 
