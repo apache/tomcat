@@ -126,6 +126,9 @@
         documentation page. (rjung)
       </fix>
       <fix>
+        <bug>52853</bug>: Clarify how Jar Scanner handles directories. (markt)
+      </fix>
+      <fix>
         <bug>53158</bug>: Fix documented defaults for DBCP.
         Patch provided by ph.dezanneau at gmail.com. (rjung)
       </fix>
