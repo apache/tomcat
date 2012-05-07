@@ -64,7 +64,9 @@ public interface Context extends Container {
 
     /**
      * The LifecycleEvent type sent when a context is reloaded.
+     * @deprecated Will be removed in Tomcat 8.0.x onwards.
      */
+    @Deprecated
     public static final String RELOAD_EVENT = "reload";
 
     /**
