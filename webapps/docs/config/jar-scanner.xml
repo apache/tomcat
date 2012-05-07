@@ -91,7 +91,10 @@
 
       <attribute name="scanAllDirectories" required="false">
        <p>If true, any directories found on the classpath will be checked to see
-       if are expanded Jar files. The default is <code>false</code></p>
+       if are expanded Jar files. The default is <code>false</code>. Tomcat
+       determines if directory is an expanded JAR file by looking for a META-INF
+       sub-directory. Only if the META-INF sub-directory exists, is the
+       directory to be an expanded JAR file.</p>
       </attribute>
 
     </attributes>
