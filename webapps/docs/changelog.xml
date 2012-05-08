@@ -64,6 +64,17 @@
         UserConfig. (kfujino)
       </add>
       <fix>
+        <bug>53024</bug>: Fix context reloading so requests received during the
+        reload are paused and processed when reloading completes rather than
+        receiving 404 responses. (markt)
+      </fix>
+      <add>
+        Improve the handling of watched resources so that changes trigger a
+        reload rather than a stop followed by a start which allows requests
+        received to be paused and processed when reloading completes rather than
+        receiving 404 responses. (markt)
+      </add>
+      <fix>
         Remove potential bottleneck on creation of new WebSocket connections.
         (markt)
       </fix>
