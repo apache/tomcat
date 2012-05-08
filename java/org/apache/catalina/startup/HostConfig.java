@@ -1325,23 +1325,19 @@ public class HostConfig
                 // Reload application
                 if(log.isInfoEnabled())
                     log.info(sm.getString("hostConfig.reload", app.name));
-                Container context = host.findChild(app.name);
-                try {
-                    // Might not have started if start failed last time
-                    if (context.getState().isAvailable()) {
-                        context.stop();
+                Context context = (Context) host.findChild(app.name);
+                if (context.getState().isAvailable()) {
+                    // Reload catches and logs exceptions
+                    context.reload();
+                } else {
+                    // If the context was not started (for example an error
+                    // in web.xml) we'll still get to try to start
+                    try {
+                        context.start();
+                    } catch (Exception e) {
+                        log.warn(sm.getString
+                                 ("hostConfig.context.restart", app.name), e);
                     }
-                } catch (Exception e) {
-                    log.warn(sm.getString
-                             ("hostConfig.context.restart", app.name), e);
-                }
-                // If the context was not started (for example an error
-                // in web.xml) we'll still get to try to start
-                try {
-                    context.start();
-                } catch (Exception e) {
-                    log.warn(sm.getString
-                             ("hostConfig.context.restart", app.name), e);
                 }
                 // Update times
                 app.reloadResources.put(resources[i],

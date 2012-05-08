@@ -3767,9 +3767,12 @@ public class StandardContext extends ContainerBase
      * <p>
      * <b>IMPLEMENTATION NOTE</b>:  This method is designed to deal with
      * reloads required by changes to classes in the underlying repositories
-     * of our class loader.  It does not handle changes to the web application
-     * deployment descriptor.  If that has occurred, you should stop this
-     * Context and create (and start) a new Context instance instead.
+     * of our class loader and changes to the web.xml file. It does not handle
+     * changes to any context.xml file. If the context.xml has changed, you
+     * should stop this Context and create (and start) a new Context instance
+     * instead. Note that there is additional code in
+     * <code>CoyoteAdapter#postParseRequest()</code> to handle mapping requests
+     * to paused Contexts.
      *
      * @exception IllegalStateException if the <code>reloadable</code>
      *  property is set to <code>false</code>.
@@ -3786,7 +3789,7 @@ public class StandardContext extends ContainerBase
             log.info(sm.getString("standardContext.reloadingStarted",
                     getName()));
 
-        // Stop accepting requests temporarily
+        // Stop accepting requests temporarily.
         setPaused(true);
 
         try {
