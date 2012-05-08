@@ -14,10 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.catalina.core;
-
 
 import java.io.IOException;
 
@@ -43,15 +40,11 @@ import org.apache.tomcat.util.buf.MessageBytes;
  * @author Craig R. McClanahan
  * @version $Id$
  */
-
 final class StandardContextValve extends ValveBase {
     
-    //------------------------------------------------------ Constructor
     public StandardContextValve() {
         super(true);
     }
-
-    // ----------------------------------------------------- Instance Variables
 
 
     /**
@@ -59,26 +52,15 @@ final class StandardContextValve extends ValveBase {
      */
     private static final String info =
         "org.apache.catalina.core.StandardContextValve/1.0";
-
-
-    private StandardContext context = null;
     
-
-    // ------------------------------------------------------------- Properties
-
 
     /**
      * Return descriptive information about this Valve implementation.
      */
     @Override
     public String getInfo() {
-
         return (info);
-
     }
-
-
-    // --------------------------------------------------------- Public Methods
 
 
     /**
@@ -89,7 +71,6 @@ final class StandardContextValve extends ValveBase {
     @Override
     public void setContainer(Container container) {
         super.setContainer(container);
-        context = (StandardContext) container;
     }
 
     
@@ -118,38 +99,11 @@ final class StandardContextValve extends ValveBase {
             return;
         }
 
-        // Wait if we are reloading
-        boolean reloaded = false;
-        while (context.getPaused()) {
-            reloaded = true;
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                // Ignore
-            }
-        }
-
-        // Reloading will have stopped the old webappclassloader and
-        // created a new one
-        if (reloaded &&
-                context.getLoader() != null &&
-                context.getLoader().getClassLoader() != null) {
-            Thread.currentThread().setContextClassLoader(
-                    context.getLoader().getClassLoader());
-        }
-
         // Select the Wrapper to be used for this Request
         Wrapper wrapper = request.getWrapper();
-        if (wrapper == null) {
+        if (wrapper == null || wrapper.isUnavailable()) {
             response.sendError(HttpServletResponse.SC_NOT_FOUND);
             return;
-        } else if (wrapper.isUnavailable()) {
-            // May be as a result of a reload, try and find the new wrapper
-            wrapper = (Wrapper) container.findChild(wrapper.getName());
-            if (wrapper == null) {
-                response.sendError(HttpServletResponse.SC_NOT_FOUND);
-                return;
-            }
         }
 
         // Acknowledge the request
