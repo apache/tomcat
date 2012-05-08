@@ -2468,6 +2468,7 @@ public class Request
         }
 
         Parameters parameters = coyoteRequest.getParameters();
+        parameters.setLimit(getConnector().getMaxParameterCount());
 
         boolean success = false;
         try {
