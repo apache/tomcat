@@ -110,6 +110,19 @@ public class ConnectionState extends JdbcInterceptor  {
 
     }
 
+
+    @Override
+    public void disconnected(ConnectionPool parent, PooledConnection con, boolean finalizing) {
+        //we are resetting, reset our defaults
+        autoCommit = null;
+        transactionIsolation = null;
+        readOnly = null;
+        catalog = null;
+        super.disconnected(parent, con, finalizing);
+    }
+
+
+
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
         String name = method.getName();
