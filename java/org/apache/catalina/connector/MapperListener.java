@@ -437,7 +437,12 @@ public class MapperListener extends LifecycleMBeanBase
             if (obj instanceof Wrapper) {
                 unregisterWrapper((Wrapper) obj);
             } else if (obj instanceof Context) {
-                unregisterContext((Context) obj);
+                Context c = (Context) obj;
+                // Only unregister if not paused. If paused, need to keep
+                // registration in place to prevent 404's during reload
+                if (!c.getPaused()) {
+                    unregisterContext(c);
+                }
             } else if (obj instanceof Host) {
                 unregisterHost((Host) obj);
             }

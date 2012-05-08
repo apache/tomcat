@@ -719,7 +719,19 @@ public class CoyoteAdapter implements Adapter {
                     }
                 }
             }
-
+            if (!mapRequired && request.getContext().getPaused()) {
+                // Found a matching context but it is paused. Mapping data will
+                // be wrong since some Wrappers may not be registered at this
+                // point.
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    // Should never happen
+                }
+                // Reset mapping
+                request.getMappingData().recycle();
+                mapRequired = true;
+            }
         }
 
         // Possible redirect
