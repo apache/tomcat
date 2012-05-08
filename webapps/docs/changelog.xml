@@ -100,6 +100,10 @@
         Make sure ContextMBean#findFilterDefs returns correct filter
         definitions. (kfujino)
       </fix>
+      <add>
+        Ensure that <code>maxParameterCount</code> applies to multi-part
+        requests handled via the Servlet 3 file upload API. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
