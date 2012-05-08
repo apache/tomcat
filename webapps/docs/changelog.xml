@@ -161,6 +161,11 @@
       <fix>
         Add missing dependencies in pom files. (markt)
       </fix>
+      <add>
+        <bug>53034</bug>Add <code>project.url</code> and
+        <code>project.licenses</code> sections to the POMs for the Maven
+        artifacts. (markt)
+      </add>
     </changelog>
   </subsection>
 </section>
