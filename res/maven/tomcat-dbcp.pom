@@ -21,4 +21,12 @@
   <artifactId>tomcat-dbcp</artifactId>
   <version>@MAVEN.DEPLOY.VERSION@</version>
   <description>Tomcat Database Connection Pooling package</description>
+  <url>http://tomcat.apache.org</url>
+  <licenses>
+    <license>
+      <name>Apache License, Version 2.0</name>
+      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
 </project>
