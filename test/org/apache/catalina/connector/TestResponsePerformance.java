@@ -24,7 +24,7 @@ import org.junit.Test;
 public class TestResponsePerformance {
     @Test
     public void testToAbsolutePerformance() throws Exception {
-        Request req = new TesterToAbsoluteRequest();
+        Request req = new TesterMockRequest();
         Response resp = new Response();
         resp.setRequest(req);
 
@@ -36,7 +36,8 @@ public class TestResponsePerformance {
 
         start = System.currentTimeMillis();
         for (int i = 0; i < 100000; i++) {
-            URI base = URI.create("http://localhost:8080/foo.html");
+            URI base = URI.create(
+                    "http://localhost:8080/level1/level2/foo.html");
             base.resolve(URI.create("bar.html")).toASCIIString();
         }
         long uri = System.currentTimeMillis() - start;
@@ -44,29 +45,5 @@ public class TestResponsePerformance {
         System.out.println("Current 'home-brew': " + homebrew +
                 "ms, Using URI: " + uri + "ms");
         assertTrue(homebrew < uri);
-    }
-
-
-    private static class TesterToAbsoluteRequest extends Request {
-
-        @Override
-        public String getScheme() {
-            return "http";
-        }
-
-        @Override
-        public String getServerName() {
-            return "localhost";
-        }
-
-        @Override
-        public int getServerPort() {
-            return 8080;
-        }
-
-        @Override
-        public String getDecodedRequestURI() {
-            return "/foo.html";
-        }
     }
 }
