@@ -1376,13 +1376,16 @@ public class NioEndpoint extends AbstractEndpoint {
 
         protected void timeout(int keyCount, boolean hasEvents) {
             long now = System.currentTimeMillis();
-            //don't process timeouts too frequently, but if the selector simply timed out
-            //then we can check timeouts to avoid gaps
-            if ( ((keyCount>0 || hasEvents) ||(now < nextExpiration)) && (!close) ) {
+            // This method is called on every loop of the Poller. Don't process
+            // timeouts on every loop of the Poller since that would create too
+            // much load and timeouts can afford to wait a few seconds.
+            // However, do process timeouts if any of the following are true:
+            // - the selector simply timed out (suggests there isn't much load)
+            // - the nextExpiration time has passed
+            // - the server socket is being closed
+            if ((keyCount > 0 || hasEvents) && (now < nextExpiration) && !close) {
                 return;
             }
-            long prevExp = nextExpiration; //for logging purposes only
-            nextExpiration = now + socketProperties.getTimeoutInterval();
             //timeout
             Set<SelectionKey> keys = selector.keys();
             int keycount = 0;
@@ -1414,9 +1417,6 @@ public class NioEndpoint extends AbstractEndpoint {
                             key.interestOps(0);
                             ka.interestOps(0); //avoid duplicate timeout calls
                             cancelledKey(key, SocketStatus.TIMEOUT);
-                        } else if (timeout > -1) {
-                            long nextTime = now+(timeout-delta);
-                            nextExpiration = (nextTime < nextExpiration)?nextTime:nextExpiration;
                         }
                     } else if (ka.isAsync() || ka.getComet()) {
                         // Async requests with a timeout of 0 or less never timeout
@@ -1435,8 +1435,15 @@ public class NioEndpoint extends AbstractEndpoint {
                     cancelledKey(key, SocketStatus.ERROR);
                 }
             }//for
-            if ( log.isTraceEnabled() ) log.trace("timeout completed: keys processed="+keycount+"; now="+now+"; nextExpiration="+prevExp+"; "+
-                                                  "keyCount="+keyCount+"; hasEvents="+hasEvents +"; eval="+( (now < prevExp) && (keyCount>0 || hasEvents) && (!close) ));
+            long prevExp = nextExpiration; //for logging purposes only
+            nextExpiration = System.currentTimeMillis() +
+                    socketProperties.getTimeoutInterval();
+            if (log.isTraceEnabled()) {
+                log.trace("timeout completed: keys processed=" + keycount +
+                        "; now=" + now + "; nextExpiration=" + prevExp +
+                        "; keyCount=" + keyCount + "; hasEvents=" + hasEvents +
+                        "; eval=" + ((now < prevExp) && (keyCount>0 || hasEvents) && (!close) ));
+            }
 
         }
     }
