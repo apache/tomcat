@@ -121,6 +121,11 @@
         The new default value will never go above 2 regardless of 
         available processors. (fhanik)
       </update>
+      <add>
+        Allow to retrieve the current <code>connectionCount</code>
+        via getter from the endpoint and as JMX attribute of the ThreadPool
+        mbean. (rjung)
+      </add>
     </changelog>
   </subsection>    
   <subsection name="Cluster">
