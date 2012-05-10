@@ -376,7 +376,7 @@ public class JIoEndpoint extends AbstractEndpoint {
         // Initialize maxConnections
         if (getMaxConnections() == 0) {
             // User hasn't set a value - use the default
-            setMaxConnections(getMaxThreads());
+            setMaxConnections(getMaxThreadsExecutor(true));
         }
 
         if (serverSocketFactory == null) {
