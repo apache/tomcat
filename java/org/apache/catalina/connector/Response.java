@@ -1560,7 +1560,7 @@ public class Response
             redirectURLCC.recycle();
             // Add the scheme
             String scheme = request.getScheme();
-                try {
+            try {
                 redirectURLCC.append(scheme, 0, scheme.length());
                 redirectURLCC.append(':');
                 redirectURLCC.append(location, 0, location.length());
@@ -1619,6 +1619,8 @@ public class Response
                     redirectURLCC.append('/');
                 }
                 redirectURLCC.append(location, 0, location.length());
+
+                normalize(redirectURLCC);
             } catch (IOException e) {
                 IllegalArgumentException iae =
                     new IllegalArgumentException(location);
@@ -1634,6 +1636,77 @@ public class Response
 
         }
 
+    }
+
+    /*
+     * Removes /./ and /../ sequences from absolute URLs.
+     * Code borrowed heavily from CoyoteAdapter.normalize()
+     */
+    private void normalize(CharChunk cc) {
+        if (cc.endsWith("/.") || cc.endsWith("/..")) {
+            try {
+                cc.append('/');
+            } catch (IOException e) {
+                throw new IllegalArgumentException(cc.toString(), e);
+            }
+        }
+
+        char[] c = cc.getChars();
+        int start = cc.getStart();
+        int end = cc.getEnd();
+        int index = 0;
+        int startIndex = 0;
+
+        // Advance past the first three / characters (should place index just
+        // scheme://host[:port]
+
+        for (int i = 0; i < 3; i++) {
+            startIndex = cc.indexOf('/', startIndex + 1);
+        }
+
+        // Remove /./
+        index = startIndex;
+        while (true) {
+            index = cc.indexOf("/./", 0, 3, index);
+            if (index < 0) {
+                break;
+            }
+            copyChars(c, start + index, start + index + 2,
+                      end - start - index - 2);
+            end = end - 2;
+            cc.setEnd(end);
+        }
+
+        // Remove /../
+        index = startIndex;
+        int pos;
+        while (true) {
+            index = cc.indexOf("/../", 0, 4, index);
+            if (index < 0) {
+                break;
+            }
+            // Prevent from going outside our context
+            if (index == startIndex) {
+                throw new IllegalArgumentException();
+            }
+            int index2 = -1;
+            for (pos = start + index - 1; (pos >= 0) && (index2 < 0); pos --) {
+                if (c[pos] == (byte) '/') {
+                    index2 = pos;
+                }
+            }
+            copyChars(c, start + index2, start + index + 3,
+                      end - start - index - 3);
+            end = end + index2 - index - 3;
+            cc.setEnd(end);
+            index = index2;
+        }
+    }
+
+    private void copyChars(char[] c, int dest, int src, int len) {
+        for (int pos = 0; pos < len; pos++) {
+            c[pos + dest] = c[pos + src];
+        }
     }
 
 

@@ -557,6 +557,25 @@ public final class CharChunk implements Cloneable, Serializable, CharSequence {
     }
 
 
+    /**
+     * Returns true if the message bytes end with the specified string.
+     * @param s the string
+     */
+    public boolean endsWith(String s) {
+        char[] c = buff;
+        int len = s.length();
+        if (c == null || len > end-start) {
+            return false;
+        }
+        int off = end - len;
+        for (int i = 0; i < len; i++) {
+            if (c[off++] != s.charAt(i)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     // -------------------- Hash code  --------------------
 
     // normal hash.
