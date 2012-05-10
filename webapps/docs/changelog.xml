@@ -104,6 +104,10 @@
         Ensure that <code>maxParameterCount</code> applies to multi-part
         requests handled via the Servlet 3 file upload API. (markt)
       </add>
+      <fix>
+        <bug>53062</bug>: When constructing absolute URLs for redirects from
+        relative URLs ensure that the resulting URLs are normalized. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
