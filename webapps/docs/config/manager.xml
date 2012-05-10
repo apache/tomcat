@@ -88,7 +88,7 @@
         <p>The initial maximum time interval, in seconds,
         between client requests before a session is invalidated. A negative value
         will result in sessions never timing out. If the attribute is not provided,
-        a default of 60 seconds is used.</p>
+        a default of 1800 seconds (30 minutes) is used.</p>
 
         <p>This attribute provides the initial value whenever a
         new session is created, but the interval may be dynamically
