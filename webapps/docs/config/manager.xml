@@ -138,7 +138,7 @@
       <attribute name="processExpiresFrequency" required="false">
         <p>Frequency of the session expiration, and related manager operations.
         Manager operations will be done once for the specified amount of
-        backgrondProcess calls (i.e., the lower the amount, the more often the
+        backgroundProcess calls (i.e., the lower the amount, the more often the
         checks will occur). The minimum value is 1, and the default value is 6.
         </p>
       </attribute>
