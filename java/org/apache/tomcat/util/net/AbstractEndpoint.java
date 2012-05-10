@@ -173,6 +173,14 @@ public abstract class AbstractEndpoint {
     }
 
     public int  getMaxConnections() { return this.maxConnections; }
+
+    public long getConnectionCount() {
+        if (connectionLimitLatch != null) {
+            return connectionLimitLatch.getCount();
+        }
+        return -1;
+    }
+
     /**
      * External Executor based thread pool.
      */
