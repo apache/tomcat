@@ -113,6 +113,12 @@
         <code>InputFilter</code>s are recycled between requests. (markt)
       </fix>
       <fix>
+        <bug>53061</bug>: Fix a problem in the NIO connector whereby if the
+        poller was under low but consistent load (>1 request/per second and
+        always less than 1 second between requests) timeouts never took place.
+        (markt)
+      </fix>
+      <fix>
         <bug>53173</bug> (<rev>1333116</rev>) :
         Properly count down maxConnections (fhanik)
       </fix>
