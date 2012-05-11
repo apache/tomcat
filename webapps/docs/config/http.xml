@@ -380,7 +380,7 @@
       falls below this value. The operating system may still accept
       connections based on the <code>acceptCount</code> setting. Default value
       varies by connector type. For BIO the default is the value of
-      <strong>maxThreads</strong> unless an <a href="executir.html">Executor</a>
+      <strong>maxThreads</strong> unless an <a href="executor.html">Executor</a>
       is used in which case the default will be the value of maxThreads from the
       executor. For NIO the default is <code>10000</code>.
       For APR/native, the default is <code>8192</code>.</p>
