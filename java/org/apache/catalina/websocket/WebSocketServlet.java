@@ -36,6 +36,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.catalina.connector.RequestFacade;
 import org.apache.catalina.util.Base64;
 import org.apache.tomcat.util.buf.B2CConverter;
+import org.apache.tomcat.util.res.StringManager;
 
 /**
  * Provides the base implementation of a Servlet for processing WebSocket
@@ -48,6 +49,8 @@ public abstract class WebSocketServlet extends HttpServlet {
     private static final byte[] WS_ACCEPT =
             "258EAFA5-E914-47DA-95CA-C5AB0DC85B11".getBytes(
                     B2CConverter.ISO_8859_1);
+    private static final StringManager sm =
+            StringManager.getManager(Constants.Package);
 
     private Queue<MessageDigest> sha1Helpers =
             new ConcurrentLinkedQueue<MessageDigest>();
@@ -123,9 +126,10 @@ public abstract class WebSocketServlet extends HttpServlet {
             inner = ((ServletRequestWrapper) inner).getRequest();
         }
         if (inner instanceof RequestFacade) {
-            ((RequestFacade) req).doUpgrade(inbound);
+            ((RequestFacade) inner).doUpgrade(inbound);
         } else {
-            resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+                    sm.getString("servlet.reqUpgradeFail"));
         }
     }
 
