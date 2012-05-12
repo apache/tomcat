@@ -75,7 +75,7 @@ public class RequestInfoExample extends HttpServlet {
         out.println("<table border=0><tr><td>");
         out.println(RB.getString("requestinfo.label.method"));
         out.println("</td><td>");
-        out.println(request.getMethod());
+        out.println(HTMLFilter.filter(request.getMethod()));
         out.println("</td></tr><tr><td>");
         out.println(RB.getString("requestinfo.label.requesturi"));
         out.println("</td><td>");
@@ -83,7 +83,7 @@ public class RequestInfoExample extends HttpServlet {
         out.println("</td></tr><tr><td>");
         out.println(RB.getString("requestinfo.label.protocol"));
         out.println("</td><td>");
-        out.println(request.getProtocol());
+        out.println(HTMLFilter.filter(request.getProtocol()));
         out.println("</td></tr><tr><td>");
         out.println(RB.getString("requestinfo.label.pathinfo"));
         out.println("</td><td>");
@@ -91,7 +91,7 @@ public class RequestInfoExample extends HttpServlet {
         out.println("</td></tr><tr><td>");
         out.println(RB.getString("requestinfo.label.remoteaddr"));
         out.println("</td><td>");
-        out.println(request.getRemoteAddr());
+        out.println(HTMLFilter.filter(request.getRemoteAddr()));
         out.println("</td></tr>");
 
         String cipherSuite=
@@ -100,7 +100,7 @@ public class RequestInfoExample extends HttpServlet {
             out.println("<tr><td>");
             out.println("SSLCipherSuite:");
             out.println("</td><td>");
-            out.println(cipherSuite);
+            out.println(HTMLFilter.filter(cipherSuite));
             out.println("</td></tr>");
         }
 
