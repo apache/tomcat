@@ -81,7 +81,11 @@
 
       <attribute name="maxActiveSessions" required="false">
         <p>The maximum number of active sessions that will be created by
-        this Manager, or -1 (the default) for no limit.</p>
+        this Manager, or <code>-1</code> (the default) for no limit.</p>
+
+        <p>When the limit is reached, any attempt to create a new session
+        (e.g. with <code>HttpServletRequest.getSession()</code> call)
+        will fail with an <code>IllegalStateException</code>.</p>
       </attribute>
 
       <attribute name="maxInactiveInterval" required="false">
