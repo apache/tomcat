@@ -108,6 +108,10 @@
         <bug>53062</bug>: When constructing absolute URLs for redirects from
         relative URLs ensure that the resulting URLs are normalized. (markt)
       </fix>
+      <fix>
+        <bug>53067</bug>: Ensure the WebSocket Servlet continues to work when
+        requests are wrapped. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
