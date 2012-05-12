@@ -27,6 +27,8 @@ import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletRequestWrapper;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -112,9 +114,19 @@ public abstract class WebSocketServlet extends HttpServlet {
             // TODO
         }
 
-        // Small hack until the Servlet API provides a way to do this.
         StreamInbound inbound = createWebSocketInbound(subProtocol);
-        ((RequestFacade) req).doUpgrade(inbound);
+
+        // Small hack until the Servlet API provides a way to do this.
+        ServletRequest inner = req;
+        // Unwrap the request
+        while (inner instanceof ServletRequestWrapper) {
+            inner = ((ServletRequestWrapper) inner).getRequest();
+        }
+        if (inner instanceof RequestFacade) {
+            ((RequestFacade) req).doUpgrade(inbound);
+        } else {
+            resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+        }
     }
 
 
