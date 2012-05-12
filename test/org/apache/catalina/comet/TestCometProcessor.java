@@ -309,12 +309,14 @@ public class TestCometProcessor extends TomcatBaseTest {
         // Last message: [Client: END]
         // Last response line: [0] (empty chunk)
         // Last comet event: [END]
+        // END event occurred: [true]
         status.append("Status:");
         status.append("\nWriterThread exception: " + writeThread.getException());
         status.append("\nReaderThread exception: " + readThread.getException());
         status.append("\nLast message: [" + lastMessage + "]");
         status.append("\nLast response line: [" + lastResponseLine + "]");
         status.append("\nLast comet event: [" + servlet.getLastEvent() + "]");
+        status.append("\nEND event occurred: [" + servlet.getEndEventOccurred() + "]");
         if (writeThread.getException() == null
                 || !lastMessage.contains("Client: END")
                 || !EventType.END.equals(servlet.getLastEvent())) {
@@ -351,8 +353,14 @@ public class TestCometProcessor extends TomcatBaseTest {
 
         private volatile EventType lastEvent;
 
+        private volatile boolean endEventOccurred = false;
+
         public EventType getLastEvent() {
             return lastEvent;
+        }
+
+        public boolean getEndEventOccurred() {
+            return endEventOccurred;
         }
 
         @Override
@@ -397,6 +405,7 @@ public class TestCometProcessor extends TomcatBaseTest {
                 String msg = "READ: " + count + " bytes";
                 response.getWriter().print("Client: " + msg + "\r\n");
             } else if (event.getEventType() == EventType.END) {
+                endEventOccurred = true;
                 if (failOnEnd) {
                     throw new IOException("Fail on end");
                 }
