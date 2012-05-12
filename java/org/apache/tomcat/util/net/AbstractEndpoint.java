@@ -181,6 +181,11 @@ public abstract class AbstractEndpoint {
      * property is added here so that this value can be inspected through JMX.
      * It is visible on "ThreadPool" MBean.
      *
+     * <p>The count is incremented by the Acceptor before it tries to accept a
+     * new connection. Until the limit is reached and thus the count cannot be
+     * incremented,  this value is more by 1 (the count of acceptors) than the
+     * actual count of connections that are being served.
+     *
      * @return The count
      */
     public long getConnectionCount() {
