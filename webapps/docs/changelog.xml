@@ -141,7 +141,7 @@
         mbean. (rjung)
       </add>
     </changelog>
-  </subsection>    
+  </subsection>
   <subsection name="Cluster">
     <changelog>
       <fix>
@@ -156,7 +156,7 @@
   <subsection name="Web applications">
     <changelog>
       <fix>
-        Remove obsolete bug warning from windows service
+        Remove obsolete bug warning from Windows service
         documentation page. (rjung)
       </fix>
       <fix>
@@ -165,6 +165,11 @@
       <fix>
         <bug>53158</bug>: Fix documented defaults for DBCP.
         Patch provided by ph.dezanneau at gmail.com. (rjung)
+      </fix>
+      <fix>
+        <bug>53203</bug>: Correct documentation for the default value
+        of <code>connectionTimeout</code> attribute for AJP protocol
+        connectors. (kkolinko)
       </fix>
     </changelog>
   </subsection>
@@ -185,7 +190,7 @@
         Add missing dependencies in pom files. (markt)
       </fix>
       <add>
-        <bug>53034</bug>Add <code>project.url</code> and
+        <bug>53034</bug>: Add <code>project.url</code> and
         <code>project.licenses</code> sections to the POMs for the Maven
         artifacts. (markt)
       </add>
