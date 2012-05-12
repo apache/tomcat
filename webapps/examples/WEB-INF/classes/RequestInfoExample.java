@@ -50,7 +50,6 @@ public class RequestInfoExample extends HttpServlet {
 
         PrintWriter out = response.getWriter();
         out.println("<html>");
-        out.println("<body>");
         out.println("<head>");
 
         String title = RB.getString("requestinfo.title");
