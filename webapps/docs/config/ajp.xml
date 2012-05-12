@@ -319,7 +319,8 @@
     <attribute name="connectionTimeout" required="false">
       <p>The number of milliseconds this <strong>Connector</strong> will wait,
       after accepting a connection, for the request URI line to be
-      presented.  The default value is 60000 (i.e. 60 seconds).</p>
+      presented.  The default value for AJP protocol connectors
+      is <code>-1</code> (i.e. infinite).</p>
     </attribute>
 
     <attribute name="executor" required="false">
