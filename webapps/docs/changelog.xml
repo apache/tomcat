@@ -175,6 +175,9 @@
         of <code>connectionTimeout</code> attribute for AJP protocol
         connectors. (kkolinko)
       </fix>
+      <fix>
+        Fix several trivial HTML markup errors in sample servlets. (kkolinko)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="jdbc-pool">
