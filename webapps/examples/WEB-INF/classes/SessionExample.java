@@ -129,7 +129,7 @@ public class SessionExample extends HttpServlet {
         out.println("</form>");
 
         out.print("<p><a href=\"");
-        out.print(response.encodeURL("SessionExample?dataname=foo&amp;datavalue=bar"));
+        out.print(HTMLFilter.filter(response.encodeURL("SessionExample?dataname=foo&datavalue=bar")));
         out.println("\" >URL encoded </a>");
 
         out.println("</body>");
