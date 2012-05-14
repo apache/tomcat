@@ -212,8 +212,8 @@ preference to this one.</p>
 Mechanism" to allow replacement of APIs created outside of the JCP
 (i.e. DOM and SAX from W3C).  It can also be used to update the XML parser
 implementation.  For more information, see:
-<a href="http://download.oracle.com/javase/1.5.0/docs/guide/standards/index.html">
-http://download.oracle.com/javase/1.5.0/docs/guide/standards/index.html</a>.</p>
+<a href="http://docs.oracle.com/javase/1.5.0/docs/guide/standards/index.html">
+http://docs.oracle.com/javase/1.5.0/docs/guide/standards/index.html</a>.</p>
 
 <p>Tomcat utilizes this mechanism by including the system property setting
 <code>-Djava.endorsed.dirs=$JAVA_ENDORSED_DIRS</code> in the

@@ -163,14 +163,14 @@ are responsible for installing, configuring, and operating an Apache Tomcat serv
 <li>Servlet 3.0
     <a href="http://jcp.org/aboutJava/communityprocess/final/jsr315/index.html">
     <strong>Specification</strong></a> and
-    <a href="http://download.oracle.com/javaee/6/api/index.html?javax/servlet/package-summary.html">
+    <a href="http://docs.oracle.com/javaee/6/api/index.html?javax/servlet/package-summary.html">
     <strong>Javadoc</strong></a>
     </li>
 <li><a href="http://jcp.org/aboutJava/communityprocess/mrel/jsr245/index.html">
     <strong>JSP 2.2 and EL 2.2 Specifications</strong></a>,
-    <a href="http://download.oracle.com/javaee/6/api/index.html?javax/servlet/jsp/package-summary.html">
+    <a href="http://docs.oracle.com/javaee/6/api/index.html?javax/servlet/jsp/package-summary.html">
     <strong>JSP 2.2 Javadoc (note it is labelled as JSP 2.1)</strong></a>,
-    <a href="http://download.oracle.com/javaee/6/api/index.html?javax/el/package-summary.html">
+    <a href="http://docs.oracle.com/javaee/6/api/index.html?javax/el/package-summary.html">
     <strong>EL 2.2 Javadoc</strong></a>
     </li>
 </ul>
