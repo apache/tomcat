@@ -202,7 +202,7 @@ com.sun.security.jgss.krb5.accept {
       IIS and Kerberos</a></li>
   <li><a href="http://spnego.sourceforge.net/index.html">
       SPNEGO project at SourceForge</a></li>
-  <li><a href="http://download.oracle.com/javase/1.5.0/docs/guide/security/jgss/tutorials/index.html">
+  <li><a href="http://docs.oracle.com/javase/1.5.0/docs/guide/security/jgss/tutorials/index.html">
       Oracle JGSS tutorial</a></li>
   <li><a href="https://cwiki.apache.org/GMOxDOC21/using-spengo-in-geronimo.html#UsingSpengoingeronimo-SettinguptheActiveDirectoryDomainController">
       Geronimo configuration for Windows authentication</a></li>

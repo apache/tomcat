@@ -154,7 +154,7 @@ permission java.io.FilePermission
   This file completely replaces the <code>java.policy</code> file present
   in your JDK system directories.  The <code>catalina.policy</code> file
   can be edited by hand, or you can use the
-  <a href="http://download.oracle.com/javase/6/docs/technotes/guides/security/PolicyGuide.html">policytool</a>
+  <a href="http://docs.oracle.com/javase/6/docs/technotes/guides/security/PolicyGuide.html">policytool</a>
   application that comes with Java 1.2 or later.</p>
 
   <p>Entries in the <code>catalina.policy</code> file use the standard

@@ -372,7 +372,7 @@ java.util.logging.ConsoleHandler.formatter = java.util.logging.SimpleFormatter
           package.
         </li>
         <li>Oracle Java 6 Javadoc for the
-          <a href="http://download.oracle.com/javase/6/docs/api/java/util/logging/package-summary.html"><code>java.util.logging</code></a>
+          <a href="http://docs.oracle.com/javase/6/docs/api/java/util/logging/package-summary.html"><code>java.util.logging</code></a>
           package.
         </li>
       </ul>
