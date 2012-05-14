@@ -410,7 +410,7 @@
     behind a firewall. Only these ports are configured via the listener. The
     remainder of the configuration is via the standard system properties for
     configuring JMX. For further information on configuring JMX see
-    <a href="http://java.sun.com/javase/6/docs/technotes/guides/management/agent.html">
+    <a href="http://docs.oracle.com/javase/6/docs/technotes/guides/management/agent.html">
     Monitoring and Management Using JMX</a> included with the Java SDK
     documentation.</p>
 
