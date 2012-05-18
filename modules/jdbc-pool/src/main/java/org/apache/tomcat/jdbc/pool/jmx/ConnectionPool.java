@@ -828,6 +828,26 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
         getPoolProperties().setPropagateInterruptState(propagateInterruptState);
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void purge() {
+        pool.purge();
+
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void purgeOnReturn() {
+        pool.purgeOnReturn();
+
+    }
+
+
+
 
 
 }

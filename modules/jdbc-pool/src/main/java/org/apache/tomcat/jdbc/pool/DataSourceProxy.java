@@ -1288,4 +1288,26 @@ public class DataSourceProxy implements PoolConfiguration {
         getPoolProperties().setPropagateInterruptState(propagateInterruptState);
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    public void purge()  {
+        try {
+            createPool().purge();
+        }catch (SQLException x) {
+            log.error("Unable to purge pool.",x);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void purgeOnReturn() {
+        try {
+            createPool().purgeOnReturn();
+        }catch (SQLException x) {
+            log.error("Unable to purge pool.",x);
+        }
+    }
+
 }
