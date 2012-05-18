@@ -182,6 +182,11 @@
   </subsection>
   <subsection name="jdbc-pool">
     <changelog>
+      <update>
+         When a connection is reconnected due to failed validation
+         make sure the ConnectionState is reset or it will assume
+         incorrect values (fhanik)
+      </update>
       <fix>
         <bug>50864</bug> (<rev>1311844</rev>):
         JMX enable most pool properties (fhanik)
