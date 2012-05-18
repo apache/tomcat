@@ -117,6 +117,14 @@
   <subsection name="Coyote">
     <changelog>
       <fix>
+        <bug>52858</bug>: Correct fix for high CPU load
+        (fhanik)
+      </fix>
+      <fix>
+        <bug>53138</bug>: Broken Sendfile on SSL introduced in 7.0.27
+        (fhanik)
+      </fix>
+      <fix>
         <bug>52055</bug>: Additional fix required to ensure that
         <code>InputFilter</code>s are recycled between requests. (markt)
       </fix>
