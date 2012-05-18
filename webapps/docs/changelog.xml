@@ -182,6 +182,10 @@
   </subsection>
   <subsection name="jdbc-pool">
     <changelog>
+      <fix>
+        <bug>53254</bug> (<rev>1340160</rev>):
+        Add in the ability to purge connections from the pool (fhanik)
+      </fix>  
       <update>
          When a connection is reconnected due to failed validation
          make sure the ConnectionState is reset or it will assume
