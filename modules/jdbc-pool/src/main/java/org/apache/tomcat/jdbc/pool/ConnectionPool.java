@@ -39,6 +39,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -119,6 +120,8 @@ public class ConnectionPool {
      * counter to track how many threads are waiting for a connection
      */
     private AtomicInteger waitcount = new AtomicInteger(0);
+
+    private AtomicLong poolVersion = new AtomicLong(Long.MIN_VALUE);
 
     //===============================================================================
     //         PUBLIC METHODS
@@ -438,6 +441,8 @@ public class ConnectionPool {
         if (properties.isFairQueue()) {
             idle = new FairBlockingQueue<PooledConnection>();
             //idle = new MultiLockFairBlockingQueue<PooledConnection>();
+            //idle = new LinkedTransferQueue<PooledConnection>();
+            //idle = new ArrayBlockingQueue<PooledConnection>(properties.getMaxActive(),false);
         } else {
             idle = new ArrayBlockingQueue<PooledConnection>(properties.getMaxActive(),properties.isFairQueue());
         }
@@ -836,6 +841,7 @@ public class ConnectionPool {
      * @return true if the connection should be closed
      */
     protected boolean shouldClose(PooledConnection con, int action) {
+        if (con.getConnectionVersion() < getPoolVersion()) return true;
         if (con.isDiscarded()) return true;
         if (isClosed()) return true;
         if (!con.validate(action)) return true;
@@ -954,11 +960,16 @@ public class ConnectionPool {
      * {@link PoolProperties#maxIdle}, {@link PoolProperties#minIdle}, {@link PoolProperties#minEvictableIdleTimeMillis}
      */
     public void checkIdle() {
+        checkIdle(false);
+    }
+
+    public void checkIdle(boolean ignoreMinSize) {
+
         try {
             if (idle.size()==0) return;
             long now = System.currentTimeMillis();
             Iterator<PooledConnection> unlocked = idle.iterator();
-            while ( (idle.size()>=getPoolProperties().getMinIdle()) && unlocked.hasNext()) {
+            while ( (ignoreMinSize || (idle.size()>=getPoolProperties().getMinIdle())) && unlocked.hasNext()) {
                 PooledConnection con = unlocked.next();
                 boolean setToNull = false;
                 try {
@@ -967,7 +978,7 @@ public class ConnectionPool {
                     if (busy.contains(con))
                         continue;
                     long time = con.getTimestamp();
-                    if ((con.getReleaseTime()>0) && ((now - time) > con.getReleaseTime()) && (getSize()>getPoolProperties().getMinIdle())) {
+                    if (shouldReleaseIdle(now, con, time)) {
                         release(con);
                         idle.remove(con);
                         setToNull = true;
@@ -986,6 +997,12 @@ public class ConnectionPool {
             log.warn("checkIdle failed, it will be retried.",e);
         }
 
+    }
+
+
+    protected boolean shouldReleaseIdle(long now, PooledConnection con, long time) {
+        if (con.getConnectionVersion() < getPoolVersion()) return true;
+        else return (con.getReleaseTime()>0) && ((now - time) > con.getReleaseTime()) && (getSize()>getPoolProperties().getMinIdle());
     }
 
     /**
@@ -1055,6 +1072,27 @@ public class ConnectionPool {
         if (incrementCounter) size.incrementAndGet();
         PooledConnection con = new PooledConnection(getPoolProperties(), this);
         return con;
+    }
+
+    /**
+     * Purges all connections in the pool.
+     * For connections currently in use, these connections will be
+     * purged when returned on the pool. This call also
+     * purges connections that are idle and in the pool
+     * To only purge used/active connections see {@link #purgeOnReturn()}
+     */
+    public void purge() {
+        purgeOnReturn();
+        checkIdle(true);
+    }
+
+    /**
+     * Purges connections when they are returned from the pool.
+     * This call does not purge idle connections until they are used.
+     * To purge idle connections see {@link #purge()}
+     */
+    public void purgeOnReturn() {
+        poolVersion.incrementAndGet();
     }
 
     /**
@@ -1250,6 +1288,10 @@ public class ConnectionPool {
 
     public static Set<TimerTask> getPoolCleaners() {
         return Collections.<TimerTask>unmodifiableSet(cleaners);
+    }
+
+    public long getPoolVersion() {
+        return poolVersion.get();
     }
 
     public static Timer getPoolTimer() {
