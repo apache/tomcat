@@ -17,15 +17,7 @@
 package org.apache.tomcat.jdbc.test;
 
 import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.Statement;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
 
-import javax.sql.DataSource;
-
-import org.apache.tomcat.jdbc.pool.DataSourceProxy;
 import org.apache.tomcat.jdbc.test.driver.Driver;
 
 /**
@@ -75,7 +67,7 @@ public class PoolPurgeTest extends DefaultTestCase {
 
     public void testPoolPurgeWithActive() throws Exception {
         init();
-        java.sql.Connection con = datasource.getConnection();
+        Connection con = datasource.getConnection();
         assertEquals("Nr of connections should be "+expectedSize, expectedSize , datasource.getSize());
         this.datasource.purge();
         assertEquals("Nr of connections should be "+(expectedSize-1), (expectedSize-1) , datasource.getSize());
@@ -86,7 +78,7 @@ public class PoolPurgeTest extends DefaultTestCase {
 
     public void testPoolPurgeOnReturn() throws Exception {
         init();
-        java.sql.Connection con = datasource.getConnection();
+        Connection con = datasource.getConnection();
         assertEquals("Nr of connections should be "+expectedSize, expectedSize , datasource.getSize());
         this.datasource.purgeOnReturn();
         assertEquals("Nr of connections should be "+expectedSize, expectedSize , datasource.getSize());
