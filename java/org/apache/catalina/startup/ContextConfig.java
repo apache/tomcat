@@ -559,9 +559,8 @@ public class ContextConfig implements LifecycleListener {
                             "contextConfig.badUrl", defaultContextFile), e);
                 }
             }
-            
-            File hostContextFile = new File(getConfigBase(),
-                    getHostConfigPath(Constants.HostContextXml));
+
+            File hostContextFile = new File(getHostConfigBase(), Constants.HostContextXml);
             if (hostContextFile.exists()) {
                 try {
                     URL hostContextUrl = hostContextFile.toURI().toURL();
@@ -1152,29 +1151,42 @@ public class ContextConfig implements LifecycleListener {
         return configBase;
     }  
 
-    
-    protected String getHostConfigPath(String resourceName) {
-        StringBuilder result = new StringBuilder();
+    protected File getHostConfigBase() {
+        File file = null;
         Container container = context;
-        Container host = null;
-        Container engine = null;
+        Host host = null;
+        Engine engine = null;
         while (container != null) {
-            if (container instanceof Host)
-                host = container;
-            if (container instanceof Engine)
-                engine = container;
+            if (container instanceof Host) {
+                host = (Host)container;
+            }
+            if (container instanceof Engine) {
+                engine = (Engine)container;
+            }
             container = container.getParent();
         }
-        if (engine != null) {
-            result.append(engine.getName()).append('/');
+        if (host != null && host.getXmlBase()!=null) {
+            String xmlBase = host.getXmlBase();
+            file = new File(xmlBase);
+            if (!file.isAbsolute())
+                file = new File(new File(System.getProperty(Globals.CATALINA_BASE_PROP)),
+                        xmlBase);
+        } else {
+            StringBuilder result = new StringBuilder();
+            if (engine != null) {
+                result.append(engine.getName()).append('/');
+            }
+            if (host != null) {
+                result.append(host.getName()).append('/');
+            }
+            file = new File (getConfigBase(), result.toString());
         }
-        if (host != null) {
-            result.append(host.getName()).append('/');
+        try {
+            return file.getCanonicalFile();
+        } catch (IOException e) {
+            return file;
         }
-        result.append(resourceName);
-        return result.toString();
     }
-
 
     /**
      * Scan the web.xml files that apply to the web application and merge them
@@ -1686,22 +1698,15 @@ public class ContextConfig implements LifecycleListener {
      * it.
      */
     protected InputSource getHostWebXmlSource() {
-        String resourceName = getHostConfigPath(Constants.HostWebXml);
-        
-        // In an embedded environment, configBase might not be set
-        File configBase = getConfigBase();
-        if (configBase == null)
-            return null;
-        
         String basePath = null;
         try {
-            basePath = configBase.getCanonicalPath();
+            basePath = getHostConfigBase().getCanonicalPath();
         } catch (IOException e) {
             log.error(sm.getString("contextConfig.baseError"), e);
             return null;
         }
 
-        return getWebXmlSource(resourceName, basePath);
+        return getWebXmlSource(Constants.HostWebXml, basePath);
     }
     
     /**

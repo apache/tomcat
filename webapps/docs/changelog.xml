@@ -112,6 +112,9 @@
         <bug>53067</bug>: Ensure the WebSocket Servlet continues to work when
         requests are wrapped. (markt)
       </fix>
+      <fix>
+        Enable host's xmlBase attribute in ContextConfig. (kfujino)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
