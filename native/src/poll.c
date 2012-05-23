@@ -401,11 +401,11 @@ TCN_IMPLEMENT_CALL(jint, Poll, maintain)(TCN_STDARGS, jlong pollset,
 }
 
 TCN_IMPLEMENT_CALL(void, Poll, setTtl)(TCN_STDARGS, jlong pollset,
-                                       jlong ttl)
+                                       jlong default_timeout)
 {
     tcn_pollset_t *p = J2P(pollset,  tcn_pollset_t *);
     UNREFERENCED_STDARGS;
-    p->default_timeout = J2T(ttl);
+    p->default_timeout = J2T(default_timeout);
 }
 
 TCN_IMPLEMENT_CALL(jlong, Poll, getTtl)(TCN_STDARGS, jlong pollset)
