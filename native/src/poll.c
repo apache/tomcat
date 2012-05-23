@@ -40,7 +40,7 @@ typedef struct tcn_pollset {
     apr_pollset_t *pollset;
     jlong         *set;
     apr_pollfd_t  *socket_set;
-    apr_interval_time_t *socket_ttl;
+    apr_time_t    *socket_ttl;
     apr_interval_time_t max_ttl;
 #ifdef TCN_DO_STATISTICS
     int sp_added;
