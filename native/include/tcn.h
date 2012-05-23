@@ -284,4 +284,6 @@ typedef struct {
     else if (F == 1) T = SOCK_DGRAM; \
     else T = F
 
+#define TCN_NO_SOCKET_TIMEOUT -2
+
 #endif /* TCN_H */

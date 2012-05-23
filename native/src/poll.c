@@ -41,6 +41,7 @@ typedef struct tcn_pollset {
     jlong         *set;
     apr_pollfd_t  *socket_set;
     apr_time_t    *socket_last_active;
+    apr_interval_time_t *socket_timeout;
     apr_interval_time_t default_timeout;
 #ifdef TCN_DO_STATISTICS
     int sp_added;
@@ -130,6 +131,8 @@ TCN_IMPLEMENT_CALL(jlong, Poll, create)(TCN_STDARGS, jint size,
     TCN_CHECK_ALLOCATED(tps->socket_set);
     tps->socket_last_active = apr_palloc(p, size * sizeof(apr_time_t));
     TCN_CHECK_ALLOCATED(tps->socket_last_active);
+    tps->socket_timeout = apr_palloc(p, size * sizeof(apr_interval_time_t));
+    TCN_CHECK_ALLOCATED(tps->socket_timeout);
     tps->nelts  = 0;
     tps->nalloc = size;
     tps->pool   = p;
@@ -158,15 +161,12 @@ TCN_IMPLEMENT_CALL(jint, Poll, destroy)(TCN_STDARGS, jlong pollset)
     return (jint)apr_pollset_destroy(p->pollset);
 }
 
-TCN_IMPLEMENT_CALL(jint, Poll, add)(TCN_STDARGS, jlong pollset,
-                                    jlong socket, jint reqevents)
-{
-    tcn_pollset_t *p = J2P(pollset,  tcn_pollset_t *);
-    tcn_socket_t *s  = J2P(socket, tcn_socket_t *);
-    apr_pollfd_t fd;
+static apr_status_t do_add(tcn_pollset_t *p, tcn_socket_t *s,
+                           apr_int16_t reqevents,
+                           apr_interval_time_t socket_timeout) {
 
-    UNREFERENCED_STDARGS;
-    TCN_ASSERT(socket != 0);
+    apr_interval_time_t timeout = socket_timeout;
+    apr_pollfd_t fd;
 
     if (p->nelts == p->nalloc) {
 #ifdef TCN_DO_STATISTICS
@@ -176,14 +176,19 @@ TCN_IMPLEMENT_CALL(jint, Poll, add)(TCN_STDARGS, jlong pollset,
     }
     memset(&fd, 0, sizeof(apr_pollfd_t));
     fd.desc_type = APR_POLL_SOCKET;
-    fd.reqevents = (apr_int16_t)reqevents;
+    fd.reqevents = reqevents;
     fd.desc.s    = s->sock;
     fd.client_data = s;
-    if (p->default_timeout > 0)
+
+    if (timeout == TCN_NO_SOCKET_TIMEOUT) {
+        timeout = p->default_timeout;
+    }
+    if (timeout > 0)
         p->socket_last_active[p->nelts] = apr_time_now();
     else
         p->socket_last_active[p->nelts] = 0;
 
+    p->socket_timeout[p->nelts] = socket_timeout;
     p->socket_set[p->nelts] = fd;
     p->nelts++;
 #ifdef TCN_DO_STATISTICS
@@ -191,6 +196,31 @@ TCN_IMPLEMENT_CALL(jint, Poll, add)(TCN_STDARGS, jlong pollset,
     p->sp_max_count = TCN_MAX(p->sp_max_count, p->sp_added);
 #endif
     return (jint)apr_pollset_add(p->pollset, &fd);
+}
+
+TCN_IMPLEMENT_CALL(jint, Poll, add)(TCN_STDARGS, jlong pollset,
+                                    jlong socket, jint reqevents)
+{
+    tcn_pollset_t *p = J2P(pollset,  tcn_pollset_t *);
+    tcn_socket_t *s  = J2P(socket, tcn_socket_t *);
+
+    UNREFERENCED_STDARGS;
+    TCN_ASSERT(socket != 0);
+
+    return (jint) do_add(p, s, (apr_int16_t)reqevents, TCN_NO_SOCKET_TIMEOUT);
+}
+
+TCN_IMPLEMENT_CALL(jint, Poll, addWithTimeout)(TCN_STDARGS, jlong pollset,
+                                               jlong socket, jint reqevents,
+                                               jlong socket_timeout)
+{
+    tcn_pollset_t *p = J2P(pollset,  tcn_pollset_t *);
+    tcn_socket_t *s  = J2P(socket, tcn_socket_t *);
+
+    UNREFERENCED_STDARGS;
+    TCN_ASSERT(socket != 0);
+
+    return (jint) do_add(p, s, (apr_int16_t)reqevents, J2T(socket_timeout));
 }
 
 static apr_status_t do_remove(tcn_pollset_t *p, const apr_pollfd_t *fd)
@@ -216,6 +246,7 @@ static apr_status_t do_remove(tcn_pollset_t *p, const apr_pollfd_t *fd)
                 else {
                     p->socket_set[dst] = p->socket_set[i];
                     p->socket_last_active[dst] = p->socket_last_active[i];
+                    p->socket_timeout[dst] = p->socket_timeout[i];
                     dst++;
                 }
             }
@@ -290,18 +321,27 @@ TCN_IMPLEMENT_CALL(jint, Poll, poll)(TCN_STDARGS, jlong pollset,
      p->sp_poll++;
 #endif
 
-    if (ptime > 0 && p->default_timeout >= 0) {
+    if (ptime > 0) {
         now = apr_time_now();
 
         /* Find the minimum timeout */
         for (i = 0; i < p->nelts; i++) {
-            apr_interval_time_t t = now - p->socket_last_active[i];
-            if (t >= p->default_timeout) {
-                ptime = 0;
-                break;
+            apr_interval_time_t socket_timeout = 0;
+            if (p->socket_timeout[i] == TCN_NO_SOCKET_TIMEOUT) {
+                socket_timeout = p->default_timeout;
             }
             else {
-                ptime = TCN_MIN(p->default_timeout - t, ptime);
+                socket_timeout = p->socket_timeout[i];
+            }
+            if (socket_timeout >= 0) {
+                apr_interval_time_t t = now - p->socket_last_active[i];
+                if (t >= socket_timeout) {
+                    ptime = 0;
+                    break;
+                }
+                else {
+                    ptime = TCN_MIN(socket_timeout - t, ptime);
+                }
             }
         }
     }
@@ -361,38 +401,33 @@ TCN_IMPLEMENT_CALL(jint, Poll, maintain)(TCN_STDARGS, jlong pollset,
     TCN_ASSERT(pollset != 0);
 
     /* Check for timeout sockets */
-    if (p->default_timeout > 0) {
-        for (i = 0; i < p->nelts; i++) {
-            if ((now - p->socket_last_active[i]) >= p->default_timeout) {
-                fd = p->socket_set[i];
-                p->set[num++] = P2J(fd.client_data);
-            }
+    for (i = 0; i < p->nelts; i++) {
+        apr_interval_time_t timeout = 0;
+        if (p->socket_timeout[i] == TCN_NO_SOCKET_TIMEOUT) {
+            timeout = p->default_timeout;
         }
-        if (remove && num) {
-            memset(&fd, 0, sizeof(apr_pollfd_t));
-#ifdef TCN_DO_STATISTICS
-             p->sp_maintained += num;
-             p->sp_max_maintained = TCN_MAX(p->sp_max_maintained, num);
-#endif
-            for (i = 0; i < num; i++) {
-                fd.desc_type = APR_POLL_SOCKET;
-                fd.reqevents = APR_POLLIN | APR_POLLOUT;
-                fd.desc.s = (J2P(p->set[i], tcn_socket_t *))->sock;
-                do_remove(p, &fd);
-            }
+        else {
+            timeout = p->socket_timeout[i];
         }
-    }
-    else if (p->default_timeout == 0) {
-        for (i = 0; i < p->nelts; i++) {
+        if (timeout == -1) {
+            continue;
+        }
+        if ((now - p->socket_last_active[i]) >= timeout) {
             fd = p->socket_set[i];
             p->set[num++] = P2J(fd.client_data);
         }
-        if (remove) {
-            remove_all(p);
+    }
+    if (remove && num) {
+        memset(&fd, 0, sizeof(apr_pollfd_t));
 #ifdef TCN_DO_STATISTICS
-            p->sp_maintained += num;
-            p->sp_max_maintained = TCN_MAX(p->sp_max_maintained, num);
+         p->sp_maintained += num;
+         p->sp_max_maintained = TCN_MAX(p->sp_max_maintained, num);
 #endif
+        for (i = 0; i < num; i++) {
+            fd.desc_type = APR_POLL_SOCKET;
+            fd.reqevents = APR_POLLIN | APR_POLLOUT;
+            fd.desc.s = (J2P(p->set[i], tcn_socket_t *))->sock;
+            do_remove(p, &fd);
         }
     }
     if (num)
