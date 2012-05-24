@@ -108,7 +108,7 @@
         <a href="#Automatic Application Deployment">Automatic Application
         Deployment</a> for more information on automatic recognition and
         deployment of web applications. If not specified the default of
-        <code>[engine_name]/[host_name]</code> will be used.</p>
+        <code>conf/&lt;engine_name&gt;/&lt;host_name&gt;</code> will be used.</p>
       </attribute>
 
       <attribute name="createDirs" required="false">
