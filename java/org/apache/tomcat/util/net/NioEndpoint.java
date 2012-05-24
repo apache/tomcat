@@ -1278,12 +1278,14 @@ public class NioEndpoint extends AbstractEndpoint {
 
         public boolean processSendfile(SelectionKey sk, KeyAttachment attachment, boolean reg, boolean event) {
             NioChannel sc = null;
-            if (log.isTraceEnabled()) {
-                log.trace("["+new java.sql.Date(System.currentTimeMillis()).toGMTString()+"] Processing send file. ["+sk+"] ");
-            }
             try {
                 unreg(sk, attachment, sk.readyOps());
                 SendfileData sd = attachment.getSendfileData();
+
+                if (log.isTraceEnabled()) {
+                    log.trace("Processing send file for: " + sd.fileName);
+                }
+
                 //setup the file channel
                 if ( sd.fchannel == null ) {
                     File f = new File(sd.fileName);
@@ -1322,7 +1324,7 @@ public class NioEndpoint extends AbstractEndpoint {
                 }
                 if ( sd.length <= 0 && sc.getOutboundRemaining()<=0) {
                     if (log.isDebugEnabled()) {
-                        log.debug("Send file complete for:"+sd.fileName);
+                        log.debug("Send file complete for: "+sd.fileName);
                     }
                     attachment.setSendfileData(null);
                     try {
@@ -1345,9 +1347,9 @@ public class NioEndpoint extends AbstractEndpoint {
                         cancelledKey(sk,SocketStatus.STOP,false);
                         return false;
                     }
-                } else { //if ( attachment.interestOps() == 0 && reg ) {
+                } else {
                     if (log.isDebugEnabled()) {
-                        log.debug("OP_WRITE for sendilfe:"+sd.fileName);
+                        log.debug("OP_WRITE for sendfile: " + sd.fileName);
                     }
                     if (event) {
                         add(attachment.getChannel(),SelectionKey.OP_WRITE);
