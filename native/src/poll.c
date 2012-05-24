@@ -40,8 +40,6 @@ typedef struct tcn_pollset {
     apr_pollset_t *pollset;
     jlong         *set;
     apr_pollfd_t  *socket_set;
-    apr_time_t    *socket_last_active;
-    apr_interval_time_t *socket_timeout;
     apr_interval_time_t default_timeout;
 #ifdef TCN_DO_STATISTICS
     int sp_added;
@@ -129,10 +127,6 @@ TCN_IMPLEMENT_CALL(jlong, Poll, create)(TCN_STDARGS, jint size,
     TCN_CHECK_ALLOCATED(tps->set);
     tps->socket_set = apr_palloc(p, size * sizeof(apr_pollfd_t));
     TCN_CHECK_ALLOCATED(tps->socket_set);
-    tps->socket_last_active = apr_palloc(p, size * sizeof(apr_time_t));
-    TCN_CHECK_ALLOCATED(tps->socket_last_active);
-    tps->socket_timeout = apr_palloc(p, size * sizeof(apr_interval_time_t));
-    TCN_CHECK_ALLOCATED(tps->socket_timeout);
     tps->nelts  = 0;
     tps->nalloc = size;
     tps->pool   = p;
@@ -174,21 +168,21 @@ static apr_status_t do_add(tcn_pollset_t *p, tcn_socket_t *s,
 #endif
         return APR_ENOMEM;
     }
+    if (timeout == TCN_NO_SOCKET_TIMEOUT) {
+        timeout = p->default_timeout;
+    }
+    if (timeout > 0)
+        s->last_active = apr_time_now();
+    else
+        s->last_active = 0;
+    s->timeout = socket_timeout;
+
     memset(&fd, 0, sizeof(apr_pollfd_t));
     fd.desc_type = APR_POLL_SOCKET;
     fd.reqevents = reqevents;
     fd.desc.s    = s->sock;
     fd.client_data = s;
 
-    if (timeout == TCN_NO_SOCKET_TIMEOUT) {
-        timeout = p->default_timeout;
-    }
-    if (timeout > 0)
-        p->socket_last_active[p->nelts] = apr_time_now();
-    else
-        p->socket_last_active[p->nelts] = 0;
-
-    p->socket_timeout[p->nelts] = socket_timeout;
     p->socket_set[p->nelts] = fd;
     p->nelts++;
 #ifdef TCN_DO_STATISTICS
@@ -232,11 +226,13 @@ static apr_status_t do_remove(tcn_pollset_t *p, const apr_pollfd_t *fd)
             /* Found an instance of the fd: remove this and any other copies */
             apr_int32_t dst = i;
             apr_int32_t old_nelts = p->nelts;
+            tcn_socket_t *ds = (tcn_socket_t *)p->socket_set[dst].client_data;
             p->nelts--;
 #ifdef TCN_DO_STATISTICS
             p->sp_removed++;
 #endif
             for (i++; i < old_nelts; i++) {
+                tcn_socket_t *ss = (tcn_socket_t *)p->socket_set[i].client_data;
                 if (fd->desc.s == p->socket_set[i].desc.s) {
 #ifdef TCN_DO_STATISTICS
                     p->sp_equals++;
@@ -245,8 +241,8 @@ static apr_status_t do_remove(tcn_pollset_t *p, const apr_pollfd_t *fd)
                 }
                 else {
                     p->socket_set[dst] = p->socket_set[i];
-                    p->socket_last_active[dst] = p->socket_last_active[i];
-                    p->socket_timeout[dst] = p->socket_timeout[i];
+                    ds->last_active = ss->last_active;
+                    ds->timeout     = ss->timeout;
                     dst++;
                 }
             }
@@ -262,8 +258,9 @@ static void update_last_active(tcn_pollset_t *p, const apr_pollfd_t *fd, apr_tim
 
     for (i = 0; i < p->nelts; i++) {
         if (fd->desc.s == p->socket_set[i].desc.s) {
+            tcn_socket_t *s = (tcn_socket_t *)p->socket_set[i].client_data;
             /* Found an instance of the fd: update last active time */
-            p->socket_last_active[i] = t;
+            s->last_active = t;
             break;
         }
     }
@@ -327,14 +324,15 @@ TCN_IMPLEMENT_CALL(jint, Poll, poll)(TCN_STDARGS, jlong pollset,
         /* Find the minimum timeout */
         for (i = 0; i < p->nelts; i++) {
             apr_interval_time_t socket_timeout = 0;
-            if (p->socket_timeout[i] == TCN_NO_SOCKET_TIMEOUT) {
+            tcn_socket_t *s = (tcn_socket_t *)p->socket_set[i].client_data;
+            if (s->timeout == TCN_NO_SOCKET_TIMEOUT) {
                 socket_timeout = p->default_timeout;
             }
             else {
-                socket_timeout = p->socket_timeout[i];
+                socket_timeout = s->timeout;
             }
             if (socket_timeout >= 0) {
-                apr_interval_time_t t = now - p->socket_last_active[i];
+                apr_interval_time_t t = now - s->last_active;
                 if (t >= socket_timeout) {
                     ptime = 0;
                     break;
@@ -403,18 +401,18 @@ TCN_IMPLEMENT_CALL(jint, Poll, maintain)(TCN_STDARGS, jlong pollset,
     /* Check for timeout sockets */
     for (i = 0; i < p->nelts; i++) {
         apr_interval_time_t timeout = 0;
-        if (p->socket_timeout[i] == TCN_NO_SOCKET_TIMEOUT) {
+        tcn_socket_t *s = (tcn_socket_t *)p->socket_set[i].client_data;
+        if (s->timeout == TCN_NO_SOCKET_TIMEOUT) {
             timeout = p->default_timeout;
         }
         else {
-            timeout = p->socket_timeout[i];
+            timeout = s->timeout;
         }
         if (timeout == -1) {
             continue;
         }
-        if ((now - p->socket_last_active[i]) >= timeout) {
-            fd = p->socket_set[i];
-            p->set[num++] = P2J(fd.client_data);
+        if ((now - s->last_active) >= timeout) {
+            p->set[num++] = P2J(s);
         }
     }
     if (remove && num) {
