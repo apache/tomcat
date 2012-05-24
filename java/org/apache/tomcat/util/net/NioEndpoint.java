@@ -1230,7 +1230,7 @@ public class NioEndpoint extends AbstractEndpoint {
                     NioChannel channel = attachment.getChannel();
                     if (sk.isReadable() || sk.isWritable() ) {
                         if ( attachment.getSendfileData() != null ) {
-                            processSendfile(sk,attachment,true, false);
+                            processSendfile(sk,attachment, false);
                         } else if ( attachment.getComet() ) {
                             //check if thread is available
                             if ( isWorkerAvailable() ) {
@@ -1276,7 +1276,7 @@ public class NioEndpoint extends AbstractEndpoint {
             return result;
         }
 
-        public boolean processSendfile(SelectionKey sk, KeyAttachment attachment, boolean reg, boolean event) {
+        public boolean processSendfile(SelectionKey sk, KeyAttachment attachment, boolean event) {
             NioChannel sc = null;
             try {
                 unreg(sk, attachment, sk.readyOps());

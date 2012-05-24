@@ -284,7 +284,7 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
                     socketWrapper.getSocket().getPoller().getSelector());
             //do the first write on this thread, might as well
             openSocket = socketWrapper.getSocket().getPoller().processSendfile(key,
-                    (KeyAttachment) socketWrapper, true, true);
+                    (KeyAttachment) socketWrapper, true);
             return true;
         }
         return false;
