@@ -245,6 +245,7 @@ public class ChunkedInputFilter implements InputFilter {
         pos = 0;
         lastValid = 0;
         endChunk = false;
+        needCRLFParse = false;
         trailingHeaders.recycle();
     }
 
