@@ -197,19 +197,6 @@ public class StandardHost extends ContainerBase implements Host {
 
 
     /**
-     * Return the XML root for this Host.  This can be an absolute
-     * pathname, a relative pathname, or a URL.
-     * If null, defaults to ${catalina.base}/conf/ directory
-     */
-    @Override
-    public String getXmlBase() {
-
-        return (this.xmlBase);
-
-    }
-
-
-    /**
      * Set the application root for this Host.  This can be an absolute
      * pathname, a relative pathname, or a URL.
      *
@@ -223,12 +210,27 @@ public class StandardHost extends ContainerBase implements Host {
         support.firePropertyChange("appBase", oldAppBase, this.appBase);
 
     }
+
+
+    /**
+     * Return the XML root for this Host.  This can be an absolute
+     * pathname, a relative pathname, or a URL.
+     * If null, defaults to
+     * ${catalina.base}/conf/&lt;engine name&gt;/&lt;host name&gt; directory
+     */
+    @Override
+    public String getXmlBase() {
+
+        return (this.xmlBase);
+
+    }
     
 
     /**
      * Set the Xml root for this Host.  This can be an absolute
      * pathname, a relative pathname, or a URL.
-     * If null, defaults to ${catalina.base}/conf/ directory
+     * If null, defaults to
+     * ${catalina.base}/conf/&lt;engine name&gt;/&lt;host name&gt; directory
      *
      * @param xmlBase The new XML root
      */
