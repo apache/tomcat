@@ -57,6 +57,10 @@
   <subsection name="Catalina">
     <changelog>
       <fix>
+        <bug>52055</bug>: An additional fix to ensure that the
+        ChunkedInputFilter is correctly recycled. (markt)
+      </fix>
+      <fix>
         <bug>53021</bug>: Correct WebSocket protocol version detection. (pero)
       </fix>
       <add>
