@@ -31,6 +31,9 @@ public class UpgradeAprProcessor extends UpgradeProcessor<Long> {
             UpgradeInbound upgradeInbound) {
         super(upgradeInbound);
 
+        Socket.timeoutSet(wrapper.getSocket().longValue(),
+                upgradeInbound.getReadTimeout());
+
         this.socket = wrapper.getSocket().longValue();
     }
 
