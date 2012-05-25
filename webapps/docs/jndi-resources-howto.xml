@@ -110,7 +110,7 @@ element:</p>
 <li><a href="config/context.html#Resource Links">&lt;ResourceLink&gt;</a> -
     Add a link to a resource defined in the global JNDI context. Use resource
     links to give a web application access to a resource defined in
-    the<a href="config/globalresources.html">&lt;GlobalNamingResources&gt;</a>
+    the <a href="config/globalresources.html">&lt;GlobalNamingResources&gt;</a>
     child element of the <a href="config/server.html">&lt;Server&gt;</a>
     element.</li>
 <li><a href="config/context.html#Transaction">&lt;Transaction&gt;</a> -
