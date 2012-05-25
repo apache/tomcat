@@ -32,6 +32,12 @@ public class UpgradeBioProcessor extends UpgradeProcessor<Socket> {
             UpgradeInbound upgradeInbound) throws IOException {
         super(upgradeInbound);
 
+        int timeout = upgradeInbound.getReadTimeout();
+        if (timeout < 0) {
+            timeout = 0;
+        }
+        wrapper.getSocket().setSoTimeout(timeout);
+
         this.inputStream = wrapper.getSocket().getInputStream();
         this.outputStream = wrapper.getSocket().getOutputStream();
     }

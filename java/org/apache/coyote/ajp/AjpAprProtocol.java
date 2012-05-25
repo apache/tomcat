@@ -127,7 +127,8 @@ public class AjpAprProtocol extends AbstractAjpProtocol {
             recycledProcessors.offer(processor);
             if (addToPoller) {
                 ((AprEndpoint)proto.endpoint).getPoller().add(
-                        socket.getSocket().longValue(), true);
+                        socket.getSocket().longValue(),
+                        proto.endpoint.getKeepAliveTimeout());
             }
         }
 
