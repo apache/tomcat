@@ -29,6 +29,9 @@
 
 <body>
 
+<section name="Table of Contents">
+<toc/>
+</section>
 
 <section name="Introduction">
 
@@ -194,13 +197,19 @@
 
     <attribute name="username" required="true">
       <p>(String) The connection username to be passed to our JDBC driver to establish a connection.
-         Note, at this point, <code>DataSource.getConnection(username,password)</code> is not using the credentials passed into the method.
+         Note that method <code>DataSource.getConnection(username,password)</code>
+         by default will not use credentials passed into the method,
+         but will use the ones configured here. See <code>alternateUsernameAllowed</code>
+         property for more details.
       </p>
     </attribute>
 
     <attribute name="password" required="true">
       <p>(String) The connection password to be passed to our JDBC driver to establish a connection.
-         Note, at this point, <code>DataSource.getConnection(username,password)</code> is not using the credentials passed into the method.
+         Note that method <code>DataSource.getConnection(username,password)</code>
+         by default will not use credentials passed into the method,
+         but will use the ones configured here. See <code>alternateUsernameAllowed</code>
+         property for more details.
       </p>
     </attribute>
 
@@ -352,13 +361,26 @@
     </attribute>
 
     <attribute name="jdbcInterceptors" required="false">
-      <p>(String) A semicolon separated list of classnames extending <code>org.apache.tomcat.jdbc.pool.JdbcInterceptor</code> class.
-         These interceptors will be inserted as an interceptor into the chain of operations on a <code>java.sql.Connection</code> object.
-         The default value is <code>null</code>.<br/>
+      <p>(String) A semicolon separated list of classnames extending
+         <code>org.apache.tomcat.jdbc.pool.JdbcInterceptor</code> class.
+         See <a href="#Configuring_JDBC_interceptors">Configuring JDBC interceptors</a>
+         below for more detailed description of syntaz and examples.
+      </p>
+      <p>
+         These interceptors will be inserted as an interceptor into the chain
+         of operations on a <code>java.sql.Connection</code> object.
+         The default value is <code>null</code>.
+      </p>
+      <p>
          Predefined interceptors:<br/>
-         <code>org.apache.tomcat.jdbc.pool.interceptor.ConnectionState</code> - keeps track of auto commit, read only, catalog and transaction isolation level.<br/>
-         <code>org.apache.tomcat.jdbc.pool.interceptor.StatementFinalizer</code> - keeps track of opened statements, and closes them when the connection is returned to the pool.<br/>
-         More predefined interceptors are described in detail in the <a href="#JDBC_interceptors">JDBC Interceptors section</a>.<br/>
+         <code>org.apache.tomcat.jdbc.pool.interceptor.<br />ConnectionState</code>
+          - keeps track of auto commit, read only, catalog and transaction isolation level.<br/>
+         <code>org.apache.tomcat.jdbc.pool.interceptor.<br />StatementFinalizer</code>
+          - keeps track of opened statements, and closes them when the connection is returned to the pool.
+      </p>
+      <p>
+         More predefined interceptors are described in detail in the
+         <a href="#JDBC_interceptors">JDBC Interceptors section</a>.
       </p>
     </attribute>
 
@@ -436,11 +458,17 @@
       <p>(boolean) By default, the jdbc-pool will ignore the
          <a href="http://docs.oracle.com/javase/6/docs/api/javax/sql/DataSource.html#getConnection(java.lang.String,%20java.lang.String)"><code>DataSource.getConnection(username,password)</code></a>
          call, and simply return a previously pooled connection under the globally configured properties <code>username</code> and <code>password</code>, for performance reasons.
-         The pool can however be used with different credentials each time a connection is used. Should you request a connection with the credentials user1/password1 and the connection
-         was previously connected using user2/password2, the connection will be closed, and reopened with the requested credentials. This way, the pool size is still managed
-         on a global level, and not on a per schema level. To enable the functionality described in the
+      </p>
+      <p>
+         The pool can however be configured to allow use of different credentials
+         each time a connection is requested.  To enable the functionality described in the
          <a href="http://docs.oracle.com/javase/6/docs/api/javax/sql/DataSource.html#getConnection(java.lang.String,%20java.lang.String)"><code>DataSource.getConnection(username,password)</code></a>
-         call, simply set the property <code>alternateUsernameAllowed</code> to true. <br/>
+         call, simply set the property <code>alternateUsernameAllowed</code>
+         to <code>true</code>.<br />
+         Should you request a connection with the credentials user1/password1 and the connection
+         was previously connected using different user2/password2, the connection will be closed,
+         and reopened with the requested credentials. This way, the pool size is still managed
+         on a global level, and not on a per schema level. <br/>
          The default value is <code>false</code>.<br/>
          This property was added as an enhancement to <a href="https://issues.apache.org/bugzilla/show_bug.cgi?id=50025">bug 50025</a>.
       </p>
@@ -485,21 +513,33 @@
   </subsection>
   <subsection name="Configuring JDBC interceptors">
     <p>Configuring JDBC interceptors is done using the <b>jdbcInterceptors</b> property.
-    The property contains a list of semi colon separated class names. If the classname is not fully qualified it will be prefixed with the
-    <code>org.apache.tomcat.jdbc.pool.interceptor.</code> prefix.<br/>
-    Example:<br/>
+    The property contains a list of semicolon separated class names. If the
+    classname is not fully qualified it will be prefixed with the
+    <code>org.apache.tomcat.jdbc.pool.interceptor.</code> prefix.
+    </p>
+    <p>Example:<br/>
       <code>
-      jdbcInterceptors=&quot;org.apache.tomcat.jdbc.pool.interceptor.ConnectionState;org.apache.tomcat.jdbc.pool.interceptor.StatementFinalizer&quot;
+      jdbcInterceptors=&quot;org.apache.tomcat.jdbc.pool.interceptor.ConnectionState;
+        org.apache.tomcat.jdbc.pool.interceptor.StatementFinalizer&quot;
       </code>
       <br/>
       is the same as
       <br/>
-      <code> jdbcInterceptors=&quot;ConnectionState;StatementFinalizer&quot;</code><br/>
-    Interceptors can have properties as well. These would be configured within the paranthesis of the class names.
-    Example:<br/>
+      <code> jdbcInterceptors=&quot;ConnectionState;StatementFinalizer&quot;</code>
+    </p>
+    <p>
+    Interceptors can have properties as well. Properties for an interceptor
+    are specified within parentheses after the class name. Several properties
+    are separated by commas.
+    </p>
+    <p>Example:<br/>
     <code>
       jdbcInterceptors=&quot;ConnectionState;StatementFinalizer(useEquals=true)&quot;
-    </code><br/>
+    </code>
+    </p>
+    <p>
+    Extra whitespace characters around class names, property names and values
+    are ignored.
     </p>
   </subsection>
   <subsection name="org.apache.tomcat.jdbc.pool.JdbcInterceptor">
@@ -597,93 +637,92 @@
   <p>Other examples of Tomcat configuration for JDBC usage can be found <a href="http://tomcat.apache.org/tomcat-6.0-doc/jndi-datasource-examples-howto.html">in the Tomcat documentation</a>. </p>
   <subsection name="Plain Ol' Java">
     <p>Here is a simple example of how to create and use a data source.</p>
-    <source>
-        import java.sql.Connection;
-        import java.sql.ResultSet;
-        import java.sql.Statement;
+<source>
+  import java.sql.Connection;
+  import java.sql.ResultSet;
+  import java.sql.Statement;
 
-        import org.apache.tomcat.jdbc.pool.DataSource;
-        import org.apache.tomcat.jdbc.pool.PoolProperties;
+  import org.apache.tomcat.jdbc.pool.DataSource;
+  import org.apache.tomcat.jdbc.pool.PoolProperties;
 
-        public class SimplePOJOExample {
+  public class SimplePOJOExample {
 
-            public static void main(String[] args) throws Exception {
-                PoolProperties p = new PoolProperties();
-                p.setUrl("jdbc:mysql://localhost:3306/mysql");
-                p.setDriverClassName("com.mysql.jdbc.Driver");
-                p.setUsername("root");
-                p.setPassword("password");
-                p.setJmxEnabled(true);
-                p.setTestWhileIdle(false);
-                p.setTestOnBorrow(true);
-                p.setValidationQuery("SELECT 1");
-                p.setTestOnReturn(false);
-                p.setValidationInterval(30000);
-                p.setTimeBetweenEvictionRunsMillis(30000);
-                p.setMaxActive(100);
-                p.setInitialSize(10);
-                p.setMaxWait(10000);
-                p.setRemoveAbandonedTimeout(60);
-                p.setMinEvictableIdleTimeMillis(30000);
-                p.setMinIdle(10);
-                p.setLogAbandoned(true);
-                p.setRemoveAbandoned(true);
-                p.setJdbcInterceptors(&quot;org.apache.tomcat.jdbc.pool.interceptor.ConnectionState;&quot;+
-                  &quot;org.apache.tomcat.jdbc.pool.interceptor.StatementFinalizer&quot;);
-                DataSource datasource = new DataSource();
-                datasource.setPoolProperties(p);
+      public static void main(String[] args) throws Exception {
+          PoolProperties p = new PoolProperties();
+          p.setUrl("jdbc:mysql://localhost:3306/mysql");
+          p.setDriverClassName("com.mysql.jdbc.Driver");
+          p.setUsername("root");
+          p.setPassword("password");
+          p.setJmxEnabled(true);
+          p.setTestWhileIdle(false);
+          p.setTestOnBorrow(true);
+          p.setValidationQuery("SELECT 1");
+          p.setTestOnReturn(false);
+          p.setValidationInterval(30000);
+          p.setTimeBetweenEvictionRunsMillis(30000);
+          p.setMaxActive(100);
+          p.setInitialSize(10);
+          p.setMaxWait(10000);
+          p.setRemoveAbandonedTimeout(60);
+          p.setMinEvictableIdleTimeMillis(30000);
+          p.setMinIdle(10);
+          p.setLogAbandoned(true);
+          p.setRemoveAbandoned(true);
+          p.setJdbcInterceptors(
+            &quot;org.apache.tomcat.jdbc.pool.interceptor.ConnectionState;&quot;+
+            &quot;org.apache.tomcat.jdbc.pool.interceptor.StatementFinalizer&quot;);
+          DataSource datasource = new DataSource();
+          datasource.setPoolProperties(p);
 
-                Connection con = null;
-                try {
-                  con = datasource.getConnection();
-                  Statement st = con.createStatement();
-                  ResultSet rs = st.executeQuery("select * from user");
-                  int cnt = 1;
-                  while (rs.next()) {
-                      System.out.println((cnt++)+". Host:" +rs.getString("Host")+
-                        " User:"+rs.getString("User")+" Password:"+rs.getString("Password"));
-                  }
-                  rs.close();
-                  st.close();
-                } finally {
-                  if (con!=null) try {con.close();}catch (Exception ignore) {}
-                }
+          Connection con = null;
+          try {
+            con = datasource.getConnection();
+            Statement st = con.createStatement();
+            ResultSet rs = st.executeQuery("select * from user");
+            int cnt = 1;
+            while (rs.next()) {
+                System.out.println((cnt++)+". Host:" +rs.getString("Host")+
+                  " User:"+rs.getString("User")+" Password:"+rs.getString("Password"));
             }
+            rs.close();
+            st.close();
+          } finally {
+            if (con!=null) try {con.close();}catch (Exception ignore) {}
+          }
+      }
 
-        }
-    </source>
+  }
+</source>
   </subsection>
   <subsection name="As a Resource">
     <p>And here is an example on how to configure a resource for JNDI lookups</p>
-    <source>
-    &lt;Resource name=&quot;jdbc/TestDB&quot;
-              auth=&quot;Container&quot;
-              type=&quot;javax.sql.DataSource&quot;
-              factory=&quot;org.apache.tomcat.jdbc.pool.DataSourceFactory&quot;
-              testWhileIdle=&quot;true&quot;
-              testOnBorrow=&quot;true&quot;
-              testOnReturn=&quot;false&quot;
-              validationQuery=&quot;SELECT 1&quot;
-              validationInterval=&quot;30000&quot;
-              timeBetweenEvictionRunsMillis=&quot;30000&quot;
-              maxActive=&quot;100&quot;
-              minIdle=&quot;10&quot;
-              maxWait=&quot;10000&quot;
-              initialSize=&quot;10&quot;
-              removeAbandonedTimeout=&quot;60&quot;
-              removeAbandoned=&quot;true&quot;
-              logAbandoned=&quot;true&quot;
-              minEvictableIdleTimeMillis=&quot;30000&quot;
-              jmxEnabled=&quot;true&quot;
-              jdbcInterceptors=
-&quot;org.apache.tomcat.jdbc.pool.interceptor.ConnectionState;org.apache.tomcat.jdbc.pool.interceptor.StatementFinalizer&quot;
-              username=&quot;root&quot;
-              password=&quot;password&quot;
-              driverClassName=&quot;com.mysql.jdbc.Driver&quot;
-              url=&quot;jdbc:mysql://localhost:3306/mysql&quot;/&gt;
-
-
-    </source>
+<source>
+&lt;Resource name=&quot;jdbc/TestDB&quot;
+          auth=&quot;Container&quot;
+          type=&quot;javax.sql.DataSource&quot;
+          factory=&quot;org.apache.tomcat.jdbc.pool.DataSourceFactory&quot;
+          testWhileIdle=&quot;true&quot;
+          testOnBorrow=&quot;true&quot;
+          testOnReturn=&quot;false&quot;
+          validationQuery=&quot;SELECT 1&quot;
+          validationInterval=&quot;30000&quot;
+          timeBetweenEvictionRunsMillis=&quot;30000&quot;
+          maxActive=&quot;100&quot;
+          minIdle=&quot;10&quot;
+          maxWait=&quot;10000&quot;
+          initialSize=&quot;10&quot;
+          removeAbandonedTimeout=&quot;60&quot;
+          removeAbandoned=&quot;true&quot;
+          logAbandoned=&quot;true&quot;
+          minEvictableIdleTimeMillis=&quot;30000&quot;
+          jmxEnabled=&quot;true&quot;
+          jdbcInterceptors=&quot;org.apache.tomcat.jdbc.pool.interceptor.ConnectionState;
+            org.apache.tomcat.jdbc.pool.interceptor.StatementFinalizer&quot;
+          username=&quot;root&quot;
+          password=&quot;password&quot;
+          driverClassName=&quot;com.mysql.jdbc.Driver&quot;
+          url=&quot;jdbc:mysql://localhost:3306/mysql&quot;/&gt;
+</source>
 
   </subsection>
   <subsection name="Asynchronous Connection Retrieval">
@@ -695,23 +734,22 @@
           <li>You will have to cast the data source to <code>org.apache.tomcat.jdbc.pool.DataSource</code></li>
         </ol>
         An example of using the async feature is show below.
-      <source>
-
-        Connection con = null;
-        try {
-          Future&lt;Connection&gt; future = datasource.getConnectionAsync();
-          while (!future.isDone()) {
-              System.out.println("Connection is not yet available. Do some background work");
-              try {
-                  Thread.sleep(100); //simulate work
-              }catch (InterruptedException x) {
-                  Thread.currentThread().interrupted();
-              }
-          }
-          con = future.get(); //should return instantly
-          Statement st = con.createStatement();
-          ResultSet rs = st.executeQuery("select * from user");
-      </source>
+<source>
+  Connection con = null;
+  try {
+    Future&lt;Connection&gt; future = datasource.getConnectionAsync();
+    while (!future.isDone()) {
+      System.out.println("Connection is not yet available. Do some background work");
+      try {
+        Thread.sleep(100); //simulate work
+      }catch (InterruptedException x) {
+        Thread.currentThread().interrupt();
+      }
+    }
+    con = future.get(); //should return instantly
+    Statement st = con.createStatement();
+    ResultSet rs = st.executeQuery("select * from user");
+</source>
     </p>
   </subsection>
   <subsection name="Interceptors">
@@ -722,82 +760,79 @@
        the pool itself will not reset them.</p>
     <p>An interceptor has to extend the <code>org.apache.tomcat.jdbc.pool.JdbcInterceptor</code> class. This class is fairly simple,
        You will need to have a no arg constructor</p>
-       <source>
-
-         public JdbcInterceptor() {
-         }
-       </source>
+<source>
+  public JdbcInterceptor() {
+  }
+</source>
     <p>
        When a connection is borrowed from the pool, the interceptor can initialize or in some other way react to the event by implementing the
-       <source>
-
-         public abstract void reset(ConnectionPool parent, PooledConnection con);
-       </source>
+<source>
+  public abstract void reset(ConnectionPool parent, PooledConnection con);
+</source>
        method. This method gets called with two parameters, a reference to the connection pool itself <code>ConnectionPool parent</code>
        and a reference to the underlying connection <code>PooledConnection con</code>.
     </p>
     <p>
        When a method on the <code>java.sql.Connection</code> object is invoked, it will cause the
-       <source>
-         public Object invoke(Object proxy, Method method, Object[] args) throws Throwable
-       </source>
+<source>
+  public Object invoke(Object proxy, Method method, Object[] args) throws Throwable
+</source>
        method to get invoked. The <code>Method method</code> is the actual method invoked, and <code>Object[] args</code> are the arguments.
        To look at a very simple example, where we demonstrate how to make the invokation to <code>java.sql.Connection.close()</code> a noop
        if the connection has been closed
-       <source>
-
-        if (CLOSE_VAL==method.getName()) {
-            if (isClosed()) return null; //noop for already closed.
-        }
-        return super.invoke(proxy,method,args);
-        </source>
+<source>
+  if (CLOSE_VAL==method.getName()) {
+      if (isClosed()) return null; //noop for already closed.
+  }
+  return super.invoke(proxy,method,args);
+</source>
         There is an observation being made. It is the comparison of the method name. One way to do this would be to do
         <code>&quot;close&quot;.equals(method.getName())</code>.
         Above we see a direct reference comparison between the method name and <code>static final String</code> reference.
         According to the JVM spec, method names and static final String end up in a shared constant pool, so the reference comparison should work.
         One could of course do this as well:
-       <source>
-
-        if (compare(CLOSE_VAL,method)) {
-            if (isClosed()) return null; //noop for already closed.
-        }
-        return super.invoke(proxy,method,args);
-        </source>
+<source>
+  if (compare(CLOSE_VAL,method)) {
+      if (isClosed()) return null; //noop for already closed.
+  }
+  return super.invoke(proxy,method,args);
+</source>
         The <code>compare(String,Method)</code> will use the <code>useEquals</code> flag on an interceptor and do either reference comparison or
         a string value comparison when the <code>useEquals=true</code> flag is set.
     </p>
     <p>Pool start/stop<br/>
        When the connection pool is started or closed, you can be notifed. You will only be notified once per interceptor class
        even though it is an instance method. and you will be notified using an interceptor currently not attached to a pool.
-       <source>
-       public void poolStarted(ConnectionPool pool) {
-       }
+<source>
+  public void poolStarted(ConnectionPool pool) {
+  }
 
-       public void poolClosed(ConnectionPool pool) {
-       }
-       </source>
+  public void poolClosed(ConnectionPool pool) {
+  }
+</source>
        When overriding these methods, don't forget to call super if you are extending a class other than <code>JdbcInterceptor</code>
     </p>
     <p>Configuring interceptors<br/>
        Interceptors are configured using the <code>jdbcInterceptors</code> property or the <code>setJdbcInterceptors</code> method.
        An interceptor can have properties, and would be configured like this
-       <source>
-       String jdbcInterceptors=&quot;org.apache.tomcat.jdbc.pool.interceptor.ConnectionState(useEquals=true,fast=yes)&quot;
-       </source>
+<source>
+  String jdbcInterceptors=
+    &quot;org.apache.tomcat.jdbc.pool.interceptor.ConnectionState(useEquals=true,fast=yes)&quot;
+</source>
     </p>
     <p>Interceptor properties<br/>
        Since interceptors can have properties, you need to be able to read the values of these properties within your
        interceptor. Taking an example like the one above, you can override the <code>setProperties</code> method.
-       <source>
-       public void setProperties(Map&lt;String, InterceptorProperty&gt; properties) {
-           super.setProperties(properties);
-           final String myprop = &quot;myprop&quot;;
-           InterceptorProperty p1 = properties.get(myprop);
-           if (p1!=null) {
-               setMyprop(Long.parseLong(p1.getValue()));
-           }
-       }
-        </source>
+<source>
+  public void setProperties(Map&lt;String, InterceptorProperty&gt; properties) {
+     super.setProperties(properties);
+     final String myprop = &quot;myprop&quot;;
+     InterceptorProperty p1 = properties.get(myprop);
+     if (p1!=null) {
+         setMyprop(Long.parseLong(p1.getValue()));
+     }
+  }
+</source>
     </p>
   </subsection>
   <subsection name="Getting the actual JDBC connection">
@@ -805,10 +840,10 @@
        We also create interceptors in these wrappers to be able to perform certain functions.
        If there is a need to retrieve the actual connection, one can do so using the <code>javax.sql.PooledConnection</code>
        interface.
-       <source>
-          Connection con = datasource.getConnection();
-          Connection actual = ((javax.sql.PooledConnection)con).getConnection();
-       </source>
+<source>
+  Connection con = datasource.getConnection();
+  Connection actual = ((javax.sql.PooledConnection)con).getConnection();
+</source>
     </p>
   </subsection>
 
@@ -819,24 +854,24 @@
   <p>Other examples of Tomcat configuration for JDBC usage can be found <a href="http://tomcat.apache.org/tomcat-6.0-doc/jndi-datasource-examples-howto.html">in the Tomcat documentation</a>. </p>
   <subsection name="Building from source">
     <p>Building is pretty simple. The pool has a dependency on <code>tomcat-juli.jar</code> and in case you want the <code>SlowQueryReportJmx</code></p>
-    <source>
-       javac -classpath tomcat-juli.jar \
-             -d . \
-             org/apache/tomcat/jdbc/pool/*.java \
-             org/apache/tomcat/jdbc/pool/interceptor/*.java \
-             org/apache/tomcat/jdbc/pool/jmx/*.java
-    </source>
+<source>
+  javac -classpath tomcat-juli.jar \
+        -d . \
+        org/apache/tomcat/jdbc/pool/*.java \
+        org/apache/tomcat/jdbc/pool/interceptor/*.java \
+        org/apache/tomcat/jdbc/pool/jmx/*.java
+</source>
     <p>
        A build file can be found in the Tomcat <a href="http://svn.apache.org/viewvc/tomcat/trunk/modules/jdbc-pool/">source repository</a>.
     </p>
     <p>
       As a convenience, a build file is also included where a simple build command will generate all files needed.
-      <source>
-        ant download  (downloads dependencies)
-        ant build     (compiles and generates .jar files)
-        ant dist      (creates a release package)
-        ant test      (runs tests, expects a test database to be setup)
-      </source>
+<source>
+  ant download  (downloads dependencies)
+  ant build     (compiles and generates .jar files)
+  ant dist      (creates a release package)
+  ant test      (runs tests, expects a test database to be setup)
+</source>
     </p>
     <p>
       The system is structured for a Maven build, but does generate release artifacts. Just the library itself.
