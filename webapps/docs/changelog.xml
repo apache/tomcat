@@ -186,6 +186,11 @@
         of <code>connectionTimeout</code> attribute for AJP protocol
         connectors. (kkolinko)
       </fix>
+      <update>
+        <bug>53289</bug>: Clarify <code>ResourceLink</code> example that
+        uses DataSource.getConnection(username, password) method. Not all
+        data source implementations support it. (kkolinko)
+      </update>
       <fix>
         Fix several trivial HTML markup errors in sample servlets. (kkolinko)
       </fix>
