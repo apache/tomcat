@@ -230,6 +230,10 @@
         <code>project.licenses</code> sections to the POMs for the Maven
         artifacts. (markt)
       </add>
+      <fix>
+        Properly mention <code>jsp_2_2.xsd</code> in the main LICENSE and
+        INSTALLLICENSE files. (kkolinko)
+      </fix>
     </changelog>
   </subsection>
 </section>
