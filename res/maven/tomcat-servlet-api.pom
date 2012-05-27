@@ -34,7 +34,7 @@
       </url>
       <distribution>repo</distribution>
       <comments>
-        The Apache license, version 2 applies to all files apart from
+        The Apache License, version 2.0 applies to all files apart from
         javaee_5.xsd, javaee_web_services_1_2.xsd,
         javaee_web_services_client_1_2.xsd, javaee_6.xsd,
         javaee_web_services_1_3.xsd, javaee_web_services_client_1_3.xsd,
