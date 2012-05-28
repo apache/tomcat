@@ -30,6 +30,7 @@ import java.security.PrivilegedAction;
 import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -142,12 +143,25 @@ public class DefaultInstanceManager implements InstanceManager {
 
     private Object newInstance(Object instance, Class<?> clazz) throws IllegalAccessException, InvocationTargetException, NamingException {
         if (!ignoreAnnotations) {
-            Map<String, String> injections = injectionMap.get(clazz.getName());
+            Map<String, String> injections = assembleInjectionsFromClassHierarchy(clazz);
             populateAnnotationsCache(clazz, injections);
             processAnnotations(instance, injections);
             postConstruct(instance, clazz);
         }
         return instance;
+    }
+
+    private Map<String, String> assembleInjectionsFromClassHierarchy(Class<?> clazz) {
+        Map<String, String> injections = new HashMap<String, String>();
+        Map<String, String> currentInjections = null;
+        while (clazz != null) {
+            currentInjections = this.injectionMap.get(clazz.getName());
+            if (currentInjections != null) {
+                injections.putAll(currentInjections);
+            }
+            clazz = clazz.getSuperclass();
+        }
+        return injections;
     }
 
     @Override
