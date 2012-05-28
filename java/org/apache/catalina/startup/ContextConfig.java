@@ -1923,6 +1923,9 @@ public class ContextConfig implements LifecycleListener {
                     } catch (IOException e) {
                         log.error(sm.getString("contextConfig.inputStreamJar",
                                 entryName, url),e);
+                    } catch (ClassFormatException e) {
+                        log.error(sm.getString("contextConfig.inputStreamJar",
+                                entryName, url),e);
                     } finally {
                         if (is != null) {
                             try {
@@ -1979,6 +1982,9 @@ public class ContextConfig implements LifecycleListener {
                     } catch (IOException e) {
                         log.error(sm.getString("contextConfig.inputStreamJndi",
                                 url),e);
+                    } catch (ClassFormatException e) {
+                        log.error(sm.getString("contextConfig.inputStreamJndi",
+                                url),e);
                     } finally {
                         if (is != null) {
                             try {
@@ -2009,6 +2015,9 @@ public class ContextConfig implements LifecycleListener {
                 fis = new FileInputStream(file);
                 processAnnotationsStream(fis, fragment);
             } catch (IOException e) {
+                log.error(sm.getString("contextConfig.inputStreamFile",
+                        file.getAbsolutePath()),e);
+            } catch (ClassFormatException e) {
                 log.error(sm.getString("contextConfig.inputStreamFile",
                         file.getAbsolutePath()),e);
             } finally {

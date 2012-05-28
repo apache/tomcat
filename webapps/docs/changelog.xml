@@ -123,6 +123,11 @@
         <bug>53090</bug>: Include superclasses when considering injection
         targets. Patch provided by Borislav Kapukaranov. (markt)
       </fix>
+      <fix>
+        <bug>53161</bug>: Provide a better error message if a
+        <code>ClassFormatException</code> occurs during annotation scanning and
+        do not prevent the web application from starting in this case. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
