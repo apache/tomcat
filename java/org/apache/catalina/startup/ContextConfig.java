@@ -1106,38 +1106,10 @@ public class ContextConfig implements LifecycleListener {
 
     protected File getHostConfigBase() {
         File file = null;
-        Container container = context;
-        Host host = null;
-        Engine engine = null;
-        while (container != null) {
-            if (container instanceof Host) {
-                host = (Host)container;
-            }
-            if (container instanceof Engine) {
-                engine = (Engine)container;
-            }
-            container = container.getParent();
+        if (context.getParent() instanceof Host) {
+            file = ((Host)context.getParent()).getConfigBaseFile();
         }
-        if (host != null && host.getXmlBase()!=null) {
-            String xmlBase = host.getXmlBase();
-            file = new File(xmlBase);
-            if (!file.isAbsolute())
-                file = new File(context.getCatalinaBase(), xmlBase);
-        } else {
-            StringBuilder result = new StringBuilder();
-            if (engine != null) {
-                result.append(engine.getName()).append('/');
-            }
-            if (host != null) {
-                result.append(host.getName()).append('/');
-            }
-            file = new File (getConfigBase(), result.toString());
-        }
-        try {
-            return file.getCanonicalFile();
-        } catch (IOException e) {
-            return file;
-        }
+        return file;
     }
 
     /**
@@ -1653,15 +1625,11 @@ public class ContextConfig implements LifecycleListener {
      * it.
      */
     protected InputSource getHostWebXmlSource() {
-        String basePath = null;
-        try {
-            basePath = getHostConfigBase().getCanonicalPath();
-        } catch (IOException e) {
-            log.error(sm.getString("contextConfig.baseError"), e);
+        File hostConfigBase = getHostConfigBase();
+        if (hostConfigBase == null)
             return null;
-        }
 
-        return getWebXmlSource(Constants.HostWebXml, basePath);
+        return getWebXmlSource(Constants.HostWebXml, hostConfigBase.getPath());
     }
 
     /**

@@ -77,12 +77,6 @@ public class HostConfig
 
 
     /**
-     * Config base.
-     */
-    protected File configBase = null;
-
-
-    /**
      * The Java class name of the Context configuration class we should use.
      */
     protected String configClass = "org.apache.catalina.startup.ContextConfig";
@@ -396,38 +390,11 @@ public class HostConfig
 
 
     /**
-     * Return a File object representing the "configuration root" directory
-     * for our associated Host.
-     */
-    protected File configBase() {
-
-        if (configBase != null) {
-            return configBase;
-        }
-
-        if (host.getXmlBase()!=null) {
-            configBase = returnCanonicalPath(host.getXmlBase());
-        } else {
-            StringBuilder xmlDir = new StringBuilder("conf");
-            Container parent = host.getParent();
-            if (parent instanceof Engine) {
-                xmlDir.append('/');
-                xmlDir.append(parent.getName());
-            }
-            xmlDir.append('/');
-            xmlDir.append(host.getName());
-            configBase = returnCanonicalPath(xmlDir.toString());
-        }
-        return (configBase);
-
-    }
-
-    /**
      * Get the name of the configBase.
      * For use with JMX management.
      */
     public String getConfigBaseName() {
-        return configBase().getAbsolutePath();
+        return host.getConfigBaseFile().getAbsolutePath();
     }
 
 
@@ -438,7 +405,7 @@ public class HostConfig
     protected void deployApps() {
 
         File appBase = host.getAppBaseFile();
-        File configBase = configBase();
+        File configBase = host.getConfigBaseFile();
         String[] filteredAppPaths = filterAppPaths(appBase.list());
         // Deploy XML descriptors from configBase
         deployDescriptors(configBase, configBase.list());
@@ -491,7 +458,7 @@ public class HostConfig
     protected void deployApps(String name) {
 
         File appBase = host.getAppBaseFile();
-        File configBase = configBase();
+        File configBase = host.getConfigBaseFile();
         ContextName cn = new ContextName(name);
         String baseName = cn.getBaseName();
 
@@ -782,7 +749,7 @@ public class HostConfig
         BufferedOutputStream ostream = null;
         File xml;
         if (copyXML) {
-            xml = new File(configBase(), cn.getBaseName() + ".xml");
+            xml = new File(host.getConfigBaseFile(), cn.getBaseName() + ".xml");
         } else {
             xml = new File(host.getAppBaseFile(),
                     cn.getBaseName() + "/META-INF/context.xml");
@@ -1034,7 +1001,7 @@ public class HostConfig
                     }
                 }
                 if (copyXML) {
-                    xmlCopy = new File(configBase(), cn.getBaseName() + ".xml");
+                    xmlCopy = new File(host.getConfigBaseFile(), cn.getBaseName() + ".xml");
                     InputStream is = null;
                     OutputStream os = null;
                     try {
@@ -1213,7 +1180,7 @@ public class HostConfig
                                     host.getAppBaseFile().getAbsolutePath() +
                                     File.separator))
                                     || (current.getAbsolutePath().startsWith(
-                                            configBase().getAbsolutePath()))) {
+                                            host.getConfigBaseFile().getAbsolutePath()))) {
                                 if (log.isDebugEnabled())
                                     log.debug("Delete " + current);
                                 ExpandWar.delete(current);
@@ -1269,7 +1236,7 @@ public class HostConfig
                         if ((current.getAbsolutePath().startsWith(
                                 host.getAppBaseFile().getAbsolutePath() + File.separator))
                             || (current.getAbsolutePath().startsWith(
-                                    configBase().getAbsolutePath()))) {
+                                    host.getConfigBaseFile().getAbsolutePath()))) {
                             if (log.isDebugEnabled())
                                 log.debug("Delete " + current);
                             ExpandWar.delete(current);
@@ -1297,7 +1264,7 @@ public class HostConfig
                         if ((current.getAbsolutePath().startsWith(
                                 host.getAppBaseFile().getAbsolutePath() + File.separator))
                             || ((current.getAbsolutePath().startsWith(
-                                    configBase().getAbsolutePath())
+                                    host.getConfigBaseFile().getAbsolutePath())
                                  && (current.getAbsolutePath().endsWith(".xml"))))) {
                             if (log.isDebugEnabled())
                                 log.debug("Delete " + current);
@@ -1368,7 +1335,7 @@ public class HostConfig
         }
 
         if (host.getCreateDirs()) {
-            File[] dirs = new File[] {host.getAppBaseFile(),configBase()};
+            File[] dirs = new File[] {host.getAppBaseFile(),host.getConfigBaseFile()};
             for (int i=0; i<dirs.length; i++) {
                 if (!dirs[i].mkdirs() && !dirs[i].isDirectory()) {
                     log.error(sm.getString("hostConfig.createDirs",dirs[i]));
@@ -1405,8 +1372,6 @@ public class HostConfig
             }
         }
         oname = null;
-        configBase = null;
-
     }
 
 

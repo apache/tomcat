@@ -30,6 +30,7 @@ import javax.management.ObjectName;
 
 import org.apache.catalina.Container;
 import org.apache.catalina.Context;
+import org.apache.catalina.Engine;
 import org.apache.catalina.Host;
 import org.apache.catalina.JmxEnabled;
 import org.apache.catalina.Lifecycle;
@@ -90,6 +91,11 @@ public class StandardHost extends ContainerBase implements Host {
      * The XML root for this Host.
      */
     private String xmlBase = null;
+
+    /**
+     * host's default config path
+     */
+    private volatile File hostConfigBase = null;
 
     /**
      * The auto deploy flag for this Host.
@@ -266,6 +272,40 @@ public class StandardHost extends ContainerBase implements Host {
         this.xmlBase = xmlBase;
         support.firePropertyChange("xmlBase", oldXmlBase, this.xmlBase);
 
+    }
+
+
+    /**
+     * ({@inheritDoc}
+     */
+    @Override
+    public File getConfigBaseFile() {
+        if (hostConfigBase != null) {
+            return hostConfigBase;
+        }
+        String path = null;
+        if (getXmlBase()!=null) {
+            path = getXmlBase();
+        } else {
+            StringBuilder xmlDir = new StringBuilder("conf");
+            Container parent = getParent();
+            if (parent instanceof Engine) {
+                xmlDir.append('/');
+                xmlDir.append(parent.getName());
+            }
+            xmlDir.append('/');
+            xmlDir.append(getName());
+            path = xmlDir.toString();
+        }
+        File file = new File(path);
+        if (!file.isAbsolute())
+            file = new File(getCatalinaBase(), path);
+        try {
+            file = file.getCanonicalFile();
+        } catch (IOException e) {// ignore
+        }
+        this.hostConfigBase = file;
+        return file;
     }
 
 
