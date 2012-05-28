@@ -119,6 +119,10 @@
       <fix>
         Enable host's xmlBase attribute in ContextConfig. (kfujino)
       </fix>
+      <fix>
+        <bug>53090</bug>: Include superclasses when considering injection
+        targets. Patch provided by Borislav Kapukaranov. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
