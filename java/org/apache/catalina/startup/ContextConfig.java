@@ -655,7 +655,7 @@ public class ContextConfig implements LifecycleListener {
             canonicalAppBase = canonicalAppBase.getCanonicalFile();
         } else {
             canonicalAppBase = 
-                new File(System.getProperty(Globals.CATALINA_BASE_PROP), appBase)
+                new File(getBaseDir(), appBase)
                 .getCanonicalFile();
         }
 
@@ -760,7 +760,7 @@ public class ContextConfig implements LifecycleListener {
             if (!docBaseFile.isAbsolute()) {
                 File file = new File(appBase);
                 if (!file.isAbsolute()) {
-                    file = new File(System.getProperty(Globals.CATALINA_BASE_PROP), appBase);
+                    file = new File(getBaseDir(), appBase);
                 }
                 docBaseFile = new File(file, docBase);
             }
@@ -1143,8 +1143,7 @@ public class ContextConfig implements LifecycleListener {
      * Get config base.
      */
     protected File getConfigBase() {
-        File configBase = 
-            new File(System.getProperty(Globals.CATALINA_BASE_PROP), "conf");
+        File configBase = new File(getBaseDir(), "conf");
         if (!configBase.exists()) {
             return null;
         }
@@ -1169,8 +1168,7 @@ public class ContextConfig implements LifecycleListener {
             String xmlBase = host.getXmlBase();
             file = new File(xmlBase);
             if (!file.isAbsolute())
-                file = new File(new File(System.getProperty(Globals.CATALINA_BASE_PROP)),
-                        xmlBase);
+                file = new File(getBaseDir(), xmlBase);
         } else {
             StringBuilder result = new StringBuilder();
             if (engine != null) {
@@ -1698,15 +1696,11 @@ public class ContextConfig implements LifecycleListener {
      * it.
      */
     protected InputSource getHostWebXmlSource() {
-        String basePath = null;
-        try {
-            basePath = getHostConfigBase().getCanonicalPath();
-        } catch (IOException e) {
-            log.error(sm.getString("contextConfig.baseError"), e);
+        File hostConfigBase = getHostConfigBase();
+        if (!hostConfigBase.exists())
             return null;
-        }
 
-        return getWebXmlSource(Constants.HostWebXml, basePath);
+        return getWebXmlSource(Constants.HostWebXml, hostConfigBase.getPath());
     }
     
     /**
