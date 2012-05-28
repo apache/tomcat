@@ -129,8 +129,9 @@ public class HostConfig
 
 
     /**
-     * Should XML files be copied to $CATALINA_BASE/conf/<engine>/<host> by
-     * default when a web application is deployed?
+     * Should XML files be copied to
+     * $CATALINA_BASE/conf/&lt;engine&gt;/&lt;host&gt; by default when
+     * a web application is deployed?
      */
     protected boolean copyXML = false;
     
