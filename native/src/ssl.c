@@ -288,13 +288,13 @@ static struct CRYPTO_dynlock_value *ssl_dyn_create_function(const char *file,
 static void ssl_dyn_lock_function(int mode, struct CRYPTO_dynlock_value *l,
                            const char *file, int line)
 {
-    apr_status_t rv;
+
 
     if (mode & CRYPTO_LOCK) {
-        rv = apr_thread_mutex_lock(l->mutex);
+        apr_thread_mutex_lock(l->mutex);
     }
     else {
-        rv = apr_thread_mutex_unlock(l->mutex);
+        apr_thread_mutex_unlock(l->mutex);
     }
 }
 
