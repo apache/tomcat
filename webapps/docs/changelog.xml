@@ -175,6 +175,10 @@
         via getter from the endpoint and as JMX attribute of the ThreadPool
         mbean. (rjung)
       </add>
+      <fix>
+        <bug>53180</bug>: Improve check for setter method when processing
+        annotations. Patch provided by Violeta Georgieva. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">
