@@ -243,7 +243,7 @@ static apr_status_t do_remove(tcn_pollset_t *p, const apr_pollfd_t *fd)
                     p->socket_set[dst] = p->socket_set[i];
                     ds->last_active = ss->last_active;
                     ds->timeout     = ss->timeout;
-                    dst++;
+                    ds = (tcn_socket_t *)p->socket_set[++dst].client_data;
                 }
             }
             break;
