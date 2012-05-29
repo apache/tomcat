@@ -279,12 +279,17 @@ public class JreMemoryLeakPreventionListener implements LifecycleListener {
                 }
 
                 /*
-                 * Several components end up calling:
-                 * sun.misc.GC.requestLatency(long)
+                 * Several components end up calling
+                 * sun.misc.GC.requestLatency(long) which creates a daemon
+                 * thread without setting the TCCL.
                  * 
                  * Those libraries / components known to trigger memory leaks
                  * due to eventual calls to requestLatency(long) are:
                  * - javax.management.remote.rmi.RMIConnectorServer.start()
+                 *
+                 * Note: Long.MAX_VALUE is a special case that causes the thread
+                 *       to terminate
+                 *
                  */
                 if (gcDaemonProtection) {
                     try {
@@ -292,7 +297,7 @@ public class JreMemoryLeakPreventionListener implements LifecycleListener {
                         Method method = clazz.getDeclaredMethod(
                                 "requestLatency",
                                 new Class[] {long.class});
-                        method.invoke(null, Long.valueOf(3600000));
+                        method.invoke(null, Long.valueOf(Long.MAX_VALUE - 1));
                     } catch (ClassNotFoundException e) {
                         if (System.getProperty("java.vendor").startsWith(
                                 "Sun")) {
