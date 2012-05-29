@@ -318,10 +318,10 @@ TCN_IMPLEMENT_CALL(jstring, SSLSocket, getInfoS)(TCN_STDARGS, jlong sock,
         break;
         case SSL_INFO_CIPHER_DESCRIPTION:
             {
-                const SSL_CIPHER *cipher = SSL_get_current_cipher(s->ssl);
+                SSL_CIPHER *cipher = (SSL_CIPHER *)SSL_get_current_cipher(s->ssl);
                 if (cipher) {
                     char buf[256];
-                    char *desc = SSL_CIPHER_description(cipher, buf, 256);
+                    const char *desc = SSL_CIPHER_description(cipher, buf, 256);
                     value = tcn_new_string(e, desc);
                 }
             }
