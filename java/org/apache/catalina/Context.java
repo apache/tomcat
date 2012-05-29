@@ -1389,7 +1389,7 @@ public interface Context extends Container {
     public void setSendRedirectBody(boolean enable);
 
     /**
-     * Determines if the context is configured to included a response body as
+     * Determines if the context is configured to include a response body as
      * part of a redirect response.
      */
     public boolean getSendRedirectBody();
