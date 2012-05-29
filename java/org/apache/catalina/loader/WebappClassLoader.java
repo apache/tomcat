@@ -2945,6 +2945,7 @@ public class WebappClassLoader
 
         int contentLength = -1;
         InputStream binaryStream = null;
+        boolean isClassResource = path.endsWith(".class");
 
         int jarFilesLength = jarFiles.length;
         int repositoriesLength = repositories.length;
@@ -3146,7 +3147,20 @@ public class WebappClassLoader
                     return null;
                 }
 
-                if (binaryStream != null) {
+                /* Only cache the binary content if there is some content
+                 * available and either:
+                 * a) It is a class file since the binary content is only cached
+                 *    until the class has been loaded
+                 *    or
+                 * b) The file needs conversion to address encoding issues (see
+                 *    below)
+                 *
+                 * In all other cases do not cache the content to prevent
+                 * excessive memory usage if large resources are present (see
+                 * https://issues.apache.org/bugzilla/show_bug.cgi?id=53081).
+                 */
+                if (binaryStream != null &&
+                        (isClassResource || fileNeedConvert)) {
 
                     byte[] binaryContent = new byte[contentLength];
 
@@ -3248,8 +3262,15 @@ public class WebappClassLoader
         if (entry != null) {
             if (entry.binaryContent != null)
                 return new ByteArrayInputStream(entry.binaryContent);
+            else {
+                try {
+                    return entry.source.openStream();
+                } catch (IOException ioe) {
+                    // Ignore
+                }
+            }
         }
-        return (null);
+        return null;
 
     }
 
