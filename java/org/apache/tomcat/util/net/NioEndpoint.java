@@ -1276,6 +1276,16 @@ public class NioEndpoint extends AbstractEndpoint {
             return result;
         }
 
+        /**
+         * @deprecated Replaced by processSendfile(sk, attachment, event)
+         */
+        @Deprecated
+        public boolean processSendfile(SelectionKey sk,
+                KeyAttachment attachment,
+                @SuppressWarnings("unused") boolean reg, boolean event) {
+            return processSendfile(sk, attachment, event);
+        }
+
         public boolean processSendfile(SelectionKey sk, KeyAttachment attachment, boolean event) {
             NioChannel sc = null;
             try {
