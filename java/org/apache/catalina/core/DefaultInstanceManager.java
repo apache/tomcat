@@ -19,6 +19,7 @@
 package org.apache.catalina.core;
 
 
+import java.beans.Introspector;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Field;
@@ -360,7 +361,7 @@ public class DefaultInstanceManager implements InstanceManager {
                                 && methodName.length() > 3
                                 && method.getParameterTypes().length == 1
                                 && method.getReturnType().getName().equals("void")) {
-                            String fieldName = Character.toLowerCase(methodName.charAt(3)) + methodName.substring(4);
+                            String fieldName = getName(method);
                             if (injections.containsKey(fieldName)) {
                                 annotations.add(new AnnotationCacheEntry(
                                         method.getName(),
@@ -661,15 +662,9 @@ public class DefaultInstanceManager implements InstanceManager {
     }
 
     public static String getName(Method setter) {
-        StringBuilder name = new StringBuilder(setter.getName());
-
-        // remove 'set'
-        name.delete(0, 3);
-
-        // lowercase first char
-        name.setCharAt(0, Character.toLowerCase(name.charAt(0)));
-
-        return name.toString();
+        // Note: method signature has already been checked for correctness.
+        // The method name always starts with "set".
+        return Introspector.decapitalize(setter.getName().substring(3));
     }
 
     private static String normalize(String jndiName){
