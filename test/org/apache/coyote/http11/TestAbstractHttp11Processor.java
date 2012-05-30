@@ -16,20 +16,28 @@
  */
 package org.apache.coyote.http11;
 
-import java.io.File;
-import java.io.IOException;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import org.junit.Test;
+import java.io.File;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.startup.SimpleHttpClient;
 import org.apache.catalina.startup.TesterServlet;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.tomcat.util.buf.ByteChunk;
+import org.junit.Test;
 
 public class TestAbstractHttp11Processor extends TomcatBaseTest {
 
@@ -237,6 +245,105 @@ public class TestAbstractHttp11Processor extends TomcatBaseTest {
         assertFalse(client.isResponse50x());
         assertTrue(client.isResponse200());
         assertEquals("OK", client.getResponseBody());
+    }
+
+
+    @Test
+    public void testChunking11NoContentLength() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+
+        // Must have a real docBase - just use temp
+        Context ctxt = tomcat.addContext("",
+                System.getProperty("java.io.tmpdir"));
+
+        Tomcat.addServlet(ctxt, "NoContentLengthFlushingServlet",
+                new NoContentLengthFlushingServlet());
+        ctxt.addServletMapping("/test", "NoContentLengthFlushingServlet");
+
+        tomcat.start();
+
+        ByteChunk responseBody = new ByteChunk();
+        Map<String,List<String>> responseHeaders =
+                new HashMap<String,List<String>>();
+        int rc = getUrl("http://localhost:" + getPort() + "/test", responseBody,
+                responseHeaders);
+
+        assertEquals(HttpServletResponse.SC_OK, rc);
+        assertTrue(responseHeaders.containsKey("Transfer-Encoding"));
+        List<String> encodings = responseHeaders.get("Transfer-Encoding");
+        assertEquals(1, encodings.size());
+        assertEquals("chunked", encodings.get(0));
+    }
+
+    @Test
+    public void testNoChunking11NoContentLengthConnectionClose()
+            throws Exception {
+
+        Tomcat tomcat = getTomcatInstance();
+
+        // Must have a real docBase - just use temp
+        Context ctxt = tomcat.addContext("",
+                System.getProperty("java.io.tmpdir"));
+
+        Tomcat.addServlet(ctxt, "NoContentLengthConnectionCloseFlushingServlet",
+                new NoContentLengthConnectionCloseFlushingServlet());
+        ctxt.addServletMapping("/test",
+                "NoContentLengthConnectionCloseFlushingServlet");
+
+        tomcat.start();
+
+        ByteChunk responseBody = new ByteChunk();
+        Map<String,List<String>> responseHeaders =
+                new HashMap<String,List<String>>();
+        int rc = getUrl("http://localhost:" + getPort() + "/test", responseBody,
+                responseHeaders);
+
+        assertEquals(HttpServletResponse.SC_OK, rc);
+
+        assertTrue(responseHeaders.containsKey("Connection"));
+        List<String> connections = responseHeaders.get("Connection");
+        assertEquals(1, connections.size());
+        assertEquals("close", connections.get(0));
+
+        assertFalse(responseHeaders.containsKey("Transfer-Encoding"));
+
+        assertEquals("OK", responseBody.toString());
+    }
+
+    // flushes with no content-length set
+    // should result in chunking on HTTP 1.1
+    private static final class NoContentLengthFlushingServlet
+            extends HttpServlet {
+
+        private static final long serialVersionUID = 1L;
+
+        @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+                throws ServletException, IOException {
+            resp.setStatus(HttpServletResponse.SC_OK);
+            resp.setContentType("text/plain");
+            resp.getWriter().write("OK");
+            resp.flushBuffer();
+        }
+    }
+
+    // flushes with no content-length set but sets Connection: close header
+    // should no result in chunking on HTTP 1.1
+    private static final class NoContentLengthConnectionCloseFlushingServlet
+            extends HttpServlet {
+
+        private static final long serialVersionUID = 1L;
+
+        @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+                throws ServletException, IOException {
+            resp.setStatus(HttpServletResponse.SC_OK);
+            resp.setContentType("text/event-stream");
+            resp.addHeader("Connection", "close");
+            resp.flushBuffer();
+            resp.getWriter().write("OK");
+            resp.flushBuffer();
+        }
     }
 
     private static final class Client extends SimpleHttpClient {
