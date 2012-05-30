@@ -180,6 +180,11 @@
         client disconnects before the response has been fully written from an
         AJP connection using the APR/native connector. (markt)
       </fix>
+      <add>
+        <bug>53169</bug>: Allow developers to avoid chunked encoding for a
+        response of unknown length by setting the <code>Connection: close</code>
+        header. Based on a patch suggested by Philippe Marschall. (markt)
+      </add>
       <fix>
         <bug>53173</bug> (<rev>1333116</rev>) :
         Properly count down maxConnections (fhanik)
