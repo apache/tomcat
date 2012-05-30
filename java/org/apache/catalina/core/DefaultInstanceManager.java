@@ -358,8 +358,8 @@ public class DefaultInstanceManager implements InstanceManager {
                         // Resource injection only if JNDI is enabled
                         if (injections != null && methodName.startsWith("set")
                                 && methodName.length() > 3
-                        		&& method.getParameterTypes().length == 1
-                        		&& method.getReturnType().getName().equals("void")) {
+                                && method.getParameterTypes().length == 1
+                                && method.getReturnType().getName().equals("void")) {
                             String fieldName = Character.toLowerCase(methodName.charAt(3)) + methodName.substring(4);
                             if (injections.containsKey(fieldName)) {
                                 annotations.add(new AnnotationCacheEntry(
