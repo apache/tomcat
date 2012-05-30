@@ -140,6 +140,11 @@
         the <code>JreMemoryLeakPreventionListener</code> does not trigger a
         full GC every hour. (markt)
       </fix>
+      <fix>
+        <bug>53322</bug>: When processing resource injection, correctly infer
+        property name from its setter method if the name starts with several
+        uppercase characters. (kkolinko)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
