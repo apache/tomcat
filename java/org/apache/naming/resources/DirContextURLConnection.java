@@ -41,6 +41,7 @@ import javax.naming.directory.DirContext;
 
 import org.apache.naming.JndiPermission;
 import org.apache.tomcat.util.buf.UDecoder;
+import org.apache.tomcat.util.buf.UEncoder;
 import org.apache.tomcat.util.http.FastHttpDateFormat;
 
 /**
@@ -57,7 +58,11 @@ import org.apache.tomcat.util.http.FastHttpDateFormat;
 public class DirContextURLConnection extends URLConnection {
 
     private static final UDecoder URL_DECODER = new UDecoder();
+    private static final UEncoder URL_ENCODER = new UEncoder();
 
+    static{
+        URL_ENCODER.addSafeCharacter('/');
+    }
 
     // ----------------------------------------------------------- Constructors
 
@@ -456,7 +461,7 @@ public class DirContextURLConnection extends URLConnection {
                     context.list(file.substring(start));
                 while (enumeration.hasMoreElements()) {
                     NameClassPair ncp = enumeration.nextElement();
-                    result.addElement(ncp.getName());
+                    result.addElement(URL_ENCODER.encodeURL(ncp.getName()));
                 }
             } catch (NamingException e) {
                 // Unexpected exception
