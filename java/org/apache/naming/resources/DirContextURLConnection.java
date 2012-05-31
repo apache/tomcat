@@ -22,8 +22,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
-import java.net.URLDecoder;
-import java.net.URLEncoder;
 import java.security.Permission;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -42,6 +40,7 @@ import javax.naming.directory.Attributes;
 import javax.naming.directory.DirContext;
 
 import org.apache.naming.JndiPermission;
+import org.apache.tomcat.util.buf.UDecoder;
 import org.apache.tomcat.util.http.FastHttpDateFormat;
 
 /**
@@ -55,8 +54,9 @@ import org.apache.tomcat.util.http.FastHttpDateFormat;
  * @author <a href="mailto:remm@apache.org">Remy Maucherat</a>
  * @version $Revision$
  */
-public class DirContextURLConnection
-    extends URLConnection {
+public class DirContextURLConnection extends URLConnection {
+
+    private static final UDecoder URL_DECODER = new UDecoder();
 
 
     // ----------------------------------------------------------- Constructors
@@ -123,7 +123,6 @@ public class DirContextURLConnection
 
     // ------------------------------------------------------------- Properties
 
-
     /**
      * Connect to the DirContext, and retrieve the bound object, as well as
      * its attributes. If no object is bound with the name specified in the
@@ -157,7 +156,7 @@ public class DirContextURLConnection
                         path = path.substring(contextPath.length());
                     }
                 }
-                path = URLDecoder.decode(path, "UTF-8");
+                path = URL_DECODER.convert(path, false);
                 object = context.lookup(path);
                 attributes = context.getAttributes(path);
                 if (object instanceof Resource)
@@ -390,8 +389,7 @@ public class DirContextURLConnection
 
         // Reopen resource
         try {
-            resource = (Resource) context.lookup(
-                    URLDecoder.decode(getURL().getFile(), "UTF-8"));
+            resource = (Resource) context.lookup(getURL().getFile());
         } catch (NamingException e) {
             // Ignore
         }
@@ -457,8 +455,7 @@ public class DirContextURLConnection
                     context.list(file.substring(start));
                 while (enumeration.hasMoreElements()) {
                     NameClassPair ncp = enumeration.nextElement();
-                    result.addElement(
-                            URLEncoder.encode(ncp.getName(), "UTF-8"));
+                    result.addElement(ncp.getName());
                 }
             } catch (NamingException e) {
                 // Unexpected exception

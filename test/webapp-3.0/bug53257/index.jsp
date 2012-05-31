@@ -15,8 +15,8 @@
   limitations under the License.
 --%><%@page contentType="text/plain; charset=UTF-8"
 %><%@page import="java.net.URL,java.net.URLConnection"%><%
-    String[] testFiles =
-            new String[] {"foo;bar", "foo&bar", "foo#bar", "foo+bar"};
+    String[] testFiles = new String[] {"foo;bar.txt", "foo&bar.txt",
+            "foo#bar.txt", "foo%bar.txt", "foo+bar.txt"};
     for (String testFile : testFiles) {
         URL url = application.getResource("/bug53257/" + testFile);
         if (url == null) {

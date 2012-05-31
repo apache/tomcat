@@ -14,14 +14,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.catalina.core;
-
 
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -69,7 +67,6 @@ import org.apache.catalina.connector.Connector;
 import org.apache.catalina.deploy.FilterDef;
 import org.apache.catalina.util.ResourceSet;
 import org.apache.catalina.util.ServerInfo;
-import org.apache.naming.resources.DirContextURLStreamHandler;
 import org.apache.naming.resources.Resource;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.buf.CharChunk;
@@ -520,9 +517,8 @@ public class ApplicationContext
             String hostName = context.getParent().getName();
             try {
                 resources.lookup(normPath);
-                return new URL
-                    ("jndi", "", 0, getJNDIUri(hostName, fullPath),
-                     new DirContextURLStreamHandler(resources));
+                return new URI("jndi",
+                        getJNDIUri(hostName, fullPath), null).toURL();
             } catch (NamingException e) {
                 // Ignore
             } catch (Exception e) {

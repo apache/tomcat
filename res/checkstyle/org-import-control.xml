@@ -106,6 +106,7 @@
     <allow pkg="javax.mail"/>
     <allow pkg="javax.wsdl"/>
     <allow pkg="org.apache.naming"/>
+    <allow class="org.apache.tomcat.util.buf.UDecoder"/>
     <allow class="org.apache.tomcat.util.http.FastHttpDateFormat"/>
     <allow class="org.apache.tomcat.util.http.RequestUtil"/>
     <subpackage name="factory.webservices">
