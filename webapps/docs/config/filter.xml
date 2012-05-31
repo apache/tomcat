@@ -622,7 +622,13 @@ FINE: Request "/docs/config/manager.html" with response status "200"
     package. Please consult the Java documentation for details of the
     expressions supported.</p>
 
-    <p>See also: <a href="#Remote_Address_Filter">Remote Address Filter</a>.</p>
+    <p><strong>Note:</strong> This filter processes the value returned by
+    method <code>ServletRequest.getRemoteHost()</code>. To allow the method
+    to return proper host names, you have to enable "DNS lookups" feature on
+    a <strong>Connector</strong>.</p>
+
+    <p>See also: <a href="#Remote_Address_Filter">Remote Address Filter</a>,
+    <a href="http.html">HTTP Connector</a> configuration.</p>
   </subsection>
 
   <subsection name="Filter Class Name">
