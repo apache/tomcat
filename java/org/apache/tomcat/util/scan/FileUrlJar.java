@@ -37,6 +37,7 @@ public class FileUrlJar implements Jar {
 
     public FileUrlJar(URL url) throws IOException {
         JarURLConnection jarConn = (JarURLConnection) url.openConnection();
+        jarConn.setUseCaches(false);
         jarFile = jarConn.getJarFile();
     }
 
