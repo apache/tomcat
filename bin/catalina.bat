@@ -98,7 +98,7 @@ rem ---------------------------------------------------------------------------
 
 rem Suppress Terminate batch job on CTRL+C
 if not ""%1"" == ""run"" goto mainEntry
-if ""%TEMP%"" == """" goto mainEntry
+if "%TEMP%" == "" goto mainEntry
 if exist "%TEMP%\%~nx0.run" goto mainEntry
 echo Y>"%TEMP%\%~nx0.run"
 if not exist "%TEMP%\%~nx0.run" goto mainEntry

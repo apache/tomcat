@@ -280,6 +280,10 @@
         Properly mention <code>jsp_2_2.xsd</code> in the main LICENSE and
         INSTALLLICENSE files. (kkolinko)
       </fix>
+      <fix>
+        <bug>53115</bug>: Fix using the command "<code>catalina.bat run</code>"
+        when the value of <code>%TEMP%</code> contains spaces. (kkolinko)
+      </fix>
     </changelog>
   </subsection>
 </section>
