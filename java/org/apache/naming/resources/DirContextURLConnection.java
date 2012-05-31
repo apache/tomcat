@@ -389,7 +389,8 @@ public class DirContextURLConnection extends URLConnection {
 
         // Reopen resource
         try {
-            resource = (Resource) context.lookup(getURL().getFile());
+            resource = (Resource) context.lookup(
+                    URL_DECODER.convert(getURL().getFile(), false));
         } catch (NamingException e) {
             // Ignore
         }
