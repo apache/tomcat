@@ -140,6 +140,12 @@
         annotations. Patch provided by Violeta Georgieva. (markt)
       </fix>
       <fix>
+        <bug>53225</bug>: Fix an IllegalStateException due to the JAR file being
+        closed when accessing static resources in a JAR file when
+        <code>urlCacheProtection=&quot;false&quot;</code> in the
+        <code>JreMemoryLeakPreventionListener</code>. (markt)
+      </fix>
+      <fix>
         <bug>53267</bug>: Ensure that using the GC Daemon Protection feature of
         the <code>JreMemoryLeakPreventionListener</code> does not trigger a
         full GC every hour. (markt)
