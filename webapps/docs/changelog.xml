@@ -146,6 +146,16 @@
         <code>JreMemoryLeakPreventionListener</code>. (markt)
       </fix>
       <fix>
+        <bug>53257</bug>: Ensure that resources, inclusing JSP files, that have
+        names that include characters with special meanings in URLs (such as
+        ampersand, semicolon, plus, hash and percent) are correctly handled.
+        This bug is partially a regression caused by the original fix for
+        <bug>51584</bug> and partially an existing issue that had not previously
+        been identified. This fix reverts the original fix for <bug>51584</bug>,
+        correctly fixes that issue and fixes the additional issues identified by
+        the test cases that were also added as part of this fix. (markt)
+      </fix>
+      <fix>
         <bug>53267</bug>: Ensure that using the GC Daemon Protection feature of
         the <code>JreMemoryLeakPreventionListener</code> does not trigger a
         full GC every hour. (markt)
