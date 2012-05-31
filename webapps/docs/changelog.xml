@@ -406,7 +406,7 @@
         one thread at the same time as it is closed on another thread. (markt)  
       </fix>
       <add>
-        Include port number when known in connector name when loggin messages
+        Include port number when known in connector name when logging messages
         from connectors that use automatic free port allocation. (markt)
       </add>
       <fix>
