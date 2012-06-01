@@ -14,15 +14,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.catalina.startup;
-
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
 
 import javax.annotation.Resource;
 import javax.annotation.Resources;
@@ -31,15 +26,15 @@ import javax.annotation.security.RunAs;
 
 import org.apache.catalina.Container;
 import org.apache.catalina.Context;
-import org.apache.catalina.Globals;
 import org.apache.catalina.Wrapper;
-import org.apache.catalina.core.DefaultInstanceManager;
 import org.apache.catalina.deploy.ContextEnvironment;
 import org.apache.catalina.deploy.ContextResource;
 import org.apache.catalina.deploy.ContextResourceEnvRef;
 import org.apache.catalina.deploy.ContextService;
 import org.apache.catalina.deploy.FilterDef;
 import org.apache.catalina.deploy.MessageDestinationRef;
+import org.apache.catalina.util.Introspection;
+import org.apache.tomcat.util.res.StringManager;
 
 /**
  * <p><strong>AnnotationSet</strong> for processing the annotations of the web application
@@ -53,8 +48,14 @@ public class WebAnnotationSet {
 
     private static final String SEPARATOR = "/";
 
-    // --------------------------------------------------------- Public Methods
+    /**
+     * The string resources for this package.
+     */
+    protected static final StringManager sm =
+        StringManager.getManager(Constants.Package);
 
+
+    // --------------------------------------------------------- Public Methods
 
     /**
      * Process the annotations on a context.
@@ -79,7 +80,8 @@ public class WebAnnotationSet {
         Class<?> classClass = null;
         String[] applicationListeners = context.findApplicationListeners();
         for (int i = 0; i < applicationListeners.length; i++) {
-            classClass = loadClass(context, applicationListeners[i]);
+            classClass = Introspection.loadClass(context,
+                    applicationListeners[i]);
             if (classClass == null) {
                 continue;
             }
@@ -98,7 +100,8 @@ public class WebAnnotationSet {
         Class<?> classClass = null;
         FilterDef[] filterDefs = context.findFilterDefs();
         for (int i = 0; i < filterDefs.length; i++) {
-            classClass = loadClass(context, (filterDefs[i]).getFilterClass());
+            classClass = Introspection.loadClass(context,
+                    (filterDefs[i]).getFilterClass());
             if (classClass == null) {
                 continue;
             }
@@ -127,7 +130,8 @@ public class WebAnnotationSet {
                     continue;
                 }
 
-                classClass = loadClass(context, wrapper.getServletClass());
+                classClass = Introspection.loadClass(context,
+                        wrapper.getServletClass());
                 if (classClass == null) {
                     continue;
                 }
@@ -254,7 +258,7 @@ public class WebAnnotationSet {
     protected static void loadFieldsAnnotation(Context context,
             Class<?> classClass) {
         // Initialize the annotations
-        Field[] fields = getDeclaredFields(classClass);
+        Field[] fields = Introspection.getDeclaredFields(classClass);
         if (fields != null && fields.length > 0) {
             for (Field field : fields) {
                 if (field.isAnnotationPresent(Resource.class)) {
@@ -272,16 +276,19 @@ public class WebAnnotationSet {
     protected static void loadMethodsAnnotation(Context context,
             Class<?> classClass) {
         // Initialize the annotations
-        Method[] methods = getDeclaredMethods(classClass);
+        Method[] methods = Introspection.getDeclaredMethods(classClass);
         if (methods != null && methods.length > 0) {
             for (Method method : methods) {
                 if (method.isAnnotationPresent(Resource.class)) {
                     Resource annotation = method.getAnnotation(Resource.class);
 
-                    checkBeanNamingConventions(method);
+                    if (!Introspection.isValidSetter(method)) {
+                        throw new IllegalArgumentException(sm.getString(
+                                "webAnnotationSet.invalidInjection"));
+                    }
 
                     String defaultName = classClass.getName() + SEPARATOR +
-                            DefaultInstanceManager.getName(method);
+                            Introspection.getName(method);
 
                     String defaultType =
                             (method.getParameterTypes()[0]).getCanonicalName();
@@ -405,16 +412,6 @@ public class WebAnnotationSet {
     }
 
 
-    private static void checkBeanNamingConventions(Method method) {
-        if (!method.getName().startsWith("set")
-                || method.getName().length() < 4
-                || method.getParameterTypes().length != 1
-                || !method.getReturnType().getName().equals("void")) {
-            throw new IllegalArgumentException("Invalid method resource injection annotation.");
-        }
-    }
-
-
     private static String getType(Resource annotation, String defaultType) {
         String type = annotation.type().getCanonicalName();
         if (type == null || type.equals("java.lang.Object")) {
@@ -434,55 +431,5 @@ public class WebAnnotationSet {
             }
         }
         return name;
-    }
-
-
-    private static Field[] getDeclaredFields(Class<?> classClass) {
-        Field[] fields = null;
-        if (Globals.IS_SECURITY_ENABLED) {
-            final Class<?> clazz = classClass;
-            fields = AccessController.doPrivileged(
-                    new PrivilegedAction<Field[]>(){
-                @Override
-                public Field[] run(){
-                    return clazz.getDeclaredFields();
-                }
-            });
-        } else {
-            fields = classClass.getDeclaredFields();
-        }
-        return fields;
-    }
-
-
-    private static Method[] getDeclaredMethods(Class<?> classClass) {
-        Method[] methods = null;
-        if (Globals.IS_SECURITY_ENABLED) {
-            final Class<?> clazz = classClass;
-            methods = AccessController.doPrivileged(
-                    new PrivilegedAction<Method[]>(){
-                @Override
-                public Method[] run(){
-                    return clazz.getDeclaredMethods();
-                }
-            });
-        } else {
-            methods = classClass.getDeclaredMethods();
-        }
-        return methods;
-    }
-
-
-    private static Class<?> loadClass(Context context, String fileString) {
-        ClassLoader classLoader = context.getLoader().getClassLoader();
-        Class<?> classClass = null;
-        try {
-            classClass = classLoader.loadClass(fileString);
-        } catch (ClassNotFoundException e) {
-            // We do nothing
-        } catch (NoClassDefFoundError e) {
-            // We do nothing
-        }
-        return classClass;
     }
 }
