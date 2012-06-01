@@ -67,6 +67,7 @@ import org.apache.catalina.connector.Connector;
 import org.apache.catalina.deploy.FilterDef;
 import org.apache.catalina.util.ResourceSet;
 import org.apache.catalina.util.ServerInfo;
+import org.apache.naming.resources.DirContextURLStreamHandler;
 import org.apache.naming.resources.Resource;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.buf.CharChunk;
@@ -533,8 +534,9 @@ public class ApplicationContext
             String hostName = context.getParent().getName();
             try {
                 resources.lookup(normPath);
-                return new URI("jndi",
-                        getJNDIUri(hostName, fullPath), null).toURL();
+                URI uri = new URI("jndi", getJNDIUri(hostName, fullPath), null);
+                return new URL(null, uri.toString(),
+                        new DirContextURLStreamHandler(resources));
             } catch (NamingException e) {
                 // Ignore
             } catch (Exception e) {
