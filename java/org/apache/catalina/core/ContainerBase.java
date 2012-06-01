@@ -31,8 +31,10 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -1042,7 +1044,8 @@ public abstract class ContainerBase extends LifecycleMBeanBase
         startStopExecutor = new ThreadPoolExecutor(
                 getStartStopThreadsInternal(),
                 getStartStopThreadsInternal(), 10, TimeUnit.SECONDS,
-                startStopQueue);
+                startStopQueue,
+                new StartStopThreadFactory(getName() + "-startStop-"));
         startStopExecutor.allowCoreThreadTimeOut(true);
         super.initInternal();
     }
@@ -1594,6 +1597,25 @@ public abstract class ContainerBase extends LifecycleMBeanBase
                 child.stop();
             }
             return null;
+        }
+    }
+
+    private static class StartStopThreadFactory implements ThreadFactory {
+        private ThreadGroup group;
+        private AtomicInteger threadNumber = new AtomicInteger(1);
+        private String namePrefix;
+        
+        public StartStopThreadFactory(String namePrefix) {
+            SecurityManager s = System.getSecurityManager();
+            group = (s != null) ? s.getThreadGroup() : Thread.currentThread().getThreadGroup();
+            this.namePrefix = namePrefix;
+        }
+        
+        @Override
+        public Thread newThread(Runnable r) {
+            Thread thread = new Thread(group, r, namePrefix + threadNumber.getAndIncrement());
+            thread.setDaemon(true);
+            return thread;
         }
     }
 }
