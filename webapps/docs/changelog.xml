@@ -161,6 +161,10 @@
         full GC every hour. (markt)
       </fix>
       <fix>
+        <bug>53285</bug>: Do not require <code>security-role-ref</code> elements
+        to contain a <code>role-link</code> element. (markt)
+      </fix>
+      <fix>
         <bug>53322</bug>: When processing resource injection, correctly infer
         property name from its setter method if the name starts with several
         uppercase characters. (kkolinko)
