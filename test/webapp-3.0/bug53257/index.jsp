@@ -13,7 +13,8 @@
   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
   See the License for the specific language governing permissions and
   limitations under the License.
---%><%@page contentType="text/plain; charset=UTF-8"
+--%>
+<%@page contentType="text/plain; charset=UTF-8"
 %><%@page import="java.net.URL,java.net.URLConnection"%><%
     String[] testFiles = new String[] {"foo;bar.txt", "foo&bar.txt",
             "foo#bar.txt", "foo%bar.txt", "foo+bar.txt"};
@@ -22,13 +23,13 @@
         if (url == null) {
             out.print("FAIL (url) - " + testFile + "\n");
         } else {
-	        URLConnection conn = url.openConnection();
-	        long lastModified = conn.getLastModified();
-	        if (lastModified == -1) {
-	            out.print("FAIL (last modified)- " + testFile + "\n");
-	        } else {
-	            out.print("PASS - " + testFile + "\n");
-	        }
+            URLConnection conn = url.openConnection();
+            long lastModified = conn.getLastModified();
+            if (lastModified == -1) {
+                out.print("FAIL (last modified)- " + testFile + "\n");
+            } else {
+                out.print("PASS - " + testFile + "\n");
+            }
         }
     }
 %>
