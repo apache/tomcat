@@ -797,7 +797,6 @@ public class Tomcat {
      */
     public static class ExistingStandardWrapper extends StandardWrapper {
         private final Servlet existing;
-        boolean init = false;
 
         @SuppressWarnings("deprecation")
         public ExistingStandardWrapper( Servlet existing ) {
@@ -821,9 +820,9 @@ public class Tomcat {
                 instance.init(facade);
                 return instance;
             } else {
-                if (!init) {
+                if (!instanceInitialized) {
                     existing.init(facade);
-                    init = true;
+                    instanceInitialized = true;
                 }
                 return existing;
             }
