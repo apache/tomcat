@@ -1592,13 +1592,13 @@ public abstract class ContainerBase extends LifecycleMBeanBase
         private ThreadGroup group;
         private AtomicInteger threadNumber = new AtomicInteger(1);
         private String namePrefix;
-        
+
         public StartStopThreadFactory(String namePrefix) {
             SecurityManager s = System.getSecurityManager();
             group = (s != null) ? s.getThreadGroup() : Thread.currentThread().getThreadGroup();
             this.namePrefix = namePrefix;
         }
-        
+
         @Override
         public Thread newThread(Runnable r) {
             Thread thread = new Thread(group, r, namePrefix + threadNumber.getAndIncrement());
