@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
@@ -84,6 +85,7 @@ public class TestCompiler extends TomcatBaseTest {
         tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());
         tomcat.start();
 
+        // foo;bar.jsp
         ByteChunk res = getUrl("http://localhost:" + getPort() +
                 "/test/bug53257/foo%3bbar.jsp");
 
@@ -116,6 +118,7 @@ public class TestCompiler extends TomcatBaseTest {
         tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());
         tomcat.start();
 
+        // foo#bar.jsp
         ByteChunk res = getUrl("http://localhost:" + getPort() +
                 "/test/bug53257/foo%23bar.jsp");
 
@@ -132,6 +135,7 @@ public class TestCompiler extends TomcatBaseTest {
         tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());
         tomcat.start();
 
+        // foo%bar.jsp
         ByteChunk res = getUrl("http://localhost:" + getPort() +
                 "/test/bug53257/foo%25bar.jsp");
 
@@ -154,6 +158,21 @@ public class TestCompiler extends TomcatBaseTest {
         // Check request completed
         String result = res.toString();
         assertEcho(result, "OK");
+    }
+
+    @Test
+    public void testBug53257f() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+
+        File appDir = new File("test/webapp-3.0");
+        tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());
+        tomcat.start();
+
+        // Check that URL decoding is not done twice
+        ByteChunk res = new ByteChunk();
+        int rc = getUrl("http://localhost:" + getPort() +
+                "/test/bug53257/foo%2525bar.jsp", res, null);
+        assertEquals(404, rc);
     }
 
     @Test
