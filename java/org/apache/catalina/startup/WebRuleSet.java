@@ -386,10 +386,15 @@ public class WebRuleSet extends RuleSetBase {
         digester.addCallMethod(fullPrefix + "/servlet/run-as/role-name",
                                "setRunAs", 0);
 
-        digester.addCallMethod(fullPrefix + "/servlet/security-role-ref",
-                               "addSecurityRoleRef", 2);
-        digester.addCallParam(fullPrefix + "/servlet/security-role-ref/role-link", 1);
-        digester.addCallParam(fullPrefix + "/servlet/security-role-ref/role-name", 0);
+        digester.addObjectCreate(fullPrefix + "/servlet/security-role-ref",
+                                 "org.apache.catalina.deploy.SecurityRoleRef");
+        digester.addSetNext(fullPrefix + "/servlet/security-role-ref",
+                            "addSecurityRoleRef",
+                            "org.apache.catalina.deploy.SecurityRoleRef");
+        digester.addCallMethod(fullPrefix + "/servlet/security-role-ref/role-link",
+                               "setLink", 0);
+        digester.addCallMethod(fullPrefix + "/servlet/security-role-ref/role-name",
+                               "setName", 0);
 
         digester.addCallMethod(fullPrefix + "/servlet/servlet-class",
                               "setServletClass", 0);
