@@ -14,10 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.catalina.deploy;
-
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
@@ -25,7 +22,8 @@ import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
-import java.util.Hashtable;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.naming.NamingException;
 
@@ -85,11 +83,9 @@ public class NamingResources extends LifecycleMBeanBase implements Serializable 
 
 
     /**
-     * List of naming entries, keyed by name. The value is the entry type, as
-     * declared by the user.
+     * Set of naming entries, keyed by name.
      */
-    private Hashtable<String, String> entries =
-        new Hashtable<String, String>();
+    private Set<String> entries = new HashSet<String>();
 
 
     /**
@@ -205,10 +201,10 @@ public class NamingResources extends LifecycleMBeanBase implements Serializable 
      */
     public void addEjb(ContextEjb ejb) {
 
-        if (entries.containsKey(ejb.getName())) {
+        if (entries.contains(ejb.getName())) {
             return;
         } else {
-            entries.put(ejb.getName(), ejb.getType());
+            entries.add(ejb.getName());
         }
 
         synchronized (ejbs) {
@@ -227,7 +223,7 @@ public class NamingResources extends LifecycleMBeanBase implements Serializable 
      */
     public void addEnvironment(ContextEnvironment environment) {
 
-        if (entries.containsKey(environment.getName())) {
+        if (entries.contains(environment.getName())) {
             ContextEnvironment ce = findEnvironment(environment.getName());
             ContextResourceLink rl = findResourceLink(environment.getName());
             if (ce != null) {
@@ -252,7 +248,7 @@ public class NamingResources extends LifecycleMBeanBase implements Serializable 
             }
         }
 
-        entries.put(environment.getName(), environment.getType());
+        entries.add(environment.getName());
 
         synchronized (envs) {
             environment.setNamingResources(this);
@@ -293,10 +289,10 @@ public class NamingResources extends LifecycleMBeanBase implements Serializable 
      */
     public void addLocalEjb(ContextLocalEjb ejb) {
 
-        if (entries.containsKey(ejb.getName())) {
+        if (entries.contains(ejb.getName())) {
             return;
         } else {
-            entries.put(ejb.getName(), ejb.getType());
+            entries.add(ejb.getName());
         }
 
         synchronized (localEjbs) {
@@ -315,10 +311,10 @@ public class NamingResources extends LifecycleMBeanBase implements Serializable 
      */
     public void addMessageDestinationRef(MessageDestinationRef mdr) {
 
-        if (entries.containsKey(mdr.getName())) {
+        if (entries.contains(mdr.getName())) {
             return;
         } else {
-            entries.put(mdr.getName(), mdr.getType());
+            entries.add(mdr.getName());
         }
 
         synchronized (mdrs) {
@@ -349,10 +345,10 @@ public class NamingResources extends LifecycleMBeanBase implements Serializable 
      */
     public void addResource(ContextResource resource) {
 
-        if (entries.containsKey(resource.getName())) {
+        if (entries.contains(resource.getName())) {
             return;
         } else {
-            entries.put(resource.getName(), resource.getType());
+            entries.add(resource.getName());
         }
 
         synchronized (resources) {
@@ -380,10 +376,10 @@ public class NamingResources extends LifecycleMBeanBase implements Serializable 
      */
     public void addResourceEnvRef(ContextResourceEnvRef resource) {
 
-        if (entries.containsKey(resource.getName())) {
+        if (entries.contains(resource.getName())) {
             return;
         } else {
-            entries.put(resource.getName(), resource.getType());
+            entries.add(resource.getName());
         }
 
         synchronized (resourceEnvRefs) {
@@ -402,14 +398,10 @@ public class NamingResources extends LifecycleMBeanBase implements Serializable 
      */
     public void addResourceLink(ContextResourceLink resourceLink) {
 
-        if (entries.containsKey(resourceLink.getName())) {
+        if (entries.contains(resourceLink.getName())) {
             return;
         } else {
-            String value = resourceLink.getType();
-            if (value == null) {
-                value = "";
-            }
-            entries.put(resourceLink.getName(), value);
+            entries.add(resourceLink.getName());
         }
 
         synchronized (resourceLinks) {
@@ -437,14 +429,10 @@ public class NamingResources extends LifecycleMBeanBase implements Serializable 
      */
     public void addService(ContextService service) {
 
-        if (entries.containsKey(service.getName())) {
+        if (entries.contains(service.getName())) {
             return;
         } else {
-            String value = service.getType();
-            if (value == null) {
-                value = "";
-            }
-            entries.put(service.getName(), value);
+            entries.add(service.getName());
         }
 
         synchronized (services) {
