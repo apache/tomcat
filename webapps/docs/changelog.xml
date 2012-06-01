@@ -169,6 +169,10 @@
         property name from its setter method if the name starts with several
         uppercase characters. (kkolinko)
       </fix>
+      <fix>
+        <bug>53342</bug>: To avoid BindException, make startStopThreads into a
+        demon thread. (kfujino)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
