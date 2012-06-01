@@ -265,16 +265,17 @@
         data source implementations support it. (kkolinko)
       </update>
       <fix>
-        Fix several trivial HTML markup errors in sample servlets. (kkolinko)
+        Fix several HTML markup errors in servlets of examples web application.
+        (kkolinko)
       </fix>
     </changelog>
   </subsection>
   <subsection name="jdbc-pool">
     <changelog>
-      <fix>
+      <add>
         <bug>53254</bug> (<rev>1340160</rev>):
         Add in the ability to purge connections from the pool (fhanik)
-      </fix>  
+      </add>  
       <update>
          When a connection is reconnected due to failed validation
          make sure the ConnectionState is reset or it will assume
