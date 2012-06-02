@@ -19,6 +19,7 @@ package org.apache.catalina.deploy;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.io.Serializable;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
@@ -35,6 +36,7 @@ import org.apache.catalina.LifecycleException;
 import org.apache.catalina.LifecycleState;
 import org.apache.catalina.Server;
 import org.apache.catalina.mbeans.MBeanUtils;
+import org.apache.catalina.util.Introspection;
 import org.apache.catalina.util.LifecycleMBeanBase;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -248,6 +250,12 @@ public class NamingResources extends LifecycleMBeanBase implements Serializable 
             }
         }
 
+        if (!checkResourceType(environment)) {
+            throw new IllegalArgumentException(sm.getString(
+                    "namingResources.resourceTypeFail", environment.getName(),
+                    environment.getType()));
+        }
+
         entries.add(environment.getName());
 
         synchronized (envs) {
@@ -314,6 +322,11 @@ public class NamingResources extends LifecycleMBeanBase implements Serializable 
         if (entries.contains(mdr.getName())) {
             return;
         } else {
+            if (!checkResourceType(mdr)) {
+                throw new IllegalArgumentException(sm.getString(
+                        "namingResources.resourceTypeFail", mdr.getName(),
+                        mdr.getType()));
+            }
             entries.add(mdr.getName());
         }
 
@@ -348,6 +361,11 @@ public class NamingResources extends LifecycleMBeanBase implements Serializable 
         if (entries.contains(resource.getName())) {
             return;
         } else {
+            if (!checkResourceType(resource)) {
+                throw new IllegalArgumentException(sm.getString(
+                        "namingResources.resourceTypeFail", resource.getName(),
+                        resource.getType()));
+            }
             entries.add(resource.getName());
         }
 
@@ -379,7 +397,11 @@ public class NamingResources extends LifecycleMBeanBase implements Serializable 
         if (entries.contains(resource.getName())) {
             return;
         } else {
-            entries.add(resource.getName());
+            if (!checkResourceType(resource)) {
+                throw new IllegalArgumentException(sm.getString(
+                        "namingResources.resourceTypeFail", resource.getName(),
+                        resource.getType()));
+            }            entries.add(resource.getName());
         }
 
         synchronized (resourceEnvRefs) {
@@ -1081,5 +1103,148 @@ public class NamingResources extends LifecycleMBeanBase implements Serializable 
         }
         // Server or just unknown
         return "type=NamingResources";
+    }
+
+    /**
+     * Checks that the configuration of the type for the specified resource is
+     * consistent with any injection targets and if the type is not specified,
+     * tries to configure the type based on the injection targets
+     *
+     * @param resource  The resource to check
+     *
+     * @return  <code>true</code> if the type for the resource is now valid (if
+     *          previously <code>null</code> this means it is now set) or
+     *          <code>false</code> if the current resource type is inconsistent
+     *          with the injection targets and/or cannot be determined
+     */
+    private boolean checkResourceType(ResourceBase resource) {
+        if (!(container instanceof Context)) {
+            // Only Context's will have injection targets
+            return true;
+        }
+
+        if (resource.getInjectionTargets() == null ||
+                resource.getInjectionTargets().size() == 0) {
+            // No injection targets so use the defined type for the resource
+            return true;
+        }
+
+        Context context = (Context) container;
+
+        String typeName = resource.getType();
+        Class<?> typeClass = null;
+        if (typeName != null) {
+            typeClass = Introspection.loadClass(context, typeName);
+            if (typeClass == null) {
+                // Can't load the type - will trigger a failure later so don't
+                // fail here
+                return true;
+            }
+        }
+
+        Class<?> injectionClass = getInjectionTargetType(context, resource);
+        if (injectionClass == null) {
+            // Indicates that a compatible type could not be identified that
+            // worked for all injection targets
+            return false;
+        }
+
+        if (typeClass == null) {
+                // Only injectionTarget defined - use it
+                resource.setType(injectionClass.getCanonicalName());
+                return true;
+        } else {
+            return injectionClass.isAssignableFrom(typeClass);
+        }
+    }
+
+    private Class<?> getInjectionTargetType(Context context,
+            ResourceBase resource) {
+
+        Class<?> result = null;
+
+        for (InjectionTarget injectionTarget : resource.getInjectionTargets()) {
+            Class<?> clazz = Introspection.loadClass(
+                    context, injectionTarget.getTargetClass());
+            if (clazz == null) {
+                // Can't load class - therefore ignore this target
+                continue;
+            }
+
+            // Look for a match
+            String targetName = injectionTarget.getTargetName();
+            // Look for a setter match first
+            Class<?> targetType = getSetterType(clazz, targetName);
+            if (targetType == null) {
+                // Try a field match if no setter match
+                targetType = getFieldType(clazz,targetName);
+            }
+            if (targetType == null) {
+                // No match - ignore this injection target
+                continue;
+            }
+            targetType = convertPrimitiveType(targetType);
+
+            // Figure out the common type - if there is one
+            if (result == null) {
+                result = targetType;
+            } else if (targetType.isAssignableFrom(result)) {
+                // NO-OP - This will work
+            } else if (result.isAssignableFrom(targetType)) {
+                // Need to use more specific type
+                result = targetType;
+            } else {
+                // Incompatible types
+                return null;
+            }
+        }
+        return result;
+    }
+
+    private Class<?> getSetterType(Class<?> clazz, String name) {
+        Method[] methods = Introspection.getDeclaredMethods(clazz);
+        if (methods != null && methods.length > 0) {
+            for (Method method : methods) {
+                if (Introspection.isValidSetter(method) &&
+                        Introspection.getName(method).equals(name)) {
+                    return method.getParameterTypes()[0];
+                }
+            }
+        }
+        return null;
+    }
+
+    private Class<?> getFieldType(Class<?> clazz, String name) {
+        Field[] fields = Introspection.getDeclaredFields(clazz);
+        if (fields != null && fields.length > 0) {
+            for (Field field : fields) {
+                if (field.getName().equals(name)) {
+                    return field.getType();
+                }
+            }
+        }
+        return null;
+    }
+
+    private Class<?> convertPrimitiveType(Class<?> clazz) {
+        if (clazz.equals(char.class)) {
+            return Character.class;
+        } else if (clazz.equals(int.class)) {
+            return Integer.class;
+        } else if (clazz.equals(boolean.class)) {
+            return Boolean.class;
+        } else if (clazz.equals(double.class)) {
+            return Double.class;
+        } else if (clazz.equals(byte.class)) {
+            return Byte.class;
+        } else if (clazz.equals(short.class)) {
+            return Short.class;
+        } else if (clazz.equals(long.class)) {
+            return Long.class;
+        } else if (clazz.equals(float.class)) {
+            return Float.class;
+        } else {
+            return clazz;
+        }
     }
 }
