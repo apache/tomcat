@@ -175,6 +175,12 @@
         uppercase characters. (kkolinko)
       </fix>
       <fix>
+        <bug>53333</bug>: When processing JNDI resources, take account of the
+        types of any specified injection targets to ensure that the resource
+        definition and the injection target types are consistent. Based on a
+        patch provided by Violeta Georgieva. (markt)
+      </fix>
+      <fix>
         <bug>53342</bug>: To avoid BindException, make startStopThreads into a
         demon thread. (kfujino)
       </fix>
