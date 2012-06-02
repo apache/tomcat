@@ -14,10 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.catalina.core;
-
 
 import java.beans.Introspector;
 import java.io.IOException;
@@ -52,6 +49,7 @@ import javax.xml.ws.WebServiceRef;
 import org.apache.catalina.ContainerServlet;
 import org.apache.catalina.Globals;
 import org.apache.catalina.security.SecurityUtil;
+import org.apache.catalina.util.Introspection;
 import org.apache.tomcat.InstanceManager;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.res.StringManager;
@@ -60,6 +58,16 @@ import org.apache.tomcat.util.res.StringManager;
  * @version $Id$
  */
 public class DefaultInstanceManager implements InstanceManager {
+
+    // Used when there are no annotations in a class
+    private static final AnnotationCacheEntry[] ANNOTATIONS_EMPTY
+        = new AnnotationCacheEntry[0];
+
+    /**
+     * The string manager for this package.
+     */
+    protected static final StringManager sm =
+        StringManager.getManager(Constants.Package);
 
     private final Context context;
     private final Map<String, Map<String, String>> injectionMap;
@@ -72,10 +80,6 @@ public class DefaultInstanceManager implements InstanceManager {
     private final Properties restrictedServlets = new Properties();
     private final Map<Class<?>, AnnotationCacheEntry[]> annotationCache =
         new WeakHashMap<Class<?>, AnnotationCacheEntry[]>();
-
-    // Used when there are no annotations in a class
-    private static final AnnotationCacheEntry[] ANNOTATIONS_EMPTY
-        = new AnnotationCacheEntry[0];
 
     public DefaultInstanceManager(Context context, Map<String, Map<String, String>> injectionMap, org.apache.catalina.Context catalinaContext, ClassLoader containerClassLoader) {
         classLoader = catalinaContext.getLoader().getClassLoader();
@@ -286,19 +290,7 @@ public class DefaultInstanceManager implements InstanceManager {
                 if (context != null) {
                     // Initialize fields annotations for resource injection if
                     // JNDI is enabled
-                    Field[] fields = null;
-                    if (Globals.IS_SECURITY_ENABLED) {
-                        final Class<?> clazz2 = clazz;
-                        fields = AccessController.doPrivileged(
-                                new PrivilegedAction<Field[]>(){
-                            @Override
-                            public Field[] run(){
-                                return clazz2.getDeclaredFields();
-                            }
-                        });
-                    } else {
-                        fields = clazz.getDeclaredFields();
-                    }
+                    Field[] fields = Introspection.getDeclaredFields(clazz);
                     for (Field field : fields) {
                         if (injections != null && injections.containsKey(field.getName())) {
                             annotations.add(new AnnotationCacheEntry(
@@ -338,30 +330,15 @@ public class DefaultInstanceManager implements InstanceManager {
                 }
 
                 // Initialize methods annotations
-                Method[] methods = null;
-                if (Globals.IS_SECURITY_ENABLED) {
-                    final Class<?> clazz2 = clazz;
-                    methods = AccessController.doPrivileged(
-                            new PrivilegedAction<Method[]>(){
-                        @Override
-                        public Method[] run(){
-                            return clazz2.getDeclaredMethods();
-                        }
-                    });
-                } else {
-                    methods = clazz.getDeclaredMethods();
-                }
+                Method[] methods = Introspection.getDeclaredMethods(clazz);
                 Method postConstruct = null;
                 Method preDestroy = null;
                 for (Method method : methods) {
-                    String methodName = method.getName();
                     if (context != null) {
                         // Resource injection only if JNDI is enabled
-                        if (injections != null && methodName.startsWith("set")
-                                && methodName.length() > 3
-                                && method.getParameterTypes().length == 1
-                                && method.getReturnType().getName().equals("void")) {
-                            String fieldName = getName(method);
+                        if (injections != null &&
+                                Introspection.isValidSetter(method)) {
+                            String fieldName = Introspection.getName(method);
                             if (injections.containsKey(fieldName)) {
                                 annotations.add(new AnnotationCacheEntry(
                                         method.getName(),
@@ -634,11 +611,9 @@ public class DefaultInstanceManager implements InstanceManager {
             Object instance, Method method, String name, Class<?> clazz)
             throws NamingException, IllegalAccessException, InvocationTargetException {
 
-        if (!method.getName().startsWith("set")
-                || method.getName().length() < 4
-                || method.getParameterTypes().length != 1
-                || !method.getReturnType().getName().equals("void")) {
-            throw new IllegalArgumentException("Invalid method resource injection annotation");
+        if (!Introspection.isValidSetter(method)) {
+            throw new IllegalArgumentException(
+                    sm.getString("defaultInstanceManager.invalidInjection"));
         }
 
         Object lookedupResource;
@@ -650,7 +625,7 @@ public class DefaultInstanceManager implements InstanceManager {
             lookedupResource = context.lookup(normalizedName);
         } else {
             lookedupResource = context.lookup(
-                    clazz.getName() + "/" + getName(method));
+                    clazz.getName() + "/" + Introspection.getName(method));
         }
 
         synchronized (method) {
@@ -661,6 +636,7 @@ public class DefaultInstanceManager implements InstanceManager {
         }
     }
 
+    @Deprecated
     public static String getName(Method setter) {
         // Note: method signature has already been checked for correctness.
         // The method name always starts with "set".

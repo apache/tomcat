@@ -77,6 +77,7 @@ import org.apache.catalina.deploy.SecurityConstraint;
 import org.apache.catalina.deploy.ServletDef;
 import org.apache.catalina.deploy.WebXml;
 import org.apache.catalina.util.ContextName;
+import org.apache.catalina.util.Introspection;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.naming.resources.DirContextURLConnection;
@@ -2089,7 +2090,7 @@ public class ContextConfig implements LifecycleListener {
             }
             if (entry.getSciSet().size() > 0) {
                 // Need to try and load the class
-                clazz = loadClass(className);
+                clazz = Introspection.loadClass(context, className);
                 if (clazz == null) {
                     // Can't load the class so no point continuing
                     return;
@@ -2117,7 +2118,8 @@ public class ContextConfig implements LifecycleListener {
                         if (entry.getKey().getName().equals(
                                 getClassName(annotationEntry.getAnnotationType()))) {
                             if (clazz == null) {
-                                clazz = loadClass(className);
+                                clazz = Introspection.loadClass(
+                                        context, className);
                                 if (clazz == null) {
                                     // Can't load the class so no point
                                     // continuing
@@ -2229,31 +2231,6 @@ public class ContextConfig implements LifecycleListener {
             }
         }
         return Collections.emptySet();
-    }
-
-    private Class<?> loadClass(String className) {
-        Class<?> clazz = null;
-        try {
-            clazz = context.getLoader().getClassLoader().loadClass(className);
-        } catch (NoClassDefFoundError e) {
-            log.debug(sm.getString("contextConfig.invalidSciHandlesTypes",
-                    className), e);
-            return null;
-        } catch (ClassNotFoundException e) {
-            log.debug(sm.getString("contextConfig.invalidSciHandlesTypes",
-                    className), e);
-            return null;
-        } catch (ClassFormatError e) {
-            log.debug(sm.getString("contextConfig.invalidSciHandlesTypes",
-                    className), e);
-            return null;
-        } catch (Throwable t) {
-            ExceptionUtils.handleThrowable(t);
-            log.debug(sm.getString("contextConfig.invalidSciHandlesTypes",
-                    className), t);
-            return null;
-        }
-        return clazz;
     }
 
     private static final String getClassName(String internalForm) {
