@@ -637,7 +637,7 @@ public class DefaultInstanceManager implements InstanceManager {
     }
 
     @Deprecated
-    public static String XXXgetName(Method setter) {
+    public static String getName(Method setter) {
         // Note: method signature has already been checked for correctness.
         // The method name always starts with "set".
         return Introspector.decapitalize(setter.getName().substring(3));
