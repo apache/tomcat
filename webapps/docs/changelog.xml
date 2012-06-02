@@ -333,11 +333,11 @@
         the value of <code>true</code>. If it is really needed, it should be
         set explicitly. (kkolinko)
       </fix>
-      <fix>
+      <add>
         <bug>52500</bug>: Added configurable mechanism to retrieve user names
         from X509 client certificates. Based on a patch provided by
         Michael Furman. (schultz)
-      </fix>
+      </add>
       <fix>
         <bug>52719</bug>: Fix a theoretical resource leak in the JAR validation
         that checks for non-permitted classes in web application JARs. (markt)
