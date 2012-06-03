@@ -29,6 +29,10 @@
  *
  * Provides parsing of the following HTTP header values as per RFC 2616:
  * - Content-Type
+ *     Note: The parser tolerates invalid parameters that do not include a
+ *           value. These parameters are available in the Parser node collection
+ *           but will be skipped by the various toString() methods. See BZ 53353
+ *           for an example.
  *
  * Support for additional headers will be provided as required.
  */
@@ -77,7 +81,7 @@ void SubType() #SubType :{ Token t = null; }
 
 void Parameter() #Parameter : {}
 {
-    Attribute() <EQUALS> Value()
+    Attribute() (<EQUALS> Value())?
 }
 
 void Attribute() # Attribute : { Token t = null; }

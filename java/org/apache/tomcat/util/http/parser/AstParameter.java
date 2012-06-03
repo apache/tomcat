@@ -31,6 +31,10 @@ public class AstParameter extends SimpleNode {
 
     @Override
     public String toString() {
+        if (children.length != 2) {
+            // Invalid input - swallow it.
+            return "";
+        }
         StringBuilder sb = new StringBuilder();
         sb.append(children[0].toString());
         sb.append("=");
