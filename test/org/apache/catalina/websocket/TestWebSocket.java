@@ -53,10 +53,6 @@ public class TestWebSocket extends TomcatBaseTest {
         "258EAFA5-E914-47DA-95CA-C5AB0DC85B11".getBytes(
                 B2CConverter.ISO_8859_1);
 
-    private OutputStream os;
-    private InputStream is;
-    private boolean isContinuation = false;
-
     @Test
     public void testSimple() throws Exception {
         Tomcat tomcat = getTomcatInstance();
@@ -65,7 +61,7 @@ public class TestWebSocket extends TomcatBaseTest {
 
         tomcat.start();
 
-        WebSocketClient client= new WebSocketClient();
+        WebSocketClient client= new WebSocketClient(getPort());
 
 
         // Send the WebSocket handshake
@@ -89,10 +85,10 @@ public class TestWebSocket extends TomcatBaseTest {
         }
 
         // Now we can do WebSocket
-        sendMessage("foo", false);
-        sendMessage("foo", true);
+        client.sendMessage("foo", false);
+        client.sendMessage("foo", true);
 
-        assertEquals("foofoo",readMessage());
+        assertEquals("foofoo", client.readMessage());
 
         // Finished with the socket
         client.close();
@@ -105,7 +101,7 @@ public class TestWebSocket extends TomcatBaseTest {
         tomcat.addWebapp(null, "/examples", appDir.getAbsolutePath());
 
         tomcat.start();
-        WebSocketClient client= new WebSocketClient();
+        WebSocketClient client= new WebSocketClient(getPort());
 
         // Send the WebSocket handshake
         client.writer.write("GET /examples/websocket/echoStream HTTP/1.1" + CRLF);
@@ -142,7 +138,7 @@ public class TestWebSocket extends TomcatBaseTest {
         tomcat.addWebapp(null, "/examples", appDir.getAbsolutePath());
 
         tomcat.start();
-        WebSocketClient client= new WebSocketClient();
+        WebSocketClient client= new WebSocketClient(getPort());
 
 
         // Send the WebSocket handshake
@@ -170,7 +166,7 @@ public class TestWebSocket extends TomcatBaseTest {
         tomcat.addWebapp(null, "/examples", appDir.getAbsolutePath());
 
         tomcat.start();
-        WebSocketClient client= new WebSocketClient();
+        WebSocketClient client= new WebSocketClient(getPort());
 
         // Send the WebSocket handshake
         client.writer.write("GET /examples/websocket/echoStream HTTP/1.1" + CRLF);
@@ -196,7 +192,7 @@ public class TestWebSocket extends TomcatBaseTest {
         tomcat.addWebapp(null, "/examples", appDir.getAbsolutePath());
 
         tomcat.start();
-        WebSocketClient client= new WebSocketClient();
+        WebSocketClient client= new WebSocketClient(getPort());
 
         // Send the WebSocket handshake
         client.writer.write("GET /examples/websocket/echoStream HTTP/1.1" + CRLF);
@@ -239,79 +235,17 @@ public class TestWebSocket extends TomcatBaseTest {
     }
 
 
-
-    private void sendMessage(String message, boolean finalFragment)
-            throws IOException {
-        ByteChunk bc = new ByteChunk(8192);
-        C2BConverter c2b = new C2BConverter(bc, "UTF-8");
-        c2b.convert(message);
-        c2b.flushBuffer();
-
-        int len = bc.getLength();
-        assertTrue(len < 126);
-
-        byte first;
-        if (isContinuation) {
-            first = Constants.OPCODE_CONTINUATION;
-        } else {
-            first = Constants.OPCODE_TEXT;
-        }
-        if (finalFragment) {
-            first = (byte) (0x80 | first);
-        }
-        os.write(first);
-
-        os.write(0x80 | len);
-
-        // Zero mask
-        os.write(0);
-        os.write(0);
-        os.write(0);
-        os.write(0);
-
-        // Payload
-        os.write(bc.getBytes(), bc.getStart(), len);
-
-        os.flush();
-
-        // Will the next frame be a continuation frame
-        isContinuation = !finalFragment;
-    }
-
-    private String readMessage() throws IOException {
-        ByteChunk bc = new ByteChunk(125);
-        CharChunk cc = new CharChunk(125);
-
-        // Skip first byte
-        is.read();
-
-        // Get payload length
-        int len = is.read() & 0x7F;
-        assertTrue(len < 126);
-
-        // Read payload
-        int read = 0;
-        while (read < len) {
-            read = read + is.read(bc.getBytes(), read, len - read);
-        }
-
-        bc.setEnd(len);
-
-        B2CConverter b2c = new B2CConverter("UTF-8");
-        b2c.convert(bc, cc, len);
-
-        return cc.toString();
-    }
-
-    private class WebSocketClient {
-        // Open the socket
+    private static class WebSocketClient {
+        private OutputStream os;
+        private InputStream is;
+        private boolean isContinuation = false;
         final String encoding = "ISO-8859-1";
-        Socket socket ;
-        Writer writer ;
-        BufferedReader reader;
+        private Socket socket ;
+        private Writer writer ;
+        private BufferedReader reader;
 
-        private WebSocketClient() {
-            SocketAddress addr = new InetSocketAddress("localhost", getPort());
+        public WebSocketClient(int port) {
+            SocketAddress addr = new InetSocketAddress("localhost", port);
             socket = new Socket();
             try {
                 socket.setSoTimeout(10000);
@@ -330,5 +264,67 @@ public class TestWebSocket extends TomcatBaseTest {
             socket.close();
         }
 
+        private void sendMessage(String message, boolean finalFragment)
+                throws IOException {
+            ByteChunk bc = new ByteChunk(8192);
+            C2BConverter c2b = new C2BConverter(bc, "UTF-8");
+            c2b.convert(message);
+            c2b.flushBuffer();
+
+            int len = bc.getLength();
+            assertTrue(len < 126);
+
+            byte first;
+            if (isContinuation) {
+                first = Constants.OPCODE_CONTINUATION;
+            } else {
+                first = Constants.OPCODE_TEXT;
+            }
+            if (finalFragment) {
+                first = (byte) (0x80 | first);
+            }
+            os.write(first);
+
+            os.write(0x80 | len);
+
+            // Zero mask
+            os.write(0);
+            os.write(0);
+            os.write(0);
+            os.write(0);
+
+            // Payload
+            os.write(bc.getBytes(), bc.getStart(), len);
+
+            os.flush();
+
+            // Will the next frame be a continuation frame
+            isContinuation = !finalFragment;
+        }
+
+        private String readMessage() throws IOException {
+            ByteChunk bc = new ByteChunk(125);
+            CharChunk cc = new CharChunk(125);
+
+            // Skip first byte
+            is.read();
+
+            // Get payload length
+            int len = is.read() & 0x7F;
+            assertTrue(len < 126);
+
+            // Read payload
+            int read = 0;
+            while (read < len) {
+                read = read + is.read(bc.getBytes(), read, len - read);
+            }
+
+            bc.setEnd(len);
+
+            B2CConverter b2c = new B2CConverter("UTF-8");
+            b2c.convert(bc, cc, len);
+
+            return cc.toString();
+        }
     }
 }
