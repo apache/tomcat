@@ -93,7 +93,7 @@ public class TestNonLoginAndBasicAuthenticator extends TomcatBaseTest {
     @Test
     public void testAcceptPublicBasic() throws Exception {
         doTestBasic(USER, PWD, CONTEXT_PATH_LOGIN + URI_PUBLIC,
-                false, 200, false, 200);
+                false, false, 200, false, 200);
     }
 
     /*
@@ -104,7 +104,19 @@ public class TestNonLoginAndBasicAuthenticator extends TomcatBaseTest {
     @Test
     public void testAcceptProtectedBasic() throws Exception {
         doTestBasic(USER, PWD, CONTEXT_PATH_LOGIN + URI_PROTECTED,
-                true, 401, false, 200);
+                false, true, 401, false, 200);
+    }
+
+    /*
+     * Try to access a protected resource in a webapp that
+     * has a BASIC login method defined. Verify the server is
+     * prepared to accept non-standard case for the auth scheme.
+     * The access should be challenged, authenticated and then permitted.
+     */
+    @Test
+    public void testAuthMethodCaseBasic() throws Exception {
+        doTestBasic(USER, PWD, CONTEXT_PATH_LOGIN + URI_PROTECTED,
+                true, true, 401, false, 200);
     }
 
     /*
@@ -117,11 +129,11 @@ public class TestNonLoginAndBasicAuthenticator extends TomcatBaseTest {
     @Test
     public void testBasicLoginSessionTimeout() throws Exception {
         doTestBasic(USER, PWD, CONTEXT_PATH_LOGIN + URI_PROTECTED,
-                true, 401, false, 200);
+                false, true, 401, false, 200);
         // wait long enough for the session above to expire
         Thread.sleep(LONG_TIMEOUT_DELAY_MSECS);
         doTestBasic(USER, PWD, CONTEXT_PATH_LOGIN + URI_PROTECTED,
-                true, 401, false, 200);
+                false, true, 401, false, 200);
     }
 
     /*
@@ -134,7 +146,7 @@ public class TestNonLoginAndBasicAuthenticator extends TomcatBaseTest {
     @Test
     public void testBasicLoginRejectProtected() throws Exception {
         doTestBasic(USER, PWD, CONTEXT_PATH_LOGIN + URI_PROTECTED,
-                true, 401, false, 200);
+                false, true, 401, false, 200);
         doTestNonLogin(CONTEXT_PATH_NOLOGIN + URI_PROTECTED,
                 true, 403);
     }
@@ -163,6 +175,7 @@ public class TestNonLoginAndBasicAuthenticator extends TomcatBaseTest {
     }
 
     private void doTestBasic(String user, String pwd, String uri,
+            boolean verifyAuthSchemeCase,
             boolean expectedReject1, int expectedRC1,
             boolean expectedReject2, int expectedRC2) throws Exception {
 
@@ -190,7 +203,8 @@ public class TestNonLoginAndBasicAuthenticator extends TomcatBaseTest {
         String credentials = user + ":" + pwd;
         byte[] credentialsBytes = ByteChunk.convertToBytes(credentials);
         String base64auth = Base64.encode(credentialsBytes);
-        String authLine = "Basic " + base64auth;
+        String authScheme = verifyAuthSchemeCase ? "bAsIc " : "Basic ";
+        String authLine = authScheme + base64auth;
 
         List<String> auth = new ArrayList<String>();
         auth.add(authLine);
