@@ -37,10 +37,16 @@ import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
  */
 public abstract class StreamInbound implements UpgradeInbound {
 
+    private final ClassLoader applicationClassLoader;
     private UpgradeProcessor<?> processor = null;
     private WsOutbound outbound;
     private int outboundByteBufferSize = WsOutbound.DEFAULT_BUFFER_SIZE;
     private int outboundCharBufferSize = WsOutbound.DEFAULT_BUFFER_SIZE;
+
+
+    public StreamInbound() {
+        applicationClassLoader = Thread.currentThread().getContextClassLoader();
+    }
 
 
     public int getOutboundByteBufferSize() {
@@ -121,11 +127,11 @@ public abstract class StreamInbound implements UpgradeInbound {
                 byte opCode = frame.getOpCode();
 
                 if (opCode == Constants.OPCODE_BINARY) {
-                    onBinaryData(wsIs);
+                    doOnBinaryData(wsIs);
                 } else if (opCode == Constants.OPCODE_TEXT) {
                     InputStreamReader r =
                             new InputStreamReader(wsIs, new Utf8Decoder());
-                    onTextData(r);
+                    doOnTextData(r);
                 } else if (opCode == Constants.OPCODE_CLOSE){
                     closeOutboundConnection(frame);
                     return SocketState.CLOSED;
@@ -158,11 +164,37 @@ public abstract class StreamInbound implements UpgradeInbound {
         return SocketState.UPGRADED;
     }
 
+    private void doOnBinaryData(InputStream is) throws IOException {
+        // Need to call onClose using the web application's class loader
+        Thread t = Thread.currentThread();
+        ClassLoader cl = t.getContextClassLoader();
+        t.setContextClassLoader(applicationClassLoader);
+        try {
+            onBinaryData(is);
+        } finally {
+            t.setContextClassLoader(cl);
+        }
+    }
+
+
+    private void doOnTextData(Reader r) throws IOException {
+        // Need to call onClose using the web application's class loader
+        Thread t = Thread.currentThread();
+        ClassLoader cl = t.getContextClassLoader();
+        t.setContextClassLoader(applicationClassLoader);
+        try {
+            onTextData(r);
+        } finally {
+            t.setContextClassLoader(cl);
+        }
+    }
+
+
     private void closeOutboundConnection(int status, ByteBuffer data) throws IOException {
         try {
             getWsOutbound().close(status, data);
         } finally {
-            onClose(status);
+            doOnClose(status);
         }
     }
 
@@ -170,13 +202,33 @@ public abstract class StreamInbound implements UpgradeInbound {
         try {
             getWsOutbound().close(frame);
         } finally {
-            onClose(Constants.OPCODE_CLOSE);
+            doOnClose(Constants.OPCODE_CLOSE);
+        }
+    }
+
+    private void doOnClose(int status) {
+        // Need to call onClose using the web application's class loader
+        Thread t = Thread.currentThread();
+        ClassLoader cl = t.getContextClassLoader();
+        t.setContextClassLoader(applicationClassLoader);
+        try {
+            onClose(status);
+        } finally {
+            t.setContextClassLoader(cl);
         }
     }
 
     @Override
-    public void onUpgradeComplete() {
-        onOpen(outbound);
+    public final void onUpgradeComplete() {
+        // Need to call onOpen using the web application's class loader
+        Thread t = Thread.currentThread();
+        ClassLoader cl = t.getContextClassLoader();
+        t.setContextClassLoader(applicationClassLoader);
+        try {
+            onOpen(outbound);
+        } finally {
+            t.setContextClassLoader(cl);
+        }
     }
 
     /**
