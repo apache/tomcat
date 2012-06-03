@@ -28,9 +28,14 @@ import java.io.Writer;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketAddress;
+import java.nio.ByteBuffer;
+import java.nio.CharBuffer;
 import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -38,6 +43,8 @@ import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
+import org.apache.catalina.Context;
+import org.apache.catalina.deploy.ContextEnvironment;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.catalina.util.Base64;
@@ -117,7 +124,6 @@ public class TestWebSocket extends TomcatBaseTest {
         String responseLine = client.reader.readLine();
         assertTrue(responseLine.startsWith("HTTP/1.1 426"));
 
-        // Swallow the headers
         List<String> headerlines = new ArrayList<String>();
 
         String responseHeaderLine = client.reader.readLine();
@@ -208,9 +214,7 @@ public class TestWebSocket extends TomcatBaseTest {
         String responseLine = client.reader.readLine();
         assertTrue(responseLine.startsWith("HTTP/1.1 101"));
 
-        // Swallow the headers
         String accept = null;
-
         String responseHeaderLine = client.reader.readLine();
         while (!responseHeaderLine.equals("")) {
             if(responseHeaderLine.startsWith("Sec-WebSocket-Accept: ")) {
@@ -234,6 +238,105 @@ public class TestWebSocket extends TomcatBaseTest {
         client.close();
     }
 
+
+    @Test
+    public void testBug53339() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+        tomcat.enableNaming();
+
+        // Must have a real docBase - just use temp
+        Context ctx =
+            tomcat.addContext("", System.getProperty("java.io.tmpdir"));
+
+        Tomcat.addServlet(ctx, "Bug53339", new Bug53339Servlet());
+        ctx.addServletMapping("/*", "Bug53339");
+
+        // Create the resource
+        ContextEnvironment env = new ContextEnvironment();
+        env.setName(Bug53339WsInbound.JNDI_NAME);
+        env.setType(String.class.getName());
+        env.setValue(Bug53339WsInbound.TEST_MESSAGE);
+        ctx.getNamingResources().addEnvironment(env);
+
+        tomcat.start();
+
+        WebSocketClient client= new WebSocketClient(getPort());
+
+        // Send the WebSocket handshake
+        client.writer.write("GET / HTTP/1.1" + CRLF);
+        client.writer.write("Host: foo" + CRLF);
+        client.writer.write("Upgrade: websocket" + CRLF);
+        client.writer.write("Connection: upgrade" + CRLF);
+        client.writer.write("Sec-WebSocket-Version: 13" + CRLF);
+        client.writer.write("Sec-WebSocket-Key: TODO" + CRLF);
+        client.writer.write(CRLF);
+        client.writer.flush();
+
+        // Make sure we got an upgrade response
+        String responseLine = client.reader.readLine();
+        assertTrue(responseLine.startsWith("HTTP/1.1 101"));
+
+        // Swallow the headers
+        String responseHeaderLine = client.reader.readLine();
+        while (!responseHeaderLine.equals("")) {
+            responseHeaderLine = client.reader.readLine();
+        }
+
+        // Now we can do WebSocket
+        String msg = client.readMessage();
+        assertEquals(Bug53339WsInbound.TEST_MESSAGE, msg);
+
+        // Finished with the socket
+        client.close();
+    }
+
+
+    private static class Bug53339Servlet extends WebSocketServlet {
+
+        private static final long serialVersionUID = 1L;
+
+        @Override
+        protected StreamInbound createWebSocketInbound(String subProtocol) {
+            return new Bug53339WsInbound();
+        }
+    }
+
+
+    private static class Bug53339WsInbound extends MessageInbound {
+
+        public static final String TEST_MESSAGE = "Test Message";
+        public static final String JNDI_NAME = "Bug53339Message";
+
+        @Override
+        protected void onOpen(WsOutbound outbound) {
+            String msg = "Error";
+            try {
+                javax.naming.Context initCtx = new InitialContext();
+                msg = (String) initCtx.lookup(
+                        "java:comp/env/" + JNDI_NAME);
+            } catch (NamingException e) {
+                // Ignore - the test checks if the message is sent
+                e.printStackTrace(); // for debug purposes if the test fails
+            }
+            CharBuffer cb = CharBuffer.wrap("" + msg);
+            try {
+                outbound.writeTextMessage(cb);
+            } catch (IOException e) {
+                // Ignore - the test checks if the message is sent
+            }
+
+        }
+
+        @Override
+        protected void onBinaryMessage(ByteBuffer message) throws IOException {
+            // Ignore
+        }
+
+        @Override
+        protected void onTextMessage(CharBuffer message) throws IOException {
+            // Ignore
+        }
+    }
 
     private static class WebSocketClient {
         private OutputStream os;
