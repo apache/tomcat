@@ -2315,6 +2315,7 @@ public class ContextConfig implements LifecycleListener {
         }
 
         boolean urlPatternsSet = false;
+        boolean servletNamesSet = false;
         boolean dispatchTypesSet = false;
         String[] urlPatterns = null;
 
@@ -2333,6 +2334,7 @@ public class ContextConfig implements LifecycleListener {
             } else if ("servletNames".equals(name)) {
                 String[] servletNames = processAnnotationsStringArray(evp
                         .getValue());
+                servletNamesSet = servletNames.length > 0;
                 for (String servletName : servletNames) {
                     filterMap.addServletName(servletName);
                 }
@@ -2389,8 +2391,10 @@ public class ContextConfig implements LifecycleListener {
         }
         if (!isWebXMLfilterDef) {
             fragment.addFilter(filterDef);
-            filterMap.setFilterName(filterName);
-            fragment.addFilterMapping(filterMap);
+            if (urlPatternsSet || servletNamesSet) {
+                filterMap.setFilterName(filterName);
+                fragment.addFilterMapping(filterMap);
+            }
         }
         if (urlPatternsSet || dispatchTypesSet) {
             Set<FilterMap> fmap = fragment.getFilterMappings();
