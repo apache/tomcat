@@ -165,7 +165,7 @@ public abstract class StreamInbound implements UpgradeInbound {
     }
 
     private void doOnBinaryData(InputStream is) throws IOException {
-        // Need to call onClose using the web application's class loader
+        // Need to call onBinaryData using the web application's class loader
         Thread t = Thread.currentThread();
         ClassLoader cl = t.getContextClassLoader();
         t.setContextClassLoader(applicationClassLoader);
@@ -178,7 +178,7 @@ public abstract class StreamInbound implements UpgradeInbound {
 
 
     private void doOnTextData(Reader r) throws IOException {
-        // Need to call onClose using the web application's class loader
+        // Need to call onTextData using the web application's class loader
         Thread t = Thread.currentThread();
         ClassLoader cl = t.getContextClassLoader();
         t.setContextClassLoader(applicationClassLoader);
