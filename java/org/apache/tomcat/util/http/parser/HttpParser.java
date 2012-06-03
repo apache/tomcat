@@ -96,8 +96,15 @@ public class HttpParser/*@bgen(jjtree)*/implements HttpParserTreeConstants, Http
   jjtree.openNodeScope(jjtn000);
     try {
       Attribute();
-      jj_consume_token(EQUALS);
-      Value();
+      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      case EQUALS:
+        jj_consume_token(EQUALS);
+        Value();
+        break;
+      default:
+        jj_la1[1] = jj_gen;
+        ;
+      }
     } catch (Throwable jjte000) {
       if (jjtc000) {
         jjtree.clearNodeScope(jjtn000);
@@ -156,7 +163,7 @@ public class HttpParser/*@bgen(jjtree)*/implements HttpParserTreeConstants, Http
                                                                                   jjtn000.jjtSetValue(t.image.trim());
         break;
       default:
-        jj_la1[1] = jj_gen;
+        jj_la1[2] = jj_gen;
         jj_consume_token(-1);
         throw new ParseException();
       }
@@ -176,13 +183,13 @@ public class HttpParser/*@bgen(jjtree)*/implements HttpParserTreeConstants, Http
   public Token jj_nt;
   private int jj_ntk;
   private int jj_gen;
-  final private int[] jj_la1 = new int[2];
+  final private int[] jj_la1 = new int[3];
   static private int[] jj_la1_0;
   static {
       jj_la1_init_0();
    }
    private static void jj_la1_init_0() {
-      jj_la1_0 = new int[] {0x2,0x180,};
+      jj_la1_0 = new int[] {0x2,0x4,0x180,};
    }
 
   /** Constructor with InputStream. */
@@ -196,7 +203,7 @@ public class HttpParser/*@bgen(jjtree)*/implements HttpParserTreeConstants, Http
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 2; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 3; i++) jj_la1[i] = -1;
   }
 
   /** Reinitialise. */
@@ -211,7 +218,7 @@ public class HttpParser/*@bgen(jjtree)*/implements HttpParserTreeConstants, Http
     jj_ntk = -1;
     jjtree.reset();
     jj_gen = 0;
-    for (int i = 0; i < 2; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 3; i++) jj_la1[i] = -1;
   }
 
   /** Constructor. */
@@ -221,7 +228,7 @@ public class HttpParser/*@bgen(jjtree)*/implements HttpParserTreeConstants, Http
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 2; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 3; i++) jj_la1[i] = -1;
   }
 
   /** Reinitialise. */
@@ -232,7 +239,7 @@ public class HttpParser/*@bgen(jjtree)*/implements HttpParserTreeConstants, Http
     jj_ntk = -1;
     jjtree.reset();
     jj_gen = 0;
-    for (int i = 0; i < 2; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 3; i++) jj_la1[i] = -1;
   }
 
   /** Constructor with generated Token Manager. */
@@ -241,7 +248,7 @@ public class HttpParser/*@bgen(jjtree)*/implements HttpParserTreeConstants, Http
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 2; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 3; i++) jj_la1[i] = -1;
   }
 
   /** Reinitialise. */
@@ -251,7 +258,7 @@ public class HttpParser/*@bgen(jjtree)*/implements HttpParserTreeConstants, Http
     jj_ntk = -1;
     jjtree.reset();
     jj_gen = 0;
-    for (int i = 0; i < 2; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 3; i++) jj_la1[i] = -1;
   }
 
   private Token jj_consume_token(int kind) throws ParseException {
@@ -307,7 +314,7 @@ public class HttpParser/*@bgen(jjtree)*/implements HttpParserTreeConstants, Http
       la1tokens[jj_kind] = true;
       jj_kind = -1;
     }
-    for (int i = 0; i < 2; i++) {
+    for (int i = 0; i < 3; i++) {
       if (jj_la1[i] == jj_gen) {
         for (int j = 0; j < 32; j++) {
           if ((jj_la1_0[i] & (1<<j)) != 0) {

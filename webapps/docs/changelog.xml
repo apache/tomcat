@@ -197,6 +197,11 @@
         <bug>53342</bug>: To avoid BindException, make startStopThreads into a
         demon thread. (kfujino)
       </fix>
+      <fix>
+        <bug>53353</bug>: Make the internal HTTP header parser more tolerant of
+        Content-Type values that contain invalid parameters by ignoring the
+        invalid parameters. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
