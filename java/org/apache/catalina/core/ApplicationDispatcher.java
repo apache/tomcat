@@ -382,6 +382,12 @@ final class ApplicationDispatcher
             processRequest(request,response,state);
         }
 
+        if (request.getAsyncContext() != null) {
+            // An async request was started during the forward, don't close the
+            // response as it may be written to during the async handling
+            return;
+        }
+
         // This is not a real close in order to support error processing
         if (wrapper.getLogger().isDebugEnabled() )
             wrapper.getLogger().debug(" Disabling the response for futher output");

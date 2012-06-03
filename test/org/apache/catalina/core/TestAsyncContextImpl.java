@@ -22,10 +22,13 @@ import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import javax.servlet.AsyncContext;
 import javax.servlet.AsyncEvent;
 import javax.servlet.AsyncListener;
+import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequestEvent;
 import javax.servlet.ServletRequestListener;
@@ -1275,4 +1278,86 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
             }
         }
     }
+
+    @Test
+    public void testBug53337() throws Exception {
+        // Setup Tomcat instance
+        Tomcat tomcat = getTomcatInstance();
+
+        // Must have a real docBase - just use temp
+        File docBase = new File(System.getProperty("java.io.tmpdir"));
+
+        Context ctx = tomcat.addContext("", docBase.getAbsolutePath());
+        Wrapper a = Tomcat.addServlet(ctx, "ServletA", new Bug53337ServletA());
+        a.setAsyncSupported(true);
+        Wrapper b = Tomcat.addServlet(ctx, "ServletB", new Bug53337ServletB());
+        b.setAsyncSupported(true);
+        Tomcat.addServlet(ctx, "ServletC", new Bug53337ServletC());
+        ctx.addServletMapping("/ServletA", "ServletA");
+        ctx.addServletMapping("/ServletB", "ServletB");
+        ctx.addServletMapping("/ServletC", "ServletC");
+
+        tomcat.start();
+
+        StringBuilder url = new StringBuilder(48);
+        url.append("http://localhost:");
+        url.append(getPort());
+        url.append("/ServletA");
+
+        ByteChunk body = new ByteChunk();
+        int rc = getUrl(url.toString(), body, null);
+
+        assertEquals(HttpServletResponse.SC_OK, rc);
+        assertEquals("OK", body.toString());
+    }
+
+    private static class Bug53337ServletA extends HttpServlet {
+
+        private static final long serialVersionUID = 1L;
+
+        @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+                throws ServletException, IOException {
+            RequestDispatcher rd = req.getRequestDispatcher("/ServletB");
+            rd.forward(req, resp);
+        }
+    }
+
+    private static class Bug53337ServletB extends HttpServlet {
+
+        private static final long serialVersionUID = 1L;
+
+        @Override
+        protected void doGet(final HttpServletRequest req,
+                final HttpServletResponse resp)
+                throws ServletException, IOException {
+
+            final AsyncContext async = req.startAsync();
+            // Just for debugging
+            async.setTimeout(100000);
+
+            ExecutorService executor = Executors.newSingleThreadExecutor();
+            executor.submit(new Runnable() {
+
+                @Override
+                public void run() {
+                    async.dispatch("/ServletC");
+                }
+            });
+            executor.shutdown();
+        }
+    }
+
+    private static class Bug53337ServletC extends HttpServlet {
+
+        private static final long serialVersionUID = 1L;
+
+        @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+                throws ServletException, IOException {
+            resp.setContentType("text/plain");
+            resp.getWriter().print("OK");
+        }
+    }
+
 }
