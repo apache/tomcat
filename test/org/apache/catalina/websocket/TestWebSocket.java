@@ -61,7 +61,7 @@ public class TestWebSocket extends TomcatBaseTest {
 
         tomcat.start();
 
-        WebSocketClient client= new WebSocketClient();
+        WebSocketClient client= new WebSocketClient(getPort());
 
 
         // Send the WebSocket handshake
@@ -101,7 +101,7 @@ public class TestWebSocket extends TomcatBaseTest {
         tomcat.addWebapp(null, "/examples", appDir.getAbsolutePath());
 
         tomcat.start();
-        WebSocketClient client= new WebSocketClient();
+        WebSocketClient client= new WebSocketClient(getPort());
 
         // Send the WebSocket handshake
         client.writer.write("GET /examples/websocket/echoStream HTTP/1.1" + CRLF);
@@ -138,7 +138,7 @@ public class TestWebSocket extends TomcatBaseTest {
         tomcat.addWebapp(null, "/examples", appDir.getAbsolutePath());
 
         tomcat.start();
-        WebSocketClient client= new WebSocketClient();
+        WebSocketClient client= new WebSocketClient(getPort());
 
 
         // Send the WebSocket handshake
@@ -166,7 +166,7 @@ public class TestWebSocket extends TomcatBaseTest {
         tomcat.addWebapp(null, "/examples", appDir.getAbsolutePath());
 
         tomcat.start();
-        WebSocketClient client= new WebSocketClient();
+        WebSocketClient client= new WebSocketClient(getPort());
 
         // Send the WebSocket handshake
         client.writer.write("GET /examples/websocket/echoStream HTTP/1.1" + CRLF);
@@ -192,7 +192,7 @@ public class TestWebSocket extends TomcatBaseTest {
         tomcat.addWebapp(null, "/examples", appDir.getAbsolutePath());
 
         tomcat.start();
-        WebSocketClient client= new WebSocketClient();
+        WebSocketClient client= new WebSocketClient(getPort());
 
         // Send the WebSocket handshake
         client.writer.write("GET /examples/websocket/echoStream HTTP/1.1" + CRLF);
@@ -235,8 +235,7 @@ public class TestWebSocket extends TomcatBaseTest {
     }
 
 
-
-    private class WebSocketClient {
+    private static class WebSocketClient {
         private OutputStream os;
         private InputStream is;
         private boolean isContinuation = false;
@@ -245,8 +244,8 @@ public class TestWebSocket extends TomcatBaseTest {
         private Writer writer ;
         private BufferedReader reader;
 
-        private WebSocketClient() {
-            SocketAddress addr = new InetSocketAddress("localhost", getPort());
+        public WebSocketClient(int port) {
+            SocketAddress addr = new InetSocketAddress("localhost", port);
             socket = new Socket();
             try {
                 socket.setSoTimeout(10000);
