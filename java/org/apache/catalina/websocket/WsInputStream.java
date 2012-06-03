@@ -54,7 +54,7 @@ public class WsInputStream extends InputStream {
      * Process the next WebSocket frame.
      *
      * @param block Should this method block until a frame is presented if no
-     *              data is currently available to process. Note that is a
+     *              data is currently available to process. Note that if a
      *              single byte is available, this method will block until the
      *              complete frame (excluding payload for non-control frames) is
      *              available.
