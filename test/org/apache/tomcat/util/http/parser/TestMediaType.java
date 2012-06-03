@@ -39,7 +39,7 @@ public class TestMediaType {
     private static final Parameter PARAM_TOKEN =
             new Parameter("a", "b");
     private static final Parameter PARAM_QUOTED =
-            new Parameter("x", "y");
+            new Parameter("x", "\"y\"");
     private static final Parameter PARAM_EMPTY_QUOTED =
             new Parameter("z", "\"\"");
     private static final Parameter PARAM_COMPLEX_QUOTED =
