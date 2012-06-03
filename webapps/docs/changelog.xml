@@ -181,6 +181,11 @@
         patch provided by Violeta Georgieva. (markt)
       </fix>
       <fix>
+        <bug>53337</bug>: Forwarding via a <code>RequestDispatcher</code> to an
+        asynchronous Servlet always failed. Includes a test case based on code
+        by Rossen Stoyanchev. (markt)
+      </fix>
+      <fix>
         <bug>53342</bug>: To avoid BindException, make startStopThreads into a
         demon thread. (kfujino)
       </fix>
