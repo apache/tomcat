@@ -58,8 +58,12 @@ public class AstMediaType extends SimpleNode {
             AstParameter p = (AstParameter) children[i];
             if (!CHARSET.equalsIgnoreCase(
                     p.children[0].jjtGetValue().toString())) {
-                sb.append(';');
-                sb.append(p.toString());
+                String s = p.toString();
+                // Invalid parameters will have zero length - skip them
+                if (s.length() > 0) {
+                    sb.append(';');
+                    sb.append(p.toString());
+                }
             }
         }
         return sb.toString();
