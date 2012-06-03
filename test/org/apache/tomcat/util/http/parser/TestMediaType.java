@@ -201,6 +201,41 @@ public class TestMediaType {
     }
 
 
+    @Test
+    public void testBug53353() throws ParseException {
+        String input = "text/html; UTF-8;charset=UTF-8";
+
+        StringReader sr = new StringReader(input);
+        HttpParser hp = new HttpParser(sr);
+        AstMediaType m = hp.MediaType();
+
+        assertTrue(m.children.length == 4);
+
+        // Check the types
+        assertTrue(m.children[0] instanceof AstType);
+        assertTrue(m.children[1] instanceof AstSubType);
+        assertEquals("text", m.children[0].toString());
+        assertEquals("html", m.children[1].toString());
+
+        // Check the parameters
+        AstParameter p = (AstParameter) m.children[2];
+        assertTrue(p.children.length == 1);
+        assertTrue(p.children[0] instanceof AstAttribute);
+        assertEquals("UTF-8", p.children[0].toString());
+
+        p = (AstParameter) m.children[3];
+        assertTrue(p.children.length == 2);
+        assertTrue(p.children[0] instanceof AstAttribute);
+        assertTrue(p.children[1] instanceof AstValue);
+        assertEquals("charset", p.children[0].toString());
+        assertEquals("UTF-8", p.children[1].toString());
+
+        // Note: Invalid input is filtered out
+        assertEquals("text/html;charset=UTF-8", m.toString());
+        assertEquals("UTF-8", m.getCharset());
+    }
+
+
     private void doTest(Parameter... parameters) throws ParseException {
         StringBuilder sb = new StringBuilder();
         sb.append(TYPES);
