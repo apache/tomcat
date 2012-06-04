@@ -1153,24 +1153,20 @@ public class NamingResources extends LifecycleMBeanBase implements Serializable 
             }
         }
 
-        Class<?> injectionClass = getInjectionTargetType(context, resource);
-        if (injectionClass == null) {
+        Class<?> compatibleClass =
+                getCompatibleType(context, resource, typeClass);
+        if (compatibleClass == null) {
             // Indicates that a compatible type could not be identified that
             // worked for all injection targets
             return false;
         }
 
-        if (typeClass == null) {
-                // Only injectionTarget defined - use it
-                resource.setType(injectionClass.getCanonicalName());
-                return true;
-        } else {
-            return injectionClass.isAssignableFrom(typeClass);
-        }
+        resource.setType(compatibleClass.getCanonicalName());
+        return true;
     }
 
-    private Class<?> getInjectionTargetType(Context context,
-            ResourceBase resource) {
+    private Class<?> getCompatibleType(Context context,
+            ResourceBase resource, Class<?> typeClass) {
 
         Class<?> result = null;
 
@@ -1196,17 +1192,28 @@ public class NamingResources extends LifecycleMBeanBase implements Serializable 
             }
             targetType = convertPrimitiveType(targetType);
 
-            // Figure out the common type - if there is one
-            if (result == null) {
-                result = targetType;
-            } else if (targetType.isAssignableFrom(result)) {
-                // NO-OP - This will work
-            } else if (result.isAssignableFrom(targetType)) {
-                // Need to use more specific type
-                result = targetType;
+            if (typeClass == null) {
+                // Need to find a common type amongst the injection targets
+                if (result == null) {
+                    result = targetType;
+                } else if (targetType.isAssignableFrom(result)) {
+                    // NO-OP - This will work
+                } else if (result.isAssignableFrom(targetType)) {
+                    // Need to use more specific type
+                    result = targetType;
+                } else {
+                    // Incompatible types
+                    return null;
+                }
             } else {
-                // Incompatible types
-                return null;
+                // Each injection target needs to be consistent with the defined
+                // type
+                if (targetType.isAssignableFrom(typeClass)) {
+                    result = typeClass;
+                } else {
+                    // Incompatible types
+                    return null;
+                }
             }
         }
         return result;
