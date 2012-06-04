@@ -401,7 +401,8 @@ public class NamingResources extends LifecycleMBeanBase implements Serializable 
                 throw new IllegalArgumentException(sm.getString(
                         "namingResources.resourceTypeFail", resource.getName(),
                         resource.getType()));
-            }            entries.add(resource.getName());
+            }
+            entries.add(resource.getName());
         }
 
         synchronized (resourceEnvRefs) {
