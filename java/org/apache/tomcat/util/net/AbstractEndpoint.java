@@ -163,10 +163,11 @@ public abstract class AbstractEndpoint {
         LimitLatch latch = this.connectionLimitLatch;
         if (latch != null) {
             // Update the latch that enforces this
-            if (maxCon == -1)
+            if (maxCon == -1) {
                 releaseConnectionLatch();
-            else
-            latch.setLimit(maxCon);
+            } else {
+                latch.setLimit(maxCon);
+            }
         } else if (maxCon > 0) {
             initializeConnectionLatch();
         }
