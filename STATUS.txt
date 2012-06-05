@@ -29,3 +29,12 @@ PATCHES ACCEPTED TO BACKPORT:
 PATCHES PROPOSED TO BACKPORT:
   [ New proposals should be added at the end of the list ]
 
+* For https://issues.apache.org/bugzilla/show_bug.cgi?id=53119
+  Prevent possible overflow exception with buffer in
+  AjpNioProcessor.output() if it is called again after previous write
+  failed with IOException.
+  I have not observed it, but it is from analogy with AjpAprProcessor fix
+  in r1344253.
+  http://svn.apache.org/viewvc?view=revision&revision=1346365
+  +1: kkolinko
+  -1:
