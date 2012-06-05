@@ -288,7 +288,7 @@ public class WebAnnotationSet {
                     }
 
                     String defaultName = classClass.getName() + SEPARATOR +
-                            Introspection.getName(method);
+                            Introspection.getPropertyName(method);
 
                     String defaultType =
                             (method.getParameterTypes()[0]).getCanonicalName();
