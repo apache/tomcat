@@ -6082,6 +6082,9 @@ public class StandardContext extends ContainerBase
         if (urlPattern.indexOf('\n') >= 0 || urlPattern.indexOf('\r') >= 0) {
             return (false);
         }
+        if (urlPattern.equals("")) {
+            return true;
+        }
         if (urlPattern.startsWith("*.")) {
             if (urlPattern.indexOf('/') < 0) {
                 checkUnusualURLPattern(urlPattern);

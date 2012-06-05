@@ -393,7 +393,13 @@ public final class Mapper {
                 context.defaultWrapper = newWrapper;
             } else {
                 // Exact wrapper
-                newWrapper.name = path;
+                if (path.length() == 0) {
+                    // Special case for the Context Root mapping which is
+                    // treated as an exact match
+                    newWrapper.name = "/";
+                } else {
+                    newWrapper.name = path;
+                }
                 Wrapper[] oldWrappers = context.exactWrappers;
                 Wrapper[] newWrappers =
                     new Wrapper[oldWrappers.length + 1];
@@ -1026,8 +1032,16 @@ public final class Mapper {
         int pos = find(wrappers, path);
         if ((pos != -1) && (path.equals(wrappers[pos].name))) {
             mappingData.requestPath.setString(wrappers[pos].name);
-            mappingData.wrapperPath.setString(wrappers[pos].name);
             mappingData.wrapper = wrappers[pos].object;
+            if (path.equals("/")) {
+                // Special handling for Context Root mapped servlet
+                mappingData.pathInfo.setString("/");
+                mappingData.wrapperPath.recycle();
+                // This seems wrong but it is what the spec says...
+                mappingData.contextPath.recycle();
+            } else {
+                mappingData.wrapperPath.setString(wrappers[pos].name);
+            }
         }
     }
 
