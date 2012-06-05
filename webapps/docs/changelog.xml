@@ -206,6 +206,10 @@
         <bug>53354</bug>: Correctly handle <code>@WebFilter</code> annotations
         that do not include a mapping. (markt)
       </fix>
+      <fix>
+        <bug>53356</bug>: Add support for servlets mapped explicitly to the
+        context root of a web application. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
