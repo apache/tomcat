@@ -1214,7 +1214,7 @@ public class NamingResources extends LifecycleMBeanBase implements Serializable 
         if (methods != null && methods.length > 0) {
             for (Method method : methods) {
                 if (Introspection.isValidSetter(method) &&
-                        Introspection.getName(method).equals(name)) {
+                        Introspection.getPropertyName(method).equals(name)) {
                     return method.getParameterTypes()[0];
                 }
             }
