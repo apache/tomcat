@@ -62,10 +62,10 @@ public class TestMapperContextRoot extends TomcatBaseTest{
             // Confirm behaviour as per Servler 12.2
             boolean pass = "/".equals(req.getPathInfo());
             if (pass) {
-                pass = (req.getServletPath() == null);
+                pass = "".equals(req.getServletPath());
             }
             if (pass) {
-                pass = (req.getContextPath() == null);
+                pass = "".equals(req.getContextPath());
             }
 
             resp.setContentType("text/plain");
