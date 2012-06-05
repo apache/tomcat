@@ -39,12 +39,12 @@ public class Introspection {
 
 
     /**
-     * Extract the Java Bean field name from the setter name.
+     * Extract the Java Bean property name from the setter name.
      *
      * Note: This method assumes that the method name has already been checked
      *       for correctness.
      */
-    public static String getName(Method setter) {
+    public static String getPropertyName(Method setter) {
         return Introspector.decapitalize(setter.getName().substring(3));
     }
 

@@ -338,7 +338,7 @@ public class DefaultInstanceManager implements InstanceManager {
                         // Resource injection only if JNDI is enabled
                         if (injections != null &&
                                 Introspection.isValidSetter(method)) {
-                            String fieldName = Introspection.getName(method);
+                            String fieldName = Introspection.getPropertyName(method);
                             if (injections.containsKey(fieldName)) {
                                 annotations.add(new AnnotationCacheEntry(
                                         method.getName(),
@@ -625,7 +625,7 @@ public class DefaultInstanceManager implements InstanceManager {
             lookedupResource = context.lookup(normalizedName);
         } else {
             lookedupResource = context.lookup(
-                    clazz.getName() + "/" + Introspection.getName(method));
+                    clazz.getName() + "/" + Introspection.getPropertyName(method));
         }
 
         synchronized (method) {
