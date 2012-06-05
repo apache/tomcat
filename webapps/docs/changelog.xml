@@ -262,6 +262,15 @@
       </add>
     </changelog>
   </subsection>
+  <subsection name="Jasper">
+    <changelog>
+      <fix>
+        <bug>53032</bug>: Modify <code>JspC</code> so it extends
+        <code>org.apache.tools.ant.Task</code> enabling it to work with features
+        such as namespaces within build.xml files. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Cluster">
     <changelog>
       <fix>
