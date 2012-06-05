@@ -276,14 +276,16 @@ public class AjpNioProcessor extends AbstractAjpProcessor<NioChannel> {
     @Override
     protected void output(byte[] src, int offset, int length)
             throws IOException {
+
+        NioEndpoint.KeyAttachment att = (NioEndpoint.KeyAttachment)socket.getAttachment(false);
+        if ( att == null ) throw new IOException("Key must be cancelled");
+
         ByteBuffer writeBuffer = socket.getBufHandler() .getWriteBuffer();
 
         writeBuffer.put(src, offset, length);
 
         writeBuffer.flip();
 
-        NioEndpoint.KeyAttachment att = (NioEndpoint.KeyAttachment)socket.getAttachment(false);
-        if ( att == null ) throw new IOException("Key must be cancelled");
         long writeTimeout = att.getTimeout();
         Selector selector = null;
         try {
@@ -294,9 +296,9 @@ public class AjpNioProcessor extends AbstractAjpProcessor<NioChannel> {
         try {
             pool.write(writeBuffer, socket, selector, writeTimeout, true);
         }finally {
+            writeBuffer.clear();
             if ( selector != null ) pool.put(selector);
         }
-        writeBuffer.clear();
     }
 
 
