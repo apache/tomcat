@@ -210,6 +210,12 @@
         <bug>53356</bug>: Add support for servlets mapped explicitly to the
         context root of a web application. (markt)
       </fix>
+      <fix>
+        <bug>53230</bug>: Changed ManagerBase to throw
+        TooManyActiveSessionsException instead of IllegalStateException
+        when the maximum number of sessions has been exceeded and a new
+        session will not be created. (schultz)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
