@@ -635,8 +635,9 @@ public abstract class ManagerBase extends LifecycleMBeanBase
         if ((maxActiveSessions >= 0) &&
                 (getActiveSessions() >= maxActiveSessions)) {
             rejectedSessions++;
-            throw new IllegalStateException(
-                    sm.getString("managerBase.createSession.ise"));
+            throw new TooManyActiveSessionsException(
+                    sm.getString("managerBase.createSession.ise"),
+                    maxActiveSessions);
         }
         
         // Recycle or create a Session instance
