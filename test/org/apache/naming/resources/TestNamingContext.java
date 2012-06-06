@@ -95,8 +95,7 @@ public class TestNamingContext extends TomcatBaseTest {
     }
 
     @Test
-    public void testAliases() throws Exception
-    {
+    public void testAliases() throws Exception {
         // Some sample text
         String foxText = "The quick brown fox jumps over the lazy dog";
         String loremIpsum = "Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
@@ -112,7 +111,7 @@ public class TestNamingContext extends TomcatBaseTest {
         File docBase = new File(tmpDir, "docBase");
         File alternate1 = new File(tmpDir, "alternate1");
         File alternate2 = new File(tmpDir, "alternate2");
-        
+
         if(!tmpDir.mkdirs())
             throw new IOException("Could not create temp directory " + tmpDir);
         if(!docBase.mkdir())
@@ -142,7 +141,7 @@ public class TestNamingContext extends TomcatBaseTest {
 
         Assert.assertNotNull(file);
         Assert.assertTrue(file instanceof Resource);
-        
+
         byte[] buffer = new byte[4096];
         Resource res = (Resource)file;
 
@@ -156,7 +155,7 @@ public class TestNamingContext extends TomcatBaseTest {
 
         Assert.assertNotNull(file);
         Assert.assertTrue(file instanceof Resource);
-        
+
         res = (Resource)file;
         len = res.streamContent().read(buffer);
         contents = new String(buffer, 0, len, "UTF-8");
@@ -186,7 +185,7 @@ public class TestNamingContext extends TomcatBaseTest {
 
         Assert.assertNotNull(file);
         Assert.assertTrue(file instanceof Resource);
-        
+
         res = (Resource)file;
         len = res.streamContent().read(buffer);
         contents = new String(buffer, 0, len, "UTF-8");
