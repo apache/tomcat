@@ -42,6 +42,7 @@ import org.junit.Test;
 import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.deploy.ContextEnvironment;
 import org.apache.catalina.deploy.ContextResource;
+import org.apache.catalina.startup.ExpandWar;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.util.buf.ByteChunk;
@@ -93,30 +94,6 @@ public class TestNamingContext extends TomcatBaseTest {
 
     }
 
-    // Recursively deletes a directory and its contents
-    private boolean rmdir(File dir)
-    {
-        if(!dir.exists()) return false;
-        if(!dir.isDirectory()) return false;
-
-        File[] files = dir.listFiles();
-        if(null != files) {
-            for(int i=0; i<files.length; ++i) {
-                if(files[i].isDirectory())
-                {
-                    if(!rmdir(files[i])) {
-                        return false;
-                    }
-                } else {
-                    if(!files[i].delete()) {
-                        return false;
-                    }
-                }
-            }
-        }
-        return dir.delete();
-    }
-
     @Test
     public void testAliases() throws Exception
     {
@@ -126,20 +103,12 @@ public class TestNamingContext extends TomcatBaseTest {
 
         // Set up a temporary docBase and some alternates that we can
         // set up as aliases.
-        File tmpDir = new File(System.getProperty("java.io.tmpdir"),
+        File tmpDir = new File(getTemporaryDirectory(),
                                "tomcat-unit-test." + TestNamingContext.class.getName());
 
-        if(tmpDir.exists())
-        {
-            // Remove any old test files
-            if(tmpDir.isDirectory()) {
-                if(!rmdir(tmpDir))
-                    throw new IOException("Could not delete old temp directory: " + tmpDir);
-            } else {
-                if(!tmpDir.delete())
-                    throw new IOException("Could not delete old temp file: " + tmpDir);
-            }
-        }
+        // Make sure we've got a clean slate
+        ExpandWar.delete(tmpDir);
+
         File docBase = new File(tmpDir, "docBase");
         File alternate1 = new File(tmpDir, "alternate1");
         File alternate2 = new File(tmpDir, "alternate2");
@@ -225,8 +194,7 @@ public class TestNamingContext extends TomcatBaseTest {
         assertEquals(loremIpsum, contents);
 
         // Clean-up
-        if(!rmdir(tmpDir))
-            throw new IOException("Could not clean-up temp directory" + tmpDir);
+        addDeleteOnTearDown(tmpDir);
     }
 
     public static final class Bug49994Servlet extends HttpServlet {
