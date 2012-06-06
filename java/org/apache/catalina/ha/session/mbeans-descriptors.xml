@@ -87,10 +87,6 @@
       type="int"
       writeable="false"/>
     <attribute
-      name="algorithm"
-      description="The message digest algorithm to be used when generating session identifiers"
-      type="java.lang.String"/>
-    <attribute
       name="className"
       description="Fully qualified class name of the managed object"
       type="java.lang.String"
@@ -193,10 +189,6 @@
       name="duplicates"
       description="Number of duplicated session ids generated"
       type="int"/>
-    <attribute
-      name="entropy"
-      description="A String initialization parameter used to increase the entropy of the initialization of our random number generator"
-      type="java.lang.String"/>
     <attribute
       name="expiredSessions"
       description="Number of sessions that expired ( doesn't include explicit invalidations )"
@@ -313,6 +305,18 @@
       is="true"
       description="Is no context manager message received? "
       type="boolean"/>
+    <attribute
+      name="secureRandomAlgorithm"
+      description="The secure random number generator algorithm name"
+      type="java.lang.String"/>
+    <attribute
+      name="secureRandomClass"
+      description="The secure random number generator class name"
+      type="java.lang.String"/>
+    <attribute
+      name="secureRandomProvider"
+      description="The secure random number generator provider name"
+      type="java.lang.String"/>
     <operation
       name="expireSession"
       description="Expired the given session"
@@ -426,10 +430,6 @@
       type="int"
       writeable="false"/>
     <attribute
-      name="algorithm"
-      description="The message digest algorithm to be used when generating session identifiers"
-      type="java.lang.String"/>
-    <attribute
       name="className"
       description="Fully qualified class name of the managed object"
       type="java.lang.String"
@@ -442,10 +442,6 @@
       name="duplicates"
       description="Number of duplicated session ids generated"
       type="int"/>
-    <attribute
-      name="entropy"
-      description="A String initialization parameter used to increase the entropy of the initialization of our random number generator"
-      type="java.lang.String"/>
     <attribute
       name="expiredSessions"
       description="Number of sessions that expired ( doesn't include explicit invalidations )"
@@ -530,6 +526,18 @@
       name="rpcTimeout"
       description="Timeout for RPC messages, how long we will wait for a reply"
       type="long"/>
+    <attribute
+      name="secureRandomAlgorithm"
+      description="The secure random number generator algorithm name"
+      type="java.lang.String"/>
+    <attribute
+      name="secureRandomClass"
+      description="The secure random number generator class name"
+      type="java.lang.String"/>
+    <attribute
+      name="secureRandomProvider"
+      description="The secure random number generator provider name"
+      type="java.lang.String"/>
     <operation
       name="expireSession"
       description="Expired the given session"
