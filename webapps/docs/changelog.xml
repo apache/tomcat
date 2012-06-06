@@ -211,6 +211,10 @@
         context root of a web application. (markt)
       </fix>
       <fix>
+        <bug>53366</bug>: Ensure new HTTP header parser works correctly when
+        running Tomcat under a security manager. (markt/kkolinko)
+      </fix>
+      <fix>
         <bug>53230</bug>: Changed ManagerBase to throw
         TooManyActiveSessionsException instead of IllegalStateException
         when the maximum number of sessions has been exceeded and a new
