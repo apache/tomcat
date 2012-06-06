@@ -16,6 +16,8 @@
  */
 package org.apache.naming.resources;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 
@@ -29,6 +31,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import junit.framework.Assert;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -87,6 +91,142 @@ public class TestNamingContext extends TomcatBaseTest {
         }
         assertEquals(expected, bc.toString());
 
+    }
+
+    // Recursively deletes a directory and its contents
+    private boolean rmdir(File dir)
+    {
+        if(!dir.exists()) return false;
+        if(!dir.isDirectory()) return false;
+
+        File[] files = dir.listFiles();
+        if(null != files) {
+            for(int i=0; i<files.length; ++i) {
+                if(files[i].isDirectory())
+                {
+                    if(!rmdir(files[i])) {
+                        return false;
+                    }
+                } else {
+                    if(!files[i].delete()) {
+                        return false;
+                    }
+                }
+            }
+        }
+        return dir.delete();
+    }
+
+    @Test
+    public void testAliases() throws Exception
+    {
+        // Some sample text
+        String foxText = "The quick brown fox jumps over the lazy dog";
+        String loremIpsum = "Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
+
+        // Set up a temporary docBase and some alternates that we can
+        // set up as aliases.
+        File tmpDir = new File(System.getProperty("java.io.tmpdir"),
+                               "tomcat-unit-test." + TestNamingContext.class.getName());
+
+        if(tmpDir.exists())
+        {
+            // Remove any old test files
+            if(tmpDir.isDirectory()) {
+                if(!rmdir(tmpDir))
+                    throw new IOException("Could not delete old temp directory: " + tmpDir);
+            } else {
+                if(!tmpDir.delete())
+                    throw new IOException("Could not delete old temp file: " + tmpDir);
+            }
+        }
+        File docBase = new File(tmpDir, "docBase");
+        File alternate1 = new File(tmpDir, "alternate1");
+        File alternate2 = new File(tmpDir, "alternate2");
+        
+        if(!tmpDir.mkdirs())
+            throw new IOException("Could not create temp directory " + tmpDir);
+        if(!docBase.mkdir())
+            throw new IOException("Could not create temp directory " + docBase);
+        if(!alternate1.mkdir())
+            throw new IOException("Could not create temp directory " + alternate1);
+        if(!alternate2.mkdir())
+            throw new IOException("Could not create temp directory " + alternate2);
+
+        // Create a file in each alternate directory that we can attempt to access
+        FileOutputStream fos = new FileOutputStream(new File(alternate1, "test1.txt"));
+        fos.write(foxText.getBytes("UTF-8"));
+        fos.flush(); fos.close();
+
+        fos = new FileOutputStream(new File(alternate2, "test2.txt"));
+        fos.write(loremIpsum.getBytes("UTF-8"));
+        fos.flush(); fos.close();
+
+        // Finally, create the Context
+        FileDirContext ctx = new FileDirContext();
+        ctx.setDocBase(docBase.getCanonicalPath());
+        ctx.setAliases("/a1=" + alternate1.getCanonicalPath()
+                       +",/a2=" + alternate2.getCanonicalPath());
+
+        // Check first alias
+        Object file = ctx.lookup("/a1/test1.txt");
+
+        Assert.assertNotNull(file);
+        Assert.assertTrue(file instanceof Resource);
+        
+        byte[] buffer = new byte[4096];
+        Resource res = (Resource)file;
+
+        int len = res.streamContent().read(buffer);
+        String contents = new String(buffer, 0, len, "UTF-8");
+
+        assertEquals(foxText, contents);
+
+        // Check second alias
+        file = ctx.lookup("/a2/test2.txt");
+
+        Assert.assertNotNull(file);
+        Assert.assertTrue(file instanceof Resource);
+        
+        res = (Resource)file;
+        len = res.streamContent().read(buffer);
+        contents = new String(buffer, 0, len, "UTF-8");
+
+        assertEquals(loremIpsum, contents);
+
+        // Test aliases with spaces around the separators
+        ctx.setAliases("   /a1= " + alternate1.getCanonicalPath()
+                       + "\n\n"
+                       +", /a2 =\n" + alternate2.getCanonicalPath()
+                       + ",");
+
+        // Check first alias
+        file = ctx.lookup("/a1/test1.txt");
+
+        Assert.assertNotNull(file);
+        Assert.assertTrue(file instanceof Resource);
+
+        res = (Resource)file;
+        len = res.streamContent().read(buffer);
+        contents = new String(buffer, 0, len, "UTF-8");
+
+        assertEquals(foxText, contents);
+
+        // Check second alias
+        file = ctx.lookup("/a2/test2.txt");
+
+        Assert.assertNotNull(file);
+        Assert.assertTrue(file instanceof Resource);
+        
+        res = (Resource)file;
+        len = res.streamContent().read(buffer);
+        contents = new String(buffer, 0, len, "UTF-8");
+
+        assertEquals(loremIpsum, contents);
+
+        // Clean-up
+        if(!rmdir(tmpDir))
+            throw new IOException("Could not clean-up temp directory" + tmpDir);
     }
 
     public static final class Bug49994Servlet extends HttpServlet {
