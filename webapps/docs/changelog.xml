@@ -225,6 +225,10 @@
         applications to use WebSocket when running under a security manager.
         (markt/kkolinko)
       </fix>
+      <fix>
+        <bug>53373</bug>: Allow whitespace around delimiters in &lt;Context&gt;
+        aliases for readability. (schultz)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
