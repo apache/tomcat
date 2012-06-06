@@ -266,6 +266,10 @@
         via getter from the endpoint and as JMX attribute of the ThreadPool
         mbean. (rjung)
       </add>
+      <fix>
+        Correct an edge case where Comet END events were not send to connected
+        clients when the Tomcat connector was stopped. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
