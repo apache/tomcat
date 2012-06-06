@@ -750,7 +750,19 @@ public class ConnectionPool {
 
             if (!con.isDiscarded() && !con.isInitialized()) {
                 //attempt to connect
-                con.connect();
+                try {
+                    con.connect();
+                } catch (Exception x) {
+                    release(con);
+                    setToNull = true;
+                    if (x instanceof SQLException) {
+                        throw (SQLException)x;
+                    } else {
+                        SQLException ex  = new SQLException(x.getMessage());
+                        ex.initCause(x);
+                        throw ex;
+                    }
+                }
             }
 
             if (usercheck) {

@@ -238,10 +238,14 @@ public class PooledConnection {
     protected void connectUsingDriver() throws SQLException {
 
         try {
-            if (driver==null)
+            if (driver==null) {
+                if (log.isDebugEnabled()) {
+                    log.debug("Instantiating driver using class: "+poolProperties.getDriverClassName()+" [url="+poolProperties.getUrl()+"]");
+                }
                 driver = (java.sql.Driver) Class.forName(poolProperties.getDriverClassName(),
                                                          true, PooledConnection.class.getClassLoader()
                                                          ).newInstance();
+            }
         } catch (java.lang.Exception cn) {
             if (log.isDebugEnabled()) {
                 log.debug("Unable to instantiate JDBC driver.", cn);
