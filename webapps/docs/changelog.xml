@@ -319,6 +319,10 @@
   </subsection>
   <subsection name="jdbc-pool">
     <changelog>
+      <update>
+        <bug>53367</bug> (<rev>1346691</rev>):
+        Prevent pool from hanging during database failure (fhanik)
+      </update>  
       <add>
         <bug>53254</bug> (<rev>1340160</rev>):
         Add in the ability to purge connections from the pool (fhanik)
