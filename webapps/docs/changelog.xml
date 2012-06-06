@@ -220,6 +220,11 @@
         <bug>53366</bug>: Ensure new HTTP header parser works correctly when
         running Tomcat under a security manager. (markt/kkolinko)
       </fix>
+      <fix>
+        <bug>53368</bug>: Configure the default security policy to allow web
+        applications to use WebSocket when running under a security manager.
+        (markt/kkolinko)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
