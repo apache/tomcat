@@ -150,6 +150,12 @@
         <code>JreMemoryLeakPreventionListener</code>. (markt)
       </fix>
       <fix>
+        <bug>53230</bug>: Changed ManagerBase to throw
+        TooManyActiveSessionsException instead of IllegalStateException
+        when the maximum number of sessions has been exceeded and a new
+        session will not be created. (schultz)
+      </fix>
+      <fix>
         <bug>53257</bug>: Ensure that resources, including JSP files, that have
         names that include characters with special meanings in URLs (such as
         ampersand, semicolon, plus, hash and percent) are correctly handled.
@@ -213,12 +219,6 @@
       <fix>
         <bug>53366</bug>: Ensure new HTTP header parser works correctly when
         running Tomcat under a security manager. (markt/kkolinko)
-      </fix>
-      <fix>
-        <bug>53230</bug>: Changed ManagerBase to throw
-        TooManyActiveSessionsException instead of IllegalStateException
-        when the maximum number of sessions has been exceeded and a new
-        session will not be created. (schultz)
       </fix>
     </changelog>
   </subsection>
