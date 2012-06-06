@@ -242,8 +242,21 @@ public abstract class BaseDirContext implements DirContext {
         
         String[] kvps = theAliases.split(",");
         for (String kvp : kvps) {
+            // Skip blanks introduced by regexp split and/or poor input
+            kvp = kvp.trim();
+            if(0 == kvp.length())
+                continue;
+
             String[] kv = kvp.split("=");
-            if (kv.length != 2 || kv[0].length() == 0 || kv[1].length() == 0)
+            if (kv.length != 2)
+                throw new IllegalArgumentException(
+                        sm.getString("resources.invalidAliasMapping", kvp));
+
+            // Trim whitespace from key and value
+            kv[0] = kv[0].trim();
+            kv[1] = kv[1].trim();
+
+            if(kv[0].length() == 0 || kv[1].length() == 0)
                 throw new IllegalArgumentException(
                         sm.getString("resources.invalidAliasMapping", kvp));
 

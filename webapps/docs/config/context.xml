@@ -534,6 +534,11 @@
         <code>aliasPathN</code> must include a leading '/' and
         <code>docBaseN</code> must be an absolute path to either a .war file or
         a directory.</p>
+        <p>Whitespace is permitted around both the <code>,</code> and
+        <code>=</code> delimiters, and will be trimmed. Therefore, an aliases
+        attribute with the value <code>"/aliasPath1 = docBase1,<br/>
+        /aliasPath2= docBase2"</code> is equivalent to
+        <code>"/aliasPath1=docBase1,/aliasPath2=docBase2"</code></p>
         <p>A resource will be searched for in the first <code>docBaseN</code>
         for which <code>aliasPathN</code> is a leading path segment of the
         resource. If there is no such alias, then the resource will be searched
