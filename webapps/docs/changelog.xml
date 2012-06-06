@@ -286,6 +286,9 @@
         <bug>53087</bug>: In order to avoid that a backup node expire a session,
         replicate session access time in BackupManager. (kfujino)
       </fix>
+      <add>
+        Add support for SecureRandom to cluster manager template. (kfujino)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Web applications">

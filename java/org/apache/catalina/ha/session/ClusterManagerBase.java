@@ -189,6 +189,9 @@ public abstract class ClusterManagerBase extends ManagerBase
         copy.setProcessExpiresFrequency(getProcessExpiresFrequency());
         copy.setNotifyListenersOnReplication(isNotifyListenersOnReplication());
         copy.setSessionAttributeFilter(getSessionAttributeFilter());
+        copy.setSecureRandomClass(getSecureRandomClass());
+        copy.setSecureRandomProvider(getSecureRandomProvider());
+        copy.setSecureRandomAlgorithm(getSecureRandomAlgorithm());
     }
 
 }
