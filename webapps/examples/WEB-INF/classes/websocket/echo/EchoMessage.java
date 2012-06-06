@@ -42,11 +42,17 @@ public class EchoMessage extends WebSocketServlet {
 
     public int getInitParameterIntValue(String name, int defaultValue) {
         String val = this.getInitParameter(name);
-        int result = defaultValue;
-        try {
-            result = Integer.parseInt(val);
-        }catch (Exception x) {
+        int result;
+        if(null != val) {
+            try {
+                result = Integer.parseInt(val);
+            }catch (Exception x) {
+                result = defaultValue;
+            }
+        } else {
+            result = defaultValue;
         }
+
         return result;
     }
 
