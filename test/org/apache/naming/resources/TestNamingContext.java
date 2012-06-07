@@ -112,6 +112,9 @@ public class TestNamingContext extends TomcatBaseTest {
         File alternate1 = new File(tmpDir, "alternate1");
         File alternate2 = new File(tmpDir, "alternate2");
 
+        // Register for clean-up
+        addDeleteOnTearDown(tmpDir);
+
         if(!tmpDir.mkdirs())
             throw new IOException("Could not create temp directory " + tmpDir);
         if(!docBase.mkdir())
@@ -123,12 +126,20 @@ public class TestNamingContext extends TomcatBaseTest {
 
         // Create a file in each alternate directory that we can attempt to access
         FileOutputStream fos = new FileOutputStream(new File(alternate1, "test1.txt"));
-        fos.write(foxText.getBytes("UTF-8"));
-        fos.flush(); fos.close();
+        try {
+            fos.write(foxText.getBytes("UTF-8"));
+            fos.flush();
+        } finally {
+            fos.close();
+        }
 
         fos = new FileOutputStream(new File(alternate2, "test2.txt"));
-        fos.write(loremIpsum.getBytes("UTF-8"));
-        fos.flush(); fos.close();
+        try {
+            fos.write(loremIpsum.getBytes("UTF-8"));
+            fos.flush();
+        } finally {
+            fos.close();
+        }
 
         // Finally, create the Context
         FileDirContext ctx = new FileDirContext();
@@ -191,9 +202,6 @@ public class TestNamingContext extends TomcatBaseTest {
         contents = new String(buffer, 0, len, "UTF-8");
 
         assertEquals(loremIpsum, contents);
-
-        // Clean-up
-        addDeleteOnTearDown(tmpDir);
     }
 
     public static final class Bug49994Servlet extends HttpServlet {
