@@ -113,6 +113,14 @@ public class DataSourceFactory implements ObjectFactory {
 
     protected static final String PROP_ALTERNATE_USERNAME_ALLOWED = "alternateUsernameAllowed";
 
+    protected static final String PROP_COMMITONRETURN = "commitOnReturn";
+    protected static final String PROP_ROLLBACKONRETURN = "rollbackOnReturn";
+
+    protected static final String PROP_USEDISPOSABLECONNECTIONFACADE = "useDisposableConnectionFacade";
+
+    protected static final String PROP_LOGVALIDATIONERRORS = "logValidationErrors";
+
+    protected static final String PROP_PROPAGATEINTERRUPTSTATE = "propagateInterruptState";
 
     public static final int UNKNOWN_TRANSACTIONISOLATION = -1;
 
@@ -162,7 +170,12 @@ public class DataSourceFactory implements ObjectFactory {
         PROP_DATASOURCE,
         PROP_DATASOURCE_JNDI,
         PROP_SUSPECT_TIMEOUT,
-        PROP_ALTERNATE_USERNAME_ALLOWED
+        PROP_ALTERNATE_USERNAME_ALLOWED,
+        PROP_COMMITONRETURN,
+        PROP_ROLLBACKONRETURN,
+        PROP_USEDISPOSABLECONNECTIONFACADE,
+        PROP_LOGVALIDATIONERRORS,
+        PROP_PROPAGATEINTERRUPTSTATE
     };
 
     // -------------------------------------------------- ObjectFactory Methods
@@ -474,6 +487,31 @@ public class DataSourceFactory implements ObjectFactory {
         value = properties.getProperty(PROP_ALTERNATE_USERNAME_ALLOWED);
         if (value != null) {
             poolProperties.setAlternateUsernameAllowed(Boolean.parseBoolean(value));
+        }
+
+        value = properties.getProperty(PROP_COMMITONRETURN);
+        if (value != null) {
+            poolProperties.setCommitOnReturn(Boolean.parseBoolean(value));
+        }
+
+        value = properties.getProperty(PROP_ROLLBACKONRETURN);
+        if (value != null) {
+            poolProperties.setRollbackOnReturn(Boolean.parseBoolean(value));
+        }
+
+        value = properties.getProperty(PROP_USEDISPOSABLECONNECTIONFACADE);
+        if (value != null) {
+            poolProperties.setUseDisposableConnectionFacade(Boolean.parseBoolean(value));
+        }
+
+        value = properties.getProperty(PROP_LOGVALIDATIONERRORS);
+        if (value != null) {
+            poolProperties.setLogValidationErrors(Boolean.parseBoolean(value));
+        }
+
+        value = properties.getProperty(PROP_PROPAGATEINTERRUPTSTATE);
+        if (value != null) {
+            poolProperties.setPropagateInterruptState(Boolean.parseBoolean(value));
         }
 
         return poolProperties;
