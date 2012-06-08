@@ -2254,6 +2254,8 @@ public class WebappClassLoader
                     }
 
                     // TimerThread can be stopped safely so treat separately
+                    // "java.util.TimerThread" in Sun/Oracle JDK
+                    // "java.util.Timer$TimerImpl" in Apache Harmony and in IBM JDK
                     if (thread.getClass().getName().startsWith("java.util.Timer") &&
                             clearReferencesStopTimerThreads) {
                         clearReferencesStopTimerThread(thread);
@@ -2278,27 +2280,36 @@ public class WebappClassLoader
                     // shutting down the executor
                     try {
 
-                        Field targetField = null;
-                        try {
-                            targetField = thread.getClass().getDeclaredField("target");
-                        }catch (NoSuchFieldException nfe){
-                            targetField = thread.getClass().getDeclaredField("runnable");
+                        // Runnable wrapped by Thread
+                        // "target" in Sun/Oracle JDK
+                        // "runnable" in IBM JDK
+                        // "action" in Apache Harmony
+                        Object target = null;
+                        for (String fieldName : new String[] { "target",
+                                "runnable", "action" }) {
+                            try {
+                                Field targetField = thread.getClass()
+                                        .getDeclaredField(fieldName);
+                                targetField.setAccessible(true);
+                                target = targetField.get(thread);
+                                break;
+                            } catch (NoSuchFieldException nfe) {
+                                continue;
+                            }
                         }
-                        if (null != targetField){
-                            targetField.setAccessible(true);
-                            Object target = targetField.get(thread);
 
-                            if (target != null &&
-                                    target.getClass().getCanonicalName() != null
-                                    && target.getClass().getCanonicalName().equals(
-                                    "java.util.concurrent.ThreadPoolExecutor.Worker")) {
-                                Field executorField =
-                                    target.getClass().getDeclaredField("this$0");
-                                executorField.setAccessible(true);
-                                Object executor = executorField.get(target);
-                                if (executor instanceof ThreadPoolExecutor) {
-                                    ((ThreadPoolExecutor) executor).shutdownNow();
-                                }
+                        // "java.util.concurrent" code is in public domain,
+                        // so all implementations are similar
+                        if (target != null &&
+                                target.getClass().getCanonicalName() != null
+                                && target.getClass().getCanonicalName().equals(
+                                "java.util.concurrent.ThreadPoolExecutor.Worker")) {
+                            Field executorField =
+                                target.getClass().getDeclaredField("this$0");
+                            executorField.setAccessible(true);
+                            Object executor = executorField.get(target);
+                            if (executor instanceof ThreadPoolExecutor) {
+                                ((ThreadPoolExecutor) executor).shutdownNow();
                             }
                         }
                     } catch (SecurityException e) {
@@ -2362,9 +2373,12 @@ public class WebappClassLoader
     private void clearReferencesStopTimerThread(Thread thread) {
 
         // Need to get references to:
-        // - newTasksMayBeScheduled field
+        // in Sun/Oracle JDK:
+        // - newTasksMayBeScheduled field (in java.util.TimerThread)
         // - queue field
         // - queue.clear()
+        // in IBM JDK, Apache Harmony:
+        // - cancel() method (in java.util.Timer$TimerImpl)
 
         try {
 
@@ -2388,11 +2402,9 @@ public class WebappClassLoader
 
             }catch (NoSuchFieldException nfe){
                 Method cancelMethod = thread.getClass().getDeclaredMethod("cancel");
-                if (null != cancelMethod){
-                    synchronized(thread) {
-                        cancelMethod.setAccessible(true);
-                        cancelMethod.invoke(thread);
-                    }
+                synchronized(thread) {
+                    cancelMethod.setAccessible(true);
+                    cancelMethod.invoke(thread);
                 }
             }
 
