@@ -102,6 +102,10 @@
       <p>(int) The number of milliseconds before an idle thread shutsdown, unless the number of active threads are less
          or equal to minSpareThreads. Default value is <code>60000</code>(1 minute)</p>
     </attribute>
+    <attribute name="maxQueueSize" required="false">
+      <p>(int) The maximum number of runnable tasks that can queue up awaiting
+        execution before we reject them. Default value is <code>Integer.MAX_VALUE</code></p>
+    </attribute>
     <attribute name="prestartminSpareThreads" required="false">
       <p>(boolean) Whether minSpareThreads should be started when starting the Executor or not,
           the default is <code>false</code></p>
