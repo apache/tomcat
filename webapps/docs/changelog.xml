@@ -351,7 +351,7 @@
       <add>
         <bug>53254</bug> (<rev>1340160</rev>):
         Add in the ability to purge connections from the pool (fhanik)
-      </add>  
+      </add>
       <update>
         <bug>53367</bug> (<rev>1346691</rev>):
         Prevent pool from hanging during database failure (fhanik)
@@ -601,6 +601,13 @@
         Bring built-in mime types for embedded Tomcat more in line with the
         ones defined in the default web.xml configuration file. (rjung)
       </update>
+      <add>
+        Add support to the JMXProxyServlet which is part of the Manager
+        application for fetching a specific key from a
+        <code>CompositeData</code> value. Updated documentation, so that
+        the entire 'get' command for the JMX proxy servlet is documented,
+        including the new optional 'key' parameter. (schultz/markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="jdbc-pool">
