@@ -344,23 +344,32 @@
   </subsection>
   <subsection name="jdbc-pool">
     <changelog>
-      <update>
-        <bug>53367</bug> (<rev>1346691</rev>):
-        Prevent pool from hanging during database failure (fhanik)
-      </update>  
+      <fix>
+        <bug>50864</bug> (<rev>1311844</rev>):
+        JMX enable most pool properties (fhanik)
+      </fix>
       <add>
         <bug>53254</bug> (<rev>1340160</rev>):
         Add in the ability to purge connections from the pool (fhanik)
       </add>  
+      <update>
+        <bug>53367</bug> (<rev>1346691</rev>):
+        Prevent pool from hanging during database failure (fhanik)
+      </update>  
       <update>
          When a connection is reconnected due to failed validation
          make sure the ConnectionState is reset or it will assume
          incorrect values (fhanik)
       </update>
       <fix>
-        <bug>50864</bug> (<rev>1311844</rev>):
-        JMX enable most pool properties (fhanik)
-      </fix>  
+        <bug>53374</bug> (<rev>1348056</rev>):
+        Add support for the following properties in DataSourceFactory:
+        <code>commitOnReturn</code>, <code>rollbackOnReturn</code>,
+        <code>useDisposableConnectionFacade</code>,
+        <code>logValidationErrors</code> and
+        <code>propagateInterruptState</code>.
+        Based on patch proposed by Suresh Avadhanula. (kkolinko)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
