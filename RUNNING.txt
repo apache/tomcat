@@ -28,7 +28,7 @@ Environment (JRE) version 6.0 or later.
 Running With JRE 6.0 Or Later
 =============================
 
-(1) Download and Install the Java SE Runtime Environment (JRE)
+(1) Download and Install Java SE Runtime Environment (JRE)
 
 (1.1) Download the Java SE Runtime Environment (JRE),
       release version 6.0 or later, from
@@ -37,23 +37,20 @@ Running With JRE 6.0 Or Later
 (1.2) Install the JRE according to the instructions included with the
       release.
 
-      You may also use the full JDK rather than just the JRE. In this
-      case set you have to configure your environment variables
-      differently - see below.
+      You may also use the full JDK rather than just the JRE.
 
 
-(2) Download and Install the Tomcat Binary Distribution
+(2) Download and Install Apache Tomcat
 
 (2.1) Download a binary distribution of Tomcat from:
 
       http://tomcat.apache.org/
 
-(2.2) Unpack the binary distribution into a convenient location so that the
-      distribution resides in its own directory (conventionally named
-      "apache-tomcat-[version]").
+(2.2) Unpack the binary distribution so that it resides in its own
+      directory (conventionally named "apache-tomcat-[version]").
 
       For the purposes of the remainder of this document, the name
-      "CATALINA_HOME" is used to refer to the full pathname of the release
+      "CATALINA_HOME" is used to refer to the full pathname of that
       directory.
 
 NOTE:  As an alternative to downloading a binary distribution, you can
@@ -65,48 +62,72 @@ create your own from the Tomcat source code, as described in
 
   b)  Do a simple build and use the "output/build" directory as
       "CATALINA_HOME".  Be warned that there are some differences between
-      contents of "output/build" and the official "release" distributive.
+      contents of "output/build" directory and full "release" distributive.
 
 
 (3) Configure Environment Variables
 
-Tomcat itself is a Java application and does not use environment variables,
-but the startup scripts use them to prepare the command that starts Tomcat.
-The full list of supported environment variables is provided as a comment
-at the top of catalina.bat (Windows) and catalina.sh (Unix) files.
+Tomcat itself is a Java application and does not use environment variables.
+The variables are used by Tomcat startup scripts. The scripts use the
+variables to prepare the command that starts Tomcat.
 
-(3.1) CATALINA_HOME and CATALINA_BASE
+(3.1) Set CATALINA_HOME (required) and CATALINA_BASE (optional)
 
-The CATALINA_HOME and CATALINA_BASE environment variables are used to
-specify location of Tomcat itself and of its active configuration
-respectively.
+CATALINA_HOME and CATALINA_BASE environment variables are used to
+specify location of Apache Tomcat itself and location of its active
+configuration, respectively.
 
-The CATALINA_HOME environment variable should be set as defined in (2.2)
-above. The startup scripts have some logic to set this variable
+CATALINA_HOME environment variable should be set as defined in (2.2)
+above. Tomcat startup scripts have some logic to set this variable
 automatically if it is absent (based on the location of the script in
 Unixes and on the current directory in Windows), but it might be not
 perfect.
 
-The CATALINA_BASE environment variable is optional and is further described
-in "Multiple Tomcat Instances" section below. If it is not set it defaults
+CATALINA_BASE environment variable is optional and is further described
+in "Multiple Tomcat Instances" section below. If it is absent, it defaults
 to be equal to CATALINA_HOME.
 
-(3.2) JRE_HOME and other variables
+(3.2) Set JRE_HOME or JAVA_HOME (required)
 
-The third and the last environment variable that is needed to start Tomcat
-specifies location of JRE or JDK that should be used to start Tomcat.
+JRE_HOME variable is used to specify location of a JRE or JDK that is used
+to start Tomcat.
 
-There are two different names of this variable, depending on whether JRE or
-JDK is used. Use the JRE_HOME variable to specify location of a JRE and
-JAVA_HOME variable to specify location of a JDK.
+JAVA_HOME variable is used to specify location of a JDK. It is used instead
+of JRE_HOME.
 
-All variables except CATALINA_HOME and CATALINA_BASE can be configured in a
-setenv.bat (Windows) or setenv.sh (Unix) file. The setenv file can be either
-in CATALINA_BASE/bin or in CATALINA_HOME/bin. If both are present, only the
-one in CATALINA_BASE is used.
+Using JAVA_HOME provides access to certain additional startup options that
+are not allowed when JRE_HOME is used.
 
-So, either set JRE_HOME variable by yourselves or create the file. For
-example,
+If both JRE_HOME and JAVA_HOME are specified, JRE_HOME is used.
+
+(3.3) Other variables (optional)
+
+There exist other environment variables, besides the four described above.
+See the comment at the top of catalina.bat or catalina.sh scripts for
+the list and description of them.
+
+One frequently used variable is CATALINA_OPTS. It allows to specify
+additional options for java command that starts Tomcat.
+
+See Java documentation for options that affect Java Runtime Environment.
+
+See System Properties page in Configuration Reference for system properties
+that are specific to Tomcat.
+
+(3.4) setenv script (optional)
+
+Except CATALINA_HOME and CATALINA_BASE, all other environment variables can
+be specified in "setenv" script.
+
+The script is named setenv.bat (Windows) or setenv.sh (*nix). It can be
+placed either into CATALINA_BASE/bin or into CATALINA_HOME/bin. The file
+has to be readable.
+
+By default setenv script file is absent. If setenv script is present both
+in CATALINA_BASE and in CATALINA_HOME, the one in CATALINA_BASE is used.
+
+For example, to configure JRE_HOME variable you can create the following
+script file:
 
 On Windows, %CATALINA_BASE%\bin\setenv.bat:
 
@@ -116,6 +137,9 @@ On Windows, %CATALINA_BASE%\bin\setenv.bat:
 On Unix, $CATALINA_BASE/bin/setenv.sh:
 
   JRE_HOME=/usr/java/latest
+
+You cannot configure CATALINA_HOME or CATALINA_BASE variable in setenv
+script, because they are used to find that file.
 
 
 (4) Start Up Tomcat
