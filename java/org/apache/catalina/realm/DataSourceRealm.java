@@ -524,6 +524,12 @@ public class DataSourceRealm
     protected ArrayList<String> getRoles(Connection dbConnection,
                                      String username) {
         
+        if (allRolesMode != AllRolesMode.STRICT_MODE && !isRoleStoreDefined()) {
+            // Using an authentication only configuration and no role store has
+            // been defined so don't spend cycles looking
+            return null;
+        }
+
         ResultSet rs = null;
         PreparedStatement stmt = null;
         ArrayList<String> list = null;
@@ -603,8 +609,13 @@ public class DataSourceRealm
 
     }
 
-    // ------------------------------------------------------ Lifecycle Methods
 
+    private boolean isRoleStoreDefined() {
+        return userRoleTable != null || roleNameCol != null;
+    }
+
+
+    // ------------------------------------------------------ Lifecycle Methods
 
     /**
      * Prepare for the beginning of active use of the public methods of this
