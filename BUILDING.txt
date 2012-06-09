@@ -223,24 +223,12 @@ The output of this command will be found in the following directories:
     ant release
 
 
-(7) Enabling Checkstyle
+(7) Tests
 
-Tomcat comes with a Checkstyle configuration that tests its source code
-for certain conventions, like presence of the license header.
+(7.1) Running Tomcat tests
 
-To enable Checkstyle checks during Tomcat build, add the following property
-to build.properties file:
-
-    execute.validate=true
-
-* NOTE: Checkstyle is licensed under LGPL. Using Checkstyle during Tomcat
-  build is optional and is off by default.
-
-
-(8) Running the tests
-
-The tests are not run when a release is built. There is separate command
-for running the tests.
+Tomcat includes a number of junit tests. The tests are not run when a
+release is built. There is separate command to run them.
 
 To run the testsuite use the following command:
 
@@ -255,8 +243,6 @@ directory:
 
     output/build/logs
 
-
-(8.1) Testing with APR connector
 
 By default the testsuite is run three times to test 3 different
 implementations of Tomcat connectors: BIO, NIO and APR. (If you are not
@@ -283,7 +269,7 @@ tcnative-1.dll file into ${tomcat.source}/bin/native/ and it will be copied
 into the above directory when the build runs.
 
 
-(8.2) Running a single test class
+(7.2) Running a single test
 
 It is possible to run a single JUnit test class by adding the "test.entry"
 property to the build.properties file. The property specifies the name of
@@ -294,7 +280,7 @@ For example:
     test.entry=org.apache.catalina.util.TestServerInfo
 
 
-(8.3) Other options
+(7.3) Other configuration options
 
  1. It is possible to enable generation of access log file when the tests
  are run. This is off by default and can be enabled by the following
@@ -320,3 +306,52 @@ For example:
  files:
 
         junit.formatter.usefile=false
+
+
+(8) Source code checks
+
+(8.1) Checkstyle
+
+* NOTE: Checkstyle is licensed under LGPL. Using Checkstyle during Tomcat
+  build is optional and is off by default.
+
+Tomcat comes with a Checkstyle configuration that tests its source code
+for certain conventions, like presence of the license header.
+
+To enable Checkstyle, add the following property to build.properties file:
+
+    execute.validate=true
+
+Once Checkstyle is enabled, the check will be performed automatically
+during the build. The check is run before compilation of the source code.
+
+It is possible to run the check separately. The command is:
+
+    cd ${tomcat.source}
+    ant validate
+
+To speed-up repeated runs of this check, a cache is configured. The cache
+is located in the following directory:
+
+    output/res/checkstyle
+
+
+(8.2) End-of-line conventions check
+
+You usually would not need to run this check. You can skip this section.
+
+Apache Tomcat project has convention that all of its textual source files,
+stored in Subversion repository, are marked with Subversion property
+"svn:eol-style" with value of "native". This convention makes the editing
+of source code on different platforms easier.
+
+This test is used by developers to check that the source code adheres to
+this convention. It verifies that the ends of lines in textual files are
+appropriate for the operating system where it is run. The idea is to run
+this check regularly on two different platforms and notify developers when
+an inconsistency is detected.
+
+The command to run this test is:
+
+    cd ${tomcat.source}
+    ant validate-eoln
