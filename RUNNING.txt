@@ -21,7 +21,7 @@ $Id$
             Running The Apache Tomcat @VERSION_MAJOR_MINOR@ Servlet/JSP Container
             ===================================================
 
-Apache Tomcat @VERSION_MAJOR_MINOR@ requires the Java Standard Edition Runtime
+Apache Tomcat @VERSION_MAJOR_MINOR@ requires a Java Standard Edition Runtime
 Environment (JRE) version 6.0 or later.
 
 =============================
@@ -58,43 +58,44 @@ NOTE:  As an alternative to downloading a binary distribution, you can
 create your own from the Tomcat source code, as described in
 "BUILDING.txt".  You can either
 
-  a)  Do the full "release" build and find the created distributive in the
+  a)  Do the full "release" build and find the created distribution in the
       "output/release" directory and then proceed with unpacking as above, or
 
   b)  Do a simple build and use the "output/build" directory as
-      "CATALINA_HOME".  Be warned that there are some differences between
-      contents of "output/build" directory and full "release" distribution.
+      "CATALINA_HOME".  Be warned that there are some differences between the
+      contents of the "output/build" directory and a full "release"
+      distribution.
 
 
 (3) Configure Environment Variables
 
 Tomcat is a Java application and does not use environment variables. The
-variables are used by Tomcat startup scripts. The scripts use the variables
+variables are used by the Tomcat startup scripts. The scripts use the variables
 to prepare the command that starts Tomcat.
 
 (3.1) Set CATALINA_HOME (required) and CATALINA_BASE (optional)
 
-CATALINA_HOME and CATALINA_BASE environment variables are used to
-specify location of Apache Tomcat itself and location of its active
+The CATALINA_HOME and CATALINA_BASE environment variables are used to
+specify the location of Apache Tomcat and the location of its active
 configuration, respectively.
 
-CATALINA_HOME environment variable should be set as defined in (2.2)
-above. Tomcat startup scripts have some logic to set this variable
+The CATALINA_HOME environment variable should be set as defined in (2.2)
+above. The Tomcat startup scripts have some logic to set this variable
 automatically if it is absent (based on the location of the script in
-Unixes and on the current directory in Windows), but it might be not
-perfect.
+Unixes and on the current directory in Windows), but this logic might not work
+in all circumstances.
 
-CATALINA_BASE environment variable is optional and is further described
-in "Multiple Tomcat Instances" section below. If it is absent, it defaults
+The CATALINA_BASE environment variable is optional and is further described
+in the "Multiple Tomcat Instances" section below. If it is absent, it defaults
 to be equal to CATALINA_HOME.
 
 
 (3.2) Set JRE_HOME or JAVA_HOME (required)
 
-JRE_HOME variable is used to specify location of a JRE that is used to
+The JRE_HOME variable is used to specify location of a JRE that is used to
 start Tomcat.
 
-JAVA_HOME variable is used to specify location of a JDK. It is used instead
+The JAVA_HOME variable is used to specify location of a JDK. It is used instead
 of JRE_HOME.
 
 Using JAVA_HOME provides access to certain additional startup options that
@@ -105,41 +106,41 @@ If both JRE_HOME and JAVA_HOME are specified, JRE_HOME is used.
 
 (3.3) Other variables (optional)
 
-There exist other environment variables, besides the four described above.
-See the comment at the top of catalina.bat or catalina.sh scripts for
-the list and description of them.
+Other environment variables exist, besides the four described above.
+See the comments at the top of catalina.bat or catalina.sh scripts for
+the list and a description of each of them.
 
-One frequently used variable is CATALINA_OPTS. It allows to specify
-additional options for java command that starts Tomcat.
+One frequently used variable is CATALINA_OPTS. It allows specification of
+additional options for the java command that starts Tomcat.
 
-See the Java documentation for the options that affect Java Runtime
+See the Java documentation for the options that affect the Java Runtime
 Environment.
 
 See the "System Properties" page in the Tomcat Configuration Reference for
 the system properties that are specific to Tomcat.
 
-A similar variable is JAVA_OPTS. It is used less frequently. It allows to
-specify options that are used both to start and to stop Tomcat and
-for other commands.
+A similar variable is JAVA_OPTS. It is used less frequently. It allows
+specification of options that are used both to start and to stop Tomcat as well
+as for other commands.
 
 Do not use JAVA_OPTS to specify memory limits. You do not need much memory
 for a small process that is used to stop Tomcat. Those settings belong to
 CATALINA_OPTS.
 
-Other frequently used variable is CATALINA_PID (on *nix platforms only). It
-specifies location of the file where process id of the forked Tomcat java
+Another frequently used variable is CATALINA_PID (on *nix platforms only). It
+specifies the location of the file where process id of the forked Tomcat java
 process will be written. This setting is optional. It will enable the
 following features:
 
  - better protection against duplicate start attempts and
- - allow forceful termination of Tomcat process when it does not react to
- the standard shutdown command.
+ - allows forceful termination of Tomcat process when it does not react to
+   the standard shutdown command.
 
 
 (3.4) setenv script (optional)
 
-Except CATALINA_HOME and CATALINA_BASE, all other environment variables can
-be specified in "setenv" script.
+Apart from CATALINA_HOME and CATALINA_BASE, all environment variables can
+be specified in the "setenv" script.
 
 The script is named setenv.bat (Windows) or setenv.sh (*nix). It can be
 placed either into CATALINA_BASE/bin or into CATALINA_HOME/bin. The file
@@ -149,7 +150,7 @@ By default the setenv script file is absent. If the setenv script is
 present both in CATALINA_BASE and in CATALINA_HOME, the one in
 CATALINA_BASE is used.
 
-For example, to configure JRE_HOME and CATALINA_PID variables you can
+For example, to configure the JRE_HOME and CATALINA_PID variables you can
 create the following script file:
 
 On Windows, %CATALINA_BASE%\bin\setenv.bat:
@@ -214,7 +215,7 @@ binary distribution shared among multiple users on the same server.  To make
 this possible, you can set the CATALINA_BASE environment variable to the
 directory that contains the files for your 'personal' Tomcat instance.
 
-When running with separate CATALINA_HOME and CATALINA_BASE, the files
+When running with a separate CATALINA_HOME and CATALINA_BASE, the files
 and directories are split as following:
 
 In CATALINA_BASE:
@@ -229,7 +230,7 @@ In CATALINA_BASE:
 
  * conf - Server configuration files (including server.xml)
 
- * lib  - Libraries and classes
+ * lib  - Libraries and classes, as explained below
 
  * logs - Log and output files
 
@@ -252,10 +253,10 @@ In CATALINA_HOME:
  * lib  - Libraries and classes, as explained below
 
  * endorsed - Libraries that override standard "Endorsed Standards"
-          libraries provided by JRE. See Classloading documentation
-          in the User Guide for details.
+              libraries provided by JRE. See Classloading documentation
+              in the User Guide for details.
 
-          By default this "endorsed" directory is absent.
+              By default this "endorsed" directory is absent.
 
 In the default configuration the JAR libraries and classes both in
 CATALINA_BASE/lib and in CATALINA_HOME/lib will be added to the common
@@ -300,7 +301,7 @@ application deployment.
 Troubleshooting
 ================
 
-There are only really 3 things likely to go wrong during the stand-alone
+There are only really 2 things likely to go wrong during the stand-alone
 Tomcat install:
 
 (1) The most common hiccup is when another web server (or any process for that
@@ -315,19 +316,10 @@ Tomcat install:
 
     Restart Tomcat and you're in business.  Be sure that you replace the "8080"
     in the URL you're using to access Tomcat.  For example, if you change the
-    port to 1977, you would request the URL http://localhost:1977/ in your browser.
+    port to 1977, you would request the URL http://localhost:1977/ in your
+    browser.
 
-(2) An "out of environment space" error when running the batch files in
-    Windows 95, 98, or ME operating systems.
-
-    Right-click on the STARTUP.BAT and SHUTDOWN.BAT files.  Click on
-    "Properties", then on the "Memory" tab.  For the "Initial environment" field,
-    enter in something like 4096.
-
-    After you click apply, Windows will create shortcuts which you can use
-    to start and stop the container.
-
-(3) The 'localhost' machine isn't found.  This could happen if you're behind a
+(2) The 'localhost' machine isn't found.  This could happen if you're behind a
     proxy.  If that's the case, make sure the proxy configuration for your
     browser knows that you shouldn't be going through the proxy to access the
     "localhost".
@@ -341,7 +333,7 @@ Tomcat install:
 Optional Components
 ====================
 
-The following optional components may be included with Apache Tomcat binary
+The following optional components may be included with the Apache Tomcat binary
 distribution. If they are not included, you can install them separately.
 
  1. Apache Tomcat Native library
@@ -355,10 +347,10 @@ that will be used to launch Tomcat.
 
 The Windows-specific binary distributions of Apache Tomcat include binary
 files for these components. On other platforms you would have to look for
-binary versions elsewhere or compile them by yourselves.
+binary versions elsewhere or compile them yourself.
 
-If you just started adopting Tomcat, do not bother with these components.
-If you like to use them, do not forget to read their documentation.
+If you are new to Tomcat, do not bother with these components to start with.
+If you do use them, do not forget to read their documentation.
 
 
 Apache Tomcat Native library
@@ -377,11 +369,11 @@ For further reading:
 
  - Apache Tomcat documentation
 
-    * Documentation for APR/Native library in Tomcat User's Guide
+    * Documentation for APR/Native library in the Tomcat User's Guide
 
       http://tomcat.apache.org/tomcat-@VERSION_MAJOR_MINOR@-doc/apr.html
 
-    * Documentation for the HTTP and AJP protocol connectors in Tomcat
+    * Documentation for the HTTP and AJP protocol connectors in the Tomcat
       Configuration Reference
 
       http://tomcat.apache.org/tomcat-@VERSION_MAJOR_MINOR@-doc/config/http.html
@@ -424,7 +416,7 @@ The binary file of Apache Tomcat Native library is usually named
 Apache Commons Daemon
 ----------------------
 
-Apache Commons Daemon project provides wrappers, that can be used to
+Apache Commons Daemon project provides wrappers that can be used to
 install Apache Tomcat as a service on Windows or as a daemon on *nix
 systems.
 
