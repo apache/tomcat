@@ -393,6 +393,11 @@
         <bug>53115</bug>: Fix using the command "<code>catalina.bat run</code>"
         when the value of <code>%TEMP%</code> contains spaces. (kkolinko)
       </fix>
+      <update>
+        Add dependencies and description to "validate" target in
+        <code>build.xml</code>, so that it could be run separately.
+        Improve documentation. (kkolinko)
+      </update>
     </changelog>
   </subsection>
 </section>
