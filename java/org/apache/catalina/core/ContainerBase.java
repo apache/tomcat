@@ -1601,9 +1601,9 @@ public abstract class ContainerBase extends LifecycleMBeanBase
     }
 
     private static class StartStopThreadFactory implements ThreadFactory {
-        private ThreadGroup group;
-        private AtomicInteger threadNumber = new AtomicInteger(1);
-        private String namePrefix;
+        private final ThreadGroup group;
+        private final AtomicInteger threadNumber = new AtomicInteger(1);
+        private final String namePrefix;
 
         public StartStopThreadFactory(String namePrefix) {
             SecurityManager s = System.getSecurityManager();
