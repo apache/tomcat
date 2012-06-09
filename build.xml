@@ -449,7 +449,9 @@
 
   </target>
 
-  <target name="validate" depends="download-validate" if="${execute.validate}">
+  <target name="validate" if="${execute.validate}"
+    depends="build-prepare,compile-prepare,download-validate"
+    description="Uses Checkstyle tool to perform style check for the source code">
     <!-- Required so we can cache checkstyle results -->
     <mkdir dir="${tomcat.output}/res/checkstyle"/>
 
