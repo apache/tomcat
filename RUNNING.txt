@@ -114,6 +114,15 @@ See Java documentation for options that affect Java Runtime Environment.
 See System Properties page in Configuration Reference for system properties
 that are specific to Tomcat.
 
+Other frequently used variable is CATALINA_PID (on *nix platforms only). It
+specifies location of the file where process id of forked Tomcat java
+process will be written. This setting is optional. It will enable the
+following features:
+
+ - better protection against duplicate start attempts and
+ - allow forceful termination of Tomcat process when it does not react to
+ the standard shutdown command.
+
 (3.4) setenv script (optional)
 
 Except CATALINA_HOME and CATALINA_BASE, all other environment variables can
@@ -126,8 +135,8 @@ has to be readable.
 By default setenv script file is absent. If setenv script is present both
 in CATALINA_BASE and in CATALINA_HOME, the one in CATALINA_BASE is used.
 
-For example, to configure JRE_HOME variable you can create the following
-script file:
+For example, to configure JRE_HOME and CATALINA_PID variables you can
+create the following script file:
 
 On Windows, %CATALINA_BASE%\bin\setenv.bat:
 
@@ -137,8 +146,9 @@ On Windows, %CATALINA_BASE%\bin\setenv.bat:
 On Unix, $CATALINA_BASE/bin/setenv.sh:
 
   JRE_HOME=/usr/java/latest
+  CATALINA_PID="$CATALINA_BASE/tomcat.pid"
 
-You cannot configure CATALINA_HOME or CATALINA_BASE variable in setenv
+You cannot configure CATALINA_HOME and CATALINA_BASE variables in setenv
 script, because they are used to find that file.
 
 
