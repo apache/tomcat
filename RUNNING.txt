@@ -28,16 +28,17 @@ Environment (JRE) version 6.0 or later.
 Running With JRE 6.0 Or Later
 =============================
 
-(1) Download and Install Java SE Runtime Environment (JRE)
+(1) Download and Install a Java SE Runtime Environment (JRE)
 
-(1.1) Download the Java SE Runtime Environment (JRE),
+(1.1) Download a Java SE Runtime Environment (JRE),
       release version 6.0 or later, from
       http://www.oracle.com/technetwork/java/javase/downloads/index.html
 
 (1.2) Install the JRE according to the instructions included with the
       release.
 
-      You may also use the full JDK rather than just the JRE.
+      You may also use a full Java Development Kit (JDK) rather than just
+      a JRE.
 
 
 (2) Download and Install Apache Tomcat
@@ -62,14 +63,14 @@ create your own from the Tomcat source code, as described in
 
   b)  Do a simple build and use the "output/build" directory as
       "CATALINA_HOME".  Be warned that there are some differences between
-      contents of "output/build" directory and full "release" distributive.
+      contents of "output/build" directory and full "release" distribution.
 
 
 (3) Configure Environment Variables
 
-Tomcat itself is a Java application and does not use environment variables.
-The variables are used by Tomcat startup scripts. The scripts use the
-variables to prepare the command that starts Tomcat.
+Tomcat is a Java application and does not use environment variables. The
+variables are used by Tomcat startup scripts. The scripts use the variables
+to prepare the command that starts Tomcat.
 
 (3.1) Set CATALINA_HOME (required) and CATALINA_BASE (optional)
 
@@ -87,10 +88,11 @@ CATALINA_BASE environment variable is optional and is further described
 in "Multiple Tomcat Instances" section below. If it is absent, it defaults
 to be equal to CATALINA_HOME.
 
+
 (3.2) Set JRE_HOME or JAVA_HOME (required)
 
-JRE_HOME variable is used to specify location of a JRE or JDK that is used
-to start Tomcat.
+JRE_HOME variable is used to specify location of a JRE that is used to
+start Tomcat.
 
 JAVA_HOME variable is used to specify location of a JDK. It is used instead
 of JRE_HOME.
@@ -99,6 +101,7 @@ Using JAVA_HOME provides access to certain additional startup options that
 are not allowed when JRE_HOME is used.
 
 If both JRE_HOME and JAVA_HOME are specified, JRE_HOME is used.
+
 
 (3.3) Other variables (optional)
 
@@ -109,19 +112,29 @@ the list and description of them.
 One frequently used variable is CATALINA_OPTS. It allows to specify
 additional options for java command that starts Tomcat.
 
-See Java documentation for options that affect Java Runtime Environment.
+See the Java documentation for the options that affect Java Runtime
+Environment.
 
-See System Properties page in Configuration Reference for system properties
-that are specific to Tomcat.
+See the "System Properties" page in the Tomcat Configuration Reference for
+the system properties that are specific to Tomcat.
+
+A similar variable is JAVA_OPTS. It is used less frequently. It allows to
+specify options that are used both to start and to stop Tomcat and
+for other commands.
+
+Do not use JAVA_OPTS to specify memory limits. You do not need much memory
+for a small process that is used to stop Tomcat. Those settings belong to
+CATALINA_OPTS.
 
 Other frequently used variable is CATALINA_PID (on *nix platforms only). It
-specifies location of the file where process id of forked Tomcat java
+specifies location of the file where process id of the forked Tomcat java
 process will be written. This setting is optional. It will enable the
 following features:
 
  - better protection against duplicate start attempts and
  - allow forceful termination of Tomcat process when it does not react to
  the standard shutdown command.
+
 
 (3.4) setenv script (optional)
 
@@ -132,8 +145,9 @@ The script is named setenv.bat (Windows) or setenv.sh (*nix). It can be
 placed either into CATALINA_BASE/bin or into CATALINA_HOME/bin. The file
 has to be readable.
 
-By default setenv script file is absent. If setenv script is present both
-in CATALINA_BASE and in CATALINA_HOME, the one in CATALINA_BASE is used.
+By default the setenv script file is absent. If the setenv script is
+present both in CATALINA_BASE and in CATALINA_HOME, the one in
+CATALINA_BASE is used.
 
 For example, to configure JRE_HOME and CATALINA_PID variables you can
 create the following script file:
@@ -148,8 +162,8 @@ On Unix, $CATALINA_BASE/bin/setenv.sh:
   JRE_HOME=/usr/java/latest
   CATALINA_PID="$CATALINA_BASE/tomcat.pid"
 
-You cannot configure CATALINA_HOME and CATALINA_BASE variables in setenv
-script, because they are used to find that file.
+You cannot configure CATALINA_HOME and CATALINA_BASE variables in the
+setenv script, because they are used to find that file.
 
 
 (4) Start Up Tomcat
@@ -321,3 +335,128 @@ Tomcat install:
     In Firefox, this is under Tools/Preferences -> Advanced/Network ->
     Connection -> Settings..., and in Internet Explorer it is Tools ->
     Internet Options -> Connections -> LAN Settings.
+
+
+====================
+Optional Components
+====================
+
+The following optional components may be included with Apache Tomcat binary
+distribution. If they are not included, you can install them separately.
+
+ 1. Apache Tomcat Native library
+
+ 2. Apache Commons Daemon service launcher
+
+Both of them are implemented in C language and as such have to be compiled
+into binary code. The binary code will be specific for a platform and CPU
+architecture and it must match the Java Runtime Environment executables
+that will be used to launch Tomcat.
+
+The Windows-specific binary distributions of Apache Tomcat include binary
+files for these components. On other platforms you would have to look for
+binary versions elsewhere or compile them by yourselves.
+
+If you just started adopting Tomcat, do not bother with these components.
+If you like to use them, do not forget to read their documentation.
+
+
+Apache Tomcat Native library
+-----------------------------
+
+It is a library that allows to use the "Apr" variant of HTTP and AJP
+protocol connectors in Apache Tomcat. It is built around OpenSSL and Apache
+Portable Runtime (APR) libraries. Those are the same libraries as used by
+Apache HTTPD Server project.
+
+This feature was especially important in the old days when Java performance
+was poor. It is less important nowadays, but it is still used and respected
+by many. See Tomcat documentation for more details.
+
+For further reading:
+
+ - Apache Tomcat documentation
+
+    * Documentation for APR/Native library in Tomcat User's Guide
+
+      http://tomcat.apache.org/tomcat-@VERSION_MAJOR_MINOR@-doc/apr.html
+
+    * Documentation for the HTTP and AJP protocol connectors in Tomcat
+      Configuration Reference
+
+      http://tomcat.apache.org/tomcat-@VERSION_MAJOR_MINOR@-doc/config/http.html
+
+      http://tomcat.apache.org/tomcat-@VERSION_MAJOR_MINOR@-doc/config/ajp.html
+
+ - Apache Tomcat Native project home
+
+      http://tomcat.apache.org/native-doc/
+
+ - Other projects
+
+    * OpenSSL
+
+      http://openssl.org/
+
+    * Apache Portable Runtime
+
+      http://apr.apache.org/
+
+    * Apache HTTP Server
+
+      http://httpd.apache.org/
+
+To disable Apache Tomcat Native library:
+
+ - To disable Apache Tomcat Native library when it is installed, or
+ - To remove the warning that is logged during Tomcat startup when the
+   library is not installed:
+
+   Edit the "conf/server.xml" file and remove "AprLifecycleListener" from
+   it.
+
+The binary file of Apache Tomcat Native library is usually named
+
+  - "tcnative-1.dll" on Windows
+  - "libtcnative-1.so" on *nix systems
+
+
+Apache Commons Daemon
+----------------------
+
+Apache Commons Daemon project provides wrappers, that can be used to
+install Apache Tomcat as a service on Windows or as a daemon on *nix
+systems.
+
+The Windows-specific implementation of Apache Commons Daemon is called
+"procrun". The *nix-specific one is called "jsvc".
+
+For further reading:
+
+ - Apache Commons Daemon project
+
+      http://commons.apache.org/daemon/
+
+ - Apache Tomcat documentation
+
+    * Installing Apache Tomcat
+
+      http://tomcat.apache.org/tomcat-@VERSION_MAJOR_MINOR@-doc/setup.html
+
+    * Windows service HOW-TO
+
+      http://tomcat.apache.org/tomcat-@VERSION_MAJOR_MINOR@-doc/windows-service-howto.html
+
+The binary files of Apache Commons Daemon in Apache Tomcat distributions
+for Windows are named:
+
+  - "tomcat@VERSION_MAJOR@.exe"
+  - "tomcat@VERSION_MAJOR@w.exe"
+
+These files are renamed copies of "prunsrv.exe" and "prunmgr.exe" from
+Apache Commons Daemon distribution. The file names have a meaning: they are
+used as the service name to register the service in Windows, as well as the
+key name to store distinct configuration for this installation of
+"procrun". If you would like to install several instances of Tomcat @VERSION_MAJOR_MINOR@
+in parallel, you have to further rename those files, using the same naming
+scheme.
