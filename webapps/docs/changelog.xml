@@ -401,7 +401,8 @@
       <update>
         Add dependencies and description to "validate" target in
         <code>build.xml</code>, so that it could be run separately.
-        Improve documentation. (kkolinko)
+        Improve <code>BUILDING.txt</code> and <code>RUNNING.txt</code>.
+        (kkolinko)
       </update>
     </changelog>
   </subsection>
