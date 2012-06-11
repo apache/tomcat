@@ -141,7 +141,11 @@ public class ErrorReportValve extends ValveBase {
 
         String message = RequestUtil.filter(response.getMessage());
         if (message == null) {
-            message = "";
+            if (throwable != null) {
+                message = RequestUtil.filter(throwable.getMessage());
+            } else {
+                message = "";
+            }
         }
 
         // Do nothing if there is no report for the specified status code
