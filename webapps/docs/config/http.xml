@@ -1176,12 +1176,11 @@
 
     <attribute name="SSLProtocol" required="false">
       <p>Protocol which may be used for communicating with clients. The default
-      value is <code>all</code>, with other acceptable values being <code>SSLv2</code>,
-      <code>SSLv3</code>, <code>TLSv1</code> and <code>SSLv2+SSLv3</code>.
-      Starting with version 1.1.21 of the Tomcat native
-      library any combination of the three protocols concatenated with a
-      plus sign will be supported. Note that the protocol <code>SSLv2</code>
-      is inherently unsafe.</p>
+      value is <code>all</code>, which is equivalent to <code>SSLv3+TLSv1</code>
+      with other acceptable values being <code>SSLv2</code>,
+      <code>SSLv3</code>, <code>TLSv1</code> and any combination of the three
+      protocols concatenated with a plus sign. Note that the protocol
+      <code>SSLv2</code> is inherently unsafe.</p>
     </attribute>
 
     <attribute name="SSLVerifyClient" required="false">
