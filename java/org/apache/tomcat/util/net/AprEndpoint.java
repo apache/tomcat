@@ -485,53 +485,26 @@ public class AprEndpoint extends AbstractEndpoint {
             }
 
             // SSL protocol
-            int value;
-            // This branch can be removed, once the required version is at least 1.1.21.
-            int tcnFullVersion = Library.TCN_MAJOR_VERSION * 1000
-                    + Library.TCN_MINOR_VERSION * 100
-                    + Library.TCN_PATCH_VERSION;
-            if (tcnFullVersion <= 1120) {
+            int value = SSL.SSL_PROTOCOL_NONE;
+            if (SSLProtocol == null || SSLProtocol.length() == 0) {
                 value = SSL.SSL_PROTOCOL_ALL;
-                if ("SSLv2".equalsIgnoreCase(SSLProtocol)) {
-                    value = SSL.SSL_PROTOCOL_SSLV2;
-                } else if ("SSLv3".equalsIgnoreCase(SSLProtocol)) {
-                    value = SSL.SSL_PROTOCOL_SSLV3;
-                } else if ("TLSv1".equalsIgnoreCase(SSLProtocol)) {
-                    value = SSL.SSL_PROTOCOL_TLSV1;
-                } else if ("SSLv2+SSLv3".equalsIgnoreCase(SSLProtocol)) {
-                    value = SSL.SSL_PROTOCOL_SSLV2 | SSL.SSL_PROTOCOL_SSLV3;
-                } else if ("all".equalsIgnoreCase(SSLProtocol) ||
-                        SSLProtocol == null || SSLProtocol.length() == 0) {
-                    // NOOP, use the default defined above
-                } else {
-                    // Protocol not recognized, fail to start as it is safer than
-                    // continuing with the default which might enable more than the
-                    // is required
-                    throw new Exception(sm.getString(
-                            "endpoint.apr.invalidSslProtocol", SSLProtocol));
-                }
             } else {
-                value = SSL.SSL_PROTOCOL_NONE;
-                if (SSLProtocol == null || SSLProtocol.length() == 0) {
-                    value = SSL.SSL_PROTOCOL_ALL;
-                } else {
-                        for (String protocol : SSLProtocol.split("\\+")) {
-                        protocol = protocol.trim();
-                        if ("SSLv2".equalsIgnoreCase(protocol)) {
-                            value |= SSL.SSL_PROTOCOL_SSLV2;
-                        } else if ("SSLv3".equalsIgnoreCase(protocol)) {
-                            value |= SSL.SSL_PROTOCOL_SSLV3;
-                        } else if ("TLSv1".equalsIgnoreCase(protocol)) {
-                            value |= SSL.SSL_PROTOCOL_TLSV1;
-                        } else if ("all".equalsIgnoreCase(protocol)) {
-                            value |= SSL.SSL_PROTOCOL_ALL;
-                        } else {
-                            // Protocol not recognized, fail to start as it is safer than
-                            // continuing with the default which might enable more than the
-                            // is required
-                            throw new Exception(sm.getString(
-                                    "endpoint.apr.invalidSslProtocol", SSLProtocol));
-                        }
+                for (String protocol : SSLProtocol.split("\\+")) {
+                    protocol = protocol.trim();
+                    if ("SSLv2".equalsIgnoreCase(protocol)) {
+                        value |= SSL.SSL_PROTOCOL_SSLV2;
+                    } else if ("SSLv3".equalsIgnoreCase(protocol)) {
+                        value |= SSL.SSL_PROTOCOL_SSLV3;
+                    } else if ("TLSv1".equalsIgnoreCase(protocol)) {
+                        value |= SSL.SSL_PROTOCOL_TLSV1;
+                    } else if ("all".equalsIgnoreCase(protocol)) {
+                        value |= SSL.SSL_PROTOCOL_ALL;
+                    } else {
+                        // Protocol not recognized, fail to start as it is safer than
+                        // continuing with the default which might enable more than the
+                        // is required
+                        throw new Exception(sm.getString(
+                                "endpoint.apr.invalidSslProtocol", SSLProtocol));
                     }
                 }
             }
