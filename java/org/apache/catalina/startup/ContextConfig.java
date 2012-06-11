@@ -1481,8 +1481,16 @@ public class ContextConfig implements LifecycleListener {
 
             initializerClassMap.put(sci, new HashSet<Class<?>>());
 
-            HandlesTypes ht =
-                sci.getClass().getAnnotation(HandlesTypes.class);
+            HandlesTypes ht = null;
+            try {
+                ht = sci.getClass().getAnnotation(HandlesTypes.class);
+            } catch (Exception e) {
+                if (log.isDebugEnabled()) {
+                    log.info(sm.getString("contextConfig.sci.debug", url), e);
+                } else {
+                    log.info(sm.getString("contextConfig.sci.info", url));
+                }
+            }
             if (ht != null) {
                 Class<?>[] types = ht.value();
                 if (types != null) {
