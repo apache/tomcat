@@ -140,10 +140,9 @@ public class ErrorReportValve extends ValveBase {
         }
 
         String message = RequestUtil.filter(response.getMessage());
-        if (message == null) {
-            if (throwable != null) {
-                message = RequestUtil.filter(throwable.getMessage());
-            } else {
+        if (message == null && throwable != null) {
+            message = RequestUtil.filter(throwable.getMessage());
+            if (message == null) {
                 message = "";
             }
         }
