@@ -177,6 +177,12 @@
         (markt/kkolinko)
       </fix>
       <fix>
+        <bug>53266</bug>: If a class specified in a <code>@HandlesTypes</code>
+        annotation on a <code>ServletContainerInitializer</code> is missing
+        log a more helpful message and do not prevent the web application from
+        starting. (markt)
+      </fix>
+      <fix>
         <bug>53267</bug>: Ensure that using the GC Daemon Protection feature of
         the <code>JreMemoryLeakPreventionListener</code> does not trigger a
         full GC every hour. (markt)
