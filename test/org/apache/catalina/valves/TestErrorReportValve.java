@@ -49,7 +49,8 @@ public class TestErrorReportValve extends TomcatBaseTest {
 
         ByteChunk res = getUrl("http://localhost:" + getPort());
 
-        Assert.assertTrue(res.toString().contains(ErrorServlet.ERROR_TEXT));
+        Assert.assertTrue(res.toString().contains("<p><b>message</b> <u>" +
+                ErrorServlet.ERROR_TEXT + "</u></p>"));
     }
 
 
