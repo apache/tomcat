@@ -28,6 +28,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import junit.framework.Assert;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -112,6 +114,135 @@ public class TestCometProcessor extends TomcatBaseTest {
         }
 
         readThread.join();
+        os.close();
+        is.close();
+    }
+
+    @Test
+    public void testSyncClose() throws Exception {
+
+        if (!isCometSupported()) {
+            log.info("This test is skipped, because this connector does not support Comet.");
+            return;
+        }
+
+        // Setup Tomcat instance
+        Tomcat tomcat = getTomcatInstance();
+        Context root = tomcat.addContext("", TEMP_DIR);
+        Tomcat.addServlet(root, "comet", new CometCloseServlet());
+        root.addServletMapping("/comet", "comet");
+        Tomcat.addServlet(root, "hello", new HelloWorldServlet());
+        root.addServletMapping("/hello", "hello");
+        tomcat.getConnector().setProperty("connectionTimeout", "5000");
+        tomcat.start();
+
+        // Create connection to Comet servlet
+        final Socket socket =
+            SocketFactory.getDefault().createSocket("localhost", getPort());
+        socket.setSoTimeout(5000);
+
+        final OutputStream os = socket.getOutputStream();
+        String requestLine = "POST http://localhost:" + getPort() +
+                "/comet HTTP/1.1\r\n";
+        os.write(requestLine.getBytes());
+        os.write("transfer-encoding: chunked\r\n".getBytes());
+        os.write("\r\n".getBytes());
+        // Don't send any data
+        os.write("0\r\n\r\n".getBytes());
+
+        InputStream is = socket.getInputStream();
+        ResponseReaderThread readThread = new ResponseReaderThread(is);
+        readThread.start();
+
+        // Wait for the comet request/response to finish
+        int count = 0;
+        while (count < 10 && !readThread.getResponse().endsWith("0\r\n\r\n")) {
+            Thread.sleep(500);
+            count++;
+        }
+
+        Assert.assertTrue(readThread.getResponse().contains("2\r\nOK"));
+
+        if (count == 10) {
+            fail("Comet request did not complete");
+        }
+
+        // Send a standard HTTP request on the same connection
+        requestLine = "GET http://localhost:" + getPort() +
+                "/hello HTTP/1.1\r\n";
+        os.write(requestLine.getBytes());
+        os.write("connection: close\r\n".getBytes());
+        os.write("\r\n".getBytes());
+
+        // Check for the expected response
+        count = 0;
+        while (count < 10 && !readThread.getResponse().contains(
+                HelloWorldServlet.RESPONSE_TEXT)) {
+            Thread.sleep(500);
+            count++;
+        }
+
+        if (count == 10) {
+            fail("Non-comet request did not complete");
+        }
+
+        readThread.join();
+        os.close();
+        is.close();
+    }
+
+    @Test
+    public void testConnectionClose() throws Exception {
+
+        if (!isCometSupported()) {
+            log.info("This test is skipped, because this connector does not support Comet.");
+            return;
+        }
+
+        // Setup Tomcat instance
+        Tomcat tomcat = getTomcatInstance();
+        Context root = tomcat.addContext("", TEMP_DIR);
+        Tomcat.addServlet(root, "comet", new ConnectionCloseServlet());
+        root.addServletMapping("/comet", "comet");
+        Tomcat.addServlet(root, "hello", new HelloWorldServlet());
+        root.addServletMapping("/hello", "hello");
+        tomcat.getConnector().setProperty("connectionTimeout", "5000");
+        tomcat.start();
+
+        // Create connection to Comet servlet
+        final Socket socket =
+            SocketFactory.getDefault().createSocket("localhost", getPort());
+        socket.setSoTimeout(5000);
+
+        final OutputStream os = socket.getOutputStream();
+        String requestLine = "POST http://localhost:" + getPort() +
+                "/comet HTTP/1.1\r\n";
+        os.write(requestLine.getBytes());
+        os.write("transfer-encoding: chunked\r\n".getBytes());
+        os.write("\r\n".getBytes());
+        // Don't send any data
+        os.write("0\r\n\r\n".getBytes());
+
+        InputStream is = socket.getInputStream();
+        ResponseReaderThread readThread = new ResponseReaderThread(is);
+        readThread.start();
+
+        // Wait for the comet request/response to finish
+        int count = 0;
+        while (count < 10 && !readThread.getResponse().endsWith("OK")) {
+            Thread.sleep(500);
+            count++;
+        }
+
+        if (count == 10) {
+            fail("Comet request did not complete");
+        }
+
+        // Read thread should have terminated cleanly when the server closed the
+        // socket
+        Assert.assertFalse(readThread.isAlive());
+        Assert.assertNull(readThread.getException());
+
         os.close();
         is.close();
     }
@@ -420,6 +551,43 @@ public class TestCometProcessor extends TomcatBaseTest {
         }
     }
 
+    private static class CometCloseServlet extends HttpServlet
+            implements CometProcessor {
+
+        private static final long serialVersionUID = 1L;
+
+        @Override
+        public void event(CometEvent event) throws IOException,
+                ServletException {
+            HttpServletResponse response = event.getHttpServletResponse();
+            response.setContentType("text/plain");
+            // Force a chunked response since that is what the test client
+            // expects
+            response.flushBuffer();
+            response.getWriter().print("OK");
+            event.close();
+        }
+
+    }
+
+    private static class ConnectionCloseServlet extends HttpServlet
+            implements CometProcessor {
+
+        private static final long serialVersionUID = 1L;
+
+        @Override
+        public void event(CometEvent event) throws IOException,
+                ServletException {
+            HttpServletResponse response = event.getHttpServletResponse();
+            response.setContentType("text/plain");
+            // Disable keep-alive
+            response.setHeader("Connection", "close");
+            response.flushBuffer();
+            response.getWriter().print("OK");
+            event.close();
+        }
+    }
+
     private static class PingWriterThread extends Thread {
 
         private final int pingCount;
@@ -455,7 +623,7 @@ public class TestCometProcessor extends TomcatBaseTest {
     private static class ResponseReaderThread extends Thread {
 
         private final InputStream is;
-        private final StringBuilder response = new StringBuilder();
+        private StringBuilder response = new StringBuilder();
 
         private volatile Exception e = null;
 
@@ -465,6 +633,10 @@ public class TestCometProcessor extends TomcatBaseTest {
 
         public Exception getException() {
             return e;
+        }
+
+        public void clearResponse() {
+            response = new StringBuilder();
         }
 
         public String getResponse() {
