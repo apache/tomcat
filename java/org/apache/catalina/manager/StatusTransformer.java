@@ -528,7 +528,7 @@ public class StatusTransformer {
             } else {
                 writer.write(" requestProcessingTime=\"0\"");
                 writer.write(" requestBytesSent=\"0\"");
-                writer.write(" requestBytesRecieved=\"0\"");
+                writer.write(" requestBytesReceived=\"0\"");
                 writer.write(" remoteAddr=\"&#63;\"");
                 writer.write(" virtualHost=\"&#63;\"");
                 writer.write(" method=\"&#63;\"");

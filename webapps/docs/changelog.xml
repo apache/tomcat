@@ -350,6 +350,10 @@
         Fix several HTML markup errors in servlets of examples web application.
         (kkolinko)
       </fix>
+      <fix>
+        <bug>53398</bug>: Correct spelling of &quot;received&quot; in the
+        Manager application&apos;s XML output. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="jdbc-pool">
