@@ -129,6 +129,11 @@
         Enable host's xmlBase attribute in ContextConfig. (kfujino)
       </fix>
       <fix>
+        <bug>53071</bug>: Use the message from the throwable (if there is one)
+        when generating the report in the <code>ErrorReportValve</code> and no
+        message has been specified via <code>sendError()</code>. (markt)
+      </fix>
+      <fix>
         <bug>53081</bug>: Do not always cache resources loaded by the web
         application class loader since they may be very large which in turn
         could trigger a memory leak. Calls to the web application class
