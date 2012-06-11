@@ -120,7 +120,6 @@ public interface ReplicatedMapEntry extends Serializable {
 
     /**
      * Return the last replicate time.
-     * @return
      */
     public long getLastTimeReplicated();
 

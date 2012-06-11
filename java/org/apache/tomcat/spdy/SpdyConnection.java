@@ -540,7 +540,6 @@ public abstract class SpdyConnection { // implements Runnable {
      * Process a SPDY connection. Called in the input thread, should not
      * block.
      *
-     * @return
      * @throws IOException
      */
     protected int handleFrame() throws IOException {
