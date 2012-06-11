@@ -62,7 +62,7 @@
         <xs:attribute name="stage" type="xs:string" use="required"/>
         <xs:attribute name="requestProcessingTime" type="xs:int" use="required"/>
         <xs:attribute name="requestBytesSent" type="xs:long" use="required"/>
-        <xs:attribute name="requestBytesRecieved" type="xs:long" use="required"/>
+        <xs:attribute name="requestBytesReceived" type="xs:long" use="required"/>
         <xs:attribute name="remoteAddr" type="xs:string" use="required"/>
         <xs:attribute name="virtualHost" type="xs:string" use="required"/>
         <xs:attribute name="method" type="xs:string" use="required"/>
