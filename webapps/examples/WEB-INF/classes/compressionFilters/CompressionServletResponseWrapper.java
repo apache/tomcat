@@ -59,11 +59,6 @@ public class CompressionServletResponseWrapper
     protected HttpServletResponse origResponse = null;
 
     /**
-     * Descriptive information about this Response implementation.
-     */
-    protected static final String info = "GZipServletResponseWrapper";
-
-    /**
      * The ServletOutputStream that has been returned by
      * <code>getOutputStream()</code>, if any.
      */
