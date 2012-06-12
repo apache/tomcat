@@ -178,7 +178,9 @@ public abstract class ContainerBase extends LifecycleMBeanBase
     /**
      * The container event listeners for this Container.
      */
-    protected ArrayList<ContainerListener> listeners = new ArrayList<ContainerListener>();
+    protected ArrayList<ContainerListener> listeners =
+            new ArrayList<ContainerListener>();
+    protected ReadWriteLock listenersLock = new ReentrantReadWriteLock();
 
 
     /**
@@ -914,10 +916,13 @@ public abstract class ContainerBase extends LifecycleMBeanBase
     @Override
     public void addContainerListener(ContainerListener listener) {
 
-        synchronized (listeners) {
+        Lock write = listenersLock.writeLock();
+        write.lock();
+        try {
             listeners.add(listener);
+        } finally {
+            write.unlock();
         }
-
     }
 
 
@@ -975,12 +980,15 @@ public abstract class ContainerBase extends LifecycleMBeanBase
     @Override
     public ContainerListener[] findContainerListeners() {
 
-        synchronized (listeners) {
+        Lock read = listenersLock.readLock();
+        read.lock();
+        try {
             ContainerListener[] results = 
                 new ContainerListener[listeners.size()];
             return listeners.toArray(results);
+        } finally {
+            read.unlock();
         }
-
     }
 
 
@@ -1059,10 +1067,13 @@ public abstract class ContainerBase extends LifecycleMBeanBase
     @Override
     public void removeContainerListener(ContainerListener listener) {
 
-        synchronized (listeners) {
+        Lock write = listenersLock.writeLock();
+        write.lock();
+        try {
             listeners.remove(listener);
+        } finally {
+            write.unlock();
         }
-
     }
 
 
@@ -1397,16 +1408,31 @@ public abstract class ContainerBase extends LifecycleMBeanBase
     @Override
     public void fireContainerEvent(String type, Object data) {
 
-        if (listeners.size() < 1)
-            return;
-        ContainerEvent event = new ContainerEvent(this, type, data);
-        ContainerListener list[] = new ContainerListener[0];
-        synchronized (listeners) {
-            list = listeners.toArray(list);
+        /*
+         * Implementation note
+         * There are two options here.
+         * 1) Take a copy of listeners and fire the events outside of the read
+         *    lock
+         * 2) Don't take a copy and fire the events inside the read lock
+         *
+         * Approach 2 has been used here since holding the read lock only
+         * prevents writes and that is preferable to creating lots of array
+         * objects. Since writes occur on start / stop (unless an external
+         * management tool is used) then holding the read lock for a relatively
+         * long time should not be an issue.
+         */
+        Lock read = listenersLock.readLock();
+        read.lock();
+        try {
+            if (listeners.size() < 1)
+                return;
+            ContainerEvent event = new ContainerEvent(this, type, data);
+            for (ContainerListener listener : listeners) {
+                listener.containerEvent(event);
+            }
+        } finally {
+            read.unlock();
         }
-        for (int i = 0; i < list.length; i++)
-            list[i].containerEvent(event);
-
     }
 
 

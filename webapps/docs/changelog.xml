@@ -65,6 +65,10 @@
         start-stop thread pool. It allows to use daemon threads and give
         them more distinct names. (kfujino)
       </update>
+      <fix>
+        <bug>52999</bug>: Remove synchronization bottleneck from the firing of
+        <code>Container</code> events. (markt)  
+      </fix>
       <add>
         <bug>53008</bug>: Additional test cases for BASIC authentication and
         RFC2617 compliance. Patch provided by Brian Burch. (markt)
