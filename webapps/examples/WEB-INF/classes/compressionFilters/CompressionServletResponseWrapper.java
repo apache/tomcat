@@ -19,6 +19,8 @@ package compressionFilters;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
@@ -30,10 +32,9 @@ import javax.servlet.http.HttpServletResponseWrapper;
  *
  * @author Amy Roh
  * @author Dmitri Valdin
- * @version $Id$
  */
-
-public class CompressionServletResponseWrapper extends HttpServletResponseWrapper {
+public class CompressionServletResponseWrapper
+        extends HttpServletResponseWrapper {
 
     // ----------------------------------------------------- Constructor
 
@@ -41,7 +42,6 @@ public class CompressionServletResponseWrapper extends HttpServletResponseWrappe
      * Calls the parent constructor which creates a ServletResponse adaptor
      * wrapping the given response object.
      */
-
     public CompressionServletResponseWrapper(HttpServletResponse response) {
         super(response);
         origResponse = response;
@@ -59,6 +59,11 @@ public class CompressionServletResponseWrapper extends HttpServletResponseWrappe
     protected HttpServletResponse origResponse = null;
 
     /**
+     * Descriptive information about this Response implementation.
+     */
+    protected static final String info = "GZipServletResponseWrapper";
+
+    /**
      * The ServletOutputStream that has been returned by
      * <code>getOutputStream()</code>, if any.
      */
@@ -74,32 +79,30 @@ public class CompressionServletResponseWrapper extends HttpServletResponseWrappe
     /**
      * The threshold number to compress
      */
-    protected int threshold = 0;
+    protected int compressionThreshold = 0;
+
+    /**
+     * The compression buffer size
+     */
+    protected int compressionBuffer = 8192;  // 8KB default
+
+    /**
+     * The mime types to compress
+     */
+    protected String[] compressionMimeTypes = {"text/html", "text/xml", "text/plain"};
 
     /**
      * Debug level
      */
-    private int debug = 0;
+    protected int debug = 0;
 
     /**
-     * Content type
+     * keeps a copy of all headers set
      */
-    protected String contentType = null;
+    private Map<String,String> headerCopies = new HashMap<String,String>();
+
 
     // --------------------------------------------------------- Public Methods
-
-
-    /**
-     * Set content type
-     */
-    @Override
-    public void setContentType(String contentType) {
-        if (debug > 1) {
-            System.out.println("setContentType to "+contentType);
-        }
-        this.contentType = contentType;
-        origResponse.setContentType(contentType);
-    }
 
 
     /**
@@ -109,9 +112,28 @@ public class CompressionServletResponseWrapper extends HttpServletResponseWrappe
         if (debug > 1) {
             System.out.println("setCompressionThreshold to " + threshold);
         }
-        this.threshold = threshold;
+        this.compressionThreshold = threshold;
     }
 
+    /**
+     * Set compression buffer
+     */
+    public void setCompressionBuffer(int buffer) {
+        if (debug > 1) {
+            System.out.println("setCompressionBuffer to " + buffer);
+        }
+        this.compressionBuffer = buffer;
+    }
+
+    /**
+     * Set compressible mime types
+     */
+    public void setCompressionMimeTypes(String[] mimeTypes) {
+        if (debug > 1) {
+            System.out.println("setCompressionMimeTypes to " + mimeTypes);
+        }
+        this.compressionMimeTypes = mimeTypes;
+    }
 
     /**
      * Set debug level
@@ -132,13 +154,14 @@ public class CompressionServletResponseWrapper extends HttpServletResponseWrappe
             System.out.println("createOutputStream gets called");
         }
 
-        CompressionResponseStream compressedStream =
-            new CompressionResponseStream(origResponse);
-        compressedStream.setDebugLevel(debug);
-        compressedStream.setBuffer(threshold);
+        CompressionResponseStream stream = new CompressionResponseStream(
+                this, origResponse.getOutputStream());
+        stream.setDebugLevel(debug);
+        stream.setCompressionThreshold(compressionThreshold);
+        stream.setCompressionBuffer(compressionBuffer);
+        stream.setCompressionMimeTypes(compressionMimeTypes);
 
-        return compressedStream;
-
+        return stream;
     }
 
 
@@ -170,7 +193,7 @@ public class CompressionServletResponseWrapper extends HttpServletResponseWrappe
     @Override
     public void flushBuffer() throws IOException {
         if (debug > 1) {
-            System.out.println("flush buffer @ CompressionServletResponseWrapper");
+            System.out.println("flush buffer @ GZipServletResponseWrapper");
         }
         ((CompressionResponseStream)stream).flush();
 
@@ -219,7 +242,6 @@ public class CompressionServletResponseWrapper extends HttpServletResponseWrappe
         if (debug > 1) {
             System.out.println("stream is set to "+stream+" in getWriter");
         }
-        //String charset = getCharsetFromContentType(contentType);
         String charEnc = origResponse.getCharacterEncoding();
         if (debug > 1) {
             System.out.println("character encoding is " + charEnc);
@@ -233,12 +255,27 @@ public class CompressionServletResponseWrapper extends HttpServletResponseWrappe
         }
 
         return (writer);
-
     }
 
     @Override
-    public void setContentLength(int length) {
-        // Don't, as compression will change it
+    public String getHeader(String name) {
+        return headerCopies.get(name);
     }
 
+    @Override
+    public void addHeader(String name, String value) {
+        if (headerCopies.containsKey(name)) {
+            String existingValue = headerCopies.get(name);
+            if ((existingValue != null) && (existingValue.length() > 0)) headerCopies.put(name, existingValue + "," + value);
+            else headerCopies.put(name, value);
+        } else headerCopies.put(name, value);
+        super.addHeader(name, value);
+    }
+
+
+    @Override
+    public void setHeader(String name, String value) {
+        headerCopies.put(name, value);
+        super.setHeader(name, value);
+    }
 }
