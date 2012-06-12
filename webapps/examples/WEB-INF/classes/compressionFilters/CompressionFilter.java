@@ -17,7 +17,9 @@
 package compressionFilters;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.List;
 import java.util.StringTokenizer;
 
 import javax.servlet.Filter;
@@ -115,11 +117,21 @@ public class CompressionFilter implements Filter {
 
             str = filterConfig.getInitParameter("compressionMimeTypes");
             if (str!=null) {
-                compressionMimeTypes = null;
+                List<String> values = new ArrayList<String>();
                 StringTokenizer st = new StringTokenizer(str, ",");
 
                 while (st.hasMoreTokens()) {
-                    compressionMimeTypes = addStringArray(compressionMimeTypes, st.nextToken().trim());
+                    String token = st.nextToken().trim();
+                    if (token.length() > 0) {
+                        values.add(token);
+                    }
+                }
+
+                if (values.size() > 0) {
+                    compressionMimeTypes = values.toArray(
+                            new String[values.size()]);
+                } else {
+                    compressionMimeTypes = null;
                 }
 
                 if (debug > 0) {
@@ -248,27 +260,6 @@ public class CompressionFilter implements Filter {
      */
     public FilterConfig getFilterConfig() {
         return config;
-    }
-
-    /**
-     * General use method
-     *
-     * @param sArray the StringArray
-     * @param value string
-     */
-    private String[] addStringArray(String sArray[], String value) {
-        String[] result = null;
-        if (sArray == null) {
-            result = new String[1];
-            result[0] = value;
-        }
-        else {
-            result = new String[sArray.length + 1];
-            for (int i = 0; i < sArray.length; i++)
-                result[i] = sArray[i];
-            result[sArray.length] = value;
-        }
-        return result;
     }
 
 }
