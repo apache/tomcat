@@ -402,7 +402,7 @@ public class StandardSession implements HttpSession, Session, Serializable {
         // Notify interested application event listeners
         Context context = (Context) manager.getContainer();
         Object listeners[] = context.getApplicationLifecycleListeners();
-        if (listeners != null) {
+        if (listeners != null && listeners.length > 0) {
             HttpSessionEvent event =
                 new HttpSessionEvent(getSession());
             for (int i = 0; i < listeners.length; i++) {
@@ -770,32 +770,34 @@ public class StandardSession implements HttpSession, Session, Serializable {
                 }
             }
             try {
-                Object listeners[] = context.getApplicationLifecycleListeners();
-                if (notify && (listeners != null)) {
-                    HttpSessionEvent event =
-                        new HttpSessionEvent(getSession());
-                    for (int i = 0; i < listeners.length; i++) {
-                        int j = (listeners.length - 1) - i;
-                        if (!(listeners[j] instanceof HttpSessionListener))
-                            continue;
-                        HttpSessionListener listener =
-                            (HttpSessionListener) listeners[j];
-                        try {
-                            context.fireContainerEvent("beforeSessionDestroyed",
-                                    listener);
-                            listener.sessionDestroyed(event);
-                            context.fireContainerEvent("afterSessionDestroyed",
-                                    listener);
-                        } catch (Throwable t) {
-                            ExceptionUtils.handleThrowable(t);
+                if (notify) {
+                    Object listeners[] = context.getApplicationLifecycleListeners();
+                    if (listeners != null && listeners.length > 0) {
+                        HttpSessionEvent event =
+                            new HttpSessionEvent(getSession());
+                        for (int i = 0; i < listeners.length; i++) {
+                            int j = (listeners.length - 1) - i;
+                            if (!(listeners[j] instanceof HttpSessionListener))
+                                continue;
+                            HttpSessionListener listener =
+                                (HttpSessionListener) listeners[j];
                             try {
-                                context.fireContainerEvent(
-                                        "afterSessionDestroyed", listener);
-                            } catch (Exception e) {
-                                // Ignore
+                                context.fireContainerEvent("beforeSessionDestroyed",
+                                        listener);
+                                listener.sessionDestroyed(event);
+                                context.fireContainerEvent("afterSessionDestroyed",
+                                        listener);
+                            } catch (Throwable t) {
+                                ExceptionUtils.handleThrowable(t);
+                                try {
+                                    context.fireContainerEvent(
+                                            "afterSessionDestroyed", listener);
+                                } catch (Exception e) {
+                                    // Ignore
+                                }
+                                manager.getContainer().getLogger().error
+                                    (sm.getString("standardSession.sessionEvent"), t);
                             }
-                            manager.getContainer().getLogger().error
-                                (sm.getString("standardSession.sessionEvent"), t);
                         }
                     }
                 }
