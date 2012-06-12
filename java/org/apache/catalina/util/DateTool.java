@@ -14,8 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.catalina.util;
 
 import java.text.DateFormat;
@@ -33,13 +31,6 @@ import java.util.TimeZone;
  * @author fhanik
  */
 public class DateTool {
-
-    /**
-     * US locale - all HTTP dates are in English
-     * @deprecated Use {@link Locale#US}
-     */
-    @Deprecated
-    public static final Locale LOCALE_US = Locale.US;
 
     /**
      * GMT timezone - all HTTP dates are on GMT
