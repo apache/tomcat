@@ -182,7 +182,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase
      */
     protected ArrayList<ContainerListener> listeners =
             new ArrayList<ContainerListener>();
-    protected ReadWriteLock listenersLock = new ReentrantReadWriteLock();
+    protected final ReadWriteLock listenersLock = new ReentrantReadWriteLock();
 
 
     /**
@@ -248,7 +248,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase
     /**
      * Lock used to control access to the Realm.
      */
-    private ReadWriteLock realmLock = new ReentrantReadWriteLock();
+    private final ReadWriteLock realmLock = new ReentrantReadWriteLock();
 
     /**
      * The resources DirContext object with which this Container is associated.
