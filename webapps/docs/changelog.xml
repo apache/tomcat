@@ -60,6 +60,11 @@
         <bug>52055</bug>: An additional fix to ensure that the
         ChunkedInputFilter is correctly recycled. (markt)
       </fix>
+      <add>
+        <bug>52954</bug>: Make DIGEST authentication tolerant of clients (mainly
+        older Android implementations) that do not follow RFC 2617 exactly.
+        (markt) 
+      </add>
       <update>
         <bug>52955</bug>: Implement custom thread factory for container
         start-stop thread pool. It allows to use daemon threads and give
