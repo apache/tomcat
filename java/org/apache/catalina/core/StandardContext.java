@@ -4658,7 +4658,7 @@ public class StandardContext extends ContainerBase
         context.setNewServletContextListenerAllowed(false);
 
         Object instances[] = getApplicationLifecycleListeners();
-        if (instances == null)
+        if (instances == null || instances.length == 0)
             return (ok);
         ServletContextEvent event =
           new ServletContextEvent(getServletContext());
@@ -4699,7 +4699,7 @@ public class StandardContext extends ContainerBase
 
         boolean ok = true;
         Object listeners[] = getApplicationLifecycleListeners();
-        if (listeners != null) {
+        if (listeners != null && listeners.length > 0) {
             ServletContextEvent event =
                 new ServletContextEvent(getServletContext());
             for (int i = 0; i < listeners.length; i++) {
