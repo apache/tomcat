@@ -344,6 +344,10 @@
         Remove obsolete bug warning from Windows service
         documentation page. (rjung)
       </fix>
+      <add>
+        <bug>50182</bug>: Various improvements to the Compression Filter. Patch
+        provided by David Becker. (markt)
+      </add>
       <fix>
         <bug>52853</bug>: Clarify how Jar Scanner handles directories. (markt)
       </fix>
