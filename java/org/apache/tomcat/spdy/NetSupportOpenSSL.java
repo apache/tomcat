@@ -203,8 +203,6 @@ public class NetSupportOpenSSL extends SpdyContext.NetSupport {
             if (rd < 0) {
                 return -1;
             }
-            off += rd;
-            len -= rd;
             return rd;
         }
     }

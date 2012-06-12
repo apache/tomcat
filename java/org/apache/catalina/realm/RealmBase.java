@@ -1200,7 +1200,7 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
             throw new IllegalArgumentException(uee.getMessage());
         }
 
-        byte[] digest = null;
+        byte[] digest;
         // Bugzilla 32137
         synchronized(md5Helper) {
             digest = md5Helper.digest(valueBytes);
