@@ -36,7 +36,9 @@ public class DateTool {
 
     /**
      * US locale - all HTTP dates are in English
+     * @deprecated Use {@link Locale#US}
      */
+    @Deprecated
     public static final Locale LOCALE_US = Locale.US;
 
     /**
@@ -75,7 +77,7 @@ public class DateTool {
     public static final ThreadLocal<DateFormat> rfc1123Format = new ThreadLocal<DateFormat>() {
         @Override
         public DateFormat initialValue() {
-            DateFormat result = new SimpleDateFormat(RFC1123_PATTERN, LOCALE_US);
+            DateFormat result = new SimpleDateFormat(RFC1123_PATTERN, Locale.US);
             result.setTimeZone(GMT_ZONE);
             return result;
         }
@@ -87,7 +89,7 @@ public class DateTool {
     public static final ThreadLocal<DateFormat> oldCookieFormat = new ThreadLocal<DateFormat>() {
         @Override
         public DateFormat initialValue() {
-            DateFormat result = new SimpleDateFormat(OLD_COOKIE_PATTERN, LOCALE_US);
+            DateFormat result = new SimpleDateFormat(OLD_COOKIE_PATTERN, Locale.US);
             result.setTimeZone(GMT_ZONE);
             return result;
         }
@@ -97,7 +99,7 @@ public class DateTool {
     public static final ThreadLocal<DateFormat> rfc1036Format = new ThreadLocal<DateFormat>() {
         @Override
         public DateFormat initialValue() {
-            DateFormat result = new SimpleDateFormat(rfc1036Pattern, LOCALE_US);
+            DateFormat result = new SimpleDateFormat(rfc1036Pattern, Locale.US);
             result.setTimeZone(GMT_ZONE);
             return result;
         }
@@ -106,7 +108,7 @@ public class DateTool {
     public static final ThreadLocal<DateFormat> asctimeFormat = new ThreadLocal<DateFormat>() {
         @Override
         public DateFormat initialValue() {
-            DateFormat result = new SimpleDateFormat(asctimePattern, LOCALE_US);
+            DateFormat result = new SimpleDateFormat(asctimePattern, Locale.US);
             result.setTimeZone(GMT_ZONE);
             return result;
         }
