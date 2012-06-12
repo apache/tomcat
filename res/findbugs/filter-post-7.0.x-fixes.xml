@@ -38,12 +38,6 @@
     <Method name="writeObject" />
     <Bug code="Se" />
   </Match>
-  <!-- Re-factor Integer constants to an enum -->
-  <Match>
-    <Class name="org.apache.catalina.startup.ClassLoaderFactory" />
-    <Method name="createClassLoader" />
-    <Bug code="RC" />
-  </Match>
   <!-- Re-factor to only have the thread running when an instance of the     -->
   <!-- handler is active -->
   <Match>
