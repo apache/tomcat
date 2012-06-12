@@ -14,7 +14,6 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-
 package compressionFilters;
 
 import java.io.IOException;
@@ -29,9 +28,7 @@ import javax.servlet.http.HttpServletResponse;
 /**
  * Very Simple test servlet to test compression filter
  * @author Amy Roh
- * @version $Id$
  */
-
 public class CompressionFilterTestServlet extends HttpServlet {
 
     private static final long serialVersionUID = 1L;
@@ -57,6 +54,11 @@ public class CompressionFilterTestServlet extends HttpServlet {
 
 
         out.println("Compression Filter Test Servlet");
+        out.println("Minimum content length for compression is 128 bytes");
+        out.println("**********  32 bytes  **********");
+        out.println("**********  32 bytes  **********");
+        out.println("**********  32 bytes  **********");
+        out.println("**********  32 bytes  **********");
         out.close();
     }
 

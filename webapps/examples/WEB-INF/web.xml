@@ -60,10 +60,17 @@
     <filter>
         <filter-name>Compression Filter</filter-name>
         <filter-class>compressionFilters.CompressionFilter</filter-class>
-
         <init-param>
-          <param-name>compressionThreshold</param-name>
-          <param-value>10</param-value>
+            <param-name>compressionThreshold</param-name>
+            <param-value>128</param-value>
+        </init-param>
+        <init-param>
+            <param-name>compressionBuffer</param-name>
+            <param-value>8192</param-value>
+        </init-param>
+        <init-param>
+            <param-name>compressionMimeTypes</param-name>
+            <param-value>text/html,text/plain,text/xml</param-value>
         </init-param>
         <init-param>
           <param-name>debug</param-name>
