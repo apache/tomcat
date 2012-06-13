@@ -1094,17 +1094,15 @@ public class AprEndpoint extends AbstractEndpoint {
         // Need two pollsets since the socketTimeout and the keep-alive timeout
         // can have different values.
         private long connectionPollset = 0;
-        private long keepAlivePollset = 0;
         private long pool = 0;
         private long[] desc;
 
         private long[] addSocket;
-        private boolean[] addSocketKeepAlive;
+        private int[] addSocketTimeout;
 
         private volatile int addCount = 0;
 
         private boolean comet = true;
-        private boolean separateKeepAlive = false;
 
         protected volatile int keepAliveCount = 0;
         public int getKeepAliveCount() { return keepAliveCount; }
@@ -1120,35 +1118,20 @@ public class AprEndpoint extends AbstractEndpoint {
         protected void init() {
             pool = Pool.create(serverSockPool);
             int size = getMaxConnections() / pollerThreadCount;
-            int keepAliveTimeout = getKeepAliveTimeout();
             int socketTimeout = socketProperties.getSoTimeout();
-            if (keepAliveTimeout != socketTimeout && !comet) {
-                separateKeepAlive = true;
-            }
             connectionPollset = allocatePoller(size, pool, socketTimeout);
-            if (separateKeepAlive) {
-                keepAlivePollset = allocatePoller(size, pool, keepAliveTimeout);
-            }
             if (connectionPollset == 0 && size > 1024) {
                 size = 1024;
                 connectionPollset = allocatePoller(size, pool, socketTimeout);
-                if (separateKeepAlive) {
-                    keepAlivePollset =
-                        allocatePoller(size, pool, keepAliveTimeout);
-                }
             }
             if (connectionPollset == 0) {
                 size = 62;
                 connectionPollset = allocatePoller(size, pool, socketTimeout);
-                if (separateKeepAlive) {
-                    keepAlivePollset =
-                        allocatePoller(size, pool, keepAliveTimeout);
-                }
             }
             desc = new long[size * 2];
             keepAliveCount = 0;
             addSocket = new long[size];
-            addSocketKeepAlive = new boolean[size];
+            addSocketTimeout= new int[size];
             addCount = 0;
         }
 
@@ -1165,11 +1148,8 @@ public class AprEndpoint extends AbstractEndpoint {
                     destroySocket(addSocket[i]);
                 }
             }
-            // Close all sockets still in the pollers
+            // Close all sockets still in the poller
             closePollset(connectionPollset);
-            if (separateKeepAlive) {
-                closePollset(keepAlivePollset);
-            }
             Pool.destroy(pool);
             keepAliveCount = 0;
             addCount = 0;
@@ -1218,7 +1198,11 @@ public class AprEndpoint extends AbstractEndpoint {
                     return;
                 }
                 addSocket[addCount] = socket;
-                addSocketKeepAlive[addCount] = keepAlive;
+                if (keepAlive) {
+                    addSocketTimeout[addCount] = getKeepAliveTimeout();
+                } else {
+                    addSocketTimeout[addCount] = getSoTimeout();
+                }
                 addCount++;
                 this.notify();
             }
@@ -1270,14 +1254,10 @@ public class AprEndpoint extends AbstractEndpoint {
                             int successCount = 0;
                             try {
                                 for (int i = (addCount - 1); i >= 0; i--) {
-                                    int rv;
-                                    if (separateKeepAlive && addSocketKeepAlive[i]) {
-                                        rv = Poll.add(keepAlivePollset,
-                                                addSocket[i], Poll.APR_POLLIN);
-                                    } else {
-                                        rv = Poll.add(connectionPollset,
-                                                addSocket[i], Poll.APR_POLLIN);
-                                    }
+                                    int rv = Poll.addWithTimeout(
+                                            connectionPollset, addSocket[i],
+                                            Poll.APR_POLLIN,
+                                            addSocketTimeout[i] * 1000);
                                     if (rv == Status.APR_SUCCESS) {
                                         successCount++;
                                     } else {
@@ -1301,18 +1281,12 @@ public class AprEndpoint extends AbstractEndpoint {
                     if (doPoll(connectionPollset)) {
                         continue;
                     }
-                    if (separateKeepAlive && doPoll(keepAlivePollset)) {
-                        continue;
-                    }
 
                     // Check timeouts (much less frequently that polling)
                     if (maintainTime > 1000000L && running) {
                         maintainTime = 0;
                         if (socketProperties.getSoTimeout() > 0) {
                             doTimeout(connectionPollset);
-                        }
-                        if (separateKeepAlive) {
-                            doTimeout(keepAlivePollset);
                         }
                     }
                 } catch (Throwable t) {
