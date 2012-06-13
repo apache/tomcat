@@ -308,6 +308,10 @@
         Correct an edge case where Comet END events were not send to connected
         clients when the Tomcat connector was stopped. (markt)
       </fix>
+      <fix>
+        <bug>53406</bug>: Fix possible stack overflow on connection close when
+        using Comet. (fhanik)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
