@@ -373,6 +373,11 @@
         <bug>53398</bug>: Correct spelling of &quot;received&quot; in the
         Manager application&apos;s XML output. (markt)
       </fix>
+      <fix>
+        <bug>53403</bug>: Update a reference to the Servlet specification in the
+        first web applciation section of the documentation web application to
+        include newer versions of the specificarion. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="jdbc-pool">
