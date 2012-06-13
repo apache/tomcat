@@ -36,6 +36,8 @@ public class UpgradeNioProcessor extends UpgradeProcessor<NioChannel> {
             UpgradeInbound upgradeInbound, NioSelectorPool pool) {
         super(upgradeInbound);
 
+        wrapper.setTimeout(upgradeInbound.getReadTimeout());
+
         this.nioChannel = wrapper.getSocket();
         this.pool = pool;
         this.maxRead = nioChannel.getBufHandler().getReadBuffer().capacity();
