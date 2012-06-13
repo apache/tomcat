@@ -102,8 +102,8 @@ application's "document root" directory:</p>
     application, such as third party class libraries or JDBC drivers.</li>
 </ul>
 
-<p>When you install an application into Tomcat (or any other
-2.2/2.3-compatible server), the classes in the <code>WEB-INF/classes/</code>
+<p>When you install an application into Tomcat (or any other 2.2 or later
+Servlet container), the classes in the <code>WEB-INF/classes/</code>
 directory, as well as all classes in JAR files found in the
 <code>WEB-INF/lib/</code> directory, are made visible to other classes
 within your particular web application.  Thus, if
