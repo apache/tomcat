@@ -155,7 +155,7 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
 
         rp.setStage(org.apache.coyote.Constants.STAGE_ENDED);
 
-        if (error) {
+        if (error || status==SocketStatus.STOP) {
             return SocketState.CLOSED;
         } else if (!comet) {
             if (keepAlive) {
