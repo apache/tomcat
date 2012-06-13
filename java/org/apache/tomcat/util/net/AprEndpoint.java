@@ -1177,14 +1177,16 @@ public class AprEndpoint extends AbstractEndpoint {
         }
 
         /**
-         * Add specified socket and associated pool to the poller. The socket will
-         * be added to a temporary array, and polled first after a maximum amount
-         * of time equal to pollTime (in most cases, latency will be much lower,
-         * however).
+         * Add specified socket and associated pool to the poller. The socket
+         * will be added to a temporary array, and polled first after a maximum
+         * amount of time equal to pollTime (in most cases, latency will be much
+         * lower, however).
          *
-         * @param socket to add to the poller
+         * @param socket    to add to the poller
+         * @param timeout   read timeout (in milliseconds) to use with this
+         *                  socket. Use -1 for infinite timeout
          */
-        public void add(long socket, boolean keepAlive) {
+        public void add(long socket, int timeout) {
             synchronized (this) {
                 // Add socket to the list. Newly added sockets will wait
                 // at most for pollTime before being polled
@@ -1198,11 +1200,7 @@ public class AprEndpoint extends AbstractEndpoint {
                     return;
                 }
                 addSocket[addCount] = socket;
-                if (keepAlive) {
-                    addSocketTimeout[addCount] = getKeepAliveTimeout();
-                } else {
-                    addSocketTimeout[addCount] = getSoTimeout();
-                }
+                addSocketTimeout[addCount] = timeout;
                 addCount++;
                 this.notify();
             }
@@ -1254,10 +1252,14 @@ public class AprEndpoint extends AbstractEndpoint {
                             int successCount = 0;
                             try {
                                 for (int i = (addCount - 1); i >= 0; i--) {
+                                    int timeout = addSocketTimeout[i];
+                                    if (timeout > 0) {
+                                        // Convert milliseconds to microseconds
+                                        timeout = timeout * 1000;
+                                    }
                                     int rv = Poll.addWithTimeout(
                                             connectionPollset, addSocket[i],
-                                            Poll.APR_POLLIN,
-                                            addSocketTimeout[i] * 1000);
+                                            Poll.APR_POLLIN, timeout);
                                     if (rv == Status.APR_SUCCESS) {
                                         successCount++;
                                     } else {
@@ -1639,7 +1641,8 @@ public class AprEndpoint extends AbstractEndpoint {
                                     Socket.timeoutSet(state.socket, socketProperties.getSoTimeout() * 1000);
                                     // If all done put the socket back in the poller for
                                     // processing of further requests
-                                    getPoller().add(state.socket, true);
+                                    getPoller().add(state.socket,
+                                            getKeepAliveTimeout());
                                 } else {
                                     // Close the socket since this is
                                     // the end of not keep-alive request.
@@ -1730,7 +1733,8 @@ public class AprEndpoint extends AbstractEndpoint {
             synchronized (socket) {
                 if (!deferAccept) {
                     if (setSocketOptions(socket.getSocket().longValue())) {
-                        getPoller().add(socket.getSocket().longValue(), false);
+                        getPoller().add(socket.getSocket().longValue(),
+                                getSoTimeout());
                     } else {
                         // Close socket and pool
                         destroySocket(socket.getSocket().longValue());

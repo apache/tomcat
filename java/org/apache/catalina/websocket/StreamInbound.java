@@ -282,4 +282,17 @@ public abstract class StreamInbound implements UpgradeInbound {
      *                      connection.
      */
     protected abstract void onTextData(Reader r) throws IOException;
+
+    /**
+     * This default implementation sets the read timeout to infinite and expects
+     * the WebSocket application to close the connection when it is no longer
+     * required. Applications wishing to set an explicit timeout may override
+     * this method and return a value of their choice.
+     *
+     * @return  The read timeout in milliseconds or -1 for infinite
+     */
+    @Override
+    public int getReadTimeout() {
+        return -1;
+    }
 }

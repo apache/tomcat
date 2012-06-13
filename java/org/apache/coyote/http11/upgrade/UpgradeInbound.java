@@ -33,4 +33,12 @@ public interface UpgradeInbound {
     SocketState onData() throws IOException;
 
     void setUpgradeOutbound(UpgradeOutbound upgradeOutbound);
+
+    /**
+     * Allow the upgraded protocol to define the read timeout to be used with
+     * the upgraded connection.
+     *
+     * @return  The read timeout in milliseconds or -1 for infinite
+     */
+    int getReadTimeout();
 }
