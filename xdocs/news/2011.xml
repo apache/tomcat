@@ -41,10 +41,6 @@ of Tomcat Native 1.1.22. This is a stable release adding some bug fixes.
 <p>
  Please see the <a href="../miscellaneous/changelog.html">ChangeLog</a> for a full list of changes.
 </p>
-<p>If you find any bugs while using this release, please fill in the
-<a href="http://issues.apache.org/bugzilla/enter_bug.cgi?product=Tomcat%206">Bugzilla</a>
-Bug Report. When entering bug select <b>Native:JNI</b> Component.
-</p>
 <hr size="1" noshade="noshade" />
 </section>
 </body>
