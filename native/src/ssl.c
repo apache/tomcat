@@ -466,9 +466,9 @@ static int ssl_rand_make(const char *file, int len, int base64)
         BIO_write(out, buf, len);
         num -= len;
     }
-    BIO_flush(out);
+    r = BIO_flush(out);
     BIO_free_all(out);
-    return 1;
+    return r > 0 ? 1 : 0;
 }
 
 TCN_IMPLEMENT_CALL(jint, SSL, initialize)(TCN_STDARGS, jstring engine)
