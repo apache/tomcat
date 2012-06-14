@@ -902,6 +902,11 @@ public class AprEndpoint extends AbstractEndpoint {
         // If not running the socket will be destroyed by
         // parent pool or acceptor socket.
         // In any case disable double free which would cause JVM core.
+
+        // While the connector is running, destroySocket() will call
+        // countDownConnection(). Once the connector is stopped, the latch is
+        // removed so it does not matter that destroySocket() does not call
+        // countDownConnection() in that case
         destroySocket(socket, running);
     }
 
@@ -977,12 +982,10 @@ public class AprEndpoint extends AbstractEndpoint {
                     if (running && !paused) {
                         // Hand this socket off to an appropriate processor
                         if (!processSocketWithOptions(socket)) {
-                            countDownConnection();
                             // Close socket and pool right away
                             destroySocket(socket);
                         }
                     } else {
-                        countDownConnection();
                         // Close socket and pool right away
                         destroySocket(socket);
                     }
