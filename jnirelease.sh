@@ -135,7 +135,7 @@ JKJNIDIST=tomcat-native-${JKJNIVER}-src
 
 rm -rf ${JKJNIDIST}
 mkdir -p ${JKJNIDIST}/jni
-for i in native java xdocs examples test build.xml build.properties.default
+for i in native java xdocs examples test build.xml build.properties.default jnirelease.sh
 do
     svn export ${JKJNISVN}/${i} ${JKJNIDIST}/jni/${i}
     if [ $? -ne 0 ]; then
@@ -181,7 +181,7 @@ tar -cf - ${JKJNIDIST} | gzip -c9 > ${JKJNIDIST}.tar.gz || exit 1
 JKWINDIST=tomcat-native-${JKJNIVER}-win32-src
 rm -rf ${JKWINDIST}
 mkdir -p ${JKWINDIST}/jni
-for i in native java xdocs examples test build.xml build.properties.default
+for i in native java xdocs examples test build.xml build.properties.default jnirelease.sh
 do
     svn export --native-eol CRLF ${JKJNISVN}/${i} ${JKWINDIST}/jni/${i}
     if [ $? -ne 0 ]; then
