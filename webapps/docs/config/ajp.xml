@@ -95,6 +95,13 @@
       By default, DNS lookups are disabled.</p>
     </attribute>
 
+    <attribute name="maxHeaderCount" required="false">
+      <p>The maximum number of headers in a request that are allowed by the
+      container. A request that contains more headers than the specified limit
+      will be rejected. A value of less than 0 means no limit.
+      If not specified, a default of 100 is used.</p>
+    </attribute>
+
     <attribute name="maxParameterCount" required="false">
       <p>The maximum number of parameter and value pairs (GET plus POST) which
       will be automatically parsed by the container. Parameter and value pairs

@@ -237,6 +237,12 @@ public abstract class AbstractProtocol implements ProtocolHandler,
         setConnectionTimeout(timeout);
     }
 
+    public int getMaxHeaderCount() {
+        return endpoint.getMaxHeaderCount();
+    }
+    public void setMaxHeaderCount(int maxHeaderCount) {
+        endpoint.setMaxHeaderCount(maxHeaderCount);
+    }
 
     // ---------------------------------------------------------- Public methods
 

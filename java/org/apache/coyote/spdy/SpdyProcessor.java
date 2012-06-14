@@ -519,6 +519,9 @@ public class SpdyProcessor extends AbstractProcessor<Object> implements
         // Request received.
         MimeHeaders mimeHeaders = request.getMimeHeaders();
 
+        // Set this every time in case limit has been changed via JMX
+        mimeHeaders.setLimit(endpoint.getMaxHeaderCount());
+
         for (int i = 0; i < frame.nvCount; i++) {
             int nameLen = frame.read16();
             if (nameLen > frame.remaining()) {
