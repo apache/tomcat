@@ -1409,9 +1409,7 @@ public class StandardContext extends ContainerBase
 
     /**
      * Return the Locale to character set mapper for this Context.
-     * @deprecated Use {@link #getCharset(Locale)}
      */
-    @Deprecated
     @Override
     public CharsetMapper getCharsetMapper() {
 
@@ -1436,7 +1434,6 @@ public class StandardContext extends ContainerBase
      *
      * @param mapper The new mapper
      */
-    @Deprecated
     @Override
     public void setCharsetMapper(CharsetMapper mapper) {
 
