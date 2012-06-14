@@ -26,18 +26,23 @@ Documentation
 -------------
 
 The documentation available as of the date of this release is
-included in HTML format in the docs directory.
+included in HTML format in the jni/docs directory.
 The most up-to-date documentation can be found at
+http://tomcat.apache.org/native-doc/
+
+Documentation about the Tomcat APR connector which is based
+on this library can be found at
 http://tomcat.apache.org/tomcat-7.0-doc/apr.html.
 
 
-Buliding
+Building
 --------
 
 To build the Java API
+> cd jni
 > ant
 
-To build the native part see native/BUILDING
+To build the native part see jni/native/BUILDING
 
 
 Running the examples
@@ -45,12 +50,17 @@ Running the examples
 
 Before running the examples you may have to set LD_LIBRARY_PATH, something like
 LD_LIBRARY_PATH=/opt/SMAWoIS/openssl/lib; export LD_LIBRARY_PATH
-1 - echo: (port in examples/org/apache/tomcat/jni/Echo.properties).
-    ant echo-example
-2 - ssl server:
-    (see parameters in ./examples/org/apache/tomcat/jni/SSL.properties)
-    The certificate and key should be in dist/classes/examples.
-    ant server-example
+
+1) echo example:
+   - Choose some free port in
+     dist/classes/examples/org/apache/tomcat/jni/Echo.properties
+   - run: ant run-echo
+
+2) ssl server example:
+   - Change parameters in dist/classes/examples/org/apache/tomcat/jni/SSL.properties
+     according to your needs. The certificate and key should be in
+     dist/classes/examples.
+   - run: ant run-ssl-server
 
 
 Cryptographic Software Notice
