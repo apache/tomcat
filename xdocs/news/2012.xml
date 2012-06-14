@@ -32,7 +32,7 @@
 <section name="2012 News &amp; Status">
 <br />
 <a name="20120613.1">
-<h3>08 August - TC-Native-1.1.24 released</h3>
+<h3>13 June - TC-Native-1.1.24 released</h3>
 </a>
 <p>The Apache Tomcat team is proud to announce the immediate availability
 of Tomcat Native 1.1.24. This is a feature-add release adding support for
@@ -49,7 +49,7 @@ Bug Report. When entering bug select <b>Native:JNI</b> Component.
 <hr size="1" noshade="noshade" />
 <br />
 <a name="20120302.1">
-<h3>08 August - TC-Native-1.1.23 released</h3>
+<h3>02 March - TC-Native-1.1.23 released</h3>
 </a>
 <p>The Apache Tomcat team is proud to announce the immediate availability
 of Tomcat Native 1.1.23. This is a stable release adding some bug fixes and
