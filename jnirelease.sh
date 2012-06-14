@@ -156,7 +156,6 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 cd "$top"
-rm -rf ${JKJNIDIST}/jni/xdocs
 mv ${JKJNIDIST}/jni/build/docs ${JKJNIDIST}/jni/docs
 rm -rf ${JKJNIDIST}/jni/build
 for i in LICENSE NOTICE README.txt
@@ -209,7 +208,6 @@ if [ $? -ne 0 ]; then
 fi
 cd "$top"
 
-rm -rf ${JKWINDIST}/jni/xdocs
 mv ${JKWINDIST}/jni/build/docs ${JKWINDIST}/jni/docs
 rm -rf ${JKWINDIST}/jni/build
 for i in LICENSE NOTICE README.txt
