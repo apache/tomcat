@@ -127,6 +127,15 @@ TCN_IMPLEMENT_CALL(jint, OS, info)(TCN_STDARGS,
         if (sysinfo(&info))
             rv = apr_get_os_error();
         else {
+            static char buf[1024];
+            unsigned long user = 0;
+            unsigned long system = 0;
+            long idle = 0;
+            long long starttime = 0;
+            int fd;
+            int len;
+            long sys_clk_tck = sysconf(_SC_CLK_TCK); /* number of system ticks per second */
+
             pvals[0] = (jlong)(info.totalram  * info.mem_unit);
             pvals[1] = (jlong)(info.freeram   * info.mem_unit);
             pvals[2] = (jlong)(info.totalswap * info.mem_unit);
@@ -134,6 +143,54 @@ TCN_IMPLEMENT_CALL(jint, OS, info)(TCN_STDARGS,
             pvals[4] = (jlong)(info.sharedram * info.mem_unit);
             pvals[5] = (jlong)(info.bufferram * info.mem_unit);
             pvals[6] = (jlong)(100 - (info.freeram * 100 / info.totalram));
+
+            if (sys_clk_tck >= 0) {
+                /* Get total CPU times from /proc/stat */
+                /* Example for the first line: cpu  2095497 8176 3280198 908667841 1543576 28867 375399 0 0 */
+                /* Accoring to the man pages, the numbers are given in units of USER_HZ:
+                 * user mode, user mode with low priority (nice), system mode, and the idle task.
+                 * Additional values can be ignored. */
+                fd = open("/proc/stat", O_RDONLY);
+                if (fd != -1) {
+                    len = read(fd, buf, sizeof buf - 1);
+                    if (len > 0) {
+                        buf[len] = '\0';
+                        if (sscanf(buf, "cpu %lu %*d %lu %ld", &user, &system, &idle) == 3) {
+                            pvals[7] = (jlong)(idle * 1000 / sys_clk_tck * 1000); /* Idle Time in microseconds */
+                            pvals[8] = (jlong)(system * 1000 / sys_clk_tck * 1000); /* Kernel Time in microseconds */
+                            pvals[9] = (jlong)(user * 1000 / sys_clk_tck * 1000); /* User Time in microseconds */
+                        }
+                    }
+                    close(fd);
+                }
+                /* Get process CPU times from /proc/self/stat */
+                /* Example for the first line:
+                 * 6309 (csh) S 6308 6309 6309 34816 7124 4202496 15119 252261 1 30 21 58 1537 1447 20 0 1 0 916031966 ... */
+                /* Parsing it according to man -s 5 proci:
+                 * pid %d, comm %s, state %c, ppid %d pgrp %d, session %d, tty_nr %d, tpgid %d, flags %u,
+                 * minflt %lu, cminflt %lu,  majflt %lu, cmajflt %lu,
+                 * utime %lu (!), stime %lu (!), cutime %ld (!), cstime %ld (!),
+                 * priority %ld, nice %ld, num_threads %ld, itrealvalue %ld,
+                 * starttime %llu (!) */
+                fd = open("/proc/self/stat", O_RDONLY);
+                if (fd != -1) {
+                    len = read(fd, buf, sizeof buf - 1);
+                    if (len > 0) {
+                        buf[len] = '\0';
+                        if (sscanf(buf, "%*d %*s %*c %*d %*d %*d %*d %*d %*u"
+                                        " %*u %*u %*u %*u"
+                                        " %lu %lu %*d %*d"
+                                        " %*d %*d %*d %*d"
+                                        "%llu", &user, &system, &starttime) == 3) {
+                            pvals[10] = (jlong)(apr_time_now() - apr_time_make(info.uptime - starttime / sys_clk_tck, 0)); /* Process creation time (apr_time_t) */
+                            pvals[11] = (jlong)(system * 1000 / sys_clk_tck * 1000); /* Process System Time in microseconds */
+                            pvals[12] = (jlong)(user * 1000 / sys_clk_tck * 1000); /* Process User Time in microseconds */
+                        }
+                    }
+                    close(fd);
+                }
+            }
+
             rv = APR_SUCCESS;
         }
     }

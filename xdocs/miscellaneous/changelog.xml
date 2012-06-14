@@ -36,6 +36,14 @@
   new documentation project for Tomcat Native was started.
   </p>
 </section>
+<section name="Changes between 1.1.24 and 1.1.25">
+  <changelog>
+    <update>
+      Add CPU information to OS info for Linux.
+      This was already available under Windows and Solaris. (rjung)
+    </update>
+  </changelog>
+</section>
 <section name="Changes between 1.1.23 and 1.1.24">
   <changelog>
     <update>
