@@ -381,13 +381,13 @@ TCN_IMPLEMENT_CALL(jint, File, writev)(TCN_STDARGS, jlong file,
     for (i = 0; i < nvec; i++) {
         ba[i] = (*e)->GetObjectArrayElement(e, bufs, i);
         vec[i].iov_len  = (*e)->GetArrayLength(e, ba[i]);
-        vec[i].iov_base = (*e)->GetByteArrayElements(e, ba[i], NULL);
+        vec[i].iov_base = (void *)((*e)->GetByteArrayElements(e, ba[i], NULL));
     }
 
     ss = apr_file_writev(f, vec, nvec, &written);
 
     for (i = 0; i < nvec; i++) {
-        (*e)->ReleaseByteArrayElements(e, ba[i], vec[i].iov_base, JNI_ABORT);
+        (*e)->ReleaseByteArrayElements(e, ba[i], (jbyte *)vec[i].iov_base, JNI_ABORT);
     }
     if (ss == APR_SUCCESS)
         return (jint)written;
@@ -415,7 +415,7 @@ TCN_IMPLEMENT_CALL(jint, File, writevFull)(TCN_STDARGS, jlong file,
     for (i = 0; i < nvec; i++) {
         ba[i] = (*e)->GetObjectArrayElement(e, bufs, i);
         vec[i].iov_len  = (*e)->GetArrayLength(e, ba[i]);
-        vec[i].iov_base = (*e)->GetByteArrayElements(e, ba[i], NULL);
+        vec[i].iov_base = (void *)((*e)->GetByteArrayElements(e, ba[i], NULL));
     }
 #if (APR_VERSION_MAJOR >= 1) && (APR_VERSION_MINOR >= 1)
     ss = apr_file_writev_full(f, vec, nvec, &written);
@@ -424,7 +424,7 @@ TCN_IMPLEMENT_CALL(jint, File, writevFull)(TCN_STDARGS, jlong file,
 #endif
 
     for (i = 0; i < nvec; i++) {
-        (*e)->ReleaseByteArrayElements(e, ba[i], vec[i].iov_base,
+        (*e)->ReleaseByteArrayElements(e, ba[i], (jbyte *)vec[i].iov_base,
                                        JNI_ABORT);
     }
     if (ss == APR_SUCCESS)

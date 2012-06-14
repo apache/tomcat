@@ -665,13 +665,13 @@ TCN_IMPLEMENT_CALL(jint, Socket, sendv)(TCN_STDARGS, jlong sock,
     for (i = 0; i < nvec; i++) {
         ba[i] = (*e)->GetObjectArrayElement(e, bufs, i);
         vec[i].iov_len  = (*e)->GetArrayLength(e, ba[i]);
-        vec[i].iov_base = (*e)->GetByteArrayElements(e, ba[i], NULL);
+        vec[i].iov_base = (void *)((*e)->GetByteArrayElements(e, ba[i], NULL));
     }
 
     ss = (*s->net->sendv)(s->opaque, vec, nvec, &written);
 
     for (i = 0; i < nvec; i++) {
-        (*e)->ReleaseByteArrayElements(e, ba[i], vec[i].iov_base, JNI_ABORT);
+        (*e)->ReleaseByteArrayElements(e, ba[i], (jbyte*)vec[i].iov_base, JNI_ABORT);
     }
     if (ss == APR_SUCCESS)
         return (jint)written;
@@ -1217,12 +1217,12 @@ TCN_IMPLEMENT_CALL(jlong, Socket, sendfile)(TCN_STDARGS, jlong sock,
     for (i = 0; i < nh; i++) {
         hba[i] = (*e)->GetObjectArrayElement(e, headers, i);
         hvec[i].iov_len  = (*e)->GetArrayLength(e, hba[i]);
-        hvec[i].iov_base = (*e)->GetByteArrayElements(e, hba[i], NULL);
+        hvec[i].iov_base = (void *)((*e)->GetByteArrayElements(e, hba[i], NULL));
     }
     for (i = 0; i < nt; i++) {
         tba[i] = (*e)->GetObjectArrayElement(e, trailers, i);
         tvec[i].iov_len  = (*e)->GetArrayLength(e, tba[i]);
-        tvec[i].iov_base = (*e)->GetByteArrayElements(e, tba[i], NULL);
+        tvec[i].iov_base = (void *)((*e)->GetByteArrayElements(e, tba[i], NULL));
     }
     hdrs.headers = &hvec[0];
     hdrs.numheaders = nh;
@@ -1240,11 +1240,11 @@ TCN_IMPLEMENT_CALL(jlong, Socket, sendfile)(TCN_STDARGS, jlong sock,
 #endif
 
     for (i = 0; i < nh; i++) {
-        (*e)->ReleaseByteArrayElements(e, hba[i], hvec[i].iov_base, JNI_ABORT);
+        (*e)->ReleaseByteArrayElements(e, hba[i], (jbyte*)hvec[i].iov_base, JNI_ABORT);
     }
 
     for (i = 0; i < nt; i++) {
-        (*e)->ReleaseByteArrayElements(e, tba[i], tvec[i].iov_base, JNI_ABORT);
+        (*e)->ReleaseByteArrayElements(e, tba[i], (jbyte*)tvec[i].iov_base, JNI_ABORT);
     }
     /* Return Number of bytes actually sent,
      * including headers, file, and trailers
