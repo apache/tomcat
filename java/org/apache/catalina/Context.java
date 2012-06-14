@@ -34,7 +34,6 @@ import org.apache.catalina.deploy.FilterMap;
 import org.apache.catalina.deploy.LoginConfig;
 import org.apache.catalina.deploy.NamingResources;
 import org.apache.catalina.deploy.SecurityConstraint;
-import org.apache.catalina.util.CharsetMapper;
 import org.apache.tomcat.JarScanner;
 import org.apache.tomcat.util.http.mapper.Mapper;
 
@@ -154,25 +153,6 @@ public interface Context extends Container {
      * Return the application available flag for this Context.
      */
     public boolean getAvailable();
-
-
-    /**
-     * Return the Locale to character set mapper for this Context.
-     * @deprecated Use {@link #getCharset(Locale)}
-     */
-    @Deprecated
-    public CharsetMapper getCharsetMapper();
-
-
-    /**
-     * Set the Locale to character set mapper for this Context.
-     *
-     * @param mapper The new mapper
-     *
-     * @deprecated
-     */
-    @Deprecated
-    public void setCharsetMapper(CharsetMapper mapper);
 
 
     /**

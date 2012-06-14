@@ -54,7 +54,6 @@ import org.apache.catalina.deploy.FilterMap;
 import org.apache.catalina.deploy.LoginConfig;
 import org.apache.catalina.deploy.NamingResources;
 import org.apache.catalina.deploy.SecurityConstraint;
-import org.apache.catalina.util.CharsetMapper;
 import org.apache.catalina.util.ContextName;
 import org.apache.catalina.util.LifecycleMBeanBase;
 import org.apache.juli.logging.Log;
@@ -315,13 +314,6 @@ public class FailedContext extends LifecycleMBeanBase implements Context {
 
     @Override
     public boolean getAvailable() { return false; }
-
-    @Deprecated
-    @Override
-    public CharsetMapper getCharsetMapper() { return null; }
-    @Deprecated
-    @Override
-    public void setCharsetMapper(CharsetMapper mapper) { /* NO-OP */ }
 
     @Override
     public String getCharset(Locale locale) { return null; }

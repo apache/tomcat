@@ -1410,7 +1410,6 @@ public class StandardContext extends ContainerBase
     /**
      * Return the Locale to character set mapper for this Context.
      */
-    @Override
     public CharsetMapper getCharsetMapper() {
 
         // Create a mapper the first time it is requested
@@ -1434,7 +1433,6 @@ public class StandardContext extends ContainerBase
      *
      * @param mapper The new mapper
      */
-    @Override
     public void setCharsetMapper(CharsetMapper mapper) {
 
         CharsetMapper oldCharsetMapper = this.charsetMapper;
