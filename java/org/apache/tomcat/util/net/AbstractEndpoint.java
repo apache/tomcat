@@ -349,6 +349,18 @@ public abstract class AbstractEndpoint {
     }
 
     /**
+     * The maximum number of headers in a request that are allowed.
+     * 100 by default. A value of less than 0 means no limit.
+     */
+    private int maxHeaderCount = 100; // as in Apache HTTPD server
+    public int getMaxHeaderCount() {
+        return maxHeaderCount;
+    }
+    public void setMaxHeaderCount(int maxHeaderCount) {
+        this.maxHeaderCount = maxHeaderCount;
+    }
+
+    /**
      * Name of the thread pool, which will be used for naming child threads.
      */
     private String name = "TP";

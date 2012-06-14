@@ -318,6 +318,12 @@
       <fix>
         Improve <code>InternalNioInputBuffer.parseHeaders()</code>. (kkolinko)
       </fix>
+      <add>
+        Implement <code>maxHeaderCount</code> attribute on Connector.
+        It is equivalent of LimitRequestFields directive of
+        <a href="http://httpd.apache.org/">Apache HTTPD</a>.
+        Default value is 100. (kkolinko)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Jasper">
