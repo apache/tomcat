@@ -267,18 +267,6 @@ static void update_last_active(tcn_pollset_t *p, const apr_pollfd_t *fd, apr_tim
 }
 
 
-static void remove_all(tcn_pollset_t *p)
-{
-    apr_int32_t i;
-    for (i = 0; i < p->nelts; i++) {
-        apr_pollset_remove(p->pollset, &(p->socket_set[i]));
-#ifdef TCN_DO_STATISTICS
-        p->sp_removed++;
-#endif
-    }
-    p->nelts = 0;
-}
-
 TCN_IMPLEMENT_CALL(jint, Poll, remove)(TCN_STDARGS, jlong pollset,
                                        jlong socket)
 {
