@@ -394,6 +394,24 @@ public class Connector extends LifecycleMBeanBase  {
 
 
     /**
+     * Return the maximum number of headers that are allowed by the container. A
+     * value of less than 0 means no limit.
+     */
+    public int getMaxHeaderCount() {
+        return ((Integer) getProperty("maxHeaderCount")).intValue();
+    }
+
+    /**
+     * Set the maximum number of headers in a request that are allowed by the
+     * container. A value of less than 0 means no limit.
+     *
+     * @param maxHeaderCount The new setting
+     */
+    public void setMaxHeaderCount(int maxHeaderCount) {
+        setProperty("maxHeaderCount", String.valueOf(maxHeaderCount));
+    }
+
+    /**
      * Return the maximum number of parameters (GET plus POST) that will be
      * automatically parsed by the container. A value of less than 0 means no
      * limit.

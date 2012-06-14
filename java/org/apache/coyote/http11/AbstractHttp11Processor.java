@@ -932,6 +932,8 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
                 } else {
                     request.setStartTime(System.currentTimeMillis());
                     keptAlive = true;
+                    // Set this every time in case limit has been changed via JMX
+                    request.getMimeHeaders().setLimit(endpoint.getMaxHeaderCount());
                     // Currently only NIO will ever return false here
                     if (!getInputBuffer().parseHeaders()) {
                         // We've read part of the request, don't recycle it

@@ -21,6 +21,7 @@ import java.io.StringWriter;
 import java.util.Enumeration;
 
 import org.apache.tomcat.util.buf.MessageBytes;
+import org.apache.tomcat.util.res.StringManager;
 
 /* XXX XXX XXX Need a major rewrite  !!!!
  */
@@ -95,6 +96,9 @@ public class MimeHeaders {
      */
     public static final int DEFAULT_HEADER_SIZE=8;
 
+    private static final StringManager sm =
+            StringManager.getManager("org.apache.tomcat.util.http");
+
     /**
      * The header fields.
      */
@@ -107,10 +111,28 @@ public class MimeHeaders {
     private int count;
 
     /**
+     * The limit on the number of header fields.
+     */
+    private int limit = -1;
+
+    /**
      * Creates a new MimeHeaders object using a default buffer size.
      */
     public MimeHeaders() {
         // NO-OP
+    }
+
+    /**
+     * Set limit on the number of header fields.
+     */
+    public void setLimit(int limit) {
+        this.limit = limit;
+        if (limit > 0 && headers.length > limit && count < limit) {
+            // shrink header list array
+            MimeHeaderField tmp[] = new MimeHeaderField[limit];
+            System.arraycopy(headers, 0, tmp, 0, count);
+            headers = tmp;
+        }
     }
 
     /**
@@ -218,11 +240,19 @@ public class MimeHeaders {
      * field has not had its name or value initialized.
      */
     private MimeHeaderField createHeader() {
+        if (limit > -1 && count >= limit) {
+            throw new IllegalStateException(sm.getString(
+                    "headers.maxCountFail", Integer.valueOf(limit)));
+        }
         MimeHeaderField mh;
         int len = headers.length;
         if (count >= len) {
             // expand header list array
-            MimeHeaderField tmp[] = new MimeHeaderField[count * 2];
+            int newLength = count * 2;
+            if (limit > 0 && newLength > limit) {
+                newLength = limit;
+            }
+            MimeHeaderField tmp[] = new MimeHeaderField[newLength];
             System.arraycopy(headers, 0, tmp, 0, len);
             headers = tmp;
         }
