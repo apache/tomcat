@@ -20,6 +20,7 @@ package org.apache.catalina;
 
 
 import java.net.URL;
+import java.util.Locale;
 import java.util.Set;
 
 import javax.servlet.ServletContainerInitializer;
@@ -169,7 +170,9 @@ public interface Context extends Container {
 
     /**
      * Return the Locale to character set mapper for this Context.
+     * @deprecated Use {@link #getCharset(Locale)}
      */
+    @Deprecated
     public CharsetMapper getCharsetMapper();
 
 
@@ -177,8 +180,19 @@ public interface Context extends Container {
      * Set the Locale to character set mapper for this Context.
      *
      * @param mapper The new mapper
+     *
+     * @deprecated
      */
+    @Deprecated
     public void setCharsetMapper(CharsetMapper mapper);
+
+
+    /**
+     * Obtain the character set name to use with the given Locale. Note that
+     * different Contexts may have different mappings of Locale to character
+     * set.
+     */
+    public String getCharset(Locale locale);
 
 
     /**

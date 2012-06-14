@@ -45,7 +45,6 @@ import org.apache.catalina.Globals;
 import org.apache.catalina.Session;
 import org.apache.catalina.Wrapper;
 import org.apache.catalina.security.SecurityUtil;
-import org.apache.catalina.util.CharsetMapper;
 import org.apache.catalina.util.DateTool;
 import org.apache.catalina.util.RequestUtil;
 import org.apache.catalina.util.SessionConfig;
@@ -885,12 +884,10 @@ public class Response
             return;
         }
 
-        CharsetMapper cm = getContext().getCharsetMapper();
-        String charset = cm.getCharset( locale );
-        if ( charset != null ){
+        String charset = getContext().getCharset(locale);
+        if (charset != null) {
             coyoteResponse.setCharacterEncoding(charset);
         }
-
     }
 
 

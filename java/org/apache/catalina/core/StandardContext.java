@@ -33,6 +33,7 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
@@ -1480,6 +1481,13 @@ public class StandardContext extends ContainerBase
                                    this.charsetMapper);
 
     }
+
+
+    @Override
+    public String getCharset(Locale locale) {
+        return getCharsetMapper().getCharset(locale);
+    }
+
 
     /**
      * Return the URL of the XML descriptor for this context.

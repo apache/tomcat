@@ -19,6 +19,7 @@ package org.apache.catalina.startup;
 import java.beans.PropertyChangeListener;
 import java.io.IOException;
 import java.net.URL;
+import java.util.Locale;
 import java.util.Set;
 
 import javax.naming.directory.DirContext;
@@ -276,10 +277,15 @@ public class FailedContext extends LifecycleMBeanBase implements Context {
     @Override
     public boolean getAvailable() { return false; }
 
+    @Deprecated
     @Override
     public CharsetMapper getCharsetMapper() { return null; }
+    @Deprecated
     @Override
     public void setCharsetMapper(CharsetMapper mapper) { /* NO-OP */ }
+
+    @Override
+    public String getCharset(Locale locale) { return null; }
 
     @Override
     public boolean getConfigured() { return false; }
