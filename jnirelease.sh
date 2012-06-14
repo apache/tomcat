@@ -158,7 +158,7 @@ fi
 cd "$top"
 mv ${JKJNIDIST}/jni/build/docs ${JKJNIDIST}/jni/docs
 rm -rf ${JKJNIDIST}/jni/build
-for i in LICENSE NOTICE README.txt
+for i in LICENSE NOTICE README.txt TODO.txt
 do
     svn cat ${JKJNISVN}/${i} > ${JKJNIDIST}/${i}
     if [ $? -ne 0 ]; then
@@ -210,7 +210,7 @@ cd "$top"
 
 mv ${JKWINDIST}/jni/build/docs ${JKWINDIST}/jni/docs
 rm -rf ${JKWINDIST}/jni/build
-for i in LICENSE NOTICE README.txt
+for i in LICENSE NOTICE README.txt TODO.txt
 do
     svn cat ${JKJNISVN}/${i} > ${JKWINDIST}/${i}
     $PERL ${JKWINDIST}/jni/native/build/lineends.pl --cr ${JKWINDIST}/${i}
