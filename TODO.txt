@@ -85,23 +85,6 @@ Furthermore some of the old files do not exist inside TC:
 I don't know their purpose and whether we can delete them.
 
 
-Incomplete implementation on Linux
-----------------------------------
-
-There is no impl for Linux to retrieve
-
-     * inf[7]  - Idle Time in microseconds
-     * inf[8]  - Kernel Time in microseconds
-     * inf[9]  - User Time in microseconds
-     * inf[10] - Process creation time (apr_time_t)
-     * inf[11] - Process Kernel Time in microseconds
-     * inf[12] - Process User Time in microseconds
-
-I implemented those for Solaris long ago and thought they existed for
-Linux from the beginning. But in fact for Linux there are only memory
-figures implemented.
-
-
 Releasing
 ---------
 
