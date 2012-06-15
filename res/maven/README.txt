@@ -17,10 +17,23 @@
 
 $Id$
 
+General preparatations before any publishing
+1 - Download Maven Ant Tasks (version 2.1.0 is known to work) and place it in
+    this directory
+2 - Generate a standard Tomcat release (ant release)
+3 - Copy mvn.properties.default to mvn.properties and adjust it as necessary.
+    You will need to set asf.ldap.username and you'll probably need to set
+    gpg.exec
+    The other properties should be OK. NOte you;ll be prompted for your GPG
+    pass-phrase and LDAP password when the script runs
+
+To publish a snaphost do the following:
+1 - ant -f mvn-pub.xml deploy-snapshot
+    This populates https://repository.apache.org/content/repositories/snapshots/org/apache/tomcat/
+
 To release do the following:
-1 - copy mvn.properties.default to mvn.properties and adjust it.
-2 - ant -f mvn-pub.xml deploy-release
-    that step creates a staging in https://repository.apache.org/index.html#stagingRepositories
-3 - check the upload and then close the repository
-4 - include the repository in the VOTE thread
-5 - in https://repository.apache.org/index.html#stagingRepositories release it
+1 - ant -f mvn-pub.xml deploy-release
+    that step creates a staging area in https://repository.apache.org/index.html#stagingRepositories
+2 - check the upload and then close the repository
+3 - include the repository in the VOTE thread
+4 - in https://repository.apache.org/index.html#stagingRepositories release it
