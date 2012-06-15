@@ -431,6 +431,10 @@
       <update>
         Update to Eclipse JDT Compiler 3.7.2 at maven tomcat-jasper.pom. (pero)
       </update>
+      <update>
+        Update the native component of the Tomcat APR/native connector to
+        1.1.24. (markt)
+      </update>
       <fix>
         Add missing dependencies in pom files. (markt)
       </fix>
