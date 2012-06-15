@@ -15,49 +15,38 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 -->
-<project name="Tomcat 7.0 Maven Deployment" default="" basedir="." xmlns:artifact="urn:maven-artifact-ant">
+<project name="Tomcat 8.0 Maven Deployment" default="" basedir="."
+         xmlns:artifact="urn:maven-artifact-ant">
   <!--
-    Built for using Maven Ant Tasks 2.0.10 - download to this directory
-    You'll also need to install jsch 0.1.42 and manually configure
-    wagon-ssh 1.0-beta-2 to use the updated jsch. This will also add a
-    requirement for jzlib 1.0.7
+    Built for using Maven Ant Tasks (version 2.1.0 is known to work)
   -->
-  <!--
-  Properties required to be set:
-  maven.repo.url - the URL of the repository, for example scp://people.apache.org/www/people.apache.org/repo/m2-snapshot-repository
-  maven.repo.repositoryId - the id of the repository, for example apache.snapshots
-  maven.deploy.version - the version that the components will be deployed as, for example @MAVEN.DEPLOY.VERSION@
-  tomcat.lib.path - the path to tomcat JAR files
-  tomcat.bin.path - the path to tomcat's bin directory (for other JAR files)
-  tomcat.pom.path - the path to the POM files
 
-  For passwordless upload you'll also need to set
-  maven.scp.username    - Your ASF ID
-  maven.scp.privateKey  - Path to your exported ssh key
-
-  All these can be defined by mvn.properties (and defaults are in mvn.properties.default)
-
-  To get a private key to work on Windows, I followed these steps
-  1. on a linux box execute 'ssh-keygen -t rsa'
-  2. same linux box execute 'cat id_rsa.pub >> authorized_keys' and 'cat id_rsa.pub >> authorized_keys2'
-  3. Copy id_rsa and id_rsa.pub to my windows box
-  4. Import id_rsa into puttygen
-  5. export id_rsa from puttygen to OpenSSH key
-  6. The key you exported from puttygen is the one you reference from the <privateKey> element
-  7. Manually create the %USERPROFILE%\.ssh directory
-  8. Manually add the %USERPROFILE%\.ssh\known_hosts file with the entry for the host
-  -->
   <property file="${basedir}/mvn.properties"/>
   <property file="${basedir}/mvn.properties.default"/>
   <property name="local.repo" value="${user.home}/.m2/repository"/>
 
   <target name="init-maven">
-    <typedef resource="org/apache/maven/artifact/ant/antlib.xml" uri="urn:maven-artifact-ant">
+    <typedef resource="org/apache/maven/artifact/ant/antlib.xml"
+             uri="urn:maven-artifact-ant">
       <classpath>
-        <pathelement location="${basedir}/maven-ant-tasks-2.0.10.jar" />
+        <pathelement location="${basedir}/maven-ant-tasks-2.1.0.jar" />
       </classpath>
     </typedef>
-    <artifact:install-provider artifactId="wagon-ssh" version="1.0-beta-2"/>
+  </target>
+
+  <target name="maven-deploy-nexus" depends="init-maven">
+    <!--deploy it in nexus -->
+    <artifact:deploy file="${file}">
+        <pom file="${pom}.tmp"/>
+        <remoteRepository url="${maven.repo.url}" layout="default">
+          <authentication username="${asf.ldap.username}"
+                          password="${asf.ldap.password}"/>
+        </remoteRepository>
+        <attach file="${file}.asc" type="jar.asc"/>
+        <attach file="${src}" classifier="sources" type="jar"/>
+        <attach file="${src}.asc" classifier="sources" type="jar.asc"/>
+        <attach file="${pom}.asc" type="pom.asc"/>
+    </artifact:deploy>
   </target>
 
   <target name="maven-deploy" depends="init-maven">
@@ -75,21 +64,24 @@
     </copy>
 
     <!--sign the jar, the source and the pom -->
-    <exec executable="${maven.gpg.exec}" failonerror="true" inputstring="${maven.gpg.passphrase}">
+    <exec executable="${gpg.exec}" failonerror="true"
+          inputstring="${gpg.passphrase}">
       <arg value="--passphrase-fd"/>
       <arg value="0"/>
       <arg value="-a"/>
       <arg value="-b"/>
       <arg value="${file}"/>
     </exec>
-    <exec executable="${maven.gpg.exec}" failonerror="true" inputstring="${maven.gpg.passphrase}">
+    <exec executable="${gpg.exec}" failonerror="true"
+          inputstring="${gpg.passphrase}">
       <arg value="--passphrase-fd"/>
       <arg value="0"/>
       <arg value="-a"/>
       <arg value="-b"/>
       <arg value="${src}"/>
     </exec>
-    <exec executable="${maven.gpg.exec}" failonerror="true" inputstring="${maven.gpg.passphrase}">
+    <exec executable="${gpg.exec}" failonerror="true"
+          inputstring="${gpg.passphrase}">
       <arg value="--passphrase-fd"/>
       <arg value="0"/>
       <arg value="-a"/>
@@ -100,16 +92,11 @@
     </exec>
 
     <!--deploy it-->
-    <artifact:deploy file="${file}">
-        <pom file="${pom}.tmp"/>
-        <remoteRepository url="${maven.repo.url}" layout="default">
-          <authentication username="${maven.scp.username}" privateKey="${maven.scp.privateKey}" passphrase="${maven.scp.passphrase}"/>
-        </remoteRepository>
-        <attach file="${file}.asc" type="jar.asc"/>
-        <attach file="${src}" classifier="sources" type="jar"/>
-        <attach file="${src}.asc" classifier="sources" type="jar.asc"/>
-        <attach file="${pom}.asc" type="pom.asc"/>
-    </artifact:deploy>
+    <antcall target="maven-deploy-nexus">
+        <param name="file" value="${file}"/>
+        <param name="pom" value="${pom}"/>
+        <param name="src" value="${src}"/>
+    </antcall>
 
     <delete file="${pom}.tmp"/>
     <delete file="${pom}.asc"/>
@@ -151,14 +138,16 @@
     </copy>
 
     <!--sign the jar and pom -->
-    <exec executable="${maven.gpg.exec}" failonerror="true" inputstring="${maven.gpg.passphrase}">
+    <exec executable="${gpg.exec}" failonerror="true"
+          inputstring="${gpg.passphrase}">
       <arg value="--passphrase-fd"/>
       <arg value="0"/>
       <arg value="-a"/>
       <arg value="-b"/>
       <arg value="${file}"/>
     </exec>
-    <exec executable="${maven.gpg.exec}" failonerror="true" inputstring="${maven.gpg.passphrase}">
+    <exec executable="${gpg.exec}" failonerror="true"
+          inputstring="${gpg.passphrase}">
       <arg value="--passphrase-fd"/>
       <arg value="0"/>
       <arg value="-a"/>
@@ -171,8 +160,9 @@
     <!--deploy it-->
     <artifact:deploy file="${file}">
       <pom file="${pom}.tmp"/>
-      <remoteRepository url="${maven.repo.url}" layout="default">
-        <authentication username="${maven.scp.username}" privateKey="${maven.scp.privateKey}" passphrase="${maven.scp.passphrase}"/>
+      <remoteRepository url="${maven.repo.url}" layout="default" >
+        <authentication username="${asf.ldap.username}"
+                        password="${asf.ldap.password}"/>
       </remoteRepository>
       <attach file="${file}.asc" type="jar.asc"/>
       <attach file="${pom}.asc" type="pom.asc"/>
@@ -199,7 +189,7 @@
     </sequential>
   </macrodef>
 
-  <target name="generic-deploy" depends="init-maven">
+  <target name="generic-deploy" depends="init-maven,init-gpg,init-ldap">
     <!-- Standard jars in bin directory -->
     <!-- Skip bootstrap.jar - it is just a subset of catalina.jar -->
     <doMavenDeploy artifactId="tomcat-juli"
@@ -306,30 +296,34 @@
 
   <target name="deploy-snapshot">
     <antcall target="generic-deploy">
-      <param name="maven.repo.repositoryId" value="${maven.snapshot.repo.repositoryId}"/>
+      <param name="maven.repo.repositoryId"
+             value="${maven.snapshot.repo.repositoryId}"/>
       <param name="maven.repo.url" value="${maven.snapshot.repo.url}"/>
-      <param name="maven.deploy.version" value="7.0-SNAPSHOT"/>
-    </antcall>
-  </target>
-
-  <target name="deploy-staging">
-    <antcall target="generic-deploy">
-      <param name="maven.repo.repositoryId" value="${maven.release.repo.repositoryId}"/>
-      <param name="maven.repo.url" value="${maven.release.repo.url}"/>
-      <param name="maven.deploy.version" value="${maven.release.deploy.version}"/>
+      <param name="maven.deploy.version" value="8.0-SNAPSHOT"/>
     </antcall>
   </target>
 
   <target name="deploy-release">
     <antcall target="generic-deploy">
-      <param name="maven.repo.repositoryId" value="${maven.asf.release.repo.repositoryId}"/>
+      <param name="maven.repo.repositoryId"
+             value="${maven.asf.release.repo.repositoryId}"/>
       <param name="maven.repo.url" value="${maven.asf.release.repo.url}"/>
-      <param name="maven.deploy.version" value="${maven.asf.release.deploy.version}"/>
+      <param name="maven.deploy.version"
+             value="${maven.asf.release.deploy.version}"/>
     </antcall>
   </target>
 
-  <target name="help">
-    <echo>Help is on the way!</echo>
+  <target name="init-gpg">
+    <input message="Enter GPG pass-phrase" addproperty="gpg.passphrase" >
+      <handler type="secure"/>
+    </input>
+  </target>
+
+  <target name="init-ldap">
+    <input message="Enter ASF LDAP (same svn) password"
+           addproperty="asf.ldap.password" >
+      <handler type="secure"/>
+    </input>
   </target>
 
 </project>
