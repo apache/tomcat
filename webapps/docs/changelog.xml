@@ -53,6 +53,14 @@
   They eventually become mixed with the numbered issues. (I.e., numbered
   issues to not "pop up" wrt. others).
 -->
+<section name="Tomcat 7.0.29 (markt)">
+  <subsection name="Catalina">
+      <fix>
+        Fix checking of recommended tcnative library version
+        when using the APR connector. (rjung)
+      </fix>
+  </subsection>
+</section>
 <section name="Tomcat 7.0.28 (markt)">
   <subsection name="Catalina">
     <changelog>
