@@ -109,7 +109,11 @@
                     }
                 }
             }, false);
-            Game.connect('ws://' + window.location.host + '/examples/websocket/snake');
+            if (window.location.protocol == 'http:') {
+                Game.connect('ws://' + window.location.host + '/examples/websocket/snake');
+            } else {
+            	Game.connect('wss://' + window.location.host + '/examples/websocket/snake');
+            }
         };
 
         Game.setDirection  = function(direction) {
