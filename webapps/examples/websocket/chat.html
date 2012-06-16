@@ -77,7 +77,11 @@
         });
 
         Chat.initialize = function() {
-            Chat.connect('ws://' + window.location.host + '/examples/websocket/chat');
+            if (window.location.protocol == 'http:') {
+                Chat.connect('ws://' + window.location.host + '/examples/websocket/chat');
+            } else {
+            	Chat.connect('wss://' + window.location.host + '/examples/websocket/chat');
+            }
         };
 
         Chat.sendMessage = (function() {
