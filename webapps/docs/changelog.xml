@@ -55,10 +55,17 @@
 -->
 <section name="Tomcat 7.0.29 (markt)">
   <subsection name="Catalina">
-      <fix>
-        Fix checking of recommended tcnative library version
-        when using the APR connector. (rjung)
-      </fix>
+    <fix>
+      Fix checking of recommended tcnative library version when using the APR
+      connector. (rjung)
+    </fix>
+  </subsection>
+  <subsection name="Web applications">
+    <fix>
+      Update the WebSocket examples in the examples web application so that they
+      work with secure connections (wss) as well as non-secure (ws) connections.
+      (markt)  
+    </fix>
   </subsection>
 </section>
 <section name="Tomcat 7.0.28 (markt)">
