@@ -76,6 +76,10 @@
       Remove a few files from the source distribution that are not required
       since they are copied / generated during the build. (markt)
     </fix>
+    <fix>
+      Add manifest files to the set of files for which the line-ending is
+      changed to match the OS defaults in the source distributions. (markt)
+    </fix>
   </subsection>
 </section>
 <section name="Tomcat 7.0.28 (markt)">
