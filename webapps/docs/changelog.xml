@@ -67,6 +67,12 @@
       (markt)  
     </fix>
   </subsection>
+  <subsection name="Other">
+    <fix>
+      Fix cleanup of temporary files in <code>TestNamingContext</code> test.
+      (kkolinko)
+    </fix>
+  </subsection>
 </section>
 <section name="Tomcat 7.0.28 (markt)">
   <subsection name="Catalina">
