@@ -1714,7 +1714,7 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
 
   </target>
 
-  <target name="dist-source">
+  <target name="dist-source" depends="compile-prepare">
 
     <mkdir dir="${tomcat.dist}/src"/>
 
@@ -1737,6 +1737,7 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
             <filename name="**/*.iml" />
             <filename name="**/*.asc" />
             <filename name="**/*.tmp" />
+            <filename name="**/*.jj" />
             <filename name="**/maven-ant-tasks-*.jar" />
             <filename name="**/thumbs.db" />
             <filename name="**/Thumbs.db" />
