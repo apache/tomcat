@@ -72,6 +72,10 @@
       Fix cleanup of temporary files in <code>TestNamingContext</code> test.
       (kkolinko)
     </fix>
+    <fix>
+      Remove a few files from the source distribution that are not required
+      since they are copied / generated during the build. (markt)
+    </fix>
   </subsection>
 </section>
 <section name="Tomcat 7.0.28 (markt)">
