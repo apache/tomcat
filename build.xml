@@ -231,6 +231,7 @@
     <include name="**/*.license"/>
     <include name="**/*.manifest"/>
     <include name="**/*.mdl"/>
+    <include name="**/*.MF"/>
     <include name="**/*.notice"/>
     <include name="**/*.nsi"/>
     <include name="**/*.pl"/>
