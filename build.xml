@@ -1725,6 +1725,7 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
           <or>
             <filename name="**/.settings/**" />
             <filename name="**/.classpath"/>
+            <filename name="**/.checkstyle"/>
             <filename name="**/.project"/>
             <filename name="**/output/**"/>
             <!-- Commented out, because
@@ -1743,7 +1744,9 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
             <filename name="**/Thumbs.db" />
             <filename name="*.launch"/>
             <filename name="bin/setenv.*" />
+            <filename name="java/org/apache/catalina/startup/catalina.properties" />
             <filename name="logs/**" />
+            <filename name="webapps/docs/jdbc-pool.xml" />
             <filename name="work/**" />
             <filename name="modules/jdbc-pool/bin/**" />
             <filename name="modules/jdbc-pool/includes/**" />
