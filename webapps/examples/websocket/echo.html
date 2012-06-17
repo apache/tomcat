@@ -104,11 +104,11 @@
         }
 
         function updateTarget(target) {
-        	if (window.location.protocol == 'http:') {
-        	    document.getElementById('target').value = 'ws://' + window.location.host + target;
-        	} else {
-        		document.getElementById('target').value = 'wss://' + window.location.host + target;
-        	}
+            if (window.location.protocol == 'http:') {
+                document.getElementById('target').value = 'ws://' + window.location.host + target;
+            } else {
+                document.getElementById('target').value = 'wss://' + window.location.host + target;
+            }
         }
 
         function log(message) {
