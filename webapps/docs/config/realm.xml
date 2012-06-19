@@ -82,17 +82,15 @@
 
     </attributes>
 
-  </subsection>
-
-
-  <subsection name="Standard Implementation">
-
     <p>Unlike most Catalina components, there are several standard
     <strong>Realm</strong> implementations available.  As a result,
     the <code>className</code> attribute MUST be used to select the
     implementation you wish to use.</p>
 
-    <h3>JDBC Database Realm (org.apache.catalina.realm.JDBCRealm)</h3>
+  </subsection>
+
+
+  <subsection name="JDBC Database Realm (org.apache.catalina.realm.JDBCRealm)">
 
     <p>The <strong>JDBC Database Realm</strong> connects Catalina to
     a relational database, accessed through an appropriate JDBC driver,
@@ -202,10 +200,10 @@
     information on setting up container managed security using the
     JDBC Database Realm component.</p>
 
+  </subsection>
 
-    <h3>
-      DataSource Database Realm (org.apache.catalina.realm.DataSourceRealm)
-    </h3>
+
+  <subsection name="DataSource Database Realm (org.apache.catalina.realm.DataSourceRealm)">
 
     <p>The <strong>DataSource Database Realm</strong> connects Catalina to
     a relational database, accessed through a JNDI named JDBC DataSource
@@ -310,9 +308,10 @@
     DataSource Realm HOW-TO</a> for more information on setting up container
     managed security using the DataSource Database Realm component.</p>
 
+  </subsection>
 
-    <h3>JNDI Directory Realm (org.apache.catalina.realm.JNDIRealm)</h3>
 
+  <subsection name="JNDI Directory Realm (org.apache.catalina.realm.JNDIRealm)">
 
     <p>The <strong>JNDI Directory Realm</strong> connects Catalina to
     an LDAP Directory, accessed through an appropriate JNDI driver,
@@ -605,8 +604,10 @@
     information on setting up container managed security using the
     JNDI Directory Realm component.</p>
 
+  </subsection>
 
-    <h3>UserDatabase Realm (org.apache.catalina.realm.UserDatabaseRealm)</h3>
+
+  <subsection name="UserDatabase Realm (org.apache.catalina.realm.UserDatabaseRealm)">
 
     <p>The <strong>UserDatabase Realm</strong> is a Realm implementation
     that is based on a UserDatabase resource made available through the global
@@ -652,7 +653,10 @@
     <a href="../jndi-resources-howto.html">JNDI resources how-to</a> for more
     information on how to configure a UserDatabase resource.</p>
 
-    <h3>Memory Based Realm (org.apache.catalina.realm.MemoryRealm)</h3>
+  </subsection>
+
+
+  <subsection name="Memory Based Realm (org.apache.catalina.realm.MemoryRealm)">
 
     <p>The <strong>Memory Based Realm</strong> is a simple Realm implementation
     that reads user information from an XML format, and represents it as a
@@ -733,7 +737,10 @@
     information on setting up container managed security using the
     Memory Based Realm component.</p>
 
-    <h3>JAAS Realm (org.apache.catalina.realm.JAASRealm)</h3>
+  </subsection>
+
+
+  <subsection name="JAAS Realm (org.apache.catalina.realm.JAASRealm)">
 
     <p><strong>JAASRealm</strong> is an implementation of the Tomcat
     <code>Realm</code> interface that authenticates users through the Java
@@ -819,7 +826,10 @@
     Guide</a> for more information on setting up container managed security
     using the JAAS Realm component.</p>
 
-    <h3>Combined Realm (org.apache.catalina.realm.CombinedRealm)</h3>
+  </subsection>
+
+
+  <subsection name="Combined Realm (org.apache.catalina.realm.CombinedRealm)">
 
     <p><strong>CombinedRealm</strong> is an implementation of the Tomcat
     <code>Realm</code> interface that authenticates users through one or more
@@ -843,7 +853,10 @@
     Guide</a> for more information on setting up container managed security
     using the CombinedRealm component.</p>
 
-    <h3>LockOut Realm (org.apache.catalina.realm.LockOutRealm)</h3>
+  </subsection>
+
+
+  <subsection name="LockOut Realm (org.apache.catalina.realm.LockOutRealm)">
 
     <p><strong>LockOutRealm</strong> is an implementation of the Tomcat
     <code>Realm</code> interface that extends the CombinedRealm to provide lock
@@ -900,7 +913,6 @@
     using the LockOutRealm component.</p>
 
   </subsection>
-
 
 </section>
 
