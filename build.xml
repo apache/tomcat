@@ -468,7 +468,6 @@
         <exclude name="output/**"/>
         <exclude name="modules/**"/>
         <exclude name="**/*.mdl"/>
-        <exclude name="**/MANIFEST.MF"/>
         <exclude name="**/*_2.xml"/>
         <exclude name="res/checkstyle/header-al2.txt"/>
         <!-- Exclude auto-generated files -->
@@ -488,6 +487,7 @@
       </fileset>
       <fileset dir="modules/jdbc-pool" >
         <exclude name=".*/**"/>
+        <exclude name="**/MANIFEST.MF"/>
         <patternset refid="text.files" />
       </fileset>
     </checkstyle>
