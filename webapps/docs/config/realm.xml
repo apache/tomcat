@@ -90,7 +90,7 @@
   </subsection>
 
 
-  <subsection name="JDBC Database Realm (org.apache.catalina.realm.JDBCRealm)">
+  <subsection name="JDBC Database Realm - org.apache.catalina.realm.JDBCRealm">
 
     <p>The <strong>JDBC Database Realm</strong> connects Catalina to
     a relational database, accessed through an appropriate JDBC driver,
@@ -203,7 +203,7 @@
   </subsection>
 
 
-  <subsection name="DataSource Database Realm (org.apache.catalina.realm.DataSourceRealm)">
+  <subsection name="DataSource Database Realm - org.apache.catalina.realm.DataSourceRealm">
 
     <p>The <strong>DataSource Database Realm</strong> connects Catalina to
     a relational database, accessed through a JNDI named JDBC DataSource
@@ -311,7 +311,7 @@
   </subsection>
 
 
-  <subsection name="JNDI Directory Realm (org.apache.catalina.realm.JNDIRealm)">
+  <subsection name="JNDI Directory Realm - org.apache.catalina.realm.JNDIRealm">
 
     <p>The <strong>JNDI Directory Realm</strong> connects Catalina to
     an LDAP Directory, accessed through an appropriate JNDI driver,
@@ -607,7 +607,7 @@
   </subsection>
 
 
-  <subsection name="UserDatabase Realm (org.apache.catalina.realm.UserDatabaseRealm)">
+  <subsection name="UserDatabase Realm - org.apache.catalina.realm.UserDatabaseRealm">
 
     <p>The <strong>UserDatabase Realm</strong> is a Realm implementation
     that is based on a UserDatabase resource made available through the global
@@ -656,7 +656,7 @@
   </subsection>
 
 
-  <subsection name="Memory Based Realm (org.apache.catalina.realm.MemoryRealm)">
+  <subsection name="Memory Based Realm - org.apache.catalina.realm.MemoryRealm">
 
     <p>The <strong>Memory Based Realm</strong> is a simple Realm implementation
     that reads user information from an XML format, and represents it as a
@@ -740,7 +740,7 @@
   </subsection>
 
 
-  <subsection name="JAAS Realm (org.apache.catalina.realm.JAASRealm)">
+  <subsection name="JAAS Realm - org.apache.catalina.realm.JAASRealm">
 
     <p><strong>JAASRealm</strong> is an implementation of the Tomcat
     <code>Realm</code> interface that authenticates users through the Java
@@ -829,7 +829,7 @@
   </subsection>
 
 
-  <subsection name="Combined Realm (org.apache.catalina.realm.CombinedRealm)">
+  <subsection name="Combined Realm - org.apache.catalina.realm.CombinedRealm">
 
     <p><strong>CombinedRealm</strong> is an implementation of the Tomcat
     <code>Realm</code> interface that authenticates users through one or more
@@ -856,7 +856,7 @@
   </subsection>
 
 
-  <subsection name="LockOut Realm (org.apache.catalina.realm.LockOutRealm)">
+  <subsection name="LockOut Realm - org.apache.catalina.realm.LockOutRealm">
 
     <p><strong>LockOutRealm</strong> is an implementation of the Tomcat
     <code>Realm</code> interface that extends the CombinedRealm to provide lock
