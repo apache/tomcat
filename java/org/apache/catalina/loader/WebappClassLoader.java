@@ -3448,7 +3448,7 @@ public class WebappClassLoader
 
 
     /**
-     * Get URL.
+     * Get the URI for the given file.
      */
     protected URL getURI(File file)
         throws MalformedURLException {
