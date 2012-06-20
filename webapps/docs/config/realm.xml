@@ -613,7 +613,7 @@
     that is based on a UserDatabase resource made available through the global
     JNDI resources configured for this Tomcat instance.</p>
 
-    <p>The Memory Based Realm implementation supports the following
+    <p>The UserDatabase Realm implementation supports the following
     additional attributes:</p>
 
     <attributes>
@@ -632,8 +632,8 @@
       </attribute>
 
       <attribute name="resourceName" required="true">
-        <p>The name of the resource that this realm will use for user, password
-        and role information.</p>
+        <p>The name of the global <code>UserDatabase</code> resource
+        that this realm will use for user, password and role information.</p>
       </attribute>
 
       <attribute name="X509UsernameRetrieverClassName" required="false">
