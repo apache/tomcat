@@ -35,12 +35,8 @@ import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
- * This valve allows to detect requests that take a long time to process, which might
- * indicate that the thread that is processing it is stuck.
- * Based on code proposed by TomLu in Bugzilla entry #50306
- *
- * @author slaurent
- *
+ * This valve allows to detect requests that take a long time to process, which
+ * might indicate that the thread that is processing it is stuck.
  */
 public class StuckThreadDetectionValve extends ValveBase {
 
@@ -136,10 +132,14 @@ public class StuckThreadDetectionValve extends ValveBase {
         if (log.isWarnEnabled()) {
             String msg = sm.getString(
                 "stuckThreadDetectionValve.notifyStuckThreadDetected",
-                monitoredThread.getThread().getName(), Long.valueOf(activeTime),
+                monitoredThread.getThread().getName(),
+                Long.valueOf(activeTime),
                 monitoredThread.getStartTime(),
                 Integer.valueOf(numStuckThreads),
-                monitoredThread.getRequestUri(), Integer.valueOf(threshold));
+                monitoredThread.getRequestUri(),
+                Integer.valueOf(threshold),
+                String.valueOf(monitoredThread.getThread().getId())
+                );
             // msg += "\n" + getStackTraceAsString(trace);
             Throwable th = new Throwable();
             th.setStackTrace(monitoredThread.getThread().getStackTrace());
@@ -147,13 +147,15 @@ public class StuckThreadDetectionValve extends ValveBase {
         }
     }
 
-    private void notifyStuckThreadCompleted(String threadName,
-            long activeTime, int numStuckThreads) {
+    private void notifyStuckThreadCompleted(CompletedStuckThread thread,
+            int numStuckThreads) {
         if (log.isWarnEnabled()) {
             String msg = sm.getString(
                 "stuckThreadDetectionValve.notifyStuckThreadCompleted",
-                threadName, Long.valueOf(activeTime),
-                Integer.valueOf(numStuckThreads));
+                thread.getName(),
+                Long.valueOf(thread.getTotalActiveTime()),
+                Integer.valueOf(numStuckThreads),
+                String.valueOf(thread.getId()));
             // Since the "stuck thread notification" is warn, this should also
             // be warn
             log.warn(msg);
@@ -193,7 +195,7 @@ public class StuckThreadDetectionValve extends ValveBase {
             activeThreads.remove(key);
             if (monitoredThread.markAsDone() == MonitoredThreadState.STUCK) {
                 completedStuckThreadsQueue.add(
-                        new CompletedStuckThread(monitoredThread.getThread().getName(),
+                        new CompletedStuckThread(monitoredThread.getThread(),
                             monitoredThread.getActiveTimeInMillis()));
             }
         }
@@ -220,8 +222,7 @@ public class StuckThreadDetectionValve extends ValveBase {
             completedStuckThread != null; completedStuckThread = completedStuckThreadsQueue.poll()) {
 
             int numStuckThreads = stuckCount.decrementAndGet();
-            notifyStuckThreadCompleted(completedStuckThread.getName(),
-                    completedStuckThread.getTotalActiveTime(), numStuckThreads);
+            notifyStuckThreadCompleted(completedStuckThread, numStuckThreads);
         }
     }
 
@@ -238,6 +239,16 @@ public class StuckThreadDetectionValve extends ValveBase {
             result[i] = idList.get(i).longValue();
         }
         return result;
+    }
+
+    public String[] getStuckThreadNames() {
+        List<String> nameList = new ArrayList<String>();
+        for (MonitoredThread monitoredThread : activeThreads.values()) {
+            if (monitoredThread.isMarkedAsStuck()) {
+                nameList.add(monitoredThread.getThread().getName());
+            }
+        }
+        return nameList.toArray(new String[nameList.size()]);
     }
 
     private static class MonitoredThread {
@@ -291,15 +302,21 @@ public class StuckThreadDetectionValve extends ValveBase {
     private static class CompletedStuckThread {
 
         private final String threadName;
+        private final long threadId;
         private final long totalActiveTime;
 
-        public CompletedStuckThread(String threadName, long totalActiveTime) {
-            this.threadName = threadName;
+        public CompletedStuckThread(Thread thread, long totalActiveTime) {
+            this.threadName = thread.getName();
+            this.threadId = thread.getId();
             this.totalActiveTime = totalActiveTime;
         }
 
         public String getName() {
             return this.threadName;
+        }
+
+        public long getId() {
+            return this.threadId;
         }
 
         public long getTotalActiveTime() {
