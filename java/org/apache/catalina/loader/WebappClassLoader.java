@@ -3449,28 +3449,6 @@ public class WebappClassLoader
 
     /**
      * Get URL.
-     * @deprecated Use {@link #getURI(File)} instead
-     */
-    @Deprecated
-    protected URL getURL(File file, boolean encoded)
-        throws MalformedURLException {
-
-        File realFile = file;
-        try {
-            realFile = realFile.getCanonicalFile();
-        } catch (IOException e) {
-            // Ignore
-        }
-        if(encoded) {
-            return getURI(realFile);
-        }
-
-        return realFile.toURI().toURL();
-    }
-
-
-    /**
-     * Get URL.
      */
     protected URL getURI(File file)
         throws MalformedURLException {
