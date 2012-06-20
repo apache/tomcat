@@ -1444,9 +1444,11 @@
     indicate that the thread that is processing it is stuck.</p>
     <p>When such a request is detected, the current stack trace of its thread is written
     to Tomcat log with a WARN level.</p>
-    <p>The IDs of the stuck threads are available through JMX in the
-    <code>stuckThreadIds</code> attribute. The JVM Thread MBean can then be used to
-    retrieve other information about each stuck thread (name, stack trace...).</p>
+    <p>The IDs and names of the stuck threads are available through JMX in the
+    <code>stuckThreadIds</code> and <code>stuckThreadNames</code> attributes.
+    The IDs can be used with the standard Threading JVM MBean
+    (<code>java.lang:type=Threading</code>) to retrieve other information
+    about each stuck thread.</p>
 
   </subsection>
 

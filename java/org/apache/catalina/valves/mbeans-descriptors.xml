@@ -496,8 +496,13 @@
                writeable="false"/>
 
     <attribute name="stuckThreadIds"
-               description="IDs of the thread currently considered stuck. Each ID can then be used with the ThreadMXBean to retrieve data about it."
+               description="IDs of the threads currently considered stuck. Each ID can then be used with the Threading MBean to retrieve data about it."
                type="long[]"
+               writeable="false"/>
+
+    <attribute name="stuckThreadNames"
+               description="Names of the threads currently considered stuck."
+               type="java.lang.String[]"
                writeable="false"/>
 
     <attribute name="threshold"
