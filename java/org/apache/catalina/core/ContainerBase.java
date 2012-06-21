@@ -29,6 +29,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Callable;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadFactory;
@@ -178,12 +179,13 @@ public abstract class ContainerBase extends LifecycleMBeanBase
 
 
     /**
-     * The container event listeners for this Container.
+     * The container event listeners for this Container. Implemented as a
+     * CopyOnWriteArrayList since listeners may invoke methods to add/remove
+     * tmeselves or other listeners and with a ReadWriteLock that would trigger
+     * a deadlock.
      */
-    protected ArrayList<ContainerListener> listeners =
-            new ArrayList<ContainerListener>();
-    protected final ReadWriteLock listenersLock = new ReentrantReadWriteLock();
-
+    protected List<ContainerListener> listeners =
+            new CopyOnWriteArrayList<ContainerListener>();
 
     /**
      * The Loader implementation with which this Container is associated.
@@ -897,14 +899,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase
      */
     @Override
     public void addContainerListener(ContainerListener listener) {
-
-        Lock write = listenersLock.writeLock();
-        write.lock();
-        try {
-            listeners.add(listener);
-        } finally {
-            write.unlock();
-        }
+        listeners.add(listener);
     }
 
 
@@ -961,16 +956,9 @@ public abstract class ContainerBase extends LifecycleMBeanBase
      */
     @Override
     public ContainerListener[] findContainerListeners() {
-
-        Lock read = listenersLock.readLock();
-        read.lock();
-        try {
-            ContainerListener[] results =
-                new ContainerListener[listeners.size()];
-            return listeners.toArray(results);
-        } finally {
-            read.unlock();
-        }
+        ContainerListener[] results =
+            new ContainerListener[0];
+        return listeners.toArray(results);
     }
 
 
@@ -1024,14 +1012,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase
      */
     @Override
     public void removeContainerListener(ContainerListener listener) {
-
-        Lock write = listenersLock.writeLock();
-        write.lock();
-        try {
-            listeners.remove(listener);
-        } finally {
-            write.unlock();
-        }
+        listeners.remove(listener);
     }
 
 
@@ -1376,30 +1357,13 @@ public abstract class ContainerBase extends LifecycleMBeanBase
     @Override
     public void fireContainerEvent(String type, Object data) {
 
-        /*
-         * Implementation note
-         * There are two options here.
-         * 1) Take a copy of listeners and fire the events outside of the read
-         *    lock
-         * 2) Don't take a copy and fire the events inside the read lock
-         *
-         * Approach 2 has been used here since holding the read lock only
-         * prevents writes and that is preferable to creating lots of array
-         * objects. Since writes occur on start / stop (unless an external
-         * management tool is used) then holding the read lock for a relatively
-         * long time should not be an issue.
-         */
-        Lock read = listenersLock.readLock();
-        read.lock();
-        try {
-            if (listeners.size() < 1)
-                return;
-            ContainerEvent event = new ContainerEvent(this, type, data);
-            for (ContainerListener listener : listeners) {
-                listener.containerEvent(event);
-            }
-        } finally {
-            read.unlock();
+        if (listeners.size() < 1)
+            return;
+
+        ContainerEvent event = new ContainerEvent(this, type, data);
+        // Note for each uses an iterator internally so this is safe
+        for (ContainerListener listener : listeners) {
+            listener.containerEvent(event);
         }
     }
 
