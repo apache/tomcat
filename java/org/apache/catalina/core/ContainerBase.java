@@ -181,7 +181,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase
     /**
      * The container event listeners for this Container. Implemented as a
      * CopyOnWriteArrayList since listeners may invoke methods to add/remove
-     * tmeselves or other listeners and with a ReadWriteLock that would trigger
+     * themselves or other listeners and with a ReadWriteLock that would trigger
      * a deadlock.
      */
     protected List<ContainerListener> listeners =
