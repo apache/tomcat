@@ -1121,12 +1121,23 @@ public class ContextConfig implements LifecycleListener {
      * web.xml file.
      */
     protected void webConfig() {
-        /* Anything and everything can override the global and host defaults.
+        /*
+         * Anything and everything can override the global and host defaults.
          * This is implemented in two parts
          * - Handle as a web fragment that gets added after everything else so
          *   everything else takes priority
          * - Mark Servlets as overridable so SCI configuration can replace
          *   configuration from the defaults
+         */
+
+        /*
+         * The rules for annotation scanning are not as clear-cut as one might
+         * think. Tomcat implements the following process:
+         * - As per SRV.1.6.2, Tomcat will scan for annotations regardless of
+         *   which Servlet spec version is declared in web.xml. The EG has
+         *   confirmed this is the expected behaviour.
+         * - This is not yet complete. Further clarifications (and possible code
+         *   changes to follow).
          */
         Set<WebXml> defaults = new HashSet<WebXml>();
         defaults.add(getDefaultWebXmlFragment());
@@ -1137,161 +1148,154 @@ public class ContextConfig implements LifecycleListener {
         InputSource contextWebXml = getContextWebXmlSource();
         parseWebXml(contextWebXml, webXml, false);
 
-        if (webXml.getMajorVersion() >= 3) {
-            ServletContext sContext = context.getServletContext();
+        ServletContext sContext = context.getServletContext();
 
-            // Ordering is important here
+        // Ordering is important here
 
-            // Step 1. Identify all the JARs packaged with the application
-            // If the JARs have a web-fragment.xml it will be parsed at this
-            // point.
-            Map<String,WebXml> fragments = processJarsForWebFragments();
+        // Step 1. Identify all the JARs packaged with the application
+        // If the JARs have a web-fragment.xml it will be parsed at this
+        // point.
+        Map<String,WebXml> fragments = processJarsForWebFragments();
 
-            // Only need to process fragments and annotations if metadata is
-            // not complete
-            Set<WebXml> orderedFragments = null;
-            if  (!webXml.isMetadataComplete()) {
-                // Step 2. Order the fragments.
-                orderedFragments = WebXml.orderWebFragments(webXml, fragments);
+        // Only need to process fragments and annotations if metadata is
+        // not complete
+        Set<WebXml> orderedFragments = null;
+        if  (!webXml.isMetadataComplete()) {
+            // Step 2. Order the fragments.
+            orderedFragments = WebXml.orderWebFragments(webXml, fragments);
 
-                // Step 3. Look for ServletContainerInitializer implementations
-                if (ok) {
-                    processServletContainerInitializers(orderedFragments);
-                }
+            // Step 3. Look for ServletContainerInitializer implementations
+            if (ok) {
+                processServletContainerInitializers(orderedFragments);
+            }
 
-                // Step 4. Process /WEB-INF/classes for annotations
-                // This will add any matching classes to the typeInitializerMap
-                if (ok) {
-                    // Hack required by Eclipse's "serve modules without
-                    // publishing" feature since this backs WEB-INF/classes by
-                    // multiple locations rather than one.
-                    NamingEnumeration<Binding> listBindings = null;
+            // Step 4. Process /WEB-INF/classes for annotations
+            // This will add any matching classes to the typeInitializerMap
+            if (ok) {
+                // Hack required by Eclipse's "serve modules without
+                // publishing" feature since this backs WEB-INF/classes by
+                // multiple locations rather than one.
+                NamingEnumeration<Binding> listBindings = null;
+                try {
                     try {
-                        try {
-                            listBindings = context.getResources().listBindings(
-                                    "/WEB-INF/classes");
-                        } catch (NameNotFoundException ignore) {
-                            // Safe to ignore
-                        }
-                        while (listBindings != null &&
-                                listBindings.hasMoreElements()) {
-                            Binding binding = listBindings.nextElement();
-                            if (binding.getObject() instanceof FileDirContext) {
-                                File webInfClassDir = new File(
-                                        ((FileDirContext) binding.getObject()).getDocBase());
-                                processAnnotationsFile(webInfClassDir, webXml);
-                            } else {
-                                String resource =
-                                        "/WEB-INF/classes/" + binding.getName();
-                                try {
-                                    URL url = sContext.getResource(resource);
-                                    processAnnotationsUrl(url, webXml);
-                                } catch (MalformedURLException e) {
-                                    log.error(sm.getString(
-                                            "contextConfig.webinfClassesUrl",
-                                            resource), e);
-                                }
+                        listBindings = context.getResources().listBindings(
+                                "/WEB-INF/classes");
+                    } catch (NameNotFoundException ignore) {
+                        // Safe to ignore
+                    }
+                    while (listBindings != null &&
+                            listBindings.hasMoreElements()) {
+                        Binding binding = listBindings.nextElement();
+                        if (binding.getObject() instanceof FileDirContext) {
+                            File webInfClassDir = new File(
+                                    ((FileDirContext) binding.getObject()).getDocBase());
+                            processAnnotationsFile(webInfClassDir, webXml);
+                        } else {
+                            String resource =
+                                    "/WEB-INF/classes/" + binding.getName();
+                            try {
+                                URL url = sContext.getResource(resource);
+                                processAnnotationsUrl(url, webXml);
+                            } catch (MalformedURLException e) {
+                                log.error(sm.getString(
+                                        "contextConfig.webinfClassesUrl",
+                                        resource), e);
                             }
                         }
-                    } catch (NamingException e) {
-                        log.error(sm.getString(
-                                "contextConfig.webinfClassesUrl",
-                                "/WEB-INF/classes"), e);
                     }
+                } catch (NamingException e) {
+                    log.error(sm.getString(
+                            "contextConfig.webinfClassesUrl",
+                            "/WEB-INF/classes"), e);
                 }
-
-                // Step 5. Process JARs for annotations - only need to process
-                // those fragments we are going to use
-                // This will add any matching classes to the typeInitializerMap
-                if (ok) {
-                    processAnnotations(orderedFragments);
-                }
-
-                // Cache, if used, is no longer required so clear it
-                javaClassCache.clear();
-
-                // Step 6. Merge web-fragment.xml files into the main web.xml
-                // file.
-                if (ok) {
-                    ok = webXml.merge(orderedFragments);
-                }
-
-                // Step 7. Apply global defaults
-                // Have to merge defaults before JSP conversion since defaults
-                // provide JSP servlet definition.
-                webXml.merge(defaults);
-
-                // Step 8. Convert explicitly mentioned jsps to servlets
-                if (ok) {
-                    convertJsps(webXml);
-                }
-
-                // Step 9. Apply merged web.xml to Context
-                if (ok) {
-                    webXml.configureContext(context);
-
-                    // Step 9a. Make the merged web.xml available to other
-                    // components, specifically Jasper, to save those components
-                    // from having to re-generate it.
-                    // TODO Use a ServletContainerInitializer for Jasper
-                    String mergedWebXml = webXml.toXml();
-                    sContext.setAttribute(
-                           org.apache.tomcat.util.scan.Constants.MERGED_WEB_XML,
-                           mergedWebXml);
-                    if (context.getLogEffectiveWebXml()) {
-                        log.info("web.xml:\n" + mergedWebXml);
-                    }
-                }
-            } else {
-                webXml.merge(defaults);
-                webXml.configureContext(context);
             }
 
-            // Always need to look for static resources
-            // Step 10. Look for static resources packaged in JARs
+            // Step 5. Process JARs for annotations - only need to process
+            // those fragments we are going to use
+            // This will add any matching classes to the typeInitializerMap
             if (ok) {
-                // Spec does not define an order.
-                // Use ordered JARs followed by remaining JARs
-                Set<WebXml> resourceJars = new LinkedHashSet<WebXml>();
-                if (orderedFragments != null) {
-                    for (WebXml fragment : orderedFragments) {
-                        resourceJars.add(fragment);
-                    }
-                }
-                for (WebXml fragment : fragments.values()) {
-                    if (!resourceJars.contains(fragment)) {
-                        resourceJars.add(fragment);
-                    }
-                }
-                processResourceJARs(resourceJars);
-                // See also StandardContext.resourcesStart() for
-                // WEB-INF/classes/META-INF/resources configuration
+                processAnnotations(orderedFragments);
             }
 
-            // Only look for ServletContainerInitializer if metadata is not
-            // complete
-            if (!webXml.isMetadataComplete()) {
-                // Step 11. Apply the ServletContainerInitializer config to the
-                // context
-                if (ok) {
-                    for (Map.Entry<ServletContainerInitializer,
-                            Set<Class<?>>> entry :
-                                initializerClassMap.entrySet()) {
-                        if (entry.getValue().isEmpty()) {
-                            context.addServletContainerInitializer(
-                                    entry.getKey(), null);
-                        } else {
-                            context.addServletContainerInitializer(
-                                    entry.getKey(), entry.getValue());
-                        }
-                    }
+            // Cache, if used, is no longer required so clear it
+            javaClassCache.clear();
+
+            // Step 6. Merge web-fragment.xml files into the main web.xml
+            // file.
+            if (ok) {
+                ok = webXml.merge(orderedFragments);
+            }
+
+            // Step 7. Apply global defaults
+            // Have to merge defaults before JSP conversion since defaults
+            // provide JSP servlet definition.
+            webXml.merge(defaults);
+
+            // Step 8. Convert explicitly mentioned jsps to servlets
+            if (ok) {
+                convertJsps(webXml);
+            }
+
+            // Step 9. Apply merged web.xml to Context
+            if (ok) {
+                webXml.configureContext(context);
+
+                // Step 9a. Make the merged web.xml available to other
+                // components, specifically Jasper, to save those components
+                // from having to re-generate it.
+                // TODO Use a ServletContainerInitializer for Jasper
+                String mergedWebXml = webXml.toXml();
+                sContext.setAttribute(
+                       org.apache.tomcat.util.scan.Constants.MERGED_WEB_XML,
+                       mergedWebXml);
+                if (context.getLogEffectiveWebXml()) {
+                    log.info("web.xml:\n" + mergedWebXml);
                 }
             }
         } else {
-            // Apply unmerged web.xml to Context
             webXml.merge(defaults);
-            convertJsps(webXml);
             webXml.configureContext(context);
+        }
+
+        // Always need to look for static resources
+        // Step 10. Look for static resources packaged in JARs
+        if (ok) {
+            // Spec does not define an order.
+            // Use ordered JARs followed by remaining JARs
+            Set<WebXml> resourceJars = new LinkedHashSet<WebXml>();
+            if (orderedFragments != null) {
+                for (WebXml fragment : orderedFragments) {
+                    resourceJars.add(fragment);
+                }
+            }
+            for (WebXml fragment : fragments.values()) {
+                if (!resourceJars.contains(fragment)) {
+                    resourceJars.add(fragment);
+                }
+            }
+            processResourceJARs(resourceJars);
+            // See also StandardContext.resourcesStart() for
+            // WEB-INF/classes/META-INF/resources configuration
+        }
+
+        // Only look for ServletContainerInitializer if metadata is not
+        // complete
+        if (!webXml.isMetadataComplete()) {
+            // Step 11. Apply the ServletContainerInitializer config to the
+            // context
+            if (ok) {
+                for (Map.Entry<ServletContainerInitializer,
+                        Set<Class<?>>> entry :
+                            initializerClassMap.entrySet()) {
+                    if (entry.getValue().isEmpty()) {
+                        context.addServletContainerInitializer(
+                                entry.getKey(), null);
+                    } else {
+                        context.addServletContainerInitializer(
+                                entry.getKey(), entry.getValue());
+                    }
+                }
+            }
         }
     }
 
