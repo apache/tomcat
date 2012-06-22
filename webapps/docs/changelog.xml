@@ -77,6 +77,11 @@
         Annotation scanning is now always performed - regardless of the version
         declared in web.xml - unless metadata complete is set to true. (markt)
       </fix>
+      <fix>
+        As per clarification from the Servlet Expert Group, JARs are always
+        checked for ServletContainerInitializers regardless of the setting of
+        metadata complete. (markt) 
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
