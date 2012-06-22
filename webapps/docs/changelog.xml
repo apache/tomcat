@@ -70,6 +70,13 @@
         could easily trigger a deadlock when deploying a ROOT web application.
         (markt)
       </fix>
+      <fix>
+        As per section 1.6.2 of the Servlet 3.0 specification and clarification
+        from the Servlet Expert Group, the servlet specification version
+        declared in web.xml no longer controls if Tomcat scans for annotations.
+        Annotation scanning is now always performed - regardless of the version
+        declared in web.xml - unless metadata complete is set to true. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
