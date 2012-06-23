@@ -84,6 +84,15 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Jasper">
+    <changelog>
+      <fix>
+        <bug>53421</bug>: Provide a more helpful error message if a getter or
+        setter cannot be found for a bean property when using expression
+        language. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Web applications">
     <changelog>
       <fix>
