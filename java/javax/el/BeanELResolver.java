@@ -292,7 +292,7 @@ public class BeanELResolver extends ELResolver {
                 if (this.write == null) {
                     throw new PropertyNotFoundException(message(ctx,
                             "propertyNotWritable", new Object[] {
-                                    type.getName(), descriptor.getName() }));
+                                    owner.getName(), descriptor.getName() }));
                 }
             }
             return this.write;
@@ -304,7 +304,7 @@ public class BeanELResolver extends ELResolver {
                 if (this.read == null) {
                     throw new PropertyNotFoundException(message(ctx,
                             "propertyNotReadable", new Object[] {
-                                    type.getName(), descriptor.getName() }));
+                                    owner.getName(), descriptor.getName() }));
                 }
             }
             return this.read;
