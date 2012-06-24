@@ -116,6 +116,10 @@
         Add manifest files to the set of files for which the line-ending is
         changed to match the OS defaults in the source distributions. (markt)
       </fix>
+      <fix>
+        Align Ant tasks definitions in *.tasks files and in antlib.xml files.
+        Some tasks were defined only in one of them. (kkolinko)
+      </fix>
     </changelog>
   </subsection>
 </section>
