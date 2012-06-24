@@ -81,14 +81,6 @@
       </scode>
     </changelog>
   </subsection>
-  <subsection name="Coyote">
-    <changelog>
-      <update>
-        Remove Ant task <code>jasper2</code>. The correct name for the JspC
-        task is <code>jasper</code>. (kkolinko)
-      </update>
-    </changelog>
-  </subsection>
   <subsection name="Tribes">
     <changelog>
       <scode>
@@ -108,6 +100,11 @@
         Remove static info String and associated getInfo() method where present.
         (markt)
       </scode>
+      <update>
+        (<rev>1353242</rev>):
+        Remove Ant task <code>jasper2</code>. The correct name for the JspC
+        task is <code>jasper</code>. (kkolinko)
+      </update>
     </changelog>
   </subsection>
 </section>
