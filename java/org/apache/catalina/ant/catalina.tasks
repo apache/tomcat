@@ -26,6 +26,7 @@ validator=org.apache.catalina.ant.ValidatorTask
 
 #Jk Task
 jkstatus=org.apache.catalina.ant.JKStatusUpdateTask
+jkupdate=org.apache.catalina.ant.JKStatusUpdateTask
 
 # Manager JMX
 jmxManagerSet=org.apache.catalina.ant.JMXSetTask

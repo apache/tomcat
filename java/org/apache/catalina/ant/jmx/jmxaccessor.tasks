@@ -21,3 +21,5 @@ jmxInvoke=org.apache.catalina.ant.jmx.JMXAccessorInvokeTask
 jmxQuery=org.apache.catalina.ant.jmx.JMXAccessorQueryTask
 jmxCreate=org.apache.catalina.ant.jmx.JMXAccessorCreateTask
 jmxUnregister=org.apache.catalina.ant.jmx.JMXAccessorUnregisterTask
+jmxEquals=org.apache.catalina.ant.jmx.JMXAccessorEqualsCondition
+jmxCondition=org.apache.catalina.ant.jmx.JMXAccessorCondition
