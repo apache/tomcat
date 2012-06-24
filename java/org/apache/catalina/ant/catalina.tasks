@@ -35,4 +35,3 @@ jmxManagerQuery=org.apache.catalina.ant.JMXQueryTask
 
 # Jasper tasks
 jasper=org.apache.jasper.JspC
-jasper2=org.apache.jasper.JspC
