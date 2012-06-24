@@ -118,7 +118,9 @@
       </fix>
       <fix>
         Align Ant tasks definitions in *.tasks files and in antlib.xml files.
-        Some tasks were defined only in one of them. (kkolinko)
+        Some tasks were defined only in one of them. Replace
+        <code>taskdef</code> with <code>typedef</code> in
+        <code>bin/catalina-tasks.xml</code>. (kkolinko)
       </fix>
     </changelog>
   </subsection>
