@@ -342,7 +342,7 @@ are automatically compiled as part of the build process.
 </p>
 
 <p>
-At the jasper2 task you can use the option <code>addWebXmlMappings</code> for
+At the jasper task you can use the option <code>addWebXmlMappings</code> for
 automatic merge the <code>${webapp.path}/WEB-INF/generated_web.xml</code>
 with the current web application deployment descriptor at
 <code>${webapp.path}/WEB-INF/web.xml</code>. When you want to use Java 6
