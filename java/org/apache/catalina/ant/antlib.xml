@@ -65,7 +65,4 @@
   <typedef
         name="jasper"
         classname="org.apache.jasper.JspC" />
-  <typedef
-        name="jasper2"
-        classname="org.apache.jasper.JspC" />
 </antlib>

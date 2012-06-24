@@ -81,6 +81,14 @@
       </scode>
     </changelog>
   </subsection>
+  <subsection name="Coyote">
+    <changelog>
+      <update>
+        Remove Ant task <code>jasper2</code>. The correct name for the JspC
+        task is <code>jasper</code>. (kkolinko)
+      </update>
+    </changelog>
+  </subsection>
   <subsection name="Tribes">
     <changelog>
       <scode>
