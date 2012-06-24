@@ -90,7 +90,7 @@ controlRole tomcat
   <section name="Manage Tomcat with JMX remote Ant Tasks">
    <p>To simplify JMX usage with Ant 1.6.x, a set of tasks is provided that may
    be used with antlib.</p>
-   <p><b>antlib</b>Copy your catalina-ant.jar from $CATALINA_HOME/lib to $ANT_HOME/lib.</p>
+   <p><b>antlib</b>: Copy your catalina-ant.jar from $CATALINA_HOME/lib to $ANT_HOME/lib.</p>
    <p>The following example shows the JMX Accessor usage:</p>
    <table border="1">
    <tr><td><p><pre>
@@ -193,7 +193,7 @@ controlRole tomcat
    <p><b>import:</b> Import the JMX Accessor Project with
    <em>&lt;import file="${CATALINA.HOME}/bin/catalina-tasks.xml" /&gt;</em> and
    reference the tasks with <em>jmxOpen</em>, <em>jmxSet</em>, <em>jmxGet</em>,
-    <em>jmxQuery</em>, <em>jmxInvoke</em>,<em>jmxEquals</em> and <em>jmxCondition</em>. </p>
+   <em>jmxQuery</em>, <em>jmxInvoke</em>, <em>jmxEquals</em> and <em>jmxCondition</em>.</p>
 
   </section>
 
