@@ -16,6 +16,7 @@
   limitations under the License.
 -->
 <antlib>
+  <!-- Pure Catalina tasks -->
   <typedef
         name="list"
         classname="org.apache.catalina.ant.ListTask" />
@@ -41,8 +42,16 @@
         name="sessions"
         classname="org.apache.catalina.ant.SessionsTask" />
   <typedef
+        name="validator"
+        classname="org.apache.catalina.ant.ValidatorTask" />
+  <!-- Jk Task -->
+  <typedef
+        name="jkstatus"
+        classname="org.apache.catalina.ant.JKStatusUpdateTask" />
+  <typedef
         name="jkupdate"
         classname="org.apache.catalina.ant.JKStatusUpdateTask" />
+  <!-- Manager JMX -->
   <typedef
         name="jmxManagerSet"
         classname="org.apache.catalina.ant.JMXSetTask" />
@@ -52,4 +61,11 @@
   <typedef
         name="jmxManagerQuery"
         classname="org.apache.catalina.ant.JMXQueryTask" />
+  <!-- Jasper -->
+  <typedef
+        name="jasper"
+        classname="org.apache.jasper.JspC" />
+  <typedef
+        name="jasper2"
+        classname="org.apache.jasper.JspC" />
 </antlib>

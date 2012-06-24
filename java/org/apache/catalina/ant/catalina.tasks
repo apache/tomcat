@@ -14,18 +14,19 @@
 # limitations under the License.
 
 # Pure catalina tasks
-deploy=org.apache.catalina.ant.DeployTask
 list=org.apache.catalina.ant.ListTask
-reload=org.apache.catalina.ant.ReloadTask
-sessions=org.apache.catalina.ant.SessionsTask
-resources=org.apache.catalina.ant.ResourcesTask
+deploy=org.apache.catalina.ant.DeployTask
 start=org.apache.catalina.ant.StartTask
+reload=org.apache.catalina.ant.ReloadTask
 stop=org.apache.catalina.ant.StopTask
 undeploy=org.apache.catalina.ant.UndeployTask
+resources=org.apache.catalina.ant.ResourcesTask
+sessions=org.apache.catalina.ant.SessionsTask
 validator=org.apache.catalina.ant.ValidatorTask
 
 #Jk Task
 jkstatus=org.apache.catalina.ant.JKStatusUpdateTask
+jkupdate=org.apache.catalina.ant.JKStatusUpdateTask
 
 # Manager JMX
 jmxManagerSet=org.apache.catalina.ant.JMXSetTask
