@@ -25,7 +25,7 @@
   <!-- set catalina.home if it's not already set -->
   <dirname property="catalina.home.bin.dir" file="${ant.file.catalina-tasks}"/>
   <property name="catalina.home" value="${catalina.home.bin.dir}/.."/>
-  <taskdef resource="org/apache/catalina/ant/catalina.tasks">
+  <typedef resource="org/apache/catalina/ant/catalina.tasks">
     <classpath>
       <fileset file="${catalina.home}/bin/tomcat-juli.jar"/>
       <fileset file="${catalina.home}/lib/tomcat-api.jar"/>
@@ -38,22 +38,8 @@
       <fileset file="${catalina.home}/lib/catalina-ant.jar"/>
       <fileset file="${catalina.home}/lib/tomcat-coyote.jar"/>
     </classpath>
-  </taskdef>
-  <taskdef resource="org/apache/catalina/ant/jmx/jmxaccessor.tasks">
-    <classpath>
-      <fileset file="${catalina.home}/lib/catalina-ant.jar"/>
-    </classpath>
-  </taskdef>
-  <typedef
-        name="jmxEquals"
-        classname="org.apache.catalina.ant.jmx.JMXAccessorEqualsCondition">
-    <classpath>
-      <fileset file="${catalina.home}/lib/catalina-ant.jar"/>
-    </classpath>
   </typedef>
-  <typedef
-        name="jmxCondition"
-        classname="org.apache.catalina.ant.jmx.JMXAccessorCondition">
+  <typedef resource="org/apache/catalina/ant/jmx/jmxaccessor.tasks">
     <classpath>
       <fileset file="${catalina.home}/lib/catalina-ant.jar"/>
     </classpath>
