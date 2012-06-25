@@ -109,6 +109,10 @@
         they work with secure connections (wss) as well as non-secure (ws)
         connections. (markt)  
       </fix>
+      <fix>
+        <bug>53456</bug>: Minor corrections and improvements to the HTTP
+        connector configuration reference. Patch provided by sebb. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
