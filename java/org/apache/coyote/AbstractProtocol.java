@@ -149,6 +149,12 @@ public abstract class AbstractProtocol implements ProtocolHandler,
     public void setClientCertProvider(String s) { this.clientCertProvider = s; }
 
 
+    @Override
+    public boolean isAprRequired() {
+        return false;
+    }
+
+
     // ---------------------- Properties that are passed through to the EndPoint
 
     @Override

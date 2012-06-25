@@ -82,4 +82,10 @@ public interface ProtocolHandler {
      * Destroy the protocol (optional).
      */
     public void destroy() throws Exception;
+
+
+    /**
+     * Requires APR/native library
+     */
+    public boolean isAprRequired();
 }
