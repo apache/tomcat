@@ -46,9 +46,6 @@
         classname="org.apache.catalina.ant.ValidatorTask" />
   <!-- Jk Task -->
   <typedef
-        name="jkstatus"
-        classname="org.apache.catalina.ant.JKStatusUpdateTask" />
-  <typedef
         name="jkupdate"
         classname="org.apache.catalina.ant.JKStatusUpdateTask" />
   <!-- Manager JMX -->
