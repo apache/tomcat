@@ -53,6 +53,14 @@ public class Http11AprProtocol extends AbstractHttp11Protocol {
     }
 
 
+    @Override
+    public boolean isAprRequired() {
+        // Override since this protocol implementation requires the APR/native
+        // library
+        return true;
+    }
+
+
     public Http11AprProtocol() {
         endpoint = new AprEndpoint();
         cHandler = new Http11ConnectionHandler(this);
