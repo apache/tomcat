@@ -41,9 +41,6 @@
   <typedef
         name="sessions"
         classname="org.apache.catalina.ant.SessionsTask" />
-  <typedef
-        name="validator"
-        classname="org.apache.catalina.ant.ValidatorTask" />
   <!-- Jk Task -->
   <typedef
         name="jkupdate"
@@ -58,8 +55,15 @@
   <typedef
         name="jmxManagerQuery"
         classname="org.apache.catalina.ant.JMXQueryTask" />
-  <!-- Jasper -->
+  <!-- Other -->
+<!-- These tasks are deliberately omitted here,
+  because they depends on other Tomcat components besides catalina-ant.jar
+  and thus are hard to use with antlib.
+  <typedef
+        name="validator"
+        classname="org.apache.catalina.ant.ValidatorTask" />
   <typedef
         name="jasper"
         classname="org.apache.jasper.JspC" />
+-->
 </antlib>
