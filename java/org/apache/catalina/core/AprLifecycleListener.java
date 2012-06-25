@@ -71,6 +71,7 @@ public class AprLifecycleListener
     protected static String SSLRandomSeed = "builtin";
     protected static boolean sslInitialized = false;
     protected static boolean aprInitialized = false;
+    @Deprecated
     protected static boolean sslAvailable = false;
     protected static boolean aprAvailable = false;
     protected static boolean fipsModeActive = false;
