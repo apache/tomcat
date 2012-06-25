@@ -101,9 +101,10 @@
         (markt)
       </scode>
       <update>
-        (<rev>1353242</rev>):
-        Remove Ant task <code>jasper2</code>. The correct name for the JspC
-        task is <code>jasper</code>. (kkolinko)
+        (<rev>1353242</rev>, <rev>1353410</rev>):
+        Remove Ant tasks <code>jasper2</code> and <code>jkstatus</code>.
+        The correct names are <code>jasper</code> and <code>jkupdate</code>.
+        (kkolinko)
       </update>
     </changelog>
   </subsection>
