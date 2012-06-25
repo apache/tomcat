@@ -49,8 +49,15 @@ public class AjpAprProtocol extends AbstractAjpProtocol {
     }
 
 
-    // ------------------------------------------------------------ Constructor
+    @Override
+    public boolean isAprRequired() {
+        // Override since this protocol implementation requires the APR/native
+        // library
+        return true;
+    }
 
+
+    // ------------------------------------------------------------ Constructor
 
     public AjpAprProtocol() {
         endpoint = new AprEndpoint();

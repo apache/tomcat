@@ -84,6 +84,15 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Coyote">
+    <changelog>
+      <fix>
+        <bug>53430</bug>: Avoid a JVM crash when a connector that requires the
+        APR/native library is explicitly specified and the library, or a recent 
+        enough  version of it, is not available. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Jasper">
     <changelog>
       <fix>
