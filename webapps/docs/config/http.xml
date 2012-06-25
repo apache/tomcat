@@ -48,8 +48,8 @@
 
   <p>If you wish to configure the <strong>Connector</strong> that is used
   for connections to web servers using the AJP protocol (such as the
-  <code>mod_jk 1.2.x</code> connector for Apache 1.3), see
-  <a href="ajp.html">here</a> instead.</p>
+  <code>mod_jk 1.2.x</code> connector for Apache 1.3), please refer to the
+  <a href="ajp.html">AJP Connector</a> documentation.</p>
 
   <p>Each incoming request requires
   a thread for the duration of that request.  If more simultaneous requests
@@ -896,10 +896,15 @@
   attributes to the values <code>https</code> and <code>true</code>
   respectively, to pass correct information to the servlets.</p>
 
-  <p>The BIO and NIO connectors used the JSSE SSL whereas the APR/native
+  <p>The BIO and NIO connectors use the JSSE SSL whereas the APR/native
   connector uses OpenSSL. Therefore, in addition to using different attributes
   to configure SSL, the APR/native connector also requires keys and certificates
   to be provided in a different format.</p>
+
+  <p>For more information, see the
+  <a href="../ssl-howto.html">SSL Configuration HOW-TO</a>.</p>
+
+  <subsection name="SSL Support - BIO and NIO">
 
   <p>The BIO and NIO connectors use the following attributes to configure SSL:
   </p>
@@ -1090,6 +1095,10 @@
 
   </attributes>
 
+  </subsection>
+
+  <subsection name="SSL Support - APR/Native">
+
   <p>When APR/native is enabled, the HTTPS connector will use a socket poller
   for keep-alive, increasing scalability of the server. It also uses OpenSSL,
   which may be more optimized than JSSE depending on the processor being used,
@@ -1203,15 +1212,14 @@
 
   </attributes>
 
-  <p>For more information, see the
-  <a href="../ssl-howto.html">SSL Configuration HOW-TO</a>.</p>
+  </subsection>
 
   </subsection>
   <subsection name="Connector Comparison">
 
     <p>Below is a small chart that shows how the connectors differentiate.</p>
     <source>
-                       Java Blocking Connector   Java Nio Blocking Connector   APR/native Connector
+                       Java Blocking Connector   Java Non Blocking Connector   APR/native Connector
                                  BIO                         NIO                       APR
     Classname              Http11Protocol             Http11NioProtocol         Http11AprProtocol
     Tomcat Version           3.x onwards                 6.x onwards              5.5.x onwards
