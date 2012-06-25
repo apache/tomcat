@@ -113,6 +113,10 @@
         <bug>53456</bug>: Minor corrections and improvements to the HTTP
         connector configuration reference. Patch provided by sebb. (markt)
       </fix>
+      <fix>
+        <bug>53459</bug>: Correction and clarifications to the SSL Connector
+        configuration examples in the SSL how-to. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">

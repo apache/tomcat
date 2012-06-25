@@ -343,11 +343,14 @@ sources like "/dev/urandom" that will allow quicker starts of Tomcat.
 <code>$CATALINA_BASE</code> represents the base directory for the
 Tomcat instance.  An example <code>&lt;Connector&gt;</code> element
 for an SSL connector is included in the default <code>server.xml</code>
-file installed with Tomcat.  For JSSE, it should look something like this:</p>
+file installed with Tomcat.  To configure an SSL connector that uses JSSE, you
+will need to remove the comments and edit it so it looks something like
+this:</p>
 <source>
 &lt;-- Define a SSL Coyote HTTP/1.1 Connector on port 8443 --&gt;
-&lt;!--
+&lt;-- Hard-coded to use the NIO protocol implementation   --&gt;
 &lt;Connector
+           protocol="org.apache.coyote.http11.Http11NioProtocol"
            port="8443" maxThreads="200"
            scheme="https" secure="true" SSLEnabled="true"
            keystoreFile="${user.home}/.keystore" keystorePass="changeit"
@@ -355,19 +358,20 @@ file installed with Tomcat.  For JSSE, it should look something like this:</p>
 --&gt;
 </source>
 <p>
-  The example above will throw an error if you have the APR and the Tomcat Native libraries in your path,
-  as Tomcat will try to use the APR connector. The APR connector uses different attributes for
-  SSL keys and certificates. An example of an APR configuration is:
+  The example above will throw an error if you have the APR and the Tomcat
+  Native libraries in your path, as Tomcat will try to use the APR connector.
+  The APR connector uses different attributes for many SSL settings,
+  particularly keys and certificates. An example of an APR configuration is:
 <source>
 &lt;-- Define a SSL Coyote HTTP/1.1 Connector on port 8443 --&gt;
-&lt;!--
+&lt;-- Hard-coded to use the APR protocol implementation   --&gt;
 &lt;Connector
+           protocol="org.apache.coyote.http11.Http11AprProtocol"
            port="8443" maxThreads="200"
            scheme="https" secure="true" SSLEnabled="true"
            SSLCertificateFile="/usr/local/ssl/server.crt"
            SSLCertificateKeyFile="/usr/local/ssl/server.pem"
-           clientAuth="optional" SSLProtocol="TLSv1"/&gt;
---&gt;
+           SSLVerifyClient="optional" SSLProtocol="TLSv1"/&gt;
 </source>
 </p>
 
