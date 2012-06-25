@@ -116,12 +116,15 @@
         Add manifest files to the set of files for which the line-ending is
         changed to match the OS defaults in the source distributions. (markt)
       </fix>
-      <fix>
-        Align Ant tasks definitions in *.tasks files and in antlib.xml files.
-        Some tasks were defined only in one of them. Replace
-        <code>taskdef</code> with <code>typedef</code> in
-        <code>bin/catalina-tasks.xml</code>. (kkolinko)
-      </fix>
+      <scode>
+        Align Jk Ant tasks definitions between antlib.xml and catalina.tasks
+        files, introducing <code>jkupdate</code> as synonym for
+        <code>jkstatus</code>. The latter one is deprecated.
+        Simplify <code>bin/catalina-tasks.xml</code>, replacing
+        <code>taskdef</code> with <code>typedef</code> and adding Ant condition
+        implementations used with JMX to <code>jmxaccessor.tasks</code> file.
+        (kkolinko)
+      </scode>
     </changelog>
   </subsection>
 </section>
