@@ -213,4 +213,10 @@ public class TesterResponse
     @Override
     @Deprecated
     public void setStatus(int status, String message) {/* NOOP */}
+
+
+    @Override
+    public void setContentLengthLong(long length) {/* NOOP */}
+
+
 }

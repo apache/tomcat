@@ -21,6 +21,7 @@ import java.io.OutputStream;
 import java.util.zip.GZIPOutputStream;
 
 import javax.servlet.ServletOutputStream;
+import javax.servlet.WriteListener;
 
 /**
  * Implementation of <b>ServletOutputStream</b> that works with
@@ -260,6 +261,27 @@ public class CompressionResponseStream extends ServletOutputStream {
     public void write(byte b[]) throws IOException {
 
         write(b, 0, b.length);
+
+    }
+
+
+
+    /**
+     * TODO SERVLET 3.1
+     */
+    @Override
+    public boolean canWrite() {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+
+    /**
+     * TODO SERVLET 3.1
+     */
+    @Override
+    public void setWriteListener(WriteListener listener) {
+        // TODO Auto-generated method stub
 
     }
 
