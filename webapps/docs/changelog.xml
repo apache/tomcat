@@ -82,6 +82,10 @@
         checked for ServletContainerInitializers regardless of the setting of
         metadata complete. (markt) 
       </fix>
+      <add>
+        <bug>53465</bug>: Populate mapped-name property for resources defined in
+        web.xml. Based on a patch by Violeta Georgieva. (markt) 
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
