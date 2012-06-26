@@ -323,4 +323,13 @@ public class HttpServletRequestWrapper extends ServletRequestWrapper implements
             ServletException {
         return this._getHttpServletRequest().getPart(name);
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void upgrade(javax.servlet.http.ProtocolHandler handler)
+            throws java.io.IOException {
+        this._getHttpServletRequest().upgrade(handler);
+    }
 }

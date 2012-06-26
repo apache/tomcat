@@ -36,6 +36,7 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
+import javax.servlet.WriteListener;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpServletResponseWrapper;
@@ -991,6 +992,26 @@ public class ExpiresFilter extends FilterBase {
             fireOnBeforeWriteResponseBodyEvent();
             servletOutputStream.write(b);
         }
+
+        /**
+         * TODO SERVLET 3.1
+         */
+        @Override
+        public boolean canWrite() {
+            // TODO Auto-generated method stub
+            return false;
+        }
+
+        /**
+         * TODO SERVLET 3.1
+         */
+        @Override
+        public void setWriteListener(WriteListener listener) {
+            // TODO Auto-generated method stub
+
+        }
+
+
 
     }
 

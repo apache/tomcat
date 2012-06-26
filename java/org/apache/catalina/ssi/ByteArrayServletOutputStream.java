@@ -20,6 +20,7 @@ package org.apache.catalina.ssi;
 import java.io.ByteArrayOutputStream;
 
 import javax.servlet.ServletOutputStream;
+import javax.servlet.WriteListener;
 
 
 /**
@@ -62,4 +63,25 @@ public class ByteArrayServletOutputStream extends ServletOutputStream {
     public void write(int b) {
         buf.write(b);
     }
+
+    /**
+     * TODO SERVLET 3.1
+     */
+    @Override
+    public boolean canWrite() {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+
+    /**
+     * TODO SERVLET 3.1
+     */
+    @Override
+    public void setWriteListener(WriteListener listener) {
+        // TODO Auto-generated method stub
+
+    }
+
+
 }

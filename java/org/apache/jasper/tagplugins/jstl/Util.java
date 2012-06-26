@@ -26,6 +26,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.Locale;
 
 import javax.servlet.ServletOutputStream;
+import javax.servlet.WriteListener;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpServletResponseWrapper;
@@ -261,6 +262,27 @@ public class Util {
             public void write(int b) throws IOException {
                 bos.write(b);
             }
+
+            /**
+             * TODO SERVLET 3.1
+             */
+            @Override
+            public boolean canWrite() {
+                // TODO Auto-generated method stub
+                return false;
+            }
+
+            /**
+             * TODO SERVLET 3.1
+             */
+            @Override
+            public void setWriteListener(WriteListener listener) {
+                // TODO Auto-generated method stub
+
+            }
+
+
+
         };
         private boolean isWriterUsed;
         private boolean isStreamUsed;
