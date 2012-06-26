@@ -29,6 +29,7 @@ import javax.servlet.jsp.JspFactory;
 import javax.servlet.jsp.PageContext;
 
 import org.apache.jasper.Constants;
+import org.apache.jasper.util.ExceptionUtils;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
@@ -93,24 +94,32 @@ public class JspFactoryImpl extends JspFactory {
     private PageContext internalGetPageContext(Servlet servlet, ServletRequest request,
             ServletResponse response, String errorPageURL, boolean needsSession,
             int bufferSize, boolean autoflush) {
-
-        PageContext pc;
-        if (USE_POOL) {
-            PageContextPool pool = localPool.get();
-            if (pool == null) {
-                pool = new PageContextPool();
-                localPool.set(pool);
-            }
-            pc = pool.get();
-            if (pc == null) {
+        try {
+            PageContext pc;
+            if (USE_POOL) {
+                PageContextPool pool = localPool.get();
+                if (pool == null) {
+                    pool = new PageContextPool();
+                    localPool.set(pool);
+                }
+                pc = pool.get();
+                if (pc == null) {
+                    pc = new PageContextImpl();
+                }
+            } else {
                 pc = new PageContextImpl();
             }
-        } else {
-            pc = new PageContextImpl();
+            pc.initialize(servlet, request, response, errorPageURL,
+                    needsSession, bufferSize, autoflush);
+            return pc;
+        } catch (Throwable ex) {
+            ExceptionUtils.handleThrowable(ex);
+            if (ex instanceof RuntimeException) {
+                throw (RuntimeException) ex;
+            }
+            log.fatal("Exception initializing page context", ex);
+            return null;
         }
-        pc.initialize(servlet, request, response, errorPageURL,
-                needsSession, bufferSize, autoflush);
-        return pc;
     }
 
     private void internalReleasePageContext(PageContext pc) {

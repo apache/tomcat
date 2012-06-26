@@ -97,7 +97,7 @@ public class JspContextWrapper extends PageContext implements VariableResolver {
     public void initialize(Servlet servlet, ServletRequest request,
             ServletResponse response, String errorPageURL,
             boolean needsSession, int bufferSize, boolean autoFlush)
-            throws IllegalStateException, IllegalArgumentException {
+            throws IOException, IllegalStateException, IllegalArgumentException {
     }
 
     @Override
