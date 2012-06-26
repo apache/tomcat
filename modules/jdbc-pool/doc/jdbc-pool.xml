@@ -617,6 +617,12 @@
            The default value is <code>true</code>.
         </p>
       </attribute>
+      <attribute name="objectName" required="false">
+        <p>(String) Define a valid <code>javax.management.ObjectName</code> string that will be used to register this object with the platform mbean server
+           The default value is <code>null</code> and the object will be registered using 
+           tomcat.jdbc:type=org.apache.tomcat.jdbc.pool.interceptor.SlowQueryReportJmx,name=the-name-of-the-pool
+        </p>
+      </attribute>
     </attributes>
   </subsection>
   <subsection name="org.apache.tomcat.jdbc.pool.interceptor.ResetAbandonedTimer">

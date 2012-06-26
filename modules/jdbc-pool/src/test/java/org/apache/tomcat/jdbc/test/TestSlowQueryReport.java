@@ -102,7 +102,7 @@ public class TestSlowQueryReport extends DefaultTestCase {
         ClientListener listener = new ClientListener();
         ConnectionPool pool = datasource.getPool();
         ManagementFactory.getPlatformMBeanServer().addNotificationListener(
-                SlowQueryReportJmx.getObjectName(SlowQueryReportJmx.class, pool.getName()),
+                new SlowQueryReportJmx().getObjectName(SlowQueryReportJmx.class, pool.getName()),
                 listener,
                 null,
                 null);

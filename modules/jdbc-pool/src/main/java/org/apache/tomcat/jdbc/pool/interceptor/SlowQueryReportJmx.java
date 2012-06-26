@@ -58,6 +58,8 @@ public class SlowQueryReportJmx extends SlowQueryReport implements NotificationE
     public static final String SLOW_QUERY_NOTIFICATION = "SLOW QUERY";
     public static final String FAILED_QUERY_NOTIFICATION = "FAILED QUERY";
 
+    public static final String objectNameAttribute = "objectName";
+
     protected static CompositeType SLOW_QUERY_TYPE;
 
     private static final Log log = LogFactory.getLog(SlowQueryReportJmx.class);
@@ -267,8 +269,13 @@ public class SlowQueryReportJmx extends SlowQueryReport implements NotificationE
     }
 
 
-    public static ObjectName getObjectName(Class<?> clazz, String poolName) throws MalformedObjectNameException {
-        ObjectName oname = new ObjectName(ConnectionPool.POOL_JMX_TYPE_PREFIX+clazz.getName()+",name=" + poolName);
+    public ObjectName getObjectName(Class<?> clazz, String poolName) throws MalformedObjectNameException {
+        ObjectName oname = null;
+        if (getProperties().containsKey(objectNameAttribute)) {
+            oname = new ObjectName(getProperties().get(objectNameAttribute).getValue());
+        } else {
+            oname = new ObjectName(ConnectionPool.POOL_JMX_TYPE_PREFIX+clazz.getName()+",name=" + poolName);
+        }
         return oname;
     }
 
