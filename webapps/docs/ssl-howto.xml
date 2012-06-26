@@ -348,9 +348,8 @@ will need to remove the comments and edit it so it looks something like
 this:</p>
 <source>
 &lt;-- Define a SSL Coyote HTTP/1.1 Connector on port 8443 --&gt;
-&lt;-- Hard-coded to use the NIO protocol implementation   --&gt;
 &lt;Connector
-           protocol="org.apache.coyote.http11.Http11NioProtocol"
+           protocol="HTTP/1.1"
            port="8443" maxThreads="200"
            scheme="https" secure="true" SSLEnabled="true"
            keystoreFile="${user.home}/.keystore" keystorePass="changeit"
@@ -364,9 +363,8 @@ this:</p>
   particularly keys and certificates. An example of an APR configuration is:
 <source>
 &lt;-- Define a SSL Coyote HTTP/1.1 Connector on port 8443 --&gt;
-&lt;-- Hard-coded to use the APR protocol implementation   --&gt;
 &lt;Connector
-           protocol="org.apache.coyote.http11.Http11AprProtocol"
+           protocol="HTTP/1.1"
            port="8443" maxThreads="200"
            scheme="https" secure="true" SSLEnabled="true"
            SSLCertificateFile="/usr/local/ssl/server.crt"
