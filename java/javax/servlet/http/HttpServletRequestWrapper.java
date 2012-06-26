@@ -307,8 +307,8 @@ public class HttpServletRequestWrapper extends ServletRequestWrapper implements
      * @since Servlet 3.0 TODO SERVLET3 - Add comments
      */
     @Override
-    public Collection<Part> getParts() throws IllegalStateException,
-            IOException, ServletException {
+    public Collection<Part> getParts() throws IOException,
+            ServletException {
         return this._getHttpServletRequest().getParts();
     }
 
@@ -319,7 +319,7 @@ public class HttpServletRequestWrapper extends ServletRequestWrapper implements
      * @since Servlet 3.0 TODO SERVLET3 - Add comments
      */
     @Override
-    public Part getPart(String name) throws IllegalStateException, IOException,
+    public Part getPart(String name) throws IOException,
             ServletException {
         return this._getHttpServletRequest().getPart(name);
     }

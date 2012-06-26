@@ -360,7 +360,7 @@ public class ServletRequestWrapper implements ServletRequest {
      * @since Servlet 3.0
      */
     @Override
-    public AsyncContext startAsync() {
+    public AsyncContext startAsync() throws IllegalStateException {
         return request.startAsync();
     }
 

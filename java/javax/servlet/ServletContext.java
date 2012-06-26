@@ -60,6 +60,8 @@ public interface ServletContext {
      */
     public static final String ORDERED_LIBS = "javax.servlet.context.orderedLibs";
 
+    public String getContextPath();
+
     /**
      * Returns a <code>ServletContext</code> object that corresponds to a
      * specified URL on the server.
@@ -82,8 +84,6 @@ public interface ServletContext {
      * @see RequestDispatcher
      */
     public ServletContext getContext(String uripath);
-
-    public String getContextPath();
 
     /**
      * Returns the major version of the Java Servlet API that this servlet
@@ -644,8 +644,7 @@ public interface ServletContext {
      * @since Servlet 3.0 TODO SERVLET3 - Add comments
      */
     public void setSessionTrackingModes(
-            Set<SessionTrackingMode> sessionTrackingModes)
-            throws IllegalStateException, IllegalArgumentException;
+            Set<SessionTrackingMode> sessionTrackingModes);
 
     /**
      * @return TODO
@@ -658,12 +657,6 @@ public interface ServletContext {
      * @since Servlet 3.0 TODO SERVLET3 - Add comments
      */
     public Set<SessionTrackingMode> getEffectiveSessionTrackingModes();
-
-    /**
-     * @param listenerClass
-     * @since Servlet 3.0 TODO SERVLET3 - Add comments
-     */
-    public void addListener(Class<? extends EventListener> listenerClass);
 
     /**
      * @param className
@@ -679,6 +672,12 @@ public interface ServletContext {
     public <T extends EventListener> void addListener(T t);
 
     /**
+     * @param listenerClass
+     * @since Servlet 3.0 TODO SERVLET3 - Add comments
+     */
+    public void addListener(Class<? extends EventListener> listenerClass);
+
+    /**
      * @param <T>
      * @param c
      * @return TODO
@@ -689,13 +688,11 @@ public interface ServletContext {
             throws ServletException;
 
     /**
-     * @param roleNames
+     * @return TODO
      * @throws UnsupportedOperationException
-     * @throws IllegalArgumentException
-     * @throws IllegalStateException
      * @since Servlet 3.0 TODO SERVLET3 - Add comments
      */
-    public void declareRoles(String... roleNames);
+    public JspConfigDescriptor getJspConfigDescriptor();
 
     /**
      * @return TODO
@@ -706,9 +703,11 @@ public interface ServletContext {
     public ClassLoader getClassLoader();
 
     /**
-     * @return TODO
+     * @param roleNames
      * @throws UnsupportedOperationException
+     * @throws IllegalArgumentException
+     * @throws IllegalStateException
      * @since Servlet 3.0 TODO SERVLET3 - Add comments
      */
-    public JspConfigDescriptor getJspConfigDescriptor();
+    public void declareRoles(String... roleNames);
 }
