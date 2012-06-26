@@ -116,4 +116,13 @@
   <login-config>
     <auth-method>BASIC</auth-method>
   </login-config>
+
+  <env-entry>
+    <description>Resource for testing bug 53465</description>
+    <env-entry-name>bug53465</env-entry-name>
+    <env-entry-value>10</env-entry-value>
+    <env-entry-type>java.lang.Integer</env-entry-type>
+    <mapped-name>Bug53465MappedName</mapped-name>
+  </env-entry>
+
 </web-app>
