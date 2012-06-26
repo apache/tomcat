@@ -114,6 +114,9 @@ public class JspFactoryImpl extends JspFactory {
             return pc;
         } catch (Throwable ex) {
             ExceptionUtils.handleThrowable(ex);
+            if (ex instanceof RuntimeException) {
+                throw (RuntimeException) ex;
+            }
             log.fatal("Exception initializing page context", ex);
             return null;
         }
