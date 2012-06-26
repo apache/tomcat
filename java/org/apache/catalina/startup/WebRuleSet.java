@@ -24,6 +24,7 @@ import java.util.ArrayList;
 
 import org.apache.catalina.deploy.ContextHandler;
 import org.apache.catalina.deploy.ContextService;
+import org.apache.catalina.deploy.ResourceBase;
 import org.apache.catalina.deploy.SecurityConstraint;
 import org.apache.catalina.deploy.ServletDef;
 import org.apache.catalina.deploy.WebXml;
@@ -493,6 +494,8 @@ public class WebRuleSet extends RuleSetBase {
                                "setLocal", 0);
         digester.addCallMethod(fullPrefix + "/ejb-local-ref/local-home",
                                "setHome", 0);
+        digester.addRule(fullPrefix + "/ejb-local-ref/mapped-name",
+                         new MappedNameRule());
         configureInjectionRules(digester, "web-app/ejb-local-ref/");
 
         //ejb-ref
@@ -513,6 +516,8 @@ public class WebRuleSet extends RuleSetBase {
                                "setHome", 0);
         digester.addCallMethod(fullPrefix + "/ejb-ref/remote",
                                "setRemote", 0);
+        digester.addRule(fullPrefix + "/ejb-ref/mapped-name",
+                         new MappedNameRule());
         configureInjectionRules(digester, "web-app/ejb-ref/");
 
         //env-entry
@@ -529,6 +534,8 @@ public class WebRuleSet extends RuleSetBase {
                                "setType", 0);
         digester.addCallMethod(fullPrefix + "/env-entry/env-entry-value",
                                "setValue", 0);
+        digester.addRule(fullPrefix + "/env-entry/mapped-name",
+                         new MappedNameRule());
         configureInjectionRules(digester, "web-app/env-entry/");
 
         //resource-env-ref
@@ -541,6 +548,8 @@ public class WebRuleSet extends RuleSetBase {
                 "setName", 0);
         digester.addCallMethod(fullPrefix + "/resource-env-ref/resource-env-ref-type",
                 "setType", 0);
+        digester.addRule(fullPrefix + "/resource-env-ref/mapped-name",
+                         new MappedNameRule());
         configureInjectionRules(digester, "web-app/resource-env-ref/");
 
         //message-destination
@@ -559,6 +568,8 @@ public class WebRuleSet extends RuleSetBase {
                                "setSmallIcon", 0);
         digester.addCallMethod(fullPrefix + "/message-destination/message-destination-name",
                                "setName", 0);
+        digester.addRule(fullPrefix + "/message-destination/mapped-name",
+                         new MappedNameRule());
 
         //message-destination-ref
         digester.addObjectCreate(fullPrefix + "/message-destination-ref",
@@ -576,7 +587,8 @@ public class WebRuleSet extends RuleSetBase {
                                "setType", 0);
         digester.addCallMethod(fullPrefix + "/message-destination-ref/message-destination-usage",
                                "setUsage", 0);
-
+        digester.addRule(fullPrefix + "/message-destination-ref/mapped-name",
+                         new MappedNameRule());
         configureInjectionRules(digester, "web-app/message-destination-ref/");
 
         //resource-ref
@@ -595,6 +607,8 @@ public class WebRuleSet extends RuleSetBase {
                                "setScope", 0);
         digester.addCallMethod(fullPrefix + "/resource-ref/res-type",
                                "setType", 0);
+        digester.addRule(fullPrefix + "/resource-ref/mapped-name",
+                         new MappedNameRule());
         configureInjectionRules(digester, "web-app/resource-ref/");
 
         //service-ref
@@ -652,9 +666,9 @@ public class WebRuleSet extends RuleSetBase {
                                "addSoapRole", 0);
         digester.addCallMethod(fullPrefix + "/service-ref/handler/port-name",
                                "addPortName", 0);
+        digester.addRule(fullPrefix + "/service-ref/mapped-name",
+                         new MappedNameRule());
         configureInjectionRules(digester, "web-app/service-ref/");
-
-
     }
 
     protected void configureInjectionRules(Digester digester, String base) {
@@ -1246,6 +1260,31 @@ final class TaglibLocationRule extends Rule {
                     "taglib definition not consistent with specification version");
         }
     }
+}
 
+/**
+ * A Rule that sets mapped name on the ResourceBase.
+ */
+final class MappedNameRule extends Rule {
 
+    public MappedNameRule() {
+        // NO-OP
+    }
+
+    /**
+     * Process the body text of this element.
+     *
+     * @param namespace the namespace URI of the matching element, or an
+     *   empty string if the parser is not namespace aware or the element has
+     *   no namespace
+     * @param name the local name if the parser is namespace aware, or just
+     *   the element name otherwise
+     * @param text The body text of this element
+     */
+    @Override
+    public void body(String namespace, String name, String text)
+            throws Exception {
+        ResourceBase resourceBase = (ResourceBase) digester.peek();
+        resourceBase.setProperty("mappedName", text.trim());
+    }
 }
