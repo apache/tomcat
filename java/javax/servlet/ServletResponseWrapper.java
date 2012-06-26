@@ -115,6 +115,14 @@ public class ServletResponseWrapper implements ServletResponse {
     }
 
     /**
+     * TODO SERVLET 3.1
+     */
+    @Override
+    public void setContentLengthLong(long length) {
+        this.response.setContentLengthLong(length);
+    }
+
+    /**
      * The default behavior of this method is to call setContentType(String
      * type) on the wrapped response object.
      */

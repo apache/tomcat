@@ -175,6 +175,11 @@ public interface ServletResponse {
     public void setContentLength(int len);
 
     /**
+     * TODO SERVLET 3.1
+     */
+    public void setContentLengthLong(long length);
+
+    /**
      * Sets the content type of the response being sent to the client, if the
      * response has not been committed yet. The given content type may include a
      * character encoding specification, for example,

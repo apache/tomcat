@@ -59,6 +59,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.servlet.http.Part;
+import javax.servlet.http.ProtocolHandler;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.Globals;
@@ -854,6 +855,7 @@ public class Request
     // ------------------------------------------------- ServletRequest Methods
 
 
+
     /**
      * Return the specified request attribute if it exists; otherwise, return
      * <code>null</code>.
@@ -908,6 +910,11 @@ public class Request
         return attr;
     }
 
+
+    @Override
+    public long getContentLengthLong() {
+        return coyoteRequest.getContentLengthLong();
+    }
 
     /**
      * Test if a given name is one of the special Servlet-spec SSL attributes.
@@ -1837,6 +1844,14 @@ public class Request
 
     // --------------------------------------------- HttpServletRequest Methods
 
+    /**
+     * TODO SERVLET 3.1
+     */
+    @Override
+    public void upgrade(ProtocolHandler handler) throws IOException {
+        // TODO Auto-generated method stub
+
+    }
 
     /**
      * Return the authentication type used for this Request.
@@ -1845,7 +1860,6 @@ public class Request
     public String getAuthType() {
         return authType;
     }
-
 
     /**
      * Return the portion of the request URI used to select the Context

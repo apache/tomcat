@@ -113,6 +113,11 @@ public class ServletRequestWrapper implements ServletRequest {
         return this.request.getContentLength();
     }
 
+    @Override
+    public long getContentLengthLong() {
+        return this.request.getContentLengthLong();
+    }
+
     /**
      * The default behavior of this method is to return getContentType() on the
      * wrapped request object.

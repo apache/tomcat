@@ -667,6 +667,16 @@ public class Response
     @Override
     public void setContentLength(int length) {
 
+        setContentLengthLong(length);
+    }
+
+
+
+    /**
+     * TODO SERVLET 3.1
+     */
+    @Override
+    public void setContentLengthLong(long length) {
         if (isCommitted()) {
             return;
         }

@@ -819,4 +819,22 @@ class NoBodyOutputStream extends ServletOutputStream {
             throw new IOException(msg);
         }
     }
+
+    /**
+     * TODO SERVLET 3.1
+     * @return
+     */
+    public boolean canWrite() {
+        return false;
+    }
+
+    /**
+     * TODO SERVLET 3.1
+     * @param listener
+     */
+    public void setWriteListener(javax.servlet.WriteListener listener) {
+
+    }
+
+
 }

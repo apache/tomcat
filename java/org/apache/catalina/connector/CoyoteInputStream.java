@@ -21,6 +21,7 @@ import java.security.AccessController;
 import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
 
+import javax.servlet.ReadListener;
 import javax.servlet.ServletInputStream;
 
 import org.apache.catalina.security.SecurityUtil;
@@ -240,5 +241,36 @@ public class CoyoteInputStream
              ib.close();
         }
     }
+
+    /**
+     * TODO SERVLET 3.1
+     */
+    @Override
+    public boolean isFinished() {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+
+    /**
+     * TODO SERVLET 3.1
+     */
+    @Override
+    public boolean isReady() {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+
+    /**
+     * TODO SERVLET 3.1
+     */
+    @Override
+    public void setReadListener(ReadListener listener) {
+        // TODO Auto-generated method stub
+
+    }
+
+
 
 }

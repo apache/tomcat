@@ -483,4 +483,10 @@ public interface HttpServletRequest extends ServletRequest {
      */
     public Part getPart(String name) throws IOException,
             ServletException;
+
+    /**
+     * TODO SERVLET 3.1
+     */
+    public abstract void upgrade(javax.servlet.http.ProtocolHandler handler)
+            throws java.io.IOException;
 }

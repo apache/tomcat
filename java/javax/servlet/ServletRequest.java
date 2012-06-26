@@ -110,6 +110,12 @@ public interface ServletRequest {
     public int getContentLength();
 
     /**
+     * TODO SERVLET 3.1
+     * @return
+     */
+    public long getContentLengthLong();
+
+    /**
      * Returns the MIME type of the body of the request, or <code>null</code> if
      * the type is not known. For HTTP servlets, same as the value of the CGI
      * variable CONTENT_TYPE.

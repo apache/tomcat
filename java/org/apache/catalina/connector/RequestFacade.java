@@ -38,6 +38,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.servlet.http.Part;
+import javax.servlet.http.ProtocolHandler;
 
 import org.apache.catalina.Globals;
 import org.apache.catalina.security.SecurityUtil;
@@ -1102,4 +1103,22 @@ public class RequestFacade implements HttpServletRequest {
             throws IOException {
         request.doUpgrade(inbound);
     }
+
+
+    /**
+     * TODO SERVLET 3.1
+     */
+    @Override
+    public long getContentLengthLong() {
+        return request.getContentLengthLong();
+    }
+
+
+    /**
+     * TODO SERVLET 3.1
+     */    @Override
+    public void upgrade(ProtocolHandler handler) throws IOException {
+    }
+
+
 }

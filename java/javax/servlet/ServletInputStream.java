@@ -81,4 +81,21 @@ public abstract class ServletInputStream extends InputStream {
         }
         return count > 0 ? count : -1;
     }
+
+    /**
+     * TODO SERVLET 3.1
+     * @return
+     */
+    public abstract boolean isFinished();
+    /**
+     * TODO SERVLET 3.1
+     * @return
+     */
+    public abstract boolean isReady();
+
+    /**
+     * TODO SERVLET 3.1
+     * @return
+     */
+    public abstract void setReadListener(javax.servlet.ReadListener listener);
 }
