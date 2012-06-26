@@ -143,11 +143,9 @@
        information. In particular, the <code>-debug</code> option is useful
        to debug issues running jsvc.</p>
 
-    <p>The file <code>
-       $CATALINA_HOME/bin/commons-daemon-1.0.x-native-src/unix/native/Tomcat5.sh
-       </code> can be used as a template for starting Tomcat automatically at
-       boot time from <code>/etc/init.d</code>. The file is currently setup for
-       running Tomcat 5.5.x, so it will be necessary to edit it a little.</p>
+    <p>The file <code>$CATALINA_HOME/bin/daemon.sh</code> can be used as a
+       template for starting Tomcat automatically at boot time from
+       <code>/etc/init.d</code> with jsvc.</p>
 
     <p>Note that the Commons-Daemon JAR file must be on your runtime classpath
        to run Tomcat in this manner.  The Commons-Daemon JAR file is in the
