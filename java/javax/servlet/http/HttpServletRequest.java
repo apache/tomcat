@@ -465,7 +465,7 @@ public interface HttpServletRequest extends ServletRequest {
      * @since Servlet 3.0
      */
     public Collection<Part> getParts() throws IOException,
-            IllegalStateException, ServletException;
+            ServletException;
 
     /**
      * Gets the named Part or null if the Part does not exist. Triggers upload
@@ -481,6 +481,6 @@ public interface HttpServletRequest extends ServletRequest {
      *             if the request is not multipart/form-data
      * @since Servlet 3.0
      */
-    public Part getPart(String name) throws IOException, IllegalStateException,
+    public Part getPart(String name) throws IOException,
             ServletException;
 }

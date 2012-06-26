@@ -43,6 +43,13 @@ public class ServletSecurityElement extends HttpConstraintElement {
         super();
     }
 
+    /**
+     * Use specified HttpConstraintElement.
+     * @param httpConstraintElement
+     */
+    public ServletSecurityElement(HttpConstraintElement httpConstraintElement) {
+        this (httpConstraintElement, null);
+    }
 
     /**
      * Use specific constraints for specified methods and default
@@ -57,13 +64,6 @@ public class ServletSecurityElement extends HttpConstraintElement {
         addHttpMethodConstraints(httpMethodConstraints);
     }
 
-    /**
-     * Use specified HttpConstraintElement.
-     * @param httpConstraintElement
-     */
-    public ServletSecurityElement(HttpConstraintElement httpConstraintElement) {
-        this (httpConstraintElement, null);
-    }
 
     /**
      * Use specified HttpConstraintElement as default and specific constraints

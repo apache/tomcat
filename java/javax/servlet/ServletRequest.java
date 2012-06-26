@@ -438,7 +438,7 @@ public interface ServletRequest {
      *             If async is not supported for this request
      * @since Servlet 3.0 TODO SERVLET3 - Add comments
      */
-    public AsyncContext startAsync();
+    public AsyncContext startAsync() throws IllegalStateException;
 
     /**
      * @param servletRequest
@@ -448,7 +448,7 @@ public interface ServletRequest {
      * @since Servlet 3.0 TODO SERVLET3 - Add comments
      */
     public AsyncContext startAsync(ServletRequest servletRequest,
-            ServletResponse servletResponse);
+            ServletResponse servletResponse) throws IllegalStateException;
 
     /**
      * @return TODO
