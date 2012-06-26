@@ -117,6 +117,10 @@
         <bug>53459</bug>: Correction and clarifications to the SSL Connector
         configuration examples in the SSL how-to. (markt)
       </fix>
+      <fix>
+        <bug>53464</bug>: Correct reference to sample init.d script for use with
+        jsvc in the documentation web application. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
