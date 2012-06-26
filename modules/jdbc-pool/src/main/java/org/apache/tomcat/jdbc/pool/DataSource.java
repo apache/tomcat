@@ -113,7 +113,7 @@ public class DataSource extends DataSourceProxy implements javax.sql.DataSource,
      * @throws MalformedObjectNameException
      */
     public ObjectName createObjectName(ObjectName original) throws MalformedObjectNameException {
-        String domain = "tomcat.jdbc";
+        String domain = ConnectionPool.POOL_JMX_DOMAIN;
         Hashtable<String,String> properties = original.getKeyPropertyList();
         String origDomain = original.getDomain();
         properties.put("type", "ConnectionPool");
