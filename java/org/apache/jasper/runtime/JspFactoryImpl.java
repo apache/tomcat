@@ -16,6 +16,7 @@
  */
 package org.apache.jasper.runtime;
 
+import java.io.IOException;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 
@@ -29,7 +30,6 @@ import javax.servlet.jsp.JspFactory;
 import javax.servlet.jsp.PageContext;
 
 import org.apache.jasper.Constants;
-import org.apache.jasper.util.ExceptionUtils;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
@@ -94,32 +94,31 @@ public class JspFactoryImpl extends JspFactory {
     private PageContext internalGetPageContext(Servlet servlet, ServletRequest request,
             ServletResponse response, String errorPageURL, boolean needsSession,
             int bufferSize, boolean autoflush) {
-        try {
-            PageContext pc;
-            if (USE_POOL) {
-                PageContextPool pool = localPool.get();
-                if (pool == null) {
-                    pool = new PageContextPool();
-                    localPool.set(pool);
-                }
-                pc = pool.get();
-                if (pc == null) {
-                    pc = new PageContextImpl();
-                }
-            } else {
+
+        PageContext pc;
+        if (USE_POOL) {
+            PageContextPool pool = localPool.get();
+            if (pool == null) {
+                pool = new PageContextPool();
+                localPool.set(pool);
+            }
+            pc = pool.get();
+            if (pc == null) {
                 pc = new PageContextImpl();
             }
+        } else {
+            pc = new PageContextImpl();
+        }
+
+        try {
             pc.initialize(servlet, request, response, errorPageURL,
                     needsSession, bufferSize, autoflush);
-            return pc;
-        } catch (Throwable ex) {
-            ExceptionUtils.handleThrowable(ex);
-            if (ex instanceof RuntimeException) {
-                throw (RuntimeException) ex;
-            }
-            log.fatal("Exception initializing page context", ex);
-            return null;
+        } catch (IOException ioe) {
+            // Implementation never throws IOE but can't change the signature
+            // since it is part of the JSP API
         }
+
+        return pc;
     }
 
     private void internalReleasePageContext(PageContext pc) {
