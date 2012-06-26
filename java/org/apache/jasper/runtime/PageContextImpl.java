@@ -119,6 +119,15 @@ public class PageContextImpl extends PageContext {
     @Override
     public void initialize(Servlet servlet, ServletRequest request,
             ServletResponse response, String errorPageURL,
+            boolean needsSession, int bufferSize, boolean autoFlush)
+            throws IOException {
+
+        _initialize(servlet, request, response, errorPageURL, needsSession,
+                bufferSize, autoFlush);
+    }
+
+    private void _initialize(Servlet servlet, ServletRequest request,
+            ServletResponse response, String errorPageURL,
             boolean needsSession, int bufferSize, boolean autoFlush) {
 
         // initialize state

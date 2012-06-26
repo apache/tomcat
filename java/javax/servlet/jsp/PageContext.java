@@ -216,6 +216,7 @@ public abstract class PageContext
      * @param autoFlush The value of the autoflush attribute from the page
      *     directive
      *
+     * @throws IOException during creation of JspWriter
      * @throws IllegalStateException if out not correctly initialized
      * @throws IllegalArgumentException If one of the given parameters
      *     is invalid
@@ -224,7 +225,7 @@ public abstract class PageContext
     public abstract void initialize(Servlet servlet, ServletRequest request,
         ServletResponse response, String errorPageURL, boolean needsSession,
         int bufferSize, boolean autoFlush)
-        throws IllegalStateException, IllegalArgumentException;
+        throws IOException, IllegalStateException, IllegalArgumentException;
 
     /**
      * <p>
