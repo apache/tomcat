@@ -117,7 +117,9 @@ public abstract class WebSocketServlet extends HttpServlet {
             // TODO
         }
 
-        StreamInbound inbound = createWebSocketInbound(subProtocol);
+        WsHttpServletRequestWrapper wrapper = new WsHttpServletRequestWrapper(req);
+        StreamInbound inbound = createWebSocketInbound(subProtocol, wrapper);
+        wrapper.invalidate();
 
         // Small hack until the Servlet API provides a way to do this.
         ServletRequest inner = req;
@@ -234,6 +236,13 @@ public abstract class WebSocketServlet extends HttpServlet {
      *
      * @param subProtocol   The sub-protocol agreed between the client and
      *                      server or <code>null</code> if none was agreed
+     * @param request       The HTTP request that initiated this WebSocket
+     *                      connection. Note that this object is <b>only</b>
+     *                      valid inside this method. You must not retain a
+     *                      reference to it outside the execution of this
+     *                      method. If Tomcat detects such access, it will throw
+     *                      an IllegalStateException
      */
-    protected abstract StreamInbound createWebSocketInbound(String subProtocol);
+    protected abstract StreamInbound createWebSocketInbound(String subProtocol,
+            HttpServletRequest request);
 }
