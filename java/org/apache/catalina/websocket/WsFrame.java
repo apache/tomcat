@@ -39,9 +39,9 @@ public class WsFrame {
     private final boolean fin;
     private final int rsv;
     private final byte opCode;
-    private byte[] mask = new byte[4];
+    private final byte[] mask = new byte[4];
     private long payloadLength;
-    private ByteBuffer payload;
+    private final ByteBuffer payload;
 
     /**
      * Create the new WebSocket frame, reading data from the processor as
