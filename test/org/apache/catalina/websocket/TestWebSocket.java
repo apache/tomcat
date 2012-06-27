@@ -36,6 +36,7 @@ import java.util.List;
 
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
+import javax.servlet.http.HttpServletRequest;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -296,7 +297,8 @@ public class TestWebSocket extends TomcatBaseTest {
         private static final long serialVersionUID = 1L;
 
         @Override
-        protected StreamInbound createWebSocketInbound(String subProtocol) {
+        protected StreamInbound createWebSocketInbound(String subProtocol,
+                HttpServletRequest request) {
             return new Bug53339WsInbound();
         }
     }

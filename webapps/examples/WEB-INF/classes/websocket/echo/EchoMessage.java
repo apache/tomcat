@@ -21,6 +21,7 @@ import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 
 import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
 
 import org.apache.catalina.websocket.MessageInbound;
 import org.apache.catalina.websocket.StreamInbound;
@@ -59,7 +60,8 @@ public class EchoMessage extends WebSocketServlet {
 
 
     @Override
-    protected StreamInbound createWebSocketInbound(String subProtocol) {
+    protected StreamInbound createWebSocketInbound(String subProtocol,
+            HttpServletRequest request) {
         return new EchoMessageInbound(byteBufSize,charBufSize);
     }
 
