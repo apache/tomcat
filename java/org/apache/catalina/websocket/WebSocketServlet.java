@@ -52,7 +52,7 @@ public abstract class WebSocketServlet extends HttpServlet {
     private static final StringManager sm =
             StringManager.getManager(Constants.Package);
 
-    private Queue<MessageDigest> sha1Helpers =
+    private final Queue<MessageDigest> sha1Helpers =
             new ConcurrentLinkedQueue<MessageDigest>();
 
 
