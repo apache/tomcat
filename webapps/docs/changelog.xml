@@ -141,6 +141,10 @@
         <bug>53445</bug> (<rev>1354173</rev>):
         Allow configurable name for SlowQueryReportJmx (fhanik)
       </fix>
+      <fix>
+        <bug>53416</bug> (<rev>1354641</rev>):
+        Multiple pools with the same name should register under JMX (fhanik)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
