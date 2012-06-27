@@ -18,6 +18,8 @@ package org.apache.catalina.core;
 
 import java.io.File;
 
+import javax.servlet.http.HttpServletResponse;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -47,5 +49,24 @@ public class TestApplicationContext extends TomcatBaseTest {
                 Assert.fail(line);
             }
         }
+    }
+
+
+    @Test
+    public void testBug53467() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+
+        File appDir = new File("test/webapp-3.0");
+        // app dir is relative to server home
+        tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());
+
+        tomcat.start();
+
+        ByteChunk res = new ByteChunk();
+        int rc = getUrl("http://localhost:" + getPort() +
+                "/test/bug53467].jsp", res, null);
+
+        Assert.assertEquals(HttpServletResponse.SC_OK, rc);
+        Assert.assertTrue(res.toString().contains("<p>OK</p>"));
     }
 }
