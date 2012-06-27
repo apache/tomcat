@@ -86,6 +86,10 @@
         <bug>53465</bug>: Populate mapped-name property for resources defined in
         web.xml. Based on a patch by Violeta Georgieva. (markt) 
       </add>
+      <add>
+        Make the request available when establishing a WebSocket connection.
+        (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
