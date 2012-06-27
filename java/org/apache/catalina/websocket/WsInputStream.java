@@ -34,8 +34,8 @@ public class WsInputStream extends InputStream {
             StringManager.getManager(Constants.Package);
 
 
-    private UpgradeProcessor<?> processor;
-    private WsOutbound outbound;
+    private final UpgradeProcessor<?> processor;
+    private final WsOutbound outbound;
 
     private WsFrame frame;
     private long remaining;
