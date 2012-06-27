@@ -20,6 +20,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.apache.catalina.websocket.StreamInbound;
 import org.apache.catalina.websocket.WebSocketServlet;
 import org.apache.catalina.websocket.WsOutbound;
@@ -30,7 +32,8 @@ public class EchoStream extends WebSocketServlet {
     private static final long serialVersionUID = 1L;
 
     @Override
-    protected StreamInbound createWebSocketInbound(String subProtocol) {
+    protected StreamInbound createWebSocketInbound(String subProtocol,
+            HttpServletRequest request) {
         return new EchoStreamInbound();
     }
 

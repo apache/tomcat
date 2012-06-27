@@ -30,6 +30,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
 
 import org.apache.catalina.websocket.MessageInbound;
 import org.apache.catalina.websocket.StreamInbound;
@@ -148,7 +149,8 @@ public class SnakeWebSocketServlet extends WebSocketServlet {
     }
 
     @Override
-    protected StreamInbound createWebSocketInbound(String subProtocol) {
+    protected StreamInbound createWebSocketInbound(String subProtocol,
+            HttpServletRequest request) {
         return new SnakeMessageInbound(connectionIds.incrementAndGet());
     }
 
