@@ -263,7 +263,7 @@
   <!--   isVirtualWebappRelative                                            -->
   <!--                       Should "virtual" paths be interpreted as       -->
   <!--                       relative to the context root, instead of       -->
-  <!--                       the server root?  (0=false, 1=true) [0]        -->
+  <!--                       the server root? [false]                       -->
   <!--                                                                      -->
   <!--   inputEncoding       The encoding to assume for SSI resources if    -->
   <!--                       one is not available from the resource.        -->
@@ -294,7 +294,7 @@
         </init-param>
         <init-param>
           <param-name>isVirtualWebappRelative</param-name>
-          <param-value>0</param-value>
+          <param-value>false</param-value>
         </init-param>
         <load-on-startup>4</load-on-startup>
     </servlet>
@@ -444,7 +444,7 @@
   <!--   isVirtualWebappRelative                                            -->
   <!--                       Should "virtual" paths be interpreted as       -->
   <!--                       relative to the context root, instead of       -->
-  <!--                       the server root?  (0=false, 1=true) [0]        -->
+  <!--                       the server root? [false]                       -->
   <!--                                                                      -->
   <!--   allowExec           Is use of the exec command enabled? [false]    -->
 
@@ -468,7 +468,7 @@
         </init-param>
         <init-param>
           <param-name>isVirtualWebappRelative</param-name>
-          <param-value>0</param-value>
+          <param-value>false</param-value>
         </init-param>
     </filter>
 -->
