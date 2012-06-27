@@ -99,7 +99,7 @@ directives will expire. Default behaviour is for all SSI directives to be
 evaluated for every request.</li>
 <li><strong>isVirtualWebappRelative</strong> - Should "virtual" SSI directive
 paths be interpreted as relative to the context root, instead of the server
-root? (0=false, 1=true) Default 0 (false).</li>
+root? Default false.</li>
 <li><strong>inputEncoding</strong> - The encoding to be assumed for SSI
 resources if one cannot be determined from the resource itself. Default is
 the default platform encoding.</li>
@@ -129,7 +129,7 @@ directives will expire. Default behaviour is for all SSI directives to be
 evaluated for every request.</li>
 <li><strong>isVirtualWebappRelative</strong> - Should "virtual" SSI directive
 paths be interpreted as relative to the context root, instead of the server
-root? (0=false, 1=true) Default 0 (false).</li>
+root? Default 0 false.</li>
 <li><strong>allowExec</strong> - Is the exec command enabled? Default is
 false.</li>
 </ul>

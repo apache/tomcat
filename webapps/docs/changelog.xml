@@ -138,6 +138,11 @@
         <bug>53464</bug>: Correct reference to sample init.d script for use with
         jsvc in the documentation web application. (markt)
       </fix>
+      <fix>
+        <bug>53473</bug>: Correct the allowed values for the SSI option
+        <code>isVirtualWebappRelative</code> which are <code>true</code> or
+        <code>false</code>. (markt)
+      </fix>
     </changelog>
   </subsection>
     <subsection name="jdbc-pool">
