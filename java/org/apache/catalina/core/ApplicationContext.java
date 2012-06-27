@@ -518,7 +518,8 @@ public class ApplicationContext
             String hostName = context.getParent().getName();
             try {
                 resources.lookup(normPath);
-                URI uri = new URI("jndi", getJNDIUri(hostName, fullPath), null);
+                URI uri = new URI("jndi", null, "", -1,
+                        getJNDIUri(hostName, fullPath), null, null);
                 return new URL(null, uri.toString(),
                         new DirContextURLStreamHandler(resources));
             } catch (NamingException e) {
