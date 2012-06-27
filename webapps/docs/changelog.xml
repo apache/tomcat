@@ -90,6 +90,11 @@
         Make the request available when establishing a WebSocket connection.
         (markt)
       </add>
+      <fix>
+        <bug>53467</bug>: Correct a regression in the fix for <bug>53257</bug>
+        that introduced problems for JSPs that used characters that must be
+        encoded if used in a URI. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
