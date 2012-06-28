@@ -251,14 +251,16 @@ public class CoyoteInputStream
         return false;
     }
 
+    @Override
+    public int dataAvailable() {
+        // TODO Auto-generated method stub
+        return 0;
+    }
 
-    /**
-     * TODO SERVLET 3.1
-     */
+
     @Override
     public boolean isReady() {
-        // TODO Auto-generated method stub
-        return false;
+        return dataAvailable()>0;
     }
 
 
