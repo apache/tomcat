@@ -180,6 +180,10 @@
         implementations used with JMX to <code>jmxaccessor.tasks</code> file.
         (kkolinko)
       </scode>
+      <fix>
+        <bug>53454</bug>: Return correct content-length header for HEAD requests
+        when content length is greater than 2GB. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
