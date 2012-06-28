@@ -22,7 +22,6 @@ import javax.servlet.ServletInputStream;
 import javax.servlet.ServletOutputStream;
 /**
  * TODO SERVLET 3.1
- * @author filip
  *
  */
 public interface WebConnection {

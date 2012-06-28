@@ -17,7 +17,6 @@
 package javax.servlet.http;
 /**
  * TODO SERVLET 3.1
- * @author filip
  *
  */
 public interface ProtocolHandler {
