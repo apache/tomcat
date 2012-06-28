@@ -89,7 +89,8 @@ class ApplicationHttpResponse extends HttpServletResponseWrapper {
 
 
     /**
-     * Disallow <code>setContentLength()</code> calls on an included response.
+     * Disallow <code>setContentLength(int)</code> calls on an included
+     * response.
      *
      * @param len The new content length
      */
@@ -98,6 +99,21 @@ class ApplicationHttpResponse extends HttpServletResponseWrapper {
 
         if (!included)
             getResponse().setContentLength(len);
+
+    }
+
+
+    /**
+     * Disallow <code>setContentLengthLong(long)</code> calls on an included
+     * response.
+     *
+     * @param len The new content length
+     */
+    @Override
+    public void setContentLengthLong(long len) {
+
+        if (!included)
+            getResponse().setContentLengthLong(len);
 
     }
 

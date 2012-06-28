@@ -909,14 +909,7 @@ public class DefaultServlet
                 // Don't set a content length if something else has already
                 // written to the response.
                 if (contentWritten == 0) {
-                    if (contentLength < Integer.MAX_VALUE) {
-                        response.setContentLength((int) contentLength);
-                    } else {
-                        // Set the content-length as String to be able to use a
-                        // long
-                        response.setHeader("content-length",
-                                "" + contentLength);
-                    }
+                    response.setContentLengthLong(contentLength);
                 }
             }
 
@@ -962,12 +955,7 @@ public class DefaultServlet
                                    + "-" + range.end + "/"
                                    + range.length);
                 long length = range.end - range.start + 1;
-                if (length < Integer.MAX_VALUE) {
-                    response.setContentLength((int) length);
-                } else {
-                    // Set the content-length as String to be able to use a long
-                    response.setHeader("content-length", "" + length);
-                }
+                response.setContentLengthLong(length);
 
                 if (contentType != null) {
                     if (debug > 0)

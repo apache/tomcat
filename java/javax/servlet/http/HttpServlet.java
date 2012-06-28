@@ -758,6 +758,12 @@ class NoBodyResponse extends HttpServletResponseWrapper {
     }
 
     @Override
+    public void setContentLengthLong(long len) {
+        super.setContentLengthLong(len);
+        didSetContentLength = true;
+    }
+
+    @Override
     public void setHeader(String name, String value) {
         super.setHeader(name, value);
         if ("content-length".equalsIgnoreCase(name)) {
