@@ -57,7 +57,7 @@
         classname="org.apache.catalina.ant.JMXQueryTask" />
   <!-- Other -->
 <!-- These tasks are deliberately omitted here,
-  because they depends on other Tomcat components besides catalina-ant.jar
+  because they depend on other Tomcat components besides catalina-ant.jar
   and thus are hard to use with antlib.
   <typedef
         name="validator"
