@@ -18,7 +18,6 @@ package javax.servlet;
 
 /**
  * TODO SERVLET 3.1
- * @author filip
  *
  */
 public interface WriteListener extends java.util.EventListener{

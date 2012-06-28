@@ -17,7 +17,6 @@
 package javax.servlet;
 /**
  * TODO SERVLET 3.1
- * @author filip
  *
  */
 public interface ReadListener extends java.util.EventListener{
