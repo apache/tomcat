@@ -457,12 +457,6 @@ public class StandardContext extends ContainerBase
         new HashMap<String, String>();
 
 
-     /**
-      * Special case: error page for status 200.
-      */
-     private ErrorPage okErrorPage = null;
-
-
     /**
      * The context initialization parameters for this web application,
      * keyed by name.
@@ -2832,9 +2826,6 @@ public class StandardContext extends ContainerBase
             }
         } else {
             synchronized (statusPages) {
-                if (errorPage.getErrorCode() == 200) {
-                    this.okErrorPage = errorPage;
-                }
                 statusPages.put(Integer.valueOf(errorPage.getErrorCode()),
                                 errorPage);
             }
@@ -3344,12 +3335,7 @@ public class StandardContext extends ContainerBase
      */
     @Override
     public ErrorPage findErrorPage(int errorCode) {
-        if (errorCode == 200) {
-            return (okErrorPage);
-        } else {
-            return (statusPages.get(Integer.valueOf(errorCode)));
-        }
-
+        return statusPages.get(Integer.valueOf(errorCode));
     }
 
 
@@ -3979,9 +3965,6 @@ public class StandardContext extends ContainerBase
             }
         } else {
             synchronized (statusPages) {
-                if (errorPage.getErrorCode() == 200) {
-                    this.okErrorPage = null;
-                }
                 statusPages.remove(Integer.valueOf(errorPage.getErrorCode()));
             }
         }
