@@ -475,7 +475,9 @@
         <p>The LDAP filter expression used for performing role
         searches.  Use <code>{0}</code> to substitute the
         distinguished name (DN) of the user, and/or <code>{1}</code> to
-        substitute the username. If not specified a role search does
+        substitute the username, and/or <code>{2}</code> the value of the 
+        userRoleAttribute attribute from the users directory entry. 
+        If not specified a role search does 
         not take place and roles are taken only from the attribute in
         the user's entry specified by the <code>userRoleName</code>
         property.</p>
@@ -569,6 +571,18 @@
         by searching the directory. If <code>userRoleName</code> is
         not specified all the roles for a user derive from the role
         search.</p>
+      </attribute>
+      
+      <attribute name="userRoleAttribute" required="false">
+        <p>The name of an attribute in the user's directory entry
+        containing the value that you wish to use when you search for 
+        roles. This is especially useful for RFC 2307 where 
+        the role memberUid can be the <code>uid</code> or the 
+        <code>uidNumber</code> of the user. This value will be
+        marked as <code>{2}</code> in your role pattern.
+        This value will NOT be available for nested group searches,
+        where  <code>{2}</code> will become <code>{1}</code>
+        </p>
       </attribute>
 
       <attribute name="userSearch" required="false">
