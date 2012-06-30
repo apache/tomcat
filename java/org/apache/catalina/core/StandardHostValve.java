@@ -279,6 +279,10 @@ final class StandardHostValve extends ValveBase {
         }
 
         ErrorPage errorPage = context.findErrorPage(statusCode);
+        if (errorPage == null) {
+            // Look for a default error page
+            errorPage = context.findErrorPage(0);
+        }
         if (errorPage != null) {
             response.setAppCommitted(false);
             request.setAttribute(RequestDispatcher.ERROR_STATUS_CODE,
