@@ -56,6 +56,13 @@
 <section name="Tomcat 7.0.29 (markt)">
   <subsection name="Catalina">
     <changelog>
+      <add>
+        Add support for searching for roles in JNDI/LDAP
+        using another value than the actual DN or username specified.
+        Rather it will use a value from the users directory entry.
+        The new attribute introduced to the JNDIRealm is userRoleAttribute
+        (fhanik)
+      </add>
       <fix>
         Fix checking of recommended tcnative library version when using the APR
         connector. (rjung)
