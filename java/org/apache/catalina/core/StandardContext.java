@@ -556,7 +556,8 @@ public class StandardContext extends ContainerBase
 
     /**
      * The status code error pages for this web application, keyed by
-     * HTTP status code (as an Integer).
+     * HTTP status code (as an Integer). Note status code zero is used for the
+     * default error page.
      */
     private HashMap<Integer, ErrorPage> statusPages =
         new HashMap<Integer, ErrorPage>();
