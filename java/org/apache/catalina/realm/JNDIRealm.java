@@ -126,8 +126,9 @@ import org.ietf.jgss.GSSCredential;
  *         property.</li>
  *     <li>The <code>roleSearch</code> pattern optionally includes pattern
  *         replacements "{0}" for the distinguished name, and/or "{1}" for
- *         the username, of the authenticated user for which roles will be
- *         retrieved.</li>
+ *         the username, and/or "{2}" the value of the userRoleAttribute
+ *         attribute from the users entry, of the authenticated user
+ *         for which roles will be retrieved.</li>
  *     <li>The <code>roleBase</code> property can be set to the element that
  *         is the base of the search for matching roles.  If not specified,
  *         the entire context will be searched.</li>
@@ -297,6 +298,14 @@ public class JNDIRealm extends RealmBase {
      * The attribute name used to retrieve the user password.
      */
     protected String userPassword = null;
+
+    /**
+     * The name of the attribute inside the users
+     * directory entry where the value will be
+     * taken to search for roles
+     * This attribute is not used during a nested search
+     */
+    protected String userRoleAttribute = null;
 
 
     /**
@@ -835,6 +844,14 @@ public class JNDIRealm extends RealmBase {
     }
 
 
+    public String getUserRoleAttribute() {
+        return userRoleAttribute;
+    }
+
+    public void setUserRoleAttribute(String userRoleAttribute) {
+        this.userRoleAttribute = userRoleAttribute;
+    }
+
     /**
      * Return the message format pattern for selecting users in this Realm.
      */
@@ -843,6 +860,8 @@ public class JNDIRealm extends RealmBase {
         return (this.userPattern);
 
     }
+
+
 
 
     /**
@@ -1249,6 +1268,9 @@ public class JNDIRealm extends RealmBase {
             list.add(userPassword);
         if (userRoleName != null)
             list.add(userRoleName);
+        if (userRoleAttribute != null) {
+            list.add(userRoleAttribute);
+        }
         String[] attrIds = new String[list.size()];
         list.toArray(attrIds);
 
@@ -1284,7 +1306,7 @@ public class JNDIRealm extends RealmBase {
 
         // If no attributes are requested, no need to look for them
         if (attrIds == null || attrIds.length == 0) {
-            return new User(username, dn, null, null);
+            return new User(username, dn, null, null,null);
         }
 
         // Get required attributes from user entry
@@ -1302,12 +1324,17 @@ public class JNDIRealm extends RealmBase {
         if (userPassword != null)
             password = getAttributeValue(userPassword, attrs);
 
+        String userRoleAttrValue = null;
+        if (userRoleAttribute != null) {
+            userRoleAttrValue = getAttributeValue(userRoleAttribute, attrs);
+        }
+
         // Retrieve values of userRoleName attribute
         ArrayList<String> roles = null;
         if (userRoleName != null)
             roles = addAttributeValues(userRoleName, attrs, roles);
 
-        return new User(username, dn, password, roles);
+        return new User(username, dn, password, roles, userRoleAttrValue);
     }
 
 
@@ -1446,12 +1473,17 @@ public class JNDIRealm extends RealmBase {
         if (userPassword != null)
             password = getAttributeValue(userPassword, attrs);
 
+        String userRoleAttrValue = null;
+        if (userRoleAttribute != null) {
+            userRoleAttrValue = getAttributeValue(userRoleAttribute, attrs);
+        }
+
         // Retrieve values of userRoleName attribute
         ArrayList<String> roles = null;
         if (userRoleName != null)
             roles = addAttributeValues(userRoleName, attrs, roles);
 
-        return new User(username, dn, password, roles);
+        return new User(username, dn, password, roles, password);
     }
 
 
@@ -1694,6 +1726,7 @@ public class JNDIRealm extends RealmBase {
 
         String dn = user.getDN();
         String username = user.getUserName();
+        String userRoleId = user.getUserRoleId();
 
         if (dn == null || username == null)
             return (null);
@@ -1721,7 +1754,7 @@ public class JNDIRealm extends RealmBase {
             return (list);
         
         // Set up parameters for an appropriate search
-        String filter = roleFormat.format(new String[] { doRFC2254Encoding(dn), username });
+        String filter = roleFormat.format(new String[] { doRFC2254Encoding(dn), username, userRoleId });
         SearchControls controls = new SearchControls();
         if (roleSubtree)
             controls.setSearchScope(SearchControls.SUBTREE_SCOPE);
@@ -1794,7 +1827,7 @@ public class JNDIRealm extends RealmBase {
                 Map<String, String> newThisRound = new HashMap<String, String>(); // Stores the groups we find in this iteration
 
                 for (Entry<String, String> group : newGroups.entrySet()) {
-                    filter = roleFormat.format(new String[] { group.getKey(), group.getValue() });
+                    filter = roleFormat.format(new String[] { group.getKey(), group.getValue(), group.getValue() });
 
                     if (containerLog.isTraceEnabled()) {
                         containerLog.trace("Perform a nested group search with base "+ roleBase + " and filter " + filter);
@@ -2378,9 +2411,11 @@ public class JNDIRealm extends RealmBase {
         private final String dn;
         private final String password;
         private final List<String> roles;
+        private final String userRoleId;
+
 
         public User(String username, String dn, String password,
-                List<String> roles) {
+                List<String> roles, String userRoleId) {
             this.username = username;
             this.dn = dn;
             this.password = password;
@@ -2389,6 +2424,7 @@ public class JNDIRealm extends RealmBase {
             } else {
                 this.roles = Collections.unmodifiableList(roles);
             }
+            this.userRoleId = userRoleId;
         }
     
         public String getUserName() {
@@ -2406,6 +2442,12 @@ public class JNDIRealm extends RealmBase {
         public List<String> getRoles() {
             return roles;
         }
+
+        public String getUserRoleId() {
+            return userRoleId;
     }
+
+
+}
 }
 
