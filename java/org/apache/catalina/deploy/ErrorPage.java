@@ -41,7 +41,8 @@ public class ErrorPage implements Serializable {
 
 
     /**
-     * The error (status) code for which this error page is active.
+     * The error (status) code for which this error page is active. Note that
+     * status code 0 is used for the default error page.
      */
     private int errorCode = 0;
 

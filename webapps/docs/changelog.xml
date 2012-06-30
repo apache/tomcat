@@ -72,6 +72,12 @@
         stuckThreadNames property as a pair for the stuckThreadIds one,
         add thread ids to the log messages. (kkolinko)
       </update>
+      <add>
+        <bug>52135</bug>: Add support for a default error page to be defined in
+        web.xml by defining an error page with just a nested location element.
+        It appears this feature was intended to be included in the Servlet 3.0
+        specification but was accidently left out. (markt)
+      </add>
       <fix>
         <bug>53450</bug>: Correct regression in fix for <bug>52999</bug> that
         could easily trigger a deadlock when deploying a ROOT web application.
