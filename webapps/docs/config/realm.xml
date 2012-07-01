@@ -92,7 +92,7 @@
 
   <subsection name="JDBC Database Realm - org.apache.catalina.realm.JDBCRealm">
 
-    <p>The <strong>JDBC Database Realm</strong> connects Catalina to
+    <p>The <strong>JDBC Database Realm</strong> connects Tomcat to
     a relational database, accessed through an appropriate JDBC driver,
     to perform lookups of usernames, passwords, and their associated
     roles.  Because the lookup is done each time that it is required,
@@ -162,7 +162,7 @@
 
       <attribute name="userCredCol" required="true">
         <p>Name of the column, in the "users" table, which contains
-        the user's credentials (i.e. password(.  If a value for the
+        the user's credentials (i.e. password).  If a value for the
         <code>digest</code> attribute is specified, this component
         will assume that the passwords have been encoded with the
         specified algorithm.  Otherwise, they will be assumed to be
@@ -205,7 +205,7 @@
 
   <subsection name="DataSource Database Realm - org.apache.catalina.realm.DataSourceRealm">
 
-    <p>The <strong>DataSource Database Realm</strong> connects Catalina to
+    <p>The <strong>DataSource Database Realm</strong> connects Tomcat to
     a relational database, accessed through a JNDI named JDBC DataSource
     to perform lookups of usernames, passwords, and their associated
     roles.  Because the lookup is done each time that it is required,
@@ -270,7 +270,7 @@
 
       <attribute name="userCredCol" required="true">
         <p>Name of the column, in the "users" table, which contains
-        the user's credentials (i.e. password(.  If a value for the
+        the user's credentials (i.e. password).  If a value for the
         <code>digest</code> attribute is specified, this component
         will assume that the passwords have been encoded with the
         specified algorithm.  Otherwise, they will be assumed to be
@@ -313,7 +313,7 @@
 
   <subsection name="JNDI Directory Realm - org.apache.catalina.realm.JNDIRealm">
 
-    <p>The <strong>JNDI Directory Realm</strong> connects Catalina to
+    <p>The <strong>JNDI Directory Realm</strong> connects Tomcat to
     an LDAP Directory, accessed through an appropriate JNDI driver,
     that stores usernames, passwords, and their associated
     roles. Changes to the directory are immediately reflected in the
@@ -456,7 +456,7 @@
         <p>The base directory entry for performing role searches. If not
         specified the top-level element in the directory context will be used.
         If specified it may optionally include pattern replacements
-        &quot;{0}&quot;..&quot;{n}&quot; corrosponding to the name parts of the
+        &quot;{0}&quot;..&quot;{n}&quot; corresponding to the name parts of the
         user's distinguished name (as returned by
         <code>javax.naming.Name.get()</code>).</p>
       </attribute>
