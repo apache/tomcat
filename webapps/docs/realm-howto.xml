@@ -642,13 +642,15 @@ find the names of roles associated with the authenticated user:</p>
 <li><strong>roleSearch</strong> - the LDAP search filter for
     selecting role entries. It optionally includes pattern
     replacements "{0}" for the distinguished name and/or "{1}" for the
-    username of the authenticated user.</li>
+    username and/or "{2}" for an attribute from user's directory entry,
+    of the authenticated user. Use <strong>userRoleAttribute</strong> to
+    specify the name of the attribute that provides the value for "{2}".</li>
 
 <li><strong>roleName</strong> - the attribute in a role entry
      containing the name of that role.</li>
 
 <li><strong>roleNested</strong> - enable nested roles. Set to
-     <code>true</code> if you want to nest roles in roles. If configured
+     <code>true</code> if you want to nest roles in roles. If configured, then
      every newly found roleName and distinguished
      Name will be recursively tried for a new role search.
      The default value is <code>false</code>.</li>

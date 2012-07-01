@@ -156,6 +156,10 @@
         <code>isVirtualWebappRelative</code> which are <code>true</code> or
         <code>false</code>. (markt)
       </fix>
+      <fix>
+        Document <code>roleNested</code> property of <code>JNDIRealm</code>
+        in Configuration Reference. (kkolinko)
+      </fix>
     </changelog>
   </subsection>
     <subsection name="jdbc-pool">
