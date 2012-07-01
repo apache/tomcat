@@ -466,27 +466,51 @@
         directory entries found by a role search. In addition you can
         use the <code>userRoleName</code> property to specify the name
         of an attribute, in the user's entry, containing additional
-        role names.  If <code>roleName</code> is not specified a role
+        role names.</p>
+        <p>If <code>roleName</code> is not specified a role
         search does not take place, and roles are taken only from the
         user's entry.</p>
       </attribute>
 
+      <attribute name="roleNested" required="false">
+        <p>Set to <code>true</code> if you want to nest roles into roles.
+        When a role search is performed and the value of this property is
+        <code>true</code>, the search will be repeated recursively to find
+        all the roles that belong to the user either directly or indirectly.
+        If not specified, the default value of <code>false</code> is used.</p>
+      </attribute>
+
       <attribute name="roleSearch" required="false">
         <p>The LDAP filter expression used for performing role
-        searches.  Use <code>{0}</code> to substitute the
-        distinguished name (DN) of the user, and/or <code>{1}</code> to
-        substitute the username, and/or <code>{2}</code> the value of the
-        userRoleAttribute attribute from the user's directory entry.
-        If not specified a role search does
-        not take place and roles are taken only from the attribute in
-        the user's entry specified by the <code>userRoleName</code>
-        property.</p>
+        searches.</p>
+
+        <p>Use <code>{0}</code> to substitute the distinguished name (DN)
+        of the user, and/or <code>{1}</code> to substitute the username,
+        and/or <code>{2}</code> for the value of an attribute from the
+        user's directory entry, of the authenticated user.
+        The name of the attribute that provides the value for <code>{2}</code>
+        is configured by the <code>userRoleAttribute</code> property.</p>
+
+        <p>When <code>roleNested</code> property is <code>true</code>,
+        this filter expression will be also used to recursively search for
+        other roles, which indirectly belong to this user. To find the
+        roles that match the newly found role, the following values
+        are used:
+        <code>{0}</code> is substituted by the distinguished name of the newly
+        found role, and both <code>{1}</code> and <code>{2}</code> are
+        substituted by the name of the role (see the <code>roleName</code>
+        property). The <code>userRoleAttribute</code> property is not
+        applicable to this search.</p>
+
+        <p>If this property is not specified, a role search does not take
+        place and roles are taken only from the attribute in the user's entry
+        specified by the <code>userRoleName</code> property.</p>
       </attribute>
 
       <attribute name="roleSearchAsUser" required="false">
         <p> When searching for user roles, should the search be performed as the
         user currently being authenticated? If false,
-        <code>connectionName</code>} and <code>connectionPassword</code> will be
+        <code>connectionName</code> and <code>connectionPassword</code> will be
         used if specified, else an anonymous. If not specified, the default
         value of <code>false</code> is used. Note that when accessing the
         directory using delegated credentials, this attribute is always ignored
@@ -579,10 +603,8 @@
         roles. This is especially useful for RFC 2307 where
         the role memberUid can be the <code>uid</code> or the
         <code>uidNumber</code> of the user. This value will be
-        marked as <code>{2}</code> in your role pattern.
-        This value will NOT be available for nested group searches,
-        where  <code>{2}</code> will become <code>{1}</code>
-        </p>
+        marked as <code>{2}</code> in your role search filter expression.
+        This value will NOT be available for nested role searches.</p>
       </attribute>
 
       <attribute name="userSearch" required="false">
