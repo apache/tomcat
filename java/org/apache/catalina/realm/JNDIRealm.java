@@ -1464,7 +1464,7 @@ public class JNDIRealm extends RealmBase {
         if (userRoleName != null)
             roles = addAttributeValues(userRoleName, attrs, roles);
 
-        return new User(username, dn, password, roles, password);
+        return new User(username, dn, password, roles, userRoleAttrValue);
     }
 
 
