@@ -325,15 +325,16 @@ To enable Checkstyle, add the following property to build.properties file:
 Once Checkstyle is enabled, the check will be performed automatically
 during the build. The check is run before compilation of the source code.
 
-It is possible to run the check separately. The command is:
-
-    cd ${tomcat.source}
-    ant validate
-
 To speed-up repeated runs of this check, a cache is configured. The cache
 is located in the following directory:
 
     output/res/checkstyle
+
+It is possible to run the check separately by invoking the "validate"
+target. The command is:
+
+    cd ${tomcat.source}
+    ant -Dexecute.validate=true validate
 
 
 (8.2) End-of-line conventions check
