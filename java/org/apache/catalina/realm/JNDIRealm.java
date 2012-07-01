@@ -126,8 +126,9 @@ import org.ietf.jgss.GSSCredential;
  *         property.</li>
  *     <li>The <code>roleSearch</code> pattern optionally includes pattern
  *         replacements "{0}" for the distinguished name, and/or "{1}" for
- *         the username, and/or "{2}" the value of the userRoleAttribute
- *         attribute from the users entry, of the authenticated user
+ *         the username, and/or "{2}" the value of an attribute from the
+ *         user's directory entry (the attribute is specified by the
+ *         <code>userRoleAttribute</code> property), of the authenticated user
  *         for which roles will be retrieved.</li>
  *     <li>The <code>roleBase</code> property can be set to the element that
  *         is the base of the search for matching roles.  If not specified,
@@ -362,7 +363,8 @@ public class JNDIRealm extends RealmBase {
 
     /**
      * The message format used to select roles for a user, with "{0}" marking
-     * the spot where the distinguished name of the user goes.
+     * the spot where the distinguished name of the user goes. The "{1}"
+     * and "{2}" are described in the Configuration Reference.
      */
     protected String roleSearch = null;
 
