@@ -860,6 +860,7 @@ class NoBodyOutputStream extends ServletOutputStream {
      * TODO SERVLET 3.1
      * @return
      */
+    @Override
     public boolean canWrite() {
         return false;
     }
@@ -868,9 +869,8 @@ class NoBodyOutputStream extends ServletOutputStream {
      * TODO SERVLET 3.1
      * @param listener
      */
+    @Override
     public void setWriteListener(javax.servlet.WriteListener listener) {
 
     }
-
-
 }
