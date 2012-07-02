@@ -49,6 +49,10 @@
 <section name="Tomcat 8.0.0">
   <subsection name="Catalina">
     <changelog>
+      <add>
+        <bug>45995</bug>: Align Tomcat with Apache httpd and perform MIME type
+        mapping based on file extension in a case insensitive manner. (markt)
+      </add>
       <scode>
         Remove duplicate code that converted a Host&apos;s appBase attribute to
         a canonical file. (markt)

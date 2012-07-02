@@ -2994,7 +2994,7 @@ public class StandardContext extends ContainerBase
     public void addMimeMapping(String extension, String mimeType) {
 
         synchronized (mimeMappings) {
-            mimeMappings.put(extension, mimeType);
+            mimeMappings.put(extension.toLowerCase(Locale.ENGLISH), mimeType);
         }
         fireContainerEvent("addMimeMapping", extension);
 
@@ -3502,7 +3502,7 @@ public class StandardContext extends ContainerBase
     @Override
     public String findMimeMapping(String extension) {
 
-        return (mimeMappings.get(extension));
+        return (mimeMappings.get(extension.toLowerCase(Locale.ENGLISH)));
 
     }
 
