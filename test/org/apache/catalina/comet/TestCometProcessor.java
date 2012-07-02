@@ -635,10 +635,6 @@ public class TestCometProcessor extends TomcatBaseTest {
             return e;
         }
 
-        public void clearResponse() {
-            response = new StringBuilder();
-        }
-
         public String getResponse() {
             return response.toString();
         }
