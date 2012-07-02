@@ -138,6 +138,7 @@ public class TestByteChunk {
     }
 
     @Test
+    @Deprecated
     public void testFindNotBytes() throws UnsupportedEncodingException {
         byte[] bytes = "Hello\u00a0world".getBytes("ISO-8859-1");
         final int len = bytes.length;
