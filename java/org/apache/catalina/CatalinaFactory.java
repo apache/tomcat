@@ -29,6 +29,7 @@ import org.apache.catalina.core.StandardPipeline;
  * @deprecated There was no demand for this capability and it will be removed in
  *             Tomcat 8.0.x
  */
+@Deprecated
 public class CatalinaFactory {
 
     private static CatalinaFactory factory = new CatalinaFactory();
