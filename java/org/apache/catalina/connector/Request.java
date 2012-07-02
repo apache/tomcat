@@ -463,7 +463,16 @@ public class Request
         userPrincipal = null;
         subject = null;
         parametersParsed = false;
-        parts = null;
+        if (parts != null) {
+            for (Part part: parts) {
+                try {
+                    part.delete();
+                } catch (IOException ignored) {
+                    // ApplicationPart.delete() never throws an IOEx
+                }
+            }
+            parts = null;
+        }
         partsParseException = null;
         cookiesParsed = false;
         locales.clear();
