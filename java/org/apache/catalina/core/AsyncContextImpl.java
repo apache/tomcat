@@ -110,21 +110,30 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
         request.getCoyoteRequest().action(ActionCode.ASYNC_TIMEOUT, result);
 
         if (result.get()) {
-            boolean listenerInvoked = false;
-            List<AsyncListenerWrapper> listenersCopy =
-                new ArrayList<AsyncListenerWrapper>();
-            listenersCopy.addAll(listeners);
-            for (AsyncListenerWrapper listener : listenersCopy) {
-                listener.fireOnTimeout(event);
-                listenerInvoked = true;
-            }
-            if (listenerInvoked) {
-                request.getCoyoteRequest().action(
-                        ActionCode.ASYNC_IS_TIMINGOUT, result);
-                return !result.get();
-            } else {
-                // No listeners, container calls complete
-                complete();
+
+            ClassLoader oldCL = Thread.currentThread().getContextClassLoader();
+            ClassLoader newCL = request.getContext().getLoader().getClassLoader();
+            try {
+                Thread.currentThread().setContextClassLoader(newCL);
+                boolean listenerInvoked = false;
+                List<AsyncListenerWrapper> listenersCopy =
+                    new ArrayList<AsyncListenerWrapper>();
+                listenersCopy.addAll(listeners);
+                for (AsyncListenerWrapper listener : listenersCopy) {
+                    listener.fireOnTimeout(event);
+                    listenerInvoked = true;
+                }
+                if (listenerInvoked) {
+                    request.getCoyoteRequest().action(
+                            ActionCode.ASYNC_IS_TIMINGOUT, result);
+                    return !result.get();
+                } else {
+                    // No listeners, container calls complete
+                    complete();
+                }
+
+            } finally {
+                Thread.currentThread().setContextClassLoader(oldCL);
             }
         }
         return true;
