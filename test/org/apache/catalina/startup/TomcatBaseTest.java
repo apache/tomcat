@@ -299,13 +299,13 @@ public abstract class TomcatBaseTest extends LoggingBaseTest {
 
             @Override
             public int getLength() {
-                return body.length;
+                return body!=null?body.length:0;
             }
 
             @Override
             public int available() {
-                if (done || body == null) return 0;
-                else return body.length;
+                if (done) return 0;
+                else return getLength();
             }
         };
         return postUrl(false,s,path,out,reqHead,resHead);
