@@ -285,9 +285,36 @@ public abstract class TomcatBaseTest extends LoggingBaseTest {
         return postUrl(body, path, out, null, resHead);
     }
 
-    public static int postUrl(byte[] body, String path, ByteChunk out,
+    public static int postUrl(final byte[] body, String path, ByteChunk out,
             Map<String, List<String>> reqHead,
             Map<String, List<String>> resHead) throws IOException {
+        BytesStreamer s = new BytesStreamer() {
+            boolean done = false;
+            @Override
+            public byte[] next() {
+                done = true;
+                return body;
+
+            }
+
+            @Override
+            public int getLength() {
+                return body.length;
+            }
+
+            @Override
+            public int available() {
+                if (done) return 0;
+                else return body.length;
+            }
+        };
+        return postUrl(false,s,path,out,reqHead,resHead);
+    }
+
+
+    public static int postUrl(boolean stream, BytesStreamer streamer, String path, ByteChunk out,
+                Map<String, List<String>> reqHead,
+                Map<String, List<String>> resHead) throws IOException {
 
         URL url = new URL(path);
         HttpURLConnection connection =
@@ -307,15 +334,26 @@ public abstract class TomcatBaseTest extends LoggingBaseTest {
                         valueList.toString());
             }
         }
+        if (streamer != null && stream) {
+            if (streamer.getLength()>0) {
+                connection.setFixedLengthStreamingMode(streamer.getLength());
+            } else {
+                connection.setChunkedStreamingMode(1024);
+            }
+        }
+
         connection.connect();
 
         // Write the request body
         OutputStream os = null;
         try {
             os = connection.getOutputStream();
-            if (body != null) {
-                os.write(body, 0, body.length);
+            while (streamer!=null && streamer.available()>0) {
+                byte[] next = streamer.next();
+                os.write(next);
+                os.flush();
             }
+
         } finally {
             if (os != null) {
                 try {
