@@ -304,7 +304,7 @@ public abstract class TomcatBaseTest extends LoggingBaseTest {
 
             @Override
             public int available() {
-                if (done) return 0;
+                if (done || body == null) return 0;
                 else return body.length;
             }
         };
