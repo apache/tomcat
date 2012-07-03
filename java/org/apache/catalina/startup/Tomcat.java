@@ -29,6 +29,7 @@ import java.util.logging.Logger;
 
 import javax.servlet.Servlet;
 import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
 
 import org.apache.catalina.Container;
 import org.apache.catalina.Context;
@@ -801,11 +802,25 @@ public class Tomcat {
         @SuppressWarnings("deprecation")
         public ExistingStandardWrapper( Servlet existing ) {
             this.existing = existing;
+            this.asyncSupported = isAsyncSupported();
             if (existing instanceof javax.servlet.SingleThreadModel) {
                 singleThreadModel = true;
                 instancePool = new Stack<Servlet>();
             }
+            this.asyncSupported = hasAsync();
         }
+
+        public boolean hasAsync() {
+            if (isAsyncSupported()) return true;
+            boolean result = false;
+            Class clazz = existing.getClass();
+            if (clazz.isAnnotationPresent(WebServlet.class)) {
+                WebServlet ws = (WebServlet)clazz.getAnnotation(WebServlet.class);
+                result = ws.asyncSupported();
+            }
+            return result;
+        }
+
         @Override
         public synchronized Servlet loadServlet() throws ServletException {
             if (singleThreadModel) {
