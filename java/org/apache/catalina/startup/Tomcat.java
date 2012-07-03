@@ -802,7 +802,6 @@ public class Tomcat {
         @SuppressWarnings("deprecation")
         public ExistingStandardWrapper( Servlet existing ) {
             this.existing = existing;
-            this.asyncSupported = isAsyncSupported();
             if (existing instanceof javax.servlet.SingleThreadModel) {
                 singleThreadModel = true;
                 instancePool = new Stack<Servlet>();
