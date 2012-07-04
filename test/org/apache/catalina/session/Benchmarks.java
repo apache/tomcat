@@ -173,7 +173,7 @@ public class Benchmarks {
         } catch (LifecycleException e) {
             // Ignore - this is expected
         }
-        mgr.setContainer(new StandardContext());
+        mgr.setContext(new StandardContext());
         mgr.generateSessionId();
         while (mgr.sessionCreationTiming.size() <
                 ManagerBase.TIMING_STATS_CACHE_SIZE) {

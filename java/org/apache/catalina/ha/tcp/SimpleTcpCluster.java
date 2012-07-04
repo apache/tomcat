@@ -554,11 +554,11 @@ public class SimpleTcpCluster extends LifecycleBase
     @Override
     public String getManagerName(String name, Manager manager) {
         String clusterName = name ;
-        if ( clusterName == null ) clusterName = manager.getContainer().getName();
-        if(getContainer() instanceof Engine) {
-            Container context = manager.getContainer() ;
-            if(context != null && context instanceof Context) {
-                Container host = ((Context)context).getParent();
+        if (clusterName == null) clusterName = manager.getContext().getName();
+        if (getContainer() instanceof Engine) {
+            Context context = manager.getContext() ;
+            if(context != null) {
+                Container host = context.getParent();
                 if(host != null && host instanceof Host && clusterName!=null &&
                         !(clusterName.startsWith(host.getName() +"#"))) {
                     clusterName = host.getName() +"#" + clusterName ;

@@ -32,7 +32,6 @@ import java.util.ArrayList;
 
 import javax.servlet.ServletContext;
 
-import org.apache.catalina.Container;
 import org.apache.catalina.Context;
 import org.apache.catalina.Loader;
 import org.apache.catalina.Session;
@@ -241,8 +240,8 @@ public final class FileStore extends StoreBase {
         if (! file.exists()) {
             return (null);
         }
-        if (manager.getContainer().getLogger().isDebugEnabled()) {
-            manager.getContainer().getLogger().debug(sm.getString(getStoreName()+".loading",
+        if (manager.getContext().getLogger().isDebugEnabled()) {
+            manager.getContext().getLogger().debug(sm.getString(getStoreName()+".loading",
                              id, file.getAbsolutePath()));
         }
 
@@ -254,9 +253,9 @@ public final class FileStore extends StoreBase {
         try {
             fis = new FileInputStream(file.getAbsolutePath());
             bis = new BufferedInputStream(fis);
-            Container container = manager.getContainer();
-            if (container instanceof Context)
-                loader = ((Context) container).getLoader();
+            Context context = manager.getContext();
+            if (context != null)
+                loader = context.getLoader();
             if (loader != null)
                 classLoader = loader.getClassLoader();
             if (classLoader != null)
@@ -264,8 +263,8 @@ public final class FileStore extends StoreBase {
             else
                 ois = new ObjectInputStream(bis);
         } catch (FileNotFoundException e) {
-            if (manager.getContainer().getLogger().isDebugEnabled())
-                manager.getContainer().getLogger().debug("No persisted data file found");
+            if (manager.getContext().getLogger().isDebugEnabled())
+                manager.getContext().getLogger().debug("No persisted data file found");
             return (null);
         } catch (IOException e) {
             if (bis != null) {
@@ -318,8 +317,8 @@ public final class FileStore extends StoreBase {
         if (file == null) {
             return;
         }
-        if (manager.getContainer().getLogger().isDebugEnabled()) {
-            manager.getContainer().getLogger().debug(sm.getString(getStoreName()+".removing",
+        if (manager.getContext().getLogger().isDebugEnabled()) {
+            manager.getContext().getLogger().debug(sm.getString(getStoreName()+".removing",
                              id, file.getAbsolutePath()));
         }
         file.delete();
@@ -343,8 +342,8 @@ public final class FileStore extends StoreBase {
         if (file == null) {
             return;
         }
-        if (manager.getContainer().getLogger().isDebugEnabled()) {
-            manager.getContainer().getLogger().debug(sm.getString(getStoreName()+".saving",
+        if (manager.getContext().getLogger().isDebugEnabled()) {
+            manager.getContext().getLogger().debug(sm.getString(getStoreName()+".saving",
                              session.getIdInternal(), file.getAbsolutePath()));
         }
         FileOutputStream fos = null;
@@ -391,10 +390,9 @@ public final class FileStore extends StoreBase {
         }
         File file = new File(this.directory);
         if (!file.isAbsolute()) {
-            Container container = manager.getContainer();
-            if (container instanceof Context) {
-                ServletContext servletContext =
-                    ((Context) container).getServletContext();
+            Context context = manager.getContext();
+            if (context != null) {
+                ServletContext servletContext = context.getServletContext();
                 File work = (File)
                     servletContext.getAttribute(ServletContext.TEMPDIR);
                 file = new File(work, this.directory);

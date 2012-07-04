@@ -152,7 +152,7 @@ public class BackupManager extends ClusterManagerBase
 
         try {
             if (getCluster() == null) {
-                Cluster cluster = getContainer().getCluster();
+                Cluster cluster = getContext().getCluster();
                 if (cluster instanceof CatalinaCluster) {
                     setCluster((CatalinaCluster)cluster);
                 } else {

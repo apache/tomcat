@@ -740,8 +740,8 @@ public class DeltaManager extends ClusterManagerBase{
             // stop remove cluster binding
             //wow, how many nested levels of if statements can we have ;)
             if(cluster == null) {
-                Container context = getContainer() ;
-                if(context != null && context instanceof Context) {
+                Context context = getContext() ;
+                if (context != null) {
                      Container host = context.getParent() ;
                      if(host != null && host instanceof Host) {
                          cluster = host.getCluster();
@@ -1465,7 +1465,7 @@ public class DeltaManager extends ClusterManagerBase{
             session.setPrimarySession(false);
             session.setId(newSessionID, false);
             if (notifyContainerListenersOnReplication) {
-                getContainer().fireContainerEvent(Context.CHANGE_SESSION_ID_EVENT,
+                getContext().fireContainerEvent(Context.CHANGE_SESSION_ID_EVENT,
                         new String[] {msg.getSessionID(), newSessionID});
             }
         }
