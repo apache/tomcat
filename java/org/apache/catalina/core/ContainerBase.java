@@ -24,7 +24,6 @@ import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
@@ -41,7 +40,6 @@ import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import javax.management.ObjectName;
-import javax.naming.directory.DirContext;
 
 import org.apache.catalina.AccessLog;
 import org.apache.catalina.Cluster;
@@ -55,7 +53,6 @@ import org.apache.catalina.Host;
 import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.LifecycleState;
-import org.apache.catalina.Loader;
 import org.apache.catalina.Manager;
 import org.apache.catalina.Pipeline;
 import org.apache.catalina.Realm;
@@ -67,7 +64,6 @@ import org.apache.catalina.util.ContextName;
 import org.apache.catalina.util.LifecycleMBeanBase;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
-import org.apache.naming.resources.ProxyDirContext;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.res.StringManager;
 
@@ -188,12 +184,6 @@ public abstract class ContainerBase extends LifecycleMBeanBase
             new CopyOnWriteArrayList<ContainerListener>();
 
     /**
-     * The Loader implementation with which this Container is associated.
-     */
-    protected Loader loader = null;
-
-
-    /**
      * The Logger implementation with which this Container is associated.
      */
     protected Log logger = null;
@@ -251,11 +241,6 @@ public abstract class ContainerBase extends LifecycleMBeanBase
      * Lock used to control access to the Realm.
      */
     private final ReadWriteLock realmLock = new ReentrantReadWriteLock();
-
-    /**
-     * The resources DirContext object with which this Container is associated.
-     */
-    protected DirContext resources = null;
 
 
     /**
@@ -371,65 +356,6 @@ public abstract class ContainerBase extends LifecycleMBeanBase
     @Override
     public void setBackgroundProcessorDelay(int delay) {
         backgroundProcessorDelay = delay;
-    }
-
-
-    /**
-     * Return the Loader with which this Container is associated.  If there is
-     * no associated Loader, return the Loader associated with our parent
-     * Container (if any); otherwise, return <code>null</code>.
-     */
-    @Override
-    public Loader getLoader() {
-
-        if (loader != null)
-            return (loader);
-        if (parent != null)
-            return (parent.getLoader());
-        return (null);
-
-    }
-
-
-    /**
-     * Set the Loader with which this Container is associated.
-     *
-     * @param loader The newly associated loader
-     */
-    @Override
-    public synchronized void setLoader(Loader loader) {
-
-        // Change components if necessary
-        Loader oldLoader = this.loader;
-        if (oldLoader == loader)
-            return;
-        this.loader = loader;
-
-        // Stop the old component if necessary
-        if (getState().isAvailable() && (oldLoader != null) &&
-            (oldLoader instanceof Lifecycle)) {
-            try {
-                ((Lifecycle) oldLoader).stop();
-            } catch (LifecycleException e) {
-                log.error("ContainerBase.setLoader: stop: ", e);
-            }
-        }
-
-        // Start the new component if necessary
-        if (loader != null)
-            loader.setContainer(this);
-        if (getState().isAvailable() && (loader != null) &&
-            (loader instanceof Lifecycle)) {
-            try {
-                ((Lifecycle) loader).start();
-            } catch (LifecycleException e) {
-                log.error("ContainerBase.setLoader: start: ", e);
-            }
-        }
-
-        // Report this property change to interested listeners
-        support.firePropertyChange("loader", oldLoader, this.loader);
-
     }
 
 
@@ -785,50 +711,6 @@ public abstract class ContainerBase extends LifecycleMBeanBase
     }
 
 
-    /**
-      * Return the resources DirContext object with which this Container is
-      * associated.  If there is no associated resources object, return the
-      * resources associated with our parent Container (if any); otherwise
-      * return <code>null</code>.
-     */
-    @Override
-    public DirContext getResources() {
-        if (resources != null)
-            return (resources);
-        if (parent != null)
-            return (parent.getResources());
-        return (null);
-
-    }
-
-
-    /**
-     * Set the resources DirContext object with which this Container is
-     * associated.
-     *
-     * @param resources The newly associated DirContext
-     */
-    @Override
-    public synchronized void setResources(DirContext resources) {
-        // Called from StandardContext.setResources()
-        //              <- StandardContext.start()
-        //              <- ContainerBase.addChildInternal()
-
-        // Change components if necessary
-        DirContext oldResources = this.resources;
-        if (oldResources == resources)
-            return;
-        Hashtable<String, String> env = new Hashtable<String, String>();
-        if (getParent() != null)
-            env.put(ProxyDirContext.HOST, getParent().getName());
-        env.put(ProxyDirContext.CONTEXT, getName());
-        this.resources = new ProxyDirContext(env, resources);
-        // Report this property change to interested listeners
-        support.firePropertyChange("resources", oldResources, this.resources);
-
-    }
-
-
     // ------------------------------------------------------ Container Methods
 
 
@@ -1054,8 +936,6 @@ public abstract class ContainerBase extends LifecycleMBeanBase
     protected synchronized void startInternal() throws LifecycleException {
 
         // Start our subordinate components, if any
-        if ((loader != null) && (loader instanceof Lifecycle))
-            ((Lifecycle) loader).start();
         logger = null;
         getLogger();
         if ((manager != null) && (manager instanceof Lifecycle))
@@ -1065,8 +945,6 @@ public abstract class ContainerBase extends LifecycleMBeanBase
         Realm realm = getRealmInternal();
         if ((realm != null) && (realm instanceof Lifecycle))
             ((Lifecycle) realm).start();
-        if ((resources != null) && (resources instanceof Lifecycle))
-            ((Lifecycle) resources).start();
 
         // Start our child containers, if any
         Container children[] = findChildren();
@@ -1146,9 +1024,6 @@ public abstract class ContainerBase extends LifecycleMBeanBase
         }
 
         // Stop our subordinate components, if any
-        if ((resources != null) && (resources instanceof Lifecycle)) {
-            ((Lifecycle) resources).stop();
-        }
         Realm realm = getRealmInternal();
         if ((realm != null) && (realm instanceof Lifecycle)) {
             ((Lifecycle) realm).stop();
@@ -1159,9 +1034,6 @@ public abstract class ContainerBase extends LifecycleMBeanBase
         if ((manager != null) && (manager instanceof Lifecycle) &&
                 ((Lifecycle) manager).getState().isAvailable() ) {
             ((Lifecycle) manager).stop();
-        }
-        if ((loader != null) && (loader instanceof Lifecycle)) {
-            ((Lifecycle) loader).stop();
         }
     }
 
@@ -1177,9 +1049,6 @@ public abstract class ContainerBase extends LifecycleMBeanBase
         }
         if ((cluster != null) && (cluster instanceof Lifecycle)) {
             ((Lifecycle) cluster).destroy();
-        }
-        if ((loader != null) && (loader instanceof Lifecycle)) {
-            ((Lifecycle) loader).destroy();
         }
 
         // Stop the Valves in our pipeline (including the basic), if any
@@ -1296,13 +1165,6 @@ public abstract class ContainerBase extends LifecycleMBeanBase
                 cluster.backgroundProcess();
             } catch (Exception e) {
                 log.warn(sm.getString("containerBase.backgroundProcess.cluster", cluster), e);
-            }
-        }
-        if (loader != null) {
-            try {
-                loader.backgroundProcess();
-            } catch (Exception e) {
-                log.warn(sm.getString("containerBase.backgroundProcess.loader", loader), e);
             }
         }
         if (manager != null) {
@@ -1522,34 +1384,37 @@ public abstract class ContainerBase extends LifecycleMBeanBase
                     // Ignore
                 }
                 if (!threadDone) {
-                    ClassLoader cl =
-                        Thread.currentThread().getContextClassLoader();
-                    Loader loader = getLoader();
-                    if (loader != null) {
-                        cl = loader.getClassLoader();
-                    }
-                    processChildren(ContainerBase.this, cl);
+                    processChildren(ContainerBase.this);
                 }
             }
         }
 
-        protected void processChildren(Container container, ClassLoader cl) {
+        protected void processChildren(Container container) {
+            ClassLoader originalClassLoader = null;
+
             try {
-                if (container.getLoader() != null) {
+                if (container instanceof Context) {
+                    // Ensure background processing for Contexts and Wrappers
+                    // is performed under the web app's class loader
+                    originalClassLoader =
+                            Thread.currentThread().getContextClassLoader();
                     Thread.currentThread().setContextClassLoader
-                        (container.getLoader().getClassLoader());
+                            (((Context) container).getLoader().getClassLoader());
                 }
                 container.backgroundProcess();
+                Container[] children = container.findChildren();
+                for (int i = 0; i < children.length; i++) {
+                    if (children[i].getBackgroundProcessorDelay() <= 0) {
+                        processChildren(children[i]);
+                    }
+                }
             } catch (Throwable t) {
                 ExceptionUtils.handleThrowable(t);
                 log.error("Exception invoking periodic operation: ", t);
             } finally {
-                Thread.currentThread().setContextClassLoader(cl);
-            }
-            Container[] children = container.findChildren();
-            for (int i = 0; i < children.length; i++) {
-                if (children[i].getBackgroundProcessorDelay() <= 0) {
-                    processChildren(children[i], cl);
+                if (originalClassLoader != null) {
+                    Thread.currentThread().setContextClassLoader(
+                            originalClassLoader);
                 }
             }
         }

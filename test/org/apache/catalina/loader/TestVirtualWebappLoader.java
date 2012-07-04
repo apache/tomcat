@@ -48,7 +48,7 @@ public class TestVirtualWebappLoader extends TomcatBaseTest {
 
         VirtualWebappLoader loader = new VirtualWebappLoader();
 
-        loader.setContainer(ctx);
+        loader.setContext(ctx);
         ctx.setLoader(loader);
         ctx.setResources(new FileDirContext());
         ctx.resourcesStart();

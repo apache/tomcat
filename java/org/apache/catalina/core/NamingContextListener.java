@@ -36,7 +36,6 @@ import javax.naming.NamingException;
 import javax.naming.Reference;
 import javax.naming.StringRefAddr;
 
-import org.apache.catalina.Container;
 import org.apache.catalina.ContainerEvent;
 import org.apache.catalina.ContainerListener;
 import org.apache.catalina.Context;
@@ -263,7 +262,7 @@ public class NamingContextListener
                 try {
                     ContextBindings.bindClassLoader
                         (container, container,
-                         ((Container) container).getLoader().getClassLoader());
+                         ((Context) container).getLoader().getClassLoader());
                 } catch (NamingException e) {
                     logger.error(sm.getString("naming.bindFailed", e));
                 }
@@ -299,7 +298,7 @@ public class NamingContextListener
             if (container instanceof Context) {
                 ContextBindings.unbindClassLoader
                     (container, container,
-                     ((Container) container).getLoader().getClassLoader());
+                     ((Context) container).getLoader().getClassLoader());
             }
 
             if (container instanceof Server) {
@@ -704,7 +703,7 @@ public class NamingContextListener
         if (container instanceof Context) {
             try {
                 compCtx.bind("Resources",
-                             ((Container) container).getResources());
+                             ((Context) container).getResources());
             } catch (NamingException e) {
                 logger.error(sm.getString("naming.bindFailed", e));
             }

@@ -1168,7 +1168,7 @@ public class StandardWrapper extends ContainerBase
         if (getServlet() == null) {
             Class<?> clazz = null;
             try {
-                clazz = getParent().getLoader().getClassLoader().loadClass(
+                clazz = ((Context) getParent()).getLoader().getClassLoader().loadClass(
                         getServletClass());
                 processServletSecurityAnnotation(clazz);
             } catch (ClassNotFoundException e) {

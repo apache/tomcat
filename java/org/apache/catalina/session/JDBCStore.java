@@ -622,8 +622,8 @@ public class JDBCStore extends StoreBase {
                     if (rst.next()) {
                         bis = new BufferedInputStream(rst.getBinaryStream(2));
 
-                        if (container != null) {
-                            loader = container.getLoader();
+                        if (container instanceof org.apache.catalina.Context) {
+                            loader = ((org.apache.catalina.Context) container).getLoader();
                         }
                         if (loader != null) {
                             classLoader = loader.getClassLoader();

@@ -715,8 +715,8 @@ public class MBeanFactory {
         // Add the new instance to its parent component
         ObjectName pname = new ObjectName(parent);
         Container container = getParentContainerFromParent(pname);
-        if (container != null) {
-            container.setLoader(loader);
+        if (container instanceof Context) {
+            ((Context) container).setLoader(loader);
         }
         // FIXME add Loader.getObjectName
         //ObjectName oname = loader.getObjectName();
@@ -852,8 +852,9 @@ public class MBeanFactory {
         ObjectName oname = new ObjectName(name);
         // Acquire a reference to the component to be removed
         Container container = getParentContainerFromChild(oname);
-        container.setLoader(null);
-
+        if (container instanceof Context) {
+            ((Context) container).setLoader(null);
+        }
     }
 
 

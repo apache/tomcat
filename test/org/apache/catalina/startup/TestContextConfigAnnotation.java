@@ -36,7 +36,7 @@ import static org.junit.Assert.fail;
 
 import org.junit.Test;
 
-import org.apache.catalina.Container;
+import org.apache.catalina.Context;
 import org.apache.catalina.Loader;
 import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.deploy.FilterDef;
@@ -328,9 +328,9 @@ public class TestContextConfigAnnotation {
             return this.getClass().getClassLoader();
         }
         @Override
-        public Container getContainer() { return null; }
+        public Context getContext() { return null; }
         @Override
-        public void setContainer(Container container) {}
+        public void setContext(Context context) {}
         @Override
         public boolean getDelegate() { return false; }
         @Override

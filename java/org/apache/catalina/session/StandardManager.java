@@ -215,8 +215,8 @@ public class StandardManager extends ManagerBase {
         try {
             fis = new FileInputStream(file.getAbsolutePath());
             bis = new BufferedInputStream(fis);
-            if (container != null)
-                loader = container.getLoader();
+            if (container instanceof Context)
+                loader = ((Context) container).getLoader();
             if (loader != null)
                 classLoader = loader.getClassLoader();
             if (classLoader != null) {

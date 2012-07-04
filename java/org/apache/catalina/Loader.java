@@ -74,17 +74,17 @@ public interface Loader {
 
 
     /**
-     * Return the Container with which this Loader has been associated.
+     * Return the Context with which this Loader has been associated.
      */
-    public Container getContainer();
+    public Context getContext();
 
 
     /**
-     * Set the Container with which this Loader has been associated.
+     * Set the Context with which this Loader has been associated.
      *
-     * @param container The associated Container
+     * @param context The associated Context
      */
-    public void setContainer(Container container);
+    public void setContext(Context context);
 
 
     /**
