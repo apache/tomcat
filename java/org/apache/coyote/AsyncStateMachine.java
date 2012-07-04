@@ -34,6 +34,7 @@ import org.apache.tomcat.util.res.StringManager;
  * STARTED       - ServletRequest.startAsync() has been called and the
  *                 request in which that call was made has finished
  *                 processing.
+ * READ_WRITE_OP - Performing an asynchronous read or write.
  * MUST_COMPLETE - complete() has been called before the request in which
  *                 ServletRequest.startAsync() has finished. As soon as that
  *                 request finishes, the complete() will be processed.
@@ -51,37 +52,41 @@ import org.apache.tomcat.util.res.StringManager;
  *
  * |----------------->--------------|
  * |                               \|/
- * |   |----------<---------------ERROR
- * |   |    complete()           /|\ |postProcess()
- * |   |                   error()|  |
- * |   |                          |  |  |--|timeout()
- * |   |           postProcess()  | \|/ | \|/            auto
- * |   |         |--------------->DISPATCHED<------------------COMPLETING<----|
- * |   |         |               /|\  |                          | /|\        |
- * |   |         |    |--->-------|   |                          |--|         |
- * |   |         ^    |               |startAsync()            timeout()      |
- * |   |         |    |               |                                       |
- * |  \|/        |    |  complete()  \|/        postProcess()                 |
- * | MUST_COMPLETE-<- | ----<------STARTING-->----------------|               ^
- * |      /|\         |               |                       |               |
- * |       |          |               |                       |               |
- * |       |          ^               |dispatch()             |               |
- * |       |          |               |                       |               |
- * |       |          |              \|/                     \|/   complete() |
- * |       |          |         MUST_DISPATCH              STARTED---->-------|
- * |       |          |           |                         |   |  \ \
- * |       |          |           |postProcess()            |   |   \ \
- * ^       ^          |           |              dispatch() |   |auto\ \
- * |       |          |           |    |--------------------|   |     \ \----<------
- * |       |          | auto     \|/  \|/                      \|/     \            \
- * |       |          |---<----DISPATCHING<-----------------TIMING_OUT  \            \
- * |       |                                  dispatch()      |   |      |            \
- * |       |                                                  |   |     \|/            |
- * |       |-------<-------------------------------------<----|   |   READ_WRITE_OP ->-
- * |                              complete()              \-------|------|
- * |                                                              |      |
- * |----<------------------------<-----------------------------<--|------|
- *                                 error()
+ * |   |----------<---------------ERROR-----------------------<----------------------------------|
+ * |   |      complete()         /|\ |                                                           |
+ * |   |                          |  |postProcess()                                              |
+ * |   |                   error()|  |                                                           |
+ * |   |                          |  |  |--|timeout()                                            |
+ * |   |           postProcess()  | \|/ | \|/            auto                                    |
+ * |   |         |--------------->DISPATCHED<-----------------------COMPLETING<-----|            |
+ * |   |         |               /|\  |                               | /|\         |            |
+ * |   |         |    |--->-------|   |                               |--|          |            |
+ * |   |         ^    |               |startAsync()                 timeout()       |            |
+ * |   |         |    |               |                                             |            |
+ * |  \|/        |    |  complete()  \|/        postProcess()                       |            |
+ * | MUST_COMPLETE-<- | ----<------STARTING-->--------------------|                 ^            |
+ * |  /|\    /|\      |               |                           |      complete() |            |
+ * |   |      |       |               |                           |     /-----------|            |
+ * |   |      |       ^               |dispatch()                 |    /                         |
+ * |   |      |       |               |                           |   /                          |
+ * |   |      |       |              \|/                         \|/ /                           |
+ * |   |      |       |         MUST_DISPATCH                  STARTED                           |
+ * |   |      |       |           |                            /|  \ \                           |
+ * |   |      |       |           |postProcess()              / |   \ \                          |
+ * ^   |      ^       |           |              dispatch()  /  |    \ \                         |
+ * |   |      |       |           |                         /   |     \ \    postProcess()       |
+ * |   |      |       |           |    |-------------------/    |auto  \ \----<--------------|   |
+ * |   |      |       | auto     \|/  \|/                      \|/      \                    |   |
+ * |   |      |       |---<----DISPATCHING<-----------------TIMING_OUT   \                   |   |
+ * |   |      |                               dispatch()      |   |      |asyncOperation()   ^   |
+ * |   |      |                                               |   |     \|/                  |   ^
+ * |   |      |-------<----------------------------------<----|   |      READ_WRITE_OP->-----|   |
+ * |   |                          complete()                      |         |      |             |
+ * |   |                                                          |         |      |  error()    |
+ * |<- | ----<-------------------<-----------------------------<--|         |      |->-----------|
+ *     |                           error()                                  |
+ *     |                                                  complete()        |
+ *     |--------------------------------------------------------------------|
  * </pre>
  */
 public class AsyncStateMachine<S> {
