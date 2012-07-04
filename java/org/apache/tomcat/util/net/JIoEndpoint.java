@@ -308,7 +308,7 @@ public class JIoEndpoint extends AbstractEndpoint {
 
                     if ((state != SocketState.CLOSED)) {
                         if (status == null) {
-                            state = handler.process(socket, SocketStatus.OPEN);
+                            state = handler.process(socket, SocketStatus.OPEN_READ);
                         } else {
                             state = handler.process(socket,status);
                         }
@@ -337,7 +337,7 @@ public class JIoEndpoint extends AbstractEndpoint {
                 } finally {
                     if (launch) {
                         try {
-                            getExecutor().execute(new SocketProcessor(socket, SocketStatus.OPEN));
+                            getExecutor().execute(new SocketProcessor(socket, SocketStatus.OPEN_READ));
                         } catch (RejectedExecutionException x) {
                             log.warn("Socket reprocessing request was rejected for:"+socket,x);
                             try {

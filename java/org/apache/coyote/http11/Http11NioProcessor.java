@@ -493,7 +493,7 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
         } else if (actionCode == ActionCode.ASYNC_COMPLETE) {
             if (asyncStateMachine.asyncComplete()) {
                 ((NioEndpoint)endpoint).processSocket(this.socket.getSocket(),
-                        SocketStatus.OPEN, true);
+                        SocketStatus.OPEN_READ, true);
             }
         } else if (actionCode == ActionCode.ASYNC_SETTIMEOUT) {
             if (param==null) {
@@ -509,7 +509,7 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
         } else if (actionCode == ActionCode.ASYNC_DISPATCH) {
             if (asyncStateMachine.asyncDispatch()) {
                 ((NioEndpoint)endpoint).processSocket(this.socket.getSocket(),
-                        SocketStatus.OPEN, true);
+                        SocketStatus.OPEN_READ, true);
             }
         } else if (actionCode == ActionCode.ASYNC_DISPATCH_FOR_OPERATION) {
             asyncStateMachine.asyncOperation();

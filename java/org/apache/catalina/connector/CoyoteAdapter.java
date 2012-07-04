@@ -155,7 +155,7 @@ public class CoyoteAdapter implements Adapter {
         boolean error = false;
         boolean read = false;
         try {
-            if (status == SocketStatus.OPEN) {
+            if (status == SocketStatus.OPEN_READ) {
                 if (response.isClosed()) {
                     // The event has been closed asynchronously, so call end instead of
                     // read to cleanup the pipeline
@@ -219,7 +219,7 @@ public class CoyoteAdapter implements Adapter {
                 connector.getService().getContainer().getPipeline().getFirst().event(request, response, request.getEvent());
             }
             if (response.isClosed() || !request.isComet()) {
-                if (status==SocketStatus.OPEN &&
+                if (status==SocketStatus.OPEN_READ &&
                         request.getEvent().getEventType() != EventType.END) {
                     //CometEvent.close was called during an event other than END
                     request.getEvent().setEventType(CometEvent.EventType.END);
@@ -302,7 +302,7 @@ public class CoyoteAdapter implements Adapter {
                 if (result.get()) {
                     if (status==SocketStatus.OPEN_WRITE) {
                         //TODO Notify write listener
-                    } else if (status==SocketStatus.OPEN) {
+                    } else if (status==SocketStatus.OPEN_READ) {
                         //TODO Notify read listener
                         asyncConImpl.canRead();
                     }
@@ -324,7 +324,7 @@ public class CoyoteAdapter implements Adapter {
                 if (!response.isClosed() && !response.isError()) {
                     if (request.getAvailable() || (request.getContentLength() > 0 && (!request.isParametersParsed()))) {
                         // Invoke a read event right away if there are available bytes
-                        if (event(req, res, SocketStatus.OPEN)) {
+                        if (event(req, res, SocketStatus.OPEN_READ)) {
                             comet = true;
                             res.action(ActionCode.COMET_BEGIN, null);
                         }
@@ -427,7 +427,7 @@ public class CoyoteAdapter implements Adapter {
                     if (!response.isClosed() && !response.isError()) {
                         if (request.getAvailable() || (request.getContentLength() > 0 && (!request.isParametersParsed()))) {
                             // Invoke a read event right away if there are available bytes
-                            if (event(req, res, SocketStatus.OPEN)) {
+                            if (event(req, res, SocketStatus.OPEN_READ)) {
                                 comet = true;
                                 res.action(ActionCode.COMET_BEGIN, null);
                             }

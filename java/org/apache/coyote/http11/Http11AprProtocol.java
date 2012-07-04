@@ -249,7 +249,7 @@ public class Http11AprProtocol extends AbstractHttp11Protocol {
                 SocketStatus status) {
             if (proto.npnHandler != null) {
                 Processor<Long> processor = null;
-                if (status == SocketStatus.OPEN) {
+                if (status == SocketStatus.OPEN_READ) {
                     processor = connections.get(socket.getSocket());
 
                 }
