@@ -144,7 +144,7 @@ public abstract class ClusterManagerBase extends ManagerBase
 
 
     public ClassLoader[] getClassLoaders() {
-        return getClassLoaders(container);
+        return getClassLoaders(getContext());
     }
 
     /**

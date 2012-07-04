@@ -849,7 +849,9 @@ public class DeltaManager extends ClusterManagerBase{
      */
     protected void registerSessionAtReplicationValve(DeltaSession session) {
         if(replicationValve == null) {
-            if(container instanceof StandardContext && ((StandardContext)container).getCrossContext()) {
+            Context context = getContext();
+            if(context instanceof StandardContext &&
+                    ((StandardContext)context).getCrossContext()) {
                 CatalinaCluster cluster = getCluster() ;
                 if(cluster != null) {
                     Valve[] valves = cluster.getValves();

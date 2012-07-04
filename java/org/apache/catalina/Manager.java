@@ -51,7 +51,11 @@ public interface Manager {
 
     /**
      * Return the Container with which this Manager is associated.
+     *
+     * @deprecated Use {@link #getContext()}. This method will be removed in
+     *             Tomcat 9 onwards.
      */
+    @Deprecated
     public Container getContainer();
 
 
@@ -59,8 +63,26 @@ public interface Manager {
      * Set the Container with which this Manager is associated.
      *
      * @param container The newly associated Container
+     *
+     * @deprecated Use {@link #setContext()}. This method will be removed in
+     *             Tomcat 9 onwards.
      */
+    @Deprecated
     public void setContainer(Container container);
+
+
+    /**
+     * Return the Context with which this Manager is associated.
+     */
+    public Context getContext();
+
+
+    /**
+     * Set the Container with which this Manager is associated.
+     *
+     * @param container The newly associated Context
+     */
+    public void setContext(Context context);
 
 
     /**

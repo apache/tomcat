@@ -215,8 +215,9 @@ public class StandardManager extends ManagerBase {
         try {
             fis = new FileInputStream(file.getAbsolutePath());
             bis = new BufferedInputStream(fis);
-            if (container instanceof Context)
-                loader = ((Context) container).getLoader();
+            Context c = getContext();
+            if (c != null)
+                loader = c.getLoader();
             if (loader != null)
                 classLoader = loader.getClassLoader();
             if (classLoader != null) {
@@ -535,9 +536,9 @@ public class StandardManager extends ManagerBase {
             return (null);
         File file = new File(pathname);
         if (!file.isAbsolute()) {
-            if (container instanceof Context) {
-                ServletContext servletContext =
-                    ((Context) container).getServletContext();
+            Context context = getContext();
+            if (context != null) {
+                ServletContext servletContext = context.getServletContext();
                 File tempdir = (File)
                     servletContext.getAttribute(ServletContext.TEMPDIR);
                 if (tempdir != null)

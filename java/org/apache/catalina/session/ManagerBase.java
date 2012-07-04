@@ -63,9 +63,9 @@ public abstract class ManagerBase extends LifecycleMBeanBase
     // ----------------------------------------------------- Instance Variables
 
     /**
-     * The Container with which this Manager is associated.
+     * The Context with which this Manager is associated.
      */
-    protected Container container;
+    private Context context;
 
 
     /**
@@ -208,40 +208,49 @@ public abstract class ManagerBase extends LifecycleMBeanBase
 
     // ------------------------------------------------------------- Properties
 
-    /**
-     * Return the Container with which this Manager is associated.
-     */
     @Override
+    @Deprecated
     public Container getContainer() {
-
-        return (this.container);
-
+        return getContext();
     }
 
 
-    /**
-     * Set the Container with which this Manager is associated.
-     *
-     * @param container The newly associated Container
-     */
     @Override
+    @Deprecated
     public void setContainer(Container container) {
 
-        // De-register from the old Container (if any)
-        if ((this.container != null) && (this.container instanceof Context))
-            ((Context) this.container).removePropertyChangeListener(this);
+        if (container instanceof Context || container == null) {
+            setContext((Context) container);
+        } else {
+            log.warn(sm.getString("managerBase.container.noop"));
+        }
+    }
 
-        Container oldContainer = this.container;
-        this.container = container;
-        support.firePropertyChange("container", oldContainer, this.container);
 
-        // Register with the new Container (if any)
-        if ((this.container != null) && (this.container instanceof Context)) {
-            setMaxInactiveInterval
-                ( ((Context) this.container).getSessionTimeout()*60 );
-            ((Context) this.container).addPropertyChangeListener(this);
+    @Override
+    public Context getContext() {
+        return context;
+    }
+
+
+    @Override
+    public void setContext(Context context) {
+        // De-register from the old Context (if any)
+        if (this.context != null) {
+            this.context.removePropertyChangeListener(this);
         }
 
+        Context oldContext = this.context;
+        this.context = context;
+        support.firePropertyChange("context", oldContext, this.context);
+        // TODO - delete the line below in Tomcat 9 onwards
+        support.firePropertyChange("container", oldContext, this.context);
+
+        // Register with the new Context (if any)
+        if (this.context != null) {
+            setMaxInactiveInterval(this.context.getSessionTimeout() * 60);
+            this.context.addPropertyChangeListener(this);
+        }
     }
 
 
@@ -751,7 +760,7 @@ public abstract class ManagerBase extends LifecycleMBeanBase
         String oldId = session.getIdInternal();
         session.setId(generateSessionId(), false);
         String newId = session.getIdInternal();
-        container.fireContainerEvent(Context.CHANGE_SESSION_ID_EVENT,
+        context.fireContainerEvent(Context.CHANGE_SESSION_ID_EVENT,
                 new String[] {oldId, newId});
     }
 
@@ -1220,10 +1229,10 @@ public abstract class ManagerBase extends LifecycleMBeanBase
     public String toString() {
         StringBuilder sb = new StringBuilder(this.getClass().getName());
         sb.append('[');
-        if (container == null) {
-            sb.append("Container is null");
+        if (context == null) {
+            sb.append("Context is null");
         } else {
-            sb.append(container.getName());
+            sb.append(context.getName());
         }
         sb.append(']');
         return sb.toString();
@@ -1236,29 +1245,22 @@ public abstract class ManagerBase extends LifecycleMBeanBase
 
         StringBuilder name = new StringBuilder("type=Manager");
 
-        if (container instanceof Context) {
-            name.append(",context=");
-            String contextName = container.getName();
-            if (!contextName.startsWith("/")) {
-                name.append('/');
-            }
-            name.append(contextName);
-
-            Context context = (Context) container;
-            name.append(",host=");
-            name.append(context.getParent().getName());
-        } else {
-            // Unlikely / impossible? Handle it to be safe
-            name.append(",container=");
-            name.append(container.getName());
+        name.append(",context=");
+        String contextName = context.getName();
+        if (!contextName.startsWith("/")) {
+            name.append('/');
         }
+        name.append(contextName);
+
+        name.append(",host=");
+        name.append(context.getParent().getName());
 
         return name.toString();
     }
 
     @Override
     public String getDomainInternal() {
-        return container.getDomain();
+        return context.getDomain();
     }
 
     // ----------------------------------------- PropertyChangeListener Methods
