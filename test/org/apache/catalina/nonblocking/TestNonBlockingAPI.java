@@ -17,9 +17,6 @@
 package org.apache.catalina.nonblocking;
 
 import java.io.IOException;
-import java.io.Reader;
-import java.nio.charset.Charset;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,11 +28,13 @@ import javax.servlet.AsyncListener;
 import javax.servlet.ReadListener;
 import javax.servlet.ServletException;
 import javax.servlet.ServletInputStream;
-import javax.servlet.ServletOutputStream;
 import javax.servlet.WriteListener;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import org.junit.Assert;
+import org.junit.Test;
 
 import org.apache.catalina.Wrapper;
 import org.apache.catalina.core.StandardContext;
@@ -45,9 +44,6 @@ import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.coyote.http11.Http11NioProtocol;
 import org.apache.tomcat.util.buf.ByteChunk;
-import org.junit.Assert;
-import org.junit.Test;
-
 
 public class TestNonBlockingAPI extends TomcatBaseTest {
 
