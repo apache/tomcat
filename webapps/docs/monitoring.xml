@@ -1126,5 +1126,44 @@ Wait for server connection and that cluster backup node is accessible<br/>
 
 </section>
 
+  <section name="Using the JMXProxyServlet">
+
+    <p>
+      Tomcat offers an alternative to using remote (or even local) JMX
+      connections while still giving you access to everything JMX has to offer:
+      Tomcat's
+      <a href="api/org/apache/catalina/manager/JMXProxyServlet.html">JMXProxyServlet</a>.
+    </p>
+    
+    <p>
+      The JMXProxyServlet allows a client to issue JMX queries via an HTTP
+      interface. This technique offers the following advantages over using
+      JMX directly from a client program:
+    </p>
+
+    <ul>
+      <li>You don't have to launch a full JVM and make a remote JMX connection
+      just to ask for one small piece of data from a runing server</li>
+      <li>You don't have to know how to work with JMX connections</li>
+      <li>You don't need any of the complex configuration covered in the rest
+      of this page</li>
+      <li>Your client program does not have to be written in Java</li>
+    </ul>
+
+    <p>
+      A perfect example of JMX overkill can be seen in the case of popular
+      server-monitoring software such as Nagios or Ichinga: if you want to
+      monitor 10 items via JMX, you will have to launch 10 JVMs, make 10 JMX
+      connections, and then shut them all down every few minutes. With the
+      JMXProxyServlet, you can make 10 HTTP connections and be done with it.
+    </p>
+    
+    <p>
+      You can find out more information about the JMXProxyServlet in the
+      documentation for the 
+      <a href="manager-howto.html#Using_the_JMX_Proxy_Servlet">Tomcat
+      manager</a>.
+    </p>
+  </section>
 </body>
 </document>
