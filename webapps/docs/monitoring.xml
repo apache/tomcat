@@ -1134,7 +1134,7 @@ Wait for server connection and that cluster backup node is accessible<br/>
       Tomcat's
       <a href="api/org/apache/catalina/manager/JMXProxyServlet.html">JMXProxyServlet</a>.
     </p>
-    
+
     <p>
       The JMXProxyServlet allows a client to issue JMX queries via an HTTP
       interface. This technique offers the following advantages over using
@@ -1157,10 +1157,10 @@ Wait for server connection and that cluster backup node is accessible<br/>
       connections, and then shut them all down every few minutes. With the
       JMXProxyServlet, you can make 10 HTTP connections and be done with it.
     </p>
-    
+
     <p>
       You can find out more information about the JMXProxyServlet in the
-      documentation for the 
+      documentation for the
       <a href="manager-howto.html#Using_the_JMX_Proxy_Servlet">Tomcat
       manager</a>.
     </p>
