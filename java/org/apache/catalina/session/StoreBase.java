@@ -132,11 +132,11 @@ public abstract class StoreBase extends LifecycleBase implements Store {
         try {
             keys = keys();
         } catch (IOException e) {
-            manager.getContainer().getLogger().error("Error getting keys", e);
+            manager.getContext().getLogger().error("Error getting keys", e);
             return;
         }
-        if (manager.getContainer().getLogger().isDebugEnabled()) {
-            manager.getContainer().getLogger().debug(getStoreName()+ ": processExpires check number of " + keys.length + " sessions" );
+        if (manager.getContext().getLogger().isDebugEnabled()) {
+            manager.getContext().getLogger().debug(getStoreName()+ ": processExpires check number of " + keys.length + " sessions" );
         }
 
         long timeNow = System.currentTimeMillis();
@@ -151,8 +151,8 @@ public abstract class StoreBase extends LifecycleBase implements Store {
                 if (timeIdle < session.getMaxInactiveInterval()) {
                     continue;
                 }
-                if (manager.getContainer().getLogger().isDebugEnabled()) {
-                    manager.getContainer().getLogger().debug(getStoreName()+ ": processExpires expire store session " + keys[i] );
+                if (manager.getContext().getLogger().isDebugEnabled()) {
+                    manager.getContext().getLogger().debug(getStoreName()+ ": processExpires expire store session " + keys[i] );
                 }
                 boolean isLoaded = false;
                 if (manager instanceof PersistentManagerBase) {
@@ -175,11 +175,11 @@ public abstract class StoreBase extends LifecycleBase implements Store {
                 }
                 remove(keys[i]);
             } catch (Exception e) {
-                manager.getContainer().getLogger().error("Session: "+keys[i]+"; ", e);
+                manager.getContext().getLogger().error("Session: "+keys[i]+"; ", e);
                 try {
                     remove(keys[i]);
                 } catch (IOException e2) {
-                    manager.getContainer().getLogger().error("Error removing key", e2);
+                    manager.getContext().getLogger().error("Error removing key", e2);
                 }
             }
         }

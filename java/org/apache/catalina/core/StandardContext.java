@@ -1937,7 +1937,7 @@ public class StandardContext extends ContainerBase
 
         // Start the new component if necessary
         if (manager != null)
-            manager.setContainer(this);
+            manager.setContext(this);
         if (getState().isAvailable() && (manager != null) &&
             (manager instanceof Lifecycle)) {
             try {

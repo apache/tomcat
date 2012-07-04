@@ -151,10 +151,10 @@ public class DeltaSession extends StandardSession implements Externalizable,Clus
         else if ( manager instanceof ClusterManagerBase ) return ((ClusterManagerBase)manager).getClassLoaders();
         else if ( manager instanceof StandardManager ) {
             StandardManager sm = (StandardManager)manager;
-            return ClusterManagerBase.getClassLoaders(sm.getContainer());
+            return ClusterManagerBase.getClassLoaders(sm.getContext());
         } else if ( manager instanceof ManagerBase ) {
             ManagerBase mb = (ManagerBase)manager;
-            return ClusterManagerBase.getClassLoaders(mb.getContainer());
+            return ClusterManagerBase.getClassLoaders(mb.getContext());
         }//end if
         return null;
     }

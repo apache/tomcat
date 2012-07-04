@@ -274,7 +274,7 @@ public class ReplicationValve
                 if(log.isDebugEnabled()) {
                     log.debug(sm.getString("ReplicationValve.crossContext.registerSession",
                         session.getIdInternal(),
-                        session.getManager().getContainer().getName()));
+                        session.getManager().getContext().getName()));
                 }
                 sessions.add(session);
             }
@@ -417,7 +417,7 @@ public class ReplicationValve
                 Session session = iter.next();
                 if(log.isDebugEnabled()) {
                     log.debug(sm.getString("ReplicationValve.crossContext.sendDelta",
-                            session.getManager().getContainer().getName() ));
+                            session.getManager().getContext().getName() ));
                 }
                 sendMessage(session,(ClusterManager)session.getManager(),containerCluster);
                 if(doStatistics()) {
@@ -461,7 +461,7 @@ public class ReplicationValve
     protected void resetDeltaRequest(Session session) {
         if(log.isDebugEnabled()) {
             log.debug(sm.getString("ReplicationValve.resetDeltaRequest" ,
-                session.getManager().getContainer().getName() ));
+                session.getManager().getContext().getName() ));
         }
         ((DeltaSession)session).resetDeltaRequest();
     }

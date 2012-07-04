@@ -534,7 +534,7 @@ public abstract class ManagerBase extends LifecycleMBeanBase
 
         super.initInternal();
 
-        setDistributable(((Context) getContainer()).getDistributable());
+        setDistributable(getContext().getDistributable());
     }
 
     @Override
@@ -809,7 +809,7 @@ public abstract class ManagerBase extends LifecycleMBeanBase
      */
     public Engine getEngine() {
         Engine e = null;
-        for (Container c = getContainer(); e == null && c != null ; c = c.getParent()) {
+        for (Container c = getContext(); e == null && c != null ; c = c.getParent()) {
             if (c instanceof Engine) {
                 e = (Engine)c;
             }
