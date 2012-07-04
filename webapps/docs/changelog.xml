@@ -62,6 +62,10 @@
         <code>file-size-threshold</code> option in web.xml)
         when request processing completes. (kkolinko)
       </fix>
+      <fix>
+        <bug>53498</bug>: Fix atomicity bugs in use of concurrent collections.
+        Based on a patch by Yu Lin. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
