@@ -122,22 +122,6 @@ public interface Container extends Lifecycle {
 
 
     /**
-     * Return the Manager with which this Container is associated.  If there is
-     * no associated Manager, return the Manager associated with our parent
-     * Container (if any); otherwise return <code>null</code>.
-     */
-    public Manager getManager();
-
-
-    /**
-     * Set the Manager with which this Container is associated.
-     *
-     * @param manager The newly associated Manager
-     */
-    public void setManager(Manager manager);
-
-
-    /**
      * Return the JMX name associated with this container.
      */
     public ObjectName getObjectName();

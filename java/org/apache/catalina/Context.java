@@ -1412,5 +1412,19 @@ public interface Context extends Container {
      * @param resources The newly associated Resources
      */
     public void setResources(DirContext resources);
+
+    /**
+     * Return the Manager with which this Context is associated.  If there is
+     * no associated Manager, return <code>null</code>.
+     */
+    public Manager getManager();
+
+
+    /**
+     * Set the Manager with which this Context is associated.
+     *
+     * @param manager The newly associated Manager
+     */
+    public void setManager(Manager manager);
 }
 

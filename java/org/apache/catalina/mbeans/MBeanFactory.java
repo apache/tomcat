@@ -44,6 +44,7 @@ import org.apache.catalina.realm.UserDatabaseRealm;
 import org.apache.catalina.session.StandardManager;
 import org.apache.catalina.startup.ContextConfig;
 import org.apache.catalina.startup.HostConfig;
+import org.apache.tomcat.util.res.StringManager;
 
 
 /**
@@ -58,6 +59,9 @@ public class MBeanFactory {
 
     private static final org.apache.juli.logging.Log log =
         org.apache.juli.logging.LogFactory.getLog(MBeanFactory.class);
+
+    protected static final StringManager sm =
+            StringManager.getManager(Constants.Package);
 
     /**
      * The <code>MBeanServer</code> for this application.
@@ -615,8 +619,10 @@ public class MBeanFactory {
         // Add the new instance to its parent component
         ObjectName pname = new ObjectName(parent);
         Container container = getParentContainerFromParent(pname);
-        if (container != null) {
-            container.setManager(manager);
+        if (container instanceof Context) {
+            ((Context) container).setManager(manager);
+        } else {
+            throw new Exception(sm.getString("mBeanFactory.managerContext"));
         }
         ObjectName oname = manager.getObjectName();
         if (oname != null) {
@@ -870,8 +876,9 @@ public class MBeanFactory {
         ObjectName oname = new ObjectName(name);
         // Acquire a reference to the component to be removed
         Container container = getParentContainerFromChild(oname);
-        container.setManager(null);
-
+        if (container instanceof Context) {
+            ((Context) container).setManager(null);
+        }
     }
 
 

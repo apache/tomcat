@@ -39,6 +39,7 @@ import org.junit.After;
 import org.junit.Before;
 
 import org.apache.catalina.Container;
+import org.apache.catalina.Context;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.LifecycleState;
 import org.apache.catalina.Server;
@@ -402,12 +403,13 @@ public abstract class TomcatBaseTest extends LoggingBaseTest {
                 Container e = service.getContainer();
                 for (Container h : e.findChildren()) {
                     for (Container c : h.findChildren()) {
-                        StandardManager m = (StandardManager) c.getManager();
+                        StandardManager m =
+                                (StandardManager) ((Context) c).getManager();
                         if (m == null) {
                             m = new StandardManager();
                             m.setSecureRandomClass(
                                     "org.apache.catalina.startup.FastNonSecureRandom");
-                            c.setManager(m);
+                            ((Context) c).setManager(m);
                         }
                     }
                 }
