@@ -74,6 +74,12 @@
         <bug>52767</bug>: Remove reference to MySQL specific autoReconnect
         property in <code>JDBCAccessLogValve</code>. (markt)
       </fix>
+      <scode>
+        Move Manager, Loader and Resources from Container to Context since
+        Context is the only place they are used. The documentation already
+        states (and has done for some time) that Context is the only valid
+        location for these nested components. (markt)
+      </scode>
     </changelog>
   </subsection>
   <subsection name="Coyote">
