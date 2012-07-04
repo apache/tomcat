@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import java.util.EnumSet;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.SessionTrackingMode;
@@ -293,6 +294,22 @@ public class CoyoteAdapter implements Adapter {
                     asyncConImpl.setErrorState(null);
                 }
             }
+
+
+            if (!request.isAsyncDispatching() && request.isAsync()) {
+                AtomicBoolean result = new AtomicBoolean(true);
+                req.action(ActionCode.ASYNC_DISPATCH_FOR_OPERATION, this);
+                if (result.get()) {
+                    if (status==SocketStatus.OPEN_WRITE) {
+                        //TODO Notify write listener
+                    } else if (status==SocketStatus.OPEN) {
+                        //TODO Notify read listener
+                        asyncConImpl.canRead();
+                    }
+                    success = true;
+                }
+            }
+
             if (request.isAsyncDispatching()) {
                 success = true;
                 connector.getService().getContainer().getPipeline().getFirst().invoke(request, response);

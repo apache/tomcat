@@ -22,6 +22,7 @@ import java.net.InetAddress;
 import java.nio.channels.SelectionKey;
 
 import javax.net.ssl.SSLEngine;
+import javax.servlet.ReadListener;
 
 import org.apache.coyote.ActionCode;
 import org.apache.coyote.RequestInfo;
@@ -100,6 +101,19 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
      * Socket associated with the current connection.
      */
     protected SocketWrapper<NioChannel> socket = null;
+
+    /**
+     * TODO SERVLET 3.1
+     */
+    protected ReadListener readListener;
+
+    public ReadListener getReadListener() {
+        return readListener;
+    }
+
+    public void setReadListener(ReadListener listener) {
+        readListener = listener;
+    }
 
 
     // --------------------------------------------------------- Public Methods
@@ -497,6 +511,21 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
                 ((NioEndpoint)endpoint).processSocket(this.socket.getSocket(),
                         SocketStatus.OPEN, true);
             }
+        } else if (actionCode == ActionCode.ASYNC_DISPATCH_FOR_OPERATION) {
+            asyncStateMachine.asyncOperation();
+        } else if (actionCode == ActionCode.SET_READ_LISTENER) {
+            ReadListener listener = (ReadListener)param;
+            request.setReadListener(listener);
+        } else if (actionCode == ActionCode.NB_READ_INTEREST) {
+            if (socket==null || socket.getSocket().getAttachment(false)==null) {
+                return;
+            }
+            RequestInfo rp = request.getRequestProcessor();
+            if (rp.getStage() == org.apache.coyote.Constants.STAGE_SERVICE) {
+                NioEndpoint.KeyAttachment attach = (NioEndpoint.KeyAttachment)socket.getSocket().getAttachment(false);
+                attach.interestOps(attach.interestOps() | SelectionKey.OP_READ);
+            }
+
         }
     }
 

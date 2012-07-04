@@ -69,18 +69,18 @@ import org.apache.tomcat.util.res.StringManager;
  * |       |          |               |                       |               |
  * |       |          |              \|/                     \|/   complete() |
  * |       |          |         MUST_DISPATCH              STARTED---->-------|
- * |       |          |           |                         |   |
- * |       |          |           |postProcess()            |   |
- * ^       ^          |           |              dispatch() |   |auto
- * |       |          |           |    |--------------------|   |
- * |       |          | auto     \|/  \|/                      \|/
- * |       |          |---<----DISPATCHING<-----------------TIMING_OUT
- * |       |                                  dispatch()      |   |
- * |       |                                                  |   |
- * |       |-------<-------------------------------------<----|   |
- * |                              complete()                      |
- * |                                                              |
- * |----<------------------------<-----------------------------<--|
+ * |       |          |           |                         |   |  \ \
+ * |       |          |           |postProcess()            |   |   \ \
+ * ^       ^          |           |              dispatch() |   |auto\ \
+ * |       |          |           |    |--------------------|   |     \ \----<------
+ * |       |          | auto     \|/  \|/                      \|/     \            \
+ * |       |          |---<----DISPATCHING<-----------------TIMING_OUT  \            \
+ * |       |                                  dispatch()      |   |      |            \
+ * |       |                                                  |   |     \|/            |
+ * |       |-------<-------------------------------------<----|   |   READ_WRITE_OP ->-
+ * |                              complete()              \-------|------|
+ * |                                                              |      |
+ * |----<------------------------<-----------------------------<--|------|
  *                                 error()
  * </pre>
  */
@@ -101,6 +101,7 @@ public class AsyncStateMachine<S> {
         TIMING_OUT(true, false, false),
         MUST_DISPATCH(true, false, true),
         DISPATCHING(true, false, true),
+        READ_WRITE_OP(true,true,false),
         ERROR(true,false,false);
 
         private boolean isAsync;
@@ -167,6 +168,16 @@ public class AsyncStateMachine<S> {
         }
     }
 
+    public synchronized void asyncOperation() {
+        if (state==AsyncState.STARTED) {
+            state = AsyncState.READ_WRITE_OP;
+        } else {
+            throw new IllegalStateException(
+                    sm.getString("asyncStateMachine.invalidAsyncState",
+                            "asyncOperation()", state));
+        }
+    }
+
     /*
      * Async has been processed. Whether or not to enter a long poll depends on
      * current state. For example, as per SRV.2.3.3.3 can now process calls to
@@ -174,7 +185,7 @@ public class AsyncStateMachine<S> {
      */
     public synchronized SocketState asyncPostProcess() {
 
-        if (state == AsyncState.STARTING) {
+        if (state == AsyncState.STARTING || state == AsyncState.READ_WRITE_OP) {
             state = AsyncState.STARTED;
             return SocketState.LONG;
         } else if (state == AsyncState.MUST_COMPLETE) {
@@ -216,6 +227,8 @@ public class AsyncStateMachine<S> {
             doComplete = true;
         } else if (state == AsyncState.TIMING_OUT ||
                 state == AsyncState.ERROR) {
+            state = AsyncState.MUST_COMPLETE;
+        } else if (state == AsyncState.READ_WRITE_OP) {
             state = AsyncState.MUST_COMPLETE;
         } else {
             throw new IllegalStateException(

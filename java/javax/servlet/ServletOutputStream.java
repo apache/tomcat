@@ -273,6 +273,8 @@ public abstract class ServletOutputStream extends OutputStream {
     }
 
     /**
+     * If this returns false, it will cause a callback to
+     * {@link WriteListener#onWritePossible()} when the buffer has emptied
      * TODO SERVLET 3.1
      * @return
      */

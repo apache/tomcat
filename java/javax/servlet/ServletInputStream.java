@@ -94,8 +94,11 @@ public abstract class ServletInputStream extends InputStream {
      * @return
      */
     public abstract boolean isFinished();
+
     /**
      * TODO SERVLET 3.1
+     * If this returns false, the container will invoke
+     * {@link ReadListener#onDataAvailable()} when data is available.
      * @return
      */
     public abstract boolean isReady();
