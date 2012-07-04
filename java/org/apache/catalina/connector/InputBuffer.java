@@ -23,6 +23,8 @@ import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
 import java.util.HashMap;
 
+import javax.servlet.ReadListener;
+
 import org.apache.catalina.security.SecurityUtil;
 import org.apache.coyote.ActionCode;
 import org.apache.coyote.Request;
@@ -247,6 +249,51 @@ public class InputBuffer extends Reader
         return available;
     }
 
+    private volatile ReadListener listener;
+    public void setReadListener(ReadListener listener) {
+        this.listener = listener;
+        coyoteRequest.action(ActionCode.SET_READ_LISTENER, listener);
+    }
+
+    public ReadListener getReadListener() {
+        return listener;
+    }
+
+    public boolean isFinished() {
+        return dataAvailable()==0;
+    }
+
+    public int dataAvailable() {
+        if (getReadListener()==null) throw new IllegalStateException("not in non blocking mode.");
+        int result = 0;
+        //first check if we have buffered something already
+        result = available();
+
+        if(result <= 0) {
+            //here we can issue a non blocking read
+            //if supported
+            //TODO SERVLET 3.1
+        }
+
+        return result;
+
+    }
+
+
+    public boolean isReady() {
+        if (getReadListener()==null) throw new IllegalStateException("not in non blocking mode.");
+        int available = dataAvailable();
+        boolean result = available>0;
+        if (!result) {
+            coyoteRequest.action(ActionCode.NB_READ_INTEREST, null);
+        }
+        return result;
+    }
+
+
+
+
+
 
     // ------------------------------------------------- Bytes Handling Methods
 
@@ -441,7 +488,9 @@ public class InputBuffer extends Reader
         if (closed) {
             throw new IOException(sm.getString("inputBuffer.streamClosed"));
         }
-
+        if (state == INITIAL_STATE) {
+            state = CHAR_STATE;
+        }
         return (available() > 0);
     }
 

@@ -105,6 +105,25 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
         }
     }
 
+    public boolean canRead() throws IOException {
+        ClassLoader oldCL = Thread.currentThread().getContextClassLoader();
+        ClassLoader newCL = request.getContext().getLoader().getClassLoader();
+        try {
+            Thread.currentThread().setContextClassLoader(newCL);
+            request.getCoyoteRequest().getReadListener().onDataAvailable();
+            if (request.getInputStream().dataAvailable()==0) {
+                request.getCoyoteRequest().getReadListener().onAllDataRead();
+            }
+        }finally {
+            Thread.currentThread().setContextClassLoader(oldCL);
+        }
+        return true;
+    }
+
+    public boolean canWrite() throws IOException {
+        return false;
+    }
+
     public boolean timeout() throws IOException {
         AtomicBoolean result = new AtomicBoolean();
         request.getCoyoteRequest().action(ActionCode.ASYNC_TIMEOUT, result);

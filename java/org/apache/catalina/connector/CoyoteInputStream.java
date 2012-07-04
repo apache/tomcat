@@ -242,25 +242,20 @@ public class CoyoteInputStream
         }
     }
 
-    /**
-     * TODO SERVLET 3.1
-     */
     @Override
     public boolean isFinished() {
-        // TODO Auto-generated method stub
-        return false;
+        return ib.isFinished();
     }
 
     @Override
     public int dataAvailable() {
-        // TODO Auto-generated method stub
-        return 0;
+        return ib.dataAvailable();
     }
 
 
     @Override
     public boolean isReady() {
-        return dataAvailable()>0;
+        return ib.isReady();
     }
 
 
@@ -269,10 +264,8 @@ public class CoyoteInputStream
      */
     @Override
     public void setReadListener(ReadListener listener) {
-        // TODO Auto-generated method stub
-
+        ib.setReadListener(listener);
     }
-
 
 
 }

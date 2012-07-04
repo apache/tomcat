@@ -169,6 +169,49 @@ public class InternalNioInputBuffer extends AbstractInputBuffer<NioChannel> {
 
     // --------------------------------------------------------- Public Methods
 
+
+    @Override
+    public boolean supportsNonBlocking() {
+        return true;
+    }
+
+
+    @Override
+    public int available() {
+
+        int available = super.available();
+        if (available>0) {
+            return available;
+        }
+
+        available = Math.max(lastValid - pos, 0);
+        if (available>0) {
+            return available;
+        }
+        try {
+            available = nbRead();
+        }catch (IOException x) {
+            //TODO SERVLET 3.1 -
+            //we should not swallow this exception
+
+            if (log.isDebugEnabled()) {
+                log.debug("Unable to issue non blocking read.", x);
+            }
+        }
+        return available;
+    }
+
+    /**
+     * Issues a non blocking read
+     * @return int - nr of bytes read
+     * @throws IOException
+     */
+    public int nbRead() throws IOException {
+        return readSocket(true,false);
+    }
+
+
+
     /**
      * Recycle the input buffer. This should be called when closing the
      * connection.

@@ -137,6 +137,13 @@ public enum ActionCode {
     ASYNC_DISPATCH,
 
     /**
+     * Callback when an async call is
+     * {@link javax.servlet.ReadListener#onDataAvailable()} or
+     * {@link javax.servlet.WriteListener#onWritePossible()}
+     */
+    ASYNC_DISPATCH_FOR_OPERATION,
+
+    /**
      * Callback to indicate the the actual dispatch has started and that the
      * async state needs change.
      */
@@ -193,5 +200,27 @@ public enum ActionCode {
     /**
      * Callback to trigger the HTTP upgrade process.
      */
-    UPGRADE
+    UPGRADE,
+
+    /**
+     * Callback to trigger setting the ReadListener
+     */
+    SET_READ_LISTENER,
+
+    /**
+     * Callback to trigger setting the WriteListener
+     */
+    SET_WRITE_LISTENER,
+
+    /**
+     * Indicator that Servlet is interested in being
+     * notified when data is available to be read
+     */
+    NB_READ_INTEREST,
+
+    /**
+     *Indicator that the Servlet is interested
+     *in being notified when it can write data
+     */
+    NB_WRITE_INTEREST
 }

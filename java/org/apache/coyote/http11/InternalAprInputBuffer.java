@@ -91,6 +91,8 @@ public class InternalAprInputBuffer extends AbstractInputBuffer<Long> {
 
     // --------------------------------------------------------- Public Methods
 
+
+
     /**
      * Recycle the input buffer. This should be called when closing the
      * connection.
@@ -99,6 +101,13 @@ public class InternalAprInputBuffer extends AbstractInputBuffer<Long> {
     public void recycle() {
         socket = 0;
         super.recycle();
+    }
+
+
+    @Override
+    public boolean supportsNonBlocking() {
+        //TODO SERVLET 3.1
+        return false;
     }
 
 

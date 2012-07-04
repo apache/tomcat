@@ -442,6 +442,12 @@ public class InternalInputBuffer extends AbstractInputBuffer<Socket> {
 
     }
 
+    @Override
+    public boolean supportsNonBlocking() {
+        //TODO SERVLET 3.1
+        return false;
+    }
+
 
     @Override
     public void recycle() {

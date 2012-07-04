@@ -1244,7 +1244,7 @@ public class NioEndpoint extends AbstractEndpoint {
                                         processSocket(channel, SocketStatus.DISCONNECT, true);
                                 } else {
                                     //future placement of a WRITE notif
-                                    if (!processSocket(channel, SocketStatus.OPEN, true))
+                                    if (!processSocket(channel, SocketStatus.OPEN_WRITE, true))
                                         processSocket(channel, SocketStatus.DISCONNECT, true);
                                 }
                             } else {
@@ -1253,8 +1253,23 @@ public class NioEndpoint extends AbstractEndpoint {
                         } else {
                             //later on, improve latch behavior
                             if ( isWorkerAvailable() ) {
-                                unreg(sk, attachment,sk.readyOps());
-                                boolean close = (!processSocket(channel, null, true));
+
+                                boolean readAndWrite = sk.isReadable() && sk.isWritable();
+                                reg(sk, attachment, 0);
+                                if (readAndWrite) {
+                                    //remember the that we want to know about write too
+                                    attachment.interestOps(SelectionKey.OP_WRITE);
+                                }
+                                //read goes before write
+                                if (sk.isReadable()) {
+                                    //read notification
+                                    if (!processSocket(channel, SocketStatus.OPEN, true))
+                                        close = true;
+                                } else {
+                                    //future placement of a WRITE notif
+                                    if (!processSocket(channel, SocketStatus.OPEN_WRITE, true))
+                                        close = true;
+                                }
                                 if (close) {
                                     cancelledKey(sk,SocketStatus.DISCONNECT);
                                 }
@@ -1652,11 +1667,10 @@ public class NioEndpoint extends AbstractEndpoint {
                                     (KeyAttachment) key.attachment(),
                                     status);
                         }
-
+                        KeyAttachment ka = (KeyAttachment)key.attachment();
                         if (state == SocketState.CLOSED) {
                             // Close socket and pool
                             try {
-                                KeyAttachment ka = (KeyAttachment) key.attachment();
                                 if (ka!=null) ka.setComet(false);
                                 socket.getPoller().cancelledKey(key, SocketStatus.ERROR);
                                 nioChannels.offer(socket);
@@ -1666,6 +1680,9 @@ public class NioEndpoint extends AbstractEndpoint {
                             }catch ( Exception x ) {
                                 log.error("",x);
                             }
+                        } else if (state == SocketState.LONG && ka != null && ka.isAsync() && ka.interestOps() > 0) {
+                            //we are async, and we are interested in operations
+                            ka.getPoller().add(socket, ka.interestOps());
                         }
                     } else if (handshake == -1 ) {
                         KeyAttachment ka = null;
