@@ -16,7 +16,6 @@
  */
 package org.apache.catalina.core;
 
-
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.io.File;
@@ -53,7 +52,6 @@ import org.apache.catalina.Host;
 import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.LifecycleState;
-import org.apache.catalina.Manager;
 import org.apache.catalina.Pipeline;
 import org.apache.catalina.Realm;
 import org.apache.catalina.Valve;
@@ -193,12 +191,6 @@ public abstract class ContainerBase extends LifecycleMBeanBase
      * Associated logger name.
      */
     protected String logName = null;
-
-
-    /**
-     * The Manager implementation with which this Container is associated.
-     */
-    protected Manager manager = null;
 
 
     /**
@@ -369,65 +361,6 @@ public abstract class ContainerBase extends LifecycleMBeanBase
             return (logger);
         logger = LogFactory.getLog(logName());
         return (logger);
-
-    }
-
-
-    /**
-     * Return the Manager with which this Container is associated.  If there is
-     * no associated Manager, return the Manager associated with our parent
-     * Container (if any); otherwise return <code>null</code>.
-     */
-    @Override
-    public Manager getManager() {
-
-        if (manager != null)
-            return (manager);
-        if (parent != null)
-            return (parent.getManager());
-        return (null);
-
-    }
-
-
-    /**
-     * Set the Manager with which this Container is associated.
-     *
-     * @param manager The newly associated Manager
-     */
-    @Override
-    public synchronized void setManager(Manager manager) {
-
-        // Change components if necessary
-        Manager oldManager = this.manager;
-        if (oldManager == manager)
-            return;
-        this.manager = manager;
-
-        // Stop the old component if necessary
-        if (getState().isAvailable() && (oldManager != null) &&
-            (oldManager instanceof Lifecycle)) {
-            try {
-                ((Lifecycle) oldManager).stop();
-            } catch (LifecycleException e) {
-                log.error("ContainerBase.setManager: stop: ", e);
-            }
-        }
-
-        // Start the new component if necessary
-        if (manager != null)
-            manager.setContainer(this);
-        if (getState().isAvailable() && (manager != null) &&
-            (manager instanceof Lifecycle)) {
-            try {
-                ((Lifecycle) manager).start();
-            } catch (LifecycleException e) {
-                log.error("ContainerBase.setManager: start: ", e);
-            }
-        }
-
-        // Report this property change to interested listeners
-        support.firePropertyChange("manager", oldManager, this.manager);
 
     }
 
@@ -938,8 +871,6 @@ public abstract class ContainerBase extends LifecycleMBeanBase
         // Start our subordinate components, if any
         logger = null;
         getLogger();
-        if ((manager != null) && (manager instanceof Lifecycle))
-            ((Lifecycle) manager).start();
         if ((cluster != null) && (cluster instanceof Lifecycle))
             ((Lifecycle) cluster).start();
         Realm realm = getRealmInternal();
@@ -1031,18 +962,11 @@ public abstract class ContainerBase extends LifecycleMBeanBase
         if ((cluster != null) && (cluster instanceof Lifecycle)) {
             ((Lifecycle) cluster).stop();
         }
-        if ((manager != null) && (manager instanceof Lifecycle) &&
-                ((Lifecycle) manager).getState().isAvailable() ) {
-            ((Lifecycle) manager).stop();
-        }
     }
 
     @Override
     protected void destroyInternal() throws LifecycleException {
 
-        if ((manager != null) && (manager instanceof Lifecycle)) {
-            ((Lifecycle) manager).destroy();
-        }
         Realm realm = getRealmInternal();
         if ((realm != null) && (realm instanceof Lifecycle)) {
             ((Lifecycle) realm).destroy();
@@ -1165,13 +1089,6 @@ public abstract class ContainerBase extends LifecycleMBeanBase
                 cluster.backgroundProcess();
             } catch (Exception e) {
                 log.warn(sm.getString("containerBase.backgroundProcess.cluster", cluster), e);
-            }
-        }
-        if (manager != null) {
-            try {
-                manager.backgroundProcess();
-            } catch (Exception e) {
-                log.warn(sm.getString("containerBase.backgroundProcess.manager", manager), e);
             }
         }
         Realm realm = getRealmInternal();

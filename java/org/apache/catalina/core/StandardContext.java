@@ -439,6 +439,12 @@ public class StandardContext extends ContainerBase
 
 
     /**
+     * The Manager implementation with which this Container is associated.
+     */
+    protected Manager manager = null;
+
+
+    /**
      * The naming context listener for this web application.
      */
     private NamingContextListener namingContextListener = null;
@@ -1901,6 +1907,48 @@ public class StandardContext extends ContainerBase
 
         // Report this property change to interested listeners
         support.firePropertyChange("loader", oldLoader, this.loader);
+    }
+
+
+    @Override
+    public Manager getManager() {
+        return manager;
+    }
+
+
+    @Override
+    public synchronized void setManager(Manager manager) {
+
+        // Change components if necessary
+        Manager oldManager = this.manager;
+        if (oldManager == manager)
+            return;
+        this.manager = manager;
+
+        // Stop the old component if necessary
+        if (getState().isAvailable() && (oldManager != null) &&
+            (oldManager instanceof Lifecycle)) {
+            try {
+                ((Lifecycle) oldManager).stop();
+            } catch (LifecycleException e) {
+                log.error("StandardContext.setManager: stop: ", e);
+            }
+        }
+
+        // Start the new component if necessary
+        if (manager != null)
+            manager.setContainer(this);
+        if (getState().isAvailable() && (manager != null) &&
+            (manager instanceof Lifecycle)) {
+            try {
+                ((Lifecycle) manager).start();
+            } catch (LifecycleException e) {
+                log.error("StandardContext.setManager: start: ", e);
+            }
+        }
+
+        // Report this property change to interested listeners
+        support.firePropertyChange("manager", oldManager, this.manager);
     }
 
 
@@ -5520,6 +5568,10 @@ public class StandardContext extends ContainerBase
             ((Lifecycle) loader).destroy();
         }
 
+        if ((manager != null) && (manager instanceof Lifecycle)) {
+            ((Lifecycle) manager).destroy();
+        }
+
         super.destroyInternal();
     }
 
@@ -5532,6 +5584,15 @@ public class StandardContext extends ContainerBase
             } catch (Exception e) {
                 log.warn(sm.getString(
                         "standardContext.backgroundProcess.loader", loader), e);
+            }
+        }
+        if (manager != null) {
+            try {
+                manager.backgroundProcess();
+            } catch (Exception e) {
+                log.warn(sm.getString(
+                        "standardContext.backgroundProcess.manager", manager),
+                        e);
             }
         }
         super.backgroundProcess();
