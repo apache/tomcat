@@ -169,7 +169,7 @@ public class ApplicationContext
     /**
      * The merged context initialization parameters for this Context.
      */
-    private Map<String,String> parameters =
+    private final ConcurrentHashMap<String,String> parameters =
         new ConcurrentHashMap<String,String>();
 
 
@@ -737,17 +737,14 @@ public class ApplicationContext
     public void removeAttribute(String name) {
 
         Object value = null;
-        boolean found = false;
 
         // Remove the specified attribute
         // Check for read only attribute
-        if (readOnlyAttributes.containsKey(name))
+        if (readOnlyAttributes.containsKey(name)){
             return;
-        found = attributes.containsKey(name);
-        if (found) {
-            value = attributes.get(name);
-            attributes.remove(name);
-        } else {
+        }
+        value = attributes.remove(name);
+        if (value == null) {
             return;
         }
 
@@ -1244,12 +1241,7 @@ public class ApplicationContext
 
     @Override
     public boolean setInitParameter(String name, String value) {
-        if (parameters.containsKey(name)) {
-            return false;
-        }
-
-        parameters.put(name, value);
-        return true;
+        return parameters.putIfAbsent(name, value) == null;
     }
 
 

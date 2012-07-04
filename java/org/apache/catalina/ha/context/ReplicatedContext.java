@@ -170,10 +170,12 @@ public class ReplicatedContext extends StandardContext implements MapOwner {
 
         @Override
         public Object getAttribute(String name) {
-            if (tomcatAttributes.containsKey(name) )
-                return tomcatAttributes.get(name);
-            else
+            Object obj = tomcatAttributes.get(name);
+            if (obj == null) {
                 return super.getAttribute(name);
+            } else {
+                return obj;
+            }
         }
 
         @SuppressWarnings("unchecked")
