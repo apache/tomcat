@@ -44,7 +44,6 @@ import javax.naming.NamingException;
 import javax.naming.directory.DirContext;
 import javax.servlet.ServletContext;
 
-import org.apache.catalina.Container;
 import org.apache.catalina.Context;
 import org.apache.catalina.Globals;
 import org.apache.catalina.Lifecycle;
@@ -123,9 +122,9 @@ public class WebappLoader extends LifecycleMBeanBase
 
 
     /**
-     * The Container with which this Loader has been associated.
+     * The Context with which this Loader has been associated.
      */
-    private Container container = null;
+    private Context context = null;
 
 
     /**
@@ -207,40 +206,30 @@ public class WebappLoader extends LifecycleMBeanBase
     }
 
 
-    /**
-     * Return the Container with which this Logger has been associated.
-     */
     @Override
-    public Container getContainer() {
-
-        return (container);
-
+    public Context getContext() {
+        return context;
     }
 
 
-    /**
-     * Set the Container with which this Logger has been associated.
-     *
-     * @param container The associated Container
-     */
     @Override
-    public void setContainer(Container container) {
+    public void setContext(Context context) {
 
-        // Deregister from the old Container (if any)
-        if ((this.container != null) && (this.container instanceof Context))
-            ((Context) this.container).removePropertyChangeListener(this);
-
-        // Process this property change
-        Container oldContainer = this.container;
-        this.container = container;
-        support.firePropertyChange("container", oldContainer, this.container);
-
-        // Register with the new Container (if any)
-        if ((this.container != null) && (this.container instanceof Context)) {
-            setReloadable( ((Context) this.container).getReloadable() );
-            ((Context) this.container).addPropertyChangeListener(this);
+        // Deregister from the old Context (if any)
+        if (this.context != null) {
+            this.context.removePropertyChangeListener(this);
         }
 
+        // Process this property change
+        Context oldContext = this.context;
+        this.context = context;
+        support.firePropertyChange("context", oldContext, this.context);
+
+        // Register with the new Container (if any)
+        if (this.context != null) {
+            setReloadable(this.context.getReloadable());
+            this.context.addPropertyChangeListener(this);
+        }
     }
 
 
@@ -398,13 +387,13 @@ public class WebappLoader extends LifecycleMBeanBase
             try {
                 Thread.currentThread().setContextClassLoader
                     (WebappLoader.class.getClassLoader());
-                if (container instanceof Context) {
-                    ((Context) container).reload();
+                if (context != null) {
+                    context.reload();
                 }
             } finally {
-                if (container.getLoader() != null) {
+                if (context.getLoader() != null) {
                     Thread.currentThread().setContextClassLoader
-                        (container.getLoader().getClassLoader());
+                        (context.getLoader().getClassLoader());
                 }
             }
         } else {
@@ -508,8 +497,8 @@ public class WebappLoader extends LifecycleMBeanBase
     public String toString() {
 
         StringBuilder sb = new StringBuilder("WebappLoader[");
-        if (container != null)
-            sb.append(container.getName());
+        if (context != null)
+            sb.append(context.getName());
         sb.append("]");
         return (sb.toString());
 
@@ -529,8 +518,8 @@ public class WebappLoader extends LifecycleMBeanBase
         if (log.isDebugEnabled())
             log.debug(sm.getString("webappLoader.starting"));
 
-        if (container.getResources() == null) {
-            log.info("No resources for " + container);
+        if (context.getResources() == null) {
+            log.info("No resources for " + context);
             setState(LifecycleState.STARTING);
             return;
         }
@@ -557,7 +546,7 @@ public class WebappLoader extends LifecycleMBeanBase
         try {
 
             classLoader = createClassLoader();
-            classLoader.setResources(container.getResources());
+            classLoader.setResources(context.getResources());
             classLoader.setDelegate(this.delegate);
             classLoader.setSearchExternalFirst(searchExternalFirst);
             for (int i = 0; i < repositories.length; i++) {
@@ -574,15 +563,15 @@ public class WebappLoader extends LifecycleMBeanBase
 
             // Binding the Webapp class loader to the directory context
             DirContextURLStreamHandler.bind(classLoader,
-                    this.container.getResources());
+                    this.context.getResources());
 
-            String contextName = container.getName();
+            String contextName = context.getName();
             if (!contextName.startsWith("/")) {
                 contextName = "/" + contextName;
             }
-            ObjectName cloname = new ObjectName(container.getDomain() +
+            ObjectName cloname = new ObjectName(context.getDomain() +
                     ":type=WebappClassLoader,context=" + contextName +
-                    ",host=" + container.getParent().getName());
+                    ",host=" + context.getParent().getName());
             Registry.getRegistry(null, null)
                 .registerComponent(classLoader, cloname, null);
 
@@ -613,9 +602,8 @@ public class WebappLoader extends LifecycleMBeanBase
         setState(LifecycleState.STOPPING);
 
         // Remove context attributes as appropriate
-        if (container instanceof Context) {
-            ServletContext servletContext =
-                ((Context) container).getServletContext();
+        if (context != null) {
+            ServletContext servletContext = context.getServletContext();
             servletContext.removeAttribute(Globals.CLASS_PATH_ATTR);
         }
 
@@ -624,13 +612,13 @@ public class WebappLoader extends LifecycleMBeanBase
         DirContextURLStreamHandler.unbind(classLoader);
 
         try {
-            String contextName = container.getName();
+            String contextName = context.getName();
             if (!contextName.startsWith("/")) {
                 contextName = "/" + contextName;
             }
-            ObjectName cloname = new ObjectName(container.getDomain() +
+            ObjectName cloname = new ObjectName(context.getDomain() +
                     ":type=WebappClassLoader,context=" + contextName +
-                    ",host=" + container.getParent().getName());
+                    ",host=" + context.getParent().getName());
             Registry.getRegistry(null, null).unregisterComponent(cloname);
         } catch (Exception e) {
             log.error("LifecycleException ", e);
@@ -682,7 +670,7 @@ public class WebappLoader extends LifecycleMBeanBase
         WebappClassLoader classLoader = null;
 
         if (parentClassLoader == null) {
-            parentClassLoader = container.getParentClassLoader();
+            parentClassLoader = context.getParentClassLoader();
         }
         Class<?>[] argTypes = { ClassLoader.class };
         Object[] args = { parentClassLoader };
@@ -701,12 +689,11 @@ public class WebappLoader extends LifecycleMBeanBase
 
         if (!Globals.IS_SECURITY_ENABLED)
             return;
-        if (!(container instanceof Context))
+        if (context == null)
             return;
 
         // Tell the class loader the root of the context
-        ServletContext servletContext =
-            ((Context) container).getServletContext();
+        ServletContext servletContext = context.getServletContext();
 
         // Assigning permissions for the work directory
         File workDir =
@@ -796,10 +783,9 @@ public class WebappLoader extends LifecycleMBeanBase
      */
     private void setRepositories() throws IOException {
 
-        if (!(container instanceof Context))
+        if (context == null)
             return;
-        ServletContext servletContext =
-            ((Context) container).getServletContext();
+        ServletContext servletContext = context.getServletContext();
         if (servletContext == null)
             return;
 
@@ -816,7 +802,7 @@ public class WebappLoader extends LifecycleMBeanBase
 
         classLoader.setWorkDir(workDir);
 
-        DirContext resources = container.getResources();
+        DirContext resources = context.getResources();
 
         // Setting up the class repository (/WEB-INF/classes), if it exists
 
@@ -979,10 +965,9 @@ public class WebappLoader extends LifecycleMBeanBase
     private void setClassPath() {
 
         // Validate our current state information
-        if (!(container instanceof Context))
+        if (context == null)
             return;
-        ServletContext servletContext =
-            ((Context) container).getServletContext();
+        ServletContext servletContext = context.getServletContext();
         if (servletContext == null)
             return;
 
@@ -1140,7 +1125,7 @@ public class WebappLoader extends LifecycleMBeanBase
 
     @Override
     protected String getDomainInternal() {
-        return container.getDomain();
+        return context.getDomain();
     }
 
 
@@ -1149,25 +1134,17 @@ public class WebappLoader extends LifecycleMBeanBase
 
         StringBuilder name = new StringBuilder("type=Loader");
 
-        if (container instanceof Context) {
-            name.append(",context=");
-            Context context = (Context) container;
+        name.append(",context=");
 
-            String contextName = context.getName();
-            if (!contextName.startsWith("/")) {
-                name.append("/");
-            }
-            name.append(contextName);
-
-            name.append(",host=");
-            name.append(context.getParent().getName());
-        } else {
-            // Unlikely / impossible? Handle it to be safe
-            name.append(",container=");
-            name.append(container.getName());
+        String contextName = context.getName();
+        if (!contextName.startsWith("/")) {
+            name.append("/");
         }
+        name.append(contextName);
+
+        name.append(",host=");
+        name.append(context.getParent().getName());
 
         return name.toString();
     }
-
 }

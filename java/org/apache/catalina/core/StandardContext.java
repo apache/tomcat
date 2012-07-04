@@ -420,6 +420,12 @@ public class StandardContext extends ContainerBase
 
 
     /**
+     * The Loader implementation with which this Container is associated.
+     */
+    private Loader loader = null;
+
+
+    /**
      * The login configuration descriptor for this web application.
      */
     private LoginConfig loginConfig = null;
@@ -669,6 +675,8 @@ public class StandardContext extends ContainerBase
      */
     private String aliases = null;
 
+
+    private DirContext resources = null;
 
     /**
      * Non proxied resources.
@@ -1854,16 +1862,45 @@ public class StandardContext extends ContainerBase
     }
 
 
-    /**
-     * Set the Loader with which this Context is associated.
-     *
-     * @param loader The newly associated loader
-     */
+    @Override
+    public Loader getLoader() {
+        return loader;
+    }
+
+
     @Override
     public synchronized void setLoader(Loader loader) {
 
-        super.setLoader(loader);
+        // Change components if necessary
+        Loader oldLoader = this.loader;
+        if (oldLoader == loader)
+            return;
+        this.loader = loader;
 
+        // Stop the old component if necessary
+        if (getState().isAvailable() && (oldLoader != null) &&
+            (oldLoader instanceof Lifecycle)) {
+            try {
+                ((Lifecycle) oldLoader).stop();
+            } catch (LifecycleException e) {
+                log.error("StandardContext.setLoader: stop: ", e);
+            }
+        }
+
+        // Start the new component if necessary
+        if (loader != null)
+            loader.setContext(this);
+        if (getState().isAvailable() && (loader != null) &&
+            (loader instanceof Lifecycle)) {
+            try {
+                ((Lifecycle) loader).start();
+            } catch (LifecycleException e) {
+                log.error("StandardContext.setLoader: start: ", e);
+            }
+        }
+
+        // Report this property change to interested listeners
+        support.firePropertyChange("loader", oldLoader, this.loader);
     }
 
 
@@ -2396,12 +2433,12 @@ public class StandardContext extends ContainerBase
     }
 
 
-    /**
-     * Set the resources DirContext object with which this Container is
-     * associated.
-     *
-     * @param resources The newly associated DirContext
-     */
+   @Override
+   public DirContext getResources() {
+       return resources;
+   }
+
+
     @Override
     public synchronized void setResources(DirContext resources) {
 
@@ -5479,8 +5516,27 @@ public class StandardContext extends ContainerBase
             instanceListeners = new String[0];
         }
 
+        if ((loader != null) && (loader instanceof Lifecycle)) {
+            ((Lifecycle) loader).destroy();
+        }
+
         super.destroyInternal();
     }
+
+
+    @Override
+    public void backgroundProcess() {
+        if (loader != null) {
+            try {
+                loader.backgroundProcess();
+            } catch (Exception e) {
+                log.warn(sm.getString(
+                        "standardContext.backgroundProcess.loader", loader), e);
+            }
+        }
+        super.backgroundProcess();
+    }
+
 
     private void resetContext() throws Exception {
         // Restore the original state ( pre reading web.xml in start )

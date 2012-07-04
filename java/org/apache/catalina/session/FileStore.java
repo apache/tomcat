@@ -255,8 +255,8 @@ public final class FileStore extends StoreBase {
             fis = new FileInputStream(file.getAbsolutePath());
             bis = new BufferedInputStream(fis);
             Container container = manager.getContainer();
-            if (container != null)
-                loader = container.getLoader();
+            if (container instanceof Context)
+                loader = ((Context) container).getLoader();
             if (loader != null)
                 classLoader = loader.getClassLoader();
             if (classLoader != null)

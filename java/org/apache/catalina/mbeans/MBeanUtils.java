@@ -26,9 +26,7 @@ import javax.management.ObjectName;
 
 import org.apache.catalina.Container;
 import org.apache.catalina.Context;
-import org.apache.catalina.Engine;
 import org.apache.catalina.Group;
-import org.apache.catalina.Host;
 import org.apache.catalina.Loader;
 import org.apache.catalina.Role;
 import org.apache.catalina.Server;
@@ -463,28 +461,18 @@ public class MBeanUtils {
      *
      * @exception MalformedObjectNameException if a name cannot be created
      */
-    static ObjectName createObjectName(String domain,
-                                              Loader loader)
+    static ObjectName createObjectName(String domain, Loader loader)
         throws MalformedObjectNameException {
 
         ObjectName name = null;
-        Container container = loader.getContainer();
+        Context context = loader.getContext();
 
-        if (container instanceof Engine) {
-            name = new ObjectName(domain + ":type=Loader");
-        } else if (container instanceof Host) {
-            name = new ObjectName(domain + ":type=Loader,host=" +
-                              container.getName());
-        } else if (container instanceof Context) {
-            Context context = ((Context)container);
-            ContextName cn = new ContextName(context.getName());
-            Container host = context.getParent();
-            name = new ObjectName(domain + ":type=Loader,context=" +
-                    cn.getDisplayName() + ",host=" + host.getName());
-        }
+        ContextName cn = new ContextName(context.getName());
+        Container host = context.getParent();
+        name = new ObjectName(domain + ":type=Loader,context=" +
+                cn.getDisplayName() + ",host=" + host.getName());
 
-        return (name);
-
+        return name;
     }
 
 

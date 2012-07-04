@@ -20,6 +20,7 @@ import java.net.URL;
 import java.util.Locale;
 import java.util.Set;
 
+import javax.naming.directory.DirContext;
 import javax.servlet.ServletContainerInitializer;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletRegistration;
@@ -1387,5 +1388,29 @@ public interface Context extends Container {
      * part of a redirect response.
      */
     public boolean getSendRedirectBody();
+
+    /**
+     * Return the Loader with which this Context is associated.
+     */
+    public Loader getLoader();
+
+    /**
+     * Set the Loader with which this Context is associated.
+     *
+     * @param loader The newly associated loader
+     */
+    public void setLoader(Loader loader);
+
+    /**
+     * Return the Resources with which this Context is associated.
+     */
+    public DirContext getResources();
+
+    /**
+     * Set the Resources object with which this Context is associated.
+     *
+     * @param resources The newly associated Resources
+     */
+    public void setResources(DirContext resources);
 }
 

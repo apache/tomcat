@@ -22,7 +22,7 @@ import java.lang.reflect.Method;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 
-import org.apache.catalina.Container;
+import org.apache.catalina.Context;
 import org.apache.catalina.Globals;
 import org.apache.juli.logging.Log;
 import org.apache.tomcat.util.ExceptionUtils;
@@ -116,9 +116,9 @@ public class Introspection {
      * class cannot be loaded, a debug level log message will be written to the
      * Container's log and null will be returned.
      */
-    public static Class<?> loadClass(Container container, String className) {
-        ClassLoader cl = container.getLoader().getClassLoader();
-        Log log = container.getLogger();
+    public static Class<?> loadClass(Context context, String className) {
+        ClassLoader cl = context.getLoader().getClassLoader();
+        Log log = context.getLogger();
         Class<?> clazz = null;
         try {
             clazz = cl.loadClass(className);
