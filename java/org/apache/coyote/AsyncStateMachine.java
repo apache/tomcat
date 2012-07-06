@@ -296,7 +296,8 @@ public class AsyncStateMachine<S> {
 
     public synchronized void asyncError() {
         if (state == AsyncState.DISPATCHED ||
-                state == AsyncState.TIMING_OUT) {
+                state == AsyncState.TIMING_OUT ||
+                state == AsyncState.READ_WRITE_OP) {
             state = AsyncState.ERROR;
         } else {
             throw new IllegalStateException(
