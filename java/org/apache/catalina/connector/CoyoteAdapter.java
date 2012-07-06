@@ -293,6 +293,22 @@ public class CoyoteAdapter implements Adapter {
                 if (!asyncConImpl.timeout()) {
                     asyncConImpl.setErrorState(null);
                 }
+            } else if (status==SocketStatus.ASYNC_READ_ERROR) {
+                success = true;
+                Throwable t = (Throwable)req.getAttribute(RequestDispatcher.ERROR_EXCEPTION);
+                req.getAttributes().remove(RequestDispatcher.ERROR_EXCEPTION);
+                asyncConImpl.notifyReadError(t);
+                if (t != null) {
+                    asyncConImpl.setErrorState(t);
+                }
+            } else if (status==SocketStatus.ASYNC_WRITE_ERROR) {
+                success = true;
+                Throwable t = (Throwable)req.getAttribute(RequestDispatcher.ERROR_EXCEPTION);
+                req.getAttributes().remove(RequestDispatcher.ERROR_EXCEPTION);
+                asyncConImpl.notifyWriteError(t);
+                if (t != null) {
+                    asyncConImpl.setErrorState(t);
+                }
             }
 
 

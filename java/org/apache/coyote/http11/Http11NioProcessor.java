@@ -24,6 +24,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.net.ssl.SSLEngine;
 import javax.servlet.ReadListener;
+import javax.servlet.RequestDispatcher;
 import javax.servlet.WriteListener;
 
 import org.apache.coyote.ActionCode;
@@ -192,14 +193,15 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
                     }
                 }catch (IOException x) {
                     if (log.isDebugEnabled()) log.debug("Unable to write async data.",x);
-                    //TODO FIXME-- fix - so we can notify of error
-                    return SocketState.CLOSED;
+                    status = SocketStatus.ASYNC_WRITE_ERROR;
+                    request.setAttribute(RequestDispatcher.ERROR_EXCEPTION, x);
                 }
                 //return if we have more data to write
-                if (isRegisteredForWrite(attach)) {
+                if (status == SocketStatus.OPEN_WRITE && isRegisteredForWrite(attach)) {
                     return SocketState.LONG;
                 }
             }catch (IllegalStateException x) {
+                attach.interestOps(attach.interestOps() | SelectionKey.OP_WRITE);
             }
         } else if (status == SocketStatus.OPEN_READ) {
             try {
@@ -209,17 +211,18 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
                     }
                 }catch (IOException x) {
                     if (log.isDebugEnabled()) log.debug("Unable to read async data.",x);
-                  //TODO FIXME-- fix - so we can notify of error
-                    return SocketState.CLOSED;
+                    status = SocketStatus.ASYNC_READ_ERROR;
+                    request.setAttribute(RequestDispatcher.ERROR_EXCEPTION, x);
                 }
                 //return if we have more data to write
             }catch (IllegalStateException x) {
+                attach.interestOps(attach.interestOps() | SelectionKey.OP_READ);
             }
         }
 
         SocketState state = super.asyncDispatch(status);
         //return if we have more data to write
-        if (isRegisteredForWrite(attach)) {
+        if (state == SocketState.LONG && isRegisteredForWrite(attach)) {
             return SocketState.LONG;
         } else {
             return state;
@@ -246,7 +249,7 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
     protected boolean isRegisteredForWrite(KeyAttachment attach) {
         //return if we have more data to write
         if (outputBuffer.hasDataToWrite()) {
-            attach.interestOps(SelectionKey.OP_WRITE);
+            attach.interestOps(attach.interestOps() | SelectionKey.OP_WRITE);
             return true;
         } else {
             return false;
