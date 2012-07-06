@@ -86,6 +86,11 @@ public class InternalAprOutputBuffer extends AbstractOutputBuffer<Long> {
     // --------------------------------------------------------- Public Methods
 
     @Override
+    public boolean supportsNonBlocking() {
+        return false;
+    }
+
+    @Override
     public void init(SocketWrapper<Long> socketWrapper,
             AbstractEndpoint endpoint) throws IOException {
 

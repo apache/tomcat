@@ -49,6 +49,7 @@ import org.apache.catalina.core.AprLifecycleListener;
 import org.apache.catalina.core.StandardServer;
 import org.apache.catalina.session.StandardManager;
 import org.apache.catalina.valves.AccessLogValve;
+import org.apache.coyote.http11.Http11NioProtocol;
 import org.apache.tomcat.util.buf.ByteChunk;
 
 /**
@@ -141,9 +142,9 @@ public abstract class TomcatBaseTest extends LoggingBaseTest {
         // Has a protocol been specified
         String protocol = System.getProperty("tomcat.test.protocol");
 
-        // Use BIO by default
+        // Use NIO by default in Tomcat 8
         if (protocol == null) {
-            protocol = "org.apache.coyote.http11.Http11Protocol";
+            protocol = Http11NioProtocol.class.getName();
         }
 
         return protocol;

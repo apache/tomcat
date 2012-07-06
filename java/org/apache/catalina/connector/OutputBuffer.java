@@ -23,6 +23,9 @@ import java.security.AccessController;
 import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
 import java.util.HashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
+
+import javax.servlet.WriteListener;
 
 import org.apache.catalina.Globals;
 import org.apache.coyote.ActionCode;
@@ -605,6 +608,27 @@ public class OutputBuffer extends Writer
     public int getBufferSize() {
         return bb.getLimit();
     }
+
+
+    public boolean canWrite() {
+        if (getWriteListener()==null) throw new IllegalStateException("not in non blocking mode.");
+        AtomicBoolean canWrite = new AtomicBoolean(true);
+        coyoteResponse.action(ActionCode.NB_WRITE_INTEREST, canWrite);
+        return canWrite.get();
+}
+
+
+
+    private volatile WriteListener listener;
+    public void setWriteListener(WriteListener listener) {
+        this.listener = listener;
+        coyoteResponse.action(ActionCode.SET_WRITE_LISTENER, listener);
+    }
+
+    public WriteListener getWriteListener() {
+        return listener;
+    }
+
 
 
 }

@@ -20,9 +20,11 @@ import java.io.IOException;
 import java.io.InterruptedIOException;
 import java.net.InetAddress;
 import java.nio.channels.SelectionKey;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.net.ssl.SSLEngine;
 import javax.servlet.ReadListener;
+import javax.servlet.WriteListener;
 
 import org.apache.coyote.ActionCode;
 import org.apache.coyote.RequestInfo;
@@ -102,19 +104,7 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
      */
     protected SocketWrapper<NioChannel> socket = null;
 
-    /**
-     * TODO SERVLET 3.1
-     */
-    protected ReadListener readListener;
-
-    public ReadListener getReadListener() {
-        return readListener;
-    }
-
-    public void setReadListener(ReadListener listener) {
-        readListener = listener;
-    }
-
+    protected volatile boolean wantOnWritePossible = false;
 
     // --------------------------------------------------------- Public Methods
 
@@ -184,6 +174,84 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
         }
     }
 
+
+
+
+    @Override
+    public SocketState asyncDispatch(SocketStatus status) {
+        final NioEndpoint.KeyAttachment attach = (NioEndpoint.KeyAttachment)socket.getSocket().getAttachment(false);
+
+
+        if (status == SocketStatus.OPEN_WRITE) {
+            try {
+                asyncStateMachine.asyncOperation();
+                try {
+                    if (outputBuffer.hasDataToWrite()) {
+                        //System.out.println("Attempting data flush!!");
+                        outputBuffer.flushBuffer(false);
+                    }
+                }catch (IOException x) {
+                    if (log.isDebugEnabled()) log.debug("Unable to write async data.",x);
+                    //TODO FIXME-- fix - so we can notify of error
+                    return SocketState.CLOSED;
+                }
+                //return if we have more data to write
+                if (isRegisteredForWrite(attach)) {
+                    return SocketState.LONG;
+                }
+            }catch (IllegalStateException x) {
+            }
+        } else if (status == SocketStatus.OPEN_READ) {
+            try {
+                try {
+                    if (inputBuffer.nbRead()>0) {
+                        asyncStateMachine.asyncOperation();
+                    }
+                }catch (IOException x) {
+                    if (log.isDebugEnabled()) log.debug("Unable to read async data.",x);
+                  //TODO FIXME-- fix - so we can notify of error
+                    return SocketState.CLOSED;
+                }
+                //return if we have more data to write
+            }catch (IllegalStateException x) {
+            }
+        }
+
+        SocketState state = super.asyncDispatch(status);
+        //return if we have more data to write
+        if (isRegisteredForWrite(attach)) {
+            return SocketState.LONG;
+        } else {
+            return state;
+        }
+    }
+
+
+
+    @Override
+    public SocketState process(SocketWrapper<NioChannel> socketWrapper) throws IOException {
+        SocketState state = super.process(socketWrapper);
+        final NioEndpoint.KeyAttachment attach = (NioEndpoint.KeyAttachment)socket.getSocket().getAttachment(false);
+        //return if we have more data to write
+        if (isRegisteredForWrite(attach)) {
+            return SocketState.LONG;
+        } else {
+            return state;
+        }
+    }
+
+
+
+
+    protected boolean isRegisteredForWrite(KeyAttachment attach) {
+        //return if we have more data to write
+        if (outputBuffer.hasDataToWrite()) {
+            attach.interestOps(SelectionKey.OP_WRITE);
+            return true;
+        } else {
+            return false;
+        }
+    }
 
     @Override
     protected void resetTimeouts() {
@@ -305,11 +373,14 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
     }
 
 
+
+
     @Override
     public void recycleInternal() {
         socket = null;
         comet = false;
         sendfileData = null;
+        wantOnWritePossible = false;
     }
 
 
@@ -492,8 +563,7 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
             }
         } else if (actionCode == ActionCode.ASYNC_COMPLETE) {
             if (asyncStateMachine.asyncComplete()) {
-                ((NioEndpoint)endpoint).processSocket(this.socket.getSocket(),
-                        SocketStatus.OPEN_READ, true);
+                ((NioEndpoint)endpoint).dispatchForEvent(this.socket.getSocket(),SocketStatus.OPEN_READ, true);
             }
         } else if (actionCode == ActionCode.ASYNC_SETTIMEOUT) {
             if (param==null) {
@@ -508,14 +578,15 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
             attach.setTimeout(timeout);
         } else if (actionCode == ActionCode.ASYNC_DISPATCH) {
             if (asyncStateMachine.asyncDispatch()) {
-                ((NioEndpoint)endpoint).processSocket(this.socket.getSocket(),
-                        SocketStatus.OPEN_READ, true);
+                ((NioEndpoint)endpoint).dispatchForEvent(this.socket.getSocket(),SocketStatus.OPEN_READ, true);
             }
-        } else if (actionCode == ActionCode.ASYNC_DISPATCH_FOR_OPERATION) {
-            asyncStateMachine.asyncOperation();
         } else if (actionCode == ActionCode.SET_READ_LISTENER) {
             ReadListener listener = (ReadListener)param;
             request.setReadListener(listener);
+        } else if (actionCode == ActionCode.SET_WRITE_LISTENER) {
+            WriteListener listener = (WriteListener)param;
+            response.setWriteListener(listener);
+            outputBuffer.setBlocking(listener==null);
         } else if (actionCode == ActionCode.NB_READ_INTEREST) {
             if (socket==null || socket.getSocket().getAttachment(false)==null) {
                 return;
@@ -524,8 +595,27 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
             if (rp.getStage() == org.apache.coyote.Constants.STAGE_SERVICE) {
                 NioEndpoint.KeyAttachment attach = (NioEndpoint.KeyAttachment)socket.getSocket().getAttachment(false);
                 attach.interestOps(attach.interestOps() | SelectionKey.OP_READ);
+            } else {
+                throw new IllegalStateException("Calling isReady asynchronously is illegal.");
             }
-
+        } else if (actionCode == ActionCode.NB_WRITE_INTEREST) {
+            if (socket==null || socket.getSocket().getAttachment(false)==null) {
+                return;
+        }
+            AtomicBoolean canWrite = (AtomicBoolean)param;
+            RequestInfo rp = request.getRequestProcessor();
+            if (rp.getStage() == org.apache.coyote.Constants.STAGE_SERVICE) {
+                if (outputBuffer.isWritable()) {
+                    canWrite.set(true);
+                } else {
+                    canWrite.set(false);
+                    wantOnWritePossible = true;
+    }
+            } else {
+                throw new IllegalStateException("Calling canWrite asynchronously is illegal.");
+            }
+        } else if (actionCode == ActionCode.ASYNC_DISPATCH_FOR_OPERATION) {
+            asyncStateMachine.asyncOperation();
         }
     }
 

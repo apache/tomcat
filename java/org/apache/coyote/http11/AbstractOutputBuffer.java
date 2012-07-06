@@ -546,4 +546,9 @@ public abstract class AbstractOutputBuffer<S> implements OutputBuffer{
         }
     }
 
+    // --------------------------------------------------------- Public Methods
+
+
+    public abstract boolean supportsNonBlocking();
+
 }

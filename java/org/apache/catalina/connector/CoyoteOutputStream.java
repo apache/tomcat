@@ -109,23 +109,15 @@ public class CoyoteOutputStream
         ob.close();
     }
 
-    /**
-     * TODO SERVLET 3.1
-     */
     @Override
     public boolean canWrite() {
-        // TODO Auto-generated method stub
-        return false;
+        return ob.canWrite();
     }
 
 
-    /**
-     * TODO SERVLET 3.1
-     */
     @Override
     public void setWriteListener(WriteListener listener) {
-        // TODO Auto-generated method stub
-
+        ob.setWriteListener(listener);
     }
 
 

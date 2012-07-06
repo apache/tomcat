@@ -296,18 +296,15 @@ public class CoyoteAdapter implements Adapter {
             }
 
 
-            if (!request.isAsyncDispatching() && request.isAsync()) {
-                AtomicBoolean result = new AtomicBoolean(true);
-                req.action(ActionCode.ASYNC_DISPATCH_FOR_OPERATION, this);
-                if (result.get()) {
-                    if (status==SocketStatus.OPEN_WRITE) {
-                        //TODO Notify write listener
-                    } else if (status==SocketStatus.OPEN_READ) {
-                        //TODO Notify read listener
-                        asyncConImpl.canRead();
-                    }
-                    success = true;
+            if (!request.isAsyncDispatching() && request.isAsync() && request.isAsyncOperation()) {
+                if (status == SocketStatus.OPEN_WRITE) {
+                    // TODO Notify write listener
+                    success = asyncConImpl.canWrite();
+                } else if (status == SocketStatus.OPEN_READ) {
+                    // TODO Notify read listener
+                    success = asyncConImpl.canRead();
                 }
+
             }
 
             if (request.isAsyncDispatching()) {

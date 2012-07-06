@@ -21,6 +21,11 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.util.Locale;
 
+import javax.servlet.ReadListener;
+import javax.servlet.WriteListener;
+
+import org.apache.coyote.http11.AbstractInputBuffer;
+import org.apache.coyote.http11.AbstractOutputBuffer;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.http.MimeHeaders;
 import org.apache.tomcat.util.http.parser.AstMediaType;
@@ -540,5 +545,30 @@ public final class Response {
             action(ActionCode.CLIENT_FLUSH, this);
         }
         return outputBuffer.getBytesWritten();
+    }
+
+    protected volatile WriteListener listener;
+
+    public WriteListener getWriteListener() {
+        return listener;
+}
+
+    public void setWriteListener(WriteListener listener) {
+        //TODO SERVLET 3.1 is it allowed to switch from non block to blocking?
+        setBlocking(listener==null);
+        this.listener = listener;
+    }
+
+    protected volatile boolean blocking = true;
+
+    public boolean isBlocking() {
+        return blocking;
+    }
+
+    public void setBlocking(boolean blocking) throws IllegalStateException {
+        @SuppressWarnings("rawtypes")
+        AbstractOutputBuffer buf = (AbstractOutputBuffer)outputBuffer;
+        if (!blocking && !buf.supportsNonBlocking()) throw new IllegalStateException();
+        this.blocking = blocking;
     }
 }
