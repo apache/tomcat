@@ -716,7 +716,16 @@ public class NioEndpoint extends AbstractEndpoint {
         return true;
     }
 
-    public boolean processSocket(NioChannel socket, SocketStatus status, boolean dispatch) {
+    public boolean dispatchForEvent(NioChannel socket, SocketStatus status, boolean dispatch) {
+        if (!dispatch) {
+            processSocket(socket,status,dispatch);
+        } else {
+            socket.getPoller().add(socket, OP_CALLBACK);
+        }
+        return true;
+    }
+
+    protected boolean processSocket(NioChannel socket, SocketStatus status, boolean dispatch) {
         try {
             KeyAttachment attachment = (KeyAttachment)socket.getAttachment(false);
             if (attachment == null) {
@@ -900,7 +909,7 @@ public class NioEndpoint extends AbstractEndpoint {
                         final KeyAttachment att = (KeyAttachment) key.attachment();
                         if ( att!=null ) {
                             //handle callback flag
-                            if (att.getComet() && (interestOps & OP_CALLBACK) == OP_CALLBACK ) {
+                            if ((interestOps & OP_CALLBACK) == OP_CALLBACK ) {
                                 att.setCometNotify(true);
                             } else {
                                 att.setCometNotify(false);
@@ -910,7 +919,8 @@ public class NioEndpoint extends AbstractEndpoint {
                             //we are registering the key to start with, reset the fairness counter.
                             int ops = key.interestOps() | interestOps;
                             att.interestOps(ops);
-                            key.interestOps(ops);
+                            if (att.getCometNotify()) key.interestOps(0);
+                            else key.interestOps(ops);
                         } else {
                             cancel = true;
                         }
@@ -979,10 +989,6 @@ public class NioEndpoint extends AbstractEndpoint {
         public void cometInterest(NioChannel socket) {
             KeyAttachment att = (KeyAttachment)socket.getAttachment(false);
             add(socket,att.getCometOps());
-            if ( (att.getCometOps()&OP_CALLBACK) == OP_CALLBACK ) {
-                nextExpiration = 0; //force the check for faster callback
-                selector.wakeup();
-            }
         }
 
         /**
@@ -1001,6 +1007,9 @@ public class NioEndpoint extends AbstractEndpoint {
             PollerEvent r = eventCache.poll();
             if ( r==null) r = new PollerEvent(socket,null,interestOps);
             else r.reset(socket,null,interestOps);
+            if ( (interestOps&OP_CALLBACK) == OP_CALLBACK ) {
+                nextExpiration = 0; //force the check for faster callback
+            }
             addEvent(r);
             if (close) {
                 processSocket(socket, SocketStatus.STOP, false);
@@ -1256,7 +1265,7 @@ public class NioEndpoint extends AbstractEndpoint {
 
                                 boolean readAndWrite = sk.isReadable() && sk.isWritable();
                                 reg(sk, attachment, 0);
-                                if (readAndWrite) {
+                                if (attachment.isAsync() && readAndWrite) {
                                     //remember the that we want to know about write too
                                     attachment.interestOps(SelectionKey.OP_WRITE);
                                 }
@@ -1406,7 +1415,7 @@ public class NioEndpoint extends AbstractEndpoint {
             // - the selector simply timed out (suggests there isn't much load)
             // - the nextExpiration time has passed
             // - the server socket is being closed
-            if ((keyCount > 0 || hasEvents) && (now < nextExpiration) && !close) {
+            if (nextExpiration > 0 && (keyCount > 0 || hasEvents) && (now < nextExpiration) && !close) {
                 return;
             }
             //timeout
@@ -1421,10 +1430,11 @@ public class NioEndpoint extends AbstractEndpoint {
                         cancelledKey(key, SocketStatus.ERROR); //we don't support any keys without attachments
                     } else if ( ka.getError() ) {
                         cancelledKey(key, SocketStatus.ERROR);//TODO this is not yet being used
-                    } else if (ka.getComet() && ka.getCometNotify() ) {
+                    } else if (ka.getCometNotify() ) {
                         ka.setCometNotify(false);
-                        reg(key,ka,0);//avoid multiple calls, this gets reregistered after invocation
-                        //if (!processSocket(ka.getChannel(), SocketStatus.OPEN_CALLBACK)) processSocket(ka.getChannel(), SocketStatus.DISCONNECT);
+                        int ops = ka.interestOps() & ~OP_CALLBACK;;
+                        reg(key,ka,0);//avoid multiple calls, this gets re-registered after invocation
+                        ka.interestOps(ops);
                         if (!processSocket(ka.getChannel(), SocketStatus.OPEN_READ, true)) processSocket(ka.getChannel(), SocketStatus.DISCONNECT, true);
                     } else if ((ka.interestOps()&SelectionKey.OP_READ) == SelectionKey.OP_READ ||
                               (ka.interestOps()&SelectionKey.OP_WRITE) == SelectionKey.OP_WRITE) {

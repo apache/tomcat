@@ -149,6 +149,10 @@ public class AsyncStateMachine<S> {
         return state.isAsync();
     }
 
+    public boolean isAsyncOperation() {
+        return state == AsyncState.READ_WRITE_OP;
+    }
+
     public boolean isAsyncDispatching() {
         return state.isDispatching();
     }

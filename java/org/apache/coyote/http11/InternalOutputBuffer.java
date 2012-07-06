@@ -96,6 +96,11 @@ public class InternalOutputBuffer extends AbstractOutputBuffer<Socket>
     // --------------------------------------------------------- Public Methods
 
     @Override
+    public boolean supportsNonBlocking() {
+        return false;
+    }
+
+    @Override
     public void init(SocketWrapper<Socket> socketWrapper,
             AbstractEndpoint endpoint) throws IOException {
 

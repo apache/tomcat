@@ -183,6 +183,11 @@ public enum ActionCode {
     ASYNC_IS_ASYNC,
 
     /**
+     * Callback to determine if async read/write is in progress
+     */
+    ASYNC_IS_ASYNC_OPERATION,
+
+    /**
      * Callback to determine if async dispatch is in progress
      */
     ASYNC_IS_STARTED,

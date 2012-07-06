@@ -153,6 +153,10 @@ public class Response
         outputBuffer.setResponse(coyoteResponse);
     }
 
+    public org.apache.coyote.Response getCoyoteResponse() {
+        return this.coyoteResponse;
+    }
+
 
     /**
      * Return the Context within which this Request is being processed.

@@ -21,6 +21,12 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.concurrent.LinkedBlockingDeque;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.coyote.OutputBuffer;
 import org.apache.coyote.Response;
@@ -76,9 +82,80 @@ public class InternalNioOutputBuffer extends AbstractOutputBuffer<NioChannel> {
      */
     private NioSelectorPool pool;
 
+    /**
+     * Flag used only for Comet requests/responses
+     */
+    protected volatile boolean blocking = true;
+
+    /**
+     * Track if the byte buffer is flipped
+     */
+    protected volatile boolean flipped = false;
+
+    /**
+     * For "non-blocking" writes use an external buffer
+     */
+    protected volatile LinkedBlockingDeque<ByteBufferHolder> bufferedWrite = null;
+
+    /**
+     * The max size of the buffered write buffer
+     */
+    protected int bufferedWriteSize = 64*1024; //64k default write buffer
+
+    /**
+     * Number of bytes last written
+     */
+    protected AtomicInteger lastWrite = new AtomicInteger(1);
+
+    protected class ByteBufferHolder {
+        private ByteBuffer buf;
+        private AtomicBoolean flipped;
+        public ByteBufferHolder(ByteBuffer buf, boolean flipped) {
+           this.buf = buf;
+           this.flipped = new AtomicBoolean(flipped);
+        }
+        public ByteBuffer getBuf() {
+            return buf;
+        }
+        public boolean isFlipped() {
+            return flipped.get();
+        }
+
+        public boolean flip() {
+            if (flipped.compareAndSet(false, true)) {
+                buf.flip();
+                return true;
+            } else {
+                return false;
+            }
+        }
+
+        public boolean hasData() {
+            if (flipped.get()) {
+                return buf.remaining()>0;
+            } else {
+                return buf.position()>0;
+            }
+        }
+
+        @Override
+        public String toString() {
+            StringBuilder builder = new StringBuilder(super.toString());
+            builder.append("[flipped=");
+            builder.append(isFlipped()?"true, remaining=" : "false, position=");
+            builder.append(isFlipped()? buf.remaining(): buf.position());
+            builder.append("]");
+            return builder.toString();
+        }
+
+    }
 
     // --------------------------------------------------------- Public Methods
 
+    @Override
+    public boolean supportsNonBlocking() {
+        return true;
+    }
 
     /**
      * Flush the response.
@@ -91,7 +168,7 @@ public class InternalNioOutputBuffer extends AbstractOutputBuffer<NioChannel> {
 
         super.flush();
         // Flush the current buffer
-        flushBuffer();
+        flushBuffer(isBlocking());
 
     }
 
@@ -107,6 +184,9 @@ public class InternalNioOutputBuffer extends AbstractOutputBuffer<NioChannel> {
             socket.getBufHandler().getWriteBuffer().clear();
             socket = null;
         }
+        lastWrite.set(1);
+        setBlocking(true);
+        flipped = false;
     }
 
 
@@ -118,7 +198,7 @@ public class InternalNioOutputBuffer extends AbstractOutputBuffer<NioChannel> {
     @Override
     public void endRequest() throws IOException {
         super.endRequest();
-        flushBuffer();
+        flushBuffer(true);
     }
 
     // ------------------------------------------------ HTTP/1.1 Output Methods
@@ -146,8 +226,12 @@ public class InternalNioOutputBuffer extends AbstractOutputBuffer<NioChannel> {
      * @throws IOException
      * TODO Fix non blocking write properly
      */
+    int total = 0;
     private synchronized int writeToSocket(ByteBuffer bytebuffer, boolean block, boolean flip) throws IOException {
-        if ( flip ) bytebuffer.flip();
+        if ( flip ) {
+            bytebuffer.flip();
+            flipped = true;
+        }
 
         int written = 0;
         NioEndpoint.KeyAttachment att = (NioEndpoint.KeyAttachment)socket.getAttachment(false);
@@ -168,7 +252,14 @@ public class InternalNioOutputBuffer extends AbstractOutputBuffer<NioChannel> {
         }finally {
             if ( selector != null ) pool.put(selector);
         }
-        if ( block ) bytebuffer.clear(); //only clear
+        if ( block || bytebuffer.remaining()==0) {
+            //blocking writes must empty the buffer
+            //and if remaining==0 then we did empty it
+            bytebuffer.clear();
+            flipped = false;
+        }
+        total+= written;
+        //System.out.println("Successful write("+written+ " / "+total);
         return written;
     }
 
@@ -204,31 +295,48 @@ public class InternalNioOutputBuffer extends AbstractOutputBuffer<NioChannel> {
 
     }
 
+
     private synchronized void addToBB(byte[] buf, int offset, int length) throws IOException {
-        while (length > 0) {
-            int thisTime = length;
-            if (socket.getBufHandler().getWriteBuffer().position() ==
-                    socket.getBufHandler().getWriteBuffer().capacity()
-                    || socket.getBufHandler().getWriteBuffer().remaining()==0) {
-                flushBuffer();
-            }
-            if (thisTime > socket.getBufHandler().getWriteBuffer().remaining()) {
-                thisTime = socket.getBufHandler().getWriteBuffer().remaining();
-            }
-            socket.getBufHandler().getWriteBuffer().put(buf, offset, thisTime);
+        //try to write to socket first
+        if (length==0) return;
+
+        boolean dataLeft = flushBuffer(isBlocking());
+
+        while (!dataLeft && length>0) {
+            int thisTime = transfer(buf,offset,length,socket.getBufHandler().getWriteBuffer());
             length = length - thisTime;
             offset = offset + thisTime;
+            writeToSocket(socket.getBufHandler().getWriteBuffer(), isBlocking(), true);
+            dataLeft = flushBuffer(isBlocking());
         }
+
         NioEndpoint.KeyAttachment ka = (NioEndpoint.KeyAttachment)socket.getAttachment(false);
         if ( ka!= null ) ka.access();//prevent timeouts for just doing client writes
+
+        if (!isBlocking() && length>0) {
+            //we must buffer as long as it fits
+            //ByteBufferHolder tail = bufferedWrite.
+            addToBuffers(buf, offset, length);
+    }
+    }
+
+    private void addToBuffers(byte[] buf, int offset, int length) {
+        ByteBufferHolder holder = bufferedWrite.peekLast();
+        if (holder==null || holder.isFlipped() || holder.getBuf().remaining()<length) {
+            ByteBuffer buffer = ByteBuffer.allocate(Math.max(bufferedWriteSize,length));
+            holder = new ByteBufferHolder(buffer,false);
+            bufferedWrite.add(holder);
+        }
+        holder.getBuf().put(buf,offset,length);
     }
 
 
     /**
      * Callback to write data from the buffer.
      */
-    private void flushBuffer() throws IOException {
+    protected boolean flushBuffer(boolean block) throws IOException {
 
+        int result = 0;
         //prevent timeout for async,
         SelectionKey key = socket.getIOChannel().keyFor(socket.getPoller().getSelector());
         if (key != null) {
@@ -236,16 +344,61 @@ public class InternalNioOutputBuffer extends AbstractOutputBuffer<NioChannel> {
             attach.access();
         }
 
+        boolean dataLeft = hasMoreDataToFlush();
+
         //write to the socket, if there is anything to write
-        if (socket.getBufHandler().getWriteBuffer().position() > 0) {
-            socket.getBufHandler().getWriteBuffer().flip();
-            writeToSocket(socket.getBufHandler().getWriteBuffer(),true, false);
+        if ( dataLeft ) {
+            result = writeToSocket(socket.getBufHandler().getWriteBuffer(),block, !flipped);
         }
+
+        dataLeft = hasMoreDataToFlush();
+
+        if (!dataLeft && bufferedWrite!=null) {
+            Iterator<ByteBufferHolder> bufIter = bufferedWrite.iterator();
+            while (!hasMoreDataToFlush() && bufIter.hasNext()) {
+                ByteBufferHolder buffer = bufIter.next();
+                buffer.flip();
+                while (!hasMoreDataToFlush() && buffer.getBuf().remaining()>0) {
+                    transfer(buffer.getBuf(), socket.getBufHandler().getWriteBuffer());
+                    if (buffer.getBuf().remaining() == 0) {
+                        bufIter.remove();
+    }
+                    result = writeToSocket(socket.getBufHandler().getWriteBuffer(),block, true);
+                    //here we must break if we didn't finish the write
+
+                }
+            }
+        }
+
+        dataLeft = hasMoreDataToFlush();
+
+        return dataLeft;
+    }
+
+    private boolean hasMoreDataToFlush() {
+        return (flipped && socket.getBufHandler().getWriteBuffer().remaining()>0) ||
+        (!flipped && socket.getBufHandler().getWriteBuffer().position() > 0);
+    }
+
+    private int transfer(byte[] from, int offset, int length, ByteBuffer to) {
+        int max = Math.min(length, to.remaining());
+        ByteBuffer tmp = ByteBuffer.wrap(from, offset, max);
+        tmp.limit (tmp.position() + max);
+        to.put (tmp);
+        return max;
+    }
+
+    private int transfer(ByteBuffer from, ByteBuffer to) {
+        int max = Math.min(from.remaining(), to.remaining());
+        ByteBuffer tmp = from.duplicate ();
+        tmp.limit (tmp.position() + max);
+        to.put (tmp);
+        from.position(from.position() + max);
+        return max;
     }
 
 
     // ----------------------------------- OutputStreamOutputBuffer Inner Class
-
 
     /**
      * This class is an output buffer which will write data to an output
@@ -274,5 +427,45 @@ public class InternalNioOutputBuffer extends AbstractOutputBuffer<NioChannel> {
         public long getBytesWritten() {
             return byteCount;
         }
+    }
+
+    //----------------------------------------non blocking writes -----------------
+    public void setBlocking(boolean blocking) {
+        this.blocking = blocking;
+        if (blocking)
+            bufferedWrite = null;
+        else
+            bufferedWrite = new LinkedBlockingDeque<ByteBufferHolder>();
+}
+
+    public void setBufferedWriteSize(int bufferedWriteSize) {
+        this.bufferedWriteSize = bufferedWriteSize;
+    }
+
+    public boolean isBlocking() {
+        return blocking;
+    }
+
+    private boolean hasBufferedData() {
+        boolean result = false;
+        if (bufferedWrite!=null) {
+            Iterator<ByteBufferHolder> iter = bufferedWrite.iterator();
+            while (!result && iter.hasNext()) {
+                result = iter.next().hasData();
+            }
+        }
+        return result;
+    }
+
+    public boolean hasDataToWrite() {
+        return hasMoreDataToFlush() || hasBufferedData();
+    }
+
+    public int getBufferedWriteSize() {
+        return bufferedWriteSize;
+    }
+
+    public boolean isWritable() {
+        return !hasDataToWrite();
     }
 }
