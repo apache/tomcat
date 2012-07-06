@@ -551,7 +551,7 @@ public class Connector extends LifecycleMBeanBase  {
      */
     public String getProtocol() {
 
-        if ("org.apache.coyote.http11.Http11Protocol".equals
+        if ("org.apache.coyote.http11.Http11NioProtocol".equals
             (getProtocolHandlerClassName())
             || "org.apache.coyote.http11.Http11AprProtocol".equals
             (getProtocolHandlerClassName())) {
@@ -590,7 +590,7 @@ public class Connector extends LifecycleMBeanBase  {
         } else {
             if ("HTTP/1.1".equals(protocol)) {
                 setProtocolHandlerClassName
-                    ("org.apache.coyote.http11.Http11Protocol");
+                    ("org.apache.coyote.http11.Http11NioProtocol");
             } else if ("AJP/1.3".equals(protocol)) {
                 setProtocolHandlerClassName
                     ("org.apache.coyote.ajp.AjpProtocol");

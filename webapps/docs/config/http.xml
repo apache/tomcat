@@ -157,7 +157,7 @@
     <attribute name="protocol" required="false">
       <p>Sets the protocol to handle incoming traffic. The default value is
         <code>HTTP/1.1</code> which uses an auto-switching mechanism to select
-        either a blocking Java based connector or an APR/native based connector.
+        either a non blocking Java based connector or an APR/native based connector.
         If the <code>PATH</code> (Windows) or <code>LD_LIBRARY_PATH</code> (on
         most unix systems) environment variables contain the Tomcat native
         library, the APR/native connector will be used. If the native library
