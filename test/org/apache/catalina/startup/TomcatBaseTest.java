@@ -290,7 +290,7 @@ public abstract class TomcatBaseTest extends LoggingBaseTest {
     public static int postUrl(final byte[] body, String path, ByteChunk out,
             Map<String, List<String>> reqHead,
             Map<String, List<String>> resHead) throws IOException {
-        BytesStreamer s = new BytesStreamer() {
+            BytesStreamer s = new BytesStreamer() {
             boolean done = false;
             @Override
             public byte[] next() {
