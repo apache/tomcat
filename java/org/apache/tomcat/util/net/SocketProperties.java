@@ -139,16 +139,6 @@ public class SocketProperties {
     protected Integer soTimeout = new Integer(20000);
 
     /**
-     * Traffic class option, value between 0 and 255
-     * IPTOS_LOWCOST (0x02)
-     * IPTOS_RELIABILITY (0x04)
-     * IPTOS_THROUGHPUT (0x08)
-     * IPTOS_LOWDELAY (0x10)
-     * JVM default used if not set
-     */
-    protected Integer soTrafficClass = null;
-
-    /**
      * Performance preferences according to
      * http://docs.oracle.com/javase/1.5.0/docs/api/java/net/Socket.html#setPerformancePreferences(int,%20int,%20int)
      * All three performance attributes must be set or the JVM defaults will be
@@ -207,8 +197,6 @@ public class SocketProperties {
             socket.setSoTimeout(soTimeout.intValue());
         if (tcpNoDelay != null)
             socket.setTcpNoDelay(tcpNoDelay.booleanValue());
-        if (soTrafficClass != null)
-            socket.setTrafficClass(soTrafficClass.intValue());
     }
 
     public void setProperties(ServerSocket socket) throws SocketException{
@@ -271,10 +259,6 @@ public class SocketProperties {
         return soTimeout.intValue();
     }
 
-    public int getSoTrafficClass() {
-        return soTrafficClass.intValue();
-    }
-
     public boolean getTcpNoDelay() {
         return tcpNoDelay.booleanValue();
     }
@@ -330,10 +314,6 @@ public class SocketProperties {
 
     public void setTcpNoDelay(boolean tcpNoDelay) {
         this.tcpNoDelay = Boolean.valueOf(tcpNoDelay);
-    }
-
-    public void setSoTrafficClass(int soTrafficClass) {
-        this.soTrafficClass = Integer.valueOf(soTrafficClass);
     }
 
     public void setSoTimeout(int soTimeout) {
