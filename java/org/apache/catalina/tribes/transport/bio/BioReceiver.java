@@ -143,7 +143,6 @@ public class BioReceiver extends ReceiverBase implements Runnable {
             socket.setOOBInline(getOoBInline());
             socket.setReuseAddress(getSoReuseAddress());
             socket.setSoLinger(getSoLingerOn(),getSoLingerTime());
-            socket.setTrafficClass(getSoTrafficClass());
             socket.setSoTimeout(getTimeout());
             ObjectReader reader = new ObjectReader(socket);
             task.serviceSocket(socket,reader);
