@@ -85,13 +85,13 @@
   <subsection name="Coyote">
     <changelog>
       <scode>
-        The default connector is now the Java NIO connector 
-        even when specifying HTTP/1.1 as protocol (fhanik)
+        The default connector is now the Java NIO connector even when specifying
+        HTTP/1.1 as protocol (fhanik)
       </scode>
       <scode>
-        Update default value of pollerThreadCount for the NIO connector.
-        The new default value will never go above 2 regardless of
-        available processors. (fhanik)
+        Update default value of pollerThreadCount for the NIO connector. The new
+        default value will never go above 2 regardless of available processors.
+        (fhanik)
       </scode>
     </changelog>
   </subsection>
