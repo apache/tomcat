@@ -21,10 +21,8 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.util.Locale;
 
-import javax.servlet.ReadListener;
 import javax.servlet.WriteListener;
 
-import org.apache.coyote.http11.AbstractInputBuffer;
 import org.apache.coyote.http11.AbstractOutputBuffer;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.http.MimeHeaders;
