@@ -558,14 +558,6 @@
         <p>This is equivalent to standard attribute
         <strong>connectionTimeout</strong>.</p>
       </attribute>
-      <attribute name="socket.soTrafficClass" required="false">
-        <p>(byte)Value between <code>0</code> and <code>255</code> for the
-        traffic class on the socket. JVM default used if not set.</p>
-        <p><strong>Note:</strong> On some JDK versions, setting
-        <strong>soTrafficClass</strong> causes a problem. A work around for this
-        is to add the <code>-Djava.net.preferIPv4Stack=true</code> value to your
-        JVM options.</p>
-      </attribute>
       <attribute name="socket.performanceConnectionTime" required="false">
         <p>(int)The first value for the performance settings. See
         <a href="http://docs.oracle.com/javase/6/docs/api/java/net/Socket.html#setPerformancePreferences(int,%20int,%20int)">Socket Performance Options</a>
