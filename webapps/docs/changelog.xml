@@ -73,8 +73,9 @@
       <fix>
         Fix an issue when running under Java 7 which throws exceptions when
         trying to set an invalid option whereas Java 6 silently swallowed them.
-        The option using the problem was <code>soTrafficClass</code>. Note that
-        <code>soTrafficClass</code> is ignored for the NioReceiver. (markt)
+        The option using the problem was <code>soTrafficClass</code>.
+        Investigations showed that this option had no effect for Cluster Channel
+        Receivers it was removed. (markt)
       </fix>
     </changelog>
   </subsection>
