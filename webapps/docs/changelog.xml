@@ -68,6 +68,15 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Coyote">
+    <changelog>
+      <fix>
+        Remove the <code>socket.soTrafficClass</code> from the BIO and NIO
+        HTTP and AJP connectors because any use of the option is either ignored
+        or in some cases (Java 7 with NIO) throws an Exception. (mark)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Cluster">
     <changelog>
       <fix>
