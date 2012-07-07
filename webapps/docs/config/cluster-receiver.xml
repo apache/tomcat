@@ -145,7 +145,8 @@
     <attribute name="soTrafficClass" required="false">
      Sets the traffic class level for the socket, the value is between 0 and 255.
      Different values are defined in <a href="http://docs.oracle.com/javase/6/docs/api/java/net/Socket.html#setTrafficClass(int)">
-     java.net.Socket#setTrafficClass(int)</a>.
+     java.net.Socket#setTrafficClass(int)</a>. Note that this option is ignored
+     for the NioReceiver implementation.
     </attribute>
     <attribute name="tcpNoDelay" required="false">
      Boolean value for the socket TCP_NODELAY option. Possible values are <code>true</code> or <code>false</code>.
