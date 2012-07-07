@@ -20,7 +20,6 @@ package org.apache.catalina.tribes.transport.nio;
 import java.io.EOFException;
 import java.io.IOException;
 import java.net.InetSocketAddress;
-import java.net.SocketException;
 import java.nio.ByteBuffer;
 import java.nio.channels.DatagramChannel;
 import java.nio.channels.SelectionKey;
@@ -132,13 +131,9 @@ public class NioSender extends AbstractSender {
         return false;
     }
 
-    private void completeConnect() throws SocketException {
-        //we connected, register ourselves for writing
-        setConnected(true);
-        connecting = false;
-        setRequestCount(0);
-        setConnectTime(System.currentTimeMillis());
+    private void configureSocket() throws IOException {
         if (socketChannel!=null) {
+            socketChannel.configureBlocking(false);
             socketChannel.socket().setSendBufferSize(getTxBufSize());
             socketChannel.socket().setReceiveBufferSize(getRxBufSize());
             socketChannel.socket().setSoTimeout((int)getTimeout());
@@ -150,12 +145,21 @@ public class NioSender extends AbstractSender {
             socketChannel.socket().setSoLinger(getSoLingerOn(),getSoLingerTime());
             socketChannel.socket().setTrafficClass(getSoTrafficClass());
         } else if (dataChannel!=null) {
+            dataChannel.configureBlocking(false);
             dataChannel.socket().setSendBufferSize(getUdpTxBufSize());
             dataChannel.socket().setReceiveBufferSize(getUdpRxBufSize());
             dataChannel.socket().setSoTimeout((int)getTimeout());
             dataChannel.socket().setReuseAddress(getSoReuseAddress());
             dataChannel.socket().setTrafficClass(getSoTrafficClass());
         }
+    }
+
+    private void completeConnect() {
+        //we connected, register ourselves for writing
+        setConnected(true);
+        connecting = false;
+        setRequestCount(0);
+        setConnectTime(System.currentTimeMillis());
     }
 
 
@@ -232,7 +236,7 @@ public class NioSender extends AbstractSender {
             InetSocketAddress daddr = new InetSocketAddress(getAddress(),getUdpPort());
             if ( dataChannel != null ) throw new IOException("Datagram channel has already been established. Connection might be in progress.");
             dataChannel = DatagramChannel.open();
-            dataChannel.configureBlocking(false);
+            configureSocket();
             dataChannel.connect(daddr);
             completeConnect();
             dataChannel.register(getSelector(),SelectionKey.OP_WRITE, this);
@@ -241,7 +245,7 @@ public class NioSender extends AbstractSender {
             InetSocketAddress addr = new InetSocketAddress(getAddress(),getPort());
             if ( socketChannel != null ) throw new IOException("Socket channel has already been established. Connection might be in progress.");
             socketChannel = SocketChannel.open();
-            socketChannel.configureBlocking(false);
+            configureSocket();
             if ( socketChannel.connect(addr) ) {
                 completeConnect();
                 socketChannel.register(getSelector(), SelectionKey.OP_WRITE, this);

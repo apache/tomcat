@@ -130,13 +130,19 @@ public class NioReceiver extends ReceiverBase implements Runnable {
         //set up the datagram channel
         if (this.getUdpPort()>0) {
             datagramChannel = DatagramChannel.open();
-            datagramChannel.configureBlocking(false);
+            configureDatagraChannel();
             //bind to the address to avoid security checks
             bindUdp(datagramChannel.socket(),getUdpPort(),getAutoBind());
         }
+    }
 
-
-
+    private void configureDatagraChannel() throws IOException {
+        datagramChannel.configureBlocking(false);
+        datagramChannel.socket().setSendBufferSize(getUdpTxBufSize());
+        datagramChannel.socket().setReceiveBufferSize(getUdpRxBufSize());
+        datagramChannel.socket().setReuseAddress(getSoReuseAddress());
+        datagramChannel.socket().setSoTimeout(getTimeout());
+        datagramChannel.socket().setTrafficClass(getSoTrafficClass());
     }
 
     public void addEvent(Runnable event) {
@@ -242,11 +248,6 @@ public class NioReceiver extends ReceiverBase implements Runnable {
 
         if (selector!=null && datagramChannel!=null) {
             ObjectReader oreader = new ObjectReader(MAX_UDP_SIZE); //max size for a datagram packet
-            datagramChannel.socket().setSendBufferSize(getUdpTxBufSize());
-            datagramChannel.socket().setReceiveBufferSize(getUdpRxBufSize());
-            datagramChannel.socket().setReuseAddress(getSoReuseAddress());
-            datagramChannel.socket().setSoTimeout(getTimeout());
-            datagramChannel.socket().setTrafficClass(getSoTrafficClass());
             registerChannel(selector,datagramChannel,SelectionKey.OP_READ,oreader);
         }
 
@@ -279,14 +280,13 @@ public class NioReceiver extends ReceiverBase implements Runnable {
                     if (key.isAcceptable()) {
                         ServerSocketChannel server = (ServerSocketChannel) key.channel();
                         SocketChannel channel = server.accept();
-                        channel.socket().setReceiveBufferSize(getRxBufSize());
+                        channel.socket().setReceiveBufferSize(getTxBufSize());
                         channel.socket().setSendBufferSize(getTxBufSize());
                         channel.socket().setTcpNoDelay(getTcpNoDelay());
                         channel.socket().setKeepAlive(getSoKeepAlive());
                         channel.socket().setOOBInline(getOoBInline());
                         channel.socket().setReuseAddress(getSoReuseAddress());
                         channel.socket().setSoLinger(getSoLingerOn(),getSoLingerTime());
-                        channel.socket().setTrafficClass(getSoTrafficClass());
                         channel.socket().setSoTimeout(getTimeout());
                         Object attach = new ObjectReader(channel);
                         registerChannel(selector,
