@@ -1167,6 +1167,10 @@ public class AprEndpoint extends AbstractEndpoint {
          *                  socket. Use -1 for infinite timeout
          */
         public void add(long socket, int timeout) {
+            if (!running) {
+                processSocket(socket, SocketStatus.STOP);
+                return;
+            }
             synchronized (this) {
                 // Add socket to the list. Newly added sockets will wait
                 // at most for pollTime before being polled
