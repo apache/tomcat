@@ -75,6 +75,10 @@
         HTTP and AJP connectors because any use of the option is either ignored
         or in some cases (Java 7 with NIO) throws an Exception. (mark)
       </fix>
+      <fix>
+        Prevent possible NPE when processing Comet requests during Connector
+        shutdown. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">
