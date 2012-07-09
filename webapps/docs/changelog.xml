@@ -66,6 +66,11 @@
         <bug>53498</bug>: Fix atomicity bugs in use of concurrent collections.
         Based on a patch by Yu Lin. (markt)
       </fix>
+      <fix>
+        Correct a regression in the previous fix for <bug>53062</bug> that did
+        not always correctly normalize redirect URLs when the redirect URL
+        included a query string component. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

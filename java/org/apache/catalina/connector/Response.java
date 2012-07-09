@@ -1752,6 +1752,18 @@ public class Response
      * Code borrowed heavily from CoyoteAdapter.normalize()
      */
     private void normalize(CharChunk cc) {
+        // Strip query string first (doing it this way makes the logic a lot
+        // simpler)
+        int query = cc.indexOf('?');
+        char[] queryCC = null;
+        if (query > -1) {
+            queryCC = new char[cc.getEnd() - query];
+            for (int i = query; i < cc.getEnd(); i++) {
+                queryCC[i - query] = cc.charAt(i);
+            }
+            cc.setEnd(query);
+        }
+
         if (cc.endsWith("/.") || cc.endsWith("/..")) {
             try {
                 cc.append('/');
@@ -1809,6 +1821,15 @@ public class Response
             end = end + index2 - index - 3;
             cc.setEnd(end);
             index = index2;
+        }
+
+        // Add the query string (if present) back in
+        if (queryCC != null) {
+            try {
+                cc.append(queryCC, 0, queryCC.length);
+            } catch (IOException ioe) {
+                throw new IllegalArgumentException(ioe);
+            }
         }
     }
 
