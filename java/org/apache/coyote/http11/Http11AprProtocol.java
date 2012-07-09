@@ -280,10 +280,13 @@ public class Http11AprProtocol extends AbstractHttp11Protocol {
             if (processor.isAsync()) {
                 // Async
                 socket.setAsync(true);
-            } else if (processor.isComet() && proto.endpoint.isRunning()) {
-                ((AprEndpoint) proto.endpoint).getCometPoller().add(
-                        socket.getSocket().longValue(),
-                        proto.endpoint.getSoTimeout());
+            } else if (processor.isComet()) {
+                // Comet
+                if (proto.endpoint.isRunning()) {
+                    ((AprEndpoint) proto.endpoint).getCometPoller().add(
+                            socket.getSocket().longValue(),
+                            proto.endpoint.getSoTimeout());
+                }
             } else {
                 // Upgraded
                 ((AprEndpoint) proto.endpoint).getPoller().add(
