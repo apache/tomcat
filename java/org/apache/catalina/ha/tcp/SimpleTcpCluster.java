@@ -45,6 +45,7 @@ import org.apache.catalina.ha.session.ClusterSessionListener;
 import org.apache.catalina.ha.session.DeltaManager;
 import org.apache.catalina.ha.session.JvmRouteBinderValve;
 import org.apache.catalina.ha.session.JvmRouteSessionIDBinderListener;
+import org.apache.catalina.ha.session.SessionMessage;
 import org.apache.catalina.ha.util.IDynamicProperty;
 import org.apache.catalina.tribes.Channel;
 import org.apache.catalina.tribes.ChannelListener;
@@ -784,15 +785,20 @@ public class SimpleTcpCluster extends LifecycleBase
     public void send(ClusterMessage msg, Member dest) {
         try {
             msg.setAddress(getLocalMember());
+            int sendOptions = channelSendOptions;
+            if (msg instanceof SessionMessage
+                    && ((SessionMessage)msg).getEventType() == SessionMessage.EVT_ALL_SESSION_DATA) {
+                sendOptions = Channel.SEND_OPTIONS_SYNCHRONIZED_ACK|Channel.SEND_OPTIONS_USE_ACK;
+            }
             if (dest != null) {
                 if (!getLocalMember().equals(dest)) {
-                    channel.send(new Member[] {dest}, msg,channelSendOptions);
+                    channel.send(new Member[] {dest}, msg, sendOptions);
                 } else
                     log.error("Unable to send message to local member " + msg);
             } else {
                 Member[] destmembers = channel.getMembers();
                 if (destmembers.length>0)
-                    channel.send(destmembers,msg,channelSendOptions);
+                    channel.send(destmembers,msg, sendOptions);
                 else if (log.isDebugEnabled())
                     log.debug("No members in cluster, ignoring message:"+msg);
             }
