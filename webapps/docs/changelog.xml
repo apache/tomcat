@@ -86,6 +86,10 @@
         Investigations showed that this option had no effect for Cluster Channel
         Receivers it was removed. (markt)
       </fix>
+      <fix>
+        <bug>53513</bug>: Fix race condition between the processing of session
+        sync message and transfer complete message. (kfujino)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
