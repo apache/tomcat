@@ -834,7 +834,7 @@ public class ConnectionPool {
      */
     protected boolean terminateTransaction(PooledConnection con) {
         try {
-            if (con.getPoolProperties().getDefaultAutoCommit()==Boolean.FALSE) {
+            if (Boolean.FALSE.equals(con.getPoolProperties().getDefaultAutoCommit())) {
                 if (this.getPoolProperties().getRollbackOnReturn()) {
                     boolean autocommit = con.getConnection().getAutoCommit();
                     if (!autocommit) con.getConnection().rollback();
