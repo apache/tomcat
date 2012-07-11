@@ -69,7 +69,7 @@
       <fix>
         Correct a regression in the previous fix for <bug>53062</bug> that did
         not always correctly normalize redirect URLs when the redirect URL
-        included a query string component. (markt)
+        included a query string or fragment component. (markt)
       </fix>
     </changelog>
   </subsection>
