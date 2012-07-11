@@ -107,6 +107,11 @@
         Update JSTL version information in the JNDI section of the documentation
         web application. (markt)
       </fix>
+      <fix>
+        <bug>53524</bug>: Correct a typo in the cluster how-to section of the
+        documentation web application. Also fix a handful of spelling errors.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
