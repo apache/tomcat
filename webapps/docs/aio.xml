@@ -345,7 +345,7 @@ public class ChatServlet
   </ul>
   <p>
     In addition to setting these parameters it is necessary to set the content-length header.
-    Tomcat will not do that for you, since you may have already written data to the 
+    Tomcat will not do that for you, since you may have already written data to the output stream.
   </p>
 
   </section>
