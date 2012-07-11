@@ -25,7 +25,6 @@ import java.io.IOException;
  * @author Glenn L. Nielsen
  * @version $Id$
  */
-
 public final class ClientAbortException extends IOException {
 
     private static final long serialVersionUID = 1L;
@@ -37,9 +36,7 @@ public final class ClientAbortException extends IOException {
      * Construct a new ClientAbortException with no other information.
      */
     public ClientAbortException() {
-
-        this(null, null);
-
+        super();
     }
 
 
@@ -49,9 +46,7 @@ public final class ClientAbortException extends IOException {
      * @param message Message describing this exception
      */
     public ClientAbortException(String message) {
-
-        this(message, null);
-
+        super(message);
     }
 
 
@@ -61,9 +56,7 @@ public final class ClientAbortException extends IOException {
      * @param throwable Throwable that caused this exception
      */
     public ClientAbortException(Throwable throwable) {
-
-        this(null, throwable);
-
+        super(throwable);
     }
 
 
@@ -75,73 +68,6 @@ public final class ClientAbortException extends IOException {
      * @param throwable Throwable that caused this exception
      */
     public ClientAbortException(String message, Throwable throwable) {
-
-        super();
-        this.message = message;
-        this.throwable = throwable;
-
+        super(message, throwable);
     }
-
-
-    //------------------------------------------------------ Instance Variables
-
-
-    /**
-     * The error message passed to our constructor (if any)
-     */
-    protected String message = null;
-
-
-    /**
-     * The underlying exception or error passed to our constructor (if any)
-     */
-    protected Throwable throwable = null;
-
-
-    //---------------------------------------------------------- Public Methods
-
-
-    /**
-     * Returns the message associated with this exception, if any.
-     */
-    @Override
-    public String getMessage() {
-
-        return (message);
-
-    }
-
-
-    /**
-     * Returns the cause that caused this exception, if any.
-     */
-    @Override
-    public Throwable getCause() {
-
-        return (throwable);
-
-    }
-
-
-    /**
-     * Return a formatted string that describes this exception.
-     */
-    @Override
-    public String toString() {
-
-        StringBuilder sb = new StringBuilder("ClientAbortException:  ");
-        if (message != null) {
-            sb.append(message);
-            if (throwable != null) {
-                sb.append(":  ");
-            }
-        }
-        if (throwable != null) {
-            sb.append(throwable.toString());
-        }
-        return (sb.toString());
-
-    }
-
-
 }
