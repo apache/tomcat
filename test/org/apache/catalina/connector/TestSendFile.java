@@ -48,38 +48,45 @@ public class TestSendFile extends TomcatBaseTest{
 
     @Test
     public void testSendFile() throws Exception {
+
         Tomcat tomcat = getTomcatInstance();
 
         Context root = tomcat.addContext("", TEMP_DIR);
 
         File[] files = new File[ITERATIONS];
         for (int i=0; i<ITERATIONS; i++) {
-            files[i] = generateFile(TEMP_DIR, EXPECTED_CONTENT_LENGTH * (i+1));
+            files[i] = generateFile(TEMP_DIR, "-"+i, EXPECTED_CONTENT_LENGTH * (i+1));
         }
+        try {
 
-        for (int i=0; i<ITERATIONS; i++) {
-            WritingServlet servlet = new WritingServlet(files[i]);
-            Tomcat.addServlet(root, "servlet" + i, servlet);
-            root.addServletMapping("/servlet" + i, "servlet" + i);
-        }
+            for (int i=0; i<ITERATIONS; i++) {
+                WritingServlet servlet = new WritingServlet(files[i]);
+                Tomcat.addServlet(root, "servlet" + i, servlet);
+                root.addServletMapping("/servlet" + i, "servlet" + i);
+            }
 
-        tomcat.start();
+            tomcat.start();
 
-        ByteChunk bc = new ByteChunk();
-        Map<String, List<String>> respHeaders = new HashMap<String, List<String>>();
-        for (int i=0; i<ITERATIONS; i++) {
-            long start = System.currentTimeMillis();
-            int rc = getUrl("http://localhost:" + getPort() + "/servlet" + i, bc, null, respHeaders);
-            assertEquals(HttpServletResponse.SC_OK, rc);
-            System.out.println("Client received "+bc.getLength() + " bytes in "+(System.currentTimeMillis()-start)+" ms.");
-            assertEquals(EXPECTED_CONTENT_LENGTH * (i+1), bc.getLength());
+            ByteChunk bc = new ByteChunk();
+            Map<String, List<String>> respHeaders = new HashMap<String, List<String>>();
+            for (int i=0; i<ITERATIONS; i++) {
+                long start = System.currentTimeMillis();
+                int rc = getUrl("http://localhost:" + getPort() + "/servlet" + i, bc, null, respHeaders);
+                assertEquals(HttpServletResponse.SC_OK, rc);
+                System.out.println("Client received "+bc.getLength() + " bytes in "+(System.currentTimeMillis()-start)+" ms.");
+                assertEquals(EXPECTED_CONTENT_LENGTH * (i+1), bc.getLength());
 
-            bc.recycle();
+                bc.recycle();
+            }
+        } finally {
+            for (File f : files) {
+                f.delete();
+            }
         }
     }
 
-    public File generateFile(String dir, int size) throws IOException {
-        String name = "testSendFile-"+System.currentTimeMillis()+".txt";
+    public File generateFile(String dir, String suffix, int size) throws IOException {
+        String name = "testSendFile-"+System.currentTimeMillis()+suffix+".txt";
         File f = new File(dir,name);
         FileWriter fw = new FileWriter(f, false);
         BufferedWriter w = new BufferedWriter(fw);
@@ -93,6 +100,7 @@ public class TestSendFile extends TomcatBaseTest{
         }
         w.flush();
         w.close();
+        System.out.println("Created file:"+f.getAbsolutePath()+" with "+f.length()+" bytes.");
         return f;
 
     }
