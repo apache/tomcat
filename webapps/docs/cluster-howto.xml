@@ -337,7 +337,7 @@ should be completed:</p>
         <code>StaticMembershipInterceptor</code> if you want to extend your membership to points beyond multicasting.
         The address attribute is the multicast address used and the port is the multicast port. These two together
         create the cluster separation. If you want a QA cluster and a production cluster, the easiest config is to
-        have the QA cluster be on a separate multicast address/port combination the the production cluster.<br/>
+        have the QA cluster be on a separate multicast address/port combination than the production cluster.<br/>
         The membership component broadcasts TCP adress/port of itselt to the other nodes so that communication between
         nodes can be done over TCP. Please note that the address being broadcasted is the one of the
         <code>Receiver.address</code> attribute.
