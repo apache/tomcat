@@ -74,9 +74,9 @@
   <!-- build output directory for jdbc-pool -->
   <property name="tomcat.pool"           value="${tomcat.output}/jdbc-pool"/>
 
-  <!-- Servlet 3.0 spec requires 1.6+ -->
-  <property name="compile.source" value="1.6"/>
-  <property name="compile.target" value="1.6"/>
+  <!-- Servlet 3.1 spec requires 1.7+ - these get overriden by build.properties(.default)-->
+  <property name="compile.source" value="1.7"/>
+  <property name="compile.target" value="1.7"/>
 
   <!-- Locations to create the JAR artifacts -->
   <!-- Standard JARs -->
@@ -1197,6 +1197,8 @@
         <jvmarg value="${test.jvmarg.egd}"/>
         <jvmarg value="-Djava.library.path=${test.apr.loc}"/>
         <jvmarg value="${test.formatter}"/>
+        <jvmarg value="-Djava.net.preferIPv4Stack=${java.net.preferIPv4Stack}"/>
+        <jvmarg value="-Dorg.apache.tomcat.util.net.NioSelectorShared=${org.apache.tomcat.util.net.NioSelectorShared}"/>
 
         <classpath refid="tomcat.test.classpath" />
 
