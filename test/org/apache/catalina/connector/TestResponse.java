@@ -271,8 +271,7 @@ public class TestResponse extends TomcatBaseTest {
         String result = resp.toAbsolute("./.?x=/../../");
 
         Assert.assertEquals(
-                "http://localhost:8080/level1/level2/?x=/../../",
-                result);
+                "http://localhost:8080/level1/level2/?x=/../../", result);
     }
 
 
@@ -284,9 +283,7 @@ public class TestResponse extends TomcatBaseTest {
 
         String result = resp.toAbsolute("./..?x=/../../");
 
-        Assert.assertEquals(
-                "http://localhost:8080/level1/?x=/../../",
-                result);
+        Assert.assertEquals("http://localhost:8080/level1/?x=/../../", result);
     }
 
 
@@ -301,6 +298,69 @@ public class TestResponse extends TomcatBaseTest {
         Assert.assertEquals(
                 "http://localhost:8080/level1/?x=/../..",
                 result);
+    }
+
+
+    @Test
+    public void testBug53062l() throws Exception {
+        Request req = new TesterMockRequest();
+        Response resp = new Response();
+        resp.setRequest(req);
+
+        String result = resp.toAbsolute("bar.html#/../");
+
+        Assert.assertEquals(
+                "http://localhost:8080/level1/level2/bar.html#/../", result);
+    }
+
+
+    @Test
+    public void testBug53062m() throws Exception {
+        Request req = new TesterMockRequest();
+        Response resp = new Response();
+        resp.setRequest(req);
+
+        String result = resp.toAbsolute("bar.html#/../../");
+
+        Assert.assertEquals(
+                "http://localhost:8080/level1/level2/bar.html#/../../", result);
+    }
+
+
+    @Test
+    public void testBug53062n() throws Exception {
+        Request req = new TesterMockRequest();
+        Response resp = new Response();
+        resp.setRequest(req);
+
+        String result = resp.toAbsolute("./.#/../../");
+
+        Assert.assertEquals(
+                "http://localhost:8080/level1/level2/#/../../", result);
+    }
+
+
+    @Test
+    public void testBug53062o() throws Exception {
+        Request req = new TesterMockRequest();
+        Response resp = new Response();
+        resp.setRequest(req);
+
+        String result = resp.toAbsolute("./..#/../../");
+
+        Assert.assertEquals("http://localhost:8080/level1/#/../../", result);
+    }
+
+
+    @Test
+    public void testBug53062p() throws Exception {
+        Request req = new TesterMockRequest();
+        Response resp = new Response();
+        resp.setRequest(req);
+
+        String result = resp.toAbsolute("./..#/../..");
+
+        Assert.assertEquals("http://localhost:8080/level1/#/../..", result);
     }
 
 

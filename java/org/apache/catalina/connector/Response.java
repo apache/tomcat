@@ -27,6 +27,7 @@ import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Enumeration;
 import java.util.List;
@@ -1654,16 +1655,17 @@ public class Response
      * Code borrowed heavily from CoyoteAdapter.normalize()
      */
     private void normalize(CharChunk cc) {
-        // Strip query string first (doing it this way makes the logic a lot
-        // simpler)
-        int query = cc.indexOf('?');
-        char[] queryCC = null;
-        if (query > -1) {
-            queryCC = new char[cc.getEnd() - query];
-            for (int i = query; i < cc.getEnd(); i++) {
-                queryCC[i - query] = cc.charAt(i);
-            }
-            cc.setEnd(query);
+        // Strip query string and/or fragment first as doing it this way makes
+        // the normalization logic a lot simpler
+        int truncate = cc.indexOf('?');
+        if (truncate == -1) {
+            truncate = cc.indexOf('#');
+        }
+        char[] truncateCC = null;
+        if (truncate > -1) {
+            truncateCC = Arrays.copyOfRange(cc.getBuffer(),
+                    cc.getStart() + truncate, cc.getEnd());
+            cc.setEnd(cc.getStart() + truncate);
         }
 
         if (cc.endsWith("/.") || cc.endsWith("/..")) {
@@ -1726,9 +1728,9 @@ public class Response
         }
 
         // Add the query string (if present) back in
-        if (queryCC != null) {
+        if (truncateCC != null) {
             try {
-                cc.append(queryCC, 0, queryCC.length);
+                cc.append(truncateCC, 0, truncateCC.length);
             } catch (IOException ioe) {
                 throw new IllegalArgumentException(ioe);
             }
