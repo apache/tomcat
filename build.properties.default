@@ -203,3 +203,5 @@ dojo-js.home=${base.path}/dojo-release-1.1.1
 dojo-js.loc=http://download.dojotoolkit.org/release-1.1.1/dojo-release-1.1.1.tar.gz
 dojo-js.jar=${dojo-js.home}/dojo/dojo.js
 
+# ----- JVM settings for unit tests
+java.net.preferIPv4Stack=false
