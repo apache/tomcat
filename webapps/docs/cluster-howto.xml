@@ -47,7 +47,7 @@
   <p>
     Using the above configuration will enable all-to-all session replication
     using the <code>DeltaManager</code> to replicate session deltas. By all-to-all we mean that the session gets replicated to all the other
-    nodes in the cluster. This works great for smaller cluster but we don't recommend it for larger clusters(a lot of tomcat nodes).
+    nodes in the cluster. This works great for smaller cluster but we don't recommend it for larger clusters(a lot of Tomcat nodes).
     Also when using the delta manager it will replicate to all nodes, even nodes that don't have the application deployed.<br/>
     To get around this problem, you'll want to use the BackupManager. This manager only replicates the session data to one backup
     node, and only to nodes that have the application deployed. Downside of the BackupManager: not quite as battle tested as the delta manager.
@@ -147,7 +147,7 @@ should be completed:</p>
    The all-to-all replication is an algorithm that is only efficient when the clusters are small. For larger clusters,  to use
    a primary-secondary session replication where the session will only be stored at one backup server simply setup the BackupManager. <br/>
    Currently you can use the domain worker attribute (mod_jk &gt; 1.2.8) to build cluster partitions
-   with the potential of having a more scaleable cluster solution with the DeltaManager(you'll need to configure the domain interceptor for this).
+   with the potential of having a more scalable cluster solution with the DeltaManager(you'll need to configure the domain interceptor for this).
    In order to keep the network traffic down in an all-to-all environment, you can split your cluster
    into smaller groups. This can be easily achieved by using different multicast addresses for the different groups.
    A very simple setup would look like this:
@@ -209,7 +209,7 @@ should be completed:</p>
     The JvmRouteBinderValve rewrites the session id to ensure that the next request will remain sticky
     (and not fall back to go to random nodes since the worker is no longer available) after a fail over.
     The valve rewrites the JSESSIONID value in the cookie with the same name.
-    Not having this valve in place, will make it harder to ensure stickyness in case of a failure for the mod_jk module.
+    Not having this valve in place, will make it harder to ensure stickiness in case of a failure for the mod_jk module.
 </p>
 <p>
     By default, if no valves are configured, the JvmRouteBinderValve is added on.
@@ -338,7 +338,7 @@ should be completed:</p>
         The address attribute is the multicast address used and the port is the multicast port. These two together
         create the cluster separation. If you want a QA cluster and a production cluster, the easiest config is to
         have the QA cluster be on a separate multicast address/port combination than the production cluster.<br/>
-        The membership component broadcasts TCP adress/port of itselt to the other nodes so that communication between
+        The membership component broadcasts TCP address/port of itself to the other nodes so that communication between
         nodes can be done over TCP. Please note that the address being broadcasted is the one of the
         <code>Receiver.address</code> attribute.
         <br/>For more info, Please visit the <a href="config/cluster-membership.html">reference documentation</a>
@@ -382,7 +382,7 @@ should be completed:</p>
     <p>
         Tribes uses a stack to send messages through. Each element in the stack is called an interceptor, and works much like the valves do
         in the Tomcat servlet container.
-        Using interceptors, logic can be broken into more managable pieces of code. The interceptors configured above are:<br/>
+        Using interceptors, logic can be broken into more manageable pieces of code. The interceptors configured above are:<br/>
         TcpFailureDetector - verifies crashed members through TCP, if multicast packets get dropped, this interceptor protects against false positives,
         ie the node marked as crashed even though it still is alive and running.<br/>
         MessageDispatch15Interceptor - dispatches messages to a thread (thread pool) to send message asynchrously.<br/>
