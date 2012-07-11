@@ -812,9 +812,9 @@ public class Tomcat {
         public boolean hasAsync() {
             if (isAsyncSupported()) return true;
             boolean result = false;
-            Class clazz = existing.getClass();
+            Class<?> clazz = existing.getClass();
             if (clazz.isAnnotationPresent(WebServlet.class)) {
-                WebServlet ws = (WebServlet)clazz.getAnnotation(WebServlet.class);
+                WebServlet ws = clazz.getAnnotation(WebServlet.class);
                 result = ws.asyncSupported();
             }
             return result;
