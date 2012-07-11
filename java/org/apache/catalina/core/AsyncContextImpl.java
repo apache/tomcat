@@ -64,7 +64,7 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
 
     private ServletRequest servletRequest = null;
     private ServletResponse servletResponse = null;
-    private List<AsyncListenerWrapper> listeners = new ArrayList<AsyncListenerWrapper>();
+    private final List<AsyncListenerWrapper> listeners = new ArrayList<AsyncListenerWrapper>();
     private boolean hasOriginalRequestAndResponse = true;
     private volatile Runnable dispatch = null;
     private Context context = null;
@@ -122,7 +122,7 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
         return true;
     }
 
-    public boolean canWrite() throws IOException {
+    public boolean canWrite() {
         if (request.getResponse().getCoyoteResponse().getWriteListener()==null) return false;
         ClassLoader oldCL = Thread.currentThread().getContextClassLoader();
         ClassLoader newCL = request.getContext().getLoader().getClassLoader();
