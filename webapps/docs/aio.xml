@@ -343,6 +343,11 @@ public class ChatServlet
   <li><code>org.apache.tomcat.sendfile.start</code>: Start offset as a Long</li>
   <li><code>org.apache.tomcat.sendfile.end</code>: End offset as a Long</li>
   </ul>
+  <p>
+    In addition to setting these parameters it is necessary to set the content-length header.
+    or set a transfer-encoding like chunked.
+    Tomcat will not do that for you, since you may have already written data to the 
+  </p>
 
   </section>
 
