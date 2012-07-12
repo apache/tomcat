@@ -73,6 +73,12 @@
     <Bug code="Dm" />
   </Match>
   <Match>
+    <!-- Sleep is of short duration and lock is required -->
+    <Class name="org.apache.catalina.core.StandardWrapper" />
+    <Method name="unload" />
+    <Bug code="SWL" />
+  </Match>
+  <Match>
     <!-- Field is only modified during Servlet load -->
     <Class name="org.apache.catalina.manager.host.HostManagerServlet" />
     <Bug code="MSF" />
