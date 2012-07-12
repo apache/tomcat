@@ -20,8 +20,10 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.DriverPropertyInfo;
 import java.sql.SQLException;
+import java.sql.SQLFeatureNotSupportedException;
 import java.util.Properties;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.logging.Logger;
 
 public class Driver implements java.sql.Driver {
     public static final String url = "jdbc:tomcat:test";
@@ -74,5 +76,14 @@ public class Driver implements java.sql.Driver {
     @Override
     public boolean jdbcCompliant() {
         return false;
+    }
+
+    // ---------------------------------------------------------- Java 7 methods
+    // Can't add @Override annotations since this code also has to compile with
+    // Java 6 for Tomcat 7.
+
+    @Override
+    public Logger getParentLogger() throws SQLFeatureNotSupportedException {
+        return null;
     }
 }
