@@ -20,6 +20,7 @@ package org.apache.catalina.core;
 
 
 import java.io.IOException;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.servlet.DispatcherType;
 import javax.servlet.RequestDispatcher;
@@ -67,8 +68,8 @@ final class StandardWrapperValve
     private volatile long processingTime;
     private volatile long maxTime;
     private volatile long minTime = Long.MAX_VALUE;
-    private volatile int requestCount;
-    private volatile int errorCount;
+    private final AtomicInteger requestCount = new AtomicInteger(0);
+    private final AtomicInteger errorCount = new AtomicInteger(0);
 
 
     /**
@@ -100,7 +101,7 @@ final class StandardWrapperValve
         Throwable throwable = null;
         // This should be a Request attribute...
         long t1=System.currentTimeMillis();
-        requestCount++;
+        requestCount.incrementAndGet();
         StandardWrapper wrapper = (StandardWrapper) getContainer();
         Servlet servlet = null;
         Context context = (Context) wrapper.getParent();
@@ -522,64 +523,24 @@ final class StandardWrapperValve
         return processingTime;
     }
 
-    /**
-     * Deprecated   unused
-     */
-    @Deprecated
-    public void setProcessingTime(long processingTime) {
-        this.processingTime = processingTime;
-    }
-
     public long getMaxTime() {
         return maxTime;
-    }
-
-    /**
-     * Deprecated   unused
-     */
-    @Deprecated
-    public void setMaxTime(long maxTime) {
-        this.maxTime = maxTime;
     }
 
     public long getMinTime() {
         return minTime;
     }
 
-    /**
-     * Deprecated   unused
-     */
-    @Deprecated
-    public void setMinTime(long minTime) {
-        this.minTime = minTime;
-    }
-
     public int getRequestCount() {
-        return requestCount;
-    }
-
-    /**
-     * Deprecated   unused
-     */
-    @Deprecated
-    public void setRequestCount(int requestCount) {
-        this.requestCount = requestCount;
+        return requestCount.get();
     }
 
     public int getErrorCount() {
-        return errorCount;
+        return errorCount.get();
     }
 
     public void incrementErrorCount() {
-        errorCount++;
-    }
-
-    /**
-     * Deprecated   unused
-     */
-    @Deprecated
-    public void setErrorCount(int errorCount) {
-        this.errorCount = errorCount;
+        errorCount.incrementAndGet();
     }
 
     @Override
