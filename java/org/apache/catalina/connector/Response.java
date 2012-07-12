@@ -114,21 +114,12 @@ public class Response
 
     // ------------------------------------------------------------- Properties
 
-
-    /**
-     * Associated Catalina connector.
-     * @deprecated  Unused
-     */
-    protected Connector connector;
-
-
     /**
      * Set the Connector through which this Request was received.
      *
      * @param connector The new connector
      */
     public void setConnector(Connector connector) {
-        this.connector = connector;
         if("AJP/1.3".equals(connector.getProtocol())) {
             // default size to size of one ajp-packet
             outputBuffer = new OutputBuffer(8184);
