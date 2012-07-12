@@ -169,8 +169,8 @@ public class JMXAccessorInvokeTask extends JMXAccessorTask {
             String sigA[]=new String[args.size()];
             for( int i=0; i<args.size(); i++ ) {
                 Arg arg=args.get(i);
-                if( arg.type==null) {
-                    arg.type="java.lang.String";
+                if (arg.getType() == null) {
+                    arg.setType("java.lang.String");
                     sigA[i]=arg.getType();
                     argsA[i]=arg.getValue();
                 } else {
