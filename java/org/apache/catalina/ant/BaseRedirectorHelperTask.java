@@ -56,7 +56,7 @@ public abstract class BaseRedirectorHelperTask extends Task {
     // ------------------------------------------------------------- Properties
 
     /** Redirector helper */
-    protected Redirector redirector = new Redirector(this);
+    protected final Redirector redirector = new Redirector(this);
     //protected Redirector redirector = null;
     /** Redirector element for this task */
     protected RedirectorElement redirectorElement = null;

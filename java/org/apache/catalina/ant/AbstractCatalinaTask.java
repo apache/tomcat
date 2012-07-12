@@ -52,7 +52,7 @@ public abstract class AbstractCatalinaTask extends BaseRedirectorHelperTask {
     /**
      * manager webapp's encoding.
      */
-    private static String CHARSET = "utf-8";
+    private static final String CHARSET = "utf-8";
 
 
     // ------------------------------------------------------------- Properties
