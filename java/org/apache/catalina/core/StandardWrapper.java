@@ -1585,7 +1585,7 @@ public class StandardWrapper extends ContainerBase
      */
     @Override
     public void incrementErrorCount(){
-        swValve.setErrorCount(swValve.getErrorCount() + 1);
+        swValve.incrementErrorCount();
     }
 
     public long getLoadTime() {
