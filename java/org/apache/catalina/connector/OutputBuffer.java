@@ -114,8 +114,7 @@ public class OutputBuffer extends Writer
     /**
      * List of encoders.
      */
-    protected HashMap<String, C2BConverter> encoders =
-        new HashMap<String, C2BConverter>();
+    protected final HashMap<String, C2BConverter> encoders = new HashMap<>();
 
 
     /**

@@ -108,8 +108,7 @@ public class InputBuffer extends Reader
     /**
      * List of encoders.
      */
-    protected HashMap<String,B2CConverter> encoders =
-        new HashMap<String,B2CConverter>();
+    protected final HashMap<String,B2CConverter> encoders = new HashMap<>();
 
 
     /**
@@ -133,7 +132,7 @@ public class InputBuffer extends Reader
     /**
      * Buffer size.
      */
-    private int size = -1;
+    private final int size;
 
 
     // ----------------------------------------------------------- Constructors

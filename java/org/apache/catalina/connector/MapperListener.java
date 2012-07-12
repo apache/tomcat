@@ -52,12 +52,12 @@ public class MapperListener extends LifecycleMBeanBase
     /**
      * Associated mapper.
      */
-    private Mapper mapper = null;
+    private final Mapper mapper;
 
     /**
      * Associated connector
      */
-    private Connector connector = null;
+    private final Connector connector;
 
 
     /**

@@ -172,7 +172,7 @@ public class Request
      * Notice that because SimpleDateFormat is not thread-safe, we can't
      * declare formats[] as a static variable.
      */
-    protected SimpleDateFormat formats[] = {
+    protected final SimpleDateFormat formats[] = {
         new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz", Locale.US),
         new SimpleDateFormat("EEEEEE, dd-MMM-yy HH:mm:ss zzz", Locale.US),
         new SimpleDateFormat("EEE MMMM d HH:mm:ss yyyy", Locale.US)
@@ -182,14 +182,13 @@ public class Request
     /**
      * The default Locale if none are specified.
      */
-    protected static Locale defaultLocale = Locale.getDefault();
+    protected static final Locale defaultLocale = Locale.getDefault();
 
 
     /**
      * The attributes associated with this Request, keyed by attribute name.
      */
-    protected HashMap<String, Object> attributes =
-        new HashMap<String, Object>();
+    protected final HashMap<String, Object> attributes = new HashMap<>();
 
 
     /**
@@ -202,21 +201,20 @@ public class Request
     /**
      * List of read only attributes for this Request.
      */
-    private final HashMap<String,Object> readOnlyAttributes =
-        new HashMap<String,Object>();
+    private final HashMap<String,Object> readOnlyAttributes = new HashMap<>();
 
 
     /**
      * The preferred Locales associated with this Request.
      */
-    protected ArrayList<Locale> locales = new ArrayList<Locale>();
+    protected final ArrayList<Locale> locales = new ArrayList<>();
 
 
     /**
      * Internal notes associated with this request by Catalina components
      * and event listeners.
      */
-    private transient HashMap<String, Object> notes = new HashMap<String, Object>();
+    private final transient HashMap<String, Object> notes = new HashMap<>();
 
 
     /**
@@ -246,14 +244,14 @@ public class Request
     /**
      * The associated input buffer.
      */
-    protected InputBuffer inputBuffer = new InputBuffer();
+    protected final InputBuffer inputBuffer = new InputBuffer();
 
 
     /**
      * ServletInputStream.
      */
     protected CoyoteInputStream inputStream =
-        new CoyoteInputStream(inputBuffer);
+            new CoyoteInputStream(inputBuffer);
 
 
     /**
@@ -307,14 +305,14 @@ public class Request
     /**
      * Post data buffer.
      */
-    protected static int CACHED_POST_LEN = 8192;
+    protected static final int CACHED_POST_LEN = 8192;
     protected byte[] postData = null;
 
 
     /**
      * Hash map used in the getParametersMap method.
      */
-    protected ParameterMap<String, String[]> parameterMap = new ParameterMap<String, String[]>();
+    protected ParameterMap<String, String[]> parameterMap = new ParameterMap<>();
 
 
     /**
@@ -421,7 +419,7 @@ public class Request
     /**
      * Path parameters
      */
-    protected Map<String,String> pathParameters = new HashMap<String, String>();
+    protected final Map<String,String> pathParameters = new HashMap<>();
 
     // --------------------------------------------------------- Public Methods
 
@@ -504,7 +502,7 @@ public class Request
         requestedSessionURL = false;
 
         if (Globals.IS_SECURITY_ENABLED || Connector.RECYCLE_FACADES) {
-            parameterMap = new ParameterMap<String, String[]>();
+            parameterMap = new ParameterMap<>();
         } else {
             parameterMap.setLocked(false);
             parameterMap.clear();
@@ -637,7 +635,7 @@ public class Request
     /**
      * Mapping data.
      */
-    protected MappingData mappingData = new MappingData();
+    protected final MappingData mappingData = new MappingData();
 
     /**
      * Return mapping data.
@@ -971,7 +969,7 @@ public class Request
         }
         // Take a copy to prevent ConncurrentModificationExceptions if used to
         // remove attributes
-        Set<String> names = new HashSet<String>();
+        Set<String> names = new HashSet<>();
         names.addAll(attributes.keySet());
         return Collections.enumeration(names);
     }
@@ -1067,7 +1065,7 @@ public class Request
         if (locales.size() > 0) {
             return Collections.enumeration(locales);
         }
-        ArrayList<Locale> results = new ArrayList<Locale>();
+        ArrayList<Locale> results = new ArrayList<>();
         results.add(defaultLocale);
         return Collections.enumeration(results);
 
@@ -2544,7 +2542,7 @@ public class Request
             upload.setFileSizeMax(mce.getMaxFileSize());
             upload.setSizeMax(mce.getMaxRequestSize());
 
-            parts = new ArrayList<Part>();
+            parts = new ArrayList<>();
             try {
                 List<FileItem> items = upload.parseRequest(this);
                 int maxPostSize = getConnector().getMaxPostSize();
@@ -3019,7 +3017,7 @@ public class Request
         // a local collection, sorted by the quality value (so we can
         // add Locales in descending order).  The values will be ArrayLists
         // containing the corresponding Locales to be added
-        TreeMap<Double, ArrayList<Locale>> locales = new TreeMap<Double, ArrayList<Locale>>();
+        TreeMap<Double, ArrayList<Locale>> locales = new TreeMap<>();
 
         // Preprocess the value to remove all whitespace
         int white = value.indexOf(' ');
@@ -3110,7 +3108,7 @@ public class Request
             Double key = new Double(-quality);  // Reverse the order
             ArrayList<Locale> values = locales.get(key);
             if (values == null) {
-                values = new ArrayList<Locale>();
+                values = new ArrayList<>();
                 locales.put(key, values);
             }
             values.add(locale);
@@ -3151,7 +3149,7 @@ public class Request
     }
 
     private static final Map<String, SpecialAttributeAdapter> specialAttributes
-        = new HashMap<String, SpecialAttributeAdapter>();
+        = new HashMap<>();
 
     static {
         specialAttributes.put(Globals.DISPATCHER_TYPE_ATTR,
