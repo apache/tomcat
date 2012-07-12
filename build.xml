@@ -2426,12 +2426,12 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
         <exclude name="**/managed/**" />
       </fileset>
     </copy>
-    
-    <patch patchfile="${basedir}/res/dbcp/dbcp-java-7.patch" 
-           dir="${tomcat-dbcp.home}" 
+
+    <patch patchfile="${basedir}/res/dbcp/dbcp-java-7.patch"
+           dir="${tomcat-dbcp.home}"
            ignorewhitespace="true"
            strip="0"/>
-    
+
     <replace dir="${tomcat-dbcp.home}/src/java/org/apache/commons"
         encoding="ISO-8859-1">
       <replacefilter token="org.apache.commons"
