@@ -29,7 +29,7 @@ public class ListELResolver extends ELResolver {
     private final boolean readOnly;
 
     private static final Class<?> UNMODIFIABLE =
-        Collections.unmodifiableList(new ArrayList<Object>()).getClass();
+        Collections.unmodifiableList(new ArrayList<>()).getClass();
 
     public ListELResolver() {
         this.readOnly = false;
