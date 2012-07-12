@@ -40,7 +40,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.junit.Assert;
 import org.junit.Test;
 
-import org.apache.catalina.Wrapper;
 import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.startup.BytesStreamer;
 import org.apache.catalina.startup.TesterServlet;
@@ -73,7 +72,7 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
 
         NBReadServlet servlet = new NBReadServlet();
         String servletName = NBReadServlet.class.getName();
-        Wrapper servletWrapper = tomcat.addServlet(ctx, servletName, servlet);
+        Tomcat.addServlet(ctx, servletName, servlet);
         ctx.addServletMapping("/", servletName);
 
         tomcat.start();
@@ -94,7 +93,7 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
 
         NBWriteServlet servlet = new NBWriteServlet();
         String servletName = NBWriteServlet.class.getName();
-        Wrapper servletWrapper = tomcat.addServlet(ctx, servletName, servlet);
+        Tomcat.addServlet(ctx, servletName, servlet);
         ctx.addServletMapping("/", servletName);
         tomcat.getConnector().setProperty("socket.txBufSize", "1024");
         tomcat.getConnector().setProperty("address", bind);
@@ -124,7 +123,7 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
                     } else if (delta > (bytesToDownload / 16)) {
                         System.out.println("Read " + counter + " bytes.");
                         delta = 0;
-                        Thread.currentThread().sleep(500);
+                        Thread.sleep(500);
                     }
                 } catch (Exception x) {
                     throw new IOException(x);
@@ -148,7 +147,7 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
 
         NBWriteServlet servlet = new NBWriteServlet();
         String servletName = NBWriteServlet.class.getName();
-        Wrapper servletWrapper = tomcat.addServlet(ctx, servletName, servlet);
+        Tomcat.addServlet(ctx, servletName, servlet);
         ctx.addServletMapping("/", servletName);
         tomcat.getConnector().setProperty("socket.txBufSize", "1024");
         tomcat.getConnector().setProperty("address", bind);
@@ -178,14 +177,14 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
                     } else if (delta > (bytesToDownload / 16)) {
                         System.out.println("Read " + counter + " bytes.");
                         delta = 0;
-                        Thread.currentThread().sleep(500);
+                        Thread.sleep(500);
                     }
                 } catch (Exception x) {
                     throw new IOException(x);
                 }
             }
         });
-        int rc = postUrlWithDisconnect(true, new DataWriter(0), "http://" + bind + ":" + getPort() + "/", slowReader, resHeaders,
+        int rc = postUrlWithDisconnect(true, new DataWriter(0), "http://" + bind + ":" + getPort() + "/", resHeaders,
                 null);
         slowReader.flushBuffer();
         Assert.assertEquals(HttpServletResponse.SC_OK, rc);
@@ -248,6 +247,7 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
 
     @WebServlet(asyncSupported = true)
     public class NBReadServlet extends TesterServlet {
+        private static final long serialVersionUID = 1L;
         public volatile TestReadListener listener;
         @Override
         protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -299,6 +299,7 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
 
     @WebServlet(asyncSupported = true)
     public class NBWriteServlet extends TesterServlet {
+        private static final long serialVersionUID = 1L;
         public volatile TestWriteListener wlistener;
         public volatile TestReadListener rlistener;
 
@@ -348,7 +349,6 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
     }
     private class TestReadListener implements ReadListener {
         AsyncContext ctx;
-        public volatile boolean onErrorInvoked = false;
 
         public TestReadListener(AsyncContext ctx) {
             this.ctx = ctx;
@@ -389,8 +389,6 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         public void onError(Throwable throwable) {
             System.out.println("ReadListener.onError");
             throwable.printStackTrace();
-            onErrorInvoked = true;
-
         }
     }
 
@@ -441,7 +439,7 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
 
     }
 
-    public static int postUrlWithDisconnect(boolean stream, BytesStreamer streamer, String path, ByteChunk out,
+    public static int postUrlWithDisconnect(boolean stream, BytesStreamer streamer, String path,
             Map<String, List<String>> reqHead, Map<String, List<String>> resHead) throws IOException {
 
         URL url = new URL(path);
@@ -502,11 +500,12 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         }
         if (rc == HttpServletResponse.SC_OK) {
             connection.getInputStream().close();
-            os.close();
+            // Should never be null here but just to be safe
+            if (os != null) {
+                os.close();
+            }
             connection.disconnect();
         }
         return rc;
     }
-
-
 }
