@@ -196,7 +196,11 @@ public class NioSelectorPool {
                     //register OP_WRITE to the selector
                     if (key==null) key = socket.getIOChannel().register(selector, SelectionKey.OP_WRITE);
                     else key.interestOps(SelectionKey.OP_WRITE);
-                    keycount = selector.select(writeTimeout);
+                    if (writeTimeout<=0) {
+                        keycount = selector.selectNow();
+                    } else {
+                        keycount = selector.select(writeTimeout);
+                    }
                 }
                 if (writeTimeout > 0 && (selector == null || keycount == 0) ) timedout = (System.currentTimeMillis()-time)>=writeTimeout;
             }//while
@@ -264,7 +268,11 @@ public class NioSelectorPool {
                     //register OP_WRITE to the selector
                     if (key==null) key = socket.getIOChannel().register(selector, SelectionKey.OP_READ);
                     else key.interestOps(SelectionKey.OP_READ);
-                    keycount = selector.select(readTimeout);
+                    if (readTimeout<=0) {
+                        keycount = selector.selectNow();
+                    } else {
+                        keycount = selector.select(readTimeout);
+                    }
                 }
                 if (readTimeout > 0 && (selector == null || keycount == 0) ) timedout = (System.currentTimeMillis()-time)>=readTimeout;
             }//while
