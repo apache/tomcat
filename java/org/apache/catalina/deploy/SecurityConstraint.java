@@ -481,7 +481,7 @@ public class SecurityConstraint implements Serializable {
      */
     public static SecurityConstraint[] createConstraints(
             ServletSecurityElement element, String urlPattern) {
-        Set<SecurityConstraint> result = new HashSet<SecurityConstraint>();
+        Set<SecurityConstraint> result = new HashSet<>();
 
         // Add the per method constraints
         Collection<HttpMethodConstraintElement> methods =

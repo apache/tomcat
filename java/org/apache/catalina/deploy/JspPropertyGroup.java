@@ -35,13 +35,13 @@ public class JspPropertyGroup {
     }
     public Boolean getElIgnored() { return elIgnored; }
 
-    private Set<String> includeCodas = new LinkedHashSet<String>();
+    private final Set<String> includeCodas = new LinkedHashSet<>();
     public void addIncludeCoda(String includeCoda) {
         includeCodas.add(includeCoda);
     }
     public Set<String> getIncludeCodas() { return includeCodas; }
 
-    private Set<String> includePreludes = new LinkedHashSet<String>();
+    private final Set<String> includePreludes = new LinkedHashSet<>();
     public void addIncludePrelude(String includePrelude) {
         includePreludes.add(includePrelude);
     }
