@@ -82,7 +82,6 @@ public class Driver implements java.sql.Driver {
     // Can't add @Override annotations since this code also has to compile with
     // Java 6 for Tomcat 7.
 
-    @Override
     public Logger getParentLogger() throws SQLFeatureNotSupportedException {
         return null;
     }
