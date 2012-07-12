@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.catalina.ant.jmx;
 
 /**
@@ -24,7 +23,15 @@ package org.apache.catalina.ant.jmx;
  * @since 5.5.10
  */
 public class Arg {
+    /**
+     * @deprecated  Use getter/setter
+     */
+    @Deprecated
     String type;
+    /**
+     * @deprecated  Use getter/setter
+     */
+    @Deprecated
     String value;
 
     public void setType( String type) {
@@ -33,6 +40,10 @@ public class Arg {
     public void setValue( String value ) {
         this.value=value;
     }
+    /**
+     * @deprecated  Use {@link #setValue(String)}
+     */
+    @Deprecated
     public void addText( String text ) {
         this.value=text;
     }
