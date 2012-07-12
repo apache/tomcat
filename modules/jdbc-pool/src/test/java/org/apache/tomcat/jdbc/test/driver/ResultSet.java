@@ -1208,16 +1208,17 @@ public class ResultSet implements java.sql.ResultSet {
         return null;
     }
 
-    // ---------------------------------------------------------- Java 7 methods
-    // Can't add @Override annotations since this code also has to compile with
-    // Java 6 for Tomcat 7.
-
+    @Override
     public <T> T getObject(int columnIndex, Class<T> type) throws SQLException {
+        // TODO Auto-generated method stub
         return null;
     }
 
-    public <T> T getObject(String columnLabel, Class<T> type)
-            throws SQLException {
+    @Override
+    public <T> T getObject(String columnLabel, Class<T> type) throws SQLException {
+        // TODO Auto-generated method stub
         return null;
     }
+
+
 }

@@ -1291,24 +1291,30 @@ public class Statement implements CallableStatement {
         return null;
     }
 
-    // ---------------------------------------------------------- Java 7 methods
-    // Can't add @Override annotations since this code also has to compile with
-    // Java 6 for Tomcat 7.
-
+    @Override
     public void closeOnCompletion() throws SQLException {
+        // TODO Auto-generated method stub
+
     }
 
+    @Override
     public boolean isCloseOnCompletion() throws SQLException {
+        // TODO Auto-generated method stub
         return false;
     }
 
-    public <T> T getObject(int parameterIndex, Class<T> type)
-            throws SQLException {
+    @Override
+    public <T> T getObject(int parameterIndex, Class<T> type) throws SQLException {
+        // TODO Auto-generated method stub
         return null;
     }
 
-    public <T> T getObject(String parameterName, Class<T> type)
-            throws SQLException {
+    @Override
+    public <T> T getObject(String parameterName, Class<T> type) throws SQLException {
+        // TODO Auto-generated method stub
         return null;
     }
+
+
+
 }

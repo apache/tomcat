@@ -285,25 +285,36 @@ public class Connection implements java.sql.Connection {
         return null;
     }
 
-    // ---------------------------------------------------------- Java 7 methods
-    // Can't add @Override annotations since this code also has to compile with
-    // Java 6 for Tomcat 7.
-
+    @Override
     public void setSchema(String schema) throws SQLException {
+        // TODO Auto-generated method stub
+
     }
 
+    @Override
     public String getSchema() throws SQLException {
+        // TODO Auto-generated method stub
         return null;
     }
 
+    @Override
     public void abort(Executor executor) throws SQLException {
+        // TODO Auto-generated method stub
+
     }
 
-    public void setNetworkTimeout(Executor executor, int milliseconds)
-            throws SQLException {
+    @Override
+    public void setNetworkTimeout(Executor executor, int milliseconds) throws SQLException {
+        // TODO Auto-generated method stub
+
     }
 
+    @Override
     public int getNetworkTimeout() throws SQLException {
+        // TODO Auto-generated method stub
         return 0;
     }
+
+
+
 }
