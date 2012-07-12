@@ -56,9 +56,10 @@ import org.apache.tomcat.jni.socket.AprSocketContext.BlockingPollHandler;
  */
 public class AprSocket implements Runnable {
 
-    static final byte[][] NO_CERTS = new byte[0][];
+    private static final Logger log =
+            Logger.getLogger("org.apache.tomcat.jni.socket.AprSocket");
 
-    static Logger log = Logger.getLogger("AprSocket");
+    static final byte[][] NO_CERTS = new byte[0][];
 
     static int CONNECTING = 1;
     static int CONNECTED = 0x2;
@@ -280,7 +281,7 @@ public class AprSocket implements Runnable {
                 updatePolling();
                 return rt;
             }
-            if (context.debug) {
+            if (log.isLoggable(Level.WARNING)) {
                 log.warning("apr.send(): Failed to send, closing " + sent);
             }
             reset();
@@ -407,7 +408,7 @@ public class AprSocket implements Runnable {
             if (context.rawDataHandler != null) {
                 context.rawDataHandler.rawData(this, false, null, -1, -1, -1, true);
             }
-            if (context.debug) {
+            if (log.isLoggable(Level.FINE)) {
                 log.info("closing: context.open=" + context.open.get() + " " + this);
             }
 
@@ -725,7 +726,7 @@ public class AprSocket implements Runnable {
                 try {
                     context.open.incrementAndGet();
 
-                    if (context.debug) {
+                    if (log.isLoggable(Level.FINE)) {
                         log.info("Accept: " + context.open.get() + " " + this + " " +
                                 getRemotePort());
                     }
@@ -795,7 +796,7 @@ public class AprSocket implements Runnable {
         }
 
         try {
-            if (context.debug) {
+            if (log.isLoggable(Level.FINE)) {
                 log.info(this + " StartSSL");
             }
 
@@ -851,7 +852,7 @@ public class AprSocket implements Runnable {
             int ticketLen = SSLExt.getTicket(socket, hostInfo.ticket);
             if (ticketLen > 0) {
                 hostInfo.ticketLen = ticketLen;
-                if (context.debug) {
+                if (log.isLoggable(Level.FINE)) {
                     log.info("Received ticket: " + ticketLen);
                 }
             }

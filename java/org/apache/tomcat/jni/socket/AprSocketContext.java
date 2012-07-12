@@ -184,7 +184,6 @@ public class AprSocketContext {
     // Separate executor for connect/handshakes
     ExecutorService connectExecutor;
 
-    boolean debug = false;
     boolean debugSSL = false;
     boolean debugPoll = false;
 
