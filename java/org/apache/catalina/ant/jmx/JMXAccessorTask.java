@@ -123,7 +123,7 @@ public class JMXAccessorTask extends BaseRedirectorHelperTask {
 
     private String ifCondition;
 
-    private Properties properties = new Properties();
+    private final Properties properties = new Properties();
 
     // ------------------------------------------------------------- Properties
 
@@ -362,7 +362,7 @@ public class JMXAccessorTask extends BaseRedirectorHelperTask {
             String[] credentials = new String[2];
             credentials[0] = username;
             credentials[1] = password;
-            environment = new HashMap<String, String[]>();
+            environment = new HashMap<>();
             environment.put(JMXConnector.CREDENTIALS, credentials);
         }
         return JMXConnectorFactory.connect(new JMXServiceURL(urlForJMX),

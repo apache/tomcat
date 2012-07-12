@@ -97,7 +97,7 @@ public class JMXAccessorInvokeTask extends JMXAccessorTask {
     // ----------------------------------------------------- Instance Variables
 
     private String operation ;
-    private List<Arg> args=new ArrayList<Arg>();
+    private List<Arg> args=new ArrayList<>();
 
     // ------------------------------------------------------------- Properties
 
