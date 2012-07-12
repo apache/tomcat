@@ -58,7 +58,7 @@ import org.apache.tomcat.util.net.SocketWrapper;
  * negotiated by TLS.
  *
  */
-public class SpdyAprNpnHandler implements NpnHandler {
+public class SpdyAprNpnHandler implements NpnHandler<Long> {
 
     private static final Log log = LogFactory.getLog(AprEndpoint.class);
 
@@ -90,12 +90,12 @@ public class SpdyAprNpnHandler implements NpnHandler {
     }
 
     @Override
-    public SocketState process(SocketWrapper<?> socketO, SocketStatus status) {
+    public SocketState process(SocketWrapper<Long> socketWrapper,
+            SocketStatus status) {
 
-        SocketWrapper<Long> socketW = (SocketWrapper<Long>) socketO;
-        long socket = socketW.getSocket().longValue();
+        long socket = socketWrapper.getSocket().longValue();
 
-        if (! spdyContext.getNetSupport().isSpdy(socketW.getSocket())) {
+        if (! spdyContext.getNetSupport().isSpdy(socketWrapper.getSocket())) {
             return SocketState.OPEN;
         }
 
