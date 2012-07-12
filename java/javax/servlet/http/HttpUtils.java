@@ -35,7 +35,7 @@ public class HttpUtils {
 
     private static final String LSTRING_FILE =
         "javax.servlet.http.LocalStrings";
-    private static ResourceBundle lStrings =
+    private static final ResourceBundle lStrings =
         ResourceBundle.getBundle(LSTRING_FILE);
 
 
@@ -86,7 +86,7 @@ public class HttpUtils {
         if (s == null) {
             throw new IllegalArgumentException();
         }
-        Hashtable<String,String[]> ht = new Hashtable<String,String[]>();
+        Hashtable<String,String[]> ht = new Hashtable<>();
         StringBuilder sb = new StringBuilder();
         StringTokenizer st = new StringTokenizer(s, "&");
         while (st.hasMoreTokens()) {
@@ -161,7 +161,7 @@ public class HttpUtils {
 
         // cheap hack to return an empty hash
         if (len <=0)
-            return new Hashtable<String,String[]>();
+            return new Hashtable<>();
 
         if (in == null) {
             throw new IllegalArgumentException();

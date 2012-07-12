@@ -38,7 +38,6 @@ public interface HttpSessionContext {
      *             must return null and will be removed in a future version of
      *             this API.
      */
-    @SuppressWarnings("dep-ann")
     // Spec API does not use @Deprecated
     public HttpSession getSession(String sessionId);
 
@@ -47,7 +46,6 @@ public interface HttpSessionContext {
      *             must return an empty <code>Enumeration</code> and will be
      *             removed in a future version of this API.
      */
-    @SuppressWarnings("dep-ann")
     // Spec API does not use @Deprecated
     public Enumeration<String> getIds();
 }

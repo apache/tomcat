@@ -119,7 +119,7 @@ public class ScopedAttributeELResolver extends ELResolver {
             Object base) {
 
         PageContext ctxt = (PageContext) context.getContext(JspContext.class);
-        List<FeatureDescriptor> list = new ArrayList<FeatureDescriptor>();
+        List<FeatureDescriptor> list = new ArrayList<>();
         Enumeration<String> e;
         Object value;
         String name;

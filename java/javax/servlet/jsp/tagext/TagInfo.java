@@ -90,6 +90,13 @@ public class TagInfo {
         this.tagExtraInfo  = tagExtraInfo;
         this.attributeInfo = attributeInfo;
 
+        // Use defaults for unspecified values
+        this.displayName = null;
+        this.largeIcon = null;
+        this.smallIcon = null;
+        this.tagVariableInfo = null;
+        this.dynamicAttributes = false;
+
         if (tagExtraInfo != null)
             tagExtraInfo.setTagInfo(this);
     }
@@ -140,6 +147,9 @@ public class TagInfo {
         this.smallIcon = smallIcon;
         this.largeIcon = largeIcon;
         this.tagVariableInfo = tvi;
+
+        // Use defaults for unspecified values
+        this.dynamicAttributes = false;
 
         if (tagExtraInfo != null)
             tagExtraInfo.setTagInfo(this);
@@ -424,24 +434,24 @@ public class TagInfo {
     /*
      * private fields for 1.1 info
      */
-    private String             tagName; // the name of the tag
-    private String             tagClassName;
-    private String             bodyContent;
-    private String             infoString;
-    private TagLibraryInfo     tagLibrary;
-    private TagExtraInfo       tagExtraInfo; // instance of TagExtraInfo
-    private TagAttributeInfo[] attributeInfo;
+    private final String             tagName; // the name of the tag
+    private final String             tagClassName;
+    private final String             bodyContent;
+    private final String             infoString;
+    private TagLibraryInfo           tagLibrary;
+    private TagExtraInfo             tagExtraInfo; // instance of TagExtraInfo
+    private final TagAttributeInfo[] attributeInfo;
 
     /*
      * private fields for 1.2 info
      */
-    private String             displayName;
-    private String             smallIcon;
-    private String             largeIcon;
-    private TagVariableInfo[]  tagVariableInfo;
+    private final String             displayName;
+    private final String             smallIcon;
+    private final String             largeIcon;
+    private final TagVariableInfo[]  tagVariableInfo;
 
     /*
      * Additional private fields for 2.0 info
      */
-    private boolean dynamicAttributes;
+    private final boolean dynamicAttributes;
 }

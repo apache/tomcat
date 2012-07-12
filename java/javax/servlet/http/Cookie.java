@@ -59,13 +59,14 @@ public class Cookie implements Cloneable, Serializable {
     private static final long serialVersionUID = 1L;
 
     private static final String LSTRING_FILE = "javax.servlet.http.LocalStrings";
-    private static ResourceBundle lStrings = ResourceBundle.getBundle(LSTRING_FILE);
+    private static final ResourceBundle lStrings =
+            ResourceBundle.getBundle(LSTRING_FILE);
 
     //
     // The value of the cookie itself.
     //
 
-    private String name; // NAME= ... "$Name" style is reserved
+    private final String name; // NAME= ... "$Name" style is reserved
     private String value; // value of NAME
 
     //
