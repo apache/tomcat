@@ -48,7 +48,7 @@ public final class SavedRequest {
     /**
      * The set of Cookies associated with this Request.
      */
-    private ArrayList<Cookie> cookies = new ArrayList<Cookie>();
+    private final ArrayList<Cookie> cookies = new ArrayList<>();
 
     public void addCookie(Cookie cookie) {
         cookies.add(cookie);
@@ -65,13 +65,12 @@ public final class SavedRequest {
      * values for this header.  The values are returned as an Iterator when
      * you ask for them.
      */
-    private HashMap<String,ArrayList<String>> headers =
-        new HashMap<String,ArrayList<String>>();
+    private final HashMap<String,ArrayList<String>> headers = new HashMap<>();
 
     public void addHeader(String name, String value) {
         ArrayList<String> values = headers.get(name);
         if (values == null) {
-            values = new ArrayList<String>();
+            values = new ArrayList<>();
             headers.put(name, values);
         }
         values.add(value);
@@ -93,7 +92,7 @@ public final class SavedRequest {
     /**
      * The set of Locales associated with this Request.
      */
-    private ArrayList<Locale> locales = new ArrayList<Locale>();
+    private final ArrayList<Locale> locales = new ArrayList<>();
 
     public void addLocale(Locale locale) {
         locales.add(locale);
