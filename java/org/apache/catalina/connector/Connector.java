@@ -67,12 +67,15 @@ public class Connector extends LifecycleMBeanBase  {
     public Connector(String protocol) {
         setProtocol(protocol);
         // Instantiate protocol handler
+        ProtocolHandler p = null;
         try {
             Class<?> clazz = Class.forName(protocolHandlerClassName);
-            this.protocolHandler = (ProtocolHandler) clazz.newInstance();
+            p = (ProtocolHandler) clazz.newInstance();
         } catch (Exception e) {
             log.error(sm.getString(
                     "coyoteConnector.protocolHandlerInstantiationFailed"), e);
+        } finally {
+            this.protocolHandler = p;
         }
     }
 
@@ -210,7 +213,7 @@ public class Connector extends LifecycleMBeanBase  {
     /**
      * Coyote protocol handler.
      */
-    protected ProtocolHandler protocolHandler = null;
+    protected final ProtocolHandler protocolHandler;
 
 
     /**
@@ -222,13 +225,14 @@ public class Connector extends LifecycleMBeanBase  {
      /**
       * Mapper.
       */
-     protected Mapper mapper = new Mapper();
+     protected final Mapper mapper = new Mapper();
 
 
      /**
       * Mapper listener.
       */
-     protected MapperListener mapperListener = new MapperListener(mapper, this);
+     protected final MapperListener mapperListener =
+             new MapperListener(mapper, this);
 
 
      /**
@@ -243,8 +247,8 @@ public class Connector extends LifecycleMBeanBase  {
      protected boolean useBodyEncodingForURI = false;
 
 
-     protected static HashMap<String,String> replacements =
-         new HashMap<String,String>();
+     protected static final HashMap<String,String> replacements =
+             new HashMap<>();
      static {
          replacements.put("acceptCount", "backlog");
          replacements.put("connectionLinger", "soLinger");
@@ -490,7 +494,7 @@ public class Connector extends LifecycleMBeanBase  {
 
     public void setParseBodyMethods(String methods) {
 
-        HashSet<String> methodSet = new HashSet<String>();
+        HashSet<String> methodSet = new HashSet<>();
 
         if( null != methods ) {
             methodSet.addAll(Arrays.asList(methods.split("\\s*,\\s*")));

@@ -47,7 +47,7 @@ public class CoyotePrincipal implements Principal, Serializable {
     /**
      * The username of the user represented by this Principal.
      */
-    protected String name = null;
+    protected final String name;
 
     @Override
     public String getName() {

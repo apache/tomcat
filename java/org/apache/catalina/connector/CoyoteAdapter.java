@@ -100,7 +100,7 @@ public class CoyoteAdapter implements Adapter {
     /**
      * The CoyoteConnector with which this processor is associated.
      */
-    private Connector connector = null;
+    private final Connector connector;
 
 
     /**
@@ -113,7 +113,7 @@ public class CoyoteAdapter implements Adapter {
     /**
      * Encoder for the Location URL in HTTP redirects.
      */
-    protected static URLEncoder urlEncoder;
+    protected static final URLEncoder urlEncoder;
 
 
     // ----------------------------------------------------- Static Initializer

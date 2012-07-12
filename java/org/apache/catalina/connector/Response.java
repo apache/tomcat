@@ -215,13 +215,13 @@ public class Response
     /**
      * URL encoder.
      */
-    protected UEncoder urlEncoder = new UEncoder();
+    protected final UEncoder urlEncoder = new UEncoder();
 
 
     /**
      * Recyclable buffer to hold the redirect URL.
      */
-    protected CharChunk redirectURLCC = new CharChunk();
+    protected final CharChunk redirectURLCC = new CharChunk();
 
 
     // --------------------------------------------------------- Public Methods
@@ -826,7 +826,7 @@ public class Response
 
         MimeHeaders headers = coyoteResponse.getMimeHeaders();
         int n = headers.size();
-        List<String> result = new ArrayList<String>(n);
+        List<String> result = new ArrayList<>(n);
         for (int i = 0; i < n; i++) {
             result.add(headers.getName(i).toString());
         }
@@ -846,7 +846,7 @@ public class Response
 
         Enumeration<String> enumeration =
             coyoteResponse.getMimeHeaders().values(name);
-        Vector<String> result = new Vector<String>();
+        Vector<String> result = new Vector<>();
         while (enumeration.hasMoreElements()) {
             result.addElement(enumeration.nextElement());
         }
