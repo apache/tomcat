@@ -32,6 +32,7 @@ import java.sql.Statement;
 import java.sql.Struct;
 import java.util.Map;
 import java.util.Properties;
+import java.util.concurrent.Executor;
 
 import org.apache.tomcat.jdbc.pool.PooledConnection;
 
@@ -284,4 +285,25 @@ public class Connection implements java.sql.Connection {
         return null;
     }
 
+    // ---------------------------------------------------------- Java 7 methods
+    // Can't add @Override annotations since this code also has to compile with
+    // Java 6 for Tomcat 7.
+
+    public void setSchema(String schema) throws SQLException {
+    }
+
+    public String getSchema() throws SQLException {
+        return null;
+    }
+
+    public void abort(Executor executor) throws SQLException {
+    }
+
+    public void setNetworkTimeout(Executor executor, int milliseconds)
+            throws SQLException {
+    }
+
+    public int getNetworkTimeout() throws SQLException {
+        return 0;
+    }
 }
