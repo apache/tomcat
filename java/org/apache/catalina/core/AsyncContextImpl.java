@@ -64,7 +64,7 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
 
     private ServletRequest servletRequest = null;
     private ServletResponse servletResponse = null;
-    private final List<AsyncListenerWrapper> listeners = new ArrayList<AsyncListenerWrapper>();
+    private final List<AsyncListenerWrapper> listeners = new ArrayList<>();
     private boolean hasOriginalRequestAndResponse = true;
     private volatile Runnable dispatch = null;
     private Context context = null;
@@ -92,8 +92,7 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
 
     @Override
     public void fireOnComplete() {
-        List<AsyncListenerWrapper> listenersCopy =
-            new ArrayList<AsyncListenerWrapper>();
+        List<AsyncListenerWrapper> listenersCopy = new ArrayList<>();
         listenersCopy.addAll(listeners);
         for (AsyncListenerWrapper listener : listenersCopy) {
             try {
@@ -172,8 +171,7 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
             try {
                 Thread.currentThread().setContextClassLoader(newCL);
                 boolean listenerInvoked = false;
-                List<AsyncListenerWrapper> listenersCopy =
-                    new ArrayList<AsyncListenerWrapper>();
+                List<AsyncListenerWrapper> listenersCopy = new ArrayList<>();
                 listenersCopy.addAll(listeners);
                 for (AsyncListenerWrapper listener : listenersCopy) {
                     listener.fireOnTimeout(event);
@@ -289,7 +287,6 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
         listeners.add(wrapper);
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public <T extends AsyncListener> T createListener(Class<T> clazz)
             throws ServletException {
@@ -353,8 +350,7 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
         this.hasOriginalRequestAndResponse = originalRequestResponse;
         this.event = new AsyncEvent(this, request, response);
 
-        List<AsyncListenerWrapper> listenersCopy =
-            new ArrayList<AsyncListenerWrapper>();
+        List<AsyncListenerWrapper> listenersCopy = new ArrayList<>();
         listenersCopy.addAll(listeners);
         for (AsyncListenerWrapper listener : listenersCopy) {
             try {
@@ -416,8 +412,7 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
         request.getCoyoteRequest().action(ActionCode.ASYNC_ERROR, null);
         AsyncEvent errorEvent = new AsyncEvent(event.getAsyncContext(),
                 event.getSuppliedRequest(), event.getSuppliedResponse(), t);
-        List<AsyncListenerWrapper> listenersCopy =
-            new ArrayList<AsyncListenerWrapper>();
+        List<AsyncListenerWrapper> listenersCopy = new ArrayList<>();
         listenersCopy.addAll(listeners);
         for (AsyncListenerWrapper listener : listenersCopy) {
             try {
