@@ -57,3 +57,12 @@ but possibly 7.1.x).
     work. Maybe use Structure 101 (or similar) to help.
 
 11. Merge Service and Engine
+
+12. Java 7 updates
+    - Use of <> operator where possible
+      - Complete for javax.*
+      - Not started for remainder
+    - Use of try with resources
+      - Not started
+    - Catching multiple exceptions
+      - Not started
