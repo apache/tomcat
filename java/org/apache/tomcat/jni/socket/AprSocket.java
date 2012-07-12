@@ -281,9 +281,7 @@ public class AprSocket implements Runnable {
                 updatePolling();
                 return rt;
             }
-            if (log.isLoggable(Level.WARNING)) {
-                log.warning("apr.send(): Failed to send, closing " + sent);
-            }
+            log.warning("apr.send(): Failed to send, closing " + sent);
             reset();
             throw new IOException("Error sending " + sent + " " + Error.strerror(-sent));
         } else {
