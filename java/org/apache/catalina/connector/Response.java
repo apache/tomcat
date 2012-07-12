@@ -117,6 +117,7 @@ public class Response
 
     /**
      * Associated Catalina connector.
+     * @deprecated  Unused
      */
     protected Connector connector;
 
