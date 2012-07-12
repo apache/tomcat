@@ -138,10 +138,9 @@ public abstract class ContainerBase extends LifecycleMBeanBase
      * this allows the XML parser to have fewer privileges than
      * Tomcat.
      */
-    protected class PrivilegedAddChild
-        implements PrivilegedAction<Void> {
+    protected class PrivilegedAddChild implements PrivilegedAction<Void> {
 
-        private Container child;
+        private final Container child;
 
         PrivilegedAddChild(Container child) {
             this.child = child;
@@ -162,8 +161,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase
     /**
      * The child Containers belonging to this Container, keyed by name.
      */
-    protected HashMap<String, Container> children =
-        new HashMap<String, Container>();
+    protected final HashMap<String, Container> children = new HashMap<>();
 
 
     /**
@@ -178,8 +176,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase
      * themselves or other listeners and with a ReadWriteLock that would trigger
      * a deadlock.
      */
-    protected List<ContainerListener> listeners =
-            new CopyOnWriteArrayList<ContainerListener>();
+    protected final List<ContainerListener> listeners = new CopyOnWriteArrayList<>();
 
     /**
      * The Logger implementation with which this Container is associated.
@@ -220,7 +217,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase
     /**
      * The Pipeline object with which this Container is associated.
      */
-    protected Pipeline pipeline = new StandardPipeline(this);
+    protected final Pipeline pipeline = new StandardPipeline(this);
 
 
     /**
@@ -250,7 +247,8 @@ public abstract class ContainerBase extends LifecycleMBeanBase
     /**
      * The property change support for this component.
      */
-    protected PropertyChangeSupport support = new PropertyChangeSupport(this);
+    protected final PropertyChangeSupport support =
+            new PropertyChangeSupport(this);
 
 
     /**
@@ -846,8 +844,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase
 
     @Override
     protected void initInternal() throws LifecycleException {
-        BlockingQueue<Runnable> startStopQueue =
-            new LinkedBlockingQueue<Runnable>();
+        BlockingQueue<Runnable> startStopQueue = new LinkedBlockingQueue<>();
         startStopExecutor = new ThreadPoolExecutor(
                 getStartStopThreadsInternal(),
                 getStartStopThreadsInternal(), 10, TimeUnit.SECONDS,
@@ -879,7 +876,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase
 
         // Start our child containers, if any
         Container children[] = findChildren();
-        List<Future<Void>> results = new ArrayList<Future<Void>>();
+        List<Future<Void>> results = new ArrayList<>();
         for (int i = 0; i < children.length; i++) {
             results.add(startStopExecutor.submit(new StartChild(children[i])));
         }
@@ -935,7 +932,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase
 
         // Stop our child containers, if any
         Container children[] = findChildren();
-        List<Future<Void>> results = new ArrayList<Future<Void>>();
+        List<Future<Void>> results = new ArrayList<>();
         for (int i = 0; i < children.length; i++) {
             results.add(startStopExecutor.submit(new StopChild(children[i])));
         }
