@@ -522,6 +522,10 @@ final class StandardWrapperValve
         return processingTime;
     }
 
+    /**
+     * Deprecated   unused
+     */
+    @Deprecated
     public void setProcessingTime(long processingTime) {
         this.processingTime = processingTime;
     }
@@ -530,6 +534,10 @@ final class StandardWrapperValve
         return maxTime;
     }
 
+    /**
+     * Deprecated   unused
+     */
+    @Deprecated
     public void setMaxTime(long maxTime) {
         this.maxTime = maxTime;
     }
@@ -538,6 +546,10 @@ final class StandardWrapperValve
         return minTime;
     }
 
+    /**
+     * Deprecated   unused
+     */
+    @Deprecated
     public void setMinTime(long minTime) {
         this.minTime = minTime;
     }
@@ -546,6 +558,10 @@ final class StandardWrapperValve
         return requestCount;
     }
 
+    /**
+     * Deprecated   unused
+     */
+    @Deprecated
     public void setRequestCount(int requestCount) {
         this.requestCount = requestCount;
     }
@@ -554,6 +570,14 @@ final class StandardWrapperValve
         return errorCount;
     }
 
+    public void incrementErrorCount() {
+        errorCount++;
+    }
+
+    /**
+     * Deprecated   unused
+     */
+    @Deprecated
     public void setErrorCount(int errorCount) {
         this.errorCount = errorCount;
     }
