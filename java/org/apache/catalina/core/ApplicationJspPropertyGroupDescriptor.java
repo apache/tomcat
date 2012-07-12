@@ -28,6 +28,10 @@ import org.apache.catalina.deploy.JspPropertyGroup;
 public class ApplicationJspPropertyGroupDescriptor
         implements JspPropertyGroupDescriptor{
 
+    /**
+     * @deprecated  Will be made private in 8.0.x
+     */
+    @Deprecated
     JspPropertyGroup jspPropertyGroup;
 
 
