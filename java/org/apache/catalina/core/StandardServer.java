@@ -128,6 +128,7 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
      * The set of Services associated with this Server.
      */
     private Service services[] = new Service[0];
+    private final Object servicesLock = new Object();
 
 
     /**
@@ -336,7 +337,7 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
 
         service.setServer(this);
 
-        synchronized (services) {
+        synchronized (servicesLock) {
             Service results[] = new Service[services.length + 1];
             System.arraycopy(services, 0, results, 0, services.length);
             results[services.length] = service;
@@ -518,7 +519,7 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
         if (name == null) {
             return (null);
         }
-        synchronized (services) {
+        synchronized (servicesLock) {
             for (int i = 0; i < services.length; i++) {
                 if (name.equals(services[i].getName())) {
                     return (services[i]);
@@ -536,7 +537,7 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
     @Override
     public Service[] findServices() {
 
-        return (services);
+        return services;
 
     }
 
@@ -561,7 +562,7 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
     @Override
     public void removeService(Service service) {
 
-        synchronized (services) {
+        synchronized (servicesLock) {
             int j = -1;
             for (int i = 0; i < services.length; i++) {
                 if (service == services[i]) {
@@ -739,7 +740,7 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
         globalNamingResources.start();
 
         // Start our defined Services
-        synchronized (services) {
+        synchronized (servicesLock) {
             for (int i = 0; i < services.length; i++) {
                 services[i].start();
             }
