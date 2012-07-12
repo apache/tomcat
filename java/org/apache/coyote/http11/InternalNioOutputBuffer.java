@@ -334,7 +334,6 @@ public class InternalNioOutputBuffer extends AbstractOutputBuffer<NioChannel> {
      */
     protected boolean flushBuffer(boolean block) throws IOException {
 
-        int result = 0;
         //prevent timeout for async,
         SelectionKey key = socket.getIOChannel().keyFor(socket.getPoller().getSelector());
         if (key != null) {
@@ -345,8 +344,8 @@ public class InternalNioOutputBuffer extends AbstractOutputBuffer<NioChannel> {
         boolean dataLeft = hasMoreDataToFlush();
 
         //write to the socket, if there is anything to write
-        if ( dataLeft ) {
-            result = writeToSocket(socket.getBufHandler().getWriteBuffer(),block, !flipped);
+        if (dataLeft) {
+            writeToSocket(socket.getBufHandler().getWriteBuffer(),block, !flipped);
         }
 
         dataLeft = hasMoreDataToFlush();
@@ -360,10 +359,9 @@ public class InternalNioOutputBuffer extends AbstractOutputBuffer<NioChannel> {
                     transfer(buffer.getBuf(), socket.getBufHandler().getWriteBuffer());
                     if (buffer.getBuf().remaining() == 0) {
                         bufIter.remove();
-    }
-                    result = writeToSocket(socket.getBufHandler().getWriteBuffer(),block, true);
+                    }
+                    writeToSocket(socket.getBufHandler().getWriteBuffer(),block, true);
                     //here we must break if we didn't finish the write
-
                 }
             }
         }
