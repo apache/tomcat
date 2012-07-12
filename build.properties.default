@@ -57,8 +57,8 @@ base.path=/usr/share/java
 #base.path=C:/path/to/the/repository
 #base.path=/usr/local
 
-compile.source=1.6
-compile.target=1.6
+compile.source=1.7
+compile.target=1.7
 compile.debug=true
 
 base-apache.loc.1=http://www.apache.org/dist

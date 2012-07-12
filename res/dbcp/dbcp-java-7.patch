@@ -1,0 +1,244 @@
+Index: src/java/org/apache/commons/dbcp/DelegatingCallableStatement.java
+===================================================================
+--- src/java/org/apache/commons/dbcp/DelegatingCallableStatement.java	(revision 1360707)
++++ src/java/org/apache/commons/dbcp/DelegatingCallableStatement.java	(working copy)
+@@ -774,5 +774,20 @@
+             handleException(e);
+         }
+     }
++
++    @Override
++    public <T> T getObject(int parameterIndex, Class<T> type) throws SQLException {
++        checkOpen();
++        return ((CallableStatement)_stmt).getObject(parameterIndex, type);
++    }
++
++    @Override
++    public <T> T getObject(String parameterName, Class<T> type) throws SQLException {
++        checkOpen();
++        return ((CallableStatement)_stmt).getObject(parameterName, type);
++    }
++
++
++
+ /* JDBC_4_ANT_KEY_END */
+ }
+Index: src/java/org/apache/commons/dbcp/cpdsadapter/DriverAdapterCPDS.java
+===================================================================
+--- src/java/org/apache/commons/dbcp/cpdsadapter/DriverAdapterCPDS.java	(revision 1360707)
++++ src/java/org/apache/commons/dbcp/cpdsadapter/DriverAdapterCPDS.java	(working copy)
+@@ -23,6 +23,7 @@
+ import java.io.Serializable;
+ import java.sql.DriverManager;
+ import java.sql.SQLException;
++
+ import javax.sql.PooledConnection;
+ import javax.sql.ConnectionPoolDataSource;
+ import javax.naming.Name;
+@@ -719,4 +720,15 @@
+     {
+         _maxPreparedStatements = maxPreparedStatements;
+     }
++
++    /* JDBC_4_ANT_KEY_BEGIN */
++
++    @Override
++    public java.util.logging.Logger getParentLogger() throws java.sql.SQLFeatureNotSupportedException {
++        throw new java.sql.SQLFeatureNotSupportedException();
+ }
++
++    /* JDBC_4_ANT_KEY_END */
++
++
++}
+Index: src/java/org/apache/commons/dbcp/DelegatingResultSet.java
+===================================================================
+--- src/java/org/apache/commons/dbcp/DelegatingResultSet.java	(revision 1360707)
++++ src/java/org/apache/commons/dbcp/DelegatingResultSet.java	(working copy)
+@@ -1274,5 +1274,17 @@
+             handleException(e);
+         }
+     }
++
++    @Override
++    public <T> T getObject(int columnIndex, Class<T> type) throws SQLException {
++        return _res.getObject(columnIndex, type);
++    }
++
++    @Override
++    public <T> T getObject(String columnLabel, Class<T> type) throws SQLException {
++        return _res.getObject(columnLabel, type);
++    }
++
++
+ /* JDBC_4_ANT_KEY_END */
+ }
+Index: src/java/org/apache/commons/dbcp/PoolingDataSource.java
+===================================================================
+--- src/java/org/apache/commons/dbcp/PoolingDataSource.java	(revision 1360707)
++++ src/java/org/apache/commons/dbcp/PoolingDataSource.java	(working copy)
+@@ -489,4 +489,11 @@
+             }
+         }
+     }
++    /* JDBC_4_ANT_KEY_BEGIN */
++    @Override
++    public java.util.logging.Logger getParentLogger() throws java.sql.SQLFeatureNotSupportedException {
++        throw new java.sql.SQLFeatureNotSupportedException();
+ }
++    /* JDBC_4_ANT_KEY_END */
++
++}
+Index: src/java/org/apache/commons/dbcp/DelegatingConnection.java
+===================================================================
+--- src/java/org/apache/commons/dbcp/DelegatingConnection.java	(revision 1360707)
++++ src/java/org/apache/commons/dbcp/DelegatingConnection.java	(working copy)
+@@ -804,5 +804,37 @@
+             return null;
+         }
+     }
++
++    @Override
++    public void setSchema(String schema) throws SQLException {
++        checkOpen();
++        _conn.setSchema(schema);
++    }
++
++    @Override
++    public String getSchema() throws SQLException {
++        checkOpen();
++        return _conn.getSchema();
++    }
++
++    @Override
++    public void abort(java.util.concurrent.Executor executor) throws SQLException {
++        checkOpen();
++        _conn.abort(executor);
++    }
++
++    @Override
++    public void setNetworkTimeout(java.util.concurrent.Executor executor, int milliseconds) throws SQLException {
++        checkOpen();
++        _conn.setNetworkTimeout(executor, milliseconds);
++    }
++
++    @Override
++    public int getNetworkTimeout() throws SQLException {
++        checkOpen();
++        return _conn.getNetworkTimeout();
++    }
++
++
+ /* JDBC_4_ANT_KEY_END */
+ }
+Index: src/java/org/apache/commons/dbcp/PoolingDriver.java
+===================================================================
+--- src/java/org/apache/commons/dbcp/PoolingDriver.java	(revision 1360707)
++++ src/java/org/apache/commons/dbcp/PoolingDriver.java	(working copy)
+@@ -501,4 +501,11 @@
+             }
+         }
+     }
++    /* JDBC_4_ANT_KEY_BEGIN */
++    @Override
++    public java.util.logging.Logger getParentLogger() throws java.sql.SQLFeatureNotSupportedException {
++        throw new java.sql.SQLFeatureNotSupportedException();
+ }
++    /* JDBC_4_ANT_KEY_END */
++
++}
+Index: src/java/org/apache/commons/dbcp/DelegatingStatement.java
+===================================================================
+--- src/java/org/apache/commons/dbcp/DelegatingStatement.java	(revision 1360707)
++++ src/java/org/apache/commons/dbcp/DelegatingStatement.java	(working copy)
+@@ -529,5 +529,19 @@
+             return false;
+         }
+     }
++
++    @Override
++    public void closeOnCompletion() throws SQLException {
++        checkOpen();
++        _stmt.closeOnCompletion();
++    }
++
++    @Override
++    public boolean isCloseOnCompletion() throws SQLException {
++        checkOpen();
++        return _stmt.isCloseOnCompletion();
++    }
++
++
+ /* JDBC_4_ANT_KEY_END */
+ }
+Index: src/java/org/apache/commons/dbcp/DelegatingDatabaseMetaData.java
+===================================================================
+--- src/java/org/apache/commons/dbcp/DelegatingDatabaseMetaData.java	(revision 1360707)
++++ src/java/org/apache/commons/dbcp/DelegatingDatabaseMetaData.java	(working copy)
+@@ -1377,6 +1377,20 @@
+         }
+     }
+ 
++    @Override
++    public ResultSet getPseudoColumns(String catalog, String schemaPattern, String tableNamePattern,
++            String columnNamePattern) throws SQLException {
++        _conn.checkOpen();
++        return DelegatingResultSet.wrapResultSet(_conn, _meta.getPseudoColumns(catalog, schemaPattern, tableNamePattern, columnNamePattern));
++    }
++
++    @Override
++    public boolean generatedKeyAlwaysReturned() throws SQLException {
++        return _meta.generatedKeyAlwaysReturned();
++    }
++
++
++
+     /* JDBC_4_ANT_KEY_END */
+ 
+ }
+Index: src/java/org/apache/commons/dbcp/BasicDataSource.java
+===================================================================
+--- src/java/org/apache/commons/dbcp/BasicDataSource.java	(revision 1360707)
++++ src/java/org/apache/commons/dbcp/BasicDataSource.java	(working copy)
+@@ -28,6 +28,7 @@
+ import java.sql.Driver;
+ import java.sql.DriverManager;
+ import java.sql.SQLException;
++
+ import javax.sql.DataSource;
+ 
+ import org.apache.commons.pool2.impl.GenericKeyedObjectPoolConfig;
+@@ -1800,4 +1801,13 @@
+             logWriter.println(message);
+         }
+     }
++    /* JDBC_4_ANT_KEY_BEGIN */
++
++    @Override
++    public java.util.logging.Logger getParentLogger() throws java.sql.SQLFeatureNotSupportedException {
++        throw new java.sql.SQLFeatureNotSupportedException();
+ }
++    /* JDBC_4_ANT_KEY_END */
++
++
++}
+Index: src/java/org/apache/commons/dbcp/datasources/InstanceKeyDataSource.java
+===================================================================
+--- src/java/org/apache/commons/dbcp/datasources/InstanceKeyDataSource.java	(revision 1360707)
++++ src/java/org/apache/commons/dbcp/datasources/InstanceKeyDataSource.java	(working copy)
+@@ -888,4 +888,15 @@
+         ref.add(new StringRefAddr("instanceKey", instanceKey));
+         return ref;
+     }
++
++    /* JDBC_4_ANT_KEY_BEGIN */
++
++    @Override
++    public java.util.logging.Logger getParentLogger() throws java.sql.SQLFeatureNotSupportedException {
++        throw new java.sql.SQLFeatureNotSupportedException();
+ }
++    /* JDBC_4_ANT_KEY_END */
++
++
++
++}
