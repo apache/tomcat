@@ -18,16 +18,8 @@ package org.apache.coyote.http11;
 
 
 import org.apache.coyote.AbstractProtocol;
-import org.apache.tomcat.util.res.StringManager;
 
-public abstract class AbstractHttp11Protocol extends AbstractProtocol {
-
-    /**
-     * The string manager for this package.
-     */
-    protected static final StringManager sm =
-        StringManager.getManager(Constants.Package);
-
+public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol {
 
     @Override
     protected String getProtocolName() {
@@ -184,11 +176,12 @@ public abstract class AbstractHttp11Protocol extends AbstractProtocol {
         endpoint.setMaxKeepAliveRequests(mkar);
     }
 
-    protected NpnHandler npnHandler;
+    protected NpnHandler<S> npnHandler;
+    @SuppressWarnings("unchecked")
     public void setNpnHandler(String impl) {
         try {
             Class<?> c = Class.forName(impl);
-            npnHandler = (NpnHandler) c.newInstance();
+            npnHandler = (NpnHandler<S>) c.newInstance();
         } catch (Exception ex) {
             getLog().warn("Failed to init light protocol " + impl, ex);
         }
