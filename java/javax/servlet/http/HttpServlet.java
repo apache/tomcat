@@ -90,7 +90,7 @@ public abstract class HttpServlet extends GenericServlet {
 
     private static final String LSTRING_FILE =
         "javax.servlet.http.LocalStrings";
-    private static ResourceBundle lStrings =
+    private static final ResourceBundle lStrings =
         ResourceBundle.getBundle(LSTRING_FILE);
 
 
@@ -732,9 +732,9 @@ public abstract class HttpServlet extends GenericServlet {
  */
 // file private
 class NoBodyResponse extends HttpServletResponseWrapper {
-    private NoBodyOutputStream                noBody;
-    private PrintWriter                        writer;
-    private boolean                        didSetContentLength;
+    private final NoBodyOutputStream noBody;
+    private PrintWriter writer;
+    private boolean didSetContentLength;
 
     // file private
     NoBodyResponse(HttpServletResponse r) {
@@ -821,10 +821,10 @@ class NoBodyOutputStream extends ServletOutputStream {
 
     private static final String LSTRING_FILE =
         "javax.servlet.http.LocalStrings";
-    private static ResourceBundle lStrings =
+    private static final ResourceBundle lStrings =
         ResourceBundle.getBundle(LSTRING_FILE);
 
-    private int                contentLength = 0;
+    private int contentLength = 0;
 
     // file private
     NoBodyOutputStream() {

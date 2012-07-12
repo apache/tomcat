@@ -34,7 +34,7 @@ import javax.servlet.annotation.ServletSecurity;
 public class ServletSecurityElement extends HttpConstraintElement {
 
     private final Map<String,HttpMethodConstraintElement> methodConstraints =
-        new HashMap<String,HttpMethodConstraintElement>();
+        new HashMap<>();
 
     /**
      * Use default HttpConstraint.
@@ -90,8 +90,7 @@ public class ServletSecurityElement extends HttpConstraintElement {
                 annotation.value().transportGuarantee(),
                 annotation.value().rolesAllowed()));
 
-        List<HttpMethodConstraintElement> l =
-            new ArrayList<HttpMethodConstraintElement>();
+        List<HttpMethodConstraintElement> l = new ArrayList<>();
         HttpMethodConstraint[] constraints = annotation.httpMethodConstraints();
         if (constraints != null) {
             for (int i = 0; i < constraints.length; i++) {
@@ -108,14 +107,13 @@ public class ServletSecurityElement extends HttpConstraintElement {
     }
 
     public Collection<HttpMethodConstraintElement> getHttpMethodConstraints() {
-        Collection<HttpMethodConstraintElement> result =
-                new HashSet<HttpMethodConstraintElement>();
+        Collection<HttpMethodConstraintElement> result = new HashSet<>();
         result.addAll(methodConstraints.values());
         return result;
     }
 
     public Collection<String> getMethodNames() {
-        Collection<String> result = new HashSet<String>();
+        Collection<String> result = new HashSet<>();
         result.addAll(methodConstraints.keySet());
         return result;
     }

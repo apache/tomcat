@@ -230,7 +230,7 @@ public class TagSupport implements IterationTag, Serializable {
      */
     public void setValue(String k, Object o) {
         if (values == null) {
-            values = new Hashtable<String, Object>();
+            values = new Hashtable<>();
         }
         values.put(k, o);
     }

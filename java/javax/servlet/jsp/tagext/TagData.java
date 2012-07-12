@@ -56,9 +56,9 @@ public class TagData implements Cloneable {
      */
     public TagData(Object[] atts[]) {
         if (atts == null) {
-            attributes = new Hashtable<String, Object>();
+            attributes = new Hashtable<>();
         } else {
-            attributes = new Hashtable<String, Object>(atts.length);
+            attributes = new Hashtable<>(atts.length);
         }
 
         if (atts != null) {

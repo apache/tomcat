@@ -174,8 +174,7 @@ public class ImplicitObjectELResolver extends ELResolver {
 
     @Override
     public Iterator<FeatureDescriptor> getFeatureDescriptors(ELContext context, Object base) {
-        List<FeatureDescriptor> feats = new ArrayList<FeatureDescriptor>(
-                SCOPE_NAMES.length);
+        List<FeatureDescriptor> feats = new ArrayList<>(SCOPE_NAMES.length);
         FeatureDescriptor feat;
         for (int i = 0; i < SCOPE_NAMES.length; i++) {
             feat = new FeatureDescriptor();
@@ -272,7 +271,7 @@ public class ImplicitObjectELResolver extends ELResolver {
                         Cookie[] c = ((HttpServletRequest) page.getRequest())
                                 .getCookies();
                         if (c != null) {
-                            Vector<String> v = new Vector<String>();
+                            Vector<String> v = new Vector<>();
                             for (int i = 0; i < c.length; i++) {
                                 v.add(c[i].getName());
                             }
@@ -334,7 +333,7 @@ public class ImplicitObjectELResolver extends ELResolver {
                             ((HttpServletRequest) page.getRequest())
                                     .getHeaders(name);
                         if (e != null) {
-                            List<String> list = new ArrayList<String>();
+                            List<String> list = new ArrayList<>();
                             while (e.hasMoreElements()) {
                                 list.add(e.nextElement());
                             }
@@ -517,7 +516,7 @@ public class ImplicitObjectELResolver extends ELResolver {
         @Override
         public final Set<Map.Entry<String,V>> entrySet() {
             Enumeration<String> e = getAttributeNames();
-            Set<Map.Entry<String, V>> set = new HashSet<Map.Entry<String, V>>();
+            Set<Map.Entry<String, V>> set = new HashSet<>();
             if (e != null) {
                 while (e.hasMoreElements()) {
                     set.add(new ScopeEntry(e.nextElement()));

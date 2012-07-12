@@ -230,13 +230,13 @@ public abstract class TagLibraryInfo {
     /**
      * The prefix assigned to this taglib from the taglib directive.
      */
-    protected String prefix;
+    protected final String prefix;
 
     /**
      * The value of the uri attribute from the taglib directive for this
      * library.
      */
-    protected String uri;
+    protected final String uri;
 
     /**
      * An array describing the tags that are defined in this tag library.
