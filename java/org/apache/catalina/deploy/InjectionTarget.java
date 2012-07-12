@@ -16,10 +16,15 @@
  */
 package org.apache.catalina.deploy;
 
+import java.io.Serializable;
+
 /**
  * @version $Id$
  */
-public class InjectionTarget {
+public class InjectionTarget implements Serializable {
+
+    private static final long serialVersionUID = 1L;
+
     private String targetClass;
     private String targetName;
 
