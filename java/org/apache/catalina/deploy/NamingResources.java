@@ -87,66 +87,62 @@ public class NamingResources extends LifecycleMBeanBase implements Serializable 
     /**
      * Set of naming entries, keyed by name.
      */
-    private Set<String> entries = new HashSet<String>();
+    private final Set<String> entries = new HashSet<>();
 
 
     /**
      * The EJB resource references for this web application, keyed by name.
      */
-    private HashMap<String, ContextEjb> ejbs =
-        new HashMap<String, ContextEjb>();
+    private final HashMap<String, ContextEjb> ejbs = new HashMap<>();
 
 
     /**
      * The environment entries for this web application, keyed by name.
      */
-    private HashMap<String, ContextEnvironment> envs =
-        new HashMap<String, ContextEnvironment>();
+    private final HashMap<String, ContextEnvironment> envs = new HashMap<>();
 
 
     /**
      * The local  EJB resource references for this web application, keyed by
      * name.
      */
-    private HashMap<String, ContextLocalEjb> localEjbs =
-        new HashMap<String, ContextLocalEjb>();
+    private final HashMap<String, ContextLocalEjb> localEjbs = new HashMap<>();
 
 
     /**
      * The message destination referencess for this web application,
      * keyed by name.
      */
-    private HashMap<String, MessageDestinationRef> mdrs =
-        new HashMap<String, MessageDestinationRef>();
+    private final HashMap<String, MessageDestinationRef> mdrs = new HashMap<>();
 
 
     /**
      * The resource environment references for this web application,
      * keyed by name.
      */
-    private HashMap<String, ContextResourceEnvRef> resourceEnvRefs =
-        new HashMap<String, ContextResourceEnvRef>();
+    private final HashMap<String, ContextResourceEnvRef> resourceEnvRefs =
+        new HashMap<>();
 
 
     /**
      * The resource references for this web application, keyed by name.
      */
-    private HashMap<String, ContextResource> resources =
-        new HashMap<String, ContextResource>();
+    private final HashMap<String, ContextResource> resources =
+        new HashMap<>();
 
 
     /**
      * The resource links for this web application, keyed by name.
      */
-    private HashMap<String, ContextResourceLink> resourceLinks =
-        new HashMap<String, ContextResourceLink>();
+    private final HashMap<String, ContextResourceLink> resourceLinks =
+        new HashMap<>();
 
 
     /**
      * The web service references for this web application, keyed by name.
      */
-    private HashMap<String, ContextService> services =
-        new HashMap<String, ContextService>();
+    private final HashMap<String, ContextService> services =
+        new HashMap<>();
 
 
     /**
@@ -158,7 +154,8 @@ public class NamingResources extends LifecycleMBeanBase implements Serializable 
     /**
      * The property change support for this component.
      */
-    protected PropertyChangeSupport support = new PropertyChangeSupport(this);
+    protected final PropertyChangeSupport support =
+            new PropertyChangeSupport(this);
 
 
     // ------------------------------------------------------------- Properties

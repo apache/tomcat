@@ -130,7 +130,7 @@ public class FilterDef implements Serializable {
      * The set of initialization parameters for this filter, keyed by
      * parameter name.
      */
-    private Map<String, String> parameters = new HashMap<String, String>();
+    private final Map<String, String> parameters = new HashMap<>();
 
     public Map<String, String> getParameterMap() {
 

@@ -186,8 +186,7 @@ public class ContextService extends ResourceBase {
      *
      * The instantiation of the handler have to be done.
      */
-    private final HashMap<String, ContextHandler> handlers =
-        new HashMap<String, ContextHandler>();
+    private final HashMap<String, ContextHandler> handlers = new HashMap<>();
 
     public Iterator<String> getHandlers() {
         return handlers.keySet().iterator();

@@ -178,7 +178,7 @@ public class FilterMap implements Serializable {
     }
 
     public String[] getDispatcherNames() {
-        ArrayList<String> result = new ArrayList<String>();
+        ArrayList<String> result = new ArrayList<>();
         if ((dispatcherMapping & FORWARD) > 0) {
             result.add(DispatcherType.FORWARD.name());
         }

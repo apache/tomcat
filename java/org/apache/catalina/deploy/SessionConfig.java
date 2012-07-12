@@ -35,7 +35,7 @@ public class SessionConfig {
     private Boolean cookieHttpOnly;
     private Boolean cookieSecure;
     private Integer cookieMaxAge;
-    private EnumSet<SessionTrackingMode> sessionTrackingModes =
+    private final EnumSet<SessionTrackingMode> sessionTrackingModes =
         EnumSet.noneOf(SessionTrackingMode.class);
 
     public Integer getSessionTimeout() {
