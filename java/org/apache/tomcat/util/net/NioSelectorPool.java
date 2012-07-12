@@ -199,7 +199,7 @@ public class NioSelectorPool {
                     if (writeTimeout==0) {
                         timedout = buf.hasRemaining();
                     } else if (writeTimeout<0) {
-                        selector.select();
+                        keycount = selector.select();
                     } else {
                         keycount = selector.select(writeTimeout);
                     }
@@ -273,7 +273,7 @@ public class NioSelectorPool {
                     if (readTimeout==0) {
                         timedout = (read==0);
                     } else if (readTimeout<0) {
-                        selector.select();
+                        keycount = selector.select();
                     } else {
                         keycount = selector.select(readTimeout);
                     }
