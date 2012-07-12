@@ -63,7 +63,7 @@ public class JMXAccessorCreateTask extends JMXAccessorTask {
 
     private String className;
     private String classLoader;
-    private List<Arg> args=new ArrayList<Arg>();
+    private List<Arg> args=new ArrayList<>();
 
     // ------------------------------------------------------------- Properties
 
