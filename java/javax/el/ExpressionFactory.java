@@ -55,8 +55,8 @@ public abstract class ExpressionFactory {
     private static final String PROPERTY_FILE;
 
     private static final CacheValue nullTcclFactory = new CacheValue();
-    private static ConcurrentMap<CacheKey, CacheValue> factoryCache
-        = new ConcurrentHashMap<CacheKey, CacheValue>();
+    private static final ConcurrentMap<CacheKey, CacheValue> factoryCache =
+            new ConcurrentHashMap<>();
 
     static {
         if (IS_SECURITY_ENABLED) {
@@ -240,7 +240,7 @@ public abstract class ExpressionFactory {
 
         public CacheKey(ClassLoader cl) {
             hash = cl.hashCode();
-            ref = new WeakReference<ClassLoader>(cl);
+            ref = new WeakReference<>(cl);
         }
 
         @Override

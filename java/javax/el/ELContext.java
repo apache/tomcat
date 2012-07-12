@@ -55,7 +55,7 @@ public abstract class ELContext {
         }
 
         if (this.map == null) {
-            this.map = new HashMap<Class<?>, Object>();
+            this.map = new HashMap<>();
         }
 
         this.map.put(key, contextObject);
