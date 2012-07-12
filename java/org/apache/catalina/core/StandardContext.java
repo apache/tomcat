@@ -253,7 +253,7 @@ public class StandardContext extends ContainerBase
      * The ordered set of ServletContainerInitializers for this web application.
      */
     private Map<ServletContainerInitializer,Set<Class<?>>> initializers =
-        new LinkedHashMap<ServletContainerInitializer,Set<Class<?>>>();
+        new LinkedHashMap<>();
 
 
     /**
@@ -376,8 +376,7 @@ public class StandardContext extends ContainerBase
      * The exception pages for this web application, keyed by fully qualified
      * class name of the Java exception.
      */
-    private HashMap<String, ErrorPage> exceptionPages =
-        new HashMap<String, ErrorPage>();
+    private HashMap<String, ErrorPage> exceptionPages = new HashMap<>();
 
 
     /**
@@ -385,15 +384,14 @@ public class StandardContext extends ContainerBase
      * have initialized, keyed by filter name.
      */
     private HashMap<String, ApplicationFilterConfig> filterConfigs =
-        new HashMap<String, ApplicationFilterConfig>();
+            new HashMap<>();
 
 
     /**
      * The set of filter definitions for this application, keyed by
      * filter name.
      */
-    private HashMap<String, FilterDef> filterDefs =
-        new HashMap<String, FilterDef>();
+    private HashMap<String, FilterDef> filterDefs = new HashMap<>();
 
 
     /**
@@ -459,21 +457,20 @@ public class StandardContext extends ContainerBase
      * The message destinations for this web application.
      */
     private HashMap<String, MessageDestination> messageDestinations =
-        new HashMap<String, MessageDestination>();
+        new HashMap<>();
 
 
     /**
      * The MIME mappings for this web application, keyed by extension.
      */
-    private HashMap<String, String> mimeMappings =
-        new HashMap<String, String>();
+    private HashMap<String, String> mimeMappings = new HashMap<>();
 
 
     /**
      * The context initialization parameters for this web application,
      * keyed by name.
      */
-    private HashMap<String, String> parameters = new HashMap<String, String>();
+    private HashMap<String, String> parameters = new HashMap<>();
 
 
     /**
@@ -534,8 +531,7 @@ public class StandardContext extends ContainerBase
      * The security role mappings for this application, keyed by role
      * name (as used within the application).
      */
-    private HashMap<String, String> roleMappings =
-        new HashMap<String, String>();
+    private HashMap<String, String> roleMappings = new HashMap<>();
 
 
     /**
@@ -550,8 +546,7 @@ public class StandardContext extends ContainerBase
      * The servlet mappings for this web application, keyed by
      * matching pattern.
      */
-    private HashMap<String, String> servletMappings =
-        new HashMap<String, String>();
+    private HashMap<String, String> servletMappings = new HashMap<>();
 
     private final Object servletMappingsLock = new Object();
 
@@ -571,8 +566,7 @@ public class StandardContext extends ContainerBase
      * HTTP status code (as an Integer). Note status code zero is used for the
      * default error page.
      */
-    private HashMap<Integer, ErrorPage> statusPages =
-        new HashMap<Integer, ErrorPage>();
+    private HashMap<Integer, ErrorPage> statusPages = new HashMap<>();
 
 
     /**
@@ -828,7 +822,7 @@ public class StandardContext extends ContainerBase
     private JspConfigDescriptor jspConfigDescriptor =
         new ApplicationJspConfigDescriptor();
 
-    private Set<String> resourceOnlyServlets = new HashSet<String>();
+    private Set<String> resourceOnlyServlets = new HashSet<>();
 
     private String webappVersion = "";
 
@@ -840,7 +834,7 @@ public class StandardContext extends ContainerBase
      * Servlets created via {@link ApplicationContext#createServlet(Class)} for
      * tracking purposes.
      */
-    private Set<Servlet> createdServlets = new HashSet<Servlet>();
+    private Set<Servlet> createdServlets = new HashSet<>();
 
     private boolean preemptiveAuthentication = false;
 
@@ -3557,8 +3551,7 @@ public class StandardContext extends ContainerBase
      *
      * @param name Name of the desired message destination ref
      */
-    public MessageDestinationRef
-        findMessageDestinationRef(String name) {
+    public MessageDestinationRef findMessageDestinationRef(String name) {
 
         return namingResources.findMessageDestinationRef(name);
 
@@ -3570,8 +3563,7 @@ public class StandardContext extends ContainerBase
      * application.  If none have been defined, a zero-length array
      * is returned.
      */
-    public MessageDestinationRef[]
-        findMessageDestinationRefs() {
+    public MessageDestinationRef[] findMessageDestinationRefs() {
 
         return namingResources.findMessageDestinationRefs();
 
@@ -4698,8 +4690,8 @@ public class StandardContext extends ContainerBase
         }
 
         // Sort listeners in two arrays
-        ArrayList<Object> eventListeners = new ArrayList<Object>();
-        ArrayList<Object> lifecycleListeners = new ArrayList<Object>();
+        ArrayList<Object> eventListeners = new ArrayList<>();
+        ArrayList<Object> lifecycleListeners = new ArrayList<>();
         for (int i = 0; i < results.length; i++) {
             if ((results[i] instanceof ServletContextAttributeListener)
                 || (results[i] instanceof ServletRequestAttributeListener)
@@ -4847,7 +4839,7 @@ public class StandardContext extends ContainerBase
 
         boolean ok = true;
 
-        Hashtable<String, String> env = new Hashtable<String, String>();
+        Hashtable<String, String> env = new Hashtable<>();
         if (getParent() != null)
             env.put(ProxyDirContext.HOST, getParent().getName());
         env.put(ProxyDirContext.CONTEXT, getName());
@@ -4961,8 +4953,7 @@ public class StandardContext extends ContainerBase
     public void loadOnStartup(Container children[]) {
 
         // Collect "load on startup" servlets that need to be initialized
-        TreeMap<Integer, ArrayList<Wrapper>> map =
-            new TreeMap<Integer, ArrayList<Wrapper>>();
+        TreeMap<Integer, ArrayList<Wrapper>> map = new TreeMap<>();
         for (int i = 0; i < children.length; i++) {
             Wrapper wrapper = (Wrapper) children[i];
             int loadOnStartup = wrapper.getLoadOnStartup();
@@ -4971,7 +4962,7 @@ public class StandardContext extends ContainerBase
             Integer key = Integer.valueOf(loadOnStartup);
             ArrayList<Wrapper> list = map.get(key);
             if (list == null) {
-                list = new ArrayList<Wrapper>();
+                list = new ArrayList<>();
                 map.put(key, list);
             }
             list.add(wrapper);
@@ -5329,7 +5320,7 @@ public class StandardContext extends ContainerBase
     }
 
     private Map<String, Map<String, String>> buildInjectionMap(NamingResources namingResources) {
-        Map<String, Map<String, String>> injectionMap = new HashMap<String, Map<String, String>>();
+        Map<String, Map<String, String>> injectionMap = new HashMap<>();
         for (Injectable resource: namingResources.findLocalEjbs()) {
             addInjectionTarget(resource, injectionMap);
         }
@@ -5362,7 +5353,7 @@ public class StandardContext extends ContainerBase
                 String clazz = injectionTarget.getTargetClass();
                 Map<String, String> injections = injectionMap.get(clazz);
                 if (injections == null) {
-                    injections = new HashMap<String, String>();
+                    injections = new HashMap<>();
                     injectionMap.put(clazz, injections);
                 }
                 injections.put(injectionTarget.getTargetName(), jndiName);
@@ -5379,7 +5370,7 @@ public class StandardContext extends ContainerBase
      * the application parameters appropriately.
      */
     private void mergeParameters() {
-        Map<String,String> mergedParams = new HashMap<String,String>();
+        Map<String,String> mergedParams = new HashMap<>();
 
         String names[] = findParameters();
         for (int i = 0; i < names.length; i++) {
@@ -5696,7 +5687,7 @@ public class StandardContext extends ContainerBase
             ServletRegistration.Dynamic registration,
             ServletSecurityElement servletSecurityElement) {
 
-        Set<String> conflicts = new HashSet<String>();
+        Set<String> conflicts = new HashSet<>();
 
         Collection<String> urlPatterns = registration.getMappings();
         for (String urlPattern : urlPatterns) {
@@ -5845,7 +5836,7 @@ public class StandardContext extends ContainerBase
         if (parent == null) {
         namingContextName = getName();
         } else {
-        Stack<String> stk = new Stack<String>();
+        Stack<String> stk = new Stack<>();
         StringBuilder buff = new StringBuilder();
         while (parent != null) {
             stk.push(parent.getName());

@@ -62,8 +62,8 @@ final class ApplicationFilterChain implements FilterChain, CometFilterChain {
 
     static {
         if (ApplicationDispatcher.WRAP_SAME_OBJECT) {
-            lastServicedRequest = new ThreadLocal<ServletRequest>();
-            lastServicedResponse = new ThreadLocal<ServletResponse>();
+            lastServicedRequest = new ThreadLocal<>();
+            lastServicedResponse = new ThreadLocal<>();
         } else {
             lastServicedRequest = null;
             lastServicedResponse = null;
@@ -136,30 +136,28 @@ final class ApplicationFilterChain implements FilterChain, CometFilterChain {
      * Static class array used when the SecurityManager is turned on and
      * <code>doFilter</code> is invoked.
      */
-    private static Class<?>[] classType = new Class[]{ServletRequest.class,
-                                                      ServletResponse.class,
-                                                      FilterChain.class};
+    private static final Class<?>[] classType = new Class[]{
+        ServletRequest.class, ServletResponse.class, FilterChain.class};
 
     /**
      * Static class array used when the SecurityManager is turned on and
      * <code>service</code> is invoked.
      */
-    private static Class<?>[] classTypeUsedInService = new Class[]{
-                                                         ServletRequest.class,
-                                                         ServletResponse.class};
+    private static final Class<?>[] classTypeUsedInService = new Class[]{
+        ServletRequest.class, ServletResponse.class};
 
     /**
      * Static class array used when the SecurityManager is turned on and
      * <code>doFilterEvent</code> is invoked.
      */
-    private static Class<?>[] cometClassType =
+    private static final Class<?>[] cometClassType =
         new Class[]{ CometEvent.class, CometFilterChain.class};
 
     /**
      * Static class array used when the SecurityManager is turned on and
      * <code>event</code> is invoked.
      */
-    private static Class<?>[] classTypeUsedInEvent =
+    private static final Class<?>[] classTypeUsedInEvent =
         new Class[] { CometEvent.class };
 
 

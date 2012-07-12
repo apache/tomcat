@@ -135,8 +135,7 @@ public class NamingContextListener
     /**
      * Objectnames hashtable.
      */
-    protected HashMap<String, ObjectName> objectNames =
-        new HashMap<String, ObjectName>();
+    protected HashMap<String, ObjectName> objectNames = new HashMap<>();
 
 
     /**
@@ -227,7 +226,7 @@ public class NamingContextListener
             if (initialized)
                 return;
 
-            Hashtable<String, Object> contextEnv = new Hashtable<String, Object>();
+            Hashtable<String, Object> contextEnv = new Hashtable<>();
             try {
                 namingContext = new NamingContext(contextEnv, getName());
             } catch (NamingException e) {

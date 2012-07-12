@@ -56,7 +56,7 @@ public final class StandardWrapperFacade
     /**
      * Wrapped config.
      */
-    private ServletConfig config = null;
+    private final ServletConfig config;
 
 
     /**

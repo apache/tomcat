@@ -105,7 +105,7 @@ public class StandardEngine extends ContainerBase implements Engine {
      * the intended host and context.
      */
     private final AtomicReference<AccessLog> defaultAccessLog =
-        new AtomicReference<AccessLog>();
+        new AtomicReference<>();
 
     // ------------------------------------------------------------- Properties
 
@@ -416,9 +416,9 @@ public class StandardEngine extends ContainerBase implements Engine {
             implements PropertyChangeListener, LifecycleListener,
             ContainerListener {
 
-        private StandardEngine engine;
-        private Host host;
-        private Context context;
+        private final StandardEngine engine;
+        private final Host host;
+        private final Context context;
         private volatile boolean disabled = false;
 
         public AccessLogListener(StandardEngine engine, Host host,

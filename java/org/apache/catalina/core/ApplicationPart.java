@@ -42,8 +42,8 @@ import org.apache.tomcat.util.http.fileupload.disk.DiskFileItem;
  */
 public class ApplicationPart implements Part {
 
-    private FileItem fileItem;
-    private MultipartConfigElement mce;
+    private final FileItem fileItem;
+    private final MultipartConfigElement mce;
 
     public ApplicationPart(FileItem fileItem, MultipartConfigElement mce) {
         this.fileItem = fileItem;
@@ -71,7 +71,7 @@ public class ApplicationPart implements Part {
     @Override
     public Collection<String> getHeaderNames() {
         if (fileItem instanceof DiskFileItem) {
-            HashSet<String> headerNames = new HashSet<String>();
+            HashSet<String> headerNames = new HashSet<>();
             Iterator<String> iter =
                 ((DiskFileItem) fileItem).getHeaders().getHeaderNames();
             while (iter.hasNext()) {
@@ -85,7 +85,7 @@ public class ApplicationPart implements Part {
     @Override
     public Collection<String> getHeaders(String name) {
         if (fileItem instanceof DiskFileItem) {
-            HashSet<String> headers = new HashSet<String>();
+            HashSet<String> headers = new HashSet<>();
             Iterator<String> iter =
                 ((DiskFileItem) fileItem).getHeaders().getHeaders(name);
             while (iter.hasNext()) {

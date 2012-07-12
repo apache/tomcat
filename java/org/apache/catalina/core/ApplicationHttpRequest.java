@@ -105,7 +105,7 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
     /**
      * The context for this request.
      */
-    protected Context context = null;
+    protected final Context context;
 
 
     /**
@@ -118,7 +118,7 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
      * If this request is cross context, since this changes session access
      * behavior.
      */
-    protected boolean crossContext = false;
+    protected final boolean crossContext;
 
 
     /**
@@ -185,7 +185,7 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
     /**
      * Special attributes.
      */
-    protected Object[] specialAttributes = new Object[specials.length];
+    protected final Object[] specialAttributes = new Object[specials.length];
 
 
     // ------------------------------------------------- ServletRequest Methods
@@ -625,9 +625,10 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
      */
     Map<String, String[]> copyMap(Map<String, String[]> orig) {
 
-        if (orig == null)
-            return (new HashMap<String, String[]>());
-        HashMap<String, String[]> dest = new HashMap<String, String[]>();
+        if (orig == null) {
+            return (new HashMap<>());
+        }
+        HashMap<String, String[]> dest = new HashMap<>();
 
         for (Map.Entry<String, String[]> entry : orig.entrySet()) {
             dest.put(entry.getKey(), entry.getValue());
@@ -734,7 +735,7 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
             return;
         }
 
-        parameters = new HashMap<String, String[]>();
+        parameters = new HashMap<>();
         parameters = copyMap(getRequest().getParameterMap());
         mergeParameters();
         parsedParams = true;
@@ -826,7 +827,7 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
      */
     protected String[] mergeValues(Object values1, Object values2) {
 
-        ArrayList<Object> results = new ArrayList<Object>();
+        ArrayList<Object> results = new ArrayList<>();
 
         if (values1 == null) {
             // Skip - nothing to merge
@@ -870,7 +871,7 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
         if ((queryParamString == null) || (queryParamString.length() < 1))
             return;
 
-        HashMap<String, String[]> queryParameters = new HashMap<String, String[]>();
+        HashMap<String, String[]> queryParameters = new HashMap<>();
         String encoding = getCharacterEncoding();
         if (encoding == null)
             encoding = "ISO-8859-1";
@@ -902,17 +903,19 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
     protected class AttributeNamesEnumerator implements Enumeration<String> {
 
         protected int pos = -1;
-        protected int last = -1;
-        protected Enumeration<String> parentEnumeration = null;
+        protected final int last;
+        protected final Enumeration<String> parentEnumeration;
         protected String next = null;
 
         public AttributeNamesEnumerator() {
+            int last = -1;
             parentEnumeration = getRequest().getAttributeNames();
             for (int i = 0; i < specialAttributes.length; i++) {
                 if (getAttribute(specials[i]) != null) {
                     last = i;
                 }
             }
+            this.last = last;
         }
 
         @Override

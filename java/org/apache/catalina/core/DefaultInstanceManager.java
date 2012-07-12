@@ -72,13 +72,13 @@ public class DefaultInstanceManager implements InstanceManager {
     private final Map<String, Map<String, String>> injectionMap;
     protected final ClassLoader classLoader;
     protected final ClassLoader containerClassLoader;
-    protected boolean privileged;
-    protected boolean ignoreAnnotations;
+    protected final boolean privileged;
+    protected final boolean ignoreAnnotations;
     private final Properties restrictedFilters = new Properties();
     private final Properties restrictedListeners = new Properties();
     private final Properties restrictedServlets = new Properties();
     private final Map<Class<?>, AnnotationCacheEntry[]> annotationCache =
-        new WeakHashMap<Class<?>, AnnotationCacheEntry[]>();
+        new WeakHashMap<>();
 
     public DefaultInstanceManager(Context context, Map<String, Map<String, String>> injectionMap, org.apache.catalina.Context catalinaContext, ClassLoader containerClassLoader) {
         classLoader = catalinaContext.getLoader().getClassLoader();
@@ -156,7 +156,7 @@ public class DefaultInstanceManager implements InstanceManager {
     }
 
     private Map<String, String> assembleInjectionsFromClassHierarchy(Class<?> clazz) {
-        Map<String, String> injections = new HashMap<String, String>();
+        Map<String, String> injections = new HashMap<>();
         Map<String, String> currentInjections = null;
         while (clazz != null) {
             currentInjections = this.injectionMap.get(clazz.getName());
@@ -281,7 +281,7 @@ public class DefaultInstanceManager implements InstanceManager {
             }
             if (annotationsArray == null) {
                 if (annotations == null) {
-                    annotations = new ArrayList<AnnotationCacheEntry>();
+                    annotations = new ArrayList<>();
                 } else {
                     annotations.clear();
                 }

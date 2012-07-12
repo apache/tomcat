@@ -132,21 +132,20 @@ public class ApplicationContext
     /**
      * The context attributes for this context.
      */
-    protected Map<String,Object> attributes =
-        new ConcurrentHashMap<String,Object>();
+    protected Map<String,Object> attributes = new ConcurrentHashMap<>();
 
 
     /**
      * List of read only attributes for this context.
      */
-    private Map<String,String> readOnlyAttributes =
-        new ConcurrentHashMap<String,String>();
+    private final Map<String,String> readOnlyAttributes =
+            new ConcurrentHashMap<>();
 
 
     /**
      * The Context instance with which we are associated.
      */
-    private StandardContext context = null;
+    private final StandardContext context;
 
 
     /**
@@ -163,14 +162,14 @@ public class ApplicationContext
     /**
      * The facade around this object.
      */
-    private ServletContext facade = new ApplicationContextFacade(this);
+    private final ServletContext facade = new ApplicationContextFacade(this);
 
 
     /**
      * The merged context initialization parameters for this Context.
      */
     private final ConcurrentHashMap<String,String> parameters =
-        new ConcurrentHashMap<String,String>();
+            new ConcurrentHashMap<>();
 
 
     /**
@@ -183,14 +182,13 @@ public class ApplicationContext
     /**
      * Thread local data used during request dispatch.
      */
-    private ThreadLocal<DispatchData> dispatchData =
-        new ThreadLocal<DispatchData>();
+    private final ThreadLocal<DispatchData> dispatchData = new ThreadLocal<>();
 
 
     /**
      * Session Cookie config
      */
-    private SessionCookieConfig sessionCookieConfig =
+    private final SessionCookieConfig sessionCookieConfig =
         new ApplicationSessionCookieConfig();
 
     /**
@@ -230,7 +228,7 @@ public class ApplicationContext
      */
     @Override
     public Enumeration<String> getAttributeNames() {
-        Set<String> names = new HashSet<String>();
+        Set<String> names = new HashSet<>();
         names.addAll(attributes.keySet());
         return Collections.enumeration(names);
     }
@@ -617,7 +615,7 @@ public class ApplicationContext
     private Set<String> getResourcePathsInternal(DirContext resources,
             String path) {
 
-        ResourceSet<String> set = new ResourceSet<String>();
+        ResourceSet<String> set = new ResourceSet<>();
         try {
             listCollectionPaths(set, resources, path);
         } catch (NamingException e) {
@@ -971,7 +969,6 @@ public class ApplicationContext
     public <T extends Filter> T createFilter(Class<T> c)
     throws ServletException {
         try {
-            @SuppressWarnings("unchecked")
             T filter = (T) context.getInstanceManager().newInstance(c.getName());
             return filter;
         } catch (IllegalAccessException e) {
@@ -1116,7 +1113,6 @@ public class ApplicationContext
     public <T extends Servlet> T createServlet(Class<T> c)
     throws ServletException {
         try {
-            @SuppressWarnings("unchecked")
             T servlet = (T) context.getInstanceManager().newInstance(c.getName());
             context.dynamicServletCreated(servlet);
             return servlet;
@@ -1348,7 +1344,6 @@ public class ApplicationContext
     public <T extends EventListener> T createListener(Class<T> c)
             throws ServletException {
         try {
-            @SuppressWarnings("unchecked")
             T listener =
                 (T) context.getInstanceManager().newInstance(c.getName());
             if (listener instanceof ServletContextListener ||
@@ -1439,8 +1434,7 @@ public class ApplicationContext
 
     @Override
     public Map<String, ? extends FilterRegistration> getFilterRegistrations() {
-        Map<String, ApplicationFilterRegistration> result =
-            new HashMap<String, ApplicationFilterRegistration>();
+        Map<String, ApplicationFilterRegistration> result = new HashMap<>();
 
         FilterDef[] filterDefs = context.findFilterDefs();
         for (FilterDef filterDef : filterDefs) {
@@ -1460,8 +1454,7 @@ public class ApplicationContext
 
     @Override
     public Map<String, ? extends ServletRegistration> getServletRegistrations() {
-        Map<String, ApplicationServletRegistration> result =
-            new HashMap<String, ApplicationServletRegistration>();
+        Map<String, ApplicationServletRegistration> result = new HashMap<>();
 
         Container[] wrappers = context.findChildren();
         for (Container wrapper : wrappers) {
@@ -1485,7 +1478,7 @@ public class ApplicationContext
     protected void clearAttributes() {
 
         // Create list of attributes to be removed
-        ArrayList<String> list = new ArrayList<String>();
+        ArrayList<String> list = new ArrayList<>();
         Iterator<String> iter = attributes.keySet().iterator();
         while (iter.hasNext()) {
             list.add(iter.next());

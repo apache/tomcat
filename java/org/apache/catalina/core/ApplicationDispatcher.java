@@ -88,8 +88,8 @@ final class ApplicationDispatcher
 
     protected class PrivilegedForward
             implements PrivilegedExceptionAction<Void> {
-        private ServletRequest request;
-        private ServletResponse response;
+        private final ServletRequest request;
+        private final ServletResponse response;
 
         PrivilegedForward(ServletRequest request, ServletResponse response)
         {
@@ -106,8 +106,8 @@ final class ApplicationDispatcher
 
     protected class PrivilegedInclude implements
             PrivilegedExceptionAction<Void> {
-        private ServletRequest request;
-        private ServletResponse response;
+        private final ServletRequest request;
+        private final ServletResponse response;
 
         PrivilegedInclude(ServletRequest request, ServletResponse response)
         {
@@ -223,37 +223,37 @@ final class ApplicationDispatcher
     /**
      * The Context this RequestDispatcher is associated with.
      */
-    private Context context = null;
+    private final Context context;
 
 
     /**
      * The servlet name for a named dispatcher.
      */
-    private String name = null;
+    private final String name;
 
 
     /**
      * The extra path information for this RequestDispatcher.
      */
-    private String pathInfo = null;
+    private final String pathInfo;
 
 
     /**
      * The query string parameters for this RequestDispatcher.
      */
-    private String queryString = null;
+    private final String queryString;
 
 
     /**
      * The request URI for this RequestDispatcher.
      */
-    private String requestURI = null;
+    private final String requestURI;
 
 
     /**
      * The servlet path for this RequestDispatcher.
      */
-    private String servletPath = null;
+    private final String servletPath;
 
 
     /**
@@ -267,14 +267,14 @@ final class ApplicationDispatcher
      * The InstanceSupport instance associated with our Wrapper (used to
      * send "before dispatch" and "after dispatch" events.
      */
-    private InstanceSupport support = null;
+    private final InstanceSupport support;
 
 
     /**
      * The Wrapper associated with the resource that will be forwarded to
      * or included.
      */
-    private Wrapper wrapper = null;
+    private final Wrapper wrapper;
 
 
     // --------------------------------------------------------- Public Methods

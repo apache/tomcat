@@ -89,8 +89,7 @@ class ApplicationRequest extends ServletRequestWrapper {
      * The request attributes for this request.  This is initialized from the
      * wrapped request, but updates are allowed.
      */
-    protected HashMap<String, Object> attributes =
-        new HashMap<String, Object>();
+    protected final HashMap<String, Object> attributes = new HashMap<>();
 
 
     // ------------------------------------------------- ServletRequest Methods

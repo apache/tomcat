@@ -42,8 +42,8 @@ public class ApplicationServletRegistration
     private static final StringManager sm =
       StringManager.getManager(Constants.Package);
 
-    private Wrapper wrapper;
-    private Context context;
+    private final Wrapper wrapper;
+    private final Context context;
 
     public ApplicationServletRegistration(Wrapper wrapper,
             Context context) {
@@ -64,7 +64,7 @@ public class ApplicationServletRegistration
 
     @Override
     public Map<String, String> getInitParameters() {
-        ParameterMap<String,String> result = new ParameterMap<String,String>();
+        ParameterMap<String,String> result = new ParameterMap<>();
 
         String[] parameterNames = wrapper.findInitParameters();
 
@@ -100,7 +100,7 @@ public class ApplicationServletRegistration
     @Override
     public Set<String> setInitParameters(Map<String, String> initParameters) {
 
-        Set<String> conflicts = new HashSet<String>();
+        Set<String> conflicts = new HashSet<>();
 
         for (Map.Entry<String, String> entry : initParameters.entrySet()) {
             if (entry.getKey() == null || entry.getValue() == null) {
@@ -168,7 +168,7 @@ public class ApplicationServletRegistration
             return Collections.emptySet();
         }
 
-        Set<String> conflicts = new HashSet<String>();
+        Set<String> conflicts = new HashSet<>();
 
         for (String urlPattern : urlPatterns) {
             String wrapperName = context.findServletMapping(urlPattern);
@@ -197,7 +197,7 @@ public class ApplicationServletRegistration
     @Override
     public Collection<String> getMappings() {
 
-        Set<String> result = new HashSet<String>();
+        Set<String> result = new HashSet<>();
         String servletName = wrapper.getName();
 
         String[] urlPatterns = context.findServletMappings();

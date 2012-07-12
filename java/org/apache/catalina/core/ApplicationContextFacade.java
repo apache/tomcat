@@ -64,13 +64,13 @@ public class ApplicationContextFacade implements ServletContext {
     /**
      * Cache Class object used for reflection.
      */
-    private HashMap<String,Class<?>[]> classCache;
+    private final HashMap<String,Class<?>[]> classCache;
 
 
     /**
      * Cache method object.
      */
-    private HashMap<String,Method> objectCache;
+    private final HashMap<String,Method> objectCache;
 
 
     // ----------------------------------------------------------- Constructors
@@ -86,8 +86,8 @@ public class ApplicationContextFacade implements ServletContext {
         super();
         this.context = context;
 
-        classCache = new HashMap<String,Class<?>[]>();
-        objectCache = new HashMap<String,Method>();
+        classCache = new HashMap<>();
+        objectCache = new HashMap<>();
         initClassCache();
     }
 
@@ -127,7 +127,7 @@ public class ApplicationContextFacade implements ServletContext {
     /**
      * Wrapped application context.
      */
-    private ApplicationContext context = null;
+    private final ApplicationContext context;
 
 
     // ------------------------------------------------- ServletContext Methods
