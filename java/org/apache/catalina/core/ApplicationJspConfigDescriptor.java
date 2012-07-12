@@ -27,11 +27,10 @@ import javax.servlet.descriptor.TaglibDescriptor;
 
 public class ApplicationJspConfigDescriptor implements JspConfigDescriptor {
 
-    private Collection<JspPropertyGroupDescriptor> jspPropertyGroups =
-        new LinkedHashSet<JspPropertyGroupDescriptor>();
+    private final Collection<JspPropertyGroupDescriptor> jspPropertyGroups =
+        new LinkedHashSet<>();
 
-    private Collection<TaglibDescriptor> taglibs =
-        new HashSet<TaglibDescriptor>();
+    private final Collection<TaglibDescriptor> taglibs = new HashSet<>();
 
     @Override
     public Collection<JspPropertyGroupDescriptor> getJspPropertyGroups() {

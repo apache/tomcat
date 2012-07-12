@@ -115,20 +115,19 @@ public class StandardWrapper extends ContainerBase
     /**
      * The broadcaster that sends j2ee notifications.
      */
-    protected NotificationBroadcasterSupport broadcaster = null;
+    protected final NotificationBroadcasterSupport broadcaster;
 
     /**
      * The count of allocations that are currently active (even if they
      * are for the same instance, as will be true on a non-STM servlet).
      */
-    protected AtomicInteger countAllocated = new AtomicInteger(0);
+    protected final AtomicInteger countAllocated = new AtomicInteger(0);
 
 
     /**
      * The facade associated with this wrapper.
      */
-    protected StandardWrapperFacade facade =
-        new StandardWrapperFacade(this);
+    protected final StandardWrapperFacade facade = new StandardWrapperFacade(this);
 
 
     /**
@@ -145,7 +144,7 @@ public class StandardWrapper extends ContainerBase
     /**
      * The support object for our instance listeners.
      */
-    protected InstanceSupport instanceSupport = new InstanceSupport(this);
+    protected final InstanceSupport instanceSupport = new InstanceSupport(this);
 
 
     /**
@@ -158,14 +157,14 @@ public class StandardWrapper extends ContainerBase
     /**
      * Mappings associated with the wrapper.
      */
-    protected ArrayList<String> mappings = new ArrayList<String>();
+    protected final ArrayList<String> mappings = new ArrayList<>();
 
 
     /**
      * The initialization parameters for this servlet, keyed by
      * parameter name.
      */
-    protected HashMap<String, String> parameters = new HashMap<String, String>();
+    protected HashMap<String, String> parameters = new HashMap<>();
 
 
     /**
@@ -173,7 +172,7 @@ public class StandardWrapper extends ContainerBase
      * used in the servlet.  The corresponding value is the role name of
      * the web application itself.
      */
-    protected HashMap<String, String> references = new HashMap<String, String>();
+    protected HashMap<String, String> references = new HashMap<>();
 
 
     /**
@@ -604,7 +603,7 @@ public class StandardWrapper extends ContainerBase
             return DEFAULT_SERVLET_METHODS;
         }
 
-        HashSet<String> allow = new HashSet<String>();
+        HashSet<String> allow = new HashSet<>();
         allow.add("TRACE");
         allow.add("OPTIONS");
 
@@ -1133,7 +1132,7 @@ public class StandardWrapper extends ContainerBase
 
             if (servlet instanceof SingleThreadModel) {
                 if (instancePool == null) {
-                    instancePool = new Stack<Servlet>();
+                    instancePool = new Stack<>();
                 }
                 singleThreadModel = true;
             }

@@ -28,11 +28,7 @@ import org.apache.catalina.deploy.JspPropertyGroup;
 public class ApplicationJspPropertyGroupDescriptor
         implements JspPropertyGroupDescriptor{
 
-    /**
-     * @deprecated  Will be made private in 8.0.x
-     */
-    @Deprecated
-    JspPropertyGroup jspPropertyGroup;
+    private final JspPropertyGroup jspPropertyGroup;
 
 
     public ApplicationJspPropertyGroupDescriptor(
@@ -164,7 +160,7 @@ public class ApplicationJspPropertyGroupDescriptor
 
     @Override
     public Collection<String> getUrlPatterns() {
-        Collection<String> result = new HashSet<String>();
+        Collection<String> result = new HashSet<>();
 
         if (jspPropertyGroup.getUrlPattern() != null) {
             result.add(jspPropertyGroup.getUrlPattern());

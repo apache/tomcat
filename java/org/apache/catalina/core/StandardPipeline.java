@@ -369,7 +369,7 @@ public class StandardPipeline extends LifecycleBase
     @Override
     public Valve[] getValves() {
 
-        ArrayList<Valve> valveList = new ArrayList<Valve>();
+        ArrayList<Valve> valveList = new ArrayList<>();
         Valve current = first;
         if (current == null) {
             current = basic;
@@ -385,7 +385,7 @@ public class StandardPipeline extends LifecycleBase
 
     public ObjectName[] getValveObjectNames() {
 
-        ArrayList<ObjectName> valveList = new ArrayList<ObjectName>();
+        ArrayList<ObjectName> valveList = new ArrayList<>();
         Valve current = first;
         if (current == null) {
             current = basic;

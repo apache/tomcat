@@ -73,7 +73,7 @@ public class StandardService extends LifecycleMBeanBase implements Service {
     /**
      * The property change support for this component.
      */
-    protected PropertyChangeSupport support = new PropertyChangeSupport(this);
+    protected final PropertyChangeSupport support = new PropertyChangeSupport(this);
 
 
     /**
@@ -84,7 +84,7 @@ public class StandardService extends LifecycleMBeanBase implements Service {
     /**
      *
      */
-    protected ArrayList<Executor> executors = new ArrayList<Executor>();
+    protected final ArrayList<Executor> executors = new ArrayList<>();
 
     /**
      * The Container associated with this Service.

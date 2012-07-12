@@ -21,8 +21,8 @@ import javax.servlet.descriptor.TaglibDescriptor;
 
 public class ApplicationTaglibDescriptor implements TaglibDescriptor {
 
-    private String location;
-    private String uri;
+    private final String location;
+    private final String uri;
 
     public ApplicationTaglibDescriptor(String location, String uri) {
         this.location = location;

@@ -76,10 +76,10 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
         globalNamingResources.setContainer(this);
 
         if (isUseNaming()) {
-            if (namingContextListener == null) {
-                namingContextListener = new NamingContextListener();
-                addLifecycleListener(namingContextListener);
-            }
+            namingContextListener = new NamingContextListener();
+            addLifecycleListener(namingContextListener);
+        } else {
+            namingContextListener = null;
         }
 
     }
@@ -103,7 +103,7 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
     /**
      * The naming context listener for this web application.
      */
-    private NamingContextListener namingContextListener = null;
+    private final NamingContextListener namingContextListener;
 
 
     /**
@@ -146,7 +146,7 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
     /**
      * The property change support for this component.
      */
-    protected PropertyChangeSupport support = new PropertyChangeSupport(this);
+    protected final PropertyChangeSupport support = new PropertyChangeSupport(this);
 
     private volatile boolean stopAwait = false;
 

@@ -41,8 +41,8 @@ public class ApplicationFilterRegistration
     private static final StringManager sm =
       StringManager.getManager(Constants.Package);
 
-    private FilterDef filterDef;
-    private Context context;
+    private final FilterDef filterDef;
+    private final Context context;
 
     public ApplicationFilterRegistration(FilterDef filterDef,
             Context context) {
@@ -112,7 +112,7 @@ public class ApplicationFilterRegistration
 
     @Override
     public Collection<String> getServletNameMappings() {
-        Collection<String> result = new HashSet<String>();
+        Collection<String> result = new HashSet<>();
 
         FilterMap[] filterMaps = context.findFilterMaps();
 
@@ -128,7 +128,7 @@ public class ApplicationFilterRegistration
 
     @Override
     public Collection<String> getUrlPatternMappings() {
-        Collection<String> result = new HashSet<String>();
+        Collection<String> result = new HashSet<>();
 
         FilterMap[] filterMaps = context.findFilterMaps();
 
@@ -154,7 +154,7 @@ public class ApplicationFilterRegistration
 
     @Override
     public Map<String, String> getInitParameters() {
-        ParameterMap<String,String> result = new ParameterMap<String,String>();
+        ParameterMap<String,String> result = new ParameterMap<>();
         result.putAll(filterDef.getParameterMap());
         result.setLocked(true);
         return result;
@@ -184,7 +184,7 @@ public class ApplicationFilterRegistration
     @Override
     public Set<String> setInitParameters(Map<String, String> initParameters) {
 
-        Set<String> conflicts = new HashSet<String>();
+        Set<String> conflicts = new HashSet<>();
 
         for (Map.Entry<String, String> entry : initParameters.entrySet()) {
             if (entry.getKey() == null || entry.getValue() == null) {
