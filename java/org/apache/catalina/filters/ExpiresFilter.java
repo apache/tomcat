@@ -1177,7 +1177,7 @@ public class ExpiresFilter extends FilterBase {
     /**
      * Expires configuration by content type. Visible for test.
      */
-    private Map<String, ExpiresConfiguration> expiresConfigurationByContentType = new LinkedHashMap<String, ExpiresConfiguration>();
+    private Map<String, ExpiresConfiguration> expiresConfigurationByContentType = new LinkedHashMap<>();
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response,
@@ -1536,7 +1536,7 @@ public class ExpiresFilter extends FilterBase {
             }
         }
 
-        List<Duration> durations = new ArrayList<Duration>();
+        List<Duration> durations = new ArrayList<>();
 
         while (currentToken != null) {
             int amount;

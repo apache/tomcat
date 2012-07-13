@@ -452,7 +452,7 @@ public class RemoteIpFilter implements Filter {
             }
         };
 
-        protected Map<String, List<String>> headers;
+        protected final Map<String, List<String>> headers;
 
         protected int localPort;
 
@@ -475,7 +475,7 @@ public class RemoteIpFilter implements Filter {
             this.secure = request.isSecure();
             this.serverPort = request.getServerPort();
 
-            headers = new HashMap<String, List<String>>();
+            headers = new HashMap<>();
             for (Enumeration<String> headerNames = request.getHeaderNames(); headerNames.hasMoreElements();) {
                 String header = headerNames.nextElement();
                 headers.put(header, Collections.list(request.getHeaders(header)));
@@ -739,7 +739,7 @@ public class RemoteIpFilter implements Filter {
                 internalProxies.matcher(request.getRemoteAddr()).matches()) {
             String remoteIp = null;
             // In java 6, proxiesHeaderValue should be declared as a java.util.Deque
-            LinkedList<String> proxiesHeaderValue = new LinkedList<String>();
+            LinkedList<String> proxiesHeaderValue = new LinkedList<>();
             StringBuilder concatRemoteIpHeaderValue = new StringBuilder();
 
             for (Enumeration<String> e = request.getHeaders(remoteIpHeader); e.hasMoreElements();) {
@@ -767,7 +767,7 @@ public class RemoteIpFilter implements Filter {
                 }
             }
             // continue to loop on remoteIpHeaderValue to build the new value of the remoteIpHeader
-            LinkedList<String> newRemoteIpHeaderValue = new LinkedList<String>();
+            LinkedList<String> newRemoteIpHeaderValue = new LinkedList<>();
             for (; idx >= 0; idx--) {
                 String currentRemoteIp = remoteIpHeaderValue[idx];
                 newRemoteIpHeaderValue.addFirst(currentRemoteIp);
