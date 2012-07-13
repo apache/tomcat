@@ -134,8 +134,7 @@ public class WebappClassLoader
      * List of ThreadGroup names to ignore when scanning for web application
      * started threads that need to be shut down.
      */
-    private static final List<String> JVM_THREAD_GROUP_NAMES =
-        new ArrayList<String>();
+    private static final List<String> JVM_THREAD_GROUP_NAMES = new ArrayList<>();
 
     private static final String JVN_THREAD_GROUP_SYSTEM = "system";
 
@@ -147,8 +146,8 @@ public class WebappClassLoader
     protected class PrivilegedFindResourceByName
         implements PrivilegedAction<ResourceEntry> {
 
-        protected String name;
-        protected String path;
+        protected final String name;
+        protected final String path;
 
         PrivilegedFindResourceByName(String name, String path) {
             this.name = name;
@@ -166,7 +165,7 @@ public class WebappClassLoader
     protected static final class PrivilegedGetClassLoader
         implements PrivilegedAction<ClassLoader> {
 
-        public Class<?> clazz;
+        public final Class<?> clazz;
 
         public PrivilegedGetClassLoader(Class<?> clazz){
             this.clazz = clazz;
@@ -272,13 +271,13 @@ public class WebappClassLoader
      * The cache of ResourceEntry for classes and resources we have loaded,
      * keyed by resource name.
      */
-    protected HashMap<String, ResourceEntry> resourceEntries = new HashMap<String, ResourceEntry>();
+    protected final HashMap<String, ResourceEntry> resourceEntries = new HashMap<>();
 
 
     /**
      * The list of not found resources.
      */
-    protected HashMap<String, String> notFoundResources =
+    protected final HashMap<String, String> notFoundResources =
         new LinkedHashMap<String, String>() {
         private static final long serialVersionUID = 1L;
         @Override
@@ -373,8 +372,7 @@ public class WebappClassLoader
      * A list of read File and Jndi Permission's required if this loader
      * is for a web application context.
      */
-    protected ArrayList<Permission> permissionList =
-        new ArrayList<Permission>();
+    protected final ArrayList<Permission> permissionList = new ArrayList<>();
 
 
     /**
@@ -387,13 +385,13 @@ public class WebappClassLoader
      * The PermissionCollection for each CodeSource for a web
      * application context.
      */
-    protected HashMap<String, PermissionCollection> loaderPC = new HashMap<String, PermissionCollection>();
+    protected final HashMap<String, PermissionCollection> loaderPC = new HashMap<>();
 
 
     /**
      * Instance of the SecurityManager installed.
      */
-    protected SecurityManager securityManager = null;
+    protected final SecurityManager securityManager;
 
 
     /**
@@ -405,7 +403,7 @@ public class WebappClassLoader
     /**
      * The system class loader.
      */
-    protected ClassLoader system = null;
+    protected final ClassLoader system;
 
 
     /**
@@ -433,7 +431,7 @@ public class WebappClassLoader
     /**
      * All permission.
      */
-    protected Permission allPermission = new java.security.AllPermission();
+    protected final Permission allPermission = new java.security.AllPermission();
 
 
     /**
@@ -1289,7 +1287,7 @@ public class WebappClassLoader
             log.debug("    findResources(" + name + ")");
 
         //we use a LinkedHashSet instead of a Vector to avoid duplicates with virtualmappings
-        LinkedHashSet<URL> result = new LinkedHashSet<URL>();
+        LinkedHashSet<URL> result = new LinkedHashSet<>();
 
         int jarFilesLength = jarFiles.length;
         int repositoriesLength = repositories.length;
@@ -2063,7 +2061,6 @@ public class WebappClassLoader
                 defineClass("org.apache.catalina.loader.JdbcLeakPrevention",
                     classBytes, 0, offset, this.getClass().getProtectionDomain());
             Object obj = lpClass.newInstance();
-            @SuppressWarnings("unchecked") // clearJdbcDriverRegistrations() returns List<String>
             List<String> driverNames = (List<String>) obj.getClass().getMethod(
                     "clearJdbcDriverRegistrations").invoke(obj);
             for (String name : driverNames) {
@@ -2092,7 +2089,6 @@ public class WebappClassLoader
 
     private final void clearReferencesStaticFinal() {
 
-        @SuppressWarnings("unchecked") // resourceEntries is HashMap<String, ResourceEntry>
         Collection<ResourceEntry> values =
             ((HashMap<String,ResourceEntry>) resourceEntries.clone()).values();
         Iterator<ResourceEntry> loadedClasses = values.iterator();

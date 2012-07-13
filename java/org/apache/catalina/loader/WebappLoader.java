@@ -171,7 +171,7 @@ public class WebappLoader extends LifecycleMBeanBase
     /**
      * The property change support for this component.
      */
-    protected PropertyChangeSupport support = new PropertyChangeSupport(this);
+    protected final PropertyChangeSupport support = new PropertyChangeSupport(this);
 
 
     /**
@@ -789,7 +789,7 @@ public class WebappLoader extends LifecycleMBeanBase
         if (servletContext == null)
             return;
 
-        loaderRepositories=new ArrayList<String>();
+        loaderRepositories=new ArrayList<>();
         // Loading the work directory
         File workDir =
             (File) servletContext.getAttribute(ServletContext.TEMPDIR);

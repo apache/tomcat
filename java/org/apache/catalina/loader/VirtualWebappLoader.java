@@ -114,7 +114,7 @@ public class VirtualWebappLoader extends WebappLoader {
         // just add any jar/directory set in virtual classpath to the
         // repositories list before calling start on the standard WebappLoader
         StringTokenizer tkn = new StringTokenizer(virtualClasspath, ";");
-        Set<String> set = new LinkedHashSet<String>();
+        Set<String> set = new LinkedHashSet<>();
         while (tkn.hasMoreTokens()) {
             String token = tkn.nextToken().trim();
 

@@ -40,7 +40,7 @@ import java.util.List;
 public class JdbcLeakPrevention {
 
     public List<String> clearJdbcDriverRegistrations() throws SQLException {
-        List<String> driverNames = new ArrayList<String>();
+        List<String> driverNames = new ArrayList<>();
 
         /*
          * DriverManager.getDrivers() has a nasty side-effect of registering
@@ -51,7 +51,7 @@ public class JdbcLeakPrevention {
          * ensuring that both original drivers and any loaded as a result of the
          * side-effects are all de-registered.
          */
-        HashSet<Driver> originalDrivers = new HashSet<Driver>();
+        HashSet<Driver> originalDrivers = new HashSet<>();
         Enumeration<Driver> drivers = DriverManager.getDrivers();
         while (drivers.hasMoreElements()) {
             originalDrivers.add(drivers.nextElement());
