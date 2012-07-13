@@ -236,32 +236,7 @@ public class WebappClassLoader
     }
 
 
-    /**
-     * Construct a new ClassLoader with no defined repositories and the given
-     * parent ClassLoader.
-     *
-     * @param parent Our parent class loader
-     *
-     * @deprecated  Unused - will be removed in 8.0.x
-     */
-    @Deprecated
-    public WebappClassLoader(ClassLoader parent) {
-
-        super(new URL[0], parent);
-
-        this.parent = getParent();
-
-        system = getSystemClassLoader();
-        securityManager = System.getSecurityManager();
-
-        if (securityManager != null) {
-            refreshPolicy();
-        }
-    }
-
-
     // ----------------------------------------------------- Instance Variables
-
 
     /**
      * Associated directory context giving access to the resources in this
