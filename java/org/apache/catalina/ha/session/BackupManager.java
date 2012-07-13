@@ -49,7 +49,7 @@ public class BackupManager extends ClusterManagerBase
      */
     protected static final StringManager sm = StringManager.getManager(Constants.Package);
 
-    protected static long DEFAULT_REPL_TIMEOUT = 15000;//15 seconds
+    protected static final long DEFAULT_REPL_TIMEOUT = 15000;//15 seconds
 
     /** Set to true if we don't want the sessions to expire on shutdown */
     protected boolean mExpireSessionsOnShutdown = true;
@@ -161,10 +161,9 @@ public class BackupManager extends ClusterManagerBase
                 }
             }
             cluster.registerManager(this);
-            LazyReplicatedMap<String,Session> map =
-                    new LazyReplicatedMap<String,Session>(this,
-                            cluster.getChannel(), rpcTimeout, getMapName(),
-                            getClassLoaders());
+            LazyReplicatedMap<String,Session> map = new LazyReplicatedMap<>(
+                    this, cluster.getChannel(), rpcTimeout, getMapName(),
+                    getClassLoaders());
             map.setChannelSendOptions(mapSendOptions);
             this.sessions = map;
         }  catch ( Exception x ) {
@@ -259,7 +258,7 @@ public class BackupManager extends ClusterManagerBase
 
     @Override
     public Set<String> getSessionIdsFull() {
-        Set<String> sessionIds = new HashSet<String>();
+        Set<String> sessionIds = new HashSet<>();
         LazyReplicatedMap<String,Session> map =
                 (LazyReplicatedMap<String,Session>)sessions;
         Iterator<String> keys = map.keySetFull().iterator();

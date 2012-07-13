@@ -55,40 +55,6 @@ public class SerializablePrincipal  implements java.io.Serializable {
 
     // ----------------------------------------------------------- Constructors
 
-    public SerializablePrincipal() {
-        super();
-    }
-
-
-    /**
-     * Construct a new Principal, associated with the specified Realm, for the
-     * specified username and password.
-     *
-     * @param name The username of the user represented by this Principal
-     * @param password Credentials used to authenticate this user
-     */
-    public SerializablePrincipal(String name, String password) {
-
-        this(name, password, null);
-
-    }
-
-
-    /**
-     * Construct a new Principal, associated with the specified Realm, for the
-     * specified username and password, with the specified role names
-     * (as Strings).
-     *
-     * @param name The username of the user represented by this Principal
-     * @param password Credentials used to authenticate this user
-     * @param roles List of roles (must be Strings) possessed by this user
-     */
-    public SerializablePrincipal(String name, String password,
-                            List<String> roles) {
-        this(name, password, roles, null);
-    }
-
-
     /**
      * Construct a new Principal, associated with the specified Realm, for the
      * specified username and password, with the specified role names
@@ -105,14 +71,17 @@ public class SerializablePrincipal  implements java.io.Serializable {
         super();
         this.name = name;
         this.password = password;
-        if (roles != null) {
-            this.roles = new String[roles.size()];
-            this.roles = roles.toArray(this.roles);
+        if (roles == null) {
+            this.roles = new String[0];
+        } else {
+            this.roles = roles.toArray(new String[roles.size()]);
             if (this.roles.length > 1)
                 Arrays.sort(this.roles);
         }
         if (userPrincipal instanceof Serializable) {
             this.userPrincipal = userPrincipal;
+        } else {
+            this.userPrincipal = null;
         }
     }
 
@@ -123,7 +92,7 @@ public class SerializablePrincipal  implements java.io.Serializable {
     /**
      * The username of the user represented by this Principal.
      */
-    protected String name = null;
+    protected final String name;
 
     public String getName() {
         return (this.name);
@@ -134,7 +103,7 @@ public class SerializablePrincipal  implements java.io.Serializable {
      * The authentication credentials for the user represented by
      * this Principal.
      */
-    protected String password = null;
+    protected final String password;
 
     public String getPassword() {
         return (this.password);
@@ -158,7 +127,7 @@ public class SerializablePrincipal  implements java.io.Serializable {
     /**
      * The set of roles associated with this user.
      */
-    protected String roles[] = new String[0];
+    protected final String roles[];
 
     public String[] getRoles() {
         return (this.roles);
@@ -168,7 +137,7 @@ public class SerializablePrincipal  implements java.io.Serializable {
     /**
      * The user principal, if present.
      */
-    protected Principal userPrincipal = null;
+    protected final Principal userPrincipal;
 
     // --------------------------------------------------------- Public Methods
 

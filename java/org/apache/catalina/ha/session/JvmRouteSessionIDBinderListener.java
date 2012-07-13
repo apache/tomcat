@@ -51,11 +51,6 @@ public class JvmRouteSessionIDBinderListener extends ClusterListener {
 
     protected boolean started = false;
 
-    /**
-     * number of session that goes to this cluster node
-     */
-    private long numberOfSessions = 0;
-
     //--Constructor---------------------------------------------
 
     public JvmRouteSessionIDBinderListener() {
@@ -63,13 +58,6 @@ public class JvmRouteSessionIDBinderListener extends ClusterListener {
     }
 
     //--Logic---------------------------------------------------
-
-    /**
-     * @return Returns the numberOfSessions.
-     */
-    public long getNumberOfSessions() {
-        return numberOfSessions;
-    }
 
     /**
      * Add this Mover as Cluster Listener ( receiver)

@@ -729,7 +729,7 @@ public class DeltaSession extends StandardSession implements Externalizable,Clus
         if (log.isDebugEnabled()) log.debug(sm.getString("deltaSession.readSession", id));
 
         // Deserialize the attribute count and attribute values
-        if (attributes == null) attributes = new ConcurrentHashMap<String, Object>();
+        if (attributes == null) attributes = new ConcurrentHashMap<>();
         int n = ( (Integer) stream.readObject()).intValue();
         boolean isValidSave = isValid;
         isValid = true;
@@ -743,13 +743,12 @@ public class DeltaSession extends StandardSession implements Externalizable,Clus
         isValid = isValidSave;
 
         if (listeners == null) {
-            ArrayList<SessionListener> arrayList =
-                new ArrayList<SessionListener>();
+            ArrayList<SessionListener> arrayList = new ArrayList<>();
             listeners = arrayList;
         }
 
         if (notes == null) {
-            notes = new Hashtable<String,Object>();
+            notes = new Hashtable<>();
         }
         activate();
     }
@@ -810,8 +809,8 @@ public class DeltaSession extends StandardSession implements Externalizable,Clus
 
         // Accumulate the names of serializable and non-serializable attributes
         String keys[] = keys();
-        ArrayList<String> saveNames = new ArrayList<String>();
-        ArrayList<Object> saveValues = new ArrayList<Object>();
+        ArrayList<String> saveNames = new ArrayList<>();
+        ArrayList<Object> saveValues = new ArrayList<>();
         for (int i = 0; i < keys.length; i++) {
             Object value = null;
             value = attributes.get(keys[i]);
@@ -839,15 +838,8 @@ public class DeltaSession extends StandardSession implements Externalizable,Clus
 
     }
 
+
     // -------------------------------------------------------- Private Methods
-
-
-    /**
-     * Return the value of an attribute without a check for validity.
-     */
-    protected Object getAttributeInternal(String name) {
-        return (attributes.get(name));
-    }
 
     protected void removeAttributeInternal(String name, boolean notify,
                                            boolean addDeltaRequest) {

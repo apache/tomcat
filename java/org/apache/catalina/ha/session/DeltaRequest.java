@@ -64,9 +64,8 @@ public class DeltaRequest implements Externalizable {
     public static final String NAME_AUTHTYPE = "__SET__AUTHTYPE__";
 
     private String sessionId;
-    private LinkedList<AttributeInfo> actions = new LinkedList<AttributeInfo>();
-    private LinkedList<AttributeInfo> actionPool =
-        new LinkedList<AttributeInfo>();
+    private LinkedList<AttributeInfo> actions = new LinkedList<>();
+    private final LinkedList<AttributeInfo> actionPool = new LinkedList<>();
 
     private boolean recordAllActions = false;
 
@@ -249,7 +248,7 @@ public class DeltaRequest implements Externalizable {
         recordAllActions = in.readBoolean();
         int cnt = in.readInt();
         if (actions == null)
-            actions = new LinkedList<AttributeInfo>();
+            actions = new LinkedList<>();
         else
             actions.clear();
         for (int i = 0; i < cnt; i++) {

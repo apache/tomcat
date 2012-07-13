@@ -29,22 +29,17 @@ import org.apache.catalina.ha.ClusterMessageBase;
  */
 public class SessionMessageImpl extends ClusterMessageBase implements SessionMessage {
 
-    private static final long serialVersionUID = 1L;
-
-
-    public SessionMessageImpl() {
-    }
+    private static final long serialVersionUID = 2L;
 
 
     /*
-
      * Private serializable variables to keep the messages state
      */
-    private int mEvtType = -1;
-    private byte[] mSession;
-    private String mSessionID;
+    private final int mEvtType;
+    private final byte[] mSession;
+    private final String mSessionID;
 
-    private String mContextName;
+    private final String mContextName;
     private long serializationTimestamp;
     private boolean timestampSet = false ;
     private String uniqueId;
