@@ -17,27 +17,6 @@
 <FindBugsFilter>
   <!-- Issues that should be fixed but can't be without API breaking changes -->
   <!-- so wait until next release-->
-  <!-- Need to re-factor method names. protected do[Read|Write]Object? -->
-  <Match>
-    <Class name="org.apache.catalina.ha.session.DeltaSession" />
-    <Method name="readObject" />
-    <Bug code="Se" />
-  </Match>
-  <Match>
-    <Class name="org.apache.catalina.ha.session.DeltaSession" />
-    <Method name="writeObject" />
-    <Bug code="Se" />
-  </Match>
-  <Match>
-    <Class name="org.apache.catalina.session.StandardSession" />
-    <Method name="readObject" />
-    <Bug code="Se" />
-  </Match>
-  <Match>
-    <Class name="org.apache.catalina.session.StandardSession" />
-    <Method name="writeObject" />
-    <Bug code="Se" />
-  </Match>
   <!-- Re-factor to only have the thread running when an instance of the     -->
   <!-- handler is active -->
   <Match>
