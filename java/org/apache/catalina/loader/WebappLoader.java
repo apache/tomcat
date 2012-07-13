@@ -215,6 +215,15 @@ public class WebappLoader extends LifecycleMBeanBase
     @Override
     public void setContext(Context context) {
 
+        if (this.context == context) {
+            return;
+        }
+
+        if (getState().isAvailable()) {
+            throw new IllegalStateException(
+                    sm.getString("webappLoader.setContext.ise"));
+        }
+
         // Deregister from the old Context (if any)
         if (this.context != null) {
             this.context.removePropertyChangeListener(this);
@@ -391,7 +400,7 @@ public class WebappLoader extends LifecycleMBeanBase
                     context.reload();
                 }
             } finally {
-                if (context.getLoader() != null) {
+                if (context != null && context.getLoader() != null) {
                     Thread.currentThread().setContextClassLoader
                         (context.getLoader().getClassLoader());
                 }
@@ -602,10 +611,8 @@ public class WebappLoader extends LifecycleMBeanBase
         setState(LifecycleState.STOPPING);
 
         // Remove context attributes as appropriate
-        if (context != null) {
-            ServletContext servletContext = context.getServletContext();
-            servletContext.removeAttribute(Globals.CLASS_PATH_ATTR);
-        }
+        ServletContext servletContext = context.getServletContext();
+        servletContext.removeAttribute(Globals.CLASS_PATH_ATTR);
 
         // Throw away our current class loader
         ((Lifecycle) classLoader).stop();
