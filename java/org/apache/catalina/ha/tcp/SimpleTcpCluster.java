@@ -891,13 +891,6 @@ public class SimpleTcpCluster extends LifecycleBase implements CatalinaCluster,
         return;
     }
 
-    // --------------------------------------------------------- Logger
-
-    @Override
-    public Log getLogger() {
-        return log;
-    }
-
     public int getChannelStartOptions() {
         return channelStartOptions;
     }

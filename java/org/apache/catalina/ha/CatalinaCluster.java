@@ -20,13 +20,10 @@ package org.apache.catalina.ha;
 import java.util.Map;
 
 import org.apache.catalina.Cluster;
-import org.apache.catalina.LifecycleException;
 import org.apache.catalina.Manager;
 import org.apache.catalina.Valve;
 import org.apache.catalina.tribes.Channel;
 import org.apache.catalina.tribes.Member;
-import org.apache.juli.logging.Log;
-
 
 
 /**
@@ -39,25 +36,6 @@ import org.apache.juli.logging.Log;
 
 public interface CatalinaCluster extends Cluster {
     // ----------------------------------------------------- Instance Variables
-
-    /**
-     * Start the cluster, the owning container will invoke this
-     * @throws Exception - if failure to start cluster
-     */
-    public void start() throws Exception;
-
-    /**
-     * Stops the cluster, the owning container will invoke this
-     * @throws LifecycleException
-     */
-    public void stop() throws LifecycleException;
-
-    /**
-     * Returns the associates logger with this cluster.
-     *
-     * @return Log
-     */
-    public Log getLogger();
 
     /**
      * Sends a message to all the members in the cluster

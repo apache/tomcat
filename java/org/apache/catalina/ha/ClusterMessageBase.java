@@ -30,12 +30,11 @@ import org.apache.catalina.tribes.Member;
  * @author not attributable
  * @version 1.0
  */
-public class ClusterMessageBase implements ClusterMessage {
+public abstract class ClusterMessageBase implements ClusterMessage {
 
     private static final long serialVersionUID = 1L;
 
     protected transient Member address;
-    private String uniqueId;
     private long timestamp;
     public ClusterMessageBase() {
         // NO-OP
@@ -53,11 +52,6 @@ public class ClusterMessageBase implements ClusterMessage {
     }
 
     @Override
-    public String getUniqueId() {
-        return uniqueId;
-    }
-
-    @Override
     public long getTimestamp() {
         return timestamp;
     }
@@ -71,11 +65,6 @@ public class ClusterMessageBase implements ClusterMessage {
     @Override
     public void setAddress(Member member) {
         this.address = member;
-    }
-
-    @Override
-    public void setUniqueId(String uniqueId) {
-        this.uniqueId = uniqueId;
     }
 
     @Override
