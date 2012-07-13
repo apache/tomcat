@@ -85,8 +85,8 @@ public class ReplicationValve
     /**
      * crossContext session container
      */
-    protected ThreadLocal<ArrayList<DeltaSession>> crossContextSessions =
-        new ThreadLocal<ArrayList<DeltaSession>>() ;
+    protected final ThreadLocal<ArrayList<DeltaSession>> crossContextSessions =
+        new ThreadLocal<>() ;
 
     /**
      * doProcessingStats (default = off)

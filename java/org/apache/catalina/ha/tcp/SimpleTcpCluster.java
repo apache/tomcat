@@ -108,11 +108,6 @@ public class SimpleTcpCluster extends LifecycleBase
 
 
     /**
-     * Name for logging purpose
-     */
-    protected String clusterImpName = "SimpleTcpCluster";
-
-    /**
      * The string manager for this package.
      */
     protected static final StringManager sm = StringManager.getManager(Constants.Package);
@@ -136,24 +131,23 @@ public class SimpleTcpCluster extends LifecycleBase
     /**
      * The property change support for this component.
      */
-    protected PropertyChangeSupport support = new PropertyChangeSupport(this);
+    protected final PropertyChangeSupport support = new PropertyChangeSupport(this);
 
     /**
      * The context name <->manager association for distributed contexts.
      */
-    protected Map<String, ClusterManager> managers =
-        new HashMap<String, ClusterManager>();
+    protected final Map<String, ClusterManager> managers = new HashMap<>();
 
     protected ClusterManager managerTemplate = new DeltaManager();
 
-    private List<Valve> valves = new ArrayList<Valve>();
+    private final List<Valve> valves = new ArrayList<>();
 
     private org.apache.catalina.ha.ClusterDeployer clusterDeployer;
 
     /**
      * Listeners of messages
      */
-    protected List<ClusterListener> clusterListeners = new ArrayList<ClusterListener>();
+    protected final List<ClusterListener> clusterListeners = new ArrayList<>();
 
     /**
      * Comment for <code>notifyLifecycleListenerOnFailure</code>
@@ -163,7 +157,7 @@ public class SimpleTcpCluster extends LifecycleBase
     /**
      * dynamic sender <code>properties</code>
      */
-    private Map<String, Object> properties = new HashMap<String, Object>();
+    private final Map<String, Object> properties = new HashMap<>();
 
     private int channelSendOptions = Channel.SEND_OPTIONS_ASYNCHRONOUS;
 
