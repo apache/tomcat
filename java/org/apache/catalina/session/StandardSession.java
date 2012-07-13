@@ -1039,7 +1039,7 @@ public class StandardSession implements HttpSession, Session, Serializable {
     public void readObjectData(ObjectInputStream stream)
         throws ClassNotFoundException, IOException {
 
-        readObject(stream);
+        doReadObject(stream);
 
     }
 
@@ -1056,7 +1056,7 @@ public class StandardSession implements HttpSession, Session, Serializable {
     public void writeObjectData(ObjectOutputStream stream)
         throws IOException {
 
-        writeObject(stream);
+        doWriteObject(stream);
 
     }
 
@@ -1548,7 +1548,7 @@ public class StandardSession implements HttpSession, Session, Serializable {
      * @exception ClassNotFoundException if an unknown class is specified
      * @exception IOException if an input/output error occurs
      */
-    protected void readObject(ObjectInputStream stream)
+    protected void doReadObject(ObjectInputStream stream)
         throws ClassNotFoundException, IOException {
 
         // Deserialize the scalar instance variables (except Manager)
@@ -1613,7 +1613,7 @@ public class StandardSession implements HttpSession, Session, Serializable {
      *
      * @exception IOException if an input/output error occurs
      */
-    protected void writeObject(ObjectOutputStream stream) throws IOException {
+    protected void doWriteObject(ObjectOutputStream stream) throws IOException {
 
         // Write the scalar instance variables (except Manager)
         stream.writeObject(Long.valueOf(creationTime));

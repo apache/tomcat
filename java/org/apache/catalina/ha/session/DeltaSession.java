@@ -529,10 +529,10 @@ public class DeltaSession extends StandardSession implements Externalizable,Clus
      */
     @Override
     public void readObjectData(ObjectInputStream stream) throws ClassNotFoundException, IOException {
-        readObject((ObjectInput)stream);
+        doReadObject((ObjectInput)stream);
     }
     public void readObjectData(ObjectInput stream) throws ClassNotFoundException, IOException {
-        readObject(stream);
+        doReadObject(stream);
     }
 
     /**
@@ -551,7 +551,7 @@ public class DeltaSession extends StandardSession implements Externalizable,Clus
         writeObjectData((ObjectOutput)stream);
     }
     public void writeObjectData(ObjectOutput stream) throws IOException {
-        writeObject(stream);
+        doWriteObject(stream);
     }
 
     public void resetDeltaRequest() {
@@ -703,11 +703,11 @@ public class DeltaSession extends StandardSession implements Externalizable,Clus
      *                if an input/output error occurs
      */
     @Override
-    protected void readObject(ObjectInputStream stream) throws ClassNotFoundException, IOException {
-        readObject((ObjectInput)stream);
+    protected void doReadObject(ObjectInputStream stream) throws ClassNotFoundException, IOException {
+        doReadObject((ObjectInput)stream);
     }
 
-    private void readObject(ObjectInput stream) throws ClassNotFoundException, IOException {
+    private void doReadObject(ObjectInput stream) throws ClassNotFoundException, IOException {
 
         // Deserialize the scalar instance variables (except Manager)
         authType = null; // Transient only
@@ -757,7 +757,7 @@ public class DeltaSession extends StandardSession implements Externalizable,Clus
     public void writeExternal(ObjectOutput out ) throws java.io.IOException {
         try {
             lock();
-            writeObject(out);
+            doWriteObject(out);
         }finally {
             unlock();
         }
@@ -786,11 +786,11 @@ public class DeltaSession extends StandardSession implements Externalizable,Clus
      *                if an input/output error occurs
      */
     @Override
-    protected void writeObject(ObjectOutputStream stream) throws IOException {
-        writeObject((ObjectOutput)stream);
+    protected void doWriteObject(ObjectOutputStream stream) throws IOException {
+        doWriteObject((ObjectOutput)stream);
     }
 
-    private void writeObject(ObjectOutput stream) throws IOException {
+    private void doWriteObject(ObjectOutput stream) throws IOException {
         // Write the scalar instance variables (except Manager)
         stream.writeObject(Long.valueOf(creationTime));
         stream.writeObject(Long.valueOf(lastAccessedTime));
