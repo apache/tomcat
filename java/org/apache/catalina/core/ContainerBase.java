@@ -194,6 +194,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase
      * The cluster with which this Container is associated.
      */
     protected Cluster cluster = null;
+    private final ReadWriteLock clusterLock = new ReentrantReadWriteLock();
 
 
     /**
@@ -370,13 +371,33 @@ public abstract class ContainerBase extends LifecycleMBeanBase
      */
     @Override
     public Cluster getCluster() {
-        if (cluster != null)
-            return (cluster);
+        Lock readLock = clusterLock.readLock();
+        readLock.lock();
+        try {
+            if (cluster != null)
+                return cluster;
 
-        if (parent != null)
-            return (parent.getCluster());
+            if (parent != null)
+                return parent.getCluster();
 
-        return (null);
+            return null;
+        } finally {
+            readLock.unlock();
+        }
+    }
+
+
+    /*
+     * Provide access to just the cluster component attached to this container.
+     */
+    protected Cluster getClusterInternal() {
+        Lock readLock = clusterLock.readLock();
+        readLock.lock();
+        try {
+            return cluster;
+        } finally {
+            readLock.unlock();
+        }
     }
 
 
@@ -386,38 +407,46 @@ public abstract class ContainerBase extends LifecycleMBeanBase
      * @param cluster The newly associated Cluster
      */
     @Override
-    public synchronized void setCluster(Cluster cluster) {
-        // Change components if necessary
-        Cluster oldCluster = this.cluster;
-        if (oldCluster == cluster)
-            return;
-        this.cluster = cluster;
+    public void setCluster(Cluster cluster) {
 
-        // Stop the old component if necessary
-        if (getState().isAvailable() && (oldCluster != null) &&
-            (oldCluster instanceof Lifecycle)) {
-            try {
-                ((Lifecycle) oldCluster).stop();
-            } catch (LifecycleException e) {
-                log.error("ContainerBase.setCluster: stop: ", e);
+        Cluster oldCluster = null;
+        Lock writeLock = clusterLock.writeLock();
+        writeLock.lock();
+        try {
+            // Change components if necessary
+            oldCluster = this.cluster;
+            if (oldCluster == cluster)
+                return;
+            this.cluster = cluster;
+
+            // Stop the old component if necessary
+            if (getState().isAvailable() && (oldCluster != null) &&
+                (oldCluster instanceof Lifecycle)) {
+                try {
+                    ((Lifecycle) oldCluster).stop();
+                } catch (LifecycleException e) {
+                    log.error("ContainerBase.setCluster: stop: ", e);
+                }
             }
-        }
 
-        // Start the new component if necessary
-        if (cluster != null)
-            cluster.setContainer(this);
+            // Start the new component if necessary
+            if (cluster != null)
+                cluster.setContainer(this);
 
-        if (getState().isAvailable() && (cluster != null) &&
-            (cluster instanceof Lifecycle)) {
-            try {
-                ((Lifecycle) cluster).start();
-            } catch (LifecycleException e) {
-                log.error("ContainerBase.setCluster: start: ", e);
+            if (getState().isAvailable() && (cluster != null) &&
+                (cluster instanceof Lifecycle)) {
+                try {
+                    ((Lifecycle) cluster).start();
+                } catch (LifecycleException e) {
+                    log.error("ContainerBase.setCluster: start: ", e);
+                }
             }
+        } finally {
+            writeLock.unlock();
         }
 
         // Report this property change to interested listeners
-        support.firePropertyChange("cluster", oldCluster, this.cluster);
+        support.firePropertyChange("cluster", oldCluster, cluster);
     }
 
 
@@ -868,6 +897,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase
         // Start our subordinate components, if any
         logger = null;
         getLogger();
+        Cluster cluster = getClusterInternal();
         if ((cluster != null) && (cluster instanceof Lifecycle))
             ((Lifecycle) cluster).start();
         Realm realm = getRealmInternal();
@@ -956,6 +986,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase
         if ((realm != null) && (realm instanceof Lifecycle)) {
             ((Lifecycle) realm).stop();
         }
+        Cluster cluster = getClusterInternal();
         if ((cluster != null) && (cluster instanceof Lifecycle)) {
             ((Lifecycle) cluster).stop();
         }
@@ -968,6 +999,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase
         if ((realm != null) && (realm instanceof Lifecycle)) {
             ((Lifecycle) realm).destroy();
         }
+        Cluster cluster = getClusterInternal();
         if ((cluster != null) && (cluster instanceof Lifecycle)) {
             ((Lifecycle) cluster).destroy();
         }
@@ -1081,11 +1113,13 @@ public abstract class ContainerBase extends LifecycleMBeanBase
         if (!getState().isAvailable())
             return;
 
+        Cluster cluster = getClusterInternal();
         if (cluster != null) {
             try {
                 cluster.backgroundProcess();
             } catch (Exception e) {
-                log.warn(sm.getString("containerBase.backgroundProcess.cluster", cluster), e);
+                log.warn(sm.getString("containerBase.backgroundProcess.cluster",
+                        cluster), e);
             }
         }
         Realm realm = getRealmInternal();

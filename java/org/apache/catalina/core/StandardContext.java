@@ -14,8 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.catalina.core;
 
 import java.io.BufferedReader;
@@ -39,6 +37,9 @@ import java.util.Set;
 import java.util.Stack;
 import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import javax.management.ListenerNotFoundException;
 import javax.management.MBeanNotificationInfo;
@@ -70,6 +71,7 @@ import javax.servlet.http.HttpSessionAttributeListener;
 import javax.servlet.http.HttpSessionListener;
 
 import org.apache.catalina.Authenticator;
+import org.apache.catalina.Cluster;
 import org.apache.catalina.Container;
 import org.apache.catalina.ContainerListener;
 import org.apache.catalina.Context;
@@ -421,6 +423,7 @@ public class StandardContext extends ContainerBase
      * The Loader implementation with which this Container is associated.
      */
     private Loader loader = null;
+    private final ReadWriteLock loaderLock = new ReentrantReadWriteLock();
 
 
     /**
@@ -440,6 +443,7 @@ public class StandardContext extends ContainerBase
      * The Manager implementation with which this Container is associated.
      */
     protected Manager manager = null;
+    private final ReadWriteLock managerLock = new ReentrantReadWriteLock();
 
 
     /**
@@ -677,11 +681,11 @@ public class StandardContext extends ContainerBase
 
 
     private DirContext resources = null;
-
     /**
      * Non proxied resources.
      */
     private DirContext webappResources = null;
+    private final ReadWriteLock resourcesLock = new ReentrantReadWriteLock();
 
     private long startupTime;
     private long startTime;
@@ -1174,6 +1178,7 @@ public class StandardContext extends ContainerBase
      */
     @Override
     public void addResourceJarUrl(URL url) {
+        DirContext webappResources = getWebappResources();
         if (webappResources instanceof BaseDirContext) {
             ((BaseDirContext) webappResources).addResourcesJar(url);
         } else {
@@ -1188,6 +1193,7 @@ public class StandardContext extends ContainerBase
      * resources for this context.
      */
     public void addResourcesDirContext(DirContext altDirContext) {
+        DirContext webappResources = getWebappResources();
         if (webappResources instanceof BaseDirContext) {
             ((BaseDirContext) webappResources).addAltDirContext(altDirContext);
         } else {
@@ -1864,85 +1870,110 @@ public class StandardContext extends ContainerBase
 
     @Override
     public Loader getLoader() {
-        return loader;
+        Lock readLock = loaderLock.readLock();
+        readLock.lock();
+        try {
+            return loader;
+        } finally {
+            readLock.unlock();
+        }
     }
 
-
     @Override
-    public synchronized void setLoader(Loader loader) {
+    public void setLoader(Loader loader) {
 
-        // Change components if necessary
-        Loader oldLoader = this.loader;
-        if (oldLoader == loader)
-            return;
-        this.loader = loader;
+        Lock writeLock = loaderLock.writeLock();
+        writeLock.lock();
+        Loader oldLoader = null;
+        try {
+            // Change components if necessary
+            oldLoader = this.loader;
+            if (oldLoader == loader)
+                return;
+            this.loader = loader;
 
-        // Stop the old component if necessary
-        if (getState().isAvailable() && (oldLoader != null) &&
-            (oldLoader instanceof Lifecycle)) {
-            try {
-                ((Lifecycle) oldLoader).stop();
-            } catch (LifecycleException e) {
-                log.error("StandardContext.setLoader: stop: ", e);
+            // Stop the old component if necessary
+            if (getState().isAvailable() && (oldLoader != null) &&
+                (oldLoader instanceof Lifecycle)) {
+                try {
+                    ((Lifecycle) oldLoader).stop();
+                } catch (LifecycleException e) {
+                    log.error("StandardContext.setLoader: stop: ", e);
+                }
             }
-        }
 
-        // Start the new component if necessary
-        if (loader != null)
-            loader.setContext(this);
-        if (getState().isAvailable() && (loader != null) &&
-            (loader instanceof Lifecycle)) {
-            try {
-                ((Lifecycle) loader).start();
-            } catch (LifecycleException e) {
-                log.error("StandardContext.setLoader: start: ", e);
+            // Start the new component if necessary
+            if (loader != null)
+                loader.setContext(this);
+            if (getState().isAvailable() && (loader != null) &&
+                (loader instanceof Lifecycle)) {
+                try {
+                    ((Lifecycle) loader).start();
+                } catch (LifecycleException e) {
+                    log.error("StandardContext.setLoader: start: ", e);
+                }
             }
+        } finally {
+            writeLock.unlock();
         }
 
         // Report this property change to interested listeners
-        support.firePropertyChange("loader", oldLoader, this.loader);
+        support.firePropertyChange("loader", oldLoader, loader);
     }
 
 
     @Override
     public Manager getManager() {
-        return manager;
+        Lock readLock = managerLock.readLock();
+        readLock.lock();
+        try {
+            return manager;
+        } finally {
+            readLock.unlock();
+        }
     }
 
 
     @Override
-    public synchronized void setManager(Manager manager) {
+    public void setManager(Manager manager) {
 
-        // Change components if necessary
-        Manager oldManager = this.manager;
-        if (oldManager == manager)
-            return;
-        this.manager = manager;
+        Lock writeLock = managerLock.writeLock();
+        writeLock.lock();
+        Manager oldManager = null;
+        try {
+            // Change components if necessary
+            oldManager = this.manager;
+            if (oldManager == manager)
+                return;
+            this.manager = manager;
 
-        // Stop the old component if necessary
-        if (getState().isAvailable() && (oldManager != null) &&
-            (oldManager instanceof Lifecycle)) {
-            try {
-                ((Lifecycle) oldManager).stop();
-            } catch (LifecycleException e) {
-                log.error("StandardContext.setManager: stop: ", e);
+            // Stop the old component if necessary
+            if (getState().isAvailable() && (oldManager != null) &&
+                (oldManager instanceof Lifecycle)) {
+                try {
+                    ((Lifecycle) oldManager).stop();
+                } catch (LifecycleException e) {
+                    log.error("StandardContext.setManager: stop: ", e);
+                }
             }
-        }
 
-        // Start the new component if necessary
-        if (manager != null)
-            manager.setContext(this);
-        if (getState().isAvailable() && (manager != null) &&
-            (manager instanceof Lifecycle)) {
-            try {
-                ((Lifecycle) manager).start();
-            } catch (LifecycleException e) {
-                log.error("StandardContext.setManager: start: ", e);
+            // Start the new component if necessary
+            if (manager != null)
+                manager.setContext(this);
+            if (getState().isAvailable() && (manager != null) &&
+                (manager instanceof Lifecycle)) {
+                try {
+                    ((Lifecycle) manager).start();
+                } catch (LifecycleException e) {
+                    log.error("StandardContext.setManager: start: ", e);
+                }
             }
+        } finally {
+            writeLock.unlock();
         }
 
         // Report this property change to interested listeners
-        support.firePropertyChange("manager", oldManager, this.manager);
+        support.firePropertyChange("manager", oldManager, manager);
     }
 
 
@@ -2475,44 +2506,68 @@ public class StandardContext extends ContainerBase
     }
 
 
-   @Override
-   public DirContext getResources() {
-       return resources;
-   }
+    @Override
+    public DirContext getResources() {
+        Lock readLock = resourcesLock.readLock();
+        readLock.lock();
+        try {
+            return resources;
+        } finally {
+            readLock.unlock();
+        }
+    }
+
+
+    private DirContext getWebappResources() {
+        Lock readLock = resourcesLock.readLock();
+        readLock.lock();
+        try {
+            return webappResources;
+        } finally {
+            readLock.unlock();
+        }
+    }
 
 
     @Override
     public synchronized void setResources(DirContext resources) {
 
-        if (getState().isAvailable()) {
-            throw new IllegalStateException
-                (sm.getString("standardContext.resources.started"));
-        }
+        Lock writeLock = resourcesLock.writeLock();
+        writeLock.lock();
+        DirContext oldResources = null;
+        try {
+            if (getState().isAvailable()) {
+                throw new IllegalStateException
+                    (sm.getString("standardContext.resources.started"));
+            }
 
-        DirContext oldResources = this.webappResources;
-        if (oldResources == resources)
-            return;
+            oldResources = this.webappResources;
+            if (oldResources == resources)
+                return;
 
-        if (resources instanceof BaseDirContext) {
-            // Caching
-            ((BaseDirContext) resources).setCached(isCachingAllowed());
-            ((BaseDirContext) resources).setCacheTTL(getCacheTTL());
-            ((BaseDirContext) resources).setCacheMaxSize(getCacheMaxSize());
-            ((BaseDirContext) resources).setCacheObjectMaxSize(
-                    getCacheObjectMaxSize());
-            // Alias support
-            ((BaseDirContext) resources).setAliases(getAliases());
-        }
-        if (resources instanceof FileDirContext) {
-            ((FileDirContext) resources).setAllowLinking(isAllowLinking());
-        }
-        this.webappResources = resources;
+            if (resources instanceof BaseDirContext) {
+                // Caching
+                ((BaseDirContext) resources).setCached(isCachingAllowed());
+                ((BaseDirContext) resources).setCacheTTL(getCacheTTL());
+                ((BaseDirContext) resources).setCacheMaxSize(getCacheMaxSize());
+                ((BaseDirContext) resources).setCacheObjectMaxSize(
+                        getCacheObjectMaxSize());
+                // Alias support
+                ((BaseDirContext) resources).setAliases(getAliases());
+            }
+            if (resources instanceof FileDirContext) {
+                ((FileDirContext) resources).setAllowLinking(isAllowLinking());
+            }
+            this.webappResources = resources;
 
-        // The proxied resources will be refreshed on start
-        this.resources = null;
+            // The proxied resources will be refreshed on start
+            this.resources = null;
+        } finally {
+            writeLock.unlock();
+        }
 
         support.firePropertyChange("resources", oldResources,
-                                   this.webappResources);
+                                   resources);
 
     }
 
@@ -4447,6 +4502,7 @@ public class StandardContext extends ContainerBase
      */
     @Override
     public String getRealPath(String path) {
+        DirContext webappResources = getWebappResources();
         if (webappResources instanceof BaseDirContext) {
             return ((BaseDirContext) webappResources).getRealPath(path);
         }
@@ -4844,6 +4900,8 @@ public class StandardContext extends ContainerBase
             env.put(ProxyDirContext.HOST, getParent().getName());
         env.put(ProxyDirContext.CONTEXT, getName());
 
+        Lock writeLock = resourcesLock.writeLock();
+        writeLock.lock();
         try {
             ProxyDirContext proxyDirContext =
                 new ProxyDirContext(env, webappResources);
@@ -4893,10 +4951,11 @@ public class StandardContext extends ContainerBase
             ExceptionUtils.handleThrowable(t);
             log.error(sm.getString("standardContext.resourcesStart"), t);
             ok = false;
+        } finally {
+            writeLock.unlock();
         }
 
-        return (ok);
-
+        return ok;
     }
 
 
@@ -4907,6 +4966,8 @@ public class StandardContext extends ContainerBase
 
         boolean ok = true;
 
+        Lock writeLock = resourcesLock.writeLock();
+        writeLock.lock();
         try {
             if (resources != null) {
                 if (resources instanceof Lifecycle) {
@@ -4934,12 +4995,12 @@ public class StandardContext extends ContainerBase
             ExceptionUtils.handleThrowable(t);
             log.error(sm.getString("standardContext.resourcesStop"), t);
             ok = false;
+        } finally {
+            this.resources = null;
+            writeLock.unlock();
         }
 
-        this.resources = null;
-
-        return (ok);
-
+        return ok;
     }
 
 
@@ -5016,6 +5077,7 @@ public class StandardContext extends ContainerBase
         }
 
         // Add missing components as necessary
+        DirContext webappResources = getWebappResources();
         if (webappResources == null) {   // (1) Required by Loader
             if (log.isDebugEnabled())
                 log.debug("Configuring default Resources");
@@ -5094,6 +5156,7 @@ public class StandardContext extends ContainerBase
             if (ok) {
 
                 // Start our subordinate components, if any
+                Loader loader = getLoader();
                 if ((loader != null) && (loader instanceof Lifecycle))
                     ((Lifecycle) loader).start();
 
@@ -5119,11 +5182,13 @@ public class StandardContext extends ContainerBase
                 logger = null;
                 getLogger();
 
+                Cluster cluster = getClusterInternal();
                 if ((cluster != null) && (cluster instanceof Lifecycle))
                     ((Lifecycle) cluster).start();
                 Realm realm = getRealmInternal();
                 if ((realm != null) && (realm instanceof Lifecycle))
                     ((Lifecycle) realm).start();
+                DirContext resources = getResources();
                 if ((resources != null) && (resources instanceof Lifecycle))
                     ((Lifecycle) resources).start();
 
@@ -5145,6 +5210,7 @@ public class StandardContext extends ContainerBase
 
                 // Acquire clustered manager
                 Manager contextManager = null;
+                Manager manager = getManager();
                 if (manager == null) {
                     if (log.isDebugEnabled()) {
                         log.debug(sm.getString("standardContext.cluster.noManager",
@@ -5195,7 +5261,7 @@ public class StandardContext extends ContainerBase
                 (Globals.RESOURCES_ATTR, getResources());
 
         // Initialize associated mapper
-        mapper.setContext(getPath(), welcomeFiles, resources);
+        mapper.setContext(getPath(), welcomeFiles, getResources());
 
         // Binding thread
         oldCCL = bindThread();
@@ -5248,6 +5314,7 @@ public class StandardContext extends ContainerBase
 
             try {
                 // Start manager
+                Manager manager = getManager();
                 if ((manager != null) && (manager instanceof Lifecycle)) {
                     ((Lifecycle) getManager()).start();
                 }
@@ -5437,6 +5504,7 @@ public class StandardContext extends ContainerBase
                 // Stop ContainerBackgroundProcessor thread
                 threadStop();
 
+                Manager manager = getManager();
                 if (manager != null && manager instanceof Lifecycle &&
                         ((Lifecycle) manager).getState().isAvailable()) {
                     ((Lifecycle) manager).stop();
@@ -5482,9 +5550,11 @@ public class StandardContext extends ContainerBase
             if ((realm != null) && (realm instanceof Lifecycle)) {
                 ((Lifecycle) realm).stop();
             }
+            Cluster cluster = getClusterInternal();
             if ((cluster != null) && (cluster instanceof Lifecycle)) {
                 ((Lifecycle) cluster).stop();
             }
+            Loader loader = getLoader();
             if ((loader != null) && (loader instanceof Lifecycle)) {
                 ((Lifecycle) loader).stop();
             }
@@ -5555,10 +5625,12 @@ public class StandardContext extends ContainerBase
             instanceListeners = new String[0];
         }
 
+        Loader loader = getLoader();
         if ((loader != null) && (loader instanceof Lifecycle)) {
             ((Lifecycle) loader).destroy();
         }
 
+        Manager manager = getManager();
         if ((manager != null) && (manager instanceof Lifecycle)) {
             ((Lifecycle) manager).destroy();
         }
@@ -5569,6 +5641,7 @@ public class StandardContext extends ContainerBase
 
     @Override
     public void backgroundProcess() {
+        Loader loader = getLoader();
         if (loader != null) {
             try {
                 loader.backgroundProcess();
@@ -5577,6 +5650,7 @@ public class StandardContext extends ContainerBase
                         "standardContext.backgroundProcess.loader", loader), e);
             }
         }
+        Manager manager = getManager();
         if (manager != null) {
             try {
                 manager.backgroundProcess();
