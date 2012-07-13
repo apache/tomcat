@@ -52,8 +52,8 @@ public class MultiCastSender
         if (s == null) {
             try {
                 group = InetAddress.getByName(config.getGroup());
-                if (config.host != null) {
-                    InetAddress addr =  InetAddress.getByName(config.host);
+                if (config.getHost() != null) {
+                    InetAddress addr =  InetAddress.getByName(config.getHost());
                     InetSocketAddress addrs = new InetSocketAddress(addr, config.getMultiport());
                     s = new MulticastSocket(addrs);
                 } else
