@@ -44,7 +44,7 @@ import org.apache.juli.logging.LogFactory;
 public class ReplicatedContext extends StandardContext implements MapOwner {
     private int mapSendOptions = Channel.SEND_OPTIONS_DEFAULT;
     private static final Log log = LogFactory.getLog( ReplicatedContext.class );
-    protected static long DEFAULT_REPL_TIMEOUT = 15000;//15 seconds
+    protected static final long DEFAULT_REPL_TIMEOUT = 15000;//15 seconds
 
     /**
      * Start this component and implement the requirements
@@ -60,10 +60,9 @@ public class ReplicatedContext extends StandardContext implements MapOwner {
             CatalinaCluster catclust = (CatalinaCluster)this.getCluster();
             if (this.context == null) this.context = new ReplApplContext(this);
             if ( catclust != null ) {
-                ReplicatedMap<String,Object> map =
-                        new ReplicatedMap<String,Object>(this,
-                                catclust.getChannel(),DEFAULT_REPL_TIMEOUT,
-                                getName(),getClassLoaders());
+                ReplicatedMap<String,Object> map = new ReplicatedMap<>(
+                        this, catclust.getChannel(),DEFAULT_REPL_TIMEOUT,
+                        getName(),getClassLoaders());
                 map.setChannelSendOptions(mapSendOptions);
                 ((ReplApplContext)this.context).setAttributeMap(map);
                 if (getAltDDName() != null) context.setAttribute(Globals.ALT_DD_ATTR, getAltDDName());
@@ -130,8 +129,8 @@ public class ReplicatedContext extends StandardContext implements MapOwner {
 
 
     protected static class ReplApplContext extends ApplicationContext {
-        protected ConcurrentHashMap<String, Object> tomcatAttributes =
-            new ConcurrentHashMap<String, Object>();
+        protected final ConcurrentHashMap<String, Object> tomcatAttributes =
+            new ConcurrentHashMap<>();
 
         public ReplApplContext(ReplicatedContext context) {
             super(context);
@@ -181,17 +180,17 @@ public class ReplicatedContext extends StandardContext implements MapOwner {
         @SuppressWarnings("unchecked")
         @Override
         public Enumeration<String> getAttributeNames() {
-            Set<String> names = new HashSet<String>();
+            Set<String> names = new HashSet<>();
             names.addAll(attributes.keySet());
 
-            return new MultiEnumeration<String>(new Enumeration[] {
+            return new MultiEnumeration<>(new Enumeration[] {
                     super.getAttributeNames(),
                     Collections.enumeration(names) });
         }
     }
 
     protected static class MultiEnumeration<T> implements Enumeration<T> {
-        Enumeration<T>[] e=null;
+        private final Enumeration<T>[] e;
         public MultiEnumeration(Enumeration<T>[] lists) {
             e = lists;
         }
