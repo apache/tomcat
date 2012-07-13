@@ -79,6 +79,12 @@
     <Bug code="SWL" />
   </Match>
   <Match>
+    <!-- shost will not be null in normal usage -->
+    <Class name="org.apache.catalina.ha.backend.CollectedInfo" />
+    <Method name="init" />
+    <Bug code="NP" />
+  </Match>
+  <Match>
     <!-- Field is only modified during Servlet load -->
     <Class name="org.apache.catalina.manager.host.HostManagerServlet" />
     <Bug code="MSF" />
