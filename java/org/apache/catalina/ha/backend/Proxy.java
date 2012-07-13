@@ -26,9 +26,6 @@ import java.net.InetAddress;
  */
 public class Proxy {
 
-  protected enum State { OK, ERROR, DOWN }
-
   public InetAddress address = null;
   public int port = 80;
-  public State state = State.OK;
 }

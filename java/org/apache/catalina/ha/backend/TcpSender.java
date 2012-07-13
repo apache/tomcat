@@ -93,9 +93,9 @@ public class TcpSender
         for (int i = 0; i < connections.length; i++) {
             if (connections[i] == null) {
                 try {
-                    if (config.host != null) {
+                    if (config.getHost() != null) {
                         connections[i] = new Socket();
-                        InetAddress addr =  InetAddress.getByName(config.host);
+                        InetAddress addr =  InetAddress.getByName(config.getHost());
                         InetSocketAddress addrs = new InetSocketAddress(addr, 0);
                         connections[i].setReuseAddress(true);
                         connections[i].bind(addrs);
