@@ -56,7 +56,7 @@ public class CsrfPreventionFilter extends FilterBase {
 
     private Random randomSource;
 
-    private final Set<String> entryPoints = new HashSet<String>();
+    private final Set<String> entryPoints = new HashSet<>();
 
     private int nonceCacheSize = 5;
 
@@ -153,7 +153,6 @@ public class CsrfPreventionFilter extends FilterBase {
                 }
             }
 
-            @SuppressWarnings("unchecked")
             LruCache<String> nonceCache =
                 (LruCache<String>) req.getSession(true).getAttribute(
                     Constants.CSRF_NONCE_SESSION_ATTR_NAME);
@@ -169,7 +168,7 @@ public class CsrfPreventionFilter extends FilterBase {
             }
 
             if (nonceCache == null) {
-                nonceCache = new LruCache<String>(nonceCacheSize);
+                nonceCache = new LruCache<>(nonceCacheSize);
                 req.getSession().setAttribute(
                         Constants.CSRF_NONCE_SESSION_ATTR_NAME, nonceCache);
             }
