@@ -46,7 +46,6 @@ import org.apache.catalina.ha.session.DeltaManager;
 import org.apache.catalina.ha.session.JvmRouteBinderValve;
 import org.apache.catalina.ha.session.JvmRouteSessionIDBinderListener;
 import org.apache.catalina.ha.session.SessionMessage;
-import org.apache.catalina.ha.util.IDynamicProperty;
 import org.apache.catalina.tribes.Channel;
 import org.apache.catalina.tribes.ChannelListener;
 import org.apache.catalina.tribes.Member;
@@ -73,9 +72,8 @@ import org.apache.tomcat.util.res.StringManager;
  * @author Peter Rossbach
  * @version $Id$
  */
-public class SimpleTcpCluster extends LifecycleBase
-    implements CatalinaCluster, LifecycleListener, IDynamicProperty,
-               MembershipListener, ChannelListener{
+public class SimpleTcpCluster extends LifecycleBase implements CatalinaCluster,
+        LifecycleListener, MembershipListener, ChannelListener{
 
     public static final Log log = LogFactory.getLog(SimpleTcpCluster.class);
 
@@ -390,7 +388,6 @@ public class SimpleTcpCluster extends LifecycleBase
      * @param name
      * @param value
      */
-    @Override
     public boolean setProperty(String name, Object value) {
         if (log.isTraceEnabled())
             log.trace(sm.getString("SimpleTcpCluster.setProperty", name, value,properties.get(name)));
@@ -408,7 +405,6 @@ public class SimpleTcpCluster extends LifecycleBase
      * @param key
      * @return The property
      */
-    @Override
     public Object getProperty(String key) {
         if (log.isTraceEnabled())
             log.trace(sm.getString("SimpleTcpCluster.getProperty", key));
@@ -420,7 +416,6 @@ public class SimpleTcpCluster extends LifecycleBase
      *
      * @return An iterator over the property names.
      */
-    @Override
     public Iterator<String> getPropertyNames() {
         return properties.keySet().iterator();
     }
@@ -430,7 +425,6 @@ public class SimpleTcpCluster extends LifecycleBase
      *
      * @param key
      */
-    @Override
     public void removeProperty(String key) {
         properties.remove(key);
     }
