@@ -28,16 +28,15 @@ import org.apache.catalina.tribes.Member;
  */
 
 public class FileMessage extends ClusterMessageBase {
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 2L;
 
     private int messageNumber;
     private byte[] data;
     private int dataLength;
 
-    private long totalLength;
     private long totalNrOfMsgs;
-    private String fileName;
-    private String contextName;
+    private final String fileName;
+    private final String contextName;
 
     public FileMessage(Member source,
                        String fileName,
@@ -46,16 +45,6 @@ public class FileMessage extends ClusterMessageBase {
         this.fileName=fileName;
         this.contextName=contextName;
     }
-
-    /*
-    public void writeExternal(ObjectOutput out) throws IOException {
-
-    }
-
-    public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
-
-    }
-    */
 
     public int getMessageNumber() {
         return messageNumber;
@@ -79,15 +68,6 @@ public class FileMessage extends ClusterMessageBase {
     public int getDataLength() {
         return dataLength;
     }
-    public void setDataLength(int dataLength) {
-        this.dataLength = dataLength;
-    }
-    public long getTotalLength() {
-        return totalLength;
-    }
-    public void setTotalLength(long totalLength) {
-        this.totalLength = totalLength;
-    }
 
     @Override
     public String getUniqueId() {
@@ -103,11 +83,7 @@ public class FileMessage extends ClusterMessageBase {
     public String getFileName() {
         return fileName;
     }
-    public void setFileName(String fileName) {
-        this.fileName = fileName;
-    }
     public String getContextName() {
         return contextName;
     }
-
 }

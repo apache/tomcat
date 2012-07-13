@@ -59,13 +59,13 @@ public class FileMessageFactory {
     /**
      * The file that we are reading/writing
      */
-    protected File file = null;
+    protected final File file;
 
     /**
      * True means that we are writing with this factory. False means that we are
      * reading with this factory
      */
-    protected boolean openForWrite;
+    protected final boolean openForWrite;
 
     /**
      * Once the factory is used, it can not be reused.
@@ -107,8 +107,7 @@ public class FileMessageFactory {
      * everything is worked as expected, messages will spend very little time in
      * the buffer.
      */
-    protected Map<Long, FileMessage> msgBuffer =
-        new ConcurrentHashMap<Long, FileMessage>();
+    protected final Map<Long, FileMessage> msgBuffer = new ConcurrentHashMap<>();
 
     /**
      * The bytes that we hold the data in, not thread safe.
@@ -207,7 +206,6 @@ public class FileMessageFactory {
             return null;
         } else {
             f.setData(data, length);
-            f.setTotalLength(size);
             f.setTotalNrOfMsgs(totalNrOfMessages);
             f.setMessageNumber(++nrOfMessagesProcessed);
             return f;

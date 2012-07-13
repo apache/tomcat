@@ -69,8 +69,8 @@ public class FarmWarDeployer extends ClusterListener
     /*--Instance Variables--------------------------------------*/
     protected boolean started = false; //default 5 seconds
 
-    protected HashMap<String, FileMessageFactory> fileFactories =
-        new HashMap<String, FileMessageFactory>();
+    protected final HashMap<String, FileMessageFactory> fileFactories =
+        new HashMap<>();
 
     protected String deployDir;
 
@@ -103,11 +103,6 @@ public class FarmWarDeployer extends ClusterListener
      * The associated host.
      */
     protected Host host = null;
-
-    /**
-     * The host appBase.
-     */
-    protected File appBase = null;
 
     /**
      * MBean server.
@@ -194,11 +189,6 @@ public class FarmWarDeployer extends ClusterListener
         }
         if (log.isInfoEnabled())
             log.info(sm.getString("farmWarDeployer.stopped"));
-    }
-
-    public void cleanDeployDir() {
-        throw new java.lang.UnsupportedOperationException(sm.getString(
-                "farmWarDeployer.notImplemented", "cleanDeployDir()"));
     }
 
     /**
@@ -407,7 +397,7 @@ public class FarmWarDeployer extends ClusterListener
         Member localMember = getCluster().getLocalMember();
         UndeployMessage msg = new UndeployMessage(localMember, System
                 .currentTimeMillis(), "Undeploy:" + contextName + ":"
-                + System.currentTimeMillis(), contextName, undeploy);
+                + System.currentTimeMillis(), contextName);
         if (log.isDebugEnabled())
             log.debug(sm.getString("farmWarDeployer.removeTxMsg", contextName));
         cluster.send(msg);
