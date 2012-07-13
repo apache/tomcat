@@ -35,6 +35,7 @@ but possibly 7.1.x).
  5. Run the unused code detector and remove everything that isn't currently used.
     Add deprecation markers for the removed code to Tomcat 7.0.x
     - Complete for javax.*
+    - Complete for o.a.catalina.[ant to deploy]
     - Remaining code in progress
 
  6. Change the default URIEncoding on the connector to UTF-8.
@@ -61,8 +62,14 @@ but possibly 7.1.x).
 12. Java 7 updates
     - Use of <> operator where possible
       - Complete for javax.*
+      - Complete for o.a.catalina.[ant to deploy]
       - Not started for remainder
     - Use of try with resources
       - Not started
     - Catching multiple exceptions
       - Not started
+
+13. Fix all FindBugs warnings
+    - Complete for javax.*
+    - Complete for o.a.catalina.[ant to deploy]
+    - Remaining code in progress
