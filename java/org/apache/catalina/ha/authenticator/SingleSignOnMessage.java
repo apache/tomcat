@@ -117,11 +117,6 @@ public class SingleSignOnMessage implements ClusterMessage {
         return result.toString();
     }
 
-    @Override
-    public void setUniqueId(String uniqueId) {
-        this.uniqueId = uniqueId;
-    }
-
     public int getAction() {
         return action;
     }

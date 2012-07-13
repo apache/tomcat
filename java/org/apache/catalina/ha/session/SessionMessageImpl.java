@@ -158,13 +158,10 @@ public class SessionMessageImpl extends ClusterMessageBase implements SessionMes
     public String getContextName() {
        return mContextName;
     }
+
     @Override
     public String getUniqueId() {
         return uniqueId;
-    }
-    @Override
-    public void setUniqueId(String uniqueId) {
-        this.uniqueId = uniqueId;
     }
 
     @Override

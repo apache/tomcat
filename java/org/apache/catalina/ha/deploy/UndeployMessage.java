@@ -63,11 +63,6 @@ public class UndeployMessage implements ClusterMessage {
         return uniqueId;
     }
 
-    @Override
-    public void setUniqueId(String uniqueId) {
-        this.uniqueId = uniqueId;
-    }
-
     public String getContextName() {
         return contextName;
     }
