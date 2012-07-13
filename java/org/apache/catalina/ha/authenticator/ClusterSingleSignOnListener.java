@@ -40,29 +40,14 @@ public class ClusterSingleSignOnListener extends ClusterListener {
 
     // ------------------------------------------------------------- Properties
 
-    private ClusterSingleSignOn clusterSSO = null;
+    private final ClusterSingleSignOn clusterSSO;
 
 
     //--Constructor---------------------------------------------
 
-    public ClusterSingleSignOnListener() {
-        // NO-OP
-    }
-
-    //--Logic---------------------------------------------------
-
-    public ClusterSingleSignOn getClusterSSO() {
-
-        return clusterSSO;
-
-    }
-
-    public void setClusterSSO(ClusterSingleSignOn clusterSSO) {
-
+    public ClusterSingleSignOnListener(ClusterSingleSignOn clusterSSO) {
         this.clusterSSO = clusterSSO;
-
     }
-
 
     /**
      * Callback from the cluster, when a message is received, The cluster will

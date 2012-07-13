@@ -87,8 +87,7 @@ public class ClusterSingleSignOn extends SingleSignOn {
     @Override
     protected synchronized void startInternal() throws LifecycleException {
 
-        clusterSSOListener = new ClusterSingleSignOnListener();
-        clusterSSOListener.setClusterSSO(this);
+        clusterSSOListener = new ClusterSingleSignOnListener(this);
 
         // Load the cluster component, if any
         try {
