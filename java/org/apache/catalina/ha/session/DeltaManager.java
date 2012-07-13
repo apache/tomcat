@@ -80,7 +80,7 @@ public class DeltaManager extends ClusterManagerBase{
     /**
      * The descriptive name of this Manager implementation (for logging).
      */
-    protected static String managerName = "DeltaManager";
+    protected static final String managerName = "DeltaManager";
     protected String name = null;
 
     /**
@@ -101,8 +101,8 @@ public class DeltaManager extends ClusterManagerBase{
      * wait time between send session block (default 2 sec)
      */
     private int sendAllSessionsWaitTime = 2 * 1000 ;
-    private ArrayList<SessionMessage> receivedMessageQueue =
-        new ArrayList<SessionMessage>() ;
+    private final ArrayList<SessionMessage> receivedMessageQueue =
+            new ArrayList<>();
     private boolean receiverQueue = false ;
     private boolean stateTimestampDrop = true ;
     private long stateTransferCreateSendTime;

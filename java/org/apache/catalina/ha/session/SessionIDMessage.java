@@ -27,9 +27,7 @@ import org.apache.catalina.ha.ClusterMessageBase;
  */
 public class SessionIDMessage extends ClusterMessageBase {
 
-    private static final long serialVersionUID = 1L;
-
-    private int messageNumber;
+    private static final long serialVersionUID = 2L;
 
     private String orignalSessionID;
 
@@ -45,8 +43,6 @@ public class SessionIDMessage extends ClusterMessageBase {
         result.append(getHost());
                 result.append("#-#");
                 result.append(getContextName());
-        result.append("#-#");
-        result.append(getMessageNumber());
         result.append("#-#");
         result.append(System.currentTimeMillis());
         return result.toString();
@@ -77,20 +73,6 @@ public class SessionIDMessage extends ClusterMessageBase {
      */
     public void setContextName(String contextName) {
         this.contextName = contextName;
-    }
-    /**
-     * @return Returns the messageNumber.
-     */
-    public int getMessageNumber() {
-        return messageNumber;
-    }
-
-    /**
-     * @param messageNumber
-     *            The messageNumber to set.
-     */
-    public void setMessageNumber(int messageNumber) {
-        this.messageNumber = messageNumber;
     }
 
 
