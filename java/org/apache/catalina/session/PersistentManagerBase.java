@@ -134,7 +134,7 @@ public abstract class PersistentManagerBase extends ManagerBase
     /**
      * The descriptive name of this Manager implementation (for logging).
      */
-    private static String name = "PersistentManagerBase";
+    private static final String name = "PersistentManagerBase";
 
 
     /**
@@ -175,8 +175,7 @@ public abstract class PersistentManagerBase extends ManagerBase
     /**
      * Sessions currently being swapped in and the associated locks
      */
-    private final Map<String,Object> sessionSwapInLocks =
-        new HashMap<String,Object>();
+    private final Map<String,Object> sessionSwapInLocks = new HashMap<>();
 
 
     // ------------------------------------------------------------- Properties

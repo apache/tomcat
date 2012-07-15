@@ -205,7 +205,7 @@ public final class FileStore extends StoreBase {
         }
 
         // Build and return the list of session identifiers
-        ArrayList<String> list = new ArrayList<String>();
+        ArrayList<String> list = new ArrayList<>();
         int n = FILE_EXT.length();
         for (int i = 0; i < files.length; i++) {
             if (files[i].endsWith(FILE_EXT)) {

@@ -152,7 +152,7 @@ public class StandardSession implements HttpSession, Session, Serializable {
     /**
      * The collection of user data attributes associated with this Session.
      */
-    protected Map<String, Object> attributes = new ConcurrentHashMap<String, Object>();
+    protected Map<String, Object> attributes = new ConcurrentHashMap<>();
 
 
     /**
@@ -209,8 +209,7 @@ public class StandardSession implements HttpSession, Session, Serializable {
     /**
      * The session event listeners for this Session.
      */
-    protected transient ArrayList<SessionListener> listeners =
-        new ArrayList<SessionListener>();
+    protected transient ArrayList<SessionListener> listeners = new ArrayList<>();
 
 
     /**
@@ -244,7 +243,7 @@ public class StandardSession implements HttpSession, Session, Serializable {
      * and event listeners.  <b>IMPLEMENTATION NOTE:</b> This object is
      * <em>not</em> saved and restored across session serializations!
      */
-    protected transient Map<String, Object> notes = new Hashtable<String, Object>();
+    protected transient Map<String, Object> notes = new Hashtable<>();
 
 
     /**
@@ -274,7 +273,7 @@ public class StandardSession implements HttpSession, Session, Serializable {
      * The property change support for this component.  NOTE:  This value
      * is not included in the serialized version of this object.
      */
-    protected transient PropertyChangeSupport support =
+    protected final transient PropertyChangeSupport support =
         new PropertyChangeSupport(this);
 
 
@@ -1168,7 +1167,7 @@ public class StandardSession implements HttpSession, Session, Serializable {
             throw new IllegalStateException
                 (sm.getString("standardSession.getAttributeNames.ise"));
 
-        Set<String> names = new HashSet<String>();
+        Set<String> names = new HashSet<>();
         names.addAll(attributes.keySet());
         return Collections.enumeration(names);
     }
@@ -1568,7 +1567,7 @@ public class StandardSession implements HttpSession, Session, Serializable {
 
         // Deserialize the attribute count and attribute values
         if (attributes == null)
-            attributes = new ConcurrentHashMap<String, Object>();
+            attributes = new ConcurrentHashMap<>();
         int n = ((Integer) stream.readObject()).intValue();
         boolean isValidSave = isValid;
         isValid = true;
@@ -1585,11 +1584,11 @@ public class StandardSession implements HttpSession, Session, Serializable {
         isValid = isValidSave;
 
         if (listeners == null) {
-            listeners = new ArrayList<SessionListener>();
+            listeners = new ArrayList<>();
         }
 
         if (notes == null) {
-            notes = new Hashtable<String, Object>();
+            notes = new Hashtable<>();
         }
     }
 
@@ -1629,8 +1628,8 @@ public class StandardSession implements HttpSession, Session, Serializable {
 
         // Accumulate the names of serializable and non-serializable attributes
         String keys[] = keys();
-        ArrayList<String> saveNames = new ArrayList<String>();
-        ArrayList<Object> saveValues = new ArrayList<Object>();
+        ArrayList<String> saveNames = new ArrayList<>();
+        ArrayList<Object> saveValues = new ArrayList<>();
         for (int i = 0; i < keys.length; i++) {
             Object value = attributes.get(keys[i]);
             if (value == null)

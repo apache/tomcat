@@ -43,12 +43,12 @@ public abstract class StoreBase extends LifecycleBase implements Store {
     /**
      * Name to register for this Store, used for logging.
      */
-    protected static String storeName = "StoreBase";
+    protected static final String storeName = "StoreBase";
 
     /**
      * The property change support for this component.
      */
-    protected PropertyChangeSupport support = new PropertyChangeSupport(this);
+    protected final PropertyChangeSupport support = new PropertyChangeSupport(this);
 
     /**
      * The string manager for this package.
