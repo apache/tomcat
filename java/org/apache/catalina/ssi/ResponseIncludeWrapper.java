@@ -56,12 +56,12 @@ public class ResponseIncludeWrapper extends HttpServletResponseWrapper {
     /**
      * Our ServletOutputStream
      */
-    protected ServletOutputStream captureServletOutputStream;
+    protected final ServletOutputStream captureServletOutputStream;
     protected ServletOutputStream servletOutputStream;
     protected PrintWriter printWriter;
 
-    private ServletContext context;
-    private HttpServletRequest request;
+    private final ServletContext context;
+    private final HttpServletRequest request;
 
     static {
         RFC1123_FORMAT = new SimpleDateFormat(RFC1123_PATTERN, Locale.US);
@@ -160,17 +160,6 @@ public class ResponseIncludeWrapper extends HttpServletResponseWrapper {
             return -1;
         }
         return lastModified;
-    }
-
-    /**
-     * Sets the value of the <code>last-modified</code> header field.
-     *
-     * @param lastModified The number of milliseconds since January 1, 1970 GMT.
-     */
-    public void setLastModified(long lastModified) {
-        this.lastModified = lastModified;
-        ((HttpServletResponse) getResponse()).setDateHeader(LAST_MODIFIED,
-                lastModified);
     }
 
     /**

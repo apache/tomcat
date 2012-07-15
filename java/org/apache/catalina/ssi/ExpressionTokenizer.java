@@ -39,10 +39,10 @@ public class ExpressionTokenizer {
     public static final int TOKEN_GT = 10;
     public static final int TOKEN_LT = 11;
     public static final int TOKEN_END = 12;
-    private char[] expr;
+    private final char[] expr;
     private String tokenVal = null;
     private int index;
-    private int length;
+    private final int length;
 
 
     /**

@@ -56,12 +56,12 @@ public class SSIServletExternalResolver implements SSIExternalResolver {
             "REQUEST_URI", "SCRIPT_FILENAME", "SCRIPT_NAME", "SERVER_ADDR",
             "SERVER_NAME", "SERVER_PORT", "SERVER_PROTOCOL", "SERVER_SOFTWARE",
             "UNIQUE_ID"};
-    protected ServletContext context;
-    protected HttpServletRequest req;
-    protected HttpServletResponse res;
-    protected boolean isVirtualWebappRelative;
-    protected int debug;
-    protected String inputEncoding;
+    protected final ServletContext context;
+    protected final HttpServletRequest req;
+    protected final HttpServletResponse res;
+    protected final boolean isVirtualWebappRelative;
+    protected final int debug;
+    protected final String inputEncoding;
 
     public SSIServletExternalResolver(ServletContext context,
             HttpServletRequest req, HttpServletResponse res,
@@ -563,8 +563,8 @@ public class SSIServletExternalResolver implements SSIExternalResolver {
     }
 
     protected static class ServletContextAndPath {
-        protected ServletContext servletContext;
-        protected String path;
+        protected final ServletContext servletContext;
+        protected final String path;
 
 
         public ServletContextAndPath(ServletContext servletContext,
