@@ -239,7 +239,10 @@ public class MemoryRealm  extends RealmBase {
      * Returns the principals for this realm.
      *
      * @return The principals, keyed by user name (a String)
+     *
+     * @deprecated  Unused
      */
+    @Deprecated
     protected Map<String,GenericPrincipal> getPrincipals() {
         return principals;
     }

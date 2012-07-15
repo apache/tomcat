@@ -171,9 +171,7 @@ public class JAASRealm
 
     /**
      * setter for the <code>appName</code> member variable
-     * @deprecated JAAS should use the <code>Engine</code> (domain) name and webpp/host overrides
      */
-    @Deprecated
     public void setAppName(String name) {
         appName = name;
     }

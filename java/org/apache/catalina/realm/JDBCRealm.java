@@ -709,7 +709,10 @@ public class JDBCRealm
      * Release our use of this connection so that it can be recycled.
      *
      * @param dbConnection The connection to be released
+     *
+     * @deprecated  Unused
      */
+    @Deprecated
     protected void release(Connection dbConnection) {
 
         // NO-OP since we are not pooling anything
