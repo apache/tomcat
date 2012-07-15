@@ -42,24 +42,6 @@ public class GenericPrincipal implements TomcatPrincipal {
 
     // ----------------------------------------------------------- Constructors
 
-
-    /**
-     * Construct a new Principal, associated with the specified Realm, for the
-     * specified username and password.
-     *
-     * @param name The username of the user represented by this Principal
-     * @param password Credentials used to authenticate this user
-     *
-     * @deprecated  Unused
-     */
-    @Deprecated
-    public GenericPrincipal(String name, String password) {
-
-        this(name, password, null);
-
-    }
-
-
     /**
      * Construct a new Principal, associated with the specified Realm, for the
      * specified username and password, with the specified role names
