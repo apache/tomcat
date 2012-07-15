@@ -188,25 +188,9 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
 
 
     /**
-     * Path used to store context descriptors.
-     * @deprecated  Unused
-     */
-    @Deprecated
-    protected final File contextDescriptors = null;
-
-
-    /**
      * The associated host.
      */
     protected transient Host host = null;
-
-
-    /**
-     * The host appBase.
-     * @deprecated  Unused
-     */
-    @Deprecated
-    protected final File appBase = null;
 
 
     /**
