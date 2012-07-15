@@ -775,6 +775,14 @@ public class JNDIRealm extends RealmBase {
     }
 
 
+    public boolean isRoleSearchAsUser() {
+        return roleSearchAsUser;
+    }
+
+    public void setRoleSearchAsUser(boolean roleSearchAsUser) {
+        this.roleSearchAsUser = roleSearchAsUser;
+    }
+
     /**
      * Return the "search subtree for roles" flag.
      */
