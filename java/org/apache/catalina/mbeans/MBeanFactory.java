@@ -109,7 +109,10 @@ public class MBeanFactory {
      * Return the managed bean definition for the specified bean type
      *
      * @param type MBean type
+     *
+     * @deprecated  Unused
      */
+    @Deprecated
     public String findObjectName(String type) {
 
         if (type.equals("org.apache.catalina.core.StandardContext")) {
