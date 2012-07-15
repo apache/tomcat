@@ -69,12 +69,12 @@ public final class SecurityUtil{
      * Cache every object for which we are creating method on it.
      */
     private static final Map<Object,Method[]> objectCache =
-        new ConcurrentHashMap<Object,Method[]>();
+            new ConcurrentHashMap<>();
 
     private static final org.apache.juli.logging.Log log=
         org.apache.juli.logging.LogFactory.getLog( SecurityUtil.class );
 
-    private static boolean packageDefinitionEnabled =
+    private static final boolean packageDefinitionEnabled =
          (System.getProperty("package.definition") == null &&
            System.getProperty("package.access")  == null) ? false : true;
 
