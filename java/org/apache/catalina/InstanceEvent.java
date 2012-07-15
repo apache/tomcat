@@ -144,12 +144,7 @@ public final class InstanceEvent extends EventObject {
      * @param type Event type (required)
      */
     public InstanceEvent(Wrapper wrapper, Filter filter, String type) {
-
-      super(wrapper);
-      this.filter = filter;
-      this.servlet = null;
-      this.type = type;
-
+        this(wrapper, filter, type, null, null, null);
     }
 
 
@@ -164,13 +159,7 @@ public final class InstanceEvent extends EventObject {
      */
     public InstanceEvent(Wrapper wrapper, Filter filter, String type,
                          Throwable exception) {
-
-      super(wrapper);
-      this.filter = filter;
-      this.servlet = null;
-      this.type = type;
-      this.exception = exception;
-
+        this(wrapper, filter, type, null, null, exception);
     }
 
 
@@ -186,14 +175,7 @@ public final class InstanceEvent extends EventObject {
      */
     public InstanceEvent(Wrapper wrapper, Filter filter, String type,
                          ServletRequest request, ServletResponse response) {
-
-      super(wrapper);
-      this.filter = filter;
-      this.servlet = null;
-      this.type = type;
-      this.request = request;
-      this.response = response;
-
+        this(wrapper, filter, type, request, response, null);
     }
 
 
@@ -232,12 +214,7 @@ public final class InstanceEvent extends EventObject {
      * @param type Event type (required)
      */
     public InstanceEvent(Wrapper wrapper, Servlet servlet, String type) {
-
-      super(wrapper);
-      this.filter = null;
-      this.servlet = servlet;
-      this.type = type;
-
+        this(wrapper, servlet, type, null, null, null);
     }
 
 
@@ -252,13 +229,7 @@ public final class InstanceEvent extends EventObject {
      */
     public InstanceEvent(Wrapper wrapper, Servlet servlet, String type,
                          Throwable exception) {
-
-      super(wrapper);
-      this.filter = null;
-      this.servlet = servlet;
-      this.type = type;
-      this.exception = exception;
-
+        this(wrapper, servlet, type, null, null, exception);
     }
 
 
@@ -274,14 +245,7 @@ public final class InstanceEvent extends EventObject {
      */
     public InstanceEvent(Wrapper wrapper, Servlet servlet, String type,
                          ServletRequest request, ServletResponse response) {
-
-      super(wrapper);
-      this.filter = null;
-      this.servlet = servlet;
-      this.type = type;
-      this.request = request;
-      this.response = response;
-
+        this(wrapper, servlet, type, request, response, null);
     }
 
 
@@ -319,41 +283,41 @@ public final class InstanceEvent extends EventObject {
      * by this event (AFTER_INIT_EVENT, AFTER_SERVICE_EVENT,
      * AFTER_DESTROY_EVENT, AFTER_DISPATCH_EVENT, and AFTER_FILTER_EVENT only).
      */
-    private Throwable exception = null;
+    private final Throwable exception;
 
 
     /**
      * The Filter instance for which this event occurred (BEFORE_FILTER_EVENT
      * and AFTER_FILTER_EVENT only).
      */
-    private transient Filter filter = null;
+    private final transient Filter filter;
 
 
     /**
      * The servlet request being processed (BEFORE_FILTER_EVENT,
      * AFTER_FILTER_EVENT, BEFORE_SERVICE_EVENT, and AFTER_SERVICE_EVENT).
      */
-    private transient ServletRequest request = null;
+    private final transient ServletRequest request;
 
 
     /**
      * The servlet response being processed (BEFORE_FILTER_EVENT,
      * AFTER_FILTER_EVENT, BEFORE_SERVICE_EVENT, and AFTER_SERVICE_EVENT).
      */
-    private transient ServletResponse response = null;
+    private final transient ServletResponse response;
 
 
     /**
      * The Servlet instance for which this event occurred (not present on
      * BEFORE_FILTER_EVENT or AFTER_FILTER_EVENT events).
      */
-    private transient Servlet servlet = null;
+    private final transient Servlet servlet;
 
 
     /**
      * The event type this instance represents.
      */
-    private String type = null;
+    private final String type;
 
 
     // ------------------------------------------------------------- Properties
@@ -429,6 +393,4 @@ public final class InstanceEvent extends EventObject {
         return (Wrapper) getSource();
 
     }
-
-
 }
