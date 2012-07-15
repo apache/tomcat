@@ -513,7 +513,7 @@ public class DataSourceRealm extends RealmBase {
         try {
             stmt = roles(dbConnection, username);
             rs = stmt.executeQuery();
-            list = new ArrayList<String>();
+            list = new ArrayList<>();
 
             while (rs.next()) {
                 String role = rs.getString(1);

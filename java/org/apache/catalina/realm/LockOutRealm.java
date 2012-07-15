@@ -424,7 +424,7 @@ public class LockOutRealm extends CombinedRealm {
 
 
     protected static class LockRecord {
-        private AtomicInteger failures = new AtomicInteger(0);
+        private final AtomicInteger failures = new AtomicInteger(0);
         private long lastFailureTime = 0;
 
         public int getFailures() {

@@ -129,7 +129,7 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
     /**
      * The property change support for this component.
      */
-    protected PropertyChangeSupport support = new PropertyChangeSupport(this);
+    protected final PropertyChangeSupport support = new PropertyChangeSupport(this);
 
 
     /**
@@ -576,7 +576,7 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
                         found = true;
                         if(collection[j].findMethod(method)) {
                             if(results == null) {
-                                results = new ArrayList<SecurityConstraint>();
+                                results = new ArrayList<>();
                             }
                             results.add(constraints[i]);
                         }
@@ -645,7 +645,7 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
                     }
                     if(collection[j].findMethod(method)) {
                         if(results == null) {
-                            results = new ArrayList<SecurityConstraint>();
+                            results = new ArrayList<>();
                         }
                         results.add(constraints[i]);
                     }
@@ -703,7 +703,7 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
                 found = true;
                 if(collection[pos].findMethod(method)) {
                     if(results == null) {
-                        results = new ArrayList<SecurityConstraint>();
+                        results = new ArrayList<>();
                     }
                     results.add(constraints[i]);
                 }
@@ -747,7 +747,7 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
                 }
                 if(matched) {
                     if(results == null) {
-                        results = new ArrayList<SecurityConstraint>();
+                        results = new ArrayList<>();
                     }
                     results.add(constraints[i]);
                 }
@@ -1378,7 +1378,7 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
 
     protected static class AllRolesMode {
 
-        private String name;
+        private final String name;
         /** Use the strict servlet spec interpretation which requires that the user
          * have one of the web-app/security-role/role-name
          */
@@ -1438,7 +1438,6 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
             return new X509SubjectDnRetriever();
 
         try {
-            @SuppressWarnings("unchecked")
             Class<? extends X509UsernameRetriever> clazz = (Class<? extends X509UsernameRetriever>)Class.forName(className);
             return clazz.newInstance();
         } catch (ClassNotFoundException e) {

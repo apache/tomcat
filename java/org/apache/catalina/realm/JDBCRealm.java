@@ -622,7 +622,7 @@ public class JDBCRealm
 
                 try {
                     // Accumulate the user's roles
-                    ArrayList<String> roleList = new ArrayList<String>();
+                    ArrayList<String> roleList = new ArrayList<>();
                     stmt = roles(dbConnection, username);
                     rs = stmt.executeQuery();
                     while (rs.next()) {

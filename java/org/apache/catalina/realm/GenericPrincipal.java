@@ -125,9 +125,10 @@ public class GenericPrincipal implements TomcatPrincipal {
         this.name = name;
         this.password = password;
         this.userPrincipal = userPrincipal;
-        if (roles != null) {
-            this.roles = new String[roles.size()];
-            this.roles = roles.toArray(this.roles);
+        if (roles == null) {
+            this.roles = new String[0];
+        } else {
+            this.roles = roles.toArray(new String[roles.size()]);
             if (this.roles.length > 1)
                 Arrays.sort(this.roles);
         }
@@ -142,7 +143,7 @@ public class GenericPrincipal implements TomcatPrincipal {
     /**
      * The username of the user represented by this Principal.
      */
-    protected String name = null;
+    protected final String name;
 
     @Override
     public String getName() {
@@ -154,7 +155,7 @@ public class GenericPrincipal implements TomcatPrincipal {
      * The authentication credentials for the user represented by
      * this Principal.
      */
-    protected String password = null;
+    protected final String password;
 
     public String getPassword() {
         return (this.password);
@@ -164,7 +165,7 @@ public class GenericPrincipal implements TomcatPrincipal {
     /**
      * The set of roles associated with this user.
      */
-    protected String roles[] = new String[0];
+    protected final String roles[];
 
     public String[] getRoles() {
         return (this.roles);
@@ -174,7 +175,7 @@ public class GenericPrincipal implements TomcatPrincipal {
     /**
      * The authenticated Principal to be exposed to applications.
      */
-    protected Principal userPrincipal = null;
+    protected final Principal userPrincipal;
 
     @Override
     public Principal getUserPrincipal() {
@@ -190,7 +191,7 @@ public class GenericPrincipal implements TomcatPrincipal {
      * The JAAS LoginContext, if any, used to authenticate this Principal.
      * Kept so we can call logout().
      */
-    protected LoginContext loginContext = null;
+    protected final LoginContext loginContext;
 
 
     /**
