@@ -105,28 +105,6 @@ public class MBeanFactory {
         this.container = container;
     }
 
-    /**
-     * Return the managed bean definition for the specified bean type
-     *
-     * @param type MBean type
-     *
-     * @deprecated  Unused
-     */
-    @Deprecated
-    public String findObjectName(String type) {
-
-        if (type.equals("org.apache.catalina.core.StandardContext")) {
-            return "StandardContext";
-        } else if (type.equals("org.apache.catalina.core.StandardEngine")) {
-            return "Engine";
-        } else if (type.equals("org.apache.catalina.core.StandardHost")) {
-            return "Host";
-        } else {
-            return null;
-        }
-
-    }
-
 
     /**
      * Little convenience method to remove redundant code
