@@ -287,8 +287,7 @@ public final class HTMLHostManagerServlet extends HostManagerServlet {
         for (int i = 0; i < children.length; i++)
             hostNames[i] = children[i].getName();
 
-        TreeMap<String,String> sortedHostNamesMap =
-            new TreeMap<String,String>();
+        TreeMap<String,String> sortedHostNamesMap = new TreeMap<>();
 
         for (int i = 0; i < hostNames.length; i++) {
             String displayPath = hostNames[i];

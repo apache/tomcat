@@ -190,7 +190,7 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
     /**
      * Path used to store context descriptors.
      */
-    protected File contextDescriptors = null;
+    protected final File contextDescriptors = null;
 
 
     /**
@@ -202,7 +202,7 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
     /**
      * The host appBase.
      */
-    protected File appBase = null;
+    protected final File appBase = null;
 
 
     /**

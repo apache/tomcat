@@ -26,7 +26,6 @@ import java.util.Enumeration;
 import java.util.Locale;
 import java.util.StringTokenizer;
 
-import javax.management.MBeanServer;
 import javax.servlet.ServletException;
 import javax.servlet.UnavailableException;
 import javax.servlet.http.HttpServlet;
@@ -43,7 +42,6 @@ import org.apache.catalina.core.ContainerBase;
 import org.apache.catalina.core.StandardHost;
 import org.apache.catalina.startup.HostConfig;
 import org.apache.tomcat.util.ExceptionUtils;
-import org.apache.tomcat.util.modeler.Registry;
 import org.apache.tomcat.util.res.StringManager;
 
 
@@ -123,12 +121,6 @@ public class HostManagerServlet
 
 
     /**
-     * MBean server.
-     */
-    protected transient MBeanServer mBeanServer = null;
-
-
-    /**
      * The string manager for this package.
      */
     protected static final StringManager sm =
@@ -173,10 +165,6 @@ public class HostManagerServlet
             installedHost = (Host) context.getParent();
             engine = (Engine) installedHost.getParent();
         }
-
-        // Retrieve the MBean server
-        mBeanServer = Registry.getRegistry(null, null).getMBeanServer();
-
     }
 
 

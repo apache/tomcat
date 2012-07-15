@@ -26,7 +26,7 @@ import org.apache.catalina.Session;
  * @author C&eacute;drik LIME
  */
 public class ReverseComparator implements Comparator<Session> {
-    protected Comparator<Session> comparator;
+    protected final Comparator<Session> comparator;
 
     /**
      *

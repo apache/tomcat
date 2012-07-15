@@ -110,7 +110,7 @@ public class SessionUtils {
             // Tapestry 3.0: Engine stored in session under "org.apache.tapestry.engine:" + config.getServletName()
             // TODO: Tapestry 4+
             {
-                final List<Object> tapestryArray = new ArrayList<Object>();
+                final List<Object> tapestryArray = new ArrayList<>();
                 for (Enumeration<String> enumeration = in_session.getAttributeNames(); enumeration.hasMoreElements();) {
                     String name = enumeration.nextElement();
                     if (name.indexOf("tapestry") > -1 && name.indexOf("engine") > -1 && null != in_session.getAttribute(name)) {//$NON-NLS-1$ //$NON-NLS-2$
@@ -147,7 +147,7 @@ public class SessionUtils {
             // Last guess: iterate over all attributes, to find a Locale
             // If there is only one, consider it to be /the/ locale
             {
-                final List<Object> localeArray = new ArrayList<Object>();
+                final List<Object> localeArray = new ArrayList<>();
                 for (Enumeration<String> enumeration = in_session.getAttributeNames(); enumeration.hasMoreElements();) {
                     String name = enumeration.nextElement();
                     Object obj = in_session.getAttribute(name);
@@ -211,7 +211,7 @@ public class SessionUtils {
             // Last guess: iterate over all attributes, to find a java.security.Principal or javax.security.auth.Subject
             // If there is only one, consider it to be /the/ user
             {
-                final List<Object> principalArray = new ArrayList<Object>();
+                final List<Object> principalArray = new ArrayList<>();
                 for (Enumeration<String> enumeration = httpSession.getAttributeNames(); enumeration.hasMoreElements();) {
                     String name = enumeration.nextElement();
                     Object obj = httpSession.getAttribute(name);
