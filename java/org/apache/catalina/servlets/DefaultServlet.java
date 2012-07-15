@@ -211,7 +211,7 @@ public class DefaultServlet
     /**
      * Full range marker.
      */
-    protected static final ArrayList<Range> FULL = new ArrayList<Range>();
+    protected static final ArrayList<Range> FULL = new ArrayList<>();
 
 
     // ----------------------------------------------------- Static Initializer
@@ -1135,7 +1135,7 @@ public class DefaultServlet
 
         // Vector which will contain all the ranges which are successfully
         // parsed.
-        ArrayList<Range> result = new ArrayList<Range>();
+        ArrayList<Range> result = new ArrayList<>();
         StringTokenizer commaTokenizer = new StringTokenizer(rangeHeader, ",");
 
         // Parsing the range list

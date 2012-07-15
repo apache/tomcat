@@ -273,10 +273,10 @@ public final class CGIServlet extends HttpServlet {
     private long stderrTimeout = 2000;
 
     /** object used to ensure multiple threads don't try to expand same file */
-    static Object expandFileLock = new Object();
+    private static final Object expandFileLock = new Object();
 
     /** the shell environment variables to be passed to the CGI script */
-    static Hashtable<String,String> shellEnv = new Hashtable<String,String>();
+    private static final Hashtable<String,String> shellEnv = new Hashtable<>();
 
     /**
      * Sets instance variables.
@@ -314,7 +314,7 @@ public final class CGIServlet extends HttpServlet {
         }
 
         if (getServletConfig().getInitParameter("executable-arg-1") != null) {
-            List<String> args = new ArrayList<String>();
+            List<String> args = new ArrayList<>();
             for (int i = 1;; i++) {
                 String arg = getServletConfig().getInitParameter(
                         "executable-arg-" + i);
@@ -678,13 +678,13 @@ public final class CGIServlet extends HttpServlet {
         private String command = null;
 
         /** cgi command's desired working directory */
-        private File workingDirectory = null;
+        private final File workingDirectory;
 
         /** cgi command's command line parameters */
-        private ArrayList<String> cmdLineParameters = new ArrayList<String>();
+        private final ArrayList<String> cmdLineParameters = new ArrayList<>();
 
         /** whether or not this object is valid or not */
-        private boolean valid = false;
+        private final boolean valid;
 
 
         /**
@@ -707,8 +707,9 @@ public final class CGIServlet extends HttpServlet {
             if (this.valid) {
                 workingDirectory = new File(command.substring(0,
                       command.lastIndexOf(File.separator)));
+            } else {
+                workingDirectory = null;
             }
-
         }
 
 
@@ -933,7 +934,7 @@ public final class CGIServlet extends HttpServlet {
              * (apologies to Marv Albert regarding MJ)
              */
 
-            Hashtable<String,String> envp = new Hashtable<String,String>();
+            Hashtable<String,String> envp = new Hashtable<>();
 
             // Add the shell environment variables (if any)
             envp.putAll(shellEnv);
@@ -1384,16 +1385,16 @@ public final class CGIServlet extends HttpServlet {
     protected class CGIRunner {
 
         /** script/command to be executed */
-        private String command = null;
+        private final String command;
 
         /** environment used when invoking the cgi script */
-        private Hashtable<String,String> env = null;
+        private final Hashtable<String,String> env;
 
         /** working directory used when invoking the cgi script */
-        private File wd = null;
+        private final File wd;
 
         /** command line parameters to be passed to the invoked script */
-        private ArrayList<String> params = null;
+        private final ArrayList<String> params;
 
         /** stdin to be passed to cgi script */
         private InputStream stdin = null;
@@ -1495,7 +1496,7 @@ public final class CGIServlet extends HttpServlet {
          */
         protected String[] hashToStringArray(Hashtable<String,?> h)
             throws NullPointerException {
-            Vector<String> v = new Vector<String>();
+            Vector<String> v = new Vector<>();
             Enumeration<String> e = h.keys();
             while (e.hasMoreElements()) {
                 String k = e.nextElement();
@@ -1596,7 +1597,7 @@ public final class CGIServlet extends HttpServlet {
             Process proc = null;
             int bufRead = -1;
 
-            List<String> cmdAndArgs = new ArrayList<String>();
+            List<String> cmdAndArgs = new ArrayList<>();
             if (cgiExecutable.length() != 0) {
                 cmdAndArgs.add(cgiExecutable);
             }
@@ -1842,7 +1843,7 @@ public final class CGIServlet extends HttpServlet {
         private static final int STATE_SECOND_CR = 3;
         private static final int STATE_HEADER_END = 4;
 
-        private InputStream input;
+        private final InputStream input;
         private int state;
 
         HTTPHeaderInputStream(InputStream theInput) {
