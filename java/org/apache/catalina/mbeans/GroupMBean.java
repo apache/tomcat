@@ -70,14 +70,13 @@ public class GroupMBean extends BaseModelMBean {
     /**
      * The configuration information registry for our managed beans.
      */
-    protected Registry registry = MBeanUtils.createRegistry();
+    protected final Registry registry = MBeanUtils.createRegistry();
 
 
     /**
      * The <code>ManagedBean</code> information describing this MBean.
      */
-    protected ManagedBean managed =
-        registry.findManagedBean("Group");
+    protected final ManagedBean managed = registry.findManagedBean("Group");
 
 
     // ------------------------------------------------------------- Attributes
@@ -89,7 +88,7 @@ public class GroupMBean extends BaseModelMBean {
     public String[] getRoles() {
 
         Group group = (Group) this.resource;
-        ArrayList<String> results = new ArrayList<String>();
+        ArrayList<String> results = new ArrayList<>();
         Iterator<Role> roles = group.getRoles();
         while (roles.hasNext()) {
             Role role = null;
@@ -116,7 +115,7 @@ public class GroupMBean extends BaseModelMBean {
     public String[] getUsers() {
 
         Group group = (Group) this.resource;
-        ArrayList<String> results = new ArrayList<String>();
+        ArrayList<String> results = new ArrayList<>();
         Iterator<User> users = group.getUsers();
         while (users.hasNext()) {
             User user = null;

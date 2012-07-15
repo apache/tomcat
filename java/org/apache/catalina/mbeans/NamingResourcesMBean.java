@@ -68,13 +68,13 @@ public class NamingResourcesMBean extends BaseModelMBean {
     /**
      * The configuration information registry for our managed beans.
      */
-    protected Registry registry = MBeanUtils.createRegistry();
+    protected final Registry registry = MBeanUtils.createRegistry();
 
 
     /**
      * The <code>ManagedBean</code> information describing this MBean.
      */
-    protected ManagedBean managed =
+    protected final ManagedBean managed =
         registry.findManagedBean("NamingResources");
 
     // ------------------------------------------------------------- Attributes
@@ -87,7 +87,7 @@ public class NamingResourcesMBean extends BaseModelMBean {
     public String[] getEnvironments() {
         ContextEnvironment[] envs =
                             ((NamingResources)this.resource).findEnvironments();
-        ArrayList<String> results = new ArrayList<String>();
+        ArrayList<String> results = new ArrayList<>();
         for (int i = 0; i < envs.length; i++) {
             try {
                 ObjectName oname =
@@ -113,7 +113,7 @@ public class NamingResourcesMBean extends BaseModelMBean {
 
         ContextResource[] resources =
                             ((NamingResources)this.resource).findResources();
-        ArrayList<String> results = new ArrayList<String>();
+        ArrayList<String> results = new ArrayList<>();
         for (int i = 0; i < resources.length; i++) {
             try {
                 ObjectName oname =
@@ -139,7 +139,7 @@ public class NamingResourcesMBean extends BaseModelMBean {
 
         ContextResourceLink[] resourceLinks =
                             ((NamingResources)this.resource).findResourceLinks();
-        ArrayList<String> results = new ArrayList<String>();
+        ArrayList<String> results = new ArrayList<>();
         for (int i = 0; i < resourceLinks.length; i++) {
             try {
                 ObjectName oname =

@@ -66,7 +66,7 @@ public class MBeanFactory {
     /**
      * The <code>MBeanServer</code> for this application.
      */
-    private static MBeanServer mserver = MBeanUtils.createServer();
+    private static final MBeanServer mserver = MBeanUtils.createServer();
 
 
     // ----------------------------------------------------------- Constructors

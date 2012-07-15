@@ -63,13 +63,13 @@ public class RoleMBean extends BaseModelMBean {
     /**
      * The configuration information registry for our managed beans.
      */
-    protected Registry registry = MBeanUtils.createRegistry();
+    protected final Registry registry = MBeanUtils.createRegistry();
 
 
     /**
      * The <code>ManagedBean</code> information describing this MBean.
      */
-    protected ManagedBean managed = registry.findManagedBean("Role");
+    protected final ManagedBean managed = registry.findManagedBean("Role");
 
 
     // ------------------------------------------------------------- Attributes
