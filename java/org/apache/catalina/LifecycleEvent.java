@@ -60,13 +60,13 @@ public final class LifecycleEvent extends EventObject {
     /**
      * The event data associated with this event.
      */
-    private Object data = null;
+    private final Object data;
 
 
     /**
      * The event type this instance represents.
      */
-    private String type = null;
+    private final String type;
 
 
     // ------------------------------------------------------------- Properties
