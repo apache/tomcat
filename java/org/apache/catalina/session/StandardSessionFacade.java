@@ -32,27 +32,15 @@ import javax.servlet.http.HttpSession;
  * @version $Id$
  */
 
-public class StandardSessionFacade
-    implements HttpSession {
+public class StandardSessionFacade implements HttpSession {
 
 
     // ----------------------------------------------------------- Constructors
-
-
-    /**
-     * Construct a new session facade.
-     */
-    public StandardSessionFacade(StandardSession session) {
-        super();
-        this.session = session;
-    }
-
 
     /**
      * Construct a new session facade.
      */
     public StandardSessionFacade(HttpSession session) {
-        super();
         this.session = session;
     }
 
@@ -63,7 +51,7 @@ public class StandardSessionFacade
     /**
      * Wrapped session object.
      */
-    private HttpSession session = null;
+    private final HttpSession session;
 
 
     // ---------------------------------------------------- HttpSession Methods

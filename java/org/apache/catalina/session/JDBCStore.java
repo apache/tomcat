@@ -64,12 +64,12 @@ public class JDBCStore extends StoreBase {
     /**
      * Name to register for this Store, used for logging.
      */
-    protected static String storeName = "JDBCStore";
+    protected static final String storeName = "JDBCStore";
 
     /**
      * Name to register for the background thread.
      */
-    protected String threadName = "JDBCStore";
+    protected final String threadName = "JDBCStore";
 
     /**
      * The connection username to use when trying to connect to the database.
@@ -490,7 +490,7 @@ public class JDBCStore extends StoreBase {
 
                     preparedKeysSql.setString(1, getName());
                     rst = preparedKeysSql.executeQuery();
-                    ArrayList<String> tmpkeys = new ArrayList<String>();
+                    ArrayList<String> tmpkeys = new ArrayList<>();
                     if (rst != null) {
                         while (rst.next()) {
                             tmpkeys.add(rst.getString(1));

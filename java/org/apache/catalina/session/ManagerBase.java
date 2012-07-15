@@ -137,10 +137,10 @@ public abstract class ManagerBase extends LifecycleMBeanBase
     protected static final int TIMING_STATS_CACHE_SIZE = 100;
 
     protected final Deque<SessionTiming> sessionCreationTiming =
-        new LinkedList<SessionTiming>();
+            new LinkedList<>();
 
     protected final Deque<SessionTiming> sessionExpirationTiming =
-        new LinkedList<SessionTiming>();
+            new LinkedList<>();
 
     /**
      * Number of sessions that have expired.
@@ -152,7 +152,7 @@ public abstract class ManagerBase extends LifecycleMBeanBase
      * The set of currently active Sessions for this Manager, keyed by
      * session identifier.
      */
-    protected Map<String, Session> sessions = new ConcurrentHashMap<String, Session>();
+    protected Map<String, Session> sessions = new ConcurrentHashMap<>();
 
     // Number of sessions created by this manager
     protected long sessionCounter=0;
@@ -978,7 +978,7 @@ public abstract class ManagerBase extends LifecycleMBeanBase
     @Override
     public int getSessionAverageAliveTime() {
         // Copy current stats
-        List<SessionTiming> copy = new ArrayList<SessionTiming>();
+        List<SessionTiming> copy = new ArrayList<>();
         synchronized (sessionExpirationTiming) {
             copy.addAll(sessionExpirationTiming);
         }
@@ -1014,7 +1014,7 @@ public abstract class ManagerBase extends LifecycleMBeanBase
     public int getSessionCreateRate() {
         long now = System.currentTimeMillis();
         // Copy current stats
-        List<SessionTiming> copy = new ArrayList<SessionTiming>();
+        List<SessionTiming> copy = new ArrayList<>();
         synchronized (sessionCreationTiming) {
             copy.addAll(sessionCreationTiming);
         }
@@ -1057,7 +1057,7 @@ public abstract class ManagerBase extends LifecycleMBeanBase
     public int getSessionExpireRate() {
         long now = System.currentTimeMillis();
         // Copy current stats
-        List<SessionTiming> copy = new ArrayList<SessionTiming>();
+        List<SessionTiming> copy = new ArrayList<>();
         synchronized (sessionExpirationTiming) {
             copy.addAll(sessionExpirationTiming);
         }
@@ -1150,7 +1150,7 @@ public abstract class ManagerBase extends LifecycleMBeanBase
             return null;
         }
 
-        HashMap<String, String> map = new HashMap<String, String>();
+        HashMap<String, String> map = new HashMap<>();
         while (ee.hasMoreElements()) {
             String attrName = ee.nextElement();
             map.put(attrName, getSessionAttribute(sessionId, attrName));
