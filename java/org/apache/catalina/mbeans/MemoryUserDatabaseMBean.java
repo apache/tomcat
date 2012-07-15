@@ -71,34 +71,34 @@ public class MemoryUserDatabaseMBean extends BaseModelMBean {
     /**
      * The configuration information registry for our managed beans.
      */
-    protected Registry registry = MBeanUtils.createRegistry();
+    protected final Registry registry = MBeanUtils.createRegistry();
 
 
     /**
      * The <code>ManagedBean</code> information describing this MBean.
      */
-    protected ManagedBean managed =
+    protected final ManagedBean managed =
         registry.findManagedBean("MemoryUserDatabase");
 
 
     /**
      * The <code>ManagedBean</code> information describing Group MBeans.
      */
-    protected ManagedBean managedGroup =
+    protected final ManagedBean managedGroup =
         registry.findManagedBean("Group");
 
 
     /**
      * The <code>ManagedBean</code> information describing Group MBeans.
      */
-    protected ManagedBean managedRole =
+    protected final ManagedBean managedRole =
         registry.findManagedBean("Role");
 
 
     /**
      * The <code>ManagedBean</code> information describing User MBeans.
      */
-    protected ManagedBean managedUser =
+    protected final ManagedBean managedUser =
         registry.findManagedBean("User");
 
 
@@ -111,7 +111,7 @@ public class MemoryUserDatabaseMBean extends BaseModelMBean {
     public String[] getGroups() {
 
         UserDatabase database = (UserDatabase) this.resource;
-        ArrayList<String> results = new ArrayList<String>();
+        ArrayList<String> results = new ArrayList<>();
         Iterator<Group> groups = database.getGroups();
         while (groups.hasNext()) {
             Group group = groups.next();
@@ -128,7 +128,7 @@ public class MemoryUserDatabaseMBean extends BaseModelMBean {
     public String[] getRoles() {
 
         UserDatabase database = (UserDatabase) this.resource;
-        ArrayList<String> results = new ArrayList<String>();
+        ArrayList<String> results = new ArrayList<>();
         Iterator<Role> roles = database.getRoles();
         while (roles.hasNext()) {
             Role role = roles.next();
@@ -145,7 +145,7 @@ public class MemoryUserDatabaseMBean extends BaseModelMBean {
     public String[] getUsers() {
 
         UserDatabase database = (UserDatabase) this.resource;
-        ArrayList<String> results = new ArrayList<String>();
+        ArrayList<String> results = new ArrayList<>();
         Iterator<User> users = database.getUsers();
         while (users.hasNext()) {
             User user = users.next();

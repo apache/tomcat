@@ -65,7 +65,7 @@ public class GlobalResourcesLifecycleListener
     /**
      * The configuration information registry for our managed beans.
      */
-    protected static Registry registry = MBeanUtils.createRegistry();
+    protected static final Registry registry = MBeanUtils.createRegistry();
 
 
     // ---------------------------------------------- LifecycleListener Methods

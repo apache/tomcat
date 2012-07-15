@@ -282,7 +282,7 @@ public class ContainerMBean extends BaseModelMBean {
      */
     public String[] findLifecycleListenerNames() throws MBeanException {
         Container container = null;
-        List<String> result = new ArrayList<String>();
+        List<String> result = new ArrayList<>();
 
         try {
             container = (Container) getManagedResource();
@@ -309,7 +309,7 @@ public class ContainerMBean extends BaseModelMBean {
      */
     public String[] findContainerListenerNames() throws MBeanException {
         Container container = null;
-        List<String> result = new ArrayList<String>();
+        List<String> result = new ArrayList<>();
 
         try {
             container = (Container) getManagedResource();

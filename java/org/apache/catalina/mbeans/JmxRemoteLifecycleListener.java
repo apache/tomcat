@@ -182,7 +182,7 @@ public class JmxRemoteLifecycleListener implements LifecycleListener {
             System.setProperty("java.rmi.server.randomIDs", "true");
 
             // Create the environment
-            HashMap<String,Object> env = new HashMap<String,Object>();
+            HashMap<String,Object> env = new HashMap<>();
 
             RMIClientSocketFactory csf = null;
             RMIServerSocketFactory ssf = null;
@@ -294,7 +294,7 @@ public class JmxRemoteLifecycleListener implements LifecycleListener {
 
         private static final String FORCED_HOST = "localhost";
 
-        private RMIClientSocketFactory factory = null;
+        private final RMIClientSocketFactory factory;
 
         public RmiClientLocalhostSocketFactory(RMIClientSocketFactory theFactory) {
             factory = theFactory;
