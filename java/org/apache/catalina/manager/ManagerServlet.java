@@ -189,7 +189,9 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
 
     /**
      * Path used to store context descriptors.
+     * @deprecated  Unused
      */
+    @Deprecated
     protected final File contextDescriptors = null;
 
 
@@ -201,7 +203,9 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
 
     /**
      * The host appBase.
+     * @deprecated  Unused
      */
+    @Deprecated
     protected final File appBase = null;
 
 
@@ -1172,24 +1176,6 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
                     t.toString()));
         }
 
-    }
-
-
-    /**
-     * Session information for the web application at the specified context path.
-     * Displays a profile of session thisAccessedTime listing number
-     * of sessions for each 10 minute interval up to 10 hours.
-     *
-     * @param writer Writer to render to
-     * @param cn Name of the application to list session information for
-     *
-     * @deprecated  Use {@link #sessions(PrintWriter, ContextName, int,
-     *              StringManager)
-     */
-    @Deprecated
-    protected void sessions(PrintWriter writer, ContextName cn,
-            StringManager smClient) {
-        sessions(writer, cn, -1, smClient);
     }
 
 
