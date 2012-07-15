@@ -1072,10 +1072,10 @@ public final class HTMLManagerServlet extends ManagerServlet {
                 }
             };
         } else if ("MaxInactiveInterval".equalsIgnoreCase(sortBy)) {
-            comparator = new BaseSessionComparator<Date>() {
+            comparator = new BaseSessionComparator<Integer>() {
                 @Override
-                public Comparable<Date> getComparableObject(Session session) {
-                    return new Date(session.getMaxInactiveInterval());
+                public Comparable<Integer> getComparableObject(Session session) {
+                    return Integer.valueOf(session.getMaxInactiveInterval());
                 }
             };
         } else if ("new".equalsIgnoreCase(sortBy)) {
