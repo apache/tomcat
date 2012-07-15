@@ -42,7 +42,7 @@ public class SecurityListener implements LifecycleListener {
     /**
      * The list of operating system users not permitted to run Tomcat.
      */
-    private Set<String> checkedOsUsers = new HashSet<String>();
+    private final Set<String> checkedOsUsers = new HashSet<>();
 
     /**
      * The minimum umask that must be configured for the operating system user

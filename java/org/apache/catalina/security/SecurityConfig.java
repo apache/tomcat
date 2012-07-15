@@ -49,26 +49,31 @@ public final class SecurityConfig{
     /**
      * List of protected package from conf/catalina.properties
      */
-    private String packageDefinition;
+    private final String packageDefinition;
 
 
     /**
      * List of protected package from conf/catalina.properties
      */
-    private String packageAccess;
+    private final String packageAccess;
 
 
     /**
      * Create a single instance of this class.
      */
-    private SecurityConfig(){
+    private SecurityConfig() {
+        String definition = null;
+        String access = null;
         try{
-            packageDefinition = CatalinaProperties.getProperty("package.definition");
-            packageAccess = CatalinaProperties.getProperty("package.access");
+            definition = CatalinaProperties.getProperty("package.definition");
+            access = CatalinaProperties.getProperty("package.access");
         } catch (java.lang.Exception ex){
             if (log.isDebugEnabled()){
                 log.debug("Unable to load properties using CatalinaProperties", ex);
             }
+        } finally {
+            packageDefinition = definition;
+            packageAccess = access;
         }
     }
 
