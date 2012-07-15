@@ -40,11 +40,9 @@ public class SSIProcessor {
     protected static final String COMMAND_START = "<!--#";
     /** The end pattern */
     protected static final String COMMAND_END = "-->";
-    protected static final int BUFFER_SIZE = 4096;
-    protected SSIExternalResolver ssiExternalResolver;
-    protected HashMap<String,SSICommand> commands =
-        new HashMap<String,SSICommand>();
-    protected int debug;
+    protected final SSIExternalResolver ssiExternalResolver;
+    protected final HashMap<String,SSICommand> commands = new HashMap<>();
+    protected final int debug;
     protected final boolean allowExec;
 
 
@@ -98,7 +96,7 @@ public class SSIProcessor {
     public long process(Reader reader, long lastModifiedDate,
             PrintWriter writer) throws IOException {
         SSIMediator ssiMediator = new SSIMediator(ssiExternalResolver,
-                lastModifiedDate, debug);
+                lastModifiedDate);
         StringWriter stringWriter = new StringWriter();
         IOTools.flow(reader, stringWriter);
         String fileContents = stringWriter.toString();

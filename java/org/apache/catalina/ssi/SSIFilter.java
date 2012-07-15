@@ -57,7 +57,7 @@ public class SSIFilter implements Filter {
     /** regex pattern to match when evaluating content types */
     protected Pattern contentTypeRegEx = null;
     /** default pattern for ssi filter content type matching */
-    protected Pattern shtmlRegEx =
+    protected final Pattern shtmlRegEx =
         Pattern.compile("text/x-server-parsed-html(;.*)?");
     /** Allow exec (normally blocked for security) */
     protected boolean allowExec = false;

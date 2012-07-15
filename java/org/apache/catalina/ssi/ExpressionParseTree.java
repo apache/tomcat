@@ -33,12 +33,12 @@ public class ExpressionParseTree {
      * Contains the current set of completed nodes. This is a workspace for the
      * parser.
      */
-    private LinkedList<Node> nodeStack = new LinkedList<Node>();
+    private final LinkedList<Node> nodeStack = new LinkedList<>();
     /**
      * Contains operator nodes that don't yet have values. This is a workspace
      * for the parser.
      */
-    private LinkedList<OppNode> oppStack = new LinkedList<OppNode>();
+    private final LinkedList<OppNode> oppStack = new LinkedList<>();
     /**
      * The root node after the expression has been parsed.
      */
@@ -46,7 +46,7 @@ public class ExpressionParseTree {
     /**
      * The SSIMediator to use when evaluating the expressions.
      */
-    private SSIMediator ssiMediator;
+    private final SSIMediator ssiMediator;
 
 
     /**

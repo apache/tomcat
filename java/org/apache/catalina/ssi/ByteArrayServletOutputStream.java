@@ -35,7 +35,7 @@ public class ByteArrayServletOutputStream extends ServletOutputStream {
     /**
      * Our buffer to hold the stream.
      */
-    protected ByteArrayOutputStream buf = null;
+    protected final ByteArrayOutputStream buf;
 
 
     /**
