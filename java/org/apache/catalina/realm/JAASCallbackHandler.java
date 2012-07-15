@@ -65,16 +65,8 @@ public class JAASCallbackHandler implements CallbackHandler {
     public JAASCallbackHandler(JAASRealm realm, String username,
                                String password) {
 
-        super();
-        this.realm = realm;
-        this.username = username;
-
-        if (realm.hasMessageDigest()) {
-            this.password = realm.digest(password);
-        }
-        else {
-            this.password = password;
-        }
+        this(realm, username, password, null, null, null, null, null, null,
+                null);
     }
 
 
@@ -97,7 +89,15 @@ public class JAASCallbackHandler implements CallbackHandler {
                                String password, String nonce, String nc,
                                String cnonce, String qop, String realmName,
                                String md5a2, String authMethod) {
-        this(realm, username, password);
+        this.realm = realm;
+        this.username = username;
+
+        if (realm.hasMessageDigest()) {
+            this.password = realm.digest(password);
+        }
+        else {
+            this.password = password;
+        }
         this.nonce = nonce;
         this.nc = nc;
         this.cnonce = cnonce;
@@ -118,53 +118,53 @@ public class JAASCallbackHandler implements CallbackHandler {
     /**
      * The password to be authenticated with.
      */
-    protected String password = null;
+    protected final String password;
 
 
     /**
      * The associated <code>JAASRealm</code> instance.
      */
-    protected JAASRealm realm = null;
+    protected final JAASRealm realm;
 
     /**
      * The username to be authenticated with.
      */
-    protected String username = null;
+    protected final String username;
 
     /**
      * Server generated nonce.
      */
-    protected String nonce = null;
+    protected final String nonce;
 
     /**
      * Nonce count.
      */
-    protected String nc = null;
+    protected final String nc;
 
     /**
      * Client generated nonce.
      */
-    protected String cnonce = null;
+    protected final String cnonce;
 
     /**
      * Quality of protection applied to the message.
      */
-    protected String qop;
+    protected final String qop;
 
     /**
      * Realm name.
      */
-    protected String realmName;
+    protected final String realmName;
 
     /**
      * Second MD5 digest.
      */
-    protected String md5a2;
+    protected final String md5a2;
 
     /**
      * The authentication method to be used. If null, assume BASIC/FORM.
      */
-    protected String authMethod;
+    protected final String authMethod;
 
     // --------------------------------------------------------- Public Methods
 

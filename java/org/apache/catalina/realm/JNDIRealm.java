@@ -1246,7 +1246,7 @@ public class JNDIRealm extends RealmBase {
         User user = null;
 
         // Get attributes to retrieve from user entry
-        ArrayList<String> list = new ArrayList<String>();
+        ArrayList<String> list = new ArrayList<>();
         if (userPassword != null)
             list.add(userPassword);
         if (userRoleName != null)
@@ -1718,7 +1718,7 @@ public class JNDIRealm extends RealmBase {
             containerLog.trace("  getRoles(" + dn + ")");
 
         // Start with roles retrieved from the user entry
-        List<String> list = new ArrayList<String>();
+        List<String> list = new ArrayList<>();
         List<String> userRoles = user.getRoles();
         if (userRoles != null) {
             list.addAll(userRoles);
@@ -1772,7 +1772,7 @@ public class JNDIRealm extends RealmBase {
         if (results == null)
             return (list);  // Should never happen, but just in case ...
 
-        HashMap<String, String> groupMap = new HashMap<String, String>();
+        HashMap<String, String> groupMap = new HashMap<>();
         try {
             while (results.hasMore()) {
                 SearchResult result = results.next();
@@ -1805,9 +1805,9 @@ public class JNDIRealm extends RealmBase {
             // Directory Groups". It avoids group slurping and handles cyclic group memberships as well.
             // See http://middleware.internet2.edu/dir/ for details
 
-            Map<String, String> newGroups = new HashMap<String,String>(groupMap);
+            Map<String, String> newGroups = new HashMap<>(groupMap);
             while (!newGroups.isEmpty()) {
-                Map<String, String> newThisRound = new HashMap<String, String>(); // Stores the groups we find in this iteration
+                Map<String, String> newThisRound = new HashMap<>(); // Stores the groups we find in this iteration
 
                 for (Entry<String, String> group : newGroups.entrySet()) {
                     filter = roleFormat.format(new String[] { group.getKey(), group.getValue(), group.getValue() });
@@ -1903,7 +1903,7 @@ public class JNDIRealm extends RealmBase {
         if (attrId == null || attrs == null)
             return values;
         if (values == null)
-            values = new ArrayList<String>();
+            values = new ArrayList<>();
         Attribute attr = attrs.get(attrId);
         if (attr == null)
             return (values);
@@ -2151,7 +2151,7 @@ public class JNDIRealm extends RealmBase {
      */
     protected Hashtable<String,String> getDirectoryContextEnvironment() {
 
-        Hashtable<String,String> env = new Hashtable<String,String>();
+        Hashtable<String,String> env = new Hashtable<>();
 
         // Configure our directory context environment.
         if (containerLog.isDebugEnabled() && connectionAttempt == 0)
@@ -2250,7 +2250,7 @@ public class JNDIRealm extends RealmBase {
     protected String[] parseUserPatternString(String userPatternString) {
 
         if (userPatternString != null) {
-            ArrayList<String> pathList = new ArrayList<String>();
+            ArrayList<String> pathList = new ArrayList<>();
             int startParenLoc = userPatternString.indexOf('(');
             if (startParenLoc == -1) {
                 // no parens here; return whole thing

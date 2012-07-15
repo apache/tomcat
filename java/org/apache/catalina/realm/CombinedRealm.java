@@ -48,7 +48,7 @@ public class CombinedRealm extends RealmBase {
     /**
      * The list of Realms contained by this Realm.
      */
-    protected List<Realm> realms = new LinkedList<Realm>();
+    protected final List<Realm> realms = new LinkedList<>();
 
     /**
      * Descriptive information about this Realm implementation.
