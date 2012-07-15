@@ -65,25 +65,25 @@ public class StatusManagerServlet
     /**
      * Vector of protocol handlers object names.
      */
-    protected Vector<ObjectName> protocolHandlers = new Vector<ObjectName>();
+    protected final Vector<ObjectName> protocolHandlers = new Vector<>();
 
 
     /**
      * Vector of thread pools object names.
      */
-    protected Vector<ObjectName> threadPools = new Vector<ObjectName>();
+    protected final Vector<ObjectName> threadPools = new Vector<>();
 
 
     /**
      * Vector of request processors object names.
      */
-    protected Vector<ObjectName> requestProcessors = new Vector<ObjectName>();
+    protected final Vector<ObjectName> requestProcessors = new Vector<>();
 
 
     /**
      * Vector of global request processors object names.
      */
-    protected Vector<ObjectName> globalRequestProcessors = new Vector<ObjectName>();
+    protected final Vector<ObjectName> globalRequestProcessors = new Vector<>();
 
 
     /**
