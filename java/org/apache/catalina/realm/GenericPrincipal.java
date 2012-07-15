@@ -49,7 +49,10 @@ public class GenericPrincipal implements TomcatPrincipal {
      *
      * @param name The username of the user represented by this Principal
      * @param password Credentials used to authenticate this user
+     *
+     * @deprecated  Unused
      */
+    @Deprecated
     public GenericPrincipal(String name, String password) {
 
         this(name, password, null);
