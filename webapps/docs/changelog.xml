@@ -71,6 +71,10 @@
         not always correctly normalize redirect URLs when the redirect URL
         included a query string or fragment component. (markt)
       </fix>
+      <fix>
+        Add missing getter and setter for <code>roleSearchAsUser</code> option
+        on JNDI Realm. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
