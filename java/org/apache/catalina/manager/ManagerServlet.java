@@ -193,7 +193,9 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
 
     /**
      * Path used to store context descriptors.
+     * @deprecated  Unused
      */
+    @Deprecated
     protected File contextDescriptors = null;
 
 
@@ -205,10 +207,12 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
     
     /**
      * The host appBase.
+     * @deprecated  Unused
      */
+    @Deprecated
     protected File appBase = null;
-    
-    
+
+
     /**
      * MBean server.
      */
@@ -1191,7 +1195,11 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
      *
      * @param writer Writer to render to
      * @param cn Name of the application to list session information for
+     *
+     * @deprecated  Use {@link #sessions(PrintWriter, ContextName, int,
+     *              StringManager)
      */
+    @Deprecated
     protected void sessions(PrintWriter writer, ContextName cn,
             StringManager smClient) {
         sessions(writer, cn, -1, smClient);
