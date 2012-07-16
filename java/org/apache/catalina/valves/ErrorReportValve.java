@@ -152,7 +152,7 @@ public class ErrorReportValve extends ValveBase {
         // Do nothing if there is no report for the specified status code
         String report = null;
         try {
-            report = sm.getString("http." + statusCode, message);
+            report = sm.getString("http." + statusCode);
         } catch (Throwable t) {
             ExceptionUtils.handleThrowable(t);
         }
