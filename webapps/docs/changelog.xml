@@ -75,6 +75,9 @@
         Add missing getter and setter for <code>roleSearchAsUser</code> option
         on JNDI Realm. (markt)
       </fix>
+      <update>
+        Add some HTTP status codes registered at IANA. (rjung)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Coyote">
