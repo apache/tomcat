@@ -241,10 +241,7 @@ public class WebappClassLoader
      * parent ClassLoader.
      *
      * @param parent Our parent class loader
-     *
-     * @deprecated  Unused - will be removed in 8.0.x
      */
-    @Deprecated
     public WebappClassLoader(ClassLoader parent) {
 
         super(new URL[0], parent);
