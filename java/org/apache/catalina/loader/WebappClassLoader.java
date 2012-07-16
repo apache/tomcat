@@ -240,12 +240,12 @@ public class WebappClassLoader
     /**
      * Construct a new ClassLoader with no defined repositories and the given
      * parent ClassLoader.
+     * <p>
+     * Method is used via reflection -
+     * see {@link WebappLoader#createClassLoader()}
      *
      * @param parent Our parent class loader
-     *
-     * @deprecated  Unused - will be removed in 8.0.x
      */
-    @Deprecated
     public WebappClassLoader(ClassLoader parent) {
 
         super(new URL[0], parent);
