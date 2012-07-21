@@ -103,24 +103,6 @@ public class Catalina {
 
 
     /**
-     * Are we starting a new server?
-     *
-     * @deprecated  Unused - will be removed in Tomcat 8.0.x
-     */
-    @Deprecated
-    protected boolean starting = false;
-
-
-    /**
-     * Are we stopping an existing server?
-     *
-     * @deprecated  Unused - will be removed in Tomcat 8.0.x
-     */
-    @Deprecated
-    protected boolean stopping = false;
-
-
-    /**
      * Use shutdown hook flag.
      */
     protected boolean useShutdownHook = true;
@@ -146,15 +128,6 @@ public class Catalina {
 
 
     // ------------------------------------------------------------- Properties
-
-    /**
-     * @deprecated  Use {@link #setConfigFile(String)}
-     */
-    @Deprecated
-    public void setConfig(String file) {
-        configFile = file;
-    }
-
 
     public void setConfigFile(String file) {
         configFile = file;
@@ -243,7 +216,7 @@ public class Catalina {
 
         if (args.length < 1) {
             usage();
-            return (false);
+            return false;
         }
 
         for (int i = 0; i < args.length; i++) {
@@ -253,27 +226,23 @@ public class Catalina {
             } else if (args[i].equals("-config")) {
                 isConfig = true;
             } else if (args[i].equals("-nonaming")) {
-                setUseNaming( false );
+                setUseNaming(false);
             } else if (args[i].equals("-help")) {
                 usage();
-                return (false);
+                return false;
             } else if (args[i].equals("start")) {
-                starting = true;
-                stopping = false;
+                // NOOP
             } else if (args[i].equals("configtest")) {
-                starting = true;
-                stopping = false;
+                // NOOP
             } else if (args[i].equals("stop")) {
-                starting = false;
-                stopping = true;
+                // NOOP
             } else {
                 usage();
-                return (false);
+                return false;
             }
         }
 
-        return (true);
-
+        return true;
     }
 
 
