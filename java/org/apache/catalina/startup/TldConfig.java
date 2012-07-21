@@ -190,27 +190,13 @@ public final class TldConfig  implements LifecycleListener {
         }
     }
 
-    /**
-     * @deprecated  Unused - will be removed in 8.0.x
-     */
-    @Deprecated
-    public Context getContext() {
-        return context;
-    }
-
-    /**
-     * @deprecated  Unused - will be removed in 8.0.x
-     */
-    @Deprecated
-    public void setContext(Context context) {
-        this.context = context;
-    }
 
     public void addApplicationListener( String s ) {
         if(log.isDebugEnabled())
             log.debug( "Add tld listener " + s);
         listeners.add(s);
     }
+
 
     public String[] getTldListeners() {
         String result[]=new String[listeners.size()];

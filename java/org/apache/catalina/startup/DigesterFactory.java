@@ -37,29 +37,6 @@ public class DigesterFactory {
      */
     private static final Log log = LogFactory.getLog(DigesterFactory.class);
 
-    /**
-     * Create a <code>Digester</code> parser with no <code>Rule</code>
-     * associated and XML validation turned off.
-     *
-     * @deprecated  Unused - will be removed in 8.0.x
-     */
-    @Deprecated
-    public static Digester newDigester(){
-        return newDigester(false, false, null);
-    }
-
-
-    /**
-     * Create a <code>Digester</code> parser with XML validation turned off.
-     * @param rule an instance of <code>RuleSet</code> used for parsing the xml.
-     *
-     * @deprecated  Unused - will be removed in 8.0.x
-     */
-    @Deprecated
-    public static Digester newDigester(RuleSet rule){
-        return newDigester(false,false,rule);
-    }
-
 
     /**
      * Create a <code>Digester</code> parser.
