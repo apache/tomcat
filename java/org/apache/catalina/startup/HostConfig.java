@@ -525,6 +525,7 @@ public class HostConfig
      * @param cn
      * @param contextXml
      */
+    @SuppressWarnings("null") // context is not null
     protected void deployDescriptor(ContextName cn, File contextXml) {
 
         DeployedApplication deployedApp = new DeployedApplication(cn.getName());
