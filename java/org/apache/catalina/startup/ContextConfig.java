@@ -1088,25 +1088,6 @@ public class ContextConfig implements LifecycleListener {
     }
 
 
-    /**
-     * Get config base.
-     *
-     * @deprecated  Unused - will be removed in 8.0.x
-     */
-    @Deprecated
-    protected File getConfigBase() {
-        File catalinaBase = context.getCatalinaBase();
-        if (catalinaBase == null) {
-            return null;
-        }
-
-        File configBase = new File(catalinaBase, "conf");
-        if (!configBase.exists()) {
-            return null;
-        }
-        return configBase;
-    }
-
     protected File getHostConfigBase() {
         File file = null;
         if (context.getParent() instanceof Host) {
