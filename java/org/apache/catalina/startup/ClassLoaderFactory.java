@@ -80,7 +80,7 @@ public final class ClassLoaderFactory {
             log.debug("Creating new class loader");
 
         // Construct the "class path" for this class loader
-        Set<URL> set = new LinkedHashSet<URL>();
+        Set<URL> set = new LinkedHashSet<>();
 
         // Add unpacked directories
         if (unpacked != null) {
@@ -152,7 +152,7 @@ public final class ClassLoaderFactory {
             log.debug("Creating new class loader");
 
         // Construct the "class path" for this class loader
-        Set<URL> set = new LinkedHashSet<URL>();
+        Set<URL> set = new LinkedHashSet<>();
 
         if (repositories != null) {
             for (Repository repository : repositories)  {
@@ -275,8 +275,8 @@ public final class ClassLoaderFactory {
     }
 
     public static class Repository {
-        private String location;
-        private RepositoryType type;
+        private final String location;
+        private final RepositoryType type;
 
         public Repository(String location, RepositoryType type) {
             this.location = location;

@@ -42,7 +42,7 @@ public class EngineRuleSet extends RuleSetBase {
     /**
      * The matching pattern prefix to use for recognizing our elements.
      */
-    protected String prefix = null;
+    protected final String prefix;
 
 
     // ------------------------------------------------------------ Constructor
@@ -53,9 +53,7 @@ public class EngineRuleSet extends RuleSetBase {
      * matching pattern prefix.
      */
     public EngineRuleSet() {
-
         this("");
-
     }
 
 
@@ -67,11 +65,8 @@ public class EngineRuleSet extends RuleSetBase {
      *  trailing slash character)
      */
     public EngineRuleSet(String prefix) {
-
-        super();
         this.namespaceURI = null;
         this.prefix = prefix;
-
     }
 
 

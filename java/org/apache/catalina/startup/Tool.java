@@ -89,7 +89,8 @@ public final class Tool {
     /**
      * The pathname of our installation base directory.
      */
-    private static String catalinaHome = System.getProperty(Globals.CATALINA_HOME_PROP);
+    private static final String catalinaHome =
+            System.getProperty(Globals.CATALINA_HOME_PROP);
 
 
     /**
@@ -158,8 +159,8 @@ public final class Tool {
         // Construct the class loader we will be using
         ClassLoader classLoader = null;
         try {
-            ArrayList<File> packed = new ArrayList<File>();
-            ArrayList<File> unpacked = new ArrayList<File>();
+            ArrayList<File> packed = new ArrayList<>();
+            ArrayList<File> unpacked = new ArrayList<>();
             unpacked.add(new File(catalinaHome, "classes"));
             packed.add(new File(catalinaHome, "lib"));
             if (common) {

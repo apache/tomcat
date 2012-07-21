@@ -65,13 +65,13 @@ public class SetNextNamingRule extends Rule {
     /**
      * The method name to call on the parent object.
      */
-    protected String methodName = null;
+    protected final String methodName;
 
 
     /**
      * The Java class name of the parameter type expected by the method.
      */
-    protected String paramType = null;
+    protected final String paramType;
 
 
     // --------------------------------------------------------- Public Methods

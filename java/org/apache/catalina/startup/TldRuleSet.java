@@ -41,7 +41,7 @@ public class TldRuleSet extends RuleSetBase {
     /**
      * The matching pattern prefix to use for recognizing our elements.
      */
-    protected String prefix = null;
+    protected final String prefix;
 
 
     // ------------------------------------------------------------ Constructor
@@ -52,9 +52,7 @@ public class TldRuleSet extends RuleSetBase {
      * matching pattern prefix.
      */
     public TldRuleSet() {
-
         this("");
-
     }
 
 
@@ -66,11 +64,8 @@ public class TldRuleSet extends RuleSetBase {
      *  trailing slash character)
      */
     public TldRuleSet(String prefix) {
-
-        super();
         this.namespaceURI = null;
         this.prefix = prefix;
-
     }
 
 

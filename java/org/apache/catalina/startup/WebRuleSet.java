@@ -61,54 +61,54 @@ public class WebRuleSet extends RuleSetBase {
     /**
      * The matching pattern prefix to use for recognizing our elements.
      */
-    protected String prefix = null;
+    protected final String prefix;
 
     /**
      * The full pattern matching prefix, including the webapp or web-fragment
      * component, to use for matching elements
      */
-    protected String fullPrefix = null;
+    protected final String fullPrefix;
 
     /**
      * Flag that indicates if this ruleset is for a web-fragment.xml file or for
      * a web.xml file.
      */
-    protected boolean fragment = false;
+    protected final boolean fragment;
 
     /**
      * The <code>SetSessionConfig</code> rule used to parse the web.xml
      */
-    protected SetSessionConfig sessionConfig = new SetSessionConfig();
+    protected final SetSessionConfig sessionConfig = new SetSessionConfig();
 
 
     /**
      * The <code>SetLoginConfig</code> rule used to parse the web.xml
      */
-    protected SetLoginConfig loginConfig = new SetLoginConfig();
+    protected final SetLoginConfig loginConfig = new SetLoginConfig();
 
 
     /**
      * The <code>SetJspConfig</code> rule used to parse the web.xml
      */
-    protected SetJspConfig jspConfig = new SetJspConfig();
+    protected final SetJspConfig jspConfig = new SetJspConfig();
 
 
     /**
      * The <code>NameRule</code> rule used to parse the web.xml
      */
-    protected NameRule name = new NameRule();
+    protected final NameRule name = new NameRule();
 
 
     /**
      * The <code>AbsoluteOrderingRule</code> rule used to parse the web.xml
      */
-    protected AbsoluteOrderingRule absoluteOrdering;
+    protected final AbsoluteOrderingRule absoluteOrdering;
 
 
     /**
      * The <code>RelativeOrderingRule</code> rule used to parse the web.xml
      */
-    protected RelativeOrderingRule relativeOrdering;
+    protected final RelativeOrderingRule relativeOrdering;
 
 
 
@@ -908,7 +908,7 @@ final class CallParamMultiRule extends CallParamRule {
             @SuppressWarnings("unchecked")
             ArrayList<String> params = (ArrayList<String>) parameters[paramIndex];
             if (params == null) {
-                params = new ArrayList<String>();
+                params = new ArrayList<>();
                 parameters[paramIndex] = params;
             }
             params.add(bodyTextStack.pop());
@@ -924,7 +924,7 @@ final class CallParamMultiRule extends CallParamRule {
  */
 final class CallMethodMultiRule extends CallMethodRule {
 
-    protected int multiParamIndex = 0;
+    protected final int multiParamIndex;
 
     public CallMethodMultiRule(String methodName, int paramCount, int multiParamIndex) {
         super(methodName, paramCount);

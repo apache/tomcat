@@ -139,11 +139,9 @@ public class Tomcat {
     protected String hostname = "localhost";
     protected String basedir;
 
-    private final Map<String, String> userPass = new HashMap<String, String>();
-    private final Map<String, List<String>> userRoles =
-        new HashMap<String, List<String>>();
-    private final Map<String, Principal> userPrincipals =
-        new HashMap<String, Principal>();
+    private final Map<String, String> userPass = new HashMap<>();
+    private final Map<String, List<String>> userRoles = new HashMap<>();
+    private final Map<String, Principal> userPrincipals = new HashMap<>();
 
     public Tomcat() {
         // NOOP
@@ -364,7 +362,7 @@ public class Tomcat {
     public void addRole(String user, String role) {
         List<String> roles = userRoles.get(user);
         if (roles == null) {
-            roles = new ArrayList<String>();
+            roles = new ArrayList<>();
             userRoles.put(user, roles);
         }
         roles.add(role);
@@ -804,7 +802,7 @@ public class Tomcat {
             this.existing = existing;
             if (existing instanceof javax.servlet.SingleThreadModel) {
                 singleThreadModel = true;
-                instancePool = new Stack<Servlet>();
+                instancePool = new Stack<>();
             }
             this.asyncSupported = hasAsync();
         }

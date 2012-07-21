@@ -63,7 +63,7 @@ public final class PasswdUserDatabase
     /**
      * The set of home directories for all defined users, keyed by username.
      */
-    private Hashtable<String,String> homes = new Hashtable<String,String>();
+    private final Hashtable<String,String> homes = new Hashtable<>();
 
 
     /**

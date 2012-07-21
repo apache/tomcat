@@ -162,7 +162,7 @@ public class ContextConfig implements LifecycleListener {
      * Cache of default web.xml fragments per Host
      */
     protected static final Map<Host,DefaultWebXmlCacheEntry> hostWebXmlCache =
-        new ConcurrentHashMap<Host,DefaultWebXmlCacheEntry>();
+            new ConcurrentHashMap<>();
 
 
     // ----------------------------------------------------- Instance Variables
@@ -200,14 +200,14 @@ public class ContextConfig implements LifecycleListener {
      * Map of ServletContainerInitializer to classes they expressed interest in.
      */
     protected final Map<ServletContainerInitializer, Set<Class<?>>> initializerClassMap =
-            new LinkedHashMap<ServletContainerInitializer, Set<Class<?>>>();
+            new LinkedHashMap<>();
 
     /**
      * Map of Types to ServletContainerInitializer that are interested in those
      * types.
      */
     protected final Map<Class<?>, Set<ServletContainerInitializer>> typeInitializerMap =
-            new HashMap<Class<?>, Set<ServletContainerInitializer>>();
+            new HashMap<>();
 
     /**
      * Cache of JavaClass objects (byte code) by fully qualified class name.
@@ -215,7 +215,7 @@ public class ContextConfig implements LifecycleListener {
      * as part of the processing for {@link HandlesTypes}.
      */
     protected final Map<String,JavaClassCacheEntry> javaClassCache =
-            new HashMap<String,JavaClassCacheEntry>();
+            new HashMap<>();
 
     /**
      * Flag that indicates if at least one {@link HandlesTypes} entry is present
@@ -467,9 +467,8 @@ public class ContextConfig implements LifecycleListener {
         Digester digester = new Digester();
         digester.setValidating(false);
         digester.setRulesValidation(true);
-        HashMap<Class<?>, List<String>> fakeAttributes =
-            new HashMap<Class<?>, List<String>>();
-        ArrayList<String> attrs = new ArrayList<String>();
+        HashMap<Class<?>, List<String>> fakeAttributes = new HashMap<>();
+        ArrayList<String> attrs = new ArrayList<>();
         attrs.add("className");
         fakeAttributes.put(Object.class, attrs);
         digester.setFakeAttributes(fakeAttributes);
@@ -1146,7 +1145,7 @@ public class ContextConfig implements LifecycleListener {
          *   those in JARs excluded from an absolute ordering) need to be
          *   scanned to check if they match.
          */
-        Set<WebXml> defaults = new HashSet<WebXml>();
+        Set<WebXml> defaults = new HashSet<>();
         defaults.add(getDefaultWebXmlFragment());
 
         WebXml webXml = createWebXml();
@@ -1270,7 +1269,7 @@ public class ContextConfig implements LifecycleListener {
         if (ok) {
             // Spec does not define an order.
             // Use ordered JARs followed by remaining JARs
-            Set<WebXml> resourceJars = new LinkedHashSet<WebXml>();
+            Set<WebXml> resourceJars = new LinkedHashSet<>();
             if (orderedFragments != null) {
                 for (WebXml fragment : orderedFragments) {
                     resourceJars.add(fragment);
@@ -1393,7 +1392,7 @@ public class ContextConfig implements LifecycleListener {
         Map<String,String> jspInitParams;
         ServletDef jspServlet = webXml.getServlets().get("jsp");
         if (jspServlet == null) {
-            jspInitParams = new HashMap<String,String>();
+            jspInitParams = new HashMap<>();
             Wrapper w = (Wrapper) context.findChild("jsp");
             if (w != null) {
                 String[] params = w.findInitParameters();
@@ -1511,7 +1510,7 @@ public class ContextConfig implements LifecycleListener {
                         Set<ServletContainerInitializer> scis =
                             typeInitializerMap.get(type);
                         if (scis == null) {
-                            scis = new HashSet<ServletContainerInitializer>();
+                            scis = new HashSet<>();
                             typeInitializerMap.put(type, scis);
                         }
                         scis.add(sci);
@@ -1823,7 +1822,7 @@ public class ContextConfig implements LifecycleListener {
             URL url = fragment.getURL();
             processAnnotationsUrl(url, annotations,
                     (handlesTypesOnly || fragment.isMetadataComplete()));
-            Set<WebXml> set = new HashSet<WebXml>();
+            Set<WebXml> set = new HashSet<>();
             set.add(annotations);
             // Merge annotations into fragment - fragment takes priority
             fragment.merge(set);
@@ -2061,7 +2060,7 @@ public class ContextConfig implements LifecycleListener {
                         entry.getSciSet()) {
                     Set<Class<?>> classes = initializerClassMap.get(sci);
                     if (classes == null) {
-                        classes = new HashSet<Class<?>>();
+                        classes = new HashSet<>();
                         initializerClassMap.put(sci, classes);
                     }
                     classes.add(clazz);
@@ -2137,8 +2136,7 @@ public class ContextConfig implements LifecycleListener {
     }
 
     private void populateSCIsForCacheEntry(JavaClassCacheEntry cacheEntry) {
-        Set<ServletContainerInitializer> result =
-                new HashSet<ServletContainerInitializer>();
+        Set<ServletContainerInitializer> result = new HashSet<>();
 
         JavaClass javaClass = cacheEntry.getJavaClass();
 
@@ -2455,7 +2453,7 @@ public class ContextConfig implements LifecycleListener {
     }
 
     protected String[] processAnnotationsStringArray(ElementValue ev) {
-        ArrayList<String> values = new ArrayList<String>();
+        ArrayList<String> values = new ArrayList<>();
         if (ev instanceof ArrayElementValue) {
             ElementValue[] arrayValues =
                 ((ArrayElementValue) ev).getElementValuesArray();
@@ -2471,7 +2469,7 @@ public class ContextConfig implements LifecycleListener {
 
     protected Map<String,String> processAnnotationWebInitParams(
             ElementValue ev) {
-        Map<String, String> result = new HashMap<String,String>();
+        Map<String, String> result = new HashMap<>();
         if (ev instanceof ArrayElementValue) {
             ElementValue[] arrayValues =
                 ((ArrayElementValue) ev).getElementValuesArray();
@@ -2501,7 +2499,7 @@ public class ContextConfig implements LifecycleListener {
 
         private static final String FRAGMENT_LOCATION =
             "META-INF/web-fragment.xml";
-        private final Map<String,WebXml> fragments = new HashMap<String,WebXml>();
+        private final Map<String,WebXml> fragments = new HashMap<>();
 
         @Override
         public void scan(JarURLConnection jarConn) throws IOException {

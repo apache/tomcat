@@ -76,7 +76,7 @@ public final class TldConfig  implements LifecycleListener {
     /**
      * The <code>Digester</code>s available to process tld files.
      */
-    private static Digester[] tldDigesters = new Digester[4];
+    private static final Digester[] tldDigesters = new Digester[4];
 
     /**
      * Create (if necessary) and return a Digester configured to process the
@@ -139,11 +139,11 @@ public final class TldConfig  implements LifecycleListener {
      * correct processing priority. Only the TLD associated with the first
      * instance of any URI will be processed.
      */
-    private Set<String> taglibUris = new HashSet<String>();
+    private final Set<String> taglibUris = new HashSet<>();
 
-    private Set<String> webxmlTaglibUris = new HashSet<String>();
+    private final Set<String> webxmlTaglibUris = new HashSet<>();
 
-    private ArrayList<String> listeners = new ArrayList<String>();
+    private final ArrayList<String> listeners = new ArrayList<>();
 
     // --------------------------------------------------------- Public Methods
 
@@ -179,7 +179,7 @@ public final class TldConfig  implements LifecycleListener {
             noTldJars = null;
         } else {
             if (noTldJars == null) {
-                noTldJars = new HashSet<String>();
+                noTldJars = new HashSet<>();
             } else {
                 noTldJars.clear();
             }
