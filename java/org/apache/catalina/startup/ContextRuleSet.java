@@ -40,13 +40,13 @@ public class ContextRuleSet extends RuleSetBase {
     /**
      * The matching pattern prefix to use for recognizing our elements.
      */
-    protected String prefix = null;
+    protected final String prefix;
 
 
     /**
      * Should the context be created.
      */
-    protected boolean create = true;
+    protected final boolean create;
 
 
     // ------------------------------------------------------------ Constructor
@@ -57,9 +57,7 @@ public class ContextRuleSet extends RuleSetBase {
      * matching pattern prefix.
      */
     public ContextRuleSet() {
-
         this("");
-
     }
 
 
@@ -71,11 +69,7 @@ public class ContextRuleSet extends RuleSetBase {
      *  trailing slash character)
      */
     public ContextRuleSet(String prefix) {
-
-        super();
-        this.namespaceURI = null;
-        this.prefix = prefix;
-
+        this(prefix, true);
     }
 
 
@@ -87,12 +81,9 @@ public class ContextRuleSet extends RuleSetBase {
      *  trailing slash character)
      */
     public ContextRuleSet(String prefix, boolean create) {
-
-        super();
         this.namespaceURI = null;
         this.prefix = prefix;
         this.create = create;
-
     }
 
 

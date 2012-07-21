@@ -40,7 +40,7 @@ public class RealmRuleSet extends RuleSetBase {
     /**
      * The matching pattern prefix to use for recognizing our elements.
      */
-    protected String prefix = null;
+    protected final String prefix;
 
 
     // ------------------------------------------------------------ Constructor
@@ -51,9 +51,7 @@ public class RealmRuleSet extends RuleSetBase {
      * matching pattern prefix.
      */
     public RealmRuleSet() {
-
         this("");
-
     }
 
 
@@ -65,11 +63,8 @@ public class RealmRuleSet extends RuleSetBase {
      *  trailing slash character)
      */
     public RealmRuleSet(String prefix) {
-
-        super();
         this.namespaceURI = null;
         this.prefix = prefix;
-
     }
 
 

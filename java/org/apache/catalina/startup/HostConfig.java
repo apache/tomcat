@@ -131,27 +131,27 @@ public class HostConfig
     /**
      * Map of deployed applications.
      */
-    protected Map<String, DeployedApplication> deployed =
-        new ConcurrentHashMap<String, DeployedApplication>();
+    protected final Map<String, DeployedApplication> deployed =
+            new ConcurrentHashMap<>();
 
 
     /**
      * List of applications which are being serviced, and shouldn't be
      * deployed/undeployed/redeployed at the moment.
      */
-    protected ArrayList<String> serviced = new ArrayList<String>();
+    protected final ArrayList<String> serviced = new ArrayList<>();
 
 
     /**
      * The <code>Digester</code> instance used to parse context descriptors.
      */
-    protected static Digester digester = createDigester();
+    protected static final Digester digester = createDigester();
 
     /**
      * The list of Wars in the appBase to be ignored because they are invalid
      * (e.g. contain /../ sequences).
      */
-    protected Set<String> invalidWars = new HashSet<String>();
+    protected final Set<String> invalidWars = new HashSet<>();
 
     // ------------------------------------------------------------- Properties
 
@@ -431,7 +431,7 @@ public class HostConfig
             return unfilteredAppPaths;
         }
 
-        List<String> filteredList = new ArrayList<String>();
+        List<String> filteredList = new ArrayList<>();
         Matcher matcher = null;
         for (String appPath : unfilteredAppPaths) {
             if (matcher == null) {
@@ -494,7 +494,7 @@ public class HostConfig
             return;
 
         ExecutorService es = host.getStartStopExecutor();
-        List<Future<?>> results = new ArrayList<Future<?>>();
+        List<Future<?>> results = new ArrayList<>();
 
         for (int i = 0; i < files.length; i++) {
             File contextXml = new File(configBase, files[i]);
@@ -659,7 +659,7 @@ public class HostConfig
             return;
 
         ExecutorService es = host.getStartStopExecutor();
-        List<Future<?>> results = new ArrayList<Future<?>>();
+        List<Future<?>> results = new ArrayList<>();
 
         for (int i = 0; i < files.length; i++) {
 
@@ -940,7 +940,7 @@ public class HostConfig
             return;
 
         ExecutorService es = host.getStartStopExecutor();
-        List<Future<?>> results = new ArrayList<Future<?>>();
+        List<Future<?>> results = new ArrayList<>();
 
         for (int i = 0; i < files.length; i++) {
 
@@ -1474,7 +1474,7 @@ public class HostConfig
          * Application context path. The assertion is that
          * (host.getChild(name) != null).
          */
-        public String name;
+        public final String name;
 
         /**
          * Any modification of the specified (static) resources will cause a
@@ -1483,8 +1483,8 @@ public class HostConfig
          * contain resources like the context.xml file, a compressed WAR path.
          * The value is the last modification time.
          */
-        public LinkedHashMap<String, Long> redeployResources =
-            new LinkedHashMap<String, Long>();
+        public final LinkedHashMap<String, Long> redeployResources =
+                new LinkedHashMap<>();
 
         /**
          * Any modification of the specified (static) resources will cause a
@@ -1493,8 +1493,7 @@ public class HostConfig
          * additional descriptors.
          * The value is the last modification time.
          */
-        public HashMap<String, Long> reloadResources =
-            new HashMap<String, Long>();
+        public final HashMap<String, Long> reloadResources = new HashMap<>();
 
         /**
          * Instant where the application was last put in service.

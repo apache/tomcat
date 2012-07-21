@@ -317,7 +317,7 @@ public final class UserConfig
         }
 
         ExecutorService executor = host.getStartStopExecutor();
-        List<Future<?>> results = new ArrayList<Future<?>>();
+        List<Future<?>> results = new ArrayList<>();
 
         // Deploy the web application (if any) for each defined user
         Enumeration<String> users = database.getUsers();

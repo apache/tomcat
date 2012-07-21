@@ -69,13 +69,13 @@ public class LifecycleListenerRule extends Rule {
      * The attribute name of an attribute that can override the
      * implementation class name.
      */
-    private String attributeName;
+    private final String attributeName;
 
 
     /**
      * The name of the <code>LifecycleListener</code> implementation class.
      */
-    private String listenerClass;
+    private final String listenerClass;
 
 
     // --------------------------------------------------------- Public Methods

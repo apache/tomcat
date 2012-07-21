@@ -41,7 +41,7 @@ public class SetAllPropertiesRule extends Rule {
     }
 
     // ----------------------------------------------------- Instance Variables
-    protected HashMap<String,String> excludes = new HashMap<String,String>();
+    protected final HashMap<String,String> excludes = new HashMap<>();
 
     // --------------------------------------------------------- Public Methods
 
