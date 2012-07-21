@@ -125,6 +125,24 @@
     <Bug code="SWL" />
   </Match>
   <Match>
+    <!-- context is never null -->
+    <Class name="org.apache.catalina.startup.HostConfig" />
+    <Method name="deployDescriptor" />
+    <Bug code="NP" />
+  </Match>
+  <Match>
+    <!-- context is never null -->
+    <Class name="org.apache.catalina.startup.HostConfig" />
+    <Method name="deployDirectory" />
+    <Bug code="NP" />
+  </Match>
+  <Match>
+    <!-- context is never null -->
+    <Class name="org.apache.catalina.startup.HostConfig" />
+    <Method name="deployWAR" />
+    <Bug code="NP" />
+  </Match>
+  <Match>
     <Class name="org.apache.catalina.tribes.group.interceptors.TcpFailureDetector"/>
     <Method name="memberAlive"/>
     <Bug code="DE"/>
