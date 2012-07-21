@@ -1142,7 +1142,10 @@ public class ContextConfig implements LifecycleListener {
 
     /**
      * Get config base.
+     *
+     * @deprecated  Unused - will be removed in 8.0.x
      */
+    @Deprecated
     protected File getConfigBase() {
         File configBase = new File(getBaseDir(), "conf");
         if (!configBase.exists()) {
