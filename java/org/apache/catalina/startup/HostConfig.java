@@ -547,8 +547,10 @@ public class HostConfig
                     log.error(sm.getString(
                             "hostConfig.deployDescriptor.error",
                             contextXml.getAbsolutePath()));
-                    context = new FailedContext();
                 } finally {
+                    if (context == null) {
+                        context = new FailedContext();
+                    }
                     digester.reset();
                 }
             }
@@ -598,7 +600,7 @@ public class HostConfig
 
             // default to appBase dir + name
             expandedDocBase = new File(host.getAppBaseFile(), cn.getBaseName());
-            if (context != null && context.getDocBase() != null) {
+            if (context.getDocBase() != null) {
                 // first assume docBase is absolute
                 expandedDocBase = new File(context.getDocBase());
                 if (!expandedDocBase.isAbsolute()) {
@@ -644,7 +646,7 @@ public class HostConfig
             addGlobalRedeployResources(deployedApp);
         }
 
-        if (context != null && host.findChild(context.getName()) != null) {
+        if (host.findChild(context.getName()) != null) {
             deployed.put(context.getName(), deployedApp);
         }
     }
@@ -834,8 +836,10 @@ public class HostConfig
                         log.error(sm.getString(
                                 "hostConfig.deployDescriptor.error",
                                 war.getAbsolutePath()));
-                        context = new FailedContext();
                     } finally {
+                        if (context == null) {
+                            context = new FailedContext();
+                        }
                         digester.reset();
                     }
                 }
@@ -995,8 +999,10 @@ public class HostConfig
                         log.error(sm.getString(
                                 "hostConfig.deployDescriptor.error",
                                 xml));
-                        context = new FailedContext();
                     } finally {
+                        if (context == null) {
+                            context = new FailedContext();
+                        }
                         digester.reset();
                     }
                 }
