@@ -66,7 +66,10 @@ public class CatalinaProperties {
 
     /**
      * Return specified property value.
+     *
+     * @deprecated  Unused - will be removed in 8.0.x
      */
+    @Deprecated
     public static String getProperty(String name, String defaultValue) {
 
         return properties.getProperty(name, defaultValue);
