@@ -104,13 +104,19 @@ public class Catalina {
 
     /**
      * Are we starting a new server?
+     *
+     * @deprecated  Unused - will be removed in Tomcat 8.0.x
      */
+    @Deprecated
     protected boolean starting = false;
 
 
     /**
      * Are we stopping an existing server?
+     *
+     * @deprecated  Unused - will be removed in Tomcat 8.0.x
      */
+    @Deprecated
     protected boolean stopping = false;
 
 
@@ -141,7 +147,10 @@ public class Catalina {
 
     // ------------------------------------------------------------- Properties
 
-
+    /**
+     * @deprecated  Use {@link #setConfigFile(String)}
+     */
+    @Deprecated
     public void setConfig(String file) {
         configFile = file;
     }
