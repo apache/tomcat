@@ -925,6 +925,8 @@ public class HostConfig
                             Long.valueOf(xml.lastModified()));
                 }
             } else {
+                // Passing null for docBase means that no resources will be
+                // watched. This will be logged at debug level.
                 addWatchedResources(deployedApp, null, context);
             }
             // Add the global redeploy resources (which are never deleted) at
