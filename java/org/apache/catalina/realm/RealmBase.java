@@ -109,7 +109,10 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
 
     /**
      * The MD5 helper object for this class.
+     *
+     * @deprecated  Unused - will be removed in Tomcat 8.0.x
      */
+    @Deprecated
     protected static final MD5Encoder md5Encoder = new MD5Encoder();
 
 
@@ -405,7 +408,7 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
         String serverDigest = null;
         // Bugzilla 32137
         synchronized(md5Helper) {
-            serverDigest = md5Encoder.encode(md5Helper.digest(valueBytes));
+            serverDigest = MD5Encoder.encode(md5Helper.digest(valueBytes));
         }
 
         if (log.isDebugEnabled()) {
@@ -1206,7 +1209,7 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
             digest = md5Helper.digest(valueBytes);
         }
 
-        return md5Encoder.encode(digest);
+        return MD5Encoder.encode(digest);
     }
 
 
