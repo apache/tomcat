@@ -364,9 +364,8 @@ public class TestDigestAuthenticator extends TomcatBaseTest {
     private static String digest(String input) throws NoSuchAlgorithmException {
         // This is slow but should be OK as this is only a test
         MessageDigest md5 = MessageDigest.getInstance("MD5");
-        MD5Encoder encoder = new MD5Encoder();
 
         md5.update(input.getBytes());
-        return encoder.encode(md5.digest());
+        return MD5Encoder.encode(md5.digest());
     }
 }

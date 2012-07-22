@@ -212,7 +212,10 @@ public class WebdavServlet
 
     /**
      * The MD5 helper object for this class.
+     *
+     * @deprecated  Unused - will be removed in Tomcat 8.0.x
      */
+    @Deprecated
     protected static final MD5Encoder md5Encoder = new MD5Encoder();
 
 
@@ -1145,7 +1148,7 @@ public class WebdavServlet
                 + lock.depth + "-" + lock.owner + "-" + lock.tokens + "-"
                 + lock.expiresAt + "-" + System.currentTimeMillis() + "-"
                 + secret;
-            String lockToken = md5Encoder.encode(md5Helper.digest(
+            String lockToken = MD5Encoder.encode(md5Helper.digest(
                     lockTokenStr.getBytes(B2CConverter.ISO_8859_1)));
 
             if ( (exists) && (object instanceof DirContext) &&

@@ -33,6 +33,14 @@ package org.apache.catalina.util;
 public final class MD5Encoder {
 
 
+    /**
+     * @deprecated  Will be made private in Tomcat 8.0.x
+     */
+    @Deprecated
+    public MD5Encoder() {
+        // NOOP
+    }
+
     // ----------------------------------------------------- Instance Variables
 
 
@@ -50,7 +58,7 @@ public final class MD5Encoder {
      * @param binaryData Array containing the digest
      * @return Encoded MD5, or null if encoding failed
      */
-    public String encode( byte[] binaryData ) {
+    public static String encode( byte[] binaryData ) {
 
         if (binaryData.length != 16)
             return null;

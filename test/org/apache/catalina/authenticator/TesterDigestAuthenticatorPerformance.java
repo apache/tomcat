@@ -180,16 +180,15 @@ public class TesterDigestAuthenticatorPerformance {
             String a2 = METHOD + ":" + CONTEXT_PATH + URI;
 
             MessageDigest digester = MessageDigest.getInstance("MD5");
-            MD5Encoder encoder = new MD5Encoder();
 
-            String md5a1 = encoder.encode(digester.digest(a1.getBytes()));
-            String md5a2 = encoder.encode(digester.digest(a2.getBytes()));
+            String md5a1 = MD5Encoder.encode(digester.digest(a1.getBytes()));
+            String md5a2 = MD5Encoder.encode(digester.digest(a2.getBytes()));
 
             String response = md5a1 + ":" + nonce + ":" + ncString + ":" +
                     cnonce + ":" + QOP + ":" + md5a2;
 
             String md5response =
-                encoder.encode(digester.digest(response.getBytes()));
+                    MD5Encoder.encode(digester.digest(response.getBytes()));
 
             StringBuilder auth = new StringBuilder();
             auth.append("Digest username=\"");
