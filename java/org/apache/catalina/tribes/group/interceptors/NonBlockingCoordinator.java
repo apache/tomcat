@@ -628,6 +628,10 @@ public class NonBlockingCoordinator extends ChannelInterceptorBase {
         protected MemberImpl[] view;
         protected UniqueId id;
         protected byte[] type;
+        /**
+         * @deprecated  Unused - will be removed in Tomcat 8.0.x
+         */
+        @Deprecated
         protected long timestamp = System.currentTimeMillis();
 
         public CoordinationMessage(XByteBuffer buf) {
