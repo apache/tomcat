@@ -148,7 +148,7 @@ public class NonBlockingCoordinator extends ChannelInterceptorBase {
     /**
      * Time to wait for coordination timeout
      */
-    protected long waitForCoordMsgTimeout = 15000;
+    protected final long waitForCoordMsgTimeout = 15000;
     /**
      * Our current view
      */
@@ -173,9 +173,9 @@ public class NonBlockingCoordinator extends ChannelInterceptorBase {
     protected boolean started = false;
     protected final int startsvc = 0xFFFF;
 
-    protected Object electionMutex = new Object();
+    protected final Object electionMutex = new Object();
 
-    protected AtomicBoolean coordMsgReceived = new AtomicBoolean(false);
+    protected final AtomicBoolean coordMsgReceived = new AtomicBoolean(false);
 
     public NonBlockingCoordinator() {
         super();
@@ -622,7 +622,7 @@ public class NonBlockingCoordinator extends ChannelInterceptorBase {
 
     public static class CoordinationMessage {
         //X{A-ldr, A-src, mbrs-A,B,C,D}
-        protected XByteBuffer buf;
+        protected final XByteBuffer buf;
         protected MemberImpl leader;
         protected MemberImpl source;
         protected MemberImpl[] view;
@@ -770,13 +770,13 @@ public class NonBlockingCoordinator extends ChannelInterceptorBase {
         public static final int EVT_CONF_RX = 12;
         public static final int EVT_ELECT_ABANDONED = 13;
 
-        int type;
-        ChannelInterceptor interceptor;
-        Member coord;
-        Member[] mbrs;
-        String info;
-        Membership view;
-        Membership suggestedView;
+        final int type;
+        final ChannelInterceptor interceptor;
+        final Member coord;
+        final Member[] mbrs;
+        final String info;
+        final Membership view;
+        final Membership suggestedView;
         public CoordinationEvent(int type,ChannelInterceptor interceptor, String info) {
             this.type = type;
             this.interceptor = interceptor;

@@ -39,12 +39,13 @@ import org.apache.catalina.tribes.util.TcclThreadFactory;
 
 public class MessageDispatch15Interceptor extends MessageDispatchInterceptor {
 
-    protected AtomicLong currentSize = new AtomicLong(0);
+    protected final AtomicLong currentSize = new AtomicLong(0);
     protected ThreadPoolExecutor executor = null;
     protected int maxThreads = 10;
     protected int maxSpareThreads = 2;
     protected long keepAliveTime = 5000;
-    protected LinkedBlockingQueue<Runnable> runnablequeue = new LinkedBlockingQueue<Runnable>();
+    protected final LinkedBlockingQueue<Runnable> runnablequeue =
+            new LinkedBlockingQueue<>();
 
     @Override
     public long getCurrentSize() {

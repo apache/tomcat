@@ -44,10 +44,10 @@ import org.apache.catalina.tribes.io.XByteBuffer;
 public class FragmentationInterceptor extends ChannelInterceptorBase {
     private static final org.apache.juli.logging.Log log = org.apache.juli.logging.LogFactory.getLog( FragmentationInterceptor.class );
 
-    protected HashMap<FragKey, FragCollection> fragpieces = new HashMap<FragKey, FragCollection>();
+    protected final HashMap<FragKey, FragCollection> fragpieces = new HashMap<>();
     private int maxSize = 1024*100;
     private long expire = 1000 * 60; //one minute expiration
-    protected boolean deepclone = true;
+    protected final boolean deepclone = true;
 
 
     @Override
@@ -172,9 +172,9 @@ public class FragmentationInterceptor extends ChannelInterceptorBase {
     }
 
     public static class FragCollection {
-        private long received = System.currentTimeMillis();
-        private ChannelMessage msg;
-        private XByteBuffer[] frags;
+        private final long received = System.currentTimeMillis();
+        private final ChannelMessage msg;
+        private final XByteBuffer[] frags;
         public FragCollection(ChannelMessage msg) {
             //get the total messages
             int count = XByteBuffer.toInt(msg.getMessage().getBytesDirect(),msg.getMessage().getLength()-4);
@@ -214,13 +214,11 @@ public class FragmentationInterceptor extends ChannelInterceptorBase {
         public boolean expired(long expire) {
             return (System.currentTimeMillis()-received)>expire;
         }
-
-
     }
 
     public static class FragKey {
-        private byte[] uniqueId;
-        private long received = System.currentTimeMillis();
+        private final byte[] uniqueId;
+        private final long received = System.currentTimeMillis();
         public FragKey(byte[] id ) {
             this.uniqueId = id;
         }

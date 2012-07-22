@@ -44,7 +44,7 @@ public class MessageDispatchInterceptor extends ChannelInterceptorBase implement
     private static final Log log = LogFactory.getLog(MessageDispatchInterceptor.class);
 
     protected long maxQueueSize = 1024*1024*64; //64MB
-    protected FastQueue queue = new FastQueue();
+    protected final FastQueue queue = new FastQueue();
     protected volatile boolean run = false;
     protected Thread msgDispatchThread = null;
     protected long currentSize = 0;
@@ -217,6 +217,4 @@ public class MessageDispatchInterceptor extends ChannelInterceptorBase implement
     public void setAlwaysSend(boolean alwaysSend) {
         this.alwaysSend = alwaysSend;
     }
-
-
 }
