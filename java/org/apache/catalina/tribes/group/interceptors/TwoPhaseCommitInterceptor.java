@@ -44,7 +44,7 @@ public class TwoPhaseCommitInterceptor extends ChannelInterceptorBase {
     private static final byte[] END_DATA = new byte[] {54, -13, 90, 110, 47, -31, 75, -24, -81, -29, 36, 52, -58, 77, -110, 56};
     private static final org.apache.juli.logging.Log log = org.apache.juli.logging.LogFactory.getLog(TwoPhaseCommitInterceptor.class);
 
-    protected HashMap<UniqueId, MapEntry> messages = new HashMap<UniqueId, MapEntry>();
+    protected final HashMap<UniqueId, MapEntry> messages = new HashMap<>();
     protected long expire = 1000 * 60; //one minute expiration
     protected boolean deepclone = true;
 
@@ -116,7 +116,6 @@ public class TwoPhaseCommitInterceptor extends ChannelInterceptorBase {
     public void heartbeat() {
         try {
             long now = System.currentTimeMillis();
-            @SuppressWarnings("unchecked")
             Map.Entry<UniqueId,MapEntry>[] entries = messages.entrySet().toArray(new Map.Entry[messages.size()]);
             for (int i=0; i<entries.length; i++ ) {
                 MapEntry entry = entries[i].getValue();
@@ -134,9 +133,9 @@ public class TwoPhaseCommitInterceptor extends ChannelInterceptorBase {
     }
 
     public static class MapEntry {
-        public ChannelMessage msg;
-        public UniqueId id;
-        public long timestamp;
+        public final ChannelMessage msg;
+        public final UniqueId id;
+        public final long timestamp;
 
         public MapEntry(ChannelMessage msg, UniqueId id, long timestamp) {
             this.msg = msg;

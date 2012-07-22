@@ -46,14 +46,14 @@ public class ThroughputInterceptor extends ChannelInterceptorBase {
     double mbRx = 0;
     double timeTx = 0;
     double lastCnt = 0;
-    AtomicLong msgTxCnt = new AtomicLong(1);
-    AtomicLong msgRxCnt = new AtomicLong(0);
-    AtomicLong msgTxErr = new AtomicLong(0);
+    final AtomicLong msgTxCnt = new AtomicLong(1);
+    final AtomicLong msgRxCnt = new AtomicLong(0);
+    final AtomicLong msgTxErr = new AtomicLong(0);
     int interval = 10000;
-    AtomicInteger access = new AtomicInteger(0);
+    final AtomicInteger access = new AtomicInteger(0);
     long txStart = 0;
     long rxStart = 0;
-    DecimalFormat df = new DecimalFormat("#0.00");
+    final DecimalFormat df = new DecimalFormat("#0.00");
 
 
     @Override

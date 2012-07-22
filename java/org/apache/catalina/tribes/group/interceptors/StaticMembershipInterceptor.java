@@ -26,7 +26,7 @@ import org.apache.catalina.tribes.group.ChannelInterceptorBase;
 
 public class StaticMembershipInterceptor
     extends ChannelInterceptorBase {
-    protected ArrayList<Member> members = new ArrayList<Member>();
+    protected final ArrayList<Member> members = new ArrayList<>();
     protected Member localMember = null;
 
     public StaticMembershipInterceptor() {

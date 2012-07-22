@@ -43,7 +43,7 @@ public class TcpPingInterceptor extends ChannelInterceptorBase {
 
     private static final Log log = LogFactory.getLog(TcpPingInterceptor.class);
 
-    protected static byte[] TCP_PING_DATA = new byte[] {
+    protected static final byte[] TCP_PING_DATA = new byte[] {
         79, -89, 115, 72, 121, -33, 67, -55, -97, 111, -119, -128, -95, 91, 7, 20,
         125, -39, 82, 91, -21, -33, 67, -102, -73, 126, -66, -113, -127, 103, 30, -74,
         55, 21, -66, -121, 69, 33, 76, -88, -65, 10, 77, 19, 83, 56, 21, 50,
@@ -55,7 +55,7 @@ public class TcpPingInterceptor extends ChannelInterceptorBase {
     protected boolean staticOnly = false;
     protected volatile boolean running = true;
     protected PingThread thread = null;
-    protected static AtomicInteger cnt = new AtomicInteger(0);
+    protected static final AtomicInteger cnt = new AtomicInteger(0);
 
     WeakReference<TcpFailureDetector> failureDetector = null;
     WeakReference<StaticMembershipInterceptor> staticMembers = null;
@@ -75,9 +75,9 @@ public class TcpPingInterceptor extends ChannelInterceptorBase {
         ChannelInterceptor next = getNext();
         while ( next != null ) {
             if ( next instanceof TcpFailureDetector )
-                failureDetector = new WeakReference<TcpFailureDetector>((TcpFailureDetector)next);
+                failureDetector = new WeakReference<>((TcpFailureDetector)next);
             if ( next instanceof StaticMembershipInterceptor )
-                staticMembers = new WeakReference<StaticMembershipInterceptor>((StaticMembershipInterceptor)next);
+                staticMembers = new WeakReference<>((StaticMembershipInterceptor)next);
             next = next.getNext();
         }
 
