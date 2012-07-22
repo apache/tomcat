@@ -312,7 +312,6 @@ public class NonBlockingCoordinator extends ChannelInterceptorBase {
             coordMsgReceived.set(true);
             synchronized (electionMutex) { electionMutex.notifyAll();}
         }
-        msg.timestamp = System.currentTimeMillis();
         Membership merged = mergeOnArrive(msg);
         if (isViewConf(msg)) handleViewConf(msg, merged);
         else handleToken(msg, merged);
@@ -628,11 +627,6 @@ public class NonBlockingCoordinator extends ChannelInterceptorBase {
         protected MemberImpl[] view;
         protected UniqueId id;
         protected byte[] type;
-        /**
-         * @deprecated  Unused - will be removed in Tomcat 8.0.x
-         */
-        @Deprecated
-        protected long timestamp = System.currentTimeMillis();
 
         public CoordinationMessage(XByteBuffer buf) {
             this.buf = buf;
