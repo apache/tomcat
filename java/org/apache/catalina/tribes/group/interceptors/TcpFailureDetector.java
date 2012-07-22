@@ -61,7 +61,7 @@ public class TcpFailureDetector extends ChannelInterceptorBase {
 
     private static final org.apache.juli.logging.Log log = org.apache.juli.logging.LogFactory.getLog( TcpFailureDetector.class );
 
-    protected static byte[] TCP_FAIL_DETECT = new byte[] {
+    protected static final byte[] TCP_FAIL_DETECT = new byte[] {
         79, -89, 115, 72, 121, -126, 67, -55, -97, 111, -119, -128, -95, 91, 7, 20,
         125, -39, 82, 91, -21, -15, 67, -102, -73, 126, -66, -113, -127, 103, 30, -74,
         55, 21, -66, -121, 69, 126, 76, -88, -65, 10, 77, 19, 83, 56, 21, 50,
@@ -79,9 +79,9 @@ public class TcpFailureDetector extends ChannelInterceptorBase {
 
     protected Membership membership = null;
 
-    protected HashMap<Member, Long> removeSuspects = new HashMap<Member, Long>();
+    protected final HashMap<Member, Long> removeSuspects = new HashMap<>();
 
-    protected HashMap<Member, Long> addSuspects = new HashMap<Member, Long>();
+    protected final HashMap<Member, Long> addSuspects = new HashMap<>();
 
     @Override
     public void sendMessage(Member[] destination, ChannelMessage msg, InterceptorPayload payload) throws ChannelException {

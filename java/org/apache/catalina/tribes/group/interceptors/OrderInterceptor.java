@@ -54,9 +54,9 @@ import org.apache.catalina.tribes.io.XByteBuffer;
  * @version 1.1
  */
 public class OrderInterceptor extends ChannelInterceptorBase {
-    private HashMap<Member, Counter> outcounter = new HashMap<Member, Counter>();
-    private HashMap<Member, Counter> incounter = new HashMap<Member, Counter>();
-    private HashMap<Member, MessageOrder> incoming = new HashMap<Member, MessageOrder>();
+    private final HashMap<Member, Counter> outcounter = new HashMap<>();
+    private final HashMap<Member, Counter> incounter = new HashMap<>();
+    private final HashMap<Member, MessageOrder> incoming = new HashMap<>();
     private long expire = 3000;
     private boolean forwardExpired = true;
     private int maxQueue = Integer.MAX_VALUE;
@@ -212,7 +212,7 @@ public class OrderInterceptor extends ChannelInterceptorBase {
     }
 
     protected static class Counter {
-        private AtomicInteger value = new AtomicInteger(0);
+        private final AtomicInteger value = new AtomicInteger(0);
 
         public int getCounter() {
             return value.get();
@@ -228,9 +228,9 @@ public class OrderInterceptor extends ChannelInterceptorBase {
     }
 
     protected static class MessageOrder {
-        private long received = System.currentTimeMillis();
+        private final long received = System.currentTimeMillis();
         private MessageOrder next;
-        private int msgNr;
+        private final int msgNr;
         private ChannelMessage msg = null;
         public MessageOrder(int msgNr,ChannelMessage msg) {
             this.msgNr = msgNr;

@@ -35,7 +35,7 @@ public class SimpleCoordinator extends ChannelInterceptorBase {
 
     private Member[] view;
 
-    private AtomicBoolean membershipChanged = new AtomicBoolean();
+    private final AtomicBoolean membershipChanged = new AtomicBoolean();
 
     private void membershipChanged() {
         membershipChanged.set(true);
