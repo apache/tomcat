@@ -108,15 +108,6 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
 
 
     /**
-     * The MD5 helper object for this class.
-     *
-     * @deprecated  Unused - will be removed in Tomcat 8.0.x
-     */
-    @Deprecated
-    protected static final MD5Encoder md5Encoder = new MD5Encoder();
-
-
-    /**
      * MD5 message digest provider.
      */
     protected static volatile MessageDigest md5Helper;

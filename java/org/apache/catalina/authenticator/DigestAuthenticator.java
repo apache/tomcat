@@ -57,15 +57,6 @@ public class DigestAuthenticator extends AuthenticatorBase {
     // -------------------------------------------------------------- Constants
 
     /**
-     * The MD5 helper object for this class.
-     *
-     * @deprecated  Unused - will be removed in Tomcat 8.0.x
-     */
-    @Deprecated
-    protected static final MD5Encoder md5Encoder = new MD5Encoder();
-
-
-    /**
      * Tomcat's DIGEST implementation only supports auth quality of protection.
      */
     protected static final String QOP = "auth";
