@@ -59,7 +59,10 @@ public class DigestAuthenticator extends AuthenticatorBase {
 
     /**
      * The MD5 helper object for this class.
+     *
+     * @deprecated  Unused - will be removed in Tomcat 8.0.x
      */
+    @Deprecated
     protected static final MD5Encoder md5Encoder = new MD5Encoder();
 
 
@@ -383,7 +386,7 @@ public class DigestAuthenticator extends AuthenticatorBase {
                     ipTimeKey.getBytes(Charset.defaultCharset()));
         }
 
-        return currentTime + ":" + md5Encoder.encode(buffer);
+        return currentTime + ":" + MD5Encoder.encode(buffer);
     }
 
 
@@ -638,7 +641,7 @@ public class DigestAuthenticator extends AuthenticatorBase {
                 buffer = md5Helper.digest(
                         serverIpTimeKey.getBytes(Charset.defaultCharset()));
             }
-            String md5ServerIpTimeKey = md5Encoder.encode(buffer);
+            String md5ServerIpTimeKey = MD5Encoder.encode(buffer);
             if (!md5ServerIpTimeKey.equals(md5clientIpTimeKey)) {
                 return false;
             }
@@ -702,7 +705,7 @@ public class DigestAuthenticator extends AuthenticatorBase {
             synchronized (md5Helper) {
                 buffer = md5Helper.digest(a2.getBytes(Charset.defaultCharset()));
             }
-            String md5a2 = md5Encoder.encode(buffer);
+            String md5a2 = MD5Encoder.encode(buffer);
 
             return realm.authenticate(userName, response, nonce, nc, cnonce,
                     qop, realmName, md5a2);
