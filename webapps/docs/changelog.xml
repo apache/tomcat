@@ -120,6 +120,10 @@
         The correct names are <code>jasper</code> and <code>jkupdate</code>.
         (kkolinko)
       </update>
+      <fix>
+        <bug>53529</bug>: Clean-up the handling of
+        <code>InterruptedException</code> throughout the code base. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>

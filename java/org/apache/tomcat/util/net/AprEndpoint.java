@@ -639,8 +639,7 @@ public class AprEndpoint extends AbstractEndpoint {
                     try {
                         Thread.sleep(50);
                     } catch (InterruptedException e) {
-                        // Ignore and clean the interrupt flag
-                        Thread.interrupted();
+                        // Ignore
                     }
                     waitLeft -= 50;
                 }

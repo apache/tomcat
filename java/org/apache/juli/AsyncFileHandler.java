@@ -123,9 +123,8 @@ public class AsyncFileHandler extends FileHandler {
                 }//switch
             }//while
         }catch (InterruptedException x) {
-            //allow thread to be interrupted and back out of the publish operation
-            //after this we clear the flag
-            Thread.interrupted();
+            // Allow thread to be interrupted and back out of the publish
+            // operation. No further action required.
         }
 
     }
@@ -147,12 +146,12 @@ public class AsyncFileHandler extends FileHandler {
                 try {
                     LogEntry entry = queue.poll(LOGGER_SLEEP_TIME, TimeUnit.MILLISECONDS);
                     if (entry!=null) entry.flush();
-                }catch (InterruptedException x) {
-                    Thread.interrupted();
-                }catch (Exception x) {
+                } catch (InterruptedException x) {
+                    // Ignore the attempt to interrupt the thread.
+                } catch (Exception x) {
                     x.printStackTrace();
                 }
-            }//while
+            }
         }
     }
 

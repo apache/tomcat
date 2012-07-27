@@ -225,19 +225,22 @@ public class NonBlockingCoordinator extends ChannelInterceptorBase {
                     coordMsgReceived.set(false);
                     fireInterceptorEvent(new CoordinationEvent(CoordinationEvent.EVT_WAIT_FOR_MSG,this,"Election, waiting for request"));
                     electionMutex.wait(waitForCoordMsgTimeout);
-                }catch ( InterruptedException x ) {
-                    Thread.interrupted();
+                } catch (InterruptedException x) {
+                    Thread.currentThread().interrupt();
                 }
-                if ( suggestedviewId == null && (!coordMsgReceived.get())) {
-                    //no message arrived, send the coord msg
-//                    fireInterceptorEvent(new CoordinationEvent(CoordinationEvent.EVT_WAIT_FOR_MSG,this,"Election, waiting timed out."));
-//                    startElection(true);
-                    fireInterceptorEvent(new CoordinationEvent(CoordinationEvent.EVT_ELECT_ABANDONED,this,"Election abandoned, waiting timed out."));
+                String msg;
+                if (suggestedviewId == null && !coordMsgReceived.get()) {
+                    if (Thread.interrupted()) {
+                        msg = "Election abandoned, waiting interrupted.";
+                    } else {
+                        msg = "Election abandoned, waiting timed out.";
+                    }
                 } else {
-                    fireInterceptorEvent(new CoordinationEvent(CoordinationEvent.EVT_ELECT_ABANDONED,this,"Election abandoned, received a message"));
+                    msg = "Election abandoned, received a message";
                 }
-            }//end if
-
+                fireInterceptorEvent(new CoordinationEvent(
+                        CoordinationEvent.EVT_ELECT_ABANDONED, this, msg));
+            }
         }
     }
 

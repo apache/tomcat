@@ -689,7 +689,9 @@ public class GroupChannel extends ChannelInterceptorBase implements ManagedChann
                     Thread.sleep(sleepTime);
                     channel.heartbeat();
                 } catch ( InterruptedException x ) {
-                    interrupted();
+                    // Ignore. Probably triggered by a call to stopHeartbeat().
+                    // In the highly unlikely event it was a different trigger,
+                    // simply ignore it and continue.
                 } catch ( Exception x ) {
                     log.error("Unable to send heartbeat through Tribes interceptor stack. Will try to sleep again.",x);
                 }//catch

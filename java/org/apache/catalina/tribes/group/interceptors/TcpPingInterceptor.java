@@ -172,7 +172,9 @@ public class TcpPingInterceptor extends ChannelInterceptorBase {
                     sleep(interval);
                     sendPing();
                 }catch ( InterruptedException ix ) {
-                    interrupted();
+                    // Ignore. Probably triggered by a call to stop().
+                    // In the highly unlikely event it was a different trigger,
+                    // simply ignore it and continue.
                 }catch ( Exception x )  {
                     log.warn("Unable to send ping from TCP ping thread.",x);
                 }

@@ -184,7 +184,6 @@ public class ThreadPoolExecutor extends java.util.concurrent.ThreadPoolExecutor 
                     }
                 } catch (InterruptedException x) {
                     submittedCount.decrementAndGet();
-                    Thread.interrupted();
                     throw new RejectedExecutionException(x);
                 }
             } else {
