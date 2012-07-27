@@ -108,8 +108,8 @@ public class NioBlockingSelector {
                     } else {
                         att.awaitWriteLatch(writeTimeout,TimeUnit.MILLISECONDS);
                     }
-                }catch (InterruptedException ignore) {
-                    Thread.interrupted();
+                } catch (InterruptedException ignore) {
+                    // Ignore
                 }
                 if ( att.getWriteLatch()!=null && att.getWriteLatch().getCount()> 0) {
                     //we got interrupted, but we haven't received notification from the poller.
@@ -173,8 +173,8 @@ public class NioBlockingSelector {
                     } else {
                         att.awaitReadLatch(readTimeout, TimeUnit.MILLISECONDS);
                     }
-                }catch (InterruptedException ignore) {
-                    Thread.interrupted();
+                } catch (InterruptedException ignore) {
+                    // Ignore
                 }
                 if ( att.getReadLatch()!=null && att.getReadLatch().getCount()> 0) {
                     //we got interrupted, but we haven't received notification from the poller.
