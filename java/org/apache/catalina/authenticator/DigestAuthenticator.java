@@ -14,10 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.catalina.authenticator;
-
 
 import java.io.IOException;
 import java.security.MessageDigest;
@@ -25,7 +22,6 @@ import java.security.NoSuchAlgorithmException;
 import java.security.Principal;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.StringTokenizer;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -39,7 +35,6 @@ import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.buf.B2CConverter;
 
 
-
 /**
  * An <b>Authenticator</b> and <b>Valve</b> implementation of HTTP DIGEST
  * Authentication (see RFC 2069).
@@ -48,7 +43,6 @@ import org.apache.tomcat.util.buf.B2CConverter;
  * @author Remy Maucherat
  * @version $Id$
  */
-
 public class DigestAuthenticator extends AuthenticatorBase {
 
     private static final Log log = LogFactory.getLog(DigestAuthenticator.class);
@@ -273,49 +267,6 @@ public class DigestAuthenticator extends AuthenticatorBase {
 
 
     // ------------------------------------------------------ Protected Methods
-
-
-    /**
-     * Parse the username from the specified authorization string.  If none
-     * can be identified, return <code>null</code>
-     *
-     * @param authorization Authorization string to be parsed
-     *
-     * @deprecated  Unused. Will be removed in Tomcat 8.0.x
-     */
-    @Deprecated
-    protected String parseUsername(String authorization) {
-
-        // Validate the authorization credentials format
-        if (authorization == null) {
-            return (null);
-        }
-        if (!authorization.startsWith("Digest ")) {
-            return (null);
-        }
-        authorization = authorization.substring(7).trim();
-
-        StringTokenizer commaTokenizer =
-            new StringTokenizer(authorization, ",");
-
-        while (commaTokenizer.hasMoreTokens()) {
-            String currentToken = commaTokenizer.nextToken();
-            int equalSign = currentToken.indexOf('=');
-            if (equalSign < 0) {
-                return null;
-            }
-            String currentTokenName =
-                currentToken.substring(0, equalSign).trim();
-            String currentTokenValue =
-                currentToken.substring(equalSign + 1).trim();
-            if ("username".equals(currentTokenName)) {
-                return (removeQuotes(currentTokenValue));
-            }
-        }
-
-        return (null);
-
-    }
 
 
     /**
