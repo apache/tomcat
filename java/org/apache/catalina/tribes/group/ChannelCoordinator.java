@@ -41,23 +41,25 @@ import org.apache.catalina.tribes.util.Logs;
  * @version $Id$
  */
 public class ChannelCoordinator extends ChannelInterceptorBase implements MessageListener {
-    private ChannelReceiver clusterReceiver = new NioReceiver();
-    private ChannelSender clusterSender = new ReplicationTransmitter();
-    private MembershipService membershipService = new McastService();
+    private ChannelReceiver clusterReceiver;
+    private ChannelSender clusterSender;
+    private MembershipService membershipService;
 
     private int startLevel = 0;
 
     public ChannelCoordinator() {
-        // Override default
-        this.optionFlag = Channel.SEND_OPTIONS_BYTE_MESSAGE |
-                Channel.SEND_OPTIONS_USE_ACK |
-                Channel.SEND_OPTIONS_SYNCHRONIZED_ACK;
+        this(new NioReceiver(), new ReplicationTransmitter(),
+                new McastService());
     }
 
     public ChannelCoordinator(ChannelReceiver receiver,
                               ChannelSender sender,
                               MembershipService service) {
-        this();
+
+        this.optionFlag = Channel.SEND_OPTIONS_BYTE_MESSAGE |
+                Channel.SEND_OPTIONS_USE_ACK |
+                Channel.SEND_OPTIONS_SYNCHRONIZED_ACK;
+
         this.setClusterReceiver(receiver);
         this.setClusterSender(sender);
         this.setMembershipService(service);
