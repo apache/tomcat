@@ -231,27 +231,11 @@ public class RpcChannel implements ChannelListener{
         public final RpcCollectorKey key;
         public final int options;
         public int destcnt;
-        /**
-         * @deprecated  Unused - will be removed in Tomcat 8.0.x
-         */
-        @Deprecated
-        public final long timeout;
 
-        /**
-         * @deprecated  Use {@link RpcCollector#RpcCollector(RpcCollectorKey,
-         *              int, int)}
-         */
-        @Deprecated
-        public RpcCollector(RpcCollectorKey key, int options, int destcnt,
-                long timeout) {
+        public RpcCollector(RpcCollectorKey key, int options, int destcnt) {
             this.key = key;
             this.options = options;
             this.destcnt = destcnt;
-            this.timeout = timeout;
-        }
-
-        public RpcCollector(RpcCollectorKey key, int options, int destcnt) {
-            this(key, options, destcnt, 0);
         }
 
         public void addResponse(Serializable message, Member sender){
