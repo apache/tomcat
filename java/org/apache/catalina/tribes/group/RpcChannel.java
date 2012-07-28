@@ -89,7 +89,7 @@ public class RpcChannel implements ChannelListener{
             channelOptions & ~Channel.SEND_OPTIONS_SYNCHRONIZED_ACK;
 
         RpcCollectorKey key = new RpcCollectorKey(UUIDGenerator.randomUUID(false));
-        RpcCollector collector = new RpcCollector(key,rpcOptions,destination.length,timeout);
+        RpcCollector collector = new RpcCollector(key,rpcOptions,destination.length);
         try {
             synchronized (collector) {
                 if ( rpcOptions != NO_REPLY ) responseMap.put(key, collector);
@@ -231,13 +231,27 @@ public class RpcChannel implements ChannelListener{
         public final RpcCollectorKey key;
         public final int options;
         public int destcnt;
+        /**
+         * @deprecated  Unused - will be removed in Tomcat 8.0.x
+         */
+        @Deprecated
         public final long timeout;
 
-        public RpcCollector(RpcCollectorKey key, int options, int destcnt, long timeout) {
+        /**
+         * @deprecated  Use {@link RpcCollector#RpcCollector(RpcCollectorKey,
+         *              int, int)}
+         */
+        @Deprecated
+        public RpcCollector(RpcCollectorKey key, int options, int destcnt,
+                long timeout) {
             this.key = key;
             this.options = options;
             this.destcnt = destcnt;
             this.timeout = timeout;
+        }
+
+        public RpcCollector(RpcCollectorKey key, int options, int destcnt) {
+            this(key, options, destcnt, 0);
         }
 
         public void addResponse(Serializable message, Member sender){
