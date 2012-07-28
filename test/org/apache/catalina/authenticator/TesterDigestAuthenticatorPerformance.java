@@ -52,7 +52,7 @@ public class TesterDigestAuthenticatorPerformance {
 
     @Test
     public void testSimple() throws Exception {
-        doTest(100, 1000000);
+        doTest(4, 100000);
     }
 
     public void doTest(int threadCount, int requestCount) throws Exception {
@@ -155,6 +155,8 @@ public class TesterDigestAuthenticatorPerformance {
                     if (authenticator.authenticate(request, response)) {
                         success++;
                     }
+                    // Clear out authenticated user ready for next iteration
+                    request.setUserPrincipal(null);
                 } catch (IOException ioe) {
                     // Ignore
                 }
