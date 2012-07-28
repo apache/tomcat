@@ -300,18 +300,4 @@ public class RpcChannel implements ChannelListener{
         }
 
     }
-
-    /**
-     * @deprecated  Unused - will be removed in Tomcat 8.0.x
-     */
-    @Deprecated
-    protected static String bToS(byte[] data) {
-        StringBuilder buf = new StringBuilder(4*16);
-        buf.append("{");
-        for (int i=0; data!=null && i<data.length; i++ ) buf.append(String.valueOf(data[i])).append(" ");
-        buf.append("}");
-        return buf.toString();
-    }
-
-
 }
