@@ -48,7 +48,8 @@ public class RpcChannel implements ChannelListener{
     private byte[] rpcId;
     private int replyMessageOptions = 0;
 
-    private HashMap<RpcCollectorKey, RpcCollector> responseMap = new HashMap<RpcCollectorKey, RpcCollector>();
+    private final HashMap<RpcCollectorKey, RpcCollector> responseMap =
+            new HashMap<>();
 
     /**
      * Create an RPC channel. You can have several RPC channels attached to a group
@@ -226,11 +227,11 @@ public class RpcChannel implements ChannelListener{
      * @version 1.0
      */
     public static class RpcCollector {
-        public ArrayList<Response> responses = new ArrayList<Response>();
-        public RpcCollectorKey key;
-        public int options;
+        public final ArrayList<Response> responses = new ArrayList<>();
+        public final RpcCollectorKey key;
+        public final int options;
         public int destcnt;
-        public long timeout;
+        public final long timeout;
 
         public RpcCollector(RpcCollectorKey key, int options, int destcnt, long timeout) {
             this.key = key;
@@ -280,7 +281,7 @@ public class RpcChannel implements ChannelListener{
     }
 
     public static class RpcCollectorKey {
-        byte[] id;
+        final byte[] id;
         public RpcCollectorKey(byte[] id) {
             this.id = id;
         }
