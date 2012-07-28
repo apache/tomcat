@@ -273,7 +273,7 @@ public class DigestAuthenticator extends AuthenticatorBase {
             }
             
             if (principal != null) {
-                String username = parseUsername(authorization);
+                String username = digestInfo.getUsername();
                 register(request, response, principal,
                         HttpServletRequest.DIGEST_AUTH,
                          username, null);
@@ -310,7 +310,10 @@ public class DigestAuthenticator extends AuthenticatorBase {
      * can be identified, return <code>null</code>
      *
      * @param authorization Authorization string to be parsed
+     *
+     * @deprecated  Unused. Will be removed in Tomcat 8.0.x
      */
+    @Deprecated
     protected String parseUsername(String authorization) {
 
         // Validate the authorization credentials format
@@ -516,6 +519,11 @@ public class DigestAuthenticator extends AuthenticatorBase {
             this.key = key;
             this.cnonces = cnonces;
             this.validateUri = validateUri;
+        }
+
+
+        public String getUsername() {
+            return userName;
         }
 
         public boolean validate(Request request, String authorization,
