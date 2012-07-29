@@ -122,13 +122,17 @@ public class TcpPingInterceptor extends ChannelInterceptorBase {
     }
 
     protected void sendPing() {
-        if (failureDetector.get()!=null) {
-            //we have a reference to the failure detector
-            //piggy back on that dude
-            failureDetector.get().checkMembers(true);
-        }else {
-            if (staticOnly && staticMembers.get()!=null) {
-                sendPingMessage(staticMembers.get().getMembers());
+        TcpFailureDetector tcpFailureDetector =
+                failureDetector != null ? failureDetector.get() : null;
+        if (tcpFailureDetector != null) {
+            // We have a reference to the failure detector
+            // Piggy back on it
+            tcpFailureDetector.checkMembers(true);
+        } else {
+            StaticMembershipInterceptor smi =
+                    staticOnly && staticMembers != null ? staticMembers.get() : null;
+            if (smi != null) {
+                sendPingMessage(smi.getMembers());
             } else {
                 sendPingMessage(getMembers());
             }
