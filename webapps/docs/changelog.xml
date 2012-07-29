@@ -85,6 +85,10 @@
       <update>
         Add some HTTP status codes registered at IANA. (rjung)
       </update>
+      <fix>
+        <bug>53535</bug>: Reduce memory footprint when performing class scanning
+        on Context start. Patch provided by Cedomir Igaly. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
