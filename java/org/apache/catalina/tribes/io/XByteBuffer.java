@@ -422,15 +422,7 @@ public class XByteBuffer
      * Converts a boolean to a 1-byte array
      * @param bool - the integer
      * @return - 1-byte array
-     * @deprecated use toBytes(boolean,byte[],int)
      */
-    @Deprecated
-    public static byte[] toBytes(boolean bool) {
-        byte[] b = new byte[1] ;
-        return toBytes(bool,b,0);
-
-    }
-
     public static byte[] toBytes(boolean bool, byte[] data, int offset) {
         data[offset] = (byte)(bool?1:0);
         return data;
@@ -451,13 +443,7 @@ public class XByteBuffer
      * Converts an integer to four bytes
      * @param n - the integer
      * @return - four bytes in an array
-     * @deprecated use toBytes(int,byte[],int)
      */
-    @Deprecated
-    public static byte[] toBytes(int n) {
-        return toBytes(n,new byte[4],0);
-    }
-
     public static byte[] toBytes(int n,byte[] b, int offset) {
         b[offset+3] = (byte) (n);
         n >>>= 8;
@@ -473,12 +459,7 @@ public class XByteBuffer
      * Converts an long to eight bytes
      * @param n - the long
      * @return - eight bytes in an array
-     * @deprecated use toBytes(long,byte[],int)
      */
-    @Deprecated
-    public static byte[] toBytes(long n) {
-        return toBytes(n,new byte[8],0);
-    }
     public static byte[] toBytes(long n, byte[] b, int offset) {
         b[offset+7] = (byte) (n);
         n >>>= 8;
