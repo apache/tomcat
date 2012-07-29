@@ -554,7 +554,7 @@ public class XByteBuffer
         return deserialize(data,offset,length,null);
     }
 
-    private static AtomicInteger invokecount = new AtomicInteger(0);
+    private static final AtomicInteger invokecount = new AtomicInteger(0);
 
     public static Serializable deserialize(byte[] data, int offset, int length, ClassLoader[] cls)
         throws IOException, ClassNotFoundException, ClassCastException {

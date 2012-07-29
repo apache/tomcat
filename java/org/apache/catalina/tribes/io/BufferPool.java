@@ -34,7 +34,7 @@ public class BufferPool {
 
 
     protected static volatile BufferPool instance = null;
-    protected BufferPoolAPI pool = null;
+    protected final BufferPoolAPI pool;
 
     private BufferPool(BufferPoolAPI pool) {
         this.pool = pool;
