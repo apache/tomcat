@@ -28,7 +28,7 @@ import java.io.OutputStream;
  */
 public class DirectByteArrayOutputStream extends OutputStream {
 
-    private XByteBuffer buffer;
+    private final XByteBuffer buffer;
 
     public DirectByteArrayOutputStream(int size) {
         buffer = new XByteBuffer(size,false);
