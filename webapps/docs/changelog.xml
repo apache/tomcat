@@ -63,6 +63,13 @@
         when request processing completes. (kkolinko)
       </fix>
       <fix>
+        <bug>53469</bug>: If a URL passed to
+        <code>javax.servlet.http.HttpServletResponse.encodeURL()</code> cannot
+        be made absolute, never encode it and return it unchanged. Previously,
+        the fix for <bug>53062</bug> meant than an
+        <code>IllegalArgumentException</code> was thrown. (markt)
+      </fix>
+      <fix>
         <bug>53498</bug>: Fix atomicity bugs in use of concurrent collections.
         Based on a patch by Yu Lin. (markt)
       </fix>
