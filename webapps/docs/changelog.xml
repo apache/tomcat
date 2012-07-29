@@ -138,6 +138,10 @@
         Avoid potential NPE identified by Find Bugs in
         <code>org.apache.catalina.tribes.io.ReplicationStream</code>. (markt)
       </fix>
+      <fix>
+        <bug>53606</bug>: Fix potential NPE in <code>TcpPingInterceptor</code>.
+        Based on a patch by F. Arnoud. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
