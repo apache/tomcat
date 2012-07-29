@@ -121,6 +121,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Tribes">
+    <changelog>
+      <fix>
+        Avoid potential NPE identified by Find Bugs in
+        <code>org.apache.catalina.tribes.io.ReplicationStream</code>. (markt)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 7.0.29 (markt)" rtext="released 2012-07-08">
   <subsection name="Catalina">
