@@ -364,6 +364,30 @@ public class TestResponse extends TomcatBaseTest {
     }
 
 
+    @Test
+    public void testBug53469a() throws Exception {
+        Request req = new TesterMockRequest();
+        Response resp = new Response();
+        resp.setRequest(req);
+
+        String result = resp.encodeURL("../bar.html");
+
+        Assert.assertEquals("../bar.html", result);
+    }
+
+
+    @Test
+    public void testBug53469b() throws Exception {
+        Request req = new TesterMockRequest();
+        Response resp = new Response();
+        resp.setRequest(req);
+
+        String result = resp.encodeURL("../../../../bar.html");
+
+        Assert.assertEquals("../../../../bar.html", result);
+    }
+
+
     private static final class Bug52811Servlet extends HttpServlet {
         private static final long serialVersionUID = 1L;
 

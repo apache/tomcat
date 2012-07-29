@@ -1134,7 +1134,14 @@ public class Response
     @Override
     public String encodeURL(String url) {
 
-        String absolute = toAbsolute(url);
+        String absolute;
+        try {
+            absolute = toAbsolute(url);
+        } catch (IllegalArgumentException iae) {
+            // Relative URL
+            return url;
+        }
+
         if (isEncodeable(absolute)) {
             // W3c spec clearly said
             if (url.equalsIgnoreCase("")) {
@@ -1702,7 +1709,7 @@ public class Response
             if (index < 0) {
                 break;
             }
-            // Prevent from going outside our context
+            // Can't go above the server root
             if (index == startIndex) {
                 throw new IllegalArgumentException();
             }
@@ -1719,7 +1726,7 @@ public class Response
             index = index2;
         }
 
-        // Add the query string (if present) back in
+        // Add the query string and/or fragment (if present) back in
         if (truncateCC != null) {
             try {
                 cc.append(truncateCC, 0, truncateCC.length);
