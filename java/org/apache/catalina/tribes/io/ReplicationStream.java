@@ -104,7 +104,12 @@ public final class ReplicationStream extends ObjectInputStream {
     protected Class<?> resolveProxyClass(String[] interfaces)
             throws IOException, ClassNotFoundException {
 
-        ClassLoader latestLoader = (classLoaders!=null && classLoaders.length==0)?null:classLoaders[0];
+        ClassLoader latestLoader;
+        if (classLoaders != null && classLoaders.length > 0) {
+            latestLoader = classLoaders[0];
+        } else {
+            latestLoader = null;
+        }
         ClassLoader nonPublicLoader = null;
         boolean hasNonPublicInterface = false;
 
