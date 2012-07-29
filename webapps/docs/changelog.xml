@@ -340,6 +340,12 @@
         (markt)
       </fix>
       <fix>
+        <bug>53047</bug>: If a JDBC Realm or DataSource Realm is configured for
+        an all roles mode that only requires authorization (and no roles) and no
+        role table or column is defined, don't populate the Principal's roles.
+        (markt)
+      </fix>
+      <fix>
         <bug>53056</bug>: Add APR version number to tcnative version INFO log
         message. (schultz)
       </fix>
