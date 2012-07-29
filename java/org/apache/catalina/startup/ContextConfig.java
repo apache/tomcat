@@ -2122,10 +2122,8 @@ public class ContextConfig implements LifecycleListener {
     private void populateSCIsForCacheEntry(JavaClassCacheEntry cacheEntry) {
         Set<ServletContainerInitializer> result = new HashSet<>();
 
-        JavaClass javaClass = cacheEntry.getJavaClass();
-
         // Super class
-        String superClassName = javaClass.getSuperclassName();
+        String superClassName = cacheEntry.getSuperclassName();
         JavaClassCacheEntry superClassCacheEntry =
                 javaClassCache.get(superClassName);
 
@@ -2145,7 +2143,7 @@ public class ContextConfig implements LifecycleListener {
         result.addAll(getSCIsForClass(superClassName));
 
         // Interfaces
-        for (String interfaceName : javaClass.getInterfaceNames()) {
+for (String interfaceName : cacheEntry.getInterfaceNames()) {
             JavaClassCacheEntry interfaceEntry =
                     javaClassCache.get(interfaceName);
             // A null could mean that the class not present in application or
@@ -2589,15 +2587,23 @@ public class ContextConfig implements LifecycleListener {
     }
 
     private static class JavaClassCacheEntry {
-        private final JavaClass javaClass;
+        public final String superclassName;
+
+        public final String[] interfaceNames;
+
         private Set<ServletContainerInitializer> sciSet = null;
 
         public JavaClassCacheEntry(JavaClass javaClass) {
-            this.javaClass = javaClass;
+            superclassName = javaClass.getSuperclassName();
+            interfaceNames = javaClass.getInterfaceNames();
         }
 
-        public JavaClass getJavaClass() {
-            return javaClass;
+        public String getSuperclassName() {
+            return superclassName;
+        }
+
+        public String[] getInterfaceNames() {
+            return interfaceNames;
         }
 
         public Set<ServletContainerInitializer> getSciSet() {
