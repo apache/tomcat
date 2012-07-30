@@ -42,22 +42,6 @@ public class MemberImpl implements Member, java.io.Externalizable {
      */
     public static final boolean DO_DNS_LOOKUPS = Boolean.parseBoolean(System.getProperty("org.apache.catalina.tribes.dns_lookups","false"));
 
-    /**
-     * @deprecated  Unused - will be removed in Tomcat 8.0.x
-     */
-    @Deprecated
-    public static final transient String TCP_LISTEN_PORT = "tcpListenPort";
-    /**
-     * @deprecated  Unused - will be removed in Tomcat 8.0.x
-     */
-    @Deprecated
-    public static final transient String TCP_LISTEN_HOST = "tcpListenHost";
-    /**
-     * @deprecated  Unused - will be removed in Tomcat 8.0.x
-     */
-    @Deprecated
-    public static final transient String MEMBER_NAME = "memberName";
-
     public static final transient byte[] TRIBES_MBR_BEGIN = new byte[] {84, 82, 73, 66, 69, 83, 45, 66, 1, 0};
     public static final transient byte[] TRIBES_MBR_END   = new byte[] {84, 82, 73, 66, 69, 83, 45, 69, 1, 0};
 
