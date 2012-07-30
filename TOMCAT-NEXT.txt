@@ -45,7 +45,6 @@ but possibly 7.1.x).
     Supporting re-factoring to consider arising from the above
     - Move Mapper from Connector to Service/Engine (saves duplication)
     - Remove Mapper from Context - use Mapper from Service
-    - Move mapper classes to o.a.catalina
 
  8. Review the connector shutdown code for timing and threading issues
     particularly any that may result in a client socket being left open after a
