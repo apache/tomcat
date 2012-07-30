@@ -435,8 +435,8 @@ public class StandardContext extends ContainerBase
     /**
      * The mapper associated with this context.
      */
-    private org.apache.tomcat.util.http.mapper.Mapper mapper =
-        new org.apache.tomcat.util.http.mapper.Mapper();
+    private org.apache.catalina.mapper.Mapper mapper =
+        new org.apache.catalina.mapper.Mapper();
 
 
     /**
@@ -2064,7 +2064,7 @@ public class StandardContext extends ContainerBase
      * Get the mapper associated with the context.
      */
     @Override
-    public org.apache.tomcat.util.http.mapper.Mapper getMapper() {
+    public org.apache.catalina.mapper.Mapper getMapper() {
         return (mapper);
     }
 

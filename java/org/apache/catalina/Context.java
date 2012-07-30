@@ -35,8 +35,8 @@ import org.apache.catalina.deploy.FilterMap;
 import org.apache.catalina.deploy.LoginConfig;
 import org.apache.catalina.deploy.NamingResources;
 import org.apache.catalina.deploy.SecurityConstraint;
+import org.apache.catalina.mapper.Mapper;
 import org.apache.tomcat.JarScanner;
-import org.apache.tomcat.util.http.mapper.Mapper;
 
 /**
  * A <b>Context</b> is a Container that represents a servlet context, and

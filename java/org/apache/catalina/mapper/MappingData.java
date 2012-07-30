@@ -15,7 +15,7 @@
  *  limitations under the License.
  */
 
-package org.apache.tomcat.util.http.mapper;
+package org.apache.catalina.mapper;
 
 import org.apache.tomcat.util.buf.MessageBytes;
 
