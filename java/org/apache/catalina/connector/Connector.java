@@ -27,7 +27,6 @@ import org.apache.catalina.LifecycleException;
 import org.apache.catalina.LifecycleState;
 import org.apache.catalina.Service;
 import org.apache.catalina.core.AprLifecycleListener;
-import org.apache.catalina.mapper.Mapper;
 import org.apache.catalina.util.LifecycleMBeanBase;
 import org.apache.coyote.Adapter;
 import org.apache.coyote.ProtocolHandler;
@@ -223,19 +222,6 @@ public class Connector extends LifecycleMBeanBase  {
 
 
      /**
-      * Mapper.
-      */
-     protected final Mapper mapper = new Mapper();
-
-
-     /**
-      * Mapper listener.
-      */
-     protected final MapperListener mapperListener =
-             new MapperListener(mapper, this);
-
-
-     /**
       * URI encoding.
       */
      protected String URIEncoding = null;
@@ -386,14 +372,6 @@ public class Connector extends LifecycleMBeanBase  {
         this.enableLookups = enableLookups;
         setProperty("enableLookups", String.valueOf(enableLookups));
 
-    }
-
-
-    /**
-     * Return the mapper.
-     */
-    public Mapper getMapper() {
-        return (mapper);
     }
 
 
@@ -970,9 +948,6 @@ public class Connector extends LifecycleMBeanBase  {
                 (sm.getString
                  ("coyoteConnector.protocolHandlerInitializationFailed"), e);
         }
-
-        // Initialize mapper listener
-        mapperListener.init();
     }
 
 
@@ -1004,8 +979,6 @@ public class Connector extends LifecycleMBeanBase  {
                 (errPrefix + " " + sm.getString
                  ("coyoteConnector.protocolHandlerStartFailed"), e);
         }
-
-        mapperListener.start();
     }
 
 
@@ -1026,15 +999,11 @@ public class Connector extends LifecycleMBeanBase  {
                 (sm.getString
                  ("coyoteConnector.protocolHandlerStopFailed"), e);
         }
-
-        mapperListener.stop();
     }
 
 
     @Override
     protected void destroyInternal() throws LifecycleException {
-        mapperListener.destroy();
-
         try {
             protocolHandler.destroy();
         } catch (Exception e) {

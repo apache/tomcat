@@ -80,6 +80,13 @@
         states (and has done for some time) that Context is the only valid
         location for these nested components. (markt)
       </scode>
+      <scode>
+        Move the Mapper from the Connector to the Service since the Mapper is
+        identical for all Connectors of a given Service and it is common for
+        there to be multiple Connectors for a Service (http, https and ajp).
+        This means there is now only ever one Mapper per Service rather than
+        possibly multiple identically configured Mapper obejcts. (markt)
+      </scode>
     </changelog>
   </subsection>
   <subsection name="Coyote">

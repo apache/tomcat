@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.catalina.connector;
+package org.apache.catalina.mapper;
 
 import org.apache.catalina.Container;
 import org.apache.catalina.ContainerEvent;
@@ -27,8 +27,8 @@ import org.apache.catalina.LifecycleEvent;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.LifecycleListener;
 import org.apache.catalina.LifecycleState;
+import org.apache.catalina.Service;
 import org.apache.catalina.Wrapper;
-import org.apache.catalina.mapper.Mapper;
 import org.apache.catalina.util.LifecycleMBeanBase;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -55,9 +55,9 @@ public class MapperListener extends LifecycleMBeanBase
     private final Mapper mapper;
 
     /**
-     * Associated connector
+     * Associated service
      */
-    private final Connector connector;
+    private final Service service;
 
 
     /**
@@ -77,9 +77,9 @@ public class MapperListener extends LifecycleMBeanBase
     /**
      * Create mapper listener.
      */
-    public MapperListener(Mapper mapper, Connector connector) {
+    public MapperListener(Mapper mapper, Service service) {
         this.mapper = mapper;
-        this.connector = connector;
+        this.service = service;
     }
 
 
@@ -95,7 +95,7 @@ public class MapperListener extends LifecycleMBeanBase
         // already registered their MBeans
         findDefaultHost();
 
-        Engine engine = (Engine) connector.getService().getContainer();
+        Engine engine = (Engine) service.getContainer();
         addListeners(engine);
 
         Container[] conHosts = engine.findChildren();
@@ -117,15 +117,18 @@ public class MapperListener extends LifecycleMBeanBase
 
     @Override
     protected String getDomainInternal() {
-        // Should be the same as the connector
-        return connector.getDomainInternal();
+        if (service instanceof LifecycleMBeanBase) {
+            return ((LifecycleMBeanBase) service).getDomain();
+        } else {
+            return null;
+        }
     }
 
 
     @Override
     protected String getObjectNameKeyProperties() {
         // Same as connector but Mapper rather than Connector
-        return connector.createObjectNameKeyProperties("Mapper");
+        return ("type=Mapper");
     }
 
     // --------------------------------------------- Container Listener methods
@@ -240,7 +243,7 @@ public class MapperListener extends LifecycleMBeanBase
 
     private void findDefaultHost() {
 
-        Engine engine = (Engine) connector.getService().getContainer();
+        Engine engine = (Engine) service.getContainer();
         String defaultHost = engine.getDefaultHost();
 
         boolean found = false;
@@ -269,7 +272,7 @@ public class MapperListener extends LifecycleMBeanBase
             mapper.setDefaultHostName(defaultHost);
         } else {
             log.warn(sm.getString("mapperListener.unknownDefaultHost",
-                    defaultHost, connector));
+                    defaultHost, service));
         }
     }
 
@@ -289,7 +292,7 @@ public class MapperListener extends LifecycleMBeanBase
         }
         if(log.isDebugEnabled()) {
             log.debug(sm.getString("mapperListener.registerHost",
-                    host.getName(), domain, connector));
+                    host.getName(), domain, service));
         }
     }
 
@@ -305,7 +308,7 @@ public class MapperListener extends LifecycleMBeanBase
 
         if(log.isDebugEnabled()) {
             log.debug(sm.getString("mapperListener.unregisterHost", hostname,
-                    domain, connector));
+                    domain, service));
         }
     }
 
@@ -332,7 +335,7 @@ public class MapperListener extends LifecycleMBeanBase
 
         if(log.isDebugEnabled()) {
             log.debug(sm.getString("mapperListener.unregisterWrapper",
-                    wrapperName, contextPath, connector));
+                    wrapperName, contextPath, service));
         }
     }
 
@@ -360,7 +363,7 @@ public class MapperListener extends LifecycleMBeanBase
 
         if(log.isDebugEnabled()) {
             log.debug(sm.getString("mapperListener.registerContext",
-                    contextPath, connector));
+                    contextPath, service));
         }
     }
 
@@ -383,7 +386,7 @@ public class MapperListener extends LifecycleMBeanBase
 
         if(log.isDebugEnabled()) {
             log.debug(sm.getString("mapperListener.unregisterContext",
-                    contextPath, connector));
+                    contextPath, service));
         }
 
         mapper.removeContextVersion(hostName, contextPath,
@@ -417,7 +420,7 @@ public class MapperListener extends LifecycleMBeanBase
 
         if(log.isDebugEnabled()) {
             log.debug(sm.getString("mapperListener.registerWrapper",
-                    wrapperName, contextPath, connector));
+                    wrapperName, contextPath, service));
         }
     }
 
