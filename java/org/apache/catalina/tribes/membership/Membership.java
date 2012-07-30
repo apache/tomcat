@@ -48,12 +48,12 @@ public class Membership implements Cloneable {
      * The name of this membership, has to be the same as the name for the local
      * member
      */
-    protected MemberImpl local;
+    protected final MemberImpl local;
 
     /**
      * A map of all the members in the cluster.
      */
-    protected HashMap<MemberImpl, MbrEntry> map = new HashMap<MemberImpl, MbrEntry>();
+    protected HashMap<MemberImpl, MbrEntry> map = new HashMap<>();
 
     /**
      * A list of all the members in the cluster.
@@ -63,13 +63,12 @@ public class Membership implements Cloneable {
     /**
       * sort members by alive time
       */
-    protected Comparator<Member> memberComparator = new MemberComparator();
+    protected final Comparator<Member> memberComparator;
 
     @Override
     public Object clone() {
         synchronized (membersLock) {
             Membership clone = new Membership(local, memberComparator);
-            @SuppressWarnings("unchecked") // map is correct type already
             final HashMap<MemberImpl, MbrEntry> tmpclone = (HashMap<MemberImpl, MbrEntry>) map.clone();
             clone.map = tmpclone;
             clone.members = new MemberImpl[members.length];
@@ -84,20 +83,20 @@ public class Membership implements Cloneable {
      * @param includeLocal - TBA
      */
     public Membership(MemberImpl local, boolean includeLocal) {
-        this.local = local;
-        if ( includeLocal ) addMember(local);
+        this(local, new MemberComparator(), includeLocal);
     }
 
     public Membership(MemberImpl local) {
-        this(local,false);
+        this(local, false);
     }
 
     public Membership(MemberImpl local, Comparator<Member> comp) {
-        this(local,comp,false);
+        this(local, comp, false);
     }
 
     public Membership(MemberImpl local, Comparator<Member> comp, boolean includeLocal) {
-        this(local,includeLocal);
+        this.local = local;
+        if ( includeLocal ) addMember(local);
         this.memberComparator = comp;
     }
     /**
@@ -203,7 +202,7 @@ public class Membership implements Cloneable {
             MbrEntry entry = i.next();
             if( entry.hasExpired(maxtime) ) {
                 if(list == null) // only need a list when members are expired (smaller gc)
-                    list = new java.util.ArrayList<MemberImpl>();
+                    list = new java.util.ArrayList<>();
                 list.add(entry.getMember());
             }
         }
@@ -292,10 +291,9 @@ public class Membership implements Cloneable {
     /**
      * Inner class that represents a member entry
      */
-    protected static class MbrEntry
-    {
+    protected static class MbrEntry {
 
-        protected MemberImpl mbr;
+        protected final MemberImpl mbr;
         protected long lastHeardFrom;
 
         public MbrEntry(MemberImpl mbr) {
