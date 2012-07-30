@@ -19,6 +19,7 @@
 package org.apache.catalina;
 
 import org.apache.catalina.connector.Connector;
+import org.apache.catalina.mapper.Mapper;
 
 /**
  * A <strong>Service</strong> is a group of one or more
@@ -147,4 +148,8 @@ public interface Service extends Lifecycle {
      */
     public void removeExecutor(Executor ex);
 
+    /**
+     * The mapper associated with this Service.
+     */
+    Mapper getMapper();
 }

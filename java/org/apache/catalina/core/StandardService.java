@@ -32,6 +32,8 @@ import org.apache.catalina.LifecycleState;
 import org.apache.catalina.Server;
 import org.apache.catalina.Service;
 import org.apache.catalina.connector.Connector;
+import org.apache.catalina.mapper.Mapper;
+import org.apache.catalina.mapper.MapperListener;
 import org.apache.catalina.util.LifecycleMBeanBase;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -94,7 +96,25 @@ public class StandardService extends LifecycleMBeanBase implements Service {
 
     private ClassLoader parentClassLoader = null;
 
+    /**
+     * Mapper.
+     */
+    protected final Mapper mapper = new Mapper();
+
+
+    /**
+     * Mapper listener.
+     */
+    protected final MapperListener mapperListener =
+            new MapperListener(mapper, this);
+
+
     // ------------------------------------------------------------- Properties
+
+    @Override
+    public Mapper getMapper() {
+        return mapper;
+    }
 
 
     /**
@@ -426,6 +446,9 @@ public class StandardService extends LifecycleMBeanBase implements Service {
             }
         }
 
+
+        mapperListener.start();
+
         // Start our defined Connectors second
         synchronized (connectorsLock) {
             for (Connector connector: connectors) {
@@ -499,6 +522,8 @@ public class StandardService extends LifecycleMBeanBase implements Service {
             }
         }
 
+        mapperListener.stop();
+
         synchronized (executors) {
             for (Executor executor: executors) {
                 executor.stop();
@@ -528,6 +553,9 @@ public class StandardService extends LifecycleMBeanBase implements Service {
             executor.init();
         }
 
+        // Initialize mapper listener
+        mapperListener.init();
+
         // Initialize our defined Connectors
         synchronized (connectorsLock) {
             for (Connector connector : connectors) {
@@ -547,6 +575,8 @@ public class StandardService extends LifecycleMBeanBase implements Service {
 
     @Override
     protected void destroyInternal() throws LifecycleException {
+        mapperListener.destroy();
+
         // Destroy our defined Connectors
         synchronized (connectorsLock) {
             for (Connector connector : connectors) {

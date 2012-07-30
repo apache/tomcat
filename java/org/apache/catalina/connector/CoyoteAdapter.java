@@ -672,8 +672,8 @@ public class CoyoteAdapter implements Adapter {
                 mapRequired = false;
             }
             // This will map the the latest version by default
-            connector.getMapper().map(serverName, decodedURI, version,
-                                      request.getMappingData());
+            connector.getService().getMapper().map(serverName, decodedURI,
+                    version, request.getMappingData());
             request.setContext((Context) request.getMappingData().context);
             request.setWrapper((Wrapper) request.getMappingData().wrapper);
 
