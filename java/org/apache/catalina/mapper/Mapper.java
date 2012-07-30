@@ -740,7 +740,7 @@ public final class Mapper {
         }
 
         // Context mapping
-        if (mappingData.context == null) {
+        if (mappingData.context == null && contexts != null) {
             int pos = find(contexts, uri);
             if (pos == -1) {
                 return;
