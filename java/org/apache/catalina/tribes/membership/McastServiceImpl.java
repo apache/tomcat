@@ -53,7 +53,7 @@ public class McastServiceImpl
     private static final org.apache.juli.logging.Log log =
         org.apache.juli.logging.LogFactory.getLog( McastService.class );
 
-    protected static int MAX_PACKET_SIZE = 65535;
+    protected static final int MAX_PACKET_SIZE = 65535;
     /**
      * Internal flag used for the listen thread that listens to the multicasting socket.
      */
@@ -67,23 +67,23 @@ public class McastServiceImpl
     /**
      * The local member that we intend to broad cast over and over again
      */
-    protected MemberImpl member;
+    protected final MemberImpl member;
     /**
      * The multicast address
      */
-    protected InetAddress address;
+    protected final InetAddress address;
     /**
      * The multicast port
      */
-    protected int port;
+    protected final int port;
     /**
      * The time it takes for a member to expire.
      */
-    protected long timeToExpiration;
+    protected final long timeToExpiration;
     /**
      * How often to we send out a broadcast saying we are alive, must be smaller than timeToExpiration
      */
-    protected long sendFrequency;
+    protected final long sendFrequency;
     /**
      * Reuse the sendPacket, no need to create a new one everytime
      */
@@ -99,11 +99,11 @@ public class McastServiceImpl
     /**
      * The actual listener, for callback when stuff goes down
      */
-    protected MembershipListener service;
+    protected final MembershipListener service;
     /**
      * The actual listener for broadcast callbacks
      */
-    protected MessageListener msgservice;
+    protected final MessageListener msgservice;
     /**
      * Thread to listen for pings
      */
@@ -116,7 +116,7 @@ public class McastServiceImpl
     /**
      * Time to live for the multicast packets that are being sent out
      */
-    protected int mcastTTL = -1;
+    protected final int mcastTTL;
     /**
      * Read timeout on the mcast socket
      */
@@ -124,7 +124,7 @@ public class McastServiceImpl
     /**
      * bind address
      */
-    protected InetAddress mcastBindAddress = null;
+    protected final InetAddress mcastBindAddress;
 
     /**
      * nr of times the system has to fail before a recovery is initiated
@@ -144,12 +144,13 @@ public class McastServiceImpl
     /**
      * Dont interrupt the sender/receiver thread, but pass off to an executor
      */
-    protected ExecutorService executor = ExecutorFactory.newThreadPool(0, 2, 2, TimeUnit.SECONDS);
+    protected final ExecutorService executor =
+            ExecutorFactory.newThreadPool(0, 2, 2, TimeUnit.SECONDS);
 
     /**
      * disable/enable local loopback message
      */
-    protected boolean localLoopbackDisabled = false;
+    protected final boolean localLoopbackDisabled;
 
     /**
      * Create a new mcast service impl
@@ -552,7 +553,7 @@ public class McastServiceImpl
     }//class ReceiverThread
 
     public class SenderThread extends Thread {
-        long time;
+        final long time;
         int errorCounter=0;
         public SenderThread(long time) {
             this.time = time;
@@ -596,7 +597,7 @@ public class McastServiceImpl
         }
 
 
-        McastServiceImpl parent = null;
+        final McastServiceImpl parent;
         public RecoveryThread(McastServiceImpl parent) {
             this.parent = parent;
         }
