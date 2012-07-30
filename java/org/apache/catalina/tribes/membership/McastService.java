@@ -330,14 +330,16 @@ public class McastService implements MembershipService,MembershipListener,Messag
             try {
                 ttl = Integer.parseInt(properties.getProperty("mcastTTL"));
             } catch ( Exception x ) {
-                log.error("Unable to parse mcastTTL="+properties.getProperty("mcastTTL"),x);
+                log.error(sm.getString("McastService.parseTTL",
+                        properties.getProperty("mcastTTL")), x);
             }
         }
         if ( properties.getProperty("mcastSoTimeout") != null ) {
             try {
                 soTimeout = Integer.parseInt(properties.getProperty("mcastSoTimeout"));
             } catch ( Exception x ) {
-                log.error("Unable to parse mcastSoTimeout="+properties.getProperty("mcastSoTimeout"),x);
+                log.error(sm.getString("McastService.parseTTL",
+                        properties.getProperty("mcastSoTimeout")), x);
             }
         }
 
@@ -374,7 +376,8 @@ public class McastService implements MembershipService,MembershipListener,Messag
         try  {
             if ( impl != null && impl.stop(svc) ) impl = null;
         } catch ( Exception x)  {
-            log.error("Unable to stop the mcast service, level:"+svc+".",x);
+            log.error(sm.getString(
+                    "McastService.stopFail", Integer.valueOf(svc)), x);
         }
     }
 
@@ -534,7 +537,7 @@ public class McastService implements MembershipService,MembershipListener,Messag
             try {
                 if (impl != null) impl.send(false);
             }catch ( Exception x ) {
-                log.error("Unable to send payload update.",x);
+                log.error(sm.getString("McastService.payload"), x);
             }
         }
     }
@@ -548,7 +551,7 @@ public class McastService implements MembershipService,MembershipListener,Messag
             try {
                 if (impl != null) impl.send(false);
             }catch ( Exception x ) {
-                log.error("Unable to send domain update.",x);
+                log.error(sm.getString("McastService.domain"), x);
             }
         }
     }
@@ -565,8 +568,6 @@ public class McastService implements MembershipService,MembershipListener,Messag
      * @throws Exception If an error occurs
      */
     public static void main(String args[]) throws Exception {
-        if(log.isInfoEnabled())
-            log.info("Usage McastService hostname tcpport");
         McastService service = new McastService();
         java.util.Properties p = new java.util.Properties();
         p.setProperty("mcastPort","5555");
