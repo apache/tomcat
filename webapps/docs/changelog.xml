@@ -142,6 +142,10 @@
         <bug>53606</bug>: Fix potential NPE in <code>TcpPingInterceptor</code>.
         Based on a patch by F. Arnoud. (markt)
       </fix>
+      <fix>
+        <bug>53607</bug>: To avoid NPE, set TCP PING data to ChannelMessage.
+        Patch provided by F.Arnoud (kfujino)
+      </fix>
     </changelog>
   </subsection>
 </section>
