@@ -37,8 +37,8 @@ version.suffix=
 # contexts by the various build scripts.
 base.path=${basedir}/includes
 
-compile.source=1.5
-compile.target=1.5
+compile.source=1.7
+compile.target=1.7
 compile.debug=true
 
 # ----- Settings for Junit test database.
