@@ -95,6 +95,10 @@
         when logging in when session IDs are being encoded as path parameters.
         (markt)
       </fix>
+      <fix>
+        <bug>53641</bug>: Correct name of HTTP header used in WebSocket
+        handshake for listing the preferred protocols. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
