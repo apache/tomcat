@@ -266,27 +266,43 @@ public class NioSender extends AbstractSender {
         try {
             connecting = false;
             setConnected(false);
-            if ( socketChannel != null ) {
+            if (socketChannel != null) {
                 try {
-                    try {socketChannel.socket().close();}catch ( Exception x){}
+                    try {
+                        socketChannel.socket().close();
+                    } catch (Exception x) {
+                        // Ignore
+                    }
                     //error free close, all the way
                     //try {socket.shutdownOutput();}catch ( Exception x){}
                     //try {socket.shutdownInput();}catch ( Exception x){}
                     //try {socket.close();}catch ( Exception x){}
-                    try {socketChannel.close();}catch ( Exception x){}
-                }finally {
+                    try {
+                        socketChannel.close();
+                    } catch (Exception x) {
+                        // Ignore
+                    }
+                } finally {
                     socketChannel = null;
                 }
             }
-            if ( dataChannel != null ) {
+            if (dataChannel != null) {
                 try {
-                    try {dataChannel.socket().close();}catch ( Exception x){}
+                    try {
+                        dataChannel.socket().close();
+                    } catch (Exception x) {
+                        // Ignore
+                    }
                     //error free close, all the way
                     //try {socket.shutdownOutput();}catch ( Exception x){}
                     //try {socket.shutdownInput();}catch ( Exception x){}
                     //try {socket.close();}catch ( Exception x){}
-                    try {dataChannel.close();}catch ( Exception x){}
-                }finally {
+                    try {
+                        dataChannel.close();
+                    } catch (Exception x) {
+                        // Ignore
+                    }
+                } finally {
                     dataChannel = null;
                 }
             }
