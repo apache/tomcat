@@ -94,7 +94,7 @@ public abstract class WebSocketServlet extends HttpServlet {
         }
 
         List<String> subProtocols = getTokensFromHeader(req,
-                "Sec-WebSocket-Protocol-Client");
+                "Sec-WebSocket-Protocol");
         if (!subProtocols.isEmpty()) {
             subProtocol = selectSubProtocol(subProtocols);
 
