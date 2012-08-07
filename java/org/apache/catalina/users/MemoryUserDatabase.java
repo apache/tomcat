@@ -79,7 +79,7 @@ public class MemoryUserDatabase implements UserDatabase {
      * The set of {@link Group}s defined in this database, keyed by
      * group name.
      */
-    protected final HashMap<String,Group> groups = new HashMap<String,Group>();
+    protected final HashMap<String,Group> groups = new HashMap<>();
 
 
     /**
@@ -118,7 +118,7 @@ public class MemoryUserDatabase implements UserDatabase {
      * The set of {@link Role}s defined in this database, keyed by
      * role name.
      */
-    protected final HashMap<String,Role> roles = new HashMap<String,Role>();
+    protected final HashMap<String,Role> roles = new HashMap<>();
 
 
     /**
@@ -132,7 +132,7 @@ public class MemoryUserDatabase implements UserDatabase {
      * The set of {@link User}s defined in this database, keyed by
      * user name.
      */
-    protected final HashMap<String,User> users = new HashMap<String,User>();
+    protected final HashMap<String,User> users = new HashMap<>();
 
 
     // ------------------------------------------------------------- Properties
@@ -647,23 +647,7 @@ public class MemoryUserDatabase implements UserDatabase {
         sb.append(this.users.size());
         sb.append("]");
         return (sb.toString());
-
     }
-
-
-    // -------------------------------------------------------- Package Methods
-
-
-    /**
-     * Return the <code>StringManager</code> for use in looking up messages.
-     */
-    StringManager getStringManager() {
-
-        return (sm);
-
-    }
-
-
 }
 
 
@@ -709,7 +693,7 @@ class MemoryGroupCreationFactory extends AbstractObjectCreationFactory {
         return (group);
     }
 
-    private MemoryUserDatabase database = null;
+    private final MemoryUserDatabase database;
 }
 
 
@@ -733,7 +717,7 @@ class MemoryRoleCreationFactory extends AbstractObjectCreationFactory {
         return (role);
     }
 
-    private MemoryUserDatabase database = null;
+    private final MemoryUserDatabase database;
 }
 
 
@@ -803,5 +787,5 @@ class MemoryUserCreationFactory extends AbstractObjectCreationFactory {
         return (user);
     }
 
-    private MemoryUserDatabase database = null;
+    private final MemoryUserDatabase database;
 }
