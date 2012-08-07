@@ -53,7 +53,7 @@ public abstract class WebSocketServlet extends HttpServlet {
             StringManager.getManager(Constants.Package);
 
     private final Queue<MessageDigest> sha1Helpers =
-            new ConcurrentLinkedQueue<MessageDigest>();
+            new ConcurrentLinkedQueue<>();
 
 
     @Override
@@ -162,7 +162,7 @@ public abstract class WebSocketServlet extends HttpServlet {
      */
     private List<String> getTokensFromHeader(HttpServletRequest req,
             String headerName) {
-        List<String> result = new ArrayList<String>();
+        List<String> result = new ArrayList<>();
 
         Enumeration<String> headers = req.getHeaders(headerName);
         while (headers.hasMoreElements()) {
