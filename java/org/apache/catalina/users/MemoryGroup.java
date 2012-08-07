@@ -67,13 +67,13 @@ public class MemoryGroup extends AbstractGroup {
     /**
      * The {@link MemoryUserDatabase} that owns this group.
      */
-    protected MemoryUserDatabase database = null;
+    protected final MemoryUserDatabase database;
 
 
     /**
      * The set of {@link Role}s associated with this group.
      */
-    protected ArrayList<Role> roles = new ArrayList<Role>();
+    protected final ArrayList<Role> roles = new ArrayList<>();
 
 
     // ------------------------------------------------------------- Properties
@@ -109,7 +109,7 @@ public class MemoryGroup extends AbstractGroup {
     @Override
     public Iterator<User> getUsers() {
 
-        ArrayList<User> results = new ArrayList<User>();
+        ArrayList<User> results = new ArrayList<>();
         Iterator<User> users = database.getUsers();
         while (users.hasNext()) {
             User user = users.next();

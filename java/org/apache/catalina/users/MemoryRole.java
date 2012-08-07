@@ -62,7 +62,7 @@ public class MemoryRole extends AbstractRole {
     /**
      * The {@link MemoryUserDatabase} that owns this role.
      */
-    protected MemoryUserDatabase database = null;
+    protected final MemoryUserDatabase database;
 
 
     // ------------------------------------------------------------- Properties

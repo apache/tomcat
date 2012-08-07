@@ -69,19 +69,19 @@ public class MemoryUser extends AbstractUser {
     /**
      * The {@link MemoryUserDatabase} that owns this user.
      */
-    protected MemoryUserDatabase database = null;
+    protected final MemoryUserDatabase database;
 
 
     /**
      * The set of {@link Group}s that this user is a member of.
      */
-    protected ArrayList<Group> groups = new ArrayList<Group>();
+    protected final ArrayList<Group> groups = new ArrayList<>();
 
 
     /**
      * The set of {@link Role}s associated with this user.
      */
-    protected ArrayList<Role> roles = new ArrayList<Role>();
+    protected final ArrayList<Role> roles = new ArrayList<>();
 
 
     // ------------------------------------------------------------- Properties
