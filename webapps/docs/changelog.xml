@@ -87,6 +87,11 @@
         This means there is now only ever one Mapper per Service rather than
         possibly multiple identically configured Mapper obejcts. (markt)
       </scode>
+      <scode>
+        Remove the per Context Mapper objects and use the Mapper from the
+        Service. This removes the need to maintain two copies of the mappings
+        for Servlets and Filters. (markt)
+      </scode>
     </changelog>
   </subsection>
   <subsection name="Coyote">

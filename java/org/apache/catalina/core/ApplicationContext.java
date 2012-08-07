@@ -120,6 +120,7 @@ public class ApplicationContext
     public ApplicationContext(StandardContext context) {
         super();
         this.context = context;
+        this.service = ((Engine) context.getParent().getParent()).getService();
 
         // Populate session tracking modes
         populateSessionTrackingModes();
@@ -149,9 +150,16 @@ public class ApplicationContext
 
 
     /**
+     * The Service instance with which we are associated.
+     */
+    private final Service service;
+
+
+    /**
      * Empty String collection to serve as the basis for empty enumerations.
      */
     private static final List<String> emptyString = Collections.emptyList();
+
 
     /**
      * Empty Servlet collection to serve as the basis for empty enumerations.
@@ -454,7 +462,7 @@ public class ApplicationContext
                 semicolon = -1;
             }
             uriCC.append(normalizedPath, 0, semicolon > 0 ? semicolon : pos);
-            context.getMapper().map(uriMB, mappingData);
+            service.getMapper().map(context, uriMB, mappingData);
             if (mappingData.wrapper == null) {
                 return (null);
             }

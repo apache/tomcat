@@ -389,7 +389,7 @@ public class MapperListener extends LifecycleMBeanBase
                     contextPath, service));
         }
 
-        mapper.removeContextVersion(hostName, contextPath,
+        mapper.removeContextVersion(context, hostName, contextPath,
                 context.getWebappVersion());
     }
 

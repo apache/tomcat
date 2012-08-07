@@ -14,8 +14,10 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package org.apache.catalina.mapper;
+
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.naming.NamingException;
 import javax.naming.directory.DirContext;
@@ -54,14 +56,16 @@ public final class Mapper {
      */
     protected String defaultHostName = null;
 
+
     /**
-     * Context associated with this wrapper, used for wrapper mapping.
+     * Mapping from Context object to Context version to support
+     * RequestDispatcher mappings.
      */
-    protected final ContextVersion context = new ContextVersion();
+    protected Map<Object, ContextVersion> contextObjectToContextVersionMap =
+            new ConcurrentHashMap<>();
 
 
     // --------------------------------------------------------- Public Methods
-
 
     /**
      * Set default host.
@@ -172,20 +176,6 @@ public final class Mapper {
 
 
     /**
-     * Set context, used for wrapper mapping (request dispatcher).
-     *
-     * @param welcomeResources Welcome files defined for this context
-     * @param resources Static resources of the context
-     */
-    public void setContext(String path, String[] welcomeResources,
-                           javax.naming.Context resources) {
-        context.path = path;
-        context.welcomeResources = welcomeResources;
-        context.resources = resources;
-    }
-
-
-    /**
      * Add a new Context to an existing Host.
      *
      * @param hostName Virtual host name this context belongs to
@@ -243,6 +233,8 @@ public final class Mapper {
                 newContextVersion.resources = resources;
                 if (insertMap(contextVersions, newContextVersions, newContextVersion)) {
                     mappedContext.versions = newContextVersions;
+                    contextObjectToContextVersionMap.put(
+                            context, newContextVersion);
                 }
             }
         }
@@ -253,12 +245,16 @@ public final class Mapper {
     /**
      * Remove a context from an existing host.
      *
-     * @param hostName Virtual host name this context belongs to
-     * @param path Context path
-     * @param version Context version
+     * @param object    The actual context
+     * @param hostName  Virtual host name this context belongs to
+     * @param path      Context path
+     * @param version   Context version
      */
-    public void removeContextVersion(String hostName, String path,
-            String version) {
+    public void removeContextVersion(Object object, String hostName,
+            String path, String version) {
+
+        contextObjectToContextVersionMap.remove(object);
+
         Host[] hosts = this.hosts;
         int pos = find(hosts, hostName);
         if (pos < 0) {
@@ -340,12 +336,6 @@ public final class Mapper {
     }
 
 
-    public void addWrapper(String path, Object wrapper, boolean jspWildCard,
-            boolean resourceOnly) {
-        addWrapper(context, path, wrapper, jspWildCard, resourceOnly);
-    }
-
-
     /**
      * Adds a wrapper to the given context.
      *
@@ -408,16 +398,6 @@ public final class Mapper {
                 }
             }
         }
-    }
-
-
-    /**
-     * Remove a wrapper from the context associated with this wrapper.
-     *
-     * @param path Wrapper mapping
-     */
-    public void removeWrapper(String path) {
-        removeWrapper(context, path);
     }
 
 
@@ -688,13 +668,15 @@ public final class Mapper {
      * @param mappingData This structure will contain the result of the mapping
      *                    operation
      */
-    public void map(MessageBytes uri, MappingData mappingData)
-        throws Exception {
+    public void map(Object context, MessageBytes uri,
+            MappingData mappingData) throws Exception {
 
+        ContextVersion contextVersion =
+                contextObjectToContextVersionMap.get(context);
         uri.toChars();
         CharChunk uricc = uri.getCharChunk();
         uricc.setLimit(-1);
-        internalMapWrapper(context, uricc, mappingData);
+        internalMapWrapper(contextVersion, uricc, mappingData);
 
     }
 

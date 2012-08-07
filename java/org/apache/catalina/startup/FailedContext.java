@@ -54,7 +54,6 @@ import org.apache.catalina.deploy.FilterMap;
 import org.apache.catalina.deploy.LoginConfig;
 import org.apache.catalina.deploy.NamingResources;
 import org.apache.catalina.deploy.SecurityConstraint;
-import org.apache.catalina.mapper.Mapper;
 import org.apache.catalina.util.ContextName;
 import org.apache.catalina.util.LifecycleMBeanBase;
 import org.apache.juli.logging.Log;
@@ -386,9 +385,6 @@ public class FailedContext extends LifecycleMBeanBase implements Context {
     public LoginConfig getLoginConfig() { return null; }
     @Override
     public void setLoginConfig(LoginConfig config) { /* NO-OP */ }
-
-    @Override
-    public Mapper getMapper() { return null; }
 
     @Override
     public NamingResources getNamingResources() { return null; }
