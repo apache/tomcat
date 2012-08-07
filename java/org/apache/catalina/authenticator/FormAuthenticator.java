@@ -475,7 +475,7 @@ public class FormAuthenticator
     }
 
       // Does the request URI match?
-      String requestURI = request.getRequestURI();
+      String requestURI = request.getDecodedRequestURI();
       if (requestURI == null) {
         return (false);
     }
@@ -635,7 +635,7 @@ public class FormAuthenticator
 
         saved.setMethod(request.getMethod());
         saved.setQueryString(request.getQueryString());
-        saved.setRequestURI(request.getRequestURI());
+        saved.setRequestURI(request.getDecodedRequestURI());
 
         // Stash the SavedRequest in our session for later use
         session.setNote(Constants.FORM_REQUEST_NOTE, saved);
