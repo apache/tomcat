@@ -31,7 +31,10 @@ import java.io.IOException;
  * </pre></code>
  * @author Filip Hanik
  * @version 1.0
+ *
+ * @deprecated  Unused - will be removed in Tomcat 8.0.x
  */
+@Deprecated
 public interface Streamable {
 
     /**
