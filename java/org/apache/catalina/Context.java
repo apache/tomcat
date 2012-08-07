@@ -35,7 +35,6 @@ import org.apache.catalina.deploy.FilterMap;
 import org.apache.catalina.deploy.LoginConfig;
 import org.apache.catalina.deploy.NamingResources;
 import org.apache.catalina.deploy.SecurityConstraint;
-import org.apache.catalina.mapper.Mapper;
 import org.apache.tomcat.JarScanner;
 
 /**
@@ -410,12 +409,6 @@ public interface Context extends Container {
      * @param config The new login configuration
      */
     public void setLoginConfig(LoginConfig config);
-
-
-    /**
-     * Get the request dispatcher mapper.
-     */
-    public Mapper getMapper();
 
 
     /**

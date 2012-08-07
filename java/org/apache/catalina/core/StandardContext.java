@@ -433,13 +433,6 @@ public class StandardContext extends ContainerBase
 
 
     /**
-     * The mapper associated with this context.
-     */
-    private org.apache.catalina.mapper.Mapper mapper =
-        new org.apache.catalina.mapper.Mapper();
-
-
-    /**
      * The Manager implementation with which this Container is associated.
      */
     protected Manager manager = null;
@@ -2061,15 +2054,6 @@ public class StandardContext extends ContainerBase
 
 
     /**
-     * Get the mapper associated with the context.
-     */
-    @Override
-    public org.apache.catalina.mapper.Mapper getMapper() {
-        return (mapper);
-    }
-
-
-    /**
      * Return the naming resources associated with this web application.
      */
     @Override
@@ -3248,19 +3232,13 @@ public class StandardContext extends ContainerBase
                 // Don't allow more than one servlet on the same pattern
                 Wrapper wrapper = (Wrapper) findChild(name2);
                 wrapper.removeMapping(decodedPattern);
-                mapper.removeWrapper(decodedPattern);
             }
             servletMappings.put(decodedPattern, name);
         }
         Wrapper wrapper = (Wrapper) findChild(name);
         wrapper.addMapping(decodedPattern);
 
-        // Update context mapper
-        mapper.addWrapper(decodedPattern, wrapper, jspWildCard,
-                resourceOnlyServlets.contains(name));
-
         fireContainerEvent("addServletMapping", decodedPattern);
-
     }
 
 
@@ -3280,7 +3258,6 @@ public class StandardContext extends ContainerBase
             watchedResources = results;
         }
         fireContainerEvent("addWatchedResource", name);
-
     }
 
 
@@ -4308,9 +4285,7 @@ public class StandardContext extends ContainerBase
         if( wrapper != null ) {
             wrapper.removeMapping(pattern);
         }
-        mapper.removeWrapper(pattern);
         fireContainerEvent("removeServletMapping", pattern);
-
     }
 
 
@@ -5259,9 +5234,6 @@ public class StandardContext extends ContainerBase
         if (ok)
             getServletContext().setAttribute
                 (Globals.RESOURCES_ATTR, getResources());
-
-        // Initialize associated mapper
-        mapper.setContext(getPath(), welcomeFiles, getResources());
 
         // Binding thread
         oldCCL = bindThread();
