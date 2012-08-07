@@ -59,9 +59,9 @@ public class NioReplicationTask extends AbstractRxTask {
     private ByteBuffer buffer = null;
     private SelectionKey key;
     private int rxBufSize;
-    private NioReceiver receiver;
-    public NioReplicationTask (ListenCallback callback, NioReceiver receiver)
-    {
+    private final NioReceiver receiver;
+
+    public NioReplicationTask (ListenCallback callback, NioReceiver receiver) {
         super(callback);
         this.receiver = receiver;
     }

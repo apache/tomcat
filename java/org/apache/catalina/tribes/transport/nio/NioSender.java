@@ -63,7 +63,7 @@ public class NioSender extends AbstractSender {
     protected ByteBuffer readbuf = null;
     protected ByteBuffer writebuf = null;
     protected byte[] current = null;
-    protected XByteBuffer ackbuf = new XByteBuffer(128,true);
+    protected final XByteBuffer ackbuf = new XByteBuffer(128,true);
     protected int remaining = 0;
     protected boolean complete;
 
