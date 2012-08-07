@@ -17,6 +17,8 @@
 
 package org.apache.catalina.tribes.transport.bio.util;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 import org.apache.catalina.tribes.ChannelMessage;
 import org.apache.catalina.tribes.Member;
 import org.apache.catalina.tribes.group.InterceptorPayload;
@@ -54,7 +56,7 @@ public class FastQueue {
     /**
      * Current Queue elements size
      */
-    private volatile int size = 0;
+    private AtomicInteger size = new AtomicInteger(0);
 
     /**
      * limit the queue length ( default is unlimited)
@@ -182,7 +184,7 @@ public class FastQueue {
     }
 
     public int getSize() {
-        return size;
+        return size.get();
     }
 
     /**
@@ -202,39 +204,39 @@ public class FastQueue {
         lock.lockAdd();
         try {
             if (log.isTraceEnabled()) {
-                log.trace("FastQueue.add: starting with size " + size);
+                log.trace("FastQueue.add: starting with size " + size.get());
             }
 
-            if ((maxQueueLength > 0) && (size >= maxQueueLength)) {
+            if ((maxQueueLength > 0) && (size.get() >= maxQueueLength)) {
                 ok = false;
                 if (log.isTraceEnabled()) {
-                    log.trace("FastQueue.add: Could not add, since queue is full (" + size + ">=" + maxQueueLength + ")");
+                    log.trace("FastQueue.add: Could not add, since queue is full (" + size.get() + ">=" + maxQueueLength + ")");
                 }
             } else {
                 LinkObject element = new LinkObject(msg,destination, payload);
-                if (size == 0) {
+                if (size.get() == 0) {
                     first = last = element;
-                    size = 1;
+                    size.set(1);
                 } else {
                     if (last == null) {
                         ok = false;
-                        log.error("FastQueue.add: Could not add, since last is null although size is "+ size + " (>0)");
+                        log.error("FastQueue.add: Could not add, since last is null although size is "+ size.get() + " (>0)");
                     } else {
                         last.append(element);
                         last = element;
-                        size++;
+                        size.incrementAndGet();
                     }
                 }
             }
 
             if (first == null) {
-                log.error("FastQueue.add: first is null, size is " + size + " at end of add");
+                log.error("FastQueue.add: first is null, size is " + size.get() + " at end of add");
             }
             if (last == null) {
-                log.error("FastQueue.add: last is null, size is " + size+ " at end of add");
+                log.error("FastQueue.add: last is null, size is " + size.get() + " at end of add");
             }
 
-            if (log.isTraceEnabled()) log.trace("FastQueue.add: add ending with size " + size);
+            if (log.isTraceEnabled()) log.trace("FastQueue.add: add ending with size " + size.get());
 
         } finally {
             lock.unlockAdd(true);
@@ -271,16 +273,16 @@ public class FastQueue {
             }
 
             if (log.isTraceEnabled()) {
-                log.trace("FastQueue.remove: remove starting with size " + size);
+                log.trace("FastQueue.remove: remove starting with size " + size.get());
             }
 
             element = first;
 
             first = last = null;
-            size = 0;
+            size.set(0);
 
             if (log.isTraceEnabled()) {
-                log.trace("FastQueue.remove: remove ending with size " + size);
+                log.trace("FastQueue.remove: remove ending with size " + size.get());
             }
 
         } finally {
