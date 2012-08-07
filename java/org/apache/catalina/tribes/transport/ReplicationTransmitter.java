@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.catalina.tribes.transport;
 
 import org.apache.catalina.tribes.ChannelException;
@@ -22,7 +21,6 @@ import org.apache.catalina.tribes.ChannelMessage;
 import org.apache.catalina.tribes.ChannelSender;
 import org.apache.catalina.tribes.Member;
 import org.apache.catalina.tribes.transport.nio.PooledParallelSender;
-import org.apache.catalina.tribes.util.StringManager;
 
 /**
  * Transmit message to other cluster members
@@ -33,12 +31,6 @@ import org.apache.catalina.tribes.util.StringManager;
  * @version $Id$
  */
 public class ReplicationTransmitter implements ChannelSender {
-
-    /**
-     * The string manager for this package.
-     */
-    protected static final StringManager sm = StringManager.getManager(Constants.Package);
-
 
     public ReplicationTransmitter() {
     }
@@ -116,8 +108,4 @@ public class ReplicationTransmitter implements ChannelSender {
     public synchronized void remove(Member member) {
         getTransport().remove(member);
     }
-
-    // ------------------------------------------------------------- protected
-
-
 }
