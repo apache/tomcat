@@ -16,9 +16,7 @@
  */
 package org.apache.tomcat.jdbc.test;
 
-import java.lang.management.ManagementFactory;
 import java.sql.Connection;
-import java.util.Hashtable;
 
 import javax.sql.PooledConnection;
 
@@ -45,7 +43,6 @@ public class EqualsHashCodeTest extends DefaultTestCase{
         this.datasource.setUsername(username);
         this.datasource.getConnection().close();
         ConnectionPool pool = datasource.createPool();
-        org.apache.tomcat.jdbc.pool.jmx.ConnectionPool jmxPool = new org.apache.tomcat.jdbc.pool.jmx.ConnectionPool(pool);
     }
 
     public void testEquals() throws Exception {
