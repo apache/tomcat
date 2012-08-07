@@ -123,7 +123,7 @@ public class ChannelException extends Exception {
      * @param mbr FaultyMember
      */
     public boolean addFaultyMember(FaultyMember mbr) {
-        if ( this.faultyMembers==null ) this.faultyMembers = new ArrayList<FaultyMember>();
+        if ( this.faultyMembers==null ) this.faultyMembers = new ArrayList<>();
         if ( !faultyMembers.contains(mbr) ) return faultyMembers.add(mbr);
         else return false;
     }
@@ -148,8 +148,8 @@ public class ChannelException extends Exception {
      * @version 1.0
      */
     public static class FaultyMember {
-        protected Exception cause;
-        protected Member member;
+        protected final Exception cause;
+        protected final Member member;
         public FaultyMember(Member mbr, Exception x) {
             this.member = mbr;
             this.cause = x;
