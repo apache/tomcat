@@ -36,11 +36,11 @@ import org.apache.catalina.tribes.group.InterceptorPayload;
 
 public class LinkObject {
 
-    private ChannelMessage msg;
+    private final ChannelMessage msg;
     private LinkObject next;
-    private byte[] key ;
-    private Member[] destination;
-    private InterceptorPayload payload;
+    private final byte[] key ;
+    private final Member[] destination;
+    private final InterceptorPayload payload;
 
     /**
      * Construct a new element from the data object.
