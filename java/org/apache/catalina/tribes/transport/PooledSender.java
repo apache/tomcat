@@ -40,7 +40,7 @@ public abstract class PooledSender extends AbstractSender implements MultiPointS
     protected static final StringManager sm =
         StringManager.getManager(Constants.Package);
 
-    private SenderQueue queue = null;
+    private final SenderQueue queue;
     private int poolSize = 25;
     public PooledSender() {
         queue = new SenderQueue(this,poolSize);
@@ -123,8 +123,8 @@ public abstract class PooledSender extends AbstractSender implements MultiPointS
         public SenderQueue(PooledSender parent, int limit) {
             this.limit = limit;
             this.parent = parent;
-            notinuse = new java.util.LinkedList<DataSender>();
-            inuse = new java.util.LinkedList<DataSender>();
+            notinuse = new java.util.LinkedList<>();
+            inuse = new java.util.LinkedList<>();
         }
 
         /**

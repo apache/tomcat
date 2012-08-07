@@ -35,7 +35,8 @@ public class SenderState {
     public static final int SUSPECT = 1;
     public static final int FAILING = 2;
 
-    protected static HashMap<Member, SenderState> memberStates = new HashMap<Member, SenderState>();
+    protected static final HashMap<Member, SenderState> memberStates =
+            new HashMap<>();
 
     public static SenderState getSenderState(Member member) {
         return getSenderState(member,true);

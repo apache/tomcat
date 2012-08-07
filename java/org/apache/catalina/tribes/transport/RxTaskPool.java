@@ -33,16 +33,16 @@ public class RxTaskPool
      * through a FIFO idle queue.
      */
 
-    List<AbstractRxTask> idle = new LinkedList<AbstractRxTask>();
-    List<AbstractRxTask> used = new LinkedList<AbstractRxTask>();
+    final List<AbstractRxTask> idle = new LinkedList<>();
+    final List<AbstractRxTask> used = new LinkedList<>();
 
-    Object mutex = new Object();
+    final Object mutex = new Object();
     boolean running = true;
 
     private int maxTasks;
     private int minTasks;
 
-    private TaskCreator creator = null;
+    private final TaskCreator creator;
 
 
     public RxTaskPool (int maxTasks, int minTasks, TaskCreator creator) throws Exception {
