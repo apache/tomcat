@@ -41,9 +41,8 @@ public class MultipointBioSender extends AbstractSender implements MultiPointSen
         // NO-OP
     }
 
-    protected long selectTimeout = 1000;
-    protected HashMap<Member, BioSender> bioSenders =
-        new HashMap<Member, BioSender>();
+    protected final long selectTimeout = 1000;
+    protected final HashMap<Member, BioSender> bioSenders = new HashMap<>();
 
     @Override
     public synchronized void sendMessage(Member[] destination, ChannelMessage msg) throws ChannelException {
@@ -140,9 +139,7 @@ public class MultipointBioSender extends AbstractSender implements MultiPointSen
 
     @Override
     public boolean keepalive() {
-        //throw new UnsupportedOperationException("Method ParallelBioSender.checkKeepAlive() not implemented");
         boolean result = false;
-        @SuppressWarnings("unchecked") // bioSenders is of type HashMap<Member, BioSender>
         Map.Entry<Member,BioSender>[] entries = bioSenders.entrySet().toArray(new Map.Entry[bioSenders.size()]);
         for ( int i=0; i<entries.length; i++ ) {
             BioSender sender = entries[i].getValue();

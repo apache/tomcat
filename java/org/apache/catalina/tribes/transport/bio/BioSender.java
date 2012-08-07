@@ -58,7 +58,8 @@ public class BioSender extends AbstractSender {
     private OutputStream soOut = null;
     private InputStream soIn = null;
 
-    protected XByteBuffer ackbuf = new XByteBuffer(Constants.ACK_COMMAND.length,true);
+    protected final XByteBuffer ackbuf =
+            new XByteBuffer(Constants.ACK_COMMAND.length, true);
 
 
     // ------------------------------------------------------------- Constructor
