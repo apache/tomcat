@@ -35,15 +35,13 @@ but possibly 7.1.x).
  5. Run the unused code detector and remove everything that isn't currently used.
     Add deprecation markers for the removed code to Tomcat 7.0.x
     - Complete for javax.*
-    - Complete for o.a.catalina.[ant to startup]
+    - Complete for o.a.catalina.[ant to users]
     - Remaining code in progress
 
  6. Change the default URIEncoding on the connector to UTF-8.
 
  7. Rip out all the JNDI code in resource handling and replace it with straight
     URLs (File or WAR).
-    Supporting re-factoring to consider arising from the above
-    - Remove Mapper from Context - use Mapper from Service
 
  8. Review the connector shutdown code for timing and threading issues
     particularly any that may result in a client socket being left open after a
@@ -60,7 +58,7 @@ but possibly 7.1.x).
 12. Java 7 updates
     - Use of <> operator where possible
       - Complete for javax.*
-      - Complete for o.a.catalina.[ant to startup]
+      - Complete for o.a.catalina.[ant to users]
       - Not started for remainder
     - Use of try with resources
       - Not started
@@ -69,5 +67,5 @@ but possibly 7.1.x).
 
 13. Fix all FindBugs warnings
     - Complete for javax.*
-    - Complete for o.a.catalina.[ant to startup]
+    - Complete for o.a.catalina.[ant to users]
     - Remaining code in progress
