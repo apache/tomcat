@@ -1349,12 +1349,6 @@ public abstract class AbstractReplicatedMap<K,V>
             }
         }
 
-        /**
-         * @deprecated  Unused - will be removed in Tomcat 8.0.x
-         */
-        @Deprecated
-        public MapMessage() {}
-
         public MapMessage(byte[] mapId,int msgtype, boolean diff,
                           Serializable key, Serializable value,
                           byte[] diffvalue, Member primary, Member[] nodes)  {
