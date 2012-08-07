@@ -72,7 +72,7 @@ public final class InstanceSupport {
     /**
      * The source component for instance events that we will fire.
      */
-    private Wrapper wrapper = null;
+    private final Wrapper wrapper;
 
 
     // ------------------------------------------------------------- Properties

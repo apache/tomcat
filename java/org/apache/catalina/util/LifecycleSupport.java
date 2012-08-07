@@ -59,7 +59,7 @@ public final class LifecycleSupport {
     /**
      * The source component for lifecycle events that we will fire.
      */
-    private Lifecycle lifecycle = null;
+    private final Lifecycle lifecycle;
 
 
     /**

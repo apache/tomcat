@@ -61,7 +61,7 @@ public class XMLWriter {
     /**
      * Writer.
      */
-    protected Writer writer = null;
+    protected final Writer writer;
 
 
     // ----------------------------------------------------------- Constructors
@@ -71,6 +71,7 @@ public class XMLWriter {
      * Constructor.
      */
     public XMLWriter() {
+        this(null);
     }
 
 

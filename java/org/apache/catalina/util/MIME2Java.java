@@ -472,11 +472,11 @@ import java.util.Locale;
  */
 public class MIME2Java {
 
-    private static Hashtable<String,String> s_enchash;
-    private static Hashtable<String,String> s_revhash;
+    private static final Hashtable<String,String> s_enchash;
+    private static final Hashtable<String,String> s_revhash;
 
     static {
-        s_enchash = new Hashtable<String,String>();
+        s_enchash = new Hashtable<>();
         //    <preferred MIME name>, <Java encoding name>
         s_enchash.put("UTF-8", "UTF8");
         s_enchash.put("US-ASCII",        "8859_1");    // ?
@@ -520,7 +520,7 @@ public class MIME2Java {
                                                 // j:CNS11643 -> EUC-TW?
                                                 // ISO-2022-CN? ISO-2022-CN-EXT?
 
-        s_revhash = new Hashtable<String,String>();
+        s_revhash = new Hashtable<>();
         //    <Java encoding name>, <preferred MIME name>
         s_revhash.put("UTF8", "UTF-8");
         //s_revhash.put("8859_1", "US-ASCII");    // ?
