@@ -34,9 +34,9 @@ import org.apache.tomcat.util.res.StringManager;
  */
 public abstract class LifecycleBase implements Lifecycle {
 
-    private static Log log = LogFactory.getLog(LifecycleBase.class);
+    private static final Log log = LogFactory.getLog(LifecycleBase.class);
 
-    private static StringManager sm =
+    private static final StringManager sm =
         StringManager.getManager("org.apache.catalina.util");
 
 
@@ -44,7 +44,7 @@ public abstract class LifecycleBase implements Lifecycle {
      * Used to handle firing lifecycle events.
      * TODO: Consider merging LifecycleSupport into this class.
      */
-    private LifecycleSupport lifecycle = new LifecycleSupport(this);
+    private final LifecycleSupport lifecycle = new LifecycleSupport(this);
 
 
     /**

@@ -39,7 +39,7 @@ public class URLEncoder {
      'A', 'B', 'C', 'D', 'E', 'F'};
 
     //Array containing the safe characters set.
-    protected BitSet safeCharacters = new BitSet(256);
+    protected final BitSet safeCharacters = new BitSet(256);
 
     public URLEncoder() {
         for (char i = 'a'; i <= 'z'; i++) {

@@ -28,10 +28,10 @@ import org.apache.tomcat.util.res.StringManager;
 
 public class SessionIdGenerator {
 
-    private static Log log = LogFactory.getLog(SessionIdGenerator.class);
+    private static final Log log = LogFactory.getLog(SessionIdGenerator.class);
 
 
-    private static StringManager sm =
+    private static final StringManager sm =
         StringManager.getManager("org.apache.catalina.util");
 
 
@@ -42,8 +42,7 @@ public class SessionIdGenerator {
      * designed this way since random number generators use a sync to make them
      * thread-safe and the sync makes using a a single object slow(er).
      */
-    private Queue<SecureRandom> randoms =
-        new ConcurrentLinkedQueue<SecureRandom>();
+    private final Queue<SecureRandom> randoms = new ConcurrentLinkedQueue<>();
 
 
     /**

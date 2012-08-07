@@ -43,8 +43,8 @@ import java.util.TimeZone;
  * @version $Id$
  */
 public class Strftime {
-    protected static Properties translate;
-    protected SimpleDateFormat simpleDateFormat;
+    protected static final Properties translate;
+    protected final SimpleDateFormat simpleDateFormat;
 
     /**
      * Initialize our pattern translation

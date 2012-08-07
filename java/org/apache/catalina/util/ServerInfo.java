@@ -42,19 +42,23 @@ public class ServerInfo {
     /**
      * The server information String with which we identify ourselves.
      */
-    private static String serverInfo = null;
+    private static final String serverInfo;
 
     /**
      * The server built String.
      */
-    private static String serverBuilt = null;
+    private static final String serverBuilt;
 
     /**
      * The server's version number String.
      */
-    private static String serverNumber = null;
+    private static final String serverNumber;
 
     static {
+
+        String info = null;
+        String built = null;
+        String number = null;
 
         try {
             InputStream is = ServerInfo.class.getResourceAsStream
@@ -62,19 +66,22 @@ public class ServerInfo {
             Properties props = new Properties();
             props.load(is);
             is.close();
-            serverInfo = props.getProperty("server.info");
-            serverBuilt = props.getProperty("server.built");
-            serverNumber = props.getProperty("server.number");
+            info = props.getProperty("server.info");
+            built = props.getProperty("server.built");
+            number = props.getProperty("server.number");
         } catch (Throwable t) {
             ExceptionUtils.handleThrowable(t);
         }
-        if (serverInfo == null)
-            serverInfo = "Apache Tomcat 7.0.x-dev";
-        if (serverBuilt == null)
-            serverBuilt = "unknown";
-        if (serverNumber == null)
-            serverNumber = "7.0.x";
+        if (info == null)
+            info = "Apache Tomcat 7.0.x-dev";
+        if (built == null)
+            built = "unknown";
+        if (number == null)
+            number = "7.0.x";
 
+        serverInfo = info;
+        serverBuilt = built;
+        serverNumber = number;
     }
 
 

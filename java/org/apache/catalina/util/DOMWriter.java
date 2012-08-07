@@ -42,7 +42,7 @@ public class DOMWriter {
    private static  String
    PRINTWRITER_ENCODING = "UTF8";
 
-   private static String MIME2JAVA_ENCODINGS[] =
+   private static final String MIME2JAVA_ENCODINGS[] =
     { "Default", "UTF-8", "US-ASCII", "ISO-8859-1", "ISO-8859-2", "ISO-8859-3", "ISO-8859-4",
       "ISO-8859-5", "ISO-8859-6", "ISO-8859-7", "ISO-8859-8", "ISO-8859-9", "ISO-2022-JP",
       "SHIFT_JIS", "EUC-JP","GB2312", "BIG5", "EUC-KR", "ISO-2022-KR", "KOI8-R", "EBCDIC-CP-US",
@@ -56,10 +56,10 @@ public class DOMWriter {
    private boolean qualifiedNames = true;
 
    /** Print writer. */
-   protected PrintWriter out;
+   protected final PrintWriter out;
 
    /** Canonical output. */
-   protected boolean canonical;
+   protected final boolean canonical;
 
 
    public DOMWriter(String encoding, boolean canonical)

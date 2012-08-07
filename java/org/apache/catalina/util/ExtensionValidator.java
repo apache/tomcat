@@ -62,12 +62,12 @@ public final class ExtensionValidator {
      * The string resources for this package.
      */
     private static final StringManager sm =
-        StringManager.getManager("org.apache.catalina.util");
+            StringManager.getManager("org.apache.catalina.util");
 
     private static volatile ArrayList<Extension> containerAvailableExtensions =
-        null;
-    private static ArrayList<ManifestResource> containerManifestResources =
-        new ArrayList<ManifestResource>();
+            null;
+    private static final ArrayList<ManifestResource> containerManifestResources =
+            new ArrayList<>();
 
 
     // ----------------------------------------------------- Static Initializer
@@ -136,8 +136,7 @@ public final class ExtensionValidator {
                     throws IOException {
 
         String appName = context.getName();
-        ArrayList<ManifestResource> appManifestResources =
-            new ArrayList<ManifestResource>();
+        ArrayList<ManifestResource> appManifestResources = new ArrayList<>();
         // If the application context is null it does not exist and
         // therefore is not valid
         if (dirContext == null) return false;
@@ -364,7 +363,7 @@ public final class ExtensionValidator {
                 while (values.hasNext()) {
                     Extension ext = values.next();
                     if (availableList == null) {
-                        availableList = new ArrayList<Extension>();
+                        availableList = new ArrayList<>();
                         availableList.add(ext);
                     } else {
                         availableList.add(ext);
