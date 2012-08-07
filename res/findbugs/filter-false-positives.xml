@@ -163,6 +163,12 @@
     <Bug code="NS"/>
   </Match>
   <Match>
+    <!-- Intentional in case thread is waiting -->
+    <Class name="org.apache.catalina.tribes.transport.RxTaskPool"/>
+    <Method name="returnWorker"/>
+    <Bug code="NN"/>
+  </Match>
+  <Match>
     <Class name="org.apache.catalina.util.LifecycleBase" />
     <Method name="getState"/>
     <Bug code="UG" />
