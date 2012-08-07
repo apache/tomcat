@@ -37,10 +37,12 @@ source distribution, do the following:
 
  1. If the JDK is already installed, skip to (2).
 
- 2. Download a Java Development Kit (JDK) release (version 1.6.x or later)
-    from:
+ 2. Download a version 7 or later Java Development Kit (JDK) release (use the
+    latest update available for your chosen version) from one of:
 
         http://www.oracle.com/technetwork/java/javase/downloads/index.html
+        http://openjdk.java.net/install/index.html
+        or another JDK vendor
 
  3. Install the JDK according to the instructions included with the release.
 
