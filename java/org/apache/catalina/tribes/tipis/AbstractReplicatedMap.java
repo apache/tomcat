@@ -1339,6 +1339,10 @@ public abstract class AbstractReplicatedMap extends ConcurrentHashMap implements
             }
         }
 
+        /**
+         * @deprecated  Unused - will be removed in Tomcat 8.0.x
+         */
+        @Deprecated
         public MapMessage() {}
 
         public MapMessage(byte[] mapId,int msgtype, boolean diff,
@@ -1448,7 +1452,11 @@ public abstract class AbstractReplicatedMap extends ConcurrentHashMap implements
                 throw new RuntimeException(x);
             }
         }
-        
+
+        /**
+         * @deprecated  Unused - will be removed in 8.0.x
+         */
+        @Deprecated
         protected Member[] readMembers(ObjectInput in) throws IOException, ClassNotFoundException {
             int nodecount = in.readInt();
             Member[] members = new Member[nodecount];
@@ -1460,6 +1468,10 @@ public abstract class AbstractReplicatedMap extends ConcurrentHashMap implements
             return members;
         }
         
+        /**
+         * @deprecated  Unused - will be removed in 8.0.x
+         */
+        @Deprecated
         protected void writeMembers(ObjectOutput out,Member[] members) throws IOException {
             if ( members == null ) members = new Member[0];
             out.writeInt(members.length);
