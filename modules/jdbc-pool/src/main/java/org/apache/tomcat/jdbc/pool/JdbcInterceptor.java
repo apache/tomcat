@@ -67,6 +67,16 @@ public abstract class JdbcInterceptor implements InvocationHandler {
     public static final String ISVALID_VAL = "isValid";
 
     /**
+     * {@link java.lang.Object#equals(Object)}
+     */
+    public static final String EQUALS_VAL = "equals";
+
+    /**
+     * {@link java.lang.Object#hashCode()}
+     */
+    public static final String HASHCODE_VAL = "hashCode";
+
+    /**
      * Properties for this interceptor.
      */
     protected Map<String,InterceptorProperty> properties = null;
