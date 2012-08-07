@@ -110,11 +110,11 @@ public abstract class AbstractReplicatedMap<K,V>
     /**
      * Simple lock object for transfers
      */
-    protected transient Object stateMutex = new Object();
+    protected final transient Object stateMutex = new Object();
     /**
      * A list of members in our map
      */
-    protected transient HashMap<Member, Long> mapMembers = new HashMap<Member, Long>();
+    protected final transient HashMap<Member, Long> mapMembers = new HashMap<>();
     /**
      * Our default send options
      */
@@ -176,7 +176,7 @@ public abstract class AbstractReplicatedMap<K,V>
                                  float loadFactor,
                                  int channelSendOptions,
                                  ClassLoader[] cls) {
-        innerMap = new ConcurrentHashMap<K,MapEntry<K, V>>(initialCapacity, loadFactor, 15);
+        innerMap = new ConcurrentHashMap<>(initialCapacity, loadFactor, 15);
         init(owner, channel, mapContextName, timeout, channelSendOptions, cls);
 
     }
@@ -384,7 +384,6 @@ public abstract class AbstractReplicatedMap<K,V>
 
     public Member[] getMapMembersExcl(Member[] exclude) {
         synchronized (mapMembers) {
-            @SuppressWarnings("unchecked") // mapMembers has the correct type
             HashMap<Member, Long> list = (HashMap<Member, Long>)mapMembers.clone();
             for (int i=0; i<exclude.length;i++) list.remove(exclude[i]);
             return getMapMembers(list);
@@ -420,9 +419,9 @@ public abstract class AbstractReplicatedMap<K,V>
                 return;
             }
             //check to see if the message is diffable
-            boolean diff = rentry != null && rentry.isDiffable();
             MapMessage msg = null;
-            if (diff && (isDirty || complete)) {
+            if (rentry != null && rentry.isDiffable() &&
+                    (isDirty || complete)) {
                 try {
                     rentry.lock();
                     //construct a diff message
@@ -545,7 +544,7 @@ public abstract class AbstractReplicatedMap<K,V>
         //state transfer request
         if (mapmsg.getMsgType() == MapMessage.MSG_STATE || mapmsg.getMsgType() == MapMessage.MSG_STATE_COPY) {
             synchronized (stateMutex) { //make sure we dont do two things at the same time
-                ArrayList<MapMessage> list = new ArrayList<MapMessage>();
+                ArrayList<MapMessage> list = new ArrayList<>();
                 Iterator<Map.Entry<K,MapEntry<K,V>>> i = innerMap.entrySet().iterator();
                 while (i.hasNext()) {
                     Map.Entry<?,?> e = i.next();
@@ -626,7 +625,7 @@ public abstract class AbstractReplicatedMap<K,V>
         if (mapmsg.getMsgType() == MapMessage.MSG_PROXY) {
             MapEntry<K,V> entry = innerMap.get(mapmsg.getKey());
             if ( entry==null ) {
-                entry = new MapEntry<K,V>((K) mapmsg.getKey(), (V) mapmsg.getValue());
+                entry = new MapEntry<>((K) mapmsg.getKey(), (V) mapmsg.getValue());
                 entry.setBackup(false);
                 entry.setProxy(true);
                 entry.setBackupNodes(mapmsg.getBackupNodes());
@@ -647,7 +646,7 @@ public abstract class AbstractReplicatedMap<K,V>
         if (mapmsg.getMsgType() == MapMessage.MSG_BACKUP || mapmsg.getMsgType() == MapMessage.MSG_COPY) {
             MapEntry<K,V> entry = innerMap.get(mapmsg.getKey());
             if (entry == null) {
-                entry = new MapEntry<K,V>((K) mapmsg.getKey(), (V) mapmsg.getValue());
+                entry = new MapEntry<>((K) mapmsg.getKey(), (V) mapmsg.getValue());
                 entry.setBackup(mapmsg.getMsgType() == MapMessage.MSG_BACKUP);
                 entry.setProxy(false);
                 entry.setBackupNodes(mapmsg.getBackupNodes());
@@ -749,7 +748,7 @@ public abstract class AbstractReplicatedMap<K,V>
     }
 
     public Member[] excludeFromSet(Member[] mbrs, Member[] set) {
-        ArrayList<Member> result = new ArrayList<Member>();
+        ArrayList<Member> result = new ArrayList<>();
         for (int i=0; i<set.length; i++ ) {
             boolean include = true;
             for (int j=0; j<mbrs.length; j++ )
@@ -987,7 +986,7 @@ public abstract class AbstractReplicatedMap<K,V>
     }
 
     public V put(K key, V value, boolean notify) {
-        MapEntry<K,V> entry = new MapEntry<K,V>(key,value);
+        MapEntry<K,V> entry = new MapEntry<>(key, value);
         entry.setBackup(false);
         entry.setProxy(false);
         entry.setPrimary(channel.getLocalMember(false));
@@ -1017,7 +1016,6 @@ public abstract class AbstractReplicatedMap<K,V>
     public void putAll(Map<? extends K, ? extends V> m) {
         Iterator<?> i = m.entrySet().iterator();
         while ( i.hasNext() ) {
-            @SuppressWarnings("unchecked")
             Map.Entry<K,V> entry = (Map.Entry<K,V>) i.next();
             put(entry.getKey(),entry.getValue());
         }
@@ -1079,7 +1077,7 @@ public abstract class AbstractReplicatedMap<K,V>
 
     @Override
     public Set<Map.Entry<K,V>> entrySet() {
-        LinkedHashSet<Map.Entry<K,V>> set = new LinkedHashSet<Map.Entry<K,V>>(innerMap.size());
+        LinkedHashSet<Map.Entry<K,V>> set = new LinkedHashSet<>(innerMap.size());
         Iterator<Map.Entry<K,MapEntry<K,V>>> i = innerMap.entrySet().iterator();
         while ( i.hasNext() ) {
             Map.Entry<?,?> e = i.next();
@@ -1096,7 +1094,7 @@ public abstract class AbstractReplicatedMap<K,V>
     public Set<K> keySet() {
         //todo implement
         //should only return keys where this is active.
-        LinkedHashSet<K> set = new LinkedHashSet<K>(innerMap.size());
+        LinkedHashSet<K> set = new LinkedHashSet<>(innerMap.size());
         Iterator<Map.Entry<K,MapEntry<K,V>>> i = innerMap.entrySet().iterator();
         while ( i.hasNext() ) {
             Map.Entry<K,MapEntry<K,V>> e = i.next();
@@ -1132,7 +1130,7 @@ public abstract class AbstractReplicatedMap<K,V>
 
     @Override
     public Collection<V> values() {
-        ArrayList<V> values = new ArrayList<V>();
+        ArrayList<V> values = new ArrayList<>();
         Iterator<Map.Entry<K,MapEntry<K,V>>> i = innerMap.entrySet().iterator();
         while ( i.hasNext() ) {
             Map.Entry<K,MapEntry<K,V>> e = i.next();
@@ -1259,7 +1257,6 @@ public abstract class AbstractReplicatedMap<K,V>
          * @throws IOException
          * @throws ClassNotFoundException
          */
-        @SuppressWarnings("unchecked")
         public void apply(byte[] data, int offset, int length, boolean diff) throws IOException, ClassNotFoundException {
             if (isDiffable() && diff) {
                 ReplicatedMapEntry rentry = (ReplicatedMapEntry) value;
@@ -1308,15 +1305,15 @@ public abstract class AbstractReplicatedMap<K,V>
         public static final int MSG_STATE_COPY = 10;
         public static final int MSG_ACCESS = 11;
 
-        private byte[] mapId;
-        private int msgtype;
-        private boolean diff;
+        private final byte[] mapId;
+        private final int msgtype;
+        private final boolean diff;
         private transient Serializable key;
         private transient Serializable value;
         private byte[] valuedata;
         private byte[] keydata;
-        private byte[] diffvalue;
-        private Member[] nodes;
+        private final byte[] diffvalue;
+        private final Member[] nodes;
         private Member primary;
 
         @Override
