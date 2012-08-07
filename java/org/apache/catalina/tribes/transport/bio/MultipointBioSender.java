@@ -41,7 +41,11 @@ public class MultipointBioSender extends AbstractSender implements MultiPointSen
         // NO-OP
     }
     
-    protected long selectTimeout = 1000; 
+    /**
+     * @deprecated  Unused - will be removed in Tomcat 8.0.x
+     */
+    @Deprecated
+    protected final long selectTimeout = 1000;
     protected HashMap<Member, BioSender> bioSenders =
         new HashMap<Member, BioSender>();
 
