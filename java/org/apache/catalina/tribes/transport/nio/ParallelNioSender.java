@@ -53,10 +53,9 @@ import org.apache.juli.logging.LogFactory;
 public class ParallelNioSender extends AbstractSender implements MultiPointSender {
 
     private static final Log log = LogFactory.getLog(ParallelNioSender.class);
-    protected long selectTimeout = 5000; //default 5 seconds, same as send timeout
-    protected Selector selector;
-    protected HashMap<Member, NioSender> nioSenders =
-        new HashMap<Member, NioSender>();
+    protected final long selectTimeout = 5000; //default 5 seconds, same as send timeout
+    protected final Selector selector;
+    protected final HashMap<Member, NioSender> nioSenders = new HashMap<>();
 
     public ParallelNioSender() throws IOException {
         synchronized (Selector.class) {

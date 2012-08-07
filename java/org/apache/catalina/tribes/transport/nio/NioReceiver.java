@@ -51,13 +51,14 @@ public class NioReceiver extends ReceiverBase implements Runnable {
     /**
      * The string manager for this package.
      */
-    protected static final StringManager sm = StringManager.getManager(Constants.Package);
+    protected static final StringManager sm =
+            StringManager.getManager(Constants.Package);
 
     private Selector selector = null;
     private ServerSocketChannel serverChannel = null;
     private DatagramChannel datagramChannel = null;
 
-    protected LinkedList<Runnable> events = new LinkedList<Runnable>();
+    protected final LinkedList<Runnable> events = new LinkedList<>();
 
     public NioReceiver() {
     }
