@@ -18,8 +18,6 @@
 package org.apache.catalina.tribes.tipis;
 
 import java.io.IOException;
-import java.io.ObjectInput;
-import java.io.ObjectOutput;
 import java.io.Serializable;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
@@ -43,7 +41,6 @@ import org.apache.catalina.tribes.group.Response;
 import org.apache.catalina.tribes.group.RpcCallback;
 import org.apache.catalina.tribes.group.RpcChannel;
 import org.apache.catalina.tribes.io.XByteBuffer;
-import org.apache.catalina.tribes.membership.MemberImpl;
 import org.apache.catalina.tribes.util.Arrays;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -1453,38 +1450,6 @@ public abstract class AbstractReplicatedMap<K,V>
                 throw new RuntimeException(x);
             }
         }
-
-        /**
-         * @deprecated  Unused - will be removed in 8.0.x
-         */
-        @Deprecated
-        protected Member[] readMembers(ObjectInput in) throws IOException {
-            int nodecount = in.readInt();
-            Member[] members = new Member[nodecount];
-            for ( int i=0; i<members.length; i++ ) {
-                byte[] d = new byte[in.readInt()];
-                in.readFully(d);
-                if (d.length > 0) members[i] = MemberImpl.getMember(d);
-            }
-            return members;
-        }
-
-        /**
-         * @deprecated  Unused - will be removed in 8.0.x
-         */
-        @Deprecated
-        protected void writeMembers(ObjectOutput out,Member[] members) throws IOException {
-            if ( members == null ) members = new Member[0];
-            out.writeInt(members.length);
-            for (int i=0; i<members.length; i++ ) {
-                if ( members[i] != null ) {
-                    byte[] d = members[i] != null ? ( (MemberImpl)members[i]).getData(false) : new byte[0];
-                    out.writeInt(d.length);
-                    out.write(d);
-                }
-            }
-        }
-
 
         /**
          * shallow clone
