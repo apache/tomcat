@@ -89,6 +89,12 @@
         <bug>53535</bug>: Reduce memory footprint when performing class scanning
         on Context start. Patch provided by Cedomir Igaly. (markt)
       </fix>
+      <fix>
+        <bug>53584</bug>: Ignore path parameters when comparing URIs for FORM
+        authentication. This prevents users being prompted twice for passwords
+        when logging in when session IDs are being encoded as path parameters.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
