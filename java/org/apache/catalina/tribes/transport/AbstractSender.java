@@ -184,24 +184,8 @@ public abstract class AbstractSender implements DataSender {
         return maxRetryAttempts;
     }
 
-    /**
-     * @deprecated  Use {@link #setDirectBuffer(boolean)}
-     */
-    @Deprecated
-    public void setDirect(boolean direct) {
-        setDirectBuffer(direct);
-    }
-
     public void setDirectBuffer(boolean directBuffer) {
         this.directBuffer = directBuffer;
-    }
-
-    /**
-     * @deprecated  Use {@link #getDirectBuffer()}
-     */
-    @Deprecated
-    public boolean getDirect() {
-        return getDirectBuffer();
     }
 
     public boolean getDirectBuffer() {
