@@ -17,6 +17,7 @@
 package org.apache.tomcat.jdbc.pool;
 
 import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 import java.sql.SQLException;
 
 /**
@@ -44,10 +45,26 @@ public class DisposableConnectionFacade extends JdbcInterceptor {
     public void reset(ConnectionPool parent, PooledConnection con) {
     }
 
+
+
+    @Override
+    public int hashCode() {
+        return System.identityHashCode(this);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return this==obj;
+    }
+
     @Override
     public Object invoke(Object proxy, Method method, Object[] args)
             throws Throwable {
-        if (getNext()==null) {
+        if (compare(EQUALS_VAL, method)) {
+            return this.equals(Proxy.getInvocationHandler(args[0]));
+        } else if (compare(HASHCODE_VAL, method)) {
+            return this.hashCode();
+        } else if (getNext()==null) {
             if (compare(ISCLOSED_VAL, method)) {
                 return Boolean.TRUE;
             }
