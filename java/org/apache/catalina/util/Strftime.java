@@ -110,19 +110,6 @@ public class Strftime {
     /**
      * Create an instance of this date formatting class
      *
-     * @see #Strftime( String, Locale )
-     *
-     * @deprecated  Unused - will be removed in 8.0.x
-     */
-    @Deprecated
-    public Strftime( String origFormat ) {
-        String convertedFormat = convertDateFormat( origFormat );
-        simpleDateFormat = new SimpleDateFormat( convertedFormat );
-    }
-
-    /**
-     * Create an instance of this date formatting class
-     *
      * @param origFormat the strftime-style formatting string
      * @param locale the locale to use for locale-specific conversions
      */
