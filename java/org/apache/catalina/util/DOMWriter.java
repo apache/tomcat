@@ -39,21 +39,7 @@ public class DOMWriter {
    //
 
    /** Default Encoding */
-   private static  String
-   PRINTWRITER_ENCODING = "UTF8";
-
-   private static final String MIME2JAVA_ENCODINGS[] =
-    { "Default", "UTF-8", "US-ASCII", "ISO-8859-1", "ISO-8859-2", "ISO-8859-3", "ISO-8859-4",
-      "ISO-8859-5", "ISO-8859-6", "ISO-8859-7", "ISO-8859-8", "ISO-8859-9", "ISO-2022-JP",
-      "SHIFT_JIS", "EUC-JP","GB2312", "BIG5", "EUC-KR", "ISO-2022-KR", "KOI8-R", "EBCDIC-CP-US",
-      "EBCDIC-CP-CA", "EBCDIC-CP-NL", "EBCDIC-CP-DK", "EBCDIC-CP-NO", "EBCDIC-CP-FI", "EBCDIC-CP-SE",
-      "EBCDIC-CP-IT", "EBCDIC-CP-ES", "EBCDIC-CP-GB", "EBCDIC-CP-FR", "EBCDIC-CP-AR1",
-      "EBCDIC-CP-HE", "EBCDIC-CP-CH", "EBCDIC-CP-ROECE","EBCDIC-CP-YU",
-      "EBCDIC-CP-IS", "EBCDIC-CP-AR2", "UTF-16"
-    };
-
-   /** Output qualified names */
-   private boolean qualifiedNames = true;
+   private static final String PRINTWRITER_ENCODING = "UTF8";
 
    /** Print writer. */
    protected final PrintWriter out;
@@ -72,67 +58,14 @@ public class DOMWriter {
    // Constructors
    //
 
-   /**
-    * Default constructor.
-    *
-    * @deprecated   Unused - will be removws in 8.0.x
-    */
-   @Deprecated
-   public DOMWriter(boolean canonical) throws UnsupportedEncodingException {
-      this( getWriterEncoding(), canonical);
-   }
-
     public DOMWriter(Writer writer, boolean canonical) {
         out = new PrintWriter(writer);
         this.canonical = canonical;
     }
 
-   /**
-    * @deprecated   Unused - will be removed in 8.0.x
-    */
-   @Deprecated
-   public boolean getQualifiedNames() {
-      return this.qualifiedNames;
-   }
-
-   /**
-    * @deprecated   Unnecessary - will be removed in 8.0.x
-    */
-   @Deprecated
-   public void setQualifiedNames(boolean qualifiedNames) {
-      this.qualifiedNames = qualifiedNames;
-   }
-
    public static String getWriterEncoding( ) {
       return (PRINTWRITER_ENCODING);
    }// getWriterEncoding
-
-   /**
-    * @deprecated   Unused - will be removed in 8.0.x
-    */
-   @Deprecated
-   public static void  setWriterEncoding( String encoding ) {
-      if( encoding.equalsIgnoreCase( "DEFAULT" ) )
-         PRINTWRITER_ENCODING  = "UTF8";
-      else if( encoding.equalsIgnoreCase( "UTF-16" ) )
-         PRINTWRITER_ENCODING  = "Unicode";
-      else
-         PRINTWRITER_ENCODING = MIME2Java.convert( encoding );
-   }// setWriterEncoding
-
-
-   /**
-    * @deprecated   Unused - will be removed in 8.0.x
-    */
-   @Deprecated
-   public static boolean isValidJavaEncoding( String encoding ) {
-      for ( int i = 0; i < MIME2JAVA_ENCODINGS.length; i++ )
-         if ( encoding.equals( MIME2JAVA_ENCODINGS[i] ) )
-            return (true);
-
-      return (false);
-   }// isValidJavaEncoding
-
 
    /** Prints the specified node, recursively. */
    public void print(Node node) {
@@ -166,20 +99,12 @@ public class DOMWriter {
             // print element with attributes
          case Node.ELEMENT_NODE: {
                out.print('<');
-               if (this.qualifiedNames) {
-                  out.print(node.getNodeName());
-               } else {
-                  out.print(node.getLocalName());
-               }
+               out.print(node.getLocalName());
                Attr attrs[] = sortAttributes(node.getAttributes());
                for ( int i = 0; i < attrs.length; i++ ) {
                   Attr attr = attrs[i];
                   out.print(' ');
-                  if (this.qualifiedNames) {
-                     out.print(attr.getNodeName());
-                  } else {
-                     out.print(attr.getLocalName());
-                  }
+                  out.print(attr.getLocalName());
 
                   out.print("=\"");
                   out.print(normalize(attr.getNodeValue()));
@@ -208,11 +133,7 @@ public class DOMWriter {
                   }
                } else {
                   out.print('&');
-                  if (this.qualifiedNames) {
-                     out.print(node.getNodeName());
-                  } else {
-                     out.print(node.getLocalName());
-                  }
+                  out.print(node.getLocalName());
                   out.print(';');
                }
                break;
@@ -239,11 +160,7 @@ public class DOMWriter {
             // print processing instruction
          case Node.PROCESSING_INSTRUCTION_NODE: {
                out.print("<?");
-               if (this.qualifiedNames) {
-                  out.print(node.getNodeName());
-               } else {
-                  out.print(node.getLocalName());
-               }
+               out.print(node.getLocalName());
 
                String data = node.getNodeValue();
                if ( data != null && data.length() > 0 ) {
@@ -257,11 +174,7 @@ public class DOMWriter {
 
       if ( type == Node.ELEMENT_NODE ) {
          out.print("</");
-         if (this.qualifiedNames) {
-            out.print(node.getNodeName());
-         } else {
-            out.print(node.getLocalName());
-         }
+         out.print(node.getLocalName());
          out.print('>');
       }
 
@@ -282,19 +195,11 @@ public class DOMWriter {
       }
       for ( int i = 0; i < len - 1; i++ ) {
          String name = null;
-         if (this.qualifiedNames) {
-            name  = array[i].getNodeName();
-         } else {
-            name  = array[i].getLocalName();
-         }
+         name  = array[i].getLocalName();
          int    index = i;
          for ( int j = i + 1; j < len; j++ ) {
             String curName = null;
-            if (this.qualifiedNames) {
-               curName = array[j].getNodeName();
-            } else {
-               curName = array[j].getLocalName();
-            }
+            curName = array[j].getLocalName();
             if ( curName.compareTo(name) < 0 ) {
                name  = curName;
                index = j;
