@@ -189,22 +189,6 @@ public final class RequestUtil {
 
 
     /**
-     * Decode and return the specified URL-encoded byte array. It is assumed
-     * the string is not a query string.
-     *
-     * @param bytes The url-encoded byte array
-     * @param enc The encoding to use; if null, the default encoding is used
-     * @exception IllegalArgumentException if a '%' character is not followed
-     * by a valid 2-digit hexadecimal number
-     *
-     * @deprecated  Unused - will be removed in 8.0.x
-     */
-    @Deprecated
-    public static String URLDecode(byte[] bytes, String enc) {
-        return URLDecode(bytes, enc, false);
-    }
-
-    /**
      * Decode and return the specified URL-encoded byte array.
      *
      * @param bytes The url-encoded byte array
