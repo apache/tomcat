@@ -104,7 +104,10 @@ public class XMLWriter {
      * @param namespaceInfo Namespace info
      * @param name Property name
      * @param value Property value
+     *
+     * @deprecated  Unused - will be removed in 8.0.x
      */
+    @Deprecated
     public void writeProperty(String namespace, String namespaceInfo,
                               String name, String value) {
         writeElement(namespace, namespaceInfo, name, OPENING);
@@ -133,7 +136,10 @@ public class XMLWriter {
      *
      * @param namespace Namespace
      * @param name Property name
+     *
+     * @deprecated  Unused - will be removed in 8.0.x
      */
+    @Deprecated
     public void writeProperty(String namespace, String name) {
         writeElement(namespace, name, NO_CONTENT);
     }

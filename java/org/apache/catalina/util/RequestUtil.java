@@ -195,7 +195,10 @@ public final class RequestUtil {
      * @param bytes The url-encoded byte array
      * @exception IllegalArgumentException if a '%' character is not followed
      * by a valid 2-digit hexadecimal number
+     *
+     * @deprecated  Unused - will be removed in 8.0.x
      */
+    @Deprecated
     public static String URLDecode(byte[] bytes) {
         return URLDecode(bytes, null);
     }
