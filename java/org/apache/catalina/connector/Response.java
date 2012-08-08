@@ -45,7 +45,6 @@ import org.apache.catalina.Globals;
 import org.apache.catalina.Session;
 import org.apache.catalina.Wrapper;
 import org.apache.catalina.security.SecurityUtil;
-import org.apache.catalina.util.DateTool;
 import org.apache.catalina.util.RequestUtil;
 import org.apache.catalina.util.SessionConfig;
 import org.apache.tomcat.util.buf.CharChunk;
@@ -979,7 +978,7 @@ public class Response
         }
 
         if (format == null) {
-            format = new SimpleDateFormat(DateTool.HTTP_RESPONSE_DATE_HEADER,
+            format = new SimpleDateFormat(FastHttpDateFormat.RFC1123_DATE,
                                           Locale.US);
             format.setTimeZone(TimeZone.getTimeZone("GMT"));
         }
@@ -1325,7 +1324,7 @@ public class Response
         }
 
         if (format == null) {
-            format = new SimpleDateFormat(DateTool.HTTP_RESPONSE_DATE_HEADER,
+            format = new SimpleDateFormat(FastHttpDateFormat.RFC1123_DATE,
                                           Locale.US);
             format.setTimeZone(TimeZone.getTimeZone("GMT"));
         }

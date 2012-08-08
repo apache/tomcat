@@ -40,17 +40,20 @@ public final class FastHttpDateFormat {
 
 
     /**
-     * HTTP date format.
+     * Only permitted HTTP date format specification when generating headers.
      */
+    public static final String RFC1123_DATE =
+            "EEE, dd MMM yyyy HH:mm:ss zzz";
+
     private static final SimpleDateFormat format =
-        new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz", Locale.US);
+            new SimpleDateFormat(RFC1123_DATE, Locale.US);
 
 
     /**
      * The set of SimpleDateFormat formats to use in getDateHeader().
      */
     private static final SimpleDateFormat formats[] = {
-        new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz", Locale.US),
+        new SimpleDateFormat(RFC1123_DATE, Locale.US),
         new SimpleDateFormat("EEEEEE, dd-MMM-yy HH:mm:ss zzz", Locale.US),
         new SimpleDateFormat("EEE MMMM d HH:mm:ss yyyy", Locale.US)
     };
