@@ -29,7 +29,10 @@ import java.util.TimeZone;
  * @author James Todd [gonzo@eng.sun.com]
  * @author Costin Manolache
  * @author fhanik
+ *
+ * @deprecated  Mostly unused and will be removed in 8.0.x onwards
  */
+@Deprecated
 public class DateTool {
 
     /**
