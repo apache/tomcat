@@ -99,6 +99,10 @@
         <bug>53641</bug>: Correct name of HTTP header used in WebSocket
         handshake for listing the preferred protocols. (markt)
       </fix>
+      <scode>
+        Document the constants that were added to the
+        <code>RequestDispatcher</code> interface in Servlet 3.0. (kkolinko)
+      </scode>
     </changelog>
   </subsection>
   <subsection name="Coyote">
