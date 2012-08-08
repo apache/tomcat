@@ -122,7 +122,10 @@ public final class StringParser {
 
     /**
      * Return the String we are currently parsing.
+     *
+     * @deprecated  Unused - will be removed in 8.0.x
      */
+    @Deprecated
     public String getString() {
 
         return (this.string);
@@ -172,7 +175,10 @@ public final class StringParser {
      * possible, a zero-length string is returned.
      *
      * @param start Starting index, zero relative, inclusive
+     *
+     * @deprecated  Unused - will be removed in 8.0.x
      */
+    @Deprecated
     public String extract(int start) {
 
         if ((start < 0) || (start >= length))
@@ -223,7 +229,10 @@ public final class StringParser {
      * or the index of the character after the last position of the string
      * if no more non-whitespace characters are found.  The current
      * parsing position is updated to the returned value.
+     *
+     * @deprecated  Unused - will be removed in 8.0.x
      */
+    @Deprecated
     public int findText() {
 
         while ((index < length) && isWhite(chars[index]))
@@ -238,7 +247,10 @@ public final class StringParser {
      * or the index of the character after the last position of the string
      * if no more whitespace characters are found.  The current parsing
      * position is updated to the returned value.
+     *
+     * @deprecated  Unused - will be removed in 8.0.x
      */
+    @Deprecated
     public int findWhite() {
 
         while ((index < length) && !isWhite(chars[index]))
@@ -265,7 +277,10 @@ public final class StringParser {
      * Return the final value.
      *
      * @param ch Character to be skipped
+     *
+     * @deprecated  Unused - will be removed in 8.0.x
      */
+    @Deprecated
     public int skipChar(char ch) {
 
         while ((index < length) && (ch == chars[index]))
@@ -279,7 +294,10 @@ public final class StringParser {
      * Advance the current parsing position while it is pointing at a
      * non-whitespace character, or until it moves past the end of the string.
      * Return the final value.
+     *
+     * @deprecated  Unused - will be removed in 8.0.x
      */
+    @Deprecated
     public int skipText() {
 
         while ((index < length) && !isWhite(chars[index]))
@@ -293,7 +311,10 @@ public final class StringParser {
      * Advance the current parsing position while it is pointing at a
      * whitespace character, or until it moves past the end of the string.
      * Return the final value.
+     *
+     * @deprecated  Unused - will be removed in 8.0.x
      */
+    @Deprecated
     public int skipWhite() {
 
         while ((index < length) && isWhite(chars[index]))
@@ -310,7 +331,10 @@ public final class StringParser {
      * Is the specified character considered to be whitespace?
      *
      * @param ch Character to be checked
+     *
+     * @deprecated  Unused - will be removed in 8.0.x
      */
+    @Deprecated
     protected boolean isWhite(char ch) {
 
         if ((ch == ' ') || (ch == '\t') || (ch == '\r') || (ch == '\n'))

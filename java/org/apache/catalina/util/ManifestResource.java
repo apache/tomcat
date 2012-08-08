@@ -104,7 +104,10 @@ public class ManifestResource {
      * has an requires extensions.
      *
      * @return true if required extensions are present
+     *
+     * @deprecated  Unused - will be removed in 8.0.x
      */
+    @Deprecated
     public boolean requiresExtensions() {
         return (requiredExtensions != null) ? true : false;
     }
