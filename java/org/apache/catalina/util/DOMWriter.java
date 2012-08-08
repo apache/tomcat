@@ -47,7 +47,10 @@ public class DOMWriter {
    /** Canonical output. */
    protected final boolean canonical;
 
-
+   /**
+    * @deprecated   Unused - will be removed in 8.0.x
+    */
+   @Deprecated
    public DOMWriter(String encoding, boolean canonical)
    throws UnsupportedEncodingException {
       out = new PrintWriter(new OutputStreamWriter(System.out, encoding));
