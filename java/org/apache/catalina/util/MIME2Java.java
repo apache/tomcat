@@ -17,8 +17,9 @@
 
 package org.apache.catalina.util;
 
-import java.util.Hashtable;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 
 /**
  * MIME2Java is a convenience class which handles conversions between MIME charset names
@@ -472,11 +473,11 @@ import java.util.Locale;
  */
 public class MIME2Java {
 
-    private static final Hashtable<String,String> s_enchash;
-    private static final Hashtable<String,String> s_revhash;
+    private static final Map<String,String> s_enchash;
+    private static final Map<String,String> s_revhash;
 
     static {
-        s_enchash = new Hashtable<>();
+        s_enchash = new HashMap<>();
         //    <preferred MIME name>, <Java encoding name>
         s_enchash.put("UTF-8", "UTF8");
         s_enchash.put("US-ASCII",        "8859_1");    // ?
@@ -517,10 +518,10 @@ public class MIME2Java {
         s_enchash.put("EBCDIC-CP-IS",    "CP871");
         s_enchash.put("EBCDIC-CP-AR2",   "CP918");
 
-                                                // j:CNS11643 -> EUC-TW?
-                                                // ISO-2022-CN? ISO-2022-CN-EXT?
+        // j:CNS11643 -> EUC-TW?
+        // ISO-2022-CN? ISO-2022-CN-EXT?
 
-        s_revhash = new Hashtable<>();
+        s_revhash = new HashMap<>();
         //    <Java encoding name>, <preferred MIME name>
         s_revhash.put("UTF8", "UTF-8");
         //s_revhash.put("8859_1", "US-ASCII");    // ?
