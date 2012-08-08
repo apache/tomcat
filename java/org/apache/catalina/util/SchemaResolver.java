@@ -18,6 +18,7 @@ package org.apache.catalina.util;
 
 
 import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.tomcat.util.digester.Digester;
 import org.xml.sax.EntityResolver;
@@ -43,7 +44,7 @@ public class SchemaResolver implements EntityResolver {
      * The URLs of dtds and schemas that have been registered, keyed by the
      * public identifier that corresponds.
      */
-    protected final HashMap<String,String> entityValidator = new HashMap<>();
+    protected final Map<String,String> entityValidator = new HashMap<>();
 
 
     /**
