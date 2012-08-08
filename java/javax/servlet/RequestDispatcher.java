@@ -39,21 +39,179 @@ import java.io.IOException;
  */
 public interface RequestDispatcher {
 
+    /**
+     * The name of the request attribute that should be set by the container
+     * when the {@link #forward(ServletRequest, ServletResponse)} method is
+     * called. It provides the original value of a path-related property of the
+     * request. See the chapter "Forwarded Request Parameters" in the Servlet
+     * Specification for details.
+     *
+     * @since Servlet 3.0
+     */
     static final String FORWARD_REQUEST_URI = "javax.servlet.forward.request_uri";
+
+    /**
+     * The name of the request attribute that should be set by the container
+     * when the {@link #forward(ServletRequest, ServletResponse)} method is
+     * called. It provides the original value of a path-related property of the
+     * request. See the chapter "Forwarded Request Parameters" in the Servlet
+     * Specification for details.
+     *
+     * @since Servlet 3.0
+     */
     static final String FORWARD_CONTEXT_PATH = "javax.servlet.forward.context_path";
+
+    /**
+     * The name of the request attribute that should be set by the container
+     * when the {@link #forward(ServletRequest, ServletResponse)} method is
+     * called. It provides the original value of a path-related property of the
+     * request. See the chapter "Forwarded Request Parameters" in the Servlet
+     * Specification for details.
+     *
+     * @since Servlet 3.0
+     */
     static final String FORWARD_PATH_INFO = "javax.servlet.forward.path_info";
+
+    /**
+     * The name of the request attribute that should be set by the container
+     * when the {@link #forward(ServletRequest, ServletResponse)} method is
+     * called. It provides the original value of a path-related property of the
+     * request. See the chapter "Forwarded Request Parameters" in the Servlet
+     * Specification for details.
+     *
+     * @since Servlet 3.0
+     */
     static final String FORWARD_SERVLET_PATH = "javax.servlet.forward.servlet_path";
+
+    /**
+     * The name of the request attribute that should be set by the container
+     * when the {@link #forward(ServletRequest, ServletResponse)} method is
+     * called. It provides the original value of a path-related property of the
+     * request. See the chapter "Forwarded Request Parameters" in the Servlet
+     * Specification for details.
+     *
+     * @since Servlet 3.0
+     */
     static final String FORWARD_QUERY_STRING = "javax.servlet.forward.query_string";
+
+    /**
+     * The name of the request attribute that should be set by the container
+     * when the {@link #include(ServletRequest, ServletResponse)} method is
+     * called on the {@code RequestDispatcher} obtained by a path and not by a
+     * name. It provides information on the path that was used to obtain the
+     * {@code RequestDispatcher} instance for this include call. See the chapter
+     * "Included Request Parameters" in the Servlet Specification for details.
+     *
+     * @since Servlet 3.0
+     */
     static final String INCLUDE_REQUEST_URI = "javax.servlet.include.request_uri";
+
+    /**
+     * The name of the request attribute that should be set by the container
+     * when the {@link #include(ServletRequest, ServletResponse)} method is
+     * called on the {@code RequestDispatcher} obtained by a path and not by a
+     * name. It provides information on the path that was used to obtain the
+     * {@code RequestDispatcher} instance for this include call. See the chapter
+     * "Included Request Parameters" in the Servlet Specification for details.
+     *
+     * @since Servlet 3.0
+     */
     static final String INCLUDE_CONTEXT_PATH = "javax.servlet.include.context_path";
+
+    /**
+     * The name of the request attribute that should be set by the container
+     * when the {@link #include(ServletRequest, ServletResponse)} method is
+     * called on the {@code RequestDispatcher} obtained by a path and not by a
+     * name. It provides information on the path that was used to obtain the
+     * {@code RequestDispatcher} instance for this include call. See the chapter
+     * "Included Request Parameters" in the Servlet Specification for details.
+     *
+     * @since Servlet 3.0
+     */
     static final String INCLUDE_PATH_INFO = "javax.servlet.include.path_info";
+
+    /**
+     * The name of the request attribute that should be set by the container
+     * when the {@link #include(ServletRequest, ServletResponse)} method is
+     * called on the {@code RequestDispatcher} obtained by a path and not by a
+     * name. It provides information on the path that was used to obtain the
+     * {@code RequestDispatcher} instance for this include call. See the chapter
+     * "Included Request Parameters" in the Servlet Specification for details.
+     *
+     * @since Servlet 3.0
+     */
     static final String INCLUDE_SERVLET_PATH = "javax.servlet.include.servlet_path";
+
+    /**
+     * The name of the request attribute that should be set by the container
+     * when the {@link #include(ServletRequest, ServletResponse)} method is
+     * called on the {@code RequestDispatcher} obtained by a path and not by a
+     * name. It provides information on the path that was used to obtain the
+     * {@code RequestDispatcher} instance for this include call. See the chapter
+     * "Included Request Parameters" in the Servlet Specification for details.
+     *
+     * @since Servlet 3.0
+     */
     static final String INCLUDE_QUERY_STRING = "javax.servlet.include.query_string";
+
+    /**
+     * The name of the request attribute that should be set by the container
+     * when custom error-handling servlet or JSP page is invoked. The value of
+     * the attribute is of type {@code java.lang.Throwable}. See the chapter
+     * "Error Handling" in the Servlet Specification for details.
+     *
+     * @since Servlet 3.0
+     */
     public static final String ERROR_EXCEPTION = "javax.servlet.error.exception";
+
+    /**
+     * The name of the request attribute that should be set by the container
+     * when custom error-handling servlet or JSP page is invoked. The value of
+     * the attribute is of type {@code java.lang.Class}. See the chapter
+     * "Error Handling" in the Servlet Specification for details.
+     *
+     * @since Servlet 3.0
+     */
     public static final String ERROR_EXCEPTION_TYPE = "javax.servlet.error.exception_type";
+
+    /**
+     * The name of the request attribute that should be set by the container
+     * when custom error-handling servlet or JSP page is invoked. The value of
+     * the attribute is of type {@code java.lang.String}. See the chapter
+     * "Error Handling" in the Servlet Specification for details.
+     *
+     * @since Servlet 3.0
+     */
     public static final String ERROR_MESSAGE = "javax.servlet.error.message";
+
+    /**
+     * The name of the request attribute that should be set by the container
+     * when custom error-handling servlet or JSP page is invoked. The value of
+     * the attribute is of type {@code java.lang.String}. See the chapter
+     * "Error Handling" in the Servlet Specification for details.
+     *
+     * @since Servlet 3.0
+     */
     public static final String ERROR_REQUEST_URI = "javax.servlet.error.request_uri";
+
+    /**
+     * The name of the request attribute that should be set by the container
+     * when custom error-handling servlet or JSP page is invoked. The value of
+     * the attribute is of type {@code java.lang.String}. See the chapter
+     * "Error Handling" in the Servlet Specification for details.
+     *
+     * @since Servlet 3.0
+     */
     public static final String ERROR_SERVLET_NAME = "javax.servlet.error.servlet_name";
+
+    /**
+     * The name of the request attribute that should be set by the container
+     * when custom error-handling servlet or JSP page is invoked. The value of
+     * the attribute is of type {@code java.lang.Integer}. See the chapter
+     * "Error Handling" in the Servlet Specification for details.
+     *
+     * @since Servlet 3.0
+     */
     public static final String ERROR_STATUS_CODE = "javax.servlet.error.status_code";
 
     /**
