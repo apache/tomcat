@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.catalina.util;
 
 import java.io.PrintWriter;
@@ -27,234 +26,226 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 /**
- * A sample DOM writer. This sample program illustrates how to
- * traverse a DOM tree in order to print a document that is parsed.
+ * A sample DOM writer. This sample program illustrates how to traverse a DOM
+ * tree in order to print a document that is parsed.
  */
 public class DOMWriter {
 
-   //
-   // Data
-   //
+    /** Default Encoding */
+    private static final String PRINTWRITER_ENCODING = "UTF8";
 
-   /** Default Encoding */
-   private static final String PRINTWRITER_ENCODING = "UTF8";
+    /** Print writer. */
+    protected final PrintWriter out;
 
-   /** Print writer. */
-   protected final PrintWriter out;
+    /** Canonical output. */
+    protected final boolean canonical;
 
-   /** Canonical output. */
-   protected final boolean canonical;
-
-   //
-   // Constructors
-   //
 
     public DOMWriter(Writer writer, boolean canonical) {
         out = new PrintWriter(writer);
         this.canonical = canonical;
     }
 
-   public static String getWriterEncoding( ) {
-      return (PRINTWRITER_ENCODING);
-   }// getWriterEncoding
 
-   /** Prints the specified node, recursively. */
-   public void print(Node node) {
+    public static String getWriterEncoding() {
+        return (PRINTWRITER_ENCODING);
+    }
 
-      // is there anything to do?
-      if ( node == null ) {
-         return;
-      }
 
-      int type = node.getNodeType();
-      switch ( type ) {
-         // print document
-         case Node.DOCUMENT_NODE: {
-               if ( !canonical ) {
-                  String  Encoding = getWriterEncoding();
-                  if( Encoding.equalsIgnoreCase( "DEFAULT" ) )
-                     Encoding = "UTF-8";
-                  else if( Encoding.equalsIgnoreCase( "Unicode" ) )
-                     Encoding = "UTF-16";
-                  else
-                     Encoding = MIME2Java.reverse( Encoding );
+    /** Prints the specified node, recursively. */
+    public void print(Node node) {
 
-                  out.println("<?xml version=\"1.0\" encoding=\""+
-                           Encoding + "\"?>");
-               }
-               print(((Document)node).getDocumentElement());
-               out.flush();
-               break;
+        // is there anything to do?
+        if (node == null) {
+            return;
+        }
+
+        int type = node.getNodeType();
+        switch (type) {
+            // print document
+            case Node.DOCUMENT_NODE: {
+                if (!canonical) {
+                    String Encoding = getWriterEncoding();
+                    if (Encoding.equalsIgnoreCase("DEFAULT"))
+                        Encoding = "UTF-8";
+                    else if (Encoding.equalsIgnoreCase("Unicode"))
+                        Encoding = "UTF-16";
+                    else
+                        Encoding = MIME2Java.reverse(Encoding);
+
+                    out.println("<?xml version=\"1.0\" encoding=\"" + Encoding +
+                            "\"?>");
+                }
+                print(((Document) node).getDocumentElement());
+                out.flush();
+                break;
             }
 
             // print element with attributes
-         case Node.ELEMENT_NODE: {
-               out.print('<');
-               out.print(node.getLocalName());
-               Attr attrs[] = sortAttributes(node.getAttributes());
-               for ( int i = 0; i < attrs.length; i++ ) {
-                  Attr attr = attrs[i];
-                  out.print(' ');
-                  out.print(attr.getLocalName());
+            case Node.ELEMENT_NODE: {
+                out.print('<');
+                out.print(node.getLocalName());
+                Attr attrs[] = sortAttributes(node.getAttributes());
+                for (int i = 0; i < attrs.length; i++) {
+                    Attr attr = attrs[i];
+                    out.print(' ');
+                    out.print(attr.getLocalName());
 
-                  out.print("=\"");
-                  out.print(normalize(attr.getNodeValue()));
-                  out.print('"');
-               }
-               out.print('>');
-               NodeList children = node.getChildNodes();
-               if ( children != null ) {
-                  int len = children.getLength();
-                  for ( int i = 0; i < len; i++ ) {
-                     print(children.item(i));
-                  }
-               }
-               break;
+                    out.print("=\"");
+                    out.print(normalize(attr.getNodeValue()));
+                    out.print('"');
+                }
+                out.print('>');
+                NodeList children = node.getChildNodes();
+                if (children != null) {
+                    int len = children.getLength();
+                    for (int i = 0; i < len; i++) {
+                        print(children.item(i));
+                    }
+                }
+                break;
             }
 
             // handle entity reference nodes
-         case Node.ENTITY_REFERENCE_NODE: {
-               if ( canonical ) {
-                  NodeList children = node.getChildNodes();
-                  if ( children != null ) {
-                     int len = children.getLength();
-                     for ( int i = 0; i < len; i++ ) {
-                        print(children.item(i));
-                     }
-                  }
-               } else {
-                  out.print('&');
-                  out.print(node.getLocalName());
-                  out.print(';');
-               }
-               break;
+            case Node.ENTITY_REFERENCE_NODE: {
+                if (canonical) {
+                    NodeList children = node.getChildNodes();
+                    if (children != null) {
+                        int len = children.getLength();
+                        for (int i = 0; i < len; i++) {
+                            print(children.item(i));
+                        }
+                    }
+                } else {
+                    out.print('&');
+                    out.print(node.getLocalName());
+                    out.print(';');
+                }
+                break;
             }
 
             // print cdata sections
-         case Node.CDATA_SECTION_NODE: {
-               if ( canonical ) {
-                  out.print(normalize(node.getNodeValue()));
-               } else {
-                  out.print("<![CDATA[");
-                  out.print(node.getNodeValue());
-                  out.print("]]>");
-               }
-               break;
+            case Node.CDATA_SECTION_NODE: {
+                if (canonical) {
+                    out.print(normalize(node.getNodeValue()));
+                } else {
+                    out.print("<![CDATA[");
+                    out.print(node.getNodeValue());
+                    out.print("]]>");
+                }
+                break;
             }
 
             // print text
-         case Node.TEXT_NODE: {
-               out.print(normalize(node.getNodeValue()));
-               break;
+            case Node.TEXT_NODE: {
+                out.print(normalize(node.getNodeValue()));
+                break;
             }
 
             // print processing instruction
-         case Node.PROCESSING_INSTRUCTION_NODE: {
-               out.print("<?");
-               out.print(node.getLocalName());
+            case Node.PROCESSING_INSTRUCTION_NODE: {
+                out.print("<?");
+                out.print(node.getLocalName());
 
-               String data = node.getNodeValue();
-               if ( data != null && data.length() > 0 ) {
-                  out.print(' ');
-                  out.print(data);
-               }
-               out.print("?>");
-               break;
+                String data = node.getNodeValue();
+                if (data != null && data.length() > 0) {
+                    out.print(' ');
+                    out.print(data);
+                }
+                out.print("?>");
+                break;
             }
-      }
+        }
 
-      if ( type == Node.ELEMENT_NODE ) {
-         out.print("</");
-         out.print(node.getLocalName());
-         out.print('>');
-      }
+        if (type == Node.ELEMENT_NODE) {
+            out.print("</");
+            out.print(node.getLocalName());
+            out.print('>');
+        }
 
-      out.flush();
+        out.flush();
 
-   } // print(Node)
+    } // print(Node)
 
-   /** Returns a sorted list of attributes. */
-   protected Attr[] sortAttributes(NamedNodeMap attrs) {
-      if (attrs == null) {
-         return new Attr[0];
-      }
+    /** Returns a sorted list of attributes. */
+    protected Attr[] sortAttributes(NamedNodeMap attrs) {
+        if (attrs == null) {
+            return new Attr[0];
+        }
 
-      int len = attrs.getLength();
-      Attr array[] = new Attr[len];
-      for ( int i = 0; i < len; i++ ) {
-         array[i] = (Attr)attrs.item(i);
-      }
-      for ( int i = 0; i < len - 1; i++ ) {
-         String name = null;
-         name  = array[i].getLocalName();
-         int    index = i;
-         for ( int j = i + 1; j < len; j++ ) {
-            String curName = null;
-            curName = array[j].getLocalName();
-            if ( curName.compareTo(name) < 0 ) {
-               name  = curName;
-               index = j;
+        int len = attrs.getLength();
+        Attr array[] = new Attr[len];
+        for (int i = 0; i < len; i++) {
+            array[i] = (Attr) attrs.item(i);
+        }
+        for (int i = 0; i < len - 1; i++) {
+            String name = null;
+            name = array[i].getLocalName();
+            int index = i;
+            for (int j = i + 1; j < len; j++) {
+                String curName = null;
+                curName = array[j].getLocalName();
+                if (curName.compareTo(name) < 0) {
+                    name = curName;
+                    index = j;
+                }
             }
-         }
-         if ( index != i ) {
-            Attr temp    = array[i];
-            array[i]     = array[index];
-            array[index] = temp;
-         }
-      }
+            if (index != i) {
+                Attr temp = array[i];
+                array[i] = array[index];
+                array[index] = temp;
+            }
+        }
 
-      return (array);
+        return (array);
 
-   } // sortAttributes(NamedNodeMap):Attr[]
+    }
 
+    /** Normalizes the given string. */
+    protected String normalize(String s) {
+        if (s == null) {
+            return "";
+        }
 
-   /** Normalizes the given string. */
-   protected String normalize(String s) {
-      if (s == null) {
-         return "";
-      }
+        StringBuilder str = new StringBuilder();
 
-      StringBuilder str = new StringBuilder();
+        int len = s.length();
+        for (int i = 0; i < len; i++) {
+            char ch = s.charAt(i);
+            switch (ch) {
+                case '<': {
+                    str.append("&lt;");
+                    break;
+                }
+                case '>': {
+                    str.append("&gt;");
+                    break;
+                }
+                case '&': {
+                    str.append("&amp;");
+                    break;
+                }
+                case '"': {
+                    str.append("&quot;");
+                    break;
+                }
+                case '\r':
+                case '\n': {
+                    if (canonical) {
+                        str.append("&#");
+                        str.append(Integer.toString(ch));
+                        str.append(';');
+                        break;
+                    }
+                    // else, default append char
+                }
+                //$FALL-THROUGH$
+                default: {
+                    str.append(ch);
+                }
+            }
+        }
 
-      int len = s.length();
-      for ( int i = 0; i < len; i++ ) {
-         char ch = s.charAt(i);
-         switch ( ch ) {
-            case '<': {
-                  str.append("&lt;");
-                  break;
-               }
-            case '>': {
-                  str.append("&gt;");
-                  break;
-               }
-            case '&': {
-                  str.append("&amp;");
-                  break;
-               }
-            case '"': {
-                  str.append("&quot;");
-                  break;
-               }
-            case '\r':
-            case '\n': {
-                  if ( canonical ) {
-                     str.append("&#");
-                     str.append(Integer.toString(ch));
-                     str.append(';');
-                     break;
-                  }
-                  // else, default append char
-               }
-            //$FALL-THROUGH$
-            default: {
-                  str.append(ch);
-               }
-         }
-      }
-
-      return (str.toString());
-
-   } // normalize(String):String
-
+        return (str.toString());
+    }
 }
