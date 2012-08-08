@@ -37,12 +37,27 @@ source distribution, do the following:
 
  1. If the JDK is already installed, skip to (2).
 
- 2. Download a version 7 or later Java Development Kit (JDK) release (use the
+ 2. Download a version 7 of Java Development Kit (JDK) release (use the
     latest update available for your chosen version) from one of:
 
         http://www.oracle.com/technetwork/java/javase/downloads/index.html
         http://openjdk.java.net/install/index.html
-        or another JDK vendor
+        or another JDK vendor.
+
+    Note:
+      Apache Tomcat builds a private copy of the Apache Commons DBCP
+      library, which is used to provide support for database connection
+      pooling. As far as java.sql interfaces differ in different Java
+      versions, the library can be successfully compiled only with the
+      specified version of JDK.
+
+      See Apache Commons DBCP project web site for more details,
+      http://commons.apache.org/dbcp/
+
+      If you really want to use a later version of JDK to build Tomcat,
+      several workarounds are possible. One of them is to skip building the
+      library. Note though that you might not be able to create a "release"
+      without it.
 
  3. Install the JDK according to the instructions included with the release.
 
