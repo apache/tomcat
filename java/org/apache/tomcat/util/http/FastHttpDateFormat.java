@@ -40,7 +40,7 @@ public final class FastHttpDateFormat {
 
 
     /**
-     * Only permitted HTTP date format specification when generating headers.
+     * The only date format permitted when generating HTTP headers.
      */
     public static final String RFC1123_DATE =
             "EEE, dd MMM yyyy HH:mm:ss zzz";
