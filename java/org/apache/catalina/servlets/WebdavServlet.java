@@ -1099,7 +1099,6 @@ public class WebdavServlet
                     case Node.ELEMENT_NODE:
                         strWriter = new StringWriter();
                         domWriter = new DOMWriter(strWriter, true);
-                        domWriter.setQualifiedNames(false);
                         domWriter.print(currentNode);
                         lock.owner += strWriter.toString();
                         break;
