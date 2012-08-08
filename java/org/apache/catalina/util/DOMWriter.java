@@ -61,7 +61,10 @@ public class DOMWriter {
    /** Canonical output. */
    protected boolean canonical;
 
-
+   /**
+    * @deprecated   Unused - will be removed in 8.0.x
+    */
+   @Deprecated
    public DOMWriter(String encoding, boolean canonical)
    throws UnsupportedEncodingException {
       out = new PrintWriter(new OutputStreamWriter(System.out, encoding));
@@ -72,7 +75,12 @@ public class DOMWriter {
    // Constructors
    //
 
-   /** Default constructor. */
+   /**
+    * Default constructor.
+    *
+    * @deprecated   Unused - will be removed in 8.0.x
+    */
+   @Deprecated
    public DOMWriter(boolean canonical) throws UnsupportedEncodingException {
       this( getWriterEncoding(), canonical);
    }
@@ -82,10 +90,18 @@ public class DOMWriter {
         this.canonical = canonical;
     }
 
+   /**
+    * @deprecated   Unused - will be removed in 8.0.x
+    */
+   @Deprecated
    public boolean getQualifiedNames() {
       return this.qualifiedNames;
    }
 
+   /**
+    * @deprecated   Unnecessary - will be removed in 8.0.x
+    */
+   @Deprecated
    public void setQualifiedNames(boolean qualifiedNames) {
       this.qualifiedNames = qualifiedNames;
    }
@@ -94,6 +110,10 @@ public class DOMWriter {
       return (PRINTWRITER_ENCODING);
    }// getWriterEncoding
 
+   /**
+    * @deprecated   Unused - will be removed in 8.0.x
+    */
+   @Deprecated
    public static void  setWriterEncoding( String encoding ) {
       if( encoding.equalsIgnoreCase( "DEFAULT" ) )
          PRINTWRITER_ENCODING  = "UTF8";
@@ -104,6 +124,10 @@ public class DOMWriter {
    }// setWriterEncoding
 
 
+   /**
+    * @deprecated   Unused - will be removed in 8.0.x
+    */
+   @Deprecated
    public static boolean isValidJavaEncoding( String encoding ) {
       for ( int i = 0; i < MIME2JAVA_ENCODINGS.length; i++ )
          if ( encoding.equals( MIME2JAVA_ENCODINGS[i] ) )
