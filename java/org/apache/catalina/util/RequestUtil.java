@@ -196,7 +196,10 @@ public final class RequestUtil {
      * @param enc The encoding to use; if null, the default encoding is used
      * @exception IllegalArgumentException if a '%' character is not followed
      * by a valid 2-digit hexadecimal number
+     *
+     * @deprecated  Unused - will be removed in 8.0.x
      */
+    @Deprecated
     public static String URLDecode(byte[] bytes, String enc) {
         return URLDecode(bytes, enc, false);
     }
