@@ -41,11 +41,11 @@ import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
 import org.apache.catalina.deploy.LoginConfig;
 import org.apache.catalina.deploy.SecurityConstraint;
-import org.apache.catalina.util.DateTool;
 import org.apache.catalina.util.SessionIdGenerator;
 import org.apache.catalina.valves.ValveBase;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.http.FastHttpDateFormat;
 import org.apache.tomcat.util.res.StringManager;
 
 
@@ -186,7 +186,7 @@ public abstract class AuthenticatorBase extends ValveBase
      * "Expires" header always set to Date(1), so generate once only
      */
     private static final String DATE_ONE =
-        (new SimpleDateFormat(DateTool.HTTP_RESPONSE_DATE_HEADER,
+        (new SimpleDateFormat(FastHttpDateFormat.RFC1123_DATE,
                               Locale.US)).format(new Date(1));
 
 
