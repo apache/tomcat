@@ -1339,18 +1339,25 @@ mywebapp/
                 classes/
 </source>
     <p>The configuration is:</p>
-<source>
+
+<source wrapped="true">
 &lt;Context path="/mywebapp" docBase="/Users/theuser/mywebapp/src/main/webapp" >
+<indent>
   &lt;Resources className="org.apache.naming.resources.VirtualDirContext"
-    extraResourcePaths=
-    "/WEB-INF/classes=/Users/theuser/mywebapp/target/classes,/pictures=/Users/theuser/mypictures,/movies=/Users/theuser/mymovies" />
+    <indent><outdent>extraResourcePaths="/WEB-INF/classes=/Users/theuser/mywebapp/target/classes,/pictures=/Users/theuser/mypictures,/movies=/Users/theuser/mymovies"</outdent></indent>
+    <indent>/></indent>
+</indent>
+<indent>
   &lt;Loader className="org.apache.catalina.loader.VirtualWebappLoader"
-    virtualClasspath="/Users/theuser/mywebapp/target/classes;
-      /Users/theuser/mylib/target/classes;
-      /Users/theuser/.m2/repository/log4j/log4j/1.2.15/log4j-1.2.15.jar" />
+    <indent><outdent>virtualClasspath="/Users/theuser/mywebapp/target/classes;/Users/theuser/mylib/target/classes;/Users/theuser/.m2/repository/log4j/log4j/1.2.15/log4j-1.2.15.jar"</outdent></indent>
+    <indent>/></indent>
+</indent>
+<indent>
   &lt;JarScanner scanAllDirectories="true" />
+</indent>
 &lt;/Context>
 </source>
+
     <p>Note that resources in mylib/target/classes/META-INF/resources/ are mapped to / as
     required by servlet 3 specification.</p>
   </subsection>

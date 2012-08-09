@@ -149,6 +149,10 @@
         documentation web application. Also fix a handful of spelling errors.
         (markt)
       </fix>
+      <fix>
+        <bug>53653</bug>: Allow for wrapped source code example in
+        config/context.html. Patch provided by Terence Bandoian. (schultz)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Tribes">
