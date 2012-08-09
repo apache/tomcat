@@ -68,12 +68,12 @@ public class StuckThreadDetectionValve extends ValveBase {
      * are stuck (caused by a long monitor interval)
      */
     private final ConcurrentHashMap<Long, MonitoredThread> activeThreads =
-            new ConcurrentHashMap<Long, MonitoredThread>();
+            new ConcurrentHashMap<>();
     /**
      *
      */
     private final Queue<CompletedStuckThread> completedStuckThreadsQueue =
-            new ConcurrentLinkedQueue<CompletedStuckThread>();
+            new ConcurrentLinkedQueue<>();
 
     /**
      * Specify the threshold (in seconds) used when checking for stuck threads.
@@ -214,7 +214,7 @@ public class StuckThreadDetectionValve extends ValveBase {
     }
 
     public long[] getStuckThreadIds() {
-        List<Long> idList = new ArrayList<Long>();
+        List<Long> idList = new ArrayList<>();
         for (MonitoredThread monitoredThread : activeThreads.values()) {
             if (monitoredThread.isMarkedAsStuck()) {
                 idList.add(Long.valueOf(monitoredThread.getThread().getId()));
@@ -229,7 +229,7 @@ public class StuckThreadDetectionValve extends ValveBase {
     }
 
     public String[] getStuckThreadNames() {
-        List<String> nameList = new ArrayList<String>();
+        List<String> nameList = new ArrayList<>();
         for (MonitoredThread monitoredThread : activeThreads.values()) {
             if (monitoredThread.isMarkedAsStuck()) {
                 nameList.add(monitoredThread.getThread().getName());

@@ -47,9 +47,9 @@ public class CrawlerSessionManagerValve extends ValveBase
         LogFactory.getLog(CrawlerSessionManagerValve.class);
 
     private final Map<String,String> clientIpSessionId =
-        new ConcurrentHashMap<String, String>();
+            new ConcurrentHashMap<>();
     private final Map<String,String> sessionIdClientIp =
-        new ConcurrentHashMap<String, String>();
+            new ConcurrentHashMap<>();
 
     private String crawlerUserAgents =
         ".*[bB]ot.*|.*Yahoo! Slurp.*|.*Feedfetcher-Google.*";
