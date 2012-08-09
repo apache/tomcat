@@ -1177,6 +1177,12 @@
       supported).</p>
     </attribute>
 
+    <attribute name="SSLHonorCipherOrder" required="false">
+      <p>Set to <code>true</code> to enforce the server's cipher order
+      (from the <code>SSLCipherSuite</code> setting) instead of allowing
+      the client to choose the cipher (which is the default).</p>
+    </attribute>
+
     <attribute name="SSLPassword" required="false">
       <p>Pass phrase for the encrypted private key. If "SSLPassword" is not
       provided, the callback function should prompt for the pass phrase.</p>
