@@ -317,6 +317,15 @@ public class AprEndpoint extends AbstractEndpoint {
     public void setSSLInsecureRenegotiation(boolean SSLInsecureRenegotiation) { this.SSLInsecureRenegotiation = SSLInsecureRenegotiation; }
     public boolean getSSLInsecureRenegotiation() { return SSLInsecureRenegotiation; }
 
+    protected boolean SSLHonorCipherOrder = false;
+    /**
+     * Set to <code>true</code> to enforce the <i>server's</i> cipher order
+     * instead of the default which is to allow the client to choose a
+     * preferred cipher.
+     */
+    public void setSSLHonorCipherOrder(boolean SSLHonorCipherOrder) { this.SSLHonorCipherOrder = SSLHonorCipherOrder; }
+    public boolean getSSLHonorCipherOrder() { return SSLHonorCipherOrder; }
+
 
     /**
      * Port in use.
@@ -526,6 +535,24 @@ public class AprEndpoint extends AbstractEndpoint {
                                           SSL.versionString()));
                 }
             }
+
+            // Set cipher order: client (default) or server
+            if (SSLHonorCipherOrder) {
+                boolean orderCiphersSupported = false;
+                try {
+                    orderCiphersSupported = SSL.hasOp(SSL.SSL_OP_CIPHER_SERVER_PREFERENCE);
+                    if (orderCiphersSupported)
+                        SSLContext.setOptions(sslContext, SSL.SSL_OP_CIPHER_SERVER_PREFERENCE);
+                } catch (UnsatisfiedLinkError e) {
+                    // Ignore
+                }
+                if (!orderCiphersSupported) {
+                    // OpenSSL does not support ciphers ordering.
+                    log.warn(sm.getString("endpoint.warn.noHonorCipherOrder",
+                                          SSL.versionString()));
+                }
+            }
+
             // List the ciphers that the client is permitted to negotiate
             SSLContext.setCipherSuite(sslContext, SSLCipherSuite);
             // Load Server key and certificate
