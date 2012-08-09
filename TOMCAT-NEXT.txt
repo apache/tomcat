@@ -1,0 +1,41 @@
+================================================================================
+  Licensed to the Apache Software Foundation (ASF) under one or more
+  contributor license agreements.  See the NOTICE file distributed with
+  this work for additional information regarding copyright ownership.
+  The ASF licenses this file to You under the Apache License, Version 2.0
+  (the "License"); you may not use this file except in compliance with
+  the License.  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+================================================================================
+
+Notes of things to consider for the next major Tomcat release (probably 8.0.x
+but possibly 7.1.x).
+
+1. Refactor the TLD parsing. TLDs are currently parsed twice. Once by Catalina
+   looking for listeners and once by Jasper.
+
+2. Refactor the XML parsing (org.apache.tomcat.util.xml ?) to remove duplicate
+   XML parsing code in Catalina and Jasper such as the entity resolvers used for
+   validation.
+
+3. TLDs may have a many to many relationship between URIs and TLD files. This
+   can result in the same TLD file being parsed many times. Refactor the
+   TldLocationCache to cache the parsed nodes (will need to check for changes to
+   TLD files).
+
+4. TLD files should be included in the dependencies for JSP and Tag files.
+
+5. Run the unused code detector and remove everything that isn't currently used.
+   Add deprecation markers for the removed code to Tomcat 7.0.x
+
+6. Change the default URIEncoding on the connector to UTF-8.
+
+7. Rip out all the JNDI code in resource handling and replace it with straight
+   URLs (File or WAR).

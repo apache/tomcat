@@ -70,6 +70,11 @@
         <code>IllegalArgumentException</code> was thrown. (markt)
       </fix>
       <fix>
+        <bug>53481</bug>: Added support for SSLHonorCipherOrder to allow
+        the server to impose its cipher order on the client. Based on a patch
+        provided by Marcel Šebek. (schultz)
+      </fix>
+      <fix>
         <bug>53498</bug>: Fix atomicity bugs in use of concurrent collections.
         Based on a patch by Yu Lin. (markt)
       </fix>
