@@ -87,6 +87,11 @@
             code {background-color:rgb(224,255,255);padding:0 0.1em;}
             code.attributeName, code.propertyName {background-color:transparent;}
         </style>
+        <style type="text/css">
+            .wrapped-source code { display: block; background-color: transparent; }
+            .wrapped-source div { margin: 0 0 0 1.25em; }
+            .wrapped-source p { margin: 0 0 0 1.25em; text-indent: -1.25em; }
+        </style>
     </head>
 
     <body bgcolor="{$body-bg}" text="{$body-fg}" link="{$body-link}"
@@ -326,9 +331,22 @@
           <td bgcolor="{$source-color}" width="1">
             <img src="{$void}" alt="" width="1" height="1" vspace="0" hspace="0" border="0"/>
           </td>
+    <xsl:choose>
+      <xsl:when test="@wrapped='true'">
+          <td bgcolor="#ffffff" height="1">
+            <div class="wrapped-source">
+            <code>
+              <xsl:apply-templates />
+            </code>
+            </div>
+          </td>
+      </xsl:when>
+      <xsl:otherwise>
           <td bgcolor="#ffffff" height="1"><pre>
             <xsl:value-of select="."/>
           </pre></td>
+      </xsl:otherwise>
+    </xsl:choose>
           <td bgcolor="{$source-color}" width="1">
             <img src="{$void}" alt="" width="1" height="1" vspace="0" hspace="0" border="0"/>
           </td>
@@ -346,6 +364,18 @@
         </tr>
       </table>
     </div>
+  </xsl:template>
+
+
+  <!-- Process a wrapped source code example - indent -->
+  <xsl:template match="source//indent">
+    <div><xsl:apply-templates /></div>
+  </xsl:template>
+
+
+  <!-- Process a wrapped source code example - outdent -->
+  <xsl:template match="source//outdent">
+    <p><xsl:apply-templates /></p>
   </xsl:template>
 
 
