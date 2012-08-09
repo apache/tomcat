@@ -421,7 +421,7 @@ public class ExtendedAccessLogValve extends AccessLogValve {
     }
 
     protected static class PatternTokenizer {
-        private StringReader sr = null;
+        private final StringReader sr;
         private StringBuilder buf = new StringBuilder();
         private boolean ended = false;
         private boolean subToken;
@@ -543,7 +543,7 @@ public class ExtendedAccessLogValve extends AccessLogValve {
         if (log.isDebugEnabled()) {
             log.debug("decodePattern, pattern =" + pattern);
         }
-        List<AccessLogElement> list = new ArrayList<AccessLogElement>();
+        List<AccessLogElement> list = new ArrayList<>();
 
         PatternTokenizer tokenizer = new PatternTokenizer(pattern);
         try {

@@ -421,7 +421,7 @@ public class AccessLogValve extends ValveBase implements AccessLog {
         private final Locale cacheDefaultLocale;
         private final DateFormatCache parent;
         private final Cache cLFCache;
-        private final HashMap<String, Cache> formatCache = new HashMap<String, Cache>();
+        private final HashMap<String, Cache> formatCache = new HashMap<>();
 
         private DateFormatCache(int size, Locale loc, DateFormatCache parent) {
             cacheSize = size;
@@ -498,7 +498,7 @@ public class AccessLogValve extends ValveBase implements AccessLog {
     /**
      * The list of our format types.
      */
-    private static enum formatType {
+    private static enum FormatType {
         CLF, SEC, MSEC, MSEC_FRAC, SDF
     }
 
@@ -1412,11 +1412,11 @@ public class AccessLogValve extends ValveBase implements AccessLog {
             msecPattern + msecPattern + msecPattern;
 
         /* Our format description string, null if CLF */
-        private String format = null;
+        private final String format;
         /* Whether to use begin of request or end of response as the timestamp */
-        private boolean usesBegin = false;
+        private final boolean usesBegin;
         /* The format type */
-        private formatType type = formatType.CLF;
+        private final FormatType type;
         /* Whether we need to postprocess by adding milliseconds */
         private boolean usesMsecs = false;
 
@@ -1452,7 +1452,10 @@ public class AccessLogValve extends ValveBase implements AccessLog {
         }
 
         protected DateAndTimeElement(String header) {
-            format = header;
+            String format = header;
+            boolean usesBegin = false;
+            FormatType type = FormatType.CLF;
+
             if (format != null) {
                 if (format.equals(requestStartPrefix)) {
                     usesBegin = true;
@@ -1468,18 +1471,21 @@ public class AccessLogValve extends ValveBase implements AccessLog {
                     format = format.substring(4);
                 }
                 if (format.length() == 0) {
-                    type = formatType.CLF;
+                    type = FormatType.CLF;
                 } else if (format.equals(secFormat)) {
-                    type = formatType.SEC;
+                    type = FormatType.SEC;
                 } else if (format.equals(msecFormat)) {
-                    type = formatType.MSEC;
+                    type = FormatType.MSEC;
                 } else if (format.equals(msecFractionFormat)) {
-                    type = formatType.MSEC_FRAC;
+                    type = FormatType.MSEC_FRAC;
                 } else {
-                    type = formatType.SDF;
+                    type = FormatType.SDF;
                     format = tidyFormat(format);
                 }
             }
+            this.format = format;
+            this.usesBegin = usesBegin;
+            this.type = type;
         }
 
         @Override
@@ -1915,7 +1921,7 @@ public class AccessLogValve extends ValveBase implements AccessLog {
      * parse pattern string and create the array of AccessLogElement
      */
     protected AccessLogElement[] createLogElements() {
-        List<AccessLogElement> list = new ArrayList<AccessLogElement>();
+        List<AccessLogElement> list = new ArrayList<>();
         boolean replace = false;
         StringBuilder buf = new StringBuilder();
         for (int i = 0; i < pattern.length(); i++) {
