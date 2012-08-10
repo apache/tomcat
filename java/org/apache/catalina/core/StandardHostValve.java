@@ -438,6 +438,7 @@ final class StandardHostValve extends ValveBase {
             } else {
                 // Reset the response (keeping the real error code and message)
                 response.resetBuffer(true);
+                response.setContentLength(-1);
 
                 rd.forward(request.getRequest(), response.getResponse());
 
