@@ -116,6 +116,10 @@
         Document the constants that were added to the
         <code>RequestDispatcher</code> interface in Servlet 3.0. (kkolinko)
       </scode>
+      <fix>
+        Ensure custom error pages are not truncated if the page that triggered
+        the error set a content length header. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
