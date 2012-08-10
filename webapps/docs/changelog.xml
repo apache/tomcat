@@ -99,6 +99,10 @@
         on Context start. Patch provided by Cedomir Igaly. (markt)
       </fix>
       <fix>
+        <bug>53541</bug>: Fix JAR scanning when WEB-INF/lib is provided via
+        VirtualDirContext. Patch provided by Philip Zuev. (markt)
+      </fix>
+      <fix>
         <bug>53584</bug>: Ignore path parameters when comparing URIs for FORM
         authentication. This prevents users being prompted twice for passwords
         when logging in when session IDs are being encoded as path parameters.
