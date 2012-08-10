@@ -296,4 +296,13 @@ public class VirtualDirContext extends FileDirContext {
         return retSuper;
     }
 
+    @Override
+    protected String doGetRealPath(String path) {
+        File file = file(path);
+        if (null != file) {
+            return file.getAbsolutePath();
+        } else {
+            return null;
+        }
+    }
 }
