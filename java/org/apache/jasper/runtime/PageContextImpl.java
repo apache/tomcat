@@ -715,6 +715,7 @@ public class PageContextImpl extends PageContext {
         // JSP.4.5 If the buffer was flushed, throw IllegalStateException
         try {
             out.clear();
+            baseOut.clear();
         } catch (IOException ex) {
             IllegalStateException ise = new IllegalStateException(Localizer
                     .getMessage("jsp.error.attempt_to_clear_flushed_buffer"));
