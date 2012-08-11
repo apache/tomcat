@@ -238,9 +238,12 @@
         declared in web.xml - unless metadata complete is set to true. (markt)
       </fix>
       <fix>
-        As per clarification from the Servlet Expert Group, JARs are always
-        checked for ServletContainerInitializers regardless of the setting of
-        metadata complete. (markt) 
+        <bug>53619</bug>As per clarification from the Servlet Expert Group,
+        JARs will always be scanned for ServletContainerInitializers regardless
+        of the setting of metadata complete. However, if an absolute ordering is
+        specified and a JAR is excluded from that ordering it will not be
+        scanned for ServletContainerInitializers nor will it be scanned for
+        matches to any HandleTypes annotations. (markt) 
       </fix>
       <add>
         <bug>53465</bug>: Populate mapped-name property for resources defined in
