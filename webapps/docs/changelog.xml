@@ -103,6 +103,10 @@
         VirtualDirContext. Patch provided by Philip Zuev. (markt)
       </fix>
       <fix>
+        <bug>53574</bug>: Ensure Servlets defined using jsp-file are available
+        when metadata-complete is true. (markt)
+      </fix>
+      <fix>
         <bug>53584</bug>: Ignore path parameters when comparing URIs for FORM
         authentication. This prevents users being prompted twice for passwords
         when logging in when session IDs are being encoded as path parameters.
