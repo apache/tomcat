@@ -45,7 +45,7 @@ Tomcat. The following is a step by step guide.
 <section name="Download a Java Development Kit (JDK) version 7">
 
 <p>
-Tomcat requires a JDK (version 7) to be installed. You can download one from<br />
+Building Apache Tomcat requires a JDK (version 7) to be installed. You can download one from<br />
 <a href="http://www.oracle.com/technetwork/java/javase/downloads/index.html">http://www.oracle.com/technetwork/java/javase/downloads/index.html</a><br/>
 <a href="http://openjdk.java.net/install/index.html">http://openjdk.java.net/install/index.html</a><br/>
 or another JDK vendor.
