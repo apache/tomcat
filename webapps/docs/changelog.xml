@@ -135,6 +135,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Jasper">
+    <changelog>
+      <fix>
+        <bug>53545</bug>: Ensure buffered data is cleared when using a
+        jsp:forward action inside a classic custom tag. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Cluster">
     <changelog>
       <fix>
