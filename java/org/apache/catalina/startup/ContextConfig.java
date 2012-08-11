@@ -1245,6 +1245,7 @@ public class ContextConfig implements LifecycleListener {
             }
         } else {
             webXml.merge(defaults);
+            convertJsps(webXml);
             webXml.configureContext(context);
         }
 
