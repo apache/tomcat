@@ -113,6 +113,15 @@
     <url-pattern>/testStandardWrapper/securityAnnotationsMetaDataPriority</url-pattern>
   </servlet-mapping>
 
+  <servlet>
+    <servlet-name>Bug53574</servlet-name>
+    <jsp-file>/WEB-INF/jsp/bug53574.jsp</jsp-file>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>Bug53574</servlet-name>
+    <url-pattern>/bug53574</url-pattern>
+  </servlet-mapping>
+
   <login-config>
     <auth-method>BASIC</auth-method>
   </login-config>
