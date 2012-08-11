@@ -1122,9 +1122,9 @@ public class ContextConfig implements LifecycleListener {
          * - As per http://java.net/jira/browse/SERVLET_SPEC-36, if the main
          *   web.xml is marked as metadata-complete, JARs are still processed
          *   for SCIs.
-         * - TBD. If metadata-complete=true and an absolute ordering is
-         *   specified, are JARs excluded from the ordering also excluded from
-         *   the SCI processing? Current assumption is that they are.
+         * - If metadata-complete=true and an absolute ordering is specified,
+         *   JARs excluded from the ordering are also excluded from the SCI
+         *   processing.
          * - If an SCI has a @HandlesType annotation then all classes (except
          *   those in JARs excluded from an absolute ordering) need to be
          *   scanned to check if they match.
