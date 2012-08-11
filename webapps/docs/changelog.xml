@@ -170,6 +170,10 @@
         (markt)
       </fix>
       <fix>
+        <bug>53601</bug>: Clarify in documentation that building Apache Tomcat 7
+        from sources requires a Java 6 JDK. (kkolinko)
+      </fix>
+      <fix>
         <bug>53653</bug>: Allow for wrapped source code example in
         config/context.html. Patch provided by Terence Bandoian. (schultz)
       </fix>

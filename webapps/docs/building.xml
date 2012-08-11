@@ -42,12 +42,12 @@ Tomcat. The following is a step by step guide.
 
 </section>
 
-<section name="Download a Java Development Kit (JDK) 1.6 or later">
+<section name="Download a Java Development Kit (JDK) version 6">
 
 <p>
-Tomcat requires a JDK (version 1.6 or later) to be installed.
-<br/>The Sun JDK can be downloaded
-<a href="http://www.oracle.com/technetwork/java/javase/downloads/index.html">here</a>.
+Building Apache Tomcat requires a JDK (version 6) to be installed. You can download one from<br />
+<a href="http://www.oracle.com/technetwork/java/javase/downloads/index.html">http://www.oracle.com/technetwork/java/javase/downloads/index.html</a><br/>
+or from another JDK vendor.
 </p>
 
 <p>
