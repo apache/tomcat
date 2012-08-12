@@ -28,6 +28,7 @@ import java.util.concurrent.Executors;
 import javax.servlet.AsyncContext;
 import javax.servlet.AsyncEvent;
 import javax.servlet.AsyncListener;
+import javax.servlet.DispatcherType;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequestEvent;
@@ -597,6 +598,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
 
         private static final long serialVersionUID = 1L;
         private static final String ITER_PARAM = "iter";
+        private static final String DISPATCH_CHECK = "check";
         private boolean addTrackingListener = false;
         private boolean completeOnError = false;
 
@@ -610,6 +612,11 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         protected void doGet(HttpServletRequest req, HttpServletResponse resp)
                 throws ServletException, IOException {
 
+            if ("y".equals(req.getParameter(DISPATCH_CHECK))) {
+                if (req.getDispatcherType() != DispatcherType.ASYNC) {
+                    resp.getWriter().write("WrongDispatcherType-");
+                }
+            }
             resp.getWriter().write("DispatchingServletGet-");
             resp.flushBuffer();
             final int iter = Integer.parseInt(req.getParameter(ITER_PARAM)) - 1;
@@ -623,7 +630,8 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
                 @Override
                 public void run() {
                     if (iter > 0) {
-                        ctxt.dispatch("/stage1?" + ITER_PARAM + "=" + iter);
+                        ctxt.dispatch("/stage1?" + ITER_PARAM + "=" + iter +
+                                "&" + DISPATCH_CHECK + "=y");
                     } else {
                         ctxt.dispatch("/stage2");
                     }
