@@ -19,6 +19,7 @@ package org.apache.catalina.valves;
 
 import java.io.IOException;
 import java.io.Writer;
+import java.util.Scanner;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -142,7 +143,11 @@ public class ErrorReportValve extends ValveBase {
         String message = RequestUtil.filter(response.getMessage());
         if (message == null) {
             if (throwable != null) {
-                message = RequestUtil.filter(throwable.getMessage());
+                String exceptionMessage = throwable.getMessage();
+                if (exceptionMessage != null && exceptionMessage.length() > 0) {
+                    message = RequestUtil.filter(
+                            (new Scanner(exceptionMessage)).nextLine());
+                }
             }
             if (message == null) {
                 message = "";
