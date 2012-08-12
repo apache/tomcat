@@ -63,6 +63,11 @@
         when request processing completes. (kkolinko)
       </fix>
       <fix>
+        <bug>53071</bug>: This additional fix for this issue improves the
+        formatting of Jasper errors (or any exceptions that use a multi-line
+        message) with the <code>ErrorReportValve</code>. (markt)
+      </fix>
+      <fix>
         <bug>53469</bug>: If a URL passed to
         <code>javax.servlet.http.HttpServletResponse.encodeURL()</code> cannot
         be made absolute, never encode it and return it unchanged. Previously,
