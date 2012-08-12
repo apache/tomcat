@@ -1036,8 +1036,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         tomcat.start();
 
         // Call the servlet once
-        Map<String,List<String>> headers =
-            new LinkedHashMap<String,List<String>>();
+        Map<String,List<String>> headers = new LinkedHashMap<>();
         ByteChunk bc = new ByteChunk();
         int rc = getUrl("http://localhost:" + getPort() + "/", bc, headers);
         assertEquals(200, rc);

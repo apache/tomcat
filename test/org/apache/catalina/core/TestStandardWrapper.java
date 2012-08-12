@@ -251,8 +251,8 @@ public class TestStandardWrapper extends TomcatBaseTest {
         ByteChunk bc = new ByteChunk();
         Map<String,List<String>> reqHeaders = null;
         if (useRole) {
-            reqHeaders = new HashMap<String,List<String>>();
-            List<String> authHeaders = new ArrayList<String>();
+            reqHeaders = new HashMap<>();
+            List<String> authHeaders = new ArrayList<>();
             // testUser, testPwd
             authHeaders.add("Basic dGVzdFVzZXI6dGVzdFB3ZA==");
             reqHeaders.put("Authorization", authHeaders);
@@ -387,7 +387,7 @@ public class TestStandardWrapper extends TomcatBaseTest {
             threads[i].join();
         }
 
-        Set<String> servlets = new HashSet<String>();
+        Set<String> servlets = new HashSet<>();
         // Output the result
         for (int i = 0; i < BUG51445_THREAD_COUNT; i ++) {
             System.out.println(threads[i].getResult());
@@ -434,7 +434,7 @@ public class TestStandardWrapper extends TomcatBaseTest {
             threads[i].join();
         }
 
-        Set<String> servlets = new HashSet<String>();
+        Set<String> servlets = new HashSet<>();
         // Output the result
         for (int i = 0; i < BUG51445_THREAD_COUNT; i ++) {
             System.out.println(threads[i].getResult());
