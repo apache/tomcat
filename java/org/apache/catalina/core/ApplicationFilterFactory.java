@@ -45,10 +45,18 @@ public final class ApplicationFilterFactory {
     // -------------------------------------------------------------- Constants
 
 
+    /**
+     * @deprecated  Use {@link Globals#DISPATCHER_TYPE_ATTR}
+     */
+    @Deprecated
     public static final String DISPATCHER_TYPE_ATTR =
-        Globals.DISPATCHER_TYPE_ATTR;
+            Globals.DISPATCHER_TYPE_ATTR;
+    /**
+     * @deprecated  Use {@link Globals#DISPATCHER_REQUEST_PATH_ATTR}
+     */
+    @Deprecated
     public static final String DISPATCHER_REQUEST_PATH_ATTR =
-        Globals.DISPATCHER_REQUEST_PATH_ATTR;
+            Globals.DISPATCHER_REQUEST_PATH_ATTR;
 
     private static ApplicationFilterFactory factory = null;
 
@@ -87,11 +95,13 @@ public final class ApplicationFilterFactory {
 
         // get the dispatcher type
         DispatcherType dispatcher = null;
-        if (request.getAttribute(DISPATCHER_TYPE_ATTR) != null) {
-            dispatcher = (DispatcherType) request.getAttribute(DISPATCHER_TYPE_ATTR);
+        if (request.getAttribute(Globals.DISPATCHER_TYPE_ATTR) != null) {
+            dispatcher = (DispatcherType) request.getAttribute(
+                    Globals.DISPATCHER_TYPE_ATTR);
         }
         String requestPath = null;
-        Object attribute = request.getAttribute(DISPATCHER_REQUEST_PATH_ATTR);
+        Object attribute = request.getAttribute(
+                Globals.DISPATCHER_REQUEST_PATH_ATTR);
 
         if (attribute != null){
             requestPath = attribute.toString();

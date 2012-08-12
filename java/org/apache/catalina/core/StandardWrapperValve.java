@@ -176,12 +176,9 @@ final class StandardWrapperValve
         MessageBytes requestPathMB = request.getRequestPathMB();
         DispatcherType dispatcherType = DispatcherType.REQUEST;
         if (request.getDispatcherType()==DispatcherType.ASYNC) dispatcherType = DispatcherType.ASYNC;
-        request.setAttribute
-            (ApplicationFilterFactory.DISPATCHER_TYPE_ATTR,
-             dispatcherType);
-        request.setAttribute
-            (ApplicationFilterFactory.DISPATCHER_REQUEST_PATH_ATTR,
-             requestPathMB);
+        request.setAttribute(Globals.DISPATCHER_TYPE_ATTR,dispatcherType);
+        request.setAttribute(Globals.DISPATCHER_REQUEST_PATH_ATTR,
+                requestPathMB);
         // Create the filter chain for this request
         ApplicationFilterFactory factory =
             ApplicationFilterFactory.getInstance();
@@ -386,12 +383,10 @@ final class StandardWrapperValve
         }
 
         MessageBytes requestPathMB = request.getRequestPathMB();
-        request.setAttribute
-            (ApplicationFilterFactory.DISPATCHER_TYPE_ATTR,
-             DispatcherType.REQUEST);
-        request.setAttribute
-            (ApplicationFilterFactory.DISPATCHER_REQUEST_PATH_ATTR,
-             requestPathMB);
+        request.setAttribute(Globals.DISPATCHER_TYPE_ATTR,
+                DispatcherType.REQUEST);
+        request.setAttribute(Globals.DISPATCHER_REQUEST_PATH_ATTR,
+                requestPathMB);
         // Get the current (unchanged) filter chain for this request
         ApplicationFilterChain filterChain =
             (ApplicationFilterChain) request.getFilterChain();
