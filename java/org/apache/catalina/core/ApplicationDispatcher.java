@@ -457,7 +457,7 @@ final class ApplicationDispatcher
                                 State state)
         throws IOException, ServletException {
                 
-        DispatcherType disInt = (DispatcherType) request.getAttribute(ApplicationFilterFactory.DISPATCHER_TYPE_ATTR);
+        DispatcherType disInt = (DispatcherType) request.getAttribute(Globals.DISPATCHER_TYPE_ATTR);
         if (disInt != null) {
             boolean doInvoke = true;
             
@@ -468,12 +468,12 @@ final class ApplicationDispatcher
 
             if (doInvoke) {
                 if (disInt != DispatcherType.ERROR) {
-                    state.outerRequest.setAttribute
-                        (ApplicationFilterFactory.DISPATCHER_REQUEST_PATH_ATTR,
-                         getCombinedPath());
-                    state.outerRequest.setAttribute
-                        (ApplicationFilterFactory.DISPATCHER_TYPE_ATTR,
-                         DispatcherType.FORWARD);
+                    state.outerRequest.setAttribute(
+                            Globals.DISPATCHER_REQUEST_PATH_ATTR,
+                            getCombinedPath());
+                    state.outerRequest.setAttribute(
+                            Globals.DISPATCHER_TYPE_ATTR,
+                            DispatcherType.FORWARD);
                     invoke(state.outerRequest, response, state);
                 } else {
                     invoke(state.outerRequest, response, state);
@@ -559,10 +559,8 @@ final class ApplicationDispatcher
             wrequest.setAttribute(Globals.NAMED_DISPATCHER_ATTR, name);
             if (servletPath != null)
                 wrequest.setServletPath(servletPath);
-            wrequest.setAttribute(ApplicationFilterFactory.DISPATCHER_TYPE_ATTR,
-                    type);
-            wrequest.setAttribute(
-                    ApplicationFilterFactory.DISPATCHER_REQUEST_PATH_ATTR,
+            wrequest.setAttribute(Globals.DISPATCHER_TYPE_ATTR, type);
+            wrequest.setAttribute(Globals.DISPATCHER_REQUEST_PATH_ATTR,
                     getCombinedPath());
             invoke(state.outerRequest, state.outerResponse, state);
         }
@@ -591,10 +589,8 @@ final class ApplicationDispatcher
                 wrequest.setQueryParams(queryString);
             }
             
-            wrequest.setAttribute(ApplicationFilterFactory.DISPATCHER_TYPE_ATTR,
-                    type);
-            wrequest.setAttribute(
-                    ApplicationFilterFactory.DISPATCHER_REQUEST_PATH_ATTR,
+            wrequest.setAttribute(Globals.DISPATCHER_TYPE_ATTR, type);
+            wrequest.setAttribute(Globals.DISPATCHER_REQUEST_PATH_ATTR,
                     getCombinedPath());
             invoke(state.outerRequest, state.outerResponse, state);
         }

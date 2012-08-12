@@ -312,11 +312,10 @@ final class StandardHostValve extends ValveBase {
             if (message == null)
                 message = "";
             request.setAttribute(RequestDispatcher.ERROR_MESSAGE, message);
-            request.setAttribute
-                (ApplicationFilterFactory.DISPATCHER_REQUEST_PATH_ATTR,
-                 errorPage.getLocation());
-            request.setAttribute(ApplicationFilterFactory.DISPATCHER_TYPE_ATTR,
-                              DispatcherType.ERROR);
+            request.setAttribute(Globals.DISPATCHER_REQUEST_PATH_ATTR,
+                    errorPage.getLocation());
+            request.setAttribute(Globals.DISPATCHER_TYPE_ATTR,
+                    DispatcherType.ERROR);
 
 
             Wrapper wrapper = request.getWrapper();
@@ -381,11 +380,10 @@ final class StandardHostValve extends ValveBase {
 
         if (errorPage != null) {
             response.setAppCommitted(false);
-            request.setAttribute
-                (ApplicationFilterFactory.DISPATCHER_REQUEST_PATH_ATTR,
-                 errorPage.getLocation());
-            request.setAttribute(ApplicationFilterFactory.DISPATCHER_TYPE_ATTR,
-                              DispatcherType.ERROR);
+            request.setAttribute(Globals.DISPATCHER_REQUEST_PATH_ATTR,
+                    errorPage.getLocation());
+            request.setAttribute(Globals.DISPATCHER_TYPE_ATTR,
+                    DispatcherType.ERROR);
             request.setAttribute(RequestDispatcher.ERROR_STATUS_CODE,
                     new Integer(HttpServletResponse.SC_INTERNAL_SERVER_ERROR));
             request.setAttribute(RequestDispatcher.ERROR_MESSAGE,
