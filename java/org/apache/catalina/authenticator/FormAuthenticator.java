@@ -140,7 +140,7 @@ public class FormAuthenticator
             if (ssoId != null) {
                 associate(ssoId, request.getSessionInternal(true));
             }
-            return (true);
+            return true;
         }
 
         // Is there an SSO session against which we can try to reauthenticate?
@@ -182,7 +182,7 @@ public class FormAuthenticator
                         register(request, response, principal,
                                 HttpServletRequest.FORM_AUTH,
                                 username, password);
-                        return (true);
+                        return true;
                     }
                 }
                 if (log.isDebugEnabled()) {
@@ -215,13 +215,13 @@ public class FormAuthenticator
                 if (log.isDebugEnabled()) {
                     log.debug("Proceed to restored request");
                 }
-                return (true);
+                return true;
             } else {
                 if (log.isDebugEnabled()) {
                     log.debug("Restore of original request failed");
                 }
                 response.sendError(HttpServletResponse.SC_BAD_REQUEST);
-                return (false);
+                return false;
             }
         }
 
@@ -251,10 +251,10 @@ public class FormAuthenticator
                 log.debug("Request body too big to save during authentication");
                 response.sendError(HttpServletResponse.SC_FORBIDDEN,
                         sm.getString("authenticator.requestBodyTooBig"));
-                return (false);
+                return false;
             }
             forwardToLoginPage(request, response, config);
-            return (false);
+            return false;
         }
 
         // Yes -- Acknowledge the request, validate the specified credentials
@@ -272,7 +272,7 @@ public class FormAuthenticator
         principal = realm.authenticate(username, password);
         if (principal == null) {
             forwardToErrorPage(request, response, config);
-            return (false);
+            return false;
         }
 
         if (log.isDebugEnabled()) {
@@ -301,7 +301,7 @@ public class FormAuthenticator
                         Constants.FORM_REQUEST_NOTE, saved);
                 response.sendRedirect(response.encodeRedirectURL(uri));
             }
-            return (false);
+            return false;
         }
 
         // Save the authenticated Principal in our session
@@ -334,7 +334,7 @@ public class FormAuthenticator
         } else {
             response.sendRedirect(response.encodeRedirectURL(requestURI));
         }
-        return (false);
+        return false;
 
     }
 
@@ -455,31 +455,30 @@ public class FormAuthenticator
      * @param request The request to be verified
      */
     protected boolean matchRequest(Request request) {
+        // Has a session been created?
+        Session session = request.getSessionInternal(false);
+        if (session == null) {
+            return false;
+        }
 
-      // Has a session been created?
-      Session session = request.getSessionInternal(false);
-      if (session == null) {
-        return (false);
-    }
+        // Is there a saved request?
+        SavedRequest sreq =
+                (SavedRequest) session.getNote(Constants.FORM_REQUEST_NOTE);
+        if (sreq == null) {
+            return false;
+        }
 
-      // Is there a saved request?
-      SavedRequest sreq = (SavedRequest)
-          session.getNote(Constants.FORM_REQUEST_NOTE);
-      if (sreq == null) {
-        return (false);
-    }
+        // Is there a saved principal?
+        if (session.getNote(Constants.FORM_PRINCIPAL_NOTE) == null) {
+            return false;
+        }
 
-      // Is there a saved principal?
-      if (session.getNote(Constants.FORM_PRINCIPAL_NOTE) == null) {
-        return (false);
-    }
-
-      // Does the request URI match?
-      String decodedRequestURI = request.getDecodedRequestURI();
-      if (decodedRequestURI == null) {
-        return (false);
-    }
-      return (decodedRequestURI.equals(sreq.getDecodedRequestURI()));
+        // Does the request URI match?
+        String decodedRequestURI = request.getDecodedRequestURI();
+        if (decodedRequestURI == null) {
+            return false;
+        }
+        return decodedRequestURI.equals(sreq.getDecodedRequestURI());
     }
 
 
@@ -501,7 +500,7 @@ public class FormAuthenticator
         session.removeNote(Constants.FORM_REQUEST_NOTE);
         session.removeNote(Constants.FORM_PRINCIPAL_NOTE);
         if (saved == null) {
-            return (false);
+            return false;
         }
 
         // Modify our current request to reflect the original one
@@ -574,7 +573,7 @@ public class FormAuthenticator
 
         request.getCoyoteRequest().requestURI().setString
             (saved.getRequestURI());
-        return (true);
+        return true;
 
     }
 
