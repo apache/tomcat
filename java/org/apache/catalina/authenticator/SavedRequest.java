@@ -146,6 +146,21 @@ public final class SavedRequest {
 
 
     /**
+     * The decode request URI associated with this Request. Path parameters are
+     * also excluded
+     */
+    private String decodedRequestURI = null;
+
+    public String getDecodedRequestURI() {
+        return (this.decodedRequestURI);
+    }
+
+    public void setDecodedRequestURI(String decodedRequestURI) {
+        this.decodedRequestURI = decodedRequestURI;
+    }
+
+
+    /**
      * The body of this request.
      */
     private ByteChunk body = null;
