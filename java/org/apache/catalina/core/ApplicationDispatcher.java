@@ -611,29 +611,15 @@ final class ApplicationDispatcher implements AsyncDispatcher, RequestDispatcher 
             throws ServletException, IOException {
 
         // Set up to handle the specified request and response
-        State state = new State(request, response, true);
+        State state = new State(request, response, false);
 
         // Create a wrapped response to use for this request
         wrapResponse(state);
 
         ApplicationHttpRequest wrequest =
             (ApplicationHttpRequest) wrapRequest(state);
-        String contextPath = context.getPath();
-        if (requestURI != null)
-            wrequest.setAttribute(RequestDispatcher.INCLUDE_REQUEST_URI,
-                                  requestURI);
-        if (contextPath != null)
-            wrequest.setAttribute(RequestDispatcher.INCLUDE_CONTEXT_PATH,
-                                  contextPath);
-        if (servletPath != null)
-            wrequest.setAttribute(RequestDispatcher.INCLUDE_SERVLET_PATH,
-                                  servletPath);
-        if (pathInfo != null)
-            wrequest.setAttribute(RequestDispatcher.INCLUDE_PATH_INFO,
-                                  pathInfo);
+
         if (queryString != null) {
-            wrequest.setAttribute(RequestDispatcher.INCLUDE_QUERY_STRING,
-                                  queryString);
             wrequest.setQueryParams(queryString);
         }
 
@@ -642,7 +628,7 @@ final class ApplicationDispatcher implements AsyncDispatcher, RequestDispatcher 
         wrequest.setAttribute(Globals.DISPATCHER_REQUEST_PATH_ATTR,
                 getCombinedPath());
 
-        wrequest.setContextPath(contextPath);
+        wrequest.setContextPath(context.getPath());
         wrequest.setRequestURI(requestURI);
         wrequest.setServletPath(servletPath);
         wrequest.setPathInfo(pathInfo);
