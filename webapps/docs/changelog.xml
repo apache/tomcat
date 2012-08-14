@@ -204,6 +204,13 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Other">
+    <changelog>
+      <fix>
+        <bug>53701</bug>: Javadoc fixes. Patch provided by sebb. (markt)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 7.0.29 (markt)" rtext="released 2012-07-08">
   <subsection name="Catalina">
