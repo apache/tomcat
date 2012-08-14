@@ -123,6 +123,11 @@
         request at each stage. (markt) 
       </fix>
       <fix>
+        <bug>53624</bug>: Ensure that
+        <code>HttpServletResponse.sendRedirect()</code> works when called after
+        a dispatch from an <code>AsyncContext</code>. (markt)
+      </fix>
+      <fix>
         <bug>53641</bug>: Correct name of HTTP header used in WebSocket
         handshake for listing the preferred protocols. (markt)
       </fix>
