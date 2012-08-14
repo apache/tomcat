@@ -30,7 +30,7 @@ import java.io.UnsupportedEncodingException;
  * <p> After retrieving an instance of this class from a {@link
  * org.apache.tomcat.util.http.fileupload.FileUpload FileUpload} instance (see
  * {@link org.apache.tomcat.util.http.fileupload.FileUpload
- * #parseRequest(javax.servlet.http.HttpServletRequest)}), you may
+ * #parseRequest(RequestContext)}), you may
  * either request all contents of the file at once using {@link #get()} or
  * request an {@link java.io.InputStream InputStream} with
  * {@link #getInputStream()} and process the file without attempting to load

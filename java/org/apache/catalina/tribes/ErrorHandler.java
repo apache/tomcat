@@ -32,14 +32,14 @@ public interface ErrorHandler {
      * Invoked if the message is dispatched asynch, and an error occurs
      * @param x ChannelException - the error that happened
      * @param id - the unique id for the message
-     * @see Channel#send(Member[], Serializable, int, ErrorHandler)
+     * @see Channel#send(Member[], java.io.Serializable, int, ErrorHandler)
      */
     public void handleError(ChannelException x, UniqueId id);
 
     /**
      * Invoked when the message has been sent successfully.
      * @param id - the unique id for the message
-     * @see Channel#send(Member[], Serializable, int, ErrorHandler)
+     * @see Channel#send(Member[], java.io.Serializable, int, ErrorHandler)
      */
     public void handleCompletion(UniqueId id);
 

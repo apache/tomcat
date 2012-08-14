@@ -64,7 +64,7 @@ public interface Manager {
      *
      * @param container The newly associated Container
      *
-     * @deprecated Use {@link #setContext()}. This method will be removed in
+     * @deprecated Use {@link #setContext(Context)}. This method will be removed in
      *             Tomcat 9 onwards.
      */
     @Deprecated
@@ -80,7 +80,7 @@ public interface Manager {
     /**
      * Set the Container with which this Manager is associated.
      *
-     * @param container The newly associated Context
+     * @param context The newly associated Context
      */
     public void setContext(Context context);
 

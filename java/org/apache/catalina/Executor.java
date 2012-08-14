@@ -31,7 +31,7 @@ public interface Executor extends java.util.concurrent.Executor, Lifecycle {
      * time until it throws a RejectedExecutionException
      *
      * @param command the runnable task
-     * @throws org.apache.catalina.util.RejectedExecutionException if this task
+     * @throws java.util.concurrent.RejectedExecutionException if this task
      * cannot be accepted for execution - the queue is full
      * @throws NullPointerException if command or unit is null
      */

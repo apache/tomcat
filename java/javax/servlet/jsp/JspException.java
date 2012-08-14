@@ -53,7 +53,7 @@ public class JspException extends Exception {
      * <code>java.lang.Throwable.getCause()</code> and {@link #getRootCause()}
      * methods.
      *
-     * @see <code>java.lang.Exception.Exception(String, Throwable)</code>
+     * @see java.lang.Exception#Exception(String, Throwable)
      *
      * @param message       a <code>String</code> containing the text of the
      *                      exception message
@@ -74,7 +74,7 @@ public class JspException extends Exception {
      * <code>java.lang.Throwable.getCause()</code> and {@link #getRootCause()}
      * methods.
      *
-     * @see <code>java.lang.Exception.Exception(Throwable)</code>
+     * @see java.lang.Exception#Exception(Throwable)
      *
      * @param cause         the <code>Throwable</code> exception that
      *                      interfered with the JSP's normal operation, making
