@@ -224,7 +224,6 @@ public class InternalNioOutputBuffer extends AbstractOutputBuffer<NioChannel> {
      * @throws IOException
      * TODO Fix non blocking write properly
      */
-    int total = 0;
     private synchronized int writeToSocket(ByteBuffer bytebuffer, boolean block, boolean flip) throws IOException {
         if ( flip ) {
             bytebuffer.flip();
@@ -256,8 +255,6 @@ public class InternalNioOutputBuffer extends AbstractOutputBuffer<NioChannel> {
             bytebuffer.clear();
             flipped = false;
         }
-        total+= written;
-        //System.out.println("Successful write("+written+ " / "+total);
         return written;
     }
 
