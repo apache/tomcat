@@ -37,9 +37,8 @@ public class CompressionResponseStream extends ServletOutputStream {
     /**
      * Construct a servlet output stream associated with the specified Response.
      *
-     * @param response The associated response
-     * @param response
-     * @param originalOutput
+     * @param responseWrapper The associated response wrapper
+     * @param originalOutput the output stream
      */
     public CompressionResponseStream(
             CompressionServletResponseWrapper responseWrapper,

@@ -105,7 +105,6 @@ public abstract class ServletInputStream extends InputStream {
 
     /**
      * TODO SERVLET 3.1
-     * @return
      */
     public abstract void setReadListener(javax.servlet.ReadListener listener);
 }

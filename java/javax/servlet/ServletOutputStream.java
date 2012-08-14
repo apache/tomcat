@@ -282,6 +282,5 @@ public abstract class ServletOutputStream extends OutputStream {
 
     /**
      * TODO SERVLET 3.1
-     * @return
      */
     public abstract void setWriteListener(javax.servlet.WriteListener listener);}
