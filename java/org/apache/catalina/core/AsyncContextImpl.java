@@ -30,7 +30,6 @@ import javax.naming.NamingException;
 import javax.servlet.AsyncContext;
 import javax.servlet.AsyncEvent;
 import javax.servlet.AsyncListener;
-import javax.servlet.DispatcherType;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -39,6 +38,7 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.catalina.AsyncDispatcher;
 import org.apache.catalina.Context;
 import org.apache.catalina.Globals;
 import org.apache.catalina.connector.Request;
@@ -222,24 +222,25 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
             request.setAttribute(ASYNC_QUERY_STRING, request.getQueryString());
         }
         final RequestDispatcher requestDispatcher = context.getRequestDispatcher(path);
-        final HttpServletRequest servletRequest = (HttpServletRequest)getRequest();
-        final HttpServletResponse servletResponse = (HttpServletResponse)getResponse();
+        if (!(requestDispatcher instanceof AsyncDispatcher)) {
+            throw new UnsupportedOperationException(
+                    sm.getString("asyncContextImpl.noAsyncDispatcher"));
+        }
+        final AsyncDispatcher applicationDispatcher =
+                (AsyncDispatcher) requestDispatcher;
+        final HttpServletRequest servletRequest =
+                (HttpServletRequest) getRequest();
+        final HttpServletResponse servletResponse =
+                (HttpServletResponse) getResponse();
         Runnable run = new Runnable() {
             @Override
             public void run() {
                 request.getCoyoteRequest().action(ActionCode.ASYNC_DISPATCHED, null);
-                DispatcherType type = (DispatcherType)request.getAttribute(Globals.DISPATCHER_TYPE_ATTR);
                 try {
-                    //piggy back on the request dispatcher to ensure that filters etc get called.
-                    //TODO SERVLET3 - async should this be include/forward or a new dispatch type
-                    //javadoc suggests include with the type of DispatcherType.ASYNC
-                    request.setAttribute(Globals.DISPATCHER_TYPE_ATTR, DispatcherType.ASYNC);
-                    requestDispatcher.include(servletRequest, servletResponse);
+                    applicationDispatcher.dispatch(servletRequest, servletResponse);
                 }catch (Exception x) {
                     //log.error("Async.dispatch",x);
                     throw new RuntimeException(x);
-                }finally {
-                    request.setAttribute(Globals.DISPATCHER_TYPE_ATTR, type);
                 }
             }
         };
