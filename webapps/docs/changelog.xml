@@ -118,6 +118,11 @@
         (markt)
       </fix>
       <fix>
+        <bug>53623</bug>: When performing a asynchronous dispatch after series
+        of forwards, ensure that the request properties are correct for the
+        request at each stage. (markt) 
+      </fix>
+      <fix>
         <bug>53641</bug>: Correct name of HTTP header used in WebSocket
         handshake for listing the preferred protocols. (markt)
       </fix>
