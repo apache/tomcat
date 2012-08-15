@@ -121,7 +121,7 @@ public class AjpNioProtocol extends AbstractAjpProtocol {
         @Override
         public void release(SocketChannel socket) {
             if (log.isDebugEnabled())
-                log.debug("Iterating through our connections to release a socket channel:"+socket);
+                log.debug(sm.getString("ajpnioprotocol.releaseStart", socket));
             boolean released = false;
             Iterator<java.util.Map.Entry<NioChannel, Processor<NioChannel>>> it = connections.entrySet().iterator();
             while (it.hasNext()) {
@@ -136,7 +136,8 @@ public class AjpNioProtocol extends AbstractAjpProtocol {
                 }
             }
             if (log.isDebugEnabled())
-                log.debug("Done iterating through our connections to release a socket channel:"+socket +" released:"+released);
+                log.debug(sm.getString("ajpnioprotocol.releaseEnd",
+                        socket, Boolean.valueOf(released)));
         }
 
         /**
