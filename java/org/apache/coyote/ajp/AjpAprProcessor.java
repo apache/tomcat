@@ -319,7 +319,7 @@ public class AjpAprProcessor extends AbstractAjpProcessor<Long> {
             if (nRead > 0) {
                 inputBuffer.limit(inputBuffer.limit() + nRead);
             } else {
-                throw new IOException(sm.getString("ajpprotocol.failedread"));
+                throw new IOException(sm.getString("ajpprocessor.failedread"));
             }
         }
 
@@ -355,7 +355,7 @@ public class AjpAprProcessor extends AbstractAjpProcessor<Long> {
                 if ((-nRead) == Status.ETIMEDOUT || (-nRead) == Status.TIMEUP) {
                     return false;
                 } else {
-                    throw new IOException(sm.getString("ajpprotocol.failedread"));
+                    throw new IOException(sm.getString("ajpprocessor.failedread"));
                 }
             }
         }

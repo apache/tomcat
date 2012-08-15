@@ -316,7 +316,7 @@ public class AjpNioProcessor extends AbstractAjpProcessor<NioChannel> {
             } else if (res == 0 && !block) {
                 break;
             } else {
-                throw new IOException(sm.getString("ajpprotocol.failedread"));
+                throw new IOException(sm.getString("ajpprocessor.failedread"));
             }
             block = true;
         }

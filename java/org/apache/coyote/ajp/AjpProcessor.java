@@ -310,7 +310,7 @@ public class AjpProcessor extends AbstractAjpProcessor<Socket> {
             if (res > 0) {
                 read += res;
             } else {
-                throw new IOException(sm.getString("ajpprotocol.failedread"));
+                throw new IOException(sm.getString("ajpprocessor.failedread"));
             }
         }
 
