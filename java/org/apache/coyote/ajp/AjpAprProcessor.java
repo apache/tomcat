@@ -84,13 +84,13 @@ public class AjpAprProcessor extends AbstractAjpProcessor<Long> {
     /**
      * Direct buffer used for input.
      */
-    protected ByteBuffer inputBuffer = null;
+    protected final ByteBuffer inputBuffer;
 
 
     /**
      * Direct buffer used for output.
      */
-    protected ByteBuffer outputBuffer = null;
+    protected final ByteBuffer outputBuffer;
 
 
     // --------------------------------------------------------- Public Methods

@@ -74,7 +74,7 @@ public class AjpNioProtocol extends AbstractAjpProtocol {
     /**
      * Connection handler for AJP.
      */
-    private AjpConnectionHandler cHandler;
+    private final AjpConnectionHandler cHandler;
 
 
     // ----------------------------------------------------- JMX related methods
@@ -92,7 +92,7 @@ public class AjpNioProtocol extends AbstractAjpProtocol {
             extends AbstractAjpConnectionHandler<NioChannel, AjpNioProcessor>
             implements Handler {
 
-        protected AjpNioProtocol proto;
+        protected final AjpNioProtocol proto;
 
         public AjpConnectionHandler(AjpNioProtocol proto) {
             this.proto = proto;

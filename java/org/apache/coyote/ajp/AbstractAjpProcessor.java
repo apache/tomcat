@@ -137,7 +137,7 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
     /**
      * AJP packet size.
      */
-    protected int packetSize;
+    protected final int packetSize;
 
     /**
      * Header message. Note that this header is merely the one used during the
@@ -145,25 +145,25 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
      * request header. It will stay unchanged during the processing of the whole
      * request.
      */
-    protected AjpMessage requestHeaderMessage = null;
+    protected final AjpMessage requestHeaderMessage;
 
 
     /**
      * Message used for response composition.
      */
-    protected AjpMessage responseMessage = null;
+    protected final AjpMessage responseMessage;
 
 
     /**
      * Body message.
      */
-    protected AjpMessage bodyMessage = null;
+    protected final AjpMessage bodyMessage;
 
 
     /**
      * Body message.
      */
-    protected MessageBytes bodyBytes = MessageBytes.newInstance();
+    protected final MessageBytes bodyBytes = MessageBytes.newInstance();
 
 
     /**
@@ -181,13 +181,13 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
     /**
      * Temp message bytes used for processing.
      */
-    protected MessageBytes tmpMB = MessageBytes.newInstance();
+    protected final MessageBytes tmpMB = MessageBytes.newInstance();
 
 
     /**
      * Byte chunk for certs.
      */
-    protected MessageBytes certificates = MessageBytes.newInstance();
+    protected final MessageBytes certificates = MessageBytes.newInstance();
 
 
     /**
