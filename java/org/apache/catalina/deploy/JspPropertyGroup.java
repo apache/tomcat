@@ -16,6 +16,7 @@
  */
 package org.apache.catalina.deploy;
 
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -71,11 +72,11 @@ public class JspPropertyGroup {
     }
     public Boolean getTrimWhitespace() { return trimWhitespace; }
 
-    private String urlPattern = null;
-    public void setUrlPattern(String urlPattern) {
-        this.urlPattern = urlPattern;
+    private Set<String> urlPattern = new HashSet<>();
+    public void addUrlPattern(String urlPattern) {
+        this.urlPattern.add(urlPattern);
     }
-    public String getUrlPattern() { return this.urlPattern; }
+    public Set<String> getUrlPatterns() { return this.urlPattern; }
 
     private String defaultContentType = null;
     public void setDefaultContentType(String defaultContentType) {

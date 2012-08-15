@@ -14,11 +14,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.catalina.core;
 
 import java.util.Collection;
-import java.util.HashSet;
 
 import javax.servlet.descriptor.JspPropertyGroupDescriptor;
 
@@ -160,13 +158,6 @@ public class ApplicationJspPropertyGroupDescriptor
 
     @Override
     public Collection<String> getUrlPatterns() {
-        Collection<String> result = new HashSet<>();
-
-        if (jspPropertyGroup.getUrlPattern() != null) {
-            result.add(jspPropertyGroup.getUrlPattern());
-        }
-
-        return result;
+        return jspPropertyGroup.getUrlPatterns();
     }
-
 }
