@@ -381,7 +381,6 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
     @Override
     public void recycleInternal() {
         socket = null;
-        comet = false;
         sendfileData = null;
         wantOnWritePossible = false;
     }
