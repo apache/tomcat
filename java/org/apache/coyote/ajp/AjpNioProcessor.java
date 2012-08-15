@@ -76,7 +76,7 @@ public class AjpNioProcessor extends AbstractAjpProcessor<NioChannel> {
     /**
      * Selector pool for the associated endpoint.
      */
-    protected NioSelectorPool pool;
+    protected final NioSelectorPool pool;
 
 
     // --------------------------------------------------------- Public Methods

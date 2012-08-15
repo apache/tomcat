@@ -64,7 +64,7 @@ public class AjpMessage {
     /**
      * Fixed size buffer.
      */
-    protected byte buf[] = null;
+    protected final byte buf[];
 
 
     /**

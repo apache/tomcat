@@ -71,7 +71,7 @@ public class AjpProtocol extends AbstractAjpProtocol {
     /**
      * Connection handler for AJP.
      */
-    private AjpConnectionHandler cHandler;
+    private final AjpConnectionHandler cHandler;
 
 
     // ----------------------------------------------------- JMX related methods
@@ -89,7 +89,7 @@ public class AjpProtocol extends AbstractAjpProtocol {
             extends AbstractAjpConnectionHandler<Socket,AjpProcessor>
             implements Handler {
 
-        protected AjpProtocol proto;
+        protected final AjpProtocol proto;
 
         public AjpConnectionHandler(AjpProtocol proto) {
             this.proto = proto;
