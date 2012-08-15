@@ -496,7 +496,7 @@ public abstract class Compiler {
             try {
                 String key = include.getKey();
                 URL includeUrl;
-                if (key.startsWith("jar:")) {
+                if (key.startsWith("jar:") || key.startsWith("file:")) {
                     includeUrl = new URL(key);
                 } else {
                     includeUrl = ctxt.getResource(include.getKey());
