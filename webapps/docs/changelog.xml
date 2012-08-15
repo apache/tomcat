@@ -160,6 +160,10 @@
         <bug>53545</bug>: Ensure buffered data is cleared when using a
         jsp:forward action inside a classic custom tag. (markt)
       </fix>
+      <fix>
+        <bug>53654</bug>: Support <code>file://</code> URLs for JSP
+        dependencies. Patch provided by Viola Lu. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">
