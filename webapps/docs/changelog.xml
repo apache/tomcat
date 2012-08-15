@@ -139,6 +139,11 @@
         Ensure custom error pages are not truncated if the page that triggered
         the error set a content length header. (markt)
       </fix>
+      <fix>
+        <bug>53702</bug>: When merging web.xml fragments, allow for
+        <code>&lt;jsp-property-group&gt;</code> elements having multiple
+        <code>&lt;url-pattern&gt;</code> elements. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

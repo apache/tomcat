@@ -810,7 +810,9 @@ public class WebXml {
             }
             for (JspPropertyGroup jpg : jspPropertyGroups) {
                 sb.append("    <jsp-property-group>\n");
-                appendElement(sb, INDENT6, "url-pattern", jpg.getUrlPattern());
+                for (String urlPattern : jpg.getUrlPatterns()) {
+                    appendElement(sb, INDENT6, "url-pattern", urlPattern);
+                }
                 appendElement(sb, INDENT6, "el-ignored", jpg.getElIgnored());
                 appendElement(sb, INDENT6, "scripting-invalid",
                         jpg.getScriptingInvalid());
@@ -1354,12 +1356,16 @@ public class WebXml {
                 jspServletName = "jsp";
             }
             if (context.findChild(jspServletName) != null) {
-                context.addServletMapping(jspPropertyGroup.getUrlPattern(),
-                        jspServletName, true);
+                for (String urlPattern : jspPropertyGroup.getUrlPatterns()) {
+                    context.addServletMapping(urlPattern, jspServletName, true);
+                }
             } else {
-                if(log.isDebugEnabled())
-                    log.debug("Skiping " + jspPropertyGroup.getUrlPattern() +
-                            " , no servlet " + jspServletName);
+                if(log.isDebugEnabled()) {
+                    for (String urlPattern : jspPropertyGroup.getUrlPatterns()) {
+                        log.debug("Skiping " + urlPattern + " , no servlet " +
+                                jspServletName);
+                    }
+                }
             }
         }
     }
