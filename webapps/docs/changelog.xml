@@ -144,6 +144,10 @@
         <code>&lt;jsp-property-group&gt;</code> elements having multiple
         <code>&lt;url-pattern&gt;</code> elements. (markt)
       </fix>
+      <add>
+        Always make the resulting web.xml available even if metadata-complete is
+        true. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
