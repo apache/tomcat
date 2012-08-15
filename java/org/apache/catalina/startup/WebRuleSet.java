@@ -303,7 +303,7 @@ public class WebRuleSet extends RuleSetBase {
         digester.addCallMethod(fullPrefix + "/jsp-config/jsp-property-group/trim-directive-whitespaces",
                                "setTrimWhitespace", 0);
         digester.addCallMethod(fullPrefix + "/jsp-config/jsp-property-group/url-pattern",
-                               "setUrlPattern", 0);
+                               "addUrlPattern", 0);
         digester.addCallMethod(fullPrefix + "/jsp-config/jsp-property-group/default-content-type",
                                "setDefaultContentType", 0);
         digester.addCallMethod(fullPrefix + "/jsp-config/jsp-property-group/buffer",
