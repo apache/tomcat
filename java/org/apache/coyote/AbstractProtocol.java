@@ -628,11 +628,11 @@ public abstract class AbstractProtocol implements ProtocolHandler,
             } catch(java.net.SocketException e) {
                 // SocketExceptions are normal
                 getLog().debug(sm.getString(
-                        "ajpprotocol.proto.socketexception.debug"), e);
+                        "abstractConnectionHandler.socketexception.debug"), e);
             } catch (java.io.IOException e) {
                 // IOExceptions are normal
                 getLog().debug(sm.getString(
-                        "ajpprotocol.proto.ioexception.debug"), e);
+                        "abstractConnectionHandler.ioexception.debug"), e);
             }
             // Future developers: if you discover any other
             // rare-but-nonfatal exceptions, catch them here, and log as
@@ -642,7 +642,8 @@ public abstract class AbstractProtocol implements ProtocolHandler,
                 // any other exception or error is odd. Here we log it
                 // with "ERROR" level, so it will show up even on
                 // less-than-verbose logs.
-                getLog().error(sm.getString("ajpprotocol.proto.error"), e);
+                getLog().error(
+                        sm.getString("abstractConnectionHandler.error"), e);
             }
             // Don't try to add upgrade processors back into the pool
             if (!(processor instanceof UpgradeProcessor)) {
