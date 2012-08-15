@@ -1681,6 +1681,7 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
         localName = null;
         remotePort = -1;
         localPort = -1;
+        comet = false;
         recycleInternal();
     }
 
