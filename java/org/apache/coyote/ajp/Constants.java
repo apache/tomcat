@@ -231,7 +231,7 @@ public final class Constants {
     }
 
     private static final Hashtable<String,Integer>  responseTransHash =
-        new Hashtable<String,Integer>(20);
+            new Hashtable<>(20);
 
     static {
         try {
