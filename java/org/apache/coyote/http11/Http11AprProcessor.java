@@ -130,7 +130,7 @@ public class Http11AprProcessor extends AbstractHttp11Processor<Long> {
 
         try {
             rp.setStage(org.apache.coyote.Constants.STAGE_SERVICE);
-            error = !adapter.event(request, response, status);
+            error = !getAdapter().event(request, response, status);
         } catch (InterruptedIOException e) {
             error = true;
         } catch (Throwable t) {
@@ -138,7 +138,7 @@ public class Http11AprProcessor extends AbstractHttp11Processor<Long> {
             log.error(sm.getString("http11processor.request.process"), t);
             // 500 - Internal Server Error
             response.setStatus(500);
-            adapter.log(request, response, 0);
+            getAdapter().log(request, response, 0);
             error = true;
         }
 
@@ -194,7 +194,7 @@ public class Http11AprProcessor extends AbstractHttp11Processor<Long> {
         if (endpoint.isPaused()) {
             // 503 - Service unavailable
             response.setStatus(503);
-            adapter.log(request, response, 0);
+            getAdapter().log(request, response, 0);
             error = true;
         } else {
             return true;

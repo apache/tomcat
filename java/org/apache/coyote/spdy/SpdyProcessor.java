@@ -156,7 +156,7 @@ public class SpdyProcessor extends AbstractProcessor<Object> implements
         RequestInfo rp = request.getRequestProcessor();
         try {
             rp.setStage(org.apache.coyote.Constants.STAGE_SERVICE);
-            adapter.service(request, response);
+            getAdapter().service(request, response);
         } catch (InterruptedIOException e) {
             error = true;
         } catch (Throwable t) {
@@ -165,7 +165,7 @@ public class SpdyProcessor extends AbstractProcessor<Object> implements
             // 500 - Internal Server Error
             t.printStackTrace();
             response.setStatus(500);
-            adapter.log(request, response, 0);
+            getAdapter().log(request, response, 0);
             error = true;
         }
 

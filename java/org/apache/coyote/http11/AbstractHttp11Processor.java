@@ -962,7 +962,7 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
                 }
                 // 400 - Bad Request
                 response.setStatus(400);
-                adapter.log(request, response, 0);
+                getAdapter().log(request, response, 0);
                 error = true;
             }
 
@@ -979,7 +979,7 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
                     }
                     // 400 - Internal Server Error
                     response.setStatus(400);
-                    adapter.log(request, response, 0);
+                    getAdapter().log(request, response, 0);
                     error = true;
                 }
             }
@@ -995,7 +995,7 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
             if (!error) {
                 try {
                     rp.setStage(org.apache.coyote.Constants.STAGE_SERVICE);
-                    adapter.service(request, response);
+                    getAdapter().service(request, response);
                     // Handle when the response was committed before a serious
                     // error occurred.  Throwing a ServletException should both
                     // set the status to 500 and set the errorException.
@@ -1015,7 +1015,7 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
                             "http11processor.request.process"), t);
                     // 500 - Internal Server Error
                     response.setStatus(500);
-                    adapter.log(request, response, 0);
+                    getAdapter().log(request, response, 0);
                     error = true;
                 }
             }
@@ -1290,7 +1290,7 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
         }
 
         if (error) {
-            adapter.log(request, response, 0);
+            getAdapter().log(request, response, 0);
         }
     }
 
@@ -1544,7 +1544,7 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
         RequestInfo rp = request.getRequestProcessor();
         try {
             rp.setStage(org.apache.coyote.Constants.STAGE_SERVICE);
-            error = !adapter.asyncDispatch(request, response, status);
+            error = !getAdapter().asyncDispatch(request, response, status);
             resetTimeouts();
         } catch (InterruptedIOException e) {
             error = true;
@@ -1556,7 +1556,7 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
             if (error) {
                 // 500 - Internal Server Error
                 response.setStatus(500);
-                adapter.log(request, response, 0);
+                getAdapter().log(request, response, 0);
             }
         }
 
