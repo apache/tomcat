@@ -29,9 +29,9 @@ import org.apache.jasper.JasperException;
  */
 public class BeanRepository {
 
-    protected HashMap<String, String> beanTypes;
-    protected ClassLoader loader;
-    protected ErrorDispatcher errDispatcher;
+    protected final HashMap<String, String> beanTypes;
+    protected final ClassLoader loader;
+    protected final ErrorDispatcher errDispatcher;
 
     /**
      * Constructor.
@@ -39,7 +39,7 @@ public class BeanRepository {
     public BeanRepository(ClassLoader loader, ErrorDispatcher err) {
         this.loader = loader;
         this.errDispatcher = err;
-        beanTypes = new HashMap<String, String>();
+        beanTypes = new HashMap<>();
     }
 
     public void addBean(Node.UseBean n, String s, String type, String scope)
