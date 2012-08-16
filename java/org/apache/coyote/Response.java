@@ -47,7 +47,7 @@ public final class Response {
     /**
      * Default locale as mandated by the spec.
      */
-    private static Locale DEFAULT_LOCALE = Locale.getDefault();
+    private static final Locale DEFAULT_LOCALE = Locale.getDefault();
 
 
     // ----------------------------------------------------- Instance Variables
@@ -67,7 +67,7 @@ public final class Response {
     /**
      * Response headers.
      */
-    protected MimeHeaders headers = new MimeHeaders();
+    protected final MimeHeaders headers = new MimeHeaders();
 
 
     /**
@@ -79,7 +79,7 @@ public final class Response {
     /**
      * Notes.
      */
-    protected Object notes[] = new Object[Constants.MAX_NOTES];
+    protected final Object notes[] = new Object[Constants.MAX_NOTES];
 
 
     /**
