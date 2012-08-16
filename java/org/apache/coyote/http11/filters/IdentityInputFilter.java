@@ -81,7 +81,10 @@ public class IdentityInputFilter implements InputFilter {
 
     /**
      * Get content length.
+     *
+     * @deprecated  Unused - will be removed in 8.0.x
      */
+    @Deprecated
     public long getContentLength() {
         return contentLength;
     }
@@ -89,7 +92,10 @@ public class IdentityInputFilter implements InputFilter {
 
     /**
      * Get remaining bytes.
+     *
+     * @deprecated  Unused - will be removed in 8.0.x
      */
+    @Deprecated
     public long getRemaining() {
         return remaining;
     }
