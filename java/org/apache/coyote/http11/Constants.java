@@ -200,13 +200,4 @@ public final class Constants {
      * POST.
      */
     public static final String POST = "POST";
-
-    /**
-     * Has security been turned on?
-     *
-     * @deprecated  Unused - will be removed in 8.0.x
-     */
-    @Deprecated
-    public static final boolean IS_SECURITY_ENABLED =
-        (System.getSecurityManager() != null);
 }
