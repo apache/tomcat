@@ -40,14 +40,22 @@ public final class Constants {
 
     public static final int DEFAULT_CONNECTION_LINGER = -1;
     public static final int DEFAULT_CONNECTION_TIMEOUT = -1;
+    /**
+     * @deprecated  Unused - will be removed in 8.0.x
+     */
+    @Deprecated
     public static final int DEFAULT_CONNECTION_UPLOAD_TIMEOUT = 300000;
     public static final boolean DEFAULT_TCP_NO_DELAY = true;
+    /**
+     * @deprecated  Unused - will be removed in 8.0.x
+     */
+    @Deprecated
     public static final boolean DEFAULT_USE_SENDFILE = false;
 
     // Prefix codes for message types from server to container
     public static final byte JK_AJP13_FORWARD_REQUEST   = 2;
-    public static final byte JK_AJP13_SHUTDOWN          = 7;
-    public static final byte JK_AJP13_PING_REQUEST      = 8;
+    public static final byte JK_AJP13_SHUTDOWN          = 7;    // Unused
+    public static final byte JK_AJP13_PING_REQUEST      = 8;    // Unused
     public static final byte JK_AJP13_CPING_REQUEST     = 10;
 
     // Prefix codes for message types from container to server
@@ -81,7 +89,12 @@ public final class Constants {
     public static final byte SC_A_SSL_CERT      = 7;
     public static final byte SC_A_SSL_CIPHER    = 8;
     public static final byte SC_A_SSL_SESSION   = 9;
+    /**
+     * @deprecated  Unused - will be removed in 8.0.x
+     */
+    @Deprecated
     public static final byte SC_A_SSL_KEYSIZE   = 11;
+    public static final byte SC_A_SSL_KEY_SIZE  = 11;
     public static final byte SC_A_SECRET        = 12;
     public static final byte SC_A_STORED_METHOD = 13;
 
@@ -176,8 +189,6 @@ public final class Constants {
     public static final int SC_REQ_PRAGMA          = 12;
     public static final int SC_REQ_REFERER         = 13;
     public static final int SC_REQ_USER_AGENT      = 14;
-    // AJP14 new header
-    public static final byte SC_A_SSL_KEY_SIZE  = 11; // XXX ???
 
     // Translates integer codes to request header names
     private static final String [] headerTransArray = {
@@ -271,31 +282,41 @@ public final class Constants {
 
     /**
      * CR.
+     * @deprecated  Unused - will be removed in 8.0.x
      */
+    @Deprecated
     public static final byte CR = (byte) '\r';
 
 
     /**
      * LF.
+     * @deprecated  Unused - will be removed in 8.0.x
      */
+    @Deprecated
     public static final byte LF = (byte) '\n';
 
 
     /**
      * SP.
+     * @deprecated  Unused - will be removed in 8.0.x
      */
+    @Deprecated
     public static final byte SP = (byte) ' ';
 
 
     /**
      * HT.
+     * @deprecated  Unused - will be removed in 8.0.x
      */
+    @Deprecated
     public static final byte HT = (byte) '\t';
 
 
     /**
      * COLON.
+     * @deprecated  Unused - will be removed in 8.0.x
      */
+    @Deprecated
     public static final byte COLON = (byte) ':';
 
 
@@ -313,83 +334,147 @@ public final class Constants {
 
     /**
      * 'Z'.
+     * @deprecated  Unused - will be removed in 8.0.x
      */
+    @Deprecated
     public static final byte Z = (byte) 'Z';
 
 
     /**
      * '?'.
+     * @deprecated  Unused - will be removed in 8.0.x
      */
+    @Deprecated
     public static final byte QUESTION = (byte) '?';
 
 
     /**
      * Lower case offset.
+     * @deprecated  Unused - will be removed in 8.0.x
      */
+    @Deprecated
     public static final byte LC_OFFSET = A - a;
 
 
     /**
      * Default HTTP header buffer size.
+     * @deprecated  Unused - will be removed in 8.0.x
      */
+    @Deprecated
     public static final int DEFAULT_HTTP_HEADER_BUFFER_SIZE = 48 * 1024;
 
 
     /* Various constant "strings" */
+    /**
+     * @deprecated  Unused - will be removed in 8.0.x
+     */
+    @Deprecated
     public static final byte[] CRLF_BYTES = ByteChunk.convertToBytes(CRLF);
+    /**
+     * @deprecated  Unused - will be removed in 8.0.x
+     */
+    @Deprecated
     public static final byte[] COLON_BYTES = ByteChunk.convertToBytes(": ");
+    /**
+     * @deprecated  Unused - will be removed in 8.0.x
+     */
+    @Deprecated
     public static final String CONNECTION = "Connection";
     public static final String CLOSE = "close";
+    /**
+     * @deprecated  Unused - will be removed in 8.0.x
+     */
+    @Deprecated
     public static final byte[] CLOSE_BYTES =
         ByteChunk.convertToBytes(CLOSE);
     public static final String KEEPALIVE = "keep-alive";
+    /**
+     * @deprecated  Unused - will be removed in 8.0.x
+     */
+    @Deprecated
     public static final byte[] KEEPALIVE_BYTES =
         ByteChunk.convertToBytes(KEEPALIVE);
+    /**
+     * @deprecated  Unused - will be removed in 8.0.x
+     */
+    @Deprecated
     public static final String CHUNKED = "chunked";
+    /**
+     * @deprecated  Unused - will be removed in 8.0.x
+     */
+    @Deprecated
     public static final byte[] ACK_BYTES =
         ByteChunk.convertToBytes("HTTP/1.1 100 Continue" + CRLF + CRLF);
+    /**
+     * @deprecated  Unused - will be removed in 8.0.x
+     */
+    @Deprecated
     public static final String TRANSFERENCODING = "Transfer-Encoding";
+    /**
+     * @deprecated  Unused - will be removed in 8.0.x
+     */
+    @Deprecated
     public static final byte[] _200_BYTES =
         ByteChunk.convertToBytes("200");
+    /**
+     * @deprecated  Unused - will be removed in 8.0.x
+     */
+    @Deprecated
     public static final byte[] _400_BYTES =
         ByteChunk.convertToBytes("400");
+    /**
+     * @deprecated  Unused - will be removed in 8.0.x
+     */
+    @Deprecated
     public static final byte[] _404_BYTES =
         ByteChunk.convertToBytes("404");
 
 
     /**
      * Identity filters (input and output).
+     * @deprecated  Unused - will be removed in 8.0.x
      */
+    @Deprecated
     public static final int IDENTITY_FILTER = 0;
 
 
     /**
      * Chunked filters (input and output).
+     * @deprecated  Unused - will be removed in 8.0.x
      */
+    @Deprecated
     public static final int CHUNKED_FILTER = 1;
 
 
     /**
      * Void filters (input and output).
+     * @deprecated  Unused - will be removed in 8.0.x
      */
+    @Deprecated
     public static final int VOID_FILTER = 2;
 
 
     /**
      * GZIP filter (output).
+     * @deprecated  Unused - will be removed in 8.0.x
      */
+    @Deprecated
     public static final int GZIP_FILTER = 3;
 
 
     /**
      * Buffered filter (input)
+     * @deprecated  Unused - will be removed in 8.0.x
      */
+    @Deprecated
     public static final int BUFFERED_FILTER = 3;
 
 
     /**
      * HTTP/1.0.
+     * @deprecated  Unused - will be removed in 8.0.x
      */
+    @Deprecated
     public static final String HTTP_10 = "HTTP/1.0";
 
 
@@ -397,25 +482,35 @@ public final class Constants {
      * HTTP/1.1.
      */
     public static final String HTTP_11 = "HTTP/1.1";
+    /**
+     * @deprecated  Unused - will be removed in 8.0.x
+     */
+    @Deprecated
     public static final byte[] HTTP_11_BYTES =
         ByteChunk.convertToBytes(HTTP_11);
 
 
     /**
      * GET.
+     * @deprecated  Unused - will be removed in 8.0.x
      */
+    @Deprecated
     public static final String GET = "GET";
 
 
     /**
      * HEAD.
+     * @deprecated  Unused - will be removed in 8.0.x
      */
+    @Deprecated
     public static final String HEAD = "HEAD";
 
 
     /**
      * POST.
+     * @deprecated  Unused - will be removed in 8.0.x
      */
+    @Deprecated
     public static final String POST = "POST";
 
 
