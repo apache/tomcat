@@ -360,7 +360,7 @@ public abstract class AbstractProtocol implements ProtocolHandler,
 
     private ObjectName createObjectName() throws MalformedObjectNameException {
         // Use the same domain as the connector
-        domain = adapter.getDomain();
+        domain = getAdapter().getDomain();
 
         if (domain == null) {
             return null;

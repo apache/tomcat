@@ -92,7 +92,7 @@ public class SpdyProxyProtocol extends AbstractProtocol {
             @Override
             public void onStream(SpdyConnection con, SpdyStream ch) throws IOException {
                 SpdyProcessor sp = new SpdyProcessor(con, endpoint);
-                sp.setAdapter(adapter);
+                sp.setAdapter(getAdapter());
                 sp.onSynStream(ch);
             }
         });
