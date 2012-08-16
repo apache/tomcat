@@ -124,7 +124,7 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
         final NioEndpoint.KeyAttachment attach = (NioEndpoint.KeyAttachment)socket.getSocket().getAttachment(false);
         try {
             rp.setStage(org.apache.coyote.Constants.STAGE_SERVICE);
-            error = !adapter.event(request, response, status);
+            error = !getAdapter().event(request, response, status);
             if ( !error ) {
                 if (attach != null) {
                     attach.setComet(comet);
@@ -152,7 +152,7 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
             log.error(sm.getString("http11processor.request.process"), t);
             // 500 - Internal Server Error
             response.setStatus(500);
-            adapter.log(request, response, 0);
+            getAdapter().log(request, response, 0);
             error = true;
         }
 
@@ -320,7 +320,7 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
         if (endpoint.isPaused()) {
             // 503 - Service unavailable
             response.setStatus(503);
-            adapter.log(request, response, 0);
+            getAdapter().log(request, response, 0);
             error = true;
         } else {
             return true;

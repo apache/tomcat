@@ -166,7 +166,7 @@ public class AjpProcessor extends AbstractAjpProcessor<Socket> {
                 log.debug(sm.getString("ajpprocessor.header.error"), t);
                 // 400 - Bad Request
                 response.setStatus(400);
-                adapter.log(request, response, 0);
+                getAdapter().log(request, response, 0);
                 error = true;
             }
 
@@ -180,7 +180,7 @@ public class AjpProcessor extends AbstractAjpProcessor<Socket> {
                     log.debug(sm.getString("ajpprocessor.request.prepare"), t);
                     // 400 - Internal Server Error
                     response.setStatus(400);
-                    adapter.log(request, response, 0);
+                    getAdapter().log(request, response, 0);
                     error = true;
                 }
             }
@@ -188,7 +188,7 @@ public class AjpProcessor extends AbstractAjpProcessor<Socket> {
             if (!error && !cping && endpoint.isPaused()) {
                 // 503 - Service unavailable
                 response.setStatus(503);
-                adapter.log(request, response, 0);
+                getAdapter().log(request, response, 0);
                 error = true;
             }
             cping = false;
@@ -197,7 +197,7 @@ public class AjpProcessor extends AbstractAjpProcessor<Socket> {
             if (!error) {
                 try {
                     rp.setStage(org.apache.coyote.Constants.STAGE_SERVICE);
-                    adapter.service(request, response);
+                    getAdapter().service(request, response);
                 } catch (InterruptedIOException e) {
                     error = true;
                 } catch (Throwable t) {
@@ -205,7 +205,7 @@ public class AjpProcessor extends AbstractAjpProcessor<Socket> {
                     log.error(sm.getString("ajpprocessor.request.process"), t);
                     // 500 - Internal Server Error
                     response.setStatus(500);
-                    adapter.log(request, response, 0);
+                    getAdapter().log(request, response, 0);
                     error = true;
                 }
             }

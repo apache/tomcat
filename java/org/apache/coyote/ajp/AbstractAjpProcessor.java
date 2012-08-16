@@ -474,7 +474,7 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
         RequestInfo rp = request.getRequestProcessor();
         try {
             rp.setStage(org.apache.coyote.Constants.STAGE_SERVICE);
-            error = !adapter.asyncDispatch(request, response, status);
+            error = !getAdapter().asyncDispatch(request, response, status);
         } catch (InterruptedIOException e) {
             error = true;
         } catch (Throwable t) {
@@ -485,7 +485,7 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
             if (error) {
                 // 500 - Internal Server Error
                 response.setStatus(500);
-                adapter.log(request, response, 0);
+                getAdapter().log(request, response, 0);
             }
         }
 
@@ -852,7 +852,7 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
         parseHost(valueMB);
 
         if (error) {
-            adapter.log(request, response, 0);
+            getAdapter().log(request, response, 0);
         }
     }
 
