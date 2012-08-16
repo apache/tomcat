@@ -103,11 +103,11 @@ public class InternalNioOutputBuffer extends AbstractOutputBuffer<NioChannel> {
     /**
      * Number of bytes last written
      */
-    protected AtomicInteger lastWrite = new AtomicInteger(1);
+    protected final AtomicInteger lastWrite = new AtomicInteger(1);
 
     protected class ByteBufferHolder {
-        private ByteBuffer buf;
-        private AtomicBoolean flipped;
+        private final ByteBuffer buf;
+        private final AtomicBoolean flipped;
         public ByteBufferHolder(ByteBuffer buf, boolean flipped) {
            this.buf = buf;
            this.flipped = new AtomicBoolean(flipped);
@@ -428,7 +428,7 @@ public class InternalNioOutputBuffer extends AbstractOutputBuffer<NioChannel> {
         if (blocking)
             bufferedWrite = null;
         else
-            bufferedWrite = new LinkedBlockingDeque<ByteBufferHolder>();
+            bufferedWrite = new LinkedBlockingDeque<>();
 }
 
     public void setBufferedWriteSize(int bufferedWriteSize) {

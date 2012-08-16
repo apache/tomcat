@@ -70,13 +70,13 @@ public class Http11Processor extends AbstractHttp11Processor<Socket> {
     /**
      * Input.
      */
-    protected InternalInputBuffer inputBuffer = null;
+    protected final InternalInputBuffer inputBuffer ;
 
 
     /**
      * Output.
      */
-    protected InternalOutputBuffer outputBuffer = null;
+    protected final InternalOutputBuffer outputBuffer;
 
 
     /**

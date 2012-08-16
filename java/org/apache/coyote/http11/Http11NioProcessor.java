@@ -85,13 +85,13 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
     /**
      * Input.
      */
-    protected InternalNioInputBuffer inputBuffer = null;
+    protected final InternalNioInputBuffer inputBuffer;
 
 
     /**
      * Output.
      */
-    protected InternalNioOutputBuffer outputBuffer = null;
+    protected final InternalNioOutputBuffer outputBuffer;
 
 
     /**
@@ -105,10 +105,8 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
      */
     protected SocketWrapper<NioChannel> socket = null;
 
-    protected volatile boolean wantOnWritePossible = false;
 
     // --------------------------------------------------------- Public Methods
-
 
     /**
      * Process pipelined HTTP requests using the specified input and output
@@ -382,7 +380,6 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
     public void recycleInternal() {
         socket = null;
         sendfileData = null;
-        wantOnWritePossible = false;
     }
 
 
@@ -611,7 +608,6 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
                     canWrite.set(true);
                 } else {
                     canWrite.set(false);
-                    wantOnWritePossible = true;
     }
             } else {
                 throw new IllegalStateException("Calling canWrite asynchronously is illegal.");

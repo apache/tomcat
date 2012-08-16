@@ -69,7 +69,7 @@ public class InternalOutputBuffer extends AbstractOutputBuffer<Socket>
     /**
      * Socket buffer.
      */
-    private ByteChunk socketBuffer;
+    private final ByteChunk socketBuffer;
 
 
     /**

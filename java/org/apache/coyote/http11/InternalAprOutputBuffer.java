@@ -80,7 +80,7 @@ public class InternalAprOutputBuffer extends AbstractOutputBuffer<Long> {
     /**
      * Direct byte buffer used for writing.
      */
-    private ByteBuffer bbuf = null;
+    private final ByteBuffer bbuf;
 
 
     // --------------------------------------------------------- Public Methods

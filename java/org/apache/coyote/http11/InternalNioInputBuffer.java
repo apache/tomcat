@@ -763,7 +763,7 @@ public class InternalNioInputBuffer extends AbstractInputBuffer<NioChannel> {
         return HeaderParseStatus.HAVE_MORE_HEADERS;
     }
 
-    private HeaderParseData headerData = new HeaderParseData();
+    private final HeaderParseData headerData = new HeaderParseData();
     public static class HeaderParseData {
         /**
          * When parsing header name: first character of the header.<br />
