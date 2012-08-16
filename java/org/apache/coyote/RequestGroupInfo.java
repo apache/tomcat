@@ -24,7 +24,7 @@ import java.util.ArrayList;
  *  collected from each RequestProcessor thread.
  */
 public class RequestGroupInfo {
-    ArrayList<RequestInfo> processors=new ArrayList<RequestInfo>();
+    private final ArrayList<RequestInfo> processors = new ArrayList<>();
     private long deadMaxTime = 0;
     private long deadProcessingTime = 0;
     private int deadRequestCount = 0;

@@ -35,7 +35,7 @@ import javax.management.ObjectName;
  * @author Costin Manolache
  */
 public class RequestInfo  {
-    RequestGroupInfo global=null;
+    private RequestGroupInfo global=null;
 
     // ----------------------------------------------------------- Constructors
 
@@ -61,10 +61,10 @@ public class RequestInfo  {
 
 
     // ----------------------------------------------------- Instance Variables
-    Request req;
-    int stage = Constants.STAGE_NEW;
-    String workerThreadName;
-    ObjectName rpName;
+    private final Request req;
+    private int stage = Constants.STAGE_NEW;
+    private String workerThreadName;
+    private ObjectName rpName;
 
     // -------------------- Information about the current request  -----------
     // This is useful for long-running requests only
