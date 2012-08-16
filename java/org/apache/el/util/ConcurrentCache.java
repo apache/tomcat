@@ -30,8 +30,8 @@ public final class ConcurrentCache<K,V> {
 
     public ConcurrentCache(int size) {
         this.size = size;
-        this.eden = new ConcurrentHashMap<K,V>(size);
-        this.longterm = new WeakHashMap<K,V>(size);
+        this.eden = new ConcurrentHashMap<>(size);
+        this.longterm = new WeakHashMap<>(size);
     }
 
     public V get(K k) {
