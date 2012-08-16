@@ -242,12 +242,4 @@ public final class Constants {
         else
             return i.intValue();
     }
-
-
-    /**
-     * CRLF.
-     * @deprecated  Unused - will be removed in 8.0.x
-     */
-    @Deprecated
-    public static final String CRLF = "\r\n";
 }
