@@ -20,10 +20,6 @@ package org.apache.jasper.compiler;
 import org.apache.jasper.JasperException;
 import org.xml.sax.Attributes;
 
-/**
- * @deprecated  Debug utility - will be moved to test source tree in 8.0.x
- */
-@Deprecated
 class Dumper {
 
     static class DumpVisitor extends Node.Visitor {
