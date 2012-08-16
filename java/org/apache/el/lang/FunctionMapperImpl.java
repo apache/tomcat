@@ -58,7 +58,7 @@ public class FunctionMapperImpl extends FunctionMapper implements
 
     public void addFunction(String prefix, String localName, Method m) {
         if (this.functions == null) {
-            this.functions = new HashMap<String, Function>();
+            this.functions = new HashMap<>();
         }
         Function f = new Function(prefix, localName, m);
         synchronized (this) {
@@ -81,7 +81,6 @@ public class FunctionMapperImpl extends FunctionMapper implements
      *
      * @see java.io.Externalizable#readExternal(java.io.ObjectInput)
      */
-    @SuppressWarnings("unchecked")
     @Override
     public void readExternal(ObjectInput in) throws IOException,
             ClassNotFoundException {

@@ -134,7 +134,7 @@ public class ReflectionUtil {
         }
 
         Method[] methods = base.getClass().getMethods();
-        Map<Method,Integer> candidates = new HashMap<Method,Integer>();
+        Map<Method,Integer> candidates = new HashMap<>();
 
         for (Method m : methods) {
             if (!m.getName().equals(methodName)) {

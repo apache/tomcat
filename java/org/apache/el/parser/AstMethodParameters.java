@@ -31,7 +31,7 @@ public final class AstMethodParameters extends SimpleNode {
     }
 
     public Object[] getParameters(EvaluationContext ctx) {
-        ArrayList<Object> params = new ArrayList<Object>();
+        ArrayList<Object> params = new ArrayList<>();
         for (int i = 0; i < this.jjtGetNumChildren(); i++) {
             params.add(this.jjtGetChild(i).getValue(ctx));
         }
