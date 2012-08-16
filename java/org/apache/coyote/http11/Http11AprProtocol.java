@@ -203,7 +203,7 @@ public class Http11AprProtocol extends AbstractHttp11Protocol<Long> {
         super.start();
         if (npnHandler != null) {
             long sslCtx = ((AprEndpoint) endpoint).getJniSslContext();
-            npnHandler.init(endpoint, sslCtx, adapter);
+            npnHandler.init(endpoint, sslCtx, getAdapter());
         }
     }
 
@@ -309,7 +309,7 @@ public class Http11AprProtocol extends AbstractHttp11Protocol<Long> {
             Http11AprProcessor processor = new Http11AprProcessor(
                     proto.getMaxHttpHeaderSize(), (AprEndpoint)proto.endpoint,
                     proto.getMaxTrailerSize());
-            processor.setAdapter(proto.adapter);
+            processor.setAdapter(proto.getAdapter());
             processor.setMaxKeepAliveRequests(proto.getMaxKeepAliveRequests());
             processor.setKeepAliveTimeout(proto.getKeepAliveTimeout());
             processor.setConnectionUploadTimeout(

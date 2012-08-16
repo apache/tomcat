@@ -95,7 +95,7 @@ public class Http11Protocol extends AbstractHttp11JsseProtocol<Socket> {
     public void start() throws Exception {
         super.start();
         if (npnHandler != null) {
-            npnHandler.init(endpoint, 0, adapter);
+            npnHandler.init(endpoint, 0, getAdapter());
         }
     }
 
@@ -186,7 +186,7 @@ public class Http11Protocol extends AbstractHttp11JsseProtocol<Socket> {
             Http11Processor processor = new Http11Processor(
                     proto.getMaxHttpHeaderSize(), (JIoEndpoint)proto.endpoint,
                     proto.getMaxTrailerSize());
-            processor.setAdapter(proto.adapter);
+            processor.setAdapter(proto.getAdapter());
             processor.setMaxKeepAliveRequests(proto.getMaxKeepAliveRequests());
             processor.setKeepAliveTimeout(proto.getKeepAliveTimeout());
             processor.setConnectionUploadTimeout(

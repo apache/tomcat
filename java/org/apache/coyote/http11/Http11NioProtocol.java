@@ -80,7 +80,7 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol<NioChannel> {
     public void start() throws Exception {
         super.start();
         if (npnHandler != null) {
-            npnHandler.init(getEndpoint(), 0, adapter);
+            npnHandler.init(getEndpoint(), 0, getAdapter());
         }
     }
 
@@ -283,7 +283,7 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol<NioChannel> {
             Http11NioProcessor processor = new Http11NioProcessor(
                     proto.getMaxHttpHeaderSize(), (NioEndpoint)proto.endpoint,
                     proto.getMaxTrailerSize());
-            processor.setAdapter(proto.adapter);
+            processor.setAdapter(proto.getAdapter());
             processor.setMaxKeepAliveRequests(proto.getMaxKeepAliveRequests());
             processor.setKeepAliveTimeout(proto.getKeepAliveTimeout());
             processor.setConnectionUploadTimeout(
