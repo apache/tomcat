@@ -18,8 +18,6 @@ package org.apache.coyote.ajp;
 
 import java.util.Hashtable;
 
-import org.apache.tomcat.util.buf.ByteChunk;
-
 /**
  * Constants.
  *
@@ -250,50 +248,4 @@ public final class Constants {
      * CRLF.
      */
     public static final String CRLF = "\r\n";
-
-
-    /**
-     * Server string.
-     * @deprecated  Unused - will be removed in 8.0.x
-     */
-    @Deprecated
-    public static final byte[] SERVER_BYTES =
-        ByteChunk.convertToBytes("Server: Apache-Coyote/1.1" + CRLF);
-
-
-    /**
-     * 'A'.
-     * @deprecated  Unused - will be removed in 8.0.x
-     */
-    @Deprecated
-    public static final byte A = (byte) 'A';
-
-
-    /**
-     * 'a'.
-     * @deprecated  Unused - will be removed in 8.0.x
-     */
-    @Deprecated
-    public static final byte a = (byte) 'a';
-
-
-    /* Various constant "strings" */
-    /**
-     * @deprecated  Unused - will be removed in 8.0.x
-     */
-    @Deprecated
-    public static final String CLOSE = "close";
-    /**
-     * @deprecated  Unused - will be removed in 8.0.x
-     */
-    @Deprecated
-    public static final String KEEPALIVE = "keep-alive";
-
-
-    /**
-     * HTTP/1.1.
-     * @deprecated  Unused - will be removed in 8.0.x
-     */
-    @Deprecated
-    public static final String HTTP_11 = "HTTP/1.1";
 }
