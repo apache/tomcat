@@ -52,7 +52,6 @@ import org.apache.tomcat.util.net.SocketWrapper;
  * tomcat servlet.
  *
  * Based on the AJP processor.
- *
  */
 public class SpdyProcessor extends AbstractProcessor<Object> implements
         Runnable {
@@ -63,22 +62,22 @@ public class SpdyProcessor extends AbstractProcessor<Object> implements
     // TODO: find a way to inject an OutputBuffer, or interecept close() -
     // so we can send FIN in the last data packet.
 
-    private SpdyConnection spdy;
+    private final SpdyConnection spdy;
 
     // Associated spdy stream
-    SpdyStream spdyStream;
+    private SpdyStream spdyStream;
 
-    ByteChunk keyBuffer = new ByteChunk();
+    private final ByteChunk keyBuffer = new ByteChunk();
 
-    boolean error = false;
+    private boolean error = false;
 
     private boolean finished;
 
-    SpdyFrame inFrame = null;
+    private SpdyFrame inFrame = null;
 
-    boolean outClosed = false;
+    private boolean outClosed = false;
 
-    boolean outCommit = false;
+    private boolean outCommit = false;
 
     public SpdyProcessor(SpdyConnection spdy, AbstractEndpoint endpoint) {
         super(endpoint);
@@ -204,7 +203,7 @@ public class SpdyProcessor extends AbstractProcessor<Object> implements
         response.finish();
     }
 
-    static final byte[] EMPTY = new byte[0];
+    private static final byte[] EMPTY = new byte[0];
 
     // Processor implementation
 
