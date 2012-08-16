@@ -48,8 +48,8 @@ abstract class ELNode {
      */
     public static class Root extends ELNode {
 
-        private ELNode.Nodes expr;
-    private char type;
+        private final ELNode.Nodes expr;
+        private final char type;
 
         Root(ELNode.Nodes expr, char type) {
             this.expr = expr;
@@ -75,7 +75,7 @@ abstract class ELNode {
      */
     public static class Text extends ELNode {
 
-        private String text;
+        private final String text;
 
         Text(String text) {
             this.text = text;
@@ -97,7 +97,7 @@ abstract class ELNode {
      */
     public static class ELText extends ELNode {
 
-        private String text;
+        private final String text;
 
         ELText(String text) {
             this.text = text;
@@ -120,8 +120,8 @@ abstract class ELNode {
      */
     public static class Function extends ELNode {
 
-        private String prefix;
-        private String name;
+        private final String prefix;
+        private final String name;
         private String uri;
         private FunctionInfo functionInfo;
         private String methodName;
@@ -187,10 +187,10 @@ abstract class ELNode {
            EL expression, for communication to Generator.
          */
         String mapName = null;        // The function map associated this EL
-        private List<ELNode> list;
+        private final List<ELNode> list;
 
         public Nodes() {
-            list = new ArrayList<ELNode>();
+            list = new ArrayList<>();
         }
 
         public void add(ELNode en) {
