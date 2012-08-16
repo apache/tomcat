@@ -52,8 +52,8 @@ import org.apache.tomcat.util.net.SocketWrapper;
 public class SpdyProxyProtocol extends AbstractProtocol {
     private static final Log log = LogFactory.getLog(SpdyProxyProtocol.class);
 
-    JIoEndpoint.Handler cHandler = new TomcatJioHandler();
-    SpdyContext spdyContext;
+    private final JIoEndpoint.Handler cHandler = new TomcatJioHandler();
+    private SpdyContext spdyContext;
 
     public SpdyProxyProtocol() {
         endpoint = new JIoEndpoint();
