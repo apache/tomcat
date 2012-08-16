@@ -92,6 +92,12 @@
         Service. This removes the need to maintain two copies of the mappings
         for Servlets and Filters. (markt)
       </scode>
+      <add>
+        If the <code>Content-Language</code> HTTP header is set directly,
+        attempt to determine the Locale from the header value and call
+        <code>ServletResponse.setLocale()</code> with the derived Locale.
+        (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">

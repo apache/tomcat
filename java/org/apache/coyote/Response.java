@@ -26,6 +26,7 @@ import javax.servlet.WriteListener;
 import org.apache.coyote.http11.AbstractOutputBuffer;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.http.MimeHeaders;
+import org.apache.tomcat.util.http.ResponseUtil;
 import org.apache.tomcat.util.http.parser.AstMediaType;
 import org.apache.tomcat.util.http.parser.HttpParser;
 import org.apache.tomcat.util.http.parser.ParseException;
@@ -342,8 +343,14 @@ public final class Response {
                 return false;
             }
         }
-        if( name.equalsIgnoreCase( "Content-Language" ) ) {
-            // XXX XXX Need to construct Locale or something else
+        if (name.equalsIgnoreCase("Content-Language")) {
+            Locale locale = ResponseUtil.getLocaleFromLanguageHeader(value);
+            if (locale == null) {
+                return false;
+            } else {
+                setLocale(locale);
+                return true;
+            }
         }
         return false;
     }
