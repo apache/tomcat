@@ -37,7 +37,7 @@ public class GzipOutputFilter implements OutputFilter {
     /**
      * Logger.
      */
-    protected static org.apache.juli.logging.Log log =
+    protected static final org.apache.juli.logging.Log log =
         org.apache.juli.logging.LogFactory.getLog(GzipOutputFilter.class);
 
 
@@ -59,7 +59,7 @@ public class GzipOutputFilter implements OutputFilter {
     /**
      * Fake internal output stream.
      */
-    protected OutputStream fakeOutputStream = new FakeOutputStream();
+    protected final OutputStream fakeOutputStream = new FakeOutputStream();
 
 
     // --------------------------------------------------- OutputBuffer Methods
@@ -159,8 +159,8 @@ public class GzipOutputFilter implements OutputFilter {
 
     protected class FakeOutputStream
         extends OutputStream {
-        protected ByteChunk outputChunk = new ByteChunk();
-        protected byte[] singleByteBuffer = new byte[1];
+        protected final ByteChunk outputChunk = new ByteChunk();
+        protected final byte[] singleByteBuffer = new byte[1];
         @Override
         public void write(int b)
             throws IOException {

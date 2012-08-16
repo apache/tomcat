@@ -40,7 +40,7 @@ public class BufferedInputFilter implements InputFilter {
     // ----------------------------------------------------- Instance Variables
 
     private ByteChunk buffered = null;
-    private ByteChunk tempRead = new ByteChunk(1024);
+    private final ByteChunk tempRead = new ByteChunk(1024);
     private InputBuffer buffer;
     private boolean hasRead = false;
 

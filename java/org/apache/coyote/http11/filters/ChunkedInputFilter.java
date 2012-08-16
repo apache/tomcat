@@ -92,7 +92,7 @@ public class ChunkedInputFilter implements InputFilter {
     /**
      * Byte chunk used to read bytes.
      */
-    protected ByteChunk readChunk = new ByteChunk();
+    protected final ByteChunk readChunk = new ByteChunk();
 
 
     /**
@@ -104,7 +104,7 @@ public class ChunkedInputFilter implements InputFilter {
     /**
      * Byte chunk used to store trailing headers.
      */
-    protected ByteChunk trailingHeaders = new ByteChunk();
+    protected final ByteChunk trailingHeaders = new ByteChunk();
 
     /**
      * Flag set to true if the next call to doRead() must parse a CRLF pair

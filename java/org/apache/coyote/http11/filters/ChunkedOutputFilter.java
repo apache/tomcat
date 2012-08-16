@@ -57,7 +57,6 @@ public class ChunkedOutputFilter implements OutputFilter {
      * Default constructor.
      */
     public ChunkedOutputFilter() {
-        chunkLength = new byte[10];
         chunkLength[8] = (byte) '\r';
         chunkLength[9] = (byte) '\n';
     }
@@ -75,13 +74,13 @@ public class ChunkedOutputFilter implements OutputFilter {
     /**
      * Buffer used for chunk length conversion.
      */
-    protected byte[] chunkLength = new byte[10];
+    protected final byte[] chunkLength = new byte[10];
 
 
     /**
      * Chunk header.
      */
-    protected ByteChunk chunkHeader = new ByteChunk();
+    protected final ByteChunk chunkHeader = new ByteChunk();
 
 
     // ------------------------------------------------------------- Properties
