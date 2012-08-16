@@ -76,33 +76,7 @@ public class IdentityInputFilter implements InputFilter {
     protected final ByteChunk endChunk = new ByteChunk();
 
 
-    // ------------------------------------------------------------- Properties
-
-
-    /**
-     * Get content length.
-     *
-     * @deprecated  Unused - will be removed in 8.0.x
-     */
-    @Deprecated
-    public long getContentLength() {
-        return contentLength;
-    }
-
-
-    /**
-     * Get remaining bytes.
-     *
-     * @deprecated  Unused - will be removed in 8.0.x
-     */
-    @Deprecated
-    public long getRemaining() {
-        return remaining;
-    }
-
-
     // ---------------------------------------------------- InputBuffer Methods
-
 
     /**
      * Read bytes.
