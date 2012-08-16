@@ -39,7 +39,7 @@ public class FlushableGZIPOutputStream extends GZIPOutputStream {
      * It is used to reserve one byte of real data so that it can be used when
      * flushing the stream.
      */
-    private byte[] lastByte = new byte[1];
+    private final byte[] lastByte = new byte[1];
     private boolean hasLastByte = false;
 
     @Override

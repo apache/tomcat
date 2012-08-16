@@ -73,7 +73,7 @@ public class IdentityInputFilter implements InputFilter {
     /**
      * Chunk used to read leftover bytes.
      */
-    protected ByteChunk endChunk = new ByteChunk();
+    protected final ByteChunk endChunk = new ByteChunk();
 
 
     // ------------------------------------------------------------- Properties
