@@ -96,7 +96,7 @@ public class AttributeParser {
     private final boolean strict;
 
     /* The type ($ or #) of expression. Literals have a type of null. */
-    private char type;
+    private final char type;
 
     /* The length of the quoted input string. */
     private final int size;
@@ -108,7 +108,7 @@ public class AttributeParser {
     private boolean lastChEscaped = false;
 
     /* The unquoted result. */
-    private StringBuilder result;
+    private final StringBuilder result;
 
 
     /**

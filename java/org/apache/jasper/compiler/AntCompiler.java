@@ -333,14 +333,14 @@ public class AntCompiler extends Compiler {
          * Thread <-> PrintStream associations.
          */
         protected static final ThreadLocal<PrintStream> streams =
-            new ThreadLocal<PrintStream>();
+                new ThreadLocal<>();
 
 
         /**
          * Thread <-> ByteArrayOutputStream associations.
          */
         protected static final ThreadLocal<ByteArrayOutputStream> data =
-            new ThreadLocal<ByteArrayOutputStream>();
+                new ThreadLocal<>();
 
 
         // --------------------------------------------------------- Public Methods
