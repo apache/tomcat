@@ -78,13 +78,13 @@ public class Http11AprProcessor extends AbstractHttp11Processor<Long> {
     /**
      * Input.
      */
-    protected InternalAprInputBuffer inputBuffer = null;
+    protected final InternalAprInputBuffer inputBuffer;
 
 
     /**
      * Output.
      */
-    protected InternalAprOutputBuffer outputBuffer = null;
+    protected final InternalAprOutputBuffer outputBuffer;
 
 
     /**

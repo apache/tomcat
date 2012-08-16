@@ -80,7 +80,7 @@ public class InternalAprInputBuffer extends AbstractInputBuffer<Long> {
     /**
      * Direct byte buffer used to perform actual reading.
      */
-    private ByteBuffer bbuf;
+    private final ByteBuffer bbuf;
 
 
     /**
