@@ -355,7 +355,7 @@ public class AjpMessage {
 
 
     public int getHeaderLength() {
-        return 4;
+        return Constants.H_SIZE;
     }
 
 
