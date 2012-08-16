@@ -36,8 +36,8 @@ public final class Constants {
 
     // Prefix codes for message types from server to container
     public static final byte JK_AJP13_FORWARD_REQUEST   = 2;
-    public static final byte JK_AJP13_SHUTDOWN          = 7;    // Unused
-    public static final byte JK_AJP13_PING_REQUEST      = 8;    // Unused
+    public static final byte JK_AJP13_SHUTDOWN          = 7;    // XXX Unused
+    public static final byte JK_AJP13_PING_REQUEST      = 8;    // XXX Unused
     public static final byte JK_AJP13_CPING_REQUEST     = 10;
 
     // Prefix codes for message types from container to server
