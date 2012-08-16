@@ -128,7 +128,7 @@ public final class Request {
 
     private final MessageBytes remoteUser=MessageBytes.newInstance();
     private final MessageBytes authType=MessageBytes.newInstance();
-    private final HashMap<String,Object> attributes=new HashMap<String,Object>();
+    private final HashMap<String,Object> attributes=new HashMap<>();
 
     private Response response;
     private ActionHook hook;

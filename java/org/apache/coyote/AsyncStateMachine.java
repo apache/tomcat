@@ -137,7 +137,7 @@ public class AsyncStateMachine<S> {
     private volatile AsyncState state = AsyncState.DISPATCHED;
     // Need this to fire listener on complete
     private AsyncContextCallback asyncCtxt = null;
-    private Processor<S> processor;
+    private final Processor<S> processor;
 
 
     public AsyncStateMachine(Processor<S> processor) {

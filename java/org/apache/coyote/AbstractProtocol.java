@@ -24,7 +24,9 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
+import javax.management.InstanceNotFoundException;
 import javax.management.MBeanRegistration;
+import javax.management.MBeanRegistrationException;
 import javax.management.MBeanServer;
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
@@ -508,7 +510,19 @@ public abstract class AbstractProtocol implements ProtocolHandler,
         }
 
         if (oname != null) {
-            Registry.getRegistry(null, null).unregisterComponent(oname);
+            if (mserver == null) {
+                Registry.getRegistry(null, null).unregisterComponent(oname);
+            } else {
+                // Possibly registered with a different MBeanServer
+                try {
+                    mserver.unregisterMBean(oname);
+                } catch (MBeanRegistrationException |
+                        InstanceNotFoundException e) {
+                    getLog().info(sm.getString(
+                            "abstractProtocol.mbeanDeregistrationFailed",
+                            oname, mserver));
+                }
+            }
         }
 
         if (tpOname != null)
@@ -525,14 +539,14 @@ public abstract class AbstractProtocol implements ProtocolHandler,
 
         protected abstract Log getLog();
 
-        protected RequestGroupInfo global = new RequestGroupInfo();
-        protected AtomicLong registerCount = new AtomicLong(0);
+        protected final RequestGroupInfo global = new RequestGroupInfo();
+        protected final AtomicLong registerCount = new AtomicLong(0);
 
-        protected ConcurrentHashMap<S,Processor<S>> connections =
-            new ConcurrentHashMap<S,Processor<S>>();
+        protected final ConcurrentHashMap<S,Processor<S>> connections =
+                new ConcurrentHashMap<>();
 
-        protected RecycledProcessors<P,S> recycledProcessors =
-            new RecycledProcessors<P,S>(this);
+        protected final RecycledProcessors<P,S> recycledProcessors =
+                new RecycledProcessors<>(this);
 
 
         protected abstract AbstractProtocol getProtocol();
@@ -721,8 +735,8 @@ public abstract class AbstractProtocol implements ProtocolHandler,
             extends ConcurrentLinkedQueue<Processor<S>> {
 
         private static final long serialVersionUID = 1L;
-        private transient AbstractConnectionHandler<S,P> handler;
-        protected AtomicInteger size = new AtomicInteger(0);
+        private final transient AbstractConnectionHandler<S,P> handler;
+        protected final AtomicInteger size = new AtomicInteger(0);
 
         public RecycledProcessors(AbstractConnectionHandler<S,P> handler) {
             this.handler = handler;
