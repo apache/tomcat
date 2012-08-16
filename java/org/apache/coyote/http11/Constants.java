@@ -203,7 +203,10 @@ public final class Constants {
 
     /**
      * Has security been turned on?
+     *
+     * @deprecated  Unused - will be removed in 8.0.x
      */
+    @Deprecated
     public static final boolean IS_SECURITY_ENABLED =
         (System.getSecurityManager() != null);
 }
