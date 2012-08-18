@@ -83,8 +83,8 @@ but possibly 7.1.x).
      to actual files and JARs.
 
      Concerns:
-     - There are problems with access to classes and jar files in unpacked
-     wars.
+     - There are problems with access to classes and JAR files in
+     non-unpacked WARs.
 
      It is resolved by unzipping the files into the working directory (in
      WebappLoader#setRepositories()).
