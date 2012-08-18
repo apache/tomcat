@@ -35,13 +35,158 @@ but possibly 7.1.x).
  5. Run the unused code detector and remove everything that isn't currently used.
     Add deprecation markers for the removed code to Tomcat 7.0.x
     - Complete for javax.*
-    - Complete for o.a.[catalina|coyoye|el].*
+    - Complete for o.a.[catalina|coyote|el].*
     - Remaining code in progress
 
  6. Change the default URIEncoding on the connector to UTF-8.
 
  7. Rip out all the JNDI code in resource handling and replace it with straight
     URLs (File or WAR).
+
+    kkolinko: I think this proposal goes too far. There are several
+    separate issues. There are:
+
+    a) Internal API to define resources
+     - BaseDirContext implementing aliases and resource jars,
+     and there will be overlays in Servlet 3.1
+     - StandardContext.setResources() allowing an arbitrary DirContext
+     implementation via <Resources> element.
+
+     Concerns:
+     - Too many ways to configure it.
+
+    b) Internal API to lookup resources
+     - DirContext interface
+
+     Concerns:
+     - Unnecessary objects, e.g. NamingException instead of null.
+
+     - Too many methods. Name vs. String. list() vs. listBindings().
+
+     - Limited API. As a workaround, there are non-standard methods that
+       are implemented on BaseDirContext instead, e.g. getRealPath(),
+       doListBindings(..).
+
+     - All caching (ProxyDirContext) and aliases handling is
+     performed on the root level only.
+
+     Once I do a lookup that returns a DirContext, further lookups on it
+     will bypass the caching and aliases.
+
+    c) WebappClassLoader and its interaction with resources
+
+     WebappClassLoader uses DirContext API to access resources (classes,
+     jars).
+
+     Note that it has to construct a classpath for Java compiler called by
+     Jasper. The compiler cannot operate on a DirContext and needs access
+     to actual files and JARs.
+
+     Concerns:
+     - There are problems with access to classes and jar files in unpacked
+     wars.
+
+     It is resolved by unzipping the files into the working directory (in
+     WebappLoader#setRepositories()).
+
+     Note that DirContext is not notified of this copying.
+     StandardJarScanner does not know of those copies either.
+
+     - There are problems when the classes directory is served from
+     multiple locations
+
+     It seems to be worked around by adding the path of the alternative
+     classes directory to virtualClasspath of VirtualWebappLoader (as shown
+     by example in config/context.html#Virtual_webapp), but it is likely
+     that I miss something.
+
+     - antiJARLocking support in WebappClassLoader creates copies of
+     resources, but does not notify the DirContext.
+
+     - WebappClassLoader.jarFiles is used to track JAR files and keep them
+     open. These might be useful when looking for resources in those files.
+     These might be useful for StandardJarScanner.
+
+    d) StandardJarScanner
+
+     Concerns:
+     - It essentially scans the same JARs as accessed by WebappClassLoader.
+
+     It might be better to access them via WebappClassLoader rather that
+     through Servlet API methods.
+
+     The scanner is used by Jasper as well, so there are some concerns to
+     keep the components independent.
+
+    e) URL returned by ServletContext.getResource()
+     jndi:/hostName/contextPath/resourcePath
+
+     Goodies:
+     - Uniform URL space. Both files and directories can be represented,
+     hiding details of aliases, resource jars, etc.
+
+     - It hides implementation details.
+
+     - Permissions can be expressed as JndiPermission. They do not depend
+     on context version number.
+
+     - Accessing a resource through such URL leverages the cache
+     implemented in ProxyDirContext class. We do not access the file system
+     directly, nor need to open a JAR file.
+
+     - It can be created from a String if necessary.
+
+     Such use relies on DirContextURLStreamHandler.bindThread(..) being
+     called earlier in the same thread.
+
+     Concerns:
+     - Some components would like to get "real" resource URL from this one.
+
+     Maybe it can be exposed through some special header name,
+     DirContextURLConnection.getHeaderField(str)?
+
+     How such real URL can be prepared?
+     DirContext.getNameInNamespace()?
+     BaseDirContext.getRealPath()?
+     ((FileResourceAttributes)DirContext.getAttributes()).getCanonicalPath()?
+
+     - A resource lookup is performed twice. The first time in
+     ServletContext.getResource() (implemented in ApplicationContext.getResource())
+     to return null for non-existing paths.
+     The second time in DirContextURLConnection.connect().
+
+     It is good that there is a cache in ProxyDirContext that saves time
+     for repeated lookups.
+
+     - Using URLs involves encoding/decoding.
+
+     If there were some other API to access resources in a web application,
+     I would prefer some opaque object that allows access to resource
+     properties, but is converted to string/url form only on demand.
+
+    f) Connection, created from jndi: URL
+     DirContextURLStreamHandler, DirContextURLConnection
+
+     Goodies:
+     - DirContextURLConnection provides information about resource via
+     methods such as getContentLength(), getHeaderField(str).
+
+     Concerns:
+     - It exposes DirContext through some APIs, such as
+     DirContextURLConnection.getContent().
+
+     Is this feature going to be preserved for compatibility, or to be
+     removed?
+
+     - DirContextURLConnection.list(): a public method, that is not part of
+     the usual URL API. So URL API is lacking. Maybe some other methods
+     could be added.
+
+     A possible candidate could be "isCollection()", instead of asking for
+     getContentType() and checking its value against ResourceAttributes.COLLECTION_TYPE.
+
+    Threads:
+    http://markmail.org/thread/hqbmdn2qs6xcooko
 
  8. Review the connector shutdown code for timing and threading issues
     particularly any that may result in a client socket being left open after a
@@ -58,7 +203,7 @@ but possibly 7.1.x).
 12. Java 7 updates
     - Use of <> operator where possible
       - Complete for javax.*
-      - Complete for o.a.[catalina|coyoye|el].*
+      - Complete for o.a.[catalina|coyote|el].*
       - Not started for remainder
     - Use of try with resources
       - Not started
@@ -67,7 +212,10 @@ but possibly 7.1.x).
 
 13. Fix all FindBugs warnings
     - Complete for javax.*
-    - Complete for o.a.[catalina|coyoye|el].*
+    - Complete for o.a.[catalina|coyote|el].*
     - Remaining code in progress
 
 14. Review date formatting with a view to reducing duplication.
+
+15. Update annotation scanning code to handle Java 7 class files (BZ 53735).
+    Make sure that BCEL fixes this issue and that we use updated code from them.
