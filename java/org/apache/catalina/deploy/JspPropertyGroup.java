@@ -16,7 +16,6 @@
  */
 package org.apache.catalina.deploy;
 
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -59,7 +58,7 @@ public class JspPropertyGroup {
         this.pageEncoding = pageEncoding;
     }
     public String getPageEncoding() { return this.pageEncoding; }
-    
+
     private Boolean scriptingInvalid = null;
     public void setScriptingInvalid(String scriptingInvalid) {
         this.scriptingInvalid = Boolean.valueOf(scriptingInvalid);
@@ -72,24 +71,24 @@ public class JspPropertyGroup {
     }
     public Boolean getTrimWhitespace() { return trimWhitespace; }
 
-    private Set<String> urlPattern = new HashSet<String>();
+    private LinkedHashSet<String> urlPattern = new LinkedHashSet<String>();
     public void addUrlPattern(String urlPattern) {
         this.urlPattern.add(urlPattern);
     }
     public Set<String> getUrlPatterns() { return this.urlPattern; }
-    
+
     private String defaultContentType = null;
     public void setDefaultContentType(String defaultContentType) {
         this.defaultContentType = defaultContentType;
     }
     public String getDefaultContentType() { return this.defaultContentType; }
-    
+
     private Integer buffer = null;
     public void setBuffer(String buffer) {
         this.buffer = Integer.valueOf(buffer);
     }
     public Integer getBuffer() { return this.buffer; }
-    
+
     private Boolean errorOnUndeclaredNamespace = null;
     public void setErrorOnUndeclaredNamespace(
             String errorOnUndeclaredNamespace) {
@@ -99,5 +98,4 @@ public class JspPropertyGroup {
     public Boolean getErrorOnUndeclaredNamespace() {
         return this.errorOnUndeclaredNamespace;
     }
-    
 }
