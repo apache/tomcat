@@ -16,7 +16,6 @@
  */
 package org.apache.catalina.deploy;
 
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -72,7 +71,7 @@ public class JspPropertyGroup {
     }
     public Boolean getTrimWhitespace() { return trimWhitespace; }
 
-    private Set<String> urlPattern = new HashSet<>();
+    private LinkedHashSet<String> urlPattern = new LinkedHashSet<>();
     public void addUrlPattern(String urlPattern) {
         this.urlPattern.add(urlPattern);
     }
@@ -99,5 +98,4 @@ public class JspPropertyGroup {
     public Boolean getErrorOnUndeclaredNamespace() {
         return this.errorOnUndeclaredNamespace;
     }
-
 }
