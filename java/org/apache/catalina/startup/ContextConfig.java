@@ -1779,7 +1779,7 @@ public class ContextConfig implements LifecycleListener {
 
 
     /**
-     * Scan /META-INF/lib for JARs and for each one found add it and any
+     * Scan /WEB-INF/lib for JARs and for each one found add it and any
      * /META-INF/web-fragment.xml to the resulting Map. web-fragment.xml files
      * will be parsed before being added to the map. Every JAR will be added and
      * <code>null</code> will be used if no web-fragment.xml was found. Any JARs
