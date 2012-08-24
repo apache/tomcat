@@ -222,6 +222,20 @@ public class Constants {
     public static final String CATALINA_BASE_PROP = "catalina.base";
 
     /**
+     * Name of system property containing default list of JARs to skip when
+     * scanning JARs for configuration elements such as TLDs.
+     */
+    public static final String DEFAULT_JAR_SKIP_PROP=
+            "tomcat.util.scan.DefaultJarScanner.jarsToSkip";
+
+    /**
+     * Name of system property containing additional list of JARs to skip when
+     * scanning for TLDs.
+     */
+    public static final String TLD_JAR_SKIP_PROP=
+            "org.apache.catalina.startup.TldConfig.jarsToSkip";
+
+    /**
      * Retain reference to default character set so we don't have to look it up.
      */
     public static final Charset ISO_8859_1 = Charset.forName("ISO-8859-1");

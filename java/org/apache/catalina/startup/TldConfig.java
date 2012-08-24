@@ -119,6 +119,47 @@ public final class TldConfig  implements LifecycleListener {
     }
 
 
+    static {
+        // Set the default list of JARs to skip for TLDs
+        StringBuilder jarList = new StringBuilder(System.getProperty(
+                Constants.DEFAULT_JARS_TO_SKIP, ""));
+
+        String tldJars = System.getProperty(Constants.TLD_JARS_TO_SKIP, "");
+        if (tldJars.length() > 0) {
+            if (jarList.length() > 0) {
+                jarList.append(',');
+            }
+            jarList.append(tldJars);
+        }
+
+        if (jarList.length() > 0) {
+            setNoTldJars(jarList.toString());
+        }
+    }
+
+    /**
+     * Sets the list of JARs that are known not to contain any TLDs.
+     *
+     * @param jarNames List of comma-separated names of JAR files that are
+     * known not to contain any TLDs.
+     */
+    public static synchronized void setNoTldJars(String jarNames) {
+        if (jarNames == null) {
+            noTldJars = null;
+        } else {
+            if (noTldJars == null) {
+                noTldJars = new HashSet<>();
+            } else {
+                noTldJars.clear();
+            }
+            StringTokenizer tokenizer = new StringTokenizer(jarNames, ",");
+            while (tokenizer.hasMoreElements()) {
+                noTldJars.add(tokenizer.nextToken());
+            }
+        }
+    }
+
+
     // ----------------------------------------------------- Instance Variables
 
     /**
@@ -167,29 +208,6 @@ public final class TldConfig  implements LifecycleListener {
     public boolean isKnownWebxmlTaglibUri(String uri) {
         return webxmlTaglibUris.contains(uri);
     }
-
-    /**
-     * Sets the list of JARs that are known not to contain any TLDs.
-     *
-     * @param jarNames List of comma-separated names of JAR files that are
-     * known not to contain any TLDs.
-     */
-    public static void setNoTldJars(String jarNames) {
-        if (jarNames == null) {
-            noTldJars = null;
-        } else {
-            if (noTldJars == null) {
-                noTldJars = new HashSet<>();
-            } else {
-                noTldJars.clear();
-            }
-            StringTokenizer tokenizer = new StringTokenizer(jarNames, ",");
-            while (tokenizer.hasMoreElements()) {
-                noTldJars.add(tokenizer.nextToken());
-            }
-        }
-    }
-
 
     public void addApplicationListener( String s ) {
         if(log.isDebugEnabled())
