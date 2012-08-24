@@ -30,6 +30,7 @@ import java.util.StringTokenizer;
 
 import javax.servlet.ServletContext;
 
+import org.apache.jasper.Constants;
 import org.apache.jasper.JasperException;
 import org.apache.jasper.util.ExceptionUtils;
 import org.apache.jasper.xmlparser.ParserUtils;
@@ -100,6 +101,48 @@ public class TldLocationsCache {
     // there are JARs that could be skipped
     private static volatile boolean showTldScanWarning = true;
 
+    static {
+        // Set the default list of JARs to skip for TLDs
+        // Set the default list of JARs to skip for TLDs
+        StringBuilder jarList = new StringBuilder(System.getProperty(
+                Constants.DEFAULT_JAR_SKIP_PROP, ""));
+
+        String tldJars = System.getProperty(Constants.TLD_JAR_SKIP_PROP, "");
+        if (tldJars.length() > 0) {
+            if (jarList.length() > 0) {
+                jarList.append(',');
+            }
+            jarList.append(tldJars);
+        }
+
+        if (jarList.length() > 0) {
+            setNoTldJars(jarList.toString());
+        }
+    }
+
+    /**
+     * Sets the list of JARs that are known not to contain any TLDs.
+     *
+     * @param jarNames List of comma-separated names of JAR files that are
+     * known not to contain any TLDs
+     */
+    public static synchronized void setNoTldJars(String jarNames) {
+        if (jarNames == null) {
+            noTldJars = null;
+        } else {
+            if (noTldJars == null) {
+                noTldJars = new HashSet<>();
+            } else {
+                noTldJars.clear();
+            }
+            StringTokenizer tokenizer = new StringTokenizer(jarNames, ",");
+            while (tokenizer.hasMoreElements()) {
+                noTldJars.add(tokenizer.nextToken());
+            }
+        }
+    }
+
+
     /**
      * The mapping of the 'global' tag library URI to the location (resource
      * path) of the TLD associated with that tag library. The location is
@@ -122,29 +165,6 @@ public class TldLocationsCache {
         mappings = new Hashtable<String, TldLocation>();
         initialized = false;
     }
-
-    /**
-     * Sets the list of JARs that are known not to contain any TLDs.
-     *
-     * @param jarNames List of comma-separated names of JAR files that are
-     * known not to contain any TLDs
-     */
-    public static void setNoTldJars(String jarNames) {
-        if (jarNames == null) {
-            noTldJars = null;
-        } else {
-            if (noTldJars == null) {
-                noTldJars = new HashSet<String>();
-            } else {
-                noTldJars.clear();
-            }
-            StringTokenizer tokenizer = new StringTokenizer(jarNames, ",");
-            while (tokenizer.hasMoreElements()) {
-                noTldJars.add(tokenizer.nextToken());
-            }
-        }
-    }
-
 
     /**
      * Obtains the TLD location cache for the given {@link ServletContext} and

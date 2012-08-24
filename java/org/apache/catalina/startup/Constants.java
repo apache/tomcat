@@ -38,6 +38,13 @@ public final class Constants {
     public static final String HostContextXml = "context.xml.default";
     public static final String HostWebXml = "web.xml.default";
 
+    public static final String DEFAULT_JARS_TO_SKIP =
+            "tomcat.util.scan.DefaultJarScanner.jarsToSkip";
+    public static final String PLUGGABILITY_JARS_TO_SKIP =
+            "org.apache.catalina.startup.ContextConfig.jarsToSkip";
+    public static final String TLD_JARS_TO_SKIP =
+            "org.apache.catalina.startup.TldConfig.jarsToSkip";
+
     /**
      * A dummy value used to suppress loading the default web.xml file.
      *
