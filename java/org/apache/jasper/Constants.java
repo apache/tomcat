@@ -219,4 +219,18 @@ public class Constants {
      * the tomcat instance installation path
      */
     public static final String CATALINA_BASE_PROP = "catalina.base";
+
+    /**
+     * Name of system property containing default list of JARs to skip when
+     * scanning JARs for configuration elements such as TLDs.
+     */
+    public static final String DEFAULT_JAR_SKIP_PROP=
+            "tomcat.util.scan.DefaultJarScanner.jarsToSkip";
+
+    /**
+     * Name of system property containing additional list of JARs to skip when
+     * scanning for TLDs.
+     */
+    public static final String TLD_JAR_SKIP_PROP=
+            "org.apache.catalina.startup.TldConfig.jarsToSkip";
 }

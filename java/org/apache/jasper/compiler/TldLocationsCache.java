@@ -30,6 +30,7 @@ import java.util.StringTokenizer;
 
 import javax.servlet.ServletContext;
 
+import org.apache.jasper.Constants;
 import org.apache.jasper.JasperException;
 import org.apache.jasper.util.ExceptionUtils;
 import org.apache.jasper.xmlparser.ParserUtils;
@@ -100,28 +101,25 @@ public class TldLocationsCache {
     // there are JARs that could be skipped
     private static volatile boolean showTldScanWarning = true;
 
-    /**
-     * The mapping of the 'global' tag library URI to the location (resource
-     * path) of the TLD associated with that tag library. The location is
-     * returned as a String array:
-     *    [0] The location
-     *    [1] If the location is a jar file, this is the location of the tld.
-     */
-    private Hashtable<String, TldLocation> mappings;
+    static {
+        // Set the default list of JARs to skip for TLDs
+        // Set the default list of JARs to skip for TLDs
+        StringBuilder jarList = new StringBuilder(System.getProperty(
+                Constants.DEFAULT_JAR_SKIP_PROP, ""));
 
-    private volatile boolean initialized;
-    private ServletContext ctxt;
+        String tldJars = System.getProperty(Constants.TLD_JAR_SKIP_PROP, "");
+        if (tldJars.length() > 0) {
+            if (jarList.length() > 0) {
+                jarList.append(',');
+            }
+            jarList.append(tldJars);
+        }
 
-    /** Constructor. 
-     *
-     * @param ctxt the servlet context of the web application in which Jasper 
-     * is running
-     */
-    public TldLocationsCache(ServletContext ctxt) {
-        this.ctxt = ctxt;
-        mappings = new Hashtable<String, TldLocation>();
-        initialized = false;
+        if (jarList.length() > 0) {
+            setNoTldJars(jarList.toString());
+        }
     }
+
 
     /**
      * Sets the list of JARs that are known not to contain any TLDs.
@@ -129,7 +127,7 @@ public class TldLocationsCache {
      * @param jarNames List of comma-separated names of JAR files that are 
      * known not to contain any TLDs 
      */
-    public static void setNoTldJars(String jarNames) {
+    public static synchronized void setNoTldJars(String jarNames) {
         if (jarNames == null) {
             noTldJars = null;
         } else {
@@ -145,6 +143,29 @@ public class TldLocationsCache {
         }
     }
 
+
+    /**
+     * The mapping of the 'global' tag library URI to the location (resource
+     * path) of the TLD associated with that tag library. The location is
+     * returned as a String array:
+     *    [0] The location
+     *    [1] If the location is a jar file, this is the location of the tld.
+     */
+    private Hashtable<String, TldLocation> mappings;
+
+    private volatile boolean initialized;
+    private ServletContext ctxt;
+
+    /** Constructor.
+     *
+     * @param ctxt the servlet context of the web application in which Jasper
+     * is running
+     */
+    public TldLocationsCache(ServletContext ctxt) {
+        this.ctxt = ctxt;
+        mappings = new Hashtable<String, TldLocation>();
+        initialized = false;
+    }
 
     /**
      * Obtains the TLD location cache for the given {@link ServletContext} and
