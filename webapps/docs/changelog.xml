@@ -179,6 +179,9 @@
         <code>NullPointerException</code> and could result in a JVM crash.
         (markt)
       </fix>
+      <fix>
+        <bug>53725</bug>: Fix possible corruption of GZIP'd output. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
