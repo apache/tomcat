@@ -268,24 +268,24 @@
     </p>
 
     <p>All formats supported by SimpleDateFormat are allowed in <code>%{xxx}t</code>.
-    In addition the following extensions have been added:
+    In addition the following extensions have been added:</p>
     <ul>
     <li><b><code>sec</code></b> - number of seconds since the epoch</li>
     <li><b><code>msec</code></b> - number of milliseconds since the epoch</li>
     <li><b><code>msec_frac</code></b> - millisecond fraction</li>
     </ul>
-    These formats can not be mixed with SimpleDateFormat formats in the same format
+    <p>These formats can not be mixed with SimpleDateFormat formats in the same format
     token.</p>
 
     <p>Furthermore one can define whether to log the timestamp for the request start
-    time or the response finish time:
+    time or the response finish time:</p>
     <ul>
     <li><b><code>begin</code></b> or prefix <b><code>begin:</code></b> chooses
     the request start time</li>
     <li><b><code>end</code></b> or prefix <b><code>end:</code></b> chooses
     the response finish time</li>
     </ul>
-    By adding multiple <code>%{xxx}t</code> tokens to the pattern, one can
+    <p>By adding multiple <code>%{xxx}t</code> tokens to the pattern, one can
     also log both timestamps.</p>
 
     <p>The shorthand pattern <code>pattern=&quot;common&quot;</code>
