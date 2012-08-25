@@ -151,9 +151,13 @@
       <fix>
         <bug>53714</bug>: Provide separate system properties to control which
         JARs are excluded from which scans when using the JarScanner. This
-        allows JARs to be excluded from TLD scanning and/or Servlet 3.0
-        pluggability scanning. (markt)
-      </fix>      
+        allows JARs to be excluded from all scans or only from TLD scanning
+        and/or Servlet 3.0 pluggability scanning. (markt)
+      </fix>
+      <update>
+        Add several JDK libraries to the value of <code>jarsToSkip</code>
+        property in the <code>catalina.properties</code> file. (markt, kkolinko)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Coyote">
