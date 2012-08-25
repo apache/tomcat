@@ -137,7 +137,6 @@ public class FlushableGZIPOutputStream extends GZIPOutputStream {
             if (len > 0) {
                 out.write(buf, 0, len);
             }
-        } while (len != 0);
+        } while (!def.needsInput());
     }
-
 }
