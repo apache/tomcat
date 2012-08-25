@@ -47,7 +47,7 @@ public class TestFlushableGZIPOutputStream {
         OutputStream output = new FlushableGZIPOutputStream(byteOutStream);
 
         File sourcesDir = new File("test/org/apache/coyote/http11/filters/");
-        List<byte[]> parts = new ArrayList<byte[]>();
+        List<byte[]> parts = new ArrayList<>();
         byte[] part;
 
         part = loadFile(new File(sourcesDir, "bug52121-part1"));
