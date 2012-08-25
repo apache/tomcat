@@ -132,7 +132,7 @@ public class JspC extends Task implements Options {
     protected static final int ALL_WEBXML = 20;
     protected static final int DEFAULT_DIE_LEVEL = 1;
     protected static final int NO_DIE_LEVEL = 0;
-    protected static final Set<String> insertBefore = new HashSet<String>();
+    protected static final Set<String> insertBefore = new HashSet<>();
 
     static {
         insertBefore.add("</web-app>");
@@ -171,8 +171,7 @@ public class JspC extends Task implements Options {
     protected boolean smapSuppressed = true;
     protected boolean smapDumped = false;
     protected boolean caching = true;
-    protected final Map<String, TagLibraryInfo> cache =
-        new HashMap<String, TagLibraryInfo>();
+    protected final Map<String, TagLibraryInfo> cache = new HashMap<>();
 
     protected String compiler = null;
 
@@ -196,7 +195,7 @@ public class JspC extends Task implements Options {
     /**
      * The pages.
      */
-    protected final List<String> pages = new Vector<String>();
+    protected final List<String> pages = new Vector<>();
 
     /**
      * Needs better documentation, this data member does.
@@ -775,7 +774,7 @@ public class JspC extends Task implements Options {
     protected void addExtension(final String extension) {
         if(extension != null) {
             if(extensions == null) {
-                extensions = new Vector<String>();
+                extensions = new Vector<>();
             }
 
             extensions.add(extension);
@@ -1222,7 +1221,7 @@ public class JspC extends Task implements Options {
      * jsps are specified.
      */
     public void scanFiles( File base ) throws JasperException {
-        Stack<String> dirs = new Stack<String>();
+        Stack<String> dirs = new Stack<>();
         dirs.push(base.toString());
 
         // Make sure default extensions are always included
@@ -1450,7 +1449,7 @@ public class JspC extends Task implements Options {
         }
 
         // Turn the classPath into URLs
-        ArrayList<URL> urls = new ArrayList<URL>();
+        ArrayList<URL> urls = new ArrayList<>();
         StringTokenizer tokenizer = new StringTokenizer(classPath,
                                                         File.pathSeparator);
         while (tokenizer.hasMoreTokens()) {
