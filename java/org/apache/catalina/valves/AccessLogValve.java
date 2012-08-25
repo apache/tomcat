@@ -110,6 +110,8 @@ import org.apache.tomcat.util.buf.B2CConverter;
  * <li><code>%{xxx}c</code> for a specific cookie
  * <li><code>%{xxx}r</code> xxx is an attribute in the ServletRequest
  * <li><code>%{xxx}s</code> xxx is an attribute in the HttpSession
+ * <li><code>%{xxx}t</code> xxx is an enhanced SimpleDateFormat pattern
+ * (see Configuration Reference document for details on supported time patterns)
  * </ul>
  *
  * <p>
