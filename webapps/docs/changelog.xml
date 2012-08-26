@@ -162,6 +162,12 @@
         Fix typos etc. in the code that logs merged web.xml (as enabled by
         <code>logEffectiveWebXml</code> option on Context). (kkolinko)
       </fix>
+      <fix>
+        <bug>53758</bug>: When adding filters via
+        <code>FilterRegistration.Dynamic</code> the filters were added at the
+        wrong point because the <code>isMatchAfter </code> logic was inverted.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
