@@ -18,7 +18,6 @@
 package org.apache.tomcat.util.bcel.classfile;
 
 import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
 
 import org.apache.tomcat.util.bcel.Constants;
@@ -69,22 +68,6 @@ public final class InnerClasses extends Attribute {
         inner_classes = new InnerClass[number_of_classes];
         for (int i = 0; i < number_of_classes; i++) {
             inner_classes[i] = new InnerClass(file);
-        }
-    }
-
-
-    /**
-     * Dump source file attribute to file stream in binary format.
-     *
-     * @param file Output file stream
-     * @throws IOException
-     */
-    @Override
-    public final void dump( DataOutputStream file ) throws IOException {
-        super.dump(file);
-        file.writeShort(number_of_classes);
-        for (int i = 0; i < number_of_classes; i++) {
-            inner_classes[i].dump(file);
         }
     }
 

@@ -18,7 +18,6 @@
 package org.apache.tomcat.util.bcel.classfile;
 
 import java.io.DataInput;
-import java.io.DataOutputStream;
 import java.io.IOException;
 
 import org.apache.tomcat.util.bcel.Constants;
@@ -60,19 +59,6 @@ public final class ConstantClass extends Constant {
 
 
     /** 
-     * Dump constant class to file stream in binary format.
-     *
-     * @param file Output file stream
-     * @throws IOException
-     */
-    @Override
-    public final void dump( DataOutputStream file ) throws IOException {
-        file.writeByte(tag);
-        file.writeShort(name_index);
-    }
-
-
-    /**
      * @return Name index in constant pool of class name.
      */
     public final int getNameIndex() {

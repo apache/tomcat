@@ -17,7 +17,6 @@
 package org.apache.tomcat.util.bcel.classfile;
 
 import java.io.DataInput;
-import java.io.DataOutputStream;
 import java.io.IOException;
 
 import org.apache.tomcat.util.bcel.Constants;
@@ -46,19 +45,6 @@ public final class ConstantUtf8 extends Constant {
     ConstantUtf8(DataInput file) throws IOException {
         super(Constants.CONSTANT_Utf8);
         bytes = file.readUTF();
-    }
-
-
-    /**
-     * Dump String in Utf8 format to file stream.
-     *
-     * @param file Output file stream
-     * @throws IOException
-     */
-    @Override
-    public final void dump( DataOutputStream file ) throws IOException {
-        file.writeByte(tag);
-        file.writeUTF(bytes);
     }
 
 

@@ -18,7 +18,6 @@
 package org.apache.tomcat.util.bcel.classfile;
 
 import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.Serializable;
 
@@ -66,9 +65,6 @@ public abstract class Constant implements Cloneable, Serializable {
     Constant(byte tag) {
         this.tag = tag;
     }
-
-
-    public abstract void dump( DataOutputStream file ) throws IOException;
 
 
     /**

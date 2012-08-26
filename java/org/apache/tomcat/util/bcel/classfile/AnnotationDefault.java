@@ -18,7 +18,6 @@
 package org.apache.tomcat.util.bcel.classfile;
 
 import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
 
 import org.apache.tomcat.util.bcel.Constants;
@@ -85,12 +84,5 @@ public class AnnotationDefault extends Attribute
     public Attribute copy(ConstantPool _constant_pool)
     {
         throw new RuntimeException("Not implemented yet!");
-    }
-
-    @Override
-    public final void dump(DataOutputStream dos) throws IOException
-    {
-      super.dump(dos);
-      default_value.dump(dos);
     }
 }
