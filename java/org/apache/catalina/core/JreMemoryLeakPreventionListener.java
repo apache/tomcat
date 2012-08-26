@@ -297,7 +297,7 @@ public class JreMemoryLeakPreventionListener implements LifecycleListener {
                         Method method = clazz.getDeclaredMethod(
                                 "requestLatency",
                                 new Class[] {long.class});
-                        method.invoke(null, Long.valueOf(Long.MAX_VALUE - 1));
+                        method.invoke(null, Long.getLong("org.apache.catalina.core.jreMemoryLeakPreventionGCDaemonPeriod", Long.valueOf(Long.MAX_VALUE-1)));
                     } catch (ClassNotFoundException e) {
                         if (System.getProperty("java.vendor").startsWith(
                                 "Sun")) {
