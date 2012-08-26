@@ -18,7 +18,6 @@
 package org.apache.tomcat.util.bcel.classfile;
 
 import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
 
 import org.apache.tomcat.util.bcel.Constants;
@@ -61,12 +60,5 @@ public class RuntimeInvisibleAnnotations extends Annotations
     {
         Annotations c = (Annotations) clone();
         return c;
-    }
-
-    @Override
-    public final void dump(DataOutputStream dos) throws IOException
-    {
-        super.dump(dos);
-        writeAnnotations(dos);
     }
 }

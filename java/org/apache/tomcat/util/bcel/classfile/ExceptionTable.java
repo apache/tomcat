@@ -18,7 +18,6 @@
 package org.apache.tomcat.util.bcel.classfile;
 
 import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
 
 import org.apache.tomcat.util.bcel.Constants;
@@ -70,22 +69,6 @@ public final class ExceptionTable extends Attribute {
         exception_index_table = new int[number_of_exceptions];
         for (int i = 0; i < number_of_exceptions; i++) {
             exception_index_table[i] = file.readUnsignedShort();
-        }
-    }
-
-
-    /**
-     * Dump exceptions attribute to file stream in binary format.
-     *
-     * @param file Output file stream
-     * @throws IOException
-     */
-    @Override
-    public final void dump( DataOutputStream file ) throws IOException {
-        super.dump(file);
-        file.writeShort(number_of_exceptions);
-        for (int i = 0; i < number_of_exceptions; i++) {
-            file.writeShort(exception_index_table[i]);
         }
     }
 

@@ -18,7 +18,6 @@
 package org.apache.tomcat.util.bcel.classfile;
 
 import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.HashMap;
@@ -67,19 +66,6 @@ public abstract class Attribute implements Cloneable, Serializable
         this.name_index = name_index;
         this.length = length;
         this.constant_pool = constant_pool;
-    }
-
-    /**
-     * Dump attribute to file stream in binary format.
-     *
-     * @param file
-     *            Output file stream
-     * @throws IOException
-     */
-    public void dump(DataOutputStream file) throws IOException
-    {
-        file.writeShort(name_index);
-        file.writeInt(length);
     }
 
     private static final Map<String,AttributeReader> readers =
