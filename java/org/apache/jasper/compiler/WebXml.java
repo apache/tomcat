@@ -39,7 +39,10 @@ import org.xml.sax.InputSource;
  * annotations with the main web.xml
  *
  * Clients *must* ensure that they call {@link #close()} to clean up resources.
+ *
+ * @deprecated  Unused - will be removed in Tomcat 8.0.x
  */
+@Deprecated
 public class WebXml {
     private static final String FILE_PROTOCOL = "file:";
     private static final String WEB_XML = "/WEB-INF/web.xml";
