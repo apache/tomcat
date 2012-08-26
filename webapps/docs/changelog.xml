@@ -158,6 +158,10 @@
         Add several JDK libraries to the value of <code>jarsToSkip</code>
         property in the <code>catalina.properties</code> file. (markt, kkolinko)
       </update>
+      <fix>
+        Fix typos etc. in the code that logs merged web.xml (as enabled by
+        <code>logEffectiveWebXml</code> option on Context). (kkolinko)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
