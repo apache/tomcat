@@ -18,7 +18,6 @@
 package org.apache.tomcat.util.bcel.classfile;
 
 import java.io.DataInput;
-import java.io.DataOutputStream;
 import java.io.IOException;
 
 import org.apache.tomcat.util.bcel.Constants;
@@ -55,19 +54,6 @@ public final class ConstantFloat extends Constant {
      */
     ConstantFloat(DataInput file) throws IOException {
         this(file.readFloat());
-    }
-
-
-    /**
-     * Dump constant float to file stream in binary format.
-     *
-     * @param file Output file stream
-     * @throws IOException
-     */
-    @Override
-    public final void dump( DataOutputStream file ) throws IOException {
-        file.writeByte(tag);
-        file.writeFloat(bytes);
     }
 
 
