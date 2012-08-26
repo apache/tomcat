@@ -68,8 +68,7 @@ public abstract class Attribute implements Cloneable, Serializable
         this.constant_pool = constant_pool;
     }
 
-    private static final Map<String,AttributeReader> readers =
-            new HashMap<String,AttributeReader>();
+    private static final Map<String,AttributeReader> readers = new HashMap<>();
 
     /*
      * Class method reads one attribute from the input data stream. This method
