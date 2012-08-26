@@ -198,6 +198,10 @@
         <bug>53654</bug>: Support <code>file://</code> URLs for JSP
         dependencies. Patch provided by Viola Lu. (markt)
       </fix>
+      <fix>
+        <bug>53737</bug>: Access JSP configuration information from web.xml via
+        the <code>ServletContext</code> rather than re-parsing web.xml. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">
