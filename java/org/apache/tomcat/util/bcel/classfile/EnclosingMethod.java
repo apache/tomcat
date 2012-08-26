@@ -29,35 +29,18 @@ public class EnclosingMethod extends Attribute {
 
     private static final long serialVersionUID = 6755214228300933233L;
 
-    // Pointer to the CONSTANT_Class_info structure representing the
-    // innermost class that encloses the declaration of the current class.
-    private int classIndex;
-
-    // If the current class is not immediately enclosed by a method or
-    // constructor, then the value of the method_index item must be zero.
-    // Otherwise, the value of the  method_index item must point to a
-    // CONSTANT_NameAndType_info structure representing the name and the
-    // type of a method in the class referenced by the class we point
-    // to in the class_index.  *It is the compiler responsibility* to
-    // ensure that the method identified by this index is the closest
-    // lexically enclosing method that includes the local/anonymous class.
-    private int methodIndex;
-
     // Ctors - and code to read an attribute in.
-    public EnclosingMethod(int nameIndex, int len, DataInputStream dis, ConstantPool cpool) throws IOException {
-        this(nameIndex, len, dis.readUnsignedShort(), dis.readUnsignedShort(), cpool);
-    }
-
-    private EnclosingMethod(int nameIndex, int len, int classIdx,int methodIdx, ConstantPool cpool) {
+    public EnclosingMethod(int nameIndex, int len, DataInputStream dis,
+            ConstantPool cpool) throws IOException {
         super(Constants.ATTR_ENCLOSING_METHOD, nameIndex, len, cpool);
-        classIndex  = classIdx;
-        methodIndex = methodIdx;
+        // Unused class index
+        dis.readUnsignedShort();
+        // Unused method index
+        dis.readUnsignedShort();
     }
 
     @Override
     public Attribute copy(ConstantPool constant_pool) {
         throw new RuntimeException("Not implemented yet!");
-        // is this next line sufficient?
-        // return (EnclosingMethod)clone();
     }
 }
