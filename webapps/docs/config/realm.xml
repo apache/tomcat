@@ -116,6 +116,11 @@
         authenticated and no check will be made for assigned roles unless roles
         are defined in web.xml in which case the user must be assigned at least
         one of those roles.</p>
+        <p>When this attribute has the value of <code>authOnly</code> or
+        <code>strictAuthOnly</code>, the <strong>roleNameCol</strong> and
+        <strong>userRoleTable</strong> attributes become optional. If those two
+        attributes are omitted, the user's roles will not be loaded by this
+        Realm.</p>
       </attribute>
 
       <attribute name="connectionName" required="true">
@@ -149,9 +154,12 @@
         used to connect to the authentication database.</p>
       </attribute>
 
-      <attribute name="roleNameCol" required="true">
+      <attribute name="roleNameCol" required="false">
         <p>Name of the column, in the "user roles" table, which contains
         a role name assigned to the corresponding user.</p>
+        <p>This attribute is <strong>required</strong> in majority of
+        configurations. See <strong>allRolesMode</strong> attribute for
+        a rare case when it can be omitted.</p>
       </attribute>
 
       <attribute name="stripRealmForGss" required="false">
@@ -174,10 +182,13 @@
         that contains the user's username.</p>
       </attribute>
 
-      <attribute name="userRoleTable" required="true">
+      <attribute name="userRoleTable" required="false">
         <p>Name of the "user roles" table, which must contain columns
         named by the <code>userNameCol</code> and <code>roleNameCol</code>
         attributes.</p>
+        <p>This attribute is <strong>required</strong> in majority of
+        configurations. See <strong>allRolesMode</strong> attribute for
+        a rare case when it can be omitted.</p>
       </attribute>
 
       <attribute name="userTable" required="true">
@@ -238,6 +249,11 @@
         authenticated and no check will be made for assigned roles unless roles
         are defined in web.xml in which case the user must be assigned at least
         one of those roles.</p>
+        <p>When this attribute has the value of <code>authOnly</code> or
+        <code>strictAuthOnly</code>, the <strong>roleNameCol</strong> and
+        <strong>userRoleTable</strong> attributes become optional. If those two
+        attributes are omitted, the user's roles will not be loaded by this
+        Realm.</p>
       </attribute>
 
       <attribute name="dataSourceName" required="true">
@@ -257,9 +273,12 @@
         global DataSource.</p>
       </attribute>
 
-      <attribute name="roleNameCol" required="true">
+      <attribute name="roleNameCol" required="false">
         <p>Name of the column, in the "user roles" table, which contains
         a role name assigned to the corresponding user.</p>
+        <p>This attribute is <strong>required</strong> in majority of
+        configurations. See <strong>allRolesMode</strong> attribute for
+        a rare case when it can be omitted.</p>
       </attribute>
 
       <attribute name="stripRealmForGss" required="false">
@@ -282,10 +301,13 @@
         that contains the user's username.</p>
       </attribute>
 
-      <attribute name="userRoleTable" required="true">
+      <attribute name="userRoleTable" required="false">
         <p>Name of the "user roles" table, which must contain columns
         named by the <code>userNameCol</code> and <code>roleNameCol</code>
         attributes.</p>
+        <p>This attribute is <strong>required</strong> in majority of
+        configurations. See <strong>allRolesMode</strong> attribute for
+        a rare case when it can be omitted.</p>
       </attribute>
 
       <attribute name="userTable" required="true">
