@@ -549,7 +549,7 @@ public class WebXml {
         return messageDestinations;
     }
 
-    // locale-encoging-mapping-list
+    // locale-encoding-mapping-list
     private final Map<String,String> localeEncodingMappings = new HashMap<>();
     public void addLocaleEncodingMapping(String locale, String encoding) {
         localeEncodingMappings.put(locale, encoding);
@@ -601,7 +601,8 @@ public class WebXml {
         sb.append("         xmlns:xsi=");
         sb.append("\"http://www.w3.org/2001/XMLSchema-instance\"\n");
         sb.append("         xsi:schemaLocation=");
-        sb.append("\"http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd\"\n");
+        sb.append("\"http://java.sun.com/xml/ns/javaee" +
+                  " http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd\"\n");
         sb.append("         version=\"");
         sb.append(getVersion());
         sb.append("\"\n");
@@ -616,7 +617,7 @@ public class WebXml {
         for (Map.Entry<String, String> entry : contextParams.entrySet()) {
             sb.append("  <context-param>\n");
             appendElement(sb, INDENT4, "param-name", entry.getKey());
-            appendElement(sb, INDENT4, "param-valuee", entry.getValue());
+            appendElement(sb, INDENT4, "param-value", entry.getValue());
             sb.append("  </context-param>\n");
         }
         sb.append('\n');
@@ -805,17 +806,17 @@ public class WebXml {
                     appendElement(sb, INDENT6, "url-pattern", urlPattern);
                 }
                 appendElement(sb, INDENT6, "el-ignored", jpg.getElIgnored());
-                appendElement(sb, INDENT6, "scripting-invalid",
-                        jpg.getScriptingInvalid());
                 appendElement(sb, INDENT6, "page-encoding",
                         jpg.getPageEncoding());
+                appendElement(sb, INDENT6, "scripting-invalid",
+                        jpg.getScriptingInvalid());
+                appendElement(sb, INDENT6, "is-xml", jpg.getIsXml());
                 for (String prelude : jpg.getIncludePreludes()) {
                     appendElement(sb, INDENT6, "include-prelude", prelude);
                 }
                 for (String coda : jpg.getIncludeCodas()) {
                     appendElement(sb, INDENT6, "include-coda", coda);
                 }
-                appendElement(sb, INDENT6, "is-xml", jpg.getIsXml());
                 appendElement(sb, INDENT6, "deferred-syntax-allowed-as-literal",
                         jpg.getDeferredSyntax());
                 appendElement(sb, INDENT6, "trim-directive-whitespaces",
