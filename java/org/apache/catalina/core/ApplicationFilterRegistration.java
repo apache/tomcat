@@ -72,9 +72,9 @@ public class ApplicationFilterRegistration
             }
 
             if (isMatchAfter) {
-                context.addFilterMapBefore(filterMap);
-            } else {
                 context.addFilterMap(filterMap);
+            } else {
+                context.addFilterMapBefore(filterMap);
             }
         }
         // else error?
@@ -101,9 +101,9 @@ public class ApplicationFilterRegistration
             }
 
             if (isMatchAfter) {
-                context.addFilterMapBefore(filterMap);
-            } else {
                 context.addFilterMap(filterMap);
+            } else {
+                context.addFilterMapBefore(filterMap);
             }
         }
         // else error?
