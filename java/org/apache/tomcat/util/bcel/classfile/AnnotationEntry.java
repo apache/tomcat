@@ -54,7 +54,7 @@ public class AnnotationEntry implements Constants, Serializable {
 
         final AnnotationEntry annotationEntry = new AnnotationEntry(file.readUnsignedShort(), constant_pool);
         final int num_element_value_pairs = (file.readUnsignedShort());
-        annotationEntry.element_value_pairs = new ArrayList<ElementValuePair>();
+        annotationEntry.element_value_pairs = new ArrayList<>();
         for (int i = 0; i < num_element_value_pairs; i++) {
             annotationEntry.element_value_pairs.add(new ElementValuePair(file.readUnsignedShort(), ElementValue.readElementValue(file, constant_pool),
                     constant_pool));
