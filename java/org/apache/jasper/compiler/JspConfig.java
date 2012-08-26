@@ -42,7 +42,7 @@ public class JspConfig {
     private final Log log = LogFactory.getLog(JspConfig.class);
 
     private Vector<JspPropertyGroup> jspProperties = null;
-    private ServletContext ctxt;
+    private final ServletContext ctxt;
     private volatile boolean initialized = false;
 
     private static final String defaultIsXml = null;    // unspecified
@@ -98,7 +98,7 @@ public class JspConfig {
                 return;
             }
 
-            jspProperties = new Vector<JspPropertyGroup>();
+            jspProperties = new Vector<>();
             Iterator<TreeNode> jspPropertyList =
                 jspConfig.findChildren("jsp-property-group");
             while (jspPropertyList.hasNext()) {
@@ -106,13 +106,13 @@ public class JspConfig {
                 TreeNode element = jspPropertyList.next();
                 Iterator<TreeNode> list = element.findChildren();
 
-                Vector<String> urlPatterns = new Vector<String>();
+                Vector<String> urlPatterns = new Vector<>();
                 String pageEncoding = null;
                 String scriptingInvalid = null;
                 String elIgnored = null;
                 String isXml = null;
-                Vector<String> includePrelude = new Vector<String>();
-                Vector<String> includeCoda = new Vector<String>();
+                Vector<String> includePrelude = new Vector<>();
+                Vector<String> includeCoda = new Vector<>();
                 String deferredSyntaxAllowedAsLiteral = null;
                 String trimDirectiveWhitespaces = null;
                 String defaultContentType = null;
@@ -248,6 +248,7 @@ public class JspConfig {
      * Select the property group that has more restrictive url-pattern.
      * In case of tie, select the first.
      */
+    @SuppressWarnings("null") // NPE not possible
     private JspPropertyGroup selectProperty(JspPropertyGroup prev,
             JspPropertyGroup curr) {
         if (prev == null) {
@@ -306,8 +307,8 @@ public class JspConfig {
             uriExtension = uri.substring(index+1);
         }
 
-        Vector<String> includePreludes = new Vector<String>();
-        Vector<String> includeCodas = new Vector<String>();
+        Vector<String> includePreludes = new Vector<>();
+        Vector<String> includeCodas = new Vector<>();
 
         JspPropertyGroup isXmlMatch = null;
         JspPropertyGroup elIgnoredMatch = null;
@@ -491,9 +492,9 @@ public class JspConfig {
     }
 
     public static class JspPropertyGroup {
-        private String path;
-        private String extension;
-        private JspProperty jspProperty;
+        private final String path;
+        private final String extension;
+        private final JspProperty jspProperty;
 
         JspPropertyGroup(String path, String extension,
                 JspProperty jspProperty) {
@@ -517,17 +518,17 @@ public class JspConfig {
 
     public static class JspProperty {
 
-        private String isXml;
-        private String elIgnored;
-        private String scriptingInvalid;
-        private String pageEncoding;
-        private Vector<String> includePrelude;
-        private Vector<String> includeCoda;
-        private String deferedSyntaxAllowedAsLiteral;
-        private String trimDirectiveWhitespaces;
-        private String defaultContentType;
-        private String buffer;
-        private String errorOnUndeclaredNamespace;
+        private final String isXml;
+        private final String elIgnored;
+        private final String scriptingInvalid;
+        private final String pageEncoding;
+        private final Vector<String> includePrelude;
+        private final Vector<String> includeCoda;
+        private final String deferedSyntaxAllowedAsLiteral;
+        private final String trimDirectiveWhitespaces;
+        private final String defaultContentType;
+        private final String buffer;
+        private final String errorOnUndeclaredNamespace;
 
         public JspProperty(String isXml, String elIgnored,
                 String scriptingInvalid, String pageEncoding,
