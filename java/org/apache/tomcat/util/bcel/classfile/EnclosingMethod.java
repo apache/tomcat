@@ -17,7 +17,6 @@
 package org.apache.tomcat.util.bcel.classfile;
 
 import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
 
 import org.apache.tomcat.util.bcel.Constants;
@@ -60,12 +59,5 @@ public class EnclosingMethod extends Attribute {
         throw new RuntimeException("Not implemented yet!");
         // is this next line sufficient?
         // return (EnclosingMethod)clone();
-    }
-
-    @Override
-    public final void dump(DataOutputStream file) throws IOException {
-        super.dump(file);
-        file.writeShort(classIndex);
-        file.writeShort(methodIndex);
     }
 }

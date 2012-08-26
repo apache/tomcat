@@ -18,7 +18,6 @@
 package org.apache.tomcat.util.bcel.classfile;
 
 import java.io.DataInput;
-import java.io.DataOutputStream;
 import java.io.IOException;
 
 import org.apache.tomcat.util.bcel.Constants;
@@ -63,20 +62,6 @@ public final class PMGClass extends Attribute {
         super(Constants.ATTR_PMG, name_index, length, constant_pool);
         this.pmg_index = pmg_index;
         this.pmg_class_index = pmg_class_index;
-    }
-
-
-    /**
-     * Dump source file attribute to file stream in binary format.
-     *
-     * @param file Output file stream
-     * @throws IOException
-     */
-    @Override
-    public final void dump( DataOutputStream file ) throws IOException {
-        super.dump(file);
-        file.writeShort(pmg_index);
-        file.writeShort(pmg_class_index);
     }
 
 

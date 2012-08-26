@@ -18,7 +18,6 @@
 package org.apache.tomcat.util.bcel.classfile;
 
 import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
 
 import org.apache.tomcat.util.bcel.Constants;
@@ -71,21 +70,6 @@ public final class Synthetic extends Attribute {
             bytes = new byte[length];
             file.readFully(bytes);
             System.err.println("Synthetic attribute with length > 0");
-        }
-    }
-
-
-    /**
-     * Dump source file attribute to file stream in binary format.
-     *
-     * @param file Output file stream
-     * @throws IOException
-     */
-    @Override
-    public final void dump( DataOutputStream file ) throws IOException {
-        super.dump(file);
-        if (length > 0) {
-            file.write(bytes, 0, length);
         }
     }
 

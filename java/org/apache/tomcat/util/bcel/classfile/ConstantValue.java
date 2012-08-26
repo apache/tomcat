@@ -17,7 +17,6 @@
 package org.apache.tomcat.util.bcel.classfile;
 
 import java.io.DataInput;
-import java.io.DataOutputStream;
 import java.io.IOException;
 
 import org.apache.tomcat.util.bcel.Constants;
@@ -61,19 +60,6 @@ public final class ConstantValue extends Attribute {
             ConstantPool constant_pool) {
         super(Constants.ATTR_CONSTANT_VALUE, name_index, length, constant_pool);
         this.constantvalue_index = constantvalue_index;
-    }
-
-
-    /**
-     * Dump constant value attribute to file stream on binary format.
-     *
-     * @param file Output file stream
-     * @throws IOException
-     */
-    @Override
-    public final void dump( DataOutputStream file ) throws IOException {
-        super.dump(file);
-        file.writeShort(constantvalue_index);
     }
 
 

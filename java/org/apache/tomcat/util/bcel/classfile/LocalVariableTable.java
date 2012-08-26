@@ -18,7 +18,6 @@
 package org.apache.tomcat.util.bcel.classfile;
 
 import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
 
 import org.apache.tomcat.util.bcel.Constants;
@@ -67,22 +66,6 @@ public class LocalVariableTable extends Attribute {
         local_variable_table = new LocalVariable[local_variable_table_length];
         for (int i = 0; i < local_variable_table_length; i++) {
             local_variable_table[i] = new LocalVariable(file, constant_pool);
-        }
-    }
-
-
-    /**
-     * Dump local variable table attribute to file stream in binary format.
-     *
-     * @param file Output file stream
-     * @throws IOException
-     */
-    @Override
-    public final void dump( DataOutputStream file ) throws IOException {
-        super.dump(file);
-        file.writeShort(local_variable_table_length);
-        for (int i = 0; i < local_variable_table_length; i++) {
-            local_variable_table[i].dump(file);
         }
     }
 
