@@ -18,7 +18,6 @@
 package org.apache.tomcat.util.bcel.classfile;
 
 import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
 
 import org.apache.tomcat.util.bcel.Constants;
@@ -68,22 +67,6 @@ public final class LineNumberTable extends Attribute {
         line_number_table = new LineNumber[line_number_table_length];
         for (int i = 0; i < line_number_table_length; i++) {
             line_number_table[i] = new LineNumber(file);
-        }
-    }
-
-
-    /**
-     * Dump line number table attribute to file stream in binary format.
-     *
-     * @param file Output file stream
-     * @throws IOException
-     */
-    @Override
-    public final void dump( DataOutputStream file ) throws IOException {
-        super.dump(file);
-        file.writeShort(line_number_table_length);
-        for (int i = 0; i < line_number_table_length; i++) {
-            line_number_table[i].dump(file);
         }
     }
 

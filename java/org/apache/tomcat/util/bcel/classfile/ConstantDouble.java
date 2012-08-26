@@ -18,7 +18,6 @@
 package org.apache.tomcat.util.bcel.classfile;
 
 import java.io.DataInput;
-import java.io.DataOutputStream;
 import java.io.IOException;
 
 import org.apache.tomcat.util.bcel.Constants;
@@ -59,19 +58,6 @@ public final class ConstantDouble extends Constant {
 
 
     /**
-     * Dump constant double to file stream in binary format.
-     *
-     * @param file Output file stream
-     * @throws IOException
-     */
-    @Override
-    public final void dump( DataOutputStream file ) throws IOException {
-        file.writeByte(tag);
-        file.writeDouble(bytes);
-    }
-
-
-    /**
      * @return data, i.e., 8 bytes.
      */
     public final double getBytes() {
@@ -86,6 +72,4 @@ public final class ConstantDouble extends Constant {
     public final String toString() {
         return super.toString() + "(bytes = " + bytes + ")";
     }
-
-
 }

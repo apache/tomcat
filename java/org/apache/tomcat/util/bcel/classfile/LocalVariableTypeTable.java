@@ -17,7 +17,6 @@
 package org.apache.tomcat.util.bcel.classfile;
 
 import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
 
 import org.apache.tomcat.util.bcel.Constants;
@@ -70,15 +69,6 @@ private int             local_variable_type_table_length; // Table of local
 
     for(int i=0; i < local_variable_type_table_length; i++)
       local_variable_type_table[i] = new LocalVariable(dis, cpool);
-  }
-
-  @Override
-  public final void dump(DataOutputStream file) throws IOException
-  {
-    super.dump(file);
-    file.writeShort(local_variable_type_table_length);
-    for(int i=0; i < local_variable_type_table_length; i++)
-      local_variable_type_table[i].dump(file);
   }
 
   public final void setLocalVariableTable(LocalVariable[] local_variable_table)

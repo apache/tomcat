@@ -18,7 +18,6 @@
 package org.apache.tomcat.util.bcel.classfile;
 
 import java.io.DataInput;
-import java.io.DataOutputStream;
 import java.io.IOException;
 
 import org.apache.tomcat.util.bcel.Constants;
@@ -59,20 +58,6 @@ public final class ConstantNameAndType extends Constant {
         super(Constants.CONSTANT_NameAndType);
         this.name_index = name_index;
         this.signature_index = signature_index;
-    }
-
-
-    /**
-     * Dump name and signature index to file stream in binary format.
-     *
-     * @param file Output file stream
-     * @throws IOException
-     */
-    @Override
-    public final void dump( DataOutputStream file ) throws IOException {
-        file.writeByte(tag);
-        file.writeShort(name_index);
-        file.writeShort(signature_index);
     }
 
 

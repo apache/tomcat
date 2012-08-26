@@ -18,7 +18,6 @@
 package org.apache.tomcat.util.bcel.classfile;
 
 import java.io.DataInput;
-import java.io.DataOutputStream;
 import java.io.IOException;
 
 import org.apache.tomcat.util.bcel.Constants;
@@ -69,19 +68,6 @@ public final class SourceFile extends Attribute {
     public SourceFile(int name_index, int length, int sourcefile_index, ConstantPool constant_pool) {
         super(Constants.ATTR_SOURCE_FILE, name_index, length, constant_pool);
         this.sourcefile_index = sourcefile_index;
-    }
-
-
-    /**
-     * Dump source file attribute to file stream in binary format.
-     *
-     * @param file Output file stream
-     * @throws IOException
-     */
-    @Override
-    public final void dump( DataOutputStream file ) throws IOException {
-        super.dump(file);
-        file.writeShort(sourcefile_index);
     }
 
 

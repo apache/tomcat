@@ -18,7 +18,6 @@
 package org.apache.tomcat.util.bcel.classfile;
 
 import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -81,21 +80,6 @@ public final class Unknown extends Attribute {
         if (length > 0) {
             bytes = new byte[length];
             file.readFully(bytes);
-        }
-    }
-
-
-    /**
-     * Dump unknown bytes to file stream.
-     *
-     * @param file Output file stream
-     * @throws IOException
-     */
-    @Override
-    public final void dump( DataOutputStream file ) throws IOException {
-        super.dump(file);
-        if (length > 0) {
-            file.write(bytes, 0, length);
         }
     }
 

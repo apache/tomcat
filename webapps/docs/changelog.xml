@@ -261,6 +261,10 @@
       <fix>
         <bug>53701</bug>: Javadoc fixes. Patch provided by sebb. (markt)
       </fix>
+      <scode>
+        Remove some unused code from Tomcat&apos;s package renamed, cut-down
+        copy of Commons BCEL used for annotation scanning. (markt)
+      </scode>
     </changelog>
   </subsection>
 </section>
