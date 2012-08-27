@@ -43,7 +43,6 @@ import org.apache.catalina.Service;
 import org.apache.catalina.Wrapper;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
-import org.apache.catalina.deploy.LoginConfig;
 import org.apache.catalina.deploy.SecurityCollection;
 import org.apache.catalina.deploy.SecurityConstraint;
 import org.apache.catalina.util.LifecycleMBeanBase;
@@ -791,31 +790,6 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
 
         if (constraints == null || constraints.length == 0)
             return (true);
-
-        // Specifically allow access to the form login and form error pages
-        // and the "j_security_check" action
-        LoginConfig config = context.getLoginConfig();
-        if ((config != null) &&
-            (Constants.FORM_METHOD.equals(config.getAuthMethod()))) {
-            String requestURI = request.getRequestPathMB().toString();
-            String loginPage = config.getLoginPage();
-            if (loginPage.equals(requestURI)) {
-                if (log.isDebugEnabled())
-                    log.debug(" Allow access to login page " + loginPage);
-                return (true);
-            }
-            String errorPage = config.getErrorPage();
-            if (errorPage.equals(requestURI)) {
-                if (log.isDebugEnabled())
-                    log.debug(" Allow access to error page " + errorPage);
-                return (true);
-            }
-            if (requestURI.endsWith(Constants.FORM_ACTION)) {
-                if (log.isDebugEnabled())
-                    log.debug(" Allow access to username/password submission");
-                return (true);
-            }
-        }
 
         // Which user principal have we already authenticated?
         Principal principal = request.getPrincipal();
