@@ -197,6 +197,11 @@
       <fix>
         <bug>53725</bug>: Fix possible corruption of GZIP'd output. (markt)
       </fix>
+      <fix>
+        Improvements to DIGEST authenticator including the disabling caching of
+        authenticated user in session by default, tracking server rather than
+        client nonces and better handling of stale nonce values. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
