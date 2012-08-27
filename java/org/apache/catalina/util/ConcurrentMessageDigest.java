@@ -30,6 +30,8 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  */
 public class ConcurrentMessageDigest {
 
+    private static final String MD5 = "MD5";
+
     private static final Map<String,Queue<MessageDigest>> queues =
             new HashMap<>();
 
@@ -38,6 +40,18 @@ public class ConcurrentMessageDigest {
         // Hide default constructor for this utility class
     }
 
+    static {
+        try {
+            // Init commonly used algorithms
+            init(MD5);
+        } catch (NoSuchAlgorithmException e) {
+            throw new IllegalArgumentException(e);
+        }
+    }
+
+    public static byte[] digestMD5(byte[] input) {
+        return digest(MD5, input);
+    }
 
     public static byte[] digest(String algorithm, byte[] input) {
 
