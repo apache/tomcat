@@ -206,10 +206,8 @@ public class TestSSOnonLoginAndDigestAuthenticator extends TomcatBaseTest {
             boolean expectedReject, int expectedRC)
             throws Exception {
 
-        Map<String,List<String>> reqHeaders =
-                new HashMap<String,List<String>>();
-        Map<String,List<String>> respHeaders =
-                new HashMap<String,List<String>>();
+        Map<String,List<String>> reqHeaders = new HashMap<>();
+        Map<String,List<String>> respHeaders = new HashMap<>();
 
         ByteChunk bc = new ByteChunk();
         if (addCookies) {
@@ -238,11 +236,9 @@ public class TestSSOnonLoginAndDigestAuthenticator extends TomcatBaseTest {
 
         String digestUri= uri;
 
-        List<String> auth = new ArrayList<String>();
-        Map<String,List<String>> reqHeaders1 =
-                new HashMap<String,List<String>>();
-        Map<String,List<String>> respHeaders1 =
-                new HashMap<String,List<String>>();
+        List<String> auth = new ArrayList<>();
+        Map<String,List<String>> reqHeaders1 = new HashMap<>();
+        Map<String,List<String>> respHeaders1 = new HashMap<>();
 
         // the first access attempt should be challenged
         auth.add(buildDigestResponse(user, pwd, digestUri, REALM, "null",
@@ -265,10 +261,8 @@ public class TestSSOnonLoginAndDigestAuthenticator extends TomcatBaseTest {
         }
 
         // Second request should succeed (if we use the server nonce)
-        Map<String,List<String>> reqHeaders2 =
-                new HashMap<String,List<String>>();
-        Map<String,List<String>> respHeaders2 =
-                new HashMap<String,List<String>>();
+        Map<String,List<String>> reqHeaders2 = new HashMap<>();
+        Map<String,List<String>> respHeaders2 = new HashMap<>();
 
         auth.clear();
         if (useServerNonce) {

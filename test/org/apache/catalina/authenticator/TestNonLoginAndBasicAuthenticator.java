@@ -155,10 +155,8 @@ public class TestNonLoginAndBasicAuthenticator extends TomcatBaseTest {
     private void doTestNonLogin(String uri, boolean expectedReject,
             int expectedRC) throws Exception {
 
-        Map<String,List<String>> reqHeaders =
-                new HashMap<String,List<String>>();
-        Map<String,List<String>> respHeaders =
-                new HashMap<String,List<String>>();
+        Map<String,List<String>> reqHeaders = new HashMap<>();
+        Map<String,List<String>> respHeaders = new HashMap<>();
 
         ByteChunk bc = new ByteChunk();
         int rc = getUrl(HTTP_PREFIX + getPort() + uri, bc, reqHeaders,
@@ -180,10 +178,8 @@ public class TestNonLoginAndBasicAuthenticator extends TomcatBaseTest {
             boolean expectedReject2, int expectedRC2) throws Exception {
 
         // the first access attempt should be challenged
-        Map<String,List<String>> reqHeaders1 =
-                new HashMap<String,List<String>>();
-        Map<String,List<String>> respHeaders1 =
-                new HashMap<String,List<String>>();
+        Map<String,List<String>> reqHeaders1 = new HashMap<>();
+        Map<String,List<String>> respHeaders1 = new HashMap<>();
 
         ByteChunk bc = new ByteChunk();
         int rc = getUrl(HTTP_PREFIX + getPort() + uri, bc, reqHeaders1,
@@ -206,13 +202,12 @@ public class TestNonLoginAndBasicAuthenticator extends TomcatBaseTest {
         String authScheme = verifyAuthSchemeCase ? "bAsIc " : "Basic ";
         String authLine = authScheme + base64auth;
 
-        List<String> auth = new ArrayList<String>();
+        List<String> auth = new ArrayList<>();
         auth.add(authLine);
-        Map<String,List<String>> reqHeaders2 = new HashMap<String,List<String>>();
+        Map<String,List<String>> reqHeaders2 = new HashMap<>();
         reqHeaders2.put(CLIENT_AUTH_HEADER, auth);
 
-        Map<String,List<String>> respHeaders2 =
-            new HashMap<String,List<String>>();
+        Map<String,List<String>> respHeaders2 = new HashMap<>();
 
         bc.recycle();
         rc = getUrl(HTTP_PREFIX + getPort() + uri, bc, reqHeaders2,

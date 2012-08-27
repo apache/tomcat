@@ -175,14 +175,13 @@ public class TestDigestAuthenticator extends TomcatBaseTest {
         } else {
             digestUri = uri;
         }
-        List<String> auth = new ArrayList<String>();
+        List<String> auth = new ArrayList<>();
         auth.add(buildDigestResponse(user, pwd, digestUri, realm, "null",
                 "null", nc1, cnonce, qop));
-        Map<String,List<String>> reqHeaders = new HashMap<String,List<String>>();
+        Map<String,List<String>> reqHeaders = new HashMap<>();
         reqHeaders.put(CLIENT_AUTH_HEADER, auth);
 
-        Map<String,List<String>> respHeaders =
-            new HashMap<String,List<String>>();
+        Map<String,List<String>> respHeaders = new HashMap<>();
 
         // The first request will fail - but we need to extract the nonce
         ByteChunk bc = new ByteChunk();
