@@ -199,6 +199,10 @@
         shutdown. (markt)
       </fix>
       <fix>
+        <bug>42181</bug>: Better handling of edge conditions in chunk header
+        processing. (kkolinko)
+      </fix>
+      <fix>
         <bug>53697</bug>: Correct a regression in the fix for <bug>51881</bug>
         that mean that in some circumstances the <code>comet</code> flag was not
         reset on <code>HttpAprProcessor</code> instances. This caused problems
