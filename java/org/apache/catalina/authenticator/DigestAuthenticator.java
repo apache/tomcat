@@ -66,8 +66,7 @@ public class DigestAuthenticator extends AuthenticatorBase {
                 md5Helper = MessageDigest.getInstance("MD5");
             }
         } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-            throw new IllegalStateException();
+            throw new IllegalStateException(e);
         }
     }
 
@@ -78,7 +77,7 @@ public class DigestAuthenticator extends AuthenticatorBase {
     /**
      * MD5 message digest provider.
      */
-    protected static volatile MessageDigest md5Helper;
+     protected static volatile MessageDigest md5Helper;
 
 
     /**
