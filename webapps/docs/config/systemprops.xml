@@ -443,11 +443,6 @@
       else the default value will be <code>false</code>.</p>
     </property>
 
-    <property name="org.apache.catalina.core. jreMemoryLeakPreventionGCDaemonPeriod">
-      <p>The timeout period set when the leak prevention code triggers the GC Daemon.</p>
-      <p>If not specified, the default value of <code>Long.MAX_VALUE-1</code> will be used.</p>
-    </property>
-
   </properties>
 
 </section>
