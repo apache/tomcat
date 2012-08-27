@@ -20,7 +20,6 @@ package org.apache.catalina.authenticator;
 
 
 import java.io.IOException;
-import java.nio.charset.Charset;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.Principal;
@@ -38,6 +37,7 @@ import org.apache.catalina.deploy.LoginConfig;
 import org.apache.catalina.util.MD5Encoder;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.buf.B2CConverter;
 
 
 
@@ -83,6 +83,7 @@ public class DigestAuthenticator extends AuthenticatorBase {
 
     public DigestAuthenticator() {
         super();
+        setCache(false);
         try {
             if (md5Helper == null)
                 md5Helper = MessageDigest.getInstance("MD5");
@@ -103,16 +104,16 @@ public class DigestAuthenticator extends AuthenticatorBase {
 
 
     /**
-     * List of client nonce values currently being tracked
+     * List of server nonce values currently being tracked
      */
-    protected Map<String,NonceInfo> cnonces;
+    protected Map<String,NonceInfo> nonces;
 
 
     /**
-     * Maximum number of client nonces to keep in the cache. If not specified,
+     * Maximum number of server nonces to keep in the cache. If not specified,
      * the default value of 1000 is used.
      */
-    protected int cnonceCacheSize = 1000;
+    protected int nonceCacheSize = 1000;
 
 
     /**
@@ -153,13 +154,13 @@ public class DigestAuthenticator extends AuthenticatorBase {
     }
 
 
-    public int getCnonceCacheSize() {
-        return cnonceCacheSize;
+    public int getNonceCacheSize() {
+        return nonceCacheSize;
     }
 
 
-    public void setCnonceCacheSize(int cnonceCacheSize) {
-        this.cnonceCacheSize = cnonceCacheSize;
+    public void setNonceCacheSize(int nonceCacheSize) {
+        this.nonceCacheSize = nonceCacheSize;
     }
 
 
@@ -266,18 +267,19 @@ public class DigestAuthenticator extends AuthenticatorBase {
         // Validate any credentials already included with this request
         String authorization = request.getHeader("authorization");
         DigestInfo digestInfo = new DigestInfo(getOpaque(), getNonceValidity(),
-                getKey(), cnonces, isValidateUri());
+                getKey(), nonces, isValidateUri());
         if (authorization != null) {
-            if (digestInfo.validate(request, authorization, config)) {
-                principal = digestInfo.authenticate(context.getRealm());
-            }
+            if (digestInfo.parse(request, authorization)) {
+                if (digestInfo.validate(request, config)) {
+                    principal = digestInfo.authenticate(context.getRealm());
+                }
             
-            if (principal != null) {
-                String username = digestInfo.getUsername();
-                register(request, response, principal,
-                        HttpServletRequest.DIGEST_AUTH,
-                         username, null);
-                return (true);
+                if (principal != null && !digestInfo.isNonceStale()) {
+                    register(request, response, principal,
+                            HttpServletRequest.DIGEST_AUTH,
+                            digestInfo.getUsername(), null);
+                    return true;
+                }
             }
         }
 
@@ -288,11 +290,9 @@ public class DigestAuthenticator extends AuthenticatorBase {
         String nonce = generateNonce(request);
 
         setAuthenticateHeader(request, response, config, nonce,
-                digestInfo.isNonceStale());
+                principal != null && digestInfo.isNonceStale());
         response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
-        //      hres.flushBuffer();
-        return (false);
-
+        return false;
     }
 
 
@@ -386,10 +386,17 @@ public class DigestAuthenticator extends AuthenticatorBase {
         byte[] buffer;
         synchronized (md5Helper) {
             buffer = md5Helper.digest(
-                    ipTimeKey.getBytes(Charset.defaultCharset()));
+                    ipTimeKey.getBytes(B2CConverter.ISO_8859_1));
         }
 
-        return currentTime + ":" + MD5Encoder.encode(buffer);
+        String nonce = currentTime + ":" + MD5Encoder.encode(buffer);
+
+        NonceInfo info = new NonceInfo(currentTime, 100);
+        synchronized (nonces) {
+            nonces.put(nonce, info);
+        }
+
+        return nonce;
     }
 
 
@@ -463,7 +470,7 @@ public class DigestAuthenticator extends AuthenticatorBase {
             setOpaque(sessionIdGenerator.generateSessionId());
         }
         
-        cnonces = new LinkedHashMap<String, DigestAuthenticator.NonceInfo>() {
+        nonces = new LinkedHashMap<String, DigestAuthenticator.NonceInfo>() {
 
             private static final long serialVersionUID = 1L;
             private static final long LOG_SUPPRESS_TIME = 5 * 60 * 1000;
@@ -475,7 +482,7 @@ public class DigestAuthenticator extends AuthenticatorBase {
                     Map.Entry<String,NonceInfo> eldest) {
                 // This is called from a sync so keep it simple
                 long currentTime = System.currentTimeMillis();
-                if (size() > getCnonceCacheSize()) {
+                if (size() > getNonceCacheSize()) {
                     if (lastLog < currentTime &&
                             currentTime - eldest.getValue().getTimestamp() <
                             getNonceValidity()) {
@@ -493,10 +500,10 @@ public class DigestAuthenticator extends AuthenticatorBase {
  
     private static class DigestInfo {
 
-        private String opaque;
-        private long nonceValidity;
-        private String key;
-        private Map<String,NonceInfo> cnonces;
+        private final String opaque;
+        private final long nonceValidity;
+        private final String key;
+        private final Map<String,NonceInfo> nonces;
         private boolean validateUri = true;
 
         private String userName = null;
@@ -508,16 +515,17 @@ public class DigestAuthenticator extends AuthenticatorBase {
         private String cnonce = null;
         private String realmName = null;
         private String qop = null;
+        private String opaqueReceived = null;
 
         private boolean nonceStale = false;
 
 
         public DigestInfo(String opaque, long nonceValidity, String key,
-                Map<String,NonceInfo> cnonces, boolean validateUri) {
+                Map<String,NonceInfo> nonces, boolean validateUri) {
             this.opaque = opaque;
             this.nonceValidity = nonceValidity;
             this.key = key;
-            this.cnonces = cnonces;
+            this.nonces = nonces;
             this.validateUri = validateUri;
         }
 
@@ -526,8 +534,8 @@ public class DigestAuthenticator extends AuthenticatorBase {
             return userName;
         }
 
-        public boolean validate(Request request, String authorization,
-                LoginConfig config) {
+
+        public boolean parse(Request request, String authorization) {
             // Validate the authorization credentials format
             if (authorization == null) {
                 return false;
@@ -541,7 +549,6 @@ public class DigestAuthenticator extends AuthenticatorBase {
             String[] tokens = authorization.split(",(?=(?:[^\"]*\"[^\"]*\")+$)");
 
             method = request.getMethod();
-            String opaque = null;
 
             for (int i = 0; i < tokens.length; i++) {
                 String currentToken = tokens[i];
@@ -573,9 +580,13 @@ public class DigestAuthenticator extends AuthenticatorBase {
                 if ("response".equals(currentTokenName))
                     response = removeQuotes(currentTokenValue);
                 if ("opaque".equals(currentTokenName))
-                    opaque = removeQuotes(currentTokenValue);
+                    opaqueReceived = removeQuotes(currentTokenValue);
             }
 
+            return true;
+        }
+
+        public boolean validate(Request request, LoginConfig config) {
             if ( (userName == null) || (realmName == null) || (nonce == null)
                  || (uri == null) || (response == null) ) {
                 return false;
@@ -621,7 +632,7 @@ public class DigestAuthenticator extends AuthenticatorBase {
             }
             
             // Validate the opaque string
-            if (!this.opaque.equals(opaque)) {
+            if (!opaque.equals(opaqueReceived)) {
                 return false;
             }
 
@@ -640,14 +651,16 @@ public class DigestAuthenticator extends AuthenticatorBase {
             long currentTime = System.currentTimeMillis();
             if ((currentTime - nonceTime) > nonceValidity) {
                 nonceStale = true;
-                return false;
+                synchronized (nonces) {
+                    nonces.remove(nonce);
+                }
             }
             String serverIpTimeKey =
                 request.getRemoteAddr() + ":" + nonceTime + ":" + key;
             byte[] buffer = null;
             synchronized (md5Helper) {
                 buffer = md5Helper.digest(
-                        serverIpTimeKey.getBytes(Charset.defaultCharset()));
+                        serverIpTimeKey.getBytes(B2CConverter.ISO_8859_1));
             }
             String md5ServerIpTimeKey = MD5Encoder.encode(buffer);
             if (!md5ServerIpTimeKey.equals(md5clientIpTimeKey)) {
@@ -660,7 +673,7 @@ public class DigestAuthenticator extends AuthenticatorBase {
             }
 
             // Validate cnonce and nc
-            // Check if presence of nc and nonce is consistent with presence of qop
+            // Check if presence of nc and Cnonce is consistent with presence of qop
             if (qop == null) {
                 if (cnonce != null || nc != null) {
                     return false;
@@ -681,20 +694,17 @@ public class DigestAuthenticator extends AuthenticatorBase {
                     return false;
                 }
                 NonceInfo info;
-                synchronized (cnonces) {
-                    info = cnonces.get(cnonce);
+                synchronized (nonces) {
+                    info = nonces.get(nonce);
                 }
                 if (info == null) {
-                    info = new NonceInfo();
+                    // Nonce is valid but not in cache. It must have dropped out
+                    // of the cache - force a re-authentication
+                    nonceStale = true;
                 } else {
-                    if (count <= info.getCount()) {
+                    if (!info.nonceCountValid(count)) {
                         return false;
                     }
-                }
-                info.setCount(count);
-                info.setTimestamp(currentTime);
-                synchronized (cnonces) {
-                    cnonces.put(cnonce, info);
                 }
             }
             return true;
@@ -711,7 +721,7 @@ public class DigestAuthenticator extends AuthenticatorBase {
 
             byte[] buffer;
             synchronized (md5Helper) {
-                buffer = md5Helper.digest(a2.getBytes(Charset.defaultCharset()));
+                buffer = md5Helper.digest(a2.getBytes(B2CConverter.ISO_8859_1));
             }
             String md5a2 = MD5Encoder.encode(buffer);
 
@@ -722,19 +732,31 @@ public class DigestAuthenticator extends AuthenticatorBase {
     }
 
     private static class NonceInfo {
-        private volatile long count;
         private volatile long timestamp;
-        
-        public void setCount(long l) {
-            count = l;
+        private volatile boolean seen[];
+        private volatile int offset;
+        private volatile int count = 0;
+
+        public NonceInfo(long currentTime, int seenWindowSize) {
+            this.timestamp = currentTime;
+            seen = new boolean[seenWindowSize];
+            offset = seenWindowSize / 2;
         }
         
-        public long getCount() {
-            return count;
-        }
-        
-        public void setTimestamp(long l) {
-            timestamp = l;
+        public synchronized boolean nonceCountValid(long nonceCount) {
+            if ((count - offset) >= nonceCount ||
+                    (nonceCount > count - offset + seen.length)) {
+                return false;
+            }
+            int checkIndex = (int) ((nonceCount + offset) % seen.length);
+            if (seen[checkIndex]) {
+                return false;
+            } else {
+                seen[checkIndex] = true;
+                seen[count % seen.length] = false;
+                count++;
+                return true;
+            }
         }
         
         public long getTimestamp() {
