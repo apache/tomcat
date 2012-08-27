@@ -286,6 +286,13 @@
         hard to diagnose. Defaults to <code>true</code>.</p>
       </attribute>
 
+      <attribute name="gcDaemonPeriod" required="false">
+        <p>Allows a user to configure the period of time the JVM will attempt to 
+        schedule an object-inspection. This value is used as a parameter when
+        calling the method <code>sun.misc.GC.requestLatency</code>
+        Defaults to <code>Long.MAX_VALUE - 1</code>.</p>
+      </attribute>
+
     </attributes>
 
   </subsection>
