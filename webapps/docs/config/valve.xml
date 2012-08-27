@@ -831,7 +831,7 @@
 
       <attribute name="cache" required="false">
         <p>Should we cache authenticated Principals if the request is part of an
-        HTTP session? If not specified, the default value of <code>true</code>
+        HTTP session? If not specified, the default value of <code>false</code>
         will be used.</p>
       </attribute>
 
