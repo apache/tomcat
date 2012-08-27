@@ -182,6 +182,9 @@
         Improve performance of DIGEST authenticator for concurrent requests.
         (markt)
       </fix>
+      <fix>
+        Remove unneeded handling of FORM authentication in RealmBase. (kkolinko)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
