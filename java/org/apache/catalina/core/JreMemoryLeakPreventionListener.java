@@ -220,7 +220,7 @@ public class JreMemoryLeakPreventionListener implements LifecycleListener {
 
     /**
      * Sets the time that this listener will request for garbage-collection latency
-     * @see {@link sun.misc.GC#requestLatency(long)}
+     * @see {@code sun.misc.GC#requestLatency(long)}
      */
     private long gcDaemonPeriod = Long.MAX_VALUE - 1;
     public long getGcDaemonPeriod() {
@@ -308,7 +308,7 @@ public class JreMemoryLeakPreventionListener implements LifecycleListener {
                         Method method = clazz.getDeclaredMethod(
                                 "requestLatency",
                                 new Class[] {long.class});
-                        method.invoke(null, getGcDaemonPeriod());
+                        method.invoke(null, Long.valueOf(getGcDaemonPeriod()));
                     } catch (ClassNotFoundException e) {
                         if (System.getProperty("java.vendor").startsWith(
                                 "Sun")) {
