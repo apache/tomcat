@@ -16,8 +16,6 @@
  */
 package org.apache.catalina.authenticator;
 
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -36,6 +34,7 @@ import org.apache.catalina.startup.TestTomcat.MapRealm;
 import org.apache.catalina.startup.TesterServlet;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.catalina.util.ConcurrentMessageDigest;
 import org.apache.catalina.util.MD5Encoder;
 import org.apache.tomcat.util.buf.ByteChunk;
 
@@ -310,7 +309,7 @@ public class TestDigestAuthenticator extends TomcatBaseTest {
      */
     private static String buildDigestResponse(String user, String pwd,
             String uri, String realm, String nonce, String opaque, String nc,
-            String cnonce, String qop) throws NoSuchAlgorithmException {
+            String cnonce, String qop) {
 
         String a1 = user + ":" + realm + ":" + pwd;
         String a2 = "GET:" + uri;
@@ -361,11 +360,8 @@ public class TestDigestAuthenticator extends TomcatBaseTest {
         return auth.toString();
     }
 
-    private static String digest(String input) throws NoSuchAlgorithmException {
-        // This is slow but should be OK as this is only a test
-        MessageDigest md5 = MessageDigest.getInstance("MD5");
-
-        md5.update(input.getBytes());
-        return MD5Encoder.encode(md5.digest());
+    private static String digest(String input) {
+        return MD5Encoder.encode(
+                ConcurrentMessageDigest.digestMD5(input.getBytes()));
     }
 }
