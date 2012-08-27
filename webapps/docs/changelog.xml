@@ -178,6 +178,10 @@
         authenticated user in session by default, tracking server rather than
         client nonces and better handling of stale nonce values. (markt)
       </fix>
+      <fix>
+        Improve performance of DIGEST authenticator for concurrent requests.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

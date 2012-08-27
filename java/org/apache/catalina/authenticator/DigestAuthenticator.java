@@ -34,6 +34,7 @@ import org.apache.catalina.LifecycleException;
 import org.apache.catalina.Realm;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.deploy.LoginConfig;
+import org.apache.catalina.util.ConcurrentMessageDigest;
 import org.apache.catalina.util.MD5Encoder;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -98,8 +99,10 @@ public class DigestAuthenticator extends AuthenticatorBase {
 
     /**
      * MD5 message digest provider.
+     * @deprecated  Unused - will be removed in Tomcat 8.0.x onwards
      */
-     protected static volatile MessageDigest md5Helper;
+    @Deprecated
+    protected static volatile MessageDigest md5Helper;
 
 
     /**
@@ -382,12 +385,8 @@ public class DigestAuthenticator extends AuthenticatorBase {
         String ipTimeKey =
             request.getRemoteAddr() + ":" + currentTime + ":" + getKey();
 
-        byte[] buffer;
-        synchronized (md5Helper) {
-            buffer = md5Helper.digest(
-                    ipTimeKey.getBytes(B2CConverter.ISO_8859_1));
-        }
-
+        byte[] buffer = ConcurrentMessageDigest.digestMD5(
+                ipTimeKey.getBytes(B2CConverter.ISO_8859_1));
         String nonce = currentTime + ":" + MD5Encoder.encode(buffer);
 
         NonceInfo info = new NonceInfo(currentTime, 100);
@@ -656,11 +655,8 @@ public class DigestAuthenticator extends AuthenticatorBase {
             }
             String serverIpTimeKey =
                 request.getRemoteAddr() + ":" + nonceTime + ":" + key;
-            byte[] buffer = null;
-            synchronized (md5Helper) {
-                buffer = md5Helper.digest(
-                        serverIpTimeKey.getBytes(B2CConverter.ISO_8859_1));
-            }
+            byte[] buffer = ConcurrentMessageDigest.digestMD5(
+                    serverIpTimeKey.getBytes(B2CConverter.ISO_8859_1));
             String md5ServerIpTimeKey = MD5Encoder.encode(buffer);
             if (!md5ServerIpTimeKey.equals(md5clientIpTimeKey)) {
                 return false;
@@ -718,10 +714,8 @@ public class DigestAuthenticator extends AuthenticatorBase {
             // MD5(Method + ":" + uri)
             String a2 = method + ":" + uri;
 
-            byte[] buffer;
-            synchronized (md5Helper) {
-                buffer = md5Helper.digest(a2.getBytes(B2CConverter.ISO_8859_1));
-            }
+            byte[] buffer = ConcurrentMessageDigest.digestMD5(
+                    a2.getBytes(B2CConverter.ISO_8859_1));
             String md5a2 = MD5Encoder.encode(buffer);
 
             return realm.authenticate(userName, response, nonce, nc, cnonce,
