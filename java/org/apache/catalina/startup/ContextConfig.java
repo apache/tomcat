@@ -1590,8 +1590,15 @@ public class ContextConfig implements LifecycleListener {
                 // Note: Ignore file URLs for now since only jar URLs will be accepted
                 if ("jar".equals(url.getProtocol())) {
                     jar = JarFactory.newInstance(url);
-                    if (jar.entryExists("META-INF/resources/")) {
-                        context.addResourceJarUrl(url);
+                    jar.nextEntry();
+                    String entryName = jar.getEntryName();
+                    while (entryName != null) {
+                        if (entryName.startsWith("META-INF/resources/")) {
+                            context.addResourceJarUrl(url);
+                            break;
+                        }
+                        jar.nextEntry();
+                        entryName = jar.getEntryName();
                     }
                 } else if ("file".equals(url.getProtocol())) {
                     FileDirContext fileDirContext = new FileDirContext();
