@@ -211,7 +211,8 @@
         (markt)
       </fix>
       <fix>
-        <bug>53725</bug>: Fix possible corruption of GZIP'd output. (markt)
+        <bug>53725</bug>: Fix possible corruption of GZIP'd output.
+        (markt/kkolinko)
       </fix>
     </changelog>
   </subsection>
