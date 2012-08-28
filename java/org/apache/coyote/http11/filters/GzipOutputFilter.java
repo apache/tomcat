@@ -74,7 +74,7 @@ public class GzipOutputFilter implements OutputFilter {
     public int doWrite(ByteChunk chunk, Response res)
         throws IOException {
         if (compressionStream == null) {
-            compressionStream = new FlushableGZIPOutputStream(fakeOutputStream);
+            compressionStream = new GZIPOutputStream(fakeOutputStream, true);
         }
         compressionStream.write(chunk.getBytes(), chunk.getStart(),
                                 chunk.getLength());
@@ -136,7 +136,7 @@ public class GzipOutputFilter implements OutputFilter {
     public long end()
         throws IOException {
         if (compressionStream == null) {
-            compressionStream = new FlushableGZIPOutputStream(fakeOutputStream);
+            compressionStream = new GZIPOutputStream(fakeOutputStream, true);
         }
         compressionStream.finish();
         compressionStream.close();
