@@ -60,7 +60,7 @@ public class TestResponse extends TomcatBaseTest {
 
         tomcat.start();
 
-        Map<String,List<String>> headers = new HashMap<String,List<String>>();
+        Map<String,List<String>> headers = new HashMap<>();
         getUrl("http://localhost:" + getPort() + "/", new ByteChunk(), headers);
 
         // Check for headers without a name

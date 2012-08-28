@@ -36,7 +36,7 @@ public class TestCsrfPreventionFilter2 {
 
         assertTrue(threadCount > 1);
 
-        LruCache<String> cache = new LruCache<String>(threadCount - 1);
+        LruCache<String> cache = new LruCache<>(threadCount - 1);
 
         LruTestThread[] threads = new LruTestThread[threadCount];
         for (int i = 0; i < threadCount; i++) {

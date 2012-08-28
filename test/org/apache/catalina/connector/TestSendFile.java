@@ -68,7 +68,7 @@ public class TestSendFile extends TomcatBaseTest{
             tomcat.start();
 
             ByteChunk bc = new ByteChunk();
-            Map<String, List<String>> respHeaders = new HashMap<String, List<String>>();
+            Map<String, List<String>> respHeaders = new HashMap<>();
             for (int i=0; i<ITERATIONS; i++) {
                 long start = System.currentTimeMillis();
                 int rc = getUrl("http://localhost:" + getPort() + "/servlet" + i, bc, null, respHeaders);

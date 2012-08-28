@@ -142,7 +142,7 @@ public class TestRemoteIpFilter extends TomcatBaseTest {
 
     @Test
     public void testCommaDelimitedListToStringArrayEmptyList() {
-        List<String> elements = new ArrayList<String>();
+        List<String> elements = new ArrayList<>();
         String actual = RemoteIpFilter.listToCommaDelimitedString(elements);
         assertEquals("", actual);
     }
@@ -510,7 +510,7 @@ public class TestRemoteIpFilter extends TomcatBaseTest {
     public void testWithTomcatServer() throws Exception {
 
         // mostly default configuration : enable "x-forwarded-proto"
-        Map<String, String> remoteIpFilterParameter = new HashMap<String, String>();
+        Map<String, String> remoteIpFilterParameter = new HashMap<>();
         remoteIpFilterParameter.put("protocolHeader", "x-forwarded-proto");
 
         // SETUP

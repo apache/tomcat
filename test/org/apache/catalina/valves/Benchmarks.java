@@ -83,7 +83,7 @@ public class Benchmarks {
             }
         };
 
-        private ThreadLocal<Date> currentDateLocal = new ThreadLocal<Date>();
+        private ThreadLocal<Date> currentDateLocal = new ThreadLocal<>();
 
         @Override
         public void run() {
@@ -119,7 +119,7 @@ public class Benchmarks {
             }
         };
 
-        private ThreadLocal<Date> currentDateLocal = new ThreadLocal<Date>();
+        private ThreadLocal<Date> currentDateLocal = new ThreadLocal<>();
 
         @Override
         public void run() {
@@ -266,7 +266,7 @@ public class Benchmarks {
             return "ThreadLocals";
         }
 
-        private ThreadLocal<String> currentDateStringLocal = new ThreadLocal<String>();
+        private ThreadLocal<String> currentDateStringLocal = new ThreadLocal<>();
 
         private ThreadLocal<Date> currentDateLocal = new ThreadLocal<Date>() {
             @Override

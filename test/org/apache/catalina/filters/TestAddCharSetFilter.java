@@ -115,7 +115,7 @@ public class TestAddCharSetFilter extends TomcatBaseTest {
 
         tomcat.start();
 
-        Map<String, List<String>> headers = new HashMap<String, List<String>>();
+        Map<String, List<String>> headers = new HashMap<>();
         getUrl("http://localhost:" + getPort() + "/", new ByteChunk(), headers);
 
         List<String> ctHeaders = headers.get("Content-Type");

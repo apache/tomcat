@@ -193,9 +193,8 @@ public class TestTomcat extends TomcatBaseTest {
      * passwords.
      */
     public static final class MapRealm extends RealmBase {
-        private Map<String,String> users = new HashMap<String,String>();
-        private Map<String,List<String>> roles =
-            new HashMap<String,List<String>>();
+        private Map<String,String> users = new HashMap<>();
+        private Map<String,List<String>> roles = new HashMap<>();
 
         public void addUser(String username, String password) {
             users.put(username, password);
@@ -204,7 +203,7 @@ public class TestTomcat extends TomcatBaseTest {
         public void addUserRole(String username, String role) {
             List<String> userRoles = roles.get(username);
             if (userRoles == null) {
-                userRoles = new ArrayList<String>();
+                userRoles = new ArrayList<>();
                 roles.put(username, userRoles);
             }
             userRoles.add(role);

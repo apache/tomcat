@@ -230,7 +230,7 @@ public class TestGenerator extends TomcatBaseTest {
         tomcat.start();
 
         ByteChunk res = new ByteChunk();
-        Map<String,List<String>> headers = new HashMap<String,List<String>>();
+        Map<String,List<String>> headers = new HashMap<>();
 
         getUrl("http://localhost:" + getPort() + "/test/bug49nnn/bug49799.jsp",
                 res, headers);

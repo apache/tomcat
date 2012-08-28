@@ -70,8 +70,7 @@ public class MapDemo implements ChannelListener, MembershipListener{
      */
     public MapDemo(Channel channel, String mapName ) {
         //instantiate the replicated map
-        map = new LazyReplicatedMap<String,StringBuilder>(null, channel, 5000,
-                mapName, null);
+        map = new LazyReplicatedMap<>(null, channel, 5000, mapName, null);
         //create a gui, name it with the member name of this JVM
         table = SimpleTableDemo.createAndShowGUI(map,channel.getLocalMember(false).getName());
         //add ourself as a listener for messages

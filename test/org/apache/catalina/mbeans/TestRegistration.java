@@ -156,7 +156,7 @@ public class TestRegistration extends TomcatBaseTest {
 
         // Verify there are the correct Tomcat MBeans
         onames = mbeanServer.queryNames(new ObjectName("Tomcat:*"), null);
-        ArrayList<String> found = new ArrayList<String>(onames.size());
+        ArrayList<String> found = new ArrayList<>(onames.size());
         for (ObjectName on: onames) {
             found.add(on.toString());
         }
@@ -172,14 +172,14 @@ public class TestRegistration extends TomcatBaseTest {
             protocol = "bio";
         }
         String index = getTomcatInstance().getConnector().getProperty("nameIndex").toString();
-        ArrayList<String> expected = new ArrayList<String>(Arrays.asList(basicMBeanNames()));
+        ArrayList<String> expected = new ArrayList<>(Arrays.asList(basicMBeanNames()));
         expected.addAll(Arrays.asList(hostMBeanNames("localhost")));
         expected.addAll(Arrays.asList(contextMBeanNames("localhost", contextName)));
         expected.addAll(Arrays.asList(connectorMBeanNames("auto-" + index, protocol)));
         expected.addAll(Arrays.asList(optionalMBeanNames("localhost")));
 
         // Did we find all expected MBeans?
-        ArrayList<String> missing = new ArrayList<String>(expected);
+        ArrayList<String> missing = new ArrayList<>(expected);
         missing.removeAll(found);
         assertTrue("Missing Tomcat MBeans: " + missing, missing.isEmpty());
 

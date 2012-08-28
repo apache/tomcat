@@ -26,7 +26,7 @@ public class TestFastRemovalDequeue {
 
     @Test
     public void testSinglePushPop() throws Exception {
-        FastRemovalDequeue<Object> q = new FastRemovalDequeue<Object>(2);
+        FastRemovalDequeue<Object> q = new FastRemovalDequeue<>(2);
 
         Object o1 = new Object();
 
@@ -42,7 +42,7 @@ public class TestFastRemovalDequeue {
 
     @Test
     public void testDoublePushPop() throws Exception {
-        FastRemovalDequeue<Object> q = new FastRemovalDequeue<Object>(2);
+        FastRemovalDequeue<Object> q = new FastRemovalDequeue<>(2);
 
         Object o1 = new Object();
         Object o2 = new Object();
@@ -69,7 +69,7 @@ public class TestFastRemovalDequeue {
 
     @Test
     public void testSingleUnpopPop() throws Exception {
-        FastRemovalDequeue<Object> q = new FastRemovalDequeue<Object>(2);
+        FastRemovalDequeue<Object> q = new FastRemovalDequeue<>(2);
 
         Object o1 = new Object();
 
@@ -85,7 +85,7 @@ public class TestFastRemovalDequeue {
 
     @Test
     public void testDoubleUnpopPop() throws Exception {
-        FastRemovalDequeue<Object> q = new FastRemovalDequeue<Object>(2);
+        FastRemovalDequeue<Object> q = new FastRemovalDequeue<>(2);
 
         Object o1 = new Object();
         Object o2 = new Object();
@@ -112,7 +112,7 @@ public class TestFastRemovalDequeue {
 
     @Test
     public void testSinglePushUnpush() throws Exception {
-        FastRemovalDequeue<Object> q = new FastRemovalDequeue<Object>(2);
+        FastRemovalDequeue<Object> q = new FastRemovalDequeue<>(2);
 
         Object o1 = new Object();
 
@@ -128,7 +128,7 @@ public class TestFastRemovalDequeue {
 
     @Test
     public void testDoublePushUnpush() throws Exception {
-        FastRemovalDequeue<Object> q = new FastRemovalDequeue<Object>(2);
+        FastRemovalDequeue<Object> q = new FastRemovalDequeue<>(2);
 
         Object o1 = new Object();
         Object o2 = new Object();
@@ -155,7 +155,7 @@ public class TestFastRemovalDequeue {
 
     @Test
     public void testSinglePushRemove() throws Exception {
-        FastRemovalDequeue<Object> q = new FastRemovalDequeue<Object>(2);
+        FastRemovalDequeue<Object> q = new FastRemovalDequeue<>(2);
 
         Object o1 = new Object();
 
@@ -172,7 +172,7 @@ public class TestFastRemovalDequeue {
 
     @Test
     public void testDoublePushRemove() throws Exception {
-        FastRemovalDequeue<Object> q = new FastRemovalDequeue<Object>(2);
+        FastRemovalDequeue<Object> q = new FastRemovalDequeue<>(2);
 
         Object o1 = new Object();
         Object o2 = new Object();

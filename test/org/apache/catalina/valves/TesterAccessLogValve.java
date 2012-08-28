@@ -34,7 +34,7 @@ public class TesterAccessLogValve extends ValveBase implements AccessLog {
     // Timing tests need a small error margin to prevent failures
     private static final long ERROR_MARGIN = 10;
 
-    private final List<Entry> entries = new ArrayList<Entry>();
+    private final List<Entry> entries = new ArrayList<>();
 
     public TesterAccessLogValve() {
         // Async requests are supported

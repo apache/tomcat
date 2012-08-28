@@ -143,13 +143,12 @@ public class TestGroupChannelSenderConnections extends LoggingBaseTest {
     public static class TestMsg implements Serializable {
         private static final long serialVersionUID = 1L;
         private static Random r = new Random();
-        private HashMap<Integer, ArrayList<Object>> map =
-            new HashMap<Integer, ArrayList<Object>>();
+        private HashMap<Integer, ArrayList<Object>> map = new HashMap<>();
         public TestMsg() {
             int size = Math.abs(r.nextInt() % 200);
             for (int i=0; i<size; i++ ) {
                 int length = Math.abs(r.nextInt() %65000);
-                ArrayList<Object> list = new ArrayList<Object>(length);
+                ArrayList<Object> list = new ArrayList<>(length);
                 map.put(Integer.valueOf(i),list);
             }
         }

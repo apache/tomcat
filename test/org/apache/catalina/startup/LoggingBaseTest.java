@@ -47,7 +47,7 @@ public abstract class LoggingBaseTest {
 
     private File tempDir;
 
-    private List<File> deleteOnTearDown = new ArrayList<File>();
+    private List<File> deleteOnTearDown = new ArrayList<>();
 
     /**
      * Helper method that returns the directory where Tomcat build resides. It

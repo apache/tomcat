@@ -77,7 +77,7 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
 
         tomcat.start();
 
-        Map<String, List<String>> resHeaders = new HashMap<String, List<String>>();
+        Map<String, List<String>> resHeaders = new HashMap<>();
         int rc = postUrl(true, new DataWriter(500), "http://localhost:" + getPort() + "/", new ByteChunk(),
                 resHeaders, null);
         Assert.assertEquals(HttpServletResponse.SC_OK, rc);
@@ -100,7 +100,7 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         System.out.println(tomcat.getConnector().getProperty("address"));
         tomcat.start();
 
-        Map<String, List<String>> resHeaders = new HashMap<String, List<String>>();
+        Map<String, List<String>> resHeaders = new HashMap<>();
         ByteChunk slowReader = new ByteChunk();
         slowReader.setLimit(1); // FIXME BUFFER IS BROKEN, 0 doesn't work
         slowReader.setByteOutputChannel(new ByteOutputChannel() {
@@ -154,7 +154,7 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         System.out.println(tomcat.getConnector().getProperty("address"));
         tomcat.start();
 
-        Map<String, List<String>> resHeaders = new HashMap<String, List<String>>();
+        Map<String, List<String>> resHeaders = new HashMap<>();
         ByteChunk slowReader = new ByteChunk();
         slowReader.setLimit(1); // FIXME BUFFER IS BROKEN, 0 doesn't work
         slowReader.setByteOutputChannel(new ByteOutputChannel() {
