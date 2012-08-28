@@ -55,8 +55,7 @@ public class TestBeanELResolverVarargsInvocation {
         beanELResolver = new BeanELResolver();
         elContext = new ELContext() {
             private VariableMapper variableMapper = new VariableMapper() {
-                private Map<String, ValueExpression> vars =
-                    new HashMap<String, ValueExpression>();
+                private Map<String, ValueExpression> vars = new HashMap<>();
 
                 @Override
                 public ValueExpression setVariable(String arg0,

@@ -51,7 +51,7 @@ public class TestBug49158 extends CookiesBaseTest {
         Tomcat tomcat = getTomcatInstance();
         addServlets(tomcat);
         tomcat.start();
-        Map<String,List<String>> headers = new HashMap<String,List<String>>();
+        Map<String,List<String>> headers = new HashMap<>();
         ByteChunk res = new ByteChunk();
         getUrl("http://localhost:" + getPort() + "/"+path, res, headers);
         List<String> cookieHeaders = headers.get("Set-Cookie");

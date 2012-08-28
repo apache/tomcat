@@ -148,7 +148,7 @@ public class TestVirtualContext extends TomcatBaseTest {
 
         // check that there's no duplicate in the URLs
         String[] allUrlsArray = allUrls.split("\\s+");
-        Assert.assertEquals(new HashSet<String>(Arrays.asList(allUrlsArray)).size(),
+        Assert.assertEquals(new HashSet<>(Arrays.asList(allUrlsArray)).size(),
             allUrlsArray.length);
 
         String allRsrsc2ClasspathUrls =
@@ -210,7 +210,7 @@ public class TestVirtualContext extends TomcatBaseTest {
 
         // check that there's no duplicate in the URLs
         String[] allRsrcPathsArray = allRsrcPaths.split("\\s+");
-        Assert.assertEquals(new HashSet<String>(Arrays.asList(allRsrcPathsArray)).size(),
+        Assert.assertEquals(new HashSet<>(Arrays.asList(allRsrcPathsArray)).size(),
             allRsrcPathsArray.length);
 
         String allRsrc2Paths =

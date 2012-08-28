@@ -104,7 +104,7 @@ public class TestGroupChannelMemberArrival {
             this.name = name;
         }
 
-        public ArrayList<Member> members = new ArrayList<Member>(1);
+        public ArrayList<Member> members = new ArrayList<>(1);
 
         @Override
         public void memberAdded(Member member) {

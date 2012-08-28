@@ -60,7 +60,7 @@ public class TestCookiesDefaultSysProps extends CookiesBaseTest {
         assertEquals("Cookie name ok", res.toString());
 
         // Need to read response headers to test version switching
-        Map<String,List<String>> headers = new HashMap<String,List<String>>();
+        Map<String,List<String>> headers = new HashMap<>();
         getUrl("http://localhost:" + getPort() + "/switch", res, headers);
         List<String> cookieHeaders = headers.get("Set-Cookie");
         for (String cookieHeader : cookieHeaders) {

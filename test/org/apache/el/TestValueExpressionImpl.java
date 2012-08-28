@@ -151,7 +151,7 @@ public class TestValueExpressionImpl {
         Object o1 = "String value";
         Object o2 = Integer.valueOf(32);
 
-        Map<Object,Object> map = new HashMap<Object,Object>();
+        Map<Object,Object> map = new HashMap<>();
         map.put("key1", o1);
         map.put("key2", o2);
 
@@ -178,7 +178,7 @@ public class TestValueExpressionImpl {
         Object o1 = "String value";
         Object o2 = Integer.valueOf(32);
 
-        List<Object> list = new ArrayList<Object>();
+        List<Object> list = new ArrayList<>();
         list.add(0, o1);
         list.add(1, o2);
 

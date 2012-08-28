@@ -48,8 +48,7 @@ public class TestHttpServlet extends TomcatBaseTest {
 
         tomcat.start();
 
-        Map<String,List<String>> resHeaders=
-                new HashMap<String, List<String>>();
+        Map<String,List<String>> resHeaders= new HashMap<>();
         int rc = headUrl("http://localhost:" + getPort() + "/", new ByteChunk(),
                resHeaders);
 

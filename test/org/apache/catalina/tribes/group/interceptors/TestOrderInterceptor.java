@@ -101,7 +101,7 @@ public class TestOrderInterceptor {
     public void testOrder2() throws Exception {
         final Member[] dest = channels[0].getMembers();
         final AtomicInteger value = new AtomicInteger(0);
-        final Queue<Exception> exceptionQueue = new ConcurrentLinkedQueue<Exception>();
+        final Queue<Exception> exceptionQueue = new ConcurrentLinkedQueue<>();
         Runnable run = new Runnable() {
             @Override
             public void run() {

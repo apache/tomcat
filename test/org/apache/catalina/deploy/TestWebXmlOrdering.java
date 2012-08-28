@@ -58,7 +58,7 @@ public class TestWebXmlOrdering {
         e.setName("e");
         f = new WebXml();
         f.setName("f");
-        fragments = new HashMap<String,WebXml>();
+        fragments = new HashMap<>();
         fragments.put("a",a);
         fragments.put("b",b);
         fragments.put("c",c);
@@ -105,7 +105,7 @@ public class TestWebXmlOrdering {
         app.addAbsoluteOrdering("b");
         app.addAbsoluteOrdering("d");
 
-        Set<WebXml> others = new HashSet<WebXml>();
+        Set<WebXml> others = new HashSet<>();
         others.add(a);
         others.add(c);
         others.add(e);
@@ -130,7 +130,7 @@ public class TestWebXmlOrdering {
         app.addAbsoluteOrdering(WebXml.ORDER_OTHERS);
         app.addAbsoluteOrdering("d");
 
-        Set<WebXml> others = new HashSet<WebXml>();
+        Set<WebXml> others = new HashSet<>();
         others.add(a);
         others.add(c);
         others.add(e);
@@ -165,7 +165,7 @@ public class TestWebXmlOrdering {
         app.addAbsoluteOrdering("d");
         app.addAbsoluteOrdering(WebXml.ORDER_OTHERS);
 
-        Set<WebXml> others = new HashSet<WebXml>();
+        Set<WebXml> others = new HashSet<>();
         others.add(a);
         others.add(c);
         others.add(e);

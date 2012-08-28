@@ -479,7 +479,8 @@ public class TestRequest extends TomcatBaseTest {
 
             PrintWriter out = resp.getWriter();
 
-            TreeMap<String,String[]> parameters = new TreeMap<String,String[]>(req.getParameterMap());
+            TreeMap<String,String[]> parameters =
+                    new TreeMap<>(req.getParameterMap());
 
             boolean first = true;
 

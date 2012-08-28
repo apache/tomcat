@@ -99,7 +99,7 @@ public class TestDomainFilterInterceptor {
             this.name = name;
         }
 
-        public ArrayList<Member> members = new ArrayList<Member>();
+        public ArrayList<Member> members = new ArrayList<>();
         @Override
         public void memberAdded(Member member) {
             if (!members.contains(member)) {

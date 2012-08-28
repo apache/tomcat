@@ -68,7 +68,7 @@ public class TestCsrfPreventionFilter extends TomcatBaseTest {
 
     @Test
     public void testLruCacheSerializable() throws Exception {
-        LruCache<String> cache = new LruCache<String>(5);
+        LruCache<String> cache = new LruCache<>(5);
         cache.add("key1");
         cache.add("key2");
         cache.add("key3");
@@ -83,7 +83,6 @@ public class TestCsrfPreventionFilter extends TomcatBaseTest {
         ByteArrayInputStream bais =
             new ByteArrayInputStream(baos.toByteArray());
         ObjectInputStream ois = new ObjectInputStream(bais);
-        @SuppressWarnings("unchecked")
         LruCache<String> cache2 = (LruCache<String>) ois.readObject();
 
         cache2.add("key7");

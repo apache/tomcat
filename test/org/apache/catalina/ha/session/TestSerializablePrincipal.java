@@ -55,7 +55,7 @@ public class TestSerializablePrincipal  {
         }
 
         // Create the Principal to serialize
-        List<String> roles = new ArrayList<String>();
+        List<String> roles = new ArrayList<>();
         roles.add("RoleA");
         roles.add("RoleB");
         TesterPrincipal tpOriginal = new TesterPrincipal("inner");

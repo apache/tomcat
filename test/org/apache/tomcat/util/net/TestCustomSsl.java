@@ -108,7 +108,7 @@ public class TestCustomSsl extends TomcatBaseTest {
         // Override the defaults
         ProtocolHandler handler = tomcat.getConnector().getProtocolHandler();
         if (handler instanceof AbstractHttp11JsseProtocol) {
-            ((AbstractHttp11JsseProtocol) handler).setTruststoreFile(null);
+            ((AbstractHttp11JsseProtocol<?>) handler).setTruststoreFile(null);
         } else {
             // Unexpected
             fail("Unexpected handler type");

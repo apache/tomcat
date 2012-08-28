@@ -100,7 +100,7 @@ public class ChannelCreator {
         boolean frag = false;
         int fragsize = 1024;
         int autoBind = 10;
-        ArrayList<Member> staticMembers = new ArrayList<Member>();
+        ArrayList<Member> staticMembers = new ArrayList<>();
         Properties transportProperties = new Properties();
         String transport = "org.apache.catalina.tribes.transport.nio.PooledParallelSender";
         String receiver = "org.apache.catalina.tribes.transport.nio.NioReceiver";

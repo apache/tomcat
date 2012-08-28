@@ -66,7 +66,7 @@ public abstract class SimpleHttpClient {
     private int requestPause = 1000;
 
     private String responseLine;
-    private List<String> responseHeaders = new ArrayList<String>();
+    private List<String> responseHeaders = new ArrayList<>();
     private String responseBody;
     private boolean useContentLength;
 
@@ -229,7 +229,7 @@ public abstract class SimpleHttpClient {
         useContinue = false;
 
         responseLine = null;
-        responseHeaders = new ArrayList<String>();
+        responseHeaders = new ArrayList<>();
         responseBody = null;
     }
 

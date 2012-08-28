@@ -45,8 +45,7 @@ public class TestSecurityConstraint {
 
         ServletSecurityElement element;
         SecurityConstraint[] result;
-        Set<HttpMethodConstraintElement> hmces =
-            new HashSet<HttpMethodConstraintElement>();
+        Set<HttpMethodConstraintElement> hmces = new HashSet<>();
 
         // Example 13-1
         // @ServletSecurity
