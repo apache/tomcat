@@ -23,8 +23,6 @@
   - *.md5 files are generated and cannot contain license
   - *.manifest JAR manifest files cannot contain license
   - package-list files in API documentation (javadoc) are generated
-  - bug52121-part1, bug52121-part2 files in tests are test data for a hard
-  to reproduce testcase and should be used as is.
   - other trivial test files, such as textual files containing only "OK' string,
   are also excluded.
 
@@ -53,11 +51,7 @@ output/dist/webapps/docs/api/package-list
 output/dist/webapps/docs/elapi/package-list
 output/dist/webapps/docs/jspapi/package-list
 output/dist/webapps/docs/servletapi/package-list
-output/dist/src/test/org/apache/coyote/http11/filters/bug52121-part1
-output/dist/src/test/org/apache/coyote/http11/filters/bug52121-part2
 output/dist/src/test/webapp-3.0/bug53257/*.txt
 output/dist/src/test/webapp-3.0-fragments/WEB-INF/classes/*.txt
-test/org/apache/coyote/http11/filters/bug52121-part1
-test/org/apache/coyote/http11/filters/bug52121-part2
 test/webapp-3.0/bug53257/*.txt
 test/webapp-3.0-fragments/WEB-INF/classes/*.txt
