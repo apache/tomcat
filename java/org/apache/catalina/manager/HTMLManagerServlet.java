@@ -492,7 +492,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
                 }
 
                 args = new Object[7];
-                args[0] = "<a href=\"" + URL_ENCODER.encode(displayPath)
+                args[0] = "<a href=\"" + URL_ENCODER.encode(contextPath + "/")
                         + "\">" + RequestUtil.filter(displayPath) + "</a>";
                 if ("".equals(ctxt.getWebappVersion())) {
                     args[1] = noVersion;
