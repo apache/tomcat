@@ -261,6 +261,10 @@
         <bug>53653</bug>: Allow for wrapped source code example in
         config/context.html. Patch provided by Terence Bandoian. (schultz)
       </fix>
+      <update>
+        <bug>53793</bug>: Change links on the list of applications in the
+        Manager to point to '/appname/' instead of '/appname'. (kkolinko)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Tribes">
