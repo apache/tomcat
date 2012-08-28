@@ -568,13 +568,7 @@ public class FormAuthenticator
 
         request.getCoyoteRequest().method().setString(method);
 
-        request.getCoyoteRequest().queryString().setString
-            (saved.getQueryString());
-
-        request.getCoyoteRequest().requestURI().setString
-            (saved.getRequestURI());
         return true;
-
     }
 
 
