@@ -281,12 +281,14 @@ public class ChunkedInputFilter implements InputFilter {
 
     /**
      * Parse the header of a chunk.
-     * A chunk header can look like
-     * A10CRLF
+     * A chunk header can look like one of the following:<br />
+     * A10CRLF<br />
      * F23;chunk-extension to be ignoredCRLF
-     * The letters before CRLF but after the trailer mark, must be valid hex digits,
-     * we should not parse F23IAMGONNAMESSTHISUP34CRLF as a valid header
-     * according to spec
+     *
+     * <p>
+     * The letters before CRLF or ';' (whatever comes first) must be valid hex
+     * digits. We should not parse F23IAMGONNAMESSTHISUP34CRLF as a valid
+     * header according to the spec.
      */
     protected boolean parseChunkHeader()
         throws IOException {
