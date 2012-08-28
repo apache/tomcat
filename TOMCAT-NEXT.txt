@@ -216,6 +216,3 @@ but possibly 7.1.x).
     - Remaining code in progress
 
 14. Review date formatting with a view to reducing duplication.
-
-15. Update annotation scanning code to handle Java 7 class files (BZ 53735).
-    Make sure that BCEL fixes this issue and that we use updated code from them.
