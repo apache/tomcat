@@ -297,6 +297,7 @@ public class FormAuthenticator
                 SavedRequest saved = new SavedRequest();
                 saved.setMethod("GET");
                 saved.setRequestURI(uri);
+                saved.setDecodedRequestURI(uri);
                 request.getSessionInternal(true).setNote(
                         Constants.FORM_REQUEST_NOTE, saved);
                 response.sendRedirect(response.encodeRedirectURL(uri));
@@ -328,6 +329,7 @@ public class FormAuthenticator
                 SavedRequest saved = new SavedRequest();
                 saved.setMethod("GET");
                 saved.setRequestURI(uri);
+                saved.setDecodedRequestURI(uri);
                 session.setNote(Constants.FORM_REQUEST_NOTE, saved);
                 response.sendRedirect(response.encodeRedirectURL(uri));
             }
