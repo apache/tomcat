@@ -40,7 +40,11 @@ public class TestGroupChannelStartStop {
 
     @After
     public void tearDown() throws Exception {
-        try {channel.stop(Channel.DEFAULT);}catch (Exception ignore){ /* Ignore */ }
+        try {
+            channel.stop(Channel.DEFAULT);
+        } catch (Exception ignore) {
+            // Ignore
+        }
     }
 
     @Test
@@ -76,7 +80,9 @@ public class TestGroupChannelStartStop {
         try {
             channel.start(Channel.MBR_RX_SEQ);
             count++;
-        } catch ( Exception x){/*expected*/}
+        } catch ( Exception x){
+            // expected
+        }
         assertEquals(count,1);
         channel.stop(Channel.DEFAULT);
         //double the membership sender
@@ -89,7 +95,9 @@ public class TestGroupChannelStartStop {
         try {
             channel.start(Channel.MBR_TX_SEQ);
             count++;
-        } catch ( Exception x){/*expected*/}
+        } catch ( Exception x){
+            // expected
+        }
         assertEquals(count,1);
         channel.stop(Channel.DEFAULT);
 
@@ -101,7 +109,9 @@ public class TestGroupChannelStartStop {
         try {
             channel.start(Channel.SND_RX_SEQ);
             count++;
-        } catch ( Exception x){/*expected*/}
+        } catch ( Exception x){
+            // expected
+        }
         assertEquals(count,1);
         channel.stop(Channel.DEFAULT);
 
@@ -113,7 +123,9 @@ public class TestGroupChannelStartStop {
         try {
             channel.start(Channel.SND_TX_SEQ);
             count++;
-        } catch ( Exception x){/*expected*/}
+        } catch ( Exception x){
+            // expected
+        }
         assertEquals(count,1);
         channel.stop(Channel.DEFAULT);
     }
@@ -129,7 +141,9 @@ public class TestGroupChannelStartStop {
         try {
             channel.start(flag);
             count++;
-        } catch ( Exception x){/*expected*/}
+        } catch ( Exception x){
+            // expected
+        }
         assertEquals(count,2);
         channel.stop(Channel.DEFAULT);
     }
@@ -142,5 +156,4 @@ public class TestGroupChannelStartStop {
         Thread.sleep(1000);
         channel.stop(Channel.DEFAULT);
     }
-
 }
