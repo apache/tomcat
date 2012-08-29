@@ -97,7 +97,7 @@ public class FlushableGZIPOutputStream extends GZIPOutputStream {
     }
 
     private void reenableCompression() {
-        if (flagReenableCompression) {
+        if (flagReenableCompression && !def.finished()) {
             flagReenableCompression = false;
             def.setLevel(Deflater.DEFAULT_COMPRESSION);
         }
