@@ -34,6 +34,8 @@ import org.apache.jasper.el.ELContextImpl;
 
 public class TestMethodExpressionImpl {
 
+    private static final String BUG53792 = "TEST_PASS";
+
     private ExpressionFactory factory;
     private ELContext context;
 
@@ -429,5 +431,39 @@ public class TestMethodExpressionImpl {
         TesterEnum actual = (TesterEnum) ve.getValue(context);
         assertEquals(TesterEnum.APPLE, actual);
 
+    }
+
+    @Test
+    public void testBug53792a() {
+        MethodExpression me = factory.createMethodExpression(context,
+                "${beanA.setBean(beanB)}", null ,
+                new Class<?>[] { TesterBeanB.class });
+        me.invoke(context, null);
+        me = factory.createMethodExpression(context,
+                "${beanB.setName('" + BUG53792 + "')}", null ,
+                new Class<?>[] { TesterBeanB.class });
+        me.invoke(context, null);
+
+        ValueExpression ve = factory.createValueExpression(context,
+                "#{beanA.getBean().name}", java.lang.String.class);
+        String actual = (String) ve.getValue(context);
+        assertEquals(BUG53792, actual);
+    }
+
+    @Test
+    public void testBug53792b() {
+        MethodExpression me = factory.createMethodExpression(context,
+                "${beanA.setBean(beanB)}", null ,
+                new Class<?>[] { TesterBeanB.class });
+        me.invoke(context, null);
+        me = factory.createMethodExpression(context,
+                "${beanB.setName('" + BUG53792 + "')}", null ,
+                new Class<?>[] { TesterBeanB.class });
+        me.invoke(context, null);
+
+        ValueExpression ve = factory.createValueExpression(context,
+                "#{beanA.getBean().name.length()}", java.lang.Integer.class);
+        Integer actual = (Integer) ve.getValue(context);
+        assertEquals(Integer.valueOf(BUG53792.length()), actual);
     }
 }
