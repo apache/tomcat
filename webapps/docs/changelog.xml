@@ -298,7 +298,7 @@
         copy of Commons BCEL used for annotation scanning. (markt)
       </scode>
       <add>
-        <bug>53735</bug>Add support for Java 7 byte code to Tomcat&apos;s
+        <bug>53735</bug>: Add support for Java 7 byte code to Tomcat&apos;s
         package renamed, cut-down copy of Commons BCEL used for annotation
         scanning. (markt)
       </add>
