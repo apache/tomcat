@@ -214,6 +214,10 @@
         <bug>53725</bug>: Fix possible corruption of GZIP'd output.
         (markt/kkolinko)
       </fix>
+      <fix>
+        Better parsing of line-terminators for requests using chunked encoding.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
