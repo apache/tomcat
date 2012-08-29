@@ -38,8 +38,52 @@ import org.apache.catalina.startup.TomcatBaseTest;
 
 public class TestChunkedInputFilter extends TomcatBaseTest {
 
+    private static final String LF = "\n";
+
     @Test
-    public void testTrailingHeaders() throws Exception {
+    public void testChunkHeaderCRLF() throws Exception {
+        doTestChunkingCRLF(true, true, true, true, true);
+    }
+
+    @Test
+    public void testChunkHeaderLF() throws Exception {
+        doTestChunkingCRLF(false, true, true, true, false);
+    }
+
+    @Test
+    public void testChunkCRLF() throws Exception {
+        doTestChunkingCRLF(true, true, true, true, true);
+    }
+
+    @Test
+    public void testChunkLF() throws Exception {
+        doTestChunkingCRLF(true, false, true, true, false);
+    }
+
+    @Test
+    public void testTrailingHeadersCRLF() throws Exception {
+        doTestChunkingCRLF(true, true, true, true, true);
+    }
+
+    @Test
+    public void testTrailingHeadersLF() throws Exception {
+        doTestChunkingCRLF(true, true, false, true, true);
+    }
+
+    @Test
+    public void testEndCRLF() throws Exception {
+        doTestChunkingCRLF(true, true, true, true, true);
+    }
+
+    @Test
+    public void testEndLF() throws Exception {
+        doTestChunkingCRLF(true, true, true, false, false);
+    }
+
+    private void doTestChunkingCRLF(boolean chunkHeaderUsesCRLF,
+            boolean chunkUsesCRLF, boolean headerUsesCRLF,
+            boolean endUsesCRLF, boolean expectPass) throws Exception {
+
         // Setup Tomcat instance
         Tomcat tomcat = getTomcatInstance();
 
@@ -60,13 +104,14 @@ public class TestChunkedInputFilter extends TomcatBaseTest {
                     SimpleHttpClient.CRLF +
             "Connection: close" + SimpleHttpClient.CRLF +
             SimpleHttpClient.CRLF +
-            "3" + SimpleHttpClient.CRLF +
-            "a=0" + SimpleHttpClient.CRLF +
+            "3" + (chunkHeaderUsesCRLF ? SimpleHttpClient.CRLF : LF) +
+            "a=0" + (chunkUsesCRLF ? SimpleHttpClient.CRLF : LF) +
             "4" + SimpleHttpClient.CRLF +
             "&b=1" + SimpleHttpClient.CRLF +
             "0" + SimpleHttpClient.CRLF +
-            "x-trailer: Test", "TestTest0123456789abcdefghijABCDEFGHIJopqrstuvwxyz" + SimpleHttpClient.CRLF +
-            SimpleHttpClient.CRLF };
+            "x-trailer: Test", "TestTest0123456789abcdefghijABCDEFGHIJopqrstuvwxyz" +
+            (headerUsesCRLF ? SimpleHttpClient.CRLF : LF)+
+            (endUsesCRLF ? SimpleHttpClient.CRLF : LF) };
 
         TrailerClient client =
                 new TrailerClient(tomcat.getConnector().getLocalPort());
@@ -74,7 +119,13 @@ public class TestChunkedInputFilter extends TomcatBaseTest {
 
         client.connect();
         client.processRequest();
-        assertEquals("null7TestTestTest0123456789abcdefghijABCDEFGHIJopqrstuvwxyz", client.getResponseBody());
+
+        if (expectPass) {
+            assertTrue(client.isResponse200());
+            assertEquals("null7TestTestTest0123456789abcdefghijABCDEFGHIJopqrstuvwxyz", client.getResponseBody());
+        } else {
+            assertTrue(client.getResponseLine(), client.isResponse500());
+        }
     }
 
     @Test
