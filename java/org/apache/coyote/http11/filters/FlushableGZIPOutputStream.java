@@ -42,6 +42,12 @@ public class FlushableGZIPOutputStream extends GZIPOutputStream {
     private byte[] lastByte = new byte[1];
     private boolean hasLastByte = false;
 
+    /**
+     * Flag that compression has to be re-enabled before the next write
+     * operation.
+     */
+    private boolean flagReenableCompression = false;
+
     @Override
     public void write(byte[] bytes) throws IOException {
         write(bytes, 0, bytes.length);
@@ -53,6 +59,7 @@ public class FlushableGZIPOutputStream extends GZIPOutputStream {
         if (length > 0) {
             flushLastByte();
             if (length > 1) {
+                reenableCompression();
                 super.write(bytes, offset, length - 1);
             }
             rememberLastByte(bytes[offset + length - 1]);
@@ -89,6 +96,13 @@ public class FlushableGZIPOutputStream extends GZIPOutputStream {
         super.close();
     }
 
+    private void reenableCompression() {
+        if (flagReenableCompression) {
+            flagReenableCompression = false;
+            def.setLevel(Deflater.DEFAULT_COMPRESSION);
+        }
+    }
+
     private void rememberLastByte(byte b) {
         lastByte[0] = b;
         hasLastByte = true;
@@ -96,6 +110,7 @@ public class FlushableGZIPOutputStream extends GZIPOutputStream {
 
     private void flushLastByte() throws IOException {
         if (hasLastByte) {
+            reenableCompression();
             // Clear the flag first, because write() may fail
             hasLastByte = false;
             super.write(lastByte, 0, 1);
@@ -118,7 +133,7 @@ public class FlushableGZIPOutputStream extends GZIPOutputStream {
             if (!def.finished()) {
                 def.setLevel(Deflater.NO_COMPRESSION);
                 flushLastByte();
-                def.setLevel(Deflater.DEFAULT_COMPRESSION);
+                flagReenableCompression = true;
             }
         }
         out.flush();
@@ -139,5 +154,4 @@ public class FlushableGZIPOutputStream extends GZIPOutputStream {
             }
         } while (len != 0);
     }
-
 }
