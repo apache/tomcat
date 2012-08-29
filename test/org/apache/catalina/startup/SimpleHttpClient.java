@@ -201,7 +201,13 @@ public abstract class SimpleHttpClient {
                 line = readLine();
                 while (line != null) {
                     builder.append(line);
-                    line = readLine();
+                    try {
+                        line = readLine();
+                    } catch (IOException ioe) {
+                        // The server probably closed the connection due to an
+                        // error
+                        line = null;
+                    }
                 }
             }
         }
