@@ -41,7 +41,6 @@ public class FlushableGZIPOutputStream extends GZIPOutputStream {
      */
     private byte[] lastByte = new byte[1];
     private boolean hasLastByte = false;
-    private boolean flushingLastByte = false;
 
     @Override
     public void write(byte[] bytes) throws IOException {
@@ -99,9 +98,7 @@ public class FlushableGZIPOutputStream extends GZIPOutputStream {
         if (hasLastByte) {
             // Clear the flag first, because write() may fail
             hasLastByte = false;
-            flushingLastByte = true;
             super.write(lastByte, 0, 1);
-            flushingLastByte = false;
         }
     }
 
@@ -140,6 +137,7 @@ public class FlushableGZIPOutputStream extends GZIPOutputStream {
             if (len > 0) {
                 out.write(buf, 0, len);
             }
-        } while (len !=0 && !flushingLastByte || !def.needsInput());
+        } while (len != 0);
     }
+
 }
