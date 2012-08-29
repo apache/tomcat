@@ -23,8 +23,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class Stockticker implements Runnable {
         public volatile boolean run = true;
-        protected AtomicInteger counter = new AtomicInteger(0);
-        ArrayList<TickListener> listeners = new ArrayList<TickListener>();
+        protected final AtomicInteger counter = new AtomicInteger(0);
+        final ArrayList<TickListener> listeners = new ArrayList<>();
         protected volatile Thread ticker = null;
         protected volatile int ticknr = 0;
 
@@ -100,8 +100,8 @@ public class Stockticker implements Runnable {
     }
 
     public static final class Stock implements Cloneable {
-        protected static DecimalFormat df = new DecimalFormat("0.00");
-        protected String symbol = "";
+        protected static final DecimalFormat df = new DecimalFormat("0.00");
+        protected final String symbol;
         protected double value = 0.0d;
         protected double lastchange = 0.0d;
         protected int cnt = 0;
