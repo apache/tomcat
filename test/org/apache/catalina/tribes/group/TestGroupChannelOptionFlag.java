@@ -47,7 +47,13 @@ public class TestGroupChannelOptionFlag {
 
     @After
     public void tearDown() throws Exception {
-        if ( channel != null ) try {channel.stop(Channel.DEFAULT);}catch ( Exception ignore) { /* Ignore */ }
+        if (channel != null) {
+            try {
+                channel.stop(Channel.DEFAULT);
+            } catch (Exception ignore) {
+                // Ignore
+            }
+        }
         channel = null;
     }
 
