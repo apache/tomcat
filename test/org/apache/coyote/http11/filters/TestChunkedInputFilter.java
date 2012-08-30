@@ -42,47 +42,58 @@ public class TestChunkedInputFilter extends TomcatBaseTest {
 
     @Test
     public void testChunkHeaderCRLF() throws Exception {
-        doTestChunkingCRLF(true, true, true, true, true);
+        doTestChunkingCRLF(true, true, true, true, true, true);
     }
 
     @Test
     public void testChunkHeaderLF() throws Exception {
-        doTestChunkingCRLF(false, true, true, true, false);
+        doTestChunkingCRLF(false, true, true, true, true, false);
     }
 
     @Test
     public void testChunkCRLF() throws Exception {
-        doTestChunkingCRLF(true, true, true, true, true);
+        doTestChunkingCRLF(true, true, true, true, true, true);
     }
 
     @Test
     public void testChunkLF() throws Exception {
-        doTestChunkingCRLF(true, false, true, true, false);
+        doTestChunkingCRLF(true, false, true, true, true, false);
     }
 
     @Test
-    public void testTrailingHeadersCRLF() throws Exception {
-        doTestChunkingCRLF(true, true, true, true, true);
+    public void testFirstTrailingHeadersCRLF() throws Exception {
+        doTestChunkingCRLF(true, true, true, true, true, true);
     }
 
     @Test
-    public void testTrailingHeadersLF() throws Exception {
-        doTestChunkingCRLF(true, true, false, true, true);
+    public void testFirstTrailingHeadersLF() throws Exception {
+        doTestChunkingCRLF(true, true, false, true, true, true);
+    }
+
+    @Test
+    public void testSecondTrailingHeadersCRLF() throws Exception {
+        doTestChunkingCRLF(true, true, true, true, true, true);
+    }
+
+    @Test
+    public void testSecondTrailingHeadersLF() throws Exception {
+        doTestChunkingCRLF(true, true, true, false, true, true);
     }
 
     @Test
     public void testEndCRLF() throws Exception {
-        doTestChunkingCRLF(true, true, true, true, true);
+        doTestChunkingCRLF(true, true, true, true, true, true);
     }
 
     @Test
     public void testEndLF() throws Exception {
-        doTestChunkingCRLF(true, true, true, false, false);
+        doTestChunkingCRLF(true, true, true, true, false, false);
     }
 
     private void doTestChunkingCRLF(boolean chunkHeaderUsesCRLF,
-            boolean chunkUsesCRLF, boolean headerUsesCRLF,
-            boolean endUsesCRLF, boolean expectPass) throws Exception {
+            boolean chunkUsesCRLF, boolean firstheaderUsesCRLF,
+            boolean secondheaderUsesCRLF, boolean endUsesCRLF,
+            boolean expectPass) throws Exception {
 
         // Setup Tomcat instance
         Tomcat tomcat = getTomcatInstance();
@@ -109,8 +120,10 @@ public class TestChunkedInputFilter extends TomcatBaseTest {
             "4" + SimpleHttpClient.CRLF +
             "&b=1" + SimpleHttpClient.CRLF +
             "0" + SimpleHttpClient.CRLF +
-            "x-trailer: Test", "TestTest0123456789abcdefghijABCDEFGHIJopqrstuvwxyz" +
-            (headerUsesCRLF ? SimpleHttpClient.CRLF : LF)+
+            "x-trailer1: Test", "Value1" +
+            (firstheaderUsesCRLF ? SimpleHttpClient.CRLF : LF) +
+            "x-trailer2: TestValue2" +
+            (secondheaderUsesCRLF ? SimpleHttpClient.CRLF : LF) +
             (endUsesCRLF ? SimpleHttpClient.CRLF : LF) };
 
         TrailerClient client =
@@ -122,7 +135,8 @@ public class TestChunkedInputFilter extends TomcatBaseTest {
 
         if (expectPass) {
             assertTrue(client.isResponse200());
-            assertEquals("null7TestTestTest0123456789abcdefghijABCDEFGHIJopqrstuvwxyz", client.getResponseBody());
+            assertEquals("nullnull7TestValue1TestValue2",
+                    client.getResponseBody());
         } else {
             assertTrue(client.getResponseLine(), client.isResponse500());
         }
@@ -206,7 +220,7 @@ public class TestChunkedInputFilter extends TomcatBaseTest {
 
         client.connect();
         client.processRequest();
-        assertEquals("null7null", client.getResponseBody());
+        assertEquals("nullnull7nullnull", client.getResponseBody());
     }
 
     private static class EchoHeaderServlet extends HttpServlet {
@@ -217,12 +231,9 @@ public class TestChunkedInputFilter extends TomcatBaseTest {
                 throws ServletException, IOException {
             resp.setContentType("text/plain");
             PrintWriter pw = resp.getWriter();
-            // Header not visible yet, body not processed
-            String value = req.getHeader("x-trailer");
-            if (value == null) {
-                value = "null";
-            }
-            pw.write(value);
+            // Headers not visible yet, body not processed
+            dumpHeader("x-trailer1", req, pw);
+            dumpHeader("x-trailer2", req, pw);
 
             // Read the body - quick and dirty
             InputStream is = req.getInputStream();
@@ -233,8 +244,14 @@ public class TestChunkedInputFilter extends TomcatBaseTest {
 
             pw.write(Integer.valueOf(count).toString());
 
-            // Header should be visible now
-            value = req.getHeader("x-trailer");
+            // Headers should be visible now
+            dumpHeader("x-trailer1", req, pw);
+            dumpHeader("x-trailer2", req, pw);
+        }
+
+        private void dumpHeader(String headerName, HttpServletRequest req,
+                PrintWriter pw) {
+            String value = req.getHeader(headerName);
             if (value == null) {
                 value = "null";
             }
