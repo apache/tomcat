@@ -872,7 +872,7 @@ public class FileDirContext extends BaseDirContext {
             Object object = null;
             if (currentFile.isDirectory()) {
                 FileDirContext tempContext = new FileDirContext(env);
-                tempContext.setDocBase(file.getPath());
+                tempContext.setDocBase(currentFile.getPath());
                 tempContext.setAllowLinking(getAllowLinking());
                 object = tempContext;
             } else {

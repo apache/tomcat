@@ -185,6 +185,11 @@
       <fix>
         Remove unneeded handling of FORM authentication in RealmBase. (kkolinko)
       </fix>
+      <fix>
+        <bug>53800</bug>: <code>FileDirContext.list()</code> did not provide
+        correct paths for subdirectories. Patch provided by Kevin Wooten.
+        (kkolinko)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
