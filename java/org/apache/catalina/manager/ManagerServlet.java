@@ -1197,7 +1197,7 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
      * @param cn Name of the application to list session information for
      *
      * @deprecated  Use {@link #sessions(PrintWriter, ContextName, int,
-     *              StringManager)
+     *              StringManager)}
      */
     @Deprecated
     protected void sessions(PrintWriter writer, ContextName cn,

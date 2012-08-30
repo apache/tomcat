@@ -206,10 +206,6 @@ public final class MethodExpressionImpl extends MethodExpression implements
         return n.getMethodInfo(ctx, this.paramTypes);
     }
 
-    /**
-     * @return
-     * @throws ELException
-     */
     private Node getNode() throws ELException {
         if (this.node == null) {
             this.node = ExpressionBuilder.createNode(this.expr);
