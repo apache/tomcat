@@ -27,6 +27,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
@@ -102,7 +104,8 @@ public class TestChunkedInputFilter extends TomcatBaseTest {
         Context ctx =
             tomcat.addContext("", System.getProperty("java.io.tmpdir"));
 
-        Tomcat.addServlet(ctx, "servlet", new EchoHeaderServlet());
+        EchoHeaderServlet servlet = new EchoHeaderServlet();
+        Tomcat.addServlet(ctx, "servlet", servlet);
         ctx.addServletMapping("/", "servlet");
 
         tomcat.start();
@@ -131,14 +134,28 @@ public class TestChunkedInputFilter extends TomcatBaseTest {
         client.setRequest(request);
 
         client.connect();
-        client.processRequest();
+        Exception processException = null;
+        try {
+            client.processRequest();
+        } catch (Exception e) {
+            // Socket was probably closed before client had a chance to read
+            // response
+            processException = e;
+        }
 
         if (expectPass) {
             assertTrue(client.isResponse200());
             assertEquals("nullnull7TestValue1TestValue2",
                     client.getResponseBody());
+            assertNull(processException);
+            assertFalse(servlet.getExceptionDuringRead());
         } else {
-            assertTrue(client.getResponseLine(), client.isResponse500());
+            if (processException == null) {
+                assertTrue(client.getResponseLine(), client.isResponse500());
+            } else {
+                // Use fall-back for checking the error occurred
+                assertTrue(servlet.getExceptionDuringRead());
+            }
         }
     }
 
@@ -226,6 +243,8 @@ public class TestChunkedInputFilter extends TomcatBaseTest {
     private static class EchoHeaderServlet extends HttpServlet {
         private static final long serialVersionUID = 1L;
 
+        private boolean exceptionDuringRead = false;
+
         @Override
         protected void doPost(HttpServletRequest req, HttpServletResponse resp)
                 throws ServletException, IOException {
@@ -238,8 +257,13 @@ public class TestChunkedInputFilter extends TomcatBaseTest {
             // Read the body - quick and dirty
             InputStream is = req.getInputStream();
             int count = 0;
-            while (is.read() > -1) {
-                count++;
+            try {
+                while (is.read() > -1) {
+                    count++;
+                }
+            } catch (IOException ioe) {
+                exceptionDuringRead = true;
+                throw ioe;
             }
 
             pw.write(Integer.valueOf(count).toString());
@@ -247,6 +271,10 @@ public class TestChunkedInputFilter extends TomcatBaseTest {
             // Headers should be visible now
             dumpHeader("x-trailer1", req, pw);
             dumpHeader("x-trailer2", req, pw);
+        }
+
+        public boolean getExceptionDuringRead() {
+            return exceptionDuringRead;
         }
 
         private void dumpHeader(String headerName, HttpServletRequest req,
