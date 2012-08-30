@@ -411,7 +411,7 @@ public class ChunkedInputFilter implements InputFilter {
 
         // CRLF terminates the request
         if (chr == Constants.CR || chr == Constants.LF) {
-            parseCRLF(true);
+            parseCRLF(false);
             return false;
         }
 
@@ -502,8 +502,9 @@ public class ChunkedInputFilter implements InputFilter {
                     lastSignificantChar = trailingHeaders.getEnd();
                 }
 
-                pos++;
-
+                if (!eol) {
+                    pos++;
+                }
             }
 
             // Checking the first character of the new line. If the character
