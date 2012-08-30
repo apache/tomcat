@@ -103,37 +103,50 @@ public final class AstValue extends SimpleNode {
         Object property = null;
         int propCount = this.jjtGetNumChildren();
 
-        if (propCount > 2 &&
-                this.jjtGetChild(propCount - 1) instanceof AstMethodParameters) {
-            // Method call with paramaters.
-            propCount-=2;
-        } else {
-            propCount--;
-        }
         int i = 1;
-
-        // evaluate any properties before our target
+        // Evaluate any properties or methods before our target
         ELResolver resolver = ctx.getELResolver();
-        if (propCount > 1) {
-            while (base != null && i < propCount) {
-                property = this.children[i].getValue(ctx);
+        while (i < propCount) {
+            if (i + 2 < propCount &&
+                    this.children[i + 1] instanceof AstMethodParameters) {
+                // Method call not at end of expression
+                base = resolver.invoke(ctx, base,
+                        this.children[i].getValue(ctx), null,
+                        ((AstMethodParameters)
+                                this.children[i + 1]).getParameters(ctx));
+                i += 2;
+            } else if (i + 2 == propCount &&
+                    this.children[i + 1] instanceof AstMethodParameters) {
+                // Method call at end of expression
                 ctx.setPropertyResolved(false);
+                property = this.children[i].getValue(ctx);
+                i += 2;
+
+                if (property == null) {
+                    throw new PropertyNotFoundException(MessageFactory.get(
+                            "error.unreachable.property", property));
+                }
+            } else if (i + 1 < propCount) {
+                // Object with property not at end of expression
+                property = this.children[i].getValue(ctx);
                 base = resolver.getValue(ctx, base, property);
                 i++;
+
+            } else {
+                // Object with property at end of expression
+                ctx.setPropertyResolved(false);
+                property = this.children[i].getValue(ctx);
+                i++;
+
+                if (property == null) {
+                    throw new PropertyNotFoundException(MessageFactory.get(
+                            "error.unreachable.property", property));
+                }
             }
-            // if we are in this block, we have more properties to resolve,
-            // but our base was null
-            if (base == null || property == null) {
+            if (base == null) {
                 throw new PropertyNotFoundException(MessageFactory.get(
                         "error.unreachable.property", property));
             }
-        }
-
-        property = this.children[i].getValue(ctx);
-
-        if (property == null) {
-            throw new PropertyNotFoundException(MessageFactory.get(
-                    "error.unreachable.property", this.children[i]));
         }
 
         Target t = new Target();
