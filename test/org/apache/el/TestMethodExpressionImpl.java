@@ -38,6 +38,7 @@ public class TestMethodExpressionImpl {
 
     private ExpressionFactory factory;
     private ELContext context;
+    private TesterBeanB beanB;
 
     @Before
     public void setUp() {
@@ -59,7 +60,7 @@ public class TestMethodExpressionImpl {
         context.getVariableMapper().setVariable("beanAAA",
                 factory.createValueExpression(beanAAA, TesterBeanAAA.class));
 
-        TesterBeanB beanB = new TesterBeanB();
+        beanB = new TesterBeanB();
         beanB.setName("B");
         context.getVariableMapper().setVariable("beanB",
                 factory.createValueExpression(beanB, TesterBeanB.class));
@@ -465,5 +466,14 @@ public class TestMethodExpressionImpl {
                 "#{beanA.getBean().name.length()}", java.lang.Integer.class);
         Integer actual = (Integer) ve.getValue(context);
         assertEquals(Integer.valueOf(BUG53792.length()), actual);
+    }
+
+
+    @Test
+    public void testBug53792c() {
+        MethodExpression me = factory.createMethodExpression(context,
+                "#{beanB.sayHello().length()}", null, new Class<?>[] {});
+        Integer result = (Integer) me.invoke(context, null);
+        assertEquals(beanB.sayHello().length(), result.intValue());
     }
 }
