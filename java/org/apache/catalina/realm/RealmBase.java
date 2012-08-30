@@ -629,14 +629,15 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
                     }
                 }
                 if(matched) {
-                    found = true;
                     if(length > longest) {
+                        found = false;
                         if(results != null) {
                             results.clear();
                         }
                         longest = length;
                     }
                     if(collection[j].findMethod(method)) {
+                        found = true;
                         if(results == null) {
                             results = new ArrayList<>();
                         }
@@ -760,7 +761,7 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
      */
     private SecurityConstraint [] resultsToArray(
             ArrayList<SecurityConstraint> results) {
-        if(results == null) {
+        if(results == null || results.size() == 0) {
             return null;
         }
         SecurityConstraint [] array = new SecurityConstraint[results.size()];
