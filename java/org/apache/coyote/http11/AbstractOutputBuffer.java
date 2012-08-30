@@ -250,7 +250,10 @@ public abstract class AbstractOutputBuffer<S> implements OutputBuffer{
 
         // Recycle Request object
         response.recycle();
-
+        // These will need to be reset if the reset was triggered by the error
+        // handling if the headers were too large
+        pos = 0;
+        byteCount = 0;
     }
 
     /**
@@ -538,10 +541,9 @@ public abstract class AbstractOutputBuffer<S> implements OutputBuffer{
      * Checks to see if there is enough space in the buffer to write the
      * requested number of bytes.
      */
-    private void checkLengthBeforeWrite(int length)
-            throws IllegalStateException {
+    private void checkLengthBeforeWrite(int length) {
         if (pos + length > buf.length) {
-            throw new IllegalStateException(
+            throw new HeadersTooLargeException(
                     sm.getString("iob.responseheadertoolarge.error"));
         }
     }
