@@ -237,7 +237,7 @@ public class RpcChannel implements ChannelListener{
         public long timeout;
 
         /**
-         * @deprecated  Use {@link RpcCollector#RpcCollector(RpcCollectorKey,
+         * @deprecated  Use {@link RpcCollector(RpcCollectorKey,
          *              int, int)}
          */
         @Deprecated
