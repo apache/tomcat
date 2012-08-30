@@ -352,7 +352,8 @@ public class ChunkedInputFilter implements InputFilter {
      */
     @Deprecated
     protected boolean parseCRLF() throws IOException {
-        return parseCRLF(false);
+        parseCRLF(false);
+        return true;
     }
 
     /**
@@ -362,7 +363,7 @@ public class ChunkedInputFilter implements InputFilter {
      *                      is recommended (RFC2616, section 19.3) for message
      *                      headers.
      */
-    protected boolean parseCRLF(boolean tolerant) throws IOException {
+    protected void parseCRLF(boolean tolerant) throws IOException {
 
         boolean eol = false;
         boolean crfound = false;
@@ -389,9 +390,6 @@ public class ChunkedInputFilter implements InputFilter {
             pos++;
 
         }
-
-        return true;
-
     }
 
 
