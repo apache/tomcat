@@ -152,10 +152,6 @@ public final class ValueExpressionImpl extends ValueExpression implements
         return this.expr;
     }
 
-    /**
-     * @return
-     * @throws ELException
-     */
     private Node getNode() throws ELException {
         if (this.node == null) {
             this.node = ExpressionBuilder.createNode(this.expr);
