@@ -348,16 +348,6 @@ public class ChunkedInputFilter implements InputFilter {
 
     /**
      * Parse CRLF at end of chunk.
-     * @deprecated  Use {@link #parseCRLF(boolean)}
-     */
-    @Deprecated
-    protected boolean parseCRLF() throws IOException {
-        parseCRLF(false);
-        return true;
-    }
-
-    /**
-     * Parse CRLF at end of chunk.
      *
      * @param   tolerant    Should tolerant parsing (LF and CRLF) be used? This
      *                      is recommended (RFC2616, section 19.3) for message
