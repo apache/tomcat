@@ -761,12 +761,21 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
 
             // Validate and write response headers
             try {
-                prepareResponse();
+//                try {
+                    prepareResponse();
+//                } catch (IllegalStateException e) {
+                    // Headers too big. Likely too late to do anything about it
+//                    response.reset();
+//                    response.setStatus(500);
+//                    response.setHeader("Connection", "close");
+//                    response.sendHeaders();
+//                }
                 getOutputBuffer().commit();
             } catch (IOException e) {
                 // Set error flag
                 error = true;
             }
+
         } else if (actionCode == ActionCode.ACK) {
             // Acknowledge request
             // Send a 100 status back if it makes sense (response not committed
@@ -1009,6 +1018,15 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
                     setCometTimeouts(socketWrapper);
                 } catch (InterruptedIOException e) {
                     error = true;
+                } catch (HeadersTooLargeException e) {
+                    error = true;
+                    // The response should not have been committed but check it
+                    // anyway to be safe
+                    if (!response.isCommitted()) {
+                        response.reset();
+                        response.setStatus(500);
+                        response.setHeader("Connection", "close");
+                    }
                 } catch (Throwable t) {
                     ExceptionUtils.handleThrowable(t);
                     getLog().error(sm.getString(

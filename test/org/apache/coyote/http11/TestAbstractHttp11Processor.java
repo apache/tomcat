@@ -18,6 +18,7 @@ package org.apache.coyote.http11;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.CharBuffer;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -307,6 +308,67 @@ public class TestAbstractHttp11Processor extends TomcatBaseTest {
         assertFalse(responseHeaders.containsKey("Transfer-Encoding"));
 
         assertEquals("OK", responseBody.toString());
+    }
+
+    @Test
+    public void testBug53677a() throws Exception {
+        doTestBug53677(false);
+    }
+
+    @Test
+    public void testBug53677b() throws Exception {
+        doTestBug53677(true);
+    }
+
+    private void doTestBug53677(boolean flush) throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+
+        // Must have a real docBase - just use temp
+        Context ctxt = tomcat.addContext("",
+                System.getProperty("java.io.tmpdir"));
+
+        Tomcat.addServlet(ctxt, "LargeHeaderServlet",
+                new LargeHeaderServlet(flush));
+        ctxt.addServletMapping("/test", "LargeHeaderServlet");
+
+        tomcat.start();
+
+        ByteChunk responseBody = new ByteChunk();
+        Map<String,List<String>> responseHeaders = new HashMap<>();
+        int rc = getUrl("http://localhost:" + getPort() + "/test", responseBody,
+                responseHeaders);
+
+        assertEquals(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, rc);
+        if (responseBody.getLength() > 0) {
+            // It will be >0 if the standard error page handlign has been
+            // triggered
+            assertFalse(responseBody.toString().contains("FAIL"));
+        }
+    }
+
+    private static final class LargeHeaderServlet extends HttpServlet {
+
+        private static final long serialVersionUID = 1L;
+
+        boolean flush = false;
+
+        public LargeHeaderServlet(boolean flush) {
+            this.flush = flush;
+        }
+
+        @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+                throws ServletException, IOException {
+            String largeValue =
+                    CharBuffer.allocate(10000).toString().replace('\0', 'x');
+            resp.setHeader("x-Test", largeValue);
+            if (flush) {
+                resp.flushBuffer();
+            }
+            resp.setContentType("text/plain");
+            resp.getWriter().print("FAIL");
+        }
+
     }
 
     // flushes with no content-length set
