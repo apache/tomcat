@@ -140,6 +140,10 @@
         the error set a content length header. (markt)
       </fix>
       <fix>
+        <bug>53677</bug>: Ensure that a 500 response rather than no response is
+        returned if the HTTP headers exceed the size limit. (markt)
+      </fix>
+      <fix>
         <bug>53702</bug>: When merging web.xml fragments, allow for
         <code>&lt;jsp-property-group&gt;</code> elements having multiple
         <code>&lt;url-pattern&gt;</code> elements. (markt)
@@ -241,6 +245,10 @@
       <fix>
         <bug>53654</bug>: Support <code>file://</code> URLs for JSP
         dependencies. Patch provided by Viola Lu. (markt)
+      </fix>
+      <fix>
+        <bug>53792</bug>: Support <code>MethodExpression</code>s that include a
+        method invocation that is not at the end of the expression. (markt)
       </fix>
     </changelog>
   </subsection>
