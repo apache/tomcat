@@ -190,6 +190,13 @@
         correct paths for subdirectories. Patch provided by Kevin Wooten.
         (kkolinko)
       </fix>
+      <fix>
+        <bug>53801</bug>: Overlapping URL patterns were sometimes merged
+        incorrectly in security constraints leading to incorrect 401 responses.
+        Note: it was possible for access to be denied when it should have been
+        granted but it was not possible for access to be granted when it should
+        have been denied. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
