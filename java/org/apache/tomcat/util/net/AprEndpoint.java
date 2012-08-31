@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.Executor;
 import java.util.concurrent.RejectedExecutionException;
 
 import org.apache.juli.logging.Log;
@@ -845,9 +846,15 @@ public class AprEndpoint extends AbstractEndpoint {
      */
     protected boolean processSocket(long socket) {
         try {
-            SocketWrapper<Long> wrapper =
-                new SocketWrapper<Long>(Long.valueOf(socket));
-            getExecutor().execute(new SocketProcessor(wrapper, null));
+            Executor executor = getExecutor();
+            if (executor == null) {
+                log.warn(sm.getString("endpoint.warn.noExector",
+                        Long.valueOf(socket), null));
+            } else {
+                SocketWrapper<Long> wrapper =
+                    new SocketWrapper<Long>(Long.valueOf(socket));
+                executor.execute(new SocketProcessor(wrapper, null));
+            }
         } catch (RejectedExecutionException x) {
             log.warn("Socket processing request was rejected for:"+socket,x);
             return false;
@@ -865,11 +872,17 @@ public class AprEndpoint extends AbstractEndpoint {
     /**
      * Process given socket for an event.
      */
-    protected boolean processSocket(long socket, SocketStatus status) {
+    public boolean processSocket(long socket, SocketStatus status) {
         try {
-            SocketWrapper<Long> wrapper =
-                    new SocketWrapper<Long>(Long.valueOf(socket));
-            getExecutor().execute(new SocketEventProcessor(wrapper, status));
+            Executor executor = getExecutor();
+            if (executor == null) {
+                log.warn(sm.getString("endpoint.warn.noExector",
+                        Long.valueOf(socket), status));
+            } else {
+                SocketWrapper<Long> wrapper =
+                        new SocketWrapper<Long>(Long.valueOf(socket));
+                executor.execute(new SocketEventProcessor(wrapper, status));
+            }
         } catch (RejectedExecutionException x) {
             log.warn("Socket processing request was rejected for:"+socket,x);
             return false;
@@ -900,11 +913,14 @@ public class AprEndpoint extends AbstractEndpoint {
                             Thread.currentThread().setContextClassLoader(
                                     getClass().getClassLoader());
                         }
-                        // During shutdown, executor may be null - avoid NPE
-                        if (!running) {
+                        Executor executor = getExecutor();
+                        if (executor == null) {
+                            log.warn(sm.getString("endpoint.warn.noExector",
+                                    socket, status));
                             return false;
+                        } else {
+                            executor.execute(proc);
                         }
-                        getExecutor().execute(proc);
                     } finally {
                         if (Constants.IS_SECURITY_ENABLED) {
                             PrivilegedAction<Void> pa = new PrivilegedSetTccl(loader);
