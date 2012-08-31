@@ -293,9 +293,16 @@ public class Http11AprProtocol extends AbstractHttp11Protocol<Long> {
                 socket.setAsync(true);
             } else if (processor.isComet()) {
                 // Comet
-                ((AprEndpoint) proto.endpoint).getCometPoller().add(
-                        socket.getSocket().longValue(),
-                        proto.endpoint.getSoTimeout());
+                if (proto.endpoint.isRunning()) {
+                    ((AprEndpoint) proto.endpoint).getCometPoller().add(
+                            socket.getSocket().longValue(),
+                            proto.endpoint.getSoTimeout());
+                } else {
+                    // Process a STOP directly
+                    ((AprEndpoint) proto.endpoint).processSocket(
+                            socket.getSocket().longValue(),
+                            SocketStatus.STOP);
+                }
             } else {
                 // Upgraded
                 ((AprEndpoint) proto.endpoint).getPoller().add(
