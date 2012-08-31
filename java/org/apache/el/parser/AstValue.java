@@ -80,7 +80,6 @@ public final class AstValue extends SimpleNode {
     @Override
     public Class<?> getType(EvaluationContext ctx) throws ELException {
         Target t = getTarget(ctx);
-        ctx.setPropertyResolved(false);
         Class<?> result = ctx.getELResolver().getType(ctx, t.base, t.property);
         if (!ctx.isPropertyResolved()) {
             throw new PropertyNotFoundException(MessageFactory.get(
@@ -118,7 +117,6 @@ public final class AstValue extends SimpleNode {
             } else if (i + 2 == propCount &&
                     this.children[i + 1] instanceof AstMethodParameters) {
                 // Method call at end of expression
-                ctx.setPropertyResolved(false);
                 property = this.children[i].getValue(ctx);
                 i += 2;
 
@@ -134,7 +132,6 @@ public final class AstValue extends SimpleNode {
 
             } else {
                 // Object with property at end of expression
-                ctx.setPropertyResolved(false);
                 property = this.children[i].getValue(ctx);
                 i++;
 
@@ -178,7 +175,6 @@ public final class AstValue extends SimpleNode {
                     return null;
                 }
 
-                ctx.setPropertyResolved(false);
                 base = resolver.getValue(ctx, base, suffix);
                 i++;
             }
@@ -193,7 +189,6 @@ public final class AstValue extends SimpleNode {
     @Override
     public boolean isReadOnly(EvaluationContext ctx) throws ELException {
         Target t = getTarget(ctx);
-        ctx.setPropertyResolved(false);
         boolean result =
             ctx.getELResolver().isReadOnly(ctx, t.base, t.property);
         if (!ctx.isPropertyResolved()) {
@@ -207,7 +202,6 @@ public final class AstValue extends SimpleNode {
     public void setValue(EvaluationContext ctx, Object value)
             throws ELException {
         Target t = getTarget(ctx);
-        ctx.setPropertyResolved(false);
         ELResolver resolver = ctx.getELResolver();
 
         // coerce to the expected type
