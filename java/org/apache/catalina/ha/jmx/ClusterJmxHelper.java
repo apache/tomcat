@@ -32,7 +32,11 @@ import org.apache.tomcat.util.modeler.Registry;
 /**
  *
  * @author Filip Hanik
+ *
+ * @deprecated  Unused - registration now happens via
+ *              {@link org.apache.catalina.util.LifecycleMBeanBase}
  */
+@Deprecated
 public class ClusterJmxHelper {
 
     protected static final Registry registry = Registry.getRegistry(null,null);

@@ -19,10 +19,10 @@
   <mbean
     name="FarmWarDeployer"
     className="org.apache.catalina.mbeans.ClassNameMBean"
-    description="Farm Deployer - Broken"
+    description="Farm Deployer"
     domain="Catalina"
     group="Cluster"
-    type="org.apache.catalina.ha.deploy.FarmWarDeployer"/>
+    type="org.apache.catalina.ha.deploy.FarmWarDeployer">
     <attribute
       name="deployDir"
       description="Deployment directory."
@@ -39,4 +39,5 @@
       name="watchEnabled"
       description="Is watching enabled?"
       type="boolean"/>
+  </mbean>
 </mbeans-descriptors>
