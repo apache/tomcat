@@ -25,6 +25,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import javax.management.ObjectName;
+
 import org.apache.catalina.Container;
 import org.apache.catalina.Context;
 import org.apache.catalina.Engine;
@@ -40,7 +42,6 @@ import org.apache.catalina.ha.ClusterListener;
 import org.apache.catalina.ha.ClusterManager;
 import org.apache.catalina.ha.ClusterMessage;
 import org.apache.catalina.ha.ClusterValve;
-import org.apache.catalina.ha.jmx.ClusterJmxHelper;
 import org.apache.catalina.ha.session.ClusterSessionListener;
 import org.apache.catalina.ha.session.DeltaManager;
 import org.apache.catalina.ha.session.JvmRouteBinderValve;
@@ -53,7 +54,7 @@ import org.apache.catalina.tribes.MembershipListener;
 import org.apache.catalina.tribes.group.GroupChannel;
 import org.apache.catalina.tribes.group.interceptors.MessageDispatch15Interceptor;
 import org.apache.catalina.tribes.group.interceptors.TcpFailureDetector;
-import org.apache.catalina.util.LifecycleBase;
+import org.apache.catalina.util.LifecycleMBeanBase;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.IntrospectionUtils;
@@ -71,8 +72,9 @@ import org.apache.tomcat.util.res.StringManager;
  * @author Peter Rossbach
  * @version $Id$
  */
-public class SimpleTcpCluster extends LifecycleBase implements CatalinaCluster,
-        LifecycleListener, MembershipListener, ChannelListener{
+public class SimpleTcpCluster extends LifecycleMBeanBase
+        implements CatalinaCluster, LifecycleListener, MembershipListener,
+        ChannelListener{
 
     public static final Log log = LogFactory.getLog(SimpleTcpCluster.class);
 
@@ -140,6 +142,7 @@ public class SimpleTcpCluster extends LifecycleBase implements CatalinaCluster,
     private final List<Valve> valves = new ArrayList<>();
 
     private org.apache.catalina.ha.ClusterDeployer clusterDeployer;
+    private ObjectName onameClusterDeployer;
 
     /**
      * Listeners of messages
@@ -598,11 +601,20 @@ public class SimpleTcpCluster extends LifecycleBase implements CatalinaCluster,
             log.trace(sm.getString("SimpleTcpCluster.event.log", lifecycleEvent.getType(), lifecycleEvent.getData()));
     }
 
+
     // ------------------------------------------------------ public
 
     @Override
-    protected void initInternal() {
-        // NOOP
+    protected void initInternal() throws LifecycleException {
+        super.initInternal();
+        if (clusterDeployer != null) {
+            StringBuilder name = new StringBuilder("type=ClusterDeployer");
+            Container container = getContainer();
+            if (container != null) {
+                name.append(container.getMBeanKeyProperties());
+            }
+            onameClusterDeployer = register(clusterDeployer, name.toString());
+        }
     }
 
 
@@ -625,9 +637,6 @@ public class SimpleTcpCluster extends LifecycleBase implements CatalinaCluster,
             channel.addChannelListener(this);
             channel.start(channelStartOptions);
             if (clusterDeployer != null) clusterDeployer.start();
-            //register JMX objects
-            ClusterJmxHelper.registerDefaultCluster(this);
-            // Notify our interested LifecycleListeners
         } catch (Exception x) {
             log.error("Unable to start cluster.", x);
             throw new LifecycleException(x);
@@ -717,9 +726,6 @@ public class SimpleTcpCluster extends LifecycleBase implements CatalinaCluster,
             channel.removeChannelListener(this);
             channel.removeMembershipListener(this);
             this.unregisterClusterValve();
-            //unregister JMX objects
-            ClusterJmxHelper.unregisterDefaultCluster(this);
-
         } catch (Exception x) {
             log.error("Unable to stop cluster valve.", x);
         }
@@ -727,8 +733,12 @@ public class SimpleTcpCluster extends LifecycleBase implements CatalinaCluster,
 
 
     @Override
-    protected void destroyInternal() {
-        // NOOP
+    protected void destroyInternal() throws LifecycleException {
+        if (onameClusterDeployer != null) {
+            unregister(onameClusterDeployer);
+            onameClusterDeployer = null;
+        }
+        super.destroyInternal();
     }
 
 
@@ -896,5 +906,29 @@ public class SimpleTcpCluster extends LifecycleBase implements CatalinaCluster,
 
     public void setChannelStartOptions(int channelStartOptions) {
         this.channelStartOptions = channelStartOptions;
+    }
+
+
+    // --------------------------------------------------------------------- JMX
+
+    @Override
+    protected String getDomainInternal() {
+        Container container = getContainer();
+        if (container == null) {
+            return null;
+        }
+        return container.getDomain();
+    }
+
+    @Override
+    protected String getObjectNameKeyProperties() {
+        StringBuilder name = new StringBuilder("type=Cluster");
+
+        Container container = getContainer();
+        if (container != null) {
+            name.append(container.getMBeanKeyProperties());
+        }
+
+        return name.toString();
     }
 }
