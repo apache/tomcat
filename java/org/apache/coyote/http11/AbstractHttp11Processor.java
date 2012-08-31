@@ -761,15 +761,7 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
 
             // Validate and write response headers
             try {
-//                try {
-                    prepareResponse();
-//                } catch (IllegalStateException e) {
-                    // Headers too big. Likely too late to do anything about it
-//                    response.reset();
-//                    response.setStatus(500);
-//                    response.setHeader("Connection", "close");
-//                    response.sendHeaders();
-//                }
+                prepareResponse();
                 getOutputBuffer().commit();
             } catch (IOException e) {
                 // Set error flag
