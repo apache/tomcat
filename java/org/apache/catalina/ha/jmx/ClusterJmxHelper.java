@@ -23,7 +23,6 @@ import javax.management.ObjectName;
 
 import org.apache.catalina.core.StandardEngine;
 import org.apache.catalina.core.StandardHost;
-import org.apache.catalina.ha.authenticator.ClusterSingleSignOn;
 import org.apache.catalina.ha.deploy.FarmWarDeployer;
 import org.apache.catalina.ha.tcp.SimpleTcpCluster;
 import org.apache.juli.logging.Log;
@@ -82,7 +81,6 @@ public class ClusterJmxHelper {
     protected static void initDefaultCluster() {
         initMetaData(SimpleTcpCluster.class);
         initMetaData(FarmWarDeployer.class); //not functional yet
-        initMetaData(ClusterSingleSignOn.class); //not functional yet
     }
 
     public static boolean registerDefaultCluster(SimpleTcpCluster cluster)  {
