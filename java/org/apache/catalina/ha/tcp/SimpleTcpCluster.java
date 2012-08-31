@@ -64,7 +64,6 @@ import org.apache.tomcat.util.res.StringManager;
  * setting up a cluster and provides callers with a valid multicast
  * receiver/sender.
  *
- * FIXME remove install/remove/start/stop context dummys
  * FIXME wrote testcases
  *
  * @author Filip Hanik
