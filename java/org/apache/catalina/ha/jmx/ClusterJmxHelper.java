@@ -25,7 +25,6 @@ import org.apache.catalina.core.StandardEngine;
 import org.apache.catalina.core.StandardHost;
 import org.apache.catalina.ha.authenticator.ClusterSingleSignOn;
 import org.apache.catalina.ha.deploy.FarmWarDeployer;
-import org.apache.catalina.ha.session.DeltaManager;
 import org.apache.catalina.ha.tcp.SimpleTcpCluster;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -82,7 +81,6 @@ public class ClusterJmxHelper {
 
     protected static void initDefaultCluster() {
         initMetaData(SimpleTcpCluster.class);
-        initMetaData(DeltaManager.class);
         initMetaData(FarmWarDeployer.class); //not functional yet
         initMetaData(ClusterSingleSignOn.class); //not functional yet
     }
