@@ -27,6 +27,7 @@ import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.net.AprEndpoint;
 import org.apache.tomcat.util.net.AprEndpoint.Handler;
+import org.apache.tomcat.util.net.SocketStatus;
 import org.apache.tomcat.util.net.SocketWrapper;
 
 
@@ -266,6 +267,11 @@ public class Http11AprProtocol extends AbstractHttp11Protocol {
                     ((AprEndpoint) proto.endpoint).getCometPoller().add(
                             socket.getSocket().longValue(),
                             proto.endpoint.getSoTimeout());
+                } else {
+                    // Process a STOP directly
+                    ((AprEndpoint) proto.endpoint).processSocket(
+                            socket.getSocket().longValue(),
+                            SocketStatus.STOP);
                 }
             } else {
                 // Upgraded

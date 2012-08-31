@@ -234,6 +234,10 @@
         Better parsing of line-terminators for requests using chunked encoding.
         (markt)
       </fix>
+      <fix>
+        Further improvements to handling of Comet END events when the connector
+        is stopped. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
