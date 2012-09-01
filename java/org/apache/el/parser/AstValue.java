@@ -129,6 +129,7 @@ public final class AstValue extends SimpleNode {
             } else if (i + 1 < propCount) {
                 // Object with property not at end of expression
                 property = this.children[i].getValue(ctx);
+                ctx.setPropertyResolved(false);
                 base = resolver.getValue(ctx, base, property);
                 i++;
 
