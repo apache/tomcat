@@ -23,9 +23,7 @@ import javax.management.ObjectName;
 
 import org.apache.catalina.core.StandardEngine;
 import org.apache.catalina.core.StandardHost;
-import org.apache.catalina.ha.authenticator.ClusterSingleSignOn;
 import org.apache.catalina.ha.deploy.FarmWarDeployer;
-import org.apache.catalina.ha.session.DeltaManager;
 import org.apache.catalina.ha.tcp.SimpleTcpCluster;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -34,7 +32,11 @@ import org.apache.tomcat.util.modeler.Registry;
 /**
  * 
  * @author Filip Hanik
+ *
+ * @deprecated  Unused - registration now happens via
+ *              {@link org.apache.catalina.util.LifecycleMBeanBase}
  */
+@Deprecated
 public class ClusterJmxHelper {
     
     protected static Registry registry = Registry.getRegistry(null,null);
@@ -83,9 +85,7 @@ public class ClusterJmxHelper {
     
     protected static void initDefaultCluster() {
         initMetaData(SimpleTcpCluster.class);
-        initMetaData(DeltaManager.class);
         initMetaData(FarmWarDeployer.class); //not functional yet
-        initMetaData(ClusterSingleSignOn.class); //not functional yet
     }
     
     public static boolean registerDefaultCluster(SimpleTcpCluster cluster)  {
