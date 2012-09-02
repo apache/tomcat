@@ -653,6 +653,20 @@ List of Cluster Mbeans<br/>
   </tr>
 
   <tr>
+    <td>FarmWarDeployer</td>
+    <td>Manages the process of deploying an application to all nodes in the cluster</td>
+    <td>Not supported</td>
+    <td><code>type=Cluster, host=${HOST}, component=deployer</code></td>
+  </tr>
+
+  <tr>
+    <td>Member</td>
+    <td>Represents a node in the cluster</td>
+    <td>type=Cluster, component=member, name=${NODE_NAME}</td>
+    <td><code>type=Cluster, host=${HOST}, component=member, name=${NODE_NAME}</code></td>
+  </tr>
+
+  <tr>
     <td>ReplicationValve</td>
     <td>This valve control the replication to the backup nodes</td>
     <td><code>type=Valve,name=ReplicationValve</code></td>
