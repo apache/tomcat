@@ -627,24 +627,6 @@ set CATALINA_OPTS=\
 -Dcom.sun.management.jmxremote.authenticate=false
 </source>
 </p>
-<p>Activate JMX with JDK 1.4:
-<ol>
-<li>Install the compat package</li>
-<li>Install the mx4j-tools.jar at common/lib (use the same mx4j version as your tomcat release)</li>
-<li>Configure a MX4J JMX HTTP Adaptor at your AJP Connector<p></p>
-<source>
-&lt;Connector port="${AJP.PORT}"
-   handler.list="mx"
-   mx.enabled="true"
-   mx.httpHost="${JMX.HOST}"
-   mx.httpPort="${JMX.PORT}"
-   protocol="AJP/1.3" /&gt;
-</source>
-</li>
-<li>Start your tomcat and look with your browser to http://${JMX.HOST}:${JMX.PORT}</li>
-<li>With the connector parameter <code>mx.authMode="basic" mx.authUser="tomcat" mx.authPassword="strange"</code> you can control the access!</li>
-</ol>
-</p>
 <p>
 List of Cluster Mbeans<br/>
 <table border="1" cellpadding="5">
