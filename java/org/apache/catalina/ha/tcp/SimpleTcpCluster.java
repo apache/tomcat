@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.management.ObjectName;
 
@@ -162,6 +163,8 @@ public class SimpleTcpCluster extends LifecycleMBeanBase
     private int channelSendOptions = Channel.SEND_OPTIONS_ASYNCHRONOUS;
 
     private int channelStartOptions = Channel.DEFAULT;
+
+    private Map<Member,ObjectName> memberOnameMap = new ConcurrentHashMap<>();
 
     // ------------------------------------------------------------- Properties
 
@@ -608,11 +611,12 @@ public class SimpleTcpCluster extends LifecycleMBeanBase
     protected void initInternal() throws LifecycleException {
         super.initInternal();
         if (clusterDeployer != null) {
-            StringBuilder name = new StringBuilder("type=ClusterDeployer");
+            StringBuilder name = new StringBuilder("type=Cluster");
             Container container = getContainer();
             if (container != null) {
                 name.append(container.getMBeanKeyProperties());
             }
+            name.append(",component=Deployer");
             onameClusterDeployer = register(clusterDeployer, name.toString());
         }
     }
@@ -637,6 +641,7 @@ public class SimpleTcpCluster extends LifecycleMBeanBase
             channel.addChannelListener(this);
             channel.start(channelStartOptions);
             if (clusterDeployer != null) clusterDeployer.start();
+            registerMember(channel.getLocalMember(false));
         } catch (Exception x) {
             log.error("Unable to start cluster.", x);
             throw new LifecycleException(x);
@@ -718,6 +723,7 @@ public class SimpleTcpCluster extends LifecycleMBeanBase
 
         setState(LifecycleState.STOPPING);
 
+        unregisterMember(channel.getLocalMember(false));
         if (clusterDeployer != null) clusterDeployer.stop();
         this.managers.clear();
         try {
@@ -816,6 +822,9 @@ public class SimpleTcpCluster extends LifecycleMBeanBase
             if (log.isInfoEnabled()) log.info("Replication member added:" + member);
             // Notify our interested LifecycleListeners
             fireLifecycleEvent(BEFORE_MEMBERREGISTER_EVENT, member);
+
+            registerMember(member);
+
             // Notify our interested LifecycleListeners
             fireLifecycleEvent(AFTER_MEMBERREGISTER_EVENT, member);
         } catch (Exception x) {
@@ -836,6 +845,9 @@ public class SimpleTcpCluster extends LifecycleMBeanBase
             if (log.isInfoEnabled()) log.info("Received member disappeared:" + member);
             // Notify our interested LifecycleListeners
             fireLifecycleEvent(BEFORE_MEMBERUNREGISTER_EVENT, member);
+
+            unregisterMember(member);
+
             // Notify our interested LifecycleListeners
             fireLifecycleEvent(AFTER_MEMBERUNREGISTER_EVENT, member);
         } catch (Exception x) {
@@ -930,5 +942,26 @@ public class SimpleTcpCluster extends LifecycleMBeanBase
         }
 
         return name.toString();
+    }
+
+    private void registerMember(Member member) {
+        // JMX registration
+        StringBuilder name = new StringBuilder("type=Cluster");
+        Container container = getContainer();
+        if (container != null) {
+            name.append(container.getMBeanKeyProperties());
+        }
+        name.append(",component=Member,name=");
+        name.append(ObjectName.quote(member.getName()));
+
+        ObjectName oname = register(member, name.toString());
+        memberOnameMap.put(member, oname);
+    }
+
+    private void unregisterMember(Member member) {
+        ObjectName oname = memberOnameMap.remove(member);
+        if (oname != null) {
+            unregister(oname);
+        }
     }
 }

@@ -92,4 +92,69 @@
       impact="ACTION"
       returnType="void"/>
   </mbean>
+  <mbean
+    name="MemberImpl"
+    description="Cluster member"
+    domain="Catalina"
+    group="Cluster"
+    type="org.apache.catalina.tribes.membership.MemberImpl">
+    <attribute
+      name="failing"
+      description="Has a problem been observed with this member (failing is worse than suspect)"
+      type="boolean"
+      is="true"
+      writeable="false"/>
+    <attribute
+      name="hostname"
+      description="The name of the host where this member is located"
+      type="String"
+      writeable="false"/>
+    <attribute
+      name="memberAliveTime"
+      description="The number of milliseconds since this member was created"
+      type="long"
+      writeable="false"/>
+    <attribute
+      name="msgCount"
+      description="The number of messages send by this member"
+      type="int"
+      writeable="false"/>
+    <attribute
+      name="name"
+      description="The unique name of this member within the cluster"
+      type="String"
+      writeable="false"/>
+    <attribute
+      name="port"
+      description="The tcp port the member is listening on"
+      type="int"
+      writeable="false"/>
+    <attribute
+      name="ready"
+      description="Is this member ready to send messages"
+      type="boolean"
+      is="true"
+      writeable="false"/>
+    <attribute
+      name="securePort"
+      description="The tcp(SSL) port the member is listening on"
+      type="int"
+      writeable="false"/>
+    <attribute
+      name="serviceStartTime"
+      description="The time the member was started"
+      type="long"
+      writeable="false"/>
+    <attribute
+      name="suspect"
+      description="Has a potential problem been observed with this member (failing is worse than suspect)"
+      type="boolean"
+      is="true"
+      writeable="false"/>
+    <attribute
+      name="udpPort"
+      description="The upd port the member is listening on"
+      type="int"
+      writeable="false"/>
+  </mbean>
 </mbeans-descriptors>

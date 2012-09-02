@@ -458,6 +458,10 @@ public class MemberImpl implements Member, java.io.Externalizable {
         }
     }
 
+    public int getMsgCount() {
+        return this.msgCount;
+    }
+
     /**
      * Contains information on how long this member has been online.
      * The result is the number of milli seconds this member has been
