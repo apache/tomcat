@@ -838,7 +838,7 @@ public class WARDirContext extends BaseDirContext {
      */
     protected ArrayList<NamingEntry> list(Entry entry) {
 
-        ArrayList<NamingEntry> entries = new ArrayList<NamingEntry>();
+        ArrayList<NamingEntry> entries = new ArrayList<>();
         Entry[] children = entry.getChildren();
         Arrays.sort(children);
         NamingEntry namingEntry = null;

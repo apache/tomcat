@@ -92,8 +92,7 @@ public class ServiceRefFactory implements ObjectFactory {
                 wsdlRefAddr = (String) tmp.getContent();
 
             // PortComponent
-            Hashtable<String,QName> portComponentRef =
-                new Hashtable<String,QName>();
+            Hashtable<String,QName> portComponentRef = new Hashtable<>();
 
             // Create QName object
             QName serviceQname = null;
@@ -177,7 +176,6 @@ public class ServiceRefFactory implements ObjectFactory {
                     Definition def = reader.readWSDL((new URL(wsdlRefAddr)).toExternalForm());
 
                     javax.wsdl.Service wsdlservice = def.getService(serviceQname);
-                    @SuppressWarnings("unchecked") // Can't change the API
                     Map<String,?> ports = wsdlservice.getPorts();
                     Method m = serviceInterfaceClass.getMethod("setEndpointAddress",
                             new Class[] { java.lang.String.class,
@@ -244,7 +242,7 @@ public class ServiceRefFactory implements ObjectFactory {
             if (((ServiceRef) ref).getHandlersSize() > 0) {
 
                 HandlerRegistry handlerRegistry = service.getHandlerRegistry();
-                ArrayList<String> soaproles = new ArrayList<String>();
+                ArrayList<String> soaproles = new ArrayList<>();
 
                 while (((ServiceRef) ref).getHandlersSize() > 0) {
                     HandlerRef handlerRef = ((ServiceRef) ref).getHandler();
@@ -263,9 +261,9 @@ public class ServiceRefFactory implements ObjectFactory {
 
                     // Load all datas relative to the handler : SOAPHeaders, config init element,
                     // portNames to be set on
-                    ArrayList<QName> headers = new ArrayList<QName>();
-                    Hashtable<String,String> config = new Hashtable<String,String>();
-                    ArrayList<String> portNames = new ArrayList<String>();
+                    ArrayList<QName> headers = new ArrayList<>();
+                    Hashtable<String,String> config = new Hashtable<>();
+                    ArrayList<String> portNames = new ArrayList<>();
                     for (int i = 0; i < handlerRef.size(); i++)
                         if (HandlerRef.HANDLER_LOCALPART.equals(handlerRef.get(i).getType())) {
                             String localpart = "";
@@ -329,7 +327,6 @@ public class ServiceRefFactory implements ObjectFactory {
      */
     private String getSOAPLocation(Port port) {
         String endpoint = null;
-        @SuppressWarnings("unchecked") // Can't change the API
         List<ExtensibilityElement> extensions = port.getExtensibilityElements();
         for (Iterator<ExtensibilityElement> i = extensions.iterator();
                 i.hasNext();) {
@@ -346,7 +343,6 @@ public class ServiceRefFactory implements ObjectFactory {
     private void initHandlerChain(QName portName, HandlerRegistry handlerRegistry,
             HandlerInfo handlerInfo, ArrayList<String> soaprolesToAdd) {
         HandlerChain handlerChain = (HandlerChain) handlerRegistry.getHandlerChain(portName);
-        @SuppressWarnings("unchecked") // Can't change the API
         Iterator<Handler> iter = handlerChain.iterator();
         while (iter.hasNext()) {
             Handler handler = iter.next();

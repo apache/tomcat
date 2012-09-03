@@ -270,7 +270,7 @@ public class DirContextURLConnection extends URLConnection {
           return (Collections.emptyMap());
 
       HashMap<String,List<String>> headerFields =
-          new HashMap<String,List<String>>(attributes.size());
+              new HashMap<>(attributes.size());
       NamingEnumeration<String> attributeEnum = attributes.getIDs();
       try {
           while (attributeEnum.hasMore()) {
@@ -278,7 +278,7 @@ public class DirContextURLConnection extends URLConnection {
               Attribute attribute = attributes.get(attributeID);
               if (attribute == null) continue;
               ArrayList<String> attributeValueList =
-                  new ArrayList<String>(attribute.size());
+                      new ArrayList<>(attribute.size());
               NamingEnumeration<?> attributeValues = attribute.getAll();
               while (attributeValues.hasMore()) {
                   Object attrValue = attributeValues.next();
@@ -360,7 +360,6 @@ public class DirContextURLConnection extends URLConnection {
     /**
      * Get object content.
      */
-    @SuppressWarnings("rawtypes") // overridden method uses raw type Class[]
     @Override
     public Object getContent(Class[] classes)
         throws IOException {
@@ -434,7 +433,7 @@ public class DirContextURLConnection extends URLConnection {
                     getURL() == null ? "null" : getURL().toString());
         }
 
-        Vector<String> result = new Vector<String>();
+        Vector<String> result = new Vector<>();
 
         if (collection != null) {
             try {

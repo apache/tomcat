@@ -154,7 +154,7 @@ public class StringManager {
     // --------------------------------------------------------------
 
     private static final Hashtable<String, StringManager> managers =
-        new Hashtable<String, StringManager>();
+            new Hashtable<>();
 
     /**
      * Get the StringManager for a particular package. If a manager for

@@ -90,7 +90,7 @@ public class VirtualDirContext extends FileDirContext {
     public void allocate() {
         super.allocate();
 
-        mappedResourcePaths = new HashMap<String, List<String>>();
+        mappedResourcePaths = new HashMap<>();
         StringTokenizer tkn = new StringTokenizer(extraResourcePaths, ",");
         while (tkn.hasMoreTokens()) {
             String resSpec = tkn.nextToken();
@@ -110,7 +110,7 @@ public class VirtualDirContext extends FileDirContext {
                 String dir = resSpec.substring(idx + 1);
                 List<String> resourcePaths = mappedResourcePaths.get(path);
                 if (resourcePaths == null) {
-                    resourcePaths = new ArrayList<String>();
+                    resourcePaths = new ArrayList<>();
                     mappedResourcePaths.put(path, resourcePaths);
                 }
                 resourcePaths.add(dir);
@@ -209,7 +209,7 @@ public class VirtualDirContext extends FileDirContext {
         List<NamingEntry> entries = super.list(file);
 
         if (mappedResourcePaths != null && !mappedResourcePaths.isEmpty()) {
-            Set<String> entryNames = new HashSet<String>(entries.size());
+            Set<String> entryNames = new HashSet<>(entries.size());
             for (NamingEntry entry : entries) {
                 entryNames.add(entry.name);
             }

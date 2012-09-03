@@ -86,7 +86,7 @@ public class ServiceRef extends Reference {
      * The vector to save the handler Reference objects, because they can't be
      * saved in the addrs vector.
      */
-    private final Vector<HandlerRef> handlers = new Vector<HandlerRef>();
+    private final Vector<HandlerRef> handlers = new Vector<>();
 
 
     // ----------------------------------------------------------- Constructors

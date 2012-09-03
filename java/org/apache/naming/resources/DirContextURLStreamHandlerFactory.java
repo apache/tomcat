@@ -45,7 +45,7 @@ public class DirContextURLStreamHandlerFactory
 
 
     private final List<URLStreamHandlerFactory> userFactories =
-        new CopyOnWriteArrayList<URLStreamHandlerFactory>();
+            new CopyOnWriteArrayList<>();
 
     private DirContextURLStreamHandlerFactory() {
         // Hide the default constructor
