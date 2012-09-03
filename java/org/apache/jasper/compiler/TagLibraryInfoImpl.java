@@ -303,6 +303,7 @@ class TagLibraryInfoImpl extends TagLibraryInfo implements TagConstants {
      * the name of the TLD entry in the jar file, which is hardcoded to
      * META-INF/taglib.tld.
      */
+    @SuppressWarnings("null") // url can't be null
     private TldLocation generateTLDLocation(String uri, JspCompilationContext ctxt)
             throws JasperException {
 

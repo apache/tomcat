@@ -1177,6 +1177,7 @@ class Parser implements TagConstants {
      *
      * CustomActionScriptlessContent ::= ScriptlessOptionalBody
      */
+    @SuppressWarnings("null") // tagFileInfo can't be null after initial test
     private boolean parseCustomTag(Node parent) throws JasperException {
 
         if (reader.peekChar() != '<') {
