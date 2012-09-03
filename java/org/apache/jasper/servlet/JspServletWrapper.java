@@ -72,7 +72,7 @@ import org.apache.tomcat.InstanceManager;
 public class JspServletWrapper {
 
     private static final Map<String,Long> ALWAYS_OUTDATED_DEPENDENCIES =
-        new HashMap<String,Long>();
+            new HashMap<>();
 
     static {
         // If this is missing,
