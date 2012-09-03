@@ -64,7 +64,7 @@ public final class ELContextImpl extends ELContext {
         public ValueExpression setVariable(String variable,
                 ValueExpression expression) {
             if (vars == null)
-                vars = new HashMap<String, ValueExpression>();
+                vars = new HashMap<>();
             return vars.put(variable, expression);
         }
 
