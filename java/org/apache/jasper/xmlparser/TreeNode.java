@@ -108,7 +108,7 @@ public class TreeNode {
     public void addAttribute(String name, String value) {
 
         if (attributes == null)
-            attributes = new HashMap<String,String>();
+            attributes = new HashMap<>();
         attributes.put(name, value);
 
     }
@@ -122,7 +122,7 @@ public class TreeNode {
     public void addChild(TreeNode node) {
 
         if (children == null)
-            children = new ArrayList<TreeNode>();
+            children = new ArrayList<>();
         children.add(node);
 
     }
@@ -209,7 +209,7 @@ public class TreeNode {
             return empty.iterator();
         }
 
-        ArrayList<TreeNode> results = new ArrayList<TreeNode>();
+        ArrayList<TreeNode> results = new ArrayList<>();
         Iterator<TreeNode> items = children.iterator();
         while (items.hasNext()) {
             TreeNode item = items.next();

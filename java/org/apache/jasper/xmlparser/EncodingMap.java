@@ -484,11 +484,11 @@ public class EncodingMap {
 
     /** fIANA2JavaMap */
     protected static final Hashtable<String,String> fIANA2JavaMap =
-        new Hashtable<String,String>();
+            new Hashtable<>();
 
     /** fJava2IANAMap */
     protected static final Hashtable<String,String> fJava2IANAMap =
-        new Hashtable<String,String>();
+            new Hashtable<>();
 
     //
     // Static initialization

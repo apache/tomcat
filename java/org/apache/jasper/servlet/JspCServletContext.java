@@ -89,7 +89,7 @@ public class JspCServletContext implements ServletContext {
      */
     public JspCServletContext(PrintWriter aLogWriter, URL aResourceBaseURL) {
 
-        myAttributes = new Hashtable<String,Object>();
+        myAttributes = new Hashtable<>();
         myLogWriter = aLogWriter;
         myResourceBaseURL = aResourceBaseURL;
 
@@ -321,7 +321,7 @@ public class JspCServletContext implements ServletContext {
     @Override
     public Set<String> getResourcePaths(String path) {
 
-        Set<String> thePaths = new HashSet<String>();
+        Set<String> thePaths = new HashSet<>();
         if (!path.endsWith("/"))
             path += "/";
         String basePath = getRealPath(path);
