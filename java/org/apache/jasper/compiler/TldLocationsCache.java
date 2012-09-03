@@ -162,7 +162,7 @@ public class TldLocationsCache {
      */
     public TldLocationsCache(ServletContext ctxt) {
         this.ctxt = ctxt;
-        mappings = new Hashtable<String, TldLocation>();
+        mappings = new Hashtable<>();
         initialized = false;
     }
 

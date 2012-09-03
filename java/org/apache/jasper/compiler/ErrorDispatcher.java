@@ -431,7 +431,7 @@ public class ErrorDispatcher {
                                 String errMsg, String fname, Node.Nodes page)
                 throws IOException, JasperException {
 
-        ArrayList<JavacErrorDetail> errors = new ArrayList<JavacErrorDetail>();
+        ArrayList<JavacErrorDetail> errors = new ArrayList<>();
         StringBuilder errMsgBuf = null;
         int lineNum = -1;
         JavacErrorDetail javacError = null;

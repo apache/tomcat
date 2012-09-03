@@ -582,7 +582,7 @@ abstract class Node implements TagConstants {
                 Mark start, Node parent) {
             super(qName, PAGE_DIRECTIVE_ACTION, attrs, nonTaglibXmlnsAttrs,
                     taglibAttrs, start, parent);
-            imports = new Vector<String>();
+            imports = new Vector<>();
         }
 
         @Override
@@ -671,7 +671,7 @@ abstract class Node implements TagConstants {
                 Mark start, Node parent) {
             super(qName, TAG_DIRECTIVE_ACTION, attrs, nonTaglibXmlnsAttrs,
                     taglibAttrs, start, parent);
-            imports = new Vector<String>();
+            imports = new Vector<>();
         }
 
         @Override
@@ -2080,7 +2080,7 @@ abstract class Node implements TagConstants {
          */
         public void addSmap(int srcLine) {
             if (extraSmap == null) {
-                extraSmap = new ArrayList<Integer>();
+                extraSmap = new ArrayList<>();
             }
             extraSmap.add(new Integer(srcLine));
         }
@@ -2333,12 +2333,12 @@ abstract class Node implements TagConstants {
         private boolean generatedInBuffer;
 
         public Nodes() {
-            list = new Vector<Node>();
+            list = new Vector<>();
         }
 
         public Nodes(Node.Root root) {
             this.root = root;
-            list = new Vector<Node>();
+            list = new Vector<>();
             list.add(root);
         }
 

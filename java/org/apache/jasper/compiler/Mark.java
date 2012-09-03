@@ -81,7 +81,7 @@ final class Mark {
         this.fileName = name;
         this.baseDir = inBaseDir;
         this.encoding = inEncoding;
-        this.includeStack = new Stack<IncludeState>();
+        this.includeStack = new Stack<>();
     }
 
 
@@ -102,7 +102,7 @@ final class Mark {
         this.encoding = other.encoding;
 
         // clone includeStack without cloning contents
-        includeStack = new Stack<IncludeState>();
+        includeStack = new Stack<>();
         for ( int i=0; i < other.includeStack.size(); i++ ) {
             includeStack.addElement( other.includeStack.elementAt(i) );
         }

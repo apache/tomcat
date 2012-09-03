@@ -71,8 +71,8 @@ class ImplicitTagLibraryInfo extends TagLibraryInfo {
         super(prefix, null);
         this.pc = pc;
         this.pi = pi;
-        this.tagFileMap = new Hashtable<String,String>();
-        this.vec = new Vector<TagFileInfo>();
+        this.tagFileMap = new Hashtable<>();
+        this.vec = new Vector<>();
 
         // Implicit tag libraries have no functions:
         this.functions = new FunctionInfo[0];

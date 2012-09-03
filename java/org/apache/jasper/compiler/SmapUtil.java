@@ -684,7 +684,7 @@ public class SmapUtil {
 
     private static class PreScanVisitor extends Node.Visitor {
 
-        HashMap<String, SmapStratum> map = new HashMap<String, SmapStratum>();
+        HashMap<String, SmapStratum> map = new HashMap<>();
 
         @Override
         public void doVisit(Node n) {

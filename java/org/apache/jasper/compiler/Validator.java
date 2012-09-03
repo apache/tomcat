@@ -870,7 +870,7 @@ class Validator {
             if (jspAttrsSize > 0) {
                 jspAttrs = new Node.JspAttribute[jspAttrsSize];
             }
-            Hashtable<String, Object> tagDataAttrs = new Hashtable<String, Object>(attrsSize);
+            Hashtable<String, Object> tagDataAttrs = new Hashtable<>(attrsSize);
 
             checkXmlAttributes(n, jspAttrs, tagDataAttrs);
             checkNamedAttributes(n, jspAttrs, attrsSize, tagDataAttrs);
@@ -1611,7 +1611,7 @@ class Validator {
                 throws JasperException {
             FunctionInfo funcInfo = func.getFunctionInfo();
             String signature = funcInfo.getFunctionSignature();
-            ArrayList<String> params = new ArrayList<String>();
+            ArrayList<String> params = new ArrayList<>();
             // Signature is of the form
             // <return-type> S <method-name S? '('
             // < <arg-type> ( ',' <arg-type> )* )? ')'
@@ -1644,7 +1644,7 @@ class Validator {
 
             class ValidateFunctionMapper extends FunctionMapper {
 
-                private HashMap<String, Method> fnmap = new HashMap<String, Method>();
+                private HashMap<String, Method> fnmap = new HashMap<>();
 
                 public void mapFunction(String fnQName, Method method) {
                     fnmap.put(fnQName, method);

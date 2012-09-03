@@ -119,7 +119,7 @@ public class JspUtil {
 
         // AttributesImpl.removeAttribute is broken, so we do this...
         int tempLength = (attrs == null) ? 0 : attrs.getLength();
-        Vector<String> temp = new Vector<String>(tempLength, 1);
+        Vector<String> temp = new Vector<>(tempLength, 1);
         for (int i = 0; i < tempLength; i++) {
             @SuppressWarnings("null")  // If attrs==null, tempLength == 0
             String qName = attrs.getQName(i);
@@ -796,7 +796,7 @@ public class JspUtil {
      * @return the components of the path
      */
     private static final String[] split(String path, String pat) {
-        Vector<String> comps = new Vector<String>();
+        Vector<String> comps = new Vector<>();
         int pos = path.indexOf(pat);
         int start = 0;
         while (pos >= 0) {

@@ -219,7 +219,7 @@ public class JavacErrorDetail {
      */
     private String[] readFile(InputStream s) throws IOException {
         BufferedReader reader = new BufferedReader(new InputStreamReader(s));
-        List<String> lines = new ArrayList<String>();
+        List<String> lines = new ArrayList<>();
         String line;
 
         while ( (line = reader.readLine()) != null ) {
