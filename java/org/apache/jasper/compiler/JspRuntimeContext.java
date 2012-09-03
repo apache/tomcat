@@ -162,7 +162,7 @@ public final class JspRuntimeContext {
         }
 
         if (options.getMaxLoadedJsps() > 0) {
-            jspQueue = new FastRemovalDequeue<JspServletWrapper>(options.getMaxLoadedJsps());
+            jspQueue = new FastRemovalDequeue<>(options.getMaxLoadedJsps());
             if (log.isDebugEnabled()) {
                 log.debug(Localizer.getMessage("jsp.message.jsp_queue_created",
                                                "" + options.getMaxLoadedJsps(), context.getContextPath()));
@@ -192,7 +192,7 @@ public final class JspRuntimeContext {
     /**
      * Maps JSP pages to their JspServletWrapper's
      */
-    private Map<String, JspServletWrapper> jsps = new ConcurrentHashMap<String, JspServletWrapper>();
+    private Map<String, JspServletWrapper> jsps = new ConcurrentHashMap<>();
 
     /**
      * Keeps JSP pages ordered by last access.

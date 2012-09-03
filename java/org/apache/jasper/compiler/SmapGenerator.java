@@ -47,8 +47,8 @@ public class SmapGenerator {
 
     private String outputFileName;
     private String defaultStratum = "Java";
-    private List<SmapStratum> strata = new ArrayList<SmapStratum>();
-    private List<String> embedded = new ArrayList<String>();
+    private List<SmapStratum> strata = new ArrayList<>();
+    private List<String> embedded = new ArrayList<>();
     private boolean doEmbedded = true;
 
     //*********************************************************************

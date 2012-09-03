@@ -132,9 +132,9 @@ public class SmapStratum {
      */
     public SmapStratum(String stratumName) {
         this.stratumName = stratumName;
-        fileNameList = new ArrayList<String>();
-        filePathList = new ArrayList<String>();
-        lineData = new ArrayList<LineInfo>();
+        fileNameList = new ArrayList<>();
+        filePathList = new ArrayList<>();
+        lineData = new ArrayList<>();
         lastFileID = 0;
     }
 

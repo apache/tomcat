@@ -208,9 +208,9 @@ class TagLibraryInfoImpl extends TagLibraryInfo implements TagConstants {
      */
     private void parseTLD(String uri, InputStream in, JarResource jarResource)
             throws JasperException {
-        Vector<TagInfo> tagVector = new Vector<TagInfo>();
-        Vector<TagFileInfo> tagFileVector = new Vector<TagFileInfo>();
-        Hashtable<String, FunctionInfo> functionTable = new Hashtable<String, FunctionInfo>();
+        Vector<TagInfo> tagVector = new Vector<>();
+        Vector<TagFileInfo> tagFileVector = new Vector<>();
+        Hashtable<String, FunctionInfo> functionTable = new Hashtable<>();
 
         // Create an iterator over the child elements of our <taglib> element
         ParserUtils pu = new ParserUtils();
@@ -351,8 +351,8 @@ class TagLibraryInfoImpl extends TagLibraryInfo implements TagConstants {
         String largeIcon = null;
         boolean dynamicAttributes = false;
 
-        Vector<TagAttributeInfo> attributeVector = new Vector<TagAttributeInfo>();
-        Vector<TagVariableInfo> variableVector = new Vector<TagVariableInfo>();
+        Vector<TagAttributeInfo> attributeVector = new Vector<>();
+        Vector<TagVariableInfo> variableVector = new Vector<>();
         Iterator<TreeNode> list = elem.findChildren();
         while (list.hasNext()) {
             TreeNode element = list.next();
@@ -631,7 +631,7 @@ class TagLibraryInfoImpl extends TagLibraryInfo implements TagConstants {
             throws JasperException {
 
         String validatorClass = null;
-        Map<String,Object> initParams = new Hashtable<String,Object>();
+        Map<String,Object> initParams = new Hashtable<>();
 
         Iterator<TreeNode> list = elem.findChildren();
         while (list.hasNext()) {

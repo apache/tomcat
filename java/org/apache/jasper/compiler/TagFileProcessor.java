@@ -129,11 +129,9 @@ class TagFileProcessor {
 
         private static final String TAG_DYNAMIC = "the dynamic-attributes attribute of the tag directive";
 
-        private HashMap<String,NameEntry> nameTable =
-            new HashMap<String,NameEntry>();
+        private HashMap<String,NameEntry> nameTable = new HashMap<>();
 
-        private HashMap<String,NameEntry> nameFromTable =
-            new HashMap<String,NameEntry>();
+        private HashMap<String,NameEntry> nameFromTable = new HashMap<>();
 
         public TagFileDirectiveVisitor(Compiler compiler,
                 TagLibraryInfo tagLibInfo, String name, String path) {
@@ -141,8 +139,8 @@ class TagFileProcessor {
             this.tagLibInfo = tagLibInfo;
             this.name = name;
             this.path = path;
-            attributeVector = new Vector<TagAttributeInfo>();
-            variableVector = new Vector<TagVariableInfo>();
+            attributeVector = new Vector<>();
+            variableVector = new Vector<>();
         }
 
         @Override
@@ -669,7 +667,7 @@ class TagFileProcessor {
     public void loadTagFiles(Compiler compiler, Node.Nodes page)
             throws JasperException {
 
-        tempVector = new Vector<Compiler>();
+        tempVector = new Vector<>();
         page.visit(new TagFileLoaderVisitor(compiler));
     }
 

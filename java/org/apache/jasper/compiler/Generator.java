@@ -357,7 +357,7 @@ class Generator {
             private final Vector<String> vars;
 
             ScriptingVarVisitor() {
-                vars = new Vector<String>();
+                vars = new Vector<>();
             }
 
             @Override
@@ -796,10 +796,9 @@ class Generator {
             this.methodsBuffered = methodsBuffered;
             this.fragmentHelperClass = fragmentHelperClass;
             methodNesting = 0;
-            handlerInfos =
-                new Hashtable<String,Hashtable<String,TagHandlerInfo>>();
-            tagVarNumbers = new Hashtable<String,Integer>();
-            textMap = new HashMap<String,String>();
+            handlerInfos = new Hashtable<>();
+            tagVarNumbers = new Hashtable<>();
+            textMap = new HashMap<>();
         }
 
         /**
@@ -1868,7 +1867,7 @@ class Generator {
 
             // Compute attribute value string for XML-style and named
             // attributes
-            Hashtable<String,String> map = new Hashtable<String,String>();
+            Hashtable<String,String> map = new Hashtable<>();
             Node.JspAttribute[] attrs = n.getJspAttributes();
             for (int i = 0; attrs != null && i < attrs.length; i++) {
                 String value = null;
@@ -1984,7 +1983,7 @@ class Generator {
                     charArrayBuffer = new GenBuffer();
                     caOut = charArrayBuffer.getOut();
                     caOut.pushIndent();
-                    textMap = new HashMap<String,String>();
+                    textMap = new HashMap<>();
                 } else {
                     caOut = charArrayBuffer.getOut();
                 }
@@ -2199,8 +2198,7 @@ class Generator {
             Hashtable<String,TagHandlerInfo> handlerInfosByShortName =
                 handlerInfos.get(n.getPrefix());
             if (handlerInfosByShortName == null) {
-                handlerInfosByShortName =
-                    new Hashtable<String,TagHandlerInfo>();
+                handlerInfosByShortName = new Hashtable<>();
                 handlerInfos.put(n.getPrefix(), handlerInfosByShortName);
             }
             TagHandlerInfo handlerInfo =
@@ -3418,7 +3416,7 @@ class Generator {
      */
     Generator(ServletWriter out, Compiler compiler) {
         this.out = out;
-        methodsBuffered = new ArrayList<GenBuffer>();
+        methodsBuffered = new ArrayList<>();
         charArrayBuffer = null;
         err = compiler.getErrorDispatcher();
         ctxt = compiler.getCompilationContext();
@@ -3443,7 +3441,7 @@ class Generator {
         varInfoNames = pageInfo.getVarInfoNames();
         breakAtLF = ctxt.getOptions().getMappedFile();
         if (isPoolingEnabled) {
-            tagHandlerPoolNames = new Vector<String>();
+            tagHandlerPoolNames = new Vector<>();
         } else {
             tagHandlerPoolNames = null;
         }
@@ -3937,8 +3935,8 @@ class Generator {
         TagHandlerInfo(Node n, Class<?> tagHandlerClass,
                 ErrorDispatcher err) throws JasperException {
             this.tagHandlerClass = tagHandlerClass;
-            this.methodMaps = new Hashtable<String, Method>();
-            this.propertyEditorMaps = new Hashtable<String, Class<?>>();
+            this.methodMaps = new Hashtable<>();
+            this.propertyEditorMaps = new Hashtable<>();
 
             try {
                 BeanInfo tagClassInfo = Introspector
@@ -4100,7 +4098,7 @@ class Generator {
         // True if the helper class should be generated.
         private boolean used = false;
 
-        private ArrayList<Fragment> fragments = new ArrayList<Fragment>();
+        private ArrayList<Fragment> fragments = new ArrayList<>();
 
         private String className;
 

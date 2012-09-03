@@ -128,7 +128,7 @@ class JspReader {
 
         this.context = ctxt;
         this.err = err;
-        sourceFiles = new Vector<String>();
+        sourceFiles = new Vector<>();
         currFileId = 0;
         singleFile = false;
         pushFile(fname, encoding, reader);

@@ -57,7 +57,7 @@ class ParserController implements TagConstants {
      * A stack to keep track of the 'current base directory'
      * for include directives that refer to relative paths.
      */
-    private Stack<String> baseDirStack = new Stack<String>();
+    private Stack<String> baseDirStack = new Stack<>();
 
     private boolean isEncodingSpecifiedInProlog;
     private boolean isBomPresent;

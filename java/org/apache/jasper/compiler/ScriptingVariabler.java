@@ -69,7 +69,7 @@ class ScriptingVariabler {
 
         public ScriptingVariableVisitor(ErrorDispatcher err) {
             this.err = err;
-            scriptVars = new HashMap<String,Integer>();
+            scriptVars = new HashMap<>();
         }
 
         @Override
@@ -89,7 +89,7 @@ class ScriptingVariabler {
                 return;
             }
 
-            List<Object> vec = new ArrayList<Object>();
+            List<Object> vec = new ArrayList<>();
 
             Integer ownRange = null;
             Node.CustomTag parent = n.getCustomTagParent();

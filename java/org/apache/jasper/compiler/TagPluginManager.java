@@ -88,7 +88,7 @@ public class TagPluginManager {
                          TAG_PLUGINS_ROOT_ELEM);
         }
 
-        tagPlugins = new HashMap<String, TagPlugin>();
+        tagPlugins = new HashMap<>();
         Iterator<TreeNode> pluginList = root.findChildren("tag-plugin");
         while (pluginList.hasNext()) {
             TreeNode pluginNode = pluginList.next();
@@ -151,7 +151,7 @@ public class TagPluginManager {
             curNodes = new Node.Nodes();
             n.setAtSTag(curNodes);
             n.setUseTagPlugin(true);
-            pluginAttributes = new HashMap<String, Object>();
+            pluginAttributes = new HashMap<>();
         }
 
         @Override

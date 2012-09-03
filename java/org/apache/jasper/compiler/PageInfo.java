@@ -103,17 +103,17 @@ class PageInfo {
 
         this.jspFile = jspFile;
         this.beanRepository = beanRepository;
-        this.varInfoNames = new HashSet<String>();
-        this.taglibsMap = new HashMap<String, TagLibraryInfo>();
-        this.jspPrefixMapper = new HashMap<String, String>();
-        this.xmlPrefixMapper = new HashMap<String, LinkedList<String>>();
-        this.nonCustomTagPrefixMap = new HashMap<String, Mark>();
-        this.imports = new Vector<String>();
-        this.dependants = new HashMap<String,Long>();
-        this.includePrelude = new Vector<String>();
-        this.includeCoda = new Vector<String>();
-        this.pluginDcls = new Vector<String>();
-        this.prefixes = new HashSet<String>();
+        this.varInfoNames = new HashSet<>();
+        this.taglibsMap = new HashMap<>();
+        this.jspPrefixMapper = new HashMap<>();
+        this.xmlPrefixMapper = new HashMap<>();
+        this.nonCustomTagPrefixMap = new HashMap<>();
+        this.imports = new Vector<>();
+        this.dependants = new HashMap<>();
+        this.includePrelude = new Vector<>();
+        this.includeCoda = new Vector<>();
+        this.pluginDcls = new Vector<>();
+        this.prefixes = new HashSet<>();
 
         // Enter standard imports
         imports.addAll(Constants.STANDARD_IMPORTS);
@@ -323,7 +323,7 @@ class PageInfo {
     public void pushPrefixMapping(String prefix, String uri) {
         LinkedList<String> stack = xmlPrefixMapper.get(prefix);
         if (stack == null) {
-            stack = new LinkedList<String>();
+            stack = new LinkedList<>();
             xmlPrefixMapper.put(prefix, stack);
         }
         stack.addFirst(uri);
