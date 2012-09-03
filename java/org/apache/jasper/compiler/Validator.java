@@ -652,6 +652,7 @@ class Validator {
             visitBody(n);
         }
 
+        @SuppressWarnings("null") // type can't be null after initial test
         @Override
         public void visit(Node.PlugIn n) throws JasperException {
             JspUtil.checkAttributes("Plugin", n, plugInAttrs, err);
@@ -803,6 +804,7 @@ class Validator {
             return false;
         }
 
+        @SuppressWarnings("null") // tagInfo can't be null after initial test
         @Override
         public void visit(Node.CustomTag n) throws JasperException {
 
@@ -1071,9 +1073,6 @@ class Validator {
                 throws JasperException {
 
             TagInfo tagInfo = n.getTagInfo();
-            if (tagInfo == null) {
-                err.jspError(n, "jsp.error.missing.tagInfo", n.getQName());
-            }
             TagAttributeInfo[] tldAttrs = tagInfo.getAttributes();
             Attributes attrs = n.getAttributes();
 
@@ -1279,9 +1278,6 @@ class Validator {
                 throws JasperException {
 
             TagInfo tagInfo = n.getTagInfo();
-            if (tagInfo == null) {
-                err.jspError(n, "jsp.error.missing.tagInfo", n.getQName());
-            }
             TagAttributeInfo[] tldAttrs = tagInfo.getAttributes();
             Node.Nodes naNodes = n.getNamedAttributeNodes();
 
@@ -1663,6 +1659,7 @@ class Validator {
                     this.fmapper = fmapper;
                 }
 
+                @SuppressWarnings("null") // c can't be null after catch block
                 @Override
                 public void visit(ELNode.Function n) throws JasperException {
 
@@ -1726,6 +1723,7 @@ class Validator {
                 err.jspError(n, "jsp.error.missing.tagInfo", n.getQName());
             }
 
+            @SuppressWarnings("null") // tagInfo can't be null here
             ValidationMessage[] errors = tagInfo.validate(n.getTagData());
             if (errors != null && errors.length != 0) {
                 StringBuilder errMsg = new StringBuilder();
