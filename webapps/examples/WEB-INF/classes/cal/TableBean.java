@@ -31,7 +31,7 @@ public class TableBean {
     boolean processError = false;
 
     public TableBean() {
-        this.table = new Hashtable<String, Entries>(10);
+        this.table = new Hashtable<>(10);
         this.JspCal = new JspCalendar();
         this.date = JspCal.getCurrentDate();
     }

@@ -117,7 +117,7 @@ public class CompressionFilter implements Filter {
 
             str = filterConfig.getInitParameter("compressionMimeTypes");
             if (str!=null) {
-                List<String> values = new ArrayList<String>();
+                List<String> values = new ArrayList<>();
                 StringTokenizer st = new StringTokenizer(str, ",");
 
                 while (st.hasMoreTokens()) {
