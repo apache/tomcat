@@ -69,7 +69,7 @@ public class Bug51582
       final Connection connection = pool.getConnection();
       final CallableStatement s = connection.prepareCall("{CALL SLEEP()}");
 
-      List<Thread> threadList = new ArrayList<Thread>();
+      List<Thread> threadList = new ArrayList<>();
 
       for (int l = 0; l < 3; l++)
       {

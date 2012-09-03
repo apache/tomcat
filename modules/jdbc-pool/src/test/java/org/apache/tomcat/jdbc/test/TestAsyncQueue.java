@@ -30,7 +30,7 @@ public class TestAsyncQueue extends TestCase {
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-        this.queue = new FairBlockingQueue<Object>();
+        this.queue = new FairBlockingQueue<>();
     }
 
     @Override

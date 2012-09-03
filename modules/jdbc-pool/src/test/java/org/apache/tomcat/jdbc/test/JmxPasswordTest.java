@@ -48,7 +48,7 @@ public class JmxPasswordTest extends DefaultTestCase{
         this.datasource.getConnection().close();
         MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
         String domain = "tomcat.jdbc";
-        Hashtable<String,String> properties = new Hashtable<String,String>();
+        Hashtable<String,String> properties = new Hashtable<>();
         properties.put("type", "ConnectionPool");
         properties.put("class", this.getClass().getName());
         oname = new ObjectName(domain,properties);
