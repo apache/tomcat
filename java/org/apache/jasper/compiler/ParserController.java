@@ -171,6 +171,7 @@ class ParserController implements TagConstants {
      * @param jarResource The JAR file from which to read the JSP page or tag file,
      * or null if the JSP page or tag file is to be read from the filesystem
      */
+    @SuppressWarnings("null") // jarResource can't be null
     private Node.Nodes doParse(String inFileName,
             Node parent,
             JarResource jarResource)

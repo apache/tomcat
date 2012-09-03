@@ -486,6 +486,7 @@ class TagFileProcessor {
      *            the TagLibraryInfo object associated with this TagInfo
      * @return a TagInfo object assembled from the directives in the tag file.
      */
+    @SuppressWarnings("null") // page can't be null
     public static TagInfo parseTagFileDirectives(ParserController pc,
             String name, String path, JarResource jarResource, TagLibraryInfo tagLibInfo)
             throws JasperException {
