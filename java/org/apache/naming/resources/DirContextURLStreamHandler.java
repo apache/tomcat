@@ -53,14 +53,14 @@ public class DirContextURLStreamHandler extends URLStreamHandler {
      * Bindings class loader - directory context. Keyed by CL id.
      */
     private static final Hashtable<ClassLoader,DirContext> clBindings =
-        new Hashtable<ClassLoader,DirContext>();
+            new Hashtable<>();
 
 
     /**
      * Bindings thread - directory context. Keyed by thread id.
      */
     private static final Hashtable<Thread,DirContext> threadBindings =
-        new Hashtable<Thread,DirContext>();
+            new Hashtable<>();
 
 
     // ----------------------------------------------------- Instance Variables

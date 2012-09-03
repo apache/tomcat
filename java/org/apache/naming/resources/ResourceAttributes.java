@@ -821,7 +821,7 @@ public class ResourceAttributes implements Attributes {
     @Override
     public NamingEnumeration<? extends Attribute> getAll() {
         if (attributes == null) {
-            Vector<BasicAttribute> attributes = new Vector<BasicAttribute>();
+            Vector<BasicAttribute> attributes = new Vector<>();
             Date creationDate = getCreationDate();
             if (creationDate != null) {
                 attributes.addElement(new BasicAttribute
@@ -856,7 +856,7 @@ public class ResourceAttributes implements Attributes {
                 attributes.addElement(new BasicAttribute(ETAG, etag));
                 attributes.addElement(new BasicAttribute(ALTERNATE_ETAG, etag));
             }
-            return new RecyclableNamingEnumeration<BasicAttribute>(attributes);
+            return new RecyclableNamingEnumeration<>(attributes);
         } else {
             return attributes.getAll();
         }
@@ -869,7 +869,7 @@ public class ResourceAttributes implements Attributes {
     @Override
     public NamingEnumeration<String> getIDs() {
         if (attributes == null) {
-            Vector<String> attributeIDs = new Vector<String>();
+            Vector<String> attributeIDs = new Vector<>();
             Date creationDate = getCreationDate();
             if (creationDate != null) {
                 attributeIDs.addElement(CREATION_DATE);
@@ -898,7 +898,7 @@ public class ResourceAttributes implements Attributes {
                 attributeIDs.addElement(ETAG);
                 attributeIDs.addElement(ALTERNATE_ETAG);
             }
-            return new RecyclableNamingEnumeration<String>(attributeIDs);
+            return new RecyclableNamingEnumeration<>(attributeIDs);
         } else {
             return attributes.getIDs();
         }

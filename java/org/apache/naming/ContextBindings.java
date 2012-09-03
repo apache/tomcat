@@ -44,35 +44,35 @@ public class ContextBindings {
      * Bindings name - naming context. Keyed by name.
      */
     private static final Hashtable<Object,Context> contextNameBindings =
-        new Hashtable<Object,Context>();
+            new Hashtable<>();
 
 
     /**
      * Bindings thread - naming context. Keyed by thread id.
      */
     private static final Hashtable<Thread,Context> threadBindings =
-        new Hashtable<Thread,Context>();
+            new Hashtable<>();
 
 
     /**
      * Bindings thread - name. Keyed by thread id.
      */
     private static final Hashtable<Thread,Object> threadNameBindings =
-        new Hashtable<Thread,Object>();
+            new Hashtable<>();
 
 
     /**
      * Bindings class loader - naming context. Keyed by CL id.
      */
     private static final Hashtable<ClassLoader,Context> clBindings =
-        new Hashtable<ClassLoader,Context>();
+            new Hashtable<>();
 
 
     /**
      * Bindings class loader - name. Keyed by CL id.
      */
     private static final Hashtable<ClassLoader,Object> clNameBindings =
-        new Hashtable<ClassLoader,Object>();
+            new Hashtable<>();
 
 
     /**

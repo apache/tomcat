@@ -97,7 +97,6 @@ public class ServiceProxy implements InvocationHandler {
      * @return Returns the correct Port
      * @throws ServiceException if port's QName is an unknown Port (not defined in WSDL).
      */
-    @SuppressWarnings("unchecked")
     private Object getProxyPortQNameClass(Object[] args)
     throws ServiceException {
         QName name = (QName) args[0];

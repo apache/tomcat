@@ -57,8 +57,7 @@ public class ResourceCache {
     /**
      * Not found cache.
      */
-    protected final HashMap<String,CacheEntry> notFoundCache =
-        new HashMap<String,CacheEntry>();
+    protected final HashMap<String,CacheEntry> notFoundCache = new HashMap<>();
 
 
     /**

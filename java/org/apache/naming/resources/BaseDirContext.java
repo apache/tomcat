@@ -70,7 +70,7 @@ public abstract class BaseDirContext implements DirContext {
      * Builds a base directory context.
      */
     public BaseDirContext() {
-        this.env = new Hashtable<String,Object>();
+        this.env = new Hashtable<>();
     }
 
 
@@ -130,8 +130,7 @@ public abstract class BaseDirContext implements DirContext {
     /**
      * Aliases allow content to be included from other locations.
      */
-    protected final Map<String,BaseDirContext> aliases =
-        new HashMap<String,BaseDirContext>();
+    protected final Map<String,BaseDirContext> aliases = new HashMap<>();
 
 
     /**
@@ -139,7 +138,7 @@ public abstract class BaseDirContext implements DirContext {
      * searched in the order they are added if the requested resource cannot be
      * found in the primary DirContext.
      */
-    protected final List<DirContext> altDirContexts = new ArrayList<DirContext>();
+    protected final List<DirContext> altDirContexts = new ArrayList<>();
 
 
     // ------------------------------------------------------------- Properties

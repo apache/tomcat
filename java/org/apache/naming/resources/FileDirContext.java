@@ -851,7 +851,7 @@ public class FileDirContext extends BaseDirContext {
      */
     protected List<NamingEntry> list(File file) {
 
-        List<NamingEntry> entries = new ArrayList<NamingEntry>();
+        List<NamingEntry> entries = new ArrayList<>();
         if (!file.isDirectory())
             return entries;
         String[] names = file.list();
