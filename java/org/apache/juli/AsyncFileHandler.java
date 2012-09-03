@@ -56,7 +56,7 @@ public class AsyncFileHandler extends FileHandler {
             System.getProperty("org.apache.juli.AsyncLoggerPollInterval","1000"));
 
     protected static final LinkedBlockingDeque<LogEntry> queue =
-            new LinkedBlockingDeque<LogEntry>(DEFAULT_MAX_RECORDS);
+            new LinkedBlockingDeque<>(DEFAULT_MAX_RECORDS);
 
     protected static final LoggerThread logger = new LoggerThread();
 

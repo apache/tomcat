@@ -79,14 +79,14 @@ public class ClassLoaderLogManager extends LogManager {
      * application redeployment.
      */
     protected final Map<ClassLoader, ClassLoaderLogInfo> classLoaderLoggers =
-        new WeakHashMap<ClassLoader, ClassLoaderLogInfo>();
+        new WeakHashMap<>();
 
 
     /**
      * This prefix is used to allow using prefixes for the properties names
      * of handlers and their subcomponents.
      */
-    protected final ThreadLocal<String> prefix = new ThreadLocal<String>();
+    protected final ThreadLocal<String> prefix = new ThreadLocal<>();
 
 
     /**
@@ -599,8 +599,7 @@ public class ClassLoaderLogManager extends LogManager {
     protected static final class LogNode {
         Logger logger;
 
-        protected final Map<String, LogNode> children =
-            new HashMap<String, LogNode>();
+        protected final Map<String, LogNode> children = new HashMap<>();
 
         protected final LogNode parent;
 
@@ -668,8 +667,8 @@ public class ClassLoaderLogManager extends LogManager {
 
     protected static final class ClassLoaderLogInfo {
         final LogNode rootNode;
-        final Map<String, Logger> loggers = new HashMap<String, Logger>();
-        final Map<String, Handler> handlers = new HashMap<String, Handler>();
+        final Map<String, Logger> loggers = new HashMap<>();
+        final Map<String, Handler> handlers = new HashMap<>();
         final Properties props = new Properties();
 
         ClassLoaderLogInfo(final LogNode rootNode) {
