@@ -532,14 +532,12 @@ class JspReader {
         int fileid = registerSourceFile(longName);
 
         if (fileid == -1) {
-            // Bugzilla 37407: http://issues.apache.org/bugzilla/show_bug.cgi?id=37407
-            if(reader != null) {
-                try {
-                    reader.close();
-                } catch (Exception any) {
-                    if(log.isDebugEnabled()) {
-                        log.debug("Exception closing reader: ", any);
-                    }
+            // http://issues.apache.org/bugzilla/show_bug.cgi?id=37407
+            try {
+                reader.close();
+            } catch (Exception any) {
+                if(log.isDebugEnabled()) {
+                    log.debug("Exception closing reader: ", any);
                 }
             }
 
