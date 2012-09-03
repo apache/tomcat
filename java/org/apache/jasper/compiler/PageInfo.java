@@ -337,9 +337,6 @@ class PageInfo {
      */
     public void popPrefixMapping(String prefix) {
         LinkedList<String> stack = xmlPrefixMapper.get(prefix);
-        if (stack == null || stack.size() == 0) {
-            // XXX throw new Exception("XXX");
-        }
         stack.removeFirst();
     }
 
@@ -465,6 +462,7 @@ class PageInfo {
                 }
             }
             try {
+                @SuppressWarnings("null") // value can't be null here
                 Integer k = new Integer(value.substring(0, value.length()-2));
                 buffer = k.intValue() * 1024;
             } catch (NumberFormatException e) {
