@@ -94,7 +94,7 @@ public class CompressionServletResponseWrapper
     /**
      * keeps a copy of all headers set
      */
-    private Map<String,String> headerCopies = new HashMap<String,String>();
+    private Map<String,String> headerCopies = new HashMap<>();
 
 
     // --------------------------------------------------------- Public Methods

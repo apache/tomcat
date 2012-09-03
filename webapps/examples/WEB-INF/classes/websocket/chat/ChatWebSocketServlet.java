@@ -43,7 +43,7 @@ public class ChatWebSocketServlet extends WebSocketServlet {
 
     private final AtomicInteger connectionIds = new AtomicInteger(0);
     private final Set<ChatMessageInbound> connections =
-            new CopyOnWriteArraySet<ChatMessageInbound>();
+            new CopyOnWriteArraySet<>();
 
     @Override
     protected StreamInbound createWebSocketInbound(String subProtocol,

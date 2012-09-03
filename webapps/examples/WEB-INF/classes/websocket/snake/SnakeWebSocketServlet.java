@@ -62,9 +62,9 @@ public class SnakeWebSocketServlet extends WebSocketServlet {
 
     private final AtomicInteger connectionIds = new AtomicInteger(0);
     private final ConcurrentHashMap<Integer, Snake> snakes =
-            new ConcurrentHashMap<Integer, Snake>();
+            new ConcurrentHashMap<>();
     private final ConcurrentHashMap<Integer, SnakeMessageInbound> connections =
-            new ConcurrentHashMap<Integer, SnakeMessageInbound>();
+            new ConcurrentHashMap<>();
 
     @Override
     public void init() throws ServletException {
