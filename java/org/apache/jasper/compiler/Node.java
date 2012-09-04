@@ -2170,7 +2170,7 @@ abstract class Node implements TagConstants {
             this.el = null;
             this.dynamic = dyn;
             this.namedAttribute = true;
-            this.tai = null;
+            this.tai = tai;
         }
 
         /**
