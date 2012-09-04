@@ -60,6 +60,10 @@
         Add one library from JDK 7 to the value of <code>jarsToSkip</code>
         property in the <code>catalina.properties</code> file. (kkolinko)
       </update>
+      <fix>
+        <bug>53828</bug>: Use correct status code when closing a WebSocket
+        connection normally in response to a close frame from a client. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">
