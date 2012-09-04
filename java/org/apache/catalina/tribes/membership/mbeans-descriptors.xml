@@ -116,7 +116,7 @@
       writeable="false"/>
     <attribute
       name="msgCount"
-      description="The number of messages send by this member"
+      description="The number of messages sent by this member"
       type="int"
       writeable="false"/>
     <attribute
@@ -181,7 +181,7 @@
       writeable="false"/>
     <attribute
       name="msgCount"
-      description="The number of messages send by this member"
+      description="The number of messages sent by this member"
       type="int"
       writeable="false"/>
     <attribute
