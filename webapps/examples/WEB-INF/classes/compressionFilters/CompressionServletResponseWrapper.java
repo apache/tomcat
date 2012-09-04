@@ -19,6 +19,7 @@ package compressionFilters;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -125,7 +126,8 @@ public class CompressionServletResponseWrapper
      */
     public void setCompressionMimeTypes(String[] mimeTypes) {
         if (debug > 1) {
-            System.out.println("setCompressionMimeTypes to " + mimeTypes);
+            System.out.println("setCompressionMimeTypes to " +
+                    Arrays.toString(mimeTypes));
         }
         this.compressionMimeTypes = mimeTypes;
     }
