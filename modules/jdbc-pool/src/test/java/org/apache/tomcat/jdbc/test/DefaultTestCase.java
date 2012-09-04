@@ -180,8 +180,16 @@ public class DefaultTestCase extends TestCase {
 
     @Override
     protected void tearDown() throws Exception {
-        try {datasource.close();}catch(Exception ignore){}
-        try {tDatasource.close();}catch(Exception ignore){}
+        try {
+            datasource.close();
+        } catch (Exception ignore){
+            // Ignore
+        }
+        try {
+            tDatasource.close();
+        } catch (Exception ignore){
+            // Ignore
+        }
         //try {((ComboPooledDataSource)c3p0Datasource).close(true);}catch(Exception ignore){}
         datasource = null;
         tDatasource = null;
