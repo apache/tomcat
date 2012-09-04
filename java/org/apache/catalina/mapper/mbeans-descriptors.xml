@@ -30,8 +30,6 @@
 
     <operation name="start" description="Start" impact="ACTION" returnType="void" />
     <operation name="stop" description="Stop" impact="ACTION" returnType="void" />
-    <operation name="pause" description="Start" impact="ACTION" returnType="void" />
-    <operation name="resume" description="Stop" impact="ACTION" returnType="void" />
     <operation name="init" description="Init" impact="ACTION" returnType="void" />
     <operation name="destroy" description="Destroy" impact="ACTION" returnType="void" />
 
