@@ -133,7 +133,11 @@ public class AlternateUsernameTest extends DefaultTestCase {
                     x.printStackTrace();
                 } finally {
                     if (pcon!=null) {
-                        try {pcon.close(); }catch (Exception ignore) {}
+                        try {
+                            pcon.close();
+                        } catch (Exception ignore) {
+                            // Ignore
+                        }
                         pcon = null;
                     }
                 }
