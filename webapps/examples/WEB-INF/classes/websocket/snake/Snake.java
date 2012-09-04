@@ -34,8 +34,8 @@ public class Snake {
     private Direction direction;
     private int length = DEFAULT_LENGTH;
     private Location head;
-    private Deque<Location> tail = new ArrayDeque<>();
-    private String hexColor;
+    private final Deque<Location> tail = new ArrayDeque<>();
+    private final String hexColor;
 
     public Snake(int id, WsOutbound outbound) {
         this.id = id;

@@ -32,7 +32,7 @@ public class FooTag extends ExampleTagBase {
 
     private static final long serialVersionUID = 1L;
 
-    private String atts[] = new String[3];
+    private final String atts[] = new String[3];
     int i = 0;
 
     private final void setAtt(int index, String value) {

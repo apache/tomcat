@@ -19,9 +19,9 @@
 package jsp2.examples;
 
 public class BookBean {
-    private String title;
-    private String author;
-    private String isbn;
+    private final String title;
+    private final String author;
+    private final String isbn;
 
     public BookBean( String title, String author, String isbn ) {
         this.title = title;
