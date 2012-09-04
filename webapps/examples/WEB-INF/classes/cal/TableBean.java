@@ -22,8 +22,8 @@ import javax.servlet.http.HttpServletRequest;
 
 public class TableBean {
 
-    Hashtable<String, Entries> table;
-    JspCalendar JspCal;
+    final Hashtable<String, Entries> table;
+    final JspCalendar JspCal;
     Entries entries;
     String date;
     String name = null;

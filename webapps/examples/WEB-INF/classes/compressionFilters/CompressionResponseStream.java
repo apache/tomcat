@@ -99,17 +99,17 @@ public class CompressionResponseStream extends ServletOutputStream {
      * The content length past which we will not write, or -1 if there is
      * no defined content length.
      */
-    protected int length = -1;
+    protected final int length = -1;
 
     /**
      * The response with which this servlet output stream is associated.
      */
-    protected CompressionServletResponseWrapper response = null;
+    protected final CompressionServletResponseWrapper response;
 
     /**
      * The underlying servlet output stream to which we should write data.
      */
-    protected ServletOutputStream output = null;
+    protected final ServletOutputStream output;
 
 
     // --------------------------------------------------------- Public Methods

@@ -49,7 +49,7 @@ public class CompressionFilter implements Filter {
     /**
      * Minimal reasonable threshold.
      */
-    private int minThreshold = 128;
+    private final int minThreshold = 128;
 
     /**
      * The threshold number to compress.
@@ -59,7 +59,7 @@ public class CompressionFilter implements Filter {
     /**
      * Minimal reasonable buffer.
      */
-    private int minBuffer = 8192;  // 8KB is what tomcat would use by default anyway
+    private final int minBuffer = 8192;  // 8KB is what tomcat would use by default anyway
 
     /**
      * The compression buffer size to avoid chunking.
