@@ -676,6 +676,9 @@ public class HostConfig
 
                 ContextName cn = new ContextName(files[i]);
 
+                if (isServiced(cn.getName()) || deploymentExists(cn.getName()))
+                    continue;
+
                 // Check for WARs with /../ /./ or similar sequences in the name
                 if (!validateContextPath(appBase, cn.getBaseName())) {
                     log.error(sm.getString(
@@ -683,9 +686,6 @@ public class HostConfig
                     invalidWars.add(files[i]);
                     continue;
                 }
-
-                if (isServiced(cn.getName()) || deploymentExists(cn.getName()))
-                    continue;
 
                 results.add(es.submit(new DeployWar(this, cn, war)));
             }
