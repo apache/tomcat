@@ -54,6 +54,14 @@
   issues to not "pop up" wrt. others).
 -->
 <section name="Tomcat 7.0.31 (markt)">
+  <subsection name="Catalina">
+    <changelog>
+      <update>
+        Add one library from JDK 7 to the value of <code>jarsToSkip</code>
+        property in the <code>catalina.properties</code> file. (kkolinko)
+      </update>
+    </changelog>
+  </subsection>
   <subsection name="Cluster">
     <changelog>
       <add>
