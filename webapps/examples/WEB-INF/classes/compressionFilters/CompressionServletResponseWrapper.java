@@ -56,7 +56,7 @@ public class CompressionServletResponseWrapper
     /**
      * Original response
      */
-    protected HttpServletResponse origResponse = null;
+    protected final HttpServletResponse origResponse;
 
     /**
      * The ServletOutputStream that has been returned by
@@ -94,7 +94,7 @@ public class CompressionServletResponseWrapper
     /**
      * keeps a copy of all headers set
      */
-    private Map<String,String> headerCopies = new HashMap<>();
+    private final Map<String,String> headerCopies = new HashMap<>();
 
 
     // --------------------------------------------------------- Public Methods
