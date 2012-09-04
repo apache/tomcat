@@ -18,6 +18,7 @@ package compressionFilters;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Arrays;
 import java.util.zip.GZIPOutputStream;
 
 import javax.servlet.ServletOutputStream;
@@ -149,7 +150,8 @@ public class CompressionResponseStream extends ServletOutputStream {
     public void setCompressionMimeTypes(String[] compressionMimeTypes) {
         this.compressionMimeTypes = compressionMimeTypes;
         if (debug > 1) {
-            System.out.println("compressionMimeTypes is set to " + this.compressionMimeTypes);
+            System.out.println("compressionMimeTypes is set to " +
+                    Arrays.toString(this.compressionMimeTypes));
         }
     }
 
