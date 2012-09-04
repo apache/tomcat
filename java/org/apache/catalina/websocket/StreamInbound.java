@@ -202,7 +202,7 @@ public abstract class StreamInbound implements UpgradeInbound {
         try {
             getWsOutbound().close(frame);
         } finally {
-            doOnClose(Constants.OPCODE_CLOSE);
+            doOnClose(Constants.STATUS_CLOSE_NORMAL);
         }
     }
 
