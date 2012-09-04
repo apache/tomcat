@@ -32,7 +32,7 @@ public class NumberGuessBean implements Serializable {
     private String hint;
     private int numGuesses;
     private boolean success;
-    private Random random = new Random();
+    private final Random random = new Random();
 
     public NumberGuessBean() {
         reset();

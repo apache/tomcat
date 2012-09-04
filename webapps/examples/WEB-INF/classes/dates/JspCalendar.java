@@ -20,7 +20,7 @@ import java.util.Calendar;
 import java.util.Date;
 
 public class JspCalendar {
-    Calendar  calendar = null;
+    final Calendar calendar;
 
     public JspCalendar() {
         calendar = Calendar.getInstance();
