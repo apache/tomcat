@@ -693,7 +693,7 @@
       <fix>
         <bug>53353</bug>: Make the internal HTTP header parser more tolerant of
         Content-Type values that contain invalid parameters by ignoring the
-        invalid parameters. (markt)
+        invalid parameters. It is a followup to bug <bug>52811</bug>. (markt)
       </fix>
       <fix>
         <bug>53354</bug>: Correctly handle <code>@WebFilter</code> annotations
@@ -957,6 +957,11 @@
       <fix>
         <bug>52792</bug>: Improve error message when a JNDI resource can not be
         found. (markt)
+      </fix>
+      <fix>
+        <bug>52811</bug>: Fix parsing of Content-Type header in
+        <code>HttpServletResponse.setContentType()</code>. Introduces
+        a new HTTP header parser that follows RFC2616. (markt/kkolinko)
       </fix>
       <fix>
         <bug>52830</bug>: Correct JNDI lookups when using
