@@ -64,6 +64,7 @@ public class TestRegistration extends TomcatBaseTest {
         return new String[] {
             "Tomcat:type=Engine",
             "Tomcat:type=Realm,realmPath=/realm0",
+            "Tomcat:type=Mapper",
             "Tomcat:type=MBeanFactory",
             "Tomcat:type=NamingResources",
             "Tomcat:type=Server",
@@ -115,8 +116,6 @@ public class TestRegistration extends TomcatBaseTest {
                 + ObjectName.quote(ADDRESS),
         "Tomcat:type=GlobalRequestProcessor,name="
                 + ObjectName.quote("http-" + type + "-" + ADDRESS + "-" + port),
-        "Tomcat:type=Mapper,port=" + port + ",address="
-                + ObjectName.quote(ADDRESS),
         "Tomcat:type=ProtocolHandler,port=" + port + ",address="
                 + ObjectName.quote(ADDRESS),
         "Tomcat:type=ThreadPool,name="
