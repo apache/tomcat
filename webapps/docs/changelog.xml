@@ -66,6 +66,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Jasper">
+    <changelog>
+      <scode>
+        <bug>53713</bug>: Performance improvement of up to four times faster
+        parsing of JSP pages. Patch provided by Sheldon Shao. (markt)
+      </scode>
+    </changelog>
+  </subsection>
   <subsection name="Cluster">
     <changelog>
       <add>
