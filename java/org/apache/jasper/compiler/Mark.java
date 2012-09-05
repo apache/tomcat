@@ -89,22 +89,37 @@ final class Mark {
      * Constructor
      */
     Mark(Mark other) {
+       init(other, false);
+    }
 
-        this.reader = other.reader;
-        this.ctxt = other.reader.getJspCompilationContext();
-        this.stream = other.stream;
-        this.fileId = other.fileId;
-        this.fileName = other.fileName;
+    void update(int cursor, int line, int col) {
+        this.cursor = cursor;
+        this.line = line;
+        this.col = col;
+    }
+
+    void init(Mark other, boolean singleFile) {
         this.cursor = other.cursor;
         this.line = other.line;
         this.col = other.col;
-        this.baseDir = other.baseDir;
-        this.encoding = other.encoding;
 
-        // clone includeStack without cloning contents
-        includeStack = new Stack<>();
-        for ( int i=0; i < other.includeStack.size(); i++ ) {
-            includeStack.addElement( other.includeStack.elementAt(i) );
+        if (!singleFile) {
+            this.reader = other.reader;
+            this.ctxt = other.ctxt;
+            this.stream = other.stream;
+            this.fileId = other.fileId;
+            this.fileName = other.fileName;
+            this.baseDir = other.baseDir;
+            this.encoding = other.encoding;
+
+            if (includeStack == null) {
+                includeStack = new Stack<>();
+            } else {
+                includeStack.clear();
+            }
+            for (int i = 0; i < other.includeStack.size(); i++ ) {
+                includeStack.addElement(other.includeStack.elementAt(i));
+            }
         }
     }
 

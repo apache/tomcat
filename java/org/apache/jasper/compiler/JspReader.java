@@ -187,6 +187,65 @@ class JspReader {
     }
 
     /**
+     * A faster approach than calling {@link #mark()} & {@link #nextChar()}.
+     * However, this approach is only safe if the mark is only used within the
+     * JspReader.
+     */
+    private int nextChar(Mark mark) throws JasperException {
+        if (!hasMoreInput()) {
+            return -1;
+        }
+
+        int ch = current.stream[current.cursor];
+
+        mark.init(current, singleFile);
+
+        current.cursor++;
+
+        if (ch == '\n') {
+            current.line++;
+            current.col = 0;
+        } else {
+            current.col++;
+        }
+        return ch;
+    }
+
+    /**
+     * Search the given character, If it was found, then mark the current cursor
+     * and the cursor point to next character.
+     */
+    private Boolean indexOf(char c, Mark mark) throws JasperException {
+        if (!hasMoreInput())
+            return null;
+
+        int end = current.stream.length;
+        int ch;
+        int line = current.line;
+        int col = current.col;
+        int i = current.cursor;
+        for(; i < end; i ++) {
+           ch = current.stream[i];
+
+           if (ch == c) {
+               mark.update(i, line, col);
+           }
+           if (ch == '\n') {
+                line++;
+                col = 0;
+            } else {
+                col++;
+            }
+           if (ch == c) {
+               current.update(i+1, line, col);
+               return Boolean.TRUE;
+           }
+        }
+        current.update(i, line, col);
+        return Boolean.FALSE;
+    }
+
+    /**
      * Back up the current cursor by one char, assumes current.cursor > 0,
      * and that the char to be pushed back is not '\n'.
      */
@@ -199,10 +258,11 @@ class JspReader {
         Mark oldstart = mark();
         reset(start);
         CharArrayWriter caw = new CharArrayWriter();
-        while (!stop.equals(mark()))
+        while (!markEquals(stop)) {
             caw.write(nextChar());
+        }
         caw.close();
-        reset(oldstart);
+        setCurrent(oldstart);
         return caw.toString();
     }
 
@@ -216,8 +276,24 @@ class JspReader {
         return new Mark(current);
     }
 
+
+    /**
+     * This method avoids a call to {@link #mark()} when doing comparison.
+     */
+    private boolean markEquals(Mark another) {
+       return another.equals(current);
+    }
+
     void reset(Mark mark) {
         current = new Mark(mark);
+    }
+
+    /**
+     * Similar to {@link #reset(Mark)} but no new Mark will be created.
+     * Therefore, the parameter mark must NOT be used in other places.
+     */
+    private void setCurrent(Mark mark) {
+       current = mark;
     }
 
     /**
@@ -228,17 +304,40 @@ class JspReader {
      *               false</strong> otherwise, position in stream unchanged.
      */
     boolean matches(String string) throws JasperException {
-        Mark mark = mark();
-        int ch = 0;
-        int i = 0;
-        do {
-            ch = nextChar();
-            if (((char) ch) != string.charAt(i++)) {
-                reset(mark);
-                return false;
-            }
-        } while (i < string.length());
-        return true;
+       int len = string.length();
+       int cursor = current.cursor;
+       int streamSize = current.stream.length;
+       if (cursor + len < streamSize) { //Try to scan in memory
+           int line = current.line;
+           int col = current.col;
+           int ch;
+           int i = 0;
+           for(; i < len; i ++) {
+               ch = current.stream[i+cursor];
+               if (string.charAt(i) != ch) {
+                   return false;
+               }
+               if (ch == '\n') {
+                  line ++;
+                  col = 0;
+               } else {
+                  col++;
+               }
+           }
+           current.update(i+cursor, line, col);
+       } else {
+           Mark mark = mark();
+           int ch = 0;
+           int i = 0;
+           do {
+               ch = nextChar();
+               if (((char) ch) != string.charAt(i++)) {
+                   setCurrent(mark);
+                   return false;
+               }
+           } while (i < len);
+       }
+       return true;
     }
 
     boolean matchesETag(String tagName) throws JasperException {
@@ -250,7 +349,7 @@ class JspReader {
         if (nextChar() == '>')
             return true;
 
-        reset(mark);
+        setCurrent(mark);
         return false;
     }
 
@@ -265,7 +364,7 @@ class JspReader {
        if (nextChar() == '>')
            return true;
 
-       reset(mark);
+       setCurrent(mark);
        return false;
     }
 
@@ -284,7 +383,7 @@ class JspReader {
         skipSpaces();
         boolean result = matches( s );
         if( !result ) {
-            reset( mark );
+            setCurrent(mark);
         }
 
         return result;
@@ -309,24 +408,29 @@ class JspReader {
      *         otherwise.
      */
     Mark skipUntil(String limit) throws JasperException {
-        Mark ret = null;
+        Mark ret = mark();
         int limlen = limit.length();
-        int ch;
+        char firstChar = limit.charAt(0);
+        Boolean result = null;
+        Mark restart = null;
 
     skip:
-        for (ret = mark(), ch = nextChar() ; ch != -1 ;
-                 ret = mark(), ch = nextChar()) {
-            if (ch == limit.charAt(0)) {
-                Mark restart = mark();
-                for (int i = 1 ; i < limlen ; i++) {
-                    if (peekChar() == limit.charAt(i))
-                        nextChar();
-                    else {
-                        reset(restart);
-                        continue skip;
-                    }
-                }
-                return ret;
+        while((result = indexOf(firstChar, ret)) != null) {
+           if (result.booleanValue()) {
+               if (restart != null) {
+                   restart.init(current, singleFile);
+               } else {
+                   restart = mark();
+               }
+               for (int i = 1 ; i < limlen ; i++) {
+                   if (peekChar() == limit.charAt(i)) {
+                       nextChar();
+                   } else {
+                       setCurrent(restart);
+                       continue skip;
+                   }
+               }
+               return ret;
             }
         }
         return null;
@@ -343,18 +447,16 @@ class JspReader {
      *         otherwise.
      */
     Mark skipUntilIgnoreEsc(String limit) throws JasperException {
-        Mark ret = null;
+        Mark ret = mark();
         int limlen = limit.length();
         int ch;
         int prev = 'x';        // Doesn't matter
-
+        char firstChar = limit.charAt(0);
     skip:
-        for (ret = mark(), ch = nextChar() ; ch != -1 ;
-                 ret = mark(), prev = ch, ch = nextChar()) {
+        for (ch = nextChar(ret) ; ch != -1 ; prev = ch, ch = nextChar(ret)) {
             if (ch == '\\' && prev == '\\') {
                 ch = 0;                // Double \ is not an escape char anymore
-            }
-            else if (ch == limit.charAt(0) && prev != '\\') {
+            } else if (ch == firstChar && prev != '\\') {
                 for (int i = 1 ; i < limlen ; i++) {
                     if (peekChar() == limit.charAt(i))
                         nextChar();
@@ -471,10 +573,10 @@ class JspReader {
                 Mark mark = mark();
                 if (((ch = nextChar()) == '>')
                         || ((ch == '-') && (nextChar() == '>'))) {
-                    reset(mark);
+                    setCurrent(mark);
                     return true;
                 } else {
-                    reset(mark);
+                    setCurrent(mark);
                     return false;
                 }
             }
