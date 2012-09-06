@@ -1344,7 +1344,98 @@ http://webserver/manager/jmxproxy/?invoke=BEANNAME&amp;op=METHODNAME&amp;ps=COMM
 http://localhost:8080/manager/jmxproxy/?invoke=Catalina%3Atype%3DService&amp;op=findConnectors&amp;ps=
 </source>
   </subsection>
-
+  <subsection name="Multiple operations" anchor="multiOp">
+    <p>
+      The JMXProxyServlet can also perform certain combinations of
+      operations with a single HTTP request:
+    </p>
+    <ul>
+      <li><code>invoke</code> and <code>set</code></li>
+      <li><code>invoke</code> and <code>get</code></li>
+      <li><code>get</code> and <code>invoke</code></li>
+      <li><code>get</code> and <code>set</code></li>
+    </ul>
+  <subsection name="Invoke and set" anchor="invokeAndSet">
+    <p>
+      If you want to invoke an operation and then set a value, add an
+      <code>invokeAndSet</code> parameter to the request and make sure you
+      have all the required parameters for both the <code>invoke</code>
+      and <code>set</code> commands:
+    </p>
+    <source>
+http://webserver/manager/jmxproxy/?invokeAndSet&amp;invoke=BEANNAME&amp;op=METHODNAME&amp;ps=COMMASEPARATEDPARAMETERS&amp;set=BEANNAME&amp;att=MYATTRIBUTE&amp;val=NEWVALUE
+    </source>
+    <p>
+      Note that you can use different target MBeans if you want to, because
+      the <code>invoke</code> and <code>set</code> parameters can obviously
+      have different values. 
+    </p>
+  </subsection>
+  <subsection name="Invoke and get" anchor="invokeAndGet">
+    <p>
+      If you want to invoke an operation and then get a value, add an
+      <code>invokeAndGet</code> parameter to the request and make sure you
+      have all the required parameters for both the <code>invoke</code>
+      and <code>get</code> commands:
+    </p>
+    <source>
+http://webserver/manager/jmxproxy/?invokeAndGet&amp;invoke=BEANNAME&amp;op=METHODNAME&amp;ps=COMMASEPARATEDPARAMETERS&amp;get=BEANNAME&amp;att=MYATTRIBUTE[&amp;key=MYKEY (optional)]
+    </source>
+    <p>
+      Note that you can use different target MBeans if you want to, because
+      the <code>invoke</code> and <code>get</code> parameters can obviously
+      have different values. 
+    </p>
+  </subsection>
+  <subsection name="Get and invoke" anchor="getAndInvoke">
+    <p>
+      If you want to get a value and then invoke an operation, add a
+      <code>getAndInvoke</code> parameter to the request and make sure you
+      have all the required parameters for both the <code>invoke</code>
+      and <code>get</code> commands:
+    </p>
+    <source>
+http://webserver/manager/jmxproxy/?getAndInvoke&amp;invoke=BEANNAME&amp;op=METHODNAME&amp;ps=COMMASEPARATEDPARAMETERS&amp;get=BEANNAME&amp;att=MYATTRIBUTE[&amp;key=MYKEY (optional)]
+    </source>
+    <p>
+      Here is an example of how to get the current value of a request
+      processor's "maxTime" metric and then reset all the metrics counters:
+    </p>
+    <source>
+http://webserver/manager/jmxproxy?getAndInvoke&amp;invoke=Catalina:type=GlobalRequestProcessor,name="http-nio-127.0.0.1-8080"&amp;op=resetCounters&amp;get=Catalina:type=GlobalRequestProcessor,name="http-nio-127.0.0.1-8080"&amp;att=maxTime
+    </source>
+    <p>
+      Note that you can use different target MBeans if you want to, because
+      the <code>invoke</code> and <code>get</code> parameters can obviously
+      have different values. 
+    </p>
+  </subsection>
+  <subsection name="Get and set" anchor="getAndSet">
+    <p>
+      If you want to get a value and then set a value, add a
+      <code>getAndSet</code> parameter to the request and make sure you
+      have all the required parameters for both the <code>get</code>
+      and <code>set</code> commands:
+    </p>
+    <source>
+http://webserver/manager/jmxproxy/?getAndSet&amp;get=BEANNAME&amp;att=MYATTRIBUTE[&amp;key=MYKEY (optional)]&amp;set=BEANNAME&amp;val=NEWVALUE
+    </source>
+    <p>
+      Here is an example of how to get the current value of a request
+      processor's "maxTime" metric and then set that value to 0:
+    </p>
+    <source>
+http://webserver/manager/jmxproxy?getAndSet&amp;get=Catalina:type=GlobalRequestProcessor,name="http-nio-127.0.0.1-8080"&amp;att=maxTime&amp;set=Catalina:type=GlobalRequestProcessor,name="http-nio-127.0.0.1-8080"&amp;val=0
+    </source>
+    <p>
+      Note that you can use different target MBeans if you want to, because
+      the <code>invoke</code> and <code>get</code> parameters can obviously
+      have different values, <b>but you must use the same attribtue name for
+      both</b> because both the <code>get</code> and <code>set</code> commands
+      both use the <code>att</code> parameter to identify the MBean attribute.
+    </p>
+  </subsection>
+  </subsection>
 </section>
 
 
