@@ -93,33 +93,98 @@ public class JMXProxyServlet extends HttpServlet  {
             return;
         }
 
-        String qry=request.getParameter("set");
-        if( qry!= null ) {
-            String name=request.getParameter("att");
-            String val=request.getParameter("val");
+        // Invoke an operation, then execute a "get"
+        if(null != request.getParameter("invokeAndGet")) {
+            try {
+                invokeOperationInternal(request.getParameter("invoke"),
+                                        request.getParameter("op"),
+                                        getInvokeParameters(request.getParameter("ps")));
 
-            setAttribute( writer, qry, name, val );
-            return;
+                getAttribute(writer,
+                             request.getParameter("get"),
+                             request.getParameter("att"),
+                             request.getParameter("key"));
+            } catch (Exception e) {
+                writer.println("Error - " + e.toString());
+                e.printStackTrace(writer);
+            }
         }
-        qry=request.getParameter("get");
-        if( qry!= null ) {
-            String name=request.getParameter("att");
-            getAttribute( writer, qry, name, request.getParameter("key") );
-            return;
-        }
-        qry = request.getParameter("invoke");
-        if(qry != null) {
-            String opName=request.getParameter("op");
-            String[] params = getInvokeParameters(request.getParameter("ps"));
-            invokeOperation(writer, qry, opName, params);
-            return;
-        }
-        qry=request.getParameter("qry");
-        if( qry == null ) {
-            qry = "*:*";
-        }
+        // Get a value first, then invoke an operation
+        else if(null != request.getParameter("getAndInvoke")) {
+            try {
+                getAttribute(writer,
+                             request.getParameter("get"),
+                             request.getParameter("att"),
+                             request.getParameter("key"));
 
-        listBeans( writer, qry );
+                invokeOperationInternal(request.getParameter("invoke"),
+                                        request.getParameter("op"),
+                                        getInvokeParameters(request.getParameter("ps")));
+            } catch (Exception e) {
+                writer.println("Error - " + e.toString());
+                e.printStackTrace(writer);
+            }
+        }
+        // Invoke an operation, then set a value
+        else if(null != request.getParameter("invokeAndSet")) {
+            try {
+                invokeOperationInternal(request.getParameter("invoke"),
+                                        request.getParameter("op"),
+                                        getInvokeParameters(request.getParameter("ps")));
+
+                setAttribute(writer,
+                             request.getParameter("set"),
+                             request.getParameter("att"),
+                             request.getParameter("val"));
+            } catch (Exception e) {
+                writer.println("Error - " + e.toString());
+                e.printStackTrace(writer);
+            }
+        }
+        // Get a value, then set its value
+        else if(null != request.getParameter("getAndSet")) {
+            try {
+                getAttribute(writer,
+                             request.getParameter("get"),
+                             request.getParameter("att"),
+                             request.getParameter("key"));
+
+                setAttributeInternal(request.getParameter("set"),
+                                     request.getParameter("att"),
+                                     request.getParameter("val"));
+            } catch (Exception e) {
+                writer.println("Error - " + e.toString());
+                e.printStackTrace(writer);
+            }
+        } else {
+            String qry=request.getParameter("set");
+            if( qry!= null ) {
+                String name=request.getParameter("att");
+                String val=request.getParameter("val");
+
+                setAttribute( writer, qry, name, val );
+                return;
+            }
+            qry=request.getParameter("get");
+            if( qry!= null ) {
+                String name=request.getParameter("att");
+                getAttribute( writer, qry, name, request.getParameter("key") );
+                return;
+            }
+            qry = request.getParameter("invoke");
+            if(qry != null) {
+                String opName=request.getParameter("op");
+                String[] params = getInvokeParameters(request.getParameter("ps"));
+                invokeOperation(writer, qry, opName, params);
+                return;
+            }
+            qry=request.getParameter("qry");
+            if( qry == null ) {
+                qry = "*:*";
+            }
+
+            listBeans( writer, qry );
+        }
     }
 
     public void getAttribute(PrintWriter writer, String onameStr, String att, String key) {
