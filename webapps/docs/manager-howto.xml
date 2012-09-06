@@ -1368,7 +1368,7 @@ http://webserver/manager/jmxproxy/?invokeAndSet&amp;invoke=BEANNAME&amp;op=METHO
     <p>
       Note that you can use different target MBeans if you want to, because
       the <code>invoke</code> and <code>set</code> parameters can obviously
-      have different values. 
+      have different values.
     </p>
   </subsection>
   <subsection name="Invoke and get" anchor="invokeAndGet">
@@ -1384,7 +1384,7 @@ http://webserver/manager/jmxproxy/?invokeAndGet&amp;invoke=BEANNAME&amp;op=METHO
     <p>
       Note that you can use different target MBeans if you want to, because
       the <code>invoke</code> and <code>get</code> parameters can obviously
-      have different values. 
+      have different values.
     </p>
   </subsection>
   <subsection name="Get and invoke" anchor="getAndInvoke">
@@ -1407,7 +1407,7 @@ http://webserver/manager/jmxproxy?getAndInvoke&amp;invoke=Catalina:type=GlobalRe
     <p>
       Note that you can use different target MBeans if you want to, because
       the <code>invoke</code> and <code>get</code> parameters can obviously
-      have different values. 
+      have different values.
     </p>
   </subsection>
   <subsection name="Get and set" anchor="getAndSet">
