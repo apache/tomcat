@@ -60,6 +60,11 @@
         Add one library from JDK 7 to the value of <code>jarsToSkip</code>
         property in the <code>catalina.properties</code> file. (kkolinko)
       </update>
+      <add>
+        <bug>52777</bug>: Add an option to automatically remove old, unused
+        versions (ones where there are no longer any active sessions) of
+        applications deployed using parallel deployment. (markt)
+      </add>
       <fix>
         <bug>53828</bug>: Use correct status code when closing a WebSocket
         connection normally in response to a close frame from a client. (markt)
