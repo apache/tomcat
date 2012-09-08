@@ -82,6 +82,9 @@
   <li>If session information is present in the request but no matching session
   can be found, use the latest version.</li>
   </ul>
+  <p>The <a href="host.html">Host</a> may be configured (via the
+  <code>undeployOldVersions</code>) to remove old versions deployed in this way
+  once they are no longer in use.</p>
   </subsection>
 
   <subsection name="Naming">
