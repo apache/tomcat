@@ -56,7 +56,7 @@ public class StandardJarScanner implements JarScanner {
 
     private static final Log log = LogFactory.getLog(StandardJarScanner.class);
 
-    private static final Set<String> defaultJarsToSkip = new HashSet<String>();
+    private static final Set<String> defaultJarsToSkip = new HashSet<>();
 
     /**
      * The string resources for this package.
@@ -135,7 +135,7 @@ public class StandardJarScanner implements JarScanner {
         } else {
             ignoredJars = jarsToSkip;
         }
-        Set<String[]> ignoredJarsTokens = new HashSet<String[]>();
+        Set<String[]> ignoredJarsTokens = new HashSet<>();
         for (String pattern: ignoredJars) {
             ignoredJarsTokens.add(Matcher.tokenizePathAsArray(pattern));
         }
