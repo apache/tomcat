@@ -162,31 +162,31 @@ public class StandardHost extends ContainerBase implements Host {
     /**
      * Should we create directories upon startup for appBase and xmlBase
      */
-     private boolean createDirs = true;
+    private boolean createDirs = true;
 
 
-     /**
-      * Track the class loaders for the child web applications so memory leaks
-      * can be detected.
-      */
-     private final Map<ClassLoader, String> childClassLoaders =
-             new WeakHashMap<>();
+    /**
+     * Track the class loaders for the child web applications so memory leaks
+     * can be detected.
+     */
+    private final Map<ClassLoader, String> childClassLoaders =
+            new WeakHashMap<>();
 
 
-     /**
-      * Any file or directory in {@link #appBase} that this pattern matches will
-      * be ignored by the automatic deployment process (both
-      * {@link #deployOnStartup} and {@link #autoDeploy}).
-      */
-     private Pattern deployIgnore = null;
+    /**
+     * Any file or directory in {@link #appBase} that this pattern matches will
+     * be ignored by the automatic deployment process (both
+     * {@link #deployOnStartup} and {@link #autoDeploy}).
+     */
+    private Pattern deployIgnore = null;
 
 
     // ------------------------------------------------------------- Properties
 
-     @Override
-     public ExecutorService getStartStopExecutor() {
-         return startStopExecutor;
-     }
+    @Override
+    public ExecutorService getStartStopExecutor() {
+        return startStopExecutor;
+    }
 
 
     /**
