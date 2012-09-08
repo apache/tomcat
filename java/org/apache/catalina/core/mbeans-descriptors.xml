@@ -1181,6 +1181,10 @@
                type="java.lang.String"
                writeable="false"/>
 
+    <attribute name="undeployOldVersions"
+               description="Determines if old versions of applications deployed using parallel deployment are automatically undeployed when no longer used. Requires autoDeploy to be enabled."
+               type="boolean"/>
+
     <attribute name="unpackWARs"
                description="Unpack WARs property"
                is="true"

@@ -27,11 +27,14 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
@@ -48,6 +51,7 @@ import org.apache.catalina.Host;
 import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleEvent;
 import org.apache.catalina.LifecycleListener;
+import org.apache.catalina.Manager;
 import org.apache.catalina.core.StandardHost;
 import org.apache.catalina.util.ContextName;
 import org.apache.catalina.util.IOTools;
@@ -1163,43 +1167,7 @@ public class HostConfig
                 if ((!resource.isDirectory()) &&
                         resource.lastModified() > lastModified) {
                     // Undeploy application
-                    if (log.isInfoEnabled())
-                        log.info(sm.getString("hostConfig.undeploy", app.name));
-                    Container context = host.findChild(app.name);
-                    try {
-                        host.removeChild(context);
-                    } catch (Throwable t) {
-                        ExceptionUtils.handleThrowable(t);
-                        log.warn(sm.getString
-                                 ("hostConfig.context.remove", app.name), t);
-                    }
-                    // Delete other redeploy resources
-                    for (int j = i + 1; j < resources.length; j++) {
-                        try {
-                            File current = new File(resources[j]);
-                            current = current.getCanonicalFile();
-                            // Never delete per host context.xml defaults
-                            if (Constants.HostContextXml.equals(
-                                    current.getName())) {
-                                continue;
-                            }
-                            // Only delete resources in the appBase or the
-                            // host's configBase
-                            if ((current.getAbsolutePath().startsWith(
-                                    host.getAppBaseFile().getAbsolutePath() +
-                                    File.separator))
-                                    || (current.getAbsolutePath().startsWith(
-                                            host.getConfigBaseFile().getAbsolutePath()))) {
-                                if (log.isDebugEnabled())
-                                    log.debug("Delete " + current);
-                                ExpandWar.delete(current);
-                            }
-                        } catch (IOException e) {
-                            log.warn(sm.getString
-                                    ("hostConfig.canonicalizing", app.name), e);
-                        }
-                    }
-                    deployed.remove(app.name);
+                    deleteRedeployResources(app, resources, i, false);
                     return;
                 }
             } else {
@@ -1220,71 +1188,7 @@ public class HostConfig
                     continue;
                 }
                 // Undeploy application
-                if (log.isInfoEnabled())
-                    log.info(sm.getString("hostConfig.undeploy", app.name));
-                Container context = host.findChild(app.name);
-                try {
-                    host.removeChild(context);
-                } catch (Throwable t) {
-                    ExceptionUtils.handleThrowable(t);
-                    log.warn(sm.getString
-                             ("hostConfig.context.remove", app.name), t);
-                }
-                // Delete all redeploy resources
-                for (int j = i + 1; j < resources.length; j++) {
-                    try {
-                        File current = new File(resources[j]);
-                        current = current.getCanonicalFile();
-                        // Never delete per host context.xml defaults
-                        if (Constants.HostContextXml.equals(
-                                current.getName())) {
-                            continue;
-                        }
-                        // Only delete resources in the appBase or the host's
-                        // configBase
-                        if ((current.getAbsolutePath().startsWith(
-                                host.getAppBaseFile().getAbsolutePath() + File.separator))
-                            || (current.getAbsolutePath().startsWith(
-                                    host.getConfigBaseFile().getAbsolutePath()))) {
-                            if (log.isDebugEnabled())
-                                log.debug("Delete " + current);
-                            ExpandWar.delete(current);
-                        }
-                    } catch (IOException e) {
-                        log.warn(sm.getString
-                                ("hostConfig.canonicalizing", app.name), e);
-                    }
-                }
-                // Delete reload resources as well (to remove any remaining .xml
-                // descriptor)
-                String[] resources2 =
-                    app.reloadResources.keySet().toArray(new String[0]);
-                for (int j = 0; j < resources2.length; j++) {
-                    try {
-                        File current = new File(resources2[j]);
-                        current = current.getCanonicalFile();
-                        // Never delete per host context.xml defaults
-                        if (Constants.HostContextXml.equals(
-                                current.getName())) {
-                            continue;
-                        }
-                        // Only delete resources in the appBase or the host's
-                        // configBase
-                        if ((current.getAbsolutePath().startsWith(
-                                host.getAppBaseFile().getAbsolutePath() + File.separator))
-                            || ((current.getAbsolutePath().startsWith(
-                                    host.getConfigBaseFile().getAbsolutePath())
-                                 && (current.getAbsolutePath().endsWith(".xml"))))) {
-                            if (log.isDebugEnabled())
-                                log.debug("Delete " + current);
-                            ExpandWar.delete(current);
-                        }
-                    } catch (IOException e) {
-                        log.warn(sm.getString
-                                ("hostConfig.canonicalizing", app.name), e);
-                    }
-                }
-                deployed.remove(app.name);
+                deleteRedeployResources(app, resources, i, true);
                 return;
             }
         }
@@ -1324,6 +1228,81 @@ public class HostConfig
         }
     }
 
+
+    private void deleteRedeployResources(DeployedApplication app,
+            String[] resources, int i, boolean deleteReloadResources) {
+
+        // Delete redeploy resources
+        if (log.isInfoEnabled())
+            log.info(sm.getString("hostConfig.undeploy", app.name));
+        Container context = host.findChild(app.name);
+        try {
+            host.removeChild(context);
+        } catch (Throwable t) {
+            ExceptionUtils.handleThrowable(t);
+            log.warn(sm.getString
+                     ("hostConfig.context.remove", app.name), t);
+        }
+        // Delete other redeploy resources
+        for (int j = i + 1; j < resources.length; j++) {
+            try {
+                File current = new File(resources[j]);
+                current = current.getCanonicalFile();
+                // Never delete per host context.xml defaults
+                if (Constants.HostContextXml.equals(
+                        current.getName())) {
+                    continue;
+                }
+                // Only delete resources in the appBase or the
+                // host's configBase
+                if ((current.getAbsolutePath().startsWith(
+                        host.getAppBaseFile().getAbsolutePath() +
+                        File.separator))
+                        || (current.getAbsolutePath().startsWith(
+                                host.getConfigBaseFile().getAbsolutePath()))) {
+                    if (log.isDebugEnabled())
+                        log.debug("Delete " + current);
+                    ExpandWar.delete(current);
+                }
+            } catch (IOException e) {
+                log.warn(sm.getString
+                        ("hostConfig.canonicalizing", app.name), e);
+            }
+        }
+
+        // Delete reload resources (to remove any remaining .xml descriptor)
+        if (deleteReloadResources) {
+            String[] resources2 =
+                    app.reloadResources.keySet().toArray(new String[0]);
+            for (int j = 0; j < resources2.length; j++) {
+                try {
+                    File current = new File(resources2[j]);
+                    current = current.getCanonicalFile();
+                    // Never delete per host context.xml defaults
+                    if (Constants.HostContextXml.equals(
+                            current.getName())) {
+                        continue;
+                    }
+                    // Only delete resources in the appBase or the host's
+                    // configBase
+                    if ((current.getAbsolutePath().startsWith(
+                            host.getAppBaseFile().getAbsolutePath() + File.separator))
+                        || ((current.getAbsolutePath().startsWith(
+                                host.getConfigBaseFile().getAbsolutePath())
+                             && (current.getAbsolutePath().endsWith(".xml"))))) {
+                        if (log.isDebugEnabled())
+                            log.debug("Delete " + current);
+                        ExpandWar.delete(current);
+                    }
+                } catch (IOException e) {
+                    log.warn(sm.getString
+                            ("hostConfig.canonicalizing", app.name), e);
+                }
+            }
+
+        }
+        deployed.remove(app.name);
+    }
 
     /**
      * Process a "start" event for this Host.
@@ -1397,10 +1376,15 @@ public class HostConfig
                 if (!isServiced(apps[i].name))
                     checkResources(apps[i]);
             }
+
+            // Check for old versions of applications that can now be undeployed
+            if (host.getUndeployOldVersions()) {
+                checkUndeploy();
+            }
+
             // Hotdeploy applications
             deployApps();
         }
-
     }
 
 
@@ -1414,6 +1398,52 @@ public class HostConfig
         } else {
             deployApps(name);
         }
+    }
+
+    /**
+     * Check for old versions of applications using parallel deployment that are
+     * now unused (have no active sessions) and undeploy any that are found.
+     */
+    public void checkUndeploy() {
+        // Need ordered set of names
+        SortedSet<String> sortedAppNames = new TreeSet<>();
+        sortedAppNames.addAll(deployed.keySet());
+
+        if (sortedAppNames.size() < 2) {
+            return;
+        }
+        Iterator<String> iter = sortedAppNames.iterator();
+
+        ContextName previous = new ContextName(iter.next());
+        do {
+            ContextName current = new ContextName(iter.next());
+
+            if (current.getPath().equals(previous.getPath())) {
+                // Current and previous are same version - current will always
+                // be a later version
+                Context context = (Context) host.findChild(previous.getName());
+                if (context != null) {
+                    Manager manager = context.getManager();
+                    if (manager != null && manager.getActiveSessions() == 0) {
+                        if (log.isInfoEnabled()) {
+                            log.info(sm.getString("hostConfig.undeployVersion",
+                                    previous.getName()));
+                        }
+                        DeployedApplication app =
+                                deployed.get(previous.getName());
+                        String[] resources =
+                                app.redeployResources.keySet().toArray(
+                                        new String[0]);
+                        // Version is unused - undeploy it completely
+                        // The -1 is a 'trick' to ensure all redeploy resources
+                        // are removed
+                        deleteRedeployResources(app, resources, -1,
+                                true);
+                    }
+                }
+            }
+            previous = current;
+        } while (iter.hasNext());
     }
 
     /**

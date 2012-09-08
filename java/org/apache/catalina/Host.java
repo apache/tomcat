@@ -210,6 +210,22 @@ public interface Host extends Container {
     public void setCreateDirs(boolean createDirs);
 
 
+    /**
+     * Returns true of the Host is configured to automatically undeploy old
+     * versions of applications deployed using parallel deployment. This only
+     * takes effect is {@link #getAutoDeploy()} also returns true.
+     */
+    public boolean getUndeployOldVersions();
+
+
+    /**
+     * Set to true if the Host should automatically undeploy old versions of
+     * applications deployed using parallel deployment. This only takes effect
+     * if {@link #getAutoDeploy()} returns true.
+     */
+    public void setUndeployOldVersions(boolean undeployOldVersions);
+
+
     // --------------------------------------------------------- Public Methods
 
     /**

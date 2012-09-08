@@ -109,6 +109,12 @@
                  type="java.lang.String"/>
     </operation>
 
+    <operation name="checkUndeploy"
+               description="Undeploy any old versions of applications deployed using parallel deployment that have no active sessions"
+               impact="ACTION"
+               returnType="void">
+    </operation>
+
     <operation name="getDeploymentTime"
                description="Get the instant where an application was deployed"
                impact="ACTION"

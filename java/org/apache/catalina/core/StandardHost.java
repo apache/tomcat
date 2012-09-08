@@ -181,7 +181,22 @@ public class StandardHost extends ContainerBase implements Host {
     private Pattern deployIgnore = null;
 
 
+    private boolean undeployOldVersions = false;
+
+
     // ------------------------------------------------------------- Properties
+
+    @Override
+    public boolean getUndeployOldVersions() {
+        return undeployOldVersions;
+    }
+
+
+    @Override
+    public void setUndeployOldVersions(boolean undeployOldVersions) {
+        this.undeployOldVersions = undeployOldVersions;
+    }
+
 
     @Override
     public ExecutorService getStartStopExecutor() {
