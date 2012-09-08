@@ -236,6 +236,8 @@ the host and port appropriately for your installation.</p>
     application, specify "/".  <strong>NOTE</strong> -
     It is not possible to perform administrative commands on the
     Manager application itself.</li>
+<li><strong>version</strong> - The version of this web application as used by
+    the parallel deployment feature,</li>
 <li><strong>war</strong> - URL of a web application archive (WAR) file,
     pathname of a directory which contains the web application, or a
     Context configuration ".xml" file.  You can use URLs in any of the
@@ -298,8 +300,8 @@ including a Context configuration XML file in
 <li><code>update</code>: When set to true, any existing update will be
     undeployed first. The default value is set to false.</li>
 <li><code>tag</code>: Specifying a tag name, this allows associating the
-    deployed webapp with a version number. The application version can
-    be later redeployed when needed using only the tag.</li>
+    deployed webapp with a tag or label. If the web application is undeployed,
+    it can be later redeployed when needed using only the tag.</li>
 </ul>
 
 <p><strong>NOTE</strong> - This command is the logical
@@ -344,9 +346,9 @@ This command is the logical opposite of the <code>/undeploy</code> command.</p>
 
 <p>There are a number of different ways the deploy command can be used.</p>
 
-<h3>Deploy a version of a previously deployed webapp</h3>
+<h3>Deploy a previously deployed webapp</h3>
 
-<p>This can be used to deploy a previous version of a web application, which
+<p>This can be used to deploy a previously deployed web application, which
 has been deployed using the <code>tag</code> attribute. Note that the work
 directory for the Manager webapp will contain the previously deployed WARs;
 removing it would make the deployment fail.</p>
