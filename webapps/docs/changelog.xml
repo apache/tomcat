@@ -93,6 +93,15 @@
       </add>
     </changelog>
   </subsection>
+  <subsection name="Web applications">
+    <changelog>
+      <add>
+        Improve the documentation web application to clarify the difference
+        between the tag and version parameters when using text interface of the
+        Manager web application. (markt)
+      </add>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 7.0.30 (markt)" rtext="released 2012-09-06">
   <subsection name="Catalina">
