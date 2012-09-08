@@ -1367,4 +1367,90 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         }
     }
 
+    @Test
+    public void testBug53843() throws Exception {
+        // Setup Tomcat instance
+        Tomcat tomcat = getTomcatInstance();
+
+        // Must have a real docBase - just use temp
+        File docBase = new File(System.getProperty("java.io.tmpdir"));
+
+        Context ctx = tomcat.addContext("", docBase.getAbsolutePath());
+        Bug53843ServletA servletA = new Bug53843ServletA();
+        Wrapper a = Tomcat.addServlet(ctx, "ServletA", servletA);
+        a.setAsyncSupported(true);
+        Tomcat.addServlet(ctx, "ServletB", new Bug53843ServletB());
+
+        ctx.addServletMapping("/ServletA", "ServletA");
+        ctx.addServletMapping("/ServletB", "ServletB");
+
+        tomcat.start();
+
+        StringBuilder url = new StringBuilder(48);
+        url.append("http://localhost:");
+        url.append(getPort());
+        url.append("/ServletA");
+
+        ByteChunk body = new ByteChunk();
+        int rc = getUrl(url.toString(), body, null);
+
+        assertEquals(HttpServletResponse.SC_OK, rc);
+        assertEquals("OK", body.toString());
+        assertTrue(servletA.isAsyncWhenExpected());
+    }
+
+    private static class Bug53843ServletA extends HttpServlet {
+
+        private static final long serialVersionUID = 1L;
+
+        private boolean isAsyncWhenExpected = true;
+
+        @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+                throws ServletException, IOException {
+
+            // Should not be async at this point
+            isAsyncWhenExpected = isAsyncWhenExpected && !req.isAsyncStarted();
+
+            final AsyncContext async = req.startAsync();
+
+            // Should be async at this point
+            isAsyncWhenExpected = isAsyncWhenExpected && req.isAsyncStarted();
+
+            async.start(new Runnable() {
+
+                @Override
+                public void run() {
+                    // This should be delayed until the original container
+                    // thread exists
+                    async.dispatch("/ServletB");
+                }
+            });
+
+            try {
+                Thread.sleep(3000);
+            } catch (InterruptedException e) {
+                throw new ServletException(e);
+            }
+
+            // Should be async at this point
+            isAsyncWhenExpected = isAsyncWhenExpected && req.isAsyncStarted();
+        }
+
+        public boolean isAsyncWhenExpected() {
+            return isAsyncWhenExpected;
+        }
+    }
+
+    private static class Bug53843ServletB extends HttpServlet {
+
+        private static final long serialVersionUID = 1L;
+
+        @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+                throws ServletException, IOException {
+            resp.setContentType("text/plain");
+            resp.getWriter().print("OK");
+        }
+    }
 }

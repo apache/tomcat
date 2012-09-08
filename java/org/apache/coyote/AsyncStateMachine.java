@@ -101,10 +101,10 @@ public class AsyncStateMachine<S> {
         DISPATCHED(false, false, false),
         STARTING(true, true, false),
         STARTED(true, true, false),
-        MUST_COMPLETE(true, false, false),
+        MUST_COMPLETE(true, true, false),
         COMPLETING(true, false, false),
         TIMING_OUT(true, false, false),
-        MUST_DISPATCH(true, false, true),
+        MUST_DISPATCH(true, true, true),
         DISPATCHING(true, false, true),
         READ_WRITE_OP(true,true,false),
         ERROR(true,false,false);
