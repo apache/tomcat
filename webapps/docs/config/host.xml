@@ -201,6 +201,14 @@
         not specified, the default value of 1 will be used.</p>
       </attribute>
 
+      <attribute name="undeployOldVersions" required="false">
+        <p>This flag determines if Tomcat, as part of the auto deployment
+        process, will check for old, unused versions of web applications
+        deployed using parallel deployment and, if any are found, remove them.
+        This flag only applies if <code>autoDeploy</code> is true. If not
+        specified the default value of false will be used.</p>
+      </attribute>
+
     </attributes>
 
   </subsection>
