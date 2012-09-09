@@ -58,7 +58,7 @@ public class LogConfigurationException extends RuntimeException {
      * @param cause The underlying cause
      */
     public LogConfigurationException(Throwable cause) {
-        this( ((cause == null) ? null : cause.toString()), cause);
+        super(cause);
     }
 
 
