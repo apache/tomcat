@@ -1404,7 +1404,7 @@ public class HostConfig
      * Check for old versions of applications using parallel deployment that are
      * now unused (have no active sessions) and undeploy any that are found.
      */
-    public void checkUndeploy() {
+    public synchronized void checkUndeploy() {
         // Need ordered set of names
         SortedSet<String> sortedAppNames = new TreeSet<>();
         sortedAppNames.addAll(deployed.keySet());
@@ -1419,11 +1419,16 @@ public class HostConfig
             ContextName current = new ContextName(iter.next());
 
             if (current.getPath().equals(previous.getPath())) {
-                // Current and previous are same version - current will always
+                // Current and previous are same path - current will always
                 // be a later version
-                Context context = (Context) host.findChild(previous.getName());
-                if (context != null) {
-                    Manager manager = context.getManager();
+                Context previousContext =
+                        (Context) host.findChild(previous.getName());
+                Context currentContext =
+                        (Context) host.findChild(previous.getName());
+                if (previousContext != null && currentContext != null &&
+                        currentContext.getState().isAvailable() &&
+                        !isServiced(previous.getName())) {
+                    Manager manager = previousContext.getManager();
                     if (manager != null && manager.getActiveSessions() == 0) {
                         if (log.isInfoEnabled()) {
                             log.info(sm.getString("hostConfig.undeployVersion",
