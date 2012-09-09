@@ -70,7 +70,16 @@ public class NamingContext implements Context {
      */
     public NamingContext(Hashtable<String,Object> env, String name)
         throws NamingException {
-        this.bindings = new HashMap<>();
+        this(env, name, new HashMap<String,NamingEntry>());
+    }
+
+
+    /**
+     * Builds a naming context using the given environment.
+     */
+    public NamingContext(Hashtable<String,Object> env, String name,
+            HashMap<String,NamingEntry> bindings) throws NamingException {
+
         this.env = new Hashtable<>();
         // FIXME ? Could be put in the environment ?
         this.name = name;
@@ -82,16 +91,6 @@ public class NamingContext implements Context {
                 addToEnvironment(entryName, env.get(entryName));
             }
         }
-    }
-
-
-    /**
-     * Builds a naming context using the given environment.
-     */
-    public NamingContext(Hashtable<String,Object> env, String name,
-            HashMap<String,NamingEntry> bindings)
-        throws NamingException {
-        this(env, name);
         this.bindings = bindings;
     }
 
@@ -114,7 +113,7 @@ public class NamingContext implements Context {
     /**
      * Bindings in this Context.
      */
-    protected HashMap<String,NamingEntry> bindings;
+    protected final HashMap<String,NamingEntry> bindings;
 
 
     /**
