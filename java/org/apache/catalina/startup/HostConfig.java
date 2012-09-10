@@ -47,6 +47,7 @@ import javax.management.ObjectName;
 
 import org.apache.catalina.Container;
 import org.apache.catalina.Context;
+import org.apache.catalina.DistributedManager;
 import org.apache.catalina.Host;
 import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleEvent;
@@ -1429,21 +1430,31 @@ public class HostConfig
                         currentContext.getState().isAvailable() &&
                         !isServiced(previous.getName())) {
                     Manager manager = previousContext.getManager();
-                    if (manager != null && manager.getActiveSessions() == 0) {
-                        if (log.isInfoEnabled()) {
-                            log.info(sm.getString("hostConfig.undeployVersion",
-                                    previous.getName()));
+                    if (manager != null) {
+                        int sessionCount;
+                        if (manager instanceof DistributedManager) {
+                            sessionCount = ((DistributedManager)
+                                    manager).getActiveSessionsFull();
+                        } else {
+                            sessionCount = manager.getActiveSessions();
                         }
-                        DeployedApplication app =
-                                deployed.get(previous.getName());
-                        String[] resources =
-                                app.redeployResources.keySet().toArray(
-                                        new String[0]);
-                        // Version is unused - undeploy it completely
-                        // The -1 is a 'trick' to ensure all redeploy resources
-                        // are removed
-                        deleteRedeployResources(app, resources, -1,
-                                true);
+                        if (sessionCount == 0) {
+                            if (log.isInfoEnabled()) {
+                                log.info(sm.getString(
+                                        "hostConfig.undeployVersion",
+                                        previous.getName()));
+                            }
+                            DeployedApplication app =
+                                    deployed.get(previous.getName());
+                            String[] resources =
+                                    app.redeployResources.keySet().toArray(
+                                            new String[0]);
+                            // Version is unused - undeploy it completely
+                            // The -1 is a 'trick' to ensure all redeploy
+                            // resources are removed
+                            deleteRedeployResources(app, resources, -1,
+                                    true);
+                        }
                     }
                 }
             }
