@@ -44,8 +44,8 @@
       <param-name>debug</param-name>
       <param-value>2</param-value>
     </init-param>
-    <!-- Uncomment this to show proxy sessions from the Backup manager in the
-         sessions list for an application
+    <!-- Uncomment this to show proxy sessions from the Backup manager or a
+         StoreManager in the sessions list for an application
     <init-param>
       <param-name>showProxySessions</param-name>
       <param-value>true</param-value>

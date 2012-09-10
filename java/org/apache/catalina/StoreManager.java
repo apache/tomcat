@@ -20,7 +20,7 @@ package org.apache.catalina;
  * PersistentManager would have been a better name but that would have clashed
  * with the implementation name.
  */
-public interface StoreManager {
+public interface StoreManager extends DistributedManager {
 
     /**
      * Return the Store object which manages persistent Session
