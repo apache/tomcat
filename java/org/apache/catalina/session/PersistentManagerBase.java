@@ -23,8 +23,11 @@ import java.security.AccessController;
 import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
+import org.apache.catalina.DistributedManager;
 import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.LifecycleState;
@@ -47,7 +50,8 @@ import org.apache.juli.logging.LogFactory;
  * @version $Id$
  */
 
-public abstract class PersistentManagerBase extends ManagerBase {
+public abstract class PersistentManagerBase extends ManagerBase
+        implements DistributedManager {
 
     private static final Log log = LogFactory.getLog(PersistentManagerBase.class);
 
@@ -646,8 +650,40 @@ public abstract class PersistentManagerBase extends ManagerBase {
     }
 
 
-    // ------------------------------------------------------ Protected Methods
+    @Override
+    public int getActiveSessionsFull() {
+        // In memory session count
+        int result = getActiveSessions();
+        try {
+            // Store session count
+            result += getStore().getSize();
+        } catch (IOException ioe) {
+            log.warn(sm.getString("persistentManager.storeSizeException"));
+        }
+        return result;
+    }
 
+
+    @Override
+    public Set<String> getSessionIdsFull() {
+        Set<String> sessionIds = new HashSet<String>();
+        // In memory session ID list
+        sessionIds.addAll(sessions.keySet());
+        // Store session ID list
+        String[] storeKeys;
+        try {
+            storeKeys = getStore().keys();
+            for (String storeKey : storeKeys) {
+                sessionIds.add(storeKey);
+            }
+        } catch (IOException e) {
+            log.warn(sm.getString("persistentManager.storeKeysException"));
+        }
+        return sessionIds;
+    }
+
+
+    // ------------------------------------------------------ Protected Methods
 
     /**
      * Look for a session in the Store and, if found, restore

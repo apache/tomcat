@@ -105,6 +105,12 @@
         between the tag and version parameters when using text interface of the
         Manager web application. (markt)
       </add>
+      <add>
+        Make sessions saved in the <code>Store</code> associated with a
+        <code>Manager</code> that extends <code>PersistentManager</code>
+        optionally visible (via the showProxySessions Servlet initialisation
+        parameter in web.xml) to the Manager web application. (markt) 
+      </add>
     </changelog>
   </subsection>
 </section>

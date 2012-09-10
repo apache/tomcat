@@ -21,11 +21,17 @@ import java.util.Set;
 
 /**
  * Interface implemented by session managers that do not keep a complete copy
- * of all sessions on the local node but do know where every session is. The
- * BackupManager is an example of such a Manager. Sessions can be primary
- * (master copy on this node), backup (backup copy on this node) or proxy (only
- * the session ID on this node). The identity of the primary and backup nodes
- * are known for all sessions, including proxy sessions.
+ * of all sessions in memory but do know where every session is. The
+ * BackupManager is an example of such a Manager as are implementations of the
+ * StoreManager interface.
+ * <p>
+ * With the BackupManager, sessions can be primary (master copy on this node),
+ * backup (backup copy on this node) or proxy (only the session ID on this
+ * node). The identity of the primary and backup nodes are known for all
+ * sessions, including proxy sessions.
+ * <p>
+ * With StoreManager implementations, sessions can be primary (session is in
+ * memory) or proxy (session is in the Store).
  */
 public interface DistributedManager {
 
