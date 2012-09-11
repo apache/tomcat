@@ -363,7 +363,7 @@ public class AprSocket implements Runnable {
 
      */
 
-    public void close() throws IOException {
+    public void close() {
         synchronized (this) {
             if ((status & CLOSED) != 0 || socket == 0) {
                 return;
@@ -442,11 +442,7 @@ public class AprSocket implements Runnable {
      */
     public void reset() {
         setStatus(ERROR);
-        try {
-            close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        close();
     }
 
 

@@ -114,11 +114,8 @@ public class SpdyProxyProtocol extends AbstractProtocol {
         @Override
         public SocketState process(SocketWrapper<Socket> socket,
                 SocketStatus status) {
-            try {
-                spdyContext.getNetSupport().onAccept(socket.getSocket());
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+
+            spdyContext.getNetSupport().onAccept(socket.getSocket());
             return SocketState.CLOSED;
         }
 

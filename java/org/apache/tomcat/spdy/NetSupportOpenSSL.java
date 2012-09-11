@@ -48,7 +48,7 @@ public class NetSupportOpenSSL extends SpdyContext.NetSupport {
     @Override
     public boolean isSpdy(Object socketW) {
         byte[] proto = new byte[32];
-        int len = SSLExt.getNPN((Long) socketW, proto);
+        int len = SSLExt.getNPN(((Long) socketW).longValue(), proto);
         return len == 6; // todo: check spdy/2
     }
 
@@ -75,11 +75,11 @@ public class NetSupportOpenSSL extends SpdyContext.NetSupport {
     }
 
     @Override
-    public void onAccept(Object socket) throws IOException {
-        onAcceptLong((Long) socket);
+    public void onAccept(Object socket) {
+        onAcceptLong(((Long) socket).longValue());
     }
 
-    public void onAcceptLong(long socket) throws IOException {
+    public void onAcceptLong(long socket) {
         SpdyConnectionAprSocket spdy = new SpdyConnectionAprSocket(ctx);
         AprSocket s = con.socket(socket);
         spdy.setSocket(s);
@@ -98,7 +98,7 @@ public class NetSupportOpenSSL extends SpdyContext.NetSupport {
     public void listen(final int port, String cert, String key) throws IOException {
         con = new AprSocketContext() {
             @Override
-            protected void onSocket(AprSocket s) throws IOException {
+            protected void onSocket(AprSocket s) {
                 SpdyConnectionAprSocket spdy = new SpdyConnectionAprSocket(ctx);
                 spdy.setSocket(s);
 

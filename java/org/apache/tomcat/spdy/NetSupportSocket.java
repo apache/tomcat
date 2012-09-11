@@ -29,10 +29,6 @@ import javax.net.ssl.SSLSocket;
 public class NetSupportSocket extends SpdyContext.NetSupport {
 
     @Override
-    public void onCreateEngine(Object engine) {
-    }
-
-    @Override
     public boolean isSpdy(Object socketW) {
         return false;
     }
