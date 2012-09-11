@@ -243,9 +243,6 @@ public class ManagedConcurrentWeakHashMap<K, V> extends AbstractMap<K, V> implem
                         return new Map.Entry<K, V>() {
                             private final Map.Entry<Key, V> en = it.next();
 
-                            // Warning suppressed, because Key stored in the map
-                            // always wraps a K
-                            @SuppressWarnings("unchecked")
                             @Override
                             public K getKey() {
                                 return (K) en.getKey().get();
