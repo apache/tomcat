@@ -1433,7 +1433,7 @@ public class NioEndpoint extends AbstractEndpoint {
                         cancelledKey(key, SocketStatus.ERROR);//TODO this is not yet being used
                     } else if (ka.getCometNotify() ) {
                         ka.setCometNotify(false);
-                        int ops = ka.interestOps() & ~OP_CALLBACK;;
+                        int ops = ka.interestOps() & ~OP_CALLBACK;
                         reg(key,ka,0);//avoid multiple calls, this gets re-registered after invocation
                         ka.interestOps(ops);
                         if (!processSocket(ka.getChannel(), SocketStatus.OPEN_READ, true)) processSocket(ka.getChannel(), SocketStatus.DISCONNECT, true);
