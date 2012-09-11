@@ -53,8 +53,7 @@ public class RulesBase implements Rules {
      * Each value is a List containing the Rules for that pattern, in the
      * order that they were originally registered.
      */
-    protected HashMap<String,List<Rule>> cache =
-        new HashMap<String,List<Rule>>();
+    protected HashMap<String,List<Rule>> cache = new HashMap<>();
 
 
     /**
@@ -75,7 +74,7 @@ public class RulesBase implements Rules {
      * The set of registered Rule instances, in the order that they were
      * originally registered.
      */
-    protected ArrayList<Rule> rules = new ArrayList<Rule>();
+    protected ArrayList<Rule> rules = new ArrayList<>();
 
 
     // ------------------------------------------------------------- Properties
@@ -159,7 +158,7 @@ public class RulesBase implements Rules {
 
         List<Rule> list = cache.get(pattern);
         if (list == null) {
-            list = new ArrayList<Rule>();
+            list = new ArrayList<>();
             cache.put(pattern, list);
         }
         list.add(rule);
@@ -221,7 +220,7 @@ public class RulesBase implements Rules {
             }
         }
         if (rulesList == null) {
-            rulesList = new ArrayList<Rule>();
+            rulesList = new ArrayList<>();
         }
         return (rulesList);
 
@@ -267,7 +266,7 @@ public class RulesBase implements Rules {
         }
 
         // Select only Rules that match on the specified namespace URI
-        ArrayList<Rule> results = new ArrayList<Rule>();
+        ArrayList<Rule> results = new ArrayList<>();
         Iterator<Rule> items = list.iterator();
         while (items.hasNext()) {
             Rule item = items.next();

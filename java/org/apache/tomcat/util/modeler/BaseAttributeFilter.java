@@ -65,7 +65,7 @@ public class BaseAttributeFilter implements NotificationFilter {
      * The set of attribute names that are accepted by this filter.  If this
      * list is empty, all attribute names are accepted.
      */
-    private HashSet<String> names = new HashSet<String>();
+    private HashSet<String> names = new HashSet<>();
 
 
     // --------------------------------------------------------- Public Methods

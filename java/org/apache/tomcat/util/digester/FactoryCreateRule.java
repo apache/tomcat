@@ -262,7 +262,7 @@ public class FactoryCreateRule extends Rule {
         if (ignoreCreateExceptions) {
 
             if (exceptionIgnoredStack == null) {
-                exceptionIgnoredStack = new ArrayStack<Boolean>();
+                exceptionIgnoredStack = new ArrayStack<>();
             }
 
             try {

@@ -48,7 +48,7 @@ public class FileCleaningTracker {
     /**
      * Collection of <code>Tracker</code> instances in existence.
      */
-    final Collection<Tracker> trackers = new Vector<Tracker>();  // synchronized
+    final Collection<Tracker> trackers = new Vector<>();  // synchronized
     /**
      * Whether to terminate the thread when the tracking is complete.
      */

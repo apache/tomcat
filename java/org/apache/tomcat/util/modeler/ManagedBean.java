@@ -61,11 +61,9 @@ public class ManagedBean implements java.io.Serializable {
      */
     transient MBeanInfo info = null;
 
-    private Map<String,AttributeInfo> attributes =
-        new HashMap<String,AttributeInfo>();
+    private Map<String,AttributeInfo> attributes = new HashMap<>();
 
-    private Map<String,OperationInfo> operations =
-        new HashMap<String,OperationInfo>();
+    private Map<String,OperationInfo> operations = new HashMap<>();
 
     protected String className = BASE_MBEAN;
     protected String description = null;

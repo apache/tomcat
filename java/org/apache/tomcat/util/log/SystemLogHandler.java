@@ -59,14 +59,13 @@ public class SystemLogHandler extends PrintStream {
     /**
      * Thread <-> CaptureLog associations.
      */
-    protected static ThreadLocal<Stack<CaptureLog>> logs =
-        new ThreadLocal<Stack<CaptureLog>>();
+    protected static ThreadLocal<Stack<CaptureLog>> logs = new ThreadLocal<>();
 
 
     /**
      * Spare CaptureLog ready for reuse.
      */
-    protected static Stack<CaptureLog> reuse = new Stack<CaptureLog>();
+    protected static Stack<CaptureLog> reuse = new Stack<>();
 
 
     // --------------------------------------------------------- Public Methods
@@ -88,7 +87,7 @@ public class SystemLogHandler extends PrintStream {
         }
         Stack<CaptureLog> stack = logs.get();
         if (stack == null) {
-            stack = new Stack<CaptureLog>();
+            stack = new Stack<>();
             logs.set(stack);
         }
         stack.push(log);

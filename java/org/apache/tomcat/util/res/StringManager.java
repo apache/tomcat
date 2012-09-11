@@ -165,7 +165,7 @@ public class StringManager {
     // --------------------------------------------------------------
 
     private static final Map<String, Map<Locale,StringManager>> managers =
-        new Hashtable<String, Map<Locale,StringManager>>();
+            new Hashtable<>();
 
     /**
      * Get the StringManager for a particular package. If a manager for
@@ -192,7 +192,7 @@ public class StringManager {
 
         Map<Locale,StringManager> map = managers.get(packageName);
         if (map == null) {
-            map = new Hashtable<Locale, StringManager>();
+            map = new Hashtable<>();
             managers.put(packageName, map);
         }
 

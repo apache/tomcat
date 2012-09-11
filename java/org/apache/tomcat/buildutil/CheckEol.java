@@ -44,7 +44,7 @@ public class CheckEol extends Task {
     private static final String eoln = System.getProperty("line.separator");
 
     /** The files to be checked */
-    private final List<FileSet> filesets = new LinkedList<FileSet>();
+    private final List<FileSet> filesets = new LinkedList<>();
 
     /**
      * Sets the files to be checked
@@ -77,7 +77,7 @@ public class CheckEol extends Task {
 
         int count = 0;
 
-        List<CheckFailure> errors = new ArrayList<CheckFailure>();
+        List<CheckFailure> errors = new ArrayList<>();
 
         // Step through each file and check.
         for (FileSet fs : filesets) {

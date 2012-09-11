@@ -203,7 +203,8 @@ public class NioBlockingSelector {
     protected static class BlockPoller extends Thread {
         protected volatile boolean run = true;
         protected Selector selector = null;
-        protected ConcurrentLinkedQueue<Runnable> events = new ConcurrentLinkedQueue<Runnable>();
+        protected ConcurrentLinkedQueue<Runnable> events =
+                new ConcurrentLinkedQueue<>();
         public void disable() { run = false; selector.wakeup();}
         protected AtomicInteger wakeupCounter = new AtomicInteger(0);
         public void cancelKey(final SelectionKey key) {

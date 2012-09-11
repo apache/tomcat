@@ -50,7 +50,7 @@ public class SpdyStream implements Runnable {
     /**
      * For blocking support.
      */
-    protected BlockingQueue<SpdyFrame> inData = new LinkedBlockingQueue<SpdyFrame>();
+    protected BlockingQueue<SpdyFrame> inData = new LinkedBlockingQueue<>();
 
     protected boolean finSent;
 

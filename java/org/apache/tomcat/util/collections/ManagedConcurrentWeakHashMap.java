@@ -37,8 +37,8 @@ import java.util.concurrent.ConcurrentMap;
 public class ManagedConcurrentWeakHashMap<K, V> extends AbstractMap<K, V> implements
         ConcurrentMap<K, V> {
 
-    private final ConcurrentMap<Key, V> map = new ConcurrentHashMap<Key, V>();
-    private final ReferenceQueue<Object> queue = new ReferenceQueue<Object>();
+    private final ConcurrentMap<Key, V> map = new ConcurrentHashMap<>();
+    private final ReferenceQueue<Object> queue = new ReferenceQueue<>();
 
     /**
      * Method, that has to be invoked periodically to clean dead keys from the

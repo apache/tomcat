@@ -53,9 +53,9 @@ public class WithDefaultsRulesWrapper implements Rules {
     /** The Rules implementation that this class wraps. */
     private Rules wrappedRules;
     /** Rules to be fired when the wrapped implementations returns none. */
-    private List<Rule> defaultRules = new ArrayList<Rule>();
+    private List<Rule> defaultRules = new ArrayList<>();
     /** All rules (preserves order in which they were originally added) */
-    private List<Rule> allRules = new ArrayList<Rule>();
+    private List<Rule> allRules = new ArrayList<>();
 
     // --------------------------------------------------------- Constructor
 
@@ -120,7 +120,7 @@ public class WithDefaultsRulesWrapper implements Rules {
         List<Rule> matches = wrappedRules.match(namespaceURI, pattern);
         if (matches ==  null || matches.isEmpty()) {
             // a little bit of defensive programming
-            return new ArrayList<Rule>(defaultRules);
+            return new ArrayList<>(defaultRules);
         }
         // otherwise
         return matches;

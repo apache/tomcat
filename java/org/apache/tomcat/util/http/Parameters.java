@@ -50,7 +50,7 @@ public final class Parameters {
         StringManager.getManager("org.apache.tomcat.util.http");
 
     private final HashMap<String,ArrayList<String>> paramHashValues =
-        new HashMap<String,ArrayList<String>>();
+            new HashMap<>();
     private boolean didQueryParameters=false;
 
     MessageBytes queryMB;
@@ -195,7 +195,7 @@ public final class Parameters {
 
         ArrayList<String> values = paramHashValues.get(key);
         if (values == null) {
-            values = new ArrayList<String>(1);
+            values = new ArrayList<>(1);
             paramHashValues.put(key, values);
         }
         values.add(value);

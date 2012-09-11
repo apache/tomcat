@@ -42,7 +42,7 @@ public class MbeansDescriptorsIntrospectionSource extends ModelerSource
 
     private Registry registry;
     private String type;
-    private final List<ObjectName> mbeans = new ArrayList<ObjectName>();
+    private final List<ObjectName> mbeans = new ArrayList<>();
 
     public void setRegistry(Registry reg) {
         this.registry=reg;
@@ -90,7 +90,7 @@ public class MbeansDescriptorsIntrospectionSource extends ModelerSource
     // ------------ Implementation for non-declared introspection classes
 
     private static final Hashtable<String,String> specialMethods =
-        new Hashtable<String,String>();
+            new Hashtable<>();
     static {
         specialMethods.put( "preDeregister", "");
         specialMethods.put( "postDeregister", "");
@@ -285,13 +285,13 @@ public class MbeansDescriptorsIntrospectionSource extends ModelerSource
 
         Method methods[]=null;
 
-        Hashtable<String,Method> attMap = new Hashtable<String,Method>();
+        Hashtable<String,Method> attMap = new Hashtable<>();
         // key: attribute val: getter method
-        Hashtable<String,Method> getAttMap = new Hashtable<String,Method>();
+        Hashtable<String,Method> getAttMap = new Hashtable<>();
         // key: attribute val: setter method
-        Hashtable<String,Method> setAttMap = new Hashtable<String,Method>();
+        Hashtable<String,Method> setAttMap = new Hashtable<>();
         // key: operation val: invoke method
-        Hashtable<String,Method> invokeAttMap = new Hashtable<String,Method>();
+        Hashtable<String,Method> invokeAttMap = new Hashtable<>();
 
         methods = realClass.getMethods();
 
