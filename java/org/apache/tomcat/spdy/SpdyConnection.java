@@ -47,7 +47,7 @@ public abstract class SpdyConnection { // implements Runnable {
     protected CompressSupport compressSupport;
 
     // Fields stored for each spdy connection
-    Map<Integer, SpdyStream> channels = new HashMap<Integer, SpdyStream>();
+    Map<Integer, SpdyStream> channels = new HashMap<>();
 
     // --------------
     protected static final Logger log = Logger.getLogger(SpdyConnection.class
@@ -112,9 +112,9 @@ public abstract class SpdyConnection { // implements Runnable {
     int outStreamId = 1;
 
     // TODO: finer handling of priorities
-    LinkedList<SpdyFrame> prioriyQueue = new LinkedList<SpdyFrame>();
+    LinkedList<SpdyFrame> prioriyQueue = new LinkedList<>();
 
-    LinkedList<SpdyFrame> outQueue = new LinkedList<SpdyFrame>();
+    LinkedList<SpdyFrame> outQueue = new LinkedList<>();
 
     // --------------
 
@@ -512,7 +512,7 @@ public abstract class SpdyConnection { // implements Runnable {
         System.err.println(msg);
         inClosed = true;
 
-        List<Integer> ch = new ArrayList<Integer>(channels.keySet());
+        List<Integer> ch = new ArrayList<>(channels.keySet());
         for (Integer i: ch) {
             SpdyStream stream = channels.remove(i);
             if (stream != null) {
@@ -525,7 +525,7 @@ public abstract class SpdyConnection { // implements Runnable {
         System.err.println(msg);
         inClosed = true;
 
-        List<Integer> ch = new ArrayList<Integer>(channels.keySet());
+        List<Integer> ch = new ArrayList<>(channels.keySet());
         for (Integer i: ch) {
             if (i > last) {
                 SpdyStream stream = channels.remove(i);

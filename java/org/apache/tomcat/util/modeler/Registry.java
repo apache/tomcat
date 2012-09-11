@@ -101,24 +101,22 @@ public class Registry implements RegistryMBean, MBeanRegistration  {
      * The set of ManagedBean instances for the beans this registry
      * knows about, keyed by name.
      */
-    private HashMap<String,ManagedBean> descriptors =
-        new HashMap<String,ManagedBean>();
+    private HashMap<String,ManagedBean> descriptors = new HashMap<>();
 
     /** List of managed beans, keyed by class name
      */
-    private HashMap<String,ManagedBean> descriptorsByClass =
-        new HashMap<String,ManagedBean>();
+    private HashMap<String,ManagedBean> descriptorsByClass = new HashMap<>();
 
     // map to avoid duplicated searching or loading descriptors
-    private HashMap<String,URL> searchedPaths=new HashMap<String,URL>();
+    private HashMap<String,URL> searchedPaths = new HashMap<>();
 
     private Object guard;
 
     // Id - small ints to use array access. No reset on stop()
     // Used for notifications
     private final Hashtable<String,Hashtable<String,Integer>> idDomains =
-        new Hashtable<String,Hashtable<String,Integer>>();
-    private final Hashtable<String,int[]> ids = new Hashtable<String,int[]>();
+        new Hashtable<>();
+    private final Hashtable<String,int[]> ids = new Hashtable<>();
 
 
     // ----------------------------------------------------------- Constructors
@@ -191,9 +189,9 @@ public class Registry implements RegistryMBean, MBeanRegistration  {
      */
     @Override
     public void stop() {
-        descriptorsByClass = new HashMap<String,ManagedBean>();
-        descriptors = new HashMap<String,ManagedBean>();
-        searchedPaths=new HashMap<String,URL>();
+        descriptorsByClass = new HashMap<>();
+        descriptors = new HashMap<>();
+        searchedPaths=new HashMap<>();
     }
 
     /** Register a bean by creating a modeler mbean and adding it to the
@@ -301,7 +299,7 @@ public class Registry implements RegistryMBean, MBeanRegistration  {
         }
         Hashtable<String,Integer> domainTable = idDomains.get(domain);
         if( domainTable == null ) {
-            domainTable = new Hashtable<String,Integer>();
+            domainTable = new Hashtable<>();
             idDomains.put( domain, domainTable);
         }
         if( name==null ) {

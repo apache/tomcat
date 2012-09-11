@@ -201,7 +201,7 @@ public class CallParamRule extends Rule {
             // so that we can make sure that the right set of parameters
             // is at the top of the stack
             if (bodyTextStack == null) {
-                bodyTextStack = new ArrayStack<String>();
+                bodyTextStack = new ArrayStack<>();
             }
             bodyTextStack.push(bodyText.trim());
         }

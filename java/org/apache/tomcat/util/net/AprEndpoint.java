@@ -95,7 +95,7 @@ public class AprEndpoint extends AbstractEndpoint {
 
 
     protected ConcurrentLinkedQueue<SocketWrapper<Long>> waitingRequests =
-        new ConcurrentLinkedQueue<SocketWrapper<Long>>();
+            new ConcurrentLinkedQueue<>();
 
     // ------------------------------------------------------------ Constructor
 
@@ -823,7 +823,7 @@ public class AprEndpoint extends AbstractEndpoint {
             // During shutdown, executor may be null - avoid NPE
             if (running) {
                 SocketWrapper<Long> wrapper =
-                    new SocketWrapper<Long>(Long.valueOf(socket));
+                    new SocketWrapper<>(Long.valueOf(socket));
                 getExecutor().execute(new SocketWithOptionsProcessor(wrapper));
             }
         } catch (RejectedExecutionException x) {
@@ -852,7 +852,7 @@ public class AprEndpoint extends AbstractEndpoint {
                         Long.valueOf(socket), null));
             } else {
                 SocketWrapper<Long> wrapper =
-                    new SocketWrapper<Long>(Long.valueOf(socket));
+                    new SocketWrapper<>(Long.valueOf(socket));
                 executor.execute(new SocketProcessor(wrapper, null));
             }
         } catch (RejectedExecutionException x) {
@@ -880,7 +880,7 @@ public class AprEndpoint extends AbstractEndpoint {
                         Long.valueOf(socket), status));
             } else {
                 SocketWrapper<Long> wrapper =
-                        new SocketWrapper<Long>(Long.valueOf(socket));
+                        new SocketWrapper<>(Long.valueOf(socket));
                 executor.execute(new SocketEventProcessor(wrapper, status));
             }
         } catch (RejectedExecutionException x) {
@@ -1444,8 +1444,8 @@ public class AprEndpoint extends AbstractEndpoint {
                 sendfilePollset = allocatePoller(size, pool, socketProperties.getSoTimeout());
             }
             desc = new long[size * 2];
-            sendfileData = new HashMap<Long, SendfileData>(size);
-            addS = new ArrayList<SendfileData>();
+            sendfileData = new HashMap<>(size);
+            addS = new ArrayList<>();
             addCount = 0;
         }
 

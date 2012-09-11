@@ -517,7 +517,7 @@ public class JIoEndpoint extends AbstractEndpoint {
     protected boolean processSocket(Socket socket) {
         // Process the request from this socket
         try {
-            SocketWrapper<Socket> wrapper = new SocketWrapper<Socket>(socket);
+            SocketWrapper<Socket> wrapper = new SocketWrapper<>(socket);
             wrapper.setKeepAliveLeft(getMaxKeepAliveRequests());
             // During shutdown, executor may be null - avoid NPE
             if (!running) {
@@ -595,7 +595,7 @@ public class JIoEndpoint extends AbstractEndpoint {
     }
 
     protected ConcurrentLinkedQueue<SocketWrapper<Socket>> waitingRequests =
-        new ConcurrentLinkedQueue<SocketWrapper<Socket>>();
+            new ConcurrentLinkedQueue<>();
 
     @Override
     protected Log getLog() {

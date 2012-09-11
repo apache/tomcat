@@ -39,7 +39,7 @@ public class MbeansDescriptorsDigesterSource extends ModelerSource
 
     private Registry registry;
     private String type;
-    private final List<ObjectName> mbeans = new ArrayList<ObjectName>();
+    private final List<ObjectName> mbeans = new ArrayList<>();
     private static volatile Digester digester = null;
 
     private static Digester createDigester() {
@@ -169,7 +169,7 @@ public class MbeansDescriptorsDigesterSource extends ModelerSource
         if (digester == null) {
             digester = createDigester();
         }
-        ArrayList<ManagedBean> loadedMbeans = new ArrayList<ManagedBean>();
+        ArrayList<ManagedBean> loadedMbeans = new ArrayList<>();
 
         synchronized (digester) {
 

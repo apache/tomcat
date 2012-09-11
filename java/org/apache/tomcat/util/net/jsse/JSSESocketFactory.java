@@ -235,7 +235,7 @@ public class JSSESocketFactory implements ServerSocketFactory, SSLUtil {
                                      && i<supportedCiphers.length; i++) {
                             if (supportedCiphers[i].equals(cipher)) {
                                 if (vec == null) {
-                                    vec = new Vector<String>();
+                                    vec = new Vector<>();
                                 }
                                 vec.addElement(cipher);
                                 break;
@@ -259,7 +259,7 @@ public class JSSESocketFactory implements ServerSocketFactory, SSLUtil {
                                  && i<supportedCiphers.length; i++) {
                         if (supportedCiphers[i].equals(cipher)) {
                             if (vec == null) {
-                                vec = new Vector<String>();
+                                vec = new Vector<>();
                             }
                             vec.addElement(cipher);
                             break;
@@ -748,7 +748,7 @@ public class JSSESocketFactory implements ServerSocketFactory, SSLUtil {
                         i < supportedProtocols.length; i++) {
                     if (supportedProtocols[i].equals(protocol)) {
                         if (vec == null) {
-                            vec = new Vector<String>();
+                            vec = new Vector<>();
                         }
                         vec.addElement(protocol);
                         break;

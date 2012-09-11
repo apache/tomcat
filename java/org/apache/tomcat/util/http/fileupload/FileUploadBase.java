@@ -298,7 +298,7 @@ public abstract class FileUploadBase {
      */
     public List<FileItem> parseRequest(RequestContext ctx)
             throws FileUploadException {
-        List<FileItem> items = new ArrayList<FileItem>();
+        List<FileItem> items = new ArrayList<>();
         boolean successful = false;
         try {
             FileItemIterator iter = getItemIterator(ctx);

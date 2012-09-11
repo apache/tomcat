@@ -118,7 +118,7 @@ public class AprSocketContext {
     /**
      * Pollers.
      */
-    List<AprPoller> pollers = new ArrayList<AprPoller>();
+    List<AprPoller> pollers = new ArrayList<>();
     static int pollerCnt = 0;
 
     // Set on all accepted or connected sockets.
@@ -133,7 +133,7 @@ public class AprSocketContext {
     // If false: use executor ( but that may choke the acceptor thread )
     protected boolean nonBlockingAccept = false;
 
-    BlockingQueue<AprSocket> acceptedQueue = new LinkedBlockingQueue<AprSocket>();
+    BlockingQueue<AprSocket> acceptedQueue = new LinkedBlockingQueue<>();
 
     /**
      * Root APR memory pool.
@@ -167,7 +167,7 @@ public class AprSocketContext {
     RawDataHandler rawDataHandler = null;
 
     // TODO: do we need this here ?
-    protected Map<String, HostInfo> hosts = new HashMap<String, HostInfo>();
+    protected Map<String, HostInfo> hosts = new HashMap<>();
 
     String[] enabledCiphers;
 
@@ -963,7 +963,7 @@ public class AprSocketContext {
 
         // Should be replaced with socket data.
         // used only to lookup by socket
-        Map<Long, AprSocket> channels = new HashMap<Long, AprSocket>();
+        Map<Long, AprSocket> channels = new HashMap<>();
 
         // Active + pending, must be < desc.length / 2
         // The channel will also have poller=this when active or pending
@@ -974,7 +974,7 @@ public class AprSocketContext {
 
         protected AtomicInteger pollCount = new AtomicInteger();
 
-        private List<AprSocket> updates = new ArrayList<AprSocket>();
+        private List<AprSocket> updates = new ArrayList<>();
 
         @Override
         public void run() {

@@ -48,7 +48,7 @@ public class B2CConverter {
         StringManager.getManager(Constants.Package);
 
     private static final Map<String, Charset> encodingToCharsetCache =
-        new HashMap<String, Charset>();
+            new HashMap<>();
 
     public static final Charset ISO_8859_1;
     public static final Charset UTF_8;

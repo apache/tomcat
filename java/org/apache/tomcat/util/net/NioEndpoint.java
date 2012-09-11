@@ -948,7 +948,8 @@ public class NioEndpoint extends AbstractEndpoint {
     public class Poller implements Runnable {
 
         protected Selector selector;
-        protected ConcurrentLinkedQueue<Runnable> events = new ConcurrentLinkedQueue<Runnable>();
+        protected ConcurrentLinkedQueue<Runnable> events =
+                new ConcurrentLinkedQueue<>();
 
         protected volatile boolean close = false;
         protected long nextExpiration = 0;//optimize expiration handling

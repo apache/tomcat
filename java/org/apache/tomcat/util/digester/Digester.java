@@ -168,8 +168,7 @@ public class Digester extends DefaultHandler {
     /**
      * The stack of body text string buffers for surrounding elements.
      */
-    protected ArrayStack<StringBuilder> bodyTexts =
-        new ArrayStack<StringBuilder>();
+    protected ArrayStack<StringBuilder> bodyTexts = new ArrayStack<>();
 
 
     /**
@@ -182,7 +181,7 @@ public class Digester extends DefaultHandler {
      *
      * @since 1.6
      */
-    protected ArrayStack<List<Rule>> matches = new ArrayStack<List<Rule>>(10);
+    protected ArrayStack<List<Rule>> matches = new ArrayStack<>(10);
 
     /**
      * The class loader to use for instantiating application objects.
@@ -208,8 +207,7 @@ public class Digester extends DefaultHandler {
      * The URLs of entityValidator that have been registered, keyed by the public
      * identifier that corresponds.
      */
-    protected HashMap<String,String> entityValidator =
-        new HashMap<String,String>();
+    protected HashMap<String,String> entityValidator = new HashMap<>();
 
 
     /**
@@ -250,16 +248,14 @@ public class Digester extends DefaultHandler {
      * is required because documents can declare nested uses of the same
      * prefix for different Namespace URIs).
      */
-    protected HashMap<String,ArrayStack<String>> namespaces =
-        new HashMap<String,ArrayStack<String>>();
+    protected HashMap<String,ArrayStack<String>> namespaces = new HashMap<>();
 
 
     /**
      * The parameters stack being utilized by CallMethodRule and
      * CallParamRule rules.
      */
-    protected ArrayStack<Object> params = new ArrayStack<Object>();
-
+    protected ArrayStack<Object> params = new ArrayStack<>();
 
     /**
      * The SAXParser we will use to parse the input stream.
@@ -298,7 +294,7 @@ public class Digester extends DefaultHandler {
     /**
      * The object stack being constructed.
      */
-    protected ArrayStack<Object> stack = new ArrayStack<Object>();
+    protected ArrayStack<Object> stack = new ArrayStack<>();
 
 
     /**
@@ -340,9 +336,9 @@ public class Digester extends DefaultHandler {
         LogFactory.getLog("org.apache.tomcat.util.digester.Digester.sax");
 
 
-    /** Stacks used for interrule communication, indexed by name String */
+    /** Stacks used for inter-rule communication, indexed by name String */
     private HashMap<String,ArrayStack<Object>> stacksByName =
-        new HashMap<String,ArrayStack<Object>>();
+            new HashMap<>();
 
     // ------------------------------------------------------------- Properties
 
@@ -1310,7 +1306,7 @@ public class Digester extends DefaultHandler {
         // Register this prefix mapping
         ArrayStack<String> stack = namespaces.get(prefix);
         if (stack == null) {
-            stack = new ArrayStack<String>();
+            stack = new ArrayStack<>();
             namespaces.put(prefix, stack);
         }
         stack.push(namespaceURI);
@@ -2406,7 +2402,7 @@ public class Digester extends DefaultHandler {
     public void push(String stackName, Object value) {
         ArrayStack<Object> namedStack = stacksByName.get(stackName);
         if (namedStack == null) {
-            namedStack = new ArrayStack<Object>();
+            namedStack = new ArrayStack<>();
             stacksByName.put(stackName, namedStack);
         }
         namedStack.push(value);

@@ -61,7 +61,7 @@ class JSSESupport implements SSLSupport, SSLSessionManager {
         StringManager.getManager("org.apache.tomcat.util.net.jsse.res");
 
     private static final Map<SSLSession,Integer> keySizeCache =
-        new WeakHashMap<SSLSession, Integer>();
+            new WeakHashMap<>();
 
     protected SSLSocket ssl;
     protected SSLSession session;

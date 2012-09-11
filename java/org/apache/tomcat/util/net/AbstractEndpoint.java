@@ -394,8 +394,8 @@ public abstract class AbstractEndpoint {
      * sub-component is the
      * {@link org.apache.tomcat.util.net.ServerSocketFactory}.
      */
-    protected HashMap<String, Object> attributes =
-        new HashMap<String, Object>();
+    protected HashMap<String, Object> attributes = new HashMap<>();
+
     /**
      * Generic property setter called when a property for which a specific
      * setter already exists within the
@@ -901,7 +901,7 @@ public abstract class AbstractEndpoint {
         if (s == null) {
             this.sslEnabledProtocolsarr = new String[0];
         } else {
-            ArrayList<String> sslEnabledProtocols = new ArrayList<String>();
+            ArrayList<String> sslEnabledProtocols = new ArrayList<>();
             StringTokenizer t = new StringTokenizer(s,",");
             while (t.hasMoreTokens()) {
                 String p = t.nextToken().trim();
