@@ -64,24 +64,17 @@ public final class SpdyContext {
             this.ctx = ctx;
         }
 
-        public abstract SpdyConnection getConnection(String host, int port) throws IOException;
+        public abstract SpdyConnection getConnection(String host, int port)
+                throws IOException;
 
-        public void onCreateEngine(Object engine) {
-        }
+        public abstract boolean isSpdy(Object socketW);
 
-        public boolean isSpdy(Object socketW) {
-            return false;
-        }
+        public abstract void onAccept(Object socket);
 
-        public void onAccept(Object socket) throws IOException {
-        }
+        public abstract void listen(int port, String cert, String key)
+                throws IOException;
 
-        public void listen(int port, String cert, String key)
-                throws IOException {
-        }
-
-        public void stop() throws IOException {
-        }
+        public abstract void stop() throws IOException;
     }
 
     public SpdyContext() {

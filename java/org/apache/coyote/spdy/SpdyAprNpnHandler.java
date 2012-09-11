@@ -99,10 +99,8 @@ public class SpdyAprNpnHandler implements NpnHandler<Long> {
             return SocketState.OPEN;
         }
 
-        try {
-            ((NetSupportOpenSSL) spdyContext.getNetSupport()).onAcceptLong(socket);
-        } catch (IOException e) {
-        }
+        ((NetSupportOpenSSL) spdyContext.getNetSupport()).onAcceptLong(socket);
+
         // No need to keep tomcat thread busy - but socket will be handled by apr socket context.
         return SocketState.LONG;
     }

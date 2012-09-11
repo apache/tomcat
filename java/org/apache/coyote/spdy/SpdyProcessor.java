@@ -213,14 +213,7 @@ public class SpdyProcessor extends AbstractProcessor<Object> implements
         }
         if (!response.isCommitted()) {
             // Validate and write response headers
-            try {
-                sendSynReply();
-            } catch (IOException e) {
-                e.printStackTrace();
-                // Set error flag
-                error = true;
-                return;
-            }
+            sendSynReply();
         }
     }
 
@@ -259,13 +252,7 @@ public class SpdyProcessor extends AbstractProcessor<Object> implements
             // transactions with the client
             maybeCommit();
 
-            try {
-                spdyStream.sendDataFrame(EMPTY, 0, 0, true);
-            } catch (IOException e) {
-                // Set error flag
-                e.printStackTrace();
-                error = true;
-            }
+            spdyStream.sendDataFrame(EMPTY, 0, 0, true);
 
         } else if (actionCode == ActionCode.REQ_SSL_ATTRIBUTE) {
 
@@ -401,7 +388,7 @@ public class SpdyProcessor extends AbstractProcessor<Object> implements
      * When committing the response, we have to validate the set of headers, as
      * well as setup the response filters.
      */
-    protected void sendSynReply() throws IOException {
+    protected void sendSynReply() {
 
         response.setCommitted(true);
 
@@ -423,7 +410,7 @@ public class SpdyProcessor extends AbstractProcessor<Object> implements
         sendResponseHead();
     }
 
-    private void sendResponseHead() throws IOException {
+    private void sendResponseHead() {
         SpdyFrame rframe = spdy.getFrame(SpdyConnection.TYPE_SYN_REPLY);
         rframe.associated = 0;
 

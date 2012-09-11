@@ -153,8 +153,7 @@ public class XercesParser{
      */
     private static void configureOldXerces(SAXParser parser,
                                            Properties properties)
-            throws ParserConfigurationException,
-                   SAXNotSupportedException {
+            throws SAXNotSupportedException {
 
         String schemaLocation = (String)properties.get("schemaLocation");
         String schemaLanguage = (String)properties.get("schemaLanguage");

@@ -305,8 +305,7 @@ public abstract class SpdyConnection { // implements Runnable {
      *
      * With a nb transport it should call drain directly.
      */
-    public void nonBlockingSend(SpdyFrame oframe, SpdyStream proc)
-            throws IOException {
+    public void nonBlockingSend(SpdyFrame oframe, SpdyStream proc) {
         queueFrame(oframe, proc, oframe.pri == 0 ? outQueue : prioriyQueue);
         getSpdyContext().getExecutor().execute(nbDrain);
     }
@@ -324,14 +323,13 @@ public abstract class SpdyConnection { // implements Runnable {
      * Add the frame to the queue and send until the queue is empty.
      *
      */
-    public void send(SpdyFrame oframe, SpdyStream proc)
-            throws IOException {
+    public void send(SpdyFrame oframe, SpdyStream proc) {
         queueFrame(oframe, proc, oframe.pri == 0 ? outQueue : prioriyQueue);
         drain();
     }
 
     private void queueFrame(SpdyFrame oframe, SpdyStream proc,
-            LinkedList<SpdyFrame> queue) throws IOException {
+            LinkedList<SpdyFrame> queue) {
 
         oframe.endData = oframe.off;
         oframe.off = 0;
@@ -663,7 +661,7 @@ public abstract class SpdyConnection { // implements Runnable {
         return spdyContext;
     }
 
-    public SpdyStream get(String host, String url) throws IOException {
+    public SpdyStream get(String host, String url) {
         SpdyStream sch = new SpdyStream(this);
         sch.getRequest().addHeader("host", host);
         sch.getRequest().addHeader("url", url);

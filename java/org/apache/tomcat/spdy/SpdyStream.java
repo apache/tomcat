@@ -102,7 +102,7 @@ public class SpdyStream implements Runnable {
      * The base method is for client implementation - servers need to override
      * and process the frame as a request.
      */
-    public void onCtlFrame(SpdyFrame frame) throws IOException {
+    public void onCtlFrame(SpdyFrame frame) {
         // TODO: handle RST
         if (frame.type == SpdyConnection.TYPE_SYN_STREAM) {
             reqFrame = frame;
@@ -157,7 +157,7 @@ public class SpdyStream implements Runnable {
      *
      * First frame will be the control frame
      */
-    public SpdyFrame getFrame(long to) throws IOException {
+    public SpdyFrame getFrame(long to) {
         SpdyFrame in;
         try {
             synchronized (this) {
@@ -202,7 +202,7 @@ public class SpdyStream implements Runnable {
     }
 
     public synchronized void sendDataFrame(byte[] data, int start,
-            int length, boolean close) throws IOException {
+            int length, boolean close) {
 
         SpdyFrame oframe = spdy.getDataFrame();
 
@@ -222,18 +222,18 @@ public class SpdyStream implements Runnable {
         spdy.send(oframe, this);
     }
 
-    public void send() throws IOException {
+    public void send() {
         send("http", "GET");
     }
 
-    public void send(String host, String url, String scheme, String method) throws IOException {
+    public void send(String host, String url, String scheme, String method) {
         getRequest().addHeader("host", host);
         getRequest().addHeader("url", url);
 
         send(scheme, method);
     }
 
-    public void send(String scheme, String method) throws IOException {
+    public void send(String scheme, String method) {
         getRequest();
         if ("GET".equalsIgnoreCase(method)) {
             // TODO: add the others
@@ -268,7 +268,7 @@ public class SpdyStream implements Runnable {
         long to = 10000; // TODO
         int pos = 0;
 
-        private void fill() throws IOException {
+        private void fill() {
             if (current == null || current.off == current.endData) {
                 if (current != null) {
                     spdy.spdyContext.releaseFrame(current);

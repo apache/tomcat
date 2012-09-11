@@ -338,8 +338,7 @@ public class AprSocketContext {
     /**
      * Set certificate, will also enable TLS mode.
      */
-    public AprSocketContext setKeys(String certPemFile, String keyDerFile)
-            throws IOException {
+    public AprSocketContext setKeys(String certPemFile, String keyDerFile) {
         this.sslMode = true;
         setTls();
         certFile = certPemFile;
@@ -403,18 +402,18 @@ public class AprSocketContext {
     /**
      * Get a socket for connectiong to host:port.
      */
-    public AprSocket socket(String host, int port, boolean ssl) throws IOException {
+    public AprSocket socket(String host, int port, boolean ssl) {
         HostInfo hi = getHostInfo(host, port, ssl);
         return socket(hi);
     }
 
-    public AprSocket socket(HostInfo hi) throws IOException {
+    public AprSocket socket(HostInfo hi) {
         AprSocket sock = newSocket(this);
         sock.setHost(hi);
         return sock;
     }
 
-    public AprSocket socket(long socket) throws IOException {
+    public AprSocket socket(long socket) {
         AprSocket sock = newSocket(this);
         // Tomcat doesn't set this
         SSLExt.sslSetMode(socket, SSLExt.SSL_MODE_ENABLE_PARTIAL_WRITE |
@@ -502,7 +501,7 @@ public class AprSocketContext {
         }
     }
 
-    AprSocket newSocket(AprSocketContext context) throws IOException {
+    AprSocket newSocket(AprSocketContext context) {
         return new AprSocket(context);
     }
 
@@ -524,7 +523,7 @@ public class AprSocketContext {
     }
 
 
-    public void stop() throws IOException {
+    public void stop() {
         synchronized (pollers) {
             if (!running) {
                 return;
@@ -742,7 +741,7 @@ public class AprSocketContext {
      * Called on each accepted socket ( for servers ) or after connection (client)
      * after handshake.
      */
-    protected void onSocket(AprSocket s) throws IOException {
+    protected void onSocket(AprSocket s) {
 
     }
 
@@ -1304,7 +1303,7 @@ public class AprSocketContext {
          * Called only from IO thread. Remove from Poll and channels,
          * set POLL bit to false.
          */
-        private void removeSafe(AprSocket up) throws IOException {
+        private void removeSafe(AprSocket up) {
             int rv = Status.APR_EGENERAL;
             if (running && serverPollset != 0 && up.socket != 0
                     && !up.isClosed()) {
