@@ -74,14 +74,4 @@ public abstract class ConstantCP extends Constant {
     public final int getNameAndTypeIndex() {
         return name_and_type_index;
     }
-
-
-    /**
-     * @return String representation.
-     */
-    @Override
-    public final String toString() {
-        return super.toString() + "(class_index = " + class_index + ", name_and_type_index = "
-                + name_and_type_index + ")";
-    }
 }

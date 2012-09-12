@@ -85,23 +85,6 @@ public final class StackMap extends Attribute {
 
 
     /**
-     * @return String representation.
-     */
-    @Override
-    public final String toString() {
-        StringBuilder buf = new StringBuilder("StackMap(");
-        for (int i = 0; i < map_length; i++) {
-            buf.append(map[i].toString());
-            if (i < map_length - 1) {
-                buf.append(", ");
-            }
-        }
-        buf.append(')');
-        return buf.toString();
-    }
-
-
-    /**
      * @return deep copy of this attribute
      */
     @Override

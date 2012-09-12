@@ -69,15 +69,6 @@ public final class Deprecated extends Attribute {
 
 
     /**
-     * @return attribute name
-     */
-    @Override
-    public final String toString() {
-        return Constants.ATTRIBUTE_NAMES[Constants.ATTR_DEPRECATED];
-    }
-
-
-    /**
      * @return deep copy of this attribute
      */
     @Override

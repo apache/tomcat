@@ -54,13 +54,4 @@ public final class ConstantUtf8 extends Constant {
     public final String getBytes() {
         return bytes;
     }
-
-
-    /**
-     * @return String representation
-     */
-    @Override
-    public final String toString() {
-        return super.toString() + "(\"" + Utility.replace(bytes, "\n", "\\n") + "\")";
-    }
 }

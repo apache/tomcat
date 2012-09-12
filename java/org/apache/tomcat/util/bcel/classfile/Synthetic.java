@@ -75,19 +75,6 @@ public final class Synthetic extends Attribute {
 
 
     /**
-     * @return String representation.
-     */
-    @Override
-    public final String toString() {
-        StringBuilder buf = new StringBuilder("Synthetic");
-        if (length > 0) {
-            buf.append(" ").append(Utility.toHexString(bytes));
-        }
-        return buf.toString();
-    }
-
-
-    /**
      * @return deep copy of this attribute
      */
     @Override
