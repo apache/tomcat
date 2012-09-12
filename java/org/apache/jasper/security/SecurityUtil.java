@@ -26,7 +26,7 @@ import org.apache.jasper.Constants;
 
 public final class SecurityUtil{
 
-    private static boolean packageDefinitionEnabled =
+    private static final boolean packageDefinitionEnabled =
          System.getProperty("package.definition") == null ? false : true;
 
     /**
