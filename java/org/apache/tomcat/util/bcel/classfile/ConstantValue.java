@@ -33,7 +33,6 @@ import org.apache.tomcat.util.bcel.Constants;
 public final class ConstantValue extends Attribute {
 
     private static final long serialVersionUID = -388222612752527969L;
-    private int constantvalue_index;
 
 
     /**
@@ -59,7 +58,6 @@ public final class ConstantValue extends Attribute {
     public ConstantValue(int name_index, int length, int constantvalue_index,
             ConstantPool constant_pool) {
         super(Constants.ATTR_CONSTANT_VALUE, name_index, length, constant_pool);
-        this.constantvalue_index = constantvalue_index;
     }
 
 

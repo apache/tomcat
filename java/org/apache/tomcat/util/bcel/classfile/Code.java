@@ -44,8 +44,6 @@ import org.apache.tomcat.util.bcel.Constants;
 public final class Code extends Attribute {
 
     private static final long serialVersionUID = 8936843273318969602L;
-    private int max_stack; // Maximum size of stack used by this method
-    private int max_locals; // Number of local variables
     private int code_length; // Length of code in bytes
     private byte[] code; // Actual byte code
     private int exception_table_length;
@@ -105,8 +103,6 @@ public final class Code extends Attribute {
     public Code(int name_index, int length, int max_stack, int max_locals, byte[] code,
             CodeException[] exception_table, Attribute[] attributes, ConstantPool constant_pool) {
         super(Constants.ATTR_CODE, name_index, length, constant_pool);
-        this.max_stack = max_stack;
-        this.max_locals = max_locals;
         setCode(code);
         setExceptionTable(exception_table);
         setAttributes(attributes); // Overwrites length!

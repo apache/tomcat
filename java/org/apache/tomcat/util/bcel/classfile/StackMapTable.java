@@ -70,7 +70,7 @@ public final class StackMapTable extends Attribute {
         map_length = file.readUnsignedShort();
         map = new StackMapTableEntry[map_length];
         for (int i = 0; i < map_length; i++) {
-            map[i] = new StackMapTableEntry(file, constant_pool);
+            map[i] = new StackMapTableEntry(file);
         }
     }
 
