@@ -94,6 +94,26 @@ public final class Unknown extends Attribute {
 
 
     /**
+     * @return String representation.
+     */
+    @Override
+    public final String toString() {
+        if (length == 0 || bytes == null) {
+            return "(Unknown attribute " + name + ")";
+        }
+        String hex;
+        if (length > 10) {
+            byte[] tmp = new byte[10];
+            System.arraycopy(bytes, 0, tmp, 0, 10);
+            hex = Utility.toHexString(tmp) + "... (truncated)";
+        } else {
+            hex = Utility.toHexString(bytes);
+        }
+        return "(Unknown attribute " + name + ": " + hex + ")";
+    }
+
+
+    /**
      * @return deep copy of this attribute
      */
     @Override

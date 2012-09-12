@@ -84,6 +84,25 @@ public final class ExceptionTable extends Attribute {
 
 
     /**
+     * @return String representation, i.e., a list of thrown exceptions.
+     */
+    @Override
+    public final String toString() {
+        StringBuilder buf = new StringBuilder();
+        String str;
+        for (int i = 0; i < number_of_exceptions; i++) {
+            str = constant_pool.getConstantString(exception_index_table[i],
+                    Constants.CONSTANT_Class);
+            buf.append(Utility.compactClassName(str, false));
+            if (i < number_of_exceptions - 1) {
+                buf.append(", ");
+            }
+        }
+        return buf.toString();
+    }
+
+
+    /**
      * @return deep copy of this attribute
      */
     @Override

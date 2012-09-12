@@ -25,6 +25,21 @@ public class ArrayElementValue extends ElementValue
     // For array types, this is the array
     private ElementValue[] evalues;
 
+    @Override
+    public String toString()
+    {
+        StringBuilder sb = new StringBuilder();
+        sb.append("{");
+        for (int i = 0; i < evalues.length; i++)
+        {
+            sb.append(evalues[i].toString());
+            if ((i + 1) < evalues.length)
+                sb.append(",");
+        }
+        sb.append("}");
+        return sb.toString();
+    }
+
     public ArrayElementValue(int type, ElementValue[] datums, ConstantPool cpool)
     {
         super(type, cpool);
@@ -43,6 +58,21 @@ public class ArrayElementValue extends ElementValue
         {
             evalues[i].dump(dos);
         }
+    }
+
+    @Override
+    public String stringifyValue()
+    {
+        StringBuilder sb = new StringBuilder();
+        sb.append("[");
+        for (int i = 0; i < evalues.length; i++)
+        {
+            sb.append(evalues[i].stringifyValue());
+            if ((i + 1) < evalues.length)
+                sb.append(",");
+        }
+        sb.append("]");
+        return sb.toString();
     }
 
     public ElementValue[] getElementValuesArray()

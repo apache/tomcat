@@ -82,6 +82,19 @@ public final class InnerClasses extends Attribute {
 
 
     /**
+     * @return String representation.
+     */
+    @Override
+    public final String toString() {
+        StringBuilder buf = new StringBuilder();
+        for (int i = 0; i < number_of_classes; i++) {
+            buf.append(inner_classes[i].toString(constant_pool)).append("\n");
+        }
+        return buf.toString();
+    }
+
+
+    /**
      * @return deep copy of this attribute
      */
     @Override

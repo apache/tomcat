@@ -20,6 +20,8 @@ package org.apache.tomcat.util.bcel.classfile;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
+import org.apache.tomcat.util.bcel.Constants;
+
 public class SimpleElementValue extends ElementValue
 {
     private int index;
@@ -38,6 +40,64 @@ public class SimpleElementValue extends ElementValue
         return index;
     }
 
+
+    @Override
+    public String toString()
+    {
+        return stringifyValue();
+    }
+
+    // Whatever kind of value it is, return it as a string
+    @Override
+    public String stringifyValue()
+    {
+        switch (type)
+        {
+        case PRIMITIVE_INT:
+            ConstantInteger c = (ConstantInteger) cpool.getConstant(getIndex(),
+                    Constants.CONSTANT_Integer);
+            return Integer.toString(c.getBytes());
+        case PRIMITIVE_LONG:
+            ConstantLong j = (ConstantLong) cpool.getConstant(getIndex(),
+                    Constants.CONSTANT_Long);
+            return Long.toString(j.getBytes());
+        case PRIMITIVE_DOUBLE:
+            ConstantDouble d = (ConstantDouble) cpool.getConstant(getIndex(),
+                    Constants.CONSTANT_Double);
+            return Double.toString(d.getBytes());
+        case PRIMITIVE_FLOAT:
+            ConstantFloat f = (ConstantFloat) cpool.getConstant(getIndex(),
+                    Constants.CONSTANT_Float);
+            return Float.toString(f.getBytes());
+        case PRIMITIVE_SHORT:
+            ConstantInteger s = (ConstantInteger) cpool.getConstant(getIndex(),
+                    Constants.CONSTANT_Integer);
+            return Integer.toString(s.getBytes());
+        case PRIMITIVE_BYTE:
+            ConstantInteger b = (ConstantInteger) cpool.getConstant(getIndex(),
+                    Constants.CONSTANT_Integer);
+            return Integer.toString(b.getBytes());
+        case PRIMITIVE_CHAR:
+            ConstantInteger ch = (ConstantInteger) cpool.getConstant(
+                    getIndex(), Constants.CONSTANT_Integer);
+            return String.valueOf((char)ch.getBytes());
+        case PRIMITIVE_BOOLEAN:
+            ConstantInteger bo = (ConstantInteger) cpool.getConstant(
+                    getIndex(), Constants.CONSTANT_Integer);
+            if (bo.getBytes() == 0) {
+                return "false";
+            }
+            return "true";
+        case STRING:
+            ConstantUtf8 cu8 = (ConstantUtf8) cpool.getConstant(getIndex(),
+                    Constants.CONSTANT_Utf8);
+            return cu8.getBytes();
+        default:
+            throw new RuntimeException(
+                    "SimpleElementValue class does not know how to stringify type "
+                            + type);
+        }
+    }
 
     @Override
     public void dump(DataOutputStream dos) throws IOException

@@ -81,4 +81,15 @@ public final class ConstantInvokeDynamic extends Constant {
     public void setNameAndTypeIndex(int name_and_type_index) {
         this.name_and_type_index = name_and_type_index;
     }
+
+
+    /**
+     * @return String representation
+     */
+    @Override
+    public final String toString() {
+        return super.toString() + "(bootstrap_method_attr_index = " +
+                bootstrap_method_attr_index + ", name_and_type_index = " +
+                name_and_type_index + ")";
+    }
 }

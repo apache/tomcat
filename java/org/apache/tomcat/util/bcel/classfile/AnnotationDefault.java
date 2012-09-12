@@ -32,7 +32,6 @@ import org.apache.tomcat.util.bcel.Constants;
 public class AnnotationDefault extends Attribute
 {
     private static final long serialVersionUID = 6715933396664171543L;
-    ElementValue default_value;
 
     /**
      * @param name_index
@@ -50,7 +49,8 @@ public class AnnotationDefault extends Attribute
     {
         this(name_index, length, (ElementValue) null,
                 constant_pool);
-        default_value = ElementValue.readElementValue(file, constant_pool);
+        // Default value
+        ElementValue.readElementValue(file, constant_pool);
     }
 
     /**
@@ -67,16 +67,6 @@ public class AnnotationDefault extends Attribute
             ElementValue defaultValue, ConstantPool constant_pool)
     {
         super(Constants.ATTR_ANNOTATION_DEFAULT, name_index, length, constant_pool);
-        setDefaultValue(defaultValue);
-    }
-
-    /**
-     * @param defaultValue
-     *            the default value of this methodinfo's annotation
-     */
-    public final void setDefaultValue(ElementValue defaultValue)
-    {
-        default_value = defaultValue;
     }
 
 

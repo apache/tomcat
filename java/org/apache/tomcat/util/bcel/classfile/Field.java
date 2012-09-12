@@ -76,6 +76,36 @@ public final class Field extends FieldOrMethod {
 
 
     /**
+     * Return string representation close to declaration format,
+     * `public static final short MAX = 100', e.g..
+     *
+     * @return String representation of field, including the signature.
+     */
+    @Override
+    public final String toString() {
+        String name, signature, access; // Short cuts to constant pool
+        // Get names from constant pool
+        access = Utility.accessToString(access_flags);
+        access = access.equals("") ? "" : (access + " ");
+        signature = Utility.signatureToString(getSignature());
+        name = getName();
+        StringBuilder buf = new StringBuilder(64);
+        buf.append(access).append(signature).append(" ").append(name);
+        ConstantValue cv = getConstantValue();
+        if (cv != null) {
+            buf.append(" = ").append(cv);
+        }
+        for (int i = 0; i < attributes_count; i++) {
+            Attribute a = attributes[i];
+            if (!(a instanceof ConstantValue)) {
+                buf.append(" [").append(a.toString()).append("]");
+            }
+        }
+        return buf.toString();
+    }
+
+
+    /**
      * Return value as defined by given BCELComparator strategy.
      * By default two Field objects are said to be equal when
      * their names and signatures are equal.

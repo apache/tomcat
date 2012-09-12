@@ -19,6 +19,7 @@ package org.apache.tomcat.util.bcel.classfile;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.StringTokenizer;
 
 import org.apache.tomcat.util.bcel.Constants;
 import org.apache.tomcat.util.bcel.util.BCELComparator;
@@ -38,9 +39,16 @@ public class JavaClass extends AccessFlags
         implements Cloneable, Comparable<JavaClass> {
 
     private static final long serialVersionUID = 7029227708237523236L;
+    private String file_name;
+    private String source_file_name = "<Unknown>";
     private String class_name;
     private String superclass_name;
+    private int major, minor; // Compiler version
+    private ConstantPool constant_pool; // Constant pool
+    private int[] interfaces; // implemented interfaces
     private String[] interface_names;
+    private Field[] fields; // Fields, i.e., variables of class
+    private Method[] methods; // methods defined in the class
     private Attribute[] attributes; // attributes defined in the class
     private AnnotationEntry[] annotations;   // annotations defined on the class
 
@@ -98,10 +106,23 @@ public class JavaClass extends AccessFlags
         if (methods == null) {
             methods = new Method[0];
         }
+        this.file_name = file_name;
+        this.major = major;
+        this.minor = minor;
         this.access_flags = access_flags;
+        this.constant_pool = constant_pool;
+        this.interfaces = interfaces;
+        this.fields = fields;
+        this.methods = methods;
         this.attributes = attributes;
         annotationsOutOfDate = true;
-
+        // Get source file name if available
+        for (int i = 0; i < attributes.length; i++) {
+            if (attributes[i] instanceof SourceFile) {
+                source_file_name = ((SourceFile) attributes[i]).getSourceFileName();
+                break;
+            }
+        }
         /* According to the specification the following entries must be of type
          * `ConstantClass' but we check that anyway via the
          * `ConstPool.getConstant' method.
@@ -175,6 +196,72 @@ public class JavaClass extends AccessFlags
      */
     public String getSuperclassName() {
         return superclass_name;
+    }
+
+
+    /**
+     * @return String representing class contents.
+     */
+    @Override
+    public String toString() {
+        String access = Utility.accessToString(access_flags, true);
+        access = access.equals("") ? "" : (access + " ");
+        StringBuilder buf = new StringBuilder(128);
+        buf.append(access).append(Utility.classOrInterface(access_flags)).append(" ").append(
+                class_name).append(" extends ").append(
+                Utility.compactClassName(superclass_name, false)).append('\n');
+        int size = interfaces.length;
+        if (size > 0) {
+            buf.append("implements\t\t");
+            for (int i = 0; i < size; i++) {
+                buf.append(interface_names[i]);
+                if (i < size - 1) {
+                    buf.append(", ");
+                }
+            }
+            buf.append('\n');
+        }
+        buf.append("filename\t\t").append(file_name).append('\n');
+        buf.append("compiled from\t\t").append(source_file_name).append('\n');
+        buf.append("compiler version\t").append(major).append(".").append(minor).append('\n');
+        buf.append("access flags\t\t").append(access_flags).append('\n');
+        buf.append("constant pool\t\t").append(constant_pool.getLength()).append(" entries\n");
+        buf.append("ACC_SUPER flag\t\t").append(isSuper()).append("\n");
+        if (attributes.length > 0) {
+            buf.append("\nAttribute(s):\n");
+            for (int i = 0; i < attributes.length; i++) {
+                buf.append(indent(attributes[i]));
+            }
+        }
+        AnnotationEntry[] annotations = getAnnotationEntries();
+        if (annotations!=null && annotations.length>0) {
+            buf.append("\nAnnotation(s):\n");
+            for (int i=0; i<annotations.length; i++)
+                buf.append(indent(annotations[i]));
+        }
+        if (fields.length > 0) {
+            buf.append("\n").append(fields.length).append(" fields:\n");
+            for (int i = 0; i < fields.length; i++) {
+                buf.append("\t").append(fields[i]).append('\n');
+            }
+        }
+        if (methods.length > 0) {
+            buf.append("\n").append(methods.length).append(" methods:\n");
+            for (int i = 0; i < methods.length; i++) {
+                buf.append("\t").append(methods[i]).append('\n');
+            }
+        }
+        return buf.toString();
+    }
+
+
+    private static final String indent( Object obj ) {
+        StringTokenizer tok = new StringTokenizer(obj.toString(), "\n");
+        StringBuilder buf = new StringBuilder();
+        while (tok.hasMoreTokens()) {
+            buf.append("\t").append(tok.nextToken()).append("\n");
+        }
+        return buf.toString();
     }
 
 

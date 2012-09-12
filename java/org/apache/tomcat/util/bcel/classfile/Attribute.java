@@ -215,4 +215,13 @@ public abstract class Attribute implements Cloneable, Serializable
      * @return deep copy of this attribute
      */
     public abstract Attribute copy(ConstantPool _constant_pool);
+
+    /**
+     * @return attribute name.
+     */
+    @Override
+    public String toString()
+    {
+        return Constants.ATTRIBUTE_NAMES[tag];
+    }
 }
