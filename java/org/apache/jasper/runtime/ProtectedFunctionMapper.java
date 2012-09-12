@@ -75,7 +75,7 @@ public final class ProtectedFunctionMapper extends javax.el.FunctionMapper
         } else {
             funcMapper = new ProtectedFunctionMapper();
         }
-        funcMapper.fnmap = new HashMap<String,Method>();
+        funcMapper.fnmap = new HashMap<>();
         return funcMapper;
     }
 

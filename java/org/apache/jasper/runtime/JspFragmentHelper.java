@@ -33,23 +33,22 @@ import javax.servlet.jsp.tagext.JspTag;
  *
  * @author Mark Roth
  */
-public abstract class JspFragmentHelper
-    extends JspFragment
-{
+public abstract class JspFragmentHelper extends JspFragment {
 
-    protected int discriminator;
-    protected JspContext jspContext;
-    protected PageContext _jspx_page_context;
-    protected JspTag parentTag;
+    protected final int discriminator;
+    protected final JspContext jspContext;
+    protected final PageContext _jspx_page_context;
+    protected final JspTag parentTag;
 
     public JspFragmentHelper( int discriminator, JspContext jspContext,
         JspTag parentTag )
     {
         this.discriminator = discriminator;
         this.jspContext = jspContext;
-        this._jspx_page_context = null;
-        if( jspContext instanceof PageContext ) {
+        if(jspContext instanceof PageContext) {
             _jspx_page_context = (PageContext)jspContext;
+        } else {
+            _jspx_page_context = null;
         }
         this.parentTag = parentTag;
     }
