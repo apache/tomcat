@@ -60,22 +60,22 @@ import org.apache.jasper.compiler.Localizer;
 public class JspContextWrapper extends PageContext implements VariableResolver {
 
     // Invoking JSP context
-    private PageContext invokingJspCtxt;
+    private final PageContext invokingJspCtxt;
 
-    private transient HashMap<String, Object> pageAttributes;
+    private final transient HashMap<String, Object> pageAttributes;
 
     // ArrayList of NESTED scripting variables
-    private ArrayList<String> nestedVars;
+    private final ArrayList<String> nestedVars;
 
     // ArrayList of AT_BEGIN scripting variables
-    private ArrayList<String> atBeginVars;
+    private final ArrayList<String> atBeginVars;
 
     // ArrayList of AT_END scripting variables
-    private ArrayList<String> atEndVars;
+    private final ArrayList<String> atEndVars;
 
-    private Map<String,String> aliases;
+    private final Map<String,String> aliases;
 
-    private HashMap<String, Object> originalNestedVars;
+    private final HashMap<String, Object> originalNestedVars;
 
     public JspContextWrapper(JspContext jspContext,
             ArrayList<String> nestedVars, ArrayList<String> atBeginVars,
@@ -84,11 +84,13 @@ public class JspContextWrapper extends PageContext implements VariableResolver {
         this.nestedVars = nestedVars;
         this.atBeginVars = atBeginVars;
         this.atEndVars = atEndVars;
-        this.pageAttributes = new HashMap<String, Object>(16);
+        this.pageAttributes = new HashMap<>(16);
         this.aliases = aliases;
 
         if (nestedVars != null) {
-            this.originalNestedVars = new HashMap<String, Object>(nestedVars.size());
+            this.originalNestedVars = new HashMap<>(nestedVars.size());
+        } else {
+            this.originalNestedVars = null;
         }
         syncBeginTagFile();
     }

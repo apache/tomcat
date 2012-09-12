@@ -53,9 +53,9 @@ public class JspApplicationContextImpl implements JspApplicationContext {
     private final ExpressionFactory expressionFactory =
             ExpressionFactory.newInstance();
 
-    private final List<ELContextListener> contextListeners = new ArrayList<ELContextListener>();
+    private final List<ELContextListener> contextListeners = new ArrayList<>();
 
-    private final List<ELResolver> resolvers = new ArrayList<ELResolver>();
+    private final List<ELResolver> resolvers = new ArrayList<>();
 
     private boolean instantiated = false;
 

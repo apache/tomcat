@@ -112,7 +112,7 @@ public class PageContextImpl extends PageContext {
      */
     PageContextImpl() {
         this.outs = new BodyContentImpl[0];
-        this.attributes = new HashMap<String, Object>(16);
+        this.attributes = new HashMap<>(16);
         this.depth = -1;
     }
 
