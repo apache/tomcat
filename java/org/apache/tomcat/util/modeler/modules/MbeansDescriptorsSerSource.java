@@ -34,19 +34,10 @@ public class MbeansDescriptorsSerSource extends ModelerSource
 {
     private static final Log log = LogFactory.getLog(MbeansDescriptorsSerSource.class);
     private Registry registry;
-    private String type;
     private final List<ObjectName> mbeans=new ArrayList<>();
 
     public void setRegistry(Registry reg) {
         this.registry=reg;
-    }
-
-    /** Used if a single component is loaded
-     *
-     * @param type
-     */
-    public void setType( String type ) {
-       this.type=type;
     }
 
     public void setSource( Object source ) {
@@ -57,7 +48,6 @@ public class MbeansDescriptorsSerSource extends ModelerSource
     public List<ObjectName> loadDescriptors( Registry registry, String type,
             Object source) throws Exception {
         setRegistry(registry);
-        setType(type);
         setSource(source);
         execute();
         return mbeans;
