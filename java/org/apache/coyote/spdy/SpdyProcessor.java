@@ -107,7 +107,6 @@ public class SpdyProcessor extends AbstractProcessor<Object> implements
                     bchunk.getStart(), rd);
             inFrame.advance(rd);
             if (inFrame.remaining() == 0) {
-                spdy.getSpdyContext().releaseFrame(inFrame);
                 if (!inFrame.isHalfClose()) {
                     inFrame = null;
                 }

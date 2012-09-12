@@ -492,7 +492,6 @@ public abstract class SpdyConnection { // implements Runnable {
             if (inFrame != null) {
                 inFrame.recyle();
                 if (nextFrame != null) {
-                    getSpdyContext().releaseFrame(inFrame);
                     inFrame = nextFrame;
                     nextFrame = null;
                 }
@@ -547,9 +546,9 @@ public abstract class SpdyConnection { // implements Runnable {
             case TYPE_SETTINGS: {
                 int cnt = inFrame.readInt();
                 for (int i = 0; i < cnt; i++) {
-                    int flag = inFrame.readByte();
-                    int id = inFrame.read24();
-                    int value = inFrame.readInt();
+                    inFrame.readByte();
+                    inFrame.read24();
+                    inFrame.readInt();
                 }
                 // TODO: save/interpret settings
                 break;

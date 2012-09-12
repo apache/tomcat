@@ -92,9 +92,6 @@ public final class SpdyContext {
         return new SpdyFrame(defaultFrameSize);
     }
 
-    public void releaseFrame(SpdyFrame done) {
-    }
-
     /**
      * Set the max frame size.
      *
@@ -196,9 +193,6 @@ public final class SpdyContext {
      */
     public SpdyConnection getConnection(String host, int port) throws IOException {
         return netSupport.getConnection(host, port);
-    }
-
-    public void releaseConnection(SpdyConnection con) {
     }
 
     public final void listen(final int port, String cert, String key) throws IOException {
