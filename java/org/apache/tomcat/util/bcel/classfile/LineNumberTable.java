@@ -81,6 +81,30 @@ public final class LineNumberTable extends Attribute {
 
 
     /**
+     * @return String representation.
+     */
+    @Override
+    public final String toString() {
+        StringBuilder buf = new StringBuilder();
+        StringBuilder line = new StringBuilder();
+        String newLine = System.getProperty("line.separator", "\n");
+        for (int i = 0; i < line_number_table_length; i++) {
+            line.append(line_number_table[i].toString());
+            if (i < line_number_table_length - 1) {
+                line.append(", ");
+            }
+            if (line.length() > 72) {
+                line.append(newLine);
+                buf.append(line.toString());
+                line.setLength(0);
+            }
+        }
+        buf.append(line);
+        return buf.toString();
+    }
+
+
+    /**
      * @return deep copy of this attribute
      */
     @Override

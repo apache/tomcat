@@ -79,6 +79,22 @@ private int             local_variable_type_table_length; // Table of local
   }
 
   /**
+   * @return String representation.
+   */
+  @Override
+  public final String toString() {
+      StringBuilder buf = new StringBuilder();
+
+    for(int i=0; i < local_variable_type_table_length; i++) {
+      buf.append(local_variable_type_table[i].toString());
+
+      if(i < local_variable_type_table_length - 1) buf.append('\n');
+    }
+
+    return buf.toString();
+  }
+
+  /**
    * @return deep copy of this attribute
    */
   @Override

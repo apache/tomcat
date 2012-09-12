@@ -32,11 +32,20 @@ public abstract class ElementValue
 
     protected ConstantPool cpool;
 
+    @Override
+    public String toString()
+    {
+        return stringifyValue();
+    }
+
     protected ElementValue(int type, ConstantPool cpool)
     {
         this.type = type;
         this.cpool = cpool;
     }
+
+
+    public abstract String stringifyValue();
 
     public abstract void dump(DataOutputStream dos) throws IOException;
 

@@ -93,6 +93,16 @@ public final class CodeException implements Cloneable, Constants, Serializable {
     /**
      * @return String representation.
      */
+    @Override
+    public final String toString() {
+        return "CodeException(start_pc = " + start_pc + ", end_pc = " + end_pc + ", handler_pc = "
+                + handler_pc + ", catch_type = " + catch_type + ")";
+    }
+
+
+    /**
+     * @return String representation.
+     */
     public final String toString( ConstantPool cp, boolean verbose ) {
         String str;
         if (catch_type == 0) {

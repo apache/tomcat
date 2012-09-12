@@ -80,4 +80,14 @@ public final class ConstantMethodHandle extends Constant {
     public void setReferenceIndex(int reference_index) {
         this.reference_index = reference_index;
     }
+
+
+    /**
+     * @return String representation
+     */
+    @Override
+    public final String toString() {
+        return super.toString() + "(reference_kind = " + reference_kind +
+                ", reference_index = " + reference_index + ")";
+    }
 }

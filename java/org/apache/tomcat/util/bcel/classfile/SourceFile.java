@@ -82,6 +82,15 @@ public final class SourceFile extends Attribute {
 
 
     /**
+     * @return String representation
+     */
+    @Override
+    public final String toString() {
+        return "SourceFile(" + getSourceFileName() + ")";
+    }
+
+
+    /**
      * @return deep copy of this attribute
      */
     @Override

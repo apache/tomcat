@@ -48,16 +48,16 @@ public final class StackMapEntry implements Cloneable, Serializable {
      * @param file Input stream
      * @throws IOException
      */
-    StackMapEntry(DataInputStream file) throws IOException {
+    StackMapEntry(DataInputStream file, ConstantPool constant_pool) throws IOException {
         this(file.readShort(), file.readShort(), null, -1, null);
         types_of_locals = new StackMapType[number_of_locals];
         for (int i = 0; i < number_of_locals; i++) {
-            types_of_locals[i] = new StackMapType(file);
+            types_of_locals[i] = new StackMapType(file, constant_pool);
         }
         number_of_stack_items = file.readShort();
         types_of_stack_items = new StackMapType[number_of_stack_items];
         for (int i = 0; i < number_of_stack_items; i++) {
-            types_of_stack_items[i] = new StackMapType(file);
+            types_of_stack_items[i] = new StackMapType(file, constant_pool);
         }
     }
 
@@ -89,6 +89,38 @@ public final class StackMapEntry implements Cloneable, Serializable {
         for (int i = 0; i < number_of_stack_items; i++) {
             types_of_stack_items[i].dump(file);
         }
+    }
+
+
+    /**
+     * @return String representation.
+     */
+    @Override
+    public final String toString() {
+        StringBuilder buf = new StringBuilder(64);
+        buf.append("(offset=").append(byte_code_offset);
+        if (number_of_locals > 0) {
+            buf.append(", locals={");
+            for (int i = 0; i < number_of_locals; i++) {
+                buf.append(types_of_locals[i]);
+                if (i < number_of_locals - 1) {
+                    buf.append(", ");
+                }
+            }
+            buf.append("}");
+        }
+        if (number_of_stack_items > 0) {
+            buf.append(", stack items={");
+            for (int i = 0; i < number_of_stack_items; i++) {
+                buf.append(types_of_stack_items[i]);
+                if (i < number_of_stack_items - 1) {
+                    buf.append(", ");
+                }
+            }
+            buf.append("}");
+        }
+        buf.append(")");
+        return buf.toString();
     }
 
 

@@ -70,7 +70,7 @@ public final class StackMapTable extends Attribute {
         map_length = file.readUnsignedShort();
         map = new StackMapTableEntry[map_length];
         for (int i = 0; i < map_length; i++) {
-            map[i] = new StackMapTableEntry(file);
+            map[i] = new StackMapTableEntry(file, constant_pool);
         }
     }
 
@@ -81,6 +81,23 @@ public final class StackMapTable extends Attribute {
     public final void setStackMapTable( StackMapTableEntry[] map ) {
         this.map = map;
         map_length = (map == null) ? 0 : map.length;
+    }
+
+
+    /**
+     * @return String representation.
+     */
+    @Override
+    public final String toString() {
+        StringBuilder buf = new StringBuilder("StackMapTable(");
+        for (int i = 0; i < map_length; i++) {
+            buf.append(map[i].toString());
+            if (i < map_length - 1) {
+                buf.append(", ");
+            }
+        }
+        buf.append(')');
+        return buf.toString();
     }
 
 

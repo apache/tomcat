@@ -63,4 +63,13 @@ public final class ConstantDouble extends Constant {
     public final double getBytes() {
         return bytes;
     }
+
+
+    /**
+     * @return String representation.
+     */
+    @Override
+    public final String toString() {
+        return super.toString() + "(bytes = " + bytes + ")";
+    }
 }

@@ -72,6 +72,16 @@ public final class Signature extends Attribute {
     }
 
     /**
+     * @return String representation
+     */
+    @Override
+    public final String toString() {
+        String s = getSignature();
+        return "Signature(" + s + ")";
+    }
+
+
+    /**
      * @return deep copy of this attribute
      */
     @Override
