@@ -75,14 +75,4 @@ public final class ConstantNameAndType extends Constant {
     public final int getSignatureIndex() {
         return signature_index;
     }
-
-
-    /**
-     * @return String representation
-     */
-    @Override
-    public final String toString() {
-        return super.toString() + "(name_index = " + name_index + ", signature_index = "
-                + signature_index + ")";
-    }
 }

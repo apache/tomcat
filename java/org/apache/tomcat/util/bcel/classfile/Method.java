@@ -20,7 +20,6 @@ package org.apache.tomcat.util.bcel.classfile;
 import java.io.DataInputStream;
 import java.io.IOException;
 
-import org.apache.tomcat.util.bcel.Constants;
 import org.apache.tomcat.util.bcel.util.BCELComparator;
 
 /**
@@ -109,43 +108,6 @@ public final class Method extends FieldOrMethod {
             return null;
         }
         return code.getLocalVariableTable();
-    }
-
-
-    /**
-     * Return string representation close to declaration format,
-     * `public static void main(String[] args) throws IOException', e.g.
-     *
-     * @return String representation of the method.
-     */
-    @Override
-    public final String toString() {
-        ConstantUtf8 c;
-        String name, signature, access; // Short cuts to constant pool
-        StringBuilder buf;
-        access = Utility.accessToString(access_flags);
-        // Get name and signature from constant pool
-        c = (ConstantUtf8) constant_pool.getConstant(signature_index, Constants.CONSTANT_Utf8);
-        signature = c.getBytes();
-        c = (ConstantUtf8) constant_pool.getConstant(name_index, Constants.CONSTANT_Utf8);
-        name = c.getBytes();
-        signature = Utility.methodSignatureToString(signature, name, access, true,
-                getLocalVariableTable());
-        buf = new StringBuilder(signature);
-        for (int i = 0; i < attributes_count; i++) {
-            Attribute a = attributes[i];
-            if (!((a instanceof Code) || (a instanceof ExceptionTable))) {
-                buf.append(" [").append(a.toString()).append("]");
-            }
-        }
-        ExceptionTable e = getExceptionTable();
-        if (e != null) {
-            String str = e.toString();
-            if (!str.equals("")) {
-                buf.append("\n\t\tthrows ").append(str);
-            }
-        }
-        return buf.toString();
     }
 
 

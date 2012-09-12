@@ -86,15 +86,6 @@ public final class PMGClass extends Attribute {
 
 
     /**
-     * @return String representation
-     */
-    @Override
-    public final String toString() {
-        return "PMGClass(" + getPMGName() + ", " + getPMGClassName() + ")";
-    }
-
-
-    /**
      * @return deep copy of this attribute
      */
     @Override

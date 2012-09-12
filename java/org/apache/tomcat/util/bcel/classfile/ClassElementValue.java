@@ -20,8 +20,6 @@ package org.apache.tomcat.util.bcel.classfile;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-import org.apache.tomcat.util.bcel.Constants;
-
 public class ClassElementValue extends ElementValue
 {
     // For primitive types and string type, this points to the value entry in
@@ -35,14 +33,6 @@ public class ClassElementValue extends ElementValue
         this.idx = idx;
     }
 
-
-    @Override
-    public String stringifyValue()
-    {
-        ConstantUtf8 cu8 = (ConstantUtf8) cpool.getConstant(idx,
-                Constants.CONSTANT_Utf8);
-        return cu8.getBytes();
-    }
 
     @Override
     public void dump(DataOutputStream dos) throws IOException

@@ -125,15 +125,6 @@ public final class StackMapType implements Cloneable, Serializable {
 
 
     /**
-     * @return String representation
-     */
-    @Override
-    public final String toString() {
-        return "(type=" + Constants.ITEM_NAMES[type] + printIndex() + ")";
-    }
-
-
-    /**
      * @param constant_pool Constant pool to be used for this object.
      */
     public final void setConstantPool( ConstantPool constant_pool ) {

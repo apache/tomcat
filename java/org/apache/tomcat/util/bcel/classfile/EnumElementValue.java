@@ -20,8 +20,6 @@ package org.apache.tomcat.util.bcel.classfile;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-import org.apache.tomcat.util.bcel.Constants;
-
 public class EnumElementValue extends ElementValue
 {
     // For enum types, these two indices point to the type and value
@@ -46,13 +44,5 @@ public class EnumElementValue extends ElementValue
         dos.writeByte(type); // u1 type of value (ENUM_CONSTANT == 'e')
         dos.writeShort(typeIdx); // u2
         dos.writeShort(valueIdx); // u2
-    }
-
-    @Override
-    public String stringifyValue()
-    {
-        ConstantUtf8 cu8 = (ConstantUtf8) cpool.getConstant(valueIdx,
-                Constants.CONSTANT_Utf8);
-        return cu8.getBytes();
     }
 }

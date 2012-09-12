@@ -150,56 +150,6 @@ public final class StackMapTableEntry implements Cloneable, Serializable {
 
 
     /**
-     * @return String representation.
-     */
-    @Override
-    public final String toString() {
-        StringBuilder buf = new StringBuilder(64);
-        buf.append("(");
-        if (frame_type >= Constants.SAME_FRAME && frame_type <= Constants.SAME_FRAME_MAX) {
-            buf.append("SAME");
-        } else if (frame_type >= Constants.SAME_LOCALS_1_STACK_ITEM_FRAME && frame_type <= Constants.SAME_LOCALS_1_STACK_ITEM_FRAME_MAX) {
-            buf.append("SAME_LOCALS_1_STACK");
-        } else if (frame_type == Constants.SAME_LOCALS_1_STACK_ITEM_FRAME_EXTENDED) {
-            buf.append("SAME_LOCALS_1_STACK_EXTENDED");
-        } else if (frame_type >= Constants.CHOP_FRAME && frame_type <= Constants.CHOP_FRAME_MAX) {
-            buf.append("CHOP "+(251-frame_type));
-        } else if (frame_type == Constants.SAME_FRAME_EXTENDED) {
-            buf.append("SAME_EXTENDED");
-        } else if (frame_type >= Constants.APPEND_FRAME && frame_type <= Constants.APPEND_FRAME_MAX) {
-            buf.append("APPEND "+(frame_type-251));
-        } else if (frame_type == Constants.FULL_FRAME) {
-            buf.append("FULL");
-        } else {
-            buf.append("UNKNOWN");
-        }
-        buf.append(", offset delta=").append(byte_code_offset_delta);
-        if (number_of_locals > 0) {
-            buf.append(", locals={");
-            for (int i = 0; i < number_of_locals; i++) {
-                buf.append(types_of_locals[i]);
-                if (i < number_of_locals - 1) {
-                    buf.append(", ");
-                }
-            }
-            buf.append("}");
-        }
-        if (number_of_stack_items > 0) {
-            buf.append(", stack items={");
-            for (int i = 0; i < number_of_stack_items; i++) {
-                buf.append(types_of_stack_items[i]);
-                if (i < number_of_stack_items - 1) {
-                    buf.append(", ");
-                }
-            }
-            buf.append("}");
-        }
-        buf.append(")");
-        return buf.toString();
-    }
-
-
-    /**
      * @return deep copy of this object
      */
     public StackMapTableEntry copy() {

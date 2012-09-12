@@ -183,39 +183,6 @@ public final class Code extends Attribute {
 
 
     /**
-     * @return String representation of code chunk.
-     */
-    public final String toString( boolean verbose ) {
-        StringBuilder buf = new StringBuilder(100);
-        buf.append("Code(max_stack = ").append(max_stack).append(", max_locals = ").append(
-                max_locals).append(", code_length = ").append(code_length).append(")\n").append(
-                Utility.codeToString(code, constant_pool, 0, -1, verbose));
-        if (exception_table_length > 0) {
-            buf.append("\nException handler(s) = \n").append("From\tTo\tHandler\tType\n");
-            for (int i = 0; i < exception_table_length; i++) {
-                buf.append(exception_table[i].toString(constant_pool, verbose)).append("\n");
-            }
-        }
-        if (attributes_count > 0) {
-            buf.append("\nAttribute(s) = \n");
-            for (int i = 0; i < attributes_count; i++) {
-                buf.append(attributes[i].toString()).append("\n");
-            }
-        }
-        return buf.toString();
-    }
-
-
-    /**
-     * @return String representation of code chunk.
-     */
-    @Override
-    public final String toString() {
-        return toString(true);
-    }
-
-
-    /**
      * @return deep copy of this attribute
      *
      * @param _constant_pool the constant pool to duplicate
