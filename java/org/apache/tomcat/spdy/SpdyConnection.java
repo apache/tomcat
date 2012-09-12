@@ -246,7 +246,8 @@ public abstract class SpdyConnection { // implements Runnable {
                         out.streamId = outStreamId;
                         outStreamId += 2;
                         synchronized(channels) {
-                            channels.put(out.streamId, out.stream);
+                            channels.put(Integer.valueOf(out.streamId),
+                                    out.stream);
                         }
                     }
 
@@ -286,7 +287,7 @@ public abstract class SpdyConnection { // implements Runnable {
                             out.stream.finSent = true;
                         }
                         if (out.stream.finRcvd && out.stream.finSent) {
-                            channels.remove(out.streamId);
+                            channels.remove(Integer.valueOf(out.streamId));
                         }
                     }
                 }
@@ -525,7 +526,7 @@ public abstract class SpdyConnection { // implements Runnable {
 
         List<Integer> ch = new ArrayList<>(channels.keySet());
         for (Integer i: ch) {
-            if (i > last) {
+            if (i.intValue() > last) {
                 SpdyStream stream = channels.remove(i);
                 if (stream != null) {
                     stream.onReset();
@@ -571,11 +572,12 @@ public abstract class SpdyConnection { // implements Runnable {
                             + inFrame.streamId
                             + " "
                             + ((errCode < RST_ERRORS.length) ? RST_ERRORS[errCode]
-                                    : errCode));
+                                    : Integer.valueOf(errCode)));
                 }
                 SpdyStream sch;
                 synchronized(channels) {
-                        sch = channels.remove(inFrame.streamId);
+                        sch = channels.remove(
+                                Integer.valueOf(inFrame.streamId));
                 }
                 // if RST stream is for a closed channel - we can ignore.
                 if (sch != null) {
@@ -590,7 +592,7 @@ public abstract class SpdyConnection { // implements Runnable {
                 SpdyStream ch = getSpdyContext().getStream(this);
 
                 synchronized (channels) {
-                    channels.put(inFrame.streamId, ch);
+                    channels.put(Integer.valueOf(inFrame.streamId), ch);
                 }
 
                 try {
@@ -607,7 +609,7 @@ public abstract class SpdyConnection { // implements Runnable {
             case TYPE_SYN_REPLY: {
                 SpdyStream sch;
                 synchronized(channels) {
-                    sch = channels.get(inFrame.streamId);
+                    sch = channels.get(Integer.valueOf(inFrame.streamId));
                 }
                 if (sch == null) {
                     abort("Missing channel");
@@ -640,7 +642,7 @@ public abstract class SpdyConnection { // implements Runnable {
             // Data frame
             SpdyStream sch;
             synchronized (channels) {
-                sch = channels.get(inFrame.streamId);
+                sch = channels.get(Integer.valueOf(inFrame.streamId));
             }
             if (sch == null) {
                 abort("Missing channel");
@@ -649,7 +651,7 @@ public abstract class SpdyConnection { // implements Runnable {
             sch.onDataFrame(inFrame);
             synchronized (channels) {
                 if (sch.finRcvd && sch.finSent) {
-                    channels.remove(inFrame.streamId);
+                    channels.remove(Integer.valueOf(inFrame.streamId));
                 }
             }
             inFrame = null;

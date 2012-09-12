@@ -1023,7 +1023,7 @@ public class AprSocketContext {
                             boolean blocking = false;
 
                             synchronized (channels) {
-                                ch = channels.get(sock);
+                                ch = channels.get(Long.valueOf(sock));
                                 if (ch != null) {
                                     blocking = ch.isBlocking();
                                 } else {
@@ -1255,7 +1255,7 @@ public class AprSocketContext {
                 if (ch.isClosed()) {
                     synchronized (channels) {
                         ch.poller = null;
-                        channels.remove(ch.socket);
+                        channels.remove(Long.valueOf(ch.socket));
                     }
                     keepAliveCount.decrementAndGet();
                     ch.reset();
@@ -1289,7 +1289,7 @@ public class AprSocketContext {
                     failed = true;
                 } else {
                     polledCount.incrementAndGet();
-                    channels.put(up.socket, up);
+                    channels.put(Long.valueOf(up.socket), up);
                     up.setStatus(AprSocket.POLL);
                 }
             }
