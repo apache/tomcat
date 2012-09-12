@@ -239,7 +239,7 @@ public class SpdyStream implements Runnable {
             // TODO: add the others
             reqFrame.halfClose();
         }
-        getRequest().addHeader("scheme", "http"); // todo
+        getRequest().addHeader("scheme", scheme);
         getRequest().addHeader("method", method);
         getRequest().addHeader("version", "HTTP/1.1");
         if (reqFrame.isHalfClose()) {
@@ -270,9 +270,6 @@ public class SpdyStream implements Runnable {
 
         private void fill() {
             if (current == null || current.off == current.endData) {
-                if (current != null) {
-                    spdy.spdyContext.releaseFrame(current);
-                }
                 current = getFrame(to);
             }
         }

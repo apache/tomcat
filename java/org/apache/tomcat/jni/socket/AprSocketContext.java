@@ -386,7 +386,7 @@ public class AprSocketContext {
             throw new IOException("Missing certificates for server");
         }
         if (sslMode || !nonBlockingAccept) {
-            acceptorDispatch = new AcceptorDispatchThread(port);
+            acceptorDispatch = new AcceptorDispatchThread();
             acceptorDispatch.setName("AprAcceptorDispatch-" + port);
             acceptorDispatch.start();
         }
@@ -688,10 +688,6 @@ public class AprSocketContext {
                 throw new IOException(e);
             }
 
-            long mode =
-                    SSLExt.sslCtxSetMode(sslCtx, SSLExt.SSL_MODE_ENABLE_PARTIAL_WRITE |
-                            SSLExt.SSL_MODE_ACCEPT_MOVING_WRITE_BUFFER);
-
             // TODO: try release buffers
             }
         }
@@ -738,11 +734,11 @@ public class AprSocketContext {
     }
 
     /**
-     * Called on each accepted socket ( for servers ) or after connection (client)
+     * Called on each accepted socket (for servers) or after connection (client)
      * after handshake.
      */
-    protected void onSocket(AprSocket s) {
-
+    protected void onSocket(@SuppressWarnings("unused") AprSocket s) {
+        // Defaults to NO-OP. Parameter is used by sub-classes.
     }
 
     class AcceptorThread extends Thread {
@@ -858,7 +854,7 @@ public class AprSocketContext {
 
     class AcceptorDispatchThread extends Thread {
 
-        AcceptorDispatchThread(int port) {
+        AcceptorDispatchThread() {
             setDaemon(true);
         }
 
@@ -885,19 +881,18 @@ public class AprSocketContext {
     AprPoller allocatePoller() throws IOException {
         long pool = Pool.create(getRootPool());
         int size = maxConnections / pollerThreadCount;
-        int timeout = keepAliveTimeout;
 
-        long serverPollset = allocatePoller(size, pool, timeout);
+        long serverPollset = allocatePoller(size, pool);
 
         if (serverPollset == 0 && size > 1024) {
             log.severe("Falling back to 1024-sized poll, won't scale");
             size = 1024;
-            serverPollset = allocatePoller(size, pool, timeout);
+            serverPollset = allocatePoller(size, pool);
         }
         if (serverPollset == 0) {
             log.severe("Falling back to 62-sized poll, won't scale");
             size = 62;
-            serverPollset = allocatePoller(size, pool, timeout);
+            serverPollset = allocatePoller(size, pool);
         }
 
         AprPoller res = new AprPoller();
@@ -920,12 +915,12 @@ public class AprSocketContext {
     // last test shows a small improvement, can switch later.
     static boolean sizeLogged = false;
 
-    protected long allocatePoller(int size, long pool, int timeout) {
+    protected long allocatePoller(int size, long pool) {
         int flag = threadSafe ? Poll.APR_POLLSET_THREADSAFE: 0;
         for (int i = 0; i < 2; i++) {
             try {
                 //  timeout must be -1 - or ttl will take effect, strange results.
-                return Poll.create(size, pool, flag, -1); // timeout * 1000);
+                return Poll.create(size, pool, flag, -1);
             } catch (Error e) {
                 e.printStackTrace();
                 if (Status.APR_STATUS_IS_EINVAL(e.getError())) {
@@ -1039,7 +1034,6 @@ public class AprSocketContext {
                             // Check for failed sockets and hand this socket off to a worker
                             long mask = desc[pollIdx * 2];
 
-                            boolean hup = ((mask & Poll.APR_POLLHUP) == Poll.APR_POLLHUP);
                             boolean err = ((mask & Poll.APR_POLLERR) == Poll.APR_POLLERR);
                             boolean nval = ((mask & Poll.APR_POLLNVAL) != 0);
                             if (err || nval) {

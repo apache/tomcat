@@ -61,10 +61,9 @@ public class MbeansDescriptorsIntrospectionSource extends ModelerSource
     }
 
     @Override
-    public List<ObjectName> loadDescriptors(Registry registry, String type,
-            Object source) throws Exception {
+    public List<ObjectName> loadDescriptors(Registry registry, Object source)
+            throws Exception {
         setRegistry(registry);
-        setType(type);
         setSource(source);
         execute();
         return mbeans;
