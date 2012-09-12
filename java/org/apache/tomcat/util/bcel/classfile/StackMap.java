@@ -70,7 +70,7 @@ public final class StackMap extends Attribute {
         map_length = file.readUnsignedShort();
         map = new StackMapEntry[map_length];
         for (int i = 0; i < map_length; i++) {
-            map[i] = new StackMapEntry(file, constant_pool);
+            map[i] = new StackMapEntry(file);
         }
     }
 

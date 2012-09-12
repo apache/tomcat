@@ -38,16 +38,9 @@ public class JavaClass extends AccessFlags
         implements Cloneable, Comparable<JavaClass> {
 
     private static final long serialVersionUID = 7029227708237523236L;
-    private String file_name;
-    private String source_file_name = "<Unknown>";
     private String class_name;
     private String superclass_name;
-    private int major, minor; // Compiler version
-    private ConstantPool constant_pool; // Constant pool
-    private int[] interfaces; // implemented interfaces
     private String[] interface_names;
-    private Field[] fields; // Fields, i.e., variables of class
-    private Method[] methods; // methods defined in the class
     private Attribute[] attributes; // attributes defined in the class
     private AnnotationEntry[] annotations;   // annotations defined on the class
 
@@ -105,23 +98,10 @@ public class JavaClass extends AccessFlags
         if (methods == null) {
             methods = new Method[0];
         }
-        this.file_name = file_name;
-        this.major = major;
-        this.minor = minor;
         this.access_flags = access_flags;
-        this.constant_pool = constant_pool;
-        this.interfaces = interfaces;
-        this.fields = fields;
-        this.methods = methods;
         this.attributes = attributes;
         annotationsOutOfDate = true;
-        // Get source file name if available
-        for (int i = 0; i < attributes.length; i++) {
-            if (attributes[i] instanceof SourceFile) {
-                source_file_name = ((SourceFile) attributes[i]).getSourceFileName();
-                break;
-            }
-        }
+
         /* According to the specification the following entries must be of type
          * `ConstantClass' but we check that anyway via the
          * `ConstPool.getConstant' method.
