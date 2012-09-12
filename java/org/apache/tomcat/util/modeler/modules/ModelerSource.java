@@ -32,9 +32,10 @@ public abstract class ModelerSource {
      * Load data, returns a list of items.
      *
      * @param registry
+     * @param type
      * @param source Introspected object or some other source
      * @throws Exception
      */
     public abstract List<ObjectName> loadDescriptors(Registry registry,
-            Object source) throws Exception;
+            String type, Object source) throws Exception;
 }

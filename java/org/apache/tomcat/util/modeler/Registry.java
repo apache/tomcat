@@ -482,7 +482,7 @@ public class Registry implements RegistryMBean, MBeanRegistration  {
             }
 
             // introspection
-            load("MbeansDescriptorsIntrospectionSource", beanClass);
+            load("MbeansDescriptorsIntrospectionSource", beanClass, type);
 
             managed=findManagedBean(type);
             if( managed==null ) {
@@ -535,20 +535,23 @@ public class Registry implements RegistryMBean, MBeanRegistration  {
      *
      * @param sourceType
      * @param source
+     * @param param
      * @return List of descriptors
      * @throws Exception
      */
-    public List<ObjectName> load( String sourceType, Object source)
-            throws Exception {
+    public List<ObjectName> load( String sourceType, Object source,
+            String param) throws Exception {
         if( log.isTraceEnabled()) {
             log.trace("load " + source );
         }
         String location=null;
+        String type=null;
         Object inputsource=null;
 
         if( source instanceof URL ) {
             URL url=(URL)source;
             location=url.toString();
+            type=param;
             inputsource=url.openStream();
             if( sourceType == null ) {
                 sourceType = sourceTypeFromExt(location);
@@ -556,13 +559,16 @@ public class Registry implements RegistryMBean, MBeanRegistration  {
         } else if( source instanceof File ) {
             location=((File)source).getAbsolutePath();
             inputsource=new FileInputStream((File)source);
+            type=param;
             if( sourceType == null ) {
                 sourceType = sourceTypeFromExt(location);
             }
         } else if( source instanceof InputStream ) {
+            type=param;
             inputsource=source;
         } else if( source instanceof Class<?> ) {
             location=((Class<?>)source).getName();
+            type=param;
             inputsource=source;
             if( sourceType== null ) {
                 sourceType="MbeansDescriptorsIntrospectionSource";
@@ -574,7 +580,7 @@ public class Registry implements RegistryMBean, MBeanRegistration  {
         }
         ModelerSource ds=getModelerSource(sourceType);
         List<ObjectName> mbeans =
-            ds.loadDescriptors(this, inputsource);
+            ds.loadDescriptors(this, type, inputsource);
 
         return mbeans;
     }
@@ -659,7 +665,7 @@ public class Registry implements RegistryMBean, MBeanRegistration  {
         log.debug( "Found " + dURL);
         searchedPaths.put( packageName,  dURL );
         try {
-            load("MbeansDescriptorsDigesterSource", dURL);
+            load("MbeansDescriptorsDigesterSource", dURL, null);
         } catch(Exception ex ) {
             log.error("Error loading " + dURL);
         }
