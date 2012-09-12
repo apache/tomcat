@@ -63,19 +63,19 @@ public class JspCServletContext implements ServletContext {
     /**
      * Servlet context attributes.
      */
-    protected Hashtable<String,Object> myAttributes;
+    protected final Hashtable<String,Object> myAttributes;
 
 
     /**
      * The log writer we will write log messages to.
      */
-    protected PrintWriter myLogWriter;
+    protected final PrintWriter myLogWriter;
 
 
     /**
      * The base URL (document root) for this context.
      */
-    protected URL myResourceBaseURL;
+    protected final URL myResourceBaseURL;
 
 
     // ----------------------------------------------------------- Constructors
