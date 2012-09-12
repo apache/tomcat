@@ -52,9 +52,9 @@
     <Bug code="IS"/>
   </Match>
   <Match>
-    <Class name="org.apache.catalina.authenticator.DigestAuthenticator"/>
-    <Field name="cnonces"/>
-    <Bug code="IS"/>
+    <!-- Method is synchronized therefore not an issue -->
+    <Class name="org.apache.catalina.authenticator.DigestAuthenticator$NonceInfo"/>
+    <Bug code="VO"/>
   </Match>
   <Match>
     <Class name="org.apache.catalina.connector.CoyoteReader"/>

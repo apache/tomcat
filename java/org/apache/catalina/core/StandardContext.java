@@ -2514,7 +2514,7 @@ public class StandardContext extends ContainerBase
 
 
     @Override
-    public synchronized void setResources(DirContext resources) {
+    public void setResources(DirContext resources) {
 
         Lock writeLock = resourcesLock.writeLock();
         writeLock.lock();
@@ -2546,13 +2546,12 @@ public class StandardContext extends ContainerBase
 
             // The proxied resources will be refreshed on start
             this.resources = null;
+
+            support.firePropertyChange("resources", oldResources,
+                    resources);
         } finally {
             writeLock.unlock();
         }
-
-        support.firePropertyChange("resources", oldResources,
-                                   resources);
-
     }
 
 
@@ -4966,12 +4965,13 @@ public class StandardContext extends ContainerBase
                         .unregisterComponent(resourcesName);
                 }
             }
+            this.resources = null;
         } catch (Throwable t) {
             ExceptionUtils.handleThrowable(t);
             log.error(sm.getString("standardContext.resourcesStop"), t);
             ok = false;
-        } finally {
             this.resources = null;
+        } finally {
             writeLock.unlock();
         }
 

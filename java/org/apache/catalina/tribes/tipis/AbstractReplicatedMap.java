@@ -623,17 +623,12 @@ public abstract class AbstractReplicatedMap<K,V>
             MapEntry<K,V> entry = innerMap.get(mapmsg.getKey());
             if ( entry==null ) {
                 entry = new MapEntry<>((K) mapmsg.getKey(), (V) mapmsg.getValue());
-                entry.setBackup(false);
-                entry.setProxy(true);
-                entry.setBackupNodes(mapmsg.getBackupNodes());
-                entry.setPrimary(mapmsg.getPrimary());
-                innerMap.put(entry.getKey(), entry);
-            } else {
-                entry.setProxy(true);
-                entry.setBackup(false);
-                entry.setBackupNodes(mapmsg.getBackupNodes());
-                entry.setPrimary(mapmsg.getPrimary());
+                entry = innerMap.putIfAbsent(entry.getKey(), entry);
             }
+            entry.setProxy(true);
+            entry.setBackup(false);
+            entry.setBackupNodes(mapmsg.getBackupNodes());
+            entry.setPrimary(mapmsg.getPrimary());
         }
 
         if (mapmsg.getMsgType() == MapMessage.MSG_REMOVE) {
@@ -1036,17 +1031,16 @@ public abstract class AbstractReplicatedMap<K,V>
 
     @Override
     public boolean containsValue(Object value) {
-        if ( value == null ) {
-            return innerMap.containsValue(value);
-        } else {
-            Iterator<Map.Entry<K,MapEntry<K,V>>> i = innerMap.entrySet().iterator();
-            while (i.hasNext()) {
-                Map.Entry<K,MapEntry<K,V>> e = i.next();
-                MapEntry<K,V> entry = innerMap.get(e.getKey());
-                if (entry!=null && entry.isActive() && value.equals(entry.getValue())) return true;
-            }//while
-            return false;
-        }//end if
+        if (value == null) {
+            throw new NullPointerException();
+        }
+        Iterator<Map.Entry<K,MapEntry<K,V>>> i = innerMap.entrySet().iterator();
+        while (i.hasNext()) {
+            Map.Entry<K,MapEntry<K,V>> e = i.next();
+            MapEntry<K,V> entry = innerMap.get(e.getKey());
+            if (entry!=null && entry.isActive() && value.equals(entry.getValue())) return true;
+        }
+        return false;
     }
 
     @Override
