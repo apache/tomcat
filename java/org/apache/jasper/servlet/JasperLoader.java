@@ -36,9 +36,9 @@ import org.apache.jasper.Constants;
  */
 public class JasperLoader extends URLClassLoader {
 
-    private PermissionCollection permissionCollection;
-    private ClassLoader parent;
-    private SecurityManager securityManager;
+    private final PermissionCollection permissionCollection;
+    private final ClassLoader parent;
+    private final SecurityManager securityManager;
 
     public JasperLoader(URL[] urls, ClassLoader parent,
                         PermissionCollection permissionCollection) {

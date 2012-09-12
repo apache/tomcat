@@ -83,16 +83,16 @@ public class JspServletWrapper {
     private final Log log = LogFactory.getLog(JspServletWrapper.class);
 
     private Servlet theServlet;
-    private String jspUri;
+    private final String jspUri;
     private Class<?> tagHandlerClass;
-    private JspCompilationContext ctxt;
+    private final JspCompilationContext ctxt;
     private long available = 0L;
-    private ServletConfig config;
-    private Options options;
+    private final ServletConfig config;
+    private final Options options;
     private boolean firstTime = true;
     /** Whether the servlet needs reloading on next access */
     private volatile boolean reload = true;
-    private boolean isTagFile;
+    private final boolean isTagFile;
     private int tripCount;
     private JasperException compileException;
     /** Timestamp of last time servlet resource was modified */
