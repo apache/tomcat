@@ -20,7 +20,6 @@ package org.apache.tomcat.util.bcel.classfile;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,9 +32,7 @@ import org.apache.tomcat.util.bcel.Constants;
  * @author  <A HREF="mailto:dbrosius@mebigfatguy.com">D. Brosius</A>
  * @since 5.3
  */
-public class AnnotationEntry implements Constants, Serializable {
-
-    private static final long serialVersionUID = 1L;
+public class AnnotationEntry implements Constants {
 
     private final int type_index;
     private final ConstantPool constant_pool;
