@@ -107,6 +107,15 @@
       </scode>
     </changelog>
   </subsection>
+  <subsection name="Web applications">
+    <changelog>
+      <add>
+        Extend the diagnostic information provided by the Manager web
+        application to include details of the configured SSL ciphers suites for
+        each connector. (markt)
+      </add>
+    </changelog>
+  </subsection>
   <subsection name="Tribes">
     <changelog>
       <scode>

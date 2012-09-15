@@ -408,6 +408,21 @@ public class NioEndpoint extends AbstractEndpoint {
     }
 
 
+    @Override
+    public String[] getCiphersUsed() {
+        SSLContext sslContext = getSSLContext();
+        if (sslContext != null) {
+            SSLEngine engine = getSSLContext().createSSLEngine();
+            if (getCiphersArray().length > 0) {
+                engine.setEnabledCipherSuites(getCiphersArray());
+            }
+            return engine.getEnabledCipherSuites();
+        } else {
+            return new String[0];
+        }
+    }
+
+
     // --------------------------------------------------------- OOM Parachute Methods
 
     protected void checkParachute() {
