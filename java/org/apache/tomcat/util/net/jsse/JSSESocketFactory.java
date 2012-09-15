@@ -279,6 +279,10 @@ public class JSSESocketFactory implements ServerSocketFactory, SSLUtil {
         return result;
     }
 
+    public String[] getEnabledCiphers() {
+        return enabledCiphers;
+    }
+
     /*
      * Gets the SSL server's keystore password.
      */

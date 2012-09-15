@@ -881,6 +881,31 @@ has been reloaded several times, it may be listed several times.</p>
 
 </subsection>
 
+<subsection name="Connector SSL diagnostics">
+
+<source>
+http://localhost:8080/manager/text/sslConnectorCiphers
+</source>
+
+<p>The SSL Connector/Ciphers diagnostic lists the SSL ciphers that are currently
+configured for each connector. For BIO and NIO, the names of the individual
+cipher suites are listed. For APR, the value of SSLCipherSuite is returned.</p>
+
+<p>The response will ook something like this:</p>
+<source>
+OK - Connector / SSL Cipher information
+Connector[HTTP/1.1-8080]
+  SSL is not enabled for this connector
+Connector[HTTP/1.1-8443]
+  TLS_ECDH_RSA_WITH_3DES_EDE_CBC_SHA
+  TLS_DHE_RSA_WITH_AES_128_CBC_SHA
+  TLS_ECDH_RSA_WITH_AES_128_CBC_SHA
+  TLS_ECDH_ECDSA_WITH_AES_128_CBC_SHA
+  ...
+</source>
+
+</subsection>
+
 <subsection name="Server Status">
 
 <p>From this link , you can view information about the server.</p>

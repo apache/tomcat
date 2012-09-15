@@ -811,6 +811,10 @@ public abstract class AbstractEndpoint {
             for (int i=0; i<ciphersarr.length; i++ ) ciphersarr[i] = t.nextToken();
         }
     }
+    /**
+     * @return  The ciphers in use by this Endpoint
+     */
+    public abstract String[] getCiphersUsed();
 
     private String keyAlias = null;
     public String getKeyAlias() { return keyAlias;}

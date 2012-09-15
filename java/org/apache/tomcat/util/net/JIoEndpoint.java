@@ -32,6 +32,7 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
+import org.apache.tomcat.util.net.jsse.JSSESocketFactory;
 
 
 /**
@@ -101,6 +102,16 @@ public class JIoEndpoint extends AbstractEndpoint {
             return s.getLocalPort();
         }
     }
+
+
+    @Override
+    public String[] getCiphersUsed() {
+        if (serverSocketFactory instanceof JSSESocketFactory) {
+            return ((JSSESocketFactory) serverSocketFactory).getEnabledCiphers();
+        }
+        return new String[0];
+    }
+
 
     /*
      * Optional feature support.

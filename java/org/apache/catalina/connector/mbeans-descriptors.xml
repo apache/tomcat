@@ -44,6 +44,15 @@
           description="Allow disabling TRACE method"
                  type="boolean"/>
 
+    <attribute   name="ciphers"
+          description="Comma-separated list of requested cipher suites"
+                 type="java.lang.String"/>
+
+    <attribute   name="ciphersUsed"
+          description="Array of ciphers suites in use"
+                 type="[Ljava.lang.String;"
+            writeable="false"/>
+
     <attribute   name="className"
           description="Fully qualified class name of the managed object"
                  type="java.lang.String"

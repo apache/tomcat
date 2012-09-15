@@ -349,6 +349,14 @@ public class AprEndpoint extends AbstractEndpoint {
     }
 
 
+    @Override
+    public String[] getCiphersUsed() {
+        // TODO : Investigate if it is possible to extract the current list of
+        //        available ciphers. Native code changes will be required.
+        return new String[] { getSSLCipherSuite() };
+    }
+
+
     // --------------------------------------------------------- Public Methods
 
     /**
