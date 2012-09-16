@@ -716,12 +716,14 @@ public class Tomcat {
         Wrapper servlet = addServlet(
                 ctx, "default", "org.apache.catalina.servlets.DefaultServlet");
         servlet.setLoadOnStartup(1);
+        servlet.setOverridable(true);
 
         // JSP servlet (by class name - to avoid loading all deps)
         servlet = addServlet(
                 ctx, "jsp", "org.apache.jasper.servlet.JspServlet");
         servlet.addInitParameter("fork", "false");
         servlet.setLoadOnStartup(3);
+        servlet.setOverridable(true);
 
         // Servlet mappings
         ctx.addServletMapping("/", "default");
