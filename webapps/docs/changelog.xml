@@ -80,6 +80,10 @@
         earliest isn't until the thread where <code>startAsync()</code> was
         called returns to the container). (markt)
       </fix>
+      <fix>
+        <bug>53863</bug>: Ensure the the implicit servlets (JSP and default) are
+        marked as override-able when using embedded mode. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
