@@ -108,7 +108,7 @@ public class CallMethodRule extends Rule {
                 this.paramTypes[i] = String.class;
             }
         }
-
+        this.paramClassNames = null;
     }
 
     /**
@@ -193,8 +193,9 @@ public class CallMethodRule extends Rule {
         if (paramTypes == null) {
             this.paramTypes = new Class[paramCount];
             for (int i = 0; i < this.paramTypes.length; i++) {
-                this.paramTypes[i] = "abc".getClass();
+                this.paramTypes[i] = String.class;
             }
+            this.paramClassNames = null;
         } else {
             // copy the parameter class names into an array
             // the classes will be loaded when the digester is set
@@ -261,7 +262,7 @@ public class CallMethodRule extends Rule {
         if (paramTypes == null) {
             this.paramTypes = new Class[paramCount];
             for (int i = 0; i < this.paramTypes.length; i++) {
-                this.paramTypes[i] = "abc".getClass();
+                this.paramTypes[i] = String.class;
             }
         } else {
             this.paramTypes = new Class[paramTypes.length];
@@ -269,7 +270,7 @@ public class CallMethodRule extends Rule {
                 this.paramTypes[i] = paramTypes[i];
             }
         }
-
+        this.paramClassNames = null;
     }
 
 
@@ -287,12 +288,12 @@ public class CallMethodRule extends Rule {
      * top of the digester object stack. The default value of zero
      * means the target object is the one on top of the stack.
      */
-    protected int targetOffset = 0;
+    protected final int targetOffset;
 
     /**
      * The method name to call on the parent object.
      */
-    protected String methodName = null;
+    protected final String methodName;
 
 
     /**
@@ -300,7 +301,7 @@ public class CallMethodRule extends Rule {
      * If this value is zero, a single parameter will be collected from the
      * body of this element.
      */
-    protected int paramCount = 0;
+    protected final int paramCount;
 
 
     /**
@@ -312,7 +313,7 @@ public class CallMethodRule extends Rule {
      * The names of the classes of the parameters to be collected.
      * This attribute allows creation of the classes to be postponed until the digester is set.
      */
-    protected String paramClassNames[] = null;
+    protected final String paramClassNames[];
 
     /**
      * Should <code>MethodUtils.invokeExactMethod</code> be used for reflection.
@@ -419,6 +420,7 @@ public class CallMethodRule extends Rule {
      * @param name the local name if the parser is namespace aware, or just
      *   the element name otherwise
      */
+    @SuppressWarnings("null") // parameters can't trigger NPE
     @Override
     public void end(String namespace, String name) throws Exception {
 
@@ -456,7 +458,7 @@ public class CallMethodRule extends Rule {
             parameters[0] = bodyText;
             if (paramTypes.length == 0) {
                 paramTypes = new Class[1];
-                paramTypes[0] = "abc".getClass();
+                paramTypes[0] = String.class;
             }
 
         }

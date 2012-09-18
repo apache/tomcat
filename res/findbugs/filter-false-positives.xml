@@ -237,6 +237,12 @@
     <Bug code="ST" />
   </Match>
   <Match>
+    <!-- NPE is desired as it indicates an error condition -->
+    <Class name="org.apache.tomcat.util.digester.CallMethodRule"/>
+    <Method name="end"/>
+    <Bug code="NP" />
+  </Match>
+  <Match>
     <!-- Test really is for the same object rather than equality -->
     <Class name="org.apache.tomcat.util.digester.Digester"/>
     <Or>
