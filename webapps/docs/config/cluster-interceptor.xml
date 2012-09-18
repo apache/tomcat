@@ -55,6 +55,7 @@
     <li><code>org.apache.catalina.tribes.group.interceptors.DomainFilterInterceptor</code></li>
     <li><code>org.apache.catalina.tribes.group.interceptors.FragmentationInterceptor</code></li>
     <li><code>org.apache.catalina.tribes.group.interceptors.GzipInterceptor</code></li>
+    <li><code>org.apache.catalina.tribes.group.interceptors.TcpPingInterceptor</code></li>
    </ul>
  </p>
 </section>
@@ -141,6 +142,20 @@
   </subsection>
   <subsection name="org.apache.catalina.tribes.group.interceptors.TcpFailureDetector Attributes">
    <attributes>
+   </attributes>
+  </subsection>
+  <subsection name="org.apache.catalina.tribes.group.interceptors.TcpPingInterceptor Attributes">
+   <attributes>
+     <attribute name="interval" required="false">
+       If useThread == true, defines the interval of sending a ping message.
+       default is 1000 ms.
+     </attribute>
+     <attribute name="useThread" required="false">
+       Flag of whether to start a thread for sending a ping message.
+       If set to true, this interceptor will start a local thread for sending a ping message.
+       if set to false, channel heartbeat will send a ping message.
+       default is false.
+     </attribute>
    </attributes>
   </subsection>
   <subsection name="org.apache.catalina.tribes.group.interceptors.ThroughputInterceptor Attributes">
