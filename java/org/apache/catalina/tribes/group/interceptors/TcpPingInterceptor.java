@@ -64,8 +64,8 @@ public class TcpPingInterceptor extends ChannelInterceptorBase {
     @Override
     public synchronized void start(int svc) throws ChannelException {
         super.start(svc);
-        running = true;
-        if ( thread == null ) {
+        if ( thread == null && useThread) {
+            running = true;
             thread = new PingThread();
             thread.setDaemon(true);
             thread.setName("TcpPingInterceptor.PingThread-"+cnt.addAndGet(1));
@@ -86,9 +86,11 @@ public class TcpPingInterceptor extends ChannelInterceptorBase {
 
     @Override
     public void stop(int svc) throws ChannelException {
-        running = false;
-        if ( thread != null ) thread.interrupt();
-        thread = null;
+        if ( thread != null ) {
+            running = false;
+            thread.interrupt();
+            thread = null;
+        }
         super.stop(svc);
     }
 
