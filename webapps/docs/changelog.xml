@@ -71,7 +71,7 @@
       </fix>
       <update>
         <code>JMXProxyServlet</code> now allows multi-op commands like
-        <code>invokeAndSet</code>code>, <code>invokeAndGet</code>,
+        <code>invokeAndSet</code>, <code>invokeAndGet</code>,
         etc. (schultz)
       </update>
       <fix>
