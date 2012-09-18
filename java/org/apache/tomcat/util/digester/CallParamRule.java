@@ -51,9 +51,7 @@ public class CallParamRule extends Rule {
      * @param paramIndex The zero-relative parameter number
      */
     public CallParamRule(int paramIndex) {
-
         this(paramIndex, null);
-
     }
 
 
@@ -66,10 +64,7 @@ public class CallParamRule extends Rule {
      */
     public CallParamRule(int paramIndex,
                          String attributeName) {
-
-        this.paramIndex = paramIndex;
-        this.attributeName = attributeName;
-
+        this(attributeName, paramIndex, 0, false);
     }
 
 
@@ -80,10 +75,7 @@ public class CallParamRule extends Rule {
      * @param fromStack should this parameter be taken from the top of the stack?
      */
     public CallParamRule(int paramIndex, boolean fromStack) {
-
-        this.paramIndex = paramIndex;
-        this.fromStack = fromStack;
-
+        this(null, paramIndex, 0, fromStack);
     }
 
     /**
@@ -95,11 +87,17 @@ public class CallParamRule extends Rule {
      * The zeroth object is the top of the stack, 1 is the next object down and so on.
      */
     public CallParamRule(int paramIndex, int stackIndex) {
-
-        this.paramIndex = paramIndex;
-        this.fromStack = true;
-        this.stackIndex = stackIndex;
+        this(null, paramIndex, stackIndex, true);
     }
+
+    private CallParamRule(String attributeName, int paramIndex, int stackIndex,
+            boolean fromStack) {
+        this.attributeName = attributeName;
+        this.paramIndex = paramIndex;
+        this.stackIndex = stackIndex;
+        this.fromStack = fromStack;
+    }
+
 
     // ----------------------------------------------------- Instance Variables
 
@@ -107,24 +105,24 @@ public class CallParamRule extends Rule {
     /**
      * The attribute from which to save the parameter value
      */
-    protected String attributeName = null;
+    protected final String attributeName;
 
 
     /**
      * The zero-relative index of the parameter we are saving.
      */
-    protected int paramIndex = 0;
+    protected final int paramIndex;
 
 
     /**
      * Is the parameter to be set from the stack?
      */
-    protected boolean fromStack = false;
+    protected final boolean fromStack;
 
     /**
      * The position of the object from the top of the stack
      */
-    protected int stackIndex = 0;
+    protected final int stackIndex;
 
     /**
      * Stack is used to allow nested body text to be processed.
