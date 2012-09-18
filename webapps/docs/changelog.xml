@@ -100,6 +100,10 @@
         Make the cluster members and the cluster deployer associated with the
         cluster accessible via JMX. (markt)
       </add>
+      <fix>
+        Fix a behavior of TcpPingInterceptor#useThread. If set to false, ping
+        thread is never started. (kfujino)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
