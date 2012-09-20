@@ -101,7 +101,7 @@ public class AsyncStateMachine<S> {
         DISPATCHED(false, false, false),
         STARTING(true, true, false),
         STARTED(true, true, false),
-        MUST_COMPLETE(true, true, false),
+        MUST_COMPLETE(true, false, false),
         COMPLETING(true, false, false),
         TIMING_OUT(true, false, false),
         MUST_DISPATCH(true, true, true),
