@@ -76,9 +76,9 @@
       </update>
       <fix>
         <bug>53843</bug>: <code>request.isAsyncStarted()</code> must continue to
-        return true until the dispatch/complete actually happens (which at the
-        earliest isn't until the thread where <code>startAsync()</code> was
-        called returns to the container). (markt)
+        return true until the dispatch actually happens (which at the earliest
+        isn't until the thread where <code>startAsync()</code> was called
+        returns to the container). (markt)
       </fix>
       <fix>
         <bug>53863</bug>: Ensure the the implicit servlets (JSP and default) are
