@@ -18,7 +18,6 @@ package org.apache.catalina.connector;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.io.StringReader;
 import java.net.MalformedURLException;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
@@ -51,8 +50,7 @@ import org.apache.tomcat.util.buf.UEncoder;
 import org.apache.tomcat.util.http.FastHttpDateFormat;
 import org.apache.tomcat.util.http.MimeHeaders;
 import org.apache.tomcat.util.http.ServerCookie;
-import org.apache.tomcat.util.http.parser.AstMediaType;
-import org.apache.tomcat.util.http.parser.HttpParser;
+import org.apache.tomcat.util.http.parser.MediaTypeCache;
 import org.apache.tomcat.util.http.parser.ParseException;
 import org.apache.tomcat.util.net.URL;
 import org.apache.tomcat.util.res.StringManager;
@@ -70,6 +68,9 @@ public class Response
 
 
     // ----------------------------------------------------------- Constructors
+
+    private static final MediaTypeCache MEDIA_TYPE_CACHE =
+            new MediaTypeCache(100);
 
     /**
      * Compliance with SRV.15.2.22.1. A call to Response.getWriter() if no
@@ -708,10 +709,9 @@ public class Response
             return;
         }
 
-        AstMediaType m = null;
-        HttpParser hp = new HttpParser(new StringReader(type));
+        String[] m = null;
         try {
-             m = hp.MediaType();
+             m = MEDIA_TYPE_CACHE.parse(type);
         } catch (ParseException e) {
             // Invalid - Assume no charset and just pass through whatever
             // the user provided.
@@ -719,13 +719,12 @@ public class Response
             return;
         }
 
-        coyoteResponse.setContentTypeNoCharset(m.toStringNoCharset());
+        coyoteResponse.setContentTypeNoCharset(m[0]);
 
-        String charset = m.getCharset();
-        if (charset != null) {
+        if (m[1] != null) {
             // Ignore charset if getWriter() has already been called
             if (!usingWriter) {
-                coyoteResponse.setCharacterEncoding(charset);
+                coyoteResponse.setCharacterEncoding(m[1]);
                 isCharacterEncodingSet = true;
             }
         }
