@@ -84,6 +84,12 @@
         <bug>53863</bug>: Ensure the the implicit servlets (JSP and default) are
         marked as override-able when using embedded mode. (markt)
       </fix>
+      <fix>
+        When the <code>DefaultServlet</code> is under heavy load, the HTTP
+        header parser added to address <bug>52811</bug> generates large amounts
+        of garbage and uses significant CPU time. A cache has been added that
+        significantly reduces the overhead of this parser. (markt) 
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
