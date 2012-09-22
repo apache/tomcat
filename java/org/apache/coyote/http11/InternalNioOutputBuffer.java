@@ -375,9 +375,7 @@ public class InternalNioOutputBuffer extends AbstractOutputBuffer<NioChannel> {
 
     private int transfer(byte[] from, int offset, int length, ByteBuffer to) {
         int max = Math.min(length, to.remaining());
-        ByteBuffer tmp = ByteBuffer.wrap(from, offset, max);
-        tmp.limit (tmp.position() + max);
-        to.put (tmp);
+        to.put(from, offset, max);
         return max;
     }
 
