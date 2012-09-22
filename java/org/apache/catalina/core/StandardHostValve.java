@@ -60,6 +60,12 @@ final class StandardHostValve extends ValveBase {
 
     private static final Log log = LogFactory.getLog(StandardHostValve.class);
 
+    // Saves a call to getClassLoader() on very request. Under high load these
+    // calls took just long enough to appear as a hot spot (although a very
+    // minor one) in a profiler.
+    private static final ClassLoader MY_CLASSLOADER =
+            StandardHostValve.class.getClassLoader();
+
     protected static final boolean STRICT_SERVLET_COMPLIANCE;
 
     protected static final boolean ACCESS_SESSION;
@@ -184,12 +190,10 @@ final class StandardHostValve extends ValveBase {
 
         // Restore the context classloader
         if (Globals.IS_SECURITY_ENABLED) {
-            PrivilegedAction<Void> pa = new PrivilegedSetTccl(
-                    StandardHostValve.class.getClassLoader());
+            PrivilegedAction<Void> pa = new PrivilegedSetTccl(MY_CLASSLOADER);
             AccessController.doPrivileged(pa);
         } else {
-            Thread.currentThread().setContextClassLoader
-                    (StandardHostValve.class.getClassLoader());
+            Thread.currentThread().setContextClassLoader(MY_CLASSLOADER);
         }
     }
 
