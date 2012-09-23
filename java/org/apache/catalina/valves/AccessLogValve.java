@@ -35,9 +35,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
-import java.util.Queue;
 import java.util.TimeZone;
-import java.util.concurrent.ConcurrentLinkedQueue;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
@@ -55,6 +53,7 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.buf.B2CConverter;
+import org.apache.tomcat.util.collections.SynchronizedStack;
 
 
 /**
@@ -572,7 +571,8 @@ public class AccessLogValve extends ValveBase implements AccessLog {
      * Buffer pool used for log message generation. Pool used to reduce garbage
      * generation.
      */
-    private Queue<CharBuffer> charBuffers = new ConcurrentLinkedQueue<>();
+    private SynchronizedStack<CharBuffer> charBuffers =
+            new SynchronizedStack<>();
 
     /**
      * Log message buffers are usually recycled and re-used. To prevent
@@ -935,7 +935,7 @@ public class AccessLogValve extends ValveBase implements AccessLog {
         long start = request.getCoyoteRequest().getStartTime();
         Date date = getDate(start + time);
 
-        CharBuffer result = charBuffers.poll();
+        CharBuffer result = charBuffers.pop();
         if (result == null) {
             result = CharBuffer.allocate(128);
         }
@@ -947,10 +947,9 @@ public class AccessLogValve extends ValveBase implements AccessLog {
         result.flip();
         log(result);
 
-        // TODO - Make this configurable
         if (result.length() <= maxLogMessageBufferSize) {
             result.clear();
-            charBuffers.add(result);
+            charBuffers.push(result);
         }
     }
 
