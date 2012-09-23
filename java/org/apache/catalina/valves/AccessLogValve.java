@@ -948,7 +948,7 @@ public class AccessLogValve extends ValveBase implements AccessLog {
         log(result);
 
         // TODO - Make this configurable
-        if (result.length() < 256) {
+        if (result.length() <= maxLogMessageBufferSize) {
             result.clear();
             charBuffers.add(result);
         }
@@ -1825,11 +1825,7 @@ public class AccessLogValve extends ValveBase implements AccessLog {
                 // second
                 buf.append(Long.toString(time / 1000));
                 buf.append('.');
-                int remains = (int) (time % 1000);
-                buf.append(Long.toString(remains / 100));
-                remains = remains % 100;
-                buf.append(Long.toString(remains / 10));
-                buf.append(Long.toString(remains % 10));
+                buf.append(Long.toString(time % 1000));
             }
         }
     }
