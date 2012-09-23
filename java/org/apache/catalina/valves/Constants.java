@@ -76,4 +76,12 @@ public final class Constants {
     public static final char[] SC_SERVICE_UNAVAILABLE_CHAR = new char[] {'5', '0', '3'};
     public static final char[] SC_GATEWAY_TIMEOUT_CHAR = new char[] {'5', '0', '4'};
     public static final char[] SC_HTTP_VERSION_NOT_SUPPORTED_CHAR = new char[] {'5', '0', '5'};
+
+    public static final char[][] OCTETS = new char[256][];
+
+    static {
+        for (int i = 0; i < 256; i++) {
+            OCTETS[i] = Integer.toString(i).toCharArray();
+        }
+    }
 }

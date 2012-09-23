@@ -75,4 +75,45 @@ public class TestConcurrentStack {
         Assert.assertNull(stack.pop());
     }
 
+    @Test
+    public void testLimit() {
+        ConcurrentStack<Object> stack = new ConcurrentStack<>(2,2);
+
+        Object o1 = new Object();
+        Object o2 = new Object();
+        Object o3 = new Object();
+        Object o4 = new Object();
+
+        stack.push(o1);
+        stack.push(o2);
+        stack.push(o3);
+        stack.push(o4);
+
+        Assert.assertSame(stack.pop(), o2);
+        Assert.assertSame(stack.pop(), o1);
+
+        Assert.assertNull(stack.pop());
+    }
+
+
+    @Test
+    public void testLimitExpand() {
+        ConcurrentStack<Object> stack = new ConcurrentStack<>(1,3);
+
+        Object o1 = new Object();
+        Object o2 = new Object();
+        Object o3 = new Object();
+        Object o4 = new Object();
+
+        stack.push(o1);
+        stack.push(o2);
+        stack.push(o3);
+        stack.push(o4);
+
+        Assert.assertSame(stack.pop(), o3);
+        Assert.assertSame(stack.pop(), o2);
+        Assert.assertSame(stack.pop(), o1);
+
+        Assert.assertNull(stack.pop());
+    }
 }
