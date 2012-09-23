@@ -42,6 +42,7 @@ import org.apache.tomcat.util.buf.B2CConverter;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.buf.CharChunk;
 import org.apache.tomcat.util.buf.MessageBytes;
+import org.apache.tomcat.util.collections.ConcurrentWeakHashMap;
 import org.apache.tomcat.util.http.Cookies;
 import org.apache.tomcat.util.http.ServerCookie;
 import org.apache.tomcat.util.net.SSLSupport;
@@ -102,6 +103,9 @@ public class CoyoteAdapter implements Adapter {
      */
     private final Connector connector;
 
+
+    private final ConcurrentWeakHashMap<Thread,String> threadNames =
+            new ConcurrentWeakHashMap<>();
 
     /**
      * The string manager for this package.
@@ -427,7 +431,13 @@ public class CoyoteAdapter implements Adapter {
 
             // Parse and set Catalina and configuration specific
             // request parameters
-            req.getRequestProcessor().setWorkerThreadName(Thread.currentThread().getName());
+            Thread t = Thread.currentThread();
+            String threadName = threadNames.get(t);
+            if (threadName == null) {
+                threadName = t.getName();
+                threadNames.put(t, threadName);
+            }
+            req.getRequestProcessor().setWorkerThreadName(threadName);
             boolean postParseSuccess = postParseRequest(req, request, res, response);
             if (postParseSuccess) {
                 //check valves if we support async
