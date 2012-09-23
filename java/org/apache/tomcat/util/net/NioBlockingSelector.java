@@ -43,7 +43,7 @@ public class NioBlockingSelector {
 
     private static int threadCounter = 0;
 
-    private SynchronizedStack<KeyReference> keyReferenceStack =
+    private final SynchronizedStack<KeyReference> keyReferenceStack =
             new SynchronizedStack<>();
 
     protected Selector sharedSelector;
