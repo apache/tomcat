@@ -34,7 +34,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.ExceptionUtils;
-import org.apache.tomcat.util.collections.ConcurrentStack;
+import org.apache.tomcat.util.collections.SynchronizedStack;
 import org.apache.tomcat.util.net.NioEndpoint.KeyAttachment;
 
 public class NioBlockingSelector {
@@ -43,8 +43,8 @@ public class NioBlockingSelector {
 
     private static int threadCounter = 0;
 
-    private ConcurrentStack<KeyReference> keyReferenceStack =
-            new ConcurrentStack<>();
+    private SynchronizedStack<KeyReference> keyReferenceStack =
+            new SynchronizedStack<>();
 
     protected Selector sharedSelector;
 

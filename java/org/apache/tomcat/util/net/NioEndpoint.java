@@ -51,7 +51,7 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.IntrospectionUtils;
-import org.apache.tomcat.util.collections.ConcurrentStack;
+import org.apache.tomcat.util.collections.SynchronizedStack;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
 import org.apache.tomcat.util.net.SecureNioChannel.ApplicationBufferHandler;
 import org.apache.tomcat.util.net.jsse.NioX509KeyManager;
@@ -127,29 +127,29 @@ public class NioEndpoint extends AbstractEndpoint {
     /**
      * Cache for SocketProcessor objects
      */
-    protected final ConcurrentStack<SocketProcessor> processorCache =
-            new ConcurrentStack<>(ConcurrentStack.DEFAULT_SIZE,
+    protected final SynchronizedStack<SocketProcessor> processorCache =
+            new SynchronizedStack<>(SynchronizedStack.DEFAULT_SIZE,
                     socketProperties.getProcessorCache());
 
     /**
      * Cache for key attachment objects
      */
-    protected final ConcurrentStack<KeyAttachment> keyCache =
-            new ConcurrentStack<>(ConcurrentStack.DEFAULT_SIZE,
+    protected final SynchronizedStack<KeyAttachment> keyCache =
+            new SynchronizedStack<>(SynchronizedStack.DEFAULT_SIZE,
                     socketProperties.getKeyCache());
 
     /**
      * Cache for poller events
      */
-    protected final ConcurrentStack<PollerEvent> eventCache =
-            new ConcurrentStack<>(ConcurrentStack.DEFAULT_SIZE,
+    protected final SynchronizedStack<PollerEvent> eventCache =
+            new SynchronizedStack<>(SynchronizedStack.DEFAULT_SIZE,
                     socketProperties.getEventCache());
 
     /**
      * Bytebuffer cache, each channel holds a set of buffers (two, except for SSL holds four)
      */
-    protected final ConcurrentStack<NioChannel> nioChannels =
-            new ConcurrentStack<>(ConcurrentStack.DEFAULT_SIZE,
+    protected final SynchronizedStack<NioChannel> nioChannels =
+            new SynchronizedStack<>(SynchronizedStack.DEFAULT_SIZE,
                     socketProperties.getBufferPoolSize());
 
 

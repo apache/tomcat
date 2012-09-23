@@ -21,13 +21,13 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.junit.Test;
 
-public class TesterPerformanceConcurrentStack {
+public class TesterPerformanceSynchronizedStack {
 
     private static final int THREAD_COUNT = 8;
     private static final int ITERATIONS = 1000000;
 
-    private static final ConcurrentStack<Object> STACK =
-            new ConcurrentStack<>();
+    private static final SynchronizedStack<Object> STACK =
+            new SynchronizedStack<>();
 
     private static final Queue<Object> QUEUE = new ConcurrentLinkedQueue<>();
 
