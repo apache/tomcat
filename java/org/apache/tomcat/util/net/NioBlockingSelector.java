@@ -26,7 +26,6 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
 import java.util.Iterator;
-import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -35,6 +34,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.ExceptionUtils;
+import org.apache.tomcat.util.collections.ConcurrentStack;
 import org.apache.tomcat.util.net.NioEndpoint.KeyAttachment;
 
 public class NioBlockingSelector {
@@ -43,8 +43,8 @@ public class NioBlockingSelector {
 
     private static int threadCounter = 0;
 
-    private Queue<KeyReference> keyReferenceQueue =
-            new ConcurrentLinkedQueue<>();
+    private ConcurrentStack<KeyReference> keyReferenceStack =
+            new ConcurrentStack<>();
 
     protected Selector sharedSelector;
 
@@ -86,7 +86,7 @@ public class NioBlockingSelector {
             throws IOException {
         SelectionKey key = socket.getIOChannel().keyFor(socket.getPoller().getSelector());
         if ( key == null ) throw new IOException("Key no longer registered");
-        KeyReference reference = keyReferenceQueue.poll();
+        KeyReference reference = keyReferenceStack.pop();
         if (reference == null) {
             reference = new KeyReference();
         }
@@ -138,7 +138,7 @@ public class NioBlockingSelector {
                 poller.cancelKey(reference.key);
             }
             reference.key = null;
-            keyReferenceQueue.add(reference);
+            keyReferenceStack.push(reference);
         }
         return written;
     }
@@ -158,7 +158,7 @@ public class NioBlockingSelector {
     public int read(ByteBuffer buf, NioChannel socket, long readTimeout) throws IOException {
         SelectionKey key = socket.getIOChannel().keyFor(socket.getPoller().getSelector());
         if ( key == null ) throw new IOException("Key no longer registered");
-        KeyReference reference = keyReferenceQueue.poll();
+        KeyReference reference = keyReferenceStack.pop();
         if (reference == null) {
             reference = new KeyReference();
         }
@@ -206,7 +206,7 @@ public class NioBlockingSelector {
                 poller.cancelKey(reference.key);
             }
             reference.key = null;
-            keyReferenceQueue.add(reference);
+            keyReferenceStack.push(reference);
         }
         return read;
     }
@@ -215,10 +215,10 @@ public class NioBlockingSelector {
     protected static class BlockPoller extends Thread {
         protected volatile boolean run = true;
         protected Selector selector = null;
-        protected ConcurrentLinkedQueue<Runnable> events =
+        protected final ConcurrentLinkedQueue<Runnable> events =
                 new ConcurrentLinkedQueue<>();
         public void disable() { run = false; selector.wakeup();}
-        protected AtomicInteger wakeupCounter = new AtomicInteger(0);
+        protected final AtomicInteger wakeupCounter = new AtomicInteger(0);
         public void cancelKey(final SelectionKey key) {
             Runnable r = new Runnable() {
                 @Override
