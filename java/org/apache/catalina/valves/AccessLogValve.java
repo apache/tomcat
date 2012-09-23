@@ -41,6 +41,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.catalina.AccessLog;
@@ -1617,7 +1618,134 @@ public class AccessLogValve extends ValveBase implements AccessLog {
         public void addElement(CharBuffer buf, Date date, Request request,
                 Response response, long time) {
             if (response != null) {
-                buf.append(Integer.toString(response.getStatus()));
+                // This approach is used to reduce GC
+                switch (response.getStatus()) {
+                    case HttpServletResponse.SC_CONTINUE:
+                        buf.put(Constants.SC_CONTINUE_CHAR);
+                        break;
+                    case HttpServletResponse.SC_SWITCHING_PROTOCOLS:
+                        buf.put(Constants.SC_SWITCHING_PROTOCOLS_CHAR);
+                        break;
+                    case HttpServletResponse.SC_OK:
+                        buf.put(Constants.SC_OK_CHAR);
+                        break;
+                    case HttpServletResponse.SC_CREATED:
+                        buf.put(Constants.SC_CREATED_CHAR);
+                        break;
+                    case HttpServletResponse.SC_ACCEPTED:
+                        buf.put(Constants.SC_ACCEPTED_CHAR);
+                        break;
+                    case HttpServletResponse.SC_NON_AUTHORITATIVE_INFORMATION:
+                        buf.put(Constants.SC_NON_AUTHORITATIVE_INFORMATION_CHAR);
+                        break;
+                    case HttpServletResponse.SC_NO_CONTENT:
+                        buf.put(Constants.SC_NO_CONTENT_CHAR);
+                        break;
+                    case HttpServletResponse.SC_RESET_CONTENT:
+                        buf.put(Constants.SC_RESET_CONTENT_CHAR);
+                        break;
+                    case HttpServletResponse.SC_PARTIAL_CONTENT:
+                        buf.put(Constants.SC_PARTIAL_CONTENT_CHAR);
+                        break;
+                    case HttpServletResponse.SC_MULTIPLE_CHOICES:
+                        buf.put(Constants.SC_MULTIPLE_CHOICES_CHAR);
+                        break;
+                    case HttpServletResponse.SC_MOVED_PERMANENTLY:
+                        buf.put(Constants.SC_MOVED_PERMANENTLY_CHAR);
+                        break;
+                    case HttpServletResponse.SC_MOVED_TEMPORARILY:
+                        buf.put(Constants.SC_MOVED_TEMPORARILY_CHAR);
+                        break;
+                    case HttpServletResponse.SC_SEE_OTHER:
+                        buf.put(Constants.SC_SEE_OTHER_CHAR);
+                        break;
+                    case HttpServletResponse.SC_NOT_MODIFIED:
+                        buf.put(Constants.SC_NOT_MODIFIED_CHAR);
+                        break;
+                    case HttpServletResponse.SC_USE_PROXY:
+                        buf.put(Constants.SC_USE_PROXY_CHAR);
+                        break;
+                    case HttpServletResponse.SC_TEMPORARY_REDIRECT:
+                        buf.put(Constants.SC_TEMPORARY_REDIRECT_CHAR);
+                        break;
+                    case HttpServletResponse.SC_BAD_REQUEST:
+                        buf.put(Constants.SC_BAD_REQUEST_CHAR);
+                        break;
+                    case HttpServletResponse.SC_UNAUTHORIZED:
+                        buf.put(Constants.SC_UNAUTHORIZED_CHAR);
+                        break;
+                    case HttpServletResponse.SC_PAYMENT_REQUIRED:
+                        buf.put(Constants.SC_PAYMENT_REQUIRED_CHAR);
+                        break;
+                    case HttpServletResponse.SC_FORBIDDEN:
+                        buf.put(Constants.SC_FORBIDDEN_CHAR);
+                        break;
+                    case HttpServletResponse.SC_NOT_FOUND:
+                        buf.put(Constants.SC_NOT_FOUND_CHAR);
+                        break;
+                    case HttpServletResponse.SC_METHOD_NOT_ALLOWED:
+                        buf.put(Constants.SC_METHOD_NOT_ALLOWED_CHAR);
+                        break;
+                    case HttpServletResponse.SC_NOT_ACCEPTABLE:
+                        buf.put(Constants.SC_NOT_ACCEPTABLE_CHAR);
+                        break;
+                    case HttpServletResponse.SC_PROXY_AUTHENTICATION_REQUIRED:
+                        buf.put(Constants.SC_PROXY_AUTHENTICATION_REQUIRED_CHAR);
+                        break;
+                    case HttpServletResponse.SC_REQUEST_TIMEOUT:
+                        buf.put(Constants.SC_REQUEST_TIMEOUT_CHAR);
+                        break;
+                    case HttpServletResponse.SC_CONFLICT:
+                        buf.put(Constants.SC_CONFLICT_CHAR);
+                        break;
+                    case HttpServletResponse.SC_GONE:
+                        buf.put(Constants.SC_GONE_CHAR);
+                        break;
+                    case HttpServletResponse.SC_LENGTH_REQUIRED:
+                        buf.put(Constants.SC_LENGTH_REQUIRED_CHAR);
+                        break;
+                    case HttpServletResponse.SC_PRECONDITION_FAILED:
+                        buf.put(Constants.SC_PRECONDITION_FAILED_CHAR);
+                        break;
+                    case HttpServletResponse.SC_REQUEST_ENTITY_TOO_LARGE:
+                        buf.put(Constants.SC_REQUEST_ENTITY_TOO_LARGE_CHAR);
+                        break;
+                    case HttpServletResponse.SC_REQUEST_URI_TOO_LONG:
+                        buf.put(Constants.SC_REQUEST_URI_TOO_LONG_CHAR);
+                        break;
+                    case HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE:
+                        buf.put(Constants.SC_UNSUPPORTED_MEDIA_TYPE_CHAR);
+                        break;
+                    case HttpServletResponse.SC_REQUESTED_RANGE_NOT_SATISFIABLE:
+                        buf.put(Constants.SC_REQUESTED_RANGE_NOT_SATISFIABLE_CHAR);
+                        break;
+                    case HttpServletResponse.SC_EXPECTATION_FAILED:
+                        buf.put(Constants.SC_EXPECTATION_FAILED_CHAR);
+                        break;
+                    case HttpServletResponse.SC_INTERNAL_SERVER_ERROR:
+                        buf.put(Constants.SC_INTERNAL_SERVER_ERROR_CHAR);
+                        break;
+                    case HttpServletResponse.SC_NOT_IMPLEMENTED:
+                        buf.put(Constants.SC_NOT_IMPLEMENTED_CHAR);
+                        break;
+                    case HttpServletResponse.SC_BAD_GATEWAY:
+                        buf.put(Constants.SC_BAD_GATEWAY_CHAR);
+                        break;
+                    case HttpServletResponse.SC_SERVICE_UNAVAILABLE:
+                        buf.put(Constants.SC_SERVICE_UNAVAILABLE_CHAR);
+                        break;
+                    case HttpServletResponse.SC_GATEWAY_TIMEOUT:
+                        buf.put(Constants.SC_GATEWAY_TIMEOUT_CHAR);
+                        break;
+                    case HttpServletResponse.SC_HTTP_VERSION_NOT_SUPPORTED:
+                        buf.put(Constants.SC_HTTP_VERSION_NOT_SUPPORTED_CHAR);
+                        break;
+                    default:
+                        // Don't use this for known codes due to the garbage the
+                        // conversion creates
+                        buf.append(Integer.toString(response.getStatus()));
+                        break;
+                }
             } else {
                 buf.append('-');
             }
