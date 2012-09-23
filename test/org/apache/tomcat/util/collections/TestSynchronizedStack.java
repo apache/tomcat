@@ -19,17 +19,17 @@ package org.apache.tomcat.util.collections;
 import org.junit.Assert;
 import org.junit.Test;
 
-public class TestConcurrentStack {
+public class TestSynchronizedStack {
 
     @Test
     public void testPopEmpty() {
-        ConcurrentStack<Object> stack = new ConcurrentStack<>();
+        SynchronizedStack<Object> stack = new SynchronizedStack<>();
         Assert.assertNull(stack.pop());
     }
 
     @Test
     public void testPushPopOrder() {
-        ConcurrentStack<Object> stack = new ConcurrentStack<>();
+        SynchronizedStack<Object> stack = new SynchronizedStack<>();
 
         Object o1 = new Object();
         Object o2 = new Object();
@@ -51,7 +51,7 @@ public class TestConcurrentStack {
 
     @Test
     public void testExpandPushPopOrder() {
-        ConcurrentStack<Object> stack = new ConcurrentStack<>();
+        SynchronizedStack<Object> stack = new SynchronizedStack<>();
 
         Object o1 = new Object();
         Object o2 = new Object();
@@ -77,7 +77,7 @@ public class TestConcurrentStack {
 
     @Test
     public void testLimit() {
-        ConcurrentStack<Object> stack = new ConcurrentStack<>(2,2);
+        SynchronizedStack<Object> stack = new SynchronizedStack<>(2,2);
 
         Object o1 = new Object();
         Object o2 = new Object();
@@ -98,7 +98,7 @@ public class TestConcurrentStack {
 
     @Test
     public void testLimitExpand() {
-        ConcurrentStack<Object> stack = new ConcurrentStack<>(1,3);
+        SynchronizedStack<Object> stack = new SynchronizedStack<>(1,3);
 
         Object o1 = new Object();
         Object o2 = new Object();

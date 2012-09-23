@@ -23,7 +23,7 @@ package org.apache.tomcat.util.collections;
  * The aim is to provide the bare minimum of required functionality as quickly
  * as possible with minimum garbage.
  */
-public class ConcurrentStack<T> {
+public class SynchronizedStack<T> {
 
     public static final int DEFAULT_SIZE = 128;
     private static final int DEFAULT_LIMIT = -1;
@@ -39,11 +39,11 @@ public class ConcurrentStack<T> {
     private Object[] stack;
 
 
-    public ConcurrentStack() {
+    public SynchronizedStack() {
         this(DEFAULT_SIZE, DEFAULT_LIMIT);
     }
 
-    public ConcurrentStack(int size, int limit) {
+    public SynchronizedStack(int size, int limit) {
         this.size = size;
         this.limit = limit;
         stack = new Object[size];
