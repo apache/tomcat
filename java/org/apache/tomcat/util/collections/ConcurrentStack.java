@@ -18,7 +18,7 @@ package org.apache.tomcat.util.collections;
 
 /**
  * This is intended as a (mostly) GC-free alternative to
- * {@link java.util.concurrent.LinkedBlockingDeque} where the requirement is to
+ * {@link java.util.concurrent.ConcurrentLinkedQueue} where the requirement is to
  * create a pool of re-usable objects with no requirement to shrink the pool.
  * The aim is to provide the bare minimum of required functionality as quickly
  * as possible with minimum garbage.
