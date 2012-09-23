@@ -1825,7 +1825,11 @@ public class AccessLogValve extends ValveBase implements AccessLog {
                 // second
                 buf.append(Long.toString(time / 1000));
                 buf.append('.');
-                buf.append(Long.toString(time % 1000));
+                int remains = (int) (time % 1000);
+                buf.append(Long.toString(remains / 100));
+                remains = remains % 100;
+                buf.append(Long.toString(remains / 10));
+                buf.append(Long.toString(remains % 10));
             }
         }
     }
