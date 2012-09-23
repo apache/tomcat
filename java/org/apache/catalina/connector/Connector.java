@@ -20,6 +20,7 @@ import java.net.InetAddress;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Locale;
 
 import javax.management.ObjectName;
 
@@ -225,6 +226,7 @@ public class Connector extends LifecycleMBeanBase  {
       * URI encoding.
       */
      protected String URIEncoding = null;
+     protected String URIEncodingLower = null;
 
 
      /**
@@ -740,12 +742,19 @@ public class Connector extends LifecycleMBeanBase  {
     }
 
      /**
-      * Return the character encoding to be used for the URI.
+      * Return the character encoding to be used for the URI using the original
+      * case.
       */
      public String getURIEncoding() {
+         return this.URIEncoding;
+     }
 
-         return (this.URIEncoding);
 
+     /**
+      * Return the character encoding to be used for the URI using lower case.
+      */
+     public String getURIEncodingLower() {
+         return this.URIEncodingLower;
      }
 
 
@@ -755,10 +764,9 @@ public class Connector extends LifecycleMBeanBase  {
       * @param URIEncoding The new URI character encoding.
       */
      public void setURIEncoding(String URIEncoding) {
-
          this.URIEncoding = URIEncoding;
+         this.URIEncodingLower = URIEncoding.toLowerCase(Locale.US);
          setProperty("uRIEncoding", URIEncoding);
-
      }
 
 
