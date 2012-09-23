@@ -81,12 +81,21 @@ public class B2CConverter {
         // Encoding names should all be ASCII
         String lowerCaseEnc = enc.toLowerCase(Locale.US);
 
+        return getCharsetLower(lowerCaseEnc);
+    }
+
+    /**
+     * Only to be used when it is known that the encoding name is in lower case.
+     */
+    public static Charset getCharsetLower(String lowerCaseEnc)
+            throws UnsupportedEncodingException{
+
         Charset charset = encodingToCharsetCache.get(lowerCaseEnc);
 
         if (charset == null) {
             // Pre-population of the cache means this must be invalid
             throw new UnsupportedEncodingException(
-                    sm.getString("b2cConverter.unknownEncoding", enc));
+                    sm.getString("b2cConverter.unknownEncoding", lowerCaseEnc));
         }
         return charset;
     }

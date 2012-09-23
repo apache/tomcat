@@ -837,13 +837,13 @@ public class CoyoteAdapter implements Adapter {
 
         // What encoding to use? Some platforms, eg z/os, use a default
         // encoding that doesn't give the expected result so be explicit
-        String enc = connector.getURIEncoding();
+        String enc = connector.getURIEncodingLower();
         if (enc == null) {
-            enc = "ISO-8859-1";
+            enc = "iso-8859-1";
         }
         Charset charset = null;
         try {
-            charset = B2CConverter.getCharset(enc);
+            charset = B2CConverter.getCharsetLower(enc);
         } catch (UnsupportedEncodingException e1) {
             log.warn(sm.getString("coyoteAdapter.parsePathParam",
                     enc));
