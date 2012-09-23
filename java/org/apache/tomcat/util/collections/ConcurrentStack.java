@@ -25,18 +25,40 @@ package org.apache.tomcat.util.collections;
  */
 public class ConcurrentStack<T> {
 
-    private int size = 128;
+    public static final int DEFAULT_SIZE = 128;
+    private static final int DEFAULT_LIMIT = -1;
+
+    private int size;
+    private int limit;
+
     /*
      * Points to the next available object in the stack
      */
     private int index = -1;
 
-    private Object[] stack = new Object[size];
+    private Object[] stack;
+
+
+    public ConcurrentStack() {
+        this(DEFAULT_SIZE, DEFAULT_LIMIT);
+    }
+
+    public ConcurrentStack(int size, int limit) {
+        this.size = size;
+        this.limit = limit;
+        stack = new Object[size];
+    }
+
 
     public synchronized void push(T obj) {
         index++;
         if (index == size) {
-            expand();
+            if (limit == -1 || size < limit) {
+                expand();
+            } else {
+                index--;
+                return;
+            }
         }
         stack[index] = obj;
     }
@@ -46,11 +68,25 @@ public class ConcurrentStack<T> {
         if (index == -1) {
             return null;
         }
-        return (T) stack[index--];
+        T result = (T) stack[index];
+        stack[index--] = null;
+        return result;
+    }
+
+    public synchronized void clear() {
+        if (index > -1) {
+            for (int i = 0; i < index + 1; i++) {
+                stack[i] = null;
+            }
+        }
+        index = -1;
     }
 
     private void expand() {
         int newSize = size * 2;
+        if (limit != -1 && newSize > limit) {
+            newSize = limit;
+        }
         Object[] newStack = new Object[newSize];
         System.arraycopy(stack, 0, newStack, 0, size);
         // This is the only point where garbage is created by throwing away the
