@@ -509,12 +509,6 @@ public class AccessLogValve extends ValveBase implements AccessLog {
     }
 
     /**
-     * Resolve hosts.
-     */
-    private boolean resolveHosts = false;
-
-
-    /**
      * Instant when the log daily rotation was last checked.
      */
     private volatile long rotationLastChecked = 0L;
@@ -765,24 +759,6 @@ public class AccessLogValve extends ValveBase implements AccessLog {
      */
     public void setSuffix(String suffix) {
         this.suffix = suffix;
-    }
-
-
-    /**
-     * Set the resolve hosts flag.
-     *
-     * @param resolveHosts The new resolve hosts value
-     */
-    public void setResolveHosts(boolean resolveHosts) {
-        this.resolveHosts = resolveHosts;
-    }
-
-
-    /**
-     * Get the value of the resolve hosts flag.
-     */
-    public boolean isResolveHosts() {
-        return resolveHosts;
     }
 
 
