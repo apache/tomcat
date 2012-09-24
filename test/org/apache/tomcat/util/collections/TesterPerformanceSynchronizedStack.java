@@ -23,7 +23,7 @@ import org.junit.Test;
 
 public class TesterPerformanceSynchronizedStack {
 
-    private static final int THREAD_COUNT = 8;
+    private static final int THREAD_COUNT = 40;
     private static final int ITERATIONS = 1000000;
 
     private static final SynchronizedStack<Object> STACK =
