@@ -157,6 +157,24 @@ public abstract class AbstractProtocol implements ProtocolHandler,
     }
 
 
+    @Override
+    public boolean isCometSupported() {
+        return endpoint.getUseComet();
+    }
+
+
+    @Override
+    public boolean isCometTimeoutSupported() {
+        return endpoint.getUseCometTimeout();
+    }
+
+
+    @Override
+    public boolean isSendfileSupported() {
+        return endpoint.getUseSendfile();
+    }
+
+
     // ---------------------- Properties that are passed through to the EndPoint
 
     @Override

@@ -3225,5 +3225,44 @@ public class Request
                         // NO-OP
                     }
                 });
+        specialAttributes.put(Globals.COMET_SUPPORTED_ATTR,
+                new SpecialAttributeAdapter() {
+                    @Override
+                    public Object get(Request request, String name) {
+                        return Boolean.valueOf(
+                                request.getConnector().getProtocolHandler(
+                                        ).isCometSupported());
+                    }
+                    @Override
+                    public void set(Request request, String name, Object value) {
+                        // NO-OP
+                    }
+                });
+        specialAttributes.put(Globals.COMET_TIMEOUT_SUPPORTED_ATTR,
+                new SpecialAttributeAdapter() {
+                    @Override
+                    public Object get(Request request, String name) {
+                        return Boolean.valueOf(
+                                request.getConnector().getProtocolHandler(
+                                        ).isCometTimeoutSupported());
+                    }
+                    @Override
+                    public void set(Request request, String name, Object value) {
+                        // NO-OP
+                    }
+                });
+        specialAttributes.put(Globals.SENDFILE_SUPPORTED_ATTR,
+                new SpecialAttributeAdapter() {
+                    @Override
+                    public Object get(Request request, String name) {
+                        return Boolean.valueOf(
+                                request.getConnector().getProtocolHandler(
+                                        ).isSendfileSupported());
+                    }
+                    @Override
+                    public void set(Request request, String name, Object value) {
+                        // NO-OP
+                    }
+                });
     }
 }
