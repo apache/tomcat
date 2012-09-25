@@ -27,6 +27,16 @@ public class SocketWrapper<E> {
     protected volatile int keepAliveLeft = 100;
     protected boolean async = false;
     protected boolean keptAlive = false;
+    /*
+     * Following cached for speed / reduced GC
+     */
+    private int localPort = -1;
+    private String localName = null;
+    private String localAddr = null;
+    private int remotePort = -1;
+    private String remoteHost = null;
+    private String remoteAddr = null;
+
 
     public SocketWrapper(E socket) {
         this.socket = socket;
@@ -49,4 +59,16 @@ public class SocketWrapper<E> {
     public int decrementKeepAlive() { return (--keepAliveLeft);}
     public boolean isKeptAlive() {return keptAlive;}
     public void setKeptAlive(boolean keptAlive) {this.keptAlive = keptAlive;}
+    public int getLocalPort() { return localPort; }
+    public void setLocalPort(int localPort) {this.localPort = localPort; }
+    public String getLocalName() { return localName; }
+    public void setLocalName(String localName) {this.localName = localName; }
+    public String getLocalAddr() { return localAddr; }
+    public void setLocalAddr(String localAddr) {this.localAddr = localAddr; }
+    public int getRemotePort() { return remotePort; }
+    public void setRemotePort(int remotePort) {this.remotePort = remotePort; }
+    public String getRemoteHost() { return remoteHost; }
+    public void setRemoteHost(String remoteHost) {this.remoteHost = remoteHost; }
+    public String getRemoteAddr() { return remoteAddr; }
+    public void setRemoteAddr(String remoteAddr) {this.remoteAddr = remoteAddr; }
 }

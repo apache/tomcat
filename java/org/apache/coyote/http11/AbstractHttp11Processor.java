@@ -159,42 +159,6 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
     protected int keepAliveTimeout = -1;
 
     /**
-     * Remote Address associated with the current connection.
-     */
-    protected String remoteAddr = null;
-
-
-    /**
-     * Remote Host associated with the current connection.
-     */
-    protected String remoteHost = null;
-
-
-    /**
-     * Local Host associated with the current connection.
-     */
-    protected String localName = null;
-
-
-    /**
-     * Local port to which the socket is connected
-     */
-    protected int localPort = -1;
-
-
-    /**
-     * Remote port to which the socket is connected
-     */
-    protected int remotePort = -1;
-
-
-    /**
-     * The local Host address.
-     */
-    protected String localAddr = null;
-
-
-    /**
      * Maximum timeout on uploads. 5 minutes as in Apache HTTPD server.
      */
     protected int connectionUploadTimeout = 300000;
@@ -1662,12 +1626,6 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
             asyncStateMachine.recycle();
         }
         upgradeInbound = null;
-        remoteAddr = null;
-        remoteHost = null;
-        localAddr = null;
-        localName = null;
-        remotePort = -1;
-        localPort = -1;
         comet = false;
         recycleInternal();
     }
