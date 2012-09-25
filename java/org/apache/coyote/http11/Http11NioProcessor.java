@@ -397,65 +397,88 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
 
         if (actionCode == ActionCode.REQ_HOST_ADDR_ATTRIBUTE) {
 
-            // Get remote host address
-            if ((remoteAddr == null) && (socket != null)) {
-                InetAddress inetAddr = socket.getSocket().getIOChannel().socket().getInetAddress();
-                if (inetAddr != null) {
-                    remoteAddr = inetAddr.getHostAddress();
+            if (socket == null) {
+                request.remoteAddr().recycle();
+            } else {
+                if (socket.getRemoteAddr() == null) {
+                    InetAddress inetAddr = socket.getSocket().getIOChannel().socket().getInetAddress();
+                    if (inetAddr != null) {
+                        socket.setRemoteAddr(inetAddr.getHostAddress());
+                    }
                 }
+                request.remoteAddr().setString(socket.getRemoteAddr());
             }
-            request.remoteAddr().setString(remoteAddr);
 
         } else if (actionCode == ActionCode.REQ_LOCAL_NAME_ATTRIBUTE) {
 
-            // Get local host name
-            if ((localName == null) && (socket != null)) {
-                InetAddress inetAddr = socket.getSocket().getIOChannel().socket().getLocalAddress();
-                if (inetAddr != null) {
-                    localName = inetAddr.getHostName();
+            if (socket == null) {
+                request.localName().recycle();
+            } else {
+                if (socket.getLocalName() == null) {
+                    InetAddress inetAddr = socket.getSocket().getIOChannel().socket().getLocalAddress();
+                    if (inetAddr != null) {
+                        socket.setLocalName(inetAddr.getHostName());
+                    }
                 }
+                request.localName().setString(socket.getLocalName());
             }
-            request.localName().setString(localName);
 
         } else if (actionCode == ActionCode.REQ_HOST_ATTRIBUTE) {
 
-            // Get remote host name
-            if ((remoteHost == null) && (socket != null)) {
-                InetAddress inetAddr = socket.getSocket().getIOChannel().socket().getInetAddress();
-                if (inetAddr != null) {
-                    remoteHost = inetAddr.getHostName();
-                }
-                if(remoteHost == null) {
-                    if(remoteAddr != null) {
-                        remoteHost = remoteAddr;
-                    } else { // all we can do is punt
-                        request.remoteHost().recycle();
+            if (socket == null) {
+                request.remoteHost().recycle();
+            } else {
+                if (socket.getRemoteHost() == null) {
+                    InetAddress inetAddr = socket.getSocket().getIOChannel().socket().getInetAddress();
+                    if (inetAddr != null) {
+                        socket.setRemoteHost(inetAddr.getHostName());
+                    }
+                    if (socket.getRemoteHost() == null) {
+                        if (socket.getRemoteAddr() == null &&
+                                inetAddr != null) {
+                            socket.setRemoteAddr(inetAddr.getHostAddress());
+                        }
+                        if (socket.getRemoteAddr() != null) {
+                            socket.setRemoteHost(socket.getRemoteAddr());
+                        }
                     }
                 }
+                request.remoteHost().setString(socket.getRemoteHost());
             }
-            request.remoteHost().setString(remoteHost);
 
         } else if (actionCode == ActionCode.REQ_LOCAL_ADDR_ATTRIBUTE) {
 
-            if (localAddr == null) {
-                localAddr = socket.getSocket().getIOChannel().socket().getLocalAddress().getHostAddress();
+            if (socket == null) {
+                request.localAddr().recycle();
+            } else {
+                if (socket.getLocalAddr() == null) {
+                    socket.setLocalAddr(
+                            socket.getSocket().getIOChannel().socket().getLocalAddress().getHostAddress());
+                }
+                request.localAddr().setString(socket.getLocalAddr());
             }
-
-            request.localAddr().setString(localAddr);
 
         } else if (actionCode == ActionCode.REQ_REMOTEPORT_ATTRIBUTE) {
 
-            if ((remotePort == -1 ) && (socket !=null)) {
-                remotePort = socket.getSocket().getIOChannel().socket().getPort();
+            if (socket == null) {
+                request.setRemotePort(0);
+            } else {
+                if (socket.getRemotePort() == -1) {
+                    socket.setRemotePort(socket.getSocket().getIOChannel().socket().getPort());
+                }
+                request.setRemotePort(socket.getRemotePort());
             }
-            request.setRemotePort(remotePort);
 
         } else if (actionCode == ActionCode.REQ_LOCALPORT_ATTRIBUTE) {
 
-            if ((localPort == -1 ) && (socket !=null)) {
-                localPort = socket.getSocket().getIOChannel().socket().getLocalPort();
+            if (socket == null) {
+                request.setLocalPort(0);
+            } else {
+                if (socket.getLocalPort() == -1) {
+                    socket.setLocalPort(socket.getSocket().getIOChannel().socket().getLocalPort());
+                }
+                request.setLocalPort(socket.getLocalPort());
             }
-            request.setLocalPort(localPort);
 
         } else if (actionCode == ActionCode.REQ_SSL_ATTRIBUTE ) {
 
