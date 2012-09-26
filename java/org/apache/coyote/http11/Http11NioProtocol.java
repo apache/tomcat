@@ -207,7 +207,7 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol<NioChannel> {
                 connections.remove(socket.getSocket());
             if (processor != null) {
                 processor.recycle(true);
-                recycledProcessors.offer(processor);
+                recycledProcessors.push(processor);
             }
         }
 
@@ -238,7 +238,7 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol<NioChannel> {
                 Processor<NioChannel> processor, boolean isSocketClosing,
                 boolean addToPoller) {
             processor.recycle(isSocketClosing);
-            recycledProcessors.offer(processor);
+            recycledProcessors.push(processor);
             if (addToPoller) {
                 socket.getSocket().getPoller().add(socket.getSocket());
             }

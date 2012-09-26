@@ -125,7 +125,7 @@ public class AjpProtocol extends AbstractAjpProtocol {
                 Processor<Socket> processor, boolean isSocketClosing,
                 boolean addToPoller) {
             processor.recycle(isSocketClosing);
-            recycledProcessors.offer(processor);
+            recycledProcessors.push(processor);
         }
 
 
