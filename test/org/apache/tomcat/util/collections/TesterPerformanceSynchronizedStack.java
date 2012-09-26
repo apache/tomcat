@@ -32,7 +32,7 @@ public class TesterPerformanceSynchronizedStack {
     private static final Queue<Object> QUEUE = new ConcurrentLinkedQueue<>();
 
     @Test
-    public void testConcurrentStack() throws InterruptedException {
+    public void testSynchronizedStack() throws InterruptedException {
         Thread[] threads = new Thread[THREAD_COUNT];
         for (int i = 0; i < THREAD_COUNT; i++) {
             threads[i] = new StackThread();
@@ -50,7 +50,7 @@ public class TesterPerformanceSynchronizedStack {
 
         long end = System.currentTimeMillis();
 
-        System.out.println("ConcurrentStack: " + (end - start) + "ms");
+        System.out.println("SynchronizedStack: " + (end - start) + "ms");
     }
 
     public static class StackThread extends Thread {
