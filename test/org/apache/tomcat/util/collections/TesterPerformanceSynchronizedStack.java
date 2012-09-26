@@ -23,7 +23,7 @@ import org.junit.Test;
 
 public class TesterPerformanceSynchronizedStack {
 
-    private static final int THREAD_COUNT = 40;
+    private static final int THREAD_COUNT = 4;
     private static final int ITERATIONS = 1000000;
 
     private static final SynchronizedStack<Object> STACK =
@@ -99,7 +99,7 @@ public class TesterPerformanceSynchronizedStack {
                 if (obj == null) {
                     obj = new Object();
                 }
-                QUEUE.add(obj);
+                QUEUE.offer(obj);
             }
             super.run();
         }
