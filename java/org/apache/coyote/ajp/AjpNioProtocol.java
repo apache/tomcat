@@ -149,7 +149,7 @@ public class AjpNioProtocol extends AbstractAjpProtocol {
             Processor<NioChannel> processor = connections.remove(socket);
             if (processor != null) {
                 processor.recycle(true);
-                recycledProcessors.offer(processor);
+                recycledProcessors.push(processor);
             }
         }
 
@@ -162,7 +162,7 @@ public class AjpNioProtocol extends AbstractAjpProtocol {
                 Processor<NioChannel> processor, boolean isSocketClosing,
                 boolean addToPoller) {
             processor.recycle(isSocketClosing);
-            recycledProcessors.offer(processor);
+            recycledProcessors.push(processor);
             if (addToPoller) {
                 socket.getSocket().getPoller().add(socket.getSocket());
             }

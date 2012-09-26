@@ -247,7 +247,7 @@ public class Http11AprProtocol extends AbstractHttp11Protocol<Long> {
                 Processor<Long> processor, boolean isSocketClosing,
                 boolean addToPoller) {
             processor.recycle(isSocketClosing);
-            recycledProcessors.offer(processor);
+            recycledProcessors.push(processor);
             if (addToPoller && proto.endpoint.isRunning()) {
                 ((AprEndpoint)proto.endpoint).getPoller().add(
                         socket.getSocket().longValue(),

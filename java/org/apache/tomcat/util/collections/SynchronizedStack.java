@@ -50,17 +50,18 @@ public class SynchronizedStack<T> {
     }
 
 
-    public synchronized void push(T obj) {
+    public synchronized boolean push(T obj) {
         index++;
         if (index == size) {
             if (limit == -1 || size < limit) {
                 expand();
             } else {
                 index--;
-                return;
+                return false;
             }
         }
         stack[index] = obj;
+        return true;
     }
 
     @SuppressWarnings("unchecked")

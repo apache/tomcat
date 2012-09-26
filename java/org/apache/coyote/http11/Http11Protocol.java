@@ -159,7 +159,7 @@ public class Http11Protocol extends AbstractHttp11JsseProtocol<Socket> {
                 Processor<Socket> processor, boolean isSocketClosing,
                 boolean addToPoller) {
             processor.recycle(isSocketClosing);
-            recycledProcessors.offer(processor);
+            recycledProcessors.push(processor);
         }
 
         @Override

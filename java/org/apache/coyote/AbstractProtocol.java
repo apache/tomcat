@@ -19,7 +19,6 @@ package org.apache.coyote;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
@@ -35,6 +34,7 @@ import org.apache.coyote.http11.upgrade.UpgradeInbound;
 import org.apache.coyote.http11.upgrade.UpgradeProcessor;
 import org.apache.juli.logging.Log;
 import org.apache.tomcat.util.ExceptionUtils;
+import org.apache.tomcat.util.collections.SynchronizedStack;
 import org.apache.tomcat.util.modeler.Registry;
 import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler;
@@ -595,7 +595,7 @@ public abstract class AbstractProtocol implements ProtocolHandler,
 
             try {
                 if (processor == null) {
-                    processor = recycledProcessors.poll();
+                    processor = recycledProcessors.pop();
                 }
                 if (processor == null) {
                     processor = createProcessor();
@@ -750,9 +750,8 @@ public abstract class AbstractProtocol implements ProtocolHandler,
     }
 
     protected static class RecycledProcessors<P extends Processor<S>, S>
-            extends ConcurrentLinkedQueue<Processor<S>> {
+            extends SynchronizedStack<Processor<S>> {
 
-        private static final long serialVersionUID = 1L;
         private final transient AbstractConnectionHandler<S,P> handler;
         protected final AtomicInteger size = new AtomicInteger(0);
 
@@ -761,13 +760,13 @@ public abstract class AbstractProtocol implements ProtocolHandler,
         }
 
         @Override
-        public boolean offer(Processor<S> processor) {
+        public boolean push(Processor<S> processor) {
             int cacheSize = handler.getProtocol().getProcessorCache();
             boolean offer = cacheSize == -1 ? true : size.get() < cacheSize;
             //avoid over growing our cache or add after we have stopped
             boolean result = false;
             if (offer) {
-                result = super.offer(processor);
+                result = super.push(processor);
                 if (result) {
                     size.incrementAndGet();
                 }
@@ -777,8 +776,8 @@ public abstract class AbstractProtocol implements ProtocolHandler,
         }
 
         @Override
-        public Processor<S> poll() {
-            Processor<S> result = super.poll();
+        public Processor<S> pop() {
+            Processor<S> result = super.pop();
             if (result != null) {
                 size.decrementAndGet();
             }
@@ -787,10 +786,10 @@ public abstract class AbstractProtocol implements ProtocolHandler,
 
         @Override
         public void clear() {
-            Processor<S> next = poll();
+            Processor<S> next = pop();
             while (next != null) {
                 handler.unregister(next);
-                next = poll();
+                next = pop();
             }
             super.clear();
             size.set(0);

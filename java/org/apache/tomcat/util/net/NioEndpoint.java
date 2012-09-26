@@ -34,7 +34,6 @@ import java.nio.channels.SocketChannel;
 import java.nio.channels.WritableByteChannel;
 import java.util.Iterator;
 import java.util.Set;
-import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -51,6 +50,7 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.IntrospectionUtils;
+import org.apache.tomcat.util.collections.SynchronizedQueue;
 import org.apache.tomcat.util.collections.SynchronizedStack;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
 import org.apache.tomcat.util.net.SecureNioChannel.ApplicationBufferHandler;
@@ -837,8 +837,8 @@ public class NioEndpoint extends AbstractEndpoint {
     public class Poller implements Runnable {
 
         protected Selector selector;
-        protected ConcurrentLinkedQueue<Runnable> events =
-                new ConcurrentLinkedQueue<>();
+        protected final SynchronizedQueue<Runnable> events =
+                new SynchronizedQueue<>();
 
         protected volatile boolean close = false;
         protected long nextExpiration = 0;//optimize expiration handling
