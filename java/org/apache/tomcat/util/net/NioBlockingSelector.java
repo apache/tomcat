@@ -244,14 +244,15 @@ public class NioBlockingSelector {
         }
 
         public void add(final KeyAttachment key, final int ops, final KeyReference ref) {
+            if ( key == null ) return;
+            NioChannel nch = key.getChannel();
+            if ( nch == null ) return;
+            final SocketChannel ch = nch.getIOChannel();
+            if ( ch == null ) return;
+
             Runnable r = new Runnable() {
                 @Override
                 public void run() {
-                    if ( key == null ) return;
-                    NioChannel nch = key.getChannel();
-                    if ( nch == null ) return;
-                    SocketChannel ch = nch.getIOChannel();
-                    if ( ch == null ) return;
                     SelectionKey sk = ch.keyFor(selector);
                     try {
                         if (sk == null) {
@@ -274,14 +275,15 @@ public class NioBlockingSelector {
         }
 
         public void remove(final KeyAttachment key, final int ops) {
+            if ( key == null ) return;
+            NioChannel nch = key.getChannel();
+            if ( nch == null ) return;
+            final SocketChannel ch = nch.getIOChannel();
+            if ( ch == null ) return;
+
             Runnable r = new Runnable() {
                 @Override
                 public void run() {
-                    if ( key == null ) return;
-                    NioChannel nch = key.getChannel();
-                    if ( nch == null ) return;
-                    SocketChannel ch = nch.getIOChannel();
-                    if ( ch == null ) return;
                     SelectionKey sk = ch.keyFor(selector);
                     try {
                         if (sk == null) {
