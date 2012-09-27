@@ -510,7 +510,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
                 } else {
                     args[2] = RequestUtil.filter(ctxt.getDisplayName());
                 }
-                args[3] = Boolean.valueOf(ctxt.getAvailable());
+                args[3] = Boolean.valueOf(ctxt.getState().isAvailable());
                 args[4] = RequestUtil.filter(response.encodeURL(request.getContextPath() +
                      "/html/sessions?" + pathVersion));
                 Manager manager = ctxt.getManager();
@@ -559,13 +559,13 @@ public final class HTMLManagerServlet extends ManagerServlet {
                 if (ctxt.getName().equals(this.context.getName())) {
                     writer.print(MessageFormat.format(
                         MANAGER_APP_ROW_BUTTON_SECTION, args));
-                } else if (ctxt.getAvailable() && isDeployed) {
+                } else if (ctxt.getState().isAvailable() && isDeployed) {
                     writer.print(MessageFormat.format(
                         STARTED_DEPLOYED_APPS_ROW_BUTTON_SECTION, args));
-                } else if (ctxt.getAvailable() && !isDeployed) {
+                } else if (ctxt.getState().isAvailable() && !isDeployed) {
                     writer.print(MessageFormat.format(
                         STARTED_NONDEPLOYED_APPS_ROW_BUTTON_SECTION, args));
-                } else if (!ctxt.getAvailable() && isDeployed) {
+                } else if (!ctxt.getState().isAvailable() && isDeployed) {
                     writer.print(MessageFormat.format(
                         STOPPED_DEPLOYED_APPS_ROW_BUTTON_SECTION, args));
                 } else {

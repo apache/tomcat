@@ -151,7 +151,12 @@ public interface Context extends Container {
 
     /**
      * Return the application available flag for this Context.
+     *
+     * @deprecated  This will be removed in Tomcat 8.0.x onwards. Use
+     *              {@link #getState()}.{@link LifecycleState#isAvailable()
+     *              isAvailable()} instead
      */
+    @Deprecated
     public boolean getAvailable();
 
 
