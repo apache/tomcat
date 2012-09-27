@@ -312,9 +312,6 @@ public class FailedContext extends LifecycleMBeanBase implements Context {
     public void setApplicationLifecycleListeners(Object[] listeners) { /* NO-OP */ }
 
     @Override
-    public boolean getAvailable() { return false; }
-
-    @Override
     public String getCharset(Locale locale) { return null; }
 
     @Override

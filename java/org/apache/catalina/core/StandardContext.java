@@ -1398,18 +1398,6 @@ public class StandardContext extends ContainerBase
 
 
     /**
-     * Return the application available flag for this Context.
-     */
-    @Override
-    public boolean getAvailable() {
-
-        // TODO Remove this method entirely
-        return getState().isAvailable();
-
-    }
-
-
-    /**
      * Return the Locale to character set mapper for this Context.
      */
     public CharsetMapper getCharsetMapper() {
