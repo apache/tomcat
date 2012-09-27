@@ -107,7 +107,7 @@ final class StandardWrapperValve
         Context context = (Context) wrapper.getParent();
 
         // Check for the application being marked unavailable
-        if (!context.getAvailable()) {
+        if (!context.getState().isAvailable()) {
             response.sendError(HttpServletResponse.SC_SERVICE_UNAVAILABLE,
                            sm.getString("standardContext.isUnavailable"));
             unavailable = true;
@@ -359,7 +359,8 @@ final class StandardWrapperValve
         Context context = (Context) wrapper.getParent();
 
         // Check for the application being marked unavailable
-        boolean unavailable = !context.getAvailable() || wrapper.isUnavailable();
+        boolean unavailable = !context.getState().isAvailable() ||
+                wrapper.isUnavailable();
 
         // Allocate a servlet instance to process this request
         try {
