@@ -863,10 +863,11 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
                 }
             }
             context = (Context) host.findChild(name);
-            if (context != null && context.getConfigured() && context.getAvailable()) {
+            if (context != null && context.getConfigured() &&
+                    context.getState().isAvailable()) {
                 writer.println(smClient.getString(
                         "managerServlet.deployed", displayPath));
-            } else if (context!=null && !context.getAvailable()) {
+            } else if (context!=null && !context.getState().isAvailable()) {
                 writer.println(smClient.getString(
                         "managerServlet.deployedButNotStarted", displayPath));
             } else {
@@ -904,7 +905,7 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
                 String displayPath = context.getPath();
                 if( displayPath.equals("") )
                     displayPath = "/";
-                if (context.getAvailable()) {
+                if (context.getState().isAvailable()) {
                     writer.println(smClient.getString("managerServlet.listitem",
                             displayPath,
                             "running",
@@ -1253,7 +1254,7 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
                 return;
             }
             context.start();
-            if (context.getAvailable())
+            if (context.getState().isAvailable())
                 writer.println(smClient.getString("managerServlet.started",
                         displayPath));
             else
