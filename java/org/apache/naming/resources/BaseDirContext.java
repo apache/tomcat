@@ -48,6 +48,7 @@ import javax.naming.directory.SearchResult;
 
 import org.apache.naming.NameParserImpl;
 import org.apache.naming.NamingContextBindingsEnumeration;
+import org.apache.naming.NamingContextEnumeration;
 import org.apache.naming.NamingEntry;
 import org.apache.naming.StringManager;
 
@@ -651,7 +652,7 @@ public abstract class BaseDirContext implements DirContext {
      * @exception NamingException if a naming exception is encountered
      */
     @Override
-    public NamingEnumeration<NameClassPair> list(Name name)
+    public final NamingEnumeration<NameClassPair> list(Name name)
         throws NamingException {
         return list(name.toString());
     }
@@ -667,8 +668,44 @@ public abstract class BaseDirContext implements DirContext {
      * @exception NamingException if a naming exception is encountered
      */
     @Override
-    public abstract NamingEnumeration<NameClassPair> list(String name)
-        throws NamingException;
+    public final NamingEnumeration<NameClassPair> list(String name)
+        throws NamingException {
+
+        if (!aliases.isEmpty()) {
+            AliasResult result = findAlias(name);
+            if (result.dirContext != null) {
+                return result.dirContext.list(result.aliasName);
+            }
+        }
+
+        // Next do a standard lookup
+        List<NamingEntry> bindings = doListBindings(name);
+
+        // Check the alternate locations
+        List<NamingEntry> altBindings = null;
+
+        for (DirContext altDirContext : altDirContexts) {
+            if (altDirContext instanceof BaseDirContext) {
+                altBindings = ((BaseDirContext) altDirContext).doListBindings(
+                        "/META-INF/resources" + name);
+            }
+            if (altBindings != null) {
+                if (bindings == null) {
+                    bindings = altBindings;
+                } else {
+                    bindings.addAll(altBindings);
+                }
+            }
+        }
+
+        if (bindings != null) {
+            return new NamingContextEnumeration(bindings.iterator());
+        }
+
+        // Really not found
+        throw new NameNotFoundException(
+                sm.getString("resources.notFound", name));
+    }
 
 
     /**
