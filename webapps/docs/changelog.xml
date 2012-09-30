@@ -90,6 +90,10 @@
         of garbage and uses significant CPU time. A cache has been added that
         significantly reduces the overhead of this parser. (markt) 
       </fix>
+      <fix>
+        <bug>53854</bug>: Make directory listings work correctly when aliases
+        are used. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
