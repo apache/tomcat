@@ -147,7 +147,11 @@ public class DataSourceProxy implements PoolConfiguration {
         if (con instanceof XAConnection) {
             return (XAConnection)con;
         } else {
-            try {con.close();} catch (Exception ignore){}
+            try {
+                con.close();
+            } catch (Exception ignore) {
+                // Ignore
+            }
             throw new SQLException("Connection from pool does not implement javax.sql.XAConnection");
         }
     }
@@ -160,7 +164,11 @@ public class DataSourceProxy implements PoolConfiguration {
         if (con instanceof XAConnection) {
             return (XAConnection)con;
         } else {
-            try {con.close();} catch (Exception ignore){}
+            try {
+                con.close();
+            } catch (Exception ignore) {
+                // Ignore
+            }
             throw new SQLException("Connection from pool does not implement javax.sql.XAConnection");
         }
     }
