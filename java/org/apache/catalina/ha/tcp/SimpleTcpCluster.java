@@ -624,7 +624,7 @@ public class SimpleTcpCluster extends LifecycleMBeanBase
 
     /**
      * Start Cluster and implement the requirements
-     * of {@link LifecycleBase#startInternal()}.
+     * of {@link org.apache.catalina.util.LifecycleBase#startInternal()}.
      *
      * @exception LifecycleException if this component detects a fatal error
      *  that prevents this component from being used
@@ -713,7 +713,7 @@ public class SimpleTcpCluster extends LifecycleMBeanBase
 
     /**
      * Stop Cluster and implement the requirements
-     * of {@link LifecycleBase#startInternal()}.
+     * of {@link org.apache.catalina.util.LifecycleBase#stopInternal()}.
      *
      * @exception LifecycleException if this component detects a fatal error
      *  that prevents this component from being used
