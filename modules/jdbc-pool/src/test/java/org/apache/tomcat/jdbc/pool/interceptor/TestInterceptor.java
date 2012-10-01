@@ -14,7 +14,6 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package org.apache.tomcat.jdbc.pool.interceptor;
 
 import java.util.Map;
@@ -32,7 +31,6 @@ public class TestInterceptor extends JdbcInterceptor {
 
     @Override
     public void poolClosed(ConnectionPool pool) {
-        // TODO Auto-generated method stub
         super.poolClosed(pool);
         poolclosed = true;
     }
@@ -45,8 +43,7 @@ public class TestInterceptor extends JdbcInterceptor {
 
     @Override
     public void reset(ConnectionPool parent, PooledConnection con) {
-        // TODO Auto-generated method stub
-
+        // NO-OP
     }
 
     @Override
@@ -54,6 +51,4 @@ public class TestInterceptor extends JdbcInterceptor {
         instancecount.incrementAndGet();
         super.setProperties(properties);
     }
-
-
 }
