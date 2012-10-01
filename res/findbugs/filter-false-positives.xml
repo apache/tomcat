@@ -411,6 +411,12 @@
     <Bug code="DE" />
   </Match>
   <Match>
+    <!-- Use of statics is unavoidable in all cases -->
+    <!-- Better to use it consistently rather than only where necessary -->
+    <Class name="org.apache.tomcat.jdbc.pool.interceptor.TestInterceptor" />
+    <Bug code="ST" />
+  </Match>
+  <Match>
     <Class name="org.apache.tomcat.util.net.TestSsl" />
     <Or>
       <Method name="testRenegotiateFail" />
