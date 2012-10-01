@@ -105,13 +105,17 @@ public interface ServletRequest {
      * same as the value of the CGI variable CONTENT_LENGTH.
      *
      * @return an integer containing the length of the request body or -1 if the
-     *         length is not known
+     *         length is not known or is greater than {@link Integer#MAX_VALUE}
      */
     public int getContentLength();
 
     /**
-     * TODO SERVLET 3.1
-     * @return
+     * Returns the length, in bytes, of the request body and made available by
+     * the input stream, or -1 if the length is not known. For HTTP servlets,
+     * same as the value of the CGI variable CONTENT_LENGTH.
+     *
+     * @return a long integer containing the length of the request body or -1 if
+     *         the length is not known
      */
     public long getContentLengthLong();
 
