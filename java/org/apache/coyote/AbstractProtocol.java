@@ -785,7 +785,7 @@ public abstract class AbstractProtocol implements ProtocolHandler,
         }
 
         @Override
-        public void clear() {
+        public synchronized void clear() {
             Processor<S> next = pop();
             while (next != null) {
                 handler.unregister(next);
