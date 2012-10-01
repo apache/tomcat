@@ -210,6 +210,12 @@
     <Bug code="CN" />
   </Match>
   <Match>
+    <!-- Use of == is deliberate -->
+    <Class name="org.apache.tomcat.jdbc.pool.JdbcInterceptor" />
+    <Method name="compare" />
+    <Bug code="ES" />
+  </Match>
+  <Match>
     <!-- Class name is appropriate -->
     <Class name="org.apache.tomcat.util.bcel.classfile.CodeException"/>
     <Bug code="Nm" />
