@@ -53,7 +53,17 @@
   They eventually become mixed with the numbered issues. (I.e., numbered
   issues to not "pop up" wrt. others).
 -->
-<section name="Tomcat 7.0.31 (markt)">
+<section name="Tomcat 7.0.32 (markt)">
+  <subsection name="Catalina">
+    <changelog>
+      <fix>
+        Improve session management in <code>CsrfPreventionFilter</code>.
+        (kkolinko)
+      </fix>
+    </changelog>
+  </subsection>
+</section>
+<section name="Tomcat 7.0.31 (markt)" rtext="not released">
   <subsection name="Catalina">
     <changelog>
       <update>
