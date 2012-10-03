@@ -57,9 +57,20 @@
   <subsection name="Catalina">
     <changelog>
       <fix>
+        Revert multiple operation support for the <code>JMXProxyServlet</code>
+        pending further discussion. (schultz)
+      </fix>
+      <fix>
         Improve session management in <code>CsrfPreventionFilter</code>.
         (kkolinko)
       </fix>
+    </changelog>
+  </subsection>
+  <subsection name="Web applications">
+    <changelog>
+    <fix>
+      Correct the couple of broken links in the Tomcat Javadoc. (markt)
+    </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
@@ -86,6 +97,11 @@
         <bug>53828</bug>: Use correct status code when closing a WebSocket
         connection normally in response to a close frame from a client. (markt)
       </fix>
+      <update>
+        <code>JMXProxyServlet</code> now allows multiple operation commands like
+        <code>invokeAndSet</code>, <code>invokeAndGet</code>,
+        etc. (schultz)
+      </update>
       <fix>
         <bug>53843</bug>: <code>request.isAsyncStarted()</code> must continue to
         return true until the dispatch actually happens (which at the earliest
