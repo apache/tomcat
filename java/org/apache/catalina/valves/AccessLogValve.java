@@ -18,6 +18,7 @@ package org.apache.catalina.valves;
 
 
 import java.io.BufferedWriter;
+import java.io.CharArrayWriter;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -25,7 +26,6 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.InetAddress;
-import java.nio.CharBuffer;
 import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -571,7 +571,7 @@ public class AccessLogValve extends ValveBase implements AccessLog {
      * Buffer pool used for log message generation. Pool used to reduce garbage
      * generation.
      */
-    private SynchronizedStack<CharBuffer> charBuffers =
+    private SynchronizedStack<CharArrayWriter> charArrayWriters =
             new SynchronizedStack<>();
 
     /**
@@ -935,21 +935,20 @@ public class AccessLogValve extends ValveBase implements AccessLog {
         long start = request.getCoyoteRequest().getStartTime();
         Date date = getDate(start + time);
 
-        CharBuffer result = charBuffers.pop();
+        CharArrayWriter result = charArrayWriters.pop();
         if (result == null) {
-            result = CharBuffer.allocate(128);
+            result = new CharArrayWriter(128);
         }
 
         for (int i = 0; i < logElements.length; i++) {
             logElements[i].addElement(result, date, request, response, time);
         }
 
-        result.flip();
         log(result);
 
-        if (result.length() <= maxLogMessageBufferSize) {
-            result.clear();
-            charBuffers.push(result);
+        if (result.size() <= maxLogMessageBufferSize) {
+            result.reset();
+            charArrayWriters.push(result);
         }
     }
 
@@ -1011,7 +1010,7 @@ public class AccessLogValve extends ValveBase implements AccessLog {
      *
      * @param message Message to be logged
      */
-    public void log(CharBuffer message) {
+    public void log(CharArrayWriter message) {
         if (rotatable) {
             // Only do a logfile switch check once a second, max.
             long systime = System.currentTimeMillis();
@@ -1056,17 +1055,20 @@ public class AccessLogValve extends ValveBase implements AccessLog {
         }
 
         // Log this message
-        synchronized(this) {
-            if (writer != null) {
-                writer.write(message.array(), message.arrayOffset(),
-                        message.arrayOffset() + message.limit());
-                writer.println("");
-                if (!buffered) {
-                    writer.flush();
+        try {
+            synchronized(this) {
+                if (writer != null) {
+                    message.writeTo(writer);
+                    writer.println("");
+                    if (!buffered) {
+                        writer.flush();
+                    }
                 }
             }
+        } catch (IOException ioe) {
+            log.warn(sm.getString(
+                    "accessLogValve.writeFail", message.toString()), ioe);
         }
-
     }
 
 
@@ -1242,7 +1244,7 @@ public class AccessLogValve extends ValveBase implements AccessLog {
      * AccessLogElement writes the partial message into the buffer.
      */
     protected interface AccessLogElement {
-        public void addElement(CharBuffer buf, Date date, Request request,
+        public void addElement(CharArrayWriter buf, Date date, Request request,
                 Response response, long time);
 
     }
@@ -1252,7 +1254,7 @@ public class AccessLogValve extends ValveBase implements AccessLog {
      */
     protected static class ThreadNameElement implements AccessLogElement {
         @Override
-        public void addElement(CharBuffer buf, Date date, Request request,
+        public void addElement(CharArrayWriter buf, Date date, Request request,
                 Response response, long time) {
             RequestInfo info = request.getCoyoteRequest().getRequestProcessor();
             if(info != null) {
@@ -1282,7 +1284,7 @@ public class AccessLogValve extends ValveBase implements AccessLog {
         }
 
         @Override
-        public void addElement(CharBuffer buf, Date date, Request request,
+        public void addElement(CharArrayWriter buf, Date date, Request request,
                 Response response, long time) {
             buf.append(LOCAL_ADDR_VALUE);
         }
@@ -1293,7 +1295,7 @@ public class AccessLogValve extends ValveBase implements AccessLog {
      */
     protected class RemoteAddrElement implements AccessLogElement {
         @Override
-        public void addElement(CharBuffer buf, Date date, Request request,
+        public void addElement(CharArrayWriter buf, Date date, Request request,
                 Response response, long time) {
             if (requestAttributesEnabled) {
                 Object addr = request.getAttribute(REMOTE_ADDR_ATTRIBUTE);
@@ -1313,7 +1315,7 @@ public class AccessLogValve extends ValveBase implements AccessLog {
      */
     protected class HostElement implements AccessLogElement {
         @Override
-        public void addElement(CharBuffer buf, Date date, Request request,
+        public void addElement(CharArrayWriter buf, Date date, Request request,
                 Response response, long time) {
             String value = null;
             if (requestAttributesEnabled) {
@@ -1337,7 +1339,7 @@ public class AccessLogValve extends ValveBase implements AccessLog {
      */
     protected static class LogicalUserNameElement implements AccessLogElement {
         @Override
-        public void addElement(CharBuffer buf, Date date, Request request,
+        public void addElement(CharArrayWriter buf, Date date, Request request,
                 Response response, long time) {
             buf.append('-');
         }
@@ -1348,7 +1350,7 @@ public class AccessLogValve extends ValveBase implements AccessLog {
      */
     protected class ProtocolElement implements AccessLogElement {
         @Override
-        public void addElement(CharBuffer buf, Date date, Request request,
+        public void addElement(CharArrayWriter buf, Date date, Request request,
                 Response response, long time) {
             if (requestAttributesEnabled) {
                 Object proto = request.getAttribute(PROTOCOL_ATTRIBUTE);
@@ -1368,7 +1370,7 @@ public class AccessLogValve extends ValveBase implements AccessLog {
      */
     protected static class UserElement implements AccessLogElement {
         @Override
-        public void addElement(CharBuffer buf, Date date, Request request,
+        public void addElement(CharArrayWriter buf, Date date, Request request,
                 Response response, long time) {
             if (request != null) {
                 String value = request.getRemoteUser();
@@ -1504,7 +1506,7 @@ public class AccessLogValve extends ValveBase implements AccessLog {
         }
 
         @Override
-        public void addElement(CharBuffer buf, Date date, Request request,
+        public void addElement(CharArrayWriter buf, Date date, Request request,
                 Response response, long time) {
             long timestamp = date.getTime();
             long frac;
@@ -1561,7 +1563,7 @@ public class AccessLogValve extends ValveBase implements AccessLog {
      */
     protected static class RequestElement implements AccessLogElement {
         @Override
-        public void addElement(CharBuffer buf, Date date, Request request,
+        public void addElement(CharArrayWriter buf, Date date, Request request,
                 Response response, long time) {
             if (request != null) {
                 String method = request.getMethod();
@@ -1590,130 +1592,130 @@ public class AccessLogValve extends ValveBase implements AccessLog {
      */
     protected static class HttpStatusCodeElement implements AccessLogElement {
         @Override
-        public void addElement(CharBuffer buf, Date date, Request request,
+        public void addElement(CharArrayWriter buf, Date date, Request request,
                 Response response, long time) {
             if (response != null) {
                 // This approach is used to reduce GC
                 switch (response.getStatus()) {
                     case HttpServletResponse.SC_CONTINUE:
-                        buf.put(Constants.SC_CONTINUE_CHAR);
+                        buf.write(Constants.SC_CONTINUE_CHAR, 0, 3);
                         break;
                     case HttpServletResponse.SC_SWITCHING_PROTOCOLS:
-                        buf.put(Constants.SC_SWITCHING_PROTOCOLS_CHAR);
+                        buf.write(Constants.SC_SWITCHING_PROTOCOLS_CHAR, 0, 3);
                         break;
                     case HttpServletResponse.SC_OK:
-                        buf.put(Constants.SC_OK_CHAR);
+                        buf.write(Constants.SC_OK_CHAR, 0, 3);
                         break;
                     case HttpServletResponse.SC_CREATED:
-                        buf.put(Constants.SC_CREATED_CHAR);
+                        buf.write(Constants.SC_CREATED_CHAR, 0, 3);
                         break;
                     case HttpServletResponse.SC_ACCEPTED:
-                        buf.put(Constants.SC_ACCEPTED_CHAR);
+                        buf.write(Constants.SC_ACCEPTED_CHAR, 0, 3);
                         break;
                     case HttpServletResponse.SC_NON_AUTHORITATIVE_INFORMATION:
-                        buf.put(Constants.SC_NON_AUTHORITATIVE_INFORMATION_CHAR);
+                        buf.write(Constants.SC_NON_AUTHORITATIVE_INFORMATION_CHAR, 0, 3);
                         break;
                     case HttpServletResponse.SC_NO_CONTENT:
-                        buf.put(Constants.SC_NO_CONTENT_CHAR);
+                        buf.write(Constants.SC_NO_CONTENT_CHAR, 0, 3);
                         break;
                     case HttpServletResponse.SC_RESET_CONTENT:
-                        buf.put(Constants.SC_RESET_CONTENT_CHAR);
+                        buf.write(Constants.SC_RESET_CONTENT_CHAR, 0, 3);
                         break;
                     case HttpServletResponse.SC_PARTIAL_CONTENT:
-                        buf.put(Constants.SC_PARTIAL_CONTENT_CHAR);
+                        buf.write(Constants.SC_PARTIAL_CONTENT_CHAR, 0, 3);
                         break;
                     case HttpServletResponse.SC_MULTIPLE_CHOICES:
-                        buf.put(Constants.SC_MULTIPLE_CHOICES_CHAR);
+                        buf.write(Constants.SC_MULTIPLE_CHOICES_CHAR, 0, 3);
                         break;
                     case HttpServletResponse.SC_MOVED_PERMANENTLY:
-                        buf.put(Constants.SC_MOVED_PERMANENTLY_CHAR);
+                        buf.write(Constants.SC_MOVED_PERMANENTLY_CHAR, 0, 3);
                         break;
                     case HttpServletResponse.SC_MOVED_TEMPORARILY:
-                        buf.put(Constants.SC_MOVED_TEMPORARILY_CHAR);
+                        buf.write(Constants.SC_MOVED_TEMPORARILY_CHAR, 0, 3);
                         break;
                     case HttpServletResponse.SC_SEE_OTHER:
-                        buf.put(Constants.SC_SEE_OTHER_CHAR);
+                        buf.write(Constants.SC_SEE_OTHER_CHAR, 0, 3);
                         break;
                     case HttpServletResponse.SC_NOT_MODIFIED:
-                        buf.put(Constants.SC_NOT_MODIFIED_CHAR);
+                        buf.write(Constants.SC_NOT_MODIFIED_CHAR, 0, 3);
                         break;
                     case HttpServletResponse.SC_USE_PROXY:
-                        buf.put(Constants.SC_USE_PROXY_CHAR);
+                        buf.write(Constants.SC_USE_PROXY_CHAR, 0, 3);
                         break;
                     case HttpServletResponse.SC_TEMPORARY_REDIRECT:
-                        buf.put(Constants.SC_TEMPORARY_REDIRECT_CHAR);
+                        buf.write(Constants.SC_TEMPORARY_REDIRECT_CHAR, 0, 3);
                         break;
                     case HttpServletResponse.SC_BAD_REQUEST:
-                        buf.put(Constants.SC_BAD_REQUEST_CHAR);
+                        buf.write(Constants.SC_BAD_REQUEST_CHAR, 0, 3);
                         break;
                     case HttpServletResponse.SC_UNAUTHORIZED:
-                        buf.put(Constants.SC_UNAUTHORIZED_CHAR);
+                        buf.write(Constants.SC_UNAUTHORIZED_CHAR, 0, 3);
                         break;
                     case HttpServletResponse.SC_PAYMENT_REQUIRED:
-                        buf.put(Constants.SC_PAYMENT_REQUIRED_CHAR);
+                        buf.write(Constants.SC_PAYMENT_REQUIRED_CHAR, 0, 3);
                         break;
                     case HttpServletResponse.SC_FORBIDDEN:
-                        buf.put(Constants.SC_FORBIDDEN_CHAR);
+                        buf.write(Constants.SC_FORBIDDEN_CHAR, 0, 3);
                         break;
                     case HttpServletResponse.SC_NOT_FOUND:
-                        buf.put(Constants.SC_NOT_FOUND_CHAR);
+                        buf.write(Constants.SC_NOT_FOUND_CHAR, 0, 3);
                         break;
                     case HttpServletResponse.SC_METHOD_NOT_ALLOWED:
-                        buf.put(Constants.SC_METHOD_NOT_ALLOWED_CHAR);
+                        buf.write(Constants.SC_METHOD_NOT_ALLOWED_CHAR, 0, 3);
                         break;
                     case HttpServletResponse.SC_NOT_ACCEPTABLE:
-                        buf.put(Constants.SC_NOT_ACCEPTABLE_CHAR);
+                        buf.write(Constants.SC_NOT_ACCEPTABLE_CHAR, 0, 3);
                         break;
                     case HttpServletResponse.SC_PROXY_AUTHENTICATION_REQUIRED:
-                        buf.put(Constants.SC_PROXY_AUTHENTICATION_REQUIRED_CHAR);
+                        buf.write(Constants.SC_PROXY_AUTHENTICATION_REQUIRED_CHAR, 0, 3);
                         break;
                     case HttpServletResponse.SC_REQUEST_TIMEOUT:
-                        buf.put(Constants.SC_REQUEST_TIMEOUT_CHAR);
+                        buf.write(Constants.SC_REQUEST_TIMEOUT_CHAR, 0, 3);
                         break;
                     case HttpServletResponse.SC_CONFLICT:
-                        buf.put(Constants.SC_CONFLICT_CHAR);
+                        buf.write(Constants.SC_CONFLICT_CHAR, 0, 3);
                         break;
                     case HttpServletResponse.SC_GONE:
-                        buf.put(Constants.SC_GONE_CHAR);
+                        buf.write(Constants.SC_GONE_CHAR, 0, 3);
                         break;
                     case HttpServletResponse.SC_LENGTH_REQUIRED:
-                        buf.put(Constants.SC_LENGTH_REQUIRED_CHAR);
+                        buf.write(Constants.SC_LENGTH_REQUIRED_CHAR, 0, 3);
                         break;
                     case HttpServletResponse.SC_PRECONDITION_FAILED:
-                        buf.put(Constants.SC_PRECONDITION_FAILED_CHAR);
+                        buf.write(Constants.SC_PRECONDITION_FAILED_CHAR, 0, 3);
                         break;
                     case HttpServletResponse.SC_REQUEST_ENTITY_TOO_LARGE:
-                        buf.put(Constants.SC_REQUEST_ENTITY_TOO_LARGE_CHAR);
+                        buf.write(Constants.SC_REQUEST_ENTITY_TOO_LARGE_CHAR, 0, 3);
                         break;
                     case HttpServletResponse.SC_REQUEST_URI_TOO_LONG:
-                        buf.put(Constants.SC_REQUEST_URI_TOO_LONG_CHAR);
+                        buf.write(Constants.SC_REQUEST_URI_TOO_LONG_CHAR, 0, 3);
                         break;
                     case HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE:
-                        buf.put(Constants.SC_UNSUPPORTED_MEDIA_TYPE_CHAR);
+                        buf.write(Constants.SC_UNSUPPORTED_MEDIA_TYPE_CHAR, 0, 3);
                         break;
                     case HttpServletResponse.SC_REQUESTED_RANGE_NOT_SATISFIABLE:
-                        buf.put(Constants.SC_REQUESTED_RANGE_NOT_SATISFIABLE_CHAR);
+                        buf.write(Constants.SC_REQUESTED_RANGE_NOT_SATISFIABLE_CHAR, 0, 3);
                         break;
                     case HttpServletResponse.SC_EXPECTATION_FAILED:
-                        buf.put(Constants.SC_EXPECTATION_FAILED_CHAR);
+                        buf.write(Constants.SC_EXPECTATION_FAILED_CHAR, 0, 3);
                         break;
                     case HttpServletResponse.SC_INTERNAL_SERVER_ERROR:
-                        buf.put(Constants.SC_INTERNAL_SERVER_ERROR_CHAR);
+                        buf.write(Constants.SC_INTERNAL_SERVER_ERROR_CHAR, 0, 3);
                         break;
                     case HttpServletResponse.SC_NOT_IMPLEMENTED:
-                        buf.put(Constants.SC_NOT_IMPLEMENTED_CHAR);
+                        buf.write(Constants.SC_NOT_IMPLEMENTED_CHAR, 0, 3);
                         break;
                     case HttpServletResponse.SC_BAD_GATEWAY:
-                        buf.put(Constants.SC_BAD_GATEWAY_CHAR);
+                        buf.write(Constants.SC_BAD_GATEWAY_CHAR, 0, 3);
                         break;
                     case HttpServletResponse.SC_SERVICE_UNAVAILABLE:
-                        buf.put(Constants.SC_SERVICE_UNAVAILABLE_CHAR);
+                        buf.write(Constants.SC_SERVICE_UNAVAILABLE_CHAR, 0, 3);
                         break;
                     case HttpServletResponse.SC_GATEWAY_TIMEOUT:
-                        buf.put(Constants.SC_GATEWAY_TIMEOUT_CHAR);
+                        buf.write(Constants.SC_GATEWAY_TIMEOUT_CHAR, 0, 3);
                         break;
                     case HttpServletResponse.SC_HTTP_VERSION_NOT_SUPPORTED:
-                        buf.put(Constants.SC_HTTP_VERSION_NOT_SUPPORTED_CHAR);
+                        buf.write(Constants.SC_HTTP_VERSION_NOT_SUPPORTED_CHAR, 0, 3);
                         break;
                     default:
                         // Don't use this for known codes due to the garbage the
@@ -1732,7 +1734,7 @@ public class AccessLogValve extends ValveBase implements AccessLog {
      */
     protected class LocalPortElement implements AccessLogElement {
         @Override
-        public void addElement(CharBuffer buf, Date date, Request request,
+        public void addElement(CharArrayWriter buf, Date date, Request request,
                 Response response, long time) {
             if (requestAttributesEnabled) {
                 Object port = request.getAttribute(SERVER_PORT_ATTRIBUTE);
@@ -1761,7 +1763,7 @@ public class AccessLogValve extends ValveBase implements AccessLog {
         }
 
         @Override
-        public void addElement(CharBuffer buf, Date date, Request request,
+        public void addElement(CharArrayWriter buf, Date date, Request request,
                 Response response, long time) {
             // Don't need to flush since trigger for log message is after the
             // response has been committed
@@ -1793,7 +1795,7 @@ public class AccessLogValve extends ValveBase implements AccessLog {
      */
     protected static class MethodElement implements AccessLogElement {
         @Override
-        public void addElement(CharBuffer buf, Date date, Request request,
+        public void addElement(CharArrayWriter buf, Date date, Request request,
                 Response response, long time) {
             if (request != null) {
                 buf.append(request.getMethod());
@@ -1816,7 +1818,7 @@ public class AccessLogValve extends ValveBase implements AccessLog {
         }
 
         @Override
-        public void addElement(CharBuffer buf, Date date, Request request,
+        public void addElement(CharArrayWriter buf, Date date, Request request,
                 Response response, long time) {
             if (millis) {
                 buf.append(Long.toString(time));
@@ -1838,7 +1840,7 @@ public class AccessLogValve extends ValveBase implements AccessLog {
      */
     protected static class QueryElement implements AccessLogElement {
         @Override
-        public void addElement(CharBuffer buf, Date date, Request request,
+        public void addElement(CharArrayWriter buf, Date date, Request request,
                 Response response, long time) {
             String query = null;
             if (request != null) {
@@ -1856,7 +1858,7 @@ public class AccessLogValve extends ValveBase implements AccessLog {
      */
     protected static class SessionIdElement implements AccessLogElement {
         @Override
-        public void addElement(CharBuffer buf, Date date, Request request,
+        public void addElement(CharArrayWriter buf, Date date, Request request,
                 Response response, long time) {
             if (request != null) {
                 if (request.getSession(false) != null) {
@@ -1876,7 +1878,7 @@ public class AccessLogValve extends ValveBase implements AccessLog {
      */
     protected static class RequestURIElement implements AccessLogElement {
         @Override
-        public void addElement(CharBuffer buf, Date date, Request request,
+        public void addElement(CharArrayWriter buf, Date date, Request request,
                 Response response, long time) {
             if (request != null) {
                 buf.append(request.getRequestURI());
@@ -1891,7 +1893,7 @@ public class AccessLogValve extends ValveBase implements AccessLog {
      */
     protected static class LocalServerNameElement implements AccessLogElement {
         @Override
-        public void addElement(CharBuffer buf, Date date, Request request,
+        public void addElement(CharArrayWriter buf, Date date, Request request,
                 Response response, long time) {
             buf.append(request.getServerName());
         }
@@ -1908,7 +1910,7 @@ public class AccessLogValve extends ValveBase implements AccessLog {
         }
 
         @Override
-        public void addElement(CharBuffer buf, Date date, Request request,
+        public void addElement(CharArrayWriter buf, Date date, Request request,
                 Response response, long time) {
             buf.append(str);
         }
@@ -1925,7 +1927,7 @@ public class AccessLogValve extends ValveBase implements AccessLog {
         }
 
         @Override
-        public void addElement(CharBuffer buf, Date date, Request request,
+        public void addElement(CharArrayWriter buf, Date date, Request request,
                 Response response, long time) {
             Enumeration<String> iter = request.getHeaders(header);
             if (iter.hasMoreElements()) {
@@ -1950,7 +1952,7 @@ public class AccessLogValve extends ValveBase implements AccessLog {
         }
 
         @Override
-        public void addElement(CharBuffer buf, Date date, Request request,
+        public void addElement(CharArrayWriter buf, Date date, Request request,
                 Response response, long time) {
             String value = "-";
             Cookie[] c = request.getCookies();
@@ -1977,7 +1979,7 @@ public class AccessLogValve extends ValveBase implements AccessLog {
         }
 
         @Override
-        public void addElement(CharBuffer buf, Date date, Request request,
+        public void addElement(CharArrayWriter buf, Date date, Request request,
                 Response response, long time) {
             if (null != response) {
                 Iterator<String> iter = response.getHeaders(header).iterator();
@@ -2004,7 +2006,7 @@ public class AccessLogValve extends ValveBase implements AccessLog {
         }
 
         @Override
-        public void addElement(CharBuffer buf, Date date, Request request,
+        public void addElement(CharArrayWriter buf, Date date, Request request,
                 Response response, long time) {
             Object value = null;
             if (request != null) {
@@ -2035,7 +2037,7 @@ public class AccessLogValve extends ValveBase implements AccessLog {
         }
 
         @Override
-        public void addElement(CharBuffer buf, Date date, Request request,
+        public void addElement(CharArrayWriter buf, Date date, Request request,
                 Response response, long time) {
             Object value = null;
             if (null != request) {
