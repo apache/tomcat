@@ -320,7 +320,7 @@
   </target>
 
   <target name="init-ldap">
-    <input message="Enter ASF LDAP (same svn) password"
+    <input message="Enter ASF LDAP (same as svn) password"
            addproperty="asf.ldap.password" >
       <handler type="secure"/>
     </input>
