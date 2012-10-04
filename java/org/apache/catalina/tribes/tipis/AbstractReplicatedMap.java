@@ -623,7 +623,10 @@ public abstract class AbstractReplicatedMap<K,V>
             MapEntry<K,V> entry = innerMap.get(mapmsg.getKey());
             if ( entry==null ) {
                 entry = new MapEntry<>((K) mapmsg.getKey(), (V) mapmsg.getValue());
-                entry = innerMap.putIfAbsent(entry.getKey(), entry);
+                MapEntry<K,V> old = innerMap.putIfAbsent(entry.getKey(), entry);
+                if (old != null) {
+                    entry = old;
+                }
             }
             entry.setProxy(true);
             entry.setBackup(false);
