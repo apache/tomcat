@@ -68,9 +68,9 @@
   </subsection>
   <subsection name="Web applications">
     <changelog>
-    <fix>
-      Correct the couple of broken links in the Tomcat Javadoc. (markt)
-    </fix>
+      <fix>
+        Correct the couple of broken links in the Tomcat Javadoc. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
@@ -100,7 +100,7 @@
       <update>
         <code>JMXProxyServlet</code> now allows multiple operation commands like
         <code>invokeAndSet</code>, <code>invokeAndGet</code>,
-        etc. (schultz)
+        etc. (schultz) <em>Note</em>: reverted in 7.0.32.
       </update>
       <fix>
         <bug>53843</bug>: <code>request.isAsyncStarted()</code> must continue to
@@ -184,7 +184,8 @@
       <fix>
         <bug>53481</bug>: Added support for SSLHonorCipherOrder to allow
         the server to impose its cipher order on the client. Based on a patch
-        provided by Marcel Šebek. (schultz)
+        provided by Marcel &#x160;ebek. This feature requires
+        Tomcat Native 1.1.25 or later. (schultz)
       </fix>
       <fix>
         <bug>53498</bug>: Fix atomicity bugs in use of concurrent collections.
