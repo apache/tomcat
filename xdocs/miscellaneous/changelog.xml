@@ -42,6 +42,11 @@
       Add CPU information to OS info for Linux.
       This was already available under Windows and Solaris. (rjung)
     </update>
+    <fix>
+      <bug>53969</bug>: ssl.c::hasOp could only check for
+      SSL_OP_ALLOW_UNSAFE_LEGACY_RENEGOTIATION. Now it can check
+      for any SSL_OP_* available at compile-time.
+    </fix>
   </changelog>
 </section>
 <section name="Changes between 1.1.23 and 1.1.24">
