@@ -45,7 +45,7 @@
     <fix>
       <bug>53969</bug>: ssl.c::hasOp could only check for
       SSL_OP_ALLOW_UNSAFE_LEGACY_RENEGOTIATION. Now it can check
-      for any SSL_OP_* available at compile-time.
+      for any SSL_OP_* available at compile-time. (schultz)
     </fix>
   </changelog>
 </section>

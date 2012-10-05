@@ -20,7 +20,7 @@ package org.apache.tomcat.jni;
 /** SSL
  *
  * @author Mladen Turk
- * @version $Revision$, $Date$
+ * @version $Id$
  */
 
 public final class SSL {
@@ -330,13 +330,19 @@ public final class SSL {
     public static native String getLastError();
 
     /**
-     * Return true if SSL_OP_ if defined.
+     * Return true if SSL_OP_ was defined at compile time.
      * <p>
-     * Currently used for testing weather the
-     * SSL_OP_ALLOW_UNSAFE_LEGACY_RENEGOTIATION is supported by OpenSSL.
+     * In Tomcat Native 1.1.21 - 1.1.24 this method can be used to test whether
+     * the SSL_OP_ALLOW_UNSAFE_LEGACY_RENEGOTIATION is supported by OpenSSL.
+     * Calling it with any other SSL_OP flag returns false.
      * <p>
+     * Since Tomcat Native 1.1.25 this method can be used with any SSL_OP flag
+     * and with any or'ed combination of SSL_OP flags to test that all of the
+     * flags were defined at compile time. It returns true if all of the flags
+     * specified by <code>op</code> were defined, and false otherwise.
      * @param op SSL_OP to test.
      * @return true if SSL_OP is supported by OpenSSL library.
+     * @since Tomcat Native 1.1.21
      */
     public static native boolean hasOp(int op);
 
