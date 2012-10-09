@@ -53,7 +53,7 @@
   They eventually become mixed with the numbered issues. (I.e., numbered
   issues to not "pop up" wrt. others).
 -->
-<section name="Tomcat 7.0.32 (markt)">
+<section name="Tomcat 7.0.32 (markt)" rtext="2012-10-09">
   <subsection name="Catalina">
     <changelog>
       <fix>
