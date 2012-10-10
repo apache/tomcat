@@ -426,7 +426,7 @@ class JspReader {
                    if (peekChar() == limit.charAt(i)) {
                        nextChar();
                    } else {
-                       setCurrent(restart);
+                       current.init(restart, singleFile);
                        continue skip;
                    }
                }
