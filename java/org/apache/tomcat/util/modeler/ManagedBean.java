@@ -253,8 +253,6 @@ public class ManagedBean implements java.io.Serializable {
      *
      * @exception InstanceNotFoundException if the managed resource
      *  object cannot be found
-     * @exception javax.management.modelmbean.InvalidTargetObjectTypeException
-     *  if our MBean cannot handle object references (should never happen)
      * @exception MBeanException if a problem occurs instantiating the
      *  <code>ModelMBean</code> instance
      * @exception RuntimeOperationsException if a JMX runtime error occurs
@@ -281,8 +279,6 @@ public class ManagedBean implements java.io.Serializable {
      *
      * @exception InstanceNotFoundException if the managed resource
      *  object cannot be found
-     * @exception javax.management.modelmbean.InvalidTargetObjectTypeException
-     *  if our MBean cannot handle object references (should never happen)
      * @exception MBeanException if a problem occurs instantiating the
      *  <code>ModelMBean</code> instance
      * @exception RuntimeOperationsException if a JMX runtime error occurs

@@ -270,7 +270,7 @@ public class BaseModelMBean implements DynamicMBean, MBeanRegistration, ModelMBe
      *
      * @exception MBeanException if the initializer of an object
      *  throws an exception
-     * @exception ReflectioNException if a Java reflection exception
+     * @exception ReflectionException if a Java reflection exception
      *  occurs when invoking a method
      */
     @Override
@@ -538,8 +538,6 @@ public class BaseModelMBean implements DynamicMBean, MBeanRegistration, ModelMBe
      *
      * @exception InstanceNotFoundException if the managed resource object
      *  cannot be found
-     * @exception InvalidTargetObjectTypeException if this ModelMBean is
-     *  asked to handle a reference type it cannot deal with
      * @exception MBeanException if the initializer of the object throws
      *  an exception
      * @exception RuntimeOperationsException if the managed resource or the
