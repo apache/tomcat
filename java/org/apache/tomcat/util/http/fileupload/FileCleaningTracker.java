@@ -33,7 +33,7 @@ import java.util.Vector;
  * In an environment with multiple class loaders (a servlet container, for
  * example), you should consider stopping the background thread if it is no
  * longer needed. This is done by invoking the method
- * {@link #exitWhenFinished}, typically in
+ * {@link #exitWhenFinished()}, typically in
  * {@link javax.servlet.ServletContextListener#contextDestroyed} or similar.
  *
  * @author Noel Bergman
