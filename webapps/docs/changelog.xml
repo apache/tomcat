@@ -53,6 +53,18 @@
   They eventually become mixed with the numbered issues. (I.e., numbered
   issues to not "pop up" wrt. others).
 -->
+<section name="Tomcat 7.0.33 (markt)">
+  <subsection name="Jasper">
+    <changelog>
+      <fix>
+        <bug>53986</bug>: Correct a regression introduced by the fix for
+        <bug>53713</bug>. JSP comments that ended with the sequence ---%&gt; (or
+        any similar sequence with a odd number of - characters) was not
+        correctly parsed. (markt)
+      </fix>
+    </changelog>
+  </subsection>
+</section>
 <section name="Tomcat 7.0.32 (markt)" rtext="2012-10-09">
   <subsection name="Catalina">
     <changelog>
