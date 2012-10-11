@@ -54,6 +54,14 @@
   issues to not "pop up" wrt. others).
 -->
 <section name="Tomcat 7.0.33 (markt)">
+  <subsection name="Coyote">
+    <changelog>
+      <fix>
+        Correct an issue that prevented WebSockets from being used over SSL when
+        using the HTTP NIO connector. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Jasper">
     <changelog>
       <fix>
