@@ -112,7 +112,7 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
         try {
             Thread.currentThread().setContextClassLoader(newCL);
             request.getCoyoteRequest().getReadListener().onDataAvailable();
-            if (request.getInputStream().dataAvailable()==0) {
+            if (request.getInputStream().isFinished()) {
                 request.getCoyoteRequest().getReadListener().onAllDataRead();
             }
         }finally {

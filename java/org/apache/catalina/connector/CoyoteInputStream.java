@@ -247,11 +247,6 @@ public class CoyoteInputStream
         return ib.isFinished();
     }
 
-    @Override
-    public int dataAvailable() {
-        return ib.dataAvailable();
-    }
-
 
     @Override
     public boolean isReady() {
@@ -266,6 +261,4 @@ public class CoyoteInputStream
     public void setReadListener(ReadListener listener) {
         ib.setReadListener(listener);
     }
-
-
 }

@@ -358,12 +358,11 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         public void onDataAvailable() {
             try {
                 ServletInputStream in = ctx.getRequest().getInputStream();
-                int avail = 0;
                 String s = "";
-                while ((avail = in.dataAvailable()) > 0) {
-                    byte[] b = new byte[avail];
-                    in.read(b);
-                    s += new String(b);
+                byte[] b = new byte[8192];
+                while (in.isReady()) {
+                    int read = in.read(b);
+                    s += new String(b, 0, read);
                 }
                 System.out.println(s);
                 if ("FINISHED".equals(s)) {

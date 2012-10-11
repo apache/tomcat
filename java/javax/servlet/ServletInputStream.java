@@ -83,28 +83,21 @@ public abstract class ServletInputStream extends InputStream {
     }
 
     /**
-     * TODO SERVLET 3.1
-     * @return  TODO
-     */
-    public abstract int dataAvailable();
-
-
-    /**
-     * TODO SERVLET 3.1
-     * @return  TODO
+     * Returns <code>true</code> if all the data has been read from the stream,
+     * else <code>false</code>.
      */
     public abstract boolean isFinished();
 
     /**
-     * TODO SERVLET 3.1
-     * If this returns false, the container will invoke
-     * {@link ReadListener#onDataAvailable()} when data is available.
-     * @return  TODO
+     * Returns <code>true</code> if data can be read without blocking, else
+     * <code>false</code>. If this method is called and returns false, the
+     * container will invoke {@link ReadListener#onDataAvailable()} when data is
+     * available.
      */
     public abstract boolean isReady();
 
     /**
-     * TODO SERVLET 3.1
+     * Sets the {@link ReadListener} for this {@link ServletInputStream}.
      */
-    public abstract void setReadListener(javax.servlet.ReadListener listener);
+    public abstract void setReadListener(ReadListener listener);
 }
