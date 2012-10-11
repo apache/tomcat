@@ -18,6 +18,7 @@ package org.apache.coyote.http11.upgrade;
 
 import java.io.EOFException;
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.nio.channels.Selector;
 
 import org.apache.tomcat.util.net.NioChannel;
@@ -120,9 +121,52 @@ public class UpgradeNioProcessor extends UpgradeProcessor<NioChannel> {
     private int readSocket(boolean block, byte[] bytes, int offset, int len)
             throws IOException {
 
-        int nRead = 0;
-        nioChannel.getBufHandler().getReadBuffer().clear();
-        nioChannel.getBufHandler().getReadBuffer().limit(len);
+        ByteBuffer readBuffer = nioChannel.getBufHandler().getReadBuffer();
+        int remaining = readBuffer.remaining();
+
+        // Is there enough data in the read buffer to satisfy this request?
+        if (remaining >= len) {
+            readBuffer.get(bytes, offset, len);
+            return len;
+        }
+
+        // Copy what data there is in the read buffer to the byte array
+        int leftToWrite = len;
+        int newOffset = offset;
+        if (remaining > 0) {
+            readBuffer.get(bytes, offset, remaining);
+            leftToWrite -= remaining;
+            newOffset += remaining;
+        }
+
+        // Fill the read buffer as best we can
+        readBuffer.clear();
+        int nRead = fillReadBuffer(block);
+
+        // Full as much of the remaining byte array as possible with the data
+        // that was just read
+        if (nRead > 0) {
+            readBuffer.flip();
+            readBuffer.limit(nRead);
+            if (nRead > leftToWrite) {
+                readBuffer.get(bytes, newOffset, leftToWrite);
+                leftToWrite = 0;
+            } else {
+                readBuffer.get(bytes, newOffset, nRead);
+                leftToWrite -= nRead;
+            }
+        } else if (nRead == 0) {
+            readBuffer.flip();
+            readBuffer.limit(nRead);
+        } else if (nRead == -1) {
+            throw new EOFException(sm.getString("nio.eof.error"));
+        }
+
+        return len - leftToWrite;
+    }
+
+    private int fillReadBuffer(boolean block) throws IOException {
+        int nRead;
         if (block) {
             Selector selector = null;
             try {
@@ -148,19 +192,8 @@ public class UpgradeNioProcessor extends UpgradeProcessor<NioChannel> {
         } else {
             nRead = nioChannel.read(nioChannel.getBufHandler().getReadBuffer());
         }
-        if (nRead > 0) {
-            nioChannel.getBufHandler().getReadBuffer().flip();
-            nioChannel.getBufHandler().getReadBuffer().limit(nRead);
-            nioChannel.getBufHandler().getReadBuffer().get(bytes, offset, nRead);
-            return nRead;
-        } else if (nRead == -1) {
-            //return false;
-            throw new EOFException(sm.getString("nio.eof.error"));
-        } else {
-            return 0;
-        }
+        return nRead;
     }
-
 
     /*
      * Adapted from the NioOutputBuffer
