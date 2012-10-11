@@ -485,8 +485,9 @@ public interface HttpServletRequest extends ServletRequest {
             ServletException;
 
     /**
-     * TODO SERVLET 3.1
+     * Start the HTTP upgrade process and pass the connection to the provided
+     * protocol handler once the current request/response pair has completed
+     * processing.
      */
-    public abstract void upgrade(javax.servlet.http.ProtocolHandler handler)
-            throws java.io.IOException;
+    public void upgrade(ProtocolHandler handler) throws java.io.IOException;
 }

@@ -20,13 +20,22 @@ import java.io.IOException;
 
 import javax.servlet.ServletInputStream;
 import javax.servlet.ServletOutputStream;
+
 /**
- * TODO SERVLET 3.1
- *
+ * The interface used by a {@link ProtocolHandler} to interact with an upgraded
+ * HTTP connection.
  */
 public interface WebConnection {
-    public abstract ServletInputStream getInputStream()
-            throws IOException;
-    public abstract ServletOutputStream getOutputStream()
-            throws IOException;
+
+    /**
+     * Provides access to the {@link ServletInputStream} for reading data from
+     * the client.
+     */
+    ServletInputStream getInputStream() throws IOException;
+
+    /**
+     * Provides access to the {@link ServletOutputStream} for writing data to
+     * the client.
+     */
+    ServletOutputStream getOutputStream() throws IOException;
 }

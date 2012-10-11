@@ -328,8 +328,7 @@ public class HttpServletRequestWrapper extends ServletRequestWrapper implements
      * {@inheritDoc}
      */
     @Override
-    public void upgrade(javax.servlet.http.ProtocolHandler handler)
-            throws java.io.IOException {
+    public void upgrade(ProtocolHandler handler) throws java.io.IOException {
         this._getHttpServletRequest().upgrade(handler);
     }
 }

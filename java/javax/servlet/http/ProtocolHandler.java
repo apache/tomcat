@@ -15,10 +15,19 @@
  * limitations under the License.
  */
 package javax.servlet.http;
+
 /**
- * TODO SERVLET 3.1
- *
+ * Interface between the HTTP upgrade process and the new protocol.
  */
 public interface ProtocolHandler {
-    public abstract void init(javax.servlet.http.WebConnection connection);
+
+    /**
+     * This method is called once the request/response pair where
+     * {@link HttpServletRequest#upgrade(ProtocolHandler) is called has
+     * completed processing and is the point where control of the connection
+     * passes from the container to the {@link ProtocolHandler}.
+     *
+     * @param connection    The connection that has been upgraded
+     */
+    void init(WebConnection connection);
 }
