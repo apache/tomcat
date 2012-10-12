@@ -843,32 +843,32 @@ class NoBodyOutputStream extends ServletOutputStream {
 
     @Override
     public void write(byte buf[], int offset, int len) throws IOException {
-        if (len >= 0) {
-            contentLength += len;
-        } else {
-            // XXX
-            // isn't this really an IllegalArgumentException?
-
-            String msg = lStrings.getString("err.io.negativelength");
-            throw new IOException(msg);
+        if (buf == null) {
+            throw new NullPointerException(
+                    lStrings.getString("err.io.nullArray"));
         }
+
+        if (offset < 0 || len < 0 || offset+len < buf.length) {
+            String msg = lStrings.getString("err.io.indexOutOfBounds");
+            Object[] msgArgs = new Object[3];
+            msgArgs[0] = Integer.valueOf(offset);
+            msgArgs[1] = Integer.valueOf(len);
+            msgArgs[2] = Integer.valueOf(offset + len);
+            msg = MessageFormat.format(msg, msgArgs);
+            throw new IndexOutOfBoundsException(msg);
+        }
+
+        contentLength += len;
     }
 
-    /**
-     * TODO SERVLET 3.1
-     * @return
-     */
     @Override
     public boolean canWrite() {
+        // TODO SERVLET 3.1
         return false;
     }
 
-    /**
-     * TODO SERVLET 3.1
-     * @param listener
-     */
     @Override
     public void setWriteListener(javax.servlet.WriteListener listener) {
-
+        // TODO SERVLET 3.1
     }
 }
