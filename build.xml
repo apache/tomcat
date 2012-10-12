@@ -47,6 +47,7 @@
   <property name="servlet.revision" value="FR" />
   <property name="jsp.revision" value="FR" />
   <property name="el.revision" value="FR" />
+  <property name="websocket.revision" value="FR" />
 
   <!-- Release artifact base names -->
   <property name="final.name"            value="${project}-${version}" />
@@ -74,7 +75,7 @@
   <!-- build output directory for jdbc-pool -->
   <property name="tomcat.pool"           value="${tomcat.output}/jdbc-pool"/>
 
-  <!-- Servlet 3.1 spec requires 1.7+ - these get overriden by build.properties(.default)-->
+  <!-- Servlet 3.1 spec requires 1.7+ -->
   <property name="compile.source" value="1.7"/>
   <property name="compile.target" value="1.7"/>
 
@@ -87,6 +88,7 @@
   <property name="servlet-api.jar" value="${tomcat.build}/lib/servlet-api.jar"/>
   <property name="jsp-api.jar" value="${tomcat.build}/lib/jsp-api.jar"/>
   <property name="el-api.jar" value="${tomcat.build}/lib/el-api.jar"/>
+  <property name="websocket-api.jar" value="${tomcat.build}/lib/websocket-api.jar"/>
   <property name="catalina.jar" value="${tomcat.build}/lib/catalina.jar"/>
   <property name="catalina-tribes.jar" value="${tomcat.build}/lib/catalina-tribes.jar"/>
   <property name="catalina-ha.jar" value="${tomcat.build}/lib/catalina-ha.jar"/>
@@ -111,6 +113,7 @@
   <property name="servlet-api-src.jar" value="${tomcat.src.jars}/servlet-api-src.jar"/>
   <property name="jsp-api-src.jar" value="${tomcat.src.jars}/jsp-api-src.jar"/>
   <property name="el-api-src.jar" value="${tomcat.src.jars}/el-api-src.jar"/>
+  <property name="websocket-api-src.jar" value="${tomcat.src.jars}/websocket-api-src.jar"/>
   <property name="catalina-src.jar" value="${tomcat.src.jars}/catalina-src.jar"/>
   <property name="catalina-tribes-src.jar" value="${tomcat.src.jars}/catalina-tribes-src.jar"/>
   <property name="catalina-ha-src.jar" value="${tomcat.src.jars}/catalina-ha-src.jar"/>
@@ -278,6 +281,10 @@
     <include name="javax/el/*" />
   </patternset>
 
+  <patternset id="files.websocket-api">
+    <include name="javax/net/websocket/**" />
+  </patternset>
+
   <patternset id="files.bootstrap">
     <include name="org/apache/catalina/startup/Bootstrap.*" />
     <include name="org/apache/catalina/startup/catalina.properties" />
@@ -368,6 +375,7 @@
     <patternset refid="files.catalina" />
     <patternset refid="files.el-api" />
     <patternset refid="files.servlet-api" />
+    <patternset refid="files.websocket-api" />
     <patternset refid="files.tomcat-api" />
     <!-- These pattern sets conflict so include files directly
       <patternset refid="files.tomcat-coyote" />
@@ -608,6 +616,7 @@
     <filter token="servlet.revision" value="${servlet.revision}"/>
     <filter token="jsp.revision" value="${jsp.revision}"/>
     <filter token="el.revision" value="${el.revision}"/>
+    <filter token="websocket.revision" value="${websocket.revision}"/>
 
     <mkdir dir="${tomcat.manifests}" />
     <copy todir="${tomcat.manifests}" overwrite="yes" filtering="yes"
@@ -650,6 +659,12 @@
       filesDir="${tomcat.classes}"
       filesId="files.el-api"
       manifest="${tomcat.manifests}/el-api.jar.manifest" />
+
+    <!-- WebSocket 1.0 Implementation JAR File -->
+    <jarIt jarfile="${websocket-api.jar}"
+      filesDir="${tomcat.classes}"
+      filesId="files.websocket-api"
+      manifest="${tomcat.manifests}/websocket-api.jar.manifest" />
 
     <!-- Bootstrap JAR File -->
     <jarIt jarfile="${bootstrap.jar}"
@@ -1639,6 +1654,23 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
         <path location="${ant.core.lib}"/>
       </classpath>
     </javadoc>
+    <javadoc packagenames="javax.net.websocket.*"
+      sourcepath="${tomcat.dist}/src/java"
+      destdir="${tomcat.dist}/webapps/docs/websocketapi"
+      version="true"
+      windowtitle="WebSocket 1.0 API Documentation - Apache Tomcat ${version}"
+      doctitle="WebSocket 1.0 API - Apache Tomcat ${version}"
+      header="&lt;b&gt;WebSocket 1.0 - Apache Tomcat ${version}&lt;/b&gt;"
+      bottom="Copyright &amp;#169; 2000-${year} Apache Software Foundation. All Rights Reserved."
+      encoding="ISO-8859-1"
+      additionalparam="-breakiterator"
+      maxmemory="256m" >
+      <classpath>
+        <path refid="compile.classpath"/>
+        <path refid="tomcat.webservices.classpath"/>
+        <path location="${ant.core.lib}"/>
+      </classpath>
+    </javadoc>
     <javadoc packagenames="org.apache.*"
       destdir="${tomcat.dist}/webapps/docs/api"
       version="true"
@@ -1657,6 +1689,7 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       <link href="../servletapi"/>
       <link href="../jspapi"/>
       <link href="../elapi"/>
+      <link href="../websocketapi"/>
       <link href="http://docs.oracle.com/javase/6/docs/api/"/>
       <link href="http://commons.apache.org/io/api-release/"/>
       <link href="http://docs.oracle.com/javaee/6/api/"/>
@@ -1680,6 +1713,7 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
         <include name="jasper.jar"/>
         <include name="jasper-el.jar"/>
         <include name="servlet-api.jar"/>
+      	<include name="websocket-api.jar"/>
         <include name="tomcat-coyote.jar"/>
         <include name="tomcat-util.jar"/>
       </fileset>
@@ -2208,6 +2242,12 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       filesDir="java"
       filesId="files.el-api"
       manifest="${tomcat.manifests}/el-api.jar.manifest" />
+
+    <!-- WebSocket 1.0 EL Implementation JAR File -->
+    <jarIt jarfile="${websocket-api-src.jar}"
+      filesDir="java"
+      filesId="files.websocket-api"
+      manifest="${tomcat.manifests}/websocket-api.jar.manifest" />
 
     <!-- Bootstrap JAR File -->
     <jarIt jarfile="${bootstrap-src.jar}"
