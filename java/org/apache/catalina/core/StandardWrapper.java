@@ -1160,7 +1160,6 @@ public class StandardWrapper extends ContainerBase
 
     /**
      * {@inheritDoc}
-     * @throws ClassNotFoundException
      */
     @Override
     public void servletSecurityAnnotationScan() throws ServletException {
