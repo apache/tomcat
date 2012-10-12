@@ -31,6 +31,10 @@ public interface HandshakeRequest {
 
     boolean isUserInRole(String role);
 
+    /**
+     * Get the HTTP Session object associated with this request. Object is used
+     * to avoid a direct dependency on the Servlet API.
+     */
     Object getSession();
 
     Map<String, String[]> getParameterMap();
