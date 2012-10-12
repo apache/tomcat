@@ -29,10 +29,8 @@ import javax.servlet.ServletRequest;
  * information for HTTP servlets.
  * <p>
  * The servlet container creates an <code>HttpServletRequest</code> object and
- * passes it as an argument to the servlet's service methods (<code>doGet</code>, <code>doPost</code>, etc).
- *
- * @author Various
- * @version $Version$
+ * passes it as an argument to the servlet's service methods
+ * (<code>doGet</code>, <code>doPost</code>, etc).
  */
 public interface HttpServletRequest extends ServletRequest {
 
@@ -310,11 +308,11 @@ public interface HttpServletRequest extends ServletRequest {
      * </table>
      * <p>
      * To reconstruct an URL with a scheme and host, use
-     * {@link HttpUtils#getRequestURL}.
+     * {@link #getRequestURL}.
      *
      * @return a <code>String</code> containing the part of the URL from the
      *         protocol name up to the query string
-     * @see HttpUtils#getRequestURL
+     * @see #getRequestURL
      */
     public String getRequestURI();
 
@@ -391,7 +389,6 @@ public interface HttpServletRequest extends ServletRequest {
      *         in the current session context; <code>false</code> otherwise
      * @see #getRequestedSessionId
      * @see #getSession
-     * @see HttpSessionContext
      */
     public boolean isRequestedSessionIdValid();
 
@@ -423,32 +420,42 @@ public interface HttpServletRequest extends ServletRequest {
     public boolean isRequestedSessionIdFromUrl();
 
     /**
-     * @param response
-     * @return TODO
-     * @throws IOException
-     * @throws ServletException
-     * @since Servlet 3.0 TODO SERVLET3 - Add comments
+     * Triggers the same authentication process as would be triggered if the
+     * request is for a resource that is protected by a security constraint.
+     *
+     * @param response  The response to use to return any authentication
+     *                  challenge
+     * @return <code>true</code> if the user is successfully authenticated and
+     *         <code>false</code> if not
+     *
+     * @since Servlet 3.0
      */
     public boolean authenticate(HttpServletResponse response)
             throws IOException, ServletException;
 
     /**
-     * @param username
-     * @param password
+     * Authenticate the provided user name and password and then associated the
+     * authenticated user with the request.
+     *
+     * @param username  The user name to authenticate
+     * @param password  The password to use to authenticate the user
+     *
      * @throws ServletException
      *             If any of {@link #getRemoteUser()},
      *             {@link #getUserPrincipal()} or {@link #getAuthType()} are
      *             non-null, if the configured authenticator does not support
      *             user name and password authentication or if the
      *             authentication fails
-     * @since Servlet 3.0 TODO SERVLET3 - Add comments
+     * @since Servlet 3.0
      */
     public void login(String username, String password) throws ServletException;
 
     /**
+     * Removes any authenticated user from the request.
+     *
      * @throws ServletException
      *             If the logout fails
-     * @since Servlet 3.0 TODO SERVLET3 - Add comments
+     * @since Servlet 3.0
      */
     public void logout() throws ServletException;
 
