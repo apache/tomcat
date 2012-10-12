@@ -24,18 +24,24 @@ import javax.servlet.ServletOutputStream;
 /**
  * The interface used by a {@link ProtocolHandler} to interact with an upgraded
  * HTTP connection.
+ *
+ * @since Servlet 3.1
  */
 public interface WebConnection {
 
     /**
      * Provides access to the {@link ServletInputStream} for reading data from
      * the client.
+     *
+     * @since Servlet 3.1
      */
     ServletInputStream getInputStream() throws IOException;
 
     /**
      * Provides access to the {@link ServletOutputStream} for writing data to
      * the client.
+     *
+     * @since Servlet 3.1
      */
     ServletOutputStream getOutputStream() throws IOException;
 }
