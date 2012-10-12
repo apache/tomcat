@@ -52,7 +52,7 @@ import javax.servlet.ServletResponse;
  * <p>There's almost no reason to override the <code>service</code>
  * method. <code>service</code> handles standard HTTP
  * requests by dispatching them to the handler methods
- * for each HTTP request type (the <code>do</code><i>XXX</i>
+ * for each HTTP request type (the <code>do</code><i>Method</i>
  * methods listed above).
  *
  * <p>Likewise, there's almost no reason to override the
@@ -586,7 +586,7 @@ public abstract class HttpServlet extends GenericServlet {
     /**
      * Receives standard HTTP requests from the public
      * <code>service</code> method and dispatches
-     * them to the <code>do</code><i>XXX</i> methods defined in
+     * them to the <code>do</code><i>Method</i> methods defined in
      * this class. This method is an HTTP-specific version of the
      * {@link javax.servlet.Servlet#service} method. There's no
      * need to override this method.
@@ -842,9 +842,7 @@ class NoBodyOutputStream extends ServletOutputStream {
     }
 
     @Override
-    public void write(byte buf[], int offset, int len)
-        throws IOException
-    {
+    public void write(byte buf[], int offset, int len) throws IOException {
         if (len >= 0) {
             contentLength += len;
         } else {
