@@ -495,6 +495,8 @@ public interface HttpServletRequest extends ServletRequest {
      * Start the HTTP upgrade process and pass the connection to the provided
      * protocol handler once the current request/response pair has completed
      * processing.
+     *
+     * @since Servlet 3.1
      */
     public void upgrade(ProtocolHandler handler) throws java.io.IOException;
 }
