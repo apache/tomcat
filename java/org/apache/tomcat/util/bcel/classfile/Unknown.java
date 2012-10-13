@@ -58,7 +58,7 @@ public final class Unknown extends Attribute {
      * @param constant_pool Array of constants
      */
     public Unknown(int name_index, int length, byte[] bytes, ConstantPool constant_pool) {
-        super(Constants.ATTR_UNKNOWN, name_index, length, constant_pool);
+        super(name_index, length, constant_pool);
         this.bytes = bytes;
         name = ((ConstantUtf8) constant_pool.getConstant(name_index, Constants.CONSTANT_Utf8))
                 .getBytes();

@@ -20,8 +20,6 @@ package org.apache.tomcat.util.bcel.classfile;
 import java.io.DataInputStream;
 import java.io.IOException;
 
-import org.apache.tomcat.util.bcel.Constants;
-
 /**
  * This class is derived from <em>Attribute</em> and denotes that this is a
  * deprecated method.
@@ -44,7 +42,7 @@ public final class Deprecated extends Attribute {
      * @param constant_pool Array of constants
      */
     public Deprecated(int name_index, int length, byte[] bytes, ConstantPool constant_pool) {
-        super(Constants.ATTR_DEPRECATED, name_index, length, constant_pool);
+        super(name_index, length, constant_pool);
         this.bytes = bytes;
     }
 

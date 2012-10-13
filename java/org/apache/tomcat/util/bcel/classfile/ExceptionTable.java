@@ -20,8 +20,6 @@ package org.apache.tomcat.util.bcel.classfile;
 import java.io.DataInputStream;
 import java.io.IOException;
 
-import org.apache.tomcat.util.bcel.Constants;
-
 /**
  * This class represents the table of exceptions that are thrown by a
  * method. This attribute may be used once per method.  The name of
@@ -49,7 +47,7 @@ public final class ExceptionTable extends Attribute {
      */
     public ExceptionTable(int name_index, int length, int[] exception_index_table,
             ConstantPool constant_pool) {
-        super(Constants.ATTR_EXCEPTIONS, name_index, length, constant_pool);
+        super(name_index, length, constant_pool);
         setExceptionIndexTable(exception_index_table);
     }
 

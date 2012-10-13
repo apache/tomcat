@@ -20,8 +20,6 @@ package org.apache.tomcat.util.bcel.classfile;
 import java.io.DataInputStream;
 import java.io.IOException;
 
-import org.apache.tomcat.util.bcel.Constants;
-
 /**
  * represents the default value of a annotation for a method info
  *
@@ -66,7 +64,7 @@ public class AnnotationDefault extends Attribute
     public AnnotationDefault(int name_index, int length,
             ElementValue defaultValue, ConstantPool constant_pool)
     {
-        super(Constants.ATTR_ANNOTATION_DEFAULT, name_index, length, constant_pool);
+        super(name_index, length, constant_pool);
     }
 
 

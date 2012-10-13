@@ -35,15 +35,14 @@ public abstract class ParameterAnnotations extends Attribute {
 
 
     /**
-     * @param parameter_annotation_type the subclass type of the parameter annotation
      * @param name_index Index pointing to the name <em>Code</em>
      * @param length Content length in bytes
      * @param file Input stream
      * @param constant_pool Array of constants
      */
-    ParameterAnnotations(byte parameter_annotation_type, int name_index, int length,
+    ParameterAnnotations(int name_index, int length,
             DataInputStream file, ConstantPool constant_pool) throws IOException {
-        this(parameter_annotation_type, name_index, length, (ParameterAnnotationEntry[]) null,
+        this(name_index, length, (ParameterAnnotationEntry[]) null,
                 constant_pool);
         num_parameters = (file.readUnsignedByte());
         parameter_annotation_table = new ParameterAnnotationEntry[num_parameters];
@@ -54,15 +53,14 @@ public abstract class ParameterAnnotations extends Attribute {
 
 
     /**
-     * @param parameter_annotation_type the subclass type of the parameter annotation
      * @param name_index Index pointing to the name <em>Code</em>
      * @param length Content length in bytes
      * @param parameter_annotation_table the actual parameter annotations
      * @param constant_pool Array of constants
      */
-    public ParameterAnnotations(byte parameter_annotation_type, int name_index, int length,
+    public ParameterAnnotations(int name_index, int length,
             ParameterAnnotationEntry[] parameter_annotation_table, ConstantPool constant_pool) {
-        super(parameter_annotation_type, name_index, length, constant_pool);
+        super(name_index, length, constant_pool);
         setParameterAnnotationTable(parameter_annotation_table);
     }
 

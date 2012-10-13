@@ -20,8 +20,6 @@ package org.apache.tomcat.util.bcel.classfile;
 import java.io.DataInput;
 import java.io.IOException;
 
-import org.apache.tomcat.util.bcel.Constants;
-
 /**
  * This class is derived from <em>Attribute</em> and represents a reference
  * to a GJ attribute.
@@ -56,7 +54,7 @@ public final class Signature extends Attribute {
      * @param constant_pool Array of constants
      */
     public Signature(int name_index, int length, ConstantPool constant_pool) {
-        super(Constants.ATTR_SIGNATURE, name_index, length, constant_pool);
+        super(name_index, length, constant_pool);
     }
 
 

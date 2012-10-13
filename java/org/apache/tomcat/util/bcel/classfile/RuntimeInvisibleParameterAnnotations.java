@@ -20,8 +20,6 @@ package org.apache.tomcat.util.bcel.classfile;
 import java.io.DataInputStream;
 import java.io.IOException;
 
-import org.apache.tomcat.util.bcel.Constants;
-
 /**
  * represents a parameter annotation that is represented in the class file
  * but is not provided to the JVM.
@@ -43,7 +41,7 @@ public class RuntimeInvisibleParameterAnnotations extends ParameterAnnotations {
      */
     RuntimeInvisibleParameterAnnotations(int name_index, int length, DataInputStream file,
             ConstantPool constant_pool) throws IOException {
-        super(Constants.ATTR_RUNTIMEIN_VISIBLE_PARAMETER_ANNOTATIONS, name_index, length, file,
+        super(name_index, length, file,
                 constant_pool);
     }
 

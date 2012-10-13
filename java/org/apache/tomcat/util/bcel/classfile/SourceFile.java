@@ -20,8 +20,6 @@ package org.apache.tomcat.util.bcel.classfile;
 import java.io.DataInput;
 import java.io.IOException;
 
-import org.apache.tomcat.util.bcel.Constants;
-
 /**
  * This class is derived from <em>Attribute</em> and represents a reference
  * to the source file of this class.  At most one SourceFile attribute
@@ -60,7 +58,7 @@ public final class SourceFile extends Attribute {
      * associated with.
      */
     public SourceFile(int name_index, int length, ConstantPool constant_pool) {
-        super(Constants.ATTR_SOURCE_FILE, name_index, length, constant_pool);
+        super(name_index, length, constant_pool);
     }
 
 

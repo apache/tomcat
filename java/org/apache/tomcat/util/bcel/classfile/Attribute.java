@@ -55,14 +55,11 @@ public abstract class Attribute implements Cloneable, Serializable
 
     protected int length; // Content length of attribute field
 
-    protected byte tag; // Tag to distiguish subclasses
-
     protected ConstantPool constant_pool;
 
-    protected Attribute(byte tag, int name_index, int length,
+    protected Attribute(int name_index, int length,
             ConstantPool constant_pool)
     {
-        this.tag = tag;
         this.name_index = name_index;
         this.length = length;
         this.constant_pool = constant_pool;
@@ -177,16 +174,6 @@ public abstract class Attribute implements Cloneable, Serializable
         ConstantUtf8 c = (ConstantUtf8) constant_pool.getConstant(name_index,
                 Constants.CONSTANT_Utf8);
         return c.getBytes();
-    }
-
-
-    /**
-     * @return Tag of attribute, i.e., its type. Value may not be altered, thus
-     *         there is no setTag() method.
-     */
-    public final byte getTag()
-    {
-        return tag;
     }
 
 

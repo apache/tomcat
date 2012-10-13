@@ -20,8 +20,6 @@ package org.apache.tomcat.util.bcel.classfile;
 import java.io.DataInputStream;
 import java.io.IOException;
 
-import org.apache.tomcat.util.bcel.Constants;
-
 /**
  * This class represents a table of line numbers for debugging
  * purposes. This attribute is used by the <em>Code</em> attribute. It
@@ -47,7 +45,7 @@ public final class LineNumberTable extends Attribute {
      */
     public LineNumberTable(int name_index, int length, LineNumber[] line_number_table,
             ConstantPool constant_pool) {
-        super(Constants.ATTR_LINE_NUMBER_TABLE, name_index, length, constant_pool);
+        super(name_index, length, constant_pool);
         setLineNumberTable(line_number_table);
     }
 

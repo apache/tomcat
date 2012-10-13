@@ -73,19 +73,6 @@ public final class Method extends FieldOrMethod {
 
 
     /**
-     * @return Code attribute of method, if any
-     */
-    public final Code getCode() {
-        for (int i = 0; i < attributes_count; i++) {
-            if (attributes[i] instanceof Code) {
-                return (Code) attributes[i];
-            }
-        }
-        return null;
-    }
-
-
-    /**
      * Return value as defined by given BCELComparator strategy.
      * By default two method objects are said to be equal when
      * their names and signatures are equal.
