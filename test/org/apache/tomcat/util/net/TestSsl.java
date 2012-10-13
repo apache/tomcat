@@ -171,8 +171,8 @@ public class TestSsl extends TomcatBaseTest {
         SSLContext sslCtx = SSLContext.getInstance("TLS");
         sslCtx.init(null, TesterSupport.getTrustManagers(), null);
         SSLSocketFactory socketFactory = sslCtx.getSocketFactory();
-        SSLSocket socket = (SSLSocket) socketFactory.createSocket("localhost",
-                getPort());
+        SSLSocket socket = (SSLSocket) socketFactory.createSocket("linux6405.dev.local",
+                8443);
 
         OutputStream os = socket.getOutputStream();
 
@@ -182,7 +182,7 @@ public class TestSsl extends TomcatBaseTest {
         socket.startHandshake();
 
         try {
-            os.write("Host: localhost\n\n".getBytes());
+            os.write("Host: linux6405.dev.local:8443\n\n".getBytes());
         } catch (IOException ex) {
             ex.printStackTrace();
             fail("Re-negotiation failed");
@@ -193,8 +193,14 @@ public class TestSsl extends TomcatBaseTest {
         BufferedReader br = new BufferedReader(r);
         String line = br.readLine();
         while (line != null) {
-            // For testing System.out.println(line);
-            line = br.readLine();
+            System.out.println(line);
+            // Linux clients see a Connection Reset in some circumstances and a
+            // clean close in others.
+            try {
+                line = br.readLine();
+            } catch (IOException ioe) {
+                line = null;
+            }
         }
     }
 
