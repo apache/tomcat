@@ -41,12 +41,6 @@ public class SimpleElementValue extends ElementValue
     }
 
 
-    @Override
-    public String toString()
-    {
-        return stringifyValue();
-    }
-
     // Whatever kind of value it is, return it as a string
     @Override
     public String stringifyValue()

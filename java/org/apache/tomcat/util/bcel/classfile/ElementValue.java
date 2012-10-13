@@ -32,11 +32,6 @@ public abstract class ElementValue
 
     protected ConstantPool cpool;
 
-    @Override
-    public String toString()
-    {
-        return stringifyValue();
-    }
 
     protected ElementValue(int type, ConstantPool cpool)
     {

@@ -63,13 +63,4 @@ public final class ConstantString extends Constant {
     public final int getStringIndex() {
         return string_index;
     }
-
-
-    /**
-     * @return String representation.
-     */
-    @Override
-    public final String toString() {
-        return super.toString() + "(string_index = " + string_index + ")";
-    }
 }

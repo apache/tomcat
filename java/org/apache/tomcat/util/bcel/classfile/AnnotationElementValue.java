@@ -48,12 +48,6 @@ public class AnnotationElementValue extends ElementValue
         return annotationEntry.toString();
     }
 
-    @Override
-    public String toString()
-    {
-        return stringifyValue();
-    }
-
     public AnnotationEntry getAnnotationEntry()
     {
         return annotationEntry;
