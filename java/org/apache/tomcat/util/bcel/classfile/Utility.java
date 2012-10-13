@@ -64,17 +64,6 @@ public abstract class Utility {
     /**
      * Convert bit field of flags into string such as `static final'.
      *
-     * @param  access_flags Access flags
-     * @return String representation of flags
-     */
-    public static final String accessToString( int access_flags ) {
-        return accessToString(access_flags, false);
-    }
-
-
-    /**
-     * Convert bit field of flags into string such as `static final'.
-     *
      * Special case: Classes compiled with new compilers and with the
      * `ACC_SUPER' flag would be said to be "synchronized". This is
      * because SUN used the same value for the flags `ACC_SUPER' and
@@ -102,54 +91,6 @@ public abstract class Utility {
             }
         }
         return buf.toString().trim();
-    }
-
-
-    /**
-     * @param access_flags the class flags
-     *
-     * @return "class" or "interface", depending on the ACC_INTERFACE flag
-     */
-    public static final String classOrInterface( int access_flags ) {
-        return ((access_flags & Constants.ACC_INTERFACE) != 0) ? "interface" : "class";
-    }
-
-
-    /**
-     * Disassemble a byte array of JVM byte codes starting from code line
-     * `index' and return the disassembled string representation. Decode only
-     * `num' opcodes (including their operands), use -1 if you want to
-     * decompile everything.
-     *
-     * @param  code byte code array
-     * @param  constant_pool Array of constants
-     * @param  index offset in `code' array
-     * <EM>(number of opcodes, not bytes!)</EM>
-     * @param  length number of opcodes to decompile, -1 for all
-     * @param  verbose be verbose, e.g. print constant pool index
-     * @return String representation of byte codes
-     */
-    public static final String codeToString( byte[] code, ConstantPool constant_pool, int index,
-            int length, boolean verbose ) {
-        StringBuilder buf = new StringBuilder(code.length * 20); // Should be sufficient
-        ByteSequence stream = new ByteSequence(code);
-        try {
-            for (int i = 0; i < index; i++) {
-                codeToString(stream, constant_pool, verbose);
-            }
-            for (int i = 0; stream.available() > 0; i++) {
-                if ((length < 0) || (i < length)) {
-                    String indices = fillup(stream.getIndex() + ":", 6, true, ' ');
-                    buf.append(indices).append(codeToString(stream, constant_pool, verbose))
-                            .append('\n');
-                }
-            }
-        } catch (IOException e) {
-            System.out.println(buf.toString());
-            e.printStackTrace();
-            throw new ClassFormatException("Byte code error: " + e, e);
-        }
-        return buf.toString();
     }
 
 
@@ -409,18 +350,6 @@ public abstract class Utility {
 
 
     /**
-     * Shorten long class names, <em>java/lang/String</em> becomes
-     * <em>String</em>.
-     *
-     * @param str The long class name
-     * @return Compacted class name
-     */
-    public static final String compactClassName( String str ) {
-        return compactClassName(str, true);
-    }
-
-
-    /**
      * Shorten long class name <em>str</em>, i.e., chop off the <em>prefix</em>,
      * if the
      * class name starts with this string and the flag <em>chopit</em> is true.
@@ -462,47 +391,6 @@ public abstract class Utility {
     // Guess what this does
     private static final int pow2( int n ) {
         return 1 << n;
-    }
-
-
-    /**
-     * Replace all occurrences of <em>old</em> in <em>str</em> with <em>new</em>.
-     *
-     * @param str String to permute
-     * @param old String to be replaced
-     * @param new_ Replacement string
-     * @return new String object
-     */
-    public static final String replace( String str, String old, String new_ ) {
-        int index, old_index;
-        try {
-            if (str.indexOf(old) != -1) { // `old' found in str
-                StringBuffer buf = new StringBuffer();
-                old_index = 0; // String start offset
-                // While we have something to replace
-                while ((index = str.indexOf(old, old_index)) != -1) {
-                    buf.append(str.substring(old_index, index)); // append prefix
-                    buf.append(new_); // append replacement
-                    old_index = index + old.length(); // Skip `old'.length chars
-                }
-                buf.append(str.substring(old_index)); // append rest of string
-                str = buf.toString();
-            }
-        } catch (StringIndexOutOfBoundsException e) { // Should not occur
-            System.err.println(e);
-        }
-        return str;
-    }
-
-
-    /**
-     * Converts signature to string with all class names compacted.
-     *
-     * @param signature to convert
-     * @return Human readable signature
-     */
-    public static final String signatureToString( String signature ) {
-        return signatureToString(signature, true);
     }
 
 
@@ -599,36 +487,6 @@ public abstract class Utility {
         }
     }
 
-    /**
-     * Convert (signed) byte to (unsigned) short value, i.e., all negative
-     * values become positive.
-     */
-    private static final short byteToShort( byte b ) {
-        return (b < 0) ? (short) (256 + b) : (short) b;
-    }
-
-
-    /** Convert bytes into hexadecimal string
-     *
-     * @param bytes an array of bytes to convert to hexadecimal
-     *
-     * @return bytes as hexadecimal string, e.g. 00 FA 12 ...
-     */
-    public static final String toHexString( byte[] bytes ) {
-        StringBuilder buf = new StringBuilder();
-        for (int i = 0; i < bytes.length; i++) {
-            short b = byteToShort(bytes[i]);
-            String hex = Integer.toString(b, 0x10);
-            if (b < 0x10) {
-                buf.append('0');
-            }
-            buf.append(hex);
-            if (i < bytes.length - 1) {
-                buf.append(' ');
-            }
-        }
-        return buf.toString();
-    }
 
     /**
      * Fillup char with up to length characters with char `fill' and justify it left or right.
@@ -672,36 +530,5 @@ public abstract class Utility {
         j++;
         CHAR_MAP[j] = '_';
         MAP_CHAR['_'] = j;
-    }
-
-    /**
-     * Escape all occurences of newline chars '\n', quotes \", etc.
-     */
-    public static final String convertString( String label ) {
-        char[] ch = label.toCharArray();
-        StringBuilder buf = new StringBuilder();
-        for (int i = 0; i < ch.length; i++) {
-            switch (ch[i]) {
-                case '\n':
-                    buf.append("\\n");
-                    break;
-                case '\r':
-                    buf.append("\\r");
-                    break;
-                case '\"':
-                    buf.append("\\\"");
-                    break;
-                case '\'':
-                    buf.append("\\'");
-                    break;
-                case '\\':
-                    buf.append("\\\\");
-                    break;
-                default:
-                    buf.append(ch[i]);
-                    break;
-            }
-        }
-        return buf.toString();
     }
 }

@@ -76,24 +76,16 @@ public class JavaClass extends AccessFlags
      * @param access_flags Access rights defined by bit flags
      * @param constant_pool Array of constants
      * @param interfaces Implemented interfaces
-     * @param fields Class fields
-     * @param methods Class methods
      * @param attributes Class attributes
      */
     public JavaClass(int class_name_index, int superclass_name_index,
             int access_flags, ConstantPool constant_pool, int[] interfaces,
-            Field[] fields, Method[] methods, Attribute[] attributes) {
+            Attribute[] attributes) {
         if (interfaces == null) {
             interfaces = new int[0];
         }
         if (attributes == null) {
             attributes = new Attribute[0];
-        }
-        if (fields == null) {
-            fields = new Field[0];
-        }
-        if (methods == null) {
-            methods = new Method[0];
         }
         this.access_flags = access_flags;
         this.attributes = attributes;
@@ -174,10 +166,6 @@ public class JavaClass extends AccessFlags
         return superclass_name;
     }
 
-
-    public final boolean isSuper() {
-        return (access_flags & Constants.ACC_SUPER) != 0;
-    }
 
     /**
      * Return value as defined by given BCELComparator strategy.

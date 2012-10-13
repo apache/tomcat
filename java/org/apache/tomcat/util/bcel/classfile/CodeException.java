@@ -18,7 +18,6 @@
 package org.apache.tomcat.util.bcel.classfile;
 
 import java.io.DataInput;
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.Serializable;
 
@@ -36,15 +35,6 @@ import org.apache.tomcat.util.bcel.Constants;
 public final class CodeException implements Cloneable, Constants, Serializable {
 
     private static final long serialVersionUID = -6351674720658890686L;
-    private int start_pc; // Range in the code the exception handler is
-    private int end_pc; // active. start_pc is inclusive, end_pc exclusive
-    private int handler_pc; /* Starting address of exception handler, i.e.,
-     * an offset from start of code.
-     */
-    private int catch_type; /* If this is zero the handler catches any
-     * exception, otherwise it points to the
-     * exception class which is to be caught.
-     */
 
 
     /**
@@ -58,35 +48,7 @@ public final class CodeException implements Cloneable, Constants, Serializable {
     }
 
 
-    /**
-     * @param start_pc Range in the code the exception handler is active,
-     * start_pc is inclusive while
-     * @param end_pc is exclusive
-     * @param handler_pc Starting address of exception handler, i.e.,
-     * an offset from start of code.
-     * @param catch_type If zero the handler catches any
-     * exception, otherwise it points to the exception class which is
-     * to be caught.
-     */
     public CodeException(int start_pc, int end_pc, int handler_pc, int catch_type) {
-        this.start_pc = start_pc;
-        this.end_pc = end_pc;
-        this.handler_pc = handler_pc;
-        this.catch_type = catch_type;
-    }
-
-
-    /**
-     * Dump code exception to file stream in binary format.
-     *
-     * @param file Output file stream
-     * @throws IOException
-     */
-    public final void dump( DataOutputStream file ) throws IOException {
-        file.writeShort(start_pc);
-        file.writeShort(end_pc);
-        file.writeShort(handler_pc);
-        file.writeShort(catch_type);
     }
 
 

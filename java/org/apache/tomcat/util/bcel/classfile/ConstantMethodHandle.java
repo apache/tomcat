@@ -37,14 +37,6 @@ public final class ConstantMethodHandle extends Constant {
 
 
     /**
-     * Initialize from another object.
-     */
-    public ConstantMethodHandle(ConstantMethodHandle c) {
-        this(c.getReferenceKind(), c.getReferenceIndex());
-    }
-
-
-    /**
      * Initialize instance from file data.
      *
      * @param file Input stream
@@ -67,17 +59,7 @@ public final class ConstantMethodHandle extends Constant {
     }
 
 
-    public void setReferenceKind(int reference_kind) {
-        this.reference_kind = reference_kind;
-    }
-
-
     public int getReferenceIndex() {
         return reference_index;
-    }
-
-
-    public void setReferenceIndex(int reference_index) {
-        this.reference_index = reference_index;
     }
 }

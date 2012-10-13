@@ -70,25 +70,6 @@ public class LocalVariableTable extends Attribute {
     }
 
 
-    /**
-     *
-     * @param index the variable slot
-     *
-     * @return the first LocalVariable that matches the slot or null if not found
-     *
-     * @deprecated since 5.2 because multiple variables can share the
-     *             same slot, use getLocalVariable(int index, int pc) instead.
-     */
-    @java.lang.Deprecated
-    public final LocalVariable getLocalVariable( int index ) {
-        for (int i = 0; i < local_variable_table_length; i++) {
-            if (local_variable_table[i].getIndex() == index) {
-                return local_variable_table[i];
-            }
-        }
-        return null;
-    }
-
     public final void setLocalVariableTable( LocalVariable[] local_variable_table ) {
         this.local_variable_table = local_variable_table;
         local_variable_table_length = (local_variable_table == null)

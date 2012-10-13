@@ -36,14 +36,6 @@ public final class ConstantMethodType extends Constant {
 
 
     /**
-     * Initialize from another object.
-     */
-    public ConstantMethodType(ConstantMethodType c) {
-        this(c.getDescriptorIndex());
-    }
-
-
-    /**
      * Initialize instance from file data.
      *
      * @param file Input stream
@@ -62,10 +54,5 @@ public final class ConstantMethodType extends Constant {
 
     public int getDescriptorIndex() {
         return descriptor_index;
-    }
-
-
-    public void setDescriptorIndex(int descriptor_index) {
-        this.descriptor_index = descriptor_index;
     }
 }
