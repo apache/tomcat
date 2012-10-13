@@ -44,6 +44,7 @@ import org.apache.catalina.AccessLog;
 import org.apache.catalina.Globals;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.LifecycleState;
+import org.apache.catalina.Session;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
 import org.apache.coyote.RequestInfo;
@@ -1728,15 +1729,15 @@ public class AccessLogValve extends ValveBase implements AccessLog {
         @Override
         public void addElement(StringBuilder buf, Date date, Request request,
                 Response response, long time) {
-            if (request != null) {
-                if (request.getSession(false) != null) {
-                    buf.append(request.getSessionInternal(false)
-                            .getIdInternal());
-                } else {
-                    buf.append('-');
-                }
-            } else {
+            if (request == null) {
                 buf.append('-');
+            } else {
+                Session session = request.getSessionInternal(false);
+                if (session == null) {
+                    buf.append('-');
+                } else {
+                    buf.append(session.getIdInternal());
+                }
             }
         }
     }

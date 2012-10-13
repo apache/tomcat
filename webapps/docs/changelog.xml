@@ -54,6 +54,14 @@
   issues to not "pop up" wrt. others).
 -->
 <section name="Tomcat 7.0.33 (markt)">
+  <subsection name="Catalina">
+    <changelog>
+      <fix>
+        <bug>53993</bug>: Avoid a possible NPE in the AccessLogValve when the
+        session ID is logged and a session is invalidated. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Coyote">
     <changelog>
       <fix>
