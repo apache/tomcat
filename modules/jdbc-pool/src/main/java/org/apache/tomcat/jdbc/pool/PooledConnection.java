@@ -365,7 +365,6 @@ public class PooledConnection {
      * Returns true if the connection pool is configured
      * to do validation for a certain action.
      * @param action
-     * @return
      */
     private boolean doValidate(int action) {
         if (action == PooledConnection.VALIDATE_BORROW &&
