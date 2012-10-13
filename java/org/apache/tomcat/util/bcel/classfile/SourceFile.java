@@ -72,16 +72,6 @@ public final class SourceFile extends Attribute {
 
 
     /**
-     * @return Source file name.
-     */
-    public final String getSourceFileName() {
-        ConstantUtf8 c = (ConstantUtf8) constant_pool.getConstant(sourcefile_index,
-                Constants.CONSTANT_Utf8);
-        return c.getBytes();
-    }
-
-
-    /**
      * @return deep copy of this attribute
      */
     @Override

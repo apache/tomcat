@@ -20,7 +20,6 @@ package org.apache.tomcat.util.bcel.classfile;
 import java.io.DataInputStream;
 import java.io.IOException;
 
-import org.apache.tomcat.util.bcel.Constants;
 import org.apache.tomcat.util.bcel.util.BCELComparator;
 
 /**
@@ -59,19 +58,6 @@ public final class Field extends FieldOrMethod {
     Field(DataInputStream file, ConstantPool constant_pool) throws IOException,
             ClassFormatException {
         super(file, constant_pool);
-    }
-
-
-    /**
-     * @return constant value associated with this field (may be null)
-     */
-    public final ConstantValue getConstantValue() {
-        for (int i = 0; i < attributes_count; i++) {
-            if (attributes[i].getTag() == Constants.ATTR_CONSTANT_VALUE) {
-                return (ConstantValue) attributes[i];
-            }
-        }
-        return null;
     }
 
 

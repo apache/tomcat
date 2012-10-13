@@ -63,16 +63,6 @@ public final class Signature extends Attribute {
 
 
     /**
-     * @return GJ signature.
-     */
-    public final String getSignature() {
-        ConstantUtf8 c = (ConstantUtf8) constant_pool.getConstant(signature_index,
-                Constants.CONSTANT_Utf8);
-        return c.getBytes();
-    }
-
-
-    /**
      * @return deep copy of this attribute
      */
     @Override

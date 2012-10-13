@@ -18,7 +18,6 @@
 package org.apache.tomcat.util.bcel.classfile;
 
 import java.io.DataInput;
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.Serializable;
 
@@ -34,11 +33,6 @@ import java.io.Serializable;
 public final class InnerClass implements Cloneable, Serializable {
 
     private static final long serialVersionUID = -4964694103982806087L;
-    private int inner_class_index;
-    private int outer_class_index;
-    private int inner_name_index;
-    private int inner_access_flags;
-
 
     /**
      * Construct object from file stream.
@@ -51,32 +45,8 @@ public final class InnerClass implements Cloneable, Serializable {
     }
 
 
-    /**
-     * @param inner_class_index Class index in constant pool of inner class
-     * @param outer_class_index Class index in constant pool of outer class
-     * @param inner_name_index  Name index in constant pool of inner class
-     * @param inner_access_flags Access flags of inner class
-     */
     public InnerClass(int inner_class_index, int outer_class_index, int inner_name_index,
             int inner_access_flags) {
-        this.inner_class_index = inner_class_index;
-        this.outer_class_index = outer_class_index;
-        this.inner_name_index = inner_name_index;
-        this.inner_access_flags = inner_access_flags;
-    }
-
-
-    /**
-     * Dump inner class attribute to file stream in binary format.
-     *
-     * @param file Output file stream
-     * @throws IOException
-     */
-    public final void dump( DataOutputStream file ) throws IOException {
-        file.writeShort(inner_class_index);
-        file.writeShort(outer_class_index);
-        file.writeShort(inner_name_index);
-        file.writeShort(inner_access_flags);
     }
 
 

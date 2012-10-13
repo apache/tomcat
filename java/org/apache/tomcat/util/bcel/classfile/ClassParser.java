@@ -117,8 +117,7 @@ public final class ClassParser {
 
         // Return the information we have gathered in a new object
         return new JavaClass(class_name_index, superclass_name_index,
-                access_flags, constant_pool, interfaces, fields, methods,
-                attributes);
+                access_flags, constant_pool, interfaces, attributes);
     }
 
 

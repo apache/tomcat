@@ -18,7 +18,6 @@
 package org.apache.tomcat.util.bcel.classfile;
 
 import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
 
 /**
@@ -75,15 +74,5 @@ public abstract class Annotations extends Attribute {
      */
     public AnnotationEntry[] getAnnotationEntries() {
         return annotation_table;
-    }
-
-    protected void writeAnnotations(DataOutputStream dos) throws IOException {
-        if (annotation_table == null) {
-            return;
-        }
-        dos.writeShort(annotation_table.length);
-        for (int i = 0; i < annotation_table.length; i++) {
-            annotation_table[i].dump(dos);
-        }
     }
 }

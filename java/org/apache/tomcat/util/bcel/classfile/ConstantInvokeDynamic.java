@@ -37,14 +37,6 @@ public final class ConstantInvokeDynamic extends Constant {
 
 
     /**
-     * Initialize from another object.
-     */
-    public ConstantInvokeDynamic(ConstantInvokeDynamic c) {
-        this(c.getBootstrapMethodAttrIndex(), c.getNameAndTypeIndex());
-    }
-
-
-    /**
      * Initialize instance from file data.
      *
      * @param file Input stream
@@ -68,17 +60,7 @@ public final class ConstantInvokeDynamic extends Constant {
     }
 
 
-    public void setBootstrapMethodAttrIndex(int bootstrap_method_attr_index) {
-        this.bootstrap_method_attr_index = bootstrap_method_attr_index;
-    }
-
-
     public int getNameAndTypeIndex() {
         return name_and_type_index;
-    }
-
-
-    public void setNameAndTypeIndex(int name_and_type_index) {
-        this.name_and_type_index = name_and_type_index;
     }
 }

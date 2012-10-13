@@ -250,12 +250,4 @@ public class ConstantPool implements Cloneable, Serializable {
         c = getConstant(i, Constants.CONSTANT_Utf8);
         return ((ConstantUtf8) c).getBytes();
     }
-
-
-    /**
-     * @return Length of constant pool.
-     */
-    public int getLength() {
-        return constant_pool_count;
-    }
 }

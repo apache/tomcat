@@ -86,32 +86,6 @@ public final class Method extends FieldOrMethod {
 
 
     /**
-     * @return ExceptionTable attribute of method, if any, i.e., list all
-     * exceptions the method may throw not exception handlers!
-     */
-    public final ExceptionTable getExceptionTable() {
-        for (int i = 0; i < attributes_count; i++) {
-            if (attributes[i] instanceof ExceptionTable) {
-                return (ExceptionTable) attributes[i];
-            }
-        }
-        return null;
-    }
-
-
-    /** @return LocalVariableTable of code attribute if any, i.e. the call is forwarded
-     * to the Code atribute.
-     */
-    public final LocalVariableTable getLocalVariableTable() {
-        Code code = getCode();
-        if (code == null) {
-            return null;
-        }
-        return code.getLocalVariableTable();
-    }
-
-
-    /**
      * Return value as defined by given BCELComparator strategy.
      * By default two method objects are said to be equal when
      * their names and signatures are equal.
