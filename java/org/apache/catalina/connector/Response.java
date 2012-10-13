@@ -801,23 +801,12 @@ public class Response
     // --------------------------------------------------- HttpResponse Methods
 
 
-    /**
-     * Return the value for the specified header, or <code>null</code> if this
-     * header has not been set.  If more than one value was added for this
-     * name, only the first is returned; use {@link #getHeaders(String)} to
-     * retrieve all of them.
-     *
-     * @param name Header name to look up
-     */
     @Override
     public String getHeader(String name) {
         return coyoteResponse.getMimeHeaders().getHeader(name);
     }
 
 
-    /**
-     * Return an Iterable of all the header names set for this response.
-     */
     @Override
     public Collection<String> getHeaderNames() {
 
@@ -832,12 +821,6 @@ public class Response
     }
 
 
-    /**
-     * Return a Collection of all the header values associated with the
-     * specified header name.
-     *
-     * @param name Header name to look up
-     */
     @Override
     public Collection<String> getHeaders(String name) {
 
@@ -860,9 +843,6 @@ public class Response
     }
 
 
-    /**
-     * Return the HTTP status code associated with this Response.
-     */
     @Override
     public int getStatus() {
         return coyoteResponse.getStatus();
