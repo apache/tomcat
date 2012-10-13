@@ -42,7 +42,7 @@ public final class ConstantMethodType extends Constant {
      */
     ConstantMethodType(DataInput file) throws IOException {
         this();
-        file.readUnsignedShort();
+        file.readUnsignedShort();   // Unused descriptor_index
     }
 
 
