@@ -20,8 +20,6 @@ package org.apache.tomcat.util.bcel.classfile;
 import java.io.DataInputStream;
 import java.io.IOException;
 
-import org.apache.tomcat.util.bcel.Constants;
-
 /**
  * This class represents colection of local variables in a
  * method. This attribute is contained in the <em>Code</em> attribute.
@@ -46,7 +44,7 @@ public class LocalVariableTable extends Attribute {
      */
     public LocalVariableTable(int name_index, int length, LocalVariable[] local_variable_table,
             ConstantPool constant_pool) {
-        super(Constants.ATTR_LOCAL_VARIABLE_TABLE, name_index, length, constant_pool);
+        super(name_index, length, constant_pool);
         setLocalVariableTable(local_variable_table);
     }
 

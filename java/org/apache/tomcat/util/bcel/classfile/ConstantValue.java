@@ -19,8 +19,6 @@ package org.apache.tomcat.util.bcel.classfile;
 import java.io.DataInput;
 import java.io.IOException;
 
-import org.apache.tomcat.util.bcel.Constants;
-
 /**
  * This class is derived from <em>Attribute</em> and represents a constant
  * value, i.e., a default value for initializing a class field.
@@ -56,7 +54,7 @@ public final class ConstantValue extends Attribute {
      */
     public ConstantValue(int name_index, int length,
             ConstantPool constant_pool) {
-        super(Constants.ATTR_CONSTANT_VALUE, name_index, length, constant_pool);
+        super(name_index, length, constant_pool);
     }
 
 

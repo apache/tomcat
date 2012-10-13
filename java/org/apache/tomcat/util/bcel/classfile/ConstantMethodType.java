@@ -32,7 +32,6 @@ import org.apache.tomcat.util.bcel.Constants;
 public final class ConstantMethodType extends Constant {
 
     private static final long serialVersionUID = 6750768220616618881L;
-    private int descriptor_index;
 
 
     /**
@@ -42,17 +41,12 @@ public final class ConstantMethodType extends Constant {
      * @throws IOException
      */
     ConstantMethodType(DataInput file) throws IOException {
-        this(file.readUnsignedShort());
+        this();
+        file.readUnsignedShort();
     }
 
 
-    public ConstantMethodType(int descriptor_index) {
+    public ConstantMethodType() {
         super(Constants.CONSTANT_MethodType);
-        this.descriptor_index = descriptor_index;
-    }
-
-
-    public int getDescriptorIndex() {
-        return descriptor_index;
     }
 }

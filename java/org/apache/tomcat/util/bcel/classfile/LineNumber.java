@@ -18,7 +18,6 @@
 package org.apache.tomcat.util.bcel.classfile;
 
 import java.io.DataInput;
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.Serializable;
 
@@ -34,8 +33,6 @@ import java.io.Serializable;
 public final class LineNumber implements Cloneable, Serializable {
 
     private static final long serialVersionUID = 3393830630264494355L;
-    private int start_pc; // Program Counter (PC) corresponds to line
-    private int line_number; // number in source file
 
 
     /**
@@ -44,29 +41,8 @@ public final class LineNumber implements Cloneable, Serializable {
      * @throws IOException
      */
     LineNumber(DataInput file) throws IOException {
-        this(file.readUnsignedShort(), file.readUnsignedShort());
-    }
-
-
-    /**
-     * @param start_pc Program Counter (PC) corresponds to
-     * @param line_number line number in source file
-     */
-    public LineNumber(int start_pc, int line_number) {
-        this.start_pc = start_pc;
-        this.line_number = line_number;
-    }
-
-
-    /**
-     * Dump line number/pc pair to file stream in binary format.
-     *
-     * @param file Output file stream
-     * @throws IOException
-     */
-    public final void dump( DataOutputStream file ) throws IOException {
-        file.writeShort(start_pc);
-        file.writeShort(line_number);
+        file.readUnsignedShort();
+        file.readUnsignedShort();
     }
 
 

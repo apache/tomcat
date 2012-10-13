@@ -20,8 +20,6 @@ package org.apache.tomcat.util.bcel.classfile;
 import java.io.DataInputStream;
 import java.io.IOException;
 
-import org.apache.tomcat.util.bcel.Constants;
-
 /**
  * This class represents a stack map attribute used for
  * preverification of Java classes for the <a
@@ -51,7 +49,7 @@ public final class StackMap extends Attribute {
      * @param constant_pool Array of constants
      */
     public StackMap(int name_index, int length, StackMapEntry[] map, ConstantPool constant_pool) {
-        super(Constants.ATTR_STACK_MAP, name_index, length, constant_pool);
+        super(name_index, length, constant_pool);
         setStackMap(map);
     }
 

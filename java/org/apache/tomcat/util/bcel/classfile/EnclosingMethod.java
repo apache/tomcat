@@ -19,8 +19,6 @@ package org.apache.tomcat.util.bcel.classfile;
 import java.io.DataInputStream;
 import java.io.IOException;
 
-import org.apache.tomcat.util.bcel.Constants;
-
 /**
  * This attribute exists for local or
  * anonymous classes and ... there can be only one.
@@ -32,7 +30,7 @@ public class EnclosingMethod extends Attribute {
     // Ctors - and code to read an attribute in.
     public EnclosingMethod(int nameIndex, int len, DataInputStream dis,
             ConstantPool cpool) throws IOException {
-        super(Constants.ATTR_ENCLOSING_METHOD, nameIndex, len, cpool);
+        super(nameIndex, len, cpool);
         // Unused class index
         dis.readUnsignedShort();
         // Unused method index

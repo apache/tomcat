@@ -34,9 +34,6 @@ import org.apache.tomcat.util.bcel.Constants;
 public final class LocalVariable implements Constants, Cloneable, Serializable {
 
     private static final long serialVersionUID = -914189896372081589L;
-    private int index; /* Variable is `index'th local variable on
-     * this method's frame.
-     */
 
 
     /**
@@ -49,15 +46,7 @@ public final class LocalVariable implements Constants, Cloneable, Serializable {
         file.readUnsignedShort();
         file.readUnsignedShort();
         file.readUnsignedShort();
-        this.index = file.readUnsignedShort();
-    }
-
-
-    /**
-     * @return index of register where variable is stored
-     */
-    public final int getIndex() {
-        return index;
+        file.readUnsignedShort();
     }
 
 

@@ -20,8 +20,6 @@ package org.apache.tomcat.util.bcel.classfile;
 import java.io.DataInputStream;
 import java.io.IOException;
 
-import org.apache.tomcat.util.bcel.Constants;
-
 /**
  * This class represents a chunk of Java byte code contained in a
  * method. It is instantiated by the
@@ -100,23 +98,10 @@ public final class Code extends Attribute {
      */
     public Code(int name_index, int length, byte[] code,
             CodeException[] exception_table, Attribute[] attributes, ConstantPool constant_pool) {
-        super(Constants.ATTR_CODE, name_index, length, constant_pool);
+        super(name_index, length, constant_pool);
         setCode(code);
         setExceptionTable(exception_table);
         setAttributes(attributes); // Overwrites length!
-    }
-
-
-    /**
-     * @return LocalVariableTable of Code, if it has one
-     */
-    public LocalVariableTable getLocalVariableTable() {
-        for (int i = 0; i < attributes_count; i++) {
-            if (attributes[i] instanceof LocalVariableTable) {
-                return (LocalVariableTable) attributes[i];
-            }
-        }
-        return null;
     }
 
 

@@ -20,8 +20,6 @@ package org.apache.tomcat.util.bcel.classfile;
 import java.io.DataInputStream;
 import java.io.IOException;
 
-import org.apache.tomcat.util.bcel.Constants;
-
 /**
  * This class is derived from <em>Attribute</em> and denotes that this class
  * is an Inner class of another.
@@ -47,7 +45,7 @@ public final class InnerClasses extends Attribute {
      */
     public InnerClasses(int name_index, int length, InnerClass[] inner_classes,
             ConstantPool constant_pool) {
-        super(Constants.ATTR_INNER_CLASSES, name_index, length, constant_pool);
+        super(name_index, length, constant_pool);
         setInnerClasses(inner_classes);
     }
 

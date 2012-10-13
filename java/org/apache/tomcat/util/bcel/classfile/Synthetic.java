@@ -20,8 +20,6 @@ package org.apache.tomcat.util.bcel.classfile;
 import java.io.DataInputStream;
 import java.io.IOException;
 
-import org.apache.tomcat.util.bcel.Constants;
-
 /**
  * This class is derived from <em>Attribute</em> and declares this class as
  * `synthetic', i.e., it needs special handling.  The JVM specification
@@ -50,7 +48,7 @@ public final class Synthetic extends Attribute {
      * with.
      */
     public Synthetic(int name_index, int length, byte[] bytes, ConstantPool constant_pool) {
-        super(Constants.ATTR_SYNTHETIC, name_index, length, constant_pool);
+        super(name_index, length, constant_pool);
         this.bytes = bytes;
     }
 
