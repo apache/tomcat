@@ -43,10 +43,10 @@ public final class CodeException implements Cloneable, Constants, Serializable {
      * @throws IOException
      */
     CodeException(DataInput file) throws IOException {
-        file.readUnsignedShort();
-        file.readUnsignedShort();
-        file.readUnsignedShort();
-        file.readUnsignedShort();
+        file.readUnsignedShort();   // Unused start_pc
+        file.readUnsignedShort();   // Unused end_pc
+        file.readUnsignedShort();   // Unused handler_pc
+        file.readUnsignedShort();   // Unused catch_type
     }
 
 
