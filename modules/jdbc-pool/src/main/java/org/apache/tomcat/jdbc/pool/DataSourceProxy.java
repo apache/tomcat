@@ -211,7 +211,7 @@ public class DataSourceProxy implements PoolConfiguration {
         }
     }
 
-    public int getPoolSize() throws SQLException{
+    public int getPoolSize() {
         final ConnectionPool p = pool;
         if (p == null) return 0;
         else return p.getSize();
@@ -1296,9 +1296,6 @@ public class DataSourceProxy implements PoolConfiguration {
         getPoolProperties().setPropagateInterruptState(propagateInterruptState);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public void purge()  {
         try {
             createPool().purge();
@@ -1307,9 +1304,6 @@ public class DataSourceProxy implements PoolConfiguration {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public void purgeOnReturn() {
         try {
             createPool().purgeOnReturn();
@@ -1317,5 +1311,4 @@ public class DataSourceProxy implements PoolConfiguration {
             log.error("Unable to purge pool.",x);
         }
     }
-
 }
