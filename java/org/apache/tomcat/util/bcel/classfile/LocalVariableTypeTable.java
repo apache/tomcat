@@ -68,7 +68,7 @@ private int             local_variable_type_table_length; // Table of local
     local_variable_type_table = new LocalVariable[local_variable_type_table_length];
 
     for(int i=0; i < local_variable_type_table_length; i++)
-      local_variable_type_table[i] = new LocalVariable(dis, cpool);
+      local_variable_type_table[i] = new LocalVariable(dis);
   }
 
   public final void setLocalVariableTable(LocalVariable[] local_variable_table)

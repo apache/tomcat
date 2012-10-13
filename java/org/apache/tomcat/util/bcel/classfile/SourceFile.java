@@ -35,7 +35,6 @@ import org.apache.tomcat.util.bcel.Constants;
 public final class SourceFile extends Attribute {
 
     private static final long serialVersionUID = 332346699609443704L;
-    private int sourcefile_index;
 
 
     /**
@@ -48,7 +47,8 @@ public final class SourceFile extends Attribute {
      */
     SourceFile(int name_index, int length, DataInput file, ConstantPool constant_pool)
             throws IOException {
-        this(name_index, length, file.readUnsignedShort(), constant_pool);
+        this(name_index, length, constant_pool);
+        file.readUnsignedShort();
     }
 
 
@@ -58,16 +58,9 @@ public final class SourceFile extends Attribute {
      * @param length Content length in bytes, the value should be 2.
      * @param constant_pool The constant pool that this attribute is
      * associated with.
-     * @param sourcefile_index Index in constant pool to CONSTANT_Utf8.  This
-     * string will be interpreted as the name of the file from which this
-     * class was compiled.  It will not be interpreted as indicating the name
-     * of the directory contqining the file or an absolute path; this
-     * information has to be supplied the consumer of this attribute - in
-     * many cases, the JVM.
      */
-    public SourceFile(int name_index, int length, int sourcefile_index, ConstantPool constant_pool) {
+    public SourceFile(int name_index, int length, ConstantPool constant_pool) {
         super(Constants.ATTR_SOURCE_FILE, name_index, length, constant_pool);
-        this.sourcefile_index = sourcefile_index;
     }
 
 

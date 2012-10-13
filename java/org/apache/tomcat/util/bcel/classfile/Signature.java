@@ -33,7 +33,6 @@ import org.apache.tomcat.util.bcel.Constants;
 public final class Signature extends Attribute {
 
     private static final long serialVersionUID = 7493781777025829964L;
-    private int signature_index;
 
 
     /**
@@ -46,19 +45,18 @@ public final class Signature extends Attribute {
      */
     Signature(int name_index, int length, DataInput file, ConstantPool constant_pool)
             throws IOException {
-        this(name_index, length, file.readUnsignedShort(), constant_pool);
+        this(name_index, length, constant_pool);
+        file.readUnsignedShort();
     }
 
 
     /**
      * @param name_index Index in constant pool to CONSTANT_Utf8
      * @param length Content length in bytes
-     * @param signature_index Index in constant pool to CONSTANT_Utf8
      * @param constant_pool Array of constants
      */
-    public Signature(int name_index, int length, int signature_index, ConstantPool constant_pool) {
+    public Signature(int name_index, int length, ConstantPool constant_pool) {
         super(Constants.ATTR_SIGNATURE, name_index, length, constant_pool);
-        this.signature_index = signature_index;
     }
 
 
