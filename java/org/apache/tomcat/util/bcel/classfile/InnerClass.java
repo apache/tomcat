@@ -40,10 +40,10 @@ public final class InnerClass implements Cloneable, Serializable {
      * @throws IOException
      */
     InnerClass(DataInput file) throws IOException {
-        file.readUnsignedShort();
-        file.readUnsignedShort();
-        file.readUnsignedShort();
-        file.readUnsignedShort();
+        file.readUnsignedShort();   // Unused inner_class_index
+        file.readUnsignedShort();   // Unused outer_class_index
+        file.readUnsignedShort();   // Unused inner_name_index
+        file.readUnsignedShort();   // Unused inner_access_flags
     }
 
 

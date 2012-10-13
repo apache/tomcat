@@ -41,8 +41,8 @@ public final class LineNumber implements Cloneable, Serializable {
      * @throws IOException
      */
     LineNumber(DataInput file) throws IOException {
-        file.readUnsignedShort();
-        file.readUnsignedShort();
+        file.readUnsignedShort();   // Unused start_pc
+        file.readUnsignedShort();   // Unused line_number
     }
 
 
