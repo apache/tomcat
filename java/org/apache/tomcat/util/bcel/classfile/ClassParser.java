@@ -234,7 +234,7 @@ public final class ClassParser {
      * @throws  ClassFormatException
      */
     private final void readVersion() throws IOException, ClassFormatException {
-        file.readUnsignedShort();
-        file.readUnsignedShort();
+        file.readUnsignedShort();   // Unused minor
+        file.readUnsignedShort();   // Unused major
     }
 }
