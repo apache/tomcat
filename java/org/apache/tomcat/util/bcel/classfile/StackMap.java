@@ -70,7 +70,7 @@ public final class StackMap extends Attribute {
         map_length = file.readUnsignedShort();
         map = new StackMapEntry[map_length];
         for (int i = 0; i < map_length; i++) {
-            map[i] = new StackMapEntry(file, constant_pool);
+            map[i] = new StackMapEntry(file);
         }
     }
 
@@ -81,23 +81,6 @@ public final class StackMap extends Attribute {
     public final void setStackMap( StackMapEntry[] map ) {
         this.map = map;
         map_length = (map == null) ? 0 : map.length;
-    }
-
-
-    /**
-     * @return String representation.
-     */
-    @Override
-    public final String toString() {
-        StringBuilder buf = new StringBuilder("StackMap(");
-        for (int i = 0; i < map_length; i++) {
-            buf.append(map[i].toString());
-            if (i < map_length - 1) {
-                buf.append(", ");
-            }
-        }
-        buf.append(')');
-        return buf.toString();
     }
 
 

@@ -64,13 +64,4 @@ public final class ConstantClass extends Constant {
     public final int getNameIndex() {
         return name_index;
     }
-
-
-    /**
-     * @return String representation.
-     */
-    @Override
-    public final String toString() {
-        return super.toString() + "(name_index = " + name_index + ")";
-    }
 }

@@ -68,13 +68,4 @@ public final class ConstantMethodType extends Constant {
     public void setDescriptorIndex(int descriptor_index) {
         this.descriptor_index = descriptor_index;
     }
-
-
-    /**
-     * @return String representation
-     */
-    @Override
-    public final String toString() {
-        return super.toString() + "(descriptor_index = " + descriptor_index + ")";
-    }
 }

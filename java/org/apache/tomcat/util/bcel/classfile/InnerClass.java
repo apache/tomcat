@@ -22,8 +22,6 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.Serializable;
 
-import org.apache.tomcat.util.bcel.Constants;
-
 /**
  * This class represents a inner class attribute, i.e., the class
  * indices of the inner and outer classes, the name and the attributes
@@ -79,44 +77,6 @@ public final class InnerClass implements Cloneable, Serializable {
         file.writeShort(outer_class_index);
         file.writeShort(inner_name_index);
         file.writeShort(inner_access_flags);
-    }
-
-
-    /**
-     * @return String representation.
-     */
-    @Override
-    public final String toString() {
-        return "InnerClass(" + inner_class_index + ", " + outer_class_index + ", "
-                + inner_name_index + ", " + inner_access_flags + ")";
-    }
-
-
-    /**
-     * @return Resolved string representation
-     */
-    public final String toString( ConstantPool constant_pool ) {
-        String inner_class_name, outer_class_name, inner_name, access;
-        inner_class_name = constant_pool.getConstantString(inner_class_index,
-                Constants.CONSTANT_Class);
-        inner_class_name = Utility.compactClassName(inner_class_name);
-        if (outer_class_index != 0) {
-            outer_class_name = constant_pool.getConstantString(outer_class_index,
-                    Constants.CONSTANT_Class);
-            outer_class_name = Utility.compactClassName(outer_class_name);
-        } else {
-            outer_class_name = "<not a member>";
-        }
-        if (inner_name_index != 0) {
-            inner_name = ((ConstantUtf8) constant_pool.getConstant(inner_name_index,
-                    Constants.CONSTANT_Utf8)).getBytes();
-        } else {
-            inner_name = "<anonymous>";
-        }
-        access = Utility.accessToString(inner_access_flags, true);
-        access = access.equals("") ? "" : (access + " ");
-        return "InnerClass:" + access + inner_class_name + "(\"" + outer_class_name + "\", \""
-                + inner_name + "\")";
     }
 
 

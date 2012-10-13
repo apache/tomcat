@@ -33,7 +33,6 @@ import org.apache.tomcat.util.bcel.Constants;
 public final class ConstantValue extends Attribute {
 
     private static final long serialVersionUID = -388222612752527969L;
-    private int constantvalue_index;
 
 
     /**
@@ -46,54 +45,18 @@ public final class ConstantValue extends Attribute {
      */
     ConstantValue(int name_index, int length, DataInput file, ConstantPool constant_pool)
             throws IOException {
-        this(name_index, length, file.readUnsignedShort(), constant_pool);
+        this(name_index, length, constant_pool);
     }
 
 
     /**
      * @param name_index Name index in constant pool
      * @param length Content length in bytes
-     * @param constantvalue_index Index in constant pool
      * @param constant_pool Array of constants
      */
-    public ConstantValue(int name_index, int length, int constantvalue_index,
+    public ConstantValue(int name_index, int length,
             ConstantPool constant_pool) {
         super(Constants.ATTR_CONSTANT_VALUE, name_index, length, constant_pool);
-        this.constantvalue_index = constantvalue_index;
-    }
-
-
-    /**
-     * @return String representation of constant value.
-     */
-    @Override
-    public final String toString() {
-        Constant c = constant_pool.getConstant(constantvalue_index);
-        String buf;
-        int i;
-        // Print constant to string depending on its type
-        switch (c.getTag()) {
-            case Constants.CONSTANT_Long:
-                buf = String.valueOf(((ConstantLong) c).getBytes());
-                break;
-            case Constants.CONSTANT_Float:
-                buf = String.valueOf(((ConstantFloat) c).getBytes());
-                break;
-            case Constants.CONSTANT_Double:
-                buf = String.valueOf(((ConstantDouble) c).getBytes());
-                break;
-            case Constants.CONSTANT_Integer:
-                buf = String.valueOf(((ConstantInteger) c).getBytes());
-                break;
-            case Constants.CONSTANT_String:
-                i = ((ConstantString) c).getStringIndex();
-                c = constant_pool.getConstant(i, Constants.CONSTANT_Utf8);
-                buf = "\"" + Utility.convertString(((ConstantUtf8) c).getBytes()) + "\"";
-                break;
-            default:
-                throw new IllegalStateException("Type of ConstValue invalid: " + c);
-        }
-        return buf;
     }
 
 
