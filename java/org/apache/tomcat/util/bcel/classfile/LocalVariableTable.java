@@ -65,7 +65,7 @@ public class LocalVariableTable extends Attribute {
         local_variable_table_length = (file.readUnsignedShort());
         local_variable_table = new LocalVariable[local_variable_table_length];
         for (int i = 0; i < local_variable_table_length; i++) {
-            local_variable_table[i] = new LocalVariable(file, constant_pool);
+            local_variable_table[i] = new LocalVariable(file);
         }
     }
 

@@ -36,13 +36,8 @@ public final class StackMapEntry implements Cloneable, Serializable {
     private static final long serialVersionUID = 1L;
 
     StackMapEntry(DataInputStream file) throws IOException {
-        this(file.readShort(), file.readShort(), null, -1, null);
-    }
-
-
-    public StackMapEntry(int byte_code_offset, int number_of_locals,
-            StackMapType[] types_of_locals, int number_of_stack_items,
-            StackMapType[] types_of_stack_items) {
+        file.readShort();
+        file.readShort();
     }
 
 

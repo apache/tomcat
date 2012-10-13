@@ -33,7 +33,6 @@ import org.apache.tomcat.util.bcel.Constants;
 public final class PMGClass extends Attribute {
 
     private static final long serialVersionUID = -1876065562391587509L;
-    private int pmg_class_index, pmg_index;
 
 
     /**
@@ -46,22 +45,19 @@ public final class PMGClass extends Attribute {
      */
     PMGClass(int name_index, int length, DataInput file, ConstantPool constant_pool)
             throws IOException {
-        this(name_index, length, file.readUnsignedShort(), file.readUnsignedShort(), constant_pool);
+        this(name_index, length, constant_pool);
+        file.readUnsignedShort();
+        file.readUnsignedShort();
     }
 
 
     /**
      * @param name_index Index in constant pool to CONSTANT_Utf8
      * @param length Content length in bytes
-     * @param pmg_index index in constant pool for source file name
-     * @param pmg_class_index Index in constant pool to CONSTANT_Utf8
      * @param constant_pool Array of constants
      */
-    public PMGClass(int name_index, int length, int pmg_index, int pmg_class_index,
-            ConstantPool constant_pool) {
+    public PMGClass(int name_index, int length, ConstantPool constant_pool) {
         super(Constants.ATTR_PMG, name_index, length, constant_pool);
-        this.pmg_index = pmg_index;
-        this.pmg_class_index = pmg_class_index;
     }
 
 

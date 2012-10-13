@@ -42,13 +42,7 @@ public final class StackMapTableEntry implements Cloneable, Serializable {
      * @throws IOException
      */
     StackMapTableEntry(DataInputStream file) throws IOException {
-        this(file.read(), -1, -1, null, -1, null);
-    }
-
-
-    public StackMapTableEntry(int tag, int byte_code_offset_delta, int number_of_locals,
-            StackMapType[] types_of_locals, int number_of_stack_items,
-            StackMapType[] types_of_stack_items) {
+        file.read();
     }
 
 

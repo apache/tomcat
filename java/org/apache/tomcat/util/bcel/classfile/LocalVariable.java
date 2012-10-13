@@ -44,15 +44,12 @@ public final class LocalVariable implements Constants, Cloneable, Serializable {
      * @param file Input stream
      * @throws IOException
      */
-    LocalVariable(DataInput file, ConstantPool constant_pool) throws IOException {
-        this(file.readUnsignedShort(), file.readUnsignedShort(), file.readUnsignedShort(), file
-                .readUnsignedShort(), file.readUnsignedShort(), constant_pool);
-    }
-
-
-    public LocalVariable(int start_pc, int length, int name_index, int signature_index, int index,
-            ConstantPool constant_pool) {
-        this.index = index;
+    LocalVariable(DataInput file) throws IOException {
+        file.readUnsignedShort();
+        file.readUnsignedShort();
+        file.readUnsignedShort();
+        file.readUnsignedShort();
+        this.index = file.readUnsignedShort();
     }
 
 
