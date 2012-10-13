@@ -42,7 +42,7 @@ public final class StackMapTableEntry implements Cloneable, Serializable {
      * @throws IOException
      */
     StackMapTableEntry(DataInputStream file) throws IOException {
-        file.read();
+        file.read();    // Unused frame_type
     }
 
 

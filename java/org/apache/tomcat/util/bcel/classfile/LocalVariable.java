@@ -42,11 +42,11 @@ public final class LocalVariable implements Constants, Cloneable, Serializable {
      * @throws IOException
      */
     LocalVariable(DataInput file) throws IOException {
-        file.readUnsignedShort();
-        file.readUnsignedShort();
-        file.readUnsignedShort();
-        file.readUnsignedShort();
-        file.readUnsignedShort();
+        file.readUnsignedShort();   // Unused start_pc
+        file.readUnsignedShort();   // Unused length
+        file.readUnsignedShort();   // Unused name_index
+        file.readUnsignedShort();   // Unused signature_index
+        file.readUnsignedShort();   // Unused index
     }
 
 

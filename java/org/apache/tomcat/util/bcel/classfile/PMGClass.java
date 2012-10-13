@@ -44,8 +44,8 @@ public final class PMGClass extends Attribute {
     PMGClass(int name_index, int length, DataInput file, ConstantPool constant_pool)
             throws IOException {
         this(name_index, length, constant_pool);
-        file.readUnsignedShort();
-        file.readUnsignedShort();
+        file.readUnsignedShort();   // Unused pmg_index
+        file.readUnsignedShort();   // Unused pmg_class_index
     }
 
 

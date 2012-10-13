@@ -44,7 +44,7 @@ public final class Signature extends Attribute {
     Signature(int name_index, int length, DataInput file, ConstantPool constant_pool)
             throws IOException {
         this(name_index, length, constant_pool);
-        file.readUnsignedShort();
+        file.readUnsignedShort();   // Unused signature_index
     }
 
 
