@@ -215,7 +215,13 @@ public class HttpServletResponseWrapper extends ServletResponseWrapper
     }
 
     /**
-     * @since Servlet 3.0 TODO SERVLET3 - Add comments
+     * {@inheritDoc}
+     * <p>
+     * The default implementation is to call
+     * {@link HttpServletResponse#getStatus()}
+     * on the wrapper {@link HttpServletResponse}.
+     *
+     * @since Servlet 3.0
      */
     @Override
     public int getStatus() {
@@ -223,7 +229,13 @@ public class HttpServletResponseWrapper extends ServletResponseWrapper
     }
 
     /**
-     * @since Servlet 3.0 TODO SERVLET3 - Add comments
+     * {@inheritDoc}
+     * <p>
+     * The default implementation is to call
+     * {@link HttpServletResponse#getHeader(String)}
+     * on the wrapper {@link HttpServletResponse}.
+     *
+     * @since Servlet 3.0
      */
     @Override
     public String getHeader(String name) {
@@ -231,7 +243,13 @@ public class HttpServletResponseWrapper extends ServletResponseWrapper
     }
 
     /**
-     * @since Servlet 3.0 TODO SERVLET3 - Add comments
+     * {@inheritDoc}
+     * <p>
+     * The default implementation is to call
+     * {@link HttpServletResponse#getHeaders(String)}
+     * on the wrapper {@link HttpServletResponse}.
+     *
+     * @since Servlet 3.0
      */
     @Override
     public Collection<String> getHeaders(String name) {
@@ -239,7 +257,13 @@ public class HttpServletResponseWrapper extends ServletResponseWrapper
     }
 
     /**
-     * @since Servlet 3.0 TODO SERVLET3 - Add comments
+     * {@inheritDoc}
+     * <p>
+     * The default implementation is to call
+     * {@link HttpServletResponse#getHeaderNames()}
+     * on the wrapper {@link HttpServletResponse}.
+     *
+     * @since Servlet 3.0
      */
     @Override
     public Collection<String> getHeaderNames() {

@@ -29,8 +29,6 @@ import javax.servlet.ServletResponse;
  * The servlet container creates an <code>HttpServletResponse</code> object and
  * passes it as an argument to the servlet's service methods (<code>doGet</code>, <code>doPost</code>, etc).
  *
- * @author Various
- * @version $Version$
  * @see javax.servlet.ServletResponse
  */
 public interface HttpServletResponse extends ServletResponse {
@@ -301,28 +299,38 @@ public interface HttpServletResponse extends ServletResponse {
     public void setStatus(int sc, String sm);
 
     /**
-     * @return TODO
-     * @since Servlet 3.0 TODO SERVLET3 - Add comments
+     * Return the HTTP status code associated with this Response.
+     *
+     * @since Servlet 3.0
      */
     public int getStatus();
 
     /**
-     * @param name
-     * @return TODO
-     * @since Servlet 3.0 TODO SERVLET3 - Add comments
+     * Return the value for the specified header, or <code>null</code> if this
+     * header has not been set.  If more than one value was added for this
+     * name, only the first is returned; use {@link #getHeaders(String)} to
+     * retrieve all of them.
+     *
+     * @param name Header name to look up
+     *
+     * @since Servlet 3.0
      */
     public String getHeader(String name);
 
     /**
-     * @param name
-     * @return TODO
-     * @since Servlet 3.0 TODO SERVLET3 - Add comments
+     * Return a Collection of all the header values associated with the
+     * specified header name.
+     *
+     * @param name Header name to look up
+     *
+     * @since Servlet 3.0
      */
     public Collection<String> getHeaders(String name);
 
     /**
-     * @return TODO
-     * @since Servlet 3.0 TODO SERVLET3 - Add comments
+     * Return an Iterable of all the header names set for this response.
+     *
+     * @since Servlet 3.0
      */
     public Collection<String> getHeaderNames();
 

@@ -61,10 +61,7 @@ import javax.servlet.ServletContext;
  * <code>ServletContext</code>), so information stored in one context will not
  * be directly visible in another.
  *
- * @author Various
- * @version $Version$
  * @see HttpSessionBindingListener
- * @see HttpSessionContext
  */
 public interface HttpSession {
 
