@@ -17,6 +17,9 @@
  */
 package org.apache.tomcat.util.bcel.classfile;
 
+import java.io.DataInput;
+import java.io.IOException;
+
 
 /**
  * Utility functions that do not really belong to any class in particular.
@@ -86,5 +89,21 @@ public abstract class Utility {
         j++;
         CHAR_MAP[j] = '_';
         MAP_CHAR['_'] = j;
+    }
+
+    protected static void swallowCodeException(DataInput file)
+            throws IOException {
+        file.readUnsignedShort();   // Unused start_pc
+        file.readUnsignedShort();   // Unused end_pc
+        file.readUnsignedShort();   // Unused handler_pc
+        file.readUnsignedShort();   // Unused catch_type
+    }
+
+    protected static void swallowInnerClass(DataInput file)
+            throws IOException {
+        file.readUnsignedShort();   // Unused inner_class_index
+        file.readUnsignedShort();   // Unused outer_class_index
+        file.readUnsignedShort();   // Unused inner_name_index
+        file.readUnsignedShort();   // Unused inner_access_flags
     }
 }
