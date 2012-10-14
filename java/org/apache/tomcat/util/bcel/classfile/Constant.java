@@ -126,6 +126,13 @@ public abstract class Constant implements Cloneable, Serializable {
     }
 
 
+
+    @Override
+    public String toString() {
+        return "[" + tag + "]";
+    }
+
+
     /**
      * Return value as defined by given BCELComparator strategy.
      * By default two Constant objects are said to be equal when
