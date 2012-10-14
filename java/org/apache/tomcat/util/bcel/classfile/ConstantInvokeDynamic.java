@@ -41,13 +41,8 @@ public final class ConstantInvokeDynamic extends Constant {
      * @throws IOException
      */
     ConstantInvokeDynamic(DataInput file) throws IOException {
-        this();
+        super(Constants.CONSTANT_InvokeDynamic);
         file.readUnsignedShort();   // Unused bootstrap_method_attr_index
         file.readUnsignedShort();   // Unused name_and_type_index
-    }
-
-
-    public ConstantInvokeDynamic() {
-        super(Constants.CONSTANT_InvokeDynamic);
     }
 }

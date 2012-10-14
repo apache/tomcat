@@ -43,19 +43,9 @@ public final class PMGClass extends Attribute {
      */
     PMGClass(int name_index, int length, DataInput file, ConstantPool constant_pool)
             throws IOException {
-        this(name_index, length, constant_pool);
+        super(name_index, length, constant_pool);
         file.readUnsignedShort();   // Unused pmg_index
         file.readUnsignedShort();   // Unused pmg_class_index
-    }
-
-
-    /**
-     * @param name_index Index in constant pool to CONSTANT_Utf8
-     * @param length Content length in bytes
-     * @param constant_pool Array of constants
-     */
-    public PMGClass(int name_index, int length, ConstantPool constant_pool) {
-        super(name_index, length, constant_pool);
     }
 
 

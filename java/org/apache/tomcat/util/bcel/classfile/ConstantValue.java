@@ -43,18 +43,8 @@ public final class ConstantValue extends Attribute {
      */
     ConstantValue(int name_index, int length, DataInput file, ConstantPool constant_pool)
             throws IOException {
-        this(name_index, length, constant_pool);
-    }
-
-
-    /**
-     * @param name_index Name index in constant pool
-     * @param length Content length in bytes
-     * @param constant_pool Array of constants
-     */
-    public ConstantValue(int name_index, int length,
-            ConstantPool constant_pool) {
         super(name_index, length, constant_pool);
+        file.readUnsignedShort();   // Unused constantvalue_index
     }
 
 
