@@ -45,20 +45,8 @@ public final class SourceFile extends Attribute {
      */
     SourceFile(int name_index, int length, DataInput file, ConstantPool constant_pool)
             throws IOException {
-        this(name_index, length, constant_pool);
-        file.readUnsignedShort();   // Unused sourcefile_index
-    }
-
-
-    /**
-     * @param name_index Index in constant pool to CONSTANT_Utf8, which
-     * should represent the string "SourceFile".
-     * @param length Content length in bytes, the value should be 2.
-     * @param constant_pool The constant pool that this attribute is
-     * associated with.
-     */
-    public SourceFile(int name_index, int length, ConstantPool constant_pool) {
         super(name_index, length, constant_pool);
+        file.readUnsignedShort();   // Unused sourcefile_index
     }
 
 

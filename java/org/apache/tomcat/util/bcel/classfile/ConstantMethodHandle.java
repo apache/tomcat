@@ -41,13 +41,8 @@ public final class ConstantMethodHandle extends Constant {
      * @throws IOException
      */
     ConstantMethodHandle(DataInput file) throws IOException {
-        this();
+        super(Constants.CONSTANT_MethodHandle);
         file.readUnsignedByte();    // Unused reference_kind
         file.readUnsignedShort();   // Unused reference_index
-    }
-
-
-    public ConstantMethodHandle() {
-        super(Constants.CONSTANT_MethodHandle);
     }
 }
