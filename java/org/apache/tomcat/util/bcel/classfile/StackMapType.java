@@ -18,7 +18,6 @@
 package org.apache.tomcat.util.bcel.classfile;
 
 import java.io.DataInput;
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.Serializable;
 
@@ -39,7 +38,6 @@ public final class StackMapType implements Cloneable, Serializable {
     private static final long serialVersionUID = 1L;
 
     private byte type;
-    private int index = -1; // Index to CONSTANT_Class or offset
 
 
     /**
@@ -48,20 +46,10 @@ public final class StackMapType implements Cloneable, Serializable {
      * @throws IOException
      */
     StackMapType(DataInput file) throws IOException {
-        this(file.readByte(), -1);
+        setType(file.readByte());
         if (hasIndex()) {
-            setIndex(file.readShort());
+            file.readShort();   // Unused index
         }
-    }
-
-
-    /**
-     * @param type type tag as defined in the Constants interface
-     * @param index index to constant pool, or byte code offset
-     */
-    public StackMapType(byte type, int index) {
-        setType(type);
-        setIndex(index);
     }
 
 
@@ -70,33 +58,6 @@ public final class StackMapType implements Cloneable, Serializable {
             throw new RuntimeException("Illegal type for StackMapType: " + t);
         }
         type = t;
-    }
-
-
-    public void setIndex( int t ) {
-        index = t;
-    }
-
-
-    /** @return index to constant pool if type == ITEM_Object, or offset
-     * in byte code, if type == ITEM_NewObject, and -1 otherwise
-     */
-    public int getIndex() {
-        return index;
-    }
-
-
-    /**
-     * Dump type entries to file.
-     *
-     * @param file Output file stream
-     * @throws IOException
-     */
-    public final void dump( DataOutputStream file ) throws IOException {
-        file.writeByte(type);
-        if (hasIndex()) {
-            file.writeShort(getIndex());
-        }
     }
 
 
