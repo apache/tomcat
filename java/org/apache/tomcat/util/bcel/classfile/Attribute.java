@@ -20,8 +20,6 @@ package org.apache.tomcat.util.bcel.classfile;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.apache.tomcat.util.bcel.Constants;
 
@@ -65,8 +63,6 @@ public abstract class Attribute implements Cloneable, Serializable
         this.constant_pool = constant_pool;
     }
 
-    private static final Map<String,AttributeReader> readers = new HashMap<>();
-
     /*
      * Class method reads one attribute from the input data stream. This method
      * must not be accessible from the outside. It is called by the Field and
@@ -107,12 +103,6 @@ public abstract class Attribute implements Cloneable, Serializable
         switch (tag)
         {
         case Constants.ATTR_UNKNOWN:
-            AttributeReader r = readers.get(name);
-            if (r != null)
-            {
-                return r.createAttribute(name_index, length, file,
-                        constant_pool);
-            }
             return new Unknown(name_index, length, file, constant_pool);
         case Constants.ATTR_CONSTANT_VALUE:
             return new ConstantValue(name_index, length, file, constant_pool);
