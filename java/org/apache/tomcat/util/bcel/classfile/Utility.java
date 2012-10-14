@@ -106,4 +106,18 @@ public abstract class Utility {
         file.readUnsignedShort();   // Unused inner_name_index
         file.readUnsignedShort();   // Unused inner_access_flags
     }
+
+    protected static void swallowLineNumber(DataInput file) throws IOException {
+        file.readUnsignedShort();   // Unused start_pc
+        file.readUnsignedShort();   // Unused line_number
+    }
+
+    protected static void swallowLocalVariable(DataInput file)
+            throws IOException {
+        file.readUnsignedShort();   // Unused start_pc
+        file.readUnsignedShort();   // Unused length
+        file.readUnsignedShort();   // Unused name_index
+        file.readUnsignedShort();   // Unused signature_index
+        file.readUnsignedShort();   // Unused index
+    }
 }

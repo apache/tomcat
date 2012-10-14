@@ -27,26 +27,10 @@ import java.io.IOException;
  * @version $Id$
  * @author  <A HREF="mailto:m.dahm@gmx.de">M. Dahm</A>
  * @see     Code
- * @see LocalVariable
  */
 public class LocalVariableTable extends Attribute {
 
     private static final long serialVersionUID = -3904314258294133920L;
-    private int local_variable_table_length; // Table of local
-    private LocalVariable[] local_variable_table; // variables
-
-
-    /**
-     * @param name_index Index in constant pool to `LocalVariableTable'
-     * @param length Content length in bytes
-     * @param local_variable_table Table of local variables
-     * @param constant_pool Array of constants
-     */
-    public LocalVariableTable(int name_index, int length, LocalVariable[] local_variable_table,
-            ConstantPool constant_pool) {
-        super(name_index, length, constant_pool);
-        setLocalVariableTable(local_variable_table);
-    }
 
 
     /**
@@ -59,19 +43,10 @@ public class LocalVariableTable extends Attribute {
      */
     LocalVariableTable(int name_index, int length, DataInputStream file, ConstantPool constant_pool)
             throws IOException {
-        this(name_index, length, (LocalVariable[]) null, constant_pool);
-        local_variable_table_length = (file.readUnsignedShort());
-        local_variable_table = new LocalVariable[local_variable_table_length];
+        super(name_index, length, constant_pool);
+        int local_variable_table_length = (file.readUnsignedShort());
         for (int i = 0; i < local_variable_table_length; i++) {
-            local_variable_table[i] = new LocalVariable(file);
+            Utility.swallowLocalVariable(file);
         }
-    }
-
-
-    public final void setLocalVariableTable( LocalVariable[] local_variable_table ) {
-        this.local_variable_table = local_variable_table;
-        local_variable_table_length = (local_variable_table == null)
-                ? 0
-                : local_variable_table.length;
     }
 }
