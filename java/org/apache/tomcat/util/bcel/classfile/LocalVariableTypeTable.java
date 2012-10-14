@@ -47,32 +47,16 @@ import java.io.IOException;
 //  }
 // J5TODO: Needs some testing !
 public class LocalVariableTypeTable extends Attribute {
-  private static final long serialVersionUID = -5466082154076451597L;
-private int             local_variable_type_table_length; // Table of local
-  private LocalVariable[] local_variable_type_table;        // variables
+    private static final long serialVersionUID = -5466082154076451597L;
 
-  public LocalVariableTypeTable(int name_index, int length,
-                                LocalVariable[] local_variable_table,
-                                ConstantPool    constant_pool)
-  {
-    super(name_index, length, constant_pool);
-    setLocalVariableTable(local_variable_table);
-  }
+    LocalVariableTypeTable(int name_index, int length,
+            DataInputStream dis, ConstantPool constant_pool)
+                    throws IOException {
+        super(name_index, length, constant_pool);
 
-  LocalVariableTypeTable(int nameIdx, int len, DataInputStream dis,ConstantPool cpool) throws IOException {
-    this(nameIdx, len, (LocalVariable[])null, cpool);
+        int local_variable_type_table_length = (dis.readUnsignedShort());
 
-    local_variable_type_table_length = (dis.readUnsignedShort());
-    local_variable_type_table = new LocalVariable[local_variable_type_table_length];
-
-    for(int i=0; i < local_variable_type_table_length; i++)
-      local_variable_type_table[i] = new LocalVariable(dis);
-  }
-
-  public final void setLocalVariableTable(LocalVariable[] local_variable_table)
-  {
-    this.local_variable_type_table = local_variable_table;
-    local_variable_type_table_length = (local_variable_table == null)? 0 :
-      local_variable_table.length;
-  }
+        for(int i=0; i < local_variable_type_table_length; i++)
+            Utility.swallowLocalVariable(dis);
+    }
 }
