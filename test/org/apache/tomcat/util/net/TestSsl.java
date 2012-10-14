@@ -193,7 +193,7 @@ public class TestSsl extends TomcatBaseTest {
         BufferedReader br = new BufferedReader(r);
         String line = br.readLine();
         while (line != null) {
-            System.out.println(line);
+            // For debugging System.out.println(line);
             // Linux clients see a Connection Reset in some circumstances and a
             // clean close in others.
             try {
