@@ -64,19 +64,4 @@ public final class Deprecated extends Attribute {
             System.err.println("Deprecated attribute with length > 0");
         }
     }
-
-
-    /**
-     * @return deep copy of this attribute
-     */
-    @Override
-    public Attribute copy( ConstantPool _constant_pool ) {
-        Deprecated c = (Deprecated) clone();
-        if (bytes != null) {
-            c.bytes = new byte[bytes.length];
-            System.arraycopy(bytes, 0, c.bytes, 0, bytes.length);
-        }
-        c.constant_pool = _constant_pool;
-        return c;
-    }
 }

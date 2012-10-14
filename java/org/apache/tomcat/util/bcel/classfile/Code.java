@@ -161,29 +161,4 @@ public final class Code extends Attribute {
         exception_table_length = (exception_table == null) ? 0 : exception_table.length;
         length = calculateLength(); // Adjust length
     }
-
-
-    /**
-     * @return deep copy of this attribute
-     *
-     * @param _constant_pool the constant pool to duplicate
-     */
-    @Override
-    public Attribute copy( ConstantPool _constant_pool ) {
-        Code c = (Code) clone();
-        if (code != null) {
-            c.code = new byte[code.length];
-            System.arraycopy(code, 0, c.code, 0, code.length);
-        }
-        c.constant_pool = _constant_pool;
-        c.exception_table = new CodeException[exception_table_length];
-        for (int i = 0; i < exception_table_length; i++) {
-            c.exception_table[i] = exception_table[i].copy();
-        }
-        c.attributes = new Attribute[attributes_count];
-        for (int i = 0; i < attributes_count; i++) {
-            c.attributes[i] = attributes[i].copy(_constant_pool);
-        }
-        return c;
-    }
 }

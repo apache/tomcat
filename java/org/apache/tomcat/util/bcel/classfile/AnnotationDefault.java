@@ -66,11 +66,4 @@ public class AnnotationDefault extends Attribute
     {
         super(name_index, length, constant_pool);
     }
-
-
-    @Override
-    public Attribute copy(ConstantPool _constant_pool)
-    {
-        throw new RuntimeException("Not implemented yet!");
-    }
 }

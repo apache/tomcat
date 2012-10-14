@@ -46,13 +46,4 @@ public final class Signature extends Attribute {
         super(name_index, length, constant_pool);
         file.readUnsignedShort();   // Unused signature_index
     }
-
-
-    /**
-     * @return deep copy of this attribute
-     */
-    @Override
-    public Attribute copy( ConstantPool _constant_pool ) {
-        return (Signature) clone();
-    }
 }

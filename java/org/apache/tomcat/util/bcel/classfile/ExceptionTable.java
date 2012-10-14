@@ -79,20 +79,4 @@ public final class ExceptionTable extends Attribute {
         this.exception_index_table = exception_index_table;
         number_of_exceptions = (exception_index_table == null) ? 0 : exception_index_table.length;
     }
-
-
-    /**
-     * @return deep copy of this attribute
-     */
-    @Override
-    public Attribute copy( ConstantPool _constant_pool ) {
-        ExceptionTable c = (ExceptionTable) clone();
-        if (exception_index_table != null) {
-            c.exception_index_table = new int[exception_index_table.length];
-            System.arraycopy(exception_index_table, 0, c.exception_index_table, 0,
-                    exception_index_table.length);
-        }
-        c.constant_pool = _constant_pool;
-        return c;
-    }
 }

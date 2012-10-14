@@ -48,16 +48,4 @@ public final class LocalVariable implements Constants, Cloneable, Serializable {
         file.readUnsignedShort();   // Unused signature_index
         file.readUnsignedShort();   // Unused index
     }
-
-
-    /**
-     * @return deep copy of this object
-     */
-    public LocalVariable copy() {
-        try {
-            return (LocalVariable) clone();
-        } catch (CloneNotSupportedException e) {
-        }
-        return null;
-    }
 }

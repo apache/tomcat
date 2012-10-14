@@ -61,16 +61,4 @@ public final class StackMapEntry implements Cloneable, Serializable {
             types_of_stack_items[i] = new StackMapType(file);
         }
     }
-
-
-    /**
-     * @return deep copy of this object
-     */
-    public StackMapEntry copy() {
-        try {
-            return (StackMapEntry) clone();
-        } catch (CloneNotSupportedException e) {
-        }
-        return null;
-    }
 }

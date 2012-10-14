@@ -48,16 +48,4 @@ public final class CodeException implements Cloneable, Constants, Serializable {
         file.readUnsignedShort();   // Unused handler_pc
         file.readUnsignedShort();   // Unused catch_type
     }
-
-
-    /**
-     * @return deep copy of this object
-     */
-    public CodeException copy() {
-        try {
-            return (CodeException) clone();
-        } catch (CloneNotSupportedException e) {
-        }
-        return null;
-    }
 }
