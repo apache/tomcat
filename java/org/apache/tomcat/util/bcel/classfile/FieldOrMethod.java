@@ -21,16 +21,35 @@ import java.io.DataInputStream;
 import java.io.IOException;
 
 import org.apache.tomcat.util.bcel.Constants;
+import org.apache.tomcat.util.bcel.util.BCELComparator;
 
 /**
- * Abstract super class for fields and methods.
+ * Class for fields and methods.
  *
  * @version $Id$
  * @author  <A HREF="mailto:m.dahm@gmx.de">M. Dahm</A>
  */
-public abstract class FieldOrMethod extends AccessFlags implements Cloneable {
+public class FieldOrMethod extends AccessFlags implements Cloneable {
 
     private static final long serialVersionUID = -3383525930205542157L;
+    private static BCELComparator _cmp = new BCELComparator() {
+
+        @Override
+        public boolean equals( Object o1, Object o2 ) {
+            FieldOrMethod THIS = (FieldOrMethod) o1;
+            FieldOrMethod THAT = (FieldOrMethod) o2;
+            return THIS.getName().equals(THAT.getName())
+                    && THIS.getSignature().equals(THAT.getSignature());
+        }
+
+
+        @Override
+        public int hashCode( Object o ) {
+            FieldOrMethod THIS = (FieldOrMethod) o;
+            return THIS.getSignature().hashCode() ^ THIS.getName().hashCode();
+        }
+    };
+
     protected int name_index; // Points to field name in constant pool
     protected int signature_index; // Points to encoded signature
     protected int attributes_count; // No. of attributes
@@ -103,5 +122,29 @@ public abstract class FieldOrMethod extends AccessFlags implements Cloneable {
         ConstantUtf8 c;
         c = (ConstantUtf8) constant_pool.getConstant(signature_index, Constants.CONSTANT_Utf8);
         return c.getBytes();
+    }
+
+    /**
+     * Return value as defined by given BCELComparator strategy.
+     * By default two FieldOrMethod objects are said to be equal when
+     * their names and signatures are equal.
+     *
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
+    @Override
+    public boolean equals( Object obj ) {
+        return _cmp.equals(this, obj);
+    }
+
+
+    /**
+     * Return value as defined by given BCELComparator strategy.
+     * By default return the hashcode of the FieldOrMethod's name XOR signature.
+     *
+     * @see java.lang.Object#hashCode()
+     */
+    @Override
+    public int hashCode() {
+        return _cmp.hashCode(this);
     }
 }

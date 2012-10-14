@@ -47,8 +47,8 @@ public final class ClassParser {
     private int access_flags; // Access rights of parsed class
     private int[] interfaces; // Names of implemented interfaces
     private ConstantPool constant_pool; // collection of constants
-    private Field[] fields; // class fields, i.e., its variables
-    private Method[] methods; // methods defined in the class
+    private FieldOrMethod[] fields; // class fields, i.e., its variables
+    private FieldOrMethod[] methods; // methods defined in the class
     private Attribute[] attributes; // attributes defined in the class
     private static final int BUFSIZE = 8192;
 
@@ -176,9 +176,9 @@ public final class ClassParser {
     private final void readFields() throws IOException, ClassFormatException {
         int fields_count;
         fields_count = file.readUnsignedShort();
-        fields = new Field[fields_count];
+        fields = new FieldOrMethod[fields_count];
         for (int i = 0; i < fields_count; i++) {
-            fields[i] = new Field(file, constant_pool);
+            fields[i] = new FieldOrMethod(file, constant_pool);
         }
     }
 
@@ -221,9 +221,9 @@ public final class ClassParser {
     private final void readMethods() throws IOException, ClassFormatException {
         int methods_count;
         methods_count = file.readUnsignedShort();
-        methods = new Method[methods_count];
+        methods = new FieldOrMethod[methods_count];
         for (int i = 0; i < methods_count; i++) {
-            methods[i] = new Method(file, constant_pool);
+            methods[i] = new FieldOrMethod(file, constant_pool);
         }
     }
 
