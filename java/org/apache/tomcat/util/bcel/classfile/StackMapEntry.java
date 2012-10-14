@@ -47,7 +47,10 @@ public final class StackMapEntry implements Cloneable, Serializable {
      * @throws IOException
      */
     StackMapEntry(DataInputStream file) throws IOException {
-        this(file.readShort(), file.readShort(), null, -1, null);
+        file.readShort();   // Unused byte_code_offset
+        number_of_locals = file.readShort();
+        types_of_locals = null;
+        types_of_stack_items = null;
         types_of_locals = new StackMapType[number_of_locals];
         for (int i = 0; i < number_of_locals; i++) {
             types_of_locals[i] = new StackMapType(file);
@@ -57,16 +60,6 @@ public final class StackMapEntry implements Cloneable, Serializable {
         for (int i = 0; i < number_of_stack_items; i++) {
             types_of_stack_items[i] = new StackMapType(file);
         }
-    }
-
-
-    public StackMapEntry(int byte_code_offset, int number_of_locals,
-            StackMapType[] types_of_locals, int number_of_stack_items,
-            StackMapType[] types_of_stack_items) {
-        this.number_of_locals = number_of_locals;
-        this.types_of_locals = types_of_locals;
-        this.number_of_stack_items = number_of_stack_items;
-        this.types_of_stack_items = types_of_stack_items;
     }
 
 
