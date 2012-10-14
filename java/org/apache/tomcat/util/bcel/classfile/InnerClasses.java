@@ -33,21 +33,7 @@ import java.io.IOException;
 public final class InnerClasses extends Attribute {
 
     private static final long serialVersionUID = 54179484605570305L;
-    private InnerClass[] inner_classes;
     private int number_of_classes;
-
-
-    /**
-     * @param name_index Index in constant pool to CONSTANT_Utf8
-     * @param length Content length in bytes
-     * @param inner_classes array of inner classes attributes
-     * @param constant_pool Array of constants
-     */
-    public InnerClasses(int name_index, int length, InnerClass[] inner_classes,
-            ConstantPool constant_pool) {
-        super(name_index, length, constant_pool);
-        setInnerClasses(inner_classes);
-    }
 
 
     /**
@@ -61,20 +47,10 @@ public final class InnerClasses extends Attribute {
      */
     InnerClasses(int name_index, int length, DataInputStream file, ConstantPool constant_pool)
             throws IOException {
-        this(name_index, length, (InnerClass[]) null, constant_pool);
+        super(name_index, length, constant_pool);
         number_of_classes = file.readUnsignedShort();
-        inner_classes = new InnerClass[number_of_classes];
         for (int i = 0; i < number_of_classes; i++) {
-            inner_classes[i] = new InnerClass(file);
+            Utility.swallowInnerClass(file);
         }
-    }
-
-
-    /**
-     * @param inner_classes the array of inner classes
-     */
-    public final void setInnerClasses( InnerClass[] inner_classes ) {
-        this.inner_classes = inner_classes;
-        number_of_classes = (inner_classes == null) ? 0 : inner_classes.length;
     }
 }
