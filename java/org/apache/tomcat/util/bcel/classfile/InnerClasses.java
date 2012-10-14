@@ -77,19 +77,4 @@ public final class InnerClasses extends Attribute {
         this.inner_classes = inner_classes;
         number_of_classes = (inner_classes == null) ? 0 : inner_classes.length;
     }
-
-
-    /**
-     * @return deep copy of this attribute
-     */
-    @Override
-    public Attribute copy( ConstantPool _constant_pool ) {
-        InnerClasses c = (InnerClasses) clone();
-        c.inner_classes = new InnerClass[number_of_classes];
-        for (int i = 0; i < number_of_classes; i++) {
-            c.inner_classes[i] = inner_classes[i].copy();
-        }
-        c.constant_pool = _constant_pool;
-        return c;
-    }
 }

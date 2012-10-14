@@ -44,16 +44,4 @@ public final class LineNumber implements Cloneable, Serializable {
         file.readUnsignedShort();   // Unused start_pc
         file.readUnsignedShort();   // Unused line_number
     }
-
-
-    /**
-     * @return deep copy of this object
-     */
-    public LineNumber copy() {
-        try {
-            return (LineNumber) clone();
-        } catch (CloneNotSupportedException e) {
-        }
-        return null;
-    }
 }

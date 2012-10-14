@@ -45,16 +45,4 @@ public final class InnerClass implements Cloneable, Serializable {
         file.readUnsignedShort();   // Unused inner_name_index
         file.readUnsignedShort();   // Unused inner_access_flags
     }
-
-
-    /**
-     * @return deep copy of this object
-     */
-    public InnerClass copy() {
-        try {
-            return (InnerClass) clone();
-        } catch (CloneNotSupportedException e) {
-        }
-        return null;
-    }
 }

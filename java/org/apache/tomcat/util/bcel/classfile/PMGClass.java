@@ -47,13 +47,4 @@ public final class PMGClass extends Attribute {
         file.readUnsignedShort();   // Unused pmg_index
         file.readUnsignedShort();   // Unused pmg_class_index
     }
-
-
-    /**
-     * @return deep copy of this attribute
-     */
-    @Override
-    public Attribute copy( ConstantPool _constant_pool ) {
-        return (PMGClass) clone();
-    }
 }

@@ -36,9 +36,4 @@ public class EnclosingMethod extends Attribute {
         // Unused method index
         dis.readUnsignedShort();
     }
-
-    @Override
-    public Attribute copy(ConstantPool constant_pool) {
-        throw new RuntimeException("Not implemented yet!");
-    }
 }

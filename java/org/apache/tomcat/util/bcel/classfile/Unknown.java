@@ -91,19 +91,4 @@ public final class Unknown extends Attribute {
     public final String getName() {
         return name;
     }
-
-
-    /**
-     * @return deep copy of this attribute
-     */
-    @Override
-    public Attribute copy( ConstantPool _constant_pool ) {
-        Unknown c = (Unknown) clone();
-        if (bytes != null) {
-            c.bytes = new byte[bytes.length];
-            System.arraycopy(bytes, 0, c.bytes, 0, bytes.length);
-        }
-        c.constant_pool = _constant_pool;
-        return c;
-    }
 }

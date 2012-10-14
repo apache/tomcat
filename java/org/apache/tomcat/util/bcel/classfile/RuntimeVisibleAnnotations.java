@@ -48,14 +48,4 @@ public class RuntimeVisibleAnnotations extends Annotations
     {
         super(name_index, length, file, constant_pool);
     }
-
-    /**
-     * @return deep copy of this attribute
-     */
-    @Override
-    public Attribute copy(ConstantPool constant_pool)
-    {
-        Annotations c = (Annotations) clone();
-        return c;
-    }
 }

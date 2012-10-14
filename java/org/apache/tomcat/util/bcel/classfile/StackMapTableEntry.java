@@ -102,16 +102,4 @@ public final class StackMapTableEntry implements Cloneable, Serializable {
         this.number_of_stack_items = number_of_stack_items;
         this.types_of_stack_items = types_of_stack_items;
     }
-
-
-    /**
-     * @return deep copy of this object
-     */
-    public StackMapTableEntry copy() {
-        try {
-            return (StackMapTableEntry) clone();
-        } catch (CloneNotSupportedException e) {
-        }
-        return null;
-    }
 }

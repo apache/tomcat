@@ -48,13 +48,4 @@ public final class SourceFile extends Attribute {
         super(name_index, length, constant_pool);
         file.readUnsignedShort();   // Unused sourcefile_index
     }
-
-
-    /**
-     * @return deep copy of this attribute
-     */
-    @Override
-    public Attribute copy( ConstantPool _constant_pool ) {
-        return (SourceFile) clone();
-    }
 }
