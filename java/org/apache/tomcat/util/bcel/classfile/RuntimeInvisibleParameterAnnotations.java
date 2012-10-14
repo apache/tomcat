@@ -41,8 +41,7 @@ public class RuntimeInvisibleParameterAnnotations extends ParameterAnnotations {
      */
     RuntimeInvisibleParameterAnnotations(int name_index, int length, DataInputStream file,
             ConstantPool constant_pool) throws IOException {
-        super(name_index, length, file,
-                constant_pool);
+        super(name_index, length, file, constant_pool);
     }
 
 

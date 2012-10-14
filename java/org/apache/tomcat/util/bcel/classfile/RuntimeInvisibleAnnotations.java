@@ -46,8 +46,7 @@ public class RuntimeInvisibleAnnotations extends Annotations
                                 DataInputStream file, ConstantPool constant_pool)
                                 throws IOException
     {
-        super(name_index, length,
-                file, constant_pool);
+        super(name_index, length, file, constant_pool);
     }
 
     /**
