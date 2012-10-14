@@ -41,10 +41,6 @@ public interface Constants {
    */
   public static final short ACC_ANNOTATION   = 0x2000;
 
-  /** One of the access flags for fields, methods, or classes.
-   */
-  public static final short ACC_ENUM         = 0x4000;
-
   /** Marks a constant pool entry as type UTF-8.  */
   public static final byte CONSTANT_Utf8               = 1;
 
@@ -95,24 +91,6 @@ public interface Constants {
     "CONSTANT_Methodref", "CONSTANT_InterfaceMethodref",
     "CONSTANT_NameAndType", "CONSTANT_MethodHandle",
     "CONSTANT_MethodType", "CONSTANT_InvokeDynamic" };
-
-  /** Illegal opcode. */
-  public static final short  UNDEFINED      = -1;
-  /** Illegal opcode. */
-  public static final short  UNPREDICTABLE  = -2;
-  /** Illegal opcode. */
-  public static final short  RESERVED       = -3;
-  /** Mnemonic for an illegal opcode. */
-  public static final String ILLEGAL_OPCODE = "<illegal opcode>";
-  /** Mnemonic for an illegal type. */
-  public static final String ILLEGAL_TYPE   = "<illegal type>";
-
-  /** Byte data type. */
-  public static final byte T_BYTE    = 8;
-  /** Short data type. */
-  public static final byte T_SHORT   = 9;
-  /** Int data type. */
-  public static final byte T_INT     = 10;
 
 
   /** Attributes and their corresponding names.
