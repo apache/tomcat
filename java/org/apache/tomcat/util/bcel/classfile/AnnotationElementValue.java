@@ -17,9 +17,6 @@
  */
 package org.apache.tomcat.util.bcel.classfile;
 
-import java.io.DataOutputStream;
-import java.io.IOException;
-
 public class AnnotationElementValue extends ElementValue
 {
     // For annotation element values, this is the annotation
@@ -33,13 +30,6 @@ public class AnnotationElementValue extends ElementValue
             throw new RuntimeException(
                     "Only element values of type annotation can be built with this ctor - type specified: " + type);
         this.annotationEntry = annotationEntry;
-    }
-
-    @Override
-    public void dump(DataOutputStream dos) throws IOException
-    {
-        dos.writeByte(type); // u1 type of value (ANNOTATION == '@')
-        annotationEntry.dump(dos);
     }
 
     @Override
