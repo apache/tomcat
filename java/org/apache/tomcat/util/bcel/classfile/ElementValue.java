@@ -101,7 +101,8 @@ public abstract class ElementValue
             return new SimpleElementValue(STRING, dis.readUnsignedShort(),
                     cpool);
         case 'e': // Enum constant
-            return new EnumElementValue(ENUM_CONSTANT, dis.readUnsignedShort(),
+            dis.readUnsignedShort();    // Unused type_index
+            return new EnumElementValue(ENUM_CONSTANT,
                     dis.readUnsignedShort(), cpool);
         case 'c': // Class
             return new ClassElementValue(CLASS, dis.readUnsignedShort(), cpool);
