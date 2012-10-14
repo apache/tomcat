@@ -18,7 +18,6 @@
 package org.apache.tomcat.util.bcel.classfile;
 
 import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
 
 /**
@@ -41,8 +40,6 @@ public abstract class ElementValue
 
 
     public abstract String stringifyValue();
-
-    public abstract void dump(DataOutputStream dos) throws IOException;
 
     public static final int STRING = 's';
 

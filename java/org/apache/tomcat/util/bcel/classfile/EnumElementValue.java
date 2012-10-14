@@ -17,9 +17,6 @@
  */
 package org.apache.tomcat.util.bcel.classfile;
 
-import java.io.DataOutputStream;
-import java.io.IOException;
-
 import org.apache.tomcat.util.bcel.Constants;
 
 public class EnumElementValue extends ElementValue
@@ -38,14 +35,6 @@ public class EnumElementValue extends ElementValue
                     "Only element values of type enum can be built with this ctor - type specified: " + type);
         this.typeIdx = typeIdx;
         this.valueIdx = valueIdx;
-    }
-
-    @Override
-    public void dump(DataOutputStream dos) throws IOException
-    {
-        dos.writeByte(type); // u1 type of value (ENUM_CONSTANT == 'e')
-        dos.writeShort(typeIdx); // u2
-        dos.writeShort(valueIdx); // u2
     }
 
     @Override

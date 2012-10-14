@@ -17,9 +17,6 @@
  */
 package org.apache.tomcat.util.bcel.classfile;
 
-import java.io.DataOutputStream;
-import java.io.IOException;
-
 import org.apache.tomcat.util.bcel.Constants;
 
 /**
@@ -55,10 +52,5 @@ public class ElementValuePair
     public final ElementValue getValue()
     {
         return elementValue;
-    }
-
-    protected void dump(DataOutputStream dos) throws IOException {
-        dos.writeShort(elementNameIndex); // u2 name of the element
-        elementValue.dump(dos);
     }
 }
