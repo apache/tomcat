@@ -59,8 +59,10 @@ public final class Code extends Attribute {
     Code(int name_index, int length, DataInputStream file, ConstantPool constant_pool)
             throws IOException {
         // Initialize with some default values which will be overwritten later
-        this(name_index, length, (byte[]) null, (CodeException[]) null,
-                (Attribute[]) null, constant_pool);
+        this(name_index, length, (byte[]) null,
+                (CodeException[]) null, (Attribute[]) null, constant_pool);
+        file.readUnsignedShort();   // Unused max_stack
+        file.readUnsignedShort();   // Unused max_locals
         code_length = file.readInt();
         code = new byte[code_length]; // Read byte code
         file.readFully(code);
