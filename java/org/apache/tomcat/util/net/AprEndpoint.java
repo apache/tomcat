@@ -1110,6 +1110,9 @@ public class AprEndpoint extends AbstractEndpoint {
      */
     public class Poller extends Thread {
 
+        public static final int FLAGS_READ = Poll.APR_POLLIN;
+        public static final int FLAGS_WRITE  = Poll.APR_POLLOUT;
+
         // Need two pollsets since the socketTimeout and the keep-alive timeout
         // can have different values.
         private long connectionPollset = 0;
@@ -1118,6 +1121,7 @@ public class AprEndpoint extends AbstractEndpoint {
 
         private long[] addSocket;
         private int[] addSocketTimeout;
+        private int[] addSocketFlags;
 
         private volatile int addCount = 0;
 
@@ -1150,7 +1154,8 @@ public class AprEndpoint extends AbstractEndpoint {
             desc = new long[size * 2];
             keepAliveCount = 0;
             addSocket = new long[size];
-            addSocketTimeout= new int[size];
+            addSocketTimeout = new int[size];
+            addSocketFlags = new int[size];
             addCount = 0;
         }
 
@@ -1204,8 +1209,10 @@ public class AprEndpoint extends AbstractEndpoint {
          * @param socket    to add to the poller
          * @param timeout   read timeout (in milliseconds) to use with this
          *                  socket. Use -1 for infinite timeout
+         * @param flags     flags that define the events that are to be polled
+         *                  for
          */
-        public void add(long socket, int timeout) {
+        public void add(long socket, int timeout, int flags) {
             synchronized (this) {
                 // Add socket to the list. Newly added sockets will wait
                 // at most for pollTime before being polled
@@ -1220,6 +1227,7 @@ public class AprEndpoint extends AbstractEndpoint {
                 }
                 addSocket[addCount] = socket;
                 addSocketTimeout[addCount] = timeout;
+                addSocketFlags[addCount] = flags;
                 addCount++;
                 this.notify();
             }
@@ -1278,7 +1286,7 @@ public class AprEndpoint extends AbstractEndpoint {
                                     }
                                     int rv = Poll.addWithTimeout(
                                             connectionPollset, addSocket[i],
-                                            Poll.APR_POLLIN, timeout);
+                                            addSocketFlags[i], timeout);
                                     if (rv == Status.APR_SUCCESS) {
                                         successCount++;
                                     } else {
@@ -1661,7 +1669,8 @@ public class AprEndpoint extends AbstractEndpoint {
                                     // If all done put the socket back in the poller for
                                     // processing of further requests
                                     getPoller().add(state.socket,
-                                            getKeepAliveTimeout());
+                                            getKeepAliveTimeout(),
+                                            Poller.FLAGS_READ);
                                 } else {
                                     // Close the socket since this is
                                     // the end of not keep-alive request.
@@ -1753,7 +1762,7 @@ public class AprEndpoint extends AbstractEndpoint {
                 if (!deferAccept) {
                     if (setSocketOptions(socket.getSocket().longValue())) {
                         getPoller().add(socket.getSocket().longValue(),
-                                getSoTimeout());
+                                getSoTimeout(), Poller.FLAGS_READ);
                     } else {
                         // Close socket and pool
                         destroySocket(socket.getSocket().longValue());
