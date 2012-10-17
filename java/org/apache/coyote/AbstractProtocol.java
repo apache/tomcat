@@ -31,7 +31,6 @@ import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
 
 import org.apache.coyote.http11.upgrade.UpgradeInbound;
-import org.apache.coyote.http11.upgrade.UpgradeProcessor;
 import org.apache.juli.logging.Log;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.collections.SynchronizedStack;
@@ -651,8 +650,9 @@ public abstract class AbstractProtocol implements ProtocolHandler,
                     // Need to keep the connection associated with the processor
                     longPoll(socket, processor);
                 } else {
-                    // Connection closed. OK to recycle the processor.
-                    if (!(processor instanceof UpgradeProcessor)) {
+                    // Connection closed. OK to recycle the processor. Upgrade
+                    // processors are not recycled.
+                    if (!processor.isUpgrade()) {
                         release(socket, processor, true, false);
                     }
                 }
@@ -678,7 +678,7 @@ public abstract class AbstractProtocol implements ProtocolHandler,
                         sm.getString("abstractConnectionHandler.error"), e);
             }
             // Don't try to add upgrade processors back into the pool
-            if (!(processor instanceof UpgradeProcessor)) {
+            if (!processor.isUpgrade()) {
                 release(socket, processor, true, false);
             }
             return SocketState.CLOSED;
