@@ -759,6 +759,7 @@ public abstract class AbstractProtocol implements ProtocolHandler,
             this.handler = handler;
         }
 
+        @SuppressWarnings("sync-override") // Size may exceed cache size a bit
         @Override
         public boolean push(Processor<S> processor) {
             int cacheSize = handler.getProtocol().getProcessorCache();
@@ -775,6 +776,7 @@ public abstract class AbstractProtocol implements ProtocolHandler,
             return result;
         }
 
+        @SuppressWarnings("sync-override") // OK if size is too big briefly
         @Override
         public Processor<S> pop() {
             Processor<S> result = super.pop();
