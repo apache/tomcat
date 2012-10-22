@@ -48,9 +48,6 @@ import org.apache.tomcat.util.res.StringManager;
 
 
 /**
- * <p>A <strong>ModelMBean</strong> implementation for the
- * <code>org.apache.catalina.core.StandardServer</code> component.</p>
- *
  * @author Amy Roh
  * @version $Id$
  */
@@ -67,25 +64,6 @@ public class MBeanFactory {
      * The <code>MBeanServer</code> for this application.
      */
     private static final MBeanServer mserver = MBeanUtils.createServer();
-
-
-    // ----------------------------------------------------------- Constructors
-
-
-    /**
-     * Construct a <code>ModelMBean</code> with default
-     * <code>ModelMBeanInfo</code> information.
-     *
-     * @exception javax.management.MBeanException if the initializer of an
-     *  object throws an exception
-     * @exception javax.management.RuntimeOperationsException if an
-     *  IllegalArgumentException occurs
-     */
-    public MBeanFactory() {
-
-        super();
-
-    }
 
 
     // ------------------------------------------------------------- Attributes
