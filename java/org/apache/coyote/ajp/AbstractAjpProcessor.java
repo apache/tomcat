@@ -768,20 +768,17 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
                 break;
 
             case Constants.SC_A_SSL_CERT :
-                request.scheme().setString("https");
                 // SSL certificate extraction is lazy, moved to JkCoyoteHandler
                 requestHeaderMessage.getBytes(certificates);
                 break;
 
             case Constants.SC_A_SSL_CIPHER :
-                request.scheme().setString("https");
                 requestHeaderMessage.getBytes(tmpMB);
                 request.setAttribute(SSLSupport.CIPHER_SUITE_KEY,
                         tmpMB.toString());
                 break;
 
             case Constants.SC_A_SSL_SESSION :
-                request.scheme().setString("https");
                 requestHeaderMessage.getBytes(tmpMB);
                 request.setAttribute(SSLSupport.SESSION_ID_KEY,
                         tmpMB.toString());

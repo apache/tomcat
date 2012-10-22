@@ -105,6 +105,11 @@
         default value will never go above 2 regardless of available processors.
         (fhanik)
       </scode>
+      <fix>
+        <bug>54010</bug>: Remove some unnecessary code (duplicate calls to
+        configure the scheme as https for AJP requests originally received over
+        HTTPS). (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
