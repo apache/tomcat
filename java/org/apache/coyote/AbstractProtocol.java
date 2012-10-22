@@ -678,7 +678,7 @@ public abstract class AbstractProtocol implements ProtocolHandler,
                         sm.getString("abstractConnectionHandler.error"), e);
             }
             // Don't try to add upgrade processors back into the pool
-            if (!processor.isUpgrade()) {
+            if (processor !=null && !processor.isUpgrade()) {
                 release(socket, processor, true, false);
             }
             return SocketState.CLOSED;
