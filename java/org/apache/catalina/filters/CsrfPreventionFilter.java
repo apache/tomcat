@@ -156,7 +156,6 @@ public class CsrfPreventionFilter extends FilterBase {
 
             HttpSession session = req.getSession(false);
 
-            @SuppressWarnings("unchecked")
             LruCache<String> nonceCache = (session == null) ? null
                     : (LruCache<String>) session.getAttribute(
                             Constants.CSRF_NONCE_SESSION_ATTR_NAME);
