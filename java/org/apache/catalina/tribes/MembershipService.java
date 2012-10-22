@@ -67,7 +67,6 @@ public interface MembershipService {
      * the listener will start to receive membership events.
      * @param level - level MBR_RX stops listening for members, level MBR_TX
      * stops broad casting the server
-     * @throws java.lang.Exception if the service fails to stop
      * @throws java.lang.IllegalArgumentException if the level is incorrect.
      */
 
