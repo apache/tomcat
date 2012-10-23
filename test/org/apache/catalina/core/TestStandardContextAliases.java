@@ -32,8 +32,10 @@ import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
+import org.apache.catalina.WebResourceRoot;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.catalina.webresources.StandardRoot;
 import org.apache.tomcat.util.buf.ByteChunk;
 
 public class TestStandardContextAliases extends TomcatBaseTest {
@@ -47,7 +49,11 @@ public class TestStandardContextAliases extends TomcatBaseTest {
             tomcat.addContext("", System.getProperty("java.io.tmpdir"));
 
         File lib = new File("webapps/examples/WEB-INF/lib");
-        ctx.setAliases("/WEB-INF/lib=" + lib.getCanonicalPath());
+        ctx.setResources(new StandardRoot(ctx));
+        ctx.getResources().createWebResourceSet(
+                WebResourceRoot.ResourceSetType.POST, lib.getAbsolutePath(),
+                "/WEB-INF/lib", "");
+
 
         Tomcat.addServlet(ctx, "test", new TestServlet());
         ctx.addServletMapping("/", "test");

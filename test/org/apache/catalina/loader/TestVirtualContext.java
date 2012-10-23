@@ -31,11 +31,12 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Assert;
 import org.junit.Test;
 
+import org.apache.catalina.WebResourceRoot;
 import org.apache.catalina.core.JreMemoryLeakPreventionListener;
 import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
-import org.apache.naming.resources.VirtualDirContext;
+import org.apache.catalina.webresources.StandardRoot;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.http.fileupload.FileUtils;
 import org.apache.tomcat.util.http.fileupload.IOUtils;
@@ -66,24 +67,38 @@ public class TestVirtualContext extends TomcatBaseTest {
         StandardContext ctx = (StandardContext) tomcat.addWebapp(null, "/test",
             appDir.getAbsolutePath());
 
-        VirtualWebappLoader loader = new VirtualWebappLoader(ctx.getParentClassLoader());
-        loader.setVirtualClasspath(//
-            "test/webapp-3.0-virtual-webapp/target/classes;" + //
-                "test/webapp-3.0-virtual-library/target/classes;" + //
-                "test/webapp-3.0-virtual-webapp/src/main/webapp/WEB-INF/classes;" + //
+        ctx.setResources(new StandardRoot(ctx));
+        File f1 = new File("test/webapp-3.0-virtual-webapp/target/classes");
+        File f2 = new File("test/webapp-3.0-virtual-library/target/classes");
+        File f3 = new File(
+                "test/webapp-3.0-virtual-webapp/src/main/webapp/WEB-INF/classes");
+        File f4 = new File(
                 "test/webapp-3.0-virtual-webapp/src/main/webapp2/WEB-INF/classes");
-        ctx.setLoader(loader);
-
-        String extraMappings = "/=test/webapp-3.0-virtual-webapp/src/main/webapp2" + //
-            ",/other=test/webapp-3.0-virtual-webapp/src/main/misc" + //
-            ",/WEB-INF/classes=test/webapp-3.0-virtual-webapp/target/classes";
-        VirtualDirContext resources = new VirtualDirContext();
-        resources.setExtraResourcePaths(extraMappings);
-        ctx.setResources(resources);
+        File f5 = new File("test/webapp-3.0-virtual-webapp/src/main/misc");
+        File f6 = new File("test/webapp-3.0-virtual-webapp/src/main/webapp2");
+        ctx.getResources().createWebResourceSet(
+                WebResourceRoot.ResourceSetType.POST, f1.getAbsolutePath(),
+                "/WEB-INF/classes", "");
+        ctx.getResources().createWebResourceSet(
+                WebResourceRoot.ResourceSetType.POST, f2.getAbsolutePath(),
+                "/WEB-INF/classes", "");
+        ctx.getResources().createWebResourceSet(
+                WebResourceRoot.ResourceSetType.POST, f3.getAbsolutePath(),
+                "/WEB-INF/classes", "");
+        ctx.getResources().createWebResourceSet(
+                WebResourceRoot.ResourceSetType.POST, f4.getAbsolutePath(),
+                "/WEB-INF/classes", "");
+        ctx.getResources().createWebResourceSet(
+                WebResourceRoot.ResourceSetType.POST, f5.getAbsolutePath(),
+                "/other", "");
+        ctx.getResources().createWebResourceSet(
+                WebResourceRoot.ResourceSetType.POST, f6.getAbsolutePath(),
+                "", "");
 
         StandardJarScanner jarScanner = new StandardJarScanner();
         jarScanner.setScanAllDirectories(true);
         ctx.setJarScanner(jarScanner);
+        ctx.setAddWebinfClassesResources(true);
 
         tomcat.start();
 
@@ -261,11 +276,15 @@ public class TestVirtualContext extends TomcatBaseTest {
         annotatedServletClassInputStream.close();
         annotatedServletClassOutputStream.close();
 
-        VirtualWebappLoader loader = new VirtualWebappLoader(ctx.getParentClassLoader());
-        loader.setVirtualClasspath("test/webapp-3.0-virtual-webapp/target/classes;" + //
-            "test/webapp-3.0-virtual-library/target/classes;" + //
-            additionWebInfClasses.getAbsolutePath());
-        ctx.setLoader(loader);
+        ctx.setResources(new StandardRoot(ctx));
+        File f1 = new File("test/webapp-3.0-virtual-webapp/target/classes");
+        File f2 = new File("test/webapp-3.0-virtual-library/target/classes");
+        ctx.getResources().createWebResourceSet(
+                WebResourceRoot.ResourceSetType.POST, f1.getAbsolutePath(),
+                "/WEB-INF/classes", "");
+        ctx.getResources().createWebResourceSet(
+                WebResourceRoot.ResourceSetType.POST, f2.getAbsolutePath(),
+                "/WEB-INF/classes", "");
 
         tomcat.start();
         // first test that without the setting on StandardContext the annotated
@@ -276,10 +295,17 @@ public class TestVirtualContext extends TomcatBaseTest {
 
         // then test that if we configure StandardContext with the additional
         // path, the servlet is detected
-        // ctx.setAdditionalVirtualWebInfClasses(additionWebInfClasses.getAbsolutePath());
-        VirtualDirContext resources = new VirtualDirContext();
-        resources.setExtraResourcePaths("/WEB-INF/classes=" + additionWebInfClasses);
-        ctx.setResources(resources);
+        ctx.setResources(new StandardRoot(ctx));
+        ctx.getResources().createWebResourceSet(
+                WebResourceRoot.ResourceSetType.POST, f1.getAbsolutePath(),
+                "/WEB-INF/classes", "");
+        ctx.getResources().createWebResourceSet(
+                WebResourceRoot.ResourceSetType.POST, f2.getAbsolutePath(),
+                "/WEB-INF/classes", "");
+        ctx.getResources().createWebResourceSet(
+                WebResourceRoot.ResourceSetType.POST,
+                additionWebInfClasses.getAbsolutePath(),
+                "/WEB-INF/classes", "");
 
         tomcat.start();
         assertPageContains("/test/annotatedServlet", MyAnnotatedServlet.MESSAGE);

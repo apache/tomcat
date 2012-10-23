@@ -255,8 +255,7 @@
 
       <p>The <strong>allowLinking</strong> attribute controls if a context is
       allowed to use linked files. If enabled and the context is undeployed, the
-      links will be followed when deleting the context resources. To avoid this
-      behaviour, use the <strong>aliases</strong> attribute. Changing this
+      links will be followed when deleting the context resources. Changing this
       setting from the default of <code>false</code> on case insensitive
       operating systems (this includes Windows) will disable a number of
       security measures and allow, among other things, direct access to the

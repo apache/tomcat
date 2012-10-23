@@ -164,12 +164,37 @@ public class ContextRuleSet extends RuleSetBase {
         digester.addRuleSet(new RealmRuleSet(prefix + "Context/"));
 
         digester.addObjectCreate(prefix + "Context/Resources",
-                                 "org.apache.naming.resources.FileDirContext",
+                                 "org.apache.catalina.webresources.StandardRoot",
                                  "className");
         digester.addSetProperties(prefix + "Context/Resources");
         digester.addSetNext(prefix + "Context/Resources",
                             "setResources",
-                            "javax.naming.directory.DirContext");
+                            "org.apache.catalina.WebResourceRoot");
+
+        digester.addObjectCreate(prefix + "Context/Resources/PreResources",
+                                 null, // MUST be specified in the element
+                                 "className");
+        digester.addSetProperties(prefix + "Context/Resources/PreResources");
+        digester.addSetNext(prefix + "Context/Resources/PreResources",
+                            "addPreResources",
+                            "org.apache.catalina.WebResourceSet");
+
+        digester.addObjectCreate(prefix + "Context/Resources/JarResources",
+                                 null, // MUST be specified in the element
+                                 "className");
+        digester.addSetProperties(prefix + "Context/Resources/JarResources");
+        digester.addSetNext(prefix + "Context/Resources/JarResources",
+                            "addJarResources",
+                            "org.apache.catalina.WebResourceSet");
+
+        digester.addObjectCreate(prefix + "Context/Resources/PostResources",
+                                 null, // MUST be specified in the element
+                                 "className");
+        digester.addSetProperties(prefix + "Context/Resources/PostResources");
+        digester.addSetNext(prefix + "Context/Resources/PostResources",
+                            "addPostResources",
+                            "org.apache.catalina.WebResourceSet");
+
 
         digester.addObjectCreate(prefix + "Context/ResourceLink",
                 "org.apache.catalina.deploy.ContextResourceLink");

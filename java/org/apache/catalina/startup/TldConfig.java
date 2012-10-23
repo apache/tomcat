@@ -59,7 +59,9 @@ public final class TldConfig  implements LifecycleListener {
 
     private static final String TLD_EXT = ".tld";
     private static final String WEB_INF = "/WEB-INF/";
+    private static final String WEB_INF_CLASSES = "/WEB-INF/classes/";
     private static final String WEB_INF_LIB = "/WEB-INF/lib/";
+
 
     // Names of JARs that are known not to contain any TLDs
     private static volatile Set<String> noTldJars = null;
@@ -255,7 +257,7 @@ public final class TldConfig  implements LifecycleListener {
         tldScanWebXml();
 
         // Stage 3a - TLDs under WEB-INF (not lib or classes)
-        tldScanResourcePaths(WEB_INF);
+        tldScanResourcePaths(WEB_INF, false);
 
         // Stages 3b & 4
         JarScanner jarScanner = context.getJarScanner();
@@ -294,6 +296,11 @@ public final class TldConfig  implements LifecycleListener {
             if (metaInf.isDirectory()) {
                 tldScanDir(metaInf);
             }
+        }
+
+        @Override
+        public void scanWebInfClasses() throws IOException {
+            tldScanResourcePaths(WEB_INF_CLASSES, true);
         }
     }
 
@@ -363,11 +370,12 @@ public final class TldConfig  implements LifecycleListener {
      *
      * Initially, rootPath equals /WEB-INF/. The /WEB-INF/classes and
      * /WEB-INF/lib sub-directories are excluded from the search, as per the
-     * JSP 2.0 spec.
+     * JSP 2.0 spec unless the JarScanner is configured to treat
+     * /WEB-INF/classes/ as an exploded JAR.
      *
      * Keep in sync with o.a.j.comiler.TldLocationsCache
      */
-    private void tldScanResourcePaths(String startPath) {
+    private void tldScanResourcePaths(String startPath, boolean webInfAsJar) {
 
         if (log.isTraceEnabled()) {
             log.trace(sm.getString("tldConfig.webinfScan", startPath));
@@ -382,7 +390,8 @@ public final class TldConfig  implements LifecycleListener {
                 String path = it.next();
                 if (!path.endsWith(TLD_EXT)
                         && (path.startsWith(WEB_INF_LIB)
-                                || path.startsWith("/WEB-INF/classes/"))) {
+                                || path.startsWith("/WEB-INF/classes/")
+                                   && !webInfAsJar)) {
                     continue;
                 }
                 if (path.endsWith(TLD_EXT)) {
@@ -407,7 +416,7 @@ public final class TldConfig  implements LifecycleListener {
                         }
                     }
                 } else {
-                    tldScanResourcePaths(path);
+                    tldScanResourcePaths(path, false);
                 }
             }
         }

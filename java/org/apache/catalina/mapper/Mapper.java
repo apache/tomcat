@@ -19,9 +19,8 @@ package org.apache.catalina.mapper;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import javax.naming.NamingException;
-import javax.naming.directory.DirContext;
-
+import org.apache.catalina.WebResource;
+import org.apache.catalina.WebResourceRoot;
 import org.apache.tomcat.util.buf.Ascii;
 import org.apache.tomcat.util.buf.CharChunk;
 import org.apache.tomcat.util.buf.MessageBytes;
@@ -188,7 +187,7 @@ public final class Mapper {
      */
     public void addContextVersion(String hostName, Object host, String path,
             String version, Object context, String[] welcomeResources,
-            javax.naming.Context resources) {
+            WebResourceRoot resources) {
 
         Host[] hosts = this.hosts;
         int pos = find(hosts, hostName);
@@ -902,14 +901,10 @@ public final class Mapper {
                     //            for physical folder
                     if (mappingData.wrapper == null
                         && contextVersion.resources != null) {
-                        Object file = null;
                         String pathStr = path.toString();
-                        try {
-                            file = contextVersion.resources.lookup(pathStr);
-                        } catch(NamingException nex) {
-                            // Swallow not found, since this is normal
-                        }
-                        if (file != null && !(file instanceof DirContext) ) {
+                        WebResource file =
+                                contextVersion.resources.getResource(pathStr);
+                        if (file != null && file.isFile()) {
                             internalMapExtensionWrapper(extensionWrappers, path,
                                                         mappingData, true);
                             if (mappingData.wrapper == null
@@ -978,14 +973,10 @@ public final class Mapper {
             // Redirection to a folder
             char[] buf = path.getBuffer();
             if (contextVersion.resources != null && buf[pathEnd -1 ] != '/') {
-                Object file = null;
                 String pathStr = path.toString();
-                try {
-                    file = contextVersion.resources.lookup(pathStr);
-                } catch(NamingException nex) {
-                    // Swallow, since someone else handles the 404
-                }
-                if (file != null && file instanceof DirContext) {
+                WebResource file =
+                        contextVersion.resources.getResource(pathStr);
+                if (file != null && file.isDirectory()) {
                     // Note: this mutates the path: do not do any processing
                     // after this (since we set the redirectPath, there
                     // shouldn't be any)
@@ -1479,7 +1470,7 @@ public final class Mapper {
     protected static final class ContextVersion extends MapElement {
         public String path = null;
         public String[] welcomeResources = new String[0];
-        public javax.naming.Context resources = null;
+        public WebResourceRoot resources = null;
         public Wrapper defaultWrapper = null;
         public Wrapper[] exactWrappers = new Wrapper[0];
         public Wrapper[] wildcardWrappers = new Wrapper[0];

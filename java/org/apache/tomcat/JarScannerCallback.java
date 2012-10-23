@@ -14,22 +14,40 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package org.apache.tomcat;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.JarURLConnection;
 
+/**
+ * This interface is implemented by clients of the {@link JarScanner} to enable
+ * them to receive notification of a discovered JAR.
+ */
 public interface JarScannerCallback {
 
     /**
+     * A JAR was found (probably packaged in a WAR) and may be accessed for
+     * further processing via the provided URL connection.
      *
-     * @param urlConn
-     * @throws IOException
+     * @param urlConn   The connection to the identified JAR
      */
     public void scan(JarURLConnection urlConn) throws IOException;
 
-    public void scan(File file) throws IOException ;
+    /**
+     * A JAR was found (probably in an unpacked WAR or possibly elsewhere on the
+     * class path) and may be accessed for further processing via the provided
+     * file.
+     *
+     * @param file  The file for the identified JAR.
+     */
+    public void scan(File file) throws IOException;
 
+    /**
+     * A directory structure was found within the web application at
+     * /WEB-INF/classes that should be handled as an unpacked JAR. Note that all
+     * resource access must be via the ServletContext to ensure that any
+     * additional resources are visible.
+     */
+    public void scanWebInfClasses() throws IOException;
 }

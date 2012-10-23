@@ -35,6 +35,19 @@ public class ConcurrentDateFormat {
     private final TimeZone timezone;
     private final Queue<SimpleDateFormat> queue = new ConcurrentLinkedQueue<>();
 
+    public static final String RFC1123_DATE = "EEE, dd MMM yyyy HH:mm:ss zzz";
+    public static final TimeZone GMT = TimeZone.getTimeZone("GMT");
+
+    private static final ConcurrentDateFormat FORMAT_RFC1123;
+
+    static {
+        FORMAT_RFC1123 = new ConcurrentDateFormat(RFC1123_DATE, Locale.US, GMT);
+    }
+
+    public static String formatRfc1123(Date date) {
+        return FORMAT_RFC1123.format(date);
+    }
+
     public ConcurrentDateFormat(String format, Locale locale,
             TimeZone timezone) {
         this.format = format;

@@ -129,21 +129,6 @@ public interface Loader {
 
 
     /**
-     * Add a new repository to the set of repositories for this class loader.
-     *
-     * @param repository Repository to be added
-     */
-    public void addRepository(String repository);
-
-
-    /**
-     * Return the set of repositories defined for this class loader.
-     * If none are defined, a zero-length array is returned.
-     */
-    public String[] findRepositories();
-
-
-    /**
      * Has the internal repository associated with this Loader been modified,
      * such that the loaded classes should be reloaded?
      */

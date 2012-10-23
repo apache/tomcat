@@ -343,10 +343,6 @@ public class TestContextConfigAnnotation {
         public void addPropertyChangeListener(PropertyChangeListener l) {
         }
         @Override
-        public void addRepository(String repository) {}
-        @Override
-        public String[] findRepositories() { return null; }
-        @Override
         public boolean modified() { return false; }
         @Override
         public void removePropertyChangeListener(PropertyChangeListener l) {}

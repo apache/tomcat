@@ -28,10 +28,8 @@ import java.net.JarURLConnection;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -44,10 +42,6 @@ import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.concurrent.ConcurrentHashMap;
 
-import javax.naming.Binding;
-import javax.naming.NameNotFoundException;
-import javax.naming.NamingEnumeration;
-import javax.naming.NamingException;
 import javax.servlet.ServletContainerInitializer;
 import javax.servlet.ServletContext;
 import javax.servlet.annotation.HandlesTypes;
@@ -65,6 +59,8 @@ import org.apache.catalina.Pipeline;
 import org.apache.catalina.Server;
 import org.apache.catalina.Service;
 import org.apache.catalina.Valve;
+import org.apache.catalina.WebResource;
+import org.apache.catalina.WebResourceRoot;
 import org.apache.catalina.Wrapper;
 import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.core.StandardHost;
@@ -79,9 +75,6 @@ import org.apache.catalina.util.ContextName;
 import org.apache.catalina.util.Introspection;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
-import org.apache.naming.resources.DirContextURLConnection;
-import org.apache.naming.resources.FileDirContext;
-import org.apache.naming.resources.ResourceAttributes;
 import org.apache.tomcat.JarScanner;
 import org.apache.tomcat.JarScannerCallback;
 import org.apache.tomcat.util.ExceptionUtils;
@@ -1181,43 +1174,12 @@ public class ContextConfig implements LifecycleListener {
         if  (!webXml.isMetadataComplete() || typeInitializerMap.size() > 0) {
             // Step 4. Process /WEB-INF/classes for annotations
             if (ok) {
-                // Hack required by Eclipse's "serve modules without
-                // publishing" feature since this backs WEB-INF/classes by
-                // multiple locations rather than one.
-                NamingEnumeration<Binding> listBindings = null;
-                try {
-                    try {
-                        listBindings = context.getResources().listBindings(
-                                "/WEB-INF/classes");
-                    } catch (NameNotFoundException ignore) {
-                        // Safe to ignore
-                    }
-                    while (listBindings != null &&
-                            listBindings.hasMoreElements()) {
-                        Binding binding = listBindings.nextElement();
-                        if (binding.getObject() instanceof FileDirContext) {
-                            File webInfClassDir = new File(
-                                    ((FileDirContext) binding.getObject()).getDocBase());
-                            processAnnotationsFile(webInfClassDir, webXml,
-                                    webXml.isMetadataComplete());
-                        } else {
-                            String resource =
-                                    "/WEB-INF/classes/" + binding.getName();
-                            try {
-                                URL url = sContext.getResource(resource);
-                                processAnnotationsUrl(url, webXml,
-                                        webXml.isMetadataComplete());
-                            } catch (MalformedURLException e) {
-                                log.error(sm.getString(
-                                        "contextConfig.webinfClassesUrl",
-                                        resource), e);
-                            }
-                        }
-                    }
-                } catch (NamingException e) {
-                    log.error(sm.getString(
-                            "contextConfig.webinfClassesUrl",
-                            "/WEB-INF/classes"), e);
+                WebResource[] webResources =
+                        context.getResources().listResources("/WEB-INF/classes");
+
+                for (WebResource webResource : webResources) {
+                    processAnnotationsWebResource(webResource, webXml,
+                            webXml.isMetadataComplete());
                 }
             }
 
@@ -1594,23 +1556,21 @@ public class ContextConfig implements LifecycleListener {
                     String entryName = jar.getEntryName();
                     while (entryName != null) {
                         if (entryName.startsWith("META-INF/resources/")) {
-                            context.addResourceJarUrl(url);
+                            context.getResources().createWebResourceSet(
+                                    WebResourceRoot.ResourceSetType.RESOURCE_JAR,
+                                    url, "", "META-INF/resources");
                             break;
                         }
                         jar.nextEntry();
                         entryName = jar.getEntryName();
                     }
                 } else if ("file".equals(url.getProtocol())) {
-                    FileDirContext fileDirContext = new FileDirContext();
-                    fileDirContext.setDocBase(new File(url.toURI()).getAbsolutePath());
-                    try {
-                        fileDirContext.lookup("META-INF/resources/");
-                        //lookup succeeded
-                        if(context instanceof StandardContext){
-                            ((StandardContext)context).addResourcesDirContext(fileDirContext);
-                        }
-                    } catch (NamingException e) {
-                        //not found, ignore
+                    File file = new File(url.toURI());
+                    File resources = new File(file, "META-INF/resources/");
+                    if (resources.isDirectory()) {
+                        context.getResources().createWebResourceSet(
+                                WebResourceRoot.ResourceSetType.RESOURCE_JAR,
+                                file.getAbsolutePath(), "", "");
                     }
                 }
             } catch (IOException ioe) {
@@ -1844,6 +1804,41 @@ public class ContextConfig implements LifecycleListener {
         }
     }
 
+    protected void processAnnotationsWebResource(WebResource webResource,
+            WebXml fragment, boolean handlesTypesOnly) {
+
+        if (webResource.isDirectory()) {
+            WebResource[] webResources =
+                    webResource.getWebResourceRoot().listResources(
+                            webResource.getWebappPath());
+            for (WebResource r : webResources) {
+                processAnnotationsWebResource(r, fragment, handlesTypesOnly);
+            }
+        } else if (webResource.isFile() &&
+                webResource.getName().endsWith(".class")) {
+            InputStream is = null;
+            try {
+                is = webResource.getInputStream();
+                processAnnotationsStream(is, fragment, handlesTypesOnly);
+            } catch (IOException e) {
+                log.error(sm.getString("contextConfig.inputStreamWebResource",
+                        webResource.getWebappPath()),e);
+            } catch (ClassFormatException e) {
+                log.error(sm.getString("contextConfig.inputStreamWebResource",
+                        webResource.getWebappPath()),e);
+            } finally {
+                if (is != null) {
+                    try {
+                        is.close();
+                    } catch (Throwable t) {
+                        ExceptionUtils.handleThrowable(t);
+                    }
+                }
+            }
+        }
+    }
+
+
     protected void processAnnotationsUrl(URL url, WebXml fragment,
             boolean handlesTypesOnly) {
         if (url == null) {
@@ -1851,8 +1846,6 @@ public class ContextConfig implements LifecycleListener {
             return;
         } else if ("jar".equals(url.getProtocol())) {
             processAnnotationsJar(url, fragment, handlesTypesOnly);
-        } else if ("jndi".equals(url.getProtocol())) {
-            processAnnotationsJndi(url, fragment, handlesTypesOnly);
         } else if ("file".equals(url.getProtocol())) {
             try {
                 processAnnotationsFile(
@@ -1911,61 +1904,6 @@ public class ContextConfig implements LifecycleListener {
             if (jar != null) {
                 jar.close();
             }
-        }
-    }
-
-
-    protected void processAnnotationsJndi(URL url, WebXml fragment,
-            boolean handlesTypesOnly) {
-        try {
-            URLConnection urlConn = url.openConnection();
-            DirContextURLConnection dcUrlConn;
-            if (!(urlConn instanceof DirContextURLConnection)) {
-                // This should never happen
-                sm.getString("contextConfig.jndiUrlNotDirContextConn", url);
-                return;
-            }
-
-            dcUrlConn = (DirContextURLConnection) urlConn;
-            dcUrlConn.setUseCaches(false);
-
-            String type = dcUrlConn.getHeaderField(ResourceAttributes.TYPE);
-            if (ResourceAttributes.COLLECTION_TYPE.equals(type)) {
-                // Collection
-                Enumeration<String> dirs = dcUrlConn.list();
-                while (dirs.hasMoreElements()) {
-                    String dir = dirs.nextElement();
-                    URL dirUrl = new URL(url.toString() + '/' + dir);
-                    processAnnotationsJndi(dirUrl, fragment, handlesTypesOnly);
-                }
-
-            } else {
-                // Single file
-                if (url.getPath().endsWith(".class")) {
-                    InputStream is = null;
-                    try {
-                        is = dcUrlConn.getInputStream();
-                        processAnnotationsStream(
-                                is, fragment, handlesTypesOnly);
-                    } catch (IOException e) {
-                        log.error(sm.getString("contextConfig.inputStreamJndi",
-                                url),e);
-                    } catch (ClassFormatException e) {
-                        log.error(sm.getString("contextConfig.inputStreamJndi",
-                                url),e);
-                    } finally {
-                        if (is != null) {
-                            try {
-                                is.close();
-                            } catch (Throwable t) {
-                                ExceptionUtils.handleThrowable(t);
-                            }
-                        }
-                    }
-                }
-            }
-        } catch (IOException e) {
-            log.error(sm.getString("contextConfig.jndiUrl", url), e);
         }
     }
 
@@ -2585,6 +2523,14 @@ for (String interfaceName : cacheEntry.getInterfaceNames()) {
                 }
                 fragments.put(fragment.getName(), fragment);
             }
+        }
+
+
+        @Override
+        public void scanWebInfClasses() {
+            // NO-OP. Fragments unpacked in WEB-INF classes are not handled,
+            // mainly because if there are multiple fragments there is no way to
+            // handle multiple web-fragment.xml files.
         }
 
         public Map<String,WebXml> getFragments() {

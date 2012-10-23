@@ -90,6 +90,7 @@ public class TldLocationsCache {
     public static final int NOROOT_REL_URI = 2;
 
     private static final String WEB_INF = "/WEB-INF/";
+    private static final String WEB_INF_CLASSES = "/WEB-INF/classes/";
     private static final String WEB_INF_LIB = "/WEB-INF/lib/";
     private static final String JAR_EXT = ".jar";
     private static final String TLD_EXT = ".tld";
@@ -237,7 +238,7 @@ public class TldLocationsCache {
         if (initialized) return;
         try {
             tldScanWebXml();
-            tldScanResourcePaths(WEB_INF);
+            tldScanResourcePaths(WEB_INF, false);
 
             JarScanner jarScanner = JarScannerFactory.getJarScanner(ctxt);
             if (jarScanner != null) {
@@ -266,6 +267,11 @@ public class TldLocationsCache {
             if (metaInf.isDirectory()) {
                 tldScanDir(metaInf);
             }
+        }
+
+        @Override
+        public void scanWebInfClasses() throws IOException {
+            tldScanResourcePaths(WEB_INF_CLASSES, true);
         }
     }
 
@@ -336,12 +342,13 @@ public class TldLocationsCache {
      *
      * Initially, rootPath equals /WEB-INF/. The /WEB-INF/classes and
      * /WEB-INF/lib sub-directories are excluded from the search, as per the
-     * JSP 2.0 spec.
+     * JSP 2.0 spec unless the JarScanner is configured to treat
+     * /WEB-INF/classes/ as an exploded JAR.
      *
      * Keep code in sync with o.a.c.startup.TldConfig
      */
-    private void tldScanResourcePaths(String startPath)
-            throws Exception {
+    private void tldScanResourcePaths(String startPath, boolean webInfAsJar)
+            throws IOException {
 
         Set<String> dirList = ctxt.getResourcePaths(startPath);
         if (dirList != null) {
@@ -350,7 +357,8 @@ public class TldLocationsCache {
                 String path = it.next();
                 if (!path.endsWith(TLD_EXT)
                         && (path.startsWith(WEB_INF_LIB)
-                                || path.startsWith("/WEB-INF/classes/"))) {
+                                || path.startsWith("/WEB-INF/classes/")
+                                   && !webInfAsJar)) {
                     continue;
                 }
                 if (path.endsWith(TLD_EXT)) {
@@ -371,7 +379,7 @@ public class TldLocationsCache {
                         }
                     }
                 } else {
-                    tldScanResourcePaths(path);
+                    tldScanResourcePaths(path, false);
                 }
             }
         }

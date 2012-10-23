@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.catalina.util;
 
 import java.io.File;
@@ -24,18 +23,13 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Locale;
-import java.util.NoSuchElementException;
 import java.util.StringTokenizer;
 import java.util.jar.JarInputStream;
 import java.util.jar.Manifest;
 
-import javax.naming.Binding;
-import javax.naming.NamingEnumeration;
-import javax.naming.NamingException;
-import javax.naming.directory.DirContext;
-
 import org.apache.catalina.Context;
-import org.apache.naming.resources.Resource;
+import org.apache.catalina.WebResource;
+import org.apache.catalina.WebResourceRoot;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.res.StringManager;
 
@@ -124,14 +118,14 @@ public final class ExtensionValidator {
      * <code>ManifestResorce<code> objects. These objects are then passed
      * to the validateManifestResources method for validation.
      *
-     * @param dirContext The JNDI root of the Web Application
-     * @param context The context from which the Logger and path to the
-     *                application
+     * @param resources The resources configured for this Web Application
+     * @param context   The context from which the Logger and path to the
+     *                  application
      *
      * @return true if all required extensions satisfied
      */
     public static synchronized boolean validateApplication(
-                                           DirContext dirContext,
+                                           WebResourceRoot resources,
                                            Context context)
                     throws IOException {
 
@@ -139,17 +133,14 @@ public final class ExtensionValidator {
         ArrayList<ManifestResource> appManifestResources = new ArrayList<>();
         // If the application context is null it does not exist and
         // therefore is not valid
-        if (dirContext == null) return false;
+        if (resources == null) return false;
         // Find the Manifest for the Web Application
         InputStream inputStream = null;
         try {
-            NamingEnumeration<Binding> wne =
-                dirContext.listBindings("/META-INF/");
-            Binding binding = wne.nextElement();
-            if (binding.getName().toUpperCase(Locale.ENGLISH).equals("MANIFEST.MF")) {
-                Resource resource = (Resource)dirContext.lookup
-                                    ("/META-INF/" + binding.getName());
-                inputStream = resource.streamContent();
+            WebResource resource =
+                    resources.getResource("/META-INF/MANIFEST.MF");
+            if (resource.isFile()) {
+                inputStream = resource.getInputStream();
                 Manifest manifest = new Manifest(inputStream);
                 inputStream.close();
                 inputStream = null;
@@ -158,10 +149,6 @@ public final class ExtensionValidator {
                     manifest, ManifestResource.WAR);
                 appManifestResources.add(mre);
             }
-        } catch (NamingException nex) {
-            // Application does not contain a MANIFEST.MF file
-        } catch (NoSuchElementException nse) {
-            // Application does not contain a MANIFEST.MF file
         } finally {
             if (inputStream != null) {
                 try {
@@ -172,35 +159,23 @@ public final class ExtensionValidator {
             }
         }
 
-        // Locate the Manifests for all bundled JARs
-        NamingEnumeration<Binding> ne = null;
         try {
-            ne = dirContext.listBindings("WEB-INF/lib/");
-            while ((ne != null) && ne.hasMoreElements()) {
-                Binding binding = ne.nextElement();
-                if (!binding.getName().toLowerCase(Locale.ENGLISH).endsWith(".jar")) {
-                    continue;
-                }
-                Object obj =
-                    dirContext.lookup("/WEB-INF/lib/" + binding.getName());
-                if (!(obj instanceof Resource)) {
-                    // Probably a directory named xxx.jar - ignore it
-                    continue;
-                }
-                Resource resource = (Resource) obj;
-                inputStream = resource.streamContent();
-                Manifest jmanifest = getManifest(inputStream);
-                if (jmanifest != null) {
-                    ManifestResource mre = new ManifestResource(
-                                                binding.getName(),
-                                                jmanifest,
-                                                ManifestResource.APPLICATION);
-                    appManifestResources.add(mre);
+            WebResource[] jars = resources.listResources("/WEB-INF/lib");
+            for (WebResource jar : jars) {
+                if (jar.getName().toLowerCase(Locale.ENGLISH).endsWith(".jar") &&
+                        jar.isFile()) {
+
+                    inputStream = jar.getInputStream();
+                    Manifest jmanifest = getManifest(inputStream);
+                    if (jmanifest != null) {
+                        ManifestResource mre = new ManifestResource(
+                                                    jar.getName(),
+                                                    jmanifest,
+                                                    ManifestResource.APPLICATION);
+                        appManifestResources.add(mre);
+                    }
                 }
             }
-        } catch (NamingException nex) {
-            // Jump out of the check for this application because it
-            // has no resources
         } finally {
             if (inputStream != null) {
                 try {

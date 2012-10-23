@@ -20,6 +20,7 @@ package org.apache.tomcat.util.scan;
 import java.io.File;
 import java.io.IOException;
 import java.net.JarURLConnection;
+import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -175,14 +176,31 @@ public class StandardJarScanner implements JarScanner {
             }
         }
 
+        // Scan WEB-INF/classes
+        if (scanAllDirectories) {
+            try {
+                URL url = context.getResource("/WEB-INF/classes/META-INF");
+                if (url != null) {
+                    try {
+                        callback.scanWebInfClasses();
+                    } catch (IOException e) {
+                        log.warn(sm.getString("jarScan.webinfclassesFail"), e);
+                    }
+                }
+            } catch (MalformedURLException e) {
+                // Ignore
+            }
+        }
+
         // Scan the classpath
-        if (scanClassPath) {
+        if (scanClassPath && classloader != null) {
             if (log.isTraceEnabled()) {
                 log.trace(sm.getString("jarScan.classloaderStart"));
             }
 
-            ClassLoader loader =
-                Thread.currentThread().getContextClassLoader();
+            // No need to scan the web application class loader - we have
+            // already scanned WEB-INF/lib and WEB-INF/classes
+            ClassLoader loader = classloader.getParent();
 
             while (loader != null) {
                 if (loader instanceof URLClassLoader) {
@@ -215,7 +233,6 @@ public class StandardJarScanner implements JarScanner {
                 }
                 loader = loader.getParent();
             }
-
         }
     }
 
