@@ -57,7 +57,7 @@ public class VirtualWebappLoader extends WebappLoader {
     /**
      * <code>;</code> separated list of additional path elements.
      */
-    private String virtualClasspath;
+    private String virtualClasspath = "";
 
     /**
      * Construct a new WebappLoader with no defined parent class loader (so that
