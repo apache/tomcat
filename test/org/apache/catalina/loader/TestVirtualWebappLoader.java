@@ -24,10 +24,11 @@ import static org.junit.Assert.assertNull;
 
 import org.junit.Test;
 
+import org.apache.catalina.WebResourceRoot;
 import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
-import org.apache.naming.resources.FileDirContext;
+import org.apache.catalina.webresources.StandardRoot;
 
 public class TestVirtualWebappLoader extends TomcatBaseTest {
 
@@ -46,25 +47,31 @@ public class TestVirtualWebappLoader extends TomcatBaseTest {
         StandardContext ctx =
             (StandardContext)tomcat.addContext("",  appDir.getAbsolutePath());
 
-        VirtualWebappLoader loader = new VirtualWebappLoader();
+
+        WebappLoader loader = new WebappLoader();
 
         loader.setContext(ctx);
         ctx.setLoader(loader);
-        ctx.setResources(new FileDirContext());
+
+        ctx.setResources(new StandardRoot(ctx));
         ctx.resourcesStart();
-        File dir = new File("test/webapp-3.0-fragments/WEB-INF/lib");
-        loader.setVirtualClasspath(dir.getAbsolutePath() + "/*.jar");
+
+        File f1 = new File("test/webapp-3.0-fragments/WEB-INF/lib");
+        ctx.getResources().createWebResourceSet(
+                WebResourceRoot.ResourceSetType.POST, f1.getAbsolutePath(),
+                "/WEB-INF/lib", "");
+
         loader.start();
-        String[] repos = loader.getRepositories();
+        String[] repos = loader.getLoaderRepositories();
         assertEquals(2,repos.length);
         loader.stop();
         // ToDo: Why doesn't remove repositories?
-        repos = loader.getRepositories();
+        repos = loader.getLoaderRepositories();
         assertEquals(2, repos.length);
 
         // no leak
         loader.start();
-        repos = loader.getRepositories();
+        repos = loader.getLoaderRepositories();
         assertEquals(2,repos.length);
 
         // clear loader

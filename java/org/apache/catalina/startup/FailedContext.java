@@ -22,7 +22,6 @@ import java.net.URL;
 import java.util.Locale;
 import java.util.Set;
 
-import javax.naming.directory.DirContext;
 import javax.servlet.ServletContainerInitializer;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletRegistration;
@@ -44,6 +43,7 @@ import org.apache.catalina.Manager;
 import org.apache.catalina.Pipeline;
 import org.apache.catalina.Realm;
 import org.apache.catalina.Valve;
+import org.apache.catalina.WebResourceRoot;
 import org.apache.catalina.Wrapper;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
@@ -261,9 +261,9 @@ public class FailedContext extends LifecycleMBeanBase implements Context {
     public void setRealm(Realm realm) { /* NO-OP */ }
 
     @Override
-    public DirContext getResources() { return null; }
+    public WebResourceRoot getResources() { return null; }
     @Override
-    public void setResources(DirContext resources) { /* NO-OP */ }
+    public void setResources(WebResourceRoot resources) { /* NO-OP */ }
 
     @Override
     public void backgroundProcess() { /* NO-OP */ }
@@ -626,9 +626,6 @@ public class FailedContext extends LifecycleMBeanBase implements Context {
     public JspConfigDescriptor getJspConfigDescriptor() { return null; }
 
     @Override
-    public void addResourceJarUrl(URL url) { /* NO-OP */ }
-
-    @Override
     public void addServletContainerInitializer(ServletContainerInitializer sci,
             Set<Class<?>> classes) { /* NO-OP */ }
 
@@ -673,4 +670,11 @@ public class FailedContext extends LifecycleMBeanBase implements Context {
 
     @Override
     public File getCatalinaBase() { return null; }
+
+    @Override
+    public void setAddWebinfClassesResources(boolean addWebinfClassesResources) {
+        // NO-OP
+    }
+    @Override
+    public boolean getAddWebinfClassesResources() { return false; }
 }

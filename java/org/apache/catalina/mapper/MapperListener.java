@@ -28,6 +28,7 @@ import org.apache.catalina.LifecycleException;
 import org.apache.catalina.LifecycleListener;
 import org.apache.catalina.LifecycleState;
 import org.apache.catalina.Service;
+import org.apache.catalina.WebResourceRoot;
 import org.apache.catalina.Wrapper;
 import org.apache.catalina.util.LifecycleMBeanBase;
 import org.apache.juli.logging.Log;
@@ -351,7 +352,7 @@ public class MapperListener extends LifecycleMBeanBase
         }
         Container host = context.getParent();
 
-        javax.naming.Context resources = context.getResources();
+        WebResourceRoot resources = context.getResources();
         String[] welcomeFiles = context.findWelcomeFiles();
 
         mapper.addContextVersion(host.getName(), host, contextPath,

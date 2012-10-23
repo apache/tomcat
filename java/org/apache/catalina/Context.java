@@ -20,7 +20,6 @@ import java.net.URL;
 import java.util.Locale;
 import java.util.Set;
 
-import javax.naming.directory.DirContext;
 import javax.servlet.ServletContainerInitializer;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletRegistration;
@@ -1256,14 +1255,6 @@ public interface Context extends Container {
 
 
     /**
-     * Add a URL for a JAR that contains static resources in a
-     * META-INF/resources directory that should be included in the static
-     * resources for this context.
-     */
-    public void addResourceJarUrl(URL url);
-
-
-    /**
      * Add a ServletContainerInitializer instance to this web application.
      *
      * @param sci       The instance to add
@@ -1391,14 +1382,14 @@ public interface Context extends Container {
     /**
      * Return the Resources with which this Context is associated.
      */
-    public DirContext getResources();
+    public WebResourceRoot getResources();
 
     /**
      * Set the Resources object with which this Context is associated.
      *
      * @param resources The newly associated Resources
      */
-    public void setResources(DirContext resources);
+    public void setResources(WebResourceRoot resources);
 
     /**
      * Return the Manager with which this Context is associated.  If there is
@@ -1413,5 +1404,21 @@ public interface Context extends Container {
      * @param manager The newly associated Manager
      */
     public void setManager(Manager manager);
+
+    /**
+     * Sets the flag that indicates if /WEB-INF/classes should be treated like
+     * an exploded JAR and JAR resources made available as if they were in a
+     * JAR.
+     *
+     * @param addWebinfClassesResources The new value for the flag
+     */
+    public void setAddWebinfClassesResources(boolean addWebinfClassesResources);
+
+    /**
+     * Gets the flag that indicates if /WEB-INF/classes should be treated like
+     * an exploded JAR and JAR resources made available as if they were in a
+     * JAR.
+     */
+    public boolean getAddWebinfClassesResources();
 }
 

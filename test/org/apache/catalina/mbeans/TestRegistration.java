@@ -96,7 +96,6 @@ public class TestRegistration extends TomcatBaseTest {
         return new String[] {
             "Tomcat:j2eeType=WebModule,name=//" + host + context +
                 ",J2EEApplication=none,J2EEServer=none",
-            "Tomcat:type=Cache,host=" + host + ",context=" + context,
             "Tomcat:type=Loader,context=" + context + ",host=" + host,
             "Tomcat:type=Manager,context=" + context + ",host=" + host,
             "Tomcat:type=NamingResources,context=" + context +
@@ -106,6 +105,8 @@ public class TestRegistration extends TomcatBaseTest {
             "Tomcat:type=Valve,context=" + context +
                 ",host=" + host + ",name=StandardContextValve",
             "Tomcat:type=WebappClassLoader,context=" + context +
+                ",host=" + host,
+            "Tomcat:type=WebResourceRoot,context=" + context +
                 ",host=" + host,
         };
     }

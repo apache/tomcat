@@ -19,7 +19,6 @@ package org.apache.catalina.core;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
-import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -34,9 +33,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-import javax.naming.Binding;
 import javax.naming.NamingException;
-import javax.naming.directory.DirContext;
 import javax.servlet.Filter;
 import javax.servlet.FilterRegistration;
 import javax.servlet.RequestDispatcher;
@@ -62,14 +59,12 @@ import org.apache.catalina.Globals;
 import org.apache.catalina.Host;
 import org.apache.catalina.LifecycleState;
 import org.apache.catalina.Service;
+import org.apache.catalina.WebResourceRoot;
 import org.apache.catalina.Wrapper;
 import org.apache.catalina.connector.Connector;
 import org.apache.catalina.deploy.FilterDef;
 import org.apache.catalina.mapper.MappingData;
-import org.apache.catalina.util.ResourceSet;
 import org.apache.catalina.util.ServerInfo;
-import org.apache.naming.resources.DirContextURLStreamHandler;
-import org.apache.naming.resources.Resource;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.buf.CharChunk;
 import org.apache.tomcat.util.buf.MessageBytes;
@@ -518,27 +513,12 @@ public class ApplicationContext
         if (normPath == null)
             return (null);
 
-        DirContext resources = context.getResources();
+        WebResourceRoot resources = context.getResources();
         if (resources != null) {
-            String fullPath = context.getPath() + normPath;
-            String hostName = context.getParent().getName();
-            try {
-                resources.lookup(normPath);
-                URI uri = new URI("jndi", null, "", -1,
-                        getJNDIUri(hostName, fullPath), null, null);
-                return new URL(null, uri.toString(),
-                        new DirContextURLStreamHandler(resources));
-            } catch (NamingException e) {
-                // Ignore
-            } catch (Exception e) {
-                // Unexpected
-                log(sm.getString("applicationContext.lookup.error", path,
-                        getContextPath()), e);
-            }
+            return resources.getResource(normPath).getURL();
         }
 
-        return (null);
-
+        return null;
     }
 
 
@@ -563,29 +543,20 @@ public class ApplicationContext
         if (normalizedPath == null)
             return (null);
 
-        DirContext resources = context.getResources();
+        WebResourceRoot resources = context.getResources();
         if (resources != null) {
-            try {
-                Object resource = resources.lookup(normalizedPath);
-                if (resource instanceof Resource)
-                    return (((Resource) resource).streamContent());
-            } catch (NamingException e) {
-                // Ignore
-            } catch (Exception e) {
-                // Unexpected
-                log(sm.getString("applicationContext.lookup.error", path,
-                        getContextPath()), e);
-            }
+            return resources.getResource(normalizedPath).getInputStream();
         }
-        return (null);
 
+        return null;
     }
 
 
     /**
      * Return a Set containing the resource paths of resources member of the
      * specified collection. Each path will be a String starting with
-     * a "/" character. The returned set is immutable.
+     * a "/" character. Paths representing directories will end with a "/"
+     * character. The returned set is immutable.
      *
      * @param path Collection path
      */
@@ -605,33 +576,12 @@ public class ApplicationContext
         if (normalizedPath == null)
             return (null);
 
-        DirContext resources = context.getResources();
+        WebResourceRoot resources = context.getResources();
         if (resources != null) {
-            return (getResourcePathsInternal(resources, normalizedPath));
+            return resources.listWebAppPaths(normalizedPath);
         }
-        return (null);
 
-    }
-
-
-    /**
-     * Internal implementation of getResourcesPath() logic.
-     *
-     * @param resources Directory context to search
-     * @param path Collection path
-     */
-    private Set<String> getResourcePathsInternal(DirContext resources,
-            String path) {
-
-        ResourceSet<String> set = new ResourceSet<>();
-        try {
-            listCollectionPaths(set, resources, path);
-        } catch (NamingException e) {
-            return (null);
-        }
-        set.setLocked(true);
-        return (set);
-
+        return null;
     }
 
 
@@ -1527,47 +1477,6 @@ public class ApplicationContext
     protected void setNewServletContextListenerAllowed(boolean allowed) {
         this.newServletContextListenerAllowed = allowed;
     }
-
-    /**
-     * List resource paths (recursively), and store all of them in the given
-     * Set.
-     */
-    private static void listCollectionPaths(Set<String> set,
-            DirContext resources, String path) throws NamingException {
-
-        Enumeration<Binding> childPaths = resources.listBindings(path);
-        while (childPaths.hasMoreElements()) {
-            Binding binding = childPaths.nextElement();
-            String name = binding.getName();
-            StringBuilder childPath = new StringBuilder(path);
-            if (!"/".equals(path) && !path.endsWith("/"))
-                childPath.append("/");
-            childPath.append(name);
-            Object object = binding.getObject();
-            if (object instanceof DirContext) {
-                childPath.append("/");
-            }
-            set.add(childPath.toString());
-        }
-
-    }
-
-
-    /**
-     * Get full path, based on the host name and the context path.
-     */
-    private static String getJNDIUri(String hostName, String path) {
-        String result;
-
-        if (path.startsWith("/")) {
-            result = "/" + hostName + path;
-        } else {
-            result = "/" + hostName + "/" + path;
-        }
-
-        return result;
-    }
-
 
     /**
      * Internal class used as thread-local storage when doing path

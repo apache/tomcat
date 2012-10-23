@@ -92,6 +92,12 @@
         Service. This removes the need to maintain two copies of the mappings
         for Servlets and Filters. (markt)
       </scode>
+      <add>
+        Implement a new Resources implementation that merges Aliases,
+        VirtualLoader, VirtualDirContext, JAR resources and external
+        repositories into a single framework rather than a separate one for each
+        feature. (markt) 
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">

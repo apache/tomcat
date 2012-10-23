@@ -27,7 +27,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -48,9 +47,7 @@ import javax.management.NotificationBroadcasterSupport;
 import javax.management.NotificationEmitter;
 import javax.management.NotificationFilter;
 import javax.management.NotificationListener;
-import javax.management.ObjectName;
 import javax.naming.NamingException;
-import javax.naming.directory.DirContext;
 import javax.servlet.FilterConfig;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.Servlet;
@@ -87,6 +84,8 @@ import org.apache.catalina.Manager;
 import org.apache.catalina.Pipeline;
 import org.apache.catalina.Realm;
 import org.apache.catalina.Valve;
+import org.apache.catalina.WebResource;
+import org.apache.catalina.WebResourceRoot;
 import org.apache.catalina.Wrapper;
 import org.apache.catalina.deploy.ApplicationParameter;
 import org.apache.catalina.deploy.ErrorPage;
@@ -108,19 +107,14 @@ import org.apache.catalina.util.ContextName;
 import org.apache.catalina.util.ExtensionValidator;
 import org.apache.catalina.util.RequestUtil;
 import org.apache.catalina.util.URLEncoder;
+import org.apache.catalina.webresources.StandardRoot;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.naming.ContextBindings;
-import org.apache.naming.resources.BaseDirContext;
-import org.apache.naming.resources.DirContextURLStreamHandler;
-import org.apache.naming.resources.FileDirContext;
-import org.apache.naming.resources.ProxyDirContext;
-import org.apache.naming.resources.WARDirContext;
 import org.apache.tomcat.InstanceManager;
 import org.apache.tomcat.JarScanner;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.IntrospectionUtils;
-import org.apache.tomcat.util.modeler.Registry;
 import org.apache.tomcat.util.scan.StandardJarScanner;
 
 /**
@@ -667,17 +661,7 @@ public class StandardContext extends ContainerBase
     protected int cacheTTL = 5000;
 
 
-    /**
-     * List of resource aliases.
-     */
-    private String aliases = null;
-
-
-    private DirContext resources = null;
-    /**
-     * Non proxied resources.
-     */
-    private DirContext webappResources = null;
+    private WebResourceRoot resources;
     private final ReadWriteLock resourcesLock = new ReentrantReadWriteLock();
 
     private long startupTime;
@@ -877,12 +861,14 @@ public class StandardContext extends ContainerBase
     }
 
 
+    @Override
     public void setAddWebinfClassesResources(
             boolean addWebinfClassesResources) {
         this.addWebinfClassesResources = addWebinfClassesResources;
     }
 
 
+    @Override
     public boolean getAddWebinfClassesResources() {
         return addWebinfClassesResources;
     }
@@ -1153,56 +1139,6 @@ public class StandardContext extends ContainerBase
      */
     public void setCacheObjectMaxSize(int cacheObjectMaxSize) {
         this.cacheObjectMaxSize = cacheObjectMaxSize;
-    }
-
-
-    /**
-     * Return the list of resource aliases.
-     */
-    public String getAliases() {
-        return this.aliases;
-    }
-
-
-    /**
-     * Add a URL for a JAR that contains static resources in a
-     * META-INF/resources directory that should be included in the static
-     * resources for this context.
-     */
-    @Override
-    public void addResourceJarUrl(URL url) {
-        DirContext webappResources = getWebappResources();
-        if (webappResources instanceof BaseDirContext) {
-            ((BaseDirContext) webappResources).addResourcesJar(url);
-        } else {
-            log.error(sm.getString("standardContext.noResourceJar", url,
-                    getName()));
-        }
-    }
-
-    /**
-     * Add a URL for a JAR that contains static resources in a
-     * META-INF/resources directory that should be included in the static
-     * resources for this context.
-     */
-    public void addResourcesDirContext(DirContext altDirContext) {
-        DirContext webappResources = getWebappResources();
-        if (webappResources instanceof BaseDirContext) {
-            ((BaseDirContext) webappResources).addAltDirContext(altDirContext);
-        } else {
-            log.error(sm.getString("standardContext.noResourceJar", altDirContext,
-                    getName()));
-        }
-    }
-
-    /**
-     * Set the current alias configuration. The list of aliases should be of the
-     * form "/aliasPath1=docBase1,/aliasPath2=docBase2" where aliasPathN must
-     * include a leading '/' and docBaseN must be an absolute path to either a
-     * .war file or a directory.
-     */
-    public void setAliases(String aliases) {
-        this.aliases = aliases;
     }
 
 
@@ -2479,7 +2415,7 @@ public class StandardContext extends ContainerBase
 
 
     @Override
-    public DirContext getResources() {
+    public WebResourceRoot getResources() {
         Lock readLock = resourcesLock.readLock();
         readLock.lock();
         try {
@@ -2490,50 +2426,29 @@ public class StandardContext extends ContainerBase
     }
 
 
-    private DirContext getWebappResources() {
-        Lock readLock = resourcesLock.readLock();
-        readLock.lock();
-        try {
-            return webappResources;
-        } finally {
-            readLock.unlock();
-        }
-    }
-
-
     @Override
-    public void setResources(DirContext resources) {
+    public void setResources(WebResourceRoot resources) {
 
         Lock writeLock = resourcesLock.writeLock();
         writeLock.lock();
-        DirContext oldResources = null;
+        WebResourceRoot oldResources = null;
         try {
             if (getState().isAvailable()) {
                 throw new IllegalStateException
                     (sm.getString("standardContext.resources.started"));
             }
 
-            oldResources = this.webappResources;
+            oldResources = this.resources;
             if (oldResources == resources)
                 return;
 
-            if (resources instanceof BaseDirContext) {
-                // Caching
-                ((BaseDirContext) resources).setCached(isCachingAllowed());
-                ((BaseDirContext) resources).setCacheTTL(getCacheTTL());
-                ((BaseDirContext) resources).setCacheMaxSize(getCacheMaxSize());
-                ((BaseDirContext) resources).setCacheObjectMaxSize(
-                        getCacheObjectMaxSize());
-                // Alias support
-                ((BaseDirContext) resources).setAliases(getAliases());
+            this.resources = resources;
+            if (oldResources != null) {
+                oldResources.setContext(null);
             }
-            if (resources instanceof FileDirContext) {
-                ((FileDirContext) resources).setAllowLinking(isAllowLinking());
+            if (resources != null) {
+                resources.setContext(this);
             }
-            this.webappResources = resources;
-
-            // The proxied resources will be refreshed on start
-            this.resources = null;
 
             support.firePropertyChange("resources", oldResources,
                     resources);
@@ -4464,9 +4379,8 @@ public class StandardContext extends ContainerBase
      */
     @Override
     public String getRealPath(String path) {
-        DirContext webappResources = getWebappResources();
-        if (webappResources instanceof BaseDirContext) {
-            return ((BaseDirContext) webappResources).getRealPath(path);
+        if (resources != null) {
+            return resources.getResource(path).getCanonicalPath();
         }
         return null;
     }
@@ -4853,68 +4767,27 @@ public class StandardContext extends ContainerBase
      * Return <code>true</code> if initialization was successfull,
      * or <code>false</code> otherwise.
      */
-    public boolean resourcesStart() {
+    public boolean resourcesStart() throws LifecycleException {
 
         boolean ok = true;
 
-        Hashtable<String, String> env = new Hashtable<>();
-        if (getParent() != null)
-            env.put(ProxyDirContext.HOST, getParent().getName());
-        env.put(ProxyDirContext.CONTEXT, getName());
+        resources.setAllowLinking(isAllowLinking());
 
-        Lock writeLock = resourcesLock.writeLock();
-        writeLock.lock();
-        try {
-            ProxyDirContext proxyDirContext =
-                new ProxyDirContext(env, webappResources);
-            if (webappResources instanceof FileDirContext) {
-                ((FileDirContext) webappResources).setAllowLinking
-                    (isAllowLinking());
-            }
-            if (webappResources instanceof BaseDirContext) {
-                ((BaseDirContext) webappResources).setDocBase(getBasePath());
-                ((BaseDirContext) webappResources).setCached
-                    (isCachingAllowed());
-                ((BaseDirContext) webappResources).setCacheTTL(getCacheTTL());
-                ((BaseDirContext) webappResources).setCacheMaxSize
-                    (getCacheMaxSize());
-                ((BaseDirContext) webappResources).allocate();
-                // Alias support
-                ((BaseDirContext) webappResources).setAliases(getAliases());
+        resources.setCachingAllowed(isCachingAllowed());
+        resources.setCacheTtl(getCacheTTL());
+        resources.setCacheMaxSize(getCacheMaxSize());
+        resources.setCacheMaxObjectSize(getCacheObjectMaxSize());
 
-                if (effectiveMajorVersion >=3 && addWebinfClassesResources) {
-                    try {
-                        DirContext webInfCtx =
-                            (DirContext) webappResources.lookup(
-                                    "/WEB-INF/classes");
-                        // Do the lookup to make sure it exists
-                        webInfCtx.lookup("META-INF/resources");
-                        ((BaseDirContext) webappResources).addAltDirContext(
-                                webInfCtx);
-                    } catch (NamingException e) {
-                        // Doesn't exist - ignore and carry on
-                    }
-                }
+        resources.start();
+
+        if (effectiveMajorVersion >=3 && addWebinfClassesResources) {
+            WebResource webinfClassesResource = resources.getResource(
+                    "/WEB-INF/classes/META-INF/resources");
+            if (webinfClassesResource.isDirectory()) {
+                getResources().createWebResourceSet(
+                        WebResourceRoot.ResourceSetType.RESOURCE_JAR,
+                        webinfClassesResource.getURL(), "", "");
             }
-            // Register the cache in JMX
-            if (isCachingAllowed()) {
-                String contextName = getName();
-                if (!contextName.startsWith("/")) {
-                    contextName = "/" + contextName;
-                }
-                ObjectName resourcesName =
-                    new ObjectName(this.getDomain() + ":type=Cache,host="
-                                   + getHostname() + ",context=" + contextName);
-                Registry.getRegistry(null, null).registerComponent
-                    (proxyDirContext.getCache(), resourcesName, null);
-            }
-            this.resources = proxyDirContext;
-        } catch (Throwable t) {
-            ExceptionUtils.handleThrowable(t);
-            log.error(sm.getString("standardContext.resourcesStart"), t);
-            ok = false;
-        } finally {
-            writeLock.unlock();
         }
 
         return ok;
@@ -4932,33 +4805,12 @@ public class StandardContext extends ContainerBase
         writeLock.lock();
         try {
             if (resources != null) {
-                if (resources instanceof Lifecycle) {
-                    ((Lifecycle) resources).stop();
-                }
-                if (webappResources instanceof BaseDirContext) {
-                    ((BaseDirContext) webappResources).release();
-                }
-                // Unregister the cache in JMX
-                if (isCachingAllowed()) {
-                    String contextName = getName();
-                    if (!contextName.startsWith("/")) {
-                        contextName = "/" + contextName;
-                    }
-                    ObjectName resourcesName =
-                        new ObjectName(this.getDomain()
-                                       + ":type=Cache,host="
-                                       + getHostname() + ",context="
-                                       + contextName);
-                    Registry.getRegistry(null, null)
-                        .unregisterComponent(resourcesName);
-                }
+                resources.stop();
             }
-            this.resources = null;
         } catch (Throwable t) {
             ExceptionUtils.handleThrowable(t);
             log.error(sm.getString("standardContext.resourcesStop"), t);
             ok = false;
-            this.resources = null;
         } finally {
             writeLock.unlock();
         }
@@ -5040,16 +4892,12 @@ public class StandardContext extends ContainerBase
         }
 
         // Add missing components as necessary
-        DirContext webappResources = getWebappResources();
-        if (webappResources == null) {   // (1) Required by Loader
+        if (getResources() == null) {   // (1) Required by Loader
             if (log.isDebugEnabled())
                 log.debug("Configuring default Resources");
+
             try {
-                if ((getDocBase() != null) && (getDocBase().endsWith(".war")) &&
-                        (!(new File(getBasePath())).isDirectory()))
-                    setResources(new WARDirContext());
-                else
-                    setResources(new FileDirContext());
+                setResources(new StandardRoot(this));
             } catch (IllegalArgumentException e) {
                 log.error("Error initializing resources: " + e.getMessage());
                 ok = false;
@@ -5151,9 +4999,6 @@ public class StandardContext extends ContainerBase
                 Realm realm = getRealmInternal();
                 if ((realm != null) && (realm instanceof Lifecycle))
                     ((Lifecycle) realm).start();
-                DirContext resources = getResources();
-                if ((resources != null) && (resources instanceof Lifecycle))
-                    ((Lifecycle) resources).start();
 
                 // Notify our interested LifecycleListeners
                 fireLifecycleEvent(Lifecycle.CONFIGURE_START_EVENT, null);
@@ -5503,9 +5348,6 @@ public class StandardContext extends ContainerBase
             if (context != null)
                 context.clearAttributes();
 
-            // Stop resources
-            resourcesStop();
-
             Realm realm = getRealmInternal();
             if ((realm != null) && (realm instanceof Lifecycle)) {
                 ((Lifecycle) realm).stop();
@@ -5518,6 +5360,9 @@ public class StandardContext extends ContainerBase
             if ((loader != null) && (loader instanceof Lifecycle)) {
                 ((Lifecycle) loader).stop();
             }
+
+            // Stop resources
+            resourcesStop();
 
         } finally {
 
@@ -5595,6 +5440,10 @@ public class StandardContext extends ContainerBase
             ((Lifecycle) manager).destroy();
         }
 
+        if (resources != null) {
+            resources.destroy();
+        }
+
         super.destroyInternal();
     }
 
@@ -5618,6 +5467,16 @@ public class StandardContext extends ContainerBase
                 log.warn(sm.getString(
                         "standardContext.backgroundProcess.manager", manager),
                         e);
+            }
+        }
+        WebResourceRoot resources = getResources();
+        if (resources != null) {
+            try {
+                resources.backgroundProcess();
+            } catch (Exception e) {
+                log.warn(sm.getString(
+                        "standardContext.backgroundProcess.resources",
+                        resources), e);
             }
         }
         super.backgroundProcess();
@@ -5794,15 +5653,10 @@ public class StandardContext extends ContainerBase
         ClassLoader oldContextClassLoader =
             Thread.currentThread().getContextClassLoader();
 
-        if (getResources() == null)
-            return oldContextClassLoader;
-
         if (getLoader().getClassLoader() != null) {
             Thread.currentThread().setContextClassLoader
                 (getLoader().getClassLoader());
         }
-
-        DirContextURLStreamHandler.bindThread(getResources());
 
         if (isUseNaming()) {
             try {
@@ -5814,7 +5668,6 @@ public class StandardContext extends ContainerBase
         }
 
         return oldContextClassLoader;
-
     }
 
 
@@ -5826,8 +5679,6 @@ public class StandardContext extends ContainerBase
         if (isUseNaming()) {
             ContextBindings.unbindThread(this, this);
         }
-
-        DirContextURLStreamHandler.unbindThread();
 
         Thread.currentThread().setContextClassLoader(oldContextClassLoader);
     }
@@ -6231,6 +6082,10 @@ public class StandardContext extends ContainerBase
         // Register the naming resources
         if (namingResources != null) {
             namingResources.init();
+        }
+
+        if (resources != null) {
+            resources.start();
         }
 
         // Send j2ee.object.created notification

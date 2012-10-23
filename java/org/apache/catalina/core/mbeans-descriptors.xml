@@ -70,10 +70,6 @@
                is="true"
                type="boolean"/>
 
-    <attribute name="aliases"
-               description="List of resource aliases"
-               type="java.lang.String" />
-
     <attribute name="altDDName"
                description="The alternate deployment descriptor name."
                type="java.lang.String" />
