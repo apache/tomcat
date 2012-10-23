@@ -80,6 +80,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Cluster">
+    <changelog>
+      <fix>
+        Add getSessionIdsFull operation to mbeans-descriptor. listSessionIdsFull
+        no longer exist. (kfujino)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 7.0.32 (markt)" rtext="2012-10-09">
   <subsection name="Catalina">
