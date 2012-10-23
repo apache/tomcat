@@ -614,10 +614,10 @@
       impact="ACTION"
       returnType="java.lang.String"/>
     <operation
-      name="listSessionIdsFull"
-      description="Return the list of active session ids"
+      name="getSessionIdsFull"
+      description="Returns the list of all sessions IDS (primary, backup and proxy)."
       impact="ACTION"
-      returnType="java.lang.String"/>
+      returnType="java.util.Set"/>
     <operation
       name="processExpires"
       description="Invalidate all sessions that have expired.s"
