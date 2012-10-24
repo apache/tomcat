@@ -78,6 +78,12 @@
         any similar sequence with a odd number of - characters) was not
         correctly parsed. (markt)
       </fix>
+      <fix>
+        <bug>54011</bug>: Fix a bug in the tag plug-in for
+        <code>&lt;c:out&gt;</code> that triggered a JSP compilation error if the
+        <code>escapeXml</code> attribute was used. Patch provided by Sheldon
+        Shao. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">
