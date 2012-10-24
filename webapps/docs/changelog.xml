@@ -84,6 +84,10 @@
         <code>escapeXml</code> attribute was used. Patch provided by Sheldon
         Shao. (markt)
       </fix>
+      <scode>
+        Follow up to <bug>54011</bug>. Simplify generated code for
+        <code>&lt;c:out&gt;</code>. Based on a patch by Sheldon Shao. (markt)
+      </scode>
     </changelog>
   </subsection>
   <subsection name="Cluster">
