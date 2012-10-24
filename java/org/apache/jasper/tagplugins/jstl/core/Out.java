@@ -66,9 +66,9 @@ public final class Out implements TagPlugin {
         //if the escapeXml is specified, assign the value to it;
         ctxt.generateJavaSource("boolean " + strEscapeXmlName + " = true;");
         if(hasEscapeXml){
-            ctxt.generateJavaSource(strEscapeXmlName + " = Boolean.parseBoolean((");
-            ctxt.generateAttribute("default");
-            ctxt.generateJavaSource(").toString());");
+            ctxt.generateJavaSource(strEscapeXmlName + " = ");
+            ctxt.generateAttribute("escapeXml");
+            ctxt.generateJavaSource(";");
         }
         
         //main part. 
