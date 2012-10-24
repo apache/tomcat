@@ -1256,8 +1256,6 @@ public class JspC extends Task implements Options {
 
     /**
      * Executes the compilation.
-     *
-     * @throws JasperException If an error occurs
      */
     @Override
     public void execute() {
