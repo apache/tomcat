@@ -18,6 +18,10 @@
 
 package org.apache.jasper.tagplugins.jstl.core;
 
+import java.io.IOException;
+
+import javax.servlet.jsp.JspWriter;
+
 import org.apache.jasper.compiler.tagplugin.TagPlugin;
 import org.apache.jasper.compiler.tagplugin.TagPluginContext;
 
@@ -72,20 +76,20 @@ public final class Out implements TagPlugin {
         }
 
         //main part.
-        ctxt.generateJavaSource("if(null != " + strValName +"){");
-        ctxt.generateJavaSource("    if(" + strEscapeXmlName + "){");
-        ctxt.generateJavaSource("        " + strValName + " = org.apache.jasper.tagplugins.jstl.Util.escapeXml(" + strValName + ");");
-        ctxt.generateJavaSource("    }");
-        ctxt.generateJavaSource("    out.write(" + strValName + ");");
-        ctxt.generateJavaSource("}else{");
-        ctxt.generateJavaSource("    if(null != " + strDefName + "){");
-        ctxt.generateJavaSource("        if(" + strEscapeXmlName + "){");
-        ctxt.generateJavaSource("            " + strDefName + " = org.apache.jasper.tagplugins.jstl.Util.escapeXml(" + strDefName + ");");
-        ctxt.generateJavaSource("        }");
-        ctxt.generateJavaSource("        out.write(" + strDefName + ");");
-        ctxt.generateJavaSource("    }else{");
-        ctxt.generateBody();
-        ctxt.generateJavaSource("    }");
-        ctxt.generateJavaSource("}");
+        ctxt.generateJavaSource(
+                "org.apache.jasper.tagplugins.jstl.core.Out.output(out, " +
+                strValName + ", " + strDefName + ", " + strEscapeXmlName +
+                ");");
+    }
+
+    public static void output(JspWriter out, String value, String defaultValue,
+            boolean escapeXml) throws IOException {
+        String v = value != null ? value : defaultValue;
+        if (v != null) {
+            if(escapeXml){
+                v = org.apache.jasper.tagplugins.jstl.Util.escapeXml(v);
+            }
+            out.write(v);
+        }
     }
 }
