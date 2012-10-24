@@ -77,7 +77,7 @@ public class FileResourceSet extends AbstractFileResourceSet {
     public WebResource getResource(String path) {
         checkPath(path);
 
-        String webAppMount = '/' + getWebAppMount();
+        String webAppMount = getWebAppMount();
         WebResourceRoot root = getRoot();
         if (path.equals(webAppMount)) {
             File f = file("", true);
@@ -97,7 +97,7 @@ public class FileResourceSet extends AbstractFileResourceSet {
         if (path.charAt(path.length() - 1) != '/') {
             path = path + '/';
         }
-        String webappMount = '/' + getWebAppMount();
+        String webappMount = getWebAppMount();
 
         if (webappMount.startsWith(path)) {
             webappMount = webappMount.substring(path.length());
@@ -117,7 +117,7 @@ public class FileResourceSet extends AbstractFileResourceSet {
         if (path.charAt(path.length() - 1) != '/') {
             path = path + '/';
         }
-        String webappMount = '/' + getWebAppMount();
+        String webappMount = getWebAppMount();
 
         if (webappMount.startsWith(path)) {
             webappMount = webappMount.substring(path.length());
