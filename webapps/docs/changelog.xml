@@ -60,6 +60,10 @@
         <bug>53993</bug>: Avoid a possible NPE in the AccessLogValve when the
         session ID is logged and a session is invalidated. (markt)
       </fix>
+      <fix>
+        Add support for LAST_ACCESS_AT_START system property to
+        PersistentManager. (kfujino)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
