@@ -66,7 +66,7 @@ public class GenericNamingResourcesFactory implements ObjectFactory {
             if (addr.getContent()!=null) {
                 value = addr.getContent().toString();
             }
-            if (setProperty(o, param, value,false)) {
+            if (setProperty(o, param, value)) {
 
             } else {
                 log.debug("Property not configured["+param+"]. No setter found on["+o+"].");
@@ -75,7 +75,8 @@ public class GenericNamingResourcesFactory implements ObjectFactory {
         return o;
     }
 
-    public static boolean setProperty(Object o, String name, String value,boolean invokeSetProperty) {
+    @SuppressWarnings("null") // setPropertyMethodVoid can't be null when used
+    private static boolean setProperty(Object o, String name, String value) {
         if (log.isDebugEnabled())
             log.debug("IntrospectionUtils: setProperty(" +
                     o.getClass() + " " + name + "=" + value + ")");

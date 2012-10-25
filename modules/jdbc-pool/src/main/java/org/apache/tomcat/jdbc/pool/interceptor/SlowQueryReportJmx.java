@@ -66,7 +66,7 @@ public class SlowQueryReportJmx extends SlowQueryReport implements NotificationE
 
 
     protected static ConcurrentHashMap<String,SlowQueryReportJmxMBean> mbeans =
-        new ConcurrentHashMap<String,SlowQueryReportJmxMBean>();
+        new ConcurrentHashMap<>();
 
 
     //==============================JMX STUFF========================
