@@ -92,6 +92,11 @@
         Follow up to <bug>54011</bug>. Simplify generated code for
         <code>&lt;c:out&gt;</code>. Based on a patch by Sheldon Shao. (markt)
       </scode>
+      <fix>
+        <bug>54012</bug>: Fix a bug in the tag plug-in infrastructure that meant
+        the <code>&lt;c:set&gt;</code> triggered a JSP compilation error when
+        used in a tag file. Based on a patch provided by Sheldon Shao. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">

@@ -243,6 +243,11 @@ public class TagPluginManager {
             curNodes = node.getAtETag();
         }
 
+        @Override
+        public boolean isTagFile() {
+            return pageInfo.isTagFile();
+        }
+
         private Node.JspAttribute getNodeAttribute(String attribute) {
             Node.JspAttribute[] attrs = node.getJspAttributes();
             for (int i=0; attrs != null && i < attrs.length; i++) {
