@@ -131,20 +131,21 @@ public class TestSendFile extends TomcatBaseTest{
                 req.setAttribute(Globals.SENDFILE_FILE_END_ATTR, new Long(f.length()));
             } else {
                 byte[] c = new byte[8192];
-                BufferedInputStream in = new BufferedInputStream(new FileInputStream(f));
-                int len = 0;
-                int written = 0;
-                long start = System.currentTimeMillis();
-                do {
-                    len = in.read(c);
-                    if (len>0) {
-                        resp.getOutputStream().write(c,0,len);
-                        written += len;
-                    }
-                } while (len > 0);
-                System.out.println("Server Wrote "+written + " bytes in "+(System.currentTimeMillis()-start)+" ms.");
+                try (BufferedInputStream in = new BufferedInputStream(
+                        new FileInputStream(f))) {
+                    int len = 0;
+                    int written = 0;
+                    long start = System.currentTimeMillis();
+                    do {
+                        len = in.read(c);
+                        if (len>0) {
+                            resp.getOutputStream().write(c,0,len);
+                            written += len;
+                        }
+                    } while (len > 0);
+                    System.out.println("Server Wrote "+written + " bytes in "+(System.currentTimeMillis()-start)+" ms.");
+                }
             }
-
         }
     }
 

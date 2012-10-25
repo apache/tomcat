@@ -35,47 +35,54 @@ public class SocketReceive {
 
     public static void main(String[] args) throws Exception {
 
-        ServerSocket srvSocket = new ServerSocket(9999);
-        System.out.println("Listening on 9999");
-        Socket socket = srvSocket.accept();
-        socket.setReceiveBufferSize(43800);
-        InputStream in = socket.getInputStream();
-        Thread t = new Thread() {
-            @Override
-            public void run() {
-                while ( true ) {
-                    try {
-                        Thread.sleep(1000);
-                        printStats(start, mb, count, df, total);
-                    }catch ( Exception x ) {
-                        // Ignore
+        try (ServerSocket srvSocket = new ServerSocket(9999)) {
+            System.out.println("Listening on 9999");
+            Socket socket = srvSocket.accept();
+            socket.setReceiveBufferSize(43800);
+            InputStream in = socket.getInputStream();
+            Thread t = new Thread() {
+                @Override
+                public void run() {
+                    while ( true ) {
+                        try {
+                            Thread.sleep(1000);
+                            printStats(start, mb, count, df, total);
+                        }catch ( Exception x ) {
+                            // Ignore
+                        }
                     }
                 }
-            }
-        };
-        t.setDaemon(true);
-        t.start();
+            };
+            t.setDaemon(true);
+            t.start();
 
-        while ( true ) {
-            if ( first ) { first = false; start = System.currentTimeMillis();}
-            int len = in.read(buf);
-            if ( len == -1 ) {
-                printStats(start, mb, count, df, total);
-                System.exit(1);
-            }
-            if ( bytes.intValue() != len ) bytes = new BigDecimal((double)len);
-            total = total.add(bytes);
-            mb += ( (double) len) / 1024 / 1024;
-            if ( ((++count) % 10000) == 0 ) {
-                printStats(start, mb, count, df, total);
+            while ( true ) {
+                if ( first ) {
+                    first = false; start = System.currentTimeMillis();
+                }
+                int len = in.read(buf);
+                if ( len == -1 ) {
+                    printStats(start, mb, count, df, total);
+                    System.exit(1);
+                }
+                if ( bytes.intValue() != len ) {
+                    bytes = new BigDecimal((double)len);
+                }
+                total = total.add(bytes);
+                mb += ( (double) len) / 1024 / 1024;
+                if ( ((++count) % 10000) == 0 ) {
+                    printStats(start, mb, count, df, total);
+                }
             }
         }
-
     }
 
-    private static void printStats(long start, double mb, int count, DecimalFormat df, BigDecimal total) {
+    private static void printStats(long start, double mb, int count,
+            DecimalFormat df, BigDecimal total) {
         long time = System.currentTimeMillis();
         double seconds = ((double)(time-start))/1000;
-        System.out.println("Throughput "+df.format(mb/seconds)+" MB/seconds messages "+count+", total "+mb+" MB, total "+total+" bytes.");
+        System.out.println("Throughput " + df.format(mb/seconds) +
+                " MB/seconds messages " + count + ", total " + mb +
+                " MB, total " + total + " bytes.");
     }
 }

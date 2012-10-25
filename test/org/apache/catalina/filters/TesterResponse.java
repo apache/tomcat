@@ -82,15 +82,12 @@ public class TesterResponse
     public void setError() {/* NOOP */}
     public boolean isError() { return false; }
     /**
-     *
-     * @return
      * @throws IOException
      */
     public ServletOutputStream createOutputStream() throws IOException {
         return null;
     }
     /**
-     *
      * @throws IOException
      */
     public void finishResponse() throws IOException {/* NOOP */}
@@ -100,7 +97,6 @@ public class TesterResponse
     public PrintWriter getReporter() { return null; }
     public void recycle() {/* NOOP */}
     /**
-     *
      * @param b
      * @throws IOException
      */
@@ -108,7 +104,6 @@ public class TesterResponse
         // NOOP
     }
     /**
-     *
      * @param b
      * @throws IOException
      */
@@ -116,7 +111,6 @@ public class TesterResponse
         // NOOP
     }
     /**
-     *
      * @param b
      * @param off
      * @param len
