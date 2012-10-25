@@ -99,8 +99,10 @@ class PageInfo {
     // JSP 2.2
     private boolean errorOnUndeclaredNamepsace = false;
 
-    PageInfo(BeanRepository beanRepository, String jspFile) {
+    private boolean isTagFile = false;
 
+    PageInfo(BeanRepository beanRepository, String jspFile, boolean isTagFile) {
+        this.isTagFile = isTagFile;
         this.jspFile = jspFile;
         this.beanRepository = beanRepository;
         this.varInfoNames = new HashSet<>();
@@ -117,6 +119,10 @@ class PageInfo {
 
         // Enter standard imports
         imports.addAll(Constants.STANDARD_IMPORTS);
+    }
+
+    public boolean isTagFile() {
+        return isTagFile;
     }
 
     /**
