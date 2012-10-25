@@ -120,5 +120,10 @@ public interface TagPluginContext {
      * Get the value of an attribute in the current tagplugin context.
      */
     Object getPluginAttribute(String attr);
+
+    /**
+     * Is the tag being used inside a tag file?
+     */
+    boolean isTagFile();
 }
 

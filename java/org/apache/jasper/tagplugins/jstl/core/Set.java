@@ -70,14 +70,20 @@ public class Set implements TagPlugin {
 
         //if the attribute var has been specified then assign the result to the var;
         if(hasVar){
+            String jspCtxt = null;
+            if (ctxt.isTagFile()) {
+                jspCtxt = "this.getJspContext()";
+            } else {
+                jspCtxt = "_jspx_page_context";
+            }
             String strVar = ctxt.getConstantAttribute("var");
             ctxt.generateJavaSource("if(null != " + resultName + "){");
-            ctxt.generateJavaSource("    pageContext.setAttribute(\"" + strVar + "\"," + resultName + "," + iScope + ");");
+            ctxt.generateJavaSource("    " + jspCtxt + ".setAttribute(\"" + strVar + "\"," + resultName + "," + iScope + ");");
             ctxt.generateJavaSource("} else {");
             if(hasScope){
-                ctxt.generateJavaSource("    pageContext.removeAttribute(\"" + strVar + "\"," + iScope + ");");
+                ctxt.generateJavaSource("    " + jspCtxt + ".removeAttribute(\"" + strVar + "\"," + iScope + ");");
             }else{
-                ctxt.generateJavaSource("    pageContext.removeAttribute(\"" + strVar + "\");");
+                ctxt.generateJavaSource("    " + jspCtxt + ".removeAttribute(\"" + strVar + "\");");
             }
             ctxt.generateJavaSource("}");
 
