@@ -168,6 +168,38 @@ public class TestCompiler extends TomcatBaseTest {
         tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());
         tomcat.start();
 
+        ByteChunk res = getUrl("http://localhost:" + getPort() +
+                "/test/bug53257/foo%20bar.jsp");
+
+        // Check request completed
+        String result = res.toString();
+        assertEcho(result, "OK");
+    }
+
+    @Test
+    public void testBug53257g() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+
+        File appDir = new File("test/webapp-3.0");
+        tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());
+        tomcat.start();
+
+        ByteChunk res = getUrl("http://localhost:" + getPort() +
+                "/test/bug53257/foo%20bar/foobar.jsp");
+
+        // Check request completed
+        String result = res.toString();
+        assertEcho(result, "OK");
+    }
+
+    @Test
+    public void testBug53257z() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+
+        File appDir = new File("test/webapp-3.0");
+        tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());
+        tomcat.start();
+
         // Check that URL decoding is not done twice
         ByteChunk res = new ByteChunk();
         int rc = getUrl("http://localhost:" + getPort() +
