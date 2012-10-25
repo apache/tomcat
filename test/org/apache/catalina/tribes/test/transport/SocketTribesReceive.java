@@ -38,52 +38,65 @@ public class SocketTribesReceive {
 
     public static void main(String[] args) throws Exception {
         int size = 43800;
-        if (args.length > 0 ) try {size=Integer.parseInt(args[0]);}catch(Exception x){ /* Ignore */ }
-        XByteBuffer xbuf = new XByteBuffer(43800,true);
-        ServerSocket srvSocket = new ServerSocket(9999);
-        System.out.println("Listening on 9999");
-        Socket socket = srvSocket.accept();
-        socket.setReceiveBufferSize(size);
-        InputStream in = socket.getInputStream();
-        Thread t = new Thread() {
-            @Override
-            public void run() {
-                while ( true ) {
-                    try {
-                        Thread.sleep(1000);
-                        printStats(start, mb, count, df, total);
-                    }catch ( Exception x ) { /* Ignore */ }
-                }
-            }
-        };
-        t.setDaemon(true);
-        t.start();
-
-        while ( true ) {
-            if ( first ) { first = false; start = System.currentTimeMillis();}
-            int len = in.read(buf);
-            if ( len == -1 ) {
-                printStats(start, mb, count, df, total);
-                System.exit(1);
-            }
-            xbuf.append(buf,0,len);
-            if ( bytes.intValue() != len ) bytes = new BigDecimal((double)len);
-            total = total.add(bytes);
-            while ( xbuf.countPackages(true) > 0 ) {
-                xbuf.extractPackage(true);
-                count++;
-            }
-            mb += ( (double) len) / 1024 / 1024;
-            if ( ((count) % 10000) == 0 ) {
-                printStats(start, mb, count, df, total);
+        if (args.length > 0 ) {
+            try {
+                size = Integer.parseInt(args[0]);
+            } catch (Exception e){
+                /* Ignore */
             }
         }
+        XByteBuffer xbuf = new XByteBuffer(43800,true);
+        try (ServerSocket srvSocket = new ServerSocket(9999)) {
+            System.out.println("Listening on 9999");
+            Socket socket = srvSocket.accept();
+            socket.setReceiveBufferSize(size);
+            InputStream in = socket.getInputStream();
+            Thread t = new Thread() {
+                @Override
+                public void run() {
+                    while ( true ) {
+                        try {
+                            Thread.sleep(1000);
+                            printStats(start, mb, count, df, total);
+                        }catch ( Exception x ) { /* Ignore */ }
+                    }
+                }
+            };
+            t.setDaemon(true);
+            t.start();
 
+            while ( true ) {
+                if ( first ) {
+                    first = false; start = System.currentTimeMillis();
+                }
+                int len = in.read(buf);
+                if ( len == -1 ) {
+                    printStats(start, mb, count, df, total);
+                    System.exit(1);
+                }
+                xbuf.append(buf,0,len);
+                if ( bytes.intValue() != len ) {
+                    bytes = new BigDecimal((double)len);
+                }
+                total = total.add(bytes);
+                while ( xbuf.countPackages(true) > 0 ) {
+                    xbuf.extractPackage(true);
+                    count++;
+                }
+                mb += ( (double) len) / 1024 / 1024;
+                if ( ((count) % 10000) == 0 ) {
+                    printStats(start, mb, count, df, total);
+                }
+            }
+        }
     }
 
-    private static void printStats(long start, double mb, int count, DecimalFormat df, BigDecimal total) {
+    private static void printStats(long start, double mb, int count,
+            DecimalFormat df, BigDecimal total) {
         long time = System.currentTimeMillis();
         double seconds = ((double)(time-start))/1000;
-        System.out.println("Throughput "+df.format(mb/seconds)+" MB/seconds messages "+count+", total "+mb+" MB, total "+total+" bytes.");
+        System.out.println("Throughput " + df.format(mb/seconds) +
+                " MB/seconds messages " + count + ", total " + mb +
+                " MB, total " + total + " bytes.");
     }
 }

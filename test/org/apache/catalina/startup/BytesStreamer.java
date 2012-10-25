@@ -24,22 +24,20 @@ package org.apache.catalina.startup;
  */
 public interface BytesStreamer {
     /**
-     * Returns the length of the content about to be streamed.
-     * Return -1 if length is unknown and chunked encoding should be used
-     * @return the length if known - otherwise -1
+     * Get the length of the content about to be streamed.
+     *
+     * @return the length if known, else -1 and chucked encoding should be used
      */
     int getLength();
 
     /**
-     * return the number of bytes available in next chunk
-     * @return
+     * @return  the number of bytes available in next chunk
      */
     int available();
 
     /**
-     * returns the next byte to write.
-     * if {@link #available()} method returns >0
-     * @return
+     * @return  returns the next byte to write if {@link #available()} returns
+     *          > 0
      */
     byte[] next();
 }

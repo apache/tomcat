@@ -52,7 +52,7 @@ public class TestListener extends TomcatBaseTest {
 
     /**
      * Check that a {@link ServletContextListener} cannot install a
-     * {@link ServletContextInitializer}.
+     * {@link ServletContainerInitializer}.
      * @throws Exception
      */
     @Test
