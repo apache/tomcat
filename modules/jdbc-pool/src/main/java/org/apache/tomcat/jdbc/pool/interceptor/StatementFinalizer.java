@@ -34,14 +34,14 @@ import org.apache.tomcat.jdbc.pool.PooledConnection;
 public class StatementFinalizer extends AbstractCreateStatementInterceptor {
     private static final Log log = LogFactory.getLog(StatementFinalizer.class);
 
-    protected ArrayList<WeakReference<Statement>> statements = new ArrayList<WeakReference<Statement>>();
+    protected ArrayList<WeakReference<Statement>> statements = new ArrayList<>();
 
     @Override
     public Object createStatement(Object proxy, Method method, Object[] args, Object statement, long time) {
         // TODO Auto-generated method stub
         try {
             if (statement instanceof Statement)
-                statements.add(new WeakReference<Statement>((Statement)statement));
+                statements.add(new WeakReference<>((Statement)statement));
         }catch (ClassCastException x) {
             //ignore this one
         }
