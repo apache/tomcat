@@ -97,6 +97,10 @@
         the <code>&lt;c:set&gt;</code> triggered a JSP compilation error when
         used in a tag file. Based on a patch provided by Sheldon Shao. (markt)
       </fix>
+      <scode>
+        <bug>54017</bug>: Simplify coercion of <code>String</code> instances to
+        <code>Object</code>. (markt)
+      </scode>
     </changelog>
   </subsection>
   <subsection name="Cluster">
