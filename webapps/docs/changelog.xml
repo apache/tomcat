@@ -102,6 +102,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Tribes">
+    <changelog>
+      <fix>
+        <bug>54045</bug>: Make sure getMembers() returns available member when
+        TcpFailureDetector works in static cluster. (kfujino)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 7.0.32 (markt)" rtext="2012-10-09">
   <subsection name="Catalina">
