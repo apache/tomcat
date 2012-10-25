@@ -72,6 +72,11 @@
         Correct an issue that prevented WebSockets from being used over SSL when
         using the HTTP NIO connector. (markt)
       </fix>
+      <fix>
+       <bug>54022</bug>: Ensure the Comet END event is triggered on client
+       disconnect with APR/native on Windows Vista/2k8 or later. Patch provided
+       by Douglas Beachy. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
