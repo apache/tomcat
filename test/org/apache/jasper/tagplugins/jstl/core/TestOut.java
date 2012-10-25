@@ -16,46 +16,17 @@
  */
 package org.apache.jasper.tagplugins.jstl.core;
 
-import java.io.File;
-
 import javax.servlet.http.HttpServletResponse;
 
 import org.junit.Assert;
 import org.junit.Test;
 
-import org.apache.catalina.Context;
-import org.apache.catalina.WebResourceRoot;
-import org.apache.catalina.startup.Tomcat;
-import org.apache.catalina.startup.TomcatBaseTest;
-import org.apache.catalina.webresources.StandardRoot;
 import org.apache.tomcat.util.buf.ByteChunk;
 
-public class TestOut extends TomcatBaseTest {
+public class TestOut extends AbstractTestTag {
 
     @Test
     public void testBug54011() throws Exception {
-        Tomcat tomcat = getTomcatInstance();
-
-        File appDir = new File("test/webapp-3.0");
-        Context ctx = tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());
-
-        ctx.setResources(new StandardRoot(ctx));
-
-        // Add the JSTL (we need the TLD)
-        File lib = new File("webapps/examples/WEB-INF/lib");
-        ctx.getResources().createWebResourceSet(
-                WebResourceRoot.ResourceSetType.POST, lib.getAbsolutePath(),
-                "/WEB-INF/lib", "");
-
-        // Configure the use of the plug-in rather than the standard impl
-        File plugin = new File(
-                "java/org/apache/jasper/tagplugins/jstl/tagPlugins.xml");
-        ctx.getResources().createWebResourceSet(
-                WebResourceRoot.ResourceSetType.POST, plugin.getAbsolutePath(),
-                "/WEB-INF/tagPlugins.xml", "");
-
-        tomcat.start();
-
         ByteChunk res = new ByteChunk();
 
         int rc = getUrl("http://localhost:" + getPort() +
