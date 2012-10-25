@@ -526,6 +526,10 @@
         <mime-type>text/vnd.in3d.3dml</mime-type>
     </mime-mapping>
     <mime-mapping>
+        <extension>3ds</extension>
+        <mime-type>image/x-3ds</mime-type>
+    </mime-mapping>
+    <mime-mapping>
         <extension>3g2</extension>
         <mime-type>video/3gpp2</mime-type>
     </mime-mapping>
@@ -642,12 +646,20 @@
         <mime-type>application/vnd.android.package-archive</mime-type>
     </mime-mapping>
     <mime-mapping>
+        <extension>appcache</extension>
+        <mime-type>text/cache-manifest</mime-type>
+    </mime-mapping>
+    <mime-mapping>
         <extension>application</extension>
         <mime-type>application/x-ms-application</mime-type>
     </mime-mapping>
     <mime-mapping>
         <extension>apr</extension>
         <mime-type>application/vnd.lotus-approach</mime-type>
+    </mime-mapping>
+    <mime-mapping>
+        <extension>arc</extension>
+        <mime-type>application/x-freearc</mime-type>
     </mime-mapping>
     <mime-mapping>
         <extension>art</extension>
@@ -758,6 +770,14 @@
         <mime-type>application/octet-stream</mime-type>
     </mime-mapping>
     <mime-mapping>
+        <extension>blb</extension>
+        <mime-type>application/x-blorb</mime-type>
+    </mime-mapping>
+    <mime-mapping>
+        <extension>blorb</extension>
+        <mime-type>application/x-blorb</mime-type>
+    </mime-mapping>
+    <mime-mapping>
         <extension>bmi</extension>
         <mime-type>application/vnd.bmi</mime-type>
     </mime-mapping>
@@ -834,6 +854,10 @@
         <mime-type>application/vnd.ms-cab-compressed</mime-type>
     </mime-mapping>
     <mime-mapping>
+        <extension>caf</extension>
+        <mime-type>audio/x-caf</mime-type>
+    </mime-mapping>
+    <mime-mapping>
         <extension>cap</extension>
         <mime-type>application/vnd.tcpdump.pcap</mime-type>
     </mime-mapping>
@@ -844,6 +868,26 @@
     <mime-mapping>
         <extension>cat</extension>
         <mime-type>application/vnd.ms-pki.seccat</mime-type>
+    </mime-mapping>
+    <mime-mapping>
+        <extension>cb7</extension>
+        <mime-type>application/x-cbr</mime-type>
+    </mime-mapping>
+    <mime-mapping>
+        <extension>cba</extension>
+        <mime-type>application/x-cbr</mime-type>
+    </mime-mapping>
+    <mime-mapping>
+        <extension>cbr</extension>
+        <mime-type>application/x-cbr</mime-type>
+    </mime-mapping>
+    <mime-mapping>
+        <extension>cbt</extension>
+        <mime-type>application/x-cbr</mime-type>
+    </mime-mapping>
+    <mime-mapping>
+        <extension>cbz</extension>
+        <mime-type>application/x-cbr</mime-type>
     </mime-mapping>
     <mime-mapping>
         <extension>cc</extension>
@@ -904,6 +948,10 @@
     <mime-mapping>
         <extension>cer</extension>
         <mime-type>application/pkix-cert</mime-type>
+    </mime-mapping>
+    <mime-mapping>
+        <extension>cfs</extension>
+        <mime-type>application/x-cfs-compressed</mime-type>
     </mime-mapping>
     <mime-mapping>
         <extension>cgm</extension>
@@ -1078,12 +1126,20 @@
         <mime-type>application/vnd.mobius.daf</mime-type>
     </mime-mapping>
     <mime-mapping>
+        <extension>dart</extension>
+        <mime-type>application/vnd.dart</mime-type>
+    </mime-mapping>
+    <mime-mapping>
         <extension>dataless</extension>
         <mime-type>application/vnd.fdsn.seed</mime-type>
     </mime-mapping>
     <mime-mapping>
         <extension>davmount</extension>
         <mime-type>application/davmount+xml</mime-type>
+    </mime-mapping>
+    <mime-mapping>
+        <extension>dbk</extension>
+        <mime-type>application/docbook+xml</mime-type>
     </mime-mapping>
     <mime-mapping>
         <extension>dcr</extension>
@@ -1120,6 +1176,10 @@
     <mime-mapping>
         <extension>dfac</extension>
         <mime-type>application/vnd.dreamfactory</mime-type>
+    </mime-mapping>
+    <mime-mapping>
+        <extension>dgc</extension>
+        <mime-type>application/x-dgc-compressed</mime-type>
     </mime-mapping>
     <mime-mapping>
         <extension>dib</extension>
@@ -1159,7 +1219,7 @@
     </mime-mapping>
     <mime-mapping>
         <extension>dmg</extension>
-        <mime-type>application/octet-stream</mime-type>
+        <mime-type>application/x-apple-diskimage</mime-type>
     </mime-mapping>
     <mime-mapping>
         <extension>dmp</extension>
@@ -1306,12 +1366,20 @@
         <mime-type>application/octet-stream</mime-type>
     </mime-mapping>
     <mime-mapping>
+        <extension>emf</extension>
+        <mime-type>application/x-msmetafile</mime-type>
+    </mime-mapping>
+    <mime-mapping>
         <extension>eml</extension>
         <mime-type>message/rfc822</mime-type>
     </mime-mapping>
     <mime-mapping>
         <extension>emma</extension>
         <mime-type>application/emma+xml</mime-type>
+    </mime-mapping>
+    <mime-mapping>
+        <extension>emz</extension>
+        <mime-type>application/x-msmetafile</mime-type>
     </mime-mapping>
     <mime-mapping>
         <extension>eol</extension>
@@ -1334,6 +1402,10 @@
         <mime-type>application/vnd.eszigno3+xml</mime-type>
     </mime-mapping>
     <mime-mapping>
+        <extension>esa</extension>
+        <mime-type>application/vnd.osgi.subsystem</mime-type>
+    </mime-mapping>
+    <mime-mapping>
         <extension>esf</extension>
         <mime-type>application/vnd.epson.esf</mime-type>
     </mime-mapping>
@@ -1344,6 +1416,14 @@
     <mime-mapping>
         <extension>etx</extension>
         <mime-type>text/x-setext</mime-type>
+    </mime-mapping>
+    <mime-mapping>
+        <extension>eva</extension>
+        <mime-type>application/x-eva</mime-type>
+    </mime-mapping>
+    <mime-mapping>
+        <extension>evy</extension>
+        <mime-type>application/x-envoy</mime-type>
     </mime-mapping>
     <mime-mapping>
         <extension>exe</extension>
@@ -1388,6 +1468,10 @@
     <mime-mapping>
         <extension>fbs</extension>
         <mime-type>image/vnd.fastbidsheet</mime-type>
+    </mime-mapping>
+    <mime-mapping>
+        <extension>fcdt</extension>
+        <mime-type>application/vnd.adobe.formscentral.fcdt</mime-type>
     </mime-mapping>
     <mime-mapping>
         <extension>fcs</extension>
@@ -1530,8 +1614,16 @@
         <mime-type>application/vnd.groove-account</mime-type>
     </mime-mapping>
     <mime-mapping>
+        <extension>gam</extension>
+        <mime-type>application/x-tads</mime-type>
+    </mime-mapping>
+    <mime-mapping>
         <extension>gbr</extension>
         <mime-type>application/rpki-ghostbusters</mime-type>
+    </mime-mapping>
+    <mime-mapping>
+        <extension>gca</extension>
+        <mime-type>application/x-gca-compressed</mime-type>
     </mime-mapping>
     <mime-mapping>
         <extension>gdl</extension>
@@ -1566,6 +1658,10 @@
         <mime-type>application/vnd.groove-identity-message</mime-type>
     </mime-mapping>
     <mime-mapping>
+        <extension>gml</extension>
+        <mime-type>application/gml+xml</mime-type>
+    </mime-mapping>
+    <mime-mapping>
         <extension>gmx</extension>
         <mime-type>application/vnd.gmx</mime-type>
     </mime-mapping>
@@ -1578,6 +1674,10 @@
         <mime-type>application/vnd.flographit</mime-type>
     </mime-mapping>
     <mime-mapping>
+        <extension>gpx</extension>
+        <mime-type>application/gpx+xml</mime-type>
+    </mime-mapping>
+    <mime-mapping>
         <extension>gqf</extension>
         <mime-type>application/vnd.grafeq</mime-type>
     </mime-mapping>
@@ -1588,6 +1688,10 @@
     <mime-mapping>
         <extension>gram</extension>
         <mime-type>application/srgs</mime-type>
+    </mime-mapping>
+    <mime-mapping>
+        <extension>gramps</extension>
+        <mime-type>application/x-gramps-xml</mime-type>
     </mime-mapping>
     <mime-mapping>
         <extension>gre</extension>
@@ -1620,6 +1724,10 @@
     <mime-mapping>
         <extension>gv</extension>
         <mime-type>text/vnd.graphviz</mime-type>
+    </mime-mapping>
+    <mime-mapping>
+        <extension>gxf</extension>
+        <mime-type>application/gxf</mime-type>
     </mime-mapping>
     <mime-mapping>
         <extension>gxt</extension>
@@ -1790,6 +1898,10 @@
         <mime-type>application/inkml+xml</mime-type>
     </mime-mapping>
     <mime-mapping>
+        <extension>install</extension>
+        <mime-type>application/x-install-instructions</mime-type>
+    </mime-mapping>
+    <mime-mapping>
         <extension>iota</extension>
         <mime-type>application/vnd.astraea-software.iota</mime-type>
     </mime-mapping>
@@ -1811,7 +1923,7 @@
     </mime-mapping>
     <mime-mapping>
         <extension>iso</extension>
-        <mime-type>application/octet-stream</mime-type>
+        <mime-type>application/x-iso9660-image</mime-type>
     </mime-mapping>
     <mime-mapping>
         <extension>itp</extension>
@@ -1894,6 +2006,10 @@
         <mime-type>application/json</mime-type>
     </mime-mapping>
     <mime-mapping>
+        <extension>jsonml</extension>
+        <mime-type>application/jsonml+json</mime-type>
+    </mime-mapping>
+    <mime-mapping>
         <extension>jspf</extension>
         <mime-type>text/plain</mime-type>
     </mime-mapping>
@@ -1942,6 +2058,10 @@
         <mime-type>application/vnd.kde.kpresenter</mime-type>
     </mime-mapping>
     <mime-mapping>
+        <extension>kpxx</extension>
+        <mime-type>application/vnd.ds-keypoint</mime-type>
+    </mime-mapping>
+    <mime-mapping>
         <extension>ksp</extension>
         <mime-type>application/vnd.kde.kspread</mime-type>
     </mime-mapping>
@@ -1987,7 +2107,7 @@
     </mime-mapping>
     <mime-mapping>
         <extension>lha</extension>
-        <mime-type>application/octet-stream</mime-type>
+        <mime-type>application/x-lzh-compressed</mime-type>
     </mime-mapping>
     <mime-mapping>
         <extension>link66</extension>
@@ -2004,6 +2124,10 @@
     <mime-mapping>
         <extension>listafp</extension>
         <mime-type>application/vnd.ibm.modcap</mime-type>
+    </mime-mapping>
+    <mime-mapping>
+        <extension>lnk</extension>
+        <mime-type>application/x-ms-shortcut</mime-type>
     </mime-mapping>
     <mime-mapping>
         <extension>log</extension>
@@ -2035,7 +2159,7 @@
     </mime-mapping>
     <mime-mapping>
         <extension>lzh</extension>
-        <mime-type>application/octet-stream</mime-type>
+        <mime-type>application/x-lzh-compressed</mime-type>
     </mime-mapping>
     <mime-mapping>
         <extension>m13</extension>
@@ -2118,6 +2242,10 @@
         <mime-type>text/troff</mime-type>
     </mime-mapping>
     <mime-mapping>
+        <extension>mar</extension>
+        <mime-type>application/octet-stream</mime-type>
+    </mime-mapping>
+    <mime-mapping>
         <extension>mathml</extension>
         <mime-type>application/mathml+xml</mime-type>
     </mime-mapping>
@@ -2166,6 +2294,10 @@
         <mime-type>application/metalink4+xml</mime-type>
     </mime-mapping>
     <mime-mapping>
+        <extension>metalink</extension>
+        <mime-type>application/metalink+xml</mime-type>
+    </mime-mapping>
+    <mime-mapping>
         <extension>mets</extension>
         <mime-type>application/mets+xml</mime-type>
     </mime-mapping>
@@ -2194,6 +2326,10 @@
         <mime-type>audio/midi</mime-type>
     </mime-mapping>
     <mime-mapping>
+        <extension>mie</extension>
+        <mime-type>application/x-mie</mime-type>
+    </mime-mapping>
+    <mime-mapping>
         <extension>mif</extension>
         <mime-type>application/x-mif</mime-type>
     </mime-mapping>
@@ -2210,6 +2346,22 @@
         <mime-type>video/mj2</mime-type>
     </mime-mapping>
     <mime-mapping>
+        <extension>mk3d</extension>
+        <mime-type>video/x-matroska</mime-type>
+    </mime-mapping>
+    <mime-mapping>
+        <extension>mka</extension>
+        <mime-type>audio/x-matroska</mime-type>
+    </mime-mapping>
+    <mime-mapping>
+        <extension>mks</extension>
+        <mime-type>video/x-matroska</mime-type>
+    </mime-mapping>
+    <mime-mapping>
+        <extension>mkv</extension>
+        <mime-type>video/x-matroska</mime-type>
+    </mime-mapping>
+    <mime-mapping>
         <extension>mlp</extension>
         <mime-type>application/vnd.dolby.mlp</mime-type>
     </mime-mapping>
@@ -2224,6 +2376,10 @@
     <mime-mapping>
         <extension>mmr</extension>
         <mime-type>image/vnd.fujixerox.edmics-mmr</mime-type>
+    </mime-mapping>
+    <mime-mapping>
+        <extension>mng</extension>
+        <mime-type>video/x-mng</mime-type>
     </mime-mapping>
     <mime-mapping>
         <extension>mny</extension>
@@ -2454,8 +2610,16 @@
         <mime-type>application/x-dtbncx+xml</mime-type>
     </mime-mapping>
     <mime-mapping>
+        <extension>nfo</extension>
+        <mime-type>text/x-nfo</mime-type>
+    </mime-mapping>
+    <mime-mapping>
         <extension>ngdat</extension>
         <mime-type>application/vnd.nokia.n-gage.data</mime-type>
+    </mime-mapping>
+    <mime-mapping>
+        <extension>nitf</extension>
+        <mime-type>application/vnd.nitf</mime-type>
     </mime-mapping>
     <mime-mapping>
         <extension>nlu</extension>
@@ -2482,8 +2646,20 @@
         <mime-type>image/vnd.net-fpx</mime-type>
     </mime-mapping>
     <mime-mapping>
+        <extension>nsc</extension>
+        <mime-type>application/x-conference</mime-type>
+    </mime-mapping>
+    <mime-mapping>
         <extension>nsf</extension>
         <mime-type>application/vnd.lotus-notes</mime-type>
+    </mime-mapping>
+    <mime-mapping>
+        <extension>ntf</extension>
+        <mime-type>application/vnd.nitf</mime-type>
+    </mime-mapping>
+    <mime-mapping>
+        <extension>nzb</extension>
+        <mime-type>application/x-nzb</mime-type>
     </mime-mapping>
     <mime-mapping>
         <extension>oa2</extension>
@@ -2500,6 +2676,10 @@
     <mime-mapping>
         <extension>obd</extension>
         <mime-type>application/x-msbinder</mime-type>
+    </mime-mapping>
+    <mime-mapping>
+        <extension>obj</extension>
+        <mime-type>application/x-tgif</mime-type>
     </mime-mapping>
     <mime-mapping>
         <extension>oda</extension>
@@ -2572,6 +2752,10 @@
         <mime-type>application/ogg</mime-type>
     </mime-mapping>
     <mime-mapping>
+        <extension>omdoc</extension>
+        <mime-type>application/omdoc+xml</mime-type>
+    </mime-mapping>
+    <mime-mapping>
         <extension>onepkg</extension>
         <mime-type>application/onenote</mime-type>
     </mime-mapping>
@@ -2590,6 +2774,10 @@
     <mime-mapping>
         <extension>opf</extension>
         <mime-type>application/oebps-package+xml</mime-type>
+    </mime-mapping>
+    <mime-mapping>
+        <extension>opml</extension>
+        <mime-type>text/x-opml</mime-type>
     </mime-mapping>
     <mime-mapping>
         <extension>oprc</extension>
@@ -3037,6 +3225,10 @@
         <mime-type>audio/vnd.rip</mime-type>
     </mime-mapping>
     <mime-mapping>
+        <extension>ris</extension>
+        <mime-type>application/x-research-info-systems</mime-type>
+    </mime-mapping>
+    <mime-mapping>
         <extension>rl</extension>
         <mime-type>application/resource-lists+xml</mime-type>
     </mime-mapping>
@@ -3063,6 +3255,10 @@
     <mime-mapping>
         <extension>rms</extension>
         <mime-type>application/vnd.jcp.javame.midlet-rms</mime-type>
+    </mime-mapping>
+    <mime-mapping>
+        <extension>rmvb</extension>
+        <mime-type>application/vnd.rn-realmedia-vbr</mime-type>
     </mime-mapping>
     <mime-mapping>
         <extension>rnc</extension>
@@ -3115,6 +3311,10 @@
     <mime-mapping>
         <extension>s</extension>
         <mime-type>text/x-asm</mime-type>
+    </mime-mapping>
+    <mime-mapping>
+        <extension>s3m</extension>
+        <mime-type>audio/s3m</mime-type>
     </mime-mapping>
     <mime-mapping>
         <extension>saf</extension>
@@ -3217,6 +3417,14 @@
         <mime-type>application/vnd.spotfire.sfs</mime-type>
     </mime-mapping>
     <mime-mapping>
+        <extension>sfv</extension>
+        <mime-type>text/x-sfv</mime-type>
+    </mime-mapping>
+    <mime-mapping>
+        <extension>sgi</extension>
+        <mime-type>image/sgi</mime-type>
+    </mime-mapping>
+    <mime-mapping>
         <extension>sgl</extension>
         <mime-type>application/vnd.stardivision.writer-global</mime-type>
     </mime-mapping>
@@ -3247,8 +3455,16 @@
     </mime-mapping>
     -->
     <mime-mapping>
+        <extension>sid</extension>
+        <mime-type>image/x-mrsid-image</mime-type>
+    </mime-mapping>
+    <mime-mapping>
         <extension>sig</extension>
         <mime-type>application/pgp-signature</mime-type>
+    </mime-mapping>
+    <mime-mapping>
+        <extension>sil</extension>
+        <mime-type>audio/silk</mime-type>
     </mime-mapping>
     <mime-mapping>
         <extension>silo</extension>
@@ -3315,6 +3531,10 @@
         <mime-type>application/smil+xml</mime-type>
     </mime-mapping>
     <mime-mapping>
+        <extension>smv</extension>
+        <mime-type>video/x-smv</mime-type>
+    </mime-mapping>
+    <mime-mapping>
         <extension>smzip</extension>
         <mime-type>application/vnd.stepmania.package</mime-type>
     </mime-mapping>
@@ -3359,8 +3579,16 @@
         <mime-type>audio/ogg</mime-type>
     </mime-mapping>
     <mime-mapping>
+        <extension>sql</extension>
+        <mime-type>application/x-sql</mime-type>
+    </mime-mapping>
+    <mime-mapping>
         <extension>src</extension>
         <mime-type>application/x-wais-source</mime-type>
+    </mime-mapping>
+    <mime-mapping>
+        <extension>srt</extension>
+        <mime-type>application/x-subrip</mime-type>
     </mime-mapping>
     <mime-mapping>
         <extension>sru</extension>
@@ -3369,6 +3597,10 @@
     <mime-mapping>
         <extension>srx</extension>
         <mime-type>application/sparql-results+xml</mime-type>
+    </mime-mapping>
+    <mime-mapping>
+        <extension>ssdl</extension>
+        <mime-type>application/ssdl+xml</mime-type>
     </mime-mapping>
     <mime-mapping>
         <extension>sse</extension>
@@ -3495,6 +3727,10 @@
         <mime-type>text/troff</mime-type>
     </mime-mapping>
     <mime-mapping>
+        <extension>t3</extension>
+        <mime-type>application/x-t3vm-image</mime-type>
+    </mime-mapping>
+    <mime-mapping>
         <extension>taglet</extension>
         <mime-type>application/vnd.mynfc</mime-type>
     </mime-mapping>
@@ -3549,6 +3785,10 @@
     <mime-mapping>
         <extension>tfm</extension>
         <mime-type>application/x-tex-tfm</mime-type>
+    </mime-mapping>
+    <mime-mapping>
+        <extension>tga</extension>
+        <mime-type>image/x-tga</mime-type>
     </mime-mapping>
     <mime-mapping>
         <extension>thmx</extension>
@@ -3649,6 +3889,10 @@
     <mime-mapping>
         <extension>ulw</extension>
         <mime-type>audio/basic</mime-type>
+    </mime-mapping>
+    <mime-mapping>
+        <extension>ulx</extension>
+        <mime-type>application/x-glulx</mime-type>
     </mime-mapping>
     <mime-mapping>
         <extension>umj</extension>
@@ -3831,6 +4075,10 @@
         <mime-type>video/vnd.vivo</mime-type>
     </mime-mapping>
     <mime-mapping>
+        <extension>vob</extension>
+        <mime-type>video/x-ms-vob</mime-type>
+    </mime-mapping>
+    <mime-mapping>
         <extension>vor</extension>
         <mime-type>application/vnd.stardivision.writer</mime-type>
     </mime-mapping>
@@ -3908,6 +4156,10 @@
         <mime-type>application/vnd.ms-works</mime-type>
     </mime-mapping>
     <mime-mapping>
+        <extension>wdp</extension>
+        <mime-type>image/vnd.ms-photo</mime-type>
+    </mime-mapping>
+    <mime-mapping>
         <extension>weba</extension>
         <mime-type>audio/webm</mime-type>
     </mime-mapping>
@@ -3977,7 +4229,7 @@
     </mime-mapping>
     <mime-mapping>
         <extension>wmz</extension>
-        <mime-type>application/x-ms-wmz</mime-type>
+        <mime-type>application/x-msmetafile</mime-type>
     </mime-mapping>
     <mime-mapping>
         <extension>woff</extension>
@@ -4029,7 +4281,31 @@
     </mime-mapping>
     <mime-mapping>
         <extension>x3d</extension>
-        <mime-type>application/vnd.hzn-3d-crossword</mime-type>
+        <mime-type>model/x3d+xml</mime-type>
+    </mime-mapping>
+    <mime-mapping>
+        <extension>x3db</extension>
+        <mime-type>model/x3d+binary</mime-type>
+    </mime-mapping>
+    <mime-mapping>
+        <extension>x3dbz</extension>
+        <mime-type>model/x3d+binary</mime-type>
+    </mime-mapping>
+    <mime-mapping>
+        <extension>x3dv</extension>
+        <mime-type>model/x3d+vrml</mime-type>
+    </mime-mapping>
+    <mime-mapping>
+        <extension>x3dvz</extension>
+        <mime-type>model/x3d+vrml</mime-type>
+    </mime-mapping>
+    <mime-mapping>
+        <extension>x3dz</extension>
+        <mime-type>model/x3d+xml</mime-type>
+    </mime-mapping>
+    <mime-mapping>
+        <extension>xaml</extension>
+        <mime-type>application/xaml+xml</mime-type>
     </mime-mapping>
     <mime-mapping>
         <extension>xap</extension>
@@ -4116,6 +4392,10 @@
         <mime-type>application/vnd.ms-excel</mime-type>
     </mime-mapping>
     <mime-mapping>
+        <extension>xlf</extension>
+        <mime-type>application/x-xliff+xml</mime-type>
+    </mime-mapping>
+    <mime-mapping>
         <extension>xlm</extension>
         <mime-type>application/vnd.ms-excel</mime-type>
     </mime-mapping>
@@ -4152,6 +4432,10 @@
         <mime-type>application/vnd.ms-excel</mime-type>
     </mime-mapping>
     <mime-mapping>
+        <extension>xm</extension>
+        <mime-type>audio/xm</mime-type>
+    </mime-mapping>
+    <mime-mapping>
         <extension>xml</extension>
         <mime-type>application/xml</mime-type>
     </mime-mapping>
@@ -4166,6 +4450,10 @@
     <mime-mapping>
         <extension>xpi</extension>
         <mime-type>application/x-xpinstall</mime-type>
+    </mime-mapping>
+    <mime-mapping>
+        <extension>xpl</extension>
+        <mime-type>application/xproc+xml</mime-type>
     </mime-mapping>
     <mime-mapping>
         <extension>xpm</extension>
@@ -4224,6 +4512,10 @@
         <mime-type>chemical/x-xyz</mime-type>
     </mime-mapping>
     <mime-mapping>
+        <extension>xz</extension>
+        <mime-type>application/x-xz</mime-type>
+    </mime-mapping>
+    <mime-mapping>
         <extension>yang</extension>
         <mime-type>application/yang</mime-type>
     </mime-mapping>
@@ -4238,6 +4530,38 @@
     <mime-mapping>
         <extension>Z</extension>
         <mime-type>application/x-compress</mime-type>
+    </mime-mapping>
+    <mime-mapping>
+        <extension>z1</extension>
+        <mime-type>application/x-zmachine</mime-type>
+    </mime-mapping>
+    <mime-mapping>
+        <extension>z2</extension>
+        <mime-type>application/x-zmachine</mime-type>
+    </mime-mapping>
+    <mime-mapping>
+        <extension>z3</extension>
+        <mime-type>application/x-zmachine</mime-type>
+    </mime-mapping>
+    <mime-mapping>
+        <extension>z4</extension>
+        <mime-type>application/x-zmachine</mime-type>
+    </mime-mapping>
+    <mime-mapping>
+        <extension>z5</extension>
+        <mime-type>application/x-zmachine</mime-type>
+    </mime-mapping>
+    <mime-mapping>
+        <extension>z6</extension>
+        <mime-type>application/x-zmachine</mime-type>
+    </mime-mapping>
+    <mime-mapping>
+        <extension>z7</extension>
+        <mime-type>application/x-zmachine</mime-type>
+    </mime-mapping>
+    <mime-mapping>
+        <extension>z8</extension>
+        <mime-type>application/x-zmachine</mime-type>
     </mime-mapping>
     <mime-mapping>
         <extension>zaz</extension>

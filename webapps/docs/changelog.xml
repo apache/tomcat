@@ -64,6 +64,10 @@
         Add support for LAST_ACCESS_AT_START system property to
         PersistentManager. (kfujino)
       </fix>
+      <add>
+        Update MIME type mapping with additional / updated mime.types from the
+        Apache web server. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
