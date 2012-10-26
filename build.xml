@@ -490,7 +490,7 @@
         <exclude name="**/org/apache/tomcat/dbcp/**"/>
         <exclude name="**/tomcat-deps/**"/>
         <!-- Exclude simple test files -->
-        <exclude name="test/webapp-3.0/bug53257/*.txt"/>
+        <exclude name="test/webapp-3.0/bug53257/**/*.txt"/>
         <exclude name="test/webapp-3.0-fragments/WEB-INF/classes/*.txt"/>
         <exclude name="test/webresources/**"/>
       </fileset>
