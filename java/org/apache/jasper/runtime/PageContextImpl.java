@@ -45,15 +45,11 @@ import javax.servlet.jsp.JspFactory;
 import javax.servlet.jsp.JspWriter;
 import javax.servlet.jsp.PageContext;
 import javax.servlet.jsp.el.ELException;
-import javax.servlet.jsp.el.ExpressionEvaluator;
-import javax.servlet.jsp.el.VariableResolver;
 import javax.servlet.jsp.tagext.BodyContent;
 
 import org.apache.jasper.compiler.Localizer;
 import org.apache.jasper.el.ELContextImpl;
-import org.apache.jasper.el.ExpressionEvaluatorImpl;
 import org.apache.jasper.el.FunctionMapperImpl;
-import org.apache.jasper.el.VariableResolverImpl;
 import org.apache.jasper.security.SecurityUtil;
 
 /**
@@ -679,8 +675,9 @@ public class PageContextImpl extends PageContext {
 
     @Override
     @Deprecated
-    public VariableResolver getVariableResolver() {
-        return new VariableResolverImpl(this.getELContext());
+    public javax.servlet.jsp.el.VariableResolver getVariableResolver() {
+        return new org.apache.jasper.el.VariableResolverImpl(
+                this.getELContext());
     }
 
     @Override
@@ -793,8 +790,9 @@ public class PageContextImpl extends PageContext {
      */
     @Override
     @Deprecated
-    public ExpressionEvaluator getExpressionEvaluator() {
-        return new ExpressionEvaluatorImpl(this.applicationContext.getExpressionFactory());
+    public javax.servlet.jsp.el.ExpressionEvaluator getExpressionEvaluator() {
+        return new org.apache.jasper.el.ExpressionEvaluatorImpl(
+                this.applicationContext.getExpressionFactory());
     }
 
     @Override
