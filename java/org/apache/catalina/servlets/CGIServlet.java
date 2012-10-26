@@ -276,7 +276,7 @@ public final class CGIServlet extends HttpServlet {
     static Object expandFileLock = new Object();
 
     /** the shell environment variables to be passed to the CGI script */
-    static Hashtable<String,String> shellEnv = new Hashtable<String,String>();
+    Hashtable<String,String> shellEnv = new Hashtable<String,String>();
 
     /**
      * Sets instance variables.

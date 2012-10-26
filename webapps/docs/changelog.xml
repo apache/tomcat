@@ -73,6 +73,10 @@
         (including the access log valve) that meant entries could be made with
         an earlier timestamp than the true timestamp. (markt) 
       </fix>
+      <fix>
+        <bug>54054</bug>: Do not share shell environment variables between
+        multiple instances of the CGI servlet. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
