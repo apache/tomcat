@@ -305,7 +305,7 @@ public class AccessLogValve extends ValveBase implements AccessLog {
             private static final String cLFFormat = "dd/MMM/yyyy:HH:mm:ss";
 
             /* Second used to retrieve CLF format in most recent invocation */
-            private long previousSeconds = 0L;
+            private long previousSeconds = Long.MIN_VALUE;
             /* Value of CLF format retrieved in most recent invocation */
             private String previousFormat = "";
 
