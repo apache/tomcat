@@ -297,9 +297,9 @@ public class AccessLogValve extends ValveBase implements AccessLog {
      * <p>This class uses a small thread local first level cache and a bigger
      * synchronized global second level cache.</p>
      */
-    private static class DateFormatCache {
+    protected static class DateFormatCache {
 
-        private class Cache {
+        protected class Cache {
 
             /* CLF log format */
             private static final String cLFFormat = "dd/MMM/yyyy:HH:mm:ss";
@@ -318,7 +318,7 @@ public class AccessLogValve extends ValveBase implements AccessLog {
             /* Helper object to be able to call SimpleDateFormat.format(). */
             private final Date currentDate = new Date();
 
-            private final String cache[];
+            protected final String cache[];
             private SimpleDateFormat formatter;
             private boolean isCLF = false;
 
@@ -426,10 +426,10 @@ public class AccessLogValve extends ValveBase implements AccessLog {
 
         private final Locale cacheDefaultLocale;
         private final DateFormatCache parent;
-        private final Cache cLFCache;
+        protected final Cache cLFCache;
         private final HashMap<String, Cache> formatCache = new HashMap<>();
 
-        private DateFormatCache(int size, Locale loc, DateFormatCache parent) {
+        protected DateFormatCache(int size, Locale loc, DateFormatCache parent) {
             cacheSize = size;
             cacheDefaultLocale = loc;
             this.parent = parent;
