@@ -499,25 +499,35 @@ public class DefaultServlet
 
         InputStream resourceInputStream = null;
 
-        // Append data specified in ranges to existing content for this
-        // resource - create a temp. file on the local filesystem to
-        // perform this operation
-        // Assume just one range is specified for now
-        if (range != null) {
-            File contentFile = executePartialPut(req, range, path);
-            resourceInputStream = new FileInputStream(contentFile);
-        } else {
-            resourceInputStream = req.getInputStream();
-        }
-
-        if (resources.write(path, resourceInputStream)) {
-            if (resource.exists()) {
-                resp.setStatus(HttpServletResponse.SC_NO_CONTENT);
+        try {
+            // Append data specified in ranges to existing content for this
+            // resource - create a temp. file on the local filesystem to
+            // perform this operation
+            // Assume just one range is specified for now
+            if (range != null) {
+                File contentFile = executePartialPut(req, range, path);
+                resourceInputStream = new FileInputStream(contentFile);
             } else {
-                resp.setStatus(HttpServletResponse.SC_CREATED);
+                resourceInputStream = req.getInputStream();
             }
-        } else {
-            resp.sendError(HttpServletResponse.SC_CONFLICT);
+
+            if (resources.write(path, resourceInputStream)) {
+                if (resource.exists()) {
+                    resp.setStatus(HttpServletResponse.SC_NO_CONTENT);
+                } else {
+                    resp.setStatus(HttpServletResponse.SC_CREATED);
+                }
+            } else {
+                resp.sendError(HttpServletResponse.SC_CONFLICT);
+            }
+        } finally {
+            if (resourceInputStream != null) {
+                try {
+                    resourceInputStream.close();
+                } catch (IOException ioe) {
+                    // Ignore
+                }
+            }
         }
     }
 

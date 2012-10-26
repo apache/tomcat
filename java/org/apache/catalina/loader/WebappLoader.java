@@ -24,7 +24,6 @@ import java.io.FileOutputStream;
 import java.io.FilePermission;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
@@ -772,8 +771,7 @@ public class WebappLoader extends LifecycleMBeanBase
                 }
 
                 if (copyJars) {
-                    if (!copy(jar.getInputStream(),
-                              new FileOutputStream(destFile))) {
+                    if (!copy(jar.getInputStream(),destFile)) {
                         throw new IOException(
                                 sm.getString("webappLoader.copyFailure"));
                     }
@@ -894,25 +892,20 @@ public class WebappLoader extends LifecycleMBeanBase
      */
     private boolean copyDir(WebResource src, File destDir) {
 
-        try {
-            WebResource[] resources =
-                    src.getWebResourceRoot().listResources(src.getWebappPath());
-            for (WebResource resource : resources) {
-                File currentFile = new File(destDir, resource.getName());
-                if (resource.isFile()) {
-                    InputStream is = resource.getInputStream();
-                    OutputStream os = new FileOutputStream(currentFile);
-                    if (!copy(is, os))
-                        return false;
-                } else if (resource.isDirectory()) {
-                    if (!currentFile.isDirectory() && !currentFile.mkdir())
-                        return false;
-                    if (!copyDir(resource, currentFile))
-                        return false;
-                }
+        WebResource[] resources =
+                src.getWebResourceRoot().listResources(src.getWebappPath());
+        for (WebResource resource : resources) {
+            File currentFile = new File(destDir, resource.getName());
+            if (resource.isFile()) {
+                InputStream is = resource.getInputStream();
+                if (!copy(is, currentFile))
+                    return false;
+            } else if (resource.isDirectory()) {
+                if (!currentFile.isDirectory() && !currentFile.mkdir())
+                    return false;
+                if (!copyDir(resource, currentFile))
+                    return false;
             }
-        } catch (IOException e) {
-            return false;
         }
 
         return true;
@@ -923,9 +916,9 @@ public class WebappLoader extends LifecycleMBeanBase
      * Copy a file to the specified temp directory. This is required only
      * because Jasper depends on it.
      */
-    private boolean copy(InputStream is, OutputStream os) {
+    private boolean copy(InputStream is, File file) {
 
-        try {
+        try (FileOutputStream os = new FileOutputStream(file)){
             byte[] buf = new byte[4096];
             while (true) {
                 int len = is.read(buf);
@@ -933,10 +926,14 @@ public class WebappLoader extends LifecycleMBeanBase
                     break;
                 os.write(buf, 0, len);
             }
-            is.close();
-            os.close();
         } catch (IOException e) {
             return false;
+        } finally {
+            try {
+                is.close();
+            } catch (IOException e) {
+                // Ignore
+            }
         }
 
         return true;

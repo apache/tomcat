@@ -1626,6 +1626,7 @@ public class ContextConfig implements LifecycleListener {
      * Identify the application web.xml to be used and obtain an input source
      * for it.
      */
+    @SuppressWarnings("resource") // stream is meant to be left open here
     protected InputSource getContextWebXmlSource() {
         InputStream stream = null;
         InputSource source = null;
@@ -1663,6 +1664,13 @@ public class ContextConfig implements LifecycleListener {
         if (stream == null || url == null) {
             if (log.isDebugEnabled()) {
                 log.debug(sm.getString("contextConfig.applicationMissing") + " " + context);
+            }
+            if (stream != null) {
+                try {
+                    stream.close();
+                } catch (IOException e) {
+                    // Ignore
+                }
             }
         } else {
             source = new InputSource(url.toExternalForm());
