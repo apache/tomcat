@@ -68,6 +68,11 @@
         Update MIME type mapping with additional / updated mime.types from the
         Apache web server. (markt)
       </add>
+      <fix>
+        <bug>54044</bug>: Correct bug in timestamp cache for access log valve
+        that meant entries could be made with a much earlier timestamp than the
+        true timestamp. (markt) 
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
