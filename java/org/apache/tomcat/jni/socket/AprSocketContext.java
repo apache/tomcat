@@ -810,10 +810,9 @@ public class AprSocketContext {
         }
 
         void unblock() {
-            try {
+            try (java.net.Socket sock = new java.net.Socket()) {
                 // Easiest ( maybe safest ) way to interrupt accept
                 // we could have it in non-blocking mode, etc
-                java.net.Socket sock = new java.net.Socket();
                 sock.connect(new InetSocketAddress("127.0.0.1", port));
             } catch (Exception ex) {
                 // ignore - the acceptor may have shut down by itself.
