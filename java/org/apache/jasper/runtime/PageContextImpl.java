@@ -49,7 +49,6 @@ import javax.servlet.jsp.tagext.BodyContent;
 
 import org.apache.jasper.compiler.Localizer;
 import org.apache.jasper.el.ELContextImpl;
-import org.apache.jasper.el.FunctionMapperImpl;
 import org.apache.jasper.security.SecurityUtil;
 
 /**
@@ -956,7 +955,7 @@ public class PageContextImpl extends PageContext {
                             @Override
                             public Object run() throws Exception {
                                 ELContextImpl ctx = (ELContextImpl) pageContext.getELContext();
-                                ctx.setFunctionMapper(new FunctionMapperImpl(functionMap));
+                                ctx.setFunctionMapper(functionMap);
                                 ValueExpression ve = exprFactory.createValueExpression(ctx, expression, expectedType);
                                 return ve.getValue(ctx);
                             }
@@ -971,7 +970,7 @@ public class PageContextImpl extends PageContext {
             }
         } else {
             ELContextImpl ctx = (ELContextImpl) pageContext.getELContext();
-            ctx.setFunctionMapper(new FunctionMapperImpl(functionMap));
+            ctx.setFunctionMapper(functionMap);
             ValueExpression ve = exprFactory.createValueExpression(ctx, expression, expectedType);
             retValue = ve.getValue(ctx);
         }
