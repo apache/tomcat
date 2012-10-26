@@ -77,8 +77,8 @@ public class FairBlockingQueue<E> implements BlockingQueue<E> {
      * Creates a new fair blocking queue.
      */
     public FairBlockingQueue() {
-        items = new LinkedList<E>();
-        waiters = new LinkedList<ExchangeCountDownLatch<E>>();
+        items = new LinkedList<>();
+        waiters = new LinkedList<>();
     }
 
     //------------------------------------------------------------------
@@ -142,7 +142,7 @@ public class FairBlockingQueue<E> implements BlockingQueue<E> {
             result = items.poll();
             if (result==null && timeout>0) {
                 //the queue is empty we will wait for an object
-                ExchangeCountDownLatch<E> c = new ExchangeCountDownLatch<E>(1);
+                ExchangeCountDownLatch<E> c = new ExchangeCountDownLatch<>(1);
                 //add to the bottom of the wait list
                 waiters.addLast(c);
                 //unlock the global lock
@@ -184,15 +184,15 @@ public class FairBlockingQueue<E> implements BlockingQueue<E> {
             E item = items.poll();
             if (item==null) {
                 //queue is empty, add ourselves as waiters
-                ExchangeCountDownLatch<E> c = new ExchangeCountDownLatch<E>(1);
+                ExchangeCountDownLatch<E> c = new ExchangeCountDownLatch<>(1);
                 waiters.addLast(c);
                 lock.unlock();
                 //return a future that will wait for the object
-                result = new ItemFuture<E>(c);
+                result = new ItemFuture<>(c);
             } else {
                 lock.unlock();
                 //return a future with the item
-                result = new ItemFuture<E>(item);
+                result = new ItemFuture<>(item);
             }
             error = false;
         } finally {

@@ -440,16 +440,16 @@ public class ConnectionPool {
         }
 
         //make space for 10 extra in case we flow over a bit
-        busy = new ArrayBlockingQueue<PooledConnection>(properties.getMaxActive(),false);
+        busy = new ArrayBlockingQueue<>(properties.getMaxActive(),false);
         //busy = new FairBlockingQueue<PooledConnection>();
         //make space for 10 extra in case we flow over a bit
         if (properties.isFairQueue()) {
-            idle = new FairBlockingQueue<PooledConnection>();
+            idle = new FairBlockingQueue<>();
             //idle = new MultiLockFairBlockingQueue<PooledConnection>();
             //idle = new LinkedTransferQueue<PooledConnection>();
             //idle = new ArrayBlockingQueue<PooledConnection>(properties.getMaxActive(),false);
         } else {
-            idle = new ArrayBlockingQueue<PooledConnection>(properties.getMaxActive(),properties.isFairQueue());
+            idle = new ArrayBlockingQueue<>(properties.getMaxActive(),properties.isFairQueue());
         }
 
         initializePoolCleaner(properties);
@@ -1271,7 +1271,7 @@ public class ConnectionPool {
 
 
     private static volatile Timer poolCleanTimer = null;
-    private static HashSet<PoolCleaner> cleaners = new HashSet<PoolCleaner>();
+    private static HashSet<PoolCleaner> cleaners = new HashSet<>();
 
     private static synchronized void registerCleaner(PoolCleaner cleaner) {
         unregisterCleaner(cleaner);

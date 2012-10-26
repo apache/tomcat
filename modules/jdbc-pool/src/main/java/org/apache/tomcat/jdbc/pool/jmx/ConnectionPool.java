@@ -51,7 +51,8 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
     /**
      * Listeners that are local and interested in our notifications, no need for JMX
      */
-    protected ConcurrentLinkedQueue<NotificationListener> listeners = new ConcurrentLinkedQueue<NotificationListener>();
+    protected ConcurrentLinkedQueue<NotificationListener> listeners =
+            new ConcurrentLinkedQueue<>();
 
     public ConnectionPool(org.apache.tomcat.jdbc.pool.ConnectionPool pool) {
         super();
