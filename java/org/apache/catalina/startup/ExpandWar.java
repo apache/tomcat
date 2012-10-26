@@ -152,16 +152,16 @@ public class ExpandWar {
             if (input != null) {
                 try {
                     input.close();
-                } catch (Throwable t) {
-                    ExceptionUtils.handleThrowable(t);
+                } catch (IOException ioe) {
+                    // Ignore
                 }
                 input = null;
             }
             if (jarFile != null) {
                 try {
                     jarFile.close();
-                } catch (Throwable t) {
-                    ExceptionUtils.handleThrowable(t);
+                } catch (IOException ioe) {
+                    // Ignore
                 }
                 jarFile = null;
             }
