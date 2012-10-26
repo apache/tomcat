@@ -20,7 +20,7 @@ import java.io.File;
 
 import javax.servlet.http.HttpServletResponse;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 import org.junit.Test;
 
