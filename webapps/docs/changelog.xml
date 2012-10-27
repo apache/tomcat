@@ -56,6 +56,10 @@
 <section name="Tomcat 7.0.33 (markt)">
   <subsection name="Catalina">
     <changelog>
+      <add>
+        <bug>53960</bug>: Extensions to HttpClient test helper class. Patch by
+        Brian Burch. (markt)
+      </add>
       <fix>
         <bug>53993</bug>: Avoid a possible NPE in the AccessLogValve when the
         session ID is logged and a session is invalidated. (markt)
