@@ -98,6 +98,11 @@
   </subsection>
   <subsection name="Jasper">
     <changelog>
+      <scode>
+        <bug>53896</bug>: Use an optimised CompositeELResolver for Jasper that
+        skips resolvers that are known to be unable to resolve the value. Patch
+        by Jarek Gawor. (markt)
+      </scode>
       <fix>
         <bug>53986</bug>: Correct a regression introduced by the fix for
         <bug>53713</bug>. JSP comments that ended with the sequence ---%&gt; (or

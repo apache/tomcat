@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -19,31 +19,24 @@ package org.apache.jasper.runtime;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
-import javax.el.ArrayELResolver;
-import javax.el.BeanELResolver;
 import javax.el.CompositeELResolver;
 import javax.el.ELContextEvent;
 import javax.el.ELContextListener;
 import javax.el.ELResolver;
 import javax.el.ExpressionFactory;
-import javax.el.ListELResolver;
-import javax.el.MapELResolver;
-import javax.el.ResourceBundleELResolver;
 import javax.servlet.ServletContext;
 import javax.servlet.jsp.JspApplicationContext;
 import javax.servlet.jsp.JspContext;
-import javax.servlet.jsp.el.ImplicitObjectELResolver;
-import javax.servlet.jsp.el.ScopedAttributeELResolver;
 
 import org.apache.jasper.Constants;
 import org.apache.jasper.el.ELContextImpl;
+import org.apache.jasper.el.JasperELResolver;
 
 /**
  * Implementation of JspApplicationContext
- * 
+ *
  * @author Jacob Hookom
  */
 public class JspApplicationContextImpl implements JspApplicationContext {
@@ -119,18 +112,7 @@ public class JspApplicationContextImpl implements JspApplicationContext {
     private ELResolver createELResolver() {
         this.instantiated = true;
         if (this.resolver == null) {
-            CompositeELResolver r = new CompositeELResolver();
-            r.add(new ImplicitObjectELResolver());
-            for (Iterator<ELResolver> itr = this.resolvers.iterator();
-                    itr.hasNext();) {
-                r.add(itr.next());
-            }
-            r.add(new MapELResolver());
-            r.add(new ResourceBundleELResolver());
-            r.add(new ListELResolver());
-            r.add(new ArrayELResolver());    
-            r.add(new BeanELResolver());
-            r.add(new ScopedAttributeELResolver());
+            CompositeELResolver r = new JasperELResolver(this.resolvers);
             this.resolver = r;
         }
         return this.resolver;
