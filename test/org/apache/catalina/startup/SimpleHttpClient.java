@@ -93,7 +93,7 @@ public abstract class SimpleHttpClient {
     private String redirectUri;
 
     private String responseBody;
-    private List<String> bodyUriElments = new ArrayList<>();
+    private List<String> bodyUriElments = new ArrayList<String>();
 
     protected void setPort(int thePort) {
         port = thePort;
