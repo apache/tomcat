@@ -99,6 +99,10 @@
   <subsection name="Jasper">
     <changelog>
       <scode>
+        <bug>53867</bug>: Optimise the XML escaping provided by the PageContext
+        implementation. Based on a patch by Sheldon Shao. (markt)
+      </scode>
+      <scode>
         <bug>53896</bug>: Use an optimised CompositeELResolver for Jasper that
         skips resolvers that are known to be unable to resolve the value. Patch
         by Jarek Gawor. (markt)
