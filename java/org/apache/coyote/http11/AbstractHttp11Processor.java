@@ -1274,8 +1274,8 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
         }
 
         int statusCode = response.getStatus();
-        if ((statusCode == 204) || (statusCode == 205)
-            || (statusCode == 304)) {
+        if (statusCode < 200 || statusCode == 204 || statusCode == 205 ||
+                statusCode == 304) {
             // No entity body
             getOutputBuffer().addActiveFilter
                 (outputFilters[Constants.VOID_FILTER]);
