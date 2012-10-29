@@ -94,6 +94,12 @@
        disconnect with APR/native on Windows Vista/2k8 or later. Patch provided
        by Douglas Beachy. (markt)
       </fix>
+      <fix>
+        <bug>54067</bug>: Ensure responses with 1xx response codes are correctly
+        marked as not containing an entity body. This caused an issue for some
+        WebSocket clients when an Transfer-Encoding header was sent with the
+        101 (HTTP upgrade) response. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
