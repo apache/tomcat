@@ -600,7 +600,7 @@ TCN_IMPLEMENT_CALL(jint, Socket, sendbb)(TCN_STDARGS, jlong sock,
     while (sent < nbytes) {
         apr_size_t wr = nbytes - sent;
         ss = (*s->net->send)(s->opaque, s->jsbbuff + offset + sent, &wr);
-        if (ss != APR_SUCCESS)
+        if (ss != APR_SUCCESS || wr == 0)
             break;
         sent += wr;
     }
