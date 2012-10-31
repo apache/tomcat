@@ -81,6 +81,11 @@
         <bug>54054</bug>: Do not share shell environment variables between
         multiple instances of the CGI servlet. (markt)
       </fix>
+      <fix>
+        <bug>54068</bug>: Rewrite the web fragment ordering algorithm to resolve
+        multiple issues that resulted in incorrect ordering or failure to find
+        a correct, valid order. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
