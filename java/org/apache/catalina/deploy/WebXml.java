@@ -26,7 +26,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -2121,75 +2120,137 @@ public class WebXml {
                 }
             }
         } else {
-            List<String> order = new LinkedList<>();
-            // Start by adding all fragments - order doesn't matter
-            order.addAll(fragments.keySet());
-
-            // Now go through and move elements to start/end depending on if
-            // they specify others
+            // Stage 1. Make all dependencies bi-directional - this makes the
+            //          next stage simpler.
             for (WebXml fragment : fragments.values()) {
-                String name = fragment.getName();
-                if (fragment.getBeforeOrdering().contains(WebXml.ORDER_OTHERS)) {
-                    // Move to beginning
-                    order.remove(name);
-                    order.add(0, name);
-                } else if (fragment.getAfterOrdering().contains(WebXml.ORDER_OTHERS)) {
-                    // Move to end
-                    order.remove(name);
-                    order.add(name);
-                }
-            }
-
-            // Now apply remaining ordering
-            for (WebXml fragment : fragments.values()) {
-                String name = fragment.getName();
                 for (String before : fragment.getBeforeOrdering()) {
-                    if (!before.equals(WebXml.ORDER_OTHERS) &&
-                            order.contains(before) &&
-                            order.indexOf(before) < order.indexOf(name)) {
-                        order.remove(name);
-                        order.add(order.indexOf(before), name);
+                    if (!before.equals(ORDER_OTHERS)) {
+                        fragments.get(before).addAfterOrdering(fragment.getName());
                     }
                 }
                 for (String after : fragment.getAfterOrdering()) {
-                    if (!after.equals(WebXml.ORDER_OTHERS) &&
-                            order.contains(after) &&
-                            order.indexOf(after) > order.indexOf(name)) {
-                        order.remove(name);
-                        order.add(order.indexOf(after) + 1, name);
+                    if (!after.equals(ORDER_OTHERS)) {
+                        fragments.get(after).addBeforeOrdering(fragment.getName());
                     }
                 }
             }
 
-            // Finally check ordering was applied correctly - if there are
-            // errors then that indicates circular references
+            // Stage 2. Make all fragments that are implicitly before/after
+            //          others explicitly so. This is iterative so the next
+            //          stage doesn't have to be.
             for (WebXml fragment : fragments.values()) {
-                String name = fragment.getName();
-                for (String before : fragment.getBeforeOrdering()) {
-                    if (!before.equals(WebXml.ORDER_OTHERS) &&
-                            order.contains(before) &&
-                            order.indexOf(before) < order.indexOf(name)) {
-                        throw new IllegalArgumentException(
-                                sm.getString("webXml.mergeConflictOrder"));
-                    }
+                if (fragment.getBeforeOrdering().contains(ORDER_OTHERS)) {
+                    makeBeforeOthersExplicit(fragment.getAfterOrdering(), fragments);
                 }
-                for (String after : fragment.getAfterOrdering()) {
-                    if (!after.equals(WebXml.ORDER_OTHERS) &&
-                            order.contains(after) &&
-                            order.indexOf(after) > order.indexOf(name)) {
-                        throw new IllegalArgumentException(
-                                sm.getString("webXml.mergeConflictOrder"));
-                    }
+                if (fragment.getAfterOrdering().contains(ORDER_OTHERS)) {
+                    makeAfterOthersExplicit(fragment.getBeforeOrdering(), fragments);
                 }
             }
 
-            // Build the ordered list
-            for (String name : order) {
-                orderedFragments.add(fragments.get(name));
+            // Stage 3. Separate into three groups
+            Set<WebXml> beforeSet = new HashSet<>();
+            Set<WebXml> othersSet = new HashSet<>();
+            Set<WebXml> afterSet = new HashSet<>();
+
+            for (WebXml fragment : fragments.values()) {
+                if (fragment.getBeforeOrdering().contains(ORDER_OTHERS)) {
+                    beforeSet.add(fragment);
+                    fragment.getBeforeOrdering().remove(ORDER_OTHERS);
+                } else if (fragment.getAfterOrdering().contains(ORDER_OTHERS)) {
+                    afterSet.add(fragment);
+                    fragment.getAfterOrdering().remove(ORDER_OTHERS);
+                } else {
+                    othersSet.add(fragment);
+                }
             }
+
+            // Stage 4. Decouple the groups so the ordering requirements for
+            //          each fragment in the group only refer to other fragments
+            //          in the group. Ordering requirements outside the group
+            //          will be handled by processing the groups in order.
+            //          Note: Only after ordering requirements are considered.
+            //                This is OK because of the processing in stage 1.
+            decoupleOtherGroups(beforeSet);
+            decoupleOtherGroups(othersSet);
+            decoupleOtherGroups(afterSet);
+
+            // Stage 5. Order each group
+            //          Note: Only after ordering requirements are considered.
+            //                This is OK because of the processing in stage 1.
+            orderFragments(orderedFragments, beforeSet);
+            orderFragments(orderedFragments, othersSet);
+            orderFragments(orderedFragments, afterSet);
         }
 
         return orderedFragments;
     }
 
+    private static void decoupleOtherGroups(Set<WebXml> group) {
+        Set<String> names = new HashSet<>();
+        for (WebXml fragment : group) {
+            names.add(fragment.getName());
+        }
+        for (WebXml fragment : group) {
+            Iterator<String> after = fragment.getAfterOrdering().iterator();
+            while (after.hasNext()) {
+                String entry = after.next();
+                if (!names.contains(entry)) {
+                    after.remove();
+                }
+            }
+        }
+    }
+    private static void orderFragments(Set<WebXml> orderedFragments,
+            Set<WebXml> unordered) {
+        Set<WebXml> addedThisRound = new HashSet<>();
+        Set<WebXml> addedLastRound = new HashSet<>();
+        while (unordered.size() > 0) {
+            Iterator<WebXml> source = unordered.iterator();
+            while (source.hasNext()) {
+                WebXml fragment = source.next();
+                for (WebXml toRemove : addedLastRound) {
+                    fragment.getAfterOrdering().remove(toRemove.getName());
+                }
+                if (fragment.getAfterOrdering().isEmpty()) {
+                    addedThisRound.add(fragment);
+                    orderedFragments.add(fragment);
+                    source.remove();
+                }
+            }
+            if (addedThisRound.size() == 0) {
+                // Circular
+                throw new IllegalArgumentException(
+                        sm.getString("webXml.mergeConflictOrder"));
+            }
+            addedLastRound.clear();
+            addedLastRound.addAll(addedThisRound);
+            addedThisRound.clear();
+        }
+    }
+
+    private static void makeBeforeOthersExplicit(Set<String> beforeOrdering,
+            Map<String, WebXml> fragments) {
+        for (String before : beforeOrdering) {
+            if (!before.equals(ORDER_OTHERS)) {
+                WebXml webXml = fragments.get(before);
+                if (!webXml.getBeforeOrdering().contains(ORDER_OTHERS)) {
+                    webXml.addBeforeOrderingOthers();
+                    makeBeforeOthersExplicit(webXml.getAfterOrdering(), fragments);
+                }
+            }
+        }
+    }
+
+    private static void makeAfterOthersExplicit(Set<String> afterOrdering,
+            Map<String, WebXml> fragments) {
+        for (String after : afterOrdering) {
+            if (!after.equals(ORDER_OTHERS)) {
+                WebXml webXml = fragments.get(after);
+                if (!webXml.getAfterOrdering().contains(ORDER_OTHERS)) {
+                    webXml.addAfterOrderingOthers();
+                    makeAfterOthersExplicit(webXml.getBeforeOrdering(), fragments);
+                }
+            }
+        }
+    }
 }
