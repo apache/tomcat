@@ -330,6 +330,11 @@ public class TestWebXmlOrdering {
         doRelativeOrderingTest(new RelativeTestRunner10());
     }
 
+    @Test
+    public void testOrderWebFragmentsRelative11() {
+        // Test references to non-existant fragments
+        doRelativeOrderingTest(new RelativeTestRunner11());
+    }
 
     @Test(expected=IllegalArgumentException.class)
     public void testOrderWebFragmentsrelativeCircular1() {
@@ -671,6 +676,25 @@ public class TestWebXmlOrdering {
 
             // c.addAfterOrdering("b");
             assertTrue(order, posC > posB);
+        }
+    }
+
+    private class RelativeTestRunner11 implements RelativeOrderingTestRunner {
+
+        @Override
+        public void init() {
+            a.addAfterOrdering("b");
+            b.addAfterOrdering("z");
+            b.addBeforeOrdering("y");
+        }
+
+        @Override
+        public void validate(String order) {
+            // There is some duplication in the tests below - it is easier to
+            // check the tests are complete this way.
+
+            // a.addAfterOrdering("b");
+            assertTrue(order, posA > posB);
         }
     }
 }
