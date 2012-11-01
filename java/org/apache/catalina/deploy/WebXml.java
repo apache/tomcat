@@ -2123,14 +2123,29 @@ public class WebXml {
             // Stage 1. Make all dependencies bi-directional - this makes the
             //          next stage simpler.
             for (WebXml fragment : fragments.values()) {
-                for (String before : fragment.getBeforeOrdering()) {
-                    if (!before.equals(ORDER_OTHERS)) {
-                        fragments.get(before).addAfterOrdering(fragment.getName());
+                Iterator<String> before =
+                        fragment.getBeforeOrdering().iterator();
+                while (before.hasNext()) {
+                    String beforeEntry = before.next();
+                    if (!beforeEntry.equals(ORDER_OTHERS)) {
+                        WebXml beforeFragment = fragments.get(beforeEntry);
+                        if (beforeFragment == null) {
+                            before.remove();
+                        } else {
+                            beforeFragment.addAfterOrdering(fragment.getName());
+                        }
                     }
                 }
-                for (String after : fragment.getAfterOrdering()) {
-                    if (!after.equals(ORDER_OTHERS)) {
-                        fragments.get(after).addBeforeOrdering(fragment.getName());
+                Iterator<String> after = fragment.getAfterOrdering().iterator();
+                while (after.hasNext()) {
+                    String afterEntry = after.next();
+                    if (!afterEntry.equals(ORDER_OTHERS)) {
+                        WebXml afterFragment = fragments.get(afterEntry);
+                        if (afterFragment == null) {
+                            after.remove();
+                        } else {
+                            afterFragment.addBeforeOrdering(fragment.getName());
+                        }
                     }
                 }
             }
