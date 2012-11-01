@@ -151,12 +151,12 @@ public class TesterWebResourceRoot implements WebResourceRoot {
     }
 
     @Override
-    public boolean write(String path, InputStream is) {
+    public boolean write(String path, InputStream is, boolean overwrite) {
         if (getResource(path).exists()) {
             return false;
         }
 
-        return main.write(path, is);
+        return main.write(path, is, false);
     }
 
     @Override

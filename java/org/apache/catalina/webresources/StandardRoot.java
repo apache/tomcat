@@ -137,14 +137,14 @@ public class StandardRoot extends LifecycleMBeanBase
     }
 
     @Override
-    public boolean write(String path, InputStream is) {
+    public boolean write(String path, InputStream is, boolean overwrite) {
         checkState();
 
-        if (preResourceExists(path)) {
+        if (!overwrite && preResourceExists(path)) {
             return false;
         }
 
-        return main.write(path, is);
+        return main.write(path, is, overwrite);
     }
 
     private boolean preResourceExists(String path) {

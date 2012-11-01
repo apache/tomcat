@@ -511,7 +511,7 @@ public class DefaultServlet
                 resourceInputStream = req.getInputStream();
             }
 
-            if (resources.write(path, resourceInputStream)) {
+            if (resources.write(path, resourceInputStream, true)) {
                 if (resource.exists()) {
                     resp.setStatus(HttpServletResponse.SC_NO_CONTENT);
                 } else {
