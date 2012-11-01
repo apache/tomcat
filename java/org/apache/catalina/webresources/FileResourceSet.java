@@ -137,7 +137,7 @@ public class FileResourceSet extends AbstractFileResourceSet {
     }
 
     @Override
-    public boolean write(String path, InputStream is) {
+    public boolean write(String path, InputStream is, boolean overwrite) {
         checkPath(path);
         return false;
     }

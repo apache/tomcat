@@ -76,14 +76,18 @@ public interface WebResourceSet extends Lifecycle {
      * InputStream. If a resource already exists at the provided path it will
      * not be overwritten.
      *
-     * @param path  The path to be used for the new Resource. It is relative to
-     *              the root of the web application and must start with '/'.
-     * @param is    The InputStream that will provide the content for the new
-     *              Resource.
+     * @param path      The path to be used for the new Resource. It is relative
+     *                  to the root of the web application and must start with
+     *                  '/'.
+     * @param is        The InputStream that will provide the content for the
+     *                  new Resource.
+     * @param overwrite If <code>true</code> and the resource already exists it
+     *                  will be overwritten. If <code>false</code> and the
+     *                  resource already exists the write will fail.
      *
      * @return  <code>true</code> if and only if the new Resource is written
      */
-    boolean write(String path, InputStream is);
+    boolean write(String path, InputStream is, boolean overwrite);
 
     void setRoot(WebResourceRoot root);
 }

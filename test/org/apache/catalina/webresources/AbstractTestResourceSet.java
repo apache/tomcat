@@ -256,48 +256,51 @@ public abstract class AbstractTestResourceSet {
     @Test(expected = IllegalArgumentException.class)
     public final void testWriteEmpty() {
         InputStream is = new ByteArrayInputStream("test".getBytes());
-        resourceRoot.write("", is);
+        resourceRoot.write("", is, false);
     }
 
     @Test
     public final void testWriteRoot() {
         InputStream is = new ByteArrayInputStream("test".getBytes());
-        Assert.assertFalse(resourceRoot.write(getMount() + "/", is));
+        Assert.assertFalse(resourceRoot.write(getMount() + "/", is, false));
     }
 
     @Test
     public final void testWriteDirA() {
         InputStream is = new ByteArrayInputStream("test".getBytes());
-        Assert.assertFalse(resourceRoot.write(getMount() + "/d1", is));
+        Assert.assertFalse(resourceRoot.write(getMount() + "/d1", is, false));
     }
 
     @Test
     public final void testWriteDirB() {
         InputStream is = new ByteArrayInputStream("test".getBytes());
-        Assert.assertFalse(resourceRoot.write(getMount() + "/d1/", is));
+        Assert.assertFalse(resourceRoot.write(getMount() + "/d1/", is, false));
     }
 
     @Test
     public final void testWriteFile() {
         InputStream is = new ByteArrayInputStream("test".getBytes());
-        Assert.assertFalse(resourceRoot.write(getMount() + "/d1/d1-f1.txt", is));
+        Assert.assertFalse(resourceRoot.write(
+                getMount() + "/d1/d1-f1.txt", is, false));
     }
 
     @Test(expected = NullPointerException.class)
     public final void testWriteNew() {
-        resourceRoot.write(getMount() + "/new-test", null);
+        resourceRoot.write(getMount() + "/new-test", null, false);
     }
 
     @Test
     public final void testWrite() {
         InputStream is = new ByteArrayInputStream("test".getBytes());
         if (isWriteable()) {
-            Assert.assertTrue(resourceRoot.write(getMount() + "/new-test", is));
+            Assert.assertTrue(resourceRoot.write(
+                    getMount() + "/new-test", is, false));
             File file = new File(getBaseDir(), "new-test");
             Assert.assertTrue(file.exists());
             Assert.assertTrue(file.delete());
         } else {
-            Assert.assertFalse(resourceRoot.write(getMount() + "/new-test", is));
+            Assert.assertFalse(resourceRoot.write(
+                    getMount() + "/new-test", is, false));
         }
     }
 }

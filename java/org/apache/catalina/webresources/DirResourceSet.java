@@ -169,7 +169,7 @@ public class DirResourceSet extends AbstractFileResourceSet {
     }
 
     @Override
-    public boolean write(String path, InputStream is) {
+    public boolean write(String path, InputStream is, boolean overwrite) {
         checkPath(path);
 
         if (is == null) {
@@ -189,7 +189,13 @@ public class DirResourceSet extends AbstractFileResourceSet {
         }
 
         if (dest.exists()) {
-            return false;
+            if (overwrite) {
+                if (!dest.delete()) {
+                    return false;
+                }
+            } else {
+                return false;
+            }
         }
 
         try (FileOutputStream fos = new FileOutputStream(dest)) {

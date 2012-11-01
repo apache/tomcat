@@ -62,6 +62,6 @@ public abstract class AbstractTestResourceSetMount
     @Test
     public void testWriteAbove() {
         InputStream is = new ByteArrayInputStream("test".getBytes());
-        Assert.assertFalse(resourceRoot.write("/", is));
+        Assert.assertFalse(resourceRoot.write("/", is, false));
     }
 }

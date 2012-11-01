@@ -1672,7 +1672,8 @@ public class WebdavServlet
                 copyResource(errorList, childSrc, childDest);
             }
         } else if (sourceResource.isFile()) {
-            if (!resources.write(dest, sourceResource.getInputStream())) {
+            if (!resources.write(dest, sourceResource.getInputStream(),
+                    false)) {
                 errorList.put(source,
                         new Integer(WebdavStatus.SC_INTERNAL_SERVER_ERROR));
                 return false;

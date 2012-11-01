@@ -217,7 +217,7 @@ public class JarResourceSet extends AbstractResourceSet {
     }
 
     @Override
-    public boolean write(String path, InputStream is) {
+    public boolean write(String path, InputStream is, boolean overwrite) {
         checkPath(path);
 
         if (is == null) {
