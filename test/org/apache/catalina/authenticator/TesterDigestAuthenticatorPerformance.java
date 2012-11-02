@@ -211,12 +211,10 @@ public class TesterDigestAuthenticatorPerformance {
             auth.append("\", response=\"");
             auth.append(md5response);
             auth.append("\"");
-            auth.append(", qop=\"");
+            auth.append(", qop=");
             auth.append(QOP);
-            auth.append("\"");
-            auth.append(", nc=\"");
+            auth.append(", nc=");
             auth.append(ncString);
-            auth.append("\"");
             auth.append(", cnonce=\"");
             auth.append(cnonce);
             auth.append("\"");
