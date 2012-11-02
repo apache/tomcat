@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -119,6 +119,12 @@ public class DigestAuthenticator extends AuthenticatorBase {
 
 
     /**
+     * The window size to use to track seen nonce count values for a given
+     * nonce. If not specified, the default of 100 is used.
+     */
+    protected int nonceCountWindowSize = 100;
+
+    /**
      * Private key.
      */
     protected String key = null;
@@ -153,6 +159,16 @@ public class DigestAuthenticator extends AuthenticatorBase {
 
         return (info);
 
+    }
+
+
+    public int getNonceCountWindowSize() {
+        return nonceCountWindowSize;
+    }
+
+
+    public void setNonceCountWindowSize(int nonceCountWindowSize) {
+        this.nonceCountWindowSize = nonceCountWindowSize;
     }
 
 
@@ -275,7 +291,7 @@ public class DigestAuthenticator extends AuthenticatorBase {
                 if (digestInfo.validate(request, config)) {
                     principal = digestInfo.authenticate(context.getRealm());
                 }
-            
+
                 if (principal != null && !digestInfo.isNonceStale()) {
                     register(request, response, principal,
                             HttpServletRequest.DIGEST_AUTH,
@@ -381,7 +397,7 @@ public class DigestAuthenticator extends AuthenticatorBase {
 
         long currentTime = System.currentTimeMillis();
 
-        
+
         String ipTimeKey =
             request.getRemoteAddr() + ":" + currentTime + ":" + getKey();
 
@@ -389,7 +405,7 @@ public class DigestAuthenticator extends AuthenticatorBase {
                 ipTimeKey.getBytes(B2CConverter.ISO_8859_1));
         String nonce = currentTime + ":" + MD5Encoder.encode(buffer);
 
-        NonceInfo info = new NonceInfo(currentTime, 100);
+        NonceInfo info = new NonceInfo(currentTime, getNonceCountWindowSize());
         synchronized (nonces) {
             nonces.put(nonce, info);
         }
@@ -453,21 +469,21 @@ public class DigestAuthenticator extends AuthenticatorBase {
 
 
     // ------------------------------------------------------- Lifecycle Methods
-    
+
     @Override
     protected synchronized void startInternal() throws LifecycleException {
         super.startInternal();
-        
+
         // Generate a random secret key
         if (getKey() == null) {
             setKey(sessionIdGenerator.generateSessionId());
         }
-        
+
         // Generate the opaque string the same way
         if (getOpaque() == null) {
             setOpaque(sessionIdGenerator.generateSessionId());
         }
-        
+
         nonces = new LinkedHashMap<String, DigestAuthenticator.NonceInfo>() {
 
             private static final long serialVersionUID = 1L;
@@ -495,7 +511,7 @@ public class DigestAuthenticator extends AuthenticatorBase {
             }
         };
     }
- 
+
     private static class DigestInfo {
 
         private final String opaque;
@@ -628,7 +644,7 @@ public class DigestAuthenticator extends AuthenticatorBase {
             if (!lcRealm.equals(realmName)) {
                 return false;
             }
-            
+
             // Validate the opaque string
             if (!opaque.equals(opaqueReceived)) {
                 return false;
@@ -735,7 +751,7 @@ public class DigestAuthenticator extends AuthenticatorBase {
             seen = new boolean[seenWindowSize];
             offset = seenWindowSize / 2;
         }
-        
+
         public synchronized boolean nonceCountValid(long nonceCount) {
             if ((count - offset) >= nonceCount ||
                     (nonceCount > count - offset + seen.length)) {
@@ -751,7 +767,7 @@ public class DigestAuthenticator extends AuthenticatorBase {
                 return true;
             }
         }
-        
+
         public long getTimestamp() {
             return timestamp;
         }
