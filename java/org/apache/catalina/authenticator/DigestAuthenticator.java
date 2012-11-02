@@ -97,6 +97,12 @@ public class DigestAuthenticator extends AuthenticatorBase {
 
 
     /**
+     * The window size to use to track seen nonce count values for a given
+     * nonce. If not specified, the default of 100 is used.
+     */
+    protected int nonceCountWindowSize = 100;
+
+    /**
      * Private key.
      */
     protected String key = null;
@@ -122,6 +128,16 @@ public class DigestAuthenticator extends AuthenticatorBase {
     protected boolean validateUri = true;
 
     // ------------------------------------------------------------- Properties
+
+    public int getNonceCountWindowSize() {
+        return nonceCountWindowSize;
+    }
+
+
+    public void setNonceCountWindowSize(int nonceCountWindowSize) {
+        this.nonceCountWindowSize = nonceCountWindowSize;
+    }
+
 
     public int getNonceCacheSize() {
         return nonceCacheSize;
@@ -315,7 +331,7 @@ public class DigestAuthenticator extends AuthenticatorBase {
                 ipTimeKey.getBytes(B2CConverter.ISO_8859_1));
         String nonce = currentTime + ":" + MD5Encoder.encode(buffer);
 
-        NonceInfo info = new NonceInfo(currentTime, 100);
+        NonceInfo info = new NonceInfo(currentTime, getNonceCountWindowSize());
         synchronized (nonces) {
             nonces.put(nonce, info);
         }

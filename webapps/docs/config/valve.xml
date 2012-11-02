@@ -897,6 +897,15 @@
         of that cache. If not specified, the default value of 1000 is used.</p>
       </attribute>
 
+      <attribute name="nonceCountWindowSize" required="false">
+        <p>Client requests may be processed out of order which in turn means
+        that the nonce count values may be processed out of order. To prevent
+        authentication failures when nonce counts are presented out of order
+        the authenticator tracks a window of nonce count values. This attribute
+        controls how big that window is. If not specified, the default value of
+        100 is used.</p>
+      </attribute>
+
       <attribute name="nonceValidity" required="false">
         <p>The time, in milliseconds, that a server generated nonce will be
         considered valid for use in authentication. If not specified, the

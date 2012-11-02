@@ -123,13 +123,13 @@ public class TesterDigestAuthenticatorPerformance {
 
         // Make the Context and Realm visible to the Authenticator
         authenticator.setContainer(context);
+        authenticator.setNonceCountWindowSize(8 * 1024);
 
         authenticator.start();
     }
 
 
     private class TesterRunnable implements Runnable {
-
 
         private String nonce;
         private int requestCount;
