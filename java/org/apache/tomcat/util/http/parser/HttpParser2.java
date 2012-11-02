@@ -173,7 +173,7 @@ public class HttpParser2 {
             int c = input.read();
             if (c != constant.charAt(i)) {
                 if (optional) {
-                    input.skip(i);
+                    input.skip(-(i+1));
                     return false;
                 } else {
                     throw new IllegalArgumentException(
@@ -186,9 +186,9 @@ public class HttpParser2 {
     }
 
     private static void skipLws(StringReader input) throws IOException {
-        char c = (char) input.read();
+        int c = input.read();
         while (c == 32 || c == 9) {
-            c = (char) input.read();
+            c = input.read();
         }
 
         // Skip back so non-LWS character is available for next read
@@ -198,10 +198,10 @@ public class HttpParser2 {
     private static String readToken(StringReader input) throws IOException {
         StringBuilder result = new StringBuilder();
 
-        char c = (char) input.read();
-        while (c != 65535 && isToken[c]) {
-            result.append(c);
-            c = (char) input.read();
+        int c = input.read();
+        while (c != -1 && isToken[c]) {
+            result.append((char) c);
+            c = input.read();
         }
         // Skip back so non-token character is available for next read
         input.skip(-1);
@@ -212,7 +212,7 @@ public class HttpParser2 {
     private static String readQuotedString(StringReader input)
             throws IOException {
 
-        char c = (char) input.read();
+        int c = input.read();
         if (c != '"') {
             throw new IllegalArgumentException(
                     "TODO i18n: Quoted string must start with a quote");
@@ -220,15 +220,18 @@ public class HttpParser2 {
 
         StringBuilder result = new StringBuilder();
 
-        c = (char) input.read();
+        c = input.read();
         while (c != '"') {
-            if (c == '\\') {
-                c = (char) input.read();
+            if (c == -1) {
+                throw new IllegalArgumentException(
+                        "TODO i18n: Quoted string must end with a quote");
+            } else if (c == '\\') {
+                c = input.read();
                 result.append(c);
             } else {
-                result.append(c);
+                result.append((char) c);
             }
-            c = (char) input.read();
+            c = input.read();
         }
 
         return result.toString();
@@ -236,7 +239,7 @@ public class HttpParser2 {
 
     private static String readTokenOrQuotedString(StringReader input)
             throws IOException {
-        char c = (char) input.read();
+        int c = input.read();
         input.skip(-1);
 
         if (c == '"') {
@@ -253,10 +256,10 @@ public class HttpParser2 {
     private static String readLhex(StringReader input) throws IOException {
         StringBuilder result = new StringBuilder();
 
-        char c = (char) input.read();
-        while (isHex[c]) {
-            result.append(c);
-            c = (char) input.read();
+        int c = input.read();
+        while (c != -1 && isHex[c]) {
+            result.append((char) c);
+            c = input.read();
         }
         // Skip back so non-hex character is available for next read
         input.skip(-1);

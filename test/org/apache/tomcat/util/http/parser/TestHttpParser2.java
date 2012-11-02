@@ -113,4 +113,43 @@ public class TestHttpParser2 {
         Assert.assertEquals("auth", result.get("qop"));
         Assert.assertEquals("9926cb3c334ede11", result.get("cnonce"));
     }
+
+    @Test
+    public void testEndWithLhex() throws Exception {
+        String header = "Digest nc=00000001";
+
+        StringReader input = new StringReader(header);
+
+        Map<String,String> result = HttpParser2.parseAuthorizationDigest(input);
+
+        Assert.assertEquals("00000001", result.get("nc"));
+    }
+
+    @Test(expected=IllegalArgumentException.class)
+    public void testUnclosedQuotedString1() throws Exception {
+        String header = "Digest username=\"test";
+
+        StringReader input = new StringReader(header);
+
+        HttpParser2.parseAuthorizationDigest(input);
+    }
+
+    @Test(expected=IllegalArgumentException.class)
+    public void testUnclosedQuotedString2() throws Exception {
+        String header = "Digest username=\"test\\";
+
+        StringReader input = new StringReader(header);
+
+        HttpParser2.parseAuthorizationDigest(input);
+    }
+
+    @Test(expected=IllegalArgumentException.class)
+    public void testNonTokenDirective() throws Exception {
+        String header = "Digest user{name=\"test\"";
+
+        StringReader input = new StringReader(header);
+
+        HttpParser2.parseAuthorizationDigest(input);
+    }
+
 }
