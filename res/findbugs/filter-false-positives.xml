@@ -232,6 +232,18 @@
   </Match>
   <Match>
     <!-- Returning null here is fine -->
+    <Class name="org.apache.tomcat.util.buf.ByteChunk"/>
+    <Method name="toString"/>
+    <Bug code="NP" />
+  </Match>
+  <Match>
+    <!-- Returning null here is fine -->
+    <Class name="org.apache.tomcat.util.buf.CharChunk"/>
+    <Method name="toString"/>
+    <Bug code="NP" />
+  </Match>
+  <Match>
+    <!-- Returning null here is fine -->
     <Class name="org.apache.tomcat.util.buf.MessageBytes"/>
     <Method name="toString"/>
     <Bug code="NP" />
@@ -291,6 +303,7 @@
     <Class name="org.apache.tomcat.util.threads.ThreadPoolExecutor" />
     <Bug code="Nm" />
   </Match>
+
   <!--  Generated code -->
   <Match>
     <Class name="org.apache.el.parser.ELParserTokenManager" />
