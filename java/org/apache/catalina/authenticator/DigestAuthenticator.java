@@ -40,7 +40,7 @@ import org.apache.catalina.util.MD5Encoder;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.buf.B2CConverter;
-import org.apache.tomcat.util.http.parser.HttpParser2;
+import org.apache.tomcat.util.http.parser.HttpParser;
 
 
 
@@ -559,7 +559,7 @@ public class DigestAuthenticator extends AuthenticatorBase {
 
             Map<String,String> directives;
             try {
-                directives = HttpParser2.parseAuthorizationDigest(
+                directives = HttpParser.parseAuthorizationDigest(
                         new StringReader(authorization));
             } catch (IOException e) {
                 return false;

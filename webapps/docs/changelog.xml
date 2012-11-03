@@ -92,6 +92,14 @@
         multiple issues that resulted in incorrect ordering or failure to find
         a correct, valid order. (markt)
       </fix>
+      <update>
+        The HTTP header parser added to address <bug>52811</bug> has been
+        removed and replaced with the light-weight HTTP header parser created to
+        address <bug>54060</bug>. The new parser includes a work-around has for
+        a bug in the Adobe Acrobat Reader 9.x plug-in for Microsoft Internet
+        Explorer that was identified when the old parser was introduced
+        (<bug>53814</bug>).  
+      </update>
     </changelog>
   </subsection>
   <subsection name="Coyote">
