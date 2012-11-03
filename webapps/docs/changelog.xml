@@ -82,6 +82,12 @@
         multiple instances of the CGI servlet. (markt)
       </fix>
       <fix>
+        <bug>54060</bug>: Use a simple parser rather than a regular expression
+        to parse HTTP Digest authentication headers so the header is correctly
+        parsed. The new approach is also faster and generates less garbage.
+        (markt)
+      </fix>
+      <fix>
         <bug>54068</bug>: Rewrite the web fragment ordering algorithm to resolve
         multiple issues that resulted in incorrect ordering or failure to find
         a correct, valid order. (markt)
