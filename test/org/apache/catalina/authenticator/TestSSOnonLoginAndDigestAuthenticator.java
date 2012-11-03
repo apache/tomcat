@@ -449,14 +449,12 @@ public class TestSSOnonLoginAndDigestAuthenticator extends TomcatBaseTest {
         auth.append(md5response);
         auth.append("\"");
         if (qop != null) {
-            auth.append(", qop=\"");
+            auth.append(", qop=");
             auth.append(qop);
-            auth.append("\"");
         }
         if (nc != null) {
-            auth.append(", nc=\"");
+            auth.append(", nc=");
             auth.append(nc);
-            auth.append("\"");
         }
         if (cnonce != null) {
             auth.append(", cnonce=\"");
