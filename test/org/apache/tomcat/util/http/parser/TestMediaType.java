@@ -16,6 +16,7 @@
  */
 package org.apache.tomcat.util.http.parser;
 
+import java.io.IOException;
 import java.io.StringReader;
 
 import static org.junit.Assert.assertEquals;
@@ -60,93 +61,90 @@ public class TestMediaType {
 
 
     @Test
-    public void testSimple() throws ParseException {
+    public void testSimple() throws IOException {
         doTest();
     }
 
 
     @Test
-    public void testSimpleWithToken() throws ParseException {
+    public void testSimpleWithToken() throws IOException {
         doTest(PARAM_TOKEN);
     }
 
 
     @Test
-    public void testSimpleWithQuotedString() throws ParseException {
+    public void testSimpleWithQuotedString() throws IOException {
         doTest(PARAM_QUOTED);
     }
 
 
     @Test
-    public void testSimpleWithEmptyQuotedString() throws ParseException {
+    public void testSimpleWithEmptyQuotedString() throws IOException {
         doTest(PARAM_EMPTY_QUOTED);
     }
 
 
     @Test
-    public void testSimpleWithComplesQuotedString() throws ParseException {
+    public void testSimpleWithComplesQuotedString() throws IOException {
         doTest(PARAM_COMPLEX_QUOTED);
     }
 
 
     @Test
-    public void testSimpleWithCharset() throws ParseException {
+    public void testSimpleWithCharset() throws IOException {
         doTest(PARAM_CHARSET);
     }
 
 
     @Test
-    public void testSimpleWithCharsetWhitespaceBefore() throws ParseException {
+    public void testSimpleWithCharsetWhitespaceBefore() throws IOException {
         doTest(PARAM_WS_CHARSET);
     }
 
 
     @Test
-    public void testSimpleWithCharsetWhitespaceAfter() throws ParseException {
+    public void testSimpleWithCharsetWhitespaceAfter() throws IOException {
         doTest(PARAM_CHARSET_WS);
     }
 
 
     @Test
-    public void testSimpleWithCharsetQuoted() throws ParseException {
+    public void testSimpleWithCharsetQuoted() throws IOException {
         doTest(PARAM_CHARSET_QUOTED);
     }
 
 
     @Test
-    public void testSimpleWithAll() throws ParseException {
+    public void testSimpleWithAll() throws IOException {
         doTest(PARAM_COMPLEX_QUOTED, PARAM_EMPTY_QUOTED, PARAM_QUOTED,
                 PARAM_TOKEN, PARAM_CHARSET);
     }
 
 
     @Test
-    public void testCharset() throws ParseException {
+    public void testCharset() throws IOException {
         StringBuilder sb = new StringBuilder();
         sb.append(TYPES);
         sb.append(PARAM_CHARSET);
         sb.append(PARAM_TOKEN);
 
         StringReader sr = new StringReader(sb.toString());
-        HttpParser hp = new HttpParser(sr);
-        AstMediaType m = hp.MediaType();
+        MediaType m = HttpParser.parseMediaType(sr);
 
-        assertEquals(sb.toString().replaceAll(" ", ""), m.toString());
+        assertEquals("foo/bar; charset=UTF-8; a=b", m.toString());
         assertEquals(CHARSET, m.getCharset());
-        assertEquals(TYPES.replaceAll(" ", "") + PARAM_TOKEN,
-                m.toStringNoCharset());
+        assertEquals("foo/bar; a=b", m.toStringNoCharset());
     }
 
 
     @Test
-    public void testCharsetQuoted() throws ParseException {
+    public void testCharsetQuoted() throws IOException {
         StringBuilder sb = new StringBuilder();
         sb.append(TYPES);
         sb.append(PARAM_CHARSET_QUOTED);
 
         StringReader sr = new StringReader(sb.toString());
-        HttpParser hp = new HttpParser(sr);
-        AstMediaType m = hp.MediaType();
+        MediaType m = HttpParser.parseMediaType(sr);
 
         assertEquals(CHARSET_WS, m.getCharset());
         assertEquals(TYPES.replaceAll(" ", ""),
@@ -155,88 +153,59 @@ public class TestMediaType {
 
 
     @Test
-    public void testBug52811() throws ParseException {
+    public void testBug52811() throws IOException {
         String input = "multipart/related;boundary=1_4F50BD36_CDF8C28;" +
                 "Start=\"<31671603.smil>\";" +
                 "Type=\"application/smil;charset=UTF-8\"";
 
         StringReader sr = new StringReader(input);
-        HttpParser hp = new HttpParser(sr);
-        AstMediaType m = hp.MediaType();
-
-        assertTrue(m.children.length == 5);
+        MediaType m = HttpParser.parseMediaType(sr);
 
         // Check the types
-        assertTrue(m.children[0] instanceof AstType);
-        assertTrue(m.children[1] instanceof AstSubType);
-        assertEquals("multipart", m.children[0].toString());
-        assertEquals("related", m.children[1].toString());
+        assertEquals("multipart", m.getType());
+        assertEquals("related", m.getSubtype());
 
         // Check the parameters
-        AstParameter p = (AstParameter) m.children[2];
-        assertTrue(p.children.length == 2);
-        assertTrue(p.children[0] instanceof AstAttribute);
-        assertTrue(p.children[1] instanceof AstValue);
-        assertEquals("boundary", p.children[0].toString());
-        assertEquals("1_4F50BD36_CDF8C28", p.children[1].toString());
+        assertTrue(m.getParameterCount() == 3);
 
-        p = (AstParameter) m.children[3];
-        assertTrue(p.children.length == 2);
-        assertTrue(p.children[0] instanceof AstAttribute);
-        assertTrue(p.children[1] instanceof AstValue);
-        assertEquals("Start", p.children[0].toString());
-        assertEquals("\"<31671603.smil>\"", p.children[1].toString());
-
-        p = (AstParameter) m.children[4];
-        assertTrue(p.children.length == 2);
-        assertTrue(p.children[0] instanceof AstAttribute);
-        assertTrue(p.children[1] instanceof AstValue);
-        assertEquals("Type", p.children[0].toString());
+        assertEquals("1_4F50BD36_CDF8C28", m.getParameterValue("boundary"));
+        assertEquals("\"<31671603.smil>\"", m.getParameterValue("Start"));
         assertEquals("\"application/smil;charset=UTF-8\"",
-                p.children[1].toString());
+                m.getParameterValue("Type"));
 
-        assertEquals(input, m.toString());
-        assertEquals(input, m.toStringNoCharset());
+        String expected = "multipart/related; boundary=1_4F50BD36_CDF8C28; " +
+                "Start=\"<31671603.smil>\"; " +
+                "Type=\"application/smil;charset=UTF-8\"";
+        assertEquals(expected, m.toString());
+        assertEquals(expected, m.toStringNoCharset());
         assertNull(m.getCharset());
     }
 
 
     @Test
-    public void testBug53353() throws ParseException {
+    public void testBug53353() throws IOException {
         String input = "text/html; UTF-8;charset=UTF-8";
 
         StringReader sr = new StringReader(input);
-        HttpParser hp = new HttpParser(sr);
-        AstMediaType m = hp.MediaType();
-
-        assertTrue(m.children.length == 4);
+        MediaType m = HttpParser.parseMediaType(sr);
 
         // Check the types
-        assertTrue(m.children[0] instanceof AstType);
-        assertTrue(m.children[1] instanceof AstSubType);
-        assertEquals("text", m.children[0].toString());
-        assertEquals("html", m.children[1].toString());
+        assertEquals("text", m.getType());
+        assertEquals("html", m.getSubtype());
 
         // Check the parameters
-        AstParameter p = (AstParameter) m.children[2];
-        assertTrue(p.children.length == 1);
-        assertTrue(p.children[0] instanceof AstAttribute);
-        assertEquals("UTF-8", p.children[0].toString());
+        assertTrue(m.getParameterCount() == 2);
 
-        p = (AstParameter) m.children[3];
-        assertTrue(p.children.length == 2);
-        assertTrue(p.children[0] instanceof AstAttribute);
-        assertTrue(p.children[1] instanceof AstValue);
-        assertEquals("charset", p.children[0].toString());
-        assertEquals("UTF-8", p.children[1].toString());
+        assertEquals("", m.getParameterValue("UTF-8"));
+        assertEquals("UTF-8", m.getCharset());
 
         // Note: Invalid input is filtered out
-        assertEquals("text/html;charset=UTF-8", m.toString());
+        assertEquals("text/html; charset=UTF-8", m.toString());
         assertEquals("UTF-8", m.getCharset());
     }
 
 
-    private void doTest(Parameter... parameters) throws ParseException {
+    private void doTest(Parameter... parameters) throws IOException {
         StringBuilder sb = new StringBuilder();
         sb.append(TYPES);
         for (Parameter p : parameters) {
@@ -244,27 +213,19 @@ public class TestMediaType {
         }
 
         StringReader sr = new StringReader(sb.toString());
-        HttpParser hp = new HttpParser(sr);
-        AstMediaType m = hp.MediaType();
+        MediaType m = HttpParser.parseMediaType(sr);
 
-        // Check all expected children are present
-        assertTrue(m.children.length == 2 + parameters.length);
+        // Check all expected parameters are present
+        assertTrue(m.getParameterCount() == parameters.length);
 
         // Check the types
-        assertTrue(m.children[0] instanceof AstType);
-        assertTrue(m.children[1] instanceof AstSubType);
-        assertEquals(TYPE.trim(), m.children[0].toString());
-        assertEquals(SUBTYPE.trim(), m.children[1].toString());
+        assertEquals(TYPE.trim(), m.getType());
+        assertEquals(SUBTYPE.trim(), m.getSubtype());
 
         // Check the parameters
         for (int i = 0; i <  parameters.length; i++) {
-            assertTrue(m.children[i + 2] instanceof AstParameter);
-            AstParameter p = (AstParameter) m.children[i + 2];
-            assertTrue(p.children.length == 2);
-            assertTrue(p.children[0] instanceof AstAttribute);
-            assertTrue(p.children[1] instanceof AstValue);
-            assertEquals(parameters[i].getName().trim(), p.children[0].toString());
-            assertEquals(parameters[i].getValue().trim(), p.children[1].toString());
+            assertEquals(parameters[i].getValue().trim(),
+                    m.getParameterValue(parameters[i].getName().trim()));
         }
     }
 
