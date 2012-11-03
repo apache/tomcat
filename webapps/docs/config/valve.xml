@@ -1188,6 +1188,18 @@
 
     <attributes>
 
+      <attribute name="alwaysUseSession" required="false">
+        <p>Should a session always be used once a user is authenticated? This
+        may offer some performance benefits since the session can then be used
+        to cache the authenticated Principal, hence removing the need to
+        authenticate the user on every request. This will also help with clients
+        that assume that the server will cache the authenticated user. However
+        there will also be the performance cost of creating and GC'ing the
+        session. For an alternative solution see
+        <code>noKeepAliveUserAgents</code>. If not set, the default value of
+        <code>false</code> will be used.</p>
+      </attribute>
+
       <attribute name="cache" required="false">
         <p>Should we cache authenticated Principals if the request is part of an
         HTTP session? If not specified, the default value of <code>true</code>
@@ -1221,6 +1233,25 @@
         <p>The name of the JAAS login configuration to be used to login as the
         service. If not specified, the default of
         <code>com.sun.security.jgss.krb5.accept</code> is used.</p>
+      </attribute>
+
+      <attribute name="noKeepAliveUserAgents" required="false">
+        <p>Some clients (not most browsers) expect the server to cache the
+        authenticated user information for a connection and do not resend the
+        credentials with every request. Tomcat will not do this unless an HTTP
+        session is available. A session will be availble if either the
+        application creates one or if <code>alwaysUseSession</code> is enabled
+        for this Authenticator.</p>
+        <p>As an alternative to creating a session, this attribute may be used
+        to define the user agents for which HTTP keep-alive is disabled. This
+        means that a connection will only used for a single request and hence
+        there is no ability to cache authenticated user information per
+        connection. There will be a performance cost in disabling HTTP
+        keep-alive.</p>
+        <p>The attribute should be a regular expression that matches the entire
+        user-agent string, e.g. <code>.*Chrome.*</code>. If not specified, no
+        regular expression will be defined and no user agents will have HTTP
+        keep-alive disabled.</p>
       </attribute>
 
       <attribute name="securePagesWithPragma" required="false">

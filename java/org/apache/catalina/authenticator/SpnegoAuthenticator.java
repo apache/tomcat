@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.security.Principal;
 import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
+import java.util.regex.Pattern;
 
 import javax.security.auth.Subject;
 import javax.security.auth.login.LoginContext;
@@ -67,6 +68,24 @@ public class SpnegoAuthenticator extends AuthenticatorBase {
     public void setStoreDelegatedCredential(
             boolean storeDelegatedCredential) {
         this.storeDelegatedCredential = storeDelegatedCredential;
+    }
+
+    private Pattern noKeepAliveUserAgents = null;
+    public String getNoKeepAliveUserAgents() {
+        Pattern p = noKeepAliveUserAgents;
+        if (p == null) {
+            return null;
+        } else {
+            return p.pattern();
+        }
+    }
+    public void setNoKeepAliveUserAgents(String noKeepAliveUserAgents) {
+        if (noKeepAliveUserAgents == null ||
+                noKeepAliveUserAgents.length() == 0) {
+            this.noKeepAliveUserAgents = null;
+        } else {
+            this.noKeepAliveUserAgents = Pattern.compile(noKeepAliveUserAgents);
+        }
     }
 
 
@@ -265,6 +284,16 @@ public class SpnegoAuthenticator extends AuthenticatorBase {
         if (principal != null) {
             register(request, response, principal, Constants.SPNEGO_METHOD,
                     principal.getName(), null);
+
+            Pattern p = noKeepAliveUserAgents;
+            if (p != null) {
+                MessageBytes ua =
+                        request.getCoyoteRequest().getMimeHeaders().getValue(
+                                "user-agent");
+                if (ua != null && p.matcher(ua.toString()).matches()) {
+                    response.setHeader("Connection", "close");
+                }
+            }
             return true;
         }
 
