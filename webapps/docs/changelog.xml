@@ -100,6 +100,12 @@
         Explorer that was identified when the old parser was introduced
         (<bug>53814</bug>).  
       </update>
+      <fix>
+        <bug>54076</bug>: Add an alternative work-around for clients that use
+        SPNEGO authentication and expect the authenticated user to be cached
+        per connection (Tomcat only does this if an HTTP session is available).
+        (markt) 
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
