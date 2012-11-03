@@ -54,7 +54,7 @@ public class TesterDigestAuthenticatorPerformance {
 
     @Test
     public void testSimple() throws Exception {
-        doTest(4, 100000);
+        doTest(4, 1000000);
     }
 
     public void doTest(int threadCount, int requestCount) throws Exception {
@@ -66,7 +66,8 @@ public class TesterDigestAuthenticatorPerformance {
 
         // Create the runnables & threads
         for (int i = 0; i < threadCount; i++) {
-            runnables[i] = new TesterRunnable(nonce, requestCount);
+            runnables[i] =
+                    new TesterRunnable(authenticator, nonce, requestCount);
             threads[i] = new Thread(runnables[i]);
         }
 
@@ -129,7 +130,7 @@ public class TesterDigestAuthenticatorPerformance {
     }
 
 
-    private class TesterRunnable implements Runnable {
+    private static class TesterRunnable implements Runnable {
 
         private String nonce;
         private int requestCount;
@@ -139,9 +140,22 @@ public class TesterDigestAuthenticatorPerformance {
 
         private TesterDigestRequest request;
         private HttpServletResponse response;
+        private DigestAuthenticator authenticator;
+
+        private static final String A1 = USER + ":" + REALM + ":" + PWD;
+        private static final String A2 = METHOD + ":" + CONTEXT_PATH + URI;
+
+        private static final String MD5A1 = MD5Encoder.encode(
+                ConcurrentMessageDigest.digest("MD5", A1.getBytes()));
+        private static final String MD5A2 = MD5Encoder.encode(
+                ConcurrentMessageDigest.digest("MD5", A2.getBytes()));
+
+
 
         // All init code should be in here. run() needs to be quick
-        public TesterRunnable(String nonce, int requestCount) throws Exception {
+        public TesterRunnable(DigestAuthenticator authenticator,
+                String nonce, int requestCount) throws Exception {
+            this.authenticator = authenticator;
             this.nonce = nonce;
             this.requestCount = requestCount;
 
@@ -183,16 +197,8 @@ public class TesterDigestAuthenticatorPerformance {
                     Integer.valueOf(nonceCount.incrementAndGet()));
             String cnonce = "cnonce";
 
-            String a1 = USER + ":" + REALM + ":" + PWD;
-            String a2 = METHOD + ":" + CONTEXT_PATH + URI;
-
-            String md5a1 = MD5Encoder.encode(
-                    ConcurrentMessageDigest.digest("MD5", a1.getBytes()));
-            String md5a2 = MD5Encoder.encode(
-                    ConcurrentMessageDigest.digest("MD5", a2.getBytes()));
-
-            String response = md5a1 + ":" + nonce + ":" + ncString + ":" +
-                    cnonce + ":" + QOP + ":" + md5a2;
+            String response = MD5A1 + ":" + nonce + ":" + ncString + ":" +
+                    cnonce + ":" + QOP + ":" + MD5A2;
 
             String md5response = MD5Encoder.encode(
                     ConcurrentMessageDigest.digest("MD5", response.getBytes()));
