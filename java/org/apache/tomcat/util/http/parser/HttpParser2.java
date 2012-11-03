@@ -36,13 +36,11 @@ import java.util.Map;
  *
  * Provides parsing of the following HTTP header values as per RFC 2616:
  * - Authorization for DIGEST authentication
+ * - MediaType (used for Content-Type header)
  *
  * Support for additional headers will be provided as required.
  *
- * TODO: Check the performance of this parser against the current Digest header
- *       parsing code.
- *
- * TODO: Add support for parsing content-type and replace HttpParser
+ * TODO: Replace HttpParser
  */
 public class HttpParser2 {
 
@@ -112,7 +110,7 @@ public class HttpParser2 {
 
         Map<String,String> result = new HashMap<>();
 
-        if (!skipConstant(input, "Digest", false)) {
+        if (skipConstant(input, "Digest") != SkipConstantResult.FOUND) {
             return null;
         }
         skipLws(input);
@@ -123,7 +121,7 @@ public class HttpParser2 {
         }
         while (!field.equals("")) {
             skipLws(input);
-            if (!skipConstant(input, "=", false)) {
+            if (skipConstant(input, "=") != SkipConstantResult.FOUND) {
                 return null;
             }
             skipLws(input);
@@ -140,11 +138,11 @@ public class HttpParser2 {
                     break;
                 case 1:
                     // FIELD_TYPE_QUOTED_STRING
-                    value = readQuotedString(input);
+                    value = readQuotedString(input, false);
                     break;
                 case 2:
                     // FIELD_TYPE_TOKEN_OR_QUOTED_STRING
-                    value = readTokenOrQuotedString(input);
+                    value = readTokenOrQuotedString(input, false);
                     break;
                 case 3:
                     // FIELD_TYPE_LHEX
@@ -166,7 +164,7 @@ public class HttpParser2 {
             result.put(field, value);
 
             skipLws(input);
-            if (!skipConstant(input, ",", true)) {
+            if (skipConstant(input, ",") == SkipConstantResult.NOT_FOUND) {
                 return null;
             }
             skipLws(input);
@@ -179,24 +177,90 @@ public class HttpParser2 {
         return result;
     }
 
-    /**
-     * @return  <code>true</code> if the constant is found or if no data is
-     *          present and EOF is allowed otherwise returns <code>false</code>
-     */
-    private static boolean skipConstant(StringReader input, String constant,
-            boolean eofOk) throws IOException {
+    public static MediaType parseMediaType(StringReader input)
+            throws IOException {
+
+        // Type (required)
+        String type = readToken(input);
+        if (type == null || type.length() == 0) {
+            return null;
+        }
+
+        skipLws(input);
+        if (skipConstant(input, "/") == SkipConstantResult.NOT_FOUND) {
+            return null;
+        }
+        skipLws(input);
+
+        // Subtype (required)
+        String subtype = readToken(input);
+        if (subtype == null || subtype.length() == 0) {
+            return null;
+        }
+
+        skipLws(input);
+
+        Map<String,String> parameters = new HashMap<>();
+
+        SkipConstantResult lookForSemiColon = skipConstant(input, ";");
+        if (lookForSemiColon == SkipConstantResult.NOT_FOUND) {
+            return null;
+        }
+        while (lookForSemiColon == SkipConstantResult.FOUND) {
+            skipLws(input);
+            String attribute = readToken(input);
+            skipLws(input);
+
+            if (skipConstant(input, "=") != SkipConstantResult.FOUND) {
+                return null;
+            }
+
+            skipLws(input);
+            String value = readTokenOrQuotedString(input, true);
+            skipLws(input);
+
+            parameters.put(attribute.toLowerCase(), value);
+
+            lookForSemiColon = skipConstant(input, ";");
+            if (lookForSemiColon == SkipConstantResult.NOT_FOUND) {
+                return null;
+            }
+        }
+
+        String charset = parameters.remove("charset");
+        StringBuilder noCharSet = new StringBuilder();
+        noCharSet.append(type);
+        noCharSet.append('/');
+        noCharSet.append(subtype);
+        for (Map.Entry<String, String> entry : parameters.entrySet()) {
+            noCharSet.append(';');
+            // Workaround for Adobe Read 9 plug-in on IE bug
+            // Can be removed after 26 June 2013 (EOL of Reader 9)
+            // See BZ 53814
+            noCharSet.append(' ');
+            noCharSet.append(entry.getKey());
+            noCharSet.append('=');
+            noCharSet.append(entry.getValue());
+        }
+
+        return new MediaType(noCharSet.toString(), charset);
+    }
+
+    private static SkipConstantResult skipConstant(StringReader input,
+            String constant) throws IOException {
         int len = constant.length();
 
         for (int i = 0; i < len; i++) {
             int c = input.read();
-            if (i == 0 && c == -1 && eofOk) {
-                return true;
+            if (i == 0 && c == -1) {
+                return SkipConstantResult.EOF;
             }
             if (c != constant.charAt(i)) {
-                return false;
+                input.skip(-(i + 1));
+                return SkipConstantResult.NOT_FOUND;
             }
         }
-        return true;
+        return SkipConstantResult.FOUND;
     }
 
     private static void skipLws(StringReader input) throws IOException {
@@ -237,8 +301,8 @@ public class HttpParser2 {
      *         quoted string was found or null if the end of data was reached
      *         before the quoted string was terminated
      */
-    private static String readQuotedString(StringReader input)
-            throws IOException {
+    private static String readQuotedString(StringReader input,
+            boolean returnQuoted) throws IOException {
 
         int c = input.read();
         if (c != '"') {
@@ -246,30 +310,38 @@ public class HttpParser2 {
         }
 
         StringBuilder result = new StringBuilder();
-
+        if (returnQuoted) {
+            result.append('\"');
+        }
         c = input.read();
         while (c != '"') {
             if (c == -1) {
                 return null;
             } else if (c == '\\') {
                 c = input.read();
+                if (returnQuoted) {
+                    result.append('\\');
+                }
                 result.append(c);
             } else {
                 result.append((char) c);
             }
             c = input.read();
         }
+        if (returnQuoted) {
+            result.append('\"');
+        }
 
         return result.toString();
     }
 
-    private static String readTokenOrQuotedString(StringReader input)
-            throws IOException {
+    private static String readTokenOrQuotedString(StringReader input,
+            boolean returnQuoted) throws IOException {
         int c = input.read();
         input.skip(-1);
 
         if (c == '"') {
-            return readQuotedString(input);
+            return readQuotedString(input, returnQuoted);
         } else {
             return readToken(input);
         }
@@ -303,10 +375,20 @@ public class HttpParser2 {
     private static String readQuotedLhex(StringReader input)
             throws IOException {
 
-        skipConstant(input, "\"", false);
+        if (skipConstant(input, "\"") != SkipConstantResult.FOUND) {
+            return null;
+        }
         String result = readLhex(input);
-        skipConstant(input, "\"", false);
+        if (skipConstant(input, "\"") == SkipConstantResult.NOT_FOUND) {
+            return null;
+        }
 
         return result;
+    }
+
+    private static enum SkipConstantResult {
+        FOUND,
+        NOT_FOUND,
+        EOF
     }
 }
