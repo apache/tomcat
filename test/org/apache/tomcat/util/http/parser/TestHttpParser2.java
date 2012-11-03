@@ -125,31 +125,34 @@ public class TestHttpParser2 {
         Assert.assertEquals("00000001", result.get("nc"));
     }
 
-    @Test(expected=IllegalArgumentException.class)
+    @Test
     public void testUnclosedQuotedString1() throws Exception {
         String header = "Digest username=\"test";
 
         StringReader input = new StringReader(header);
 
-        HttpParser2.parseAuthorizationDigest(input);
+        Map<String,String> result = HttpParser2.parseAuthorizationDigest(input);
+        Assert.assertNull(result);
     }
 
-    @Test(expected=IllegalArgumentException.class)
+    @Test
     public void testUnclosedQuotedString2() throws Exception {
         String header = "Digest username=\"test\\";
 
         StringReader input = new StringReader(header);
 
-        HttpParser2.parseAuthorizationDigest(input);
+        Map<String,String> result = HttpParser2.parseAuthorizationDigest(input);
+        Assert.assertNull(result);
     }
 
-    @Test(expected=IllegalArgumentException.class)
+    @Test
     public void testNonTokenDirective() throws Exception {
         String header = "Digest user{name=\"test\"";
 
         StringReader input = new StringReader(header);
 
-        HttpParser2.parseAuthorizationDigest(input);
+        Map<String,String> result = HttpParser2.parseAuthorizationDigest(input);
+        Assert.assertNull(result);
     }
 
 }

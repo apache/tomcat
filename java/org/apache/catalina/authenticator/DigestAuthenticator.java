@@ -481,7 +481,11 @@ public class DigestAuthenticator extends AuthenticatorBase {
             try {
                 directives = HttpParser2.parseAuthorizationDigest(
                         new StringReader(authorization));
-            } catch (IllegalArgumentException | IOException e) {
+            } catch (IOException e) {
+                return false;
+            }
+
+            if (directives == null) {
                 return false;
             }
 

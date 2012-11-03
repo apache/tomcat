@@ -98,7 +98,8 @@ public class HttpParser2 {
      *
      * @param input The header value to parse
      *
-     * @return  A map of directives and values as {@link String}s. Although the
+     * @return  A map of directives and values as {@link String}s or
+     *          <code>null</code> if a parsing error occurs. Although the
      *          values returned are {@link String}s they will have been
      *          validated to ensure that they conform to RFC 2617.
      *
@@ -111,13 +112,20 @@ public class HttpParser2 {
 
         Map<String,String> result = new HashMap<>();
 
-        swallowConstant(input, "Digest", false);
+        if (!skipConstant(input, "Digest", false)) {
+            return null;
+        }
         skipLws(input);
         // All field names are valid tokens
         String field = readToken(input);
-        while (field != null) {
+        if (field == null) {
+            return null;
+        }
+        while (!field.equals("")) {
             skipLws(input);
-            swallowConstant(input, "=", false);
+            if (!skipConstant(input, "=", false)) {
+                return null;
+            }
             skipLws(input);
             String value = null;
             Integer type = fieldTypes.get(field.toLowerCase(Locale.US));
@@ -152,34 +160,40 @@ public class HttpParser2 {
                             "TODO i18n: Unsupported type");
             }
 
+            if (value == null) {
+                return null;
+            }
             result.put(field, value);
 
             skipLws(input);
-            if (!swallowConstant(input, ",", true)) {
-                break;
+            if (!skipConstant(input, ",", true)) {
+                return null;
             }
             skipLws(input);
             field = readToken(input);
+            if (field == null) {
+                return null;
+            }
         }
 
         return result;
     }
 
-    private static boolean swallowConstant(StringReader input, String constant,
-            boolean optional) throws IOException {
+    /**
+     * @return  <code>true</code> if the constant is found or if no data is
+     *          present and EOF is allowed otherwise returns <code>false</code>
+     */
+    private static boolean skipConstant(StringReader input, String constant,
+            boolean eofOk) throws IOException {
         int len = constant.length();
 
         for (int i = 0; i < len; i++) {
             int c = input.read();
+            if (i == 0 && c == -1 && eofOk) {
+                return true;
+            }
             if (c != constant.charAt(i)) {
-                if (optional) {
-                    input.skip(-(i+1));
-                    return false;
-                } else {
-                    throw new IllegalArgumentException(
-                            "TODO I18N: Failed to parse input for [" + constant +
-                            "]");
-                }
+                return false;
             }
         }
         return true;
@@ -195,6 +209,11 @@ public class HttpParser2 {
         input.skip(-1);
     }
 
+    /**
+     * @return  the token if one was found, the empty string if no data was
+     *          available to read or <code>null</code> if data other than a
+     *          token was found
+     */
     private static String readToken(StringReader input) throws IOException {
         StringBuilder result = new StringBuilder();
 
@@ -206,16 +225,24 @@ public class HttpParser2 {
         // Skip back so non-token character is available for next read
         input.skip(-1);
 
-        return result.toString();
+        if (c != -1 && result.length() == 0) {
+            return null;
+        } else {
+            return result.toString();
+        }
     }
 
+    /**
+     * @return the quoted string if one was found, null if data other than a
+     *         quoted string was found or null if the end of data was reached
+     *         before the quoted string was terminated
+     */
     private static String readQuotedString(StringReader input)
             throws IOException {
 
         int c = input.read();
         if (c != '"') {
-            throw new IllegalArgumentException(
-                    "TODO i18n: Quoted string must start with a quote");
+            return null;
         }
 
         StringBuilder result = new StringBuilder();
@@ -223,8 +250,7 @@ public class HttpParser2 {
         c = input.read();
         while (c != '"') {
             if (c == -1) {
-                throw new IllegalArgumentException(
-                        "TODO i18n: Quoted string must end with a quote");
+                return null;
             } else if (c == '\\') {
                 c = input.read();
                 result.append(c);
@@ -249,9 +275,12 @@ public class HttpParser2 {
         }
     }
 
-    /*
+    /**
      * Parses lower case hex but permits upper case hex to be used (converting
      * it to lower case before returning).
+     *
+     * @return the lower case hex if present or <code>null</code> if data other
+     *         than lower case hex was found
      */
     private static String readLhex(StringReader input) throws IOException {
         StringBuilder result = new StringBuilder();
@@ -264,15 +293,19 @@ public class HttpParser2 {
         // Skip back so non-hex character is available for next read
         input.skip(-1);
 
-        return result.toString().toLowerCase();
+        if (result.length() == 0) {
+            return null;
+        } else {
+            return result.toString().toLowerCase();
+        }
     }
 
     private static String readQuotedLhex(StringReader input)
             throws IOException {
 
-        swallowConstant(input, "\"", false);
+        skipConstant(input, "\"", false);
         String result = readLhex(input);
-        swallowConstant(input, "\"", false);
+        skipConstant(input, "\"", false);
 
         return result;
     }
