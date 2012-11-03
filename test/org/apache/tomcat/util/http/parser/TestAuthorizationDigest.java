@@ -22,7 +22,7 @@ import java.util.Map;
 import org.junit.Assert;
 import org.junit.Test;
 
-public class TestHttpParser2 {
+public class TestAuthorizationDigest {
 
     @Test
     public void testBug54060a() throws Exception {
