@@ -54,7 +54,6 @@ import org.apache.tomcat.util.http.FastHttpDateFormat;
 import org.apache.tomcat.util.http.MimeHeaders;
 import org.apache.tomcat.util.http.ServerCookie;
 import org.apache.tomcat.util.http.parser.MediaTypeCache;
-import org.apache.tomcat.util.http.parser.ParseException;
 import org.apache.tomcat.util.net.URL;
 import org.apache.tomcat.util.res.StringManager;
 
@@ -804,10 +803,8 @@ public class Response
             return;
         }
 
-        String[] m = null;
-        try {
-             m = MEDIA_TYPE_CACHE.parse(type);
-        } catch (ParseException e) {
+        String[] m = MEDIA_TYPE_CACHE.parse(type);
+        if (m == null) {
             // Invalid - Assume no charset and just pass through whatever
             // the user provided.
             coyoteResponse.setContentTypeNoCharset(type);
