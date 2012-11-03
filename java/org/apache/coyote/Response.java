@@ -25,9 +25,8 @@ import javax.servlet.WriteListener;
 import org.apache.coyote.http11.AbstractOutputBuffer;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.http.MimeHeaders;
-import org.apache.tomcat.util.http.parser.AstMediaType;
 import org.apache.tomcat.util.http.parser.HttpParser;
-import org.apache.tomcat.util.http.parser.ParseException;
+import org.apache.tomcat.util.http.parser.MediaType;
 
 /**
  * Response object.
@@ -434,11 +433,13 @@ public final class Response {
             return;
         }
 
-        AstMediaType m = null;
-        HttpParser hp = new HttpParser(new StringReader(type));
+        MediaType m = null;
         try {
-             m = hp.MediaType();
-        } catch (ParseException e) {
+             m = HttpParser.parseMediaType(new StringReader(type));
+        } catch (IOException e) {
+            // Ignore - null test below handles this
+        }
+        if (m == null) {
             // Invalid - Assume no charset and just pass through whatever
             // the user provided.
             this.contentType = type;

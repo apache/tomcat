@@ -481,7 +481,6 @@
         <!-- Exclude auto-generated files -->
         <exclude name="java/org/apache/el/parser/ELParser*.java" />
         <exclude name="java/org/apache/el/parser/Node.java" />
-        <exclude name="java/org/apache/tomcat/util/http/parser/HttpParser*.java" />
         <exclude name="java/org/apache/**/parser/JJT*ParserState.java" />
         <exclude name="java/org/apache/**/parser/ParseException.java" />
         <exclude name="java/org/apache/**/parser/SimpleCharStream.java" />
