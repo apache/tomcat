@@ -17,6 +17,7 @@
 package org.apache.catalina.authenticator;
 
 import java.io.IOException;
+import java.io.StringReader;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.Principal;
@@ -34,6 +35,7 @@ import org.apache.catalina.util.MD5Encoder;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.buf.B2CConverter;
+import org.apache.tomcat.util.http.parser.HttpParser2;
 
 
 /**
@@ -474,58 +476,25 @@ public class DigestAuthenticator extends AuthenticatorBase {
             if (authorization == null) {
                 return false;
             }
-            if (!authorization.startsWith("Digest ")) {
+
+            Map<String,String> directives;
+            try {
+                directives = HttpParser2.parseAuthorizationDigest(
+                        new StringReader(authorization));
+            } catch (IllegalArgumentException | IOException e) {
                 return false;
             }
-            authorization = authorization.substring(7).trim();
-
-            // Bugzilla 37132: http://issues.apache.org/bugzilla/show_bug.cgi?id=37132
-            String[] tokens = authorization.split(",(?=(?:[^\"]*\"[^\"]*\")+$)");
 
             method = request.getMethod();
-
-            for (int i = 0; i < tokens.length; i++) {
-                String currentToken = tokens[i];
-                if (currentToken.length() == 0) {
-                    continue;
-                }
-
-                int equalSign = currentToken.indexOf('=');
-                if (equalSign < 0) {
-                    return false;
-                }
-                String currentTokenName =
-                    currentToken.substring(0, equalSign).trim();
-                String currentTokenValue =
-                    currentToken.substring(equalSign + 1).trim();
-                if ("username".equals(currentTokenName)) {
-                    userName = removeQuotes(currentTokenValue);
-                }
-                if ("realm".equals(currentTokenName)) {
-                    realmName = removeQuotes(currentTokenValue, true);
-                }
-                if ("nonce".equals(currentTokenName)) {
-                    nonce = removeQuotes(currentTokenValue);
-                }
-                if ("nc".equals(currentTokenName)) {
-                    nc = removeQuotes(currentTokenValue);
-                }
-                if ("cnonce".equals(currentTokenName)) {
-                    cnonce = removeQuotes(currentTokenValue);
-                }
-                if ("qop".equals(currentTokenName)) {
-                    qop = removeQuotes(currentTokenValue);
-                }
-                if ("uri".equals(currentTokenName)) {
-                    uri = removeQuotes(currentTokenValue);
-                }
-                if ("response".equals(currentTokenName)) {
-                    response = removeQuotes(currentTokenValue);
-                }
-                if ("opaque".equals(currentTokenName)) {
-                    opaqueReceived = removeQuotes(currentTokenValue);
-                }
-            }
+            userName = directives.get("username");
+            realmName = directives.get("realm");
+            nonce = directives.get("nonce");
+            nc = directives.get("nc");
+            cnonce = directives.get("cnonce");
+            qop = directives.get("qop");
+            uri = directives.get("uri");
+            response = directives.get("response");
+            opaqueReceived = directives.get("opaque");
 
             return true;
         }
