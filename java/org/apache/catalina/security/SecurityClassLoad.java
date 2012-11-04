@@ -250,23 +250,9 @@ public final class SecurityClassLoad {
                 basePackage + "util.http.FastHttpDateFormat");
         clazz.newInstance();
         loader.loadClass(basePackage + "util.http.HttpMessages");
-        loader.loadClass(basePackage + "util.http.parser.AstAttribute");
-        loader.loadClass(basePackage + "util.http.parser.AstMediaType");
-        loader.loadClass(basePackage + "util.http.parser.AstParameter");
-        loader.loadClass(basePackage + "util.http.parser.AstSubType");
-        loader.loadClass(basePackage + "util.http.parser.AstType");
-        loader.loadClass(basePackage + "util.http.parser.AstValue");
         loader.loadClass(basePackage + "util.http.parser.HttpParser");
-        loader.loadClass(basePackage + "util.http.parser.HttpParserConstants");
-        loader.loadClass(basePackage + "util.http.parser.HttpParserTokenManager");
-        loader.loadClass(basePackage + "util.http.parser.HttpParserTreeConstants");
-        loader.loadClass(basePackage + "util.http.parser.JJTHttpParserState");
-        loader.loadClass(basePackage + "util.http.parser.Node");
-        loader.loadClass(basePackage + "util.http.parser.ParseException");
-        loader.loadClass(basePackage + "util.http.parser.SimpleCharStream");
-        loader.loadClass(basePackage + "util.http.parser.SimpleNode");
-        loader.loadClass(basePackage + "util.http.parser.Token");
-        loader.loadClass(basePackage + "util.http.parser.TokenMgrError");
+        loader.loadClass(basePackage + "util.http.parser.MediaType");
+        loader.loadClass(basePackage + "util.http.parser.MediaTypeCache");
         // net
         loader.loadClass(basePackage + "util.net.Constants");
         loader.loadClass(basePackage +
