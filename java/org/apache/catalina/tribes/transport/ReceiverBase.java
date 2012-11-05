@@ -63,7 +63,7 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, R
     private int udpRxBufSize = 43800;
     private int udpTxBufSize = 25188;
 
-    private boolean listen = false;
+    private volatile boolean listen = false;
     private RxTaskPool pool;
     private boolean direct = true;
     private long tcpSelectorTimeout = 5000;
