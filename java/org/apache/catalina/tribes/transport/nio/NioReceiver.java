@@ -30,6 +30,7 @@ import java.nio.channels.SocketChannel;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.apache.catalina.tribes.io.ObjectReader;
 import org.apache.catalina.tribes.transport.AbstractRxTask;
@@ -58,7 +59,7 @@ public class NioReceiver extends ReceiverBase implements Runnable {
      */
     private static final String info = "NioReceiver/1.0";
 
-    private Selector selector = null;
+    private AtomicReference<Selector> selector = new AtomicReference<Selector>();
     private ServerSocketChannel serverChannel = null;
     private DatagramChannel datagramChannel = null;
 
@@ -136,7 +137,7 @@ public class NioReceiver extends ReceiverBase implements Runnable {
             // Selector.open() isn't thread safe
             // http://bugs.sun.com/view_bug.do?bug_id=6427854
             // Affects 1.6.0_29, fixed in 1.7.0_01
-            selector = Selector.open();
+            this.selector.set(Selector.open());
         }
         // set the port the server channel will listen to
         //serverSocket.bind(new InetSocketAddress(getBind(), getTcpListenPort()));
@@ -144,7 +145,7 @@ public class NioReceiver extends ReceiverBase implements Runnable {
         // set non-blocking mode for the listening socket
         serverChannel.configureBlocking(false);
         // register the ServerSocketChannel with the Selector
-        serverChannel.register(selector, SelectionKey.OP_ACCEPT);
+        serverChannel.register(this.selector.get(), SelectionKey.OP_ACCEPT);
 
         //set up the datagram channel
         if (this.getUdpPort()>0) {
@@ -165,12 +166,13 @@ public class NioReceiver extends ReceiverBase implements Runnable {
     }
 
     public void addEvent(Runnable event) {
+        Selector selector = this.selector.get();
         if ( selector != null ) {
             synchronized (events) {
                 events.add(event);
             }
             if ( log.isTraceEnabled() ) log.trace("Adding event to selector:"+event);
-            if ( isListening() && selector!=null ) selector.wakeup();
+            if ( isListening() ) selector.wakeup();
         }
     }
 
@@ -210,7 +212,7 @@ public class NioReceiver extends ReceiverBase implements Runnable {
         long now = System.currentTimeMillis();
         if ( (now-lastCheck) < getSelectorTimeout() ) return;
         //timeout
-        Selector tmpsel = selector;
+        Selector tmpsel = this.selector.get();
         Set<SelectionKey> keys =  (isListening()&&tmpsel!=null)?tmpsel.keys():null;
         if ( keys == null ) return;
         for (Iterator<SelectionKey> iter = keys.iterator(); iter.hasNext();) {
@@ -263,7 +265,7 @@ public class NioReceiver extends ReceiverBase implements Runnable {
         setListen(true);
 
         // Avoid NPEs if selector is set to null on stop.
-        Selector selector = this.selector;
+        Selector selector = this.selector.get();
 
         if (selector!=null && datagramChannel!=null) {
             ObjectReader oreader = new ObjectReader(MAX_UDP_SIZE); //max size for a datagram packet
@@ -359,6 +361,7 @@ public class NioReceiver extends ReceiverBase implements Runnable {
      */
     protected void stopListening() {
         setListen(false);
+        Selector selector = this.selector.get();
         if (selector != null) {
             try {
                 selector.wakeup();
@@ -366,14 +369,13 @@ public class NioReceiver extends ReceiverBase implements Runnable {
             } catch (Exception x) {
                 log.error("Unable to close cluster receiver selector.", x);
             } finally {
-                selector = null;
+                this.selector.set(null);
             }
         }
     }
 
     private void closeSelector() throws IOException {
-        Selector selector = this.selector;
-        this.selector = null;
+        Selector selector = this.selector.getAndSet(null);
         if (selector==null) return;
         try {
             Iterator<SelectionKey> it = selector.keys().iterator();
