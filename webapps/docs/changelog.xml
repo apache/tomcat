@@ -171,6 +171,10 @@
         Add getSessionIdsFull operation to mbeans-descriptor. listSessionIdsFull
         no longer exist. (kfujino)
       </fix>
+      <fix>
+        <bug>54086</bug>: Fix threading issue when stopping an 
+        <code>NioReceiver</code>. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Tribes">
