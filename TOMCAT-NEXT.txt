@@ -202,9 +202,7 @@ but possibly 7.1.x).
 
 12. Java 7 updates
     - Use of <> operator where possible
-      - Complete for javax.*
-      - Complete for o.a.[catalina|coyote|el].*
-      - Not started for remainder
+      - Complete
     - Use of try with resources
       - Not started
     - Catching multiple exceptions
