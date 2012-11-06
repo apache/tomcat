@@ -196,7 +196,8 @@ public class SmapUtil {
 
         static void install(File classFile, byte[] smap) throws IOException {
             File tmpFile = new File(classFile.getPath() + "tmp");
-            new SDEInstaller(classFile, smap, tmpFile);
+            SDEInstaller installer = new SDEInstaller(classFile, smap);
+            installer.install(tmpFile);
             if (!classFile.delete()) {
                 throw new IOException("classFile.delete() failed");
             }
@@ -205,7 +206,7 @@ public class SmapUtil {
             }
         }
 
-        SDEInstaller(File inClassFile, byte[] sdeAttr, File outClassFile)
+        SDEInstaller(File inClassFile, byte[] sdeAttr)
             throws IOException {
             if (!inClassFile.exists()) {
                 throw new FileNotFoundException("no such file: " + inClassFile);
@@ -215,7 +216,9 @@ public class SmapUtil {
             // get the bytes
             orig = readWhole(inClassFile);
             gen = new byte[orig.length + sdeAttr.length + 100];
+        }
 
+        void install(File outClassFile) throws IOException {
             // do it
             addSDE();
 
