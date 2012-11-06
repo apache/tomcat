@@ -183,6 +183,8 @@ public class DataSourceProxy implements PoolConfiguration {
 
     /**
      * {@link javax.sql.DataSource#getConnection()}
+     * @param username unused
+     * @param password unused
      */
     public javax.sql.PooledConnection getPooledConnection(String username,
             String password) throws SQLException {
