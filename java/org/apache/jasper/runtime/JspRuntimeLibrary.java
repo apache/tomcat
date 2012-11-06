@@ -133,8 +133,7 @@ public class JspRuntimeLibrary {
         if (s == null || s.length() == 0) {
             return (char) 0;
         } else {
-            // this trick avoids escaping issues
-            return (char)(int) s.charAt(0);
+            return s.charAt(0);
         }
     }
 
