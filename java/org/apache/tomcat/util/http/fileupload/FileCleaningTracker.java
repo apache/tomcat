@@ -19,8 +19,11 @@ package org.apache.tomcat.util.http.fileupload;
 import java.io.File;
 import java.lang.ref.PhantomReference;
 import java.lang.ref.ReferenceQueue;
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Vector;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
 
 /**
  * Keeps track of files awaiting deletion, and deletes them when an associated
@@ -33,22 +36,24 @@ import java.util.Vector;
  * In an environment with multiple class loaders (a servlet container, for
  * example), you should consider stopping the background thread if it is no
  * longer needed. This is done by invoking the method
- * {@link #exitWhenFinished()}, typically in
+ * {@link #exitWhenFinished}, typically in
  * {@link javax.servlet.ServletContextListener#contextDestroyed} or similar.
  *
- * @author Noel Bergman
- * @author Martin Cooper
- * @version $Id: FileCleaner.java 490987 2006-12-29 12:11:48Z scolebourne $
+ * @version $Id$
  */
 public class FileCleaningTracker {
     /**
      * Queue of <code>Tracker</code> instances being watched.
      */
-    ReferenceQueue /* Tracker */ q = new ReferenceQueue();
+    ReferenceQueue<Object> q = new ReferenceQueue<>();
     /**
      * Collection of <code>Tracker</code> instances in existence.
      */
-    final Collection<Tracker> trackers = new Vector<>();  // synchronized
+    final Collection<Tracker> trackers = Collections.synchronizedSet(new HashSet<Tracker>()); // synchronized
+    /**
+     * Collection of File paths that failed to delete.
+     */
+    final List<String> deleteFailures = Collections.synchronizedList(new ArrayList<String>());
     /**
      * Whether to terminate the thread when the tracking is complete.
      */
@@ -150,6 +155,15 @@ public class FileCleaningTracker {
     }
 
     /**
+     * Return the file paths that failed to delete.
+     *
+     * @return the file paths that failed to delete
+     */
+    public List<String> getDeleteFailures() {
+        return deleteFailures;
+    }
+
+    /**
      * Call this method to cause the file cleaner thread to terminate when
      * there are no more objects being tracked for deletion.
      * <p>
@@ -168,7 +182,7 @@ public class FileCleaningTracker {
      * <p>
      * This method allows the thread to be terminated. Simply call this method
      * in the resource cleanup code, such as {@link javax.servlet.ServletContextListener#contextDestroyed}.
-     * One called, no new objects can be tracked by the file cleaner.
+     * Once called, no new objects can be tracked by the file cleaner.
      */
     public synchronized void exitWhenFinished() {
         // synchronized block protects reaper
@@ -200,17 +214,16 @@ public class FileCleaningTracker {
         public void run() {
             // thread exits when exitWhenFinished is true and there are no more tracked objects
             while (exitWhenFinished == false || trackers.size() > 0) {
-                Tracker tracker = null;
                 try {
                     // Wait for a tracker to remove.
-                    tracker = (Tracker) q.remove();
-                } catch (Exception e) {
-                    continue;
-                }
-                if (tracker != null) {
-                    tracker.delete();
-                    tracker.clear();
+                    Tracker tracker = (Tracker) q.remove(); // cannot return null
                     trackers.remove(tracker);
+                    if (!tracker.delete()) {
+                        deleteFailures.add(tracker.getPath());
+                    }
+                    tracker.clear();
+                } catch (InterruptedException e) {
+                    continue;
                 }
             }
         }
@@ -220,7 +233,7 @@ public class FileCleaningTracker {
     /**
      * Inner class which acts as the reference for a file pending deletion.
      */
-    private static final class Tracker extends PhantomReference {
+    private static final class Tracker extends PhantomReference<Object> {
 
         /**
          * The full path to the file being tracked.
@@ -239,17 +252,26 @@ public class FileCleaningTracker {
          * @param marker  the marker object used to track the file, not null
          * @param queue  the queue on to which the tracker will be pushed, not null
          */
-        Tracker(String path, FileDeleteStrategy deleteStrategy, Object marker, ReferenceQueue queue) {
+        Tracker(String path, FileDeleteStrategy deleteStrategy, Object marker, ReferenceQueue<? super Object> queue) {
             super(marker, queue);
             this.path = path;
-            this.deleteStrategy = (deleteStrategy == null ? FileDeleteStrategy.NORMAL : deleteStrategy);
+            this.deleteStrategy = deleteStrategy == null ? FileDeleteStrategy.NORMAL : deleteStrategy;
+        }
+
+        /**
+         * Return the path.
+         *
+         * @return the path
+         */
+        public String getPath() {
+            return path;
         }
 
         /**
          * Deletes the file associated with this tracker instance.
          *
-         * @return <code>true</code> if the file was deleted successfully;
-         *         <code>false</code> otherwise.
+         * @return {@code true} if the file was deleted successfully;
+         *         {@code false} otherwise.
          */
         public boolean delete() {
             return deleteStrategy.deleteQuietly(new File(path));
