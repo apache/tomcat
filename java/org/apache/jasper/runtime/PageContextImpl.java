@@ -28,6 +28,7 @@ import java.util.Enumeration;
 import java.util.HashMap;
 
 import javax.el.ELContext;
+import javax.el.ELException;
 import javax.el.ExpressionFactory;
 import javax.el.ValueExpression;
 import javax.servlet.RequestDispatcher;
@@ -44,7 +45,6 @@ import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.JspFactory;
 import javax.servlet.jsp.JspWriter;
 import javax.servlet.jsp.PageContext;
-import javax.servlet.jsp.el.ELException;
 import javax.servlet.jsp.tagext.BodyContent;
 
 import org.apache.jasper.compiler.Localizer;
@@ -832,6 +832,7 @@ public class PageContextImpl extends PageContext {
 
     }
 
+    @SuppressWarnings("deprecation") // Still jave to support old JSP EL
     private void doHandlePageException(Throwable t) throws IOException,
             ServletException {
 
@@ -887,10 +888,9 @@ public class PageContextImpl extends PageContext {
                 throw (RuntimeException) t;
 
             Throwable rootCause = null;
-            if (t instanceof JspException) {
-                rootCause = ((JspException) t).getCause();
-            } else if (t instanceof ELException) {
-                rootCause = ((ELException) t).getCause();
+            if (t instanceof JspException || t instanceof ELException ||
+                    t instanceof javax.servlet.jsp.el.ELException) {
+                rootCause =t.getCause();
             }
 
             if (rootCause != null) {
