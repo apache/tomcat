@@ -28,8 +28,9 @@ import org.apache.catalina.webresources.StandardRoot;
 
 public abstract class AbstractTestTag extends TomcatBaseTest {
 
+    @Override
     @Before
-    public void setup() throws Exception {
+    public void setUp() throws Exception {
         super.setUp();
         Tomcat tomcat = getTomcatInstance();
 
