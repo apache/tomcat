@@ -523,6 +523,39 @@
 
 </section>
 
+<section name="JAR Scanning">
+
+  <properties>
+    <property name="tomcat.util.scan. DefaultJarScanner.jarsToSkip">
+      <p>The comma-separated list of filenames of JARs that Tomcat will not scan
+         for configuration information when using the
+         <a href="jar-scanner.html">JarScanner</a> functionality. Note that
+         there are additional system properties that enable JARs to be excluded
+         from specific scans rather than all scans.</p>
+      <p>The coded default is that no JARs are skipped however the system
+         property is set in a default Tomcat installation via the
+         <code>$CATALINA_BASE/conf/catalina.properties</code> file.</p>
+    </property>
+
+    <property name="org.apache.catalina.startup. ContextConfig.jarsToSkip">
+      <p>The comma-separated list of additional filenames of JARs that Tomcat
+         will not scan for Servlet 3.0 pluggability features.</p>
+      <p>The coded default is that no JARs are skipped however the system
+         property is set in a default Tomcat installation via the
+         <code>$CATALINA_BASE/conf/catalina.properties</code> file.</p>
+    </property>
+
+    <property name="org.apache.catalina.startup. TldConfig.jarsToSkip">
+      <p>The comma-separated list of additional filenames of JARs that Tomcat
+         will not scan for TLDs.</p>
+      <p>The coded default is that no JARs are skipped however the system
+         property is set in a default Tomcat installation via the
+         <code>$CATALINA_BASE/conf/catalina.properties</code> file.</p>
+    </property>
+  </properties>
+
+</section>
+
 <section name="Other">
 
   <properties>
@@ -608,33 +641,6 @@
       <p>If <code>true</code>, the server will exit if an exception happens
          during the server initialization phase.</p>
       <p>If not specified, the default value of <code>false</code> will be used.</p>
-    </property>
-
-    <property name="tomcat.util.scan. DefaultJarScanner.jarsToSkip">
-      <p>The comma-separated list of filenames of JARs that Tomcat will not scan
-         for configuration information when using the
-         <a href="jar-scanner.html">JarScanner</a> functionality. Note that
-         there are additional system properties that enable JARs to be excluded
-         from specific scans rather than all scans.</p>
-      <p>The coded default is that no JARs are skipped however the system
-         property is set in a default Tomcat installation via the
-         <code>$CATALINA_BASE/catalina.properties</code> file.</p>
-    </property>
-
-    <property name="org.apache.catalina.startup. ContextConfig.jarsToSkip">
-      <p>The comma-separated list of additional filenames of JARs that Tomcat
-         will not scan for Servlet 3.0 pluggability features.</p>
-      <p>The coded default is that no JARs are skipped however the system
-         property is set in a default Tomcat installation via the
-         <code>$CATALINA_BASE/catalina.properties</code> file.</p>
-    </property>
-
-    <property name="org.apache.catalina.startup. TldConfig.jarsToSkip">
-      <p>The comma-separated list of additional filenames of JARs that Tomcat
-         will not scan for TLDs.</p>
-      <p>The coded default is that no JARs are skipped however the system
-         property is set in a default Tomcat installation via the
-         <code>$CATALINA_BASE/catalina.properties</code> file.</p>
     </property>
 
   </properties>
