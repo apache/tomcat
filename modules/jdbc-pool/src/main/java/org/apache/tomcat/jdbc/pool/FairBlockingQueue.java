@@ -503,6 +503,7 @@ public class FairBlockingQueue<E> implements BlockingQueue<E> {
         int index;
         E element = null;
 
+        @SuppressWarnings("unchecked") // Can't create arrays of generic types
         public FairIterator() {
             final ReentrantLock lock = FairBlockingQueue.this.lock;
             lock.lock();
