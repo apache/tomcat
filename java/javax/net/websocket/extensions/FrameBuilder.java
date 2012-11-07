@@ -25,22 +25,26 @@ public class FrameBuilder {
         return null;
     }
 
+    @SuppressWarnings("unused") // TODO Remove this once implemented
     public Frame.Data.Text createTextFrame(String s) {
         // TODO
         return null;
     }
 
+    @SuppressWarnings("unused") // TODO Remove this once implemented
     public Frame.Data.Text.Continuation createTextContinuationFrame(
             String s, boolean isLast) {
         // TODO
         return null;
     }
 
+    @SuppressWarnings("unused") // TODO Remove this once implemented
     public Frame.Data.Binary createBinaryFrame(ByteBuffer bb) {
         // TODO
         return null;
     }
 
+    @SuppressWarnings("unused") // TODO Remove this once implemented
     public Frame.Data.Binary.Continuation createBinaryContinuationFrame(
             ByteBuffer bb, boolean isLast) {
         // TODO
