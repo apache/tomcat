@@ -24,7 +24,9 @@ import javax.net.websocket.extensions.Extension;
 
 public class DefaultServerConfiguration implements ServerEndpointConfiguration {
     private URI uri;
+    @SuppressWarnings("unused") // TODO Remove this once implemented
     private List<String> subprotocols = new ArrayList<>();
+    @SuppressWarnings("unused") // TODO Remove this once implemented
     private List<Extension> extensions = new ArrayList<>();
     private List<Encoder> encoders = new ArrayList<>();
     private List<Decoder> decoders = new ArrayList<>();
