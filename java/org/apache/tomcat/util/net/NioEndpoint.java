@@ -1630,7 +1630,9 @@ public class NioEndpoint extends AbstractEndpoint {
                     }
                 }catch ( Throwable t ) {
                     log.error("",t);
-                    socket.getPoller().cancelledKey(key,SocketStatus.ERROR);
+                    if (socket != null) {
+                        socket.getPoller().cancelledKey(key,SocketStatus.ERROR);
+                    }
                 } finally {
                     if (launch) {
                         try {

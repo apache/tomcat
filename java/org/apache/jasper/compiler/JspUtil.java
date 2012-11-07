@@ -1002,6 +1002,13 @@ public class JspUtil {
                 break;
             }
         }
+
+        if (t == null) {
+            // Should never happen
+            throw new IllegalArgumentException("Unable to extract type from [" +
+                    type + "]");
+        }
+
         StringBuilder resultType = new StringBuilder(t);
         for (; dims > 0; dims--) {
             resultType.append("[]");
