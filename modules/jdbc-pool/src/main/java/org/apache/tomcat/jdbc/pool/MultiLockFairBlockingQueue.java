@@ -80,6 +80,7 @@ public class MultiLockFairBlockingQueue<E> implements BlockingQueue<E> {
     /**
      * Creates a new fair blocking queue.
      */
+    @SuppressWarnings("unchecked") // Can create arrays of generic types
     public MultiLockFairBlockingQueue() {
         items = new LinkedList[LOCK_COUNT];
         waiters = new LinkedList[LOCK_COUNT];
@@ -520,6 +521,7 @@ public class MultiLockFairBlockingQueue<E> implements BlockingQueue<E> {
         int index;
         E element = null;
 
+        @SuppressWarnings("unchecked") // Can't create arrays of generic types
         public FairIterator() {
             ArrayList<E> list = new ArrayList<>(MultiLockFairBlockingQueue.this.size());
             for (int idx=0; idx<LOCK_COUNT; idx++) {
