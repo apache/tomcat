@@ -488,7 +488,9 @@ class JspDocumentParser
 
         if (tagDependentNesting > 0) {
             if (charBuffer.length() > 0) {
-                new Node.TemplateText(charBuffer.toString(), startMark, current);
+                @SuppressWarnings("unused")
+                Node unused = new Node.TemplateText(
+                        charBuffer.toString(), startMark, current);
             }
             startMark = new Mark(ctxt, path, locator.getLineNumber(),
                                  locator.getColumnNumber());
@@ -517,10 +519,9 @@ class JspDocumentParser
                 if ((lastCh == '$' || lastCh == '#') && ch == '{') {
                     elType = lastCh;
                     if (ttext.size() > 0) {
-                        new Node.TemplateText(
-                            ttext.toString(),
-                            startMark,
-                            current);
+                        @SuppressWarnings("unused")
+                        Node unused = new Node.TemplateText(
+                                ttext.toString(), startMark, current);
                         ttext = new CharArrayWriter();
                         //We subtract two from the column number to
                         //account for the '[$,#]{' that we've already parsed
@@ -553,10 +554,10 @@ class JspDocumentParser
                             continue;
                         }
                         if (ch == '}') {
-                            new Node.ELExpression((char) elType,
-                                ttext.toString(),
-                                startMark,
-                                current);
+                            @SuppressWarnings("unused")
+                            Node unused = new Node.ELExpression(
+                                    (char) elType, ttext.toString(),
+                                    startMark, current);
                             ttext = new CharArrayWriter();
                             startMark = new Mark(ctxt, path, line, column);
                             break;
@@ -589,7 +590,9 @@ class JspDocumentParser
                 ttext.write(lastCh);
             }
             if (ttext.size() > 0) {
-                new Node.TemplateText(ttext.toString(), startMark, current);
+                @SuppressWarnings("unused")
+                Node unused = new Node.TemplateText(
+                        ttext.toString(), startMark, current);
             }
         }
         startMark = new Mark(ctxt, path, locator.getLineNumber(),
@@ -698,13 +701,11 @@ class JspDocumentParser
 
         // ignore comments in the DTD
         if (!inDTD) {
-            startMark =
-                new Mark(
-                    ctxt,
-                    path,
-                    locator.getLineNumber(),
+            startMark = new Mark(ctxt, path, locator.getLineNumber(),
                     locator.getColumnNumber());
-            new Node.Comment(new String(buf, offset, len), startMark, current);
+            @SuppressWarnings("unused")
+            Node unused = new Node.Comment(
+                    new String(buf, offset, len), startMark, current);
         }
     }
 

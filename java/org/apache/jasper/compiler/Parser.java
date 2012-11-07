@@ -439,7 +439,8 @@ class Parser implements TagConstants {
             }
         }
 
-        new Node.TaglibDirective(attrs, start, parent);
+        @SuppressWarnings("unused")
+        Node unused = new Node.TaglibDirective(attrs, start, parent);
     }
 
     /*
@@ -593,7 +594,8 @@ class Parser implements TagConstants {
      */
     private void parseAttributeDirective(Node parent) throws JasperException {
         Attributes attrs = parseAttributes();
-        new Node.AttributeDirective(attrs, start, parent);
+        @SuppressWarnings("unused")
+        Node unused = new Node.AttributeDirective(attrs, start, parent);
     }
 
     /*
@@ -602,7 +604,8 @@ class Parser implements TagConstants {
      */
     private void parseVariableDirective(Node parent) throws JasperException {
         Attributes attrs = parseAttributes();
-        new Node.VariableDirective(attrs, start, parent);
+        @SuppressWarnings("unused")
+        Node unused = new Node.VariableDirective(attrs, start, parent);
     }
 
     /*
@@ -615,7 +618,9 @@ class Parser implements TagConstants {
             err.jspError(start, "jsp.error.unterminated", "&lt;%--");
         }
 
-        new Node.Comment(reader.getText(start, stop), start, parent);
+        @SuppressWarnings("unused")
+        Node unused =
+                new Node.Comment(reader.getText(start, stop), start, parent);
     }
 
     /*
@@ -628,8 +633,9 @@ class Parser implements TagConstants {
             err.jspError(start, "jsp.error.unterminated", "&lt;%!");
         }
 
-        new Node.Declaration(parseScriptText(reader.getText(start, stop)),
-                start, parent);
+        @SuppressWarnings("unused")
+        Node unused = new Node.Declaration(
+                parseScriptText(reader.getText(start, stop)), start, parent);
     }
 
     /*
@@ -655,7 +661,8 @@ class Parser implements TagConstants {
                             "&lt;jsp:declaration&gt;");
                 }
                 text = parseScriptText(reader.getText(start, stop));
-                new Node.Declaration(text, start, parent);
+                @SuppressWarnings("unused")
+                Node unused = new Node.Declaration(text, start, parent);
                 if (reader.matches("![CDATA[")) {
                     start = reader.mark();
                     stop = reader.skipUntil("]]>");
@@ -663,7 +670,8 @@ class Parser implements TagConstants {
                         err.jspError(start, "jsp.error.unterminated", "CDATA");
                     }
                     text = parseScriptText(reader.getText(start, stop));
-                    new Node.Declaration(text, start, parent);
+                    @SuppressWarnings("unused")
+                    Node unused2 = new Node.Declaration(text, start, parent);
                 } else {
                     break;
                 }
@@ -686,8 +694,9 @@ class Parser implements TagConstants {
             err.jspError(start, "jsp.error.unterminated", "&lt;%=");
         }
 
-        new Node.Expression(parseScriptText(reader.getText(start, stop)),
-                start, parent);
+        @SuppressWarnings("unused")
+        Node unused = new Node.Expression(
+                parseScriptText(reader.getText(start, stop)), start, parent);
     }
 
     /*
@@ -711,7 +720,8 @@ class Parser implements TagConstants {
                             "&lt;jsp:expression&gt;");
                 }
                 text = parseScriptText(reader.getText(start, stop));
-                new Node.Expression(text, start, parent);
+                @SuppressWarnings("unused")
+                Node unused = new Node.Expression(text, start, parent);
                 if (reader.matches("![CDATA[")) {
                     start = reader.mark();
                     stop = reader.skipUntil("]]>");
@@ -719,7 +729,8 @@ class Parser implements TagConstants {
                         err.jspError(start, "jsp.error.unterminated", "CDATA");
                     }
                     text = parseScriptText(reader.getText(start, stop));
-                    new Node.Expression(text, start, parent);
+                    @SuppressWarnings("unused")
+                    Node unused2 = new Node.Expression(text, start, parent);
                 } else {
                     break;
                 }
@@ -758,7 +769,9 @@ class Parser implements TagConstants {
                 singleQuoted = !singleQuoted;
         } while (currentChar != '}' || (singleQuoted || doubleQuoted));
 
-        new Node.ELExpression(type, reader.getText(start, last), start, parent);
+        @SuppressWarnings("unused")
+        Node unused = new Node.ELExpression(
+                type, reader.getText(start, last), start, parent);
     }
 
     /*
@@ -771,8 +784,9 @@ class Parser implements TagConstants {
             err.jspError(start, "jsp.error.unterminated", "&lt;%");
         }
 
-        new Node.Scriptlet(parseScriptText(reader.getText(start, stop)), start,
-                parent);
+        @SuppressWarnings("unused")
+        Node unused = new Node.Scriptlet(
+                parseScriptText(reader.getText(start, stop)), start, parent);
     }
 
     /*
@@ -796,7 +810,8 @@ class Parser implements TagConstants {
                             "&lt;jsp:scriptlet&gt;");
                 }
                 text = parseScriptText(reader.getText(start, stop));
-                new Node.Scriptlet(text, start, parent);
+                @SuppressWarnings("unused")
+                Node unused = new Node.Scriptlet(text, start, parent);
                 if (reader.matches("![CDATA[")) {
                     start = reader.mark();
                     stop = reader.skipUntil("]]>");
@@ -804,7 +819,8 @@ class Parser implements TagConstants {
                         err.jspError(start, "jsp.error.unterminated", "CDATA");
                     }
                     text = parseScriptText(reader.getText(start, stop));
-                    new Node.Scriptlet(text, start, parent);
+                    @SuppressWarnings("unused")
+                    Node unused2 = new Node.Scriptlet(text, start, parent);
                 } else {
                     break;
                 }
@@ -1240,11 +1256,13 @@ class Parser implements TagConstants {
         // Parse 'CustomActionEnd' production:
         if (reader.matches("/>")) {
             if (tagInfo != null) {
-                new Node.CustomTag(tagName, prefix, shortTagName, uri, attrs,
-                        start, parent, tagInfo, tagHandlerClass);
+                @SuppressWarnings("unused")
+                Node unused = new Node.CustomTag(tagName, prefix, shortTagName,
+                        uri, attrs, start, parent, tagInfo, tagHandlerClass);
             } else {
-                new Node.CustomTag(tagName, prefix, shortTagName, uri, attrs,
-                        start, parent, tagFileInfo);
+                @SuppressWarnings("unused")
+                Node unused = new Node.CustomTag(tagName, prefix, shortTagName,
+                        uri, attrs, start, parent, tagFileInfo);
             }
             return true;
         }
@@ -1329,7 +1347,8 @@ class Parser implements TagConstants {
             }
             ttext.write(ch);
         }
-        new Node.TemplateText(ttext.toString(), start, parent);
+        @SuppressWarnings("unused")
+        Node unused = new Node.TemplateText(ttext.toString(), start, parent);
     }
 
     /*
@@ -1380,7 +1399,9 @@ class Parser implements TagConstants {
                         continue;
                     }
                     // Create a template text node
-                    new Node.TemplateText(ttext.toString(), start, parent);
+                    @SuppressWarnings("unused")
+                    Node unused = new Node.TemplateText(
+                            ttext.toString(), start, parent);
 
                     // Mark and parse the EL expression and create its node:
                     start = reader.mark();
@@ -1393,7 +1414,9 @@ class Parser implements TagConstants {
                 }
             }
 
-            new Node.TemplateText(ttext.toString(), start, parent);
+            @SuppressWarnings("unused")
+            Node unused =
+                    new Node.TemplateText(ttext.toString(), start, parent);
 
             if (!reader.hasMoreInput()) {
                 err.jspError(start, "jsp.error.unterminated",
@@ -1599,8 +1622,9 @@ class Parser implements TagConstants {
         if (bodyEnd == null) {
             err.jspError(start, "jsp.error.unterminated", "&lt;" + tag);
         }
-        new Node.TemplateText(reader.getText(bodyStart, bodyEnd), bodyStart,
-                parent);
+        @SuppressWarnings("unused")
+        Node unused = new Node.TemplateText(reader.getText(bodyStart, bodyEnd),
+                bodyStart, parent);
     }
 
     /*
