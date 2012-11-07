@@ -30,6 +30,7 @@ public abstract class AbstractTestTag extends TomcatBaseTest {
 
     @Before
     public void setup() throws Exception {
+        super.setUp();
         Tomcat tomcat = getTomcatInstance();
 
         File appDir = new File("test/webapp-3.0");

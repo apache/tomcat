@@ -186,6 +186,19 @@
     <Bug code="ST" />
   </Match>
   <Match>
+    <!-- Node constructors add node to parent. Local variable is used to
+         silence an Eclipse warning -->
+    <Class name="org.apache.jasper.compiler.ELFunctionMapper"/>
+    <Method name="map"/>
+    <Bug code="DLS"/>
+  </Match>
+  <Match>
+    <!-- Node constructors add node to parent. Local variable is used to
+         silence an Eclipse warning -->
+    <Class name="org.apache.jasper.compiler.Parser"/>
+    <Bug code="DLS"/>
+  </Match>
+  <Match>
     <!-- Simpler to catch Exception than to create dummy implementations of the
          necessary exception hierarchy -->
     <Class name="org.apache.naming.factory.SendMailFactory$1" />
@@ -203,11 +216,6 @@
     <!-- Class name needs to start with a lower case letter in this case -->
     <Class name="org.apache.naming.java.javaURLContextFactory" />
     <Bug code="Nm" />
-  </Match>
-  <Match>
-    <!-- Class has to implement clone since its superclass does but fakes it -->
-    <Class name="org.apache.naming.resources.ResourceAttributes" />
-    <Bug code="CN" />
   </Match>
   <Match>
     <!-- Use of == is deliberate -->
@@ -286,6 +294,12 @@
     <Class name="org.apache.tomcat.util.net.AprEndpoint$SocketEventProcessor"/>
     <Method name="run"/>
     <Bug code="ML" />
+  </Match>
+  <Match>
+    <!-- Object is only ever set to null, sync therefore is still valid -->
+    <Class name="org.apache.tomcat.util.net.NioEndpoint$SocketProcessor"/>
+    <Method name="run"/>
+    <Bug code="ML"/>
   </Match>
   <Match>
     <Class name="org.apache.tomcat.util.net.SecureNioChannel"/>

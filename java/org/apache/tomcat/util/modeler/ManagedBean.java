@@ -22,6 +22,9 @@ package org.apache.tomcat.util.modeler;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import javax.management.AttributeNotFoundException;
 import javax.management.DynamicMBean;
@@ -55,11 +58,12 @@ public class ManagedBean implements java.io.Serializable {
     static final Class<?>[] NO_ARGS_PARAM_SIG = new Class[0];
 
 
+    private ReadWriteLock mBeanInfoLock = new ReentrantReadWriteLock();
     /**
      * The <code>ModelMBeanInfo</code> object that corresponds
      * to this <code>ManagedBean</code> instance.
      */
-    transient MBeanInfo info = null;
+    private transient MBeanInfo info = null;
 
     private Map<String,AttributeInfo> attributes = new HashMap<>();
 
@@ -71,7 +75,7 @@ public class ManagedBean implements java.io.Serializable {
     protected String group = null;
     protected String name = null;
 
-    protected NotificationInfo notifications[] = new NotificationInfo[0];
+    private NotificationInfo notifications[] = new NotificationInfo[0];
     protected String type = null;
 
     /** Constructor. Will add default attributes.
@@ -110,8 +114,14 @@ public class ManagedBean implements java.io.Serializable {
     }
 
     public void setClassName(String className) {
-        this.className = className;
-        this.info = null;
+        Lock l = mBeanInfoLock.writeLock();
+        l.lock();
+        try {
+            this.className = className;
+            this.info = null;
+        } finally {
+            l.unlock();
+        }
     }
 
 
@@ -123,8 +133,14 @@ public class ManagedBean implements java.io.Serializable {
     }
 
     public void setDescription(String description) {
-        this.description = description;
-        this.info = null;
+        Lock l = mBeanInfoLock.writeLock();
+        l.lock();
+        try {
+            this.description = description;
+            this.info = null;
+        } finally {
+            l.unlock();
+        }
     }
 
 
@@ -162,8 +178,14 @@ public class ManagedBean implements java.io.Serializable {
     }
 
     public void setName(String name) {
-        this.name = name;
-        this.info = null;
+        Lock l = mBeanInfoLock.writeLock();
+        l.lock();
+        try {
+            this.name = name;
+            this.info = null;
+        } finally {
+            l.unlock();
+        }
     }
 
 
@@ -195,8 +217,14 @@ public class ManagedBean implements java.io.Serializable {
     }
 
     public void setType(String type) {
-        this.type = type;
-        this.info = null;
+        Lock l = mBeanInfoLock.writeLock();
+        l.lock();
+        try {
+            this.type = type;
+            this.info = null;
+        } finally {
+            l.unlock();
+        }
     }
 
 
@@ -220,7 +248,10 @@ public class ManagedBean implements java.io.Serializable {
      */
     public void addNotification(NotificationInfo notification) {
 
-        synchronized (notifications) {
+        Lock l = mBeanInfoLock.writeLock();
+
+        l.lock();
+        try {
             NotificationInfo results[] =
                 new NotificationInfo[notifications.length + 1];
             System.arraycopy(notifications, 0, results, 0,
@@ -228,8 +259,9 @@ public class ManagedBean implements java.io.Serializable {
             results[notifications.length] = notification;
             notifications = results;
             this.info = null;
+        } finally {
+            l.unlock();
         }
-
     }
 
 
@@ -348,40 +380,51 @@ public class ManagedBean implements java.io.Serializable {
     MBeanInfo getMBeanInfo() {
 
         // Return our cached information (if any)
-        if (info != null)
-            return (info);
+        Lock l = mBeanInfoLock.readLock();
+        l.lock();
+        try {
+            if (info != null)
+                return info;
+        } finally {
+            l.unlock();
+        }
 
-        // Create subordinate information descriptors as required
-        AttributeInfo attrs[] = getAttributes();
-        MBeanAttributeInfo attributes[] =
-            new MBeanAttributeInfo[attrs.length];
-        for (int i = 0; i < attrs.length; i++)
-            attributes[i] = attrs[i].createAttributeInfo();
+        l = mBeanInfoLock.writeLock();
+        l.lock();
+        try {
+            // Create subordinate information descriptors as required
+            AttributeInfo attrs[] = getAttributes();
+            MBeanAttributeInfo attributes[] =
+                new MBeanAttributeInfo[attrs.length];
+            for (int i = 0; i < attrs.length; i++)
+                attributes[i] = attrs[i].createAttributeInfo();
 
-        OperationInfo opers[] = getOperations();
-        MBeanOperationInfo operations[] =
-            new MBeanOperationInfo[opers.length];
-        for (int i = 0; i < opers.length; i++)
-            operations[i] = opers[i].createOperationInfo();
-
-
-        NotificationInfo notifs[] = getNotifications();
-        MBeanNotificationInfo notifications[] =
-            new MBeanNotificationInfo[notifs.length];
-        for (int i = 0; i < notifs.length; i++)
-            notifications[i] = notifs[i].createNotificationInfo();
+            OperationInfo opers[] = getOperations();
+            MBeanOperationInfo operations[] =
+                new MBeanOperationInfo[opers.length];
+            for (int i = 0; i < opers.length; i++)
+                operations[i] = opers[i].createOperationInfo();
 
 
-        // Construct and return a new ModelMBeanInfo object
-        info = new MBeanInfo(getClassName(),
-                             getDescription(),
-                             attributes,
-                             new MBeanConstructorInfo[] {},
-                             operations,
-                             notifications);
+            NotificationInfo notifs[] = getNotifications();
+            MBeanNotificationInfo notifications[] =
+                new MBeanNotificationInfo[notifs.length];
+            for (int i = 0; i < notifs.length; i++)
+                notifications[i] = notifs[i].createNotificationInfo();
 
-        return (info);
 
+            // Construct and return a new ModelMBeanInfo object
+            info = new MBeanInfo(getClassName(),
+                                 getDescription(),
+                                 attributes,
+                                 new MBeanConstructorInfo[] {},
+                                 operations,
+                                 notifications);
+
+            return info;
+        } finally {
+            l.unlock();
+        }
     }
 
 
