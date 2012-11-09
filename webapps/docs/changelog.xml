@@ -110,6 +110,10 @@
         <bug>54096</bug>: In web.xml, &lt;env-entry&gt; should accept any type
         that has a constructor that takes a single String or char. (markt)
       </fix>
+      <add>
+        <bug>54127</bug>: Add support for sending a WebSocket Ping. Patch
+        provided by Sean Winterberger. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
