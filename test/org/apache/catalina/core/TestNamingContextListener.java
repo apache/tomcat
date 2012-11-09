@@ -33,8 +33,13 @@ import org.apache.catalina.startup.TomcatBaseTest;
 
 public class TestNamingContextListener extends TomcatBaseTest {
 
-    private static final String JNDI_NAME = "TestName";
-    private static final String JNDI_VALUE= "Test Value";
+    private static final String BUG49132_NAME = "TestName";
+    private static final String BUG49132_VALUE = "Test Value";
+
+    private static final String BUG54096_NameA = "envA";
+    private static final String BUG54096_ValueA = "valueA";
+    private static final String BUG54096_NameB = "envB";
+    private static final String BUG54096_ValueB = "B";
 
     /**
      * Test JNDI is available to ServletContextListeners.
@@ -51,9 +56,9 @@ public class TestNamingContextListener extends TomcatBaseTest {
         tomcat.enableNaming();
 
         ContextEnvironment environment = new ContextEnvironment();
-        environment.setType(JNDI_VALUE.getClass().getName());
-        environment.setName(JNDI_NAME);
-        environment.setValue(JNDI_VALUE);
+        environment.setType(BUG49132_VALUE.getClass().getName());
+        environment.setName(BUG49132_NAME);
+        environment.setValue(BUG49132_VALUE);
         ctx.getNamingResources().addEnvironment(environment);
 
         ctx.addApplicationListener(Bug49132Listener.class.getName());
@@ -77,8 +82,8 @@ public class TestNamingContextListener extends TomcatBaseTest {
                 initCtx = new InitialContext();
                 javax.naming.Context envCtx =
                     (javax.naming.Context) initCtx.lookup("java:comp/env");
-                String value = (String) envCtx.lookup(JNDI_NAME);
-                if (!JNDI_VALUE.equals(value)) {
+                String value = (String) envCtx.lookup(BUG49132_NAME);
+                if (!BUG49132_VALUE.equals(value)) {
                     throw new RuntimeException();
                 }
             } catch (NamingException e) {
@@ -87,4 +92,95 @@ public class TestNamingContextListener extends TomcatBaseTest {
         }
     }
 
+    @Test
+    public void testBug54096() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+
+        // Must have a real docBase - just use temp
+        org.apache.catalina.Context ctx =
+            tomcat.addContext("", System.getProperty("java.io.tmpdir"));
+
+        // Enable JNDI - it is disabled by default
+        tomcat.enableNaming();
+
+        ContextEnvironment environmentA = new ContextEnvironment();
+        environmentA.setType(Bug54096EnvA.class.getName());
+        environmentA.setName(BUG54096_NameA);
+        environmentA.setValue(BUG54096_ValueA);
+        ctx.getNamingResources().addEnvironment(environmentA);
+
+        ContextEnvironment environmentB = new ContextEnvironment();
+        environmentB.setType(Bug54096EnvB.class.getName());
+        environmentB.setName(BUG54096_NameB);
+        environmentB.setValue(BUG54096_ValueB);
+        ctx.getNamingResources().addEnvironment(environmentB);
+
+        ctx.addApplicationListener(Bug54096Listener.class.getName());
+
+        tomcat.start();
+
+        assertEquals(LifecycleState.STARTED, ctx.getState());
+    }
+
+    public static class Bug54096EnvA {
+
+        private final String value;
+
+        public Bug54096EnvA(String value) {
+            this.value = value;
+        }
+
+        public String getValue() {
+            return value;
+        }
+    }
+
+    public static class Bug54096EnvB {
+
+        private final char value;
+
+        public Bug54096EnvB(char value) {
+            this.value = value;
+        }
+
+        public char getValue() {
+            return value;
+        }
+    }
+
+    public static final class Bug54096Listener implements
+            ServletContextListener {
+
+        @Override
+        public void contextDestroyed(ServletContextEvent sce) {
+            // NOOP
+        }
+
+        @Override
+        public void contextInitialized(ServletContextEvent sce) {
+            javax.naming.Context initCtx;
+            try {
+                initCtx = new InitialContext();
+                javax.naming.Context envCtx =
+                    (javax.naming.Context) initCtx.lookup("java:comp/env");
+
+                // Validate entry A
+                Bug54096EnvA valueA =
+                        (Bug54096EnvA) envCtx.lookup(BUG54096_NameA);
+                if (!BUG54096_ValueA.equals(valueA.getValue())) {
+                    throw new RuntimeException();
+                }
+
+                // Validate entry B
+                Bug54096EnvB valueB =
+                        (Bug54096EnvB) envCtx.lookup(BUG54096_NameB);
+                if (BUG54096_ValueB.charAt(0) != valueB.getValue()) {
+                    throw new RuntimeException();
+                }
+
+            } catch (NamingException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
 }
