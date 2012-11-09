@@ -301,6 +301,29 @@ public class WsOutbound {
      * @throws IOException  If an error occurs writing to the client
      */
     public synchronized void pong(ByteBuffer data) throws IOException {
+        sendControlMessage(data, Constants.OPCODE_PONG);
+    }
+
+    /**
+     * Send a ping message to the client
+     *
+     * @param data      Optional message.
+     *
+     * @throws IOException  If an error occurs writing to the client
+     */
+    public synchronized void ping(ByteBuffer data) throws IOException {
+        sendControlMessage(data, Constants.OPCODE_PING);
+    }
+
+    /**
+     * Generic function to send either a ping or a pong.
+     *
+     * @param data      Optional message.
+     * @param opcode    The byte to include as the opcode.
+     *
+     * @throws IOException  If an error occurs writing to the client
+     */
+    private synchronized void sendControlMessage(ByteBuffer data, byte opcode) throws IOException {
 
         if (closed) {
             throw new IOException(sm.getString("outbound.closed"));
@@ -308,7 +331,7 @@ public class WsOutbound {
 
         doFlush(true);
 
-        upgradeOutbound.write(0x8A);
+        upgradeOutbound.write(0x80 | opcode);
         if (data == null) {
             upgradeOutbound.write(0);
         } else {
