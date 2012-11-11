@@ -145,6 +145,9 @@ final class StandardHostValve extends ValveBase {
         // If a request init listener throws an exception, the request is
         // aborted
         boolean asyncAtStart = request.isAsync();
+        // An async error page may dispatch to another resource. This flag helps
+        // ensure an infinite error handling loop is not entered
+        boolean errorAtStart = response.isError();
         if (asyncAtStart || context.fireRequestInitEvent(request)) {
 
             // Ask this Context to process this request
@@ -152,29 +155,37 @@ final class StandardHostValve extends ValveBase {
                 context.getPipeline().getFirst().invoke(request, response);
             } catch (Throwable t) {
                 ExceptionUtils.handleThrowable(t);
-                request.setAttribute(RequestDispatcher.ERROR_EXCEPTION, t);
-                throwable(request, response, t);
+                if (errorAtStart) {
+                    container.getLogger().error("Exception Processing " +
+                            request.getRequestURI(), t);
+                } else {
+                    request.setAttribute(RequestDispatcher.ERROR_EXCEPTION, t);
+                    throwable(request, response, t);
+                }
             }
 
             // If the request was async at the start and an error occurred then
             // the async error handling will kick-in and that will fire the
             // request destroyed event *after* the error handling has taken
             // place
-            if (!(request.isAsync() || (asyncAtStart && request.getAttribute(
-                        RequestDispatcher.ERROR_EXCEPTION) != null))) {
-                // Protect against NPEs if context was destroyed during a long
-                // running request.
+            if (!(request.isAsync() || (asyncAtStart &&
+                    request.getAttribute(
+                            RequestDispatcher.ERROR_EXCEPTION) != null))) {
+                // Protect against NPEs if context was destroyed during a
+                // long running request.
                 if (context.getState().isAvailable()) {
-                    // Error page processing
-                    response.setSuspended(false);
+                    if (!errorAtStart) {
+                        // Error page processing
+                        response.setSuspended(false);
 
-                    Throwable t = (Throwable) request.getAttribute(
-                            RequestDispatcher.ERROR_EXCEPTION);
+                        Throwable t = (Throwable) request.getAttribute(
+                                RequestDispatcher.ERROR_EXCEPTION);
 
-                    if (t != null) {
-                        throwable(request, response, t);
-                    } else {
-                        status(request, response);
+                        if (t != null) {
+                            throwable(request, response, t);
+                        } else {
+                            status(request, response);
+                        }
                     }
 
                     context.fireRequestDestroyEvent(request);
@@ -334,7 +345,7 @@ final class StandardHostValve extends ValveBase {
      * @param throwable The exception that occurred (which possibly wraps
      *  a root cause exception
      */
-    private void throwable(Request request, Response response,
+    protected void throwable(Request request, Response response,
                              Throwable throwable) {
         Context context = request.getContext();
         if (context == null) {
