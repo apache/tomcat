@@ -271,7 +271,8 @@ public class AsyncStateMachine<S> {
         if (state == AsyncState.STARTING) {
             state = AsyncState.MUST_DISPATCH;
         } else if (state == AsyncState.STARTED ||
-                state == AsyncState.TIMING_OUT) {
+                state == AsyncState.TIMING_OUT ||
+                state == AsyncState.ERROR) {
             state = AsyncState.DISPATCHING;
             doDispatch = true;
         } else {

@@ -41,6 +41,8 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.catalina.AsyncDispatcher;
 import org.apache.catalina.Context;
 import org.apache.catalina.Globals;
+import org.apache.catalina.Host;
+import org.apache.catalina.Valve;
 import org.apache.catalina.connector.Request;
 import org.apache.coyote.ActionCode;
 import org.apache.coyote.AsyncContextCallback;
@@ -182,8 +184,8 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
                             ActionCode.ASYNC_IS_TIMINGOUT, result);
                     return !result.get();
                 } else {
-                    // No listeners, container calls complete
-                    complete();
+                    // No listeners, trigger error handling
+                    return false;
                 }
 
             } finally {
@@ -422,6 +424,23 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
                 log.warn("onStartAsync() failed for listener of type [" +
                         listener.getClass().getName() + "]", ioe);
             }
+        }
+
+        // SRV.2.3.3.3 (search for "error dispatch")
+        if (servletResponse instanceof HttpServletResponse) {
+            ((HttpServletResponse) servletResponse).setStatus(
+                    HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+        }
+
+        Host host = (Host) context.getParent();
+        Valve stdHostValve = host.getPipeline().getBasic();
+        if (stdHostValve instanceof StandardHostValve) {
+            ((StandardHostValve) stdHostValve).throwable(request,
+                    request.getResponse(), t);
+        }
+
+        if (isStarted() && !request.isAsyncDispatching()) {
+            complete();
         }
     }
 
