@@ -123,6 +123,11 @@
         <code>AsyncListener.complete()</code> are called with the correct
         thread context class loader. (fhanik)
       </fix>
+      <fix>
+        <bug>54123</bug>: If an asynchronous request times out without any
+        <code>AsyncListener</code>s defined, a 500 error will be triggered.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
