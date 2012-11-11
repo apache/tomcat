@@ -103,6 +103,9 @@ public abstract class SimpleHttpClient {
         request = theRequest;
     }
 
+    /*
+     * Expect the server to reply with 100 Continue interim response
+     */
     public void setUseContinue(boolean theUseContinueFlag) {
         useContinue = theUseContinueFlag;
     }
@@ -133,6 +136,10 @@ public abstract class SimpleHttpClient {
 
     public String getResponseBody() {
         return responseBody;
+    }
+
+    public List<String> getResponseBodyUriElements() {
+        return bodyUriElments;
     }
 
     public void setUseContentLength(boolean b) {
@@ -180,17 +187,23 @@ public abstract class SimpleHttpClient {
 
     }
 
+    /*
+     * Send the component parts of the request
+     * (be tolerant and simply skip null entries)
+     */
     public void sendRequest() throws InterruptedException, IOException {
-        // Send the request
         boolean first = true;
         for (String requestPart : request) {
-            if (first) {
-                first = false;
-            } else {
-                Thread.sleep(requestPause);
+            if (requestPart != null) {
+                if (first) {
+                    first = false;
+                }
+                else {
+                    Thread.sleep(requestPause);
+                }
+                writer.write(requestPart);
+                writer.flush();
             }
-            writer.write(requestPart);
-            writer.flush();
         }
     }
 
