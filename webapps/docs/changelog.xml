@@ -118,6 +118,11 @@
         In FormAuthenticator: If it is configured to change Session IDs,
         do the change before displaying the login form. (kkolinko)
       </fix>
+      <fix>
+        Ensure <code>AsyncListener.timeout()</code> and
+        <code>AsyncListener.complete()</code> are called with the correct
+        thread context class loader. (fhanik)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
