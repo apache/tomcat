@@ -218,9 +218,10 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
         }
         check();
         if (request.getAttribute(ASYNC_REQUEST_URI)==null) {
-            request.setAttribute(ASYNC_REQUEST_URI, request.getRequestURI()+"?"+request.getQueryString());
+            request.setAttribute(ASYNC_REQUEST_URI, request.getRequestURI());
             request.setAttribute(ASYNC_CONTEXT_PATH, request.getContextPath());
             request.setAttribute(ASYNC_SERVLET_PATH, request.getServletPath());
+            request.setAttribute(ASYNC_PATH_INFO, request.getPathInfo());
             request.setAttribute(ASYNC_QUERY_STRING, request.getQueryString());
         }
         final RequestDispatcher requestDispatcher = context.getRequestDispatcher(path);
