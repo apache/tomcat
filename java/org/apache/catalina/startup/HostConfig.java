@@ -603,10 +603,12 @@ public class HostConfig
         boolean isExternalWar = false;
         boolean isExternal = false;
         File expandedDocBase = null;
+        FileInputStream fis = null;
         try {
+            fis = new FileInputStream(contextXml);
             synchronized (digester) {
                 try {
-                    context = (Context) digester.parse(contextXml);
+                    context = (Context) digester.parse(fis);
                 } catch (Exception e) {
                     log.error(sm.getString(
                             "hostConfig.deployDescriptor.error",
@@ -658,6 +660,13 @@ public class HostConfig
             log.error(sm.getString("hostConfig.deployDescriptor.error",
                                    contextXml.getAbsolutePath()), t);
         } finally {
+            if (fis != null) {
+                try {
+                    fis.close();
+                } catch (IOException e) {
+                    // Ignore
+                }
+            }
             // Get paths for WAR and expanded WAR in appBase
 
             // default to appBase dir + name
