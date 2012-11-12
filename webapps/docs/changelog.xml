@@ -113,6 +113,10 @@
         (markt) 
       </fix>
       <fix>
+        <bug>54087</bug>: Correctly handle (ignore) invalid If-Modified-Since
+        header rather than throwing an exception. (markt)
+      </fix>
+      <fix>
         <bug>54096</bug>: In web.xml, &lt;env-entry&gt; should accept any type
         that has a constructor that takes a single String or char. (markt)
       </fix>
