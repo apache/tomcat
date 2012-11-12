@@ -545,10 +545,11 @@ public class HostConfig
         boolean isExternalWar = false;
         boolean isExternal = false;
         File expandedDocBase = null;
-        try {
+
+        try (FileInputStream fis = new FileInputStream(contextXml)) {
             synchronized (digester) {
                 try {
-                    context = (Context) digester.parse(contextXml);
+                    context = (Context) digester.parse(fis);
                 } catch (Exception e) {
                     log.error(sm.getString(
                             "hostConfig.deployDescriptor.error",
