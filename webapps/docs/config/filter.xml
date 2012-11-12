@@ -131,6 +131,11 @@
 
     <attributes>
 
+      <attribute name="denyStatus" required="false">
+        <p>HTTP response status code that is used when rejecting denied
+        request. The default value is <code>403</code>.</p>
+      </attribute>
+
       <attribute name="entryPoints" required="false">
         <p>A comma separated list of URLs that will not be tested for the
         presence of a valid nonce. They are used to provide a way to navigate

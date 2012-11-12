@@ -143,6 +143,11 @@
         <code>javax.servlet.async.request_uri</code> and add missing request
         attribute <code>javax.servlet.async.path_info</code>. (markt)
       </fix>
+      <add>
+        Add <code>denyStatus</code> initialization parameter to
+        <code>CsrfPreventionFilter</code>, allowing to customize the HTTP
+        status code used for denied requests. (kkolinko)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
