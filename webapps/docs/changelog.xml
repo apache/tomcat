@@ -73,6 +73,12 @@
         Apache web server. (markt)
       </add>
       <fix>
+        <bug>54007</bug>: Fix a memory leak that prevented deletion of a
+        context.xml file associated with a Context that had failed to deploy.
+        Also fix the problems uncovered with undeploying such a Context once the
+        leak had been fixed and the file could be deleted. (markt)
+      </fix>
+      <fix>
         <bug>54044</bug>: Correct bug in timestamp cache used by logging
         (including the access log valve) that meant entries could be made with
         an earlier timestamp than the true timestamp. (markt) 

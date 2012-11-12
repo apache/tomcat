@@ -242,7 +242,7 @@ public abstract class LifecycleBase implements Lifecycle {
             setStateInternal(LifecycleState.STOPPED, null, false);
 
             destroy();
-        } else {
+        } else if (!state.equals(LifecycleState.FAILED)){
             // Shouldn't be necessary but acts as a check that sub-classes are
             // doing what they are supposed to.
             if (!state.equals(LifecycleState.STOPPING)) {
@@ -272,7 +272,8 @@ public abstract class LifecycleBase implements Lifecycle {
                 stop();
             } catch (LifecycleException e) {
                 // Just log. Still want to destroy.
-                log.warn(sm.getString("lifecycleBase.destroyStopFail"), e);
+                log.warn(sm.getString(
+                        "lifecycleBase.destroyStopFail", toString()), e);
             }
         }
 
