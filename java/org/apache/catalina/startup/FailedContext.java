@@ -222,6 +222,10 @@ public class FailedContext extends LifecycleMBeanBase implements Context {
     @Override
     public void removeChild(Container child) { /* NO-OP */ }
 
+    @Override
+    public String toString() {
+        return getName();
+    }
 
     // -------------------------------------------- All NO-OPs beyond this point
     @Override
