@@ -57,6 +57,8 @@ public class CsrfPreventionFilter extends FilterBase {
 
     private Random randomSource;
 
+    private int denyStatus = HttpServletResponse.SC_FORBIDDEN;
+
     private final Set<String> entryPoints = new HashSet<>();
 
     private int nonceCacheSize = 5;
@@ -64,6 +66,24 @@ public class CsrfPreventionFilter extends FilterBase {
     @Override
     protected Log getLogger() {
         return log;
+    }
+
+    /**
+     * Return response status code that is used to reject denied request.
+     */
+    public int getDenyStatus() {
+        return denyStatus;
+    }
+
+    /**
+     * Set response status code that is used to reject denied request. If none
+     * set, the default value of 403 will be used.
+     *
+     * @param denyStatus
+     *            HTTP status code
+     */
+    public void setDenyStatus(int denyStatus) {
+        this.denyStatus = denyStatus;
     }
 
     /**
@@ -166,7 +186,7 @@ public class CsrfPreventionFilter extends FilterBase {
 
                 if (nonceCache == null || previousNonce == null ||
                         !nonceCache.contains(previousNonce)) {
-                    res.sendError(HttpServletResponse.SC_FORBIDDEN);
+                    res.sendError(denyStatus);
                     return;
                 }
             }
