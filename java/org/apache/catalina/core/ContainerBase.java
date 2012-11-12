@@ -58,6 +58,7 @@ import org.apache.catalina.Valve;
 import org.apache.catalina.Wrapper;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
+import org.apache.catalina.startup.FailedContext;
 import org.apache.catalina.util.ContextName;
 import org.apache.catalina.util.LifecycleMBeanBase;
 import org.apache.juli.logging.Log;
@@ -1342,6 +1343,9 @@ public abstract class ContainerBase extends LifecycleMBeanBase
 
             try {
                 if (container instanceof Context) {
+                    if (container instanceof FailedContext) {
+                        return;
+                    }
                     // Ensure background processing for Contexts and Wrappers
                     // is performed under the web app's class loader
                     originalClassLoader =
