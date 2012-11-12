@@ -1033,9 +1033,11 @@ public class ContextConfig implements LifecycleListener {
         }
 
         // Changed to getWorkPath per Bugzilla 35819.
-        String workDir = ((StandardContext) context).getWorkPath();
-        if (workDir != null) {
-            ExpandWar.delete(new File(workDir));
+        if (context instanceof StandardContext) {
+            String workDir = ((StandardContext) context).getWorkPath();
+            if (workDir != null) {
+                ExpandWar.delete(new File(workDir));
+            }
         }
     }
 
