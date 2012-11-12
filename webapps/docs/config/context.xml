@@ -934,13 +934,9 @@
 
       <attribute name="type" required="true">
         <p>The fully qualified Java class name expected by the web application
-        for this environment entry.  Must be one of the legal values for
+        for this environment entry.  Must be a legal value for
         <code>&lt;env-entry-type&gt;</code> in the web application deployment
-        descriptor:  <code>java.lang.Boolean</code>,
-        <code>java.lang.Byte</code>, <code>java.lang.Character</code>,
-        <code>java.lang.Double</code>, <code>java.lang.Float</code>,
-        <code>java.lang.Integer</code>, <code>java.lang.Long</code>,
-        <code>java.lang.Short</code>, or <code>java.lang.String</code>.</p>
+        descriptor.</p>
       </attribute>
 
       <attribute name="value" required="true">
