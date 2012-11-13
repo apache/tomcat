@@ -40,7 +40,7 @@ public class JasperELResolver extends CompositeELResolver {
 
     private int size;
     private ELResolver[] resolvers;
-    private int appResolversSize;
+    private final int appResolversSize;
 
     public JasperELResolver(List<ELResolver> appResolvers) {
         appResolversSize = appResolvers.size();
