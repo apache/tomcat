@@ -201,9 +201,9 @@ public class HttpParser {
 
             if (skipConstant(input, "=") == SkipConstantResult.FOUND) {
                 String value = readTokenOrQuotedString(input, true);
-                parameters.put(attribute, value);
+                parameters.put(attribute.toLowerCase(Locale.US), value);
             } else {
-                parameters.put(attribute, "");
+                parameters.put(attribute.toLowerCase(Locale.US), "");
             }
 
             lookForSemiColon = skipConstant(input, ";");
