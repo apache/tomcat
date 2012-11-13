@@ -19,6 +19,8 @@ package org.apache.tomcat.util.http.parser;
 import java.io.IOException;
 import java.io.StringReader;
 
+import junit.framework.Assert;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
@@ -256,5 +258,16 @@ public class TestMediaType {
             sb.append(value);
             return sb.toString();
         }
+    }
+
+    @Test
+    public void testCase() throws Exception {
+        StringReader sr = new StringReader("type/sub-type;a=1;B=2");
+        MediaType m = HttpParser.parseMediaType(sr);
+
+        Assert.assertEquals("1", m.getParameterValue("A"));
+        Assert.assertEquals("1", m.getParameterValue("a"));
+        Assert.assertEquals("2", m.getParameterValue("B"));
+        Assert.assertEquals("2", m.getParameterValue("b"));
     }
 }
