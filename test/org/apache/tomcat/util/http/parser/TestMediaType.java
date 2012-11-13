@@ -176,8 +176,8 @@ public class TestMediaType {
                 m.getParameterValue("Type"));
 
         String expected = "multipart/related; boundary=1_4F50BD36_CDF8C28; " +
-                "Start=\"<31671603.smil>\"; " +
-                "Type=\"application/smil;charset=UTF-8\"";
+                "start=\"<31671603.smil>\"; " +
+                "type=\"application/smil;charset=UTF-8\"";
         assertEquals(expected, m.toString());
         assertEquals(expected, m.toStringNoCharset());
         assertNull(m.getCharset());
