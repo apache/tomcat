@@ -93,7 +93,7 @@ public abstract class SimpleHttpClient {
     private String redirectUri;
 
     private String responseBody;
-    private List<String> bodyUriElments = new ArrayList<>();
+    private List<String> bodyUriElements = new ArrayList<>();
 
     protected void setPort(int thePort) {
         port = thePort;
@@ -139,7 +139,7 @@ public abstract class SimpleHttpClient {
     }
 
     public List<String> getResponseBodyUriElements() {
-        return bodyUriElments;
+        return bodyUriElements;
     }
 
     public void setUseContentLength(boolean b) {
@@ -211,7 +211,7 @@ public abstract class SimpleHttpClient {
         // clear any residual data before starting on this response
         responseHeaders.clear();
         responseBody = null;
-        bodyUriElments.clear();
+        bodyUriElements.clear();
 
         // Read the response status line
         responseLine = readLine();
@@ -332,7 +332,7 @@ public abstract class SimpleHttpClient {
                         + ELEMENT_TAIL + "]\nActual: [" + body + "]");
             }
             String element = body.substring(iStart, iEnd);
-            bodyUriElments.add(element);
+            bodyUriElements.add(element);
             iStart += element.length();
         }
         return iStart;
