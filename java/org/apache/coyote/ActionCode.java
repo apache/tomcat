@@ -192,6 +192,11 @@ public enum ActionCode {
     ASYNC_IS_TIMINGOUT,
 
     /**
+    * Callback to determine if async is in error
+    */
+    ASYNC_IS_ERROR,
+
+    /**
      * Callback to trigger the HTTP upgrade process.
      */
     UPGRADE

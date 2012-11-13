@@ -472,9 +472,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
             }
         } else {
             expected.append("onTimeout-");
-            if (dispatchUrl == null) {
-                expected.append("onError-");
-            } else {
+            if (dispatchUrl != null) {
                 expected.append("NonAsyncServletGet-");
             }
             expected.append("onComplete-");
