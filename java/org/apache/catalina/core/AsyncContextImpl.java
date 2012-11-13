@@ -431,7 +431,7 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
             try {
                 listener.fireOnError(errorEvent);
             } catch (IOException ioe) {
-                log.warn("onStartAsync() failed for listener of type [" +
+                log.warn("onError() failed for listener of type [" +
                         listener.getClass().getName() + "]", ioe);
             }
         }
