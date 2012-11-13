@@ -96,13 +96,22 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
     public void fireOnComplete() {
         List<AsyncListenerWrapper> listenersCopy = new ArrayList<>();
         listenersCopy.addAll(listeners);
-        for (AsyncListenerWrapper listener : listenersCopy) {
-            try {
-                listener.fireOnComplete(event);
-            } catch (IOException ioe) {
-                log.warn("onComplete() failed for listener of type [" +
-                        listener.getClass().getName() + "]", ioe);
+
+        ClassLoader oldCL = Thread.currentThread().getContextClassLoader();
+        ClassLoader newCL = request.getContext().getLoader().getClassLoader();
+
+        try {
+            Thread.currentThread().setContextClassLoader(newCL);
+            for (AsyncListenerWrapper listener : listenersCopy) {
+                try {
+                    listener.fireOnComplete(event);
+                } catch (IOException ioe) {
+                    log.warn("onComplete() failed for listener of type [" +
+                            listener.getClass().getName() + "]", ioe);
+                }
             }
+        } finally {
+            Thread.currentThread().setContextClassLoader(oldCL);
         }
     }
 
