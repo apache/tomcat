@@ -44,8 +44,8 @@ public class JasperELResolver extends CompositeELResolver {
 
     public JasperELResolver(List<ELResolver> appResolvers) {
         appResolversSize = appResolvers.size();
-        resolvers = new ELResolver[0];
-        size = resolvers.length;
+        resolvers = new ELResolver[appResolversSize + 7];
+        size = 0;
 
         add(new ImplicitObjectELResolver());
         for (ELResolver appResolver : appResolvers) {
@@ -63,11 +63,15 @@ public class JasperELResolver extends CompositeELResolver {
     public synchronized void add(ELResolver elResolver) {
         super.add(elResolver);
 
-        ELResolver[] nr = new ELResolver[size + 1];
-        System.arraycopy(resolvers, 0, nr, 0, size);
-        nr[size] = elResolver;
+        if (resolvers.length < size) {
+            resolvers[size] = elResolver;
+        } else {
+            ELResolver[] nr = new ELResolver[size + 1];
+            System.arraycopy(resolvers, 0, nr, 0, size);
+            nr[size] = elResolver;
 
-        resolvers = nr;
+            resolvers = nr;
+        }
         size ++;
     }
 
