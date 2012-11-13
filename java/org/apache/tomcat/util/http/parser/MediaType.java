@@ -17,6 +17,7 @@
 package org.apache.tomcat.util.http.parser;
 
 import java.util.LinkedHashMap;
+import java.util.Locale;
 import java.util.Map;
 
 public class MediaType {
@@ -59,7 +60,7 @@ public class MediaType {
     }
 
     public String getParameterValue(String parameter) {
-        return parameters.get(parameter);
+        return parameters.get(parameter.toLowerCase(Locale.US));
     }
 
     @Override
